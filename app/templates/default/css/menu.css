@@ -1,0 +1,60 @@
+.wireframemenu
+{
+border: 1px solid #C0C0C0;
+background-color: white;
+border-bottom-width: 0;
+width: 170px;
+}
+
+* html .wireframemenu
+{ /*IE only rule. Original menu width minus all left/right paddings */
+width: 170;
+}
+
+.wireframemenu ul
+{
+padding: 0;
+margin: 0;
+list-style-type: none;
+}
+
+.wireframemenu a
+{
+font: bold 12px Verdana;
+padding: 3px 2px;
+display: block;
+width: 100%; /*Define width for IE6's sake*/
+color: #595959;
+text-decoration: none;
+border-bottom: 1px dashed #C0C0C0;
+font-weight: 300;
+}
+
+.wireframemenu a:visited
+{
+color: #595959;
+}
+
+html>body .wireframemenu a
+{ /*Non IE rule*/
+width: auto;
+}
+
+.wireframemenu a:hover
+{
+background-color: #F8FBBD;
+color: black;
+}
+
+.titulo_menu
+{
+background-color: #A7DF60;
+font: bold 13px Verdana;
+padding: 4px;
+display: block;
+/*width: 100%; /*Define width for IE6's sake*/
+color: #595965;
+font-weight: bolder;
+border-bottom: 1px solid #C0C0C0;
+font-variant: small-caps;
+}

@@ -1,0 +1,51 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+td.ubicacion {
+	background-color: #FFFFFF;
+	background-repeat:repeat-y;
+	background-position:center;
+	padding: 0 20px 0 20px;
+}
+
+td.titulo_sec {
+		background-color: #FFFFFF;
+	background-repeat:repeat-y;
+	background-position:bottom;
+	padding: 0 35px 0 35px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.table_blanco {
+	background-color: #FFFFFF;
+	border: 1px solid #BDBDBD;
+}
+
+td.cont_tabla {
+		background-color: #FFFFFF;
+	background-repeat:repeat-y;
+	background-position:center;
+	padding: 0 20px 0 20px;
+}
+
+td.fondo_cierre {
+	background-color: #FFFFFF;
+	background-repeat:no-repeat;
+	background-position:top;
+	padding: 0 20px 0 20px;
+}	
+	
+.txt_peque {
+	font-size: 10px;
+}
+
+.tb_header {
+	background-color: #FFFFFF;
+}
+
+.tb_base {
+	/*width:927px;*/
+	background-color:transparent;
+}

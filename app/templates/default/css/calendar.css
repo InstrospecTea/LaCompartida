@@ -1,0 +1,99 @@
+td.cal
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #000000;
+	background-color : #FFFFFF;
+}
+
+select.month
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #000000;
+	width : 85px;
+}
+
+input.year
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #000000;
+	width : 30px;
+}
+
+.calMesAnoBar 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	font-weight: bold;
+	color : #000000;
+	background-color : #CECFFF;
+}
+
+td.calDaysColor 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	font-weight: bold;
+	color : #006500;		
+	background-color : #FFFFFF;
+}
+
+td.calWeekend 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #ffffff;
+	background-color : #E7E3E7;
+}	
+
+td.calBgColor 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #ffffff;
+	background-color : #FFFFFF;
+}
+
+.calBorderColor 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #ffffff;
+	background-color : #31309C;
+}
+
+td.calHighlightColor 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #ffffff;
+	background-color : #ffffcc;
+}
+
+A.cal 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #000000;
+	text-decoration : none;
+}	
+
+A.cal:Hover 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	font-weight: bold;
+	color : #FF0000;
+	text-decoration : underline;
+} 
+
+.disabled 
+{
+	font-family : Arial,Helvetica,Sans-serif;
+	font-size : 10px;
+	color : #808080;
+	text-decoration : none;
+}	
+

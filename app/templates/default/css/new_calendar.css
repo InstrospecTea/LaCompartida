@@ -1,0 +1,134 @@
+
+/*to get round corners*/
+b.rtop{display:block;background: transparent;}
+b.rtop b{display:block;height: 1px; overflow: hidden; background: #608294}
+b.r1{margin: 0 5px}
+b.r2{margin: 0 3px}
+b.r3{margin: 0 2px}
+b.rtop b.r4{margin: 0 1px;height: 2px}
+
+
+/*Styles for date picker*/
+
+.floating{
+	background-color: White;
+	margin:0px;
+	border:1px solid #bfcdd4;
+	font-family: Arial;
+	font-size:12px;
+	width:219px; /* cellwidth * 7 + cellpadding * 14 + cellborder * 14 */
+	display:block;
+	padding:0px;
+	min-height:175px;
+}
+.floating:hover{
+	cursor:pointer;
+	/*cursor:hand; /* If you're worried about old IE versions, turn this on.  I have it off because I hate seeing css exceptions in my debug window. ;) */
+}
+.floating .calwrapper{
+	display:block;
+}
+.floating .calweekswrapper{
+	display:block;
+	border: solid 1px White;
+}
+.floating .calheader{
+	display: block;
+	width:100%;
+	text-align:center;
+	color:#CF6228;
+	font-size:13px;
+	font-weight: bold;
+	background-color: #EEF3F6;
+	padding-bottom: 2px;
+}
+.floating .caltitle{
+	width:auto;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+.floating .calcontrol{
+	font-weight: bold;
+	width:20px;
+	background: transparent no-repeat center center;
+}
+
+.floating .calcontrol:hover{
+}
+.floating .calclose{
+	float:right;
+	display:block;
+	background-image: url(../../img/close.jpg);
+}
+.floating .calprevmonth{
+	float:left;
+	/*background-image: url(images/calendar/month-previous.jpg);*/
+}
+.floating .calnextmonth{
+	float:right;
+	/*background-image: url(images/calendar/month-next.jpg);*/
+}
+.floating .calnextyear{
+	float:right;
+	/*background-image: url(images/calendar/year-next.jpg);*/
+}
+.floating .calprevyear{
+	float:left;
+	/*background-image: url(images/calendar/year-previous.jpg);*/
+}
+.floating .daybox{
+	float:left;
+	background-color: white;
+	border:1px solid white;
+	width:25px;
+	padding:2px;
+	color:black;
+	text-align:center;	
+}
+.floating .dayboxvalue{
+	display: none;
+}
+.floating .dayboxname{
+	border: 1px solid #EEF3F6;
+	background-color: #EEF3F6;
+	color:#6190AA;
+}
+.floating .dayboxsunday{
+	background-color: White;
+	border: 1px solid White;
+}
+.floating .dayboxsaturday{
+	background-color: White;
+	border: 1px solid White;
+}
+.floating .daybox:hover{
+}
+.floating .dayboxname:hover{
+}
+.floating .dayinmonth{
+	color:#6190AA;
+}
+.floating .dayoutmonth{
+	color:gray;
+}
+.floating .dayselected{
+	background-color: #A8D67A;
+	color: #000000;
+}
+.floating .daycurrent{
+	border:1px solid #666666;
+}
+.floating .weekbox{
+	width:100%;
+	min-height:21px;
+	display:block;
+	margin-top:3px;
+	background-color: #EEF3F6;
+}
+.floating .endweek{
+	float:left;
+}
+.floating .weekboxname{
+	background-color: #EEF3F6;
+}

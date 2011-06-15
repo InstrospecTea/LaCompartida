@@ -1,0 +1,33 @@
+/* 
+ * ---------------------------------------------------------------------- 
+ * WebDate                                                                
+ *                                                                        
+ * Version: 1.1                                                           
+ * Release date: 2005.01.30                                               
+ *                                                                        
+ * Copyright (c) Amir Firdus, 2005.                                       
+ * All rights reserved.                                                   
+ *                                                                        
+ * License:                                                               
+ * This software is free to use and distribute as long as the             
+ * link to Firdus Software web site (www.firdus.com) is not removed.      
+ * Removing the link requires author's permission and it may cost money.  
+ * ---------------------------------------------------------------------- 
+ */
+
+div#fs-pat-div {position:absolute;z-index:1;background:#f0f0f0;border:1px solid #000000;visibility:hidden;font-family:verdana,sans-serif;}
+
+div#fs-pat-div a {text-decoration:none;}
+div#fs-pat-div a:hover{text-decoration:underline}
+
+div#fs-pat-div table {text-align:center;font-size:10px;}
+
+div#fs-pat-div .date {background:#ffffff;width:30px;color:#000000;}
+div#fs-pat-div .task {background:#f1eeda;}
+
+div#fs-pat-div .logoLink {color:#999999;}
+div#fs-pat-div .taskLink {color:#336699;}
+
+div#fs-pat-div .buttonOut {background:#d8d8a8;color:#336699;border-style:solid;border-color:#ffffff #999999 #999999 #ffffff;border-width:1px;cursor:crosshair;}
+div#fs-pat-div .buttonIn {background:#d8d8a8;color:#336699;border-style:solid;border-color:#999999 #ffffff #ffffff #999999;border-width:1px;cursor:crosshair;}
+

@@ -1,0 +1,53 @@
+<?
+class Conf
+{
+	function AppName() { return 'Lemontech - The Time Billing'; }
+	function ServerIP() { return 'lab.lemontech.cl'; }
+	function ServerDir() { return dirname(__FILE__); }
+	function RootDir() { return '/smoers/time_tracking'; }
+	function ImgDir() { return Conf::RootDir().'/app/templates/'.Conf::Templates().'/img'; }
+	function dbHost() { return 'localhost'; }
+	function dbName() { return 'time_tracking'; }
+	function dbUser() { return 'time_tracking'; }
+	function dbPass() { return '.tt.'; }
+	function logoutRedirect() { return Conf::RootDir().'/index.php?logout'; }
+	function Hash() { return 'c85ef9997e6a30032a765a20ee69630b'; }
+	function TimestampDeployJS(){ return '1234370043'; }
+	function TimestampDeployCSS(){ return '1226330411'; }
+	function HostJuicios() { return Conf::Server()."/smoers/juicios/fw/usuarios/index.php"; }
+	function UsuarioWS() { return 'Lemontech_SAP'; }
+	function PasswordWS() { return 'U72N4Y69l073u4641R6B'; }
+	function LangDefecto() { return "abogado_materia"; }
+	function LogoExcel() { return Conf::ServerDir().'/templates/'.Conf::Templates().'/img/logo_cg3.bmp'; }
+	function Logo($fullPath=false) { return ($fullPath?Conf::Server():'').Conf::ImgDir().'/logo_tt.jpg'; }
+	function LogoDoc($fullPath=false) { return ($fullPath?Conf::Server():'').Conf::ImgDir().'/logo_tt.jpg'; } 
+	function RutaGraficos() { return "/usr/share/php/ChartDirector/lib/phpchartdir.php"; }
+	function RutaPdf() { return "/var/www/lemontech.cl/public_html/pruebas/lme/libs/fpdf/fpdf.php"; }
+	function DireccionPdf() { return "Estudio Lemontech\nTorremolinos 70, Oficina 4\nCP 7550159 Las Condes\nSantiago, Chile\nTf. +56-2 2299243\ninfo@lemontech.cl";}
+	function LogoPdf($fullPath=true) { return ($fullPath?Conf::Server():'').Conf::ImgDir().'/logo_pdf.jpg'; }
+	function Templates() { return "default"; }
+	function MantencionTablas() { return array('grupo_cliente','prm_comuna','prm_tipo_proyecto','prm_moneda'); }
+	function Host() { return Conf::Server()."/smoers/time_tracking/"; }
+	function GlosaTablas()
+	{
+		$glosa['prm_comuna'] = "glosa_comuna";
+		$glosa['cliente'] = "cliente";
+		$glosa['asunto'] = "glosa_asunto";
+		return $glosa;
+	}
+	function Locale() { return array('es_CL','es_ES'); }
+	function NombreIdentificador() {return 'RUT'; }
+	function Server() { return "http://lab.lemontech.cl"; }
+	function GetConf($sesion, $glosa_opcion)
+	{
+				$query_conf = "SELECT valor_opcion FROM configuracion WHERE glosa_opcion='$glosa_opcion'";
+				$resp_conf = mysql_query($query_conf, $sesion->dbh) or Utiles::errorSQL($query_conf, __FILE__, __LINE__, $sesion->dbh);
+				list($valor_opcion) = mysql_fetch_array($resp_conf);
+				return $valor_opcion;
+	}
+}
+
+require_once Conf::ServerDir().'/../app/lang/es.php';		//Para que cargue el idioma por defecto
+require_once Conf::ServerDir().'/../app/lang/abogado.php';	//Por si hay palabras especificas relacionadas con el rubro
+?>
+

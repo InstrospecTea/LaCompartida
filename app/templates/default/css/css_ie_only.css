@@ -1,0 +1,349 @@
+@charset "utf-8";
+/* CSS Document */
+
+/** Por izquínas redondas. **/
+
+.spiffy{display:block}
+
+.spiffy *{
+display:block;
+height:1px;
+overflow:hidden;
+font-size:.01em;
+background:#E0E0E0;
+}
+
+.spiffy1{
+margin-left:3px;
+margin-right:3px;
+padding-left:0px;
+padding-right:0px;
+border-left:1px solid #E0E0E0;
+border-right:1px solid #E0E0E0;
+background:#A0A0A0;
+}
+
+a:hover .spiffy1,
+li[active=true] .spiffy1{
+	margin-left:3px;
+margin-right:3px;
+padding-left:0px;
+padding-right:0px;
+border-left:1px solid #42a62b;
+border-right:1px solid #42a62b;
+background:#A0A0A0;
+}
+
+.spiffy2{
+margin-left:1px;
+margin-right:1px;
+padding-right:0px;
+padding-left:0px;
+border-left:1px solid #E0E0E0;
+border-right:1px solid #E0E0E0;
+background:#A0A0A0;
+}
+
+a:hover .spiffy2,
+li[active=true] .spiffy2{
+	margin-left:1px;
+margin-right:1px;
+padding-right:0px;
+padding-left:0px;
+border-left:1px solid #42a62b;
+border-right:1px solid #42a62b;
+background: #A0A0A0;
+}
+
+.spiffy3{
+margin-left:1px;
+margin-right:1px;
+border-left:1px solid #E0E0E0;
+border-right:1px solid #E0E0E0;
+background: #A0A0A0;
+}
+
+a:hover .spiffy3,
+li[active=true] .spiffy3{
+margin-left:1px;
+margin-right:1px;
+border-left:1px solid #42a62b;
+border-right:1px solid #42a62b;
+background: #A0A0A0;
+}
+
+.spiffy4{
+border-left:1px solid #E0E0E0;
+border-right:1px solid #E0E0E0;
+background: #A0A0A0;
+}
+
+a:hover .spiffy4,
+li[active=true] .spiffy4{
+border-left:1px solid #42a62b;
+border-right:1px solid #42a62b;
+background: #A0A0A0;
+}
+
+.spiffy5{
+border-left:1px solid #E0E0E0;
+border-right:1px solid #E0E0E0;
+background: #A0A0A0;
+}
+
+a:hover .spiffy5,
+li[active=true] .spiffy5{
+border-left:1px solid #42a62b;
+border-right:1px solid #42a62b;
+background: #A0A0A0;
+}
+
+.spiffyfg{
+background:#E0E0E0;
+color:#346700;
+padding: 0 0 2px 0px;
+margin: 0;
+text-align:center;
+}
+
+.spiffyfg span {
+	color:#346700;
+}
+
+li[active=true] a .spiffyfg span,
+a:hover .spiffyfg span{
+	color:#FFFFFF;
+}
+
+li[active=true] a .spiffyfg,
+a:hover .spiffyfg{
+	background:#42a62b;
+	color:#FFFFFF;
+	padding: 0 0 2px 0px;
+	margin: 0;
+	text-align:center;
+}
+	
+	.droplinetabs{
+overflow: hidden;
+}
+
+
+.submenu {
+ display: block;
+}
+ 
+.droplinetabs ul{
+font: bold 13px Tahoma, Arial, Geneva, sans-serif;
+text-transform: capitalize;
+letter-spacing: 0px;
+margin: 0;
+padding: 0;
+width: 100%;
+list-style: none;
+}
+
+.droplinetabs ul li ul{
+font: bold 12px Tahoma, Arial, Geneva, sans-serif;
+text-transform: capitalize;
+letter-spacing: 0px;
+margin: 0;
+padding: 0;
+width: 100%;
+list-style: none;
+}
+
+.barra_fija ul {
+	font: bold 12px Tahoma, Arial, Geneva, sans-serif;
+	text-transform: capitalize;
+	letter-spacing: 0px;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	list-style:none;
+}
+
+.barra_fija li, 
+.droplinetabs li{
+display: inline;
+margin: 0 2px 0 0;
+padding: 0;
+text-transform: capitalize;
+}
+
+
+
+.droplinetabs a{
+float: left;
+color: #346700;
+background: #A0A0A0; /*default background color of tabs, left corner image*/
+margin: 0 4px 0 0px;
+text-decoration: none;
+letter-spacing: 0px;
+}
+
+ 
+.droplinetabs a span{
+float: left;
+display: block;
+background: transparent; 
+padding: 2px 7px 3px 7px;
+cursor: pointer;
+}
+
+.barra_fija a {
+	float: left;
+color: #346700;
+background: #A0A0A0; /*default background color of tabs, left corner image*/
+margin: 0 4px 0 0px;
+padding: 4px 2px 0 2px;
+text-decoration: none;
+letter-spacing: 0px;
+}
+
+.droplinetabs a .color_activo{
+	background: #E0E0E0;
+}
+
+.droplinetabs a:hover .color_activo,
+li[active=true] a .color_activo {
+	background: #42a62b;
+}
+
+.barra_fija a span, 
+.droplinetabs li li a span {
+float: left;
+display: block;
+background: transparent; 
+margin: 0;
+padding: 3px 7px 3px 7px;
+cursor: pointer;
+}
+
+.droplinetabs a span{
+float: none;
+}
+
+.barra_fija li a {
+background-color: #42a62b; /*background color of tabs onMouseover*/
+color: white;
+}
+
+.droplinetabs a:hover {
+	background-color: #A0A0A0;
+	color:white;
+	text-decoration: underline;
+}
+
+.barra_fija li[active=true] a span, 
+.droplinetabs a:hover span,
+.droplinetabs li[active=true] a span {
+background-color: #42a62b;
+}
+
+
+/* Sub level menus*/
+.barra_fija ul li ul, 
+.droplinetabs ul li ul{
+position: absolute;
+z-index: 100;
+left: 0;
+top: 0;
+background: #42a62b; /*sub menu background color */
+visibility: hidden;
+}
+
+
+/* Sub level menus*/
+.barra_fija ul li[active=true] ul, 
+.droplinetabs ul li[active=true] ul{
+position: absolute;
+z-index: 100;
+left: 0;
+top: 0;
+background: transparent; /*sub menu background color */
+visibility: visible;
+}
+	
+
+/* Sub level menu links style */
+.droplinetabs ul li ul li a{
+color: white;
+font: normal 12px Tahoma, Arial, Geneva, sans-serif;
+text-transform: capitalize;
+padding: 7px;
+padding-left: 9px;
+padding-right: 13px;
+margin: 0;
+background: #42a62b; /*sub menu background color */
+}
+
+.barra_fija ul li ul li a span, 
+.droplinetabs ul li ul li a span{
+background: #42a62b; /*sub menu background color */
+}
+
+.barra_fija ul a:hover { /*sub menu links' background color onMouseover. Add rounded edges in capable browsers */
+background:#42a62b;
+padding: 4px 6px 0 2px;
+margin: 0;
+text-decoration: underline;
+}
+
+
+
+.barra_fija li[activo_adentro=true] a { 
+	text-decoration: underline;
+}
+
+.droplinetabs ul li ul a:hover {
+	background:#42a62b;
+padding: 7px 13px 0 9px;
+margin: 0;
+text-decoration: underline;
+}
+
+body {
+	font-family: Tahoma, Arial, Geneva, sans-serif;
+	font-size: 12px;
+	}
+
+.text_bold {
+	font-weight: bold;
+}
+
+.dest_verde {
+	color: #6bb60c;
+	font-weight:500;
+}
+
+.blanco {
+	color: #FFFFFF;
+	font-color: #FFFFFF;
+}
+
+
+
+/*MENU CSS:*/
+
+
+/* IE6 only */
+.nav table  {
+border-collapse:collapse; 
+margin:-1px;
+font-size:1em; 
+width:0; 
+height:0;
+}
+
+#dhtmlpointer {
+	display: none;
+}
+
+
+#fd_menu_grey {
+	background-color: #42a62b;
+	position:static;
+	height:30px;
+	width:980px;	 
+}

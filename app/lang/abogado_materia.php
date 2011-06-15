@@ -1,0 +1,46 @@
+<?
+
+$_LANG['asunto'] =  "materia";
+$_LANG['Asunto'] =  "Materia";
+$_LANG['asuntos'] =  "materias";
+$_LANG['Asuntos'] =  "Materias";
+$_LANG['Código asunto'] = "Código materia";
+$_LANG['Título asunto'] = "Título materia";
+$_LANG['glosa_asunto'] = "Materia";
+$_LANG['prm_area_proyecto.glosa'] = "Área Materia";
+$_LANG['Debes guardar primero el contrato para seleccionar los asuntos'] = "Debes guardar primero el contrato para seleccionar las materias";
+$_LANG['Listado de asuntos'] = "Listado de materias";
+$_LANG['Emitir Cobro :: Selección de asuntos'] = "Emitir Cobro :: Selección de materias";
+$_LANG['Categoria de'] = "Categoría de materia";
+$_LANG['Para ingresar una actividad genérica, deje el campo asunto en blanco y estará disponible para todos los asuntos'] = "Para ingresar una actividad genérica, deje el campo materia en blanco y estará disponible para todos los materias";
+$_LANG['El Trabajo se guardó como NO COBRABLE ya que el asunto está marcado de esta manera.'] = "El Trabajo se guardó como NO COBRABLE ya que la materia está marcado de esta manera.";
+$_LANG['Existe un asunto con el mismo código, por favor seleccione otro código'] = "Existe una materia con el mismo código, por favor seleccione otro código";
+$_LANG['Asunto guardado con éxito'] = "Materia guardado con éxito";
+$_LANG['El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo'] = "El código ingresado ya se encuentra asignado a otra materia. Por favor ingrese uno nuevo";
+$_LANG['El último asunto ingresado es'] = "La última materia ingresado es";
+$_LANG['Categoría de asunto'] = "Categoría de materia";
+$_LANG['Tip tasa'] = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada materia.";
+$_LANG['Tip suma'] = "Es un único monto de dinero para la materia. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de cobro que no puede tener límites.";
+$_LANG['Tip flat'] = "El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de esta materia. Puede tener límites por HH o monto total";
+$_LANG['Debe seleccionar un asunto para este reporte'] = "Debe seleccionar una materia para este reporte";
+$_LANG['Reporte Gráfico asuntos'] = "Reporte Gráfico materias";
+$_LANG['Horas trabajadas por asunto'] = "Horas trabajadas por materia";
+$_LANG['hr_asunto_cobrable'] = "Hrs. Trabajadas(Materias Cobrables)";
+$_LANG['hr_asunto_no_cobrable'] = "Hrs. Trabajadas(Materias No Cobrables)";
+$_LANG['No se puede eliminar un'] = "No se puede eliminar un";
+$_LANG['tipo_asunto'] = "Tipo Materia";
+$_LANG['area_asunto'] = "Area Materia";
+$_LANG['%asunto_mb%'] = "Ref.:";
+$_LANG['glosa_asunto'] = "Materia";
+$_LANG['prm_area_proyecto.glosa'] = "Área de materia";
+$_LANG['MailAsuntoNuevo'] = "Enviar mail por materia nueva";
+$_LANG['CorreosModificacionAdminDatos'] = "Enviar email por modificación de materia";
+$_LANG['Agregar Asunto'] = "Agregar Materia";
+$_LANG['Asunto guardado con éxito'] = "Materia guardado con éxito";
+$_LANG['Profesional vs. Asunto'] = "Profesional vs. Materia";
+$_LANG['Asuntos trabajados'] = "Materias trabajados";
+$_LANG['ASUNTO'] = "MATERIA";
+$_LANG['Asunto carta'] = "Materia";
+
+
+?>

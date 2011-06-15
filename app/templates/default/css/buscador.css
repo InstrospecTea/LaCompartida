@@ -1,0 +1,136 @@
+table.buscador
+{
+	border:0px solid black; 
+	border-collapse: collapse;
+	padding: 2px;
+}
+
+td.buscador
+{
+	font-size: 10px;
+	font-weight: normal;
+	color: #000000;
+	padding: 3px;
+	vertical-align: middle;
+}
+.titulo_buscador
+{
+	text-align: left;
+	font-size: 18px;
+}
+.subtitulo_buscador
+{
+	text-align:left; 
+	font-size:10px; 
+	color:#666666;
+}
+.pagination{
+padding: 2px;
+text-align: center;
+}
+
+.pagination ul{
+margin: 0;
+padding: 0;
+text-align: center; 
+font-size: 12px;
+}
+
+.pagination li{
+list-style-type: none;
+display: inline;
+padding-bottom: 1px;
+}
+
+.pagination a, .pagination a:visited
+{
+font-size: 12px;
+padding: 0 5px;
+border: 1px solid #000000;
+text-decoration: none; 
+color: #6CA522;
+}
+
+.pagination a:hover, .pagination a:active
+{
+border: 1px solid #6CA522;
+color: #000;
+background-color: lightyellow;
+}
+
+.pagination li.currentpage
+{
+font-weight: bold;
+padding: 0 5px;
+border: 1px solid navy;
+background-color: #6CA522;
+color: #FFF;
+}
+
+.pagination li.disablepage
+{
+padding: 0 5px;
+border: 1px solid #929292;
+color: #929292;
+}
+
+.pagination li.nextpage
+{
+font-weight: bold;
+}
+
+* html .pagination li.currentpage, * html .pagination li.disablepage
+{ 
+/*IE 6 and below. Adjust non linked LIs slightly to account for bugs*/
+margin-right: 5px;
+padding-right: 0;
+}
+/*tr.pie_buscador
+{
+	border: 1px solid black;
+    font-style: normal;
+    color: #ffffff;
+	background-color: #6CA522;
+	height: 20px;
+}
+td.pie_buscador
+{
+	font-size: 10px;
+	font-weight: normal;
+	padding: 2px;
+	vertical-align: middle;
+}
+a.pie_buscador
+{
+	color: #ffffff;
+	text-decoration: none;
+	font-size: 10px;
+}
+a.pie_buscador_sel
+{
+	color: #ffffff;
+	font-weight: bolder;
+	text-decoration: none;
+	font-size: 12px;
+}
+*/
+tr.encabezado
+{
+	border: 1px solid black;
+}
+td.encabezado
+{
+    font-style: normal;
+    color: #ffffff;
+	background-color: #6CA522;
+	height: 20px;
+	font-size: 12px;
+	vertical-align: middle;
+	text-align: center;
+}
+a.encabezado
+{
+	font-size: 12px;
+	color: #ffffff;
+	text-decoration: none;
+}

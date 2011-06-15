@@ -1,0 +1,36 @@
+
+form#config a.login, 
+form#config a.goback {
+	margin: 0 10px 10px 10px;
+}
+
+ul#job_list li span.client {
+	font-size:12pt;
+	display:block;
+}
+
+ul#job_list li span.subject {
+	font-size:10pt;
+	display:block;
+}
+
+.action_button, .action {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#53b401), to(#208100));
+  text-align: center;
+  text-shadow: rgba(0,0,0,.7) 0 2px 2px;
+  -webkit-box-shadow: rgba(0,0,0,.3) 2px 2px 3px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.action_button {
+    display: block;
+    border-width: 12px;
+    padding: 10px;
+    text-decoration: inherit;
+    color: inherit;
+    color: #FFFFFF;
+    -webkit-border-radius: 7px;
+		margin:10px;
+}
+
