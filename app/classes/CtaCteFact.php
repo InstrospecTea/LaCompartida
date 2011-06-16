@@ -176,6 +176,7 @@ class CtaCteFact extends Objeto
 		$monto = $pago->fields['monto'];
 		$id_moneda = $pago->fields['id_moneda'];
 		$monto_moneda_cobro = $pago->fields['monto_moneda_cobro'];
+		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
 		$tipo_doc = $pago->fields['tipo_doc'];
 		$numero_doc = $pago->fields['nro_documento'];
 		$numero_cheque = $pago->fields['nro_cheque'];
@@ -246,7 +247,7 @@ class CtaCteFact extends Objeto
 		$id_documento = $mvto->GetIdDocumentoLiquidacionSoyMvto();
 		if( $id_documento )
 			$documento->Load( $id_documento );
-		$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
+		$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
 	}
 	
 	//elimina los neteos de las cosas q el mvto esta pagando, y retorna el saldo liberado

@@ -387,9 +387,9 @@
 			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
 			monto -= Redondear(saldo_individual, cifras_decimales);
 		});
-		monto = Redondear(($('monto_moneda_cobro').value - monto), cifras_decimales);
+		monto = Redondear(monto, cifras_decimales);
 		if(monto > 0 && !confirm('<?=__("El monto ingresado excede el saldo a pagar")?> ('+
-			(monto)+')\n<?=__("¿Está seguro que desea continuar?")?>')){
+			Redondear(($('monto_moneda_cobro').value - monto), cifras_decimales)+')\n<?=__("¿Está seguro que desea continuar?")?>')){
 			continuar = 0;
 		}
 	}
