@@ -291,7 +291,9 @@ class Factura extends Objeto
 					$html2 = str_replace('%glosa_mes%', str_replace($meses_org,$mes_largo_es,date( 'M' ,strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%num_anio%', date( 'Y' ,strtotime($fecha_factura)), $html2);
 					$html2 = str_replace('%num_mes%', date( 'm' ,strtotime($fecha_factura)), $html2);
-					$html2 = str_replace('%num_anio_2cifras%', date( 'y' ,strtotime($fecha_factura)), $html2);		
+					$html2 = str_replace('%num_anio_2cifras%', date( 'y' ,strtotime($fecha_factura)), $html2);
+					$fecha_2_cifras = date( 'y' ,strtotime($fecha_factura));
+					$html2 = str_replace('%num_anio_ultimacifra%', $fecha_2_cifras[1], $html2);
 
 
 

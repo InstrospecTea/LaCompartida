@@ -36,7 +36,7 @@
 			<? 
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists( 'Conf', 'UsaDisenoNuevo' ) && Conf::UsaDisenoNuevo() ) ) 
 				{ ?>
-					<img src="<?=Conf::ImgDir()?>/logo_lemontech_TTB.jpg" width="175" height="70" />
+					<img src="<?=Conf::ImgDir()?>/logo_lemontech_ttb.jpg" width="175" height="70" />
 		<?	}
 			else 
 				{ ?>

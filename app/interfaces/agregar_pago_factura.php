@@ -220,7 +220,7 @@
 			ids = elem.id.split('_');
 			var saldo_fact = Number($('x_saldo_hide_'+ids[1]).value);
 			if(Number(elem.value) > saldo_fact) elem.value = saldo_fact;
-			monto += Redondear(elem.value, cifras_decimales);
+			monto += Number(Redondear(elem.value, cifras_decimales));
 		});
 		$('monto_moneda_cobro').value = Redondear(monto, cifras_decimales);
 
@@ -385,9 +385,9 @@
 		$$('[id^="saldo_"]').each(function(elem){
 			ids = elem.id.split('_');
 			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
-			monto -= Redondear(saldo_individual, cifras_decimales);
+			monto -= Number(Redondear(saldo_individual, cifras_decimales));
 		});
-		monto = Redondear(monto, cifras_decimales);
+		monto = Number(Redondear(monto, cifras_decimales));
 		if(monto > 0 && !confirm('<?=__("El monto ingresado excede el saldo a pagar")?> ('+
 			Redondear(($('monto_moneda_cobro').value - monto), cifras_decimales)+')\n<?=__("¿Está seguro que desea continuar?")?>')){
 			continuar = 0;

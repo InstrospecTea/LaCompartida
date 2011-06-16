@@ -8,7 +8,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/Funciones.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-
+ 
 	$sesion = new Sesion(array('ADM', 'COB'));
 	set_time_limit(400);
 	ini_set("memory_limit","256M");
@@ -38,13 +38,15 @@
 		$where_cobro .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 	if($id_grupo_cliente)
 		$where_cobro .= " AND cliente.id_grupo_cliente = '$id_grupo_cliente' ";
+	
 	if($forma_cobro)
-		$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
+	   $where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	if($tipo_liquidacion){ //1:honorarios, 2:gastos, 3:mixtas
-		$incluye_honorarios = $tipo_liquidacion&1 ? true : false;
-		$incluye_gastos = $tipo_liquidacion&2 ? true : false;
-		$where_cobro .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
+	   $incluye_honorarios = $tipo_liquidacion&1 ? true : false;
+	   $incluye_gastos = $tipo_liquidacion&2 ? true : false;
+	   $where_cobro .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
 	}
+
 
 	if(!$id_cobro)
 		{
@@ -161,6 +163,40 @@ $mostrar_resumen_de_profesionales = 1;
 												'FgColor' => '37',
 												'Color' => 'black',
 												'TextWrap' => '0'));
+	
+		//Retorna el timestamp excel de la fecha
+		function fecha_valor($fecha)
+		{
+			$fecha = explode('-',$fecha);
+			if(sizeof($fecha)!=3)
+				return 0;
+			// number of seconds in a day
+			$seconds_in_a_day = 86400;
+			// Unix timestamp to Excel date difference in seconds
+			$ut_to_ed_diff = $seconds_in_a_day * 25569;
+
+			$time = mktime(0,0,0,$fecha[1],$fecha[2],$fecha[0]);
+			$time_max = mktime(0,0,0,$fecha[1],$fecha[2],'2037');
+	
+			if($fecha[0] != '0000')
+			{
+				if(floatval($fecha[0]) <= 2040)
+					return floor(($time + $ut_to_ed_diff) / $seconds_in_a_day);
+				else
+					return floor(($time_max + $ut_to_ed_diff) / $seconds_in_a_day);
+			}
+			return 0;
+		}
+		//Imprime la Fecha en formato timestap excel
+		function fecha_excel($worksheet, $fila, $col, $fecha, $formato, $default='00-00-00')
+		{
+			$valor = fecha_valor($fecha);
+			if(!$valor)
+				$valot = fecha_valor($default);
+
+			$worksheet->writeNumber($fila, $col, $valor, $formato);
+		}
+
 					
 										  
 		// Definimos las columnas, mantenerlas así permite agregar nuevas columnas sin tener que rehacer todo.
@@ -247,7 +283,7 @@ $mostrar_resumen_de_profesionales = 1;
 				
 				// Es necesario setear estos valores para que la emisión masiva funcione.
 				$filas = 0;
-
+ 
 				// Indicaciones correspondiente a la modificacion de trabajos desde el excel
 				++$filas;	
 				$ws->write($filas, $col_descripcion, 'INSTRUCCIONES:', $formato_instrucciones12);
@@ -363,6 +399,15 @@ $mostrar_resumen_de_profesionales = 1;
 				}
 			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 			$idioma->Load($cobro->fields['codigo_idioma']);
+			$ff = str_replace('%d','DD',$idioma->fields['formato_fecha']);
+			$ff = str_replace('%m','MM',$ff);
+			$ff = str_replace('%y','YY',$ff);
+			$formato_fecha =& $wb->addFormat(array('Size' => 7,
+									'Valign' => 'top',
+									'Color' => 'black'));
+			$formato_fecha->setNumFormat($ff.';[Red]@ "'.__("Error: Formato incorrecto de fecha").'"');
+
+
 			
 			// Estas variables son necesario para poder decidir si se imprima una tabla o no, 
 			// generalmente si no tiene data no se escribe 
@@ -597,7 +642,10 @@ $mostrar_resumen_de_profesionales = 1;
 					$filas2 = $filas;
 
 					$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'fecha', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
-					$ws->write($filas++, $col_abogado, ($trabajo->fields['fecha_emision'] == '0000-00-00' or $trabajo->fields['fecha_emision'] == '') ? Utiles::sql2fecha(date('Y-m-d'), $idioma->fields['formato_fecha']) : Utiles::sql2fecha($trabajo->fields['fecha_emision'], $idioma->fields['formato_fecha']), $formato_encabezado);
+
+					fecha_excel($ws,$filas++,$col_abogado,$trabajo->fields['fecha_emision'],$formato_fecha);
+
+					//$ws->write($filas++, $col_abogado, ($trabajo->fields['fecha_emision'] == '0000-00-00' or $trabajo->fields['fecha_emision'] == '') ? Utiles::sql2fecha(date('Y-m-d'), $idioma->fields['formato_fecha']) : Utiles::sql2fecha($trabajo->fields['fecha_emision'], $idioma->fields['formato_fecha']), $formato_encabezado);
 
 					// Se saca la fecha inicial según el primer trabajo
 					// esto es especial para LyR
@@ -624,11 +672,14 @@ $mostrar_resumen_de_profesionales = 1;
 					if( $fecha_primer_trabajo && $fecha_primer_trabajo != '0000-00-00' )
 						{
 							$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'fecha_desde', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
-							$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_inicial_primer_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
+
+							fecha_excel($ws,$filas++,$col_abogado,$trabajo->fields['fecha_inicial_primer_trabajo'],$formato_fecha);
+							//$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_inicial_primer_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
 						}
 
 					$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'fecha_hasta', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
-					$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_final_ultimo_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
+					fecha_excel($ws,$filas++,$col_abogado,$trabajo->fields['fecha_final_ultimo_trabajo'],$formato_fecha);
+					//$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_final_ultimo_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
 
 					// Si hay una factura asociada mostramos su número.
 					if( $cobro->fields['documento'])
@@ -873,7 +924,8 @@ $mostrar_resumen_de_profesionales = 1;
 									for($i=0;$i<$lista_trabajos->num;$i++)
 									{
 										$trabajo = $lista_trabajos->Get($i);
-										$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
+										fecha_excel($ws,$filas,$col_fecha,$trabajo->fields['fecha'],$formato_fecha);
+										//$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
 										if(!$opc_ver_asuntos_separados)
 											$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $formato_descripcion);
 										$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $formato_descripcion);
@@ -1047,7 +1099,8 @@ $mostrar_resumen_de_profesionales = 1;
 														$duracion='-';
 									
 													$ws->write($filas, $col_id_trabajo, $tramite->fields['id_tramite'], $formato_normal);
-													$ws->write($filas, $col_fecha, Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
+													fecha_excel($ws,$filas,$col_fecha,$tramite->fields['fecha'],$formato_fecha);
+													//$ws->write($filas, $col_fecha, Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
 													$ws->write($filas, $col_abogado, $tramite->fields['username'], $formato_normal);
 													if(!$opc_ver_asuntos_separados)
 														$ws->write($filas, $col_abogado+1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
@@ -1240,7 +1293,8 @@ $mostrar_resumen_de_profesionales = 1;
 							for($i=0;$i<$lista_gastos->num;$i++)
 							{
 								$gasto = $lista_gastos->Get($i);
-								$ws->write($filas, $col_descripcion-1, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
+								fecha_excel($ws,$filas,$col_descripcion-1,$gasto->fields['fecha'],$formato_fecha);
+								//$ws->write($filas, $col_descripcion-1, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
 								$ws->write($filas, $col_descripcion, $gasto->fields['descripcion'], $formato_descripcion);
 								if($gasto->fields['egreso'])
 									$ws->writeNumber($filas, $col_descripcion+1, $gasto->fields['monto_cobrable']*($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']), $formato_moneda_gastos);

@@ -12,7 +12,7 @@ class Trabajo extends Objeto
 	var $etapa = null;
 	//Primera etapa del proyecto
 	var $primera_etapa = null;
-
+ 
 	var $monto = null;
 
 	function Trabajo($sesion, $fields = "", $params = "")
@@ -143,6 +143,17 @@ class Trabajo extends Objeto
 			return true;
 	}
 
+	static function FechaExcel2sql($dias)
+	{
+		// number of seconds in a day
+		$seconds_in_a_day = 86400;
+		// Unix timestamp to Excel date difference in seconds
+		$ut_to_ed_diff = $seconds_in_a_day * 25569;
+		
+		return gmdate('Y-m-d',($dias * $seconds_in_a_day)-$ut_to_ed_diff);
+	}
+
+
 	static function ActualizarConExcel($archivo_data, $sesion)
 	{
 		/*
@@ -240,7 +251,7 @@ class Trabajo extends Objeto
 		}
 		if($col_descripcion == 23 || $col_duracion_cobrable == 23 || $col_abogado == 23)
 			return __('Error, los nombres de las columnas no corresponden, por favor revise que está subiendo el archivo correcto.');
-		
+  
 		// Para dara feedback al usuario.
 		$num_modificados = 0;
 		$num_insertados = 0;
@@ -278,10 +289,6 @@ class Trabajo extends Objeto
 										
 							$cobro = new Cobro($sesion);
 							$cobro->Load($id_cobro);
-							
-							$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
-							$idioma->Load($cobro->fields['codigo_idioma']);
-							
 							$cobro->LoadAsuntos();
 			$continuar = false;
 			// Para cambiar el asunto en el caso de ver los asuntos por separado necesitamos una variable para 
@@ -316,29 +323,8 @@ class Trabajo extends Objeto
 					
 				$descripcion = $hoja['cells'][$fila][$col_descripcion];
 				
-				
-				// La fecha está en formato DD-MM-AAAA, hay que transformarla a AAAA-MM-DD
-				
-				list($formato1, $formato2, $formato3) = explode('/',str_replace('%','',$idioma->fields['formato_fecha']));
-				if( $formato1 == 'd' || $formato1 == 'D' )
-					{ 
-						list($d, $m, $a) = explode('-', $hoja['cells'][$fila][$col_fecha]);
-						if(!$a) list($d, $m, $a) = explode('/', $hoja['cells'][$fila][$col_fecha]);
-					}
-				else if( $formato1 == 'm' || $formato1 == 'M' )
-					{
-						list($m, $d, $a) = explode('-', $hoja['cells'][$fila][$col_fecha]);
-						if(!$a) list($m, $d, $a) = explode('/', $hoja['cells'][$fila][$col_fecha]);
-					}
-				if(!( $m && $d && $a ) || !checkdate($m,$d,$a))
-					{
-						$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el fecha ingresado no es valido.<br/>";
-						continue;
-					}
-				if($a < 100)
-					$a = '20'.$a;
-				$fecha = "$a-$m-$d";
-				
+				//La fecha viene como un número de días de timestamp excel.
+				$fecha = Trabajo::FechaExcel2sql($hoja['cells'][$fila][$col_fecha]);
 				
 				if($col_solicitante != 23)
 					$solicitante = $hoja['cells'][$fila][$col_solicitante];
@@ -454,9 +440,9 @@ class Trabajo extends Objeto
 													'".$duracion_trabajada."',
 													'".$duracion_cobrable."',
 													".($col_solicitante != 23?"'".addslashes($solicitante)."',":'')."
-													'".$tarifa_hh."',
-													'".$costo_hh."',
-													'".$tarifa_hh_estandar."',
+													".$tarifa_hh.",
+													".$costo_hh.",
+													".$tarifa_hh_estandar.",
 													NOW(),
 													NOW())";
 							mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
