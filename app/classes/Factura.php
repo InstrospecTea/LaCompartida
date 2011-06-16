@@ -280,7 +280,7 @@ class Factura extends Objeto
 					$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($this->fields['cliente']), $html2);
 					$html2 = str_replace('%encargado_comercial%', $encargado_comercial, $html2);
 					$html2 = str_replace('%rut_cliente%', $this->fields['RUT_cliente'], $html2);
-					$meses_org = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
+					$meses_org = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 					$month_short = array('JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC');
 					$mes_corto = array('JAN','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC');
 					$mes_largo_es = array('ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICICIEMBRE');
@@ -292,8 +292,8 @@ class Factura extends Objeto
 					$html2 = str_replace('%num_anio%', date( 'Y' ,strtotime($fecha_factura)), $html2);
 					$html2 = str_replace('%num_mes%', date( 'm' ,strtotime($fecha_factura)), $html2);
 					$html2 = str_replace('%num_anio_2cifras%', date( 'y' ,strtotime($fecha_factura)), $html2);
-					$fecha_2_cifras = date( 'y' ,strtotime($fecha_factura));
-					$html2 = str_replace('%num_anio_ultimacifra%', $fecha_2_cifras[1], $html2);
+					$anio_yyyy = date( 'Y' ,strtotime($fecha_factura));
+					$html2 = str_replace('%num_anio_ultimacifra%', $anio_yyyy[3], $html2);
 
 
 
@@ -511,66 +511,66 @@ class Factura extends Objeto
 						/*
 						Montos Rebaza-alcazar
 						*/
-						
+
 						if(( method_exists('Conf','GetConf') && (Conf::GetConf($this->sesion,'DesgloseFactura')=='con_desglose')))
 						{
-							$html2 = str_replace('%honorarios%', number_format($factura_datos_detalle['factura_honorarios'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-							
-							$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', $factura_datos_detalle['cobro_simbolo_moneda'], $html2);
-							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', $factura_datos_detalle['factura_descripcion_subtotal_gastos'], $html2);
-							$html2 = str_replace('%subtotal_gastos_con_impuesto%', number_format($factura_datos_detalle['factura_subtotal_gastos_con_impuesto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-							
+							$html2 = str_replace('%honorarios%', number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
+							$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', $simbolo, $html2);
+							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', strtoupper($descripcion_subtotal_gastos), $html2);
+							$html2 = str_replace('%subtotal_gastos_con_impuesto%', number_format($subtotal_gastos_con_impuesto, 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
 							if(( method_exists('Conf','GetConf') && (Conf::GetConf($this->sesion,'UsarGastosConSinImpuesto')=='1')))
 							{
-								$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', $factura_datos_detalle['cobro_simbolo_moneda'], $html2);
-								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', $factura_datos_detalle['factura_descripcion_subtotal_gastos_sin_impuesto'], $html2);
-								$html2 = str_replace('%subtotal_gastos_sin_impuesto%', number_format($factura_datos_detalle['factura_subtotal_gastos_sin_impuesto'], 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-							}
+								$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', $simbolo, $html2);
+								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', strtoupper($descripcion_subtotal_gastos_sin_impuesto), $html2);
+								$html2 = str_replace('%subtotal_gastos_sin_impuesto%', number_format($subtotal_gastos_sin_impuesto, 0, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+								}
 							else
 							{
 								$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', '', $html2);
-								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', '', $html2); 
-								$html2 = str_replace('%subtotal_gastos_sin_impuesto%', '', $html2); 
+								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', '', $html2);
+								$html2 = str_replace('%subtotal_gastos_sin_impuesto%', '', $html2);
 							}
-							
-							$suma_monto_sin_iva = number_format($factura_datos_detalle['factura_honorarios'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-							$suma_monto_con_iva = number_format($factura_datos_detalle['factura_total'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
+							$suma_monto_sin_iva = number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+							$suma_monto_con_iva = number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 							$impuesto = number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-							
+
 							$html2 = str_replace('%suma_montos_sin_iva%', $suma_monto_sin_iva, $html2);
-							$html2 = str_replace('%suma_montos_solo_iva%', $factura_datos_detalle['factura_iva'], $html2);
+							$html2 = str_replace('%suma_montos_solo_iva%', $impuesto, $html2);
 							$html2 = str_replace('%suma_monto_con_iva%', $suma_monto_con_iva, $html2);
-								
+
 						}
 						else
 						{
-							$html2 = str_replace('%honorarios%', number_format($factura_datos_detalle['factura_subtotal'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-							
+							$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+
 							$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', '', $html2);
-							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', '', $html2); 
-							$html2 = str_replace('%subtotal_gastos_con_impuesto%', '', $html2); 
-							
+							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', '', $html2);
+							$html2 = str_replace('%subtotal_gastos_con_impuesto%', '', $html2);
+
 							$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', '', $html2);
-							$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', '', $html2); 
-							$html2 = str_replace('%subtotal_gastos_sin_impuesto%', '', $html2); 
-							
+							$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', '', $html2);
+							$html2 = str_replace('%subtotal_gastos_sin_impuesto%', '', $html2);
+
 							$html2 = str_replace('%suma_montos_sin_iva%', '', $html2);
 							$html2 = str_replace('%suma_montos_solo_iva%', '', $html2);
 							$html2 = str_replace('%suma_monto_con_iva%', '', $html2);
 						}
-						
+
 						$monto_palabra=new MontoEnPalabra($this->sesion);
 
 						$glosa_moneda_lang = __($glosa_moneda);
 						$glosa_moneda_plural_lang = __($glosa_moneda_plural);
 
 						$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total,$cobro_id_moneda,$glosa_moneda_lang,$glosa_moneda_plural_lang));
-						$html2 = str_replace('%simbolo%', $simbolo , $html2); 
-						
-						$html2 = str_replace('%subtotal%', number_format($factura_datos_detalle['factura_subtotal'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-						$html2 = str_replace('%monto_impuesto_sin_gastos%', number_format($factura_datos_detalle['factura_iva'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-						$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($factura_datos_detalle['factura_total'], $factura_datos_detalle['factura_cifras_decimales_moneda'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2); 
-						$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra , $html2); 
+						$html2 = str_replace('%simbolo%', $simbolo , $html2);
+
+						$html2 = str_replace('%subtotal%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+						$html2 = str_replace('%monto_impuesto_sin_gastos%', number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+						$html2 = str_replace('%monto_total_bruto_sin_gastos%', number_format($total, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+						$html2 = str_replace('%monto_total_palabra%', $monto_total_palabra , $html2);
 						
 
 						
