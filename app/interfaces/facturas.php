@@ -163,8 +163,8 @@
 		$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
 		$b->AgregarFuncion("iva","Iva","align=right nowrap");
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
-		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
+		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		$b->color_mouse_over = "#bcff5c";
 		$b->funcionTR = "funcionTR";
@@ -196,8 +196,8 @@
 
 	function Saldo(& $fila)
 	{
-		$saldo = $saldo*(-1);
-		return $saldo > 0 ? $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],",",".") : '';
+		$saldo = $fila->fields['saldo']*(-1);
+		return number_format($saldo,$fila->fields['cifras_decimales'],",",".");
 	}
 	function Pago(& $fila, $sesion)
 	{
@@ -213,7 +213,7 @@
 		while(list($monto_aporte) = mysql_fetch_array($resp)){
 			$monto_pago = $monto_aporte;
 		}
-		return $monto_pago > 0 ? $fila->fields['simbolo'].' '.number_format($monto_pago,$fila->fields['cifras_decimales'],",",".") : '';
+		return number_format($monto_pago,$fila->fields['cifras_decimales'],",",".");
 	}
 	
 	function funcionTR(& $fila)
@@ -243,8 +243,8 @@
 		$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";
-		$html .= "<td align=right nowrap>".Saldo(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right nowrap>".Saldo(& $fila)."</td>";
 		$html .= "<td align=center nowrap>".Opciones(& $fila)."</td>";
 		$html .= "</tr>";
 

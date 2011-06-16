@@ -8,6 +8,7 @@ require_once 'Cliente.php';
 require_once 'Asunto.php';
 require_once 'CobroMoneda.php';
 require_once 'MontoEnPalabra.php';
+require_once 'UtilesApp.php';
 
 class Factura extends Objeto
 {
@@ -46,7 +47,45 @@ class Factura extends Objeto
 			return $this->Load($id);
 		return false;
 	}
-	
+
+	function Escribir()
+	{
+		if($this->Write())
+		{
+			$cobro = new Cobro($this->sesion);
+			if($cobro->Load($this->fields['id_cobro']))
+			{
+				if( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
+				{
+					$query = "SELECT
+						group_concat(idDocLegal) as listaDocLegal
+						FROM (
+						SELECT
+						 CONCAT(if(f.id_documento_legal != 0, if(f.letra is not null, if(f.letra != '',concat('LETRA ',f.letra), CONCAT(p.codigo,' ',f.numero)), CONCAT(p.codigo,' ',f.numero)), ''),IF(f.anulado=1,' (ANULADO)',''),' ') as idDocLegal
+						,f.id_cobro
+						FROM factura f, prm_documento_legal p
+						WHERE f.id_documento_legal = p.id_documento_legal
+						AND id_cobro = '".$this->fields['id_cobro']."'
+						)zz
+						GROUP BY id_cobro";
+					$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					list($lista) = mysql_fetch_array($resp);
+					$cobro->Edit('documento',$lista);
+				}
+				else
+				{
+					$cobro->Edit('documento',$this->fields['numero']);
+				}
+				$cobro->Write();
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	function PrimerTipoDocumentoLegal()
 	{
 		$query = "SELECT id_documento_legal FROM prm_documento_legal ORDER BY id_documento_legal ASC LIMIT 1";
@@ -238,6 +277,7 @@ class Factura extends Objeto
 					
 					$html2 = str_replace('%nombre_cliente%', $this->fields['cliente'], $html2);
 					$html2 = str_replace('%glosa_cliente%', $this->fields['cliente'], $html2);
+					$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($this->fields['cliente']), $html2);
 					$html2 = str_replace('%encargado_comercial%', $encargado_comercial, $html2);
 					$html2 = str_replace('%rut_cliente%', $this->fields['RUT_cliente'], $html2);
 					$meses_org = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
@@ -246,6 +286,7 @@ class Factura extends Objeto
 					$mes_largo_es = array('ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICICIEMBRE');
 					$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto.' '.$contacto.' '.$apellido_contacto), $html2);
 					$html2 = str_replace('%direccion_cliente%', $this->fields['direccion_cliente'], $html2);
+					$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($this->fields['direccion_cliente']), $html2);
 					$html2 = str_replace('%num_dia%', date( 'd' ,strtotime($fecha_factura)), $html2);
 					$html2 = str_replace('%glosa_mes%', str_replace($meses_org,$mes_largo_es,date( 'M' ,strtotime($fecha_factura))), $html2);
 					$html2 = str_replace('%num_anio%', date( 'Y' ,strtotime($fecha_factura)), $html2);
@@ -645,17 +686,13 @@ class Factura extends Objeto
 		return $numero;
 	}
 	
-	function ExisteNumeroDocLegal($tipo_documento_legal, $numero, $id_factura = '') {
+	function ExisteNumeroDocLegal($tipo_documento_legal, $numero) {
 		if (empty($tipo_documento_legal) or empty($numero)) {
 			echo "$tipo_documento_legal, $numero";
 			return false;
 		}
 		
-		if( $id_factura != '' )
-			$where = " AND id_factura != '$id_factura' ";
-		else
-			$where = "";
-		$query = "SELECT COUNT(*) FROM factura WHERE numero = ".$numero." AND id_documento_legal = '".$tipo_documento_legal."' AND serie_documento_legal = '".Conf::GetConf($this->sesion,'SerieDocumentosLegales')."' $where";
+		$query = "SELECT COUNT(*) FROM factura WHERE numero = ".$numero." AND id_documento_legal = '".$tipo_documento_legal."' AND serie_documento_legal = '".Conf::GetConf($this->sesion,'SerieDocumentosLegales')."'";
 		$cantidad_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__ , __LINE__, $this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($cantidad_resp);
 		if ($cantidad > 0)
@@ -666,11 +703,6 @@ class Factura extends Objeto
 	function ValidarDocLegal() {
 		if (empty($this->fields['id_factura'])) {
 			if (!$this->ExisteNumeroDocLegal($this->fields['id_documento_legal'], $this->fields['numero'])) {
-				return false;
-			}
-		}
-		else {
-			if (!$this->ExisteNumeroDocLegal($this->fields['id_documento_legal'], $this->fields['numero'], $this->fields['id_factura'])) {
 				return false;
 			}
 		}

@@ -230,7 +230,7 @@
 	}
 
 	function Redondear(num, decimales){
-		return ( Math.pow(10, decimales) * num).round() / Math.pow(10, decimales);
+		return Number(num).toFixed(decimales);
 	}
 
 	function ActualizarMontoMonedaCobro(){
@@ -387,9 +387,9 @@
 			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
 			monto -= Redondear(saldo_individual, cifras_decimales);
 		});
-		monto = Redondear(monto, cifras_decimales);
+		monto = Redondear(($('monto_moneda_cobro').value - monto), cifras_decimales);
 		if(monto > 0 && !confirm('<?=__("El monto ingresado excede el saldo a pagar")?> ('+
-			($('monto_moneda_cobro').value - monto)+')\n<?=__("¿Está seguro que desea continuar?")?>')){
+			(monto)+')\n<?=__("¿Está seguro que desea continuar?")?>')){
 			continuar = 0;
 		}
 	}

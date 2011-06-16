@@ -41,7 +41,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		if($tabla == "cliente")
 			if(!$usa_inactivo)
 				$where = " WHERE activo=1";
-				
+
 		if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
 			$oncambio='';
 		else
@@ -172,7 +172,8 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							var campos = response.split('~');
 							if(response.indexOf('VACIO|') != -1)
 							{
-								select_destino.options.length = 1;
+								if( accion != \"cargar_asuntos_desde_campo\" )
+									select_destino.options.length = 1;
 								offLoading();
 								
 								if( accion == \"cargar_asuntos_desde_campo\" )

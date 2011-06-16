@@ -72,7 +72,7 @@
 			$factura->Edit('estado','ABIERTA');
 			$factura->Edit('anulado',0);
 			$factura->Edit("id_estado", "1");
-			if($factura->Write())
+			if($factura->Escribir())
 			{
 				$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
@@ -83,7 +83,7 @@
 			$factura->Edit('estado','ANULADA');
 			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
 			$factura->Edit('anulado',1);
-			if($factura->Write())
+			if($factura->Escribir())
 			{
 				$pagina->AddInfo(__('Documento Tributario').' '.__('anulado con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
@@ -155,7 +155,7 @@
 				$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
 				$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal));
 			}
-			else if($factura->Write())
+			else if($factura->Escribir())
 			{
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero);
@@ -182,33 +182,7 @@
 				# Esto se puede descomentar para imprimir facturas desde la edición
 				
 				if($id_cobro)
-				{
-					if( $cobro )
-					{
-						if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) || ( method_exists('Conf','NuevoModuloFactura') && Conf::NuevoModuloFactura() ) ) )
-						{
-							$query_lista_docLegalesActivos = "SELECT
-								group_concat(idDocLegal) as listaDocLegal
-								FROM (
-								SELECT
-								 CONCAT(if(f.id_documento_legal != 0, if(f.letra is not null, if(f.letra != '',concat('LETRA ',f.letra), CONCAT(p.codigo,' ',f.numero)), CONCAT(p.codigo,' ',f.numero)), ''),IF(f.anulado=1,' (ANULADO)',''),' ') as idDocLegal
-								,f.id_cobro
-								FROM factura f, prm_documento_legal p
-								WHERE f.id_documento_legal = p.id_documento_legal
-								AND id_cobro = '".$id_cobro."'
-								)zz
-								GROUP BY id_cobro";
-							$resp_lista_docLegalesActivos = mysql_query($query_lista_docLegalesActivos,$sesion->dbh) or Utiles::errorSQL($resp_lista_docLegalesActivos,__FILE__,__LINE__,$sesion->dbh);
-							list($lista_facturasActivas, $lista_NotaCreditoActivas)=mysql_fetch_array($resp_lista_docLegalesActivos);
-							$cobro->Edit('documento',$lista_facturasActivas); 
-						}
-						else
-						{						
-							$cobro->Edit('documento',$numero);
-						}
-						$cobro->Write();
-					}
-					
+				{					
 					$documento = new Documento($sesion);
 					$documento->LoadByCobro($id_cobro);
 					

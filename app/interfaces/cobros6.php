@@ -94,7 +94,7 @@
                         $cobro->Edit('facturado', 0); 
                         $cobro->Write(); 
                         $factura->Edit('anulado',1); 
-                        if($factura->Write()) 
+                        if($factura->Escribir())
                                 $pagina->AddInfo(__('Factura anulado.')); 
                 }
                 $id_factura=$factura->fields['id_factura']; 
@@ -221,7 +221,7 @@
                 $factura->Edit('id_moneda', $documento_cobro->fields['id_moneda']); 
                 $factura->Edit('honorarios', $documento_cobro->fields['honorarios']); 
                 $factura->Edit('gastos', $documento_cobro->fields['gastos']); 
-                if( $factura->Write() )
+                if( $factura->Escribir() )
                 {
                 	if($id_cobro)
 									{
@@ -274,7 +274,7 @@
 		if( !( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaNumeracionAutomatica') ) && !( method_exists('Conf','UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() ) ) 
 		{
 			$factura->Edit('numero',$documento);
-			$factura->Write();
+			$factura->Escribir();
 			$cobro->Edit('documento',$documento);
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || (  method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) )
 				$cobro->Edit('nota_cobro',$nota_cobro);
@@ -1076,7 +1076,7 @@ function AgregarFactura(idx){
 																							FROM carta ORDER BY id_carta","id_carta",
 																			$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], $cobro->fields['opc_ver_carta']=='1'?'':'disabled'); ?>
 												</td>
-											</tr>
+											</tr> 
 											<tr>
 												<td align="right">&nbsp;</td>
 												<td align="left" style="font-size: 10px;">

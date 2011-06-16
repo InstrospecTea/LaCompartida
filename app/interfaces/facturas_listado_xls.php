@@ -310,7 +310,7 @@
 						$monto_pago = $monto_aporte;
 					}
 					
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$id_moneda_base]);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
 				else if($col_name[$i] == 'monto_pagos_moneda_base') {
 					$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$decimales_moneda_base,false);

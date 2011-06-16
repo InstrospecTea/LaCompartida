@@ -134,7 +134,7 @@
 			if( $cobro->Load($cob['id_cobro']) )
 			{
 				$cobro->Edit('id_carta',$cob['id_carta']);
-				$ret = $cobro->GuardarCobro();
+				$ret = $cobro->GuardarCobro(true);
 				$cobro->Edit('etapa_cobro','5');
 				$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 				$cobro->Edit('estado','EMITIDO');
