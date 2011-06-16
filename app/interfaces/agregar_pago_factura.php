@@ -310,14 +310,14 @@
 	
 	function ActualizarMontosIndividuales( id )
 	{
-		var cifras_decimales = $('cifras_decimales_pago').value;
+		/*var cifras_decimales = $('cifras_decimales_pago').value;
 		var monto = $(id).value;
 		$$('[id^="saldo_"]').each(function(elem){
 			ids = elem.id.split('_');
 			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
 			elem.value = Redondear(saldo_individual, cifras_decimales);
 			monto -= saldo_individual;
-		});
+		});*/
 	}
 
 	function Imprimir_voucher(form,id_factura_pago)
