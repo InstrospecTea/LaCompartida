@@ -183,11 +183,11 @@
 	
 	function SubTotal(& $fila)
 	{
-		return $fila->fields['total'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['honorarios'],$fila->fields['cifras_decimales'],",",".") : '';
+		return $fila->fields['honorarios'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['honorarios'],$fila->fields['cifras_decimales'],",",".") : '';
 	}
 	function Iva(& $fila)
 	{
-		return $fila->fields['total'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['iva'],$fila->fields['cifras_decimales'],",",".") : '';
+		return $fila->fields['iva'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['iva'],$fila->fields['cifras_decimales'],",",".") : '';
 	}
 	function MontoTotal(& $fila)
 	{
