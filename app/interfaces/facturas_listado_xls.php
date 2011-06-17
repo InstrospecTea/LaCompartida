@@ -206,7 +206,7 @@
 	for($i=0; $i<$col_num; ++$i)
 	{
 		// ocultar celdas con PHP
-		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','tipo_cambio','id_factura')) ) {
+		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','id_factura')) ) {
 			$arr_col[$col_name[$i]]['hidden'] = 'SI'; }
 		else { $arr_col[$col_name[$i]]['celda'] = $col++; }
 
@@ -224,7 +224,7 @@
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 
 		// ancho celdas ocultos
-		if(in_array($col_name[$i],array('total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base')) ) {
+		if(in_array($col_name[$i],array('total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 		// css celdas
@@ -253,9 +253,15 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'.' '.$simbolo_moneda_base); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
 
+		//formato columna excel para formulas
+		$arr_col[$col_name[$i]]['celda_excel'] = Utiles::NumToColumnaExcel($arr_col[$col_name[$i]]['celda']);
+
 	}
 	unset($col);
 	$fila = 0; //fila inicial
+
+	$col_formula_pago = $arr_col['monto_pagos_moneda_base']['celda_excel'];
+	$col_formula_saldo = $arr_col['saldo_moneda_base']['celda_excel'];
 
 	// Escribir encabezado reporte
 	$ws1->write($fila, 0, __('Documentos tributarios'), $formato_encabezado);
@@ -279,6 +285,7 @@
 	$fila_inicial = $fila;
 	// Escribir filas
 	for($j=0; $j<$lista_suntos_liquidar->num; ++$j, ++$fila) {
+		$fila_actual = $fila+1;
 		$proc = $lista_suntos_liquidar->Get($j);
 		$ws1->write($fila, $col_glosa_cliente, $proc->fields[$col_name[$i]], $formato_normal);
 		for($i=0; $i<$col_num; $i++) {
@@ -289,10 +296,6 @@
 				else if($col_name[$i] == 'saldo') {
 					$saldo = $proc->fields[$col_name[$i]]*(-1);
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
-				}
-				else if($col_name[$i] == 'saldo_moneda_base') {
-					$saldo_moneda_base = UtilesApp::CambiarMoneda($saldo, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$decimales_moneda_base,false);
-					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				else if($col_name[$i] == 'saldo_pagos') {
 					//$factura = new Factura($sesion);
@@ -312,9 +315,15 @@
 					
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
+				else if($col_name[$i] == 'saldo_moneda_base') {
+					$saldo_moneda_base = UtilesApp::CambiarMoneda($saldo, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
+					$ws1->writeFormula($fila, $arr_col['saldo_moneda_base']['celda'], "=".$arr_col['saldo']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
+					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo_moneda_base, $formatos_moneda[$id_moneda_base]);
+				}
 				else if($col_name[$i] == 'monto_pagos_moneda_base') {
-					$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$decimales_moneda_base,false);
-					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
+					$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
+					$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=".$arr_col['saldo_pagos']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
+					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				if($col_name[$i] == 'glosa_cliente') {
 					$query = "SELECT GROUP_CONCAT(codigo_asunto) FROM cobro_asunto WHERE id_cobro='".$proc->fields['id_cobro']."' GROUP BY id_cobro";
@@ -323,7 +332,7 @@
 					while(list($lista_codigo_asunto) = mysql_fetch_array($resp)){
 						$lista_asuntos = '('.$lista_codigo_asunto.')';
 					}
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos.' '.$proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]] .' ' . $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 				}
 				else {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
@@ -332,10 +341,9 @@
 		}
 	}
 	//suma columnas con moneda base
-	$col_formula_pago = Utiles::NumToColumnaExcel($arr_col['monto_pagos_moneda_base']['celda']);
-	$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=SUM($col_formula_pago$fila_inicial:$col_formula_pago$fila)", $formatos_moneda[$id_moneda_base]);
-	$col_formula_saldo = Utiles::NumToColumnaExcel($arr_col['saldo_moneda_base']['celda']);
-	$ws1->writeFormula($fila, $arr_col['saldo_moneda_base']['celda'], "=SUM($col_formula_saldo$fila_inicial:$col_formula_saldo$fila)", $formatos_moneda[$id_moneda_base]);
+	$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=SUM(".$arr_col['monto_pagos_moneda_base']['celda_excel']."$fila_inicial:".$arr_col['monto_pagos_moneda_base']['celda_excel']."$fila)", $formatos_moneda[$id_moneda_base]);
+	$ws1->writeFormula($fila, $arr_col['saldo_moneda_base']['celda'], "=SUM(".$arr_col['saldo_moneda_base']['celda_excel']."$fila_inicial:".$arr_col['saldo_moneda_base']['celda_excel']."$fila)", $formatos_moneda[$id_moneda_base]);
+
 	$wb->close();
 	exit;
 ?>
