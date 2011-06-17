@@ -147,7 +147,7 @@
 							LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal";
 	$query__listado .="	WHERE (f.codigo_cliente = '$codigo_cliente'";
 	$query__listado .=  $where_lista_cobro;
-	$query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 AND (ccfm.saldo != 0 OR ccfmn.monto != 0)";
+	$query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 AND ccfm.saldo != 0 OR ccfmn.monto != 0";
 	
 	
 ?>
@@ -215,7 +215,7 @@
 	function ActualizarMonto()
 	{
 		var cifras_decimales = $('cifras_decimales_pago').value;
-		var monto = 0;
+		var monto = Number(0);
 		$$('[id^="saldo_"]').each(function(elem){ 
 			ids = elem.id.split('_');
 			var saldo_fact = Number($('x_saldo_hide_'+ids[1]).value);
@@ -223,7 +223,6 @@
 			monto += Number(Redondear(elem.value, cifras_decimales));
 		});
 		$('monto_moneda_cobro').value = Redondear(monto, cifras_decimales);
-
 		if($F('id_moneda') == '<?=$id_moneda_cobro?>'){
 			$('monto').value = $('monto_moneda_cobro').value;
 		}
@@ -233,6 +232,8 @@
 		return Number(num).toFixed(decimales);
 	}
 
+	var suma_saldo = 0;
+	var monto_tmp = 0;
 	function ActualizarMontoMonedaCobro(){
 		var moneda = $('id_moneda').value;
 		if(moneda == '<?=$id_moneda_cobro?>'){
@@ -244,6 +245,13 @@
 			$('monto_moneda_cobro').value = Redondear($('monto').value * $('factura_pago_moneda_'+moneda).value / $('factura_pago_moneda_<?=$id_moneda_cobro?>').value, $('cifras_decimales_pago').value);
 		}
 		ActualizarMontosIndividuales('monto_moneda_cobro');
+
+		if(monto_tmp > 0 && !confirm('<?=__("El monto ingresado excede el saldo a pagar")?> ('+
+			suma_saldo + ')\n<?=__("¿Está seguro que desea continuar?")?>')){
+			continuar = 0;
+			$('monto').value = suma_saldo;
+		}
+
 	}
 
 	function CargarCuenta( origen, destino ) 
@@ -310,14 +318,25 @@
 	
 	function ActualizarMontosIndividuales( id )
 	{
-		/*var cifras_decimales = $('cifras_decimales_pago').value;
+		suma_saldo=0;
+		monto_tmp=0;
+		var cifras_decimales = $('cifras_decimales_pago').value;
+		var lista_facturas = $('lista_facturas').value;
+		var arreglo_facturas = lista_facturas.split(',');
 		var monto = $(id).value;
-		$$('[id^="saldo_"]').each(function(elem){
-			ids = elem.id.split('_');
-			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
-			elem.value = Redondear(saldo_individual, cifras_decimales);
-			monto -= saldo_individual;
-		});*/
+		for(var i = 0; i<=arreglo_facturas.length-1; i++)
+		{
+			$$('[id^="saldo_"]').each(function(elem){
+				ids = elem.id.split('_');
+				if(ids[1]==arreglo_facturas[i]) {
+					var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
+					elem.value = Redondear(saldo_individual, cifras_decimales);
+					monto -= saldo_individual;
+					suma_saldo += saldo_individual;
+				}
+			});
+		}
+		monto_tmp = monto;
 	}
 
 	function Imprimir_voucher(form,id_factura_pago)
