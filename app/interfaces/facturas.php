@@ -92,7 +92,6 @@
 				}
 			if($id_contrato)
 				{
-					$join = " JOIN cobro ON cobro.id_cobro=factura.id_cobro ";
 					$where .= " AND cobro.id_contrato=".$id_contrato." ";
 				}
 			if($id_cobro)
@@ -145,7 +144,6 @@
 				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-							$join 
 							WHERE $where";
 		
 		$x_pag = 12;

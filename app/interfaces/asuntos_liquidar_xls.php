@@ -10,6 +10,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../app/classes/Asunto.php';
 	require_once Conf::ServerDir().'/../app/classes/Contrato.php';
+	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 
 	$sesion = new Sesion(array('ADM', 'COB'));
 	set_time_limit(400);
@@ -20,7 +21,42 @@
 
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
-		
+
+	//FILTROS DESDE GENERA_COBRO.PHP
+	if($codigo_cliente_secundario)
+	{
+		$cliente=new Cliente($sesion);
+		$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
+		$codigo_cliente=$cliente->fields['codigo_cliente'];
+	}
+	if($codigo_cliente)
+	{
+		$cliente=new Cliente($sesion);
+		$cliente->LoadByCodigo($codigo_cliente);
+		$codigo_cliente_secundario=$cliente->fields['codigo_cliente_secundario'];
+	}
+	$where = 1;
+	$where_subquery = 1;
+	$where_trabajo = "";
+	if($activo)
+		$where_subquery .= " AND co.activo = 'SI' ";
+	else
+		$where_subquery .= " AND co.activo = 'NO' ";
+	if($id_usuario)
+		$where_subquery .= " AND co.id_usuario_responsable = '$id_usuario' ";
+	if($forma_cobro)
+		$where_subquery .= " AND co.forma_cobro = '$forma_cobro' ";
+	if($tipo_liquidacion) //1-2 = honorarios-gastos, 3 = mixtas
+		$where_subquery .= " AND co.separar_liquidaciones = '".($tipo_liquidacion=='3' ? 0 : 1)."' ";
+	if($codigo_cliente)
+		$where_subquery .= " AND cl.codigo_cliente = '$codigo_cliente' ";
+	if($id_grupo_cliente)
+		$where_subquery .= " AND cl.id_grupo_cliente = '$id_grupo_cliente' ";
+
+	if($fecha_ini)
+		$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') >= DATE_FORMAT('$fecha_ini','%Y-%m-%d') ";
+	if($fecha_fin)
+		$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') <= DATE_FORMAT('$fecha_fin','%Y-%m-%d') ";
 	// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 	$query_asuntos_liquidar="
 		SELECT
@@ -37,8 +73,8 @@
 		,if(DATE_FORMAT(cobro.fecha_fin,'%Y-%m-%d')>DATE_FORMAT('0000-00-00','%Y-%m-%d'),DATE_FORMAT(cobro.fecha_fin,'%Y-%m-%d'),'') as fecha_ultimo_cobro
 		,cobro.se_esta_cobrando AS glosa_ultimo_cobro
 		,'' AS horas_castigadas
-		,(SELECT SUM(TIME_TO_SEC(trabajo.duracion)/3600) FROM trabajo WHERE trabajo.codigo_asunto IN (listado_codigo_asuntos) AND (trabajo.id_cobro = '' OR trabajo.id_cobro IS NULL) AND trabajo.fecha > cobro.fecha_fin AND trabajo.cobrable = 1 ) AS hh_val_trabajo
-		,(SELECT SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600) FROM trabajo WHERE trabajo.codigo_asunto IN (listado_codigo_asuntos) AND (trabajo.id_cobro = '' OR trabajo.id_cobro IS NULL) AND trabajo.fecha > cobro.fecha_fin AND trabajo.cobrable = 1 ) AS hh_val_cobrado
+		,(SELECT SUM(TIME_TO_SEC(trabajo.duracion)/3600) FROM trabajo WHERE trabajo.codigo_asunto IN (listado_codigo_asuntos) AND (trabajo.id_cobro = '' OR trabajo.id_cobro IS NULL) AND trabajo.fecha > cobro.fecha_fin AND trabajo.cobrable = 1 $where_trabajo ) AS hh_val_trabajo
+		,(SELECT SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/3600) FROM trabajo WHERE trabajo.codigo_asunto IN (listado_codigo_asuntos) AND (trabajo.id_cobro = '' OR trabajo.id_cobro IS NULL) AND trabajo.fecha > cobro.fecha_fin AND trabajo.cobrable = 1 $where_trabajo ) AS hh_val_cobrado
 		,'' AS monto_total
 		FROM (
 			SELECT
@@ -56,7 +92,7 @@
 			JOIN cliente cl ON cl.codigo_cliente = co.codigo_cliente
 			LEFT JOIN usuario u ON u.id_usuario = co.id_usuario_responsable
 			LEFT JOIN prm_moneda mo ON mo.id_moneda = co.id_moneda
-			WHERE co.activo =  'SI'
+			WHERE $where_subquery
 			GROUP BY co.id_contrato
 		)zz
 		LEFT JOIN cobro ON cobro.id_cobro = ultimo_id_cobro
