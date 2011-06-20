@@ -195,7 +195,7 @@
 	function Saldo(& $fila)
 	{
 		$saldo = $fila->fields['saldo']*(-1);
-		return number_format($saldo,$fila->fields['cifras_decimales'],",",".");
+		return  $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],",",".");
 	}
 	function Pago(& $fila, $sesion)
 	{
@@ -211,7 +211,7 @@
 		while(list($monto_aporte) = mysql_fetch_array($resp)){
 			$monto_pago = $monto_aporte;
 		}
-		return number_format($monto_pago,$fila->fields['cifras_decimales'],",",".");
+		return  $fila->fields['simbolo'].' '.number_format($monto_pago,$fila->fields['cifras_decimales'],",",".");
 	}
 	
 	function funcionTR(& $fila)

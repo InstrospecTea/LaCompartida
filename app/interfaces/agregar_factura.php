@@ -94,6 +94,7 @@
 			//chequear
 			$mensaje_accion = 'guardar';
 			$factura->Edit('subtotal',$monto_neto);
+			$factura->Edit('porcentaje_impuesto',$porcentaje_impuesto);
 			$factura->Edit('iva',$iva);
 			$factura->Edit('total',''.($monto_neto+$iva));
 			$factura->Edit("id_factura_padre", $id_factura_padre? $id_factura_padre : NULL);
@@ -266,7 +267,26 @@
 		$monto_subtotal_gastos = $subtotal_gastos;
 		$descripcion_subtotal_gastos_sin_impuesto = __('Gastos s/ IVA');
 		$monto_subtotal_gastos_sin_impuesto = $subtotal_gastos_sin_impuestos;			
-			
+
+		
+		if($id_cobro > 0)
+		{
+			$cobro = new Cobro($sesion);
+			$cobro->load($id_cobro);
+			$porcentaje_impuesto = $cobro->fields['porcentaje_impuesto'];
+			if($cobro->fields['porcentaje_impuesto'] == 0 && (( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'ValorImpuesto'))))) {
+				$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
+			}
+		}
+		if($factura->loaded())
+		{
+			if($factura->fields['porcentaje_impuesto'] > 0)
+				$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
+		}
+		else
+		{
+			$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
+		}
 		
 		if($factura->fields['total'] >0){
 			
@@ -288,7 +308,7 @@
 			}
 			
 			//CON DESGLOSE
-		
+
 			$descripcion_honorario = $factura->fields['descripcion'];
 			$monto_honorario = $factura->fields['subtotal'];
 			$descripcion_subtotal_gastos = $factura->fields['descripcion_subtotal_gastos'];
@@ -732,7 +752,7 @@ function Cerrar()
 }
 
 function desgloseMontosFactura(form){
-	var porcentaje_impuesto = 0;
+	var porcentaje_impuesto = <?=$porcentaje_impuesto;?>;
 	var porcentaje_impuesto_gastos = 0;
 	var monto_impuesto = 0;
 	var monto_impuesto_gasto = 0;
@@ -746,17 +766,11 @@ function desgloseMontosFactura(form){
 		$cobro = new Cobro($sesion);
 		$cobro->load($id_cobro);
 		?>
-		porcentaje_impuesto = <?=$cobro->fields['porcentaje_impuesto'];?>;
 		porcentaje_impuesto_gastos = <?=$cobro->fields['porcentaje_impuesto_gastos'];?>;
 		
 		<?php
 	}
 	else{
-		if($cobro->fields['porcentaje_impuesto'] == 0 && (( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'ValorImpuesto'))))) {
-			?>
-			porcentaje_impuesto = <?=Conf::GetConf($sesion,'ValorImpuesto');?>;
-			<?php
-		}
 		if($cobro->fields['porcentaje_impuesto_gastos'] == 0 && (( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'ValorImpuestoGastos'))))) {
 			?>
 			porcentaje_impuesto_gastos = <?=Conf::GetConf($sesion,'ValorImpuestoGastos');?>;
@@ -849,6 +863,7 @@ function ActualizarDocumentoMonedaPago()
 
 <input type='hidden' name='opc' id='opc' value='buscar'>
 
+<input type="hidden" name="porcentaje_impuesto" id="porcentaje_impuesto" value="<?=$porcentaje_impuesto;?>">
 
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">

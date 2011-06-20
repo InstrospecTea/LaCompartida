@@ -258,8 +258,12 @@ class Reporte
 				IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
 												cobro.fecha_creacion,
 												cobro.fecha_fin) as fecha_final,
-				DATE_FORMAT(fecha_final, \'%m-%y\') as mes,
-				DATE_FORMAT(fecha_final, \'%d-%m-%y\') as dia_reporte,
+				DATE_FORMAT(IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
+												cobro.fecha_creacion,
+												cobro.fecha_fin), \'%m-%y\') as mes,
+				DATE_FORMAT(IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
+												cobro.fecha_creacion,
+												cobro.fecha_fin), \'%d-%m-%Y\') as dia_reporte,
 				cobro.estado AS estado,
 				cobro.forma_cobro AS forma_cobro,
 			';
@@ -393,7 +397,7 @@ class Reporte
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 						trabajo.fecha as fecha_final,
 						DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes,
-						DATE_FORMAT(trabajo.fecha, \'%d-%m-%y\') as dia_reporte,
+						DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,
 						IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
@@ -822,6 +826,19 @@ class Reporte
 
 		if(empty($this->row))
 			return $r;
+
+		foreach($this->row as $row)
+		{	
+			$identificador = $row[$id];
+			$identificador_col = $row[$id_col];
+
+			if(!isset($r['labels'][$identificador]))
+				$r['labels'][$identificador] = array();
+			if(!isset($r['labels_col'][$identificador_col]))
+				$r['labels_col'][$identificador_col] = array();
+		}
+		ksort($r['labels_col']);
+		
 		foreach($this->row as $row)
 		{
 			$nombre = $row[$label];

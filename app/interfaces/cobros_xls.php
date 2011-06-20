@@ -192,7 +192,7 @@ $mostrar_resumen_de_profesionales = 1;
 		{
 			$valor = fecha_valor($fecha);
 			if(!$valor)
-				$valot = fecha_valor($default);
+				$valor = fecha_valor($default);
 
 			$worksheet->writeNumber($fila, $col, $valor, $formato);
 		}

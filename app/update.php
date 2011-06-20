@@ -5443,6 +5443,15 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
+
+					case 4.21:
+						$query = array();
+						$query[] = "ALTER TABLE  `factura` ADD  `porcentaje_impuesto` DOUBLE NOT NULL COMMENT  'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos';";
+						$query[] = "UPDATE factura SET porcentaje_impuesto = ((iva*100)/honorarios)";
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh)))
+								throw new Exception($q."---".mysql_error());
+					break;
  	}
 }
 
@@ -5633,6 +5642,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.18;
 	$VERSIONES[$num++] = 4.19;
 	$VERSIONES[$num++] = 4.20;
+	$VERSIONES[$num++] = 4.21;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
