@@ -174,7 +174,6 @@
 						$contrato->Edit("glosa_contrato",$contra_clie->fields['glosa_contrato']);
 						$contrato->Edit("codigo_cliente",$contra_clie->fields['codigo_cliente']);
 						$contrato->Edit("id_usuario_responsable",$contra_clie->fields['id_usuario_responsable']);
-						$contrato->Edit("centro_costo",$contra_clie->fields['centro_costo']);
 						if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 							{
 								$contrato->Edit("titulo_contacto",$contra_clie->fields['titulo_contacto']);
@@ -305,7 +304,6 @@
 					$contrato->Edit("glosa_contrato",$glosa_contrato);
 					$contrato->Edit("codigo_cliente",$codigo_cliente);
 					$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
-					$contrato->Edit("centro_costo",$centro_costo);
 					$contrato->Edit("observaciones",$observaciones);
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 						{

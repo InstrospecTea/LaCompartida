@@ -89,7 +89,6 @@
 		$contrato->Edit("glosa_contrato",$glosa_contrato);
 		$contrato->Edit("codigo_cliente",$codigo_cliente);
 		$contrato->Edit("id_usuario_responsable",$id_usuario_responsable ? $id_usuario_responsable : '1');
-		$contrato->Edit("centro_costo",$centro_costo);
 		$contrato->Edit("observaciones",$observaciones);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 			{

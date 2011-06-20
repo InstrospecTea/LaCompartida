@@ -500,6 +500,7 @@ input.tag
 	text-align:center;
 	overflow:hidden;
 }
+
 .span_data
 {
 	font-size:9px;
@@ -509,6 +510,7 @@ input.tag
 	background-color:#FFFFFF;
 	overflow:hidden;
 }
+
 .mano_on
 {
 	cursor:pointer;
@@ -521,14 +523,14 @@ input.tag
 	width : 640px;
 	height : 250px;
 	overflow : auto;
-
 }
 
 /*Botones*/
 .btn
 {
 	cursor:pointer;
-	background: transparent url('../../img/botones/gray_bg.gif') no-repeat top right;
+	background: transparent url('../../img/botones/gray_bg.gif') top right;
+	background-repeat: repeat-x;
 	height: 20px; /* Height of button background height */
 }
 

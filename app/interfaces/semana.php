@@ -191,12 +191,13 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario);
 	$fecha_dia = Utiles::sql2date($semana_actual);
 	for($i = 0; $i < 7; $i++)
 	{
+		$dia_de_mes = date("j",strtotime(Utiles::add_date($semana_actual,$i)));
 		$mouse_over = 'onmouseover = "this.style.background=\'#DF9862\'"';
 		$mouse_out = 'onmouseout = "this.style.background=\'#FFFFFF\'"';
 		echo("
 			<td width=14% style='border: 1px solid black; text-align:center;' id='dia_$i' ".$mouse_over." ".$mouse_out.">
 				<input type=hidden name='dia$i' id='dia$i' value=".$fecha_dia.">
-				$dias[$i]
+				$dias[$i] $dia_de_mes
 			</td>
 			");
 		$fecha_dia = date("d-m-Y",strtotime("$fecha_dia+1 days"));

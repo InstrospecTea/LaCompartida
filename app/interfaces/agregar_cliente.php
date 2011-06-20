@@ -144,7 +144,6 @@
 						$contrato->Edit("glosa_contrato",$glosa_contrato);
 						$contrato->Edit("codigo_cliente",$codigo_cliente);
 						$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
-						$contrato->Edit("centro_costo",$centro_costo);
 						$contrato->Edit("observaciones",$observaciones);
 						if( method_exists('Conf','GetConf') )
 						{
@@ -305,7 +304,6 @@
 									$contra->Edit("glosa_contrato",$glosa_contrato);
 									$contra->Edit("codigo_cliente",$codigo_cliente);
 									$contra->Edit("id_usuario_responsable",$id_usuario_responsable);
-									$contra->Edit("centro_costo",$centro_costo);
 									$contra->Edit("observaciones",$observaciones);
 									if (method_exists('Conf','TituloContacto'))
 										{

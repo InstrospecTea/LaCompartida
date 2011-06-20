@@ -32,7 +32,23 @@
 	{
 		if($cobros->Load($id_cobro_hide))
 		{
-			if($cobros->Eliminar())
+			$query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($cont_documentos) = mysql_fetch_array($resp);
+			
+			$query = "SELECT count(*) FROM factura WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($cont_facturas) = mysql_fetch_array($resp);
+			
+			if( $cont_documentos > 0 )
+			{
+				$pagina->AddError(__('El cobro N°'.$cobros->fields['id_cobro'].' no se puede borrar porque tiene un pago asociado.'));
+			}
+			else if( $cont_facturas > 0 )
+			{
+				$pagina->AddError(__('El cobro N°'.$cobros->fields['id_cobro'].' no se puede borrar porque tiene un documento tributario asociado.'));
+			}
+			else if($cobros->Eliminar())
 			{
 				$pagina->AddInfo(__('Cobro eliminado con éxito'));
 			}
@@ -178,7 +194,7 @@
 
 		    	$ht = "<tr bgcolor='#F2F2F2'>
 							<td align=center style='font-size:10px; width: 70px;'>
-								<b>N° Cobro</b>
+								<b>".__('N° Cobro')."</b>
 							</td>";
 
 				if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') ) || ( method_exists('Conf','FacturaSeguimientoCobros') && Conf::FacturaSeguimientoCobros() ) )

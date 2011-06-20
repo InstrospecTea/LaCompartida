@@ -598,11 +598,11 @@ if($opc == 'buscar')
 {
 ?>
 	<table width="720px">
-		<tr align="right">
-			<td>
+		<tr>
+			<td align="right" width="580px">
 				<a href="javascript:void(0);" style="color: #990000; font-size: 9px; font-weight: normal;" onclick="ToggleDiv('opciones_excel');"><?=__('opciones excel')?></a>
 			</td>
-			<td>
+			<td align="right" nowrap>
 				<?=__('Idioma')?>: <?= Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","lang",$cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'] ,'','',80);?>
 			</td>
 		</tr>
@@ -646,12 +646,12 @@ if($opc == 'buscar')
 			</td>
 		</tr>
 		<tr>
-			<td align="right">
+			<td align="center" colspan="2">
 				<input type="button" value="<?php echo  __('Asuntos por') .' '.__('cobrar');?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
-				<input type="button" value="Excel borradores" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
-				<input type="button" value="Imprimir borradores" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
-				<input type="button" value="Generar borradores" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
-				<input type="button" value="Emitir cobros" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
+				<input type="button" value="<?=__('Generar borradores')?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
+				<input type="button" value="<?=__('Excel borradores')?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
+				<input type="button" value="<?=__('Imprimir borradores')?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
+				<input type="button" value="<?=__('Emitir cobros')?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
 			</td>
 		</tr>
 	</table>
@@ -797,19 +797,19 @@ if($opc == 'buscar')
 				// Mostrar dos botones de monedas para crear liquidaciones por separado
 				if ($contrato->fields['separar_liquidaciones']) {
 					if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
-						$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='Generar cobro individual para honorarios' border=0 onclick=\"GenerarIndividual('"
+						$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('"
 						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 0)\" >";
 					}
 					if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
 					if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
-						$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='Generar cobro individual para gastos' border=0 onclick=\"GenerarIndividual('"
+						$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('"
 						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 0, 1)\" >";
 					}
 				} else {
 					// Flujo Actual, solo uno que hace ambas cosas
-					$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='Generar cobro individual' border=0 onclick=\"GenerarIndividual('"
+					$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('"
 						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 1)\" >";
 				}
@@ -848,17 +848,17 @@ if($opc == 'buscar')
 		// Mostrar dos botones de monedas para crear liquidaciones por separado
 		if ($contrato->fields['separar_liquidaciones']) {
 			if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
-				$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='Generar cobro individual para honorarios' border=0 onclick=\"GenerarIndividual('',";
+				$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('',";
 				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 1, 0);\" />";
 			}
 			if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
 			if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
-				$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='Generar cobro individual para gastos' border=0 onclick=\"GenerarIndividual('',";
+				$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('',";
 				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 0, 1);\" />";
 			}
 		} else {
 			// Flujo Actual, solo uno que hace ambas cosas
-			$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='Generar cobro individual' border=0 onclick=\"GenerarIndividual('',";
+			$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 1, 1);\" >";
 		}
 		

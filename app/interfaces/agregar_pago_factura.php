@@ -214,14 +214,23 @@
 	
 	function ActualizarMonto()
 	{
+		var lista_facturas = $('lista_facturas').value;
+		var arreglo_facturas = lista_facturas.split(',');
+
 		var cifras_decimales = $('cifras_decimales_pago').value;
 		var monto = Number(0);
-		$$('[id^="saldo_"]').each(function(elem){ 
-			ids = elem.id.split('_');
-			var saldo_fact = Number($('x_saldo_hide_'+ids[1]).value);
-			if(Number(elem.value) > saldo_fact) elem.value = saldo_fact;
-			monto += Number(Redondear(elem.value, cifras_decimales));
-		});
+		for(var i = 0; i<=arreglo_facturas.length-1; i++)
+		{
+			$$('[id^="saldo_"]').each(function(elem){
+				ids = elem.id.split('_');
+				if(ids[1]==arreglo_facturas[i])
+				{
+					var saldo_fact = Number($('x_saldo_hide_'+ids[1]).value);
+					if(Number(elem.value) > saldo_fact) elem.value = saldo_fact;
+					monto += Number(Redondear(elem.value, cifras_decimales));
+				}
+			});
+		}
 		$('monto_moneda_cobro').value = Redondear(monto, cifras_decimales);
 		if($F('id_moneda') == '<?=$id_moneda_cobro?>'){
 			$('monto').value = $('monto_moneda_cobro').value;

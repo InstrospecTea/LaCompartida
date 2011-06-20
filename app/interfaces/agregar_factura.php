@@ -123,8 +123,8 @@
 
 			if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
 			{ 
-				$factura->Edit("descripcion",$descripcion_honorarios_legales);
-				$factura->Edit("honorarios",( $monto_honorarios_legales || $monto_iva_honorarios_legales ) ? $monto_honorarios_legales + $monto_iva_honorarios_legales : NULL);
+				$factura->Edit("descripcion", $descripcion_honorarios_legales);
+				$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
 				$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
 				$factura->Edit("subtotal_sin_descuento", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
 				$factura->Edit("descripcion_subtotal_gastos",$descripcion_gastos_con_iva ? $descripcion_gastos_con_iva: NULL);

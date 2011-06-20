@@ -1,0 +1,134 @@
+<?
+ require_once dirname(__FILE__).'/../conf.php';
+ require_once dirname(__FILE__).'/es.php';
+ 
+	$_LANG['ROL/RUT'] = "RUC";
+	$_LANG['RUT/NIT'] = "RUC";
+	$_LANG['RUT']     = "RUC";
+	$_LANG['Gastos c/ IVA'] = "Gastos c/ IGV";
+	$_LANG['Gastos s/ IVA'] = "Gastos s/ IGV";
+	$_LANG['IVA'] = "IGV";
+	$_LANG['Impuesto'] = "IGV";
+	$_LANG['Monto Impuesto'] = "Monto IGV";
+	$_LANG['Total con IVA']     = "Total con IGV";
+	$_LANG['Pago retenciÃ³n impuestos']     = "DetracciÃ³n";
+	$_LANG['Director proyecto']     = "Encargado comercial";
+
+	$_LANG['Dólares']     = "Dólares Americanos";
+	$_LANG['Dolar']     = "Dólar Americano";
+	
+	# Menú
+	$_LANG['Cobranza']  = "Liquidación";
+	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
+	$_LANG['Seguimiento Cobros'] = "Seguimiento Liquidaciones";
+	$_LANG['Seguimiento de cobros'] = "Seguimiento de Liquidaciones";
+	$_LANG['Cobro N°'] = "Liquidación N°";
+	$_LANG['el cobro N°'] = "la liquidación N°";
+	
+	$_LANG['N° Cobro'] = "N° Liquidación";
+	$_LANG['Eliminar cobro'] = "Eliminar pre-liquidación";
+	$_LANG['Revisar Cobro'] = "Revisar Liquidación";
+	$_LANG['Este cobro es sólo de honorarios, y no incluye gastos'] = "Esta liquidación es sólo de honorarios, y no incluye gastos";
+	$_LANG['Este cobro es sólo de gastos, y no incluye honorarios'] = "Esta liquidación es sólo de gastos, y no incluye honorarios";
+	$_LANG['Emitir Cobro :: Detalle #'] = "Emitir Liquidación :: Detalle #";
+	$_LANG['COBRO CREADO'] = "LIQUIDACIÓN CREADA";
+	$_LANG['Continuar con el cobro'] = "Continuar con la liquidación";
+	$_LANG['Ud. está realizando la emisión masiva de cobros, asegúrese de haber verificado sus datos o cobros en proceso.'] = "Ud. está realizando la emisión masiva de liquidaciones, asegúrese de haber verificado sus datos o liquidaciones en proceso.";
+	$_LANG['¿Desea emitir los cobros?'] = "¿Desea emitir las liquidaciones?";
+	$_LANG['Cobros generado con &eacute;xito'] = "Liquidaciones generado con &eacute;xito";
+	$_LANG['Cobros emitidos con &eacute;xito'] = "Liquidaciones emitidas con &eacute;xito";
+	$_LANG['Generar borradores'] = "Generar Pre-liquidación y planillón";
+	$_LANG['Excel borradores'] = "Planillón Excel";
+	$_LANG['Imprimir borradores'] = "Pre-liquidaciones";
+	$_LANG['Generar cobro individual'] = "Generar liquidación individual";
+	$_LANG['Generar cobro individual para gastos'] = "Generar liquidación individual para gastos";
+	$_LANG['Generar cobro individual para honorarios'] = "Generar liquidación individual para honorarios";
+	
+	#Attache
+	$_LANG['Encargado Comercial'] = "Attache Primario";
+	$_LANG['Usuario encargado'] = "Attache Secundario";
+	
+	$_LANG['Detalle Cobro'] = "Detalle liquidación";
+	$_LANG['No hay gastos en este cobro'] = "No hay gastos en esta liquidación";
+	$_LANG['Cobro'] = "Liquidación";
+	$_LANG['Resumen Nota de Cobro'] = "Resumen Nota de Liquidación";
+	$_LANG['NOTA DE COBRO'] = "NOTA DE LIQUIDACIÓN";
+	$_LANG['Periodo Cobro'] = "Periodo Liquidación";
+	$_LANG['%reference_no%'] = "Liquidación N°";
+	$_LANG['Debe especificar un cliente o cobro'] = "Debe especificar un cliente o liquidación";
+	$_LANG['Ud. a seleccionado forma de cobro:'] = "Ud. a seleccionado forma de liquidación:";
+	$_LANG['Carta de cobro'] = "Carta de liquidación";
+	$_LANG['El valor de este cobro ha excedido al <u>CAP</u> acordado, para igualar al <u>CAP</u> se debe realizar un descuento de'] = "El valor de esta liquidación ha excedido al <u>CAP</u> acordado, para igualar al <u>CAP</u> se debe realizar un descuento de";
+	$_LANG['Proceso masivo de emisión de cobros'] = "Proceso masivo de planillón y Pre-Liquidaciones";
+	$_LANG['Cobros pendientes'] = "Liquidaciónes pendientes";
+	$_LANG['Seleccionar para cobro'] = "Seleccionar para liquidación";
+	$_LANG['¿Ud. desea generar los cobros'] = "¿Ud. desea generar los liquidaciones?";
+	$_LANG['¿Ud. desea emitir los cobros?'] = "¿Ud. desea emitir las liquidaciones?";
+	$_LANG['¿Ud. desea generar este cobro individualmente?'] = "¿Ud. desea generar esta liquidación individualmente?";
+	$_LANG['A continuación se imprimirán los cobros pendientes del periodo, si Ud. desea imprimir todos los cobros deberá chequear la opción correspondiente'] = "A continuación se imprimirán las liquidaciones pendientes del periodo, si Ud. desea imprimir todas las liquidaciones deberá chequear la opción correspondiente";
+	$_LANG['Ver cobro asociado'] = "Ver liquidación asociado";
+	$_LANG['Cobros'] = "Liquidaciones";
+	$_LANG['Cobros emitidos'] = "Liquidaciones emitidos";
+	$_LANG['Revisar cobros'] = "Revisar liquidaciones";
+	$_LANG['Cobro eliminado con éxito'] = "Liquidaciones eliminado con éxito";
+	$_LANG['Listado de cobros'] = "Listado de liquidaciones";
+	$_LANG['Forma de cobro'] = "Forma de liquidaciones";
+	$_LANG['Resumen final del Cobro'] = "Resumen final de la liquidación";
+	$_LANG['Emitir Cobro'] = "Emitir Liquidación";
+	$_LANG['Emitir cobros'] = "Emisión de Liquidaciones";
+	$_LANG['Parámetros del Cobro'] = "Parámetros de la liquidación";
+	$_LANG['Cobro inválido'] = "Liquidación inválida";
+	$_LANG['Debe especificar un cobro'] = "Debe especificar una liquidación";
+	$_LANG['Emitir Cobro :: Selección de asuntos'] = "Emitir Liquidación :: Selección de asuntos";
+	$_LANG['Emitir Cobro :: Seleccion de Gastos'] = "Emitir Liquidación :: Seleccion de Gastos";
+	$_LANG['Emitir Cobro :: Detalle'] = "Emitir Liquidación :: Detalle";
+	$_LANG['Tienes que ingresar la forma de cobro.'] = "Tienes que ingresar la forma de liquidación.";
+	$_LANG['Una vez efectuado el cobro, la información no podrá ser modificada sin reemitir el cobro, ¿Está seguro que desea Emitir el Cobro?'] = "Una vez efectuado la liquidación, la información no podrá ser modificada sin reemitir la liquidación, ¿Está seguro que desea Emitir la liquidación?";
+	$_LANG['Mostrar modalidad del cobro'] = "Mostrar modalidad de la liquidación";
+	$_LANG['Mostrar gastos del cobro'] = "Mostrar gastos de la liquidación";
+	$_LANG['Mostrar el descuento del cobro'] = "Mostrar el descuento de la liquidación";
+	$_LANG['Imprimir Cobro para '] = "Imprimir Liquidación para";
+	$_LANG['¿Está seguro que requiere anular la emisión de este cobro?'] = "¿Está seguro que requiere anular la emisión de esta liquidación?";
+	$_LANG['¿Está seguro de que desea modificar el estado del cobro?'] = "¿Está seguro de que desea modificar el estado del liquidación?";
+	$_LANG['Estado del Cobro'] = "Estado de la Liquidación";
+	$_LANG['Cobro Periodico'] = "Liquidación Periodica";
+	$_LANG['Fecha de Cobro'] = "Fecha de Liquidación";
+	$_LANG['Fecha Estimada de Cobro'] = "Fecha Estimada de Liquidación";
+	$_LANG['Cobro Periodico'] = "Liquidación Periodica";
+	$_LANG['Fecha Primer Cobro'] = "Fecha Primera Liquidación";
+	$_LANG['Emitir cobro :: Selección del Cliente'] = "Emitir Liquidación :: Selección del Cliente";
+	$_LANG['No se puede eliminar un contrato que tenga cobro(s) asociado(s)'] = "No se puede eliminar un contrato que tenga liquidaciones(s) asociada(s)";
+	$_LANG['COBRO EMITIDO'] = "LIQUIDACIÓN EMITIDA";
+	$_LANG['Total Nota de Cobro'] = "Total Nota de Liquidación";
+	$_LANG['Total Cobro'] = "Total Liquidación";
+	$_LANG['Saldo aprovisionado restante tras Cobro #'] = "Saldo aprovisionado restante tras Liquidación #";
+	$_LANG['Fecha último cobro'] = "Fecha última liquidación";
+	$_LANG['Fecha Prox. Cobro'] = "Fecha Prox. Liquidación";
+	$_LANG['horas desde el último cobro'] = "horas desde el última liquidación";
+	$_LANG['monto desde el último cobro'] = "monto desde el última liquidación";
+	$_LANG['Cobro inválido'] = "Liquidación inválida";
+	$_LANG['Hrs cobro/trab.'] = "Hrs liquidación/trab.";
+	$_LANG['Hrs Trab./Cobro.'] = "Hrs Trab./Liquidación.";
+	$_LANG['Minuta de cobro No'] = "Minuta de Liquidación N° ";
+	$_LANG['Fecha Cobro'] = "Fecha Liquidación";
+	$_LANG['Tip suma'] = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de liquidación que no puede tener límites.";
+	$_LANG['Tip mensual'] = "La liquidación se hará de forma mensual.";
+	$_LANG['Tip individual'] = "La liquidación se hará de forma individual de acuerdo al monto definido por Cliente.";
+	$_LANG['No es posible Eliminar el Cobro. Es posible que ya se encuentre eliminado'] = "No es posible Eliminar la liquidación. Es posible que ya se encuentre eliminado";
+	$_LANG['Forma Cobro'] = "Forma Liquidación";
+	$_LANG['Debe ingresar horas desde el último cobro'] = "Debe ingresar horas desde el última liquidación";
+	$_LANG['Debe seleccionar una forma de cobro'] = "Debe seleccionar una forma de liquidación";
+	$_LANG['¿Está seguro de eliminar el cobro?'] = "¿Está seguro de eliminar la liquidación?";
+	$_LANG['que tiene cobros asociados'] = "que tiene liquidaciones asociados";
+	$_LANG['que tiene cobros asociados.'] = "que tiene liquidaciones asociados.";
+	$_LANG['Error no se pudo gardar cobro #'] = "Error no se pudo guardar liquidación #";
+	$_LANG['Departamento Cobranza'] = "Departamento Liquidación";
+	$_LANG['id_cobro'] = "N° Liquidación";
+	$_LANG['forma_cobro'] = "Forma de Liquidación";
+	$_LANG['TituloContacto'] = "Indicar titulo de persona en la carta de liquidación";
+	$_LANG['ValorSinEspacio'] = "Mostrar valores en nota de liquidación sin espacio entre simbolo y monto";
+	$_LANG['ParafoGastosSoloSiHayGastos'] = "Solo imprime parafo de gastos si la liquidación tiene gastos";
+	$_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de asuntos si la liquidación tiene trabajos";
+	
+
+?>

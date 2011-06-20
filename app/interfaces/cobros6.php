@@ -219,7 +219,7 @@
                 $factura->Edit('descripcion',$servicio_periodo); 
                 $factura->Edit('id_cobro',$cobro->fields['id_cobro']); 
                 $factura->Edit('id_moneda', $documento_cobro->fields['id_moneda']); 
-                $factura->Edit('honorarios', $documento_cobro->fields['honorarios']); 
+                $factura->Edit('honorarios', $documento_cobro->fields['honorarios']);
                 $factura->Edit('gastos', $documento_cobro->fields['gastos']); 
                 if( $factura->Escribir() )
                 {
@@ -1151,7 +1151,7 @@ function AgregarFactura(idx){
 	</tr>
 	<tr>
 		<!-- Facturas -->
-		<td>
+		<td colspan="2">
 				<?
 				if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')) {
 					?>

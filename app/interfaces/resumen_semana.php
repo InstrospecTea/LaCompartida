@@ -219,9 +219,10 @@ else
 		echo("<tr>");
 		for($i = 0; $i < 7; $i++)
 		{
+			$dia_de_mes = date("j",strtotime(Utiles::add_date($semana_actual,$i)));
 			echo("
-			<td style='width: 100px; border: 1px solid black; text-align:center;'>
-				$dias[$i]
+			<td style='width: 100px; border: 1px solid black; text-align:center;' nowrap>
+				$dias[$i] $dia_de_mes
 			</td>
 			");
 		}

@@ -475,8 +475,8 @@ function Refrescar()
 		<td align='left'>
 			<?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrado",$cobrado,'','Todos','60')?>
 			</td>
-			<td align="left">
-				<?=__('N° Cobro')?>&nbsp;
+			<td align="left" nowrap>
+				<?=__('id_cobro')?>&nbsp;
 				<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type=text size=6 name=id_cobro id=id_cobro value="<?=$id_cobro ?>">
 			</td>
 	</tr>
