@@ -22,6 +22,8 @@
 	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	$params_array['codigo_permiso'] = 'COB';
 	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	$params_array['codigo_permiso'] = 'PRO';
+	$permiso_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
 	if($id_trabajo > 0)
 	{
@@ -1298,11 +1300,24 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 
     </tr>
 			<tr>
+				<?
+					$mostrar_cobrable=true;
+					if($permiso_profesional->fields['permitido'] && !$permisos->fields['permitido']) {
+						$mostrar_cobrable=false;
+					}
+				?>
 				<td colspan="2" align=right>
+					<?	if($mostrar_cobrable) { ?>
 					<?=__('Cobrable')?><br/>
+					<? } ?>
 				</td>
 				<td align=left>
+					<?	if($mostrar_cobrable) { ?>
 					<input type=checkbox name=cobrable value=1 <?= $t->fields['cobrable'] == 1 ? "checked" : "" ?> id="chkCobrable" onClick="CheckVisible();">
+					<? } 
+					else {?>
+					<input type=hidden name=cobrable value=1 >
+					<? } ?>
 					&nbsp;&nbsp;
 					<div id=divVisible <? if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
 					<? if($permisos->fields['permitido']) { ?>

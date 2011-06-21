@@ -361,6 +361,7 @@
 		var cifras_decimales = $('cifras_decimales_pago').value;
 		var lista_facturas = $('lista_facturas').value;
 		arreglo_facturas = lista_facturas.split(',');
+		var porcentaje_impuesto_retencion = 12;
 		for(var i = 0; i<=arreglo_facturas.length-1; i++)
 		{
 			var monto_pagos = $('x_saldo_hide_'+arreglo_facturas[i]).value;
@@ -368,14 +369,27 @@
 
 			if( $('pago_retencion').checked )
 			{
-				monto_retencion_impuestos = monto_pagos*12;
-				monto_retencion_impuestos = (monto_retencion_impuestos.round())/100;
-				monto_retencion_impuestos = monto_retencion_impuestos.toFixed(cifras_decimales);
+				if($('pago_retencion_monto_loaded').value!='false'){
+					monto_retencion_impuestos = $('pago_retencion_monto_loaded').value;
+				}
+				else{
+					monto_retencion_impuestos = monto_pagos*porcentaje_impuesto_retencion;
+					monto_retencion_impuestos = (monto_retencion_impuestos.round())/100;
+					monto_retencion_impuestos = monto_retencion_impuestos.toFixed(cifras_decimales);
+				}
 				$('saldo_'+arreglo_facturas[i]).value = monto_retencion_impuestos;
 			}
 			else
 			{
-				$('saldo_'+arreglo_facturas[i]).value = monto_pagos;
+				if($('pago_retencion_monto_loaded').value!='false'){
+					monto_retencion_impuestos = monto_pagos*100;
+					monto_retencion_impuestos = (monto_retencion_impuestos.round())/porcentaje_impuesto_retencion;
+					monto_retencion_impuestos = monto_retencion_impuestos.toFixed(cifras_decimales);
+					$('saldo_'+arreglo_facturas[i]).value = monto_retencion_impuestos;
+				}
+				else{
+					$('saldo_'+arreglo_facturas[i]).value = monto_pagos;
+				}
 			}
 		}
 		ActualizarMonto();
@@ -431,6 +445,7 @@
 <input type=hidden name='id_factura_pago' id='id_factura_pago' value='<?=$pago->fields['id_factura_pago'];?>' />
 <input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?=$moneda_cobro->fields['cifras_decimales']?>" />
 <input type=hidden name='id_factura_pago' id='id_factura_pago' value="<?=$pago->fields['id_factura_pago']?>" />
+<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?=$pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>"
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>

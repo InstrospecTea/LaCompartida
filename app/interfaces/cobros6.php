@@ -25,6 +25,16 @@
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	
 	$factura_pago = new FacturaPago($sesion);
+
+	if( $opc == 'eliminar_pago' )
+	{
+		if( $eliminar_pago > 0 )
+			{
+				$factura_pago->Load($eliminar_pago);
+				if( $factura_pago->Eliminar() )
+					$pagina->addInfo(__('Pago borrado con exitó'));
+			}
+	}
 	if($opc == "eliminar_documento")
 	{
 		$documento_eliminado = new Documento($sesion);
@@ -249,7 +259,7 @@
                 $id_factura=$factura->fields['id_factura']; 
         }
 		}
-		
+	
 	if($opc == 'guardar')
 	{
 		$cambiar_estado = false;
@@ -292,15 +302,7 @@
 		$cobro->Write();
 	}
 
-	if( $opc == 'eliminar_pago' ) 
-	{
-		if( $eliminar_pago > 0 )
-			{
-				$factura_pago->Load($eliminar_pago);
-				if( $factura_pago->Eliminar() )
-					$pagina->addInfo(__('Pago borrado con exitó'));
-			}
-	}
+	
 
 	if($cambiar_estado)
 	{				

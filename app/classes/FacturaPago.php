@@ -114,6 +114,17 @@ class FacturaPago extends Objeto
 
 		$mvto_neteado = new CtaCteFactMvto($this->sesion);
 		$factura = new Factura($this->sesion);
+		$factura_encabezado =  new Factura($this->sesion);
+
+		//EL voucher debe mostrar como encabezado el nombre de
+		//la razon social asociada a la 1era Factura que esta pagando
+		$lista_facturas_desde_pago = $this->GetListaFacturasSoyPago();
+		$arr_factura = split(',',$lista_facturas_desde_pago);
+		$factura_encabezado->Load($arr_factura[0]);
+		//print_r($factura_encabezado->fields);
+		$glosa_cliente_encabezado = $factura_encabezado->fields['cliente'];
+		$rut_cliente_encabezado = $factura_encabezado->fields['RUT_cliente'];
+
 
 		$html = $parser_factura_pago->tags[$theTag];
 
@@ -146,8 +157,8 @@ class FacturaPago extends Objeto
 				$html = str_replace('%moneda%', __('Moneda'), $html);
 
 				$html = str_replace('%Num_valor%', $this->fields['nro_documento'], $html);
-				$html = str_replace('%rut_valor%', $rut_cliente, $html);
-				$html = str_replace('%cliente_valor%', $glosa_cliente, $html);
+				$html = str_replace('%rut_valor%', $rut_cliente_encabezado, $html);
+				$html = str_replace('%cliente_valor%', $glosa_cliente_encabezado, $html);
 				$html = str_replace('%cheque_valor%', $this->fields['nro_cheque'], $html);
 				$html = str_replace('%concepto_valor%', $this->fields['descripcion'], $html);
 				$html = str_replace('%fecha_valor%', $this->fields['fecha'], $html);

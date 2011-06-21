@@ -71,7 +71,7 @@ xmlns="http://www.w3.org/TR/REC-html40">
 if( $id_formato != '' )
 	$where = " WHERE id_formato = '$id_formato' ";
 else
-	$where = " ORDER BY id_formato LIMIT 1";
+	$where = " WHERE 1=2";
 $query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
 list($html_header, $html_pie) = mysql_fetch_array($resp); 

@@ -173,7 +173,7 @@ class Documento extends Objeto
 									$neteo_documento = new NeteoDocumento($this->sesion);
 									//Si el neteo existía, está siendo modificado y se debe partir de 0:
 									if( $neteo_documento->Ids($id_documento,$id_documento_cobro)) 
-										$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro); 
+										$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro);
 									else
 										$out_neteos .= "<tr><td>No</td><td>0</td><td>0</td>";
 									
@@ -189,6 +189,8 @@ class Documento extends Objeto
 											$cambios_en_saldo_honorarios[] = $id_documento_cobro;
 										if($saldo_gastos_anterior != $documento_cobro_aux->fields['saldo_gastos'])
 											$cambios_en_saldo_gastos[] = $id_documento_cobro;
+
+										$neteo_documento->CambiarEstadoCobro($id_cobro_neteado,$documento_cobro_aux->fields['saldo_honorarios'],$documento_cobro_aux->fields['saldo_gastos']);
 									}
 								}
 						

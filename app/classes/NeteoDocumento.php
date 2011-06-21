@@ -112,6 +112,8 @@ class NeteoDocumento extends Objeto
 
 				$documento_cobro->Write();
 
+				$this->CambiarEstadoCobro($documento_cobro->fields['id_cobro'],$saldo_cobro_honorarios,$saldo_cobro_gastos);
+				
 				$this->Edit('valor_cobro_honorarios','0');
 				$this->Edit('valor_cobro_gastos','0');
 				$this->Edit('valor_pago_honorarios','0');
@@ -242,6 +244,25 @@ class NeteoDocumento extends Objeto
 		}	
 		return $out;
 	}
+
+	function CambiarEstadoCobro($id_cobro,$saldo_cobro_honorarios,$saldo_cobro_gastos)
+	{
+		$cobro = new Cobro($this->sesion);
+		$cobro->Load($id_cobro);
+		if($cobro->Loaded())
+		{
+			if(($cobro->fields['estado']=='PAGADO') && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
+			{
+				$cobro->Edit('estado','EMITIDO');
+			}
+			else if((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE')) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
+			{
+				$cobro->Edit('estado','PAGADO');
+			}
+			$cobro->Write();
+		}
+	}
+
 }
 
 

@@ -346,7 +346,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 			<?=__('Categoría Usuario')?>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<?=Html::SelectQuery($sesion,'SELECT id_categoria_usuario,glosa_categoria FROM prm_categoria_usuario ORDER BY id_categoria_usuario','id_categoria_usuario', $usuario->fields['id_categoria_usuario'] ? $usuario->fields['id_categoria_usuario'] : $id_categoria_usuario ,"onchange=Cambiar_Usuario_Categoria('".$usuario->fields['id_usuario']."','id_categoria_usuario','cambiar_tarifa_usuario'); ")?>
+			<?=Html::SelectQuery($sesion,'SELECT id_categoria_usuario,glosa_categoria FROM prm_categoria_usuario ORDER BY id_categoria_usuario','id_categoria_usuario', $usuario->fields['id_categoria_usuario'] ? $usuario->fields['id_categoria_usuario'] : $id_categoria_usuario ,$usuario->loaded ? "onchange=Cambiar_Usuario_Categoria('".$usuario->fields['id_usuario']."','id_categoria_usuario','cambiar_tarifa_usuario'); " : "")?>
 		</td>
 	</tr>
 	<tr>

@@ -268,8 +268,13 @@
 		$descripcion_subtotal_gastos_sin_impuesto = __('Gastos s/ IVA');
 		$monto_subtotal_gastos_sin_impuesto = $subtotal_gastos_sin_impuestos;			
 
-		
-		if($id_cobro > 0)
+
+		if($factura->loaded())
+		{
+			if($factura->fields['porcentaje_impuesto'] > 0)
+				$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
+		}
+		else if($id_cobro > 0)
 		{
 			$cobro = new Cobro($sesion);
 			$cobro->load($id_cobro);
@@ -278,14 +283,10 @@
 				$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
 			}
 		}
-		if($factura->loaded())
-		{
-			if($factura->fields['porcentaje_impuesto'] > 0)
-				$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
-		}
 		else
 		{
 			$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
+			//$porcentaje_impuesto = 0;
 		}
 		
 		if($factura->fields['total'] >0){
@@ -774,6 +775,7 @@ function desgloseMontosFactura(form){
 		if($cobro->fields['porcentaje_impuesto_gastos'] == 0 && (( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'ValorImpuestoGastos'))))) {
 			?>
 			porcentaje_impuesto_gastos = <?=Conf::GetConf($sesion,'ValorImpuestoGastos');?>;
+			//porcentaje_impuesto_gastos = 0;
 			<?php
 		}
 	}	
