@@ -279,14 +279,11 @@
 			$cobro = new Cobro($sesion);
 			$cobro->load($id_cobro);
 			$porcentaje_impuesto = $cobro->fields['porcentaje_impuesto'];
-			if($cobro->fields['porcentaje_impuesto'] == 0 && (( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'ValorImpuesto'))))) {
-				$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
-			}
 		}
 		else
 		{
-			$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
-			//$porcentaje_impuesto = 0;
+			//$porcentaje_impuesto = Conf::GetConf($sesion,'ValorImpuesto');
+			$porcentaje_impuesto = 0;
 		}
 		
 		if($factura->fields['total'] >0){

@@ -62,7 +62,8 @@
 			$pago->Edit('id_factura_pago',$id_factura_pago);
 		}
 		$pago->Edit('fecha', Utiles::fecha2sql($fecha));
-		$pago->Edit('codigo_cliente', $codigo_cliente);
+		//$pago->Edit('codigo_cliente', $codigo_cliente);
+		$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 		$pago->Edit('monto', $monto);
 		$pago->Edit('id_moneda', $id_moneda);
 		$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
@@ -445,7 +446,8 @@
 <input type=hidden name='id_factura_pago' id='id_factura_pago' value='<?=$pago->fields['id_factura_pago'];?>' />
 <input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?=$moneda_cobro->fields['cifras_decimales']?>" />
 <input type=hidden name='id_factura_pago' id='id_factura_pago' value="<?=$pago->fields['id_factura_pago']?>" />
-<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?=$pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>"
+<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?=$pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>" />
+<input type="hidden" name="codigo_cliente_factura" value="<?= $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente?>" >
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -502,7 +504,6 @@
 				$cliente = new Cliente($sesion);
 				$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario( $codigo_cliente );
 			}
-
 			if(UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 				{
 					if(UtilesApp::GetConf($sesion,'CodigoSecundario') )
@@ -518,7 +519,7 @@
 						}
 						else
 						{
-							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente," ","CargarTabla(1);", 280);
+							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente," disabled ","CargarTabla(1);", 280);
 						}
 				} ?>
 		</td>

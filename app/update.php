@@ -5452,6 +5452,31 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
+
+
+
+
+
+
+
+
+
+					case 4.21:
+						$query = array();
+						$query[] = "CREATE TABLE `usuario_cambio_historial` (
+						  `id_usuario` int(11) default NULL,
+						  `id_usuario_creador` int(11) NOT NULL default '0',
+						  `nombre_dato` varchar(255) default NULL,
+						  `valor_original` text,
+						  `valor_actual` text,
+						  `fecha` datetime default NULL,
+						  KEY `id_usuario` (`id_usuario`),
+						  KEY `usuario_creador` (`id_usuario_creador`)
+						) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Historial de cambios en usuarios';";
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh)))
+								throw new Exception($q."---".mysql_error());
+					break;
  	}
 }
 
@@ -5643,6 +5668,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.19;
 	$VERSIONES[$num++] = 4.20;
 	$VERSIONES[$num++] = 4.21;
+	$VERSIONES[$num++] = 4.22;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

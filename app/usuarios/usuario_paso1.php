@@ -7,85 +7,108 @@
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 
 	$sesion = new Sesion( array('ADM') );
-
 	$pagina = new Pagina($sesion);
-
 	$pagina->titulo = __('Administración de Usuarios') ;
 
 	if ($opc=="eliminado")
 		$pagina->AddInfo(__('Usuario').' '.__('eliminado con éxito'));
 
-		if($desde == "")
-				$desde = 0;
-		if($x_pag == "")
-				$x_pag = 20;
-		if($orden == '')
-				$orden = 'apellido1';
-				
+	if($desde == "")
+			$desde = 0;
+	if($x_pag == "")
+			$x_pag = 20;
+	if($orden == '')
+			$orden = 'apellido1';
+
+	//Opción cancelar
 	if($opc == 'cancelar')
 	{
 		$pagina->Redirect('usuario_paso1.php');
 	}
+	//Opción editar
 	else if($opc == 'edit')
 	{
 		if($cambiar_alerta_diaria=='on') 
-				{ 
-				if($alerta_diaria=='on') $alerta_diaria=1; else $alerta_diaria=0; 
-				if($retraso_max=='') $retraso_max=0;
-				} 
-				else 
-				{
-				$alerta_diaria='alerta_diaria';
-				$retraso_max='retraso_max';
-				}
+		{ 
+			if($alerta_diaria=='on') $alerta_diaria=1; else $alerta_diaria=0; 
+			if($retraso_max=='') $retraso_max=0;
+		} 
+		else 
+		{
+			$alerta_diaria='alerta_diaria';
+			$retraso_max='retraso_max';
+		}
 		if($cambiar_restriccion_diario=='on')
-				{
-				if($restriccion_diario=='') $restriccion_diario=0;
-				}
-				else
-				{
-				$restriccion_diario='restriccion_diario';
-				}
+		{
+			if($restriccion_diario=='')
+				$restriccion_diario=0;
+		}
+		else
+		{
+			$restriccion_diario='restriccion_diario';
+		}
 		if($cambiar_alerta_semanal=='on') 
-				{ 
-				if($alerta_semanal=='on') $alerta_semanal=1; else $alerta_semanal=0; 
-				if($restriccion_max=='') $restriccion_max=0;
-				if($restriccion_min=='') $restriccion_min=0;
-				} 
-				else 
-				{
-				$alerta_semanal='alerta_semanal';
-				$restriccion_max='restriccion_max';
-				$restriccion_min='restriccion_min';
-				}
+		{
+			if($alerta_semanal=='on') 
+				$alerta_semanal=1; 
+			else
+				$alerta_semanal=0; 
+			if($restriccion_max=='')
+				$restriccion_max=0;
+			if($restriccion_min=='')
+				$restriccion_min=0;
+		} 
+		else 
+		{
+			$alerta_semanal='alerta_semanal';
+			$restriccion_max='restriccion_max';
+			$restriccion_min='restriccion_min';
+		}
 		if($cambiar_restriccion_mensual=='on')
-				{
-				if($restriccion_mensual=='') $restriccion_mensual=120;
-				}
-			else
-				{
-				$restriccion_mensual='restriccion_mensual';
-				}
+		{
+			if($restriccion_mensual=='') 
+				$restriccion_mensual=120;
+		}
+		else
+		{
+			$restriccion_mensual='restriccion_mensual';
+		}
 		if($cambiar_dias_ingreso_trabajo=='on')
-				{
-				if($dias_ingreso_trabajo=='') $dias_ingreso_trabajo=7;
-				}
-			else
-				{
-				$dias_ingreso_trabajo='dias_ingreso_trabajo';
-				}
+		{
+			if($dias_ingreso_trabajo=='') 
+				$dias_ingreso_trabajo=7;
+		}
+		else
+		{
+			$dias_ingreso_trabajo='dias_ingreso_trabajo';
+		}
+	
+		//Actualizar alerta de Usuario
+		$query3 = "UPDATE usuario SET alerta_diaria=".$alerta_diaria.", alerta_semanal=".$alerta_semanal.", retraso_max=".$retraso_max.",
+					restriccion_max=".$restriccion_max.", restriccion_min=".$restriccion_min.", restriccion_mensual=".$restriccion_mensual.",
+					dias_ingreso_trabajo=".$dias_ingreso_trabajo.", restriccion_diario=".$restriccion_diario;
+		$resp3 = mysql_query($query3,$sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
 		
-		$query3="UPDATE usuario SET alerta_diaria=".$alerta_diaria.", alerta_semanal=".$alerta_semanal.", retraso_max=".$retraso_max.",
-							restriccion_max=".$restriccion_max.", restriccion_min=".$restriccion_min.", restriccion_mensual=".$restriccion_mensual.",
-							dias_ingreso_trabajo=".$dias_ingreso_trabajo.", restriccion_diario=".$restriccion_diario;
-		$resp3=mysql_query($query3,$sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
+		//Insert para el registro de cambios Restricciones y alertas generales
+		$nuevos = 'Alerta diaria: '.$alerta_diaria.',';
+		$nuevos .= 'Retraso max. diaria (HH): '.$retraso_max.',';
+		$nuevos .= 'Restricción min. diaria (HH): '.$restriccion_diario.',';
+		$nuevos .= 'Alerta semanal: '.$alerta_semanal.',';
+		$nuevos .= 'Restricción min. semanal (HH): '.$restriccion_min.',';
+		$nuevos .= 'Restricción max. semanal (HH): '.$restriccion_max.',';		
+		$nuevos .= 'Restricción min. mensual (Hrs): '.$restriccion_mensual.',';
+		$nuevos .= 'Plazo max. (días) para ingreso de trabajos: '.$dias_ingreso_trabajo;
+		$query4 = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
+		$query4 .= " VALUES(NULL,'".$sesion->usuario->fields['id_usuario']."','Restricciones y alertas generales',NULL,'".$nuevos."',NOW())";
+		$resp = mysql_query($query4, $sesion->dbh) or Utiles::errorSQL($query4,__FILE__,__LINE__,$sesion->dbh);
 		
-		if($alerta_diaria==0) $alerta_diaria='';
-		if($alerta_semanal==0) $alerta_semanal='';
+		if($alerta_diaria==0) 
+			$alerta_diaria='';
+		if($alerta_semanal==0)
+			$alerta_semanal='';
 	}
 	
 	$pagina->PrintTop();
-
 	$tooltip_text = __('Para agregar un nuevo usuario ingresa su RUT aquí.');
 ?>
 

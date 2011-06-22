@@ -9,7 +9,20 @@
 	$dbhOrigen = @mysql_connect(ConfMigracion::dbHost(), ConfMigracion::dbUser(),ConfMigracion::dbPass()) or die(mysql_error());
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	
+	$sesion = new Sesion();
+	$migracion = new Migracion($sesion);
 	
+	if( method_exists('ConfMigracion','DatosPrm') && ConfMigracion::DatosPrm() != "" )
+	{
+		$migracion->SetDatosParametricos(ConfMigracion::DatosPrm());
+	}
+	
+	if( method_exists('ConfMigracion','QueryUsuario') && ConfMigracion::QueryUsuario() != "" )
+	{
+	$responseUsuario = mysql_query(ConfMigracion::QueryUsuario(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryUsuario(),__FILE__,__LINE__,$dbhOrigen);
+	$migracion->Query2ObjetoUsuario($responseUsuario);
+	}
+	exit;
 	if( method_exists('ConfMigracion','QueryCliente') && ConfMigracion::QueryCliente() != "" )
 	{
 	$responseCliente = mysql_query(ConfMigracion::QueryCliente(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCliente(),__FILE__,__LINE__,$dbhOrigen);
@@ -19,13 +32,7 @@
 	if( method_exists('ConfMigracion','QueryAsunto') && ConfMigracion::QueryAsunto() != "" )
 	{
 	$responseAsunto = mysql_query(ConfMigracion::QueryAsunto(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryAsunto(),__FILE__,__LINE__,$dbhOrigen);
-	Migracion::ImprimirDataEnPantalla($responseAsunto);
-	}
-	
-	if( method_exists('ConfMigracion','QueryUsuario') && ConfMigracion::QueryUsuario() != "" )
-	{
-	$responseUsuario = mysql_query(ConfMigracion::QueryUsuario(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryUsuario(),__FILE__,__LINE__,$dbhOrigen);
-	Migracion::Query2ObjetoUsuario($responseUsuario);
+	Migracion::Query2ObjetoAsunto($responseAsunto);
 	}
 	
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )

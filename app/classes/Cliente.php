@@ -31,7 +31,12 @@ class Cliente extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
-
+ 
+  function InsertarDatos( /* Argumentos */)
+  {
+   // Copia de pedazo de codigo en agregar_cliente.php	
+  }
+  
 	//funcion que asigna el nuevo codigo automatico para un cliente
 	function AsignarCodigoCliente()
 	{

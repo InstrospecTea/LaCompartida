@@ -721,7 +721,7 @@ class Factura extends Objeto
 		if (empty($tipo_documento_legal)) {
 			return false;
 		}
-		$query = "SELECT MAX(numero) as numero_actual FROM factura WHERE id_documento_legal = " . $tipo_documento_legal;
+		$query = "SELECT MAX(numero) as numero_actual FROM factura WHERE id_documento_legal = '".$tipo_documento_legal."' AND serie_documento_legal = '".Conf::GetConf($this->sesion,'SerieDocumentosLegales')."'";
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__ , __LINE__, $this->sesion->dbh);
 		list($numero_max) = mysql_fetch_array($numero_resp);
 		return $numero_max;

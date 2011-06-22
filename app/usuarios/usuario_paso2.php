@@ -27,6 +27,16 @@
 
 	if($opc == 'edit')
 	{
+		//Arreglo Original, antes de guardar los cambios $arr1
+		$arr1 = $usuario->fields;
+		if($email == "")
+			$pagina->AddError(__('Debe ingresar el e-mail del usuario'));
+
+		$usuario->Edit('rut', Utiles::LimpiarRut($rut));
+		$usuario->Edit('dv_rut', $dv_rut);
+		$usuario->Edit('nombre', $nombre);
+		$usuario->Edit('apellido1', $apellido1);
+		$usuario->Edit('apellido2', $apellido2);
 		$query = "SELECT count(*) FROM usuario WHERE username = '".addslashes($username)."' AND username != '".addslashes($usuario->fields['username'])."'";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($cantidad) = mysql_fetch_array($resp);
@@ -38,7 +48,35 @@
 			$focus_username = true;
 		}
 		else
-		{
+			$usuario->Edit('username', $username);
+		$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
+		$usuario->Edit('id_area_usuario', $id_area_usuario);
+		$usuario->Edit('telefono1', $telefono1);
+		$usuario->Edit('telefono2', $telefono2);
+		$usuario->Edit('dir_calle', $dir_calle);
+		$usuario->Edit('dir_numero', $dir_numero);
+		$usuario->Edit('dir_depto', $dir_depto);
+		$usuario->Edit('dir_comuna', $dir_comuna);
+		$usuario->Edit('email', $email);
+		$usuario->Edit('activo', $activo);
+		$usuario->Edit('visible', $activo==1 ? 1 : $visible);
+		$usuario->Edit('restriccion_min', $restriccion_min);
+		$usuario->Edit('restriccion_max', $restriccion_max);
+		$usuario->Edit('restriccion_mensual', $restriccion_mensual);
+		if($dias_ingreso_trabajo == "") { $dias_ingreso_trabajo = 30; }
+		$usuario->Edit('dias_ingreso_trabajo', $dias_ingreso_trabajo);
+		$usuario->Edit('retraso_max', $retraso_max);
+		$usuario->Edit('restriccion_diario', $restriccion_diario);
+		$usuario->Edit('alerta_diaria', $alerta_diaria);
+		$usuario->Edit('alerta_semanal', $alerta_semanal);
+		$usuario->Edit('alerta_revisor', $alerta_revisor);
+		//$usuario->Edit('id_moneda_costo', $id_moneda_costo);
+
+		//Compara y guarda cambios en los datos del Usuario
+		$usuario->GuardaCambiosUsuario($arr1, $usuario->fields);
+
+ 		if( $usuario->loaded )
+		{		
 			if($email == "")
 				$pagina->AddError(__('Debe ingresar el e-mail del usuario'));
 	
@@ -108,9 +146,12 @@
 					$pagina->AddError( $usuario->error );
 				}
 			}
-	
-			$lista_monedas = new ListaObjetos($sesion,"","SELECT * FROM prm_moneda");
-			for($x=0;$x<$lista_monedas->num;$x++)
+		}
+		else
+		{
+			$new_password = Utiles::NewPassword();
+			$usuario->Edit('password', md5( $new_password ) );
+			if( $usuario->Write() )
 			{
 				$moneda = $lista_monedas->Get($x);
 				if($mon_costo[$moneda->fields['id_moneda']] != 0)
@@ -144,8 +185,11 @@
 		if( $usuario->EliminaVacacion($vacacion_id_tmp,$usuario->fields['id_usuario']) )
 			$pagina->AddInfo( __('Se ha eliminado correctamente el dato de vacaciones.'));
 	}
-
-	$usuario_vacaciones = $usuario->ListaVacacion($usuario->fields['id_usuario']);
+	
+	//Lista de vacaciones
+	$usuario_vacaciones = array();
+	if($usuario->loaded)
+		$usuario_vacaciones = $usuario->ListaVacacion($usuario->fields['id_usuario']);
 	$pagina->titulo = __('Administración - Usuarios');
 	$pagina->PrintTop();
   if($usuario->loaded)
@@ -290,8 +334,6 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 		}
 									
 </script>
-
-
 
 <form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data" onSubmit="return Validar(this);">
  <input type="hidden" name="opc" id="opc" value="edit" />
@@ -448,7 +490,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<fieldset>
 	<legend><?=__('Permisos')?></legend>
 	<table>
-                <?=Html::PrintCheckbox($sesion, $usuario->permisos, 'codigo_permiso', 'glosa', 'permitido');?>
+		<?=Html::PrintCheckbox($sesion, $usuario->permisos, 'codigo_permiso', 'glosa', 'permitido');?>
 <?
 	if(!$usuario->loaded)
 		echo "<em>Debe agregar el usuario para poder asignarle permisos</em>";
@@ -659,6 +701,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 					<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fin</td>
 					<td width="40px" style="border:1px solid #ccc">&nbsp;</td>
 				</tr>
+<?php if( !empty($usuario_vacaciones) ): ?>
 <?php foreach($usuario_vacaciones as $k => $vaca): ?>
 				<tr>
 					<td style="border:1px solid #ccc; text-align:center;"><?php echo $vaca['fecha_inicio']; ?></td>
@@ -666,6 +709,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 					<td style="border:1px solid #ccc; text-align: center"><img src= "<?=Conf::ImgDir()?>/eliminar.gif" id="vacacion_<?php echo $vaca['id']; ?>" border="0" style="cursor:pointer;" class="cls_eliminar_vacacion" title="Eliminar registro" ></td>
 				</tr>
 <?php endforeach; ?>
+<?php endif; ?>
 			</table>
 		</fieldset>
 		
@@ -731,23 +775,49 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 <?
     }
 ?>
-<?
+<?php
 function CargarPermisos()
 {
-    global $usuario, $pagina, $permiso, $_POST;
-
-    for($i = 0; $i < $usuario->permisos->num; $i++)
-    {
-        $permiso = &$usuario->permisos->get($i);
-        if($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']])
-        {
-            $permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
-            if(!$usuario->EditPermisos($permiso))
-                $pagina->AddError($usuario->error);
-        }
-    }
-    $usuario->PermisoALL();
-}?>
+	global $usuario, $pagina, $permiso, $_POST;
+	$permisos_inactivos = array();
+	$permisos_activos = array();
+	$permisos_activados = array();
+	//Obtenemos lista de permisos actual sin considerar ALL
+	$lista_actual_permisos = $usuario->ListaPermisosUsuario($usuario->fields['id_usuario']);
+	for($i = 0; $i < $usuario->permisos->num; $i++)
+	{
+	  $permiso = &$usuario->permisos->get($i);
+	  if($permiso->fields['permitido'] <> $_POST[$permiso->fields['codigo_permiso']])
+	  {
+	  	$permisos_inactivos[] = $permiso->fields['codigo_permiso'];
+	    $permiso->fields['permitido'] = $_POST[$permiso->fields['codigo_permiso']];
+	    if( !$usuario->EditPermisos($permiso) )
+				$pagina->AddError($usuario->error);
+			else if( !empty($_POST[$permiso->fields['codigo_permiso']]) )
+				$permisos_activados[] = $permiso->fields['codigo_permiso'];
+	  }
+	  else
+	  	$permisos_activos[] = $permiso->fields['codigo_permiso'];
+	}
+	$usuario->PermisoALL();
+	
+	//Si se agregaron permisos nuevos
+	if( !empty($permisos_activados) )
+	{
+		$permisos_activados = array_merge($permisos_activados, $permisos_activos);
+		$permisos_activados = implode(',', $permisos_activados);
+		$permisos_activos = implode(',', $permisos_activos);
+		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
+	}
+	//Si hay diferencia entre los activos vs los que se econtraban agregados es porque se quitó alguno
+	else if( count($lista_actual_permisos) <> count($permisos_activos) )
+	{
+		$permisos_activados = implode(',', $permisos_activos);
+		$permisos_activos = implode(',', $lista_actual_permisos);
+		$usuario->GuardaCambiosRelacionUsuario($usuario->fields['id_usuario'], 'permisos', $permisos_activos, $permisos_activados);
+	}
+}
+?>
 <script>
 	window.onbeforeunload = function(){
      return preguntarGuardar();

@@ -1,7 +1,9 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
+require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 require_once Conf::ServerDir().'/../app/classes/CobroPendiente.php';
@@ -9,24 +11,27 @@ require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
 require_once Conf::ServerDir().'/../app/classes/Asunto.php';
 require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
+require_once Conf::ServerDir().'/../app/classes/UsuarioExt.php';
 
 class Migracion
 {
-	public function Migracion($sesion)
+	var $sesion = null;
+	var $logs = array();
+
+	public function Migracion()
 	{
-		$this->sesion = $sesion;
-		$this->pagina = new Pagina($this->sesion, true);
+		$this->sesion = new Sesion();
 	}
 	
-	public function AgregarAsunto($asunto = null,  $contrato = null, $cobros_pendientes = array(), $documentos_delegados = array(), $cliente = null)
+	public function AgregarAsunto($asunto = null,  $contrato = null, $cobros_pendientes = array(), $documentos_legales = array(), $cliente = null)
 	{
 		if (empty($asunto) or empty($cliente))
 		{
-			$this->pagina->AddError("Faltan parametro(s), asunto o cliente");
+			$this->logs[] = "Faltan parametro(s), asunto o cliente";
 			return false;
 		}
 		
-		$asunto_existente = new Asunto($this->session);
+		$asunto_existente = new Asunto($this->sesion);
 
 		if($asunto->fields['id_asunto'])
 		{
@@ -43,12 +48,12 @@ class Migracion
 
 		if($asunto_existente->Loaded())
 		{
-			$this->pagina->AddError("El asunto con código " . $asunto->fields["codigo_asunto"] . " ya existe.");
+			$this->logs[] = "El asunto con código " . $asunto->fields["codigo_asunto"] . " ya existe.";
 			return true;
 		}
 		else if (empty($asunto->fields["codigo_asunto"]))
 		{
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoEspecialGastos') ) || ( method_exists('Conf','CodigoEspecialGastos') && Conf::CodigoEspecialGastos() ) )
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'CodigoEspecialGastos') ) || ( method_exists('Conf','CodigoEspecialGastos') && Conf::CodigoEspecialGastos() ) )
 			{
 				$asunto->fields["codigo_asunto"] = $asunto->AsignarCodigoAsunto($asunto->fields["codigo_cliente"], $asunto->fields["glosa_asunto"]);
 			}
@@ -66,7 +71,7 @@ class Migracion
 			$cliente->Edit('codigo_cliente_secundario', $cliente->CodigoACodigoSecundario($asunto->fields["codigo_cliente"]));
 		}
 
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 		{
 			$asunto_existente->Edit("codigo_asunto_secundario", $cliente->fields['codigo_cliente_secundario'] . '-' . substr(strtoupper($asunto->fields['codigo_asunto_secundario']), -4));
 		}
@@ -117,7 +122,19 @@ class Migracion
 				$contrato_existente->Load($asunto->fields['id_contrato_indep']);
 			}
 			
-			self::GuardarContrato($contrato, $codigo_existente, $cobros_pendientes, $documentos_delegados);
+			self::GuardarContrato($contrato, $codigo_existente, $cobros_pendientes, $documentos_legales);
+		}
+	}
+	
+	function SetDatosParametricos( $prm ) 
+	{
+		foreach( $prm as $key => $val ) {
+			$query = "DELETE FROM $key";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			
+			$datos_prm = implode("'),('",$val['datos']);
+			$query = "INSERT INTO $key ( ".$val['glosa_campo']." ) VALUES ( '".$datos_prm."' )";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		}
 	}
 	
@@ -144,11 +161,13 @@ class Migracion
 	
 	function Query2ObjetosCliente($response)
 	{
+		$this->logs = array();
 		while($row = mysql_fetch_assoc($response))
 		{
+			print_r($row);
 			$sesion = new Sesion();
-			$cliente = new Cliente($sesion);
-			$contrato = new Contrato($sesion);
+			$cliente = new Cliente($this->sesion);
+			$contrato = new Contrato($this->sesion);
 			
 			$row['cliente_FFF_glosa_cliente'] 				= addslashes($row['cliente_FFF_glosa_cliente']);
 			$row['contrato_FFF_factura_razon_social'] = addslashes($row['contrato_FFF_factura_razon_social']);
@@ -162,20 +181,28 @@ class Migracion
 				else if( $keys[0] == 'contrato' )
 					$contrato->Edit($keys[1],$val);
 			}
+
+			self::AgregarCliente($cliente, $contrato);
 			
-			AgregarCliente($cliente, $contrato);
-			//echo '<pre>';print_r($cliente->fields);echo '</pre>';
-			//echo '<pre>';print_r($contrato->fields);echo '</pre>';
+			//AgregarCliente($cliente, $contrato);
+			echo '<pre>';print_r($cliente->fields);echo '</pre>';
+			echo '<pre>';print_r($contrato->fields);echo '</pre>';
+		}
+		
+		foreach ($this->logs as $log)
+		{
+			echo $log . "<br/>";
 		}
 	}
 	
 	function Query2ObjetoAsunto($response)
 	{
+		$this->logs = array();
 		while($row = mysql_fetch_assoc($response))
 		{
 			$sesion = new Sesion();
-			$asunto = new Asunto($sesion);
-			$contrato = new Contrato($sesion);
+			$asunto = new Asunto($this->sesion);
+			$contrato = new Contrato($this->sesion);
 		
 			foreach( $row as $key => $val )
 			{
@@ -186,18 +213,22 @@ class Migracion
 					$contrato->Edit($keys[1],$val);
 			}
 			
-			AgregarAsunto($asunto, $contrato);
+			//AgregarAsunto($asunto, $contrato);
 			echo '<pre>';print_r($asunto->fields);echo '</pre>';
 			echo '<pre>';print_r($contrato->fields);echo '</pre>';
 		}
 	}
-	
+ 
 	function Query2ObjetoUsuario($response)
 	{
 		while($row = mysql_fetch_assoc($response))
 		{
 			$sesion = new Sesion();
-			$usuario = new Usuario($sesion);
+			$usuario = new UsuarioExt($sesion);
+			$usuario->guardar_fecha = false;
+			
+			$permisos = $this->PermisosSegunCategoria($row);
+			$row = $this->LimpiarCategoriaUsuario($row);
 			
 			foreach( $row as $key => $val )
 			{
@@ -205,125 +236,67 @@ class Migracion
 				$usuario->Edit($keys[1],$val);
 			}
 			
-			//AgregarUsuario($usuario);
-			echo '<pre>';print_r($usuario->fields);echo '</pre>';
+			$this->AgregarUsuario($usuario, $permisos);
+			//echo '<pre>';print_r($usuario->fields);echo '</pre>';
 		}
 	}
 	
-	public function ClientePrueba()
+	function LimpiarCategoriaUsuario( $data )
+	{ 
+		switch ( $data['usuario_FFF_id_categoria_usuario'] ) {
+				case 'ASOCIADO'				:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Asociado'",$this->sesion->dbh)); break;
+				case 'ADMINISTRATIVOS':		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Administrativo'",$this->sesion->dbh)); break;
+				case 'ASOCIADO JUNIOR':		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Asociado Junior'",$this->sesion->dbh)); break;
+				case 'ADMINISTRADOR'	:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Administrativo'",$this->sesion->dbh)); break;
+				case 'ASOCIADO SENIOR':		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Asociado Senior'",$this->sesion->dbh)); break;
+				case 'ASISTENTE'			:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Asistente'",$this->sesion->dbh)); break;
+				case 'NO TRABAJA'			:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'NT'",$this->sesion->dbh)); break;
+				case 'PROCURADOR'			:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Procurador'",$this->sesion->dbh)); break;  
+				case 'PRACTICANTE'		:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Practicante'",$this->sesion->dbh)); break;
+				case 'SECRETARIA'			:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Secretaria'",$this->sesion->dbh)); break;
+				case 'SOCIO'					:		list($data['usuario_FFF_id_categoria_usuario']) = mysql_fetch_array(mysql_query("SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = 'Socio'",$this->sesion->dbh)); break;
+			}
+			return $data;
+	}
+	
+	function PermisosSegunCategoria($data)
 	{
-		$test = array();
-
-		$cliente = new Cliente($this->sesion);
-		$cliente->Edit("glosa_cliente", "CLIENTE NUMERO 3");
-		$cliente->Edit("codigo_cliente", 1353);
-		$cliente->Edit("codigo_cliente_secundario", "1353-SEC");
-		$cliente->Edit("id_moneda", 5);
-		$cliente->Edit("activo", 1);
-		$cliente->Edit("id_usuario_encargado", 1);
-		$cliente->Edit("id_grupo_cliente", 2);
-		
-		$test['cliente'] = $cliente;
-		
-		$contrato = new Contrato($this->session);
-		$contrato->Edit("activo", 1);
-		$contrato->Edit("usa_impuesto_separado", 1);
-		$contrato->Edit("usa_impuesto_gastos", 1);
-		$contrato->Edit("glosa_contrato", "Glosa Factura");
-		$contrato->Edit("codigo_cliente", "1353");
-		$contrato->Edit("id_usuario_responsable", 3);
-		$contrato->Edit("centro_costo", "");
-		$contrato->Edit("observaciones", "Detalle Cobranza");
-		$contrato->Edit("titulo_contacto", "Sr.");
-		$contrato->Edit("contacto", "Solicitante");
-		$contrato->Edit("apellido_contacto", "Apellido");
-		$contrato->Edit("fono_contacto", "02-7619282");
-		$contrato->Edit("email_contacto", "solicitante@mail.cl");
-		$contrato->Edit("direccion_contacto", "Dirección envió");
-		$contrato->Edit("es_periodico", "");
-		$contrato->Edit("activo", 1);
-		$contrato->Edit("periodo_fecha_inicio", "17-06-2011");
-		$contrato->Edit("periodo_repeticiones", 10);
-		$contrato->Edit("periodo_intervalo", 1);
-		$contrato->Edit("periodo_unidad", $contrato->fields["codigo_unidad"]);
-		$contrato->Edit("monto", 35000);
-		$contrato->Edit("id_moneda", 5);
-		$contrato->Edit("forma_cobro", "FLAT FEE");
-		$contrato->Edit("fecha_inicio_cap", "");
-		$contrato->Edit("retainer_horas", 0);
-		$contrato->Edit("id_usuario_modificador", 1);
-		$contrato->Edit("id_carta", 1);
-		$contrato->Edit("id_formato", 1);
-		$contrato->Edit("id_tarifa", 2);
-		$contrato->Edit("id_tramite_tarifa", 1);
-		$contrato->Edit("id_moneda_tramite", 2);
-
-		#facturacion
-		$contrato->Edit("rut", "15782711-1");
-		$contrato->Edit("factura_razon_social", "Mario Negrete");
-		$contrato->Edit("factura_giro", "Mario Negrete");
-		$contrato->Edit("factura_direccion", "Dirección 400");
-		$contrato->Edit("factura_telefono", "7610292");
-		$contrato->Edit("cod_factura_telefono", "02");
-
-		#Opc contrato
-		$contrato->Edit("opc_ver_modalidad", 1);
-		$contrato->Edit("opc_ver_profesional",1);
-		$contrato->Edit("opc_ver_gastos", 1);
-		$contrato->Edit("opc_ver_morosidad", 1);
-		$contrato->Edit("opc_ver_descuento", 1);
-		$contrato->Edit("opc_ver_tipo_cambio", 1);
-		$contrato->Edit("opc_ver_numpag", 1);
-		$contrato->Edit("opc_ver_resumen_cobro", 1);
-		$contrato->Edit("opc_ver_carta", 1);
-		$contrato->Edit("opc_papel", "LETTER");
-		$contrato->Edit("opc_moneda_total", 2);
-		$contrato->Edit("opc_moneda_gastos", 2);
-		$contrato->Edit("opc_ver_solicitante", "0_");
-		$contrato->Edit("opc_ver_asuntos_separados", 0);
-		$contrato->Edit("opc_ver_horas_trabajadas",0);
-		$contrato->Edit("opc_ver_cobrable", 0);
-		$contrato->Edit("codigo_idioma", "es");
-
-		#descto
-		$contrato->Edit("tipo_descuento", "VALOR");
-		$contrato->Edit("descuento", 100);
-		$contrato->Edit("porcentaje_descuento", '0');
-		$contrato->Edit("id_moneda_monto", $contrato->fields["id_moneda_monto"]);
-		$contrato->Edit("alerta_hh", $contrato->fields["alerta_hh"]);
-		$contrato->Edit("alerta_monto", $contrato->fields["alerta_monto"]);
-		$contrato->Edit("limite_hh", $contrato->fields["limite_hh"]);
-		$contrato->Edit("limite_monto", $contrato->fields["limite_monto"]);
-		$contrato->Edit("separar_liquidaciones", $contrato->fields["separar_liquidaciones"]);
-		
-		$test['contrato'] = $contrato;
-		
-		$cobro = new CobroPendiente($this->sesion);
-		$cobro->Edit("fecha_cobro", "16-06-2011");
-		$cobro->Edit("descripcion", "Descripción");
-		$cobro->Edit("monto_estimado", 35000);
-
-		$test['cobro_pendientes'][] = $cobro;
-
-		$contrato_documento_legal = new ContratoDocumentoLegal($this->sesion);
-		$contrato_documento_legal->Edit('id_tipo_documento_legal', 4);
-		$contrato_documento_legal->Edit('honorarios', 0);
-		$contrato_documento_legal->Edit('gastos_con_impuestos', 1);
-		$contrato_documento_legal->Edit('gastos_sin_impuestos', 1);
-		$contrato_documento_legal->Edit('id_tipo_documento_legal', 1);
-		
-		$test['documentos_legales'][] = $documento_legal;
-		
-		$contrato_documento_legal = new ContratoDocumentoLegal($this->sesion);
-		$contrato_documento_legal->Edit('id_tipo_documento_legal', 2);
-		$contrato_documento_legal->Edit('honorarios', 1);
-		$contrato_documento_legal->Edit('gastos_con_impuestos', 0);
-		$contrato_documento_legal->Edit('gastos_sin_impuestos', 0);
-		$contrato_documento_legal->Edit('id_tipo_documento_legal', 1);
-		
-		$test['documentos_legales'][] = $contrato_documento_legal;
-		
-		return $test;
+		$id = $data['usuario_FFF_id_usuario'];
+		switch ( $data['usuario_FFF_id_categoria_usuario'] ) {
+				case 'ASOCIADO'				: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'ADMINISTRATIVOS': $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'),
+																									array('permitido' => true,'codigo_permiso' => 'ADM'),
+																									array('permitido' => true,'codigo_permiso' => 'COB'),
+																									array('permitido' => true,'codigo_permiso' => 'DAT'),
+																									array('permitido' => true,'codigo_permiso' => 'OFI'),
+																									array('permitido' => true,'codigo_permiso' => 'REP'),
+																									array('permitido' => true,'codigo_permiso' => 'REV')
+																								);
+				case 'ASOCIADO JUNIOR': $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'ADMINISTRADOR'	: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'),
+																									array('permitido' => true,'codigo_permiso' => 'ADM'),
+																									array('permitido' => true,'codigo_permiso' => 'COB'),
+																									array('permitido' => true,'codigo_permiso' => 'DAT'),
+																									array('permitido' => true,'codigo_permiso' => 'OFI'),
+																									array('permitido' => true,'codigo_permiso' => 'REP'),
+																									array('permitido' => true,'codigo_permiso' => 'REV')
+																								);
+				case 'ASOCIADO SENIOR': $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'ASISTENTE'			: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'PROCURADOR'			: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'PRACTICANTE'		: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'SECRETARIA'			: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'));
+				case 'SOCIO'					: $permisos = array(array('permitido' => true,'codigo_permiso' => 'PRO'),
+																									array('permitido' => true,'codigo_permiso' => 'ADM'),
+																									array('permitido' => true,'codigo_permiso' => 'COB'),
+																									array('permitido' => true,'codigo_permiso' => 'DAT'),
+																									array('permitido' => true,'codigo_permiso' => 'OFI'),
+																									array('permitido' => true,'codigo_permiso' => 'REP'),
+																									array('permitido' => true,'codigo_permiso' => 'REV'),
+																									array('permitido' => true,'codigo_permiso' => 'SOC')
+																								);
+			}
+			return $permisos;
 	}
 	
 	public function ExisteCodigoSecundario($cliente, $codigo_cliente_secundario)
@@ -339,7 +312,7 @@ class Migracion
 		{
 			if($codigo_cliente_secundario == $codigo_cliente_secundario_temp)
 			{ 
-				$this->pagina->AddError('El código ingresado ya existe para otro cliente');
+				$this->logs[] = 'El código ingresado ya existe para otro cliente';
 				return true;
 			}
 		}
@@ -347,16 +320,18 @@ class Migracion
 
 	function AgregarCliente($cliente = null, $contrato = null, $cobros_pendientes = array(), $documentos_legales = array(), $agregar_asuntos_defecto = false)
 	{
+		$this->logs[] = "Ingresando cliente: " . $cliente->fields['codigo_cliente'];
+
 		if (empty($cliente) or empty($contrato))
 		{
-			$this->pagina->AddError("Faltan parametro(s), cliente o asunto");
+			$this->logs[] = "Faltan parametro(s), cliente o asunto";
 			return false;
 		}
 
 	    $id_usuario = $this->sesion->usuario->fields['id_usuario'];
 
 		$codigo_obligatorio = true;
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoObligatorio') ) || ( method_exists('Conf','CodigoObligatorio') && Conf::CodigoObligatorio() ) )
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'CodigoObligatorio') ) || ( method_exists('Conf','CodigoObligatorio') && Conf::CodigoObligatorio() ) )
 		{
 			if(!Conf::CodigoObligatorio())
 			{
@@ -364,8 +339,8 @@ class Migracion
 			}
 		}
 
-		$cliente_existente = new Cliente($sesion);
-		$contrato_existente = new Contrato($sesion);
+		$cliente_existente = new Cliente($this->sesion);
+		$contrato_existente = new Contrato($this->sesion);
 
 	    if ($cliente->fields['id_cliente'])
 	    {
@@ -391,23 +366,25 @@ class Migracion
 			$loadasuntos = true;
 		}
 		
-		if(!empty($cliente->fields["codigo_cliente_secundario"]) and self::ExisteCodigoSecundario($cliente->fields['id_cliente']))
+		if(!empty($cliente->fields["codigo_cliente_secundario"]) and self::ExisteCodigoSecundario($cliente->fields['id_cliente'], $cliente->fields["codigo_cliente_secundario"]))
 		{ 
 			return false;
 		}
 
-		if (self::GuardarCliente($cliente))
+		if (self::GuardarCliente($cliente, $cliente_existente))
 		{
-			if(self::GuardarContrato($cliente, $contrato, $contrato_existente, $cobros_pendientes, $documentos_delegados))
+			$this->logs[] = "Ingresando contrato";
+			
+			if(self::GuardarContrato($cliente, $contrato, $contrato_existente, $cobros_pendientes, $documentos_legales))
 			{
 				$cliente->Edit("id_contrato", $contrato->fields['id_contrato']);
-				if($cliente->Write())
+				if(self::Write($cliente))
 				{
-					$this->pagina->AddInfo(__('Cliente').' '.__('Guardado con exito').'<br>'.__('Contrato guardado con éxito'));
+					$this->logs[] = __('Cliente').' '.__('Guardado con exito').'<br>'.__('Contrato guardado con éxito');
 				}
 				else
 				{
-					$this->pagina->AddInfo($cliente->error);
+					$this->logs[] = $cliente->error;
 				}
 			}
 		}
@@ -418,7 +395,7 @@ class Migracion
 			{
 				if( method_exists('Conf','GetConf') )
 				{
-					$asuntos = explode(';',Conf::GetConf($sesion,'AgregarAsuntosPorDefecto'));
+					$asuntos = explode(';',Conf::GetConf($this->sesion,'AgregarAsuntosPorDefecto'));
 				}
 				else
 				{
@@ -427,7 +404,7 @@ class Migracion
 		
 				for($i=1;$i<count($asuntos);$i++)
 				{	
-					$asunto = new Asunto($sesion);
+					$asunto = new Asunto($this->sesion);
 					$asunto->Edit('codigo_asunto',$asunto->AsignarCodigoAsunto($codigo_cliente));
 					$asunto->Edit('codigo_asunto_secundario',$asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario));
 					$asunto->Edit('glosa_asunto',$asuntos[$i]);
@@ -439,9 +416,9 @@ class Migracion
 					$asunto->Edit("email_contacto",$email_contacto_contrato);
 					$asunto->Edit("direccion_contacto",$direccion_contacto_contrato);
 					$asunto->Edit("id_encargado",$id_usuario_encargado);
-					if (!$asunto->Write())
+					if (!self::Write($asunto))
 					{
-						$this->pagina->AddError($asunto->error);
+						$this->logs[] = $asunto->error;
 					}
 				}
 			}
@@ -458,19 +435,21 @@ class Migracion
 		$cliente_existente->Edit("id_usuario_encargado", $cliente->fields["id_usuario_encargado"]);
 		$cliente_existente->Edit("id_grupo_cliente", !empty($cliente->fields["id_grupo_cliente"]) ? $cliente->fields["id_grupo_cliente"] : 'NULL');
 
-		if(!$cliente_existente->Write())
+		if(!self::Write($cliente_existente))
 		{
-			$pagina->AddError($cliente->error);
+			$this->logs[] = $cliente->error;
 			return false;
 		}
 		return true;
 	}
 	
-	public function GuardarContrato($contrato = null, $contrato_existente = null, $cobros_pendientes = array(), $documentos_delegados = array())
+	public function GuardarContrato($contrato = null, $contrato_existente = null, $cobros_pendientes = array(), $documentos_legales = array())
 	{
+		$contrato_existente->guardar_fecha = false;
+
 		if($contrato->fields["forma_cobro"] != 'TASA' && $contrato->fields["monto"] == 0)
 		{
-			$this->pagina->AddError( __('Ud. a seleccionado forma de cobro:') . " " . $contrato->fields["forma_cobro"] . " " . __('y no ha ingresado monto') );
+			$this->logs[] =  __('Ud. a seleccionado forma de cobro:') . " " . $contrato->fields["forma_cobro"] . " " . __('y no ha ingresado monto');
 		}
 		else if($contrato->fields["forma_cobro"] == 'TASA')
 		{
@@ -576,32 +555,32 @@ class Migracion
 		
 		$contrato_existente->Edit("separar_liquidaciones", $contrato->fields["separar_liquidaciones"]);
 		
-		if (!$contrato_existente->Write())
+		if (!self::Write($contrato_existente))
 		{
-			$this->pagina->AddError($contrato->error);
+			$this->logs[] = $contrato_existente->error;
 			return false;
 		}
 		
 		//Cobros pendientes
-		CobroPendiente::EliminarPorContrato($this->sesion, $contrato->fields['id_contrato']);
+		CobroPendiente::EliminarPorContrato($this->sesion, $contrato_existente->fields['id_contrato']);
 		foreach ($cobros_pendientes as $cobro_pendiente)
 		{
 			$cobro = new CobroPendiente($this->sesion);
-			$cobro->Edit("id_contrato", $contrato->fields["id_contrato"]);
-			$cobro->Edit("fecha_cobro", Utiles::fecha2sql($cobro_pendiente["fecha_cobro"]));
-			$cobro->Edit("descripcion", $cobro_pendiente["descripcion"]);
-			$cobro->Edit("monto_estimado", $cobro_pendiente["monto_estimado"]);
-			if (!$cobro->Write())
+			$cobro->Edit("id_contrato", $contrato_existente->fields["id_contrato"]);
+			$cobro->Edit("fecha_cobro", Utiles::fecha2sql($cobro_pendiente->fields["fecha_cobro"]));
+			$cobro->Edit("descripcion", $cobro_pendiente->fields["descripcion"]);
+			$cobro->Edit("monto_estimado", $cobro_pendiente->fields["monto_estimado"]);
+			if (!self::Write($cobro))
 			{
-				$this->pagina->AddError($cobro->error);
+				$this->logs[] = $cobro->error;
 			}
 		}
 
 		//Documentos legales
-		ContratoDocumentoLegal::EliminarDocumentosLegales($this->sesion, $contrato->fields['id_contrato']);
+		ContratoDocumentoLegal::EliminarDocumentosLegales($this->sesion, $contrato_existente->fields['id_contrato']);
 		foreach ($documentos_legales as $documento_legal) {
 			$contrato_documento_legal = new ContratoDocumentoLegal($this->sesion);
-			$contrato_documento_legal->Edit('id_contrato', $contrato->fields["id_contrato"]);
+			$contrato_documento_legal->Edit('id_contrato', $contrato_existente->fields["id_contrato"]);
 			$contrato_documento_legal->Edit('id_tipo_documento_legal', $documento_legal->fields["id_tipo_documento_legal"]);
 			if (!empty($documento_legal->fields["honorarios"]))
 			{
@@ -616,9 +595,9 @@ class Migracion
 				$contrato_documento_legal->Edit('gastos_sin_impuestos', 1);
 			}
 			$contrato_documento_legal->Edit('id_tipo_documento_legal', $documento_legal->fields["documento_legal"]);
-			if (!$contrato_documento_legal->Write())
+			if (!self::Write($contrato_documento_legal))
 			{
-				$this->pagina->AddError($contrato_documento_legal->error);
+				$this->logs[] = $contrato_documento_legal->error;
 			}
 		}
 
@@ -628,7 +607,7 @@ class Migracion
 	#Recibe un arreglo de items, construido de la forma
 	# $items = array();
 	# //foreach [nombre,rut,etc]...
-	# $u = new Usuario($sesion);
+	# $u = new Usuario($this->sesion);
 	# $u->Edit('nombre',$nombre)
 	# $u->Edit('rut',$rut);
 	# $u->Edit ...
@@ -712,7 +691,7 @@ class Migracion
 
 		#Confirmo que el username no exista
 		$query = "SELECT count(*) FROM usuario WHERE username = '".addslashes($usuario->fields['username'])."'";
-		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($resp);
 		if($cantidad > 0)
 		{
@@ -741,7 +720,7 @@ class Migracion
 		#Ingreso el password
 		$usuario->Edit('password', md5( $password ) );
 
-		if( $usuario->Write() )
+		if(self::Write($usuario) )
 		{
 			#Cargar permisos
 			foreach($permisos as $permiso)
@@ -761,5 +740,87 @@ class Migracion
 			$this->log .= "<br>Error en usuario: '".$usuario->fields['username']."': ".$usuario->error;
 		}
 	}
+	
+	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
+	public function Write($objeto)
+	{
+		$objeto->error = "";
+
+		if(!$objeto->Check())
+			return false;
+	
+		if($objeto->Loaded())
+		{
+			$query = "UPDATE ".$objeto->tabla." SET ";
+			if($objeto->guardar_fecha)
+				$query .= "fecha_modificacion=NOW(),";
+			
+			$c = 0;
+			foreach ( $objeto->fields as $key => $val )
+			{
+				if( $objeto->changes[$key] )
+				{
+					$do_update = true;
+					if($c > 0)
+					    $query .= ",";
+					if($val != 'NULL')
+					    $query .= "$key = '".addslashes($val)."'";
+					else
+					    $query .= "$key = NULL ";
+					$c++;
+				}
+			}
+			
+			$query .= " WHERE ".$objeto->campo_id."='"  .$objeto->fields[$objeto->campo_id] . "'";
+			if($do_update) //Solo en caso de que se haya modificado algún campo
+			{
+				$resp = mysql_query($query, $this->sesion->dbh);
+				if (!$resp)
+				{
+					$this->logs[] = mysql_errno($this->sesion->dbh) . " " . mysql_error($this->sesion->dbh);
+					return false;
+				}
+				return true;
+			}
+			else //Retorna true ya que si no quiere hacer update la función corrió bien
+				return true;
+			#Utiles::CrearLog($this->sesion, "reserva", $this->fields[$campo_id], "MODIFICAR","",$query);
+		}
+		else
+		{
+			$query = "INSERT INTO ".$objeto->tabla." SET ";
+			if($objeto->guardar_fecha)
+				$query .= "fecha_creacion=NOW(),";
+			
+			$c = 0;
+			foreach ( $objeto->fields as $key => $val )
+			{
+				if( $objeto->changes[$key] )
+				{
+					if($c > 0)
+					    $query .= ",";
+					if($val != 'NULL')
+					    $query .= "$key = '".addslashes($val)."'";
+					
+					else
+					    $query .= "$key = NULL ";
+					
+					$c++;
+				}
+			}
+
+			$resp = mysql_query($query, $this->sesion->dbh);
+			if (!resp)
+			{
+				$this->logs[] = mysql_errno($this->sesion->dbh) . " " . mysql_error($this->sesion->dbh);
+				return false;
+			}
+			$objeto->fields[$objeto->campo_id] = mysql_insert_id($this->sesion->dbh);
+			#Utiles::CrearLog($objeto->sesion, "reserva", $objeto->fields['id_reserva'], "INSERTAR","",$query);
+		
+		}
+		return true;
+	}
+
 }	
 ?>

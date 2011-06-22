@@ -67,8 +67,18 @@ class UsuarioExt extends Usuario
 	
 	function GuardarSecretario($ids)
 	{
+		//Se obtienen los datos actuales
+		$query = "SELECT id_profesional FROM usuario_secretario WHERE id_secretario='".$this->fields['id_usuario']."'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$lista_actual = array();
+		while( list($id_profesional) = mysql_fetch_array($resp) )
+		{
+			$lista_actual[] = $id_profesional;
+		}
+		//Se eliminan todas
 		$query = "DELETE FROM usuario_secretario WHERE id_secretario='".$this->fields['id_usuario']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$lista_nuevos = array();
 		if(count($ids) > 0)
 		{
 			foreach($ids as $id_profesional => $value)
@@ -77,15 +87,34 @@ class UsuarioExt extends Usuario
 									SET id_secretario=".$this->fields['id_usuario'].", id_profesional = '$value'
 									ON DUPLICATE KEY UPDATE id_secretario='".$this->fields['id_usuario']."', id_profesional='$value'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				$lista_nuevos[] = $value;
 			}
-			return true;
+			
+			//Registrar el cambio de secretarios para el usuario
+			if( count($lista_actual) <> count($lista_nuevos) )
+			{
+				$lista_nuevos = implode(',', $lista_nuevos);
+				$lista_actual = implode(',', $lista_actual);
+				$this->GuardaCambiosRelacionUsuario($this->fields['id_usuario'], 'secretarios', $lista_actual, $lista_nuevos);
+			}
 		}
+		return true;
 	}
 	function GuardarRevisado($ids)
 	{
+		//Se obtienen los datos actuales
+		$query = "SELECT id_revisado FROM usuario_revisor WHERE id_revisor='".$this->fields['id_usuario']."'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$lista_actual = array();
+		while( list($id_revisado) = mysql_fetch_array($resp) )
+		{
+			$lista_actual[] = $id_revisado;
+		}
+		
+		//Se eliminan todos para luego insertar
 		$query = "DELETE FROM usuario_revisor WHERE id_revisor='".$this->fields['id_usuario']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		
+		$lista_nuevos = array();
 		if($ids)
 		{
 			$ids = explode('::',$ids);
@@ -96,10 +125,19 @@ class UsuarioExt extends Usuario
 					$query = "INSERT INTO usuario_revisor
 										SET id_revisor=".$this->fields['id_usuario'].", id_revisado = '$value'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					$lista_nuevos[] = $value;
 				}
-				return true;
+				
+				//Registrar el cambio de secretarios para el usuario
+				if( count($lista_actual) <> count($lista_nuevos) )
+				{
+					$lista_nuevos = implode(',', $lista_nuevos);
+					$lista_actual = implode(',', $lista_actual);
+					$this->GuardaCambiosRelacionUsuario($this->fields['id_usuario'], 'revisores', $lista_actual, $lista_nuevos);
+				}
 			}
 		}
+		return true;
 	}
 	function GuardarTarifaSegunCategoria( $id,$id_categoria_usuario )
 	{
@@ -301,5 +339,47 @@ class UsuarioExt extends Usuario
 		return $html;
 	}
 	
+	/*Compara arreglo usuario y guarda cambios realizados*/
+	function GuardaCambiosUsuario($arr1, $arr2)
+	{
+		$usuario_activo = $this->sesion->usuario->fields['id_usuario'];
+		$arr_diff = array();
+		foreach($arr1 as $indice1 => $valor1)
+		{
+			if( $arr2[$indice1] != $valor1 )
+			{
+				if( $valor1 == '0' && $arr2[$indice1] == '' )
+					continue;
+				$arr_diff[$indice1] = array('valor_original'=> $valor1, 'valor_actual'=> $arr2[$indice1]);
+				$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
+				$query .= " VALUES('".$arr1['id_usuario']."','".$usuario_activo."','".$indice1."','".$valor1."','".$arr2[$indice1]."',NOW())";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			}
+		}
+		return $arr_diff;
+	}
+	
+	/* Guarda cambios en los permisos */
+	function GuardaCambiosRelacionUsuario($id_usuario = null, $dato, $actuales, $nuevos)
+	{
+		$usuario_activo = $this->sesion->usuario->fields['id_usuario'];
+		$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
+		$query .= " VALUES('".$id_usuario."','".$usuario_activo."','".$dato."','".$actuales."','".$nuevos."',NOW())";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		return true;
+	}
+
+	/*Lista de permisos usuario*/
+	function ListaPermisosUsuario($id_usuario)
+	{
+		$query .= "SELECT codigo_permiso FROM usuario_permiso WHERE id_usuario='".$id_usuario."' AND codigo_permiso NOT IN ('ALL')";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$lista = array();
+		while( list($codigo) = mysql_fetch_array($resp) )
+		{
+			$lista[] = $codigo;
+		}
+		return $lista;
+	}
 }
 ?>

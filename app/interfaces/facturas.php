@@ -200,18 +200,27 @@
 	function Pago(& $fila, $sesion)
 	{
 		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
+						,ccfm.id_moneda as id_moneda
+						,mo.cifras_decimales
+						,mo.simbolo
 					FROM factura_pago AS fp
 					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
 					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
 
+		//echo "<br>".$query;
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_pago = 0;
-		while(list($monto_aporte) = mysql_fetch_array($resp)){
+		$simbolo_aporte_pago = $fila->fields['simbolo'];
+		$cifras_decimales_aporte_pago = $fila->fields['cifras_decimales'];
+		while(list($monto_aporte,$id_moneda_aporte,$cifras_decimales_aporte,$simbolo_aporte) = mysql_fetch_array($resp)){
 			$monto_pago = $monto_aporte;
+			$simbolo_aporte_pago = $simbolo_aporte;
+			$cifras_decimales_aporte_pago = $cifras_decimales_aporte;
 		}
-		return  $fila->fields['simbolo'].' '.number_format($monto_pago,$fila->fields['cifras_decimales'],",",".");
+		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,",",".");
 	}
 	
 	function funcionTR(& $fila)
