@@ -189,7 +189,10 @@
 	//Lista de vacaciones
 	$usuario_vacaciones = array();
 	if($usuario->loaded)
+	{
 		$usuario_vacaciones = $usuario->ListaVacacion($usuario->fields['id_usuario']);
+		$usuario_historial = $usuario->ListaCambios($usuario->fields['id_usuario']);
+	}
 	$pagina->titulo = __('Administración - Usuarios');
 	$pagina->PrintTop();
   if($usuario->loaded)
@@ -712,6 +715,56 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 <?php endif; ?>
 			</table>
 		</fieldset>
+		
+		
+		
+		<!-- Historial -->
+		<fieldset>
+			<legend onClick="Expandir('historial')" style="cursor:pointer">
+				<span id="historial_img"><img src= "<?=Conf::ImgDir()?>/mas.gif" border="0" ></span>
+				<?=__('Historial')?>
+			</legend>
+			<table id="historial_tabla" style='display:none;' width="600px">
+				<tr>
+					<td colspan="3" style="font-size:11px;"><b>Fecha creación:</b> <?php echo Utiles::sql2date($usuario->fields['fecha_creacion']); ?></td>
+				</tr>
+				<tr>
+					<td colspan="3" style="font-size:11px; font-weight:bold">Lista de modificaciones realizadas</td>
+				</tr>
+				<tr style="border:1px solid #454545">
+					<td width="80px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fecha</td>
+					<td width="120px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Dato modificado</td>
+					<td width="150px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor actual</td>
+					<td width="150px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor anterior</td>
+					<td width="250px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Modificado por</td>
+				</tr>
+<?php if( !empty($usuario_historial) ): ?>
+<?php foreach($usuario_historial as $k => $historia): 
+				if( trim($historia['nombre_dato']) == 'categoría' )
+				{
+					$glosa_actual = (!empty($historia['valor_actual'])) ? Utiles::Glosa($sesion, $historia['valor_actual'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+					$glosa_origen = (!empty($historia['valor_original'])) ? Utiles::Glosa($sesion, $historia['valor_original'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+				}
+				else
+				{
+					$glosa_actual = (!empty($historia['valor_actual'])) ? 'activo' : 'inactivo';
+					$glosa_origen = (!empty($historia['valor_original'])) ? 'activo' : 'inactivo';
+				}
+?>
+				<tr>
+					<td style="border:1px solid #ccc; text-align:center;"><?php echo $historia['fecha']; ?></td>
+					<td style="border:1px solid #ccc; text-align:center;"><?php echo $historia['nombre_dato']; ?></td>
+					<td style="border:1px solid #ccc; text-align: center"><?php echo $glosa_actual; ?></td>
+					<td style="border:1px solid #ccc; text-align: center"><?php echo $glosa_origen; ?></td>
+					<td style="border:1px solid #ccc; text-align: left"><?php echo $historia['nombre'].' '.$historia['ap_paterno'].' '.$historia['ap_materno']; ?></td>
+				</tr>
+<?php endforeach; ?>
+<?php endif; ?>
+			</table>
+		</fieldset>
+		
+		
+		
 		
 		<div style="both:clear">&nbsp;</div>
 		

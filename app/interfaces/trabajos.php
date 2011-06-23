@@ -137,7 +137,7 @@
 			$where .= " AND trabajo.id_cobro = $id_cobro ";
 
 		if($mes)
-			$where .= " AND CONCAT(Month(fecha),'-',Year(fecha)) = '$mes' ";
+			$where .= " AND DATE_FORMAT(trabajo.fecha, '%m-%y') = '$mes' ";
 
 		if($cobro_nulo)
 			$where .= " AND trabajo.id_cobro IS NULL ";

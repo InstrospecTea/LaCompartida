@@ -31,32 +31,9 @@
 	$pagina = new Pagina($sesion);
 	
 	
-	$mis_reportes = array();
-	
-	
-	if($opc == 'eliminar_reporte')
-		if(!in_array($nuevo_reporte,$mis_reportes))
-		{
-			$query = "DELETE FROM usuario_reporte  WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."' AND reporte =  '".mysql_real_escape_string($eliminado_reporte)."';";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		}
-	
-	$query_mis_reportes = "SELECT reporte FROM usuario_reporte WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."'";
-	$resp_mis_reportes = mysql_query($query_mis_reportes,$sesion->dbh) or Utiles::errorSQL($query_mis_reportes,__FILE__,__LINE__,$sesion->dbh);
-	while( list($reporte_encontrado) = mysql_fetch_array($resp_mis_reportes) )
-			$mis_reportes[] = $reporte_encontrado;
-	
-	if($opc == 'nuevo_reporte')
-		if(!in_array($nuevo_reporte,$mis_reportes))
-		{
-			$query = "INSERT INTO usuario_reporte (id_usuario,reporte) VALUES ('".$sesion->usuario->fields['id_usuario']."' , '".mysql_real_escape_string($nuevo_reporte)."' );";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			$mis_reportes[] = mysql_real_escape_string($nuevo_reporte);
-		}
-	
 	
 
-	/*REPORTE AVANZADO. ESTA PANTALLA SOLO TIENE INPUTS DEL USUARIO. SUBMIT LLAMA AL TIPO DE REPORTE SELECCIONADO*/
+	/*REPORTE DIARIO.*/
 	$pagina->titulo = __('Resumen actividades profesionales');
 
 	$tipos_de_dato = array();
@@ -81,59 +58,16 @@
 	$tipos_de_dato[] ='valor_estandar';
 
 	$agrupadores = array(
-	'glosa_cliente',
-	'glosa_asunto',
 	'profesional',
+	'glosa_cliente',
 	'estado',
 	'id_cobro',
-	'mes',
 	'forma_cobro',
-	'tipo_asunto',
 	'prm_area_proyecto.glosa',
 	'categoria_usuario',
 	'area_usuario',
 	'glosa_grupo_cliente',
-	'id_usuario_responsable',
-	'dia_reporte');
-	if($debug==1)
-	{
-		$agrupadores[] = 'id_trabajo';
-		$agrupadores[] = 'dia_corte';
-		$agrupadores[] = 'dia_emision';
-	}
-
-	$vistas = array();
-	$vistas[] = array('glosa_grupo_cliente', 'profesional', 'id_cobro', 'glosa_cliente', 'glosa_asunto', 'forma_cobro');
-	$vistas[] = array('mes', 'glosa_cliente', 'estado',	'id_cobro',	 'glosa_asunto', 'profesional'	);
-
-	$vistas[] = array('glosa_cliente'																	);
-	$vistas[] = array('glosa_cliente',			'glosa_asunto'											);
-	$vistas[] = array('glosa_cliente',			'glosa_asunto',		'profesional'						);
-	$vistas[] = array('glosa_cliente',			'id_cobro',			'glosa_asunto',		'profesional'	);
-	$vistas[] = array('glosa_cliente',			'profesional'											);
-	$vistas[] = array('glosa_grupo_cliente',	'glosa_cliente',	'glosa_asunto',		'profesional'	);
-	$vistas[] = array('prm_area_proyecto.glosa'															);
-	$vistas[] = array('profesional'																		);
-	$vistas[] = array('profesional',			'glosa_cliente'											);
-	$vistas[] = array('profesional',			'glosa_cliente',	'glosa_asunto'						);
-	$vistas[] = array('id_usuario_responsable'															);
-	$vistas[] = array('mes',					'glosa_cliente'											);
-	$vistas[] = array('mes',					'profesional'											);
-	$vistas[] = array('mes',					'glosa_cliente',	'profesional'						);
-	$vistas[] = array('id_cobro',				'profesional'											);
-	$vistas[] = array('id_cobro',				'glosa_cliente',	'profesional'						);
-	$vistas[] = array('forma_cobro',			'id_cobro'												);
-	$vistas[] = array('forma_cobro',			'id_cobro',			'profesional'						);
-	$vistas[] = array('estado',					'id_cobro',			'glosa_cliente',	'profesional'	);
-	$vistas[] = array('estado',					'mes',				'id_cobro'							);
-	$vistas[] = array('glosa_asunto'																	);
-	$vistas[] = array('tipo_asunto',			'prm_area_proyecto.glosa',		'profesional',		'glosa_cliente'	);
-
-	//Las vistas se escriben en el Select en el Lenguaje actual
-	$vistas_lang = $vistas;
-	foreach($vistas as $k => $v)
-		foreach($v as $k2 => $s)
-			$vistas_lang[$k][$k2] = __($s);
+	'id_usuario_responsable');
 
 	$glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 	$glosa_dato['horas_cobrables'] = "Total de Horas Trabajadas en asuntos Cobrables";
@@ -156,13 +90,8 @@
 	$glosa_dato['diferencia_valor_estandar'] = "Diferencia entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar";	
 	$glosa_dato['valor_estandar'] = "Valor que se habría cobrado usando THHs Estándar";
 
-	$glosa_boton['planilla'] = "Despliega una Planilla con deglose por cada Agrupador elegido.";
-	$glosa_boton['excel'] = "Genera la Planilla como un Documento Excel.";
 	$glosa_boton['tabla'] = "Genera un Documento Excel con una tabla cruzada.";
-	$glosa_boton['barra'] = "Despliega un Gráfico de Barras, usando el primer Agrupador.";
-	$glosa_boton['torta'] = "Despliega un Gráfico de Torta, usando el primer Agrupador.";
-	$glosa_boton['dispersion'] = "Despliega un Gráfico de Dispersión, usando el primer Agrupador.";
-
+	
 	$tipos_moneda = array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar');
 
 	$hoy = date("Y-m-d");
@@ -184,7 +113,7 @@
 
 			$fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
 			$fecha_ini = "01-".$fecha_m."-".$fecha_anio;
-		}
+	}
 ?>
 <style>
 
@@ -210,109 +139,16 @@ input.btn{ margin:3px;}
 
 <script type="text/javascript">
 
-function Agrupadores(num)
-{
-	var numero_agrupadores = parseInt($('numero_agrupadores').value);
-	numero_agrupadores += num;
-	if(numero_agrupadores < 1)
-		numero_agrupadores = 1;
-	if(numero_agrupadores > 6)
-		numero_agrupadores = 6;
-	$('numero_agrupadores').value = numero_agrupadores;
-	for(var i =0; i < 6; i++)
-	{
-		var selector = $('span_agrupador_'+i);
-		if(i<numero_agrupadores)
-			selector.show();
-		else
-			selector.hide();
-	}
-	//if(numero_agrupadores == 1)
-	//	$('menos_agrupadores').hide();
-	//else
-	//	$('menos_agrupadores').show();
-
-	//if(numero_agrupadores == 6)
-	//$('mas_agrupadores').hide();
-	//else
-	//	$('mas_agrupadores').show();
-	RevisarTabla();
-}
-
-//Al cambiar un agrupador, en los agrupadores siguientes, el valor previo se hace disponible y el valor nuevo se indispone.
-function CambiarAgrupador(num)
-{
-	var selector = $('agrupador_'+num);
-	var selector_previo = $('agrupador_valor_previo_'+num);
-
-	//Los selectores siguientes
-	for(var i = num + 1; i < 6; i++)
-	{
-		var selector_siguiente = $('agrupador_'+i);
-		//se indispone lo nuevo
-		for(var j = 0; j < selector_siguiente.length; j++)
-		{
-			if(selector_siguiente.options[j].text == selector.options[selector.selectedIndex].text)
-			{
-				selector_siguiente.options[j]=null;
-				CambiarAgrupador(i);	
-			}
-		}
-		//y se dispone lo viejo, SOLO si no resultó elegido en uno anterior
-		var valor = selector_previo.value;
-		var txt = selector_previo.options[selector_previo.selectedIndex].text;
-		var elegido_en_anterior = false;
-		for(var k = i; k >= 0; k--)
-		{
-			var anterior = $('agrupador_'+k);
-			if(anterior.options[anterior.selectedIndex].text == txt)
-				elegido_en_anterior = true;
-		}
-		if(!elegido_en_anterior)
-		{
-			opc = new Option(txt,valor);
-			selector_siguiente.options[selector_siguiente.options.length] = opc;
-		}
-	}
-	//ahora selector_previo debe guardar el dato nuevo, para el proximo cambio
-	selector_previo.options[0] = null;
-	valor = selector.value;
-	txt = selector.options[selector.selectedIndex].text;
-	opc = new Option(txt,valor);
-	selector_previo.options[0] = opc;	
-}
-
-function ResizeIframe(width, height)
-{
-	currentfr = document.getElementById('planilla'); 
-	currentfr.height = height+'px'; // currentfr.Document.body.scrollHeight;
-	currentfr.width = width+'px'; // currentfr.Document.body.scrollHeight;
-
-}
-
 function Generar(form, valor)
 {
-	form.opc.value = valor;
-
+	
 	form.vista.value = $('agrupador_0').value;
 	for(i=1;i<$('numero_agrupadores').value;i++)
 	{
 		form.vista.value += '-'+$('agrupador_'+i).value;
 	}
-	if(valor == 'pdf')
-	{
-		form.action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
-	}
-	else if(valor == 'excel')
-	{
-			form.action = 'planillas/planilla_reporte_avanzado.php';
-	}
-	else if(valor == 'tabla')
-	{
-		form.action = 'planillas/planilla_reporte_avanzado_tabla.php';
-	}
-	else
-		form.action = 'reporte_avanzado.php';
+
+	form.action = 'planillas/planilla_reporte_diario.php';
 	form.submit();
 }
 
@@ -331,56 +167,6 @@ function Rangos(obj, form)
 		td_hide.style['display'] = '';
 		td_show.style['display'] = 'none';
 	}
-}
-
-/*Al activar la Comparación, debo hacer cosas Visibles y cambiar valores*/
-function Comparar()
-{
-	var comparar = $('comparar');
-	var tipo_de_dato = document.getElementById('tipo_dato');
-	var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
-	var tinta = document.getElementById('tipo_tinta');
-	var vs = document.getElementById('vs');
-	var dispersion = document.getElementById('dispersion');
-	var td_dato_comparado = document.getElementById('td_dato_comparado');
-	var td_dato = document.getElementById('td_dato');
-
-
-	//Si el valor comparado es igual al principal, debo cambiarlo:
-	if(tipo_de_dato_comparado.selectedIndex == tipo_de_dato.selectedIndex)
-	{
-		if(tipo_de_dato_comparado.selectedIndex == 0)
-			tipo_de_dato_comparado.selectedIndex = 1;
-		else
-			tipo_de_dato_comparado.selectedIndex = 0;
-	}
-
-	if(comparar.checked)
-	{
-		tinta.style['display'] = '';
-		vs.style['display'] = 'inline';
-		dispersion.style['display'] = 'inline';
-		td_dato_comparado.style['display'] = '';
-		td_dato.className = 'borde_rojo';
-
-		elegido = document.getElementById(tipo_de_dato_comparado.value);
-		elegido.className = 'boton_comparar';
-	}
-	else
-	{
-		tinta.style['display'] = 'none';
-		vs.style['display'] = 'none';
-		td_dato_comparado.style['display'] = 'none';
-		dispersion.style['display'] = 'none';
-		td_dato.className = 'borde_blanco';
-
-		elegido = document.getElementById(tipo_de_dato_comparado.value);
-		elegido.className = 'boton_normal';
-	}
-
-	RevisarMoneda();
-	RevisarCircular();
-	RevisarTabla();
 }
 
 //Sincroniza los selectores de Campo de Fecha Visibles e Invisibles
@@ -427,55 +213,14 @@ function RevisarMoneda()
 {
 	var tipo_de_dato = document.getElementById('tipo_dato');
 	var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
-	var comparar = $('comparar');
 
 	if(
 		tipo_de_dato.value in
 			{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':''}
-		||
-			(comparar.checked && tipo_de_dato_comparado.value in
-				{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':''}
-			)
 		)
 		Monedas(true);
 	else
 		Monedas(false);
-}
-
-//Revisa la visibilidad del botón de gráfico circular.
-function RevisarCircular()
-{
-	var tipo_de_dato = document.getElementById('tipo_dato');
-	var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
-	var comparar = $('comparar');
-	var circular = $('circular');
-
-	if(!comparar.checked)
-	{
-		if(
-			tipo_de_dato.value in
-				{'rentabilidad':'','valor_hora':'','diferencia_valor_estandar':'','horas_castigadas':''}
-		)
-			circular.style['display'] = 'none';
-		else
-			circular.style['display'] = '';
-	}
-	else
-		circular.style['display'] = 'none';
-}
-
-function RevisarTabla()
-{
-	var comparar = $('comparar');
-	var vista = $('vista');
-	var tabla = $('tabla');
-
-	if(!comparar.checked && $('numero_agrupadores').value==2)
-	{
-		tabla.style['display'] = '';
-	}
-	else
-		tabla.style['display'] = 'none';
 }
 
 function SelectValueSet(SelectName, Value)
@@ -488,71 +233,6 @@ function SelectValueSet(SelectName, Value)
      SelectObject.selectedIndex = index;
    }
 }
-
-function CargarReporte(reporte)
-{
-	if(reporte == "0")
-	{
-		$('span_eliminar_reporte').style.visibility = 'hidden';
-		return 0;
-	}
-	else if(reporte == 'nuevo_reporte')
-	{
-		$('span_eliminar_reporte').style.visibility = 'hidden';
-		GenerarReporte();
-	}
-	else
-		$('span_eliminar_reporte').style.visibility = 'visible';
-	
-	var elementos = reporte.split('.');
-	var datos = elementos[0].split(',');
-	var agrupadores = elementos[1].split(',');
-	
-	SelectValueSet('tipo_dato',datos[0]);
-	if(datos.size() == 2)
-	{
-		SelectValueSet('tipo_dato_comparado',datos[1]);
-		$('comparar').checked = true;
-	}
-	else
-		$('comparar').checked = false;		
-	Comparar();
-	
-	Agrupadores( agrupadores.size() - parseInt($('numero_agrupadores').value));
-	
-	for(i = 0; i < agrupadores.size(); i++)
-	{
-		SelectValueSet('agrupador_'+i,agrupadores[i]);
-		CambiarAgrupador(i);
-	}
-	
-	$('eliminado_reporte').value = reporte;
-}
-
-function GenerarReporte()
-{
-		var s = $('tipo_dato').value;
-		if($('comparar').checked == true)
-			s += ','+$('tipo_dato_comparado').value;
-		s += '.';
-		var numero_agrupadores = parseInt($('numero_agrupadores').value);
-		for(i = 0; i < numero_agrupadores; i++)
-		{
-				if(i != 0)
-				 s += ',';
-				s += $('agrupador_'+i).value;
-		}
-		$('nuevo_reporte').value = s;
-		$('formulario').opc.value = 'nuevo_reporte';
-		$('formulario').submit();	
-}
-
-function EliminarReporte()
-{
-		$('formulario').opc.value = 'eliminar_reporte';
-		$('formulario').submit();	
-}
-
 
 //Hace visible o invisible el input de Moneda.
 function Monedas(visible)
@@ -622,7 +302,6 @@ function TipoDato(valor)
 {
 	var td_col = document.getElementById(valor);
 	var tipo_de_dato = document.getElementById('tipo_dato');
-	var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
 	var comparar = document.getElementById('comparar');
 	var tintas = document.getElementsByName('tinta');
 
@@ -632,10 +311,7 @@ function TipoDato(valor)
 			var tinta = tintas[i].value;
 	}
 
-	if(!comparar.checked || (comparar.checked && tinta=='rojo' && valor!= tipo_de_dato_comparado.value))
-	{
 		td_col.className = 'boton_presionado';
-
 		<?
 		foreach($tipos_de_dato as $key => $t_d)
 		{
@@ -644,21 +320,7 @@ function TipoDato(valor)
 			echo "} else {td_col= document.getElementById('".$t_d."'); if(td_col.className=='boton_presionado')td_col.className = 'boton_normal'; }\n";
 		}
 		?>
-	}
-	else if(valor != tipo_de_dato.value)
-	{
-			td_col.className = 'boton_comparar';
-			<?
-			foreach($tipos_de_dato as $key => $t_d)
-			{
-				echo " if(valor == '".$t_d."' ){ ";
-				echo " tipo_de_dato_comparado.selectedIndex = ".$key."; \n";
-				echo "} else {td_col= document.getElementById('".$t_d."'); if(td_col.className=='boton_comparar') td_col.className = 'boton_normal'; }\n";
-			}
-			?>
-	}
 	RevisarMoneda();
-	RevisarCircular();
 }
 
 </script>
@@ -680,51 +342,6 @@ if(!$popup)
 
 <!-- SELECTOR DE FILTROS -->
 <table width="90%"><tr><td align="center">
-
-<fieldset width="100%" class="border_plomo tb_base" align="center"><legend><?=__('Mis Reportes')?></legend>
-<div>
-	<select name="mis_reportes_elegido" id='mis_reportes' onchange="CargarReporte($('mis_reportes').value);">
-		<option value="0"><?=__('Seleccione Reporte...')?></option>
-		<?
-		   $estilo_eliminar_reporte = 'style="visibility:hidden"';
-		   if(empty($mis_reportes))
-		   {
-			 echo '<option value="0">-- '.__('No se han agregado reportes').'. --</option>';
-		   }
-		   else
-		   {
-			   $j = 1;
-			   foreach($mis_reportes as $mi_reporte)
-			   {
-				   $elementos = explode('.',$mi_reporte);
-				   $mis_datos = explode(',',$elementos[0]);
-				   $mis_agrupadores = explode(',',$elementos[1]);
-				   
-					foreach($mis_datos as $i => $mi_dato)
-						$mis_datos[$i] = __($mi_dato);
-					foreach($mis_agrupadores as $i => $mi_agrupador)
-						$mis_agrupadores[$i] = __($mi_agrupador);
-					
-					$selected_mi_reporte = '';
-					if($mi_reporte == $nuevo_reporte || $mis_reportes_elegido == $mi_reporte)
-					{
-						$selected_mi_reporte = 'selected';
-						$estilo_eliminar_reporte = '';
-					}
-					
-					$num = $j<10? '0'.$j:$j;
-				    echo '<option '.$selected_mi_reporte.' value="'.$mi_reporte.'">'.$num.' )&nbsp;&nbsp;'.implode(' vs. ',$mis_datos).' : '.implode(' - ',$mis_agrupadores)."</option>";
-				    $j++;
-				}
-		   }
-		?>
-		<option value = "nuevo_reporte">+++ <?=__('Agregar selección actual')?>. +++</option>
-	</select>
-	<span id="span_eliminar_reporte" <?=$estilo_eliminar_reporte?> >&nbsp;<a style='color:#CC1111' href="javascript:void(0)" onclick="EliminarReporte();"><?=__('Eliminar')?></a></span>
-	<input type=hidden name='nuevo_reporte' id='nuevo_reporte' />
-	<input type=hidden name='eliminado_reporte' id='eliminado_reporte' />
-</div>
-</fieldset>
 
 <fieldset width="100%" class="border_plomo tb_base" align="center">
 <legend onClick="MostrarOculto('filtros')" style="cursor:pointer">
@@ -824,6 +441,7 @@ if(!$popup)
 																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Corte")?>
+			</span>
 			<span title="<?=__($explica_periodo_emision)?>">
 			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
 																					<? if($campo_fecha=='emision') echo 'checked="checked"';
@@ -1204,43 +822,10 @@ if(!$popup)
 <br>
 <fieldset align="center" width="90%" class="border_plomo tb_base">
 <legend><?=__('Vista')?></legend>
-<table style="border: 0px solid black; width:730px" cellpadding="0" cellspacing="4">
-<!--<tr>
-	<td style="width: 330px; font-size: 11px;" colspan=6>
+	<div style="align:center">
+		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
+		<input type=hidden name=vista id=vista value='' />
 		<?=__('Agrupar por')?>:&nbsp;
-		<img src="<?=Conf::ImgDir()?>/mas.gif" onclick="Agrupadores(1)"; id='mas_agrupadores'
-		 style='<?=$numero_agrupadores==6?'display:none;':''?> cursor:pointer;' />
-		<img src="<?=Conf::ImgDir()?>/menos.gif" onclick="Agrupadores(-1)"; id='menos_agrupadores'
-		 style=' <?=$numero_agrupadores==1?'display:none;':''?> cursor:pointer;' />
-		<select name="vista" id="vista" onchange="RevisarTabla();">
-		<?
-				foreach($vistas as $key => $v)
-				{
-					$s = implode('-',$v);
-					echo '<option value="'.$s.'" ';
-					if($vista == $s)
-						echo 'selected';
-					echo ">".implode(' - ',$vistas_lang[$key]);
-					echo "</option>\n";
-				}
-		?>
-		</select>
-		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
-		<input type=hidden name=vista id=vista value='' />
-	</td>
-</tr>-->
-<tr>
-	<td colspan=6 align=left>
-	<div style="float:left">
-		<img src="<?=Conf::ImgDir()?>/menos.gif" onclick="Agrupadores(-1)"; 
-		 style='cursor:pointer;' />
-		 <img src="<?=Conf::ImgDir()?>/mas.gif" onclick="Agrupadores(1)"; 
-		 style='cursor:pointer;' />
-		 <?=__('Agrupar por')?>:&nbsp;
-		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
-		<input type=hidden name=vista id=vista value='' />
-	</div>
-	<div style="float:left">
 		<?
 				$ya_elegidos = array();
 				for($i=0;$i<6;$i++)
@@ -1249,7 +834,7 @@ if(!$popup)
 						if( $i >= $numero_agrupadores)
 							echo ' style="display:none;" ';
 						echo '>';
-						echo '<select name="agrupador['.$i.']" id="agrupador_'.$i.'" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador('.$i.');"  ';
+						echo '<select name="agrupador['.$i.']" id="agrupador_'.$i.'" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" ';
 						echo '/>';
 						$elegido = false;
 						$valor_previo = '';
@@ -1281,153 +866,20 @@ if(!$popup)
 						echo '</select></span>';
 						echo $valor_previo;
 				}
-		?>
+		?>	
+		<input type="button" class="btn" title="<?=__($glosa_boton['tabla'])?>" id="tabla" value="<?=__('Generar Excel')?>" onclick="Generar(this.form,'tabla');">
 	</div>
-	</td>
-</tr>
-<tr>
-	<td align=center colspan=5>
-			<input type="button" class="btn" title="<?=__($glosa_boton['planilla'])?>" value="<?=__('Planilla')?>" onclick="Generar(this.form,'print')" />
-			<input type="button" class="btn" title="<?=__($glosa_boton['excel'])?>" value="<?=__('Excel')?>" onclick="Generar(this.form,'excel');">
-			<input type="button" class="btn" title="<?=__($glosa_boton['tabla'])?>" id="tabla" value="<?=__('Tabla')?>" onclick="Generar(this.form,'tabla');">
-			<input type="button" class="btn" title="<?=__($glosa_boton['barra'])?>" value="<?=__('Barras')?>" onclick="Generar(this.form,'barra');">
-			<input type="button" class="btn" title="<?=__($glosa_boton['dispersion'])?>" id="dispersion" style="<?= $comparar ? '':'display:none;'?>" value="<?=__('Dispersión')?>" onclick="Generar(this.form,'dispersion');">
-			<input type=button class=btn title="<?=__($glosa_boton['torta'])?>" id="circular" value="<?=__('Gráfico Torta')?>" onclick="Generar(this.form,'circular');" style="<?= $comparar ? 'display:none;':''?>" >
-	</td>
-	<td style="width: 100px; font-size: 11px;">
-		<label for="comparar"><?=__('Comparar')?>:</label> <input type="checkbox" name="comparar" id="comparar" value="1" onclick="Comparar()" <?= $comparar? 'checked':''?> title='Comparar' /> </td>
-	</td>
-</tr>
-<tr>
-	<td colspan = 6>
-		<table cellpadding="2" cellspacing="5">
-			<tr>
-				<td>
-					<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
-					<?
-						if(isset($orden_barras_max2min) || !isset($tipo_dato))
-							echo 'checked="checked"';
-					?>
-					title=<?=__('Ordenar Gráfico de Barras de Mayor a Menor')?> onclick="MostrarLimite(this.checked)"/>
-					<label for="orden_barras_max2min"><?=__("Gráficar de Mayor a Menor")?></label>
-				</td>
-				<td>
-					<span id = "limite_check" <? if(!isset($orden_barras_max2min) && isset($tipo_dato) ) echo 'style= "display: none; "'; ?>>
-						<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?=$limitar?'checked="checked"':''?> />
-						<label for="limite_checkbox"><?=__("y mostrar sólo") ?></label> &nbsp;
-						<input type="text" name="limite" value="<?=$limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
-						<?=__("resultados superiores") ?>
-					<span>
-				</td>
-				<td>
-					<span id = "agupador_check">
-						<input type="checkbox" name="agrupar" id="agrupador_checkbox" value="1" <?= $agrupar? 'checked':''?> />
-						<label for="agrupador_checkbox"><?=__("agrupando el resto") ?></label>. &nbsp;
-					<span>
-				</td>
-			</tr>
-		</table>
-	</td>
-</tr>
-</table>
 </fieldset>
 </td></tr></table>
 
-<script> RevisarMoneda(); RevisarCircular(); RevisarTabla();</script>
+<script> RevisarMoneda();</script>
 
 		<!-- RESULTADO -->
 <?
 }
 
-	$alto = 800;
-	switch($opc)
-	{
-		case 'print':
-		{
-			$url_iframe = "reporte_avanzado_planilla.php?popup=1";
-			break;
-		}
-		case 'circular':
-		{
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=circular&popup=1";
-			$alto = 540;
-			if($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-		case 'barra':
-		{
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=barras&popup=1";
-			$alto = 540;
-			if($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-		case 'dispersion':
-		{
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=dispersion&popup=1";
-			$alto = 640;
-			if($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-	}
-	$url_iframe .= "&tipo_dato=".$tipo_dato;
-	$url_iframe .= "&vista=".$vista;
-	$url_iframe .= "&id_moneda=".$id_moneda;
-
-	if($limitar)
-		$url_iframe .= "&limite=".$limite;
-	if($agrupar)
-		$url_iframe .= "&agrupar=1";
-
-	if($filtros_check)
-	{
-		if(is_array($clientesF))
-			$url_iframe .= "&clientes=".implode(',',$clientesF);
-		if(is_array($usuariosF))
-			$url_iframe .= "&usuarios=".implode(',',$usuariosF);
-
-		if(is_array($areas_asunto))
-			$url_iframe .= "&areas_asunto=".implode(',',$areas_asunto);
-		if(is_array($tipos_asunto))
-			$url_iframe .= "&tipos_asunto=".implode(',',$tipos_asunto);
-
-		if($area_y_categoria)
-		{
-			if(is_array($areas))
-				$url_iframe .= "&areas_usuario=".implode(',',$areas);
-			if(is_array($categorias))
-				$url_iframe .= "&categorias_usuario=".implode(',',$categorias);
-		}
-
-		$url_iframe .= "&fecha_ini=".$fecha_ini;
-		$url_iframe .= "&fecha_fin=".$fecha_fin;
-	}
-	else
-	{
-		if(is_array($clientes))
-			$url_iframe .= "&clientes=".implode(',',$clientes);
-		if(is_array($usuarios))
-			$url_iframe .= "&usuarios=".implode(',',$usuarios);
-
-		$url_iframe .= "&fecha_ini=01-".$fecha_mes."-".$fecha_anio;
-		$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
-		$url_iframe .= "&fecha_fin=".$fecha_ultimo_dia."-".$fecha_mes."-".$fecha_anio;
-	}
-	$url_iframe .= "&campo_fecha=".$campo_fecha;
-
-	if($comparar)
-		$url_iframe .= "&tipo_dato_comparado=".$tipo_dato_comparado;
-
 ?>
 </form>
-
-	<?
-	if($opc && $opc != 'nuevo_reporte' && $opc != 'eliminar_reporte'):
-	?>
-		 <iframe name=planilla id=planilla src='<?=$url_iframe ?>' frameborder=0 width=730px height=<?=$alto?>px></iframe>
-	<? endif; ?>
 
 <script>
 Calendar.setup(

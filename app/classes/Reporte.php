@@ -34,10 +34,12 @@ class Reporte
 
 	var $agrupador_principal = 0;
 
-	//
+	//Campos utilizados para determinar los datos en el periodo. Default: trabajo.
 	var $campo_fecha = 'trabajo.fecha';
 	var $campo_fecha_2 = '';
 	var $campo_fecha_3 = '';
+	var $campo_fecha_cobro = 'cobro.fecha_fin';
+	var $campo_fecha_cobro_2 = 'cobro.fecha_emision';
 	
 	//Cuanto se repite la fila para cada agrupador
 	var $filas = array();
@@ -147,7 +149,18 @@ class Reporte
 		{
 			$this->campo_fecha = 'cobro.fecha_fin';
 			$this->campo_fecha_2 = 'cobro.fecha_creacion';
-			$this->campo_fecha_3 = 'trabajo.fecha';
+			$this->campo_fecha_3 = '';
+		}
+
+		if($campo_fecha == 'emision')
+		{
+			$this->campo_fecha = 'cobro.fecha_emision';
+			$this->campo_fecha_2 = '';
+			$this->campo_fecha_3 = '';
+
+			$this->campo_fecha_cobro = 'cobro.fecha_emision';
+			$this->campo_fecha_cobro_2 = '';
+
 		}
 	}
 
@@ -234,10 +247,20 @@ class Reporte
 	}
 
 
+	function alt($opc1,$opc2)
+	{
+		if(!$opc2)
+			return $opc1;
+		else
+			return " IF( $opc1 IS NULL OR $opc1 = '00-00-0000' , $opc2 , $opc1 )";
+	}
+
 	function cobroQuery()	//Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
 	{
 		if(empty($this->id_agrupador_cobro))
 			return 0;
+
+		$campo_fecha = $this->alt($this->campo_fecha_cobro,$this->campo_fecha_cobro_2);
 
 		$s = 'SELECT \''.__('Indefinido').'\' as profesional, \''.__('Indefinido').'\' as categoria_usuario, \''.__('Indefinido').'\' as area_usuario,
 				-1 as id_usuario,
@@ -255,15 +278,11 @@ class Reporte
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 				cobro.id_cobro,
-				IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
-												cobro.fecha_creacion,
-												cobro.fecha_fin) as fecha_final,
-				DATE_FORMAT(IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
-												cobro.fecha_creacion,
-												cobro.fecha_fin), \'%m-%y\') as mes,
-				DATE_FORMAT(IF(cobro.fecha_fin IS NULL OR cobro.fecha_fin = \'00-00-0000\',
-												cobro.fecha_creacion,
-												cobro.fecha_fin), \'%d-%m-%Y\') as dia_reporte,
+				'.$campo_fecha.' as fecha_final,
+				DATE_FORMAT( '.$campo_fecha.' , \'%m-%y\') as mes,
+				DATE_FORMAT( '.$campo_fecha.' , \'%d-%m-%Y\') as dia_reporte,
+				'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
+				'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
 				cobro.estado AS estado,
 				cobro.forma_cobro AS forma_cobro,
 			';
@@ -359,10 +378,8 @@ class Reporte
 			unset($this->filtros['asunto.id_area_proyecto']);
 			unset($this->filtros['asunto.id_tipo_asunto']);
 
-			$this->campo_fecha = 'cobro.fecha_fin';
-			$this->campo_fecha_2 = 'cobro.fecha_creacion';
-			$this->campo_fecha_3 = '';
 			$s .= $this->sWhere('cobro');
+
 			$s .= ' AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL OR (cobro.monto_thh_estandar = 0 AND cobro.forma_cobro = \'FLAT FEE\') OR (cobro.forma_cobro <> \'FLAT FEE\' AND cobro.monto_thh = 0) )';
 
 			$s .= ' GROUP BY '.implode(', ', $this->id_agrupador_cobro);
@@ -396,8 +413,10 @@ class Reporte
 						grupo_cliente.id_grupo_cliente,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 						trabajo.fecha as fecha_final,
-						DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes,
-						DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,
+						'.(in_array('mes',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes,':'').'
+						'.(in_array('dia_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,':'').'
+						'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
+						'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
 						IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
@@ -609,25 +628,26 @@ class Reporte
 				}
 			}
 		}
-		if(!empty($this->rango ))
+		//Añado el periodo determinado
+		if($from == 'trabajo')
 		{
-			$s .= " AND ( ".$this->campo_fecha." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ";
-
-			if($this->campo_fecha_2)
-			{
-				$s.= " OR ( (".$this->campo_fecha." IS NULL OR ".$this->campo_fecha." = '00-00-0000') AND ".$this->campo_fecha_2." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ) ";
-			}
-			else
-				$s.=') ';
-			if($this->campo_fecha_3)
-			{
-				$s.= " OR ( (".$this->campo_fecha." IS NULL OR ".$this->campo_fecha." = '00-00-0000') AND ".$this->campo_fecha_2." IS NULL AND ".$this->campo_fecha_3." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ) ) ";
-			}
-			else if($this->campo_fecha_2)
-				$s.=') ';
+			$campo_fecha = $this->campo_fecha;
+			$campo_fecha_2 = $this->campo_fecha_2;
+		}
+		else
+		{
+			$campo_fecha = $this->campo_fecha_cobro;
+			$campo_fecha_2 = $this->campo_fecha_cobro_2;
+		}
+		if(!empty($this->rango))
+		{
+			$s .= " AND ( ".$campo_fecha." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ";
+			if($campo_fecha_2)
+				$s.= " OR ( (".$campo_fecha." IS NULL OR ".$campo_fecha." = '00-00-0000') AND ".$campo_fecha_2." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ) ";
+			$s.=') ';
 		}
 		/* Si se filtra el periodo por cobro, los trabajos sin cobro no se ven */
-		if($this->campo_fecha == 'cobro.fecha_fin' && $from == 'trabajo')
+		if( ($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo')
 			$s .= " AND trabajo.id_cobro IS NOT NULL ";
 
 		return $s;

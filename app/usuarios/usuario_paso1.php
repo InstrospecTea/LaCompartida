@@ -125,21 +125,23 @@ function RevisarRut( form )
 function Listar( form, from )
 {
 	var nom=document.act.nombre.value;
+	var activo = 0;
+	if($('activo').checked==true)
+		activo = 1;
+
 	if(from == 'buscar')
 		form.action = 'usuario_paso1.php?buscar=1';
 	else if(from == 'xls')
 	{
-		if(document.act.activo.checked==true)
-			form.action = '../interfaces/usuarios_xls.php?act=1&nombre=nom';
-		else if(document.act.activo.checked==false) 
-			form.action = '../interfaces/usuarios_xls.php?act=0&nombre=nom';
+		form.action = '../interfaces/usuarios_xls.php?act='+activo+'&nombre=nom';
 	}
 	else if(from == 'xls_vacacion')
 	{
-		if($('activo').checked==true)
-			form.action = '../interfaces/usuarios_xls.php?act=1&nombre=nom&vacacion=true';
-		else if($('activo').checked==false) 
-			form.action = '../interfaces/usuarios_xls.php?act=0&nombre=nom&vacacion=true';
+		form.action = '../interfaces/usuarios_xls.php?act='+activo+'&nombre=nom&vacacion=true';
+	}
+	else if(from == 'xls_modificaciones')
+	{
+		form.action = '../interfaces/usuarios_xls.php?act='+activo+'&nombre=nom&modificaciones=true';
 	}
 	else
 		return false;
@@ -511,6 +513,7 @@ function Listar( form, from )
 						&nbsp;&nbsp; <input type="submit" class=btn value="Buscar" onclick="Listar(this.form,'buscar')" />
 						&nbsp;&nbsp; <input type="button" class=btn value="<?=__('Descargar listado a Excel')?>" onclick="Listar(this.form,'xls')" />
 						&nbsp; <input type="button" class=btn value="<?=__('Descargar vacaciones a Excel')?>" onclick="Listar(this.form,'xls_vacacion')" />
+						&nbsp; <input type="button" class=btn value="<?=__('Descargar modificaciones a Excel')?>" onclick="Listar(this.form,'xls_modificaciones')" />
 			</form>
 				</td>
 		</tr>

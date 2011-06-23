@@ -381,5 +381,31 @@ class UsuarioExt extends Usuario
 		}
 		return $lista;
 	}
+	
+	/**
+	 * Lista los cambios realizados a usuarios de acuerdo a tipos indicados
+	 */
+	function ListaCambios($id_usuario )
+	{
+		$query = "SELECT usuario_historial.id_usuario_creador,usuario_historial.nombre_dato,usuario_historial.valor_original,usuario_historial.valor_actual,usuario_historial.fecha, usuario.nombre,usuario.apellido1,usuario.apellido2 FROM usuario_cambio_historial AS usuario_historial";
+		$query .= " JOIN usuario ON usuario.id_usuario = usuario_historial.id_usuario_creador";
+		$query .= " WHERE usuario_historial.id_usuario = '".$id_usuario."' AND nombre_dato IN ('id_categoria_usuario','activo')";
+		$query .= " ORDER BY fecha DESC";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		while( list($id_usuario_creador,$nombre_dato,$valor_original,$valor_actual,$fecha,$nombre,$apellido1,$apellido2) = mysql_fetch_array($resp) )
+		{
+			$lista[] = array(
+				'id_usuario_creador'=> $id_usuario_creador,
+				'nombre_dato'=> ($nombre_dato == 'id_categoria_usuario') ? 'categoría' : $nombre_dato,
+				'valor_original'=> $valor_original,
+				'valor_actual'=> $valor_actual,
+				'fecha'=> Utiles::sql2date($fecha),
+				'nombre'=> $nombre,
+				'ap_paterno'=> $apellido1,
+				'ap_materno'=> $apellido2
+			);
+		}
+		return $lista;
+	}
 }
 ?>

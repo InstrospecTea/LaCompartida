@@ -67,8 +67,8 @@
   if(!empty($vacacion))
   {
   	$wb->send('Lista_vacaciones_usuarios.xls');
-  	$ws1->setColumn( 1, 1,  25.00);
-		$ws1->setColumn( 2, 2,  25.00);
+  	$ws1->setColumn( 1, 1, 25.00);
+		$ws1->setColumn( 2, 2, 25.00);
 		$ws1->setColumn( 3, 3, 20.00);
 		$ws1->setColumn( 4, 4, 20.00);
 		$ws1->write(0, 0, 'Lista de vacaciones de Usuarios', $encabezado);
@@ -105,6 +105,70 @@
 	    $ws1->write($fila_inicial, 2, $row[rut].'-'.$row[dv_rut], $f4);
 	    $ws1->write($fila_inicial, 3, Utiles::sql2date($row[fecha_inicio]), $f4);
 	    $ws1->write($fila_inicial, 4, Utiles::sql2date($row[fecha_fin]), $f4);
+	    $fila_inicial++;
+		}
+	}
+	else if( !empty($modificaciones) )
+	{
+		$wb->send('Lista_modificaciones_usuarios.xls');
+		$ws1->setColumn( 1, 1, 25.00);
+		$ws1->setColumn( 2, 2, 25.00);
+  	$ws1->setColumn( 3, 3, 25.00);
+		$ws1->setColumn( 4, 4, 20.00);
+		$ws1->setColumn( 5, 5, 20.00);
+		$ws1->setColumn( 6, 6, 20.00);
+		$ws1->setColumn( 7, 7, 50.00);
+		$ws1->write(0, 0, 'Lista de modificaciones de Usuarios', $encabezado);
+		$ws1->mergeCells (0, 0, 0, 8);
+		$info_usr1 = str_replace('<br>',' - ',$PdfLinea1);
+		$ws1->write(2, 0, utf8_decode($info_usr1), $encabezado);
+		$ws1->mergeCells (2, 0, 2, 8);
+		$info_usr = str_replace('<br>',' - ',$PdfLinea2);
+		$ws1->write(3, 0, utf8_decode($info_usr), $encabezado);
+		$ws1->mergeCells (3, 0, 3, 8);
+		$i=0;
+		$fila_inicial = 7;
+		if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador())=='rut' ) )
+			$glosa_rut = 'Rut';
+		else
+			$glosa_rut = 'CNI';
+		
+		$ws1->write($fila_inicial, 1, __('Usuario'), $tit);
+		$ws1->write($fila_inicial, 2, __('Fecha creación'), $tit);
+		$ws1->write($fila_inicial, 3, __('Fecha modificación'), $tit);
+	  $ws1->write($fila_inicial, 4, __('Dato modificado'), $tit);
+	  $ws1->write($fila_inicial, 5, __('Valor actual'), $tit);
+	  $ws1->write($fila_inicial, 6, __('Valor anterior'), $tit);
+	  $ws1->write($fila_inicial, 7, __('Modificado por'), $tit);
+	  $fila_inicial++;
+		$query = "SELECT u.id_usuario, CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre, u.rut, u.dv_rut,u.fecha_creacion,
+										UV.fecha, UV.id_usuario_creador, UV.nombre_dato, UV.valor_original, UV.valor_actual
+										FROM usuario AS u
+										JOIN usuario_cambio_historial AS UV on u.id_usuario = UV.id_usuario
+										WHERE $where AND UV.nombre_dato IN ('id_categoria_usuario','activo') ORDER BY u.id_usuario, UV.fecha DESC";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
+	  while($row = mysql_fetch_assoc($resp))
+	  {
+			$i=0;
+			if( trim($row['nombre_dato']) == 'id_categoria_usuario' )
+			{
+				$row['nombre_dato'] = 'categoría';
+				$glosa_actual = (!empty($row['valor_actual'])) ? Utiles::Glosa($sesion, $row['valor_actual'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+				$glosa_origen = (!empty($row['valor_original'])) ? Utiles::Glosa($sesion, $row['valor_original'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+			}
+			else
+			{
+				$glosa_actual = (!empty($row['valor_actual'])) ? 'activo' : 'inactivo';
+				$glosa_origen = (!empty($row['valor_original'])) ? 'activo' : 'inactivo';
+			}
+			
+			$ws1->write($fila_inicial, 1, $row[nombre], $f4);
+			$ws1->write($fila_inicial, 2, Utiles::sql2date($row[fecha_creacion]), $f4);
+	    $ws1->write($fila_inicial, 3, Utiles::sql2date($row[fecha]), $f4);
+	    $ws1->write($fila_inicial, 4, $row[nombre_dato], $f4);
+	    $ws1->write($fila_inicial, 5, $glosa_actual, $f4);
+	    $ws1->write($fila_inicial, 6, $glosa_origen, $f4);
+	    $ws1->write($fila_inicial, 7, Utiles::Glosa($sesion, $row['id_usuario_creador'], "CONCAT_WS(' ',nombre,apellido1,apellido2) AS glosa", 'usuario','id_usuario'), $f4);
 	    $fila_inicial++;
 		}
 	}
