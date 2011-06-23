@@ -141,7 +141,13 @@
 									'Border' => 1,
 									'Color' => 'black'));
 		$txt_derecha->setTextWrap();
-		
+		$txt_derecha_bold =& $wb->addFormat(array('Size' => 11,
+									'Valign' => 'top',
+									'Align' => 'right',
+									'Border' => 1,
+									'Bold' => 1,
+									'Color' => 'black'));
+
 		$fecha =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
@@ -155,6 +161,13 @@
 									'Border' => 1,
 									'Color' => 'black'));
 		$numeros->setNumFormat("0");
+		$numeros_bold =& $wb->addFormat(array('Size' => 12,
+									'VAlign' => 'top',
+									'Align' => 'right',
+									'Border' => 1,
+									'Bold' => 1,
+									'Color' => 'black'));
+		$numeros_bold->setNumFormat("0");
 
 		$horas_minutos =& $wb->addFormat(array('Size' => 12,
 									'VAlign' => 'top',
@@ -162,6 +175,14 @@
 									'Border' => 1,
 									'Color' => 'black'));
 		$horas_minutos->setNumFormat("[h]:mm");
+
+		$horas_minutos_bold =& $wb->addFormat(array('Size' => 12,
+									'VAlign' => 'top',
+									'Align' => 'right',
+									'Border' => 1,
+									'Bold' => 1,
+									'Color' => 'black'));
+		$horas_minutos_bold->setNumFormat("[hh]:mm");
 
 		$titulo_filas =& $wb->addFormat(array('Size' => 12,
 									'Align' => 'center',
@@ -238,15 +259,21 @@
 		$ws1->mergeCells($fila, $columna, $fila+$filas-1, $columna);
 	}
 
-	function dato($fila,$columna,$valor)
+	function dato($fila,$columna,$valor,$bold=false)
 	{
 		global $ws1;
 		global $numeros;
+		global $numeros_bold;
 		global $horas_minutos;
+		global $horas_minutos_bold;
 		global $tipo_dato;
 		global $sesion;
 		global $tipo_dato_comparado;
 		global $txt_rojo;
+
+		$hm = $bold? $horas_minutos_bold:$horas_minutos;
+		$n = $bold? $numeros_bold:$numeros;
+
 		if($valor === '99999!*')
 		{
 			$ws1->write($fila,$columna,'99999!*',$txt_rojo);
@@ -255,9 +282,9 @@
 		else
 		{
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  )  && (strpos($tipo_dato,"oras_") || strpos($tipo_dato_comparado,"oras_")))
-				$ws1->writeNumber($fila,$columna,Reporte::FormatoValor($sesion,$valor,$tipo_dato,"excel"),$horas_minutos);
+				$ws1->writeNumber($fila,$columna,Reporte::FormatoValor($sesion,$valor,$tipo_dato,"excel"),$hm);
 			else
-				$ws1->writeNumber($fila,$columna,$valor,$numeros);
+				$ws1->writeNumber($fila,$columna,$valor,$n);
 		}
 	}
 
@@ -425,11 +452,12 @@
 		
 		
 	}
+		$col_c = sizeof($agrupadores)-1;
 		//TOTALES
-		$ws1->write($fila_a,$columna+$col_c,"TOTAL",$txt_derecha);
+		$ws1->write($fila_a,$columna+$col_c,"TOTAL",$txt_derecha_bold);
 		
-		dato($fila_a,$col_c+1,$resultado[$tipo_dato]['total']);
+		dato($fila_a,$col_c+1,$resultado[$tipo_dato]['total'],true);
 		if($comparar)
-			dato($fila_a,$col_c+2,$resultado[$tipo_dato_comparado]['total']);
+			dato($fila_a,$col_c+2,$resultado[$tipo_dato_comparado]['total'],true);
     $wb->close();
 ?>
