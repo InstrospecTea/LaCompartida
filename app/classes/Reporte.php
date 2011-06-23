@@ -190,7 +190,7 @@ class Reporte
 		//Para ORDER BY - Query principal por trabajos
 		switch($s)
 		{
-			case "mes": 
+			case "mes_reporte": 
 			case "dia_reporte":
 				$this->orden_agrupador[] = "fecha_final";
 				break;
@@ -279,7 +279,7 @@ class Reporte
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 				cobro.id_cobro,
 				'.$campo_fecha.' as fecha_final,
-				DATE_FORMAT( '.$campo_fecha.' , \'%m-%y\') as mes,
+				DATE_FORMAT( '.$campo_fecha.' , \'%m-%y\') as mes_reporte,
 				DATE_FORMAT( '.$campo_fecha.' , \'%d-%m-%Y\') as dia_reporte,
 				'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
 				'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
@@ -413,7 +413,7 @@ class Reporte
 						grupo_cliente.id_grupo_cliente,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 						trabajo.fecha as fecha_final,
-						'.(in_array('mes',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes,':'').'
+						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes_reporte,':'').'
 						'.(in_array('dia_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,':'').'
 						'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
 						'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'

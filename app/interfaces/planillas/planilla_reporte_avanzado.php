@@ -259,6 +259,25 @@
 		$ws1->mergeCells($fila, $columna, $fila+$filas-1, $columna);
 	}
 
+	function fila_col($fila,$col)
+	{
+			return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
+	}
+
+	function total($fila,$columna,$valor)
+	{
+		global $ws1;
+		global $numeros_bold;
+		global $horas_minutos_bold;
+		global $tipo_dato;
+		global $sesion;
+		
+			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  )  && (strpos($tipo_dato,"oras_") || strpos($tipo_dato_comparado,"oras_")))
+				$ws1->write($fila,$columna,Reporte::FormatoValor($sesion,$valor,$tipo_dato,"excel"),$horas_minutos_bold);
+			else
+				$ws1->write($fila,$columna,$valor,$numeros_bold);
+	}
+
 	function dato($fila,$columna,$valor,$bold=false)
 	{
 		global $ws1;
@@ -455,9 +474,11 @@
 		$col_c = sizeof($agrupadores)-1;
 		//TOTALES
 		$ws1->write($fila_a,$columna+$col_c,"TOTAL",$txt_derecha_bold);
-		
-		dato($fila_a,$col_c+1,$resultado[$tipo_dato]['total'],true);
+				
+		total($fila_a,$col_c+1,'=SUM('.fila_col($fila,$col_c+1).':'.fila_col($fila_a-1, $col_c+1).')');
+
 		if($comparar)
-			dato($fila_a,$col_c+2,$resultado[$tipo_dato_comparado]['total'],true);
+			total($fila_a,$col_c+2,'=SUM('.fila_col($fila,$col_c+2).':'.fila_col($fila_a-1, $col_c+2).')');
+		
     $wb->close();
 ?>

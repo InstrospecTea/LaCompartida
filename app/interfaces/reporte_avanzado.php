@@ -86,7 +86,6 @@
 	'profesional',
 	'estado',
 	'id_cobro',
-	'mes',
 	'forma_cobro',
 	'tipo_asunto',
 	'prm_area_proyecto.glosa',
@@ -94,6 +93,7 @@
 	'area_usuario',
 	'glosa_grupo_cliente',
 	'id_usuario_responsable',
+	'mes_reporte',
 	'dia_reporte');
 	if($debug==1)
 	{
@@ -101,39 +101,6 @@
 		$agrupadores[] = 'dia_corte';
 		$agrupadores[] = 'dia_emision';
 	}
-
-	$vistas = array();
-	$vistas[] = array('glosa_grupo_cliente', 'profesional', 'id_cobro', 'glosa_cliente', 'glosa_asunto', 'forma_cobro');
-	$vistas[] = array('mes', 'glosa_cliente', 'estado',	'id_cobro',	 'glosa_asunto', 'profesional'	);
-
-	$vistas[] = array('glosa_cliente'																	);
-	$vistas[] = array('glosa_cliente',			'glosa_asunto'											);
-	$vistas[] = array('glosa_cliente',			'glosa_asunto',		'profesional'						);
-	$vistas[] = array('glosa_cliente',			'id_cobro',			'glosa_asunto',		'profesional'	);
-	$vistas[] = array('glosa_cliente',			'profesional'											);
-	$vistas[] = array('glosa_grupo_cliente',	'glosa_cliente',	'glosa_asunto',		'profesional'	);
-	$vistas[] = array('prm_area_proyecto.glosa'															);
-	$vistas[] = array('profesional'																		);
-	$vistas[] = array('profesional',			'glosa_cliente'											);
-	$vistas[] = array('profesional',			'glosa_cliente',	'glosa_asunto'						);
-	$vistas[] = array('id_usuario_responsable'															);
-	$vistas[] = array('mes',					'glosa_cliente'											);
-	$vistas[] = array('mes',					'profesional'											);
-	$vistas[] = array('mes',					'glosa_cliente',	'profesional'						);
-	$vistas[] = array('id_cobro',				'profesional'											);
-	$vistas[] = array('id_cobro',				'glosa_cliente',	'profesional'						);
-	$vistas[] = array('forma_cobro',			'id_cobro'												);
-	$vistas[] = array('forma_cobro',			'id_cobro',			'profesional'						);
-	$vistas[] = array('estado',					'id_cobro',			'glosa_cliente',	'profesional'	);
-	$vistas[] = array('estado',					'mes',				'id_cobro'							);
-	$vistas[] = array('glosa_asunto'																	);
-	$vistas[] = array('tipo_asunto',			'prm_area_proyecto.glosa',		'profesional',		'glosa_cliente'	);
-
-	//Las vistas se escriben en el Select en el Lenguaje actual
-	$vistas_lang = $vistas;
-	foreach($vistas as $k => $v)
-		foreach($v as $k2 => $s)
-			$vistas_lang[$k][$k2] = __($s);
 
 	$glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 	$glosa_dato['horas_cobrables'] = "Total de Horas Trabajadas en asuntos Cobrables";
@@ -803,37 +770,8 @@ if(!$popup)
 </table>
 </center>
 
-			<!-- SELECTOR FILTROS EXPANDIDO -->
-<table id="full_filtros" style="border: 0px solid black; width:730px; <?=$filtros_check? '':'display:none;'?> " cellpadding="0" cellspacing="3">
-	<tr valign=top>
-		<td align=left>
-			<b><?=__('Profesionales')?>:</b></td>
-		<td align=left>
-			<b><?=__('Clientes')?>:</b></td>
-		<td align=left width='80px'>
-			<b><?=__('Periodo de') ?>:</b>
-		</td>
-		<td>
-			<span title="<?=__($explica_periodo_trabajo)?>">
-			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
-																					<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Trabajo")?>
-			</span>
-			<span title="<?=__($explica_periodo_cobro)?>">
-			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
-																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
-																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Corte")?>
-			<span title="<?=__($explica_periodo_emision)?>">
-			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
-																					<? if($campo_fecha=='emision') echo 'checked="checked"';
-																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Emisión")?>
-			</span>
-		</td>
-	</tr>
-
-	<?
+<!-- SELECTOR FILTROS EXPANDIDO -->
+<?
 		$largo_select = 6;
 		if( method_exists('Conf','GetConf') )
 		{
@@ -853,6 +791,35 @@ if(!$popup)
 		}
 	?>
 
+<table id="full_filtros" style="border: 0px solid black; width:730px; <?=$filtros_check? '':'display:none;'?> " cellpadding="0" cellspacing="3">
+	<tr valign=top>
+		<td align=left>
+			<b><?=__('Profesionales')?>:</b></td>
+		<td align=left>
+			<b><?=__('Clientes')?>:</b></td>
+		<td align=left width='80px'>
+			<b><?=__('Periodo de') ?>:</b>
+		</td>
+		<td colspan="<?= $filtros_extra? '2':'1'?>">
+			<span title="<?=__($explica_periodo_trabajo)?>">
+			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
+																					<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
+			<?=__("Trabajo")?>
+			</span>
+			<span title="<?=__($explica_periodo_cobro)?>">
+			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
+																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
+																					 ?> onclick ="SincronizarCampoFecha()" />
+			<?=__("Corte")?>
+			<span title="<?=__($explica_periodo_emision)?>">
+			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
+																					<? if($campo_fecha=='emision') echo 'checked="checked"';
+																					 ?> onclick ="SincronizarCampoFecha()" />
+			<?=__("Emisión")?>
+			</span>
+		</td>
+	</tr>
+
 	<tr valign=top>
 		<td rowspan="3" align=left>
 		<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]",$usuariosF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>		</td>
@@ -860,7 +827,7 @@ if(!$popup)
 		<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]",$clientesF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
 	 	</td>
 	 	<!-- PERIODOS -->
-	 	<td colspan="2" align=center>
+	 	<td colspan="<?= $filtros_extra? '3':'2'?>" align=center>
 			<div id=periodo_rango>
 				<?=__('Fecha desde')?>:&nbsp;
 					<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
@@ -877,7 +844,7 @@ if(!$popup)
 	if($filtros_extra)
 	{?>
 	<tr>
-		<td align=center>
+		<td align=center colspan=2>
 			<b><?=__("Tipo de Asunto")?>:</b>
 
 		</td>

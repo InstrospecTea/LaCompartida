@@ -61,7 +61,7 @@
 								IF(Cliente.MonedaTarifaMensual='D','2',IF(Cliente.MonedaTarifaMensual='E','3','1')) 				as contrato_FFF_id_moneda_monto, 
 								Cliente.TarifaHora 																																					as contrato_FFF_id_tarifa, 
 								Cliente.TarifaMensual 																																			as contrato_FFF_monto, 
-								Cliente.Attache 																																						as contrato_FFF_id_usuario_responsable, 
+								IF(Cliente.Attache IS NOT NULL, Cliente.Attache, 1) 																											as contrato_FFF_id_usuario_responsable,
 								Cliente.ContactoDeCobranza 																																	as contrato_FFF_contacto, 
 								Cliente.FechaCreacion 																																			as contrato_FFF_fecha_creacion, 
 								Cliente.FechaModificacion 																																	as contrato_FFF_fecha_modificacion, 

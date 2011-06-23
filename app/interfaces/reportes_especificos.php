@@ -162,6 +162,32 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 			
 			</ul>
 			</td>
+
+	</tr>
+</table>
+		<br/>
+    	</td>
+		
+			<td>
+    		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
+		<tr>
+		<?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+		<td rowspan="2" width=15%><img src="<?=Conf::ImgDir()?>/proyectos_32_nuevo.gif" alt=''/></td>
+		<? } else { ?>
+		<td rowspan="2" width=15%><img src="<?=Conf::ImgDir()?>/proyectos_32.gif" alt=''/></td>
+	<? } ?>
+		<td valign=center style='font-weight:bold; height: 15px;' width=85%><?=__('Experimentales')?></td>
+	</tr>
+	<tr valign=top align=left style="height: 5px;">
+      	<td><hr size=1 width=100%></td>
+			</tr>
+	<tr><td></td>
+		<td>
+			<ul style="list-style-position: outside; text-align: left;">
+			<li><a href='<?=Conf::RootDir()?>/app/interfaces/reporte_diario.php' style="color:#000;text-decoration: none;"><?=__('Reporte Diario')?></a></li>
+			</ul>
+			</td>
+
 	</tr>
 </table>
 		<br/>

@@ -914,8 +914,8 @@ $_LANG['rentabilidad'] = "Rentabilidad";
 $_LANG['valor_hora'] = "Valor Hora";
 $_LANG['diferencia_valor_estandar'] = "Diferencia Valor Estándar";
 $_LANG['valor_estandar'] = "Valor Estándar";
-$_LANG['mes'] = 'Mes';
-$_LANG['dia_reporte'] = 'Día';
+$_LANG['mes_reporte'] = 'Trabajo (mes)';
+$_LANG['dia_reporte'] = 'Trabajo (día)';
 $_LANG['estado'] = "Estado";
 
 ### Configuración ###

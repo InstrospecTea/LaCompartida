@@ -301,6 +301,24 @@
 		$worksheet->writeNumber($fila, $col, $valor, $formato);
 	}
 
+	function fila_col($fila,$col)
+	{
+			return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
+	}
+
+	function total($fila,$columna,$valor)
+	{
+		global $ws1;
+		global $numeros_bold;
+		global $horas_minutos_bold;
+		global $tipo_dato;
+		global $sesion;
+		
+			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  )  && (strpos($tipo_dato,"oras_") || strpos($tipo_dato_comparado,"oras_")))
+				$ws1->write($fila,$columna,Reporte::FormatoValor($sesion,$valor,$tipo_dato,"excel"),$horas_minutos_bold);
+			else
+				$ws1->write($fila,$columna,$valor,$numeros_bold);
+	}
 
 	function dato($fila,$columna,$valor,$bold = false, $alerta = false)
 	{
@@ -409,7 +427,7 @@
 				$col++;
 			}
 			//TOTAL_COLUMNA:
-			dato($fil,$col,$r['labels'][$id]['total'],true);
+			total($fil,$col,'=SUM('.fila_col($fil,1).':'.fila_col($fil, $col-1).')');
 			$fil++;
 		}
 
@@ -417,10 +435,11 @@
 		$col = $columna + 1;
 		foreach($r['labels_col'] as $id_col => $nombre)
 		{
-			dato($fil,$col,$r['labels_col'][$id_col]['total'],true);
+			total($fil,$col,'=SUM('.fila_col($fila,$col).':'.fila_col($fil-1, $col).')');
 			$col++;
 		}
-		dato($fil,$col,$r['total'],true);
+		total($fil,$col,'=SUM('.fila_col($fila,$col).':'.fila_col($fil-1, $col).')');
+			
 	}
     $wb->close();
 ?>

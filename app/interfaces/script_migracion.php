@@ -4,14 +4,20 @@
 	require_once Conf::ServerDir().'/../app/classes/Migracion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+
+	$sesion = new Sesion();
+	$migracion = new Migracion($sesion);
+
+	
 	
 	// Conectarse a la base de datos antiguo
 	$dbhOrigen = @mysql_connect(ConfMigracion::dbHost(), ConfMigracion::dbUser(),ConfMigracion::dbPass()) or die(mysql_error());
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	
-	$sesion = new Sesion();
-	$migracion = new Migracion($sesion);
 	
+	set_time_limit(0);
+	
+	/*
 	if( method_exists('ConfMigracion','DatosPrm') && ConfMigracion::DatosPrm() != "" )
 	{
 		$migracion->SetDatosParametricos(ConfMigracion::DatosPrm());
@@ -28,13 +34,13 @@
 		$responseCliente = mysql_query(ConfMigracion::QueryCliente(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCliente(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetosCliente($responseCliente);
 	}
-	
+*/
 	if( method_exists('ConfMigracion','QueryAsunto') && ConfMigracion::QueryAsunto() != "" )
 	{
 		$responseAsunto = mysql_query(ConfMigracion::QueryAsunto(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryAsunto(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoAsunto($responseAsunto);
 	}
-	
+	/*
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )
 	{
 		$responseHoras = mysql_query(ConfMigracion::QueryHoras(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);
@@ -57,5 +63,5 @@
 	{
 		$responseFacturas = mysql_query(ConfMigracion::QueryFacturas(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryFacturas(),__FILE__,__LINE__,$dbhOrigen);
 		$facturas = mysql_fetch_assoc($responseFacturas);
-	}
+	}*/
 ?>
