@@ -5461,7 +5461,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 
 
 
-					case 4.21:
+					case 4.22:
 						$query = array();
 						$query[] = "CREATE TABLE `usuario_cambio_historial` (
 						  `id_usuario` int(11) default NULL,

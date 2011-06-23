@@ -492,7 +492,7 @@
 			<?=__('Fecha')?>
 		</td>
 		<td align=left colspan="3">
-			<input type="text" name="fecha" value="<?=$documento->fields[fecha] ? Utiles::sql2date($documento->fields[fecha]) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+			<input type="text" name="fecha" value="<?=$pago->fields['fecha'] ? Utiles::sql2date($pago->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
 		</td>
 	</tr>

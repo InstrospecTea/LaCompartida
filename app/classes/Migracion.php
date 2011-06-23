@@ -740,7 +740,69 @@ class Migracion
 			$this->log .= "<br>Error en usuario: '".$usuario->fields['username']."': ".$usuario->error;
 		}
 	}
-	
+
+
+	/*
+	 * Agregar Trabajos
+	 * Se recive un Array de varios Objetos,
+	 * y se ingresa cada objeto durante la iteracion
+	 */
+	public function AgregarHoras($items = null)
+	{
+		if(!empty($items))
+		{
+			foreach($items as $item)
+				AgregarUsuario($item['hora']);
+		}
+	}
+
+	public function AgregarHora($hora = null)
+	{
+		/*
+		 * Validar FK
+		 */
+		#Instancio Clases a usar en validación de FK
+		$usuario	= new Usuario($this->sesion);
+		$asunto		= new Asunto($this->sesion);
+		$moneda		= new Moneda($this->sesion);
+
+		#Confirmo que el id_usuario exista
+		if(!$usuario->Load($hora->fields['id_usuario']))
+		{
+			$this->log .= '<br>Error ingreso hora: id_usuario "'.$hora->fields['id_usuario'].'" no existe';
+			return false;
+		}
+
+		#Confirmo que el codigo_asunto exista
+		if(!$asunto->LoadByCodigo($hora->fields['codigo_asunto']))
+		{
+			$this->log .= '<br>Error ingreso hora: codigo_asunto "'.$hora->fields['codigo_asunto'].'" no existe';
+			return false;
+		}
+
+		#Confirmo que el codigo_actividad exista
+		$query = "SELECT count(*) FROM actividad WHERE codigo_actividad = '".addslashes($hora->fields['codigo_actividad'])."'";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		list($cantidad) = mysql_fetch_array($resp);
+		if($cantidad == 0)
+		{
+			$this->log .= '<br>Error ingreso hora: codigo_actividad "'.$hora->fields['codigo_actividad'].'" no existe';
+			return false;
+		}
+
+		#Confirmo que el id_moneda exista
+		if(!$moneda->Load($hora->fields['id_moneda']))
+		{
+			$this->log .= '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
+			return false;
+		}
+
+		/*
+		 * Registrar información
+		 */
+		$hora->Write();
+	}
+
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
 	public function Write($objeto)
 	{
