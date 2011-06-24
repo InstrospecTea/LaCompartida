@@ -5,11 +5,23 @@
 		function dbName() { return 'Payet_dbo'; 		}
 		function dbUser() { return 'root'; 					}
 		function dbPass() { return 'chantasio'; 		}
-		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 'glosa_campo' => 'glosa_categoria', 'datos' => array('Administrativo','Asistente','Asociado','Asociado Junior','Asociado Senior','Practicante','Secretaria','Socio','NT','Procurador')),
-																				'prm_area_usuario' => array('glosa_campo' => 'glosa', 'datos' => array('Administración','Corporativo','Laboral','Procesal','Regulatorio','Tributario')),
-																				'grupo_cliente' => array('glosa_campo' => 'glosa_grupo_cliente', 'datos' => array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario')),
-																				'prm_area_proyecto' => array('glosa_campo' => 'glosa', 'datos' => array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
-																			); }
+		/*function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
+																					'campo_glosa' 					=> 'glosa_categoria', 
+																				  'campo_id'            	=> 'id_categoria_usuario', 
+																				  'datos'              	  => array('Administrativo','Asistente','Asociado','Asociado Junior','Asociado Senior','Practicante','Secretaria','Socio','NT','Procurador')),
+																				'prm_area_usuario'      => array( 
+																					'campo_glosa' 					=> 'glosa',           
+																				  'campo_id'            	=> 'id',                   
+																				  'datos'              	  => array('Administración','Corporativo','Laboral','Procesal','Regulatorio','Tributario')),
+																				'grupo_cliente'         => array( 
+																					'campo_glosa' 					=> 'glosa_grupo_cliente', 
+																				  'campo_id'            	=> 'id_grupo_cliente',
+																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario')),
+																				'prm_area_proyecto'     => array( 
+																					'campo_glosa' 					=> 'glosa', 
+																				  'campo_id'            	=> 'id_area_proyecto',
+																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
+																			); }*/
 		function QueryUsuario() 
 		{ 
 			return "SELECT 
@@ -18,13 +30,12 @@
 								Empleado.ApellidoPaterno 																				as usuario_FFF_apellido1,
 								Empleado.ApellidoMaterno 																				as usuario_FFF_apellido2,
 								Empleado.Siglas 																								as usuario_FFF_username,
-								TbCategoriaEmpleados.DescripcionCategoria												as usuario_FFF_id_categoria_usuario,
+								Empleado.Categoria																							as usuario_FFF_id_categoria_usuario,
 								CONCAT_WS(', ',Empleado.Direccion,Empleado.Provincia) 					as usuario_FFF_dir_calle,
 								Empleado.Departamento 																					as usuario_FFF_dir_depto,
-								Empleado.Distrito 																							as usuario_FFF_dir_comuna,
 								Empleado.Telefono1 																							as usuario_FFF_telefono1,
 								Empleado.Telefono1 																							as usuario_FFF_telefono2,
-								CONCAT(Empleado.DocumentoIdentidad,Empleado.DocIdentidadNumero) as usuario_FFF_rut,
+								Empleado.DocIdentidadNumero																		  as usuario_FFF_rut,
 								Empleado.CorreoElectronico 																			as usuario_FFF_email,
 								IF(Empleado.Status='A','1','0') 																as usuario_FFF_activo,
 								Empleado.FechaCreacion 																					as usuario_FFF_fecha_creacion,

@@ -102,7 +102,7 @@
 			$usuario->Edit('visible', $activo==1 ? 1 : $visible);
 			$usuario->Edit('restriccion_min', $restriccion_min);
 			$usuario->Edit('restriccion_max', $restriccion_max);
-			//$usuario->Edit('restriccion_mensual', $restriccion_mensual);
+			$usuario->Edit('restriccion_mensual', $restriccion_mensual);
 			if($dias_ingreso_trabajo == "") { $dias_ingreso_trabajo = 30; }
 			$usuario->Edit('dias_ingreso_trabajo', $dias_ingreso_trabajo);
 			$usuario->Edit('retraso_max', $retraso_max);

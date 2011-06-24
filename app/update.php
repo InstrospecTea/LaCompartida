@@ -5438,7 +5438,8 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` ADD `monto_pago` DOUBLE NOT NULL COMMENT 'monto en la moneda del pago' AFTER `monto` ;";
 						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` CHANGE `monto` `monto` DOUBLE NOT NULL DEFAULT '0' COMMENT 'monto en la moneda de la deuda'";
 						$query[] = "UPDATE `factura_pago` SET `monto_moneda_cobro` = `monto`, `id_moneda_cobro` = `id_moneda` WHERE 1";
-						$query[] = "UPDATE `cta_cte_fact_mvto_neteo` SET `monto_pago` = `monto` WHERE 1";
+						$query[] = "UPDATE `cta_cte_fact_mvto_neteo` SET `monto_pago` = `monto` WHERE 1"; 
+						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5452,14 +5453,6 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-
-
-
-
-
-
-
-
 
 					case 4.22:
 						$query = array();
@@ -5477,6 +5470,39 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
+
+					case 4.23:
+						$query_consulta = "SELECT glosa_moneda FROM prm_moneda";
+						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+						
+						$valor_opcion = "select";
+						while(list($glosa)=mysql_fetch_array($resp_consulta))
+							$valor_opcion .= ";$glosa";
+							
+						$query = array():
+						$query[] = "ALTER TABLE  `contrato` CHANGE  `centro_costo`  `centro_costo` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT  'Depricated, no se usa'";
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+													VALUES (
+														NULL ,  'MonedaTotalPorDefecto',  'Dólar',  '',  '".$valor_opcion."', 2, 299
+													);";
+						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_cobro` );";
+						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_estado` );";
+						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_moneda` );";
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_cobro` ) REFERENCES `rebaza_timetracking`.`cobro` (
+												`id_cobro`
+												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_estado` ) REFERENCES `rebaza_timetracking`.`prm_estado_factura` (
+												`id_estado`
+												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_moneda` ) REFERENCES `rebaza_timetracking`.`prm_moneda` (
+												`id_moneda`
+												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh)))
+								throw new Exception($q."---".mysql_error());
+					break;
+
  	}
 }
 
@@ -5669,6 +5695,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.20;
 	$VERSIONES[$num++] = 4.21;
 	$VERSIONES[$num++] = 4.22;
+	$VERSIONES[$num++] = 4.23;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

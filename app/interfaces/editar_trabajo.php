@@ -1316,7 +1316,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					<input type=checkbox name=cobrable value=1 <?= $t->fields['cobrable'] == 1 ? "checked" : "" ?> id="chkCobrable" onClick="CheckVisible();">
 					<? } 
 					else {?>
-					<input type=hidden name=cobrable value=1 >
+					<input type=hidden name=cobrable id="chkCobrable" value=1 >
 					<? } ?>
 					&nbsp;&nbsp;
 					<div id=divVisible <? if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>

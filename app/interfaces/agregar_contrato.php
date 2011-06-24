@@ -1006,6 +1006,10 @@ else
 	if(!$id_moneda)
 		$id_moneda = GetMonedaBase($sesion);
 		
+	if(!$opc_moneda_total)
+		$opc_moneda_total = GetMonedaTotalPorDefecto($sesion);
+	if(!$opc_moneda_total)
+		$opc_moneda_total = GetMonedaBase($sesion);
 ?>
 
 <!-- COBRANZA -->
@@ -1082,7 +1086,7 @@ else
 			<tr>
 				<td align="right" colspan='1' style="font-size:10pt;"><?=__('Mostrar total en')?>:</td>
 				<td align="left">
-					<?=Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$contrato->fields['opc_moneda_total'],'style="font-size:10pt;"','','60')?>
+					<?=Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$contrato->fields['opc_moneda_total'] ? $contrato->fields['opc_moneda_total'] : $opc_moneda_total,'style="font-size:10pt;"','','60')?>
 					<span id="monedas_para_honorarios_y_gastos" style="display: none">
 						<?php echo __('para honorarios y en'); ?>
 						<?php echo Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_gastos',$contrato->fields['opc_moneda_gastos'],' style="font-size:10pt;"','','60'); ?>

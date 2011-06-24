@@ -7,13 +7,12 @@
 
 	$sesion = new Sesion();
 	$migracion = new Migracion($sesion);
-
-	
 	
 	// Conectarse a la base de datos antiguo
 	$dbhOrigen = @mysql_connect(ConfMigracion::dbHost(), ConfMigracion::dbUser(),ConfMigracion::dbPass()) or die(mysql_error());
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	
+	// Nombre de función para revisar datos recibidos: "ImprimirDataEnPantalla"
 	
 	set_time_limit(0);
 	
@@ -26,9 +25,13 @@
 	if( method_exists('ConfMigracion','QueryUsuario') && ConfMigracion::QueryUsuario() != "" )
 	{
 		$responseUsuario = mysql_query(ConfMigracion::QueryUsuario(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryUsuario(),__FILE__,__LINE__,$dbhOrigen);
+		//$migracion->ImprimirDataEnPantalla($responseUsuario);
 		$migracion->Query2ObjetoUsuario($responseUsuario);
 	}
-
+	echo '<pre>';
+	print_r($migracion->logs);
+	echo '</pre>';
+	exit;
 	if( method_exists('ConfMigracion','QueryCliente') && ConfMigracion::QueryCliente() != "" )
 	{
 		$responseCliente = mysql_query(ConfMigracion::QueryCliente(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCliente(),__FILE__,__LINE__,$dbhOrigen);
