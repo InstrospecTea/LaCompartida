@@ -126,9 +126,9 @@ $sesion = null;
 
 		if ($contrato)
 		{
+			$cliente_existente = new Cliente($this->sesion);
 			$contrato_existente = new Contrato($this->sesion);
-
-	
+			/*
 			if(!empty($asunto->fields['id_contrato']))
 			{
 				$contrato_existente->Load($asunto->fields['id_contrato']);
@@ -136,6 +136,42 @@ $sesion = null;
 			else if (!empty($asunto->fields['id_contrato_indep']))
 			{
 				$contrato_existente->Load($asunto->fields['id_contrato_indep']);
+			}
+			
+			*/
+			
+
+			//CARGAR CONTRATO DEL CLIENTE
+			if(!empty($asunto_existente->fields['id_contrato']))
+			{
+				$contrato_existente->Load($asunto_existente->fields['id_contrato']);
+			}
+			else if (!empty($asunto_existente->fields['id_contrato_indep']))
+			{
+				$contrato_existente->Load($asunto_existente->fields['id_contrato_indep']);
+			}
+			else
+			{
+				$contrato_cliente		= new Contrato($this->sesion);
+				$cliente_existente->LoadByCodigoSecundario($cliente->fields['codigo_cliente_secundario']);
+				$contrato_cliente->Load($cliente_existente->fields['id_contrato']);
+				if($contrato_cliente->loaded())
+				{
+					if($asunto_existente->fields['id_contrato'] != $cliente->fields['id_contrato'])
+						$contrato_existente->Load($asunto_existente->fields['id_contrato']);
+					else if($asunto_existente->fields['id_contrato_indep'] > 0 && ($asunto_existente->fields['id_contrato_indep'] != $cliente->fields['id_contrato']))
+						$contrato_existente->Load($asunto_existente->fields['id_contrato_indep']);
+
+				}
+				else
+				{
+					// esta opción se debe usar para el caso que solo existe un contrato por cliente
+					$query = "SELECT id_contrato FROM contrato WHERE codigo_cliente='".$cliente_existente->fields['codigo_cliente']."'";
+					$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					list($id_cliente_existente) = mysql_fetch_array($resp);
+					$contrato_cliente		= new Contrato($this->sesion);
+					$contrato_existente->Load($id_cliente_existente);
+				}
 			}
 			self::GuardarContrato($cliente, $contrato, $contrato_existente, $cobros_pendientes, $documentos_legales, $asunto_existente);
 		}
@@ -509,7 +545,7 @@ function ImprimirDataEnPantalla($response)
 		return true;
 	}
 	
-	public function GuardarContrato($cliente = null, $contrato = null, $contrato_existente = null, $cobros_pendientes = array(), $documentos_legales = array(), $asuntos = array())
+	public function GuardarContrato($cliente = null, $contrato = null, $contrato_existente = null, $cobros_pendientes = array(), $documentos_legales = array(), $asunto_existente = array())
 	{
 		$moneda		= new Moneda($this->sesion);
 		$contrato_existente->guardar_fecha = false;
@@ -636,12 +672,20 @@ function ImprimirDataEnPantalla($response)
 		}
 
 		//Asuntos
-		$asuntos->Edit("id_contrato", $contrato_existente->fields["id_contrato"]);
-		$asuntos->Edit("id_contrato_indep",$contrato_existente->fields['id_contrato']);
-		if (!self::Write($asuntos))
+		//--> VER DESDE LINEA 157 de AGREGAR_ASUNTOS
+		//--> NO olvidar unir script clientes con el de asuntos
+		if(!empty($asunto_existente))
 		{
-			$this->logs[] = $asuntos->error;
+			$asunto_existente->Edit('id_contrato',$contrato_existente->fields['id_contrato']);
+			$asunto_existente->Edit('id_contrato_indep',$contrato_existente->fields['id_contrato']);
+			if (!self::Write($asunto_existente))
+			{
+				$this->logs[] = $contrato_existente->error;
+				return false;
+			}
 		}
+
+		
 		
 		
 		/*

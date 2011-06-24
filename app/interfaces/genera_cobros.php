@@ -277,9 +277,27 @@ function GeneraCobros(form, desde, opcion)
 	}
 	else if(desde == 'excel')
 	{
-		form.action = 'genera_cobros.php';
-		form.opc.value = 'excel';
-		form.submit();
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=existen_borradores', false);
+		http.onreadystatechange = function()
+		{
+			if(http.readyState == 4)
+			{
+				var response = http.responseText;
+				if(response)
+				{
+					form.action = 'genera_cobros.php';
+					form.opc.value = 'excel';
+					form.submit();
+				}
+				else
+				{
+					alert('No existen '+"<?=__('borradores')?>"+' en el sistema.');
+					return false;
+				}
+			}
+		};
+		http.send(null);
 	}
 	else if(desde == 'emitir')
 	{
@@ -316,26 +334,44 @@ function ImpresionCobros(alerta, opcion)
 {
 	var form = $('form_busca');
 	var proceso = $('id_proceso').value;
-
-	if(alerta)
+	
+	var http = getXMLHTTP();
+	http.open('get', 'ajax.php?accion=existen_borradores', false);
+	http.onreadystatechange = function()
 	{
-		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?=__('A continuación se imprimirán los borradores del periodo que ha seleccionado.')?><br><br><?=__('¿Desea imprimir los cobros del periodo?')?></span><br><br>';
-		text_window += '<span style="text-align:center; "> <input type="checkbox" name="cartas" id="cartas" checked="checked" /> Incluir cartas </span> ';
-		Dialog.confirm(text_window,
+		if(http.readyState == 4)
 		{
-			top:150, left:290, width:400, okLabel: "<?=__('Imprimir')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
-			id: "myDialogId",
-			cancel:function(win){ return false; },
-			ok:function(win){ var cartas = $('cartas'); if(cartas.checked) ImpresionCobros(false,'cartas'); else ImpresionCobros(false,'');
-				return true; //alert('ok'); else alert('no'); // ImpresionCobros(false,''); return true;
+			var response = http.responseText;
+			if(response)
+			{
+				if(alerta)
+				{
+					var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
+					text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?=__('A continuación se imprimirán los borradores del periodo que ha seleccionado.')?><br><br><?=__('¿Desea imprimir los cobros del periodo?')?></span><br><br>';
+					text_window += '<span style="text-align:center; "> <input type="checkbox" name="cartas" id="cartas" checked="checked" /> Incluir cartas </span> ';
+					Dialog.confirm(text_window,
+					{
+						top:150, left:290, width:400, okLabel: "<?=__('Imprimir')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+						id: "myDialogId",
+						cancel:function(win){ return false; },
+						ok:function(win){ var cartas = $('cartas'); if(cartas.checked) ImpresionCobros(false,'cartas'); else ImpresionCobros(false,'');
+							return true; //alert('ok'); else alert('no'); // ImpresionCobros(false,''); return true;
+						}
+					});
+				}
+				else
+				{
+					GeneraCobros(form,'print',opcion);
+				}
 			}
-		});
-	}
-	else
-	{
-		GeneraCobros(form,'print',opcion);
-	}
+			else
+			{
+				alert('No existen '+"<?=__('borradores')?>"+' en el sistema.');
+				return false;
+			}
+		}
+	};
+	http.send(null);
 }
 
 /*

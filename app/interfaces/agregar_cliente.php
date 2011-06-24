@@ -183,11 +183,13 @@
 						$contrato->Edit("periodo_unidad", $codigo_unidad);
 						$contrato->Edit("monto", $monto);
 						$contrato->Edit("id_moneda", $id_moneda);
+						$contrato->Edit("id_moneda_tramite", $id_moneda_tramite);
 						$contrato->Edit("forma_cobro", $forma_cobro);
 						$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 						$contrato->Edit("retainer_horas", $retainer_horas);
 						$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
 						$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
+						$contrato->Edit("id_formato", $id_formato ? $id_formato : 'NULL');
 						$contrato->Edit("id_tarifa", $id_tarifa ? $id_tarifa : 'NULL');
 						$contrato->Edit("id_tramite_tarifa", $id_tramite_tarifa ? $id_tramite_tarifa : 'NULL' );
 						#facturacion
@@ -216,6 +218,9 @@
 						$contrato->Edit("opc_ver_asuntos_separados",$opc_ver_asuntos_separados);
 						$contrato->Edit("opc_ver_horas_trabajadas",$opc_ver_horas_trabajadas);
 						$contrato->Edit("opc_ver_cobrable",$opc_ver_cobrable);
+						$contrato->Edit("opc_restar_retainer",$opc_restar_retainer);
+						$contrato->Edit("opc_ver_detalle_retainer",$opc_ver_detalle_retainer);
+						$contrato->Edit("opc_ver_valor_hh_flat_fee",$opc_ver_valor_hh_flat_fee);
 						$contrato->Edit("codigo_idioma",$codigo_idioma != '' ? $codigo_idioma : 'es');
 						#descto.
 						$contrato->Edit("tipo_descuento",$tipo_descuento);

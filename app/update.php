@@ -5475,15 +5475,20 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query_consulta = "SELECT glosa_moneda FROM prm_moneda";
 						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
 						
-						$valor_opcion = "select";
+						$query_moneda_base = "SELECT glosa_moneda FROM prm_moneda WHERE moneda_base = 1";
+						if(!($resp_moneda_base = mysql_query($query_moneda_base, $dbh)))
+							throw new Exception($query_moneda_base."---".mysql_error());
+						list($glosa_moneda_base) = mysql_fetch_array($resp_moneda_base);
+					
+						$valores_posibles = "select";
 						while(list($glosa)=mysql_fetch_array($resp_consulta))
-							$valor_opcion .= ";$glosa";
+							$valores_posibles .= ";$glosa";
 							
 						$query = array():
 						$query[] = "ALTER TABLE  `contrato` CHANGE  `centro_costo`  `centro_costo` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT  'Depricated, no se usa'";
 						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
-														NULL ,  'MonedaTotalPorDefecto',  'Dólar',  '',  '".$valor_opcion."', 2, 299
+														NULL ,  'MonedaTotalPorDefecto',  '".$glosa_moneda_base."',  '',  '".$valores_posibles."', 2, 299
 													);";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_cobro` );";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_estado` );";

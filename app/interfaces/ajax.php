@@ -11,7 +11,18 @@
     $sesion = new Sesion('');
     #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 		
-		if( $accion == "buscar_banco" )
+		if( $accion == "existen_borradores" )
+		{
+			$query = "SELECT count(*) FROM cobro WHERE estado = 'CREADO' OR estado = 'EN REVISION'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($cantidad) = mysql_fetch_array($resp);
+			
+			if($cantidad > 0)
+				echo true;
+			else
+				echo false;
+		}
+		else if( $accion == "buscar_banco" )
 		{
 			$query = "SELECT id_banco FROM cuenta_banco WHERE id_cuenta = '".$id."'";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
