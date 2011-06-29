@@ -340,20 +340,24 @@ class UsuarioExt extends Usuario
 	}
 	
 	/*Compara arreglo usuario y guarda cambios realizados*/
-	function GuardaCambiosUsuario($arr1, $arr2)
+	function GuardaCambiosUsuario($arr1 = array(), $arr2 = array())
 	{
 		$usuario_activo = $this->sesion->usuario->fields['id_usuario'];
 		$arr_diff = array();
-		foreach($arr1 as $indice1 => $valor1)
+		
+		if( is_array($arr1) )
 		{
-			if( $arr2[$indice1] != $valor1 )
+			foreach($arr1 as $indice1 => $valor1)
 			{
-				if( $valor1 == '0' && $arr2[$indice1] == '' )
-					continue;
-				$arr_diff[$indice1] = array('valor_original'=> $valor1, 'valor_actual'=> $arr2[$indice1]);
-				$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
-				$query .= " VALUES('".$arr1['id_usuario']."','".$usuario_activo."','".$indice1."','".$valor1."','".$arr2[$indice1]."',NOW())";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				if( $arr2[$indice1] != $valor1 )
+				{
+					if( $valor1 == '0' && $arr2[$indice1] == '' )
+						continue;
+					$arr_diff[$indice1] = array('valor_original'=> $valor1, 'valor_actual'=> $arr2[$indice1]);
+					$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
+					$query .= " VALUES('".$arr1['id_usuario']."','".$usuario_activo."','".$indice1."','".$valor1."','".$arr2[$indice1]."',NOW())";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				}
 			}
 		}
 		return $arr_diff;

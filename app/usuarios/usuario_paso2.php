@@ -37,6 +37,10 @@
 		$usuario->Edit('nombre', $nombre);
 		$usuario->Edit('apellido1', $apellido1);
 		$usuario->Edit('apellido2', $apellido2);
+		
+		if(!$username)
+			$username = $nombre.' '.$apellido1.' '.$apellido2;
+		
 		$query = "SELECT count(*) FROM usuario WHERE username = '".addslashes($username)."' AND username != '".addslashes($usuario->fields['username'])."'";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($cantidad) = mysql_fetch_array($resp);
@@ -71,92 +75,50 @@
 		$usuario->Edit('alerta_semanal', $alerta_semanal);
 		$usuario->Edit('alerta_revisor', $alerta_revisor);
 		//$usuario->Edit('id_moneda_costo', $id_moneda_costo);
-
+		
 		//Compara y guarda cambios en los datos del Usuario
 		$usuario->GuardaCambiosUsuario($arr1, $usuario->fields);
-
- 		if( $usuario->loaded )
-		{		
-			if($email == "")
-				$pagina->AddError(__('Debe ingresar el e-mail del usuario'));
-	
-			$usuario->Edit('rut', Utiles::LimpiarRut($rut));
-			$usuario->Edit('dv_rut', $dv_rut);
-			$usuario->Edit('nombre', $nombre);
-			$usuario->Edit('apellido1', $apellido1);
-			$usuario->Edit('apellido2', $apellido2);
-			if(!$username)
-				$usuario->Edit('username', $nombre.' '.$apellido1.' '.$apellido2);
-			else
-				$usuario->Edit('username', $username);
-			$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
-			$usuario->Edit('id_area_usuario', $id_area_usuario);
-			$usuario->Edit('telefono1', $telefono1);
-			$usuario->Edit('telefono2', $telefono2);
-			$usuario->Edit('dir_calle', $dir_calle);
-			$usuario->Edit('dir_numero', $dir_numero);
-			$usuario->Edit('dir_depto', $dir_depto);
-			$usuario->Edit('dir_comuna', $dir_comuna);
-			$usuario->Edit('email', $email);
-			$usuario->Edit('activo', $activo);
-			$usuario->Edit('visible', $activo==1 ? 1 : $visible);
-			$usuario->Edit('restriccion_min', $restriccion_min);
-			$usuario->Edit('restriccion_max', $restriccion_max);
-			$usuario->Edit('restriccion_mensual', $restriccion_mensual);
-			if($dias_ingreso_trabajo == "") { $dias_ingreso_trabajo = 30; }
-			$usuario->Edit('dias_ingreso_trabajo', $dias_ingreso_trabajo);
-			$usuario->Edit('retraso_max', $retraso_max);
-			$usuario->Edit('restriccion_diario', $restriccion_diario);
-			$usuario->Edit('alerta_diaria', $alerta_diaria);
-			$usuario->Edit('alerta_semanal', $alerta_semanal);
-			$usuario->Edit('alerta_revisor', $alerta_revisor);
-			$usuario->Edit('id_moneda_costo', $id_moneda_costo);
-	
-	 		if( $usuario->loaded )
+		
+	 	if( $usuario->loaded )
+		{
+			if( $usuario->Write() )
 			{
-				if( $usuario->Write() )
-				{
-					CargarPermisos();
-	        $usuario->GuardarSecretario($usuario_secretario);
-					$usuario->GuardarRevisado($arreglo_revisados);
-					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
-					$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
-					$pagina->AddInfo( __('Usuario editado con éxito.'));
-				}
-				else
-				{
-					$pagina->AddError( $usuario->error );
-				}
+				CargarPermisos();
+        $usuario->GuardarSecretario($usuario_secretario);
+				$usuario->GuardarRevisado($arreglo_revisados);
+				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
+				$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
+				$pagina->AddInfo( __('Usuario editado con éxito.'));
 			}
 			else
 			{
-				$new_password = Utiles::NewPassword();
-				$usuario->Edit('password', md5( $new_password ) );
-	
-				if( $usuario->Write() )
-				{
-					CargarPermisos();
-					$usuario->GuardarSecretario($usuario_secretario);
-					$usuario->GuardarRevisado($arreglo_revisados);
-					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
-					$pagina->AddInfo( __('Usuario ingresado con éxito, su nuevo password es').' '.$new_password );
-				}
-				else
-				{
-					$pagina->AddError( $usuario->error );
-				}
+				$pagina->AddError( $usuario->error );
 			}
 		}
 		else
 		{
 			$new_password = Utiles::NewPassword();
 			$usuario->Edit('password', md5( $new_password ) );
+
 			if( $usuario->Write() )
 			{
-				$moneda = $lista_monedas->Get($x);
-				if($mon_costo[$moneda->fields['id_moneda']] != 0)
-					$usuario->GuardarCosto($moneda->fields['id_moneda'],$mon_costo[$moneda->fields['id_moneda']]);
+				CargarPermisos();
+				$usuario->GuardarSecretario($usuario_secretario);
+				$usuario->GuardarRevisado($arreglo_revisados);
+				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
+				$pagina->AddInfo( __('Usuario ingresado con éxito, su nuevo password es').' '.$new_password );
 			}
+			else
+			{
+				$pagina->AddError( $usuario->error );
+			}
+		}
+		$lista_monedas = new ListaObjetos($sesion,"","SELECT * FROM prm_moneda");
+    for($x=0;$x<$lista_monedas->num;$x++)
+    {
+			$moneda = $lista_monedas->Get($x);
+			if($mon_costo[$moneda->fields['id_moneda']] != 0)
+				$usuario->GuardarCosto($moneda->fields['id_moneda'],$mon_costo[$moneda->fields['id_moneda']]);
 		}
 	}
 	else if($opc == 'pass' and $usuario->loaded)

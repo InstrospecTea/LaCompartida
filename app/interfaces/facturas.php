@@ -145,17 +145,37 @@
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 							WHERE $where";
+
+		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$monto_saldo_total = 0;
+		$glosa_monto_saldo_total = '';
+		$where_moneda = ' WHERE moneda_base = 1';
+		if($id_moneda>0) {
+			$where_moneda = 'WHERE id_moneda = '.$id_moneda;
+		}
+		$query_moneda = 'SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio FROM prm_moneda	'. $where_moneda .' ORDER BY id_moneda ';
+		$resp_moneda = mysql_query($query_moneda, $sesion->dbh) or Utiles::errorSQL($query_moneda, __FILE__, __LINE__, $sesion->dbh);
+		$id_moneda_base=0;
+		while(list($id_moneda_tmp, $simbolo_moneda_tmp, $cifras_decimales_tmp, $moneda_base_tmp, $tipo_cambio_tmp) = mysql_fetch_array($resp_moneda)){
+			while($row = mysql_fetch_assoc($resp))
+			{
+				$monto_saldo_total += UtilesApp::CambiarMoneda($row['saldo'],$row['tipo_cambio'],$row['cifras_decimales'],$tipo_cambio_tmp,$cifras_decimales_tmp);
+			}
+			$glosa_monto_saldo_total = '<b>'.__('Saldo'). ' ' . $simbolo_moneda_tmp. ' ' .number_format($monto_saldo_total,$cifras_decimales_tmp,",",".")."</b>";
+		}
+		// calcular el saldo en moneda base
 		
 		$x_pag = 12;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_facturas";
-		$b->titulo = "Documentos Tributarios";
+		$b->titulo = "Documentos Tributarios <br />".$glosa_monto_saldo_total;
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
-		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=60px");
+		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
 		$b->AgregarEncabezado("numero",__('N°'),"align=right width=30px");
 		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left width=40px");
+		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
-		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=40px");
+		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
 		$b->AgregarEncabezado("estado",__('Estado'),"align=center");
 		$b->AgregarEncabezado("id_cobro",__('Cobro'),"align=center");
 		$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
@@ -222,6 +242,23 @@
 		}
 		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,",",".");
 	}
+
+	function Glosa_asuntos(& $fila, $sesion)
+	{
+		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
+					FROM cobro_asunto ca
+					LEFT JOIN asunto a ON ca.codigo_asunto = a.codigo_asunto
+					WHERE ca.id_cobro='".$fila->fields['id_cobro']."' GROUP BY ca.id_cobro";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$lista_asuntos = '';
+		$lista_asuntos_glosa = '';
+		while(list($lista_codigo_asunto,$lista_glosa_asunto) = mysql_fetch_array($resp)){
+			$lista_asuntos = '('.$lista_codigo_asunto.')';
+			$lista_asuntos_glosa = $lista_glosa_asunto;
+		}
+		$lista_asuntos_glosa = str_replace(', ','<br />',$lista_asuntos_glosa);
+		return  $lista_asuntos_glosa;
+	}
 	
 	function funcionTR(& $fila)
 	{
@@ -240,6 +277,7 @@
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
 		$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
+		$html .= "<td align=right nowrap>".Glosa_asuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
 		$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )

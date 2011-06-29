@@ -127,18 +127,23 @@ var BrowserDetect = {
 BrowserDetect.init();
 function MostrarDivs()
 {
-//	myHideDiv("firefox");
-//	myHideDiv("explorer6");
-	if(BrowserDetect.browser == "Explorer")
-		myHideDiv("firefox");
-	if(BrowserDetect.browser == "Explorer" && BrowserDetect.version == 7)
-		myHideDiv("explorer6");
-	else if(BrowserDetect.browser == "Firefox")
-		myHideDiv("explorer6");
+	if(BrowserDetect.browser == "Firefox") {
+		$$('.explorer','.chrome').invoke('hide');
+	} else if(BrowserDetect.browser == "Firefox") {
+		jQuery('.explorer .chrome').hide();
+	} else if (BrowserDetect.browser == "Mozilla") {
+		$$('.explorer','.firefox').invoke('hide');
+	} else if(BrowserDetect.browser == "Explorer" && BrowserDetect.version <= 6) {
+		jQuery('.explorer','.chrome','.firefox').invoke('hide');
+		$$('.explorer6').invoke('show');
+	} else if (BrowserDetect.browser == "Explorer") {
+		$$('.chrome','.firefox').invoke('hide');
+	}
 }
 function getDNETVersion(reportError)
 {
 	var result = "";
+	var res = new Array();
 	var ua = navigator.userAgent;
 	var ie = ua.indexOf("MSIE");
 	var i = ua.indexOf(".NET CLR");
@@ -157,6 +162,7 @@ function getDNETVersion(reportError)
 		var dnet = ua.substring(i, j);
 		if((dnet != null) && dnet.length > 0)
 		result = ".NET ha sido detectado en su sistema!<br>La versión de .NET reportada por su browser es: " + dnet + "<br/>De todas formas si tiene problemas para utilizar la aplicación descarge .NET desde el siguiente enlace: <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
+		res['conpuntonet'] = true;
 	}
 	else
 	{
@@ -168,15 +174,20 @@ function getDNETVersion(reportError)
 				result += "<br> Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.";
 			}
 		}
-		else return null;
+		else result = null;
+		res['conpuntonet'] = false;
 	}
+	
+	res['texto'] = result;
 
-	return result;
+	return res;
 }
 
 function writeDNetReport(doc)
 {
-	doc.write("<div id=net style='background-color:#ff0000;border:1px solid black;font-size:1.3em;'>" + getDNETVersion(true) + "</div><br />");
+	var res = getDNETVersion(true);
+	var color = res['conpuntonet'] ? "#92B901" : "#ff0000";
+	doc.write("<div id=net style='background-color:" + color + ";border:1px solid black;font-size:1.3em;'>" + res['texto'] + "</div><br />");
 }
 
 // -->
@@ -184,17 +195,22 @@ function writeDNetReport(doc)
 </script>
 
 
-		<div id="firefox" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
+		<div class="firefox" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
 			Para poder instalar la aplicación en Mozilla Firefox debe descargar en primer lugar el add-on
 			<a href="https://addons.mozilla.org/firefox/1608/" target="_blank">FFClickOnce</a>
+			<br />
 		</div>
-		<br />
 
-		<div id="explorer6" align="left">
+		<div class="chrome" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
+			En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".
+			<br />
+		</div>
+
+		<div class="explorer explorer6" align="left">
 			Usted está utilizando Internet Explorer 6. Por su seguridad, Lemontech recomienda actualizar a la última versión de <a target="_blank" href="http://www.microsoft.com/windows/ie/">Internet Explorer</a>
 			<hr style="color:black;" size=1 />
-		</div>
-		<br />
+		</div>		
+		
 		<div align=left>
 			<ul>
 			<li>A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.</li>
@@ -214,7 +230,7 @@ function writeDNetReport(doc)
 			$PdfLinea1 = Conf::PdfLinea1();
 		}
 ?>
-			<A style="text-decoration: none;" HREF="../../cliente_windows/TimeTracking.application?titulo=<?= urlencode($PdfLinea1); ?>&host=<?= urlencode(Conf::Host()); ?>&titulo_asunto=<?=__('Asunto')?>">instalar / ejecutar</A>
+			<A style="text-decoration: none;" HREF="../../cliente_windows/application.php?titulo=<?= urlencode($PdfLinea1); ?>&host=<?= urlencode(Conf::Host()); ?>&titulo_asunto=<?=__('Asunto')?>">Instalar y ejecutar</A>
 			</SPAN>
 			</center>
 		</div>

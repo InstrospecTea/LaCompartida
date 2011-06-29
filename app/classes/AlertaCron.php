@@ -213,13 +213,13 @@ function EnviarAlertaProfesional($id_persona,$mensaje, $sesion, $header = true)
 		list($horas_ultima_semana) = mysql_fetch_array($resp);
 		return $horas_ultima_semana;
 	}
-	
+
 	function HorasCobrablesUltimaSemana($id_usuario)
 	{
 		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 FROM trabajo WHERE
 									fecha <= NOW() AND
 									fecha > DATE_SUB(NOW(), INTERVAL 7 DAY)
-									AND id_usuario = '$id_usuario'";
+									AND id_usuario = '$id_usuario' AND cobrable = 1";
 		$resp = mysql_query($query);
 		list($horas_ultima_semana) = mysql_fetch_array($resp);
 		return $horas_ultima_semana;

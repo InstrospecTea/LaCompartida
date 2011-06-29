@@ -129,6 +129,6 @@
 	$_LANG['ValorSinEspacio'] = "Mostrar valores en nota de liquidación sin espacio entre simbolo y monto";
 	$_LANG['ParafoGastosSoloSiHayGastos'] = "Solo imprime parafo de gastos si la liquidación tiene gastos";
 	$_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de asuntos si la liquidación tiene trabajos";
-	
+	$_LANG['borradores'] = "pre-liquidaciones";
 
 ?>

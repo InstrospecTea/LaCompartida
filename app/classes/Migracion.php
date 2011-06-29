@@ -14,6 +14,7 @@ require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 require_once Conf::ServerDir().'/../app/classes/UsuarioExt.php';
 require_once Conf::ServerDir().'/../app/classes/UsuarioExt.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
+require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
 
 class Migracion
 {
@@ -684,11 +685,9 @@ function ImprimirDataEnPantalla($response)
 				return false;
 			}
 		}
-
-		
-		
 		
 		/*
+		
 		//Cobros pendientes
 		CobroPendiente::EliminarPorContrato($this->sesion, $contrato_existente->fields['id_contrato']);
 		foreach ($cobros_pendientes as $cobro_pendiente)
@@ -731,6 +730,7 @@ function ImprimirDataEnPantalla($response)
 			}
 		}
 		*/
+		
 
 	}
 
@@ -902,62 +902,71 @@ function ImprimirDataEnPantalla($response)
     * Se recive un Array de varios Objetos,
     * y se ingresa cada objeto durante la iteracion
     */
-  public function AgregarHoras($items = null)
-  {
-      if(!empty($items))
-      {
- 					foreach($items as $item)
-              AgregarUsuario($item['hora']);
-      }
- 	}
+	function Query2ObjetoHora($response)
+	{
+		while($row = mysql_fetch_assoc($response))
+		{
+			$sesion = new Sesion();
+			$trabajo = new Trabajo($sesion);
+			$trabajo->guardar_fecha = false;
+
+	
+			foreach( $row as $key => $val )
+			{
+				$trabajo->Edit($key,$val);
+			}
+			$this->AgregarHora($trabajo);
+			//echo '<pre>';print_r($usuario->fields);echo '</pre>';
+			//echo "<br><br>--------------------------------------------<br><br>";
+		}
+	}
 
   public function AgregarHora($hora = null)
   {
-      /*
-       * Validar FK
- 			 */
-      #Instancio Clases a usar en validación de FK
-      $usuario    = new Usuario($this->sesion);
-      $asunto     = new Asunto($this->sesion);
- 			$moneda     = new Moneda($this->sesion);
+	/*
+	* Validar FK
+	*/
 
-      #Confirmo que el id_usuario exista
-      if(!$usuario->Load($hora->fields['id_usuario']))
-      {
- 				$this->log .= '<br>Error ingreso hora: id_usuario "'.$hora->fields['id_usuario'].'" no existe';
-        return false;
-      }
 
- 
-			#Confirmo que el codigo_asunto exista
-      if(!$asunto->LoadByCodigo($hora->fields['codigo_asunto']))
-      {
-          $this->log .= '<br>Error ingreso hora: codigo_asunto "'.$hora->fields['codigo_asunto'].'" no existe';
-					return false;
-      }
+	 
+	#Instancio Clases a usar en validación de FK
+	$usuario    = new Usuario($this->sesion);
+	$asunto     = new Asunto($this->sesion);
+	$moneda     = new Moneda($this->sesion);
 
-      #Confirmo que el codigo_actividad exista
- 			$query = "SELECT count(*) FROM actividad WHERE codigo_actividad = '".addslashes($hora->fields['codigo_actividad'])."'";
-      $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-      list($cantidad) = mysql_fetch_array($resp);
-      if($cantidad == 0)
-      {
-          $this->log .= '<br>Error ingreso hora: codigo_actividad "'.$hora->fields['codigo_actividad'].'" no existe';
-          return false;
-      }
+	#Confirmo que el id_usuario exista
+	$id_usuario = (int)$hora->fields['id_usuario'];
+	$hora->Edit('id_usuario', $id_usuario);
+
+	$codigo_asunto = substr($hora->fields['codigo_asunto'],0,4).'-0'.substr($hora->fields['codigo_asunto'],-3);
+	$hora->Edit('codigo_asunto', $codigo_asunto);
 
  
-			#Confirmo que el id_moneda exista
-      if(!$moneda->Load($hora->fields['id_moneda']))
-      {
-          $this->log .= '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
-          return false;
- 			}
+	#Confirmo que el id_moneda exista
+	$id_moneda=9;
+	$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora->fields['id_moneda']."%'";
+	$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+	list($id_moneda) = mysql_fetch_array($resp);
+	if(!$id_moneda)
+	{
+		//$this->log .= '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
+		echo '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
+		//return false;
+	}
+	$hora->Edit('id_moneda', $id_moneda);
 
-      /*
-       * Registrar información
-       */
-      $hora->Write();
+	/*
+	* Registrar informaci�n
+	*/
+	if($this->Write($hora))
+	{
+	  echo "<br>trabajo ingresado correctamente";
+	}
+	else
+	{
+		echo "<br><b>trabajo NO FUE ingresado</b>";
+		//$this->log .= '<br>Error ingreso hora: el trabajo no fue ingresado';
+	}
 }
 
 
@@ -1039,10 +1048,11 @@ function ImprimirDataEnPantalla($response)
 					$c++;
 				}
 			}
-			//echo "<br><br><br>Query = ".$query;
+			
 			$resp = mysql_query($query, $this->sesion->dbh);
 			if (!$resp)
 			{
+				echo "<br>Query = ".$query."<br><br>";
 				$this->logs[] = mysql_errno($this->sesion->dbh) . " <b>Error explicacion:</b> " . mysql_error($this->sesion->dbh). " <b>Datos:</b> " .$error_string;
 				return false;
 			}

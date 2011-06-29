@@ -237,7 +237,6 @@
 		require_once('gastos_xls_resumen.php');
 		exit;
 	}
-	
 	if( $preparar_cobro == 1 )
 	{
 		$where = 1;
@@ -413,7 +412,11 @@ function BuscarGastos( form, from )
 		$pagina_excel = "form.action = 'gastos_xls.php';";	
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ExcelGastosSeparado') ) || ( method_exists('Conf','ExcelGastosSeparado') && Conf::ExcelGastosSeparado() ) )
 		{
-				$pagina_excel = "form.action = 'gastos_xls_separado.php';";
+			$pagina_excel = "form.action = 'gastos_xls_separado.php';";
+		}
+		if( UtilesApp::GetConf($sesion,'ExcelGastosDesglosado') )
+		{
+			$pagina_excel = "form.action = 'gastos_xls_por_encargado.php';";
 		}
 	?>
 
@@ -533,6 +536,10 @@ function Refrescar()
     	<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 	<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
     </td>
+	</tr>
+	<tr>
+		<td align=right><?=__('Encargado comercial')?>&nbsp;</td>
+		<td colspan=2 align=left><?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre","id_usuario_responsable",$id_usuario_responsable,'',__('Cualquiera'),'200')?>
 	</tr>
 	<tr>
  		<td align=right>

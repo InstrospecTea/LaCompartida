@@ -1,6 +1,6 @@
 <? 
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../app/interfaces/conf_migracion.php';
+	require_once Conf::ServerDir().'/../app/interfaces/migracion_conf.php';
 	require_once Conf::ServerDir().'/../app/classes/Migracion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -29,7 +29,7 @@
 		$migracion->Query2ObjetoUsuario($responseUsuario);
 	}
 
-*/
+
 
 	if( method_exists('ConfMigracion','QueryCliente') && ConfMigracion::QueryCliente() != "" )
 	{
@@ -43,13 +43,19 @@
 		$responseAsunto = mysql_query(ConfMigracion::QueryAsunto(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryAsunto(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoAsunto($responseAsunto);
 	}
-	/*
+	*/
+
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )
 	{
 		$responseHoras = mysql_query(ConfMigracion::QueryHoras(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);
-		$horas = mysql_fetch_assoc($responseHoras);
+		
+		$migracion->Query2ObjetoHora($responseHoras);
+		//$horas = mysql_fetch_assoc($responseHoras);
+		//$migracion->AgregarHoras($responseHoras);
+
 	}
-	
+	/*
 	if( method_exists('ConfMigracion','QueryGastos') && ConfMigracion::QueryGastos() != "" )
 	{
 		$responseGastos = mysql_query(ConfMigracion::QueryGastos(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);

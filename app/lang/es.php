@@ -219,8 +219,6 @@ $_LANG['Duración Cobrable'] = "Duración Cobrable";
 $_LANG['Se han encontrado los siguientes errores:'] = "Se han encontrado los siguientes errores:";
 $_LANG['Ud. a seleccionado forma de cobro:'] = "Ud. a seleccionado forma de cobro:";
 $_LANG['y no ha ingresado monto'] = "y no ha ingresado monto";
-$_LANG['Ud. a seleccionado forma de cobro:'] = "Ud. a seleccionado forma de cobro:";
-$_LANG['y no ha ingresado monto'] = "y no ha ingresado monto";
 $_LANG['Mostrar total en'] = "Mostrar total en";
 $_LANG['POR'] = "POR";
 $_LANG['HASTA'] = "HASTA";
@@ -823,7 +821,7 @@ $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
 															<tr><td width='35%'>Banco Beneficiario:</td><td width='65%'>HSBC Bank Chile</td></tr>
 															<tr><td width='35%'>Dirección:</td><td width='65%'>Av. Andrés Bello 2711, piso 9, Las Condes, Santiago</td></tr>
 															<tr><td width='35%'>Swift Banco Beneficiario:</td><td width='65%'>BLICCLRM</td></tr>
-															<tr><td width='35%'>Cuenta beneficiario:</td><td width='65%'>000-20552-060</td></tr>
+															<tr><td width='35%'>Cuenta beneficiario:</td><td width='65%'>000-020552-060</td></tr>
 														</table>";
 #Carta MB Chile con Boleta Adjunta (Boleta)
 $_LANG['%detalle_mb_boleta%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%.";
@@ -975,6 +973,11 @@ $_LANG['ValorSinEspacio'] = "Mostrar valores en nota de cobro sin espacio entre 
 $_LANG['ParafoGastosSoloSiHayGastos'] = "Solo imprime parafo de gastos si el cobro tiene gastos";
 $_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de asuntos si el cobro tiene trabajos";
 $_LANG['ReporteRevisadosATodosLosAbogados'] = "Enviar resumen de horas semanales a todos los abogados";
+$_LANG['MonedaTarifaPorDefecto'] = "Moneda tarifa por defecto";
+$_LANG['MonedaTotalPorDefecto'] = "Moneda total por defecto";
+$_LANG['UsarGastosConSinImpuesto'] = "Usar conceptos gastos con/sin impuestos";
+$_LANG['UsarGastosCobrable'] = "Permitir a diferenciar entre gastos cobrables y no cobrables";
+$_LANG['AlertaRevisor'] = "Mandar resumen de horas trabajadas a los revisores";
 
 /*Mantención Tabla fw*/
 // prm_banco

@@ -597,7 +597,7 @@ $mostrar_resumen_de_profesionales = 1;
 				$filas = 0;
 				$filas_totales_asuntos = array();
 
-				$ws->write($filas, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo').' '.$cobro->fields['id_cobro'], $formato_encabezado);
+				$ws->write($filas, $col_descripcion+1, Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo').' '.$cobro->fields['id_cobro'], $formato_encabezado);
 				$filas += 2;
 
 				// Escribir el encabezado con los datos del cliente

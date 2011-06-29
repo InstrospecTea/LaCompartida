@@ -25,6 +25,8 @@
 		
 	// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 
+	$id_moneda_filtro = $id_moneda;
+
 	if($orden == "")
 			$orden = "fecha DESC";
 
@@ -85,6 +87,8 @@
 					, prm_documento_legal.glosa as tipo
 					, numero
 					, glosa_cliente
+					, '' glosa_asunto
+					, '' codigo_asunto
 					, CONCAT(LEFT(nombre,1),LEFT(apellido1,1),LEFT(apellido2,1)) AS encargado_comercial
 					, descripcion
 					, prm_estado_factura.glosa as estado
@@ -224,19 +228,21 @@
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 
 		// ancho celdas ocultos
-		if(in_array($col_name[$i],array('total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio')) ) {
+		if(in_array($col_name[$i],array('total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 		// css celdas
 		if(in_array($col_name[$i],array('fecha')) ) {
 			$arr_col[$col_name[$i]]['css'] = $formato_fecha_tiempo; }
-		else if(in_array($col_name[$i],array('glosa_cliente','descripcion')) ) {
+		else if(in_array($col_name[$i],array('glosa_cliente','descripcion','glosa_asunto')) ) {
 			$arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
 		else { $arr_col[$col_name[$i]]['css'] = $formato_normal; }
 
 		// titulos celdas
 		if(in_array($col_name[$i],array('glosa_cliente')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Cliente'); }
+		if(in_array($col_name[$i],array('glosa_asunto')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Asuntos'); }
 		else if(in_array($col_name[$i],array('encargado_comercial')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Abogado'); }
 		else if(in_array($col_name[$i],array('id_cobro')) ) {
@@ -266,6 +272,7 @@
 	// Escribir encabezado reporte
 	$ws1->write($fila, 0, __('Documentos tributarios'), $formato_encabezado);
 	$fila++;
+
 	$ws1->write($fila, 0, $fecha_actual, $formato_encabezado);
 	$fila++;
 	$fila++;
@@ -288,6 +295,32 @@
 		$fila_actual = $fila+1;
 		$proc = $lista_suntos_liquidar->Get($j);
 		$ws1->write($fila, $col_glosa_cliente, $proc->fields[$col_name[$i]], $formato_normal);
+
+		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
+					FROM cobro_asunto ca
+					LEFT JOIN asunto a ON ca.codigo_asunto = a.codigo_asunto
+					WHERE ca.id_cobro='".$proc->fields['id_cobro']."' GROUP BY ca.id_cobro";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$lista_asuntos = '';
+		$lista_asuntos_glosa = '';
+		while(list($lista_codigo_asunto,$lista_glosa_asunto) = mysql_fetch_array($resp)){
+			$lista_asuntos = '('.$lista_codigo_asunto.')';
+			$lista_asuntos_glosa = $lista_glosa_asunto;
+		}
+
+		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					WHERE ccfm2.id_factura =  '".$proc->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$monto_pago = 0;
+		while(list($monto_aporte) = mysql_fetch_array($resp)){
+			$monto_pago = $monto_aporte;
+		}
+
 		for($i=0; $i<$col_num; $i++) {
 	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
 				if($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'iva') {
@@ -300,18 +333,6 @@
 				else if($col_name[$i] == 'saldo_pagos') {
 					//$factura = new Factura($sesion);
 					//$lista_pagos_fact = $factura->GetPagosSoyFactura($proc->fields['id_factura']);
-					$query = "SELECT SUM(ccfmn.monto) as monto_aporte 
-								FROM factura_pago AS fp
-								JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-								JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-								LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-								WHERE ccfm2.id_factura =  '".$proc->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
-					
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-					$monto_pago = 0;
-					while(list($monto_aporte) = mysql_fetch_array($resp)){
-						$monto_pago = $monto_aporte;
-					}
 					
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
@@ -326,13 +347,16 @@
 					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				if($col_name[$i] == 'glosa_cliente') {
-					$query = "SELECT GROUP_CONCAT(codigo_asunto) FROM cobro_asunto WHERE id_cobro='".$proc->fields['id_cobro']."' GROUP BY id_cobro";
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-					$lista_asuntos = '';
-					while(list($lista_codigo_asunto) = mysql_fetch_array($resp)){
-						$lista_asuntos = '('.$lista_codigo_asunto.')';
-					}
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]] .' ' . $lista_asuntos, $arr_col[$col_name[$i]]['css']);
+					
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
+				}
+				if($col_name[$i] == 'glosa_asunto') {
+
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos_glosa, $arr_col[$col_name[$i]]['css']);
+				}
+				if($col_name[$i] == 'codigo_asunto') {
+
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 				}
 				else {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
@@ -343,7 +367,6 @@
 	//suma columnas con moneda base
 	$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=SUM(".$arr_col['monto_pagos_moneda_base']['celda_excel']."$fila_inicial:".$arr_col['monto_pagos_moneda_base']['celda_excel']."$fila)", $formatos_moneda[$id_moneda_base]);
 	$ws1->writeFormula($fila, $arr_col['saldo_moneda_base']['celda'], "=SUM(".$arr_col['saldo_moneda_base']['celda_excel']."$fila_inicial:".$arr_col['saldo_moneda_base']['celda_excel']."$fila)", $formatos_moneda[$id_moneda_base]);
-
 	$wb->close();
 	exit;
 ?>
