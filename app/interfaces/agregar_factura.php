@@ -920,7 +920,7 @@ function ActualizarDocumentoMonedaPago()
 		$resp_doc = mysql_query($query_doc,$sesion->dbh) or Utiles::errorSQL($query_doc,__FILE__,__LINE__,$sesion->dbh);
 		list($codigo_documento_legal) = mysql_fetch_array($resp_doc);
 	
-		if(($codigo_documento_legal == 'NC' || $codigo_documento_legal == 'ND') && ($id_cobro || $codigo_cliente))
+		if(($codigo_documento_legal == 'NC') && ($id_cobro || $codigo_cliente))
 		{
 			if($id_cobro)
 			{

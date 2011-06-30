@@ -8,6 +8,7 @@ require_once Conf::ServerDir().'/../app/classes/CtaCteFactMvto.php';
 require_once Conf::ServerDir().'/../app/classes/Factura.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class FacturaPago extends Objeto
 {
@@ -140,7 +141,9 @@ class FacturaPago extends Objeto
 
 			case 'ENCABEZADO':
 
-				$html = str_replace('%estudio_valor%', 'ESTUDIO REBAZA, ALCAZAR & DE LAS CASAS', $html);
+				if( UtilesApp::GetConf($this->sesion,'PdfLinea1') )
+					$PdfLinea1 = UtilesApp::GetConf($this->sesion,'PdfLinea1');
+				$html = str_replace('%estudio_valor%', $PdfLinea1, $html);
 
 			break;
 
