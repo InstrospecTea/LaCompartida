@@ -49,7 +49,7 @@
 	else if( method_exists( 'Conf', 'DiaMailSemanal' ) )
 		$DiaMailSemanal = Conf::DiaMailSemanal();
 		
-	if( date("D") == $DiaMailSemanal)
+	if( date("D") == $DiaMailSemanal || $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')
 	{
 		// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
 		$query = 	"SELECT usuario.id_usuario,

@@ -94,11 +94,111 @@
 							}
             }
         	}
+        
+        //Validaciones por configuración
+        if (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente'))
+		{
+			if (empty($glosa_cliente)) $pagina->AddError(__("Por favor ingrese la nombre del cliente"));
+			if (empty($codigo_cliente)) $pagina->AddError(__("Por favor ingrese el codigo del cliente"));
+			if (empty($id_grupo_cliente)) $pagina->AddError(__("Por favor ingrese el grupo del cliente"));
+			if (empty($id_usuario_encargado)) $pagina->AddError(__("Por favor ingrese usuario encargado para el cliente"));
+			
+			if (empty($factura_rut)) $pagina->AddError(__("Por favor ingrese ROL/RUT de la factura"));
+			if (empty($factura_razon_social)) $pagina->AddError(__("Por favor ingrese la razón social de la factura"));
+			if (empty($factura_giro)) $pagina->AddError(__("Por favor ingrese el giro de la factura"));
+			if (empty($factura_direccion)) $pagina->AddError(__("Por favor ingrese la dirección de la factura"));
+			if (empty($factura_telefono)) $pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
+			if (empty($glosa_contrato)) $pagina->AddError(__("Por favor ingrese la glosa de la factura"));
+			
+			if((method_exists('Conf','GetConf') and Conf::GetConf($sesion,'TituloContacto')) or 
+			(method_exists('Conf','TituloContacto') and Conf::TituloContacto()))
+			{
+				if (empty($titulo_contacto)) $pagina->AddError(__("Por favor ingrese titulo del solicitante"));
+				if (empty($nombre_contacto)) $pagina->AddError(__("Por favor ingrese nombre del solicitante"));
+				if (empty($apellido_contacto)) $pagina->AddError(__("Por favor ingrese apellido del solicitante"));
+			}
+			else
+			{
+				if (empty($contacto)) $pagina->AddError(__("Por favor ingrese contanto del solicitante"));
+			}
+
+			if (empty($fono_contacto_contrato)) $pagina->AddError(__("Por favor ingrese el teléfono del solicitante"));
+			if (empty($email_contacto_contrato)) $pagina->AddError(__("Por favor ingrese el correo del solicitante"));
+			if (empty($direccion_contacto_contrato)) $pagina->AddError(__("Por favor ingrese la dirección del solicitante"));
+			
+			if (empty($id_tarifa)) $pagina->AddError(__("Por favor ingrese la tarifa en la tarificación"));
+			if (empty($id_moneda)) $pagina->AddError(__("Por favor ingrese la moneda de la tarifa en la tarificación"));
+
+			if (empty($forma_cobro))
+			{
+				$pagina->AddError(__("Por favor ingrese la forma de cobro en la tarificación"));
+			}
+			else
+			{
+				switch ($forma_cobro)
+				{
+					case "RETAINER":
+						if (empty($monto))  $pagina->AddError(__("Por favor ingrese el monto para el retainer en la tarificación"));
+						if ($retainer_horas <= 0)  $pagina->AddError(__("Por favor ingrese las horas para el retainer en la tarificación"));
+						if (empty($id_moneda_monto))  $pagina->AddError(__("Por favor ingrese la moneda para el retainer en la tarificación"));
+						break;
+					case "FLAT FEE":
+						if (empty($monto))  $pagina->AddError(__("Por favor ingrese el monto para el flat fee en la tarificación"));
+						if (empty($id_moneda_monto))  $pagina->AddError(__("Por favor ingrese la moneda para el flat fee en la tarificación"));
+						break;
+					case "CAP":
+						if (empty($monto))  $pagina->AddError(__("Por favor ingrese el monto para el cap en la tarificación"));
+						if (empty($id_moneda_monto))  $pagina->AddError(__("Por favor ingrese la moneda para el cap en la tarificación"));
+						if (empty($fecha_inicio_cap))  $pagina->AddError(__("Por favor ingrese la fecha de inicio para el cap en la tarificación"));
+						break;
+					case "PROPORCIONAL":
+						if (empty($monto))  $pagina->AddError(__("Por favor ingrese el monto para el proporcional en la tarificación"));
+						if ($retainer_horas <= 0)  $pagina->AddError(__("Por favor ingrese las horas para el proporcional en la tarificación"));
+						if (empty($id_moneda_monto))  $pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificación"));
+						break;
+					case "TASA":
+						break;
+					default:
+						$pagina->AddError(__("Por favor ingrese la forma de cobro en la tarificación"));
+				}
+			}
+			
+			if (empty($opc_moneda_total)) $pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificación"));
+			
+			if (empty($tipo_descuento))
+			{
+				$pagina->AddError(__("Por favor ingrese el descuento en la tarificación"));
+			}
+			else
+			{
+				switch ($tipo_descuento)
+				{
+					case "VALOR":
+						if (empty($descuento))  $pagina->AddError(__("Por favor ingrese el valor del descuento en la tarificación"));
+						break;
+					case "PORCENTAJE":
+						if (empty($porcentaje_descuento))  $pagina->AddError(__("Por favor ingrese el porcentaje del descuento en la tarificación"));
+						break;
+					default:
+						$pagina->AddError(__("Por favor ingrese el descuento en la tarificación"));
+				}
+			}
+			
+			if (empty($observaciones)) $pagina->AddError(__("Por favor ingrese la observacion en la tarificación"));
+
+		}
+
+		$errores = $pagina->GetErrors();
+		if (!empty($errores))
+		{
+			$val = true;
+			$loadasuntos = false;
+		}
 
 				if(!$val)
 				{
-					$cliente->Edit("glosa_cliente",$glosa_cliente);
-					$cliente->Edit("codigo_cliente",$codigo_cliente);
+					$cliente->Edit("glosa_cliente", $glosa_cliente);
+					$cliente->Edit("codigo_cliente", $codigo_cliente);
 					if($codigo_cliente_secundario)
 						$cliente->Edit("codigo_cliente_secundario",strtoupper($codigo_cliente_secundario));
 					else 
@@ -183,22 +283,23 @@
 						$contrato->Edit("periodo_unidad", $codigo_unidad);
 						$contrato->Edit("monto", $monto);
 						$contrato->Edit("id_moneda", $id_moneda);
-						$contrato->Edit("id_moneda_tramite", $id_moneda_tramite);
 						$contrato->Edit("forma_cobro", $forma_cobro);
 						$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 						$contrato->Edit("retainer_horas", $retainer_horas);
 						$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
 						$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
-						$contrato->Edit("id_formato", $id_formato ? $id_formato : 'NULL');
 						$contrato->Edit("id_tarifa", $id_tarifa ? $id_tarifa : 'NULL');
 						$contrato->Edit("id_tramite_tarifa", $id_tramite_tarifa ? $id_tramite_tarifa : 'NULL' );
+
 						#facturacion
+
 						$contrato->Edit("rut",$factura_rut);
 						$contrato->Edit("factura_razon_social",$factura_razon_social);
 						$contrato->Edit("factura_giro",$factura_giro);
 						$contrato->Edit("factura_direccion",$factura_direccion);
 						$contrato->Edit("factura_telefono",$factura_telefono);
 						$contrato->Edit("cod_factura_telefono",$cod_factura_telefono);
+
 						#Opc contrato
 						$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 						$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
@@ -218,9 +319,6 @@
 						$contrato->Edit("opc_ver_asuntos_separados",$opc_ver_asuntos_separados);
 						$contrato->Edit("opc_ver_horas_trabajadas",$opc_ver_horas_trabajadas);
 						$contrato->Edit("opc_ver_cobrable",$opc_ver_cobrable);
-						$contrato->Edit("opc_restar_retainer",$opc_restar_retainer);
-						$contrato->Edit("opc_ver_detalle_retainer",$opc_ver_detalle_retainer);
-						$contrato->Edit("opc_ver_valor_hh_flat_fee",$opc_ver_valor_hh_flat_fee);
 						$contrato->Edit("codigo_idioma",$codigo_idioma != '' ? $codigo_idioma : 'es');
 						#descto.
 						$contrato->Edit("tipo_descuento",$tipo_descuento);

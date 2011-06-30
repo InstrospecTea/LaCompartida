@@ -409,11 +409,32 @@
 	$pagina->titulo = __('Imprimir').' '.__('Cobro').' #'.$id_cobro.' '.__('para')." ".Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'],'glosa_cliente','cliente','codigo_cliente');
 	if($popup)
 	{
+		$cobro->LoadAsuntos();
+		$asunto = new Asunto($sesion);
+		$glosa_asunto_titulo = '';
+		$max_largo_titulo_asunto = 30;
+		for($x=0; $x<count($cobro->asuntos); $x++)
+		{
+			
+			if($x==0)
+				$separador_inicio = '  -  ';
+			else if($x==count($cobro->asuntos))
+				$separador = '.';
+			else
+				$separador = ', ';
+			$glosa_asunto_titulo .=   Utiles::Glosa($sesion, $cobro->asuntos[$x],'glosa_asunto','asunto','codigo_asunto') . $separador;
+		}
+		$glosa_asunto_alt = $glosa_asunto_titulo;
+		$glosa_asunto_titulo = substr($glosa_asunto_titulo,0,$max_largo_titulo_asunto);
+		if(strlen($glosa_asunto_alt)>$max_largo_titulo_asunto)
+			$glosa_asunto_titulo = $glosa_asunto_titulo . '...';
+		$glosa_asunto_titulo = $separador_inicio . $glosa_asunto_titulo;
+//$glosa_asunto_titulo = Utiles::Glosa($sesion, $cobro->LoadAsuntos());
 ?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
-					<?=__('Imprimir').' '.__('Cobro').' #'.$id_cobro.' '.__('para')." ".Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'],'glosa_cliente','cliente','codigo_cliente');?>
+					<span title="<?=$glosa_asunto_alt?>"><?=__('Imprimir').' '.__('Cobro').' #'.$id_cobro.' '.__('para')." ".Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'],'glosa_cliente','cliente','codigo_cliente') . " ". $glosa_asunto_titulo;?></span>
 				</td>
 			</tr>
 		</table>

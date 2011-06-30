@@ -412,7 +412,7 @@
 							else
 								$min[$id] = 0;
 						}
-						if(!$min[$id] || $min[$id] < $r['celdas'][$id][$id_col]['valor'])					
+						if(!$min[$id] || $min[$id] <= $r['celdas'][$id][$id_col]['valor'])					
 							dato($fil,$col,$r['celdas'][$id][$id_col]['valor']);
 						else
 							dato($fil,$col,$r['celdas'][$id][$id_col]['valor'],false,true);

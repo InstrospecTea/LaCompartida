@@ -2,7 +2,7 @@
  require_once dirname(__FILE__).'/../app/conf.php';
  
 /* PASO 1: Agregar los cambios en un case del switch de esta funcion. */
-/*         Si ocurre un error, levantar una excepciÛn, nunca hacer un exit o die */
+/*         Si ocurre un error, levantar una excepci√≥n, nunca hacer un exit o die */
 
 /* IMPORTANTE:
 	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
@@ -19,7 +19,7 @@ function Actualizaciones( &$dbh, $new_version )
 	case 1.1:
 		echo 'Mensaje de prueba 2.<br>';
 
-		$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresiÛn del DOC';";
+		$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresi√≥n del DOC';";
 
 		if( !mysql_query($query,$dbh) )
 			throw new Exception(mysql_error());
@@ -33,7 +33,7 @@ function Actualizaciones( &$dbh, $new_version )
 
 	 case 1.3:
         echo 'Mensaje de prueba 2.<br>';
-        $query = "ALTER TABLE `cobro` ADD `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '0' COMMENT 'Tipo de cambio de la moneda presentada en la impresiÛn del DOC';";
+        $query = "ALTER TABLE `cobro` ADD `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '0' COMMENT 'Tipo de cambio de la moneda presentada en la impresi√≥n del DOC';";
 
         if( !mysql_query($query,$dbh) )
             throw new Exception(mysql_error());
@@ -126,8 +126,8 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 	case 1.7:
 				echo 'Mensaje de prueba 7.<br>';
-        $query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresiÛn del DOC',
-									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresiÛn del DOC'";
+        $query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresi√≥n del DOC',
+									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresi√≥n del DOC'";
         if( !mysql_query($query,$dbh) )
             throw new Exception(mysql_error());
 
@@ -212,7 +212,7 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
-			$query = "UPDATE `menu` SET `glosa` = 'FacturaciÛn clientes' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_CL' LIMIT 1 ";
+			$query = "UPDATE `menu` SET `glosa` = 'Facturaci√≥n clientes' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_CL' LIMIT 1 ";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
@@ -220,15 +220,15 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
-			$query = "UPDATE `menu` SET `glosa` = 'Gr·fico asuntos',`orden` = '40' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_AS' LIMIT 1 ";
+			$query = "UPDATE `menu` SET `glosa` = 'Gr√°fico asuntos',`orden` = '40' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_AS' LIMIT 1 ";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
-			$query = "UPDATE `menu` SET `glosa` = 'Gr·fico usuarios',`orden` = '50' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_US' LIMIT 1 ";
+			$query = "UPDATE `menu` SET `glosa` = 'Gr√°fico usuarios',`orden` = '50' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_US' LIMIT 1 ";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
-			$query = "UPDATE `menu` SET `glosa` = 'Reporte genÈrico',`orden` = '60' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'OLAP' LIMIT 1 ";
+			$query = "UPDATE `menu` SET `glosa` = 'Reporte gen√©rico',`orden` = '60' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'OLAP' LIMIT 1 ";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
@@ -329,7 +329,7 @@ CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLAT
 
 			$query = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` )
 								VALUES (
-								'RAP', 'PeriÛdico', '/app/interfaces/resumen_actividades.php', '', '', '0', '70', 'REP');";
+								'RAP', 'Peri√≥dico', '/app/interfaces/resumen_actividades.php', '', '', '0', '70', 'REP');";
 			if( !mysql_query($query,$dbh) )
 				throw new Exception(mysql_error());
 
@@ -590,7 +590,7 @@ echo $query;
   break;
 
   case 2.3:
-  	$query = "UPDATE `menu` SET `glosa` = 'GeneraciÛn de Cobros',
+  	$query = "UPDATE `menu` SET `glosa` = 'Generaci√≥n de Cobros',
 								`url` = '/app/interfaces/genera_cobros.php',
 								`codigo_padre` = 'COBRANZA' WHERE CONVERT( `codigo` USING utf8 ) = 'COBROS' LIMIT 1";
     if(! ($resp = mysql_query($query,$dbh)))
@@ -600,7 +600,7 @@ echo $query;
   break;
 
   case 2.31:
-  	### Update cobro para los antiguos que no est·n relacionados a ning˙n contrato. ###
+  	### Update cobro para los antiguos que no est√°n relacionados a ning√∫n contrato. ###
 		$query = "UPDATE cobro
 								JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
 								JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto
@@ -786,7 +786,7 @@ echo $query;
         if(! ($resp = mysql_query($query,$dbh)))
         throw new Exception($query ."---".mysql_error());
 
-    $query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este c√≥digo es vac√≠o si la actividad sirve para todos los asuntos'";
+    $query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este c√É¬≥digo es vac√É¬≠o si la actividad sirve para todos los asuntos'";
         if(! ($resp = mysql_query($query,$dbh)))
         throw new Exception($query ."---".mysql_error());
 
@@ -987,7 +987,7 @@ echo $query;
         throw new Exception($query ."---".mysql_error());
 
     $query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 )
-    					CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este cÛdigo es vacÌo si la actividad sirve para todos los asuntos'";
+    					CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este c√≥digo es vac√≠o si la actividad sirve para todos los asuntos'";
     if(! ($resp = mysql_query($query,$dbh)))
         throw new Exception($query ."---".mysql_error());
 
@@ -1062,14 +1062,14 @@ echo $query;
 		if(! ($resp = mysql_query($query,$dbh)))
 	    	throw new Exception($query ."---".mysql_error());
 
-		$query = "UPDATE `menu` SET `glosa` = 'Gr·fico profesionales',
+		$query = "UPDATE `menu` SET `glosa` = 'Gr√°fico profesionales',
 		`url` = '/app/interfaces/reportes_usuarios.php',
 		`codigo_padre` = 'REP' WHERE CONVERT( `codigo` USING utf8 ) = 'REP_US' LIMIT 1";
 		if(! ($resp = mysql_query($query,$dbh)))
         	throw new Exception($query ."---".mysql_error());
 
 		$query = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` )
-					VALUES ('REP_ESPE', 'EspecÌficos', '/app/interfaces/reportes_especificos.php', '', '', '0', '80', 'REP');";
+					VALUES ('REP_ESPE', 'Espec√≠ficos', '/app/interfaces/reportes_especificos.php', '', '', '0', '80', 'REP');";
 		if(! ($resp = mysql_query($query,$dbh)))
         	throw new Exception($query ."---".mysql_error());
 
@@ -1334,7 +1334,7 @@ echo $query;
 					- Filtro para asuntos (actividad)<br>
 					- Se puede ingresar horas con decimales, deben pedir activacion<br>
 					- Cambios Nota de Cobro, mayores detalles, deben pedir activacion<br>
-					- Codigo asunto con codigo_cliente-aÒo+dos_digitos (En el conf es TipoCodigoAsunto: agregar!!)<br>";
+					- Codigo asunto con codigo_cliente-a√±o+dos_digitos (En el conf es TipoCodigoAsunto: agregar!!)<br>";
 	break;
 	########################### DOCUMENTOS, EDICIONES COBRO ############################
 	case 2.63:
@@ -1581,8 +1581,8 @@ echo $query;
 
 		echo "Cambios realizados: <br>
 				-Se pueden inrgesar cobros programados. <br>
-				-En la generaciÛn de cobros se puede generar directamente por cobro programado. <br>
-				-El la generaciÛn masiva te da la opciÛn de generar programados o WIP. <br>
+				-En la generaci√≥n de cobros se puede generar directamente por cobro programado. <br>
+				-El la generaci√≥n masiva te da la opci√≥n de generar programados o WIP. <br>
 				-Se puede ingresar una descripcion a la cobranza. <br>
 				-Los documentos se separaron del menu de cobranza. <br>";
 
@@ -1835,7 +1835,7 @@ echo $query;
 				throw new Exception($query ."---".mysql_error());
 			$query = "ALTER TABLE  `cobro`
 									ADD `porcentaje_impuesto` tinyint(3) unsigned NOT NULL default '0'
-											COMMENT 'Para agregar el impuesto al final cuando no est· incluido en el valor del cobro.'
+											COMMENT 'Para agregar el impuesto al final cuando no est√° incluido en el valor del cobro.'
 									AFTER  `monto_subtotal` ;";
 			if(! ($resp = mysql_query($query,$dbh)))
 				throw new Exception($query ."---".mysql_error());
@@ -1851,12 +1851,12 @@ echo $query;
 		case 2.8:
 
 			$query = "CREATE TABLE `configuracion` (
-								`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la p·gina de configuraciÛn.',
+								`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la p√°gina de configuraci√≥n.',
 								`glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
 								`valor_opcion` text NOT NULL,
 								`comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
-								`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un n˙mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
-								`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de apariciÛn en la p·gina de configuraciÛn, -1 para no mostrar la opciÛn.',
+								`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un n√∫mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
+								`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparici√≥n en la p√°gina de configuraci√≥n, -1 para no mostrar la opci√≥n.',
 								PRIMARY KEY  (`id`)
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=19;";
 			if(! ($resp = mysql_query($query,$dbh)))
@@ -1864,21 +1864,21 @@ echo $query;
 
 			$query = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `orden`)
 									VALUES
-									(1, 'MaxDiasIngresoTrabajo', '-1', 'M·ximo de dÌas hacia atr·s en los que se pueden ingresar trabajos, -1 indica que no hay lÌ≠mite.', 'numero', 1),
-									(2, 'MaxDiasIngresoTrabajoRevisor', '-1', 'M·ximo de dÌas hacia atr·s en los que un revisor puede ingresar o modificar trabajos, -1 indica que no hay lÌ≠mite.', 'numero', 1),
+									(1, 'MaxDiasIngresoTrabajo', '-1', 'M√°ximo de d√≠as hacia atr√°s en los que se pueden ingresar trabajos, -1 indica que no hay l√≠¬≠mite.', 'numero', 1),
+									(2, 'MaxDiasIngresoTrabajoRevisor', '-1', 'M√°ximo de d√≠as hacia atr√°s en los que un revisor puede ingresar o modificar trabajos, -1 indica que no hay l√≠¬≠mite.', 'numero', 1),
 									(3, 'MailAdmin', '', 'Email al que llegan los avisos del sistema.', 'string', 3),
-									(4, 'Activar corrector ortogr·fico', '0', NULL, 'boolean', -1),
+									(4, 'Activar corrector ortogr√°fico', '0', NULL, 'boolean', -1),
 									(5, 'MailSistema', '', NULL, 'string', -1),
-									(6, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesiÛn.', 'string', 3),
+									(6, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesi√≥n.', 'string', 3),
 									(7, 'DireccionPdf', '', NULL, 'string', 2),
 									(8, 'PdfLinea1', '', NULL, 'string', 3),
 									(9, 'PdfLinea2', '', NULL, 'string', 3),
 									(10, 'PdfLinea3', '', NULL, 'string', 3),
-									(11, 'MailAsuntoNuevo', '0', 'Indica si se envÌa un email cada vez que se crea un asunto nuevo.', 'boolean', 4),
+									(11, 'MailAsuntoNuevo', '0', 'Indica si se env√≠a un email cada vez que se crea un asunto nuevo.', 'boolean', 4),
 									(12, 'RecordarSesion', '1', NULL, 'boolean', 4),
 									(13, 'OrdenadoPor', '0', '0 no se necesita, 1 obligatorio, 2 opcional', 'select;0;1;2', -1),
 									(14, 'IdiomaGrande', '0', NULL, 'boolean', 5),
-									(15, 'CorreosModificacionAdminDatos', '', 'Dejar en blanco para que no se envÌen mails.', 'string', 5),
+									(15, 'CorreosModificacionAdminDatos', '', 'Dejar en blanco para que no se env√≠en mails.', 'string', 5),
 									(16, 'ImprimirDuracionTrabajada', '0', NULL, 'boolean', 7),
 									(17, 'ImprimirValorTrabajo', '0', NULL, 'boolean', 7),
 									(18, 'DiaMailSemanal', 'Fri', NULL, 'select;Mon;Tue;Wed;Thu;Fri;Sat;Sun', 7);";
@@ -1909,7 +1909,7 @@ echo $query;
 				throw new Exception($query ."---".mysql_error());
 
 			$query = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`)
-								VALUES ('CONF', 'ConfiguraciÛn', '/app/interfaces/configuracion.php', '', '', '0', '45', 'ADMIN_SIS');";
+								VALUES ('CONF', 'Configuraci√≥n', '/app/interfaces/configuracion.php', '', '', '0', '45', 'ADMIN_SIS');";
 			if(! ($resp = mysql_query($query,$dbh)))
 				throw new Exception($query ."---".mysql_error());
 
@@ -1917,7 +1917,7 @@ echo $query;
 			if(! ($resp = mysql_query($query,$dbh)))
 				throw new Exception($query ."---".mysql_error());
 
-			echo "Recordar ingresar la funciÛn GetConf en el conf.";
+			echo "Recordar ingresar la funci√≥n GetConf en el conf.";
 		break;
 		#####MOSTRAR TIPO CAMBIO NOTA DE COBRO####
 		case 2.81:
@@ -2117,7 +2117,7 @@ echo $query;
 				throw new Exception($query ."---".mysql_error());
 		break;
 
-		### Gasto -tipo  -n∞ documento
+		### Gasto -tipo  -n¬∞ documento
 		case 2.86:
 		$query = array();
 		$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_cta_corriente_tipo` INT( 11 ) NULL DEFAULT NULL AFTER  `id_usuario_orden` ;";
@@ -2135,7 +2135,7 @@ echo $query;
 		), (
 		NULL ,  'Cargo Procurador'
 		), (
-		NULL ,  'TelÈfono'
+		NULL ,  'Tel√©fono'
 		), (
 		NULL ,  'Fotocopias'
 		);";
@@ -2148,7 +2148,7 @@ echo $query;
 				throw new Exception($q ."---".mysql_error());
 		}
 		break;
-		##### N˙mero OT #####
+		##### N√∫mero OT #####
 		case 2.87:
 			$query = "ALTER TABLE  `cta_corriente` ADD  `numero_ot` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `numero_documento` ;";
 			if(! ($resp = mysql_query($query,$dbh)))
@@ -2376,7 +2376,7 @@ echo $query;
 					throw new Exception($q ."---".mysql_error());
 			}
 		break;
-		#### parametrizaciÛn glosas excel ####
+		#### parametrizaci√≥n glosas excel ####
 		case 3.00:
 			$query = array();
 			$query[] = "CREATE TABLE `prm_excel_cobro` (
@@ -2386,23 +2386,23 @@ echo $query;
 										`grupo` varchar(60) NOT NULL default '',
 										PRIMARY KEY  (`id_prm_excel_cobro`)
 									) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=50 ;";
-			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa`, `grupo`) VALUES (1, 'id_trabajo', 'N∫', 'Listado de trabajos'),
+			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa`, `grupo`) VALUES (1, 'id_trabajo', 'N¬∫', 'Listado de trabajos'),
 										(2, 'fecha', 'Fecha', 'Listado de trabajos'),
 										(3, 'abogado', 'Abogado', 'Listado de trabajos'),
 										(4, 'asunto', 'Asunto', 'Listado de trabajos'),
 										(5, 'solicitante', 'Solicitante', 'Listado de trabajos'),
-										(6, 'descripcion', 'DescripciÛn', 'Listado de trabajos'),
-										(7, 'duracion_trabajada', 'DuraciÛn Trabajada', 'Listado de trabajos'),
-										(8, 'duracion_cobrable', 'DuraciÛn', 'Listado de trabajos'),
-										(9, 'duracion_retainer', 'DuraciÛn Retainer', 'Listado de trabajos'),
+										(6, 'descripcion', 'Descripci√≥n', 'Listado de trabajos'),
+										(7, 'duracion_trabajada', 'Duraci√≥n Trabajada', 'Listado de trabajos'),
+										(8, 'duracion_cobrable', 'Duraci√≥n', 'Listado de trabajos'),
+										(9, 'duracion_retainer', 'Duraci√≥n Retainer', 'Listado de trabajos'),
 										(10, 'cobrable', 'Cobrable', 'Listado de trabajos'),
 										(11, 'tarifa_hh', 'Tarifa (%glosa_moneda%)', 'Listado de trabajos'),
 										(12, 'valor_trabajo', 'Valor (%glosa_moneda%)', 'Listado de trabajos'),
 										(13, 'cliente', 'Cliente', 'Encabezado'),
-										(14, 'direccion', 'DirecciÛn', 'Encabezado'),
+										(14, 'direccion', 'Direcci√≥n', 'Encabezado'),
 										(15, 'rut', 'RUT', 'Encabezado'),
 										(16, 'contacto', 'Contacto', 'Encabezado'),
-										(17, 'telefono', 'TelÈfono', 'Encabezado'),
+										(17, 'telefono', 'Tel√©fono', 'Encabezado'),
 										(18, 'titulo', 'Resumen cobro', 'Resumen'),
 										(19, 'fecha', 'Fecha:', 'Resumen'),
 										(20, 'fecha_desde', 'Fecha desde:', 'Resumen'),
@@ -2430,11 +2430,11 @@ echo $query;
 										(42, 'total', 'Total (%glosa_moneda%)', 'Detalle profesional'),
 										(43, 'titulo', 'Gastos', 'Listado de gastos'),
 										(44, 'fecha', 'Fecha', 'Listado de gastos'),
-										(45, 'descripcion', 'DescripciÛn', 'Listado de gastos'),
+										(45, 'descripcion', 'Descripci√≥n', 'Listado de gastos'),
 										(46, 'monto', 'Monto', 'Listado de gastos'),
 										(47, 'horas_retainer', 'Hr. Retainer', 'Detalle profesional'),
-										(48, 'factura', 'Factura N∫', 'Resumen'),
-										(49, 'minuta', 'Minuta de cobro N∫', 'Encabezado');";
+										(48, 'factura', 'Factura N¬∫', 'Resumen'),
+										(49, 'minuta', 'Minuta de cobro N¬∫', 'Encabezado');";
 			foreach($query as $q)
 			{
 				if(! ($resp = mysql_query($q,$dbh)))
@@ -2450,29 +2450,29 @@ echo $query;
 					throw new Exception($q ."---".mysql_error());
 			}
 		break;
-		#### parametrizaciÛn glosas en excel (espaÒol e ingles) ####
+		#### parametrizaci√≥n glosas en excel (espa√±ol e ingles) ####
 		case 3.02:
 			$query = array();
 			$query[] = "ALTER TABLE `prm_excel_cobro` DROP COLUMN `glosa`;";
 			$query[] = "ALTER TABLE `prm_excel_cobro` ADD COLUMN `glosa_es` VARCHAR(60) COLLATE utf8_general_ci NOT NULL DEFAULT '';";
 			$query[] = "ALTER TABLE `prm_excel_cobro` ADD COLUMN `glosa_en` VARCHAR(60) COLLATE utf8_general_ci NOT NULL DEFAULT '';";
-			$query[] = "UPDATE `prm_excel_cobro` SET `nombre_interno` = 'id_trabajo', `glosa_es` = 'N∫', `glosa_en` = 'N∫', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 1;";
+			$query[] = "UPDATE `prm_excel_cobro` SET `nombre_interno` = 'id_trabajo', `glosa_es` = 'N¬∫', `glosa_en` = 'N¬∫', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 1;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha', `glosa_es` = 'Fecha', `glosa_en` = 'Date', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 2;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'abogado', `glosa_es` = 'Abogado', `glosa_en` = 'Lawyer', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 3;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'asunto', `glosa_es` = 'Asunto', `glosa_en` = 'Matter', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 4;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'solicitante', `glosa_es` = 'Solicitante', `glosa_en` = 'Solicitante', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 5;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'DescripciÛn', `glosa_en` = 'Description', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 6;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_trabajada', `glosa_es` = 'DuraciÛn Trabajada', `glosa_en` = 'Worked duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 7;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_cobrable', `glosa_es` = 'DuraciÛn', `glosa_en` = 'Collectible duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 8;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_retainer', `glosa_es` = 'DuraciÛn Retainer', `glosa_en` = 'Retained duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 9;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripci√≥n', `glosa_en` = 'Description', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 6;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_trabajada', `glosa_es` = 'Duraci√≥n Trabajada', `glosa_en` = 'Worked duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 7;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_cobrable', `glosa_es` = 'Duraci√≥n', `glosa_en` = 'Collectible duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 8;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_retainer', `glosa_es` = 'Duraci√≥n Retainer', `glosa_en` = 'Retained duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 9;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'cobrable', `glosa_es` = 'Cobrable', `glosa_en` = 'Chargeable', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 10;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'tarifa_hh', `glosa_es` = 'Tarifa (%glosa_moneda%)', `glosa_en` = 'Rate (%glosa_moneda%)', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 11;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'valor_trabajo', `glosa_es` = 'Valor (%glosa_moneda%)', `glosa_en` = 'Amount (%glosa_moneda%)', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 12;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'cliente', `glosa_es` = 'Cliente', `glosa_en` = 'Client', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 13;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'direccion', `glosa_es` = 'DirecciÛn', `glosa_en` = 'Address', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 14;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'direccion', `glosa_es` = 'Direcci√≥n', `glosa_en` = 'Address', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 14;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'rut', `glosa_es` = 'RUT', `glosa_en` = 'Tax Payer Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 15;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'contacto', `glosa_es` = 'Contacto', `glosa_en` = 'Contact', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 16;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'telefono', `glosa_es` = 'TelÈfono', `glosa_en` = 'Phone Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 17;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'telefono', `glosa_es` = 'Tel√©fono', `glosa_en` = 'Phone Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 17;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'titulo', `glosa_es` = 'Resumen cobro', `glosa_en` = 'Invoice summary', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 18;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha', `glosa_es` = 'Fecha:', `glosa_en` = 'Date:', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 19;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha_desde', `glosa_es` = 'Fecha desde:', `glosa_en` = 'From:', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 20;";
@@ -2500,11 +2500,11 @@ echo $query;
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'total', `glosa_es` = 'Total (%glosa_moneda%)', `glosa_en` = 'Total (%glosa_moneda%)', `grupo` = 'Detalle profesional' WHERE  `id_prm_excel_cobro` = 42;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'titulo', `glosa_es` = 'Gastos', `glosa_en` = 'Expenses', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 43;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha', `glosa_es` = 'Fecha', `glosa_en` = 'Date', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 44;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'DescripciÛn', `glosa_en` = 'Descrption', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 45;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripci√≥n', `glosa_en` = 'Descrption', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 45;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'monto', `glosa_es` = 'Monto', `glosa_en` = 'Amount', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 46;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'horas_retainer', `glosa_es` = 'Hr. Retainer', `glosa_en` = 'Hrs Retainer', `grupo` = 'Detalle profesional' WHERE  `id_prm_excel_cobro` = 47;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'factura', `glosa_es` = 'Factura N∫', `glosa_en` = 'Invoice N∫', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 48;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'minuta', `glosa_es` = 'Minuta de cobro N∫', `glosa_en` = 'Bill of charge N∞', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 49;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'factura', `glosa_es` = 'Factura N¬∫', `glosa_en` = 'Invoice N¬∫', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 48;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'minuta', `glosa_es` = 'Minuta de cobro N¬∫', `glosa_en` = 'Bill of charge N¬∞', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 49;";
 			$query[] = "ALTER TABLE cobro ADD `solo_gastos` int(1) NOT NULL default '0';";
 			foreach($query as $q)
 			{
@@ -2525,7 +2525,7 @@ echo $query;
 					throw new Exception($q ."---".mysql_error());
 			}
 		break;
-		#### AgregaciÛn de las tablas del tema tr·mites ####
+		#### Agregaci√≥n de las tablas del tema tr√°mites ####
 		case 3.04:
 			$query=array();
 			$query[]="ALTER TABLE `contrato` ADD COLUMN `id_tramite_tarifa` INT(11) NULL";
@@ -2573,12 +2573,12 @@ echo $query;
 									PRIMARY KEY (`id_tramite_valor`),
 									UNIQUE KEY `id_tramite_tarifa_2` (`id_tramite_tipo`,`id_moneda`,`id_tramite_tarifa`)
 									) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=346;";
-			$query[]="UPDATE `menu` SET `glosa` =  'GestiÛn', `url` = NULL ,
+			$query[]="UPDATE `menu` SET `glosa` =  'Gesti√≥n', `url` = NULL ,
 								`codigo_padre` = NULL WHERE CONVERT( `codigo` USING utf8 ) = 'PRO' LIMIT 1;";
 			$query[]= "INSERT INTO menu ( codigo , glosa , url , descripcion , foto_url , tipo , orden , codigo_padre )
-									VALUES ( 'ADM_TRA', 'Adm. Tr·mites' , '/app/interfaces/tramites.php' , NULL, NULL, '0' , '25' , 'ADM'),
-												( 'TRA_HRS' , 'Tr·mites' , '/app/interfaces/horas_tramites.php', NULL , NULL , '0' , '15' , 'PRO' ),
-												( 'TAR_TRA' , 'Tarifa tr·mites' , '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=2' , NULL , NULL , '0' , '56' , 'COBRANZA') ;";
+									VALUES ( 'ADM_TRA', 'Adm. Tr√°mites' , '/app/interfaces/tramites.php' , NULL, NULL, '0' , '25' , 'ADM'),
+												( 'TRA_HRS' , 'Tr√°mites' , '/app/interfaces/horas_tramites.php', NULL , NULL , '0' , '15' , 'PRO' ),
+												( 'TAR_TRA' , 'Tarifa tr√°mites' , '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=2' , NULL , NULL , '0' , '56' , 'COBRANZA') ;";
 			$query[]= "INSERT INTO menu_permiso ( codigo_permiso, codigo_menu )
 									VALUES('ADM' , 'ADM_TRA'),
 												('PRO' , 'TRA_HRS'),
@@ -2627,15 +2627,15 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 
       case 3.08:
       		$query=array();
-      		$query[]="INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `grupo`) VALUES (50, 'titulo', 'Tr·mites', 'Tr·mites', 'Listado de tr·mites'),
-											(51, 'fecha', 'Fecha', 'Date', 'Listado de tr·mites'),
-											(52, 'id_trabajo', 'N∞', 'N∞', 'Listado de tr·mites'),
-											(53, 'abogado', 'Abogado', 'Lawyer', 'Listado de tr·mites'),
-											(54, 'asunto', 'Asunto', 'Matter', 'Listado de tr·mites'),
-											(55, 'solicitante', 'Solicitante', 'Solicitante', 'Listado de tr·mites'),
-											(56, 'descripcion', 'DescripciÛn', 'Description', 'Listado de tr·mites'),
-											(57, 'duracion', 'DuraciÛn', 'Duration', 'Listado de tr·mites'),
-											(58, 'valor', 'Valor', 'Amount', 'Listado de tr·mites');";
+      		$query[]="INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `grupo`) VALUES (50, 'titulo', 'Tr√°mites', 'Tr√°mites', 'Listado de tr√°mites'),
+											(51, 'fecha', 'Fecha', 'Date', 'Listado de tr√°mites'),
+											(52, 'id_trabajo', 'N¬∞', 'N¬∞', 'Listado de tr√°mites'),
+											(53, 'abogado', 'Abogado', 'Lawyer', 'Listado de tr√°mites'),
+											(54, 'asunto', 'Asunto', 'Matter', 'Listado de tr√°mites'),
+											(55, 'solicitante', 'Solicitante', 'Solicitante', 'Listado de tr√°mites'),
+											(56, 'descripcion', 'Descripci√≥n', 'Description', 'Listado de tr√°mites'),
+											(57, 'duracion', 'Duraci√≥n', 'Duration', 'Listado de tr√°mites'),
+											(58, 'valor', 'Valor', 'Amount', 'Listado de tr√°mites');";
 			foreach($query as $q)
 				{
 					if(! ($resp = mysql_query($q,$dbh)))
@@ -2740,8 +2740,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[]="ALTER TABLE `configuracion` ENGINE = innodb;";
 			$query[]="INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 								VALUES ( 19 , 'CiudadSignatura', '' , 'La ciudad ingresada va a aparecer en la firma junto con la fecha del documento', 'string', '4', '425'),
-											 ( 20 , 'Numeracion', '310000039689', 'NumeraciÛn autorizada por la dian mediante res. No.', 'numero','4', '430'),
-											 ( 21 , 'NumeracionFecha', '2009-05-20', 'Fecha de NumeraciÛn', 'string','4', '435'),
+											 ( 20 , 'Numeracion', '310000039689', 'Numeraci√≥n autorizada por la dian mediante res. No.', 'numero','4', '430'),
+											 ( 21 , 'NumeracionFecha', '2009-05-20', 'Fecha de Numeraci√≥n', 'string','4', '435'),
 											 ( 22 , 'NumeracionDesde', '41008', NULL , 'numero','4', '440'),
 											 ( 23 , 'NumeracionHasta', '45000', NULL , 'numero','4', '445'),
 											 ( 24 , 'NombreEmpresa', '' , NULL , 'string','1', '130'),
@@ -2752,7 +2752,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 												`id_configuracion_categoria`='1', `orden` = '105' WHERE `id` =3 LIMIT 1 ;";
 			$query[]="UPDATE `configuracion` SET `comentario` =  NULL , `id_configuracion_categoria`='1',
 												`orden` = '110' WHERE `id` =5 LIMIT 1 ;";
-      $query[]="UPDATE `configuracion` SET `comentario` =  'Tiempo en segundos que dura la sesiÛn.',
+      $query[]="UPDATE `configuracion` SET `comentario` =  'Tiempo en segundos que dura la sesi√≥n.',
 												`id_configuracion_categoria`='1', `orden` = '115' WHERE `id` =6 LIMIT 1 ;";
 			$query[]="UPDATE `configuracion` SET `comentario` =  NULL , `id_configuracion_categoria`='1',
 												`orden` = '120' WHERE `id` =12 LIMIT 1 ;";
@@ -2764,9 +2764,9 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 												`id_configuracion_categoria`='2', `orden` = '210' WHERE `id` =16 LIMIT 1 ;";
 			$query[]="UPDATE `configuracion` SET `comentario` =  NULL ,
 												`id_configuracion_categoria`='2', `orden` = '215' WHERE `id` =17 LIMIT 1 ;";
-			$query[]="UPDATE `configuracion` SET `comentario` =  'Indica si se envÌa un email cada vez que se crea un asunto nuevo.',
+			$query[]="UPDATE `configuracion` SET `comentario` =  'Indica si se env√≠a un email cada vez que se crea un asunto nuevo.',
 												`id_configuracion_categoria`='3', `orden` = '305' WHERE `id` =11 LIMIT 1 ;";
-			$query[]="UPDATE `configuracion` SET `comentario` =  'Dejar en blanco para que no se envÌen mails.',
+			$query[]="UPDATE `configuracion` SET `comentario` =  'Dejar en blanco para que no se env√≠en mails.',
 												`id_configuracion_categoria`='3', `orden` = '310' WHERE `id` =15 LIMIT 1 ;";
 			$query[]="UPDATE `configuracion` SET `comentario` =  NULL ,
 												`id_configuracion_categoria`='3', `orden` = '315' WHERE `id` =18 LIMIT 1 ;";
@@ -2777,7 +2777,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[]="INSERT INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`)
 											VALUES (1, 'Datos Generales'),
 														 (2, 'Datos Cobranza'),
-														 (3, 'ConfiguraciÛn alertas'),
+														 (3, 'Configuraci√≥n alertas'),
 														 (4, 'Opciones documentos');";
 			foreach($query as $q)
 				{
@@ -2874,7 +2874,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = 'CREATE TABLE reporte_consolidado (
 							id_reporte_consolidado int(11) NOT NULL auto_increment,
 							fecha_generacion timestamp NOT NULL default CURRENT_TIMESTAMP,
-							periodo date NOT NULL default "0000-00-00" COMMENT "Solo se toman en cuenta el aÒo y mes.",
+							periodo date NOT NULL default "0000-00-00" COMMENT "Solo se toman en cuenta el a√±o y mes.",
 							contenido longblob NOT NULL COMMENT "Archivo PDF con el reporte.",
 							id_moneda int(11) NOT NULL default "0",
 							PRIMARY KEY  (id_reporte_consolidado),
@@ -2895,9 +2895,9 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 										  PRIMARY KEY  (`id_titulo`)
 										) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;";
 			$query[] = "INSERT INTO `prm_titulo_persona` (`id_titulo`, `titulo`, `glosa_titulo`) 
-											 VALUES (1, 'Sr.', 'SeÒor'),
-															(2, 'Sra.', 'SeÒora'),
-															(3, 'Srta.', 'SeÒorita');";
+											 VALUES (1, 'Sr.', 'Se√±or'),
+															(2, 'Sra.', 'Se√±ora'),
+															(3, 'Srta.', 'Se√±orita');";
 															
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
@@ -3056,7 +3056,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 																) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 				$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '15' WHERE  `id_prm_excel_cobro` =3 LIMIT 1;";
 				$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '12' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizar· el sistema', 'string', 1, -1);";
+				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizar√° el sistema', 'string', 1, -1);";
 				$query[] = "ALTER TABLE  `trabajo_respaldo_excel` 
 														ADD  `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `id_usuario` ,
 														ADD  `id_cobro` INT( 11 ) NULL AFTER  `codigo_asunto` ;";
@@ -3090,8 +3090,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				case 3.27:
 				$query = array();
 
-				//Agrego la categorÌa AdministraciÛn, si no existe.
-				$query[] = "INSERT INTO prm_categoria_usuario (glosa_categoria,id_categoria_lemontech) SELECT 'AdministraciÛn' as glosa_categoria, 5 as id_categoria_lemontech FROM DUAL WHERE NOT EXISTS (SELECT * FROM `prm_categoria_usuario` WHERE  glosa_categoria  LIKE '%dminis%')";
+				//Agrego la categor√≠a Administraci√≥n, si no existe.
+				$query[] = "INSERT INTO prm_categoria_usuario (glosa_categoria,id_categoria_lemontech) SELECT 'Administraci√≥n' as glosa_categoria, 5 as id_categoria_lemontech FROM DUAL WHERE NOT EXISTS (SELECT * FROM `prm_categoria_usuario` WHERE  glosa_categoria  LIKE '%dminis%')";
 				$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 2 WHERE glosa_categoria = 'Asociado Senior';";
 				$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 3 WHERE glosa_categoria = 'Asociado Junior';";
 				$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 3 WHERE glosa_categoria = 'Asesor Externo';";
@@ -3104,7 +3104,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 						LEFT JOIN usuario_permiso as comercial ON (usuario.id_usuario = comercial.id_usuario AND comercial.codigo_permiso = 'SOC')
 						WHERE id_categoria_usuario IS NULL ";
 
-				//Obtengo las categorÌas a las que se puede asignar.
+				//Obtengo las categor√≠as a las que se puede asignar.
 				$query_admin = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 5 LIMIT 1 "; 
 				$query_socio = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 1 LIMIT 1 "; 
 				$query_junior = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 3 LIMIT 1 "; 
@@ -3132,7 +3132,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					throw new Exception($query_usuarios ."---".mysql_error());
 				while( list($id_usuario, $profesional, $comercial) = mysql_fetch_array($resp_usuarios) )
 				{
-					//por cada usuario sin categorÌa, puede tener la categorÌa 'Admin', 'Asociado Junior', o 'Socio' dependiendo de los permisos
+					//por cada usuario sin categor√≠a, puede tener la categor√≠a 'Admin', 'Asociado Junior', o 'Socio' dependiendo de los permisos
 					if(!$profesional)
 					{
 						$query[] = "UPDATE usuario SET id_categoria_usuario = '".$admin."' WHERE id_usuario = '".$id_usuario."'"; 
@@ -3169,7 +3169,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 							throw new Exception($q."---".mysql_error());
 				break;
 				
-				/*Achicar tamaÒo de las columnas fecha y abogado al tamaÒo que tenÌa antes de lo modificacion 3.25*/
+				/*Achicar tama√±o de las columnas fecha y abogado al tama√±o que ten√≠a antes de lo modificacion 3.25*/
 				case 3.29:
 					$query = array();
 					$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '9' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
@@ -3311,13 +3311,13 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 												  PRIMARY KEY  (`id_configuracion_categoria`)
 												) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;";
 					$query[] = "CREATE TABLE `configuracion` (
-												  `id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la p·gina de configuraciÛn.',
+												  `id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la p√°gina de configuraci√≥n.',
 												  `glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
 												  `valor_opcion` text NOT NULL,
 												  `comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
-												  `valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un n˙mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
+												  `valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un n√∫mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
 												  `id_configuracion_categoria` int(11) NOT NULL default '0',
-												  `orden` int(11) NOT NULL default '-1' COMMENT 'Orden de apariciÛn en la p·gina de configuraciÛn, -1 para no mostrar la opciÛn.',
+												  `orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparici√≥n en la p√°gina de configuraci√≥n, -1 para no mostrar la opci√≥n.',
 												  PRIMARY KEY  (`id`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 					$query[] = "ALTER TABLE `configuracion` ADD INDEX (  `id_configuracion_categoria` );";
@@ -3327,16 +3327,16 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					$query[] = "ALTER TABLE  `configuracion` ADD UNIQUE (`glosa_opcion`);";
 					$query[] = "INSERT INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`) VALUES (1, 'Datos Generales'),
 													(2, 'Datos Cobranza'),
-													(3, 'ConfiguraciÛn alertas'),
+													(3, 'Configuraci√≥n alertas'),
 													(4, 'Opciones documentos'),
 													(5, 'Administracion Reportes por Lemontech'),
 													(6, 'Configuracion por Lemontech');";
 					if( method_exists('Conf','MaxLoggedTime') )
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(31, 'MaxLoggedTime', '".Conf::MaxLoggedTime()."', 'Tiempo en segundos que dura la sesiÛn', 'string', 6, 10);";
+													(31, 'MaxLoggedTime', '".Conf::MaxLoggedTime()."', 'Tiempo en segundos que dura la sesi√≥n', 'string', 6, 10);";
 					else
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(31, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesiÛn', 'string', 6, 10);";
+													(31, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesi√≥n', 'string', 6, 10);";
 													
 					if( method_exists('Conf','MailSistema') )
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
@@ -3967,17 +3967,17 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					
 					if( method_exists('Conf','ZonaHoraria') )
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(138, 'ZonaHoraria', '".Conf::ZonaHoraria()."', 'Se debe agregar el nombre de la zona horaria que utilizar· el sistema', 'string', 6, -1);";
+													(138, 'ZonaHoraria', '".Conf::ZonaHoraria()."', 'Se debe agregar el nombre de la zona horaria que utilizar√° el sistema', 'string', 6, -1);";
 					else
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(138, 'ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizar· el sistema', 'string', 6, -1);";
+													(138, 'ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizar√° el sistema', 'string', 6, -1);";
 													
 					if( method_exists('Conf','CiudadSignatura') )
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(139, 'CiudadSignatura', '".Conf::CiudadSignatura()."', 'La ciudad ingresada aquÌ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
+													(139, 'CiudadSignatura', '".Conf::CiudadSignatura()."', 'La ciudad ingresada aqu√≠ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
 					else
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
-													(139, 'CiudadSignatura', '', 'La ciudad ingresada aquÌ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
+													(139, 'CiudadSignatura', '', 'La ciudad ingresada aqu√≠ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
 													
 					if( method_exists('Conf','NombreEmpresa') )
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
@@ -4080,7 +4080,7 @@ ADD `notificado_monto_excedido` tinyint(4) NOT NULL default '0' AFTER `notificad
 			
 			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 VALUES (
-NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lÌmites de Alerta.',  'boolean',  '6',  '20'
+NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan l√≠mites de Alerta.',  'boolean',  '6',  '20'
 );";
 
 					foreach($query as $q)
@@ -4121,7 +4121,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lÌmites de Aler
 								`monto_documento_gastos` DOUBLE NOT NULL ,
 								`id_moneda_documento` INT( 11 ) NOT NULL ,
 								PRIMARY KEY ( `id_factura` , `id_cobro` ) 
-								) ENGINE = INNODB COMMENT = 'RelaciÛn de facturas que incluyen cobros';";
+								) ENGINE = INNODB COMMENT = 'Relaci√≥n de facturas que incluyen cobros';";
 
 					$query[] = "ALTER TABLE `factura_cobro` ADD `impuesto_factura` DOUBLE NOT NULL DEFAULT '0' AFTER `monto_factura` ;";
 
@@ -4148,8 +4148,8 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lÌmites de Aler
 
 
 					$query[] = "INSERT INTO `prm_documento_legal` VALUES  (1,'Factura'),
-						 (2,'Nota de crÈdito'),
-						 (3,'Nota de dÈbito'),
+						 (2,'Nota de cr√©dito'),
+						 (3,'Nota de d√©bito'),
 						 (4,'Boleta');";
 
 					$query[] = "
@@ -4315,7 +4315,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lÌmites de Aler
 				
 				case 3.54:
 					$query = array();
-					$query[] = "ALTER TABLE `prm_documento_legal` ADD `numero_inicial` INT NOT NULL COMMENT 'ultimo numero usado como instalaciÛn del documento legal para usar correlativo';";
+					$query[] = "ALTER TABLE `prm_documento_legal` ADD `numero_inicial` INT NOT NULL COMMENT 'ultimo numero usado como instalaci√≥n del documento legal para usar correlativo';";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
@@ -4390,7 +4390,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lÌmites de Aler
 				
 				case 3.59:
 					$query = array();
-					$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACTURA', 'FacturaciÛn', '/app/interfaces/mantencion_facturacion.php', '', '', 0, 300, 'ADMIN_SIS');";
+					$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACTURA', 'Facturaci√≥n', '/app/interfaces/mantencion_facturacion.php', '', '', 0, 300, 'ADMIN_SIS');";
 					$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACTURA');";
 				
 					foreach($query as $q)
@@ -4438,7 +4438,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 					$query = array();
 					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
-												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retenciÛn',  'boolean',  '6',  '-1'
+												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retenci√≥n',  'boolean',  '6',  '-1'
 												);";
 												
 				foreach($query as $q)
@@ -4464,7 +4464,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 					$query = array();
 					$query[] = " INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
-													NULL ,  'MonedaTarifaPorDefecto',  '".$glosa_moneda_base."',  '',  'select;Peso;DÛlar;UF;UTM;Euro;UTA',  '2',  '299'
+													NULL ,  'MonedaTarifaPorDefecto',  '".$glosa_moneda_base."',  '',  'select;Peso;D√≥lar;UF;UTM;Euro;UTA',  '2',  '299'
 													);";
 													
 				foreach($query as $q)
@@ -5162,7 +5162,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 					$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo`
 												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_4` FOREIGN KEY (`id_mvto_pago`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE,
 												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_3` FOREIGN KEY (`id_mvto_deuda`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE;";
-					$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'RazÛn Social Cliente'";
+					$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'Raz√≥n Social Cliente'";
 					
 					
 					foreach($query as $q)
@@ -5294,7 +5294,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 
 					$query[] = "ALTER TABLE  `prm_moneda` ADD  `glosa_moneda_plural` VARCHAR( 100 ) NOT NULL COMMENT  'este campo se usa principalmente en cambiar montos por palabras' AFTER `glosa_moneda` ;";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =  'Pesos' WHERE glosa_moneda =  'Peso'";
-					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'DÛlares' WHERE glosa_moneda =  'DÛlar'";
+					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'D√≥lares' WHERE glosa_moneda =  'D√≥lar'";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Euros' WHERE glosa_moneda =  'Euro'";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Soles' WHERE glosa_moneda =  'Soles'";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'UF' WHERE glosa_moneda =  'UF'";
@@ -5324,23 +5324,6 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
   `orden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id_concepto`)
 );";
-					$query[] = "INSERT INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
-(1, 'Cobranza al 100%', 0, 2),
-(2, 'Cobranza de detracciÛn 12%', 0, 6),
-(3, 'ComisiÛn y gastos bancarios', 0, 7),
-(4, 'RetenciÛn', 0, 15),
-(5, 'Dscto. nota de credito', 0, 8),
-(6, 'Cobranza al 88%', 0, 3),
-(7, 'Gastos Financieros', 0, 10),
-(8, 'Pago a cuenta', 0, 13),
-(9, 'Saldo de factura', 0, 14),
-(10, 'Pago por canje', 0, 12),
-(11, 'Otros ingresos', 0, 11),
-(12, 'Ajuste por tipo de cambio', 0, 1),
-(13, 'Cobranza al 6%', 0, 4),
-(14, 'Cobranza al 94%', 0, 5),
-(15, 'Dscto. nota de credito parcial', 0, 9),
-(16, 'Concepto pagado', 0, 16);";
 					$query[] = "ALTER TABLE  `factura_pago` ADD  `id_concepto` INT NOT NULL COMMENT  'es la glosa que se muestra en el voucher';";
 
 					foreach($query as $q)
@@ -5353,6 +5336,24 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 
 					$query[] = 	"ALTER TABLE  `prm_factura_pago_concepto` ADD  `pje_variable` INT NOT NULL COMMENT  'si es 1, se hace un replace de % por el % que corresponda' AFTER  `glosa` ;";
 				
+					$query[] = "INSERT INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
+(1, 'Cobranza al 100%', 0, 2),
+(2, 'Cobranza de detracci√≥n 12%', 0, 6),
+(3, 'Comisi√≥n y gastos bancarios', 0, 7),
+(4, 'Retenci√≥n', 0, 15),
+(5, 'Dscto. nota de credito', 0, 8),
+(6, 'Cobranza al 88%', 0, 3),
+(7, 'Gastos Financieros', 0, 10),
+(8, 'Pago a cuenta', 0, 13),
+(9, 'Saldo de factura', 0, 14),
+(10, 'Pago por canje', 0, 12),
+(11, 'Otros ingresos', 0, 11),
+(12, 'Ajuste por tipo de cambio', 0, 1),
+(13, 'Cobranza al 6%', 0, 4),
+(14, 'Cobranza al 94%', 0, 5),
+(15, 'Dscto. nota de credito parcial', 0, 9),
+(16, 'Concepto pagado', 0, 16);";
+
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5484,7 +5485,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						while(list($glosa)=mysql_fetch_array($resp_consulta))
 							$valores_posibles .= ";$glosa";
 							
-						$query = array():
+						$query = array();
 						$query[] = "ALTER TABLE  `contrato` CHANGE  `centro_costo`  `centro_costo` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT  'Depricated, no se usa'";
 						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
@@ -5518,6 +5519,13 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
+					break;
+			
+					case 4.25:
+						$query = array();
+						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ValidacionesCliente', '0', NULL , 'boolean', '6', '-1');";
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
  	}
@@ -5714,8 +5722,9 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.22;
 	$VERSIONES[$num++] = 4.23;
 	$VERSIONES[$num++] = 4.24;
+	$VERSIONES[$num++] = 4.25;
 
-/* LISTO, NO MODIFICAR NADA M¡S A PARTIR DE ESTA LÕNEA */
+/* LISTO, NO MODIFICAR NADA M√ÅS A PARTIR DE ESTA L√çNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 {
@@ -5746,19 +5755,19 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
     require_once dirname(__FILE__).'/../app/classes/Documento.php';
 
 	if( $_GET['hash'] != Conf::Hash() )
-		die('Credenciales inv·lidas.');
+		die('Credenciales inv√°lidas.');
 
 	$versionFileName = dirname(__FILE__).'/../app/version.php';
 
 	if( !file_exists($versionFileName) )
-		die('Error, el archivo de versiÛn no se encuentra.');
+		die('Error, el archivo de versi√≥n no se encuentra.');
 	if( !is_writable($versionFileName) )
-		die('Error, el archivo de versiÛn no se puede escribir.');
+		die('Error, el archivo de versi√≥n no se puede escribir.');
 
     require_once $versionFileName;
 
 	if( !isset($VERSION) or $VERSION < 0.01 )
-		die('Error en la versiÛn del software.');
+		die('Error en la versi√≥n del software.');
 
 	$sesion = new Sesion();
 
@@ -5766,7 +5775,7 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 	{
 		if( $VERSION <  $new_version )
 		{
-			echo '<hr>Comienzo de proceso de cambios para versiÛn '.number_format($new_version,2,'.','').'<br>';
+			echo '<hr>Comienzo de proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').'<br>';
 
 			try
 			{
@@ -5786,13 +5795,13 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 				if(!mysql_query("ROLLBACK", $sesion->dbh))
 					echo 'Error en ROLLBACK: '.mysql_error($sesion->dbh);
 
-				echo 'Error en proceso de cambios para versiÛn '.number_format($new_version,2,'.','').'<br>';
-				echo( 'Se encontrÛ un error: '.$exc->getMessage() );
+				echo 'Error en proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').'<br>';
+				echo( 'Se encontr√≥ un error: '.$exc->getMessage() );
 				exit(1);
 			}
 
 			GuardarVersion( $versionFileName, $new_version );
-			echo 'Proceso de cambios para versiÛn '.number_format($new_version,2,'.','').' finalizado<br>';
+			echo 'Proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').' finalizado<br>';
 		}
 	}
 

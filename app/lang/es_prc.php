@@ -18,7 +18,7 @@
 	$_LANG['Dolar']     = "Dólar Americano";
 	
 	# Menú
-	$_LANG['Cobranza']  = "Liquidación";
+	$_LANG['Cobranza']  = "Facturación";
 	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
 	$_LANG['Seguimiento Cobros'] = "Seguimiento Liquidaciones";
 	$_LANG['Seguimiento de cobros'] = "Seguimiento de Liquidaciones";
@@ -130,5 +130,6 @@
 	$_LANG['ParafoGastosSoloSiHayGastos'] = "Solo imprime parafo de gastos si la liquidación tiene gastos";
 	$_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de asuntos si la liquidación tiene trabajos";
 	$_LANG['borradores'] = "pre-liquidaciones";
-
+	$_LANG['Descargar Archivo'] = "Pre-liquidación";
+	$_LANG['Descargar Excel'] = "Planillón Excel";
 ?>
