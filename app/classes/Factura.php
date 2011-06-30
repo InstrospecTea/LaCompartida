@@ -482,7 +482,7 @@ class Factura extends Objeto
 						/*
 						Montos Rebaza-alcazar
 						*/
-
+						
 						if(( method_exists('Conf','GetConf') && (Conf::GetConf($this->sesion,'DesgloseFactura')=='con_desglose')))
 						{
 							$html2 = str_replace('%honorarios%', number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
@@ -509,6 +509,9 @@ class Factura extends Objeto
 							$impuesto = number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 							$html2 = str_replace('%suma_montos_sin_iva%', $suma_monto_sin_iva, $html2);
+
+							$monto_subtotal_honorario_y_gastos = $monto_subtotal + $subtotal_gastos + $subtotal_gastos_sin_impuesto;
+							$html2 = str_replace('%monto_subtotal_honorario_y_gastos%', number_format($monto_subtotal_honorario_y_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 							$html2 = str_replace('%suma_montos_solo_iva%', $impuesto, $html2);
 							$html2 = str_replace('%suma_monto_con_iva%', $suma_monto_con_iva, $html2);
 

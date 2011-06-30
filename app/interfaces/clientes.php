@@ -133,13 +133,13 @@ else { ?>
 				</td>
 			</tr>
 			<tr>
-				<td align=right>
+				<td align=right class=cvs>
 					<?=__('Fecha')?>
 				</td>
-				<td nowrap align=left>
+				<td nowrap align=left class=cvs>
 					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
 					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
-					<?=__('Hasta')?>
+					&nbsp;&nbsp;<?=__('Hasta')?>
 					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
 				</td>

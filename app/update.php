@@ -4608,6 +4608,27 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 
 
 
+				case 3.76:
+					$query = array();
+
+					$q = "DESCRIBE cliente;";
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					$campos = array();
+					while(list($campos[]) = mysql_fetch_array($res));
+
+					if(!in_array('fecha_creacion', $campos)){
+						$query[] = "ALTER TABLE `cliente` ADD `fecha_creacion` DATETIME NOT NULL , ADD `fecha_modificacion` DATETIME NOT NULL ;";
+
+						$q = "SELECT codigo_cliente, min( fecha_creacion ) FROM contrato GROUP BY codigo_cliente;";
+						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+						while(list($codigo, $fecha) = mysql_fetch_array($res)){
+							$query[] = "UPDATE cliente set fecha_creacion = '$fecha' WHERE codigo_cliente = '$codigo';";
+						}
+					}
+
+					foreach($query as $q)
+						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
 
 
 
@@ -5539,6 +5560,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
+					//este cambio se implemento paralelamente en la version antigua (case 3.76), asi q primero se revisa si el campo ya se habia agregado para no tratar de hacerlo de nuevo
 					case 4.27:
 						$query = array();
 
