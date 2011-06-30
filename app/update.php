@@ -5431,7 +5431,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-
+					
 					case 4.20:
 						$query = array();
 						$query[] = "ALTER TABLE `factura_pago` ADD `monto_moneda_cobro` DOUBLE NOT NULL COMMENT 'monto en la moneda del cobro' AFTER `id_moneda` ;";
@@ -5445,7 +5445,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-
+					
 					case 4.21:
 						$query = array();
 						$query[] = "ALTER TABLE  `factura` ADD  `porcentaje_impuesto` DOUBLE NOT NULL COMMENT  'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos';";
@@ -5454,7 +5454,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-
+					
 					case 4.22:
 						$query = array();
 						$query[] = "CREATE TABLE `usuario_cambio_historial` (
@@ -5471,7 +5471,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-
+					
 					case 4.23:
 						$query_consulta = "SELECT glosa_moneda FROM prm_moneda";
 						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
@@ -5528,6 +5528,59 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
+					case 4.26:
+						$query = array();
+						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'N°', `glosa_en` =  'N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =1 LIMIT 1 ;";
+						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Factura N°', `glosa_en` =  'Invoice N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =48 LIMIT 1 ;";
+						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Minuta de cobro N°', `glosa_en` =  'Bill of charge N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =49 LIMIT 1 ;";
+						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'N°', `glosa_en` =  'N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =52 LIMIT 1 ;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.27:
+						$query = array();
+
+						$q = "DESCRIBE cliente;";
+						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+						$campos = array();
+						while(list($campos[]) = mysql_fetch_array($res));
+
+						if(!in_array('fecha_creacion', $campos)){
+							$query[] = "ALTER TABLE `cliente` ADD `fecha_creacion` DATETIME NOT NULL , ADD `fecha_modificacion` DATETIME NOT NULL ;";
+
+							$q = "SELECT codigo_cliente, min( fecha_creacion ) FROM contrato GROUP BY codigo_cliente;";
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+							while(list($codigo, $fecha) = mysql_fetch_array($res)){
+								$query[] = "UPDATE cliente set fecha_creacion = '$fecha' WHERE codigo_cliente = '$codigo';";
+							}
+						}
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.28:
+						$query_consulta = "SELECT count(*) FROM tramite_tarifa";
+						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+						list($cantidad) = mysql_fetch_array($resp_consulta);
+						
+						$query = array();
+						if( $cantidad = 0 )
+							$query[] = "INSERT INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
+															 VALUES ( '1',  'TARIFA BASE',  '0000-00-00 00:00:00', NULL ,  '1',  '1' );";
+						
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+														VALUES (
+														NULL ,  'MaxDuracionTrabajo',  '14',  'duración maxima que puede tener un trabajo',  'numero',  '2',  '240'
+														);"
+							
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh)))
+								throw new Exception($q."---".mysql_error());
+					break;
+>>>>>>> .r2993
  	}
 }
 
@@ -5723,6 +5776,9 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.23;
 	$VERSIONES[$num++] = 4.24;
 	$VERSIONES[$num++] = 4.25;
+	$VERSIONES[$num++] = 4.26;
+	$VERSIONES[$num++] = 4.27;
+	$VERSIONES[$num++] = 4.28;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

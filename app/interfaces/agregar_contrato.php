@@ -72,6 +72,9 @@
 		$show = 'none';
 
 
+	$validaciones_segun_config = method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente');
+	$obligatorio = '<span class="req">*</span>';
+
 	#CONTRATO GUARDA
 	if($opcion_contrato == "guardar_contrato" && $popup && !$motivo)
 	{
@@ -855,7 +858,8 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<table id='datos_factura' style='display:<?=$show?>'>
 	<tr>
 		<td align="right" width='20%'>
-			<?=__('ROL/RUT')?>
+			<?=__('ROL/RUT') ?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="3">
         	<input type="text" size=20 name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ?>" onblur="validarUnicoCliente(this.value,'rut');" />
@@ -864,6 +868,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
    	<tr>
 		<td align="right" colspan="1">
 			<?=__('Razón Social')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<input name='factura_razon_social' size=50 value="<?= $contrato->fields['factura_razon_social'] ?>"  />
@@ -872,6 +877,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<tr>
 		<td align="right" colspan="1">
 			<?=__('Giro')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<input name='factura_giro' size=50 value="<?= $contrato->fields['factura_giro'] ?>"  />
@@ -880,6 +886,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<tr>
 		<td align="right" colspan="1">
 			<?=__('Dirección')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<textarea name='factura_direccion' rows=4 cols="55" ><?= $contrato->fields['factura_direccion'] ?></textarea>
@@ -888,6 +895,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<tr>
 		<td align="right" colspan="1">
 			<?=__('Teléfono')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<input name='cod_factura_telefono' size=8 value="<?= $contrato->fields['cod_factura_telefono'] ?>" />&nbsp;<input name='factura_telefono' size=30 value="<?= $contrato->fields['factura_telefono'] ?>" />
@@ -896,6 +904,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<tr>
 		<td align="right" colspan="1">
 			<?=__('Glosa factura')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<textarea name='glosa_contrato' rows=4 cols="55" ><?= $contrato->fields['glosa_contrato'] ?></textarea>
@@ -920,6 +929,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto')
 	<tr>
 		<td align="right" width="20%">
 			<?=__('Titulo')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan='3'>
 			<?= Html::SelectQuery($sesion, "SELECT titulo, glosa_titulo FROM prm_titulo_persona ORDER BY id_titulo","titulo_contacto", $contrato->fields['titulo_contacto'] ? $contrato->fields['titulo_contacto'] : '', '','Vacio',65); ?>&nbsp;&nbsp;
@@ -928,6 +938,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto')
 	<tr>
 		<td align="right" width='20%'>
 			<?=__('Nombre')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align='left' colspan='3'>
 			<input type="text" size='55' name="nombre_contacto" id="nombre_contacto" value="<?= $contrato->fields['contacto'] ?>" />
@@ -936,6 +947,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto')
 	<tr>
 		<td align="right" width='20%'>
 			<?=__('Apellido')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align='left' colspan='3'>
 			<input type="text" size='55' name="apellido_contacto" id="apellido_contacto" value="<?= $contrato->fields['apellido_contacto'] ?>"  />
@@ -949,6 +961,7 @@ else
 	<tr>
 		<td align="right" width='20%'>
 			<?=__('Nombre')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align='left' colspan='3'>
 			<input type="text" size='55' name="contacto" id="contacto" value="<?= $contrato->fields['contacto'] ?>"  />
@@ -960,6 +973,7 @@ else
     <tr>
 		<td align="right" colspan="1">
 			<?=__('Teléfono')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<input name='fono_contacto_contrato' size=30 value="<?= $contrato->fields['fono_contacto'] ?>" />
@@ -968,6 +982,7 @@ else
     <tr>
 		<td align="right" colspan="1">
 			<?=__('E-mail')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<input name='email_contacto_contrato' size=55 value="<?= $contrato->fields['email_contacto'] ?>"  />
@@ -976,6 +991,7 @@ else
     <tr>
 		<td align="right" colspan="1">
 			<?=__('Dirección envío')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?= $contrato->fields['direccion_contacto'] ?></textarea>
@@ -1023,10 +1039,12 @@ else
 			<tr>
 				<td align="right" width="25%" style="font-size:10pt;">
 					<?=__('Tarifa horas')?>
+					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td align="left" width="75%" style="font-size:10pt;">
 					<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, ""); ?>&nbsp;&nbsp;
 					<?=__('Tarifa en')?>
+					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 					<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda();"','',"80"); ?>&nbsp;&nbsp;
 					<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
 					<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
@@ -1035,6 +1053,7 @@ else
 		  <tr>
 				<td align="right" style="font-size:10pt;">
 					<?=__('Forma de cobro')?>
+					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 	<?
 				if(!$contrato->fields['forma_cobro'])
@@ -1057,22 +1076,34 @@ else
 					</div>
 					<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id=div_forma_cobro>
 						<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
-							&nbsp;<?=__('Monto')?>&nbsp;<input id='monto' name=monto size="7" value="<?= $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
-							&nbsp;&nbsp;<?=__('Moneda')?>&nbsp;<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"','',"80"); ?>
+							&nbsp;<?=__('Monto')?>
+							<?php if ($validaciones_segun_config) echo $obligatorio ?>
+							&nbsp;<input id='monto' name=monto size="7" value="<?= $contrato->fields['monto'] ?>" onchange="actualizarMonto();"/>&nbsp;&nbsp;
+							&nbsp;&nbsp;<?=__('Moneda')?>
+							<?php if ($validaciones_segun_config) echo $obligatorio ?>
+							&nbsp;<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"','',"80"); ?>
 						</div>
 						<div id="div_horas" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							&nbsp;<?=__('Horas')?>
+							<?php if ($validaciones_segun_config) echo $obligatorio ?>
 							&nbsp;<input name=retainer_horas size="7" value="<?= $contrato->fields['retainer_horas'] ?>" />
 						</div>
 						<div id="div_fecha_cap" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							<table style='border: 0px solid' bgcolor='#C6DEAD'>
 							<? if($cobro){ ?>
 							<tr>
-								<td><?=__('Monto utilizado')?>:</td><td align=left>&nbsp;<label style='background-color:#FFFFFF'> <?=$cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0;?> </label></td>
+								<td>
+									<?=__('Monto utilizado')?>:
+									<?php if ($validaciones_segun_config) echo $obligatorio ?>
+								</td>
+								<td align=left>&nbsp;<label style='background-color:#FFFFFF'> <?=$cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0;?> </label></td>
 							</tr>
 							<? }?>
 							<tr>
-								<td><?=__('Fecha inicio')?>:</td>
+								<td>
+									<?=__('Fecha inicio')?>:
+									<?php if ($validaciones_segun_config) echo $obligatorio ?>
+								</td>
 								<td align="left">
 									<input type="text" name="fecha_inicio_cap" value="<?= Utiles::sql2date($contrato->fields['fecha_inicio_cap']) ?>" id="fecha_inicio_cap" size="11" maxlength="10" />
 									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_inicio_cap" style="cursor:pointer" />
@@ -1084,7 +1115,10 @@ else
 				</td>
 			</tr>
 			<tr>
-				<td align="right" colspan='1' style="font-size:10pt;"><?=__('Mostrar total en')?>:</td>
+				<td align="right" colspan='1' style="font-size:10pt;">
+				<?=__('Mostrar total en')?>:
+				<?php if ($validaciones_segun_config) echo $obligatorio ?>
+				</td>
 				<td align="left">
 					<?=Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$contrato->fields['opc_moneda_total'] ? $contrato->fields['opc_moneda_total'] : $opc_moneda_total,'style="font-size:10pt;"','','60')?>
 					<span id="monedas_para_honorarios_y_gastos" style="display: none">
@@ -1098,7 +1132,10 @@ else
 				<td colspan="2"><hr size="1"></td>
 			</tr>
 			<tr>
-				<td align="right"><?=__('Descuento')?></td>
+				<td align="right">
+					<?=__('Descuento')?>
+					<?php if ($validaciones_segun_config) echo $obligatorio ?>
+				</td>
 				<td align="left">
 					<input type=text name=descuento id=descuento size=6 value=<?=$contrato->fields['descuento']?>> <input type=radio name=tipo_descuento id=tipo_descuento value='VALOR' <?=$contrato->fields['tipo_descuento'] == 'VALOR' ? 'checked="checked"' : '' ?> /><?=__('Valor')?>
 					<br>
@@ -1111,6 +1148,7 @@ else
 			<tr>
 				<td align="right">
 					<?=__('Detalle Cobranza')?>
+					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td align="left">
 					<textarea name="observaciones" rows="3" cols="47"><?=$contrato->fields['observaciones'] ? $contrato->fields['observaciones'] : '' ?></textarea>

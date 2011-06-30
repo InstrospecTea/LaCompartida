@@ -12,7 +12,9 @@
 	$pagina = new Pagina($sesion);
 	$rut_limpio = Utiles::LimpiarRut($rut);
 	$usuario = new UsuarioExt($sesion, $rut_limpio);
-	
+
+	$validaciones_segun_config = method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente');
+	$obligatorio = '<span style="color:#ff0000;font-size:10px;vertical-align:top;">*</span>';
 
 	if($opc == "eliminar")
 	{
@@ -29,8 +31,6 @@
 	{
 		//Arreglo Original, antes de guardar los cambios $arr1
 		$arr1 = $usuario->fields;
-		if($email == "")
-			$pagina->AddError(__('Debe ingresar el e-mail del usuario'));
 
 		$usuario->Edit('rut', Utiles::LimpiarRut($rut));
 		$usuario->Edit('dv_rut', $dv_rut);
@@ -38,21 +38,10 @@
 		$usuario->Edit('apellido1', $apellido1);
 		$usuario->Edit('apellido2', $apellido2);
 		
-		if(!$username)
+		if(empty($username) and !$validaciones_segun_config)
 			$username = $nombre.' '.$apellido1.' '.$apellido2;
-		
-		$query = "SELECT count(*) FROM usuario WHERE username = '".addslashes($username)."' AND username != '".addslashes($usuario->fields['username'])."'";
-		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		list($cantidad) = mysql_fetch_array($resp);
-		
-		$focus_username = false;
-		if($cantidad > 0)
-		{
-			$pagina->AddError(__('El Código Usuario ingresado ya existe.'));
-			$focus_username = true;
-		}
-		else
-			$usuario->Edit('username', $username);
+		$usuario->Edit('username', $username);
+			
 		$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
 		$usuario->Edit('id_area_usuario', $id_area_usuario);
 		$usuario->Edit('telefono1', $telefono1);
@@ -76,49 +65,54 @@
 		$usuario->Edit('alerta_revisor', $alerta_revisor);
 		//$usuario->Edit('id_moneda_costo', $id_moneda_costo);
 		
-		//Compara y guarda cambios en los datos del Usuario
-		$usuario->GuardaCambiosUsuario($arr1, $usuario->fields);
-		
-	 	if( $usuario->loaded )
+		$usuario->Validaciones($arr1, $pagina, $validaciones_segun_config);
+		$errores = $pagina->GetErrors();
+		if (empty($errores))
 		{
-			if( $usuario->Write() )
+			//Compara y guarda cambios en los datos del Usuario
+			$usuario->GuardaCambiosUsuario($arr1, $usuario->fields);
+			
+		 	if( $usuario->loaded )
 			{
-				CargarPermisos();
-        $usuario->GuardarSecretario($usuario_secretario);
-				$usuario->GuardarRevisado($arreglo_revisados);
-				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
-				$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
-				$pagina->AddInfo( __('Usuario editado con éxito.'));
+				if( $usuario->Write() )
+				{
+					CargarPermisos();
+	        		$usuario->GuardarSecretario($usuario_secretario);
+					$usuario->GuardarRevisado($arreglo_revisados);
+					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
+					$usuario->GuardarVacacion($vacaciones_fecha_inicio, $vacaciones_fecha_fin);
+					$pagina->AddInfo( __('Usuario editado con éxito.'));
+				}
+				else
+				{
+					$pagina->AddError( $usuario->error );
+				}
 			}
 			else
 			{
-				$pagina->AddError( $usuario->error );
+				$new_password = Utiles::NewPassword();
+				$usuario->Edit('password', md5( $new_password ) );
+	
+				if( $usuario->Write() )
+				{
+					CargarPermisos();
+					$usuario->GuardarSecretario($usuario_secretario);
+					$usuario->GuardarRevisado($arreglo_revisados);
+					$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
+					$pagina->AddInfo( __('Usuario ingresado con éxito, su nuevo password es').' '.$new_password );
+				}
+				else
+				{
+					$pagina->AddError( $usuario->error );
+				}
 			}
-		}
-		else
-		{
-			$new_password = Utiles::NewPassword();
-			$usuario->Edit('password', md5( $new_password ) );
-
-			if( $usuario->Write() )
-			{
-				CargarPermisos();
-				$usuario->GuardarSecretario($usuario_secretario);
-				$usuario->GuardarRevisado($arreglo_revisados);
-				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'],$usuario->fields['id_categoria_usuario']);
-				$pagina->AddInfo( __('Usuario ingresado con éxito, su nuevo password es').' '.$new_password );
+			$lista_monedas = new ListaObjetos($sesion,"","SELECT * FROM prm_moneda");
+		    for($x=0;$x<$lista_monedas->num;$x++)
+		    {
+					$moneda = $lista_monedas->Get($x);
+					if($mon_costo[$moneda->fields['id_moneda']] != 0)
+						$usuario->GuardarCosto($moneda->fields['id_moneda'],$mon_costo[$moneda->fields['id_moneda']]);
 			}
-			else
-			{
-				$pagina->AddError( $usuario->error );
-			}
-		}
-		$lista_monedas = new ListaObjetos($sesion,"","SELECT * FROM prm_moneda");
-    for($x=0;$x<$lista_monedas->num;$x++)
-    {
-			$moneda = $lista_monedas->Get($x);
-			if($mon_costo[$moneda->fields['id_moneda']] != 0)
-				$usuario->GuardarCosto($moneda->fields['id_moneda'],$mon_costo[$moneda->fields['id_moneda']]);
 		}
 	}
 	else if($opc == 'pass' and $usuario->loaded)
@@ -319,17 +313,19 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('Nombre Completo')?>
+			<span class="req">*</span>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<input type="text" name="nombre" value="<?=$usuario->fields['nombre'] ? $usuario->fields['nombre'] : $nombre ?>" size="30" style=""/> <span class="req">*</span>
+			<input type="text" name="nombre" value="<?=$usuario->fields['nombre'] ? $usuario->fields['nombre'] : $nombre ?>" size="30" style=""/>
 		</td>
 	</tr>
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('Apellido Paterno')?>
+			<span class="req">*</span>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<input type="text" name="apellido1" value="<?=$usuario->fields['apellido1'] ? $usuario->fields['apellido1'] : $apellido1 ?>" size="20" style=""/> <span class="req">*</span>
+			<input type="text" name="apellido1" value="<?=$usuario->fields['apellido1'] ? $usuario->fields['apellido1'] : $apellido1 ?>" size="20" style=""/>
 		</td>
 	</tr>
 	<tr>
@@ -343,6 +339,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('Código Usuario')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td valign="top" class="texto" align="left">
 			<input type="text" name="username" id="username" value="<?=$usuario->fields['username'] ? $usuario->fields['username'] : $username ?>" size="20" style=""/>
@@ -351,6 +348,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('Categoría Usuario')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td valign="top" class="texto" align="left">
 			<?=Html::SelectQuery($sesion,'SELECT id_categoria_usuario,glosa_categoria FROM prm_categoria_usuario ORDER BY id_categoria_usuario','id_categoria_usuario', $usuario->fields['id_categoria_usuario'] ? $usuario->fields['id_categoria_usuario'] : $id_categoria_usuario ,$usuario->loaded ? "onchange=Cambiar_Usuario_Categoria('".$usuario->fields['id_usuario']."','id_categoria_usuario','cambiar_tarifa_usuario'); " : "")?>
@@ -359,6 +357,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('Área Usuario')?>
+			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td valign="top" class="texto" align="left">
 			<?=Html::SelectQuery($sesion,'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa','id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario)?>
@@ -417,9 +416,10 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 	<tr>
 		<td valign="top" class="texto" align="right">
 			<?=__('E-Mail')?>
+			<span class="req">*</span>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<input type="text" name="email" value="<?=$usuario->fields['email'] ? $usuario->fields['email'] : $email ?>" size="30"/> <span class="req">*</span>
+			<input type="text" name="email" value="<?=$usuario->fields['email'] ? $usuario->fields['email'] : $email ?>" size="30"/>
 		</td>
 	</tr>
 

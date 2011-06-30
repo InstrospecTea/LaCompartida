@@ -411,5 +411,41 @@ class UsuarioExt extends Usuario
 		}
 		return $lista;
 	}
+	
+	public function Validaciones($usuario_sin_modificar, $pagina, $validar_segun_conf = false)
+	{
+		if ($this->ExisteCodigo($usuario_sin_modificar['username']))
+		{
+			$pagina->AddError(__('El Código Usuario ingresado ya existe.'));
+		}
+		
+		if (empty($this->fields["nombre"])) $pagina->AddError(__('Debe ingresar el nombre del usuario'));
+		if (empty($this->fields["apellido1"])) $pagina->AddError(__('Debe ingresar el apellido paterno del usuario'));
+		if (empty($this->fields["email"])) $pagina->AddError(__('Debe ingresar el e-mail del usuario'));
+		
+		if ($validar_segun_conf)
+		{
+			if (empty($this->fields["username"])) $pagina->AddError(__('Debe ingresar el código usuario'));
+			//if (empty($this->fields["apellido2"])) $pagina->AddError(__('Debe ingresar el apellido materno del usuario'));
+			if (empty($this->fields["id_categoria_usuario"])) $pagina->AddError(__('Debe ingresar la categoría del usuario'));
+			if (empty($this->fields["id_area_usuario"])) $pagina->AddError(__('Debe ingresar el área del usuario'));
+		}
+	}
+	
+	public function ExisteCodigo($username_anterior)
+	{
+		if (empty($this->fields["username"]))
+		{
+			return false;
+		}
+		$query = "SELECT count(*) FROM usuario WHERE username = '" . addslashes($this->fields["username"]) . "' AND username != '" . addslashes($username_anterior) . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__, $this->sesion->dbh);
+		list($cantidad) = mysql_fetch_array($resp);
+		if($cantidad > 0)
+		{
+			return true;
+		}
+		return false;
+	}
 }
 ?>

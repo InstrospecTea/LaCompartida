@@ -41,7 +41,10 @@
 			$codigo_cliente=$cliente->AsignarCodigoCliente();
 			$cliente->fields['codigo_cliente']=$codigo_cliente;
 	}
-		
+	
+	$validaciones_segun_config = method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente');
+	$obligatorio = '<span class="req">*</span>';
+
     if($opcion == "guardar")
     {
         #Validaciones
@@ -95,8 +98,8 @@
             }
         	}
         
-        //Validaciones por configuración
-        if (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente'))
+        //Validaciones segun la configuración
+        if ($validaciones_segun_config)
 		{
 			if (empty($glosa_cliente)) $pagina->AddError(__("Por favor ingrese la nombre del cliente"));
 			if (empty($codigo_cliente)) $pagina->AddError(__("Por favor ingrese el codigo del cliente"));
@@ -701,6 +704,7 @@ else { ?>
 <tr>
 	<td align="right">
 		<?=__('Codigo')?>
+		<?php if ($validaciones_segun_config) echo $obligatorio ?>
 	</td>
 	<td align="left">
 		<input type="text" name="codigo_cliente" size="5" maxlength="5" <?= $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?= $cliente->fields['codigo_cliente'] ?>" onchange="this.value=this.value.toUpperCase()" />
@@ -721,15 +725,16 @@ else { ?>
 <tr>
 	<td align="right">
 		<?=__('Nombre')?>
+		<span style="color:#FF0000; font-size:10px">*</span>
 	</td>
 	<td align="left">
 		<input name="glosa_cliente" id="glosa_cliente" size="50" value="<?= $cliente->fields['glosa_cliente'] ?>"  />
-		<span style="color:#FF0000; font-size:10px">*</span>
 	</td>
 </tr>
 <tr>
 	<td align="right">
 		<?=__('Grupo')?>
+		<?php if ($validaciones_segun_config) echo $obligatorio ?>
 	</td>
 	<td align="left">
 		<?= Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno') ) ?>
@@ -745,7 +750,10 @@ else { ?>
                 OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
 ?>
 <tr>
-	<td align="right"><?=__('Usuario encargado')?></td>
+	<td align="right">
+		<?=__('Usuario encargado')?>
+		<?php if ($validaciones_segun_config) echo $obligatorio ?>
+	</td>
 	<td align="left">&nbsp;<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM 
 				usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional 
 				WHERE $where AND usuario.activo=1 AND usuario.visible=1

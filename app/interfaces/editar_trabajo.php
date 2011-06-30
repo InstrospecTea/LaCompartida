@@ -904,7 +904,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
-<input type=hidden name=max_hora id=max_hora value=14 />
+<input type=hidden name=max_hora id=max_hora value=<?=Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
 <input type=hidden name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?=$t->fields['codigo_asunto']?>" />
 <?
 	if( $opcion != 'nuevo' )
@@ -1144,7 +1144,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		if( Conf::GetConf($sesion,'TipoIngresoHoras')=='selector' )
 		{ 
 			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, Conf::GetConf($sesion,'MaxDuracionTrabajo'), '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
 		}
 		else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' )
 		{
@@ -1162,7 +1162,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		if(Conf::TipoIngresoHoras()=='selector')
 		{ 
 			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, Conf::GetConf($sesion,'MaxDuracionTrabajo'), '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
 		}
 		else if(Conf::TipoIngresoHoras()=='decimal')
 		{
@@ -1213,7 +1213,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
 			{
 				$duracion_cobrada = '00:00:00';
-				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, 14);
+				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, Conf::GetConf($sesion,'MaxDuracionTrabajo'));
 			}
 			else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
 			{
@@ -1231,7 +1231,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			if(Conf::TipoIngresoHoras()=='selector')
 			{
 				$duracion_cobrada = '00:00:00';
-				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, 14);
+				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, Conf::GetConf($sesion,'MaxDuracionTrabajo'));
 			}
 			else if(Conf::TipoIngresoHoras()=='decimal')
 			{

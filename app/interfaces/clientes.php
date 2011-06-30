@@ -133,6 +133,18 @@ else { ?>
 				</td>
 			</tr>
 			<tr>
+				<td align=right>
+					<?=__('Fecha')?>
+				</td>
+				<td nowrap align=left>
+					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+					<?=__('Hasta')?>
+					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+				</td>
+			</tr>
+			<tr>
 				<td align=right class=cvs>
 					<?=__('Solo Activos')?>
 				</td>
@@ -151,7 +163,22 @@ else { ?>
 	</fieldset>
 </td></tr></table>
 </form>
-
+<script type="text/javascript">
+Calendar.setup(
+	{
+		inputField	: "fecha1",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha1"		// ID of the button
+	}
+);
+Calendar.setup(
+	{
+		inputField	: "fecha2",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha2"		// ID of the button
+	}
+);
+</script>
 <?
 	if($buscar)
 	{
@@ -175,6 +202,12 @@ else { ?>
 		if( $id_grupo_cliente > 0 )
 		{
 			$where .= " AND cliente.id_grupo_cliente = ".$id_grupo_cliente."";
+		}
+		if(!empty($fecha1)){
+			$where .= " AND cliente.fecha_creacion >= '".Utiles::fecha2sql($fecha1)."' ";
+		}
+		if(!empty($fecha2)){
+			$where .= " AND cliente.fecha_creacion <= '".Utiles::fecha2sql($fecha2)."' ";
 		}
 		if( $solo_activos == 1)
 			$where .= " AND cliente.activo = 1 ";
