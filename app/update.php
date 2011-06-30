@@ -5574,13 +5574,13 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 														VALUES (
 														NULL ,  'MaxDuracionTrabajo',  '14',  'duración maxima que puede tener un trabajo',  'numero',  '2',  '240'
-														);"
+														);";
 							
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
->>>>>>> .r2993
+
  	}
 }
 
