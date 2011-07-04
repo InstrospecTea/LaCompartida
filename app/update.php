@@ -5618,6 +5618,17 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
+					case 4.30:
+						$query = array();
+						$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+VALUES (
+'DesactivarClaveRTF',  '0', NULL ,  'boolean', 6, -1
+);";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
 
  	}
 }
@@ -5818,6 +5829,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.27;
 	$VERSIONES[$num++] = 4.28;
 	$VERSIONES[$num++] = 4.29;
+	$VERSIONES[$num++] = 4.30;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

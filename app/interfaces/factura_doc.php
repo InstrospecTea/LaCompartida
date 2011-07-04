@@ -20,6 +20,9 @@
 			$lang = 'es';
 	require_once Conf::ServerDir()."/lang/$lang.php";
 
+
+	$desactivar_clave_rtf = UtilesApp::GetConf($sesion,'DesactivarClaveRTF');
+
 	//$cssData = UtilesApp::TemplateCartaCSS($sesion,$cobro->fields['id_carta']);
 	//$cssData .= UtilesApp::CSSCobro($sesion);
 	//$html = $factura->GeneraHTMLFactura();
@@ -28,8 +31,12 @@
 	$html_css = $factura->GeneraHTMLFactura();
 	$html = $html_css['html'];
 	$cssData = $html_css['css'];
+
+
+	$configuracion = array();
+	$configuracion['desactivar_clave_rtf']=$desactivar_clave_rtf;
 	
-	$doc = new DocGenerator($html,$cssData);
+	$doc = new DocGenerator($html,$cssData,'LETTER',false,'PORTRAIT','1.5','1.5','2.0','1.5','EMITIDO','', $configuracion);
 	$valor_unico=substr(time(),-3);
 	$doc->output('doc_tributario_'.$id_factura_grabada.'_'.$valor_unico.'.doc', '', 'factura');
 	exit;

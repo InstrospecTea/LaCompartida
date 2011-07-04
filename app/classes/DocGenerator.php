@@ -51,7 +51,7 @@ class DocGenerator
 	 * @param $bottomMargin: bottom margin of the document
 	 * @param $leftMargin: left margin of the document 
 	 */
-	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='')
+	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='', $configuracion = array())
 	{
 		global $desde;
 		
@@ -87,6 +87,8 @@ class DocGenerator
 		
 		$this->numImages =0;
 		$this->estado=$estado;
+
+		$this->configuracion=$configuracion;
 		
 		$this->newSession($html, $this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin,$this->estado, $id_formato);
 		$this->newPage();
@@ -417,13 +419,13 @@ class DocGenerator
 		$header .= "<![endif]-->\r\n";
         $header .= "<!--[if gte mso 9]><xml>\r\n";
         $header .= "<w:WordDocument>\r\n";
-      if( $desde == 'factura' ) 
+		if( $desde == 'factura' && $this->configuracion['desactivar_clave_rtf']!=1 )
       	{
-	        $header .= "<w:DocumentProtection>ReadOnly</w:DocumentProtection>";
-	 				$header .= "<w:UnprotectPassword>12345</w:UnprotectPassword>";
-					$header .= "<w:StyleLock/>";
-				 	$header .= "<w:StyleLockEnforced/>";
-				}	
+			$header .= "<w:DocumentProtection>ReadOnly</w:DocumentProtection>";
+			$header .= "<w:UnprotectPassword>12345</w:UnprotectPassword>";
+			$header .= "<w:StyleLock/>";
+			$header .= "<w:StyleLockEnforced/>";
+		}
         $header .= "<w:View>Print</w:View>\r\n";
         $header .= "<w:Zoom>100</w:Zoom>\r\n";
         $header .= "</w:WordDocument>\r\n";
