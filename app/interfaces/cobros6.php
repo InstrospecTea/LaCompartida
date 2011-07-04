@@ -421,7 +421,9 @@
 			else if($x==(count($cobro->asuntos))-1)
 				$separador = '.';
 			
-				
+			if( count($cobro->asuntos) == 1 )
+				$separador = '.';
+			
 			$glosa_asunto_titulo .=   Utiles::Glosa($sesion, $cobro->asuntos[$x],'glosa_asunto','asunto','codigo_asunto') . $separador;
 		}
 		$glosa_asunto_alt = $glosa_asunto_titulo;
@@ -429,7 +431,7 @@
 		if(strlen($glosa_asunto_alt)>$max_largo_titulo_asunto)
 			$glosa_asunto_titulo = $glosa_asunto_titulo . '...';
 		$glosa_asunto_titulo = $separador_inicio . $glosa_asunto_titulo;
-//$glosa_asunto_titulo = Utiles::Glosa($sesion, $cobro->LoadAsuntos());
+		//$glosa_asunto_titulo = Utiles::Glosa($sesion, $cobro->LoadAsuntos());
 ?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
