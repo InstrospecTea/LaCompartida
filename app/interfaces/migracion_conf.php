@@ -72,7 +72,7 @@
 								IF(Cliente.MonedaTarifaMensual='D','2',IF(Cliente.MonedaTarifaMensual='E','3','1')) 				as contrato_FFF_id_moneda_monto, 
 								Cliente.TarifaHora 																																					as contrato_FFF_id_tarifa, 
 								Cliente.TarifaMensual 																																			as contrato_FFF_monto, 
-								IF(Cliente.Attache IS NOT NULL, Cliente.Attache, 1) 																											as contrato_FFF_id_usuario_responsable,
+								IF(Cliente.Attache IS NOT NULL, Cliente.Attache, 1) 																				as contrato_FFF_id_usuario_responsable,
 								Cliente.ContactoDeCobranza 																																	as contrato_FFF_contacto, 
 								Cliente.FechaCreacion 																																			as contrato_FFF_fecha_creacion, 
 								Cliente.FechaModificacion 																																	as contrato_FFF_fecha_modificacion, 
@@ -98,7 +98,7 @@
 								OrdenFacturacion.Attache 																										as contrato_FFF_id_usuario_responsable,
 								IF(OrdenFacturacion.FlagFacturable='S','1','0') 														as asunto_FFF_cobrable,
 								IF(OrdenFacturacion.HojaTiemposFlag='O','1','0')														as asunto_FFF_activo,
-								IF(OrdenFacturacion.HojaTiemposFlag='O','1','0')														as contrato_FFF_activo,
+								IF(OrdenFacturacion.HojaTiemposFlag='O','SI','NO')													as contrato_FFF_activo,
 								OrdenFacturacion.Asunto 																										as asunto_FFF_glosa_asunto,
 								OrdenFacturacion.Moneda 																										as asunto_FFF_id_moneda,
 								OrdenFacturacion.Moneda 																										as contrato_FFF_id_moneda,
@@ -124,35 +124,36 @@
 							FROM OrdenFacturacion 
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
-							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente
-							LIMIT 0,5";
+							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente";
 		}
 		
 		function QueryHoras()
 		{
 			return "SELECT
-					if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
-					,htd.Fecha
-					,htd.horaInicio as hora_inicio
-					,htd.TiempoHoras as duracion
-					,SEC_TO_TIME(htd.TiempoFacturable*60) as duracion_cobrada
-					,htd.CodigoEmpleadoFacturable as id_usuario
-					,IF(htd.FlagFacturable = 'S',1,0) as cobrable
-					,htd.AsuntoLargo as descripcion
-					,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) as fecha_creacion
-					,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) as fecha_modificacion
-					,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) as tarifa_hh
-					,htd.tarifaorigen as tarifa_hh_estandar
-					,htd.moneda as id_moneda
-					,htd.NumeroOrdenFacturacion as codigo_asunto
-					,htd.id_trabajo_lemontech as id_trabajo
-					FROM HojaTiempoDetalle htd
-					LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=htd.hojatiempoid
-					LEFT JOIN HojaTiempoajustado hta ON hta.hojatiempoajustadoid = htr.hojatiempoajustadoid
-					";
+								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
+								,htd.Fecha																																					as fecha 
+								,htd.horaInicio 																																		as hora_inicio
+								,SEC_TO_TIME(htd.Tiempo*60)																													as duracion
+								,SEC_TO_TIME(hta.TiempoFacturable*60) 																							as duracion_cobrada
+								,htd.CodigoEmpleadoFacturable 																											as id_usuario
+								,IF(htd.FlagFacturable = 'S',1,0) 																									as cobrable
+								,htd.AsuntoLargo 																																		as descripcion
+								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 						as fecha_creacion
+								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) as fecha_modificacion
+								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 						as tarifa_hh
+								,htd.moneda 																																				as id_moneda
+								,htd.NumeroOrdenFacturacion 																												as codigo_asunto
+								,htd.id_trabajo_lemontech 																													as id_trabajo
+								FROM HojaTiempoDetalle htd
+								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=htd.hojatiempoid
+								LEFT JOIN HojaTiempoajustado hta ON hta.hojatiempoajustadoid = htr.hojatiempoajustadoid";
 		}
 		function QueryGastos() { return ""; }
-		function QueryCobros() { return ""; }
+		function QueryCobros() { return "SELECT 
+																				id_contrato, 
+																				'2010-01-01' as fecha_ini, 
+																				'2010-12-31' as fecha_fin 
+																			 FROM contrato"; }
 		function QueryFacturas() { return ""; }
 	}
 ?>

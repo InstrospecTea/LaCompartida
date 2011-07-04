@@ -5603,6 +5603,22 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 								throw new Exception($q."---".mysql_error());
 					break;
 
+
+					case 4.29:
+						$query = array();
+						$query[] = "CREATE TABLE `prm_proveedor` (
+									  `id_proveedor` int(11) NOT NULL auto_increment,
+									  `rut` varchar(12) NOT NULL default '',
+									  `glosa` varchar(50) NOT NULL default '',
+									  PRIMARY KEY  (`id_proveedor`)
+									) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+						$query[] = "ALTER TABLE `cta_corriente` ADD  `id_proveedor` INT( 11 ) NOT NULL ;";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+
  	}
 }
 
@@ -5801,6 +5817,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 	$VERSIONES[$num++] = 4.26;
 	$VERSIONES[$num++] = 4.27;
 	$VERSIONES[$num++] = 4.28;
+	$VERSIONES[$num++] = 4.29;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

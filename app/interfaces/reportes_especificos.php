@@ -65,6 +65,7 @@
 			<tr><td></td>
 				<td>
 					<ul style="list-style-position: outside; text-align: left;">
+						<li><a href='usuario_vacaciones.php' style="color:#000;text-decoration: none;"><?=__('Usuario vacaciones')?></a></li>
 						<li><a href='resumen_abogado.php' style="color:#000;text-decoration: none;"><?=__('Rendimiento profesionales')?></a></li>
 						<li><a href='reportes_usuarios.php' style="color:#000;text-decoration: none;"><?=__('Gr&aacute;fico profesionales')?></a></li>
 					  <li><a href='planillas/planilla_demora_ingreso_horas.php' style="color:#000;text-decoration: none;"><?=__('Demora ingreso de horas por profesional')?></a></li>

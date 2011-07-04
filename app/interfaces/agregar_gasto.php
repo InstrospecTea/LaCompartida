@@ -177,6 +177,8 @@
 		if($cambio_asunto)
 			$gasto->Edit('id_cobro','NULL');
 
+		$gasto->Edit('id_proveedor',$id_proveedor ? $id_proveedor : NULL);
+
 		if ($gasto->Write())
 		{
 			$pagina->AddInfo($txt_tipo.' '.__('Guardado con éxito.').' '.$ingreso_eliminado);
@@ -443,6 +445,12 @@ function AgregarNuevo(tipo, prov)
 			}
 <? } ?>
 }
+
+function AgregarProveedor()
+{
+	var urlo = 'agregar_proveedor.php?popup=1';
+	nuevaVentana('Agregar_Proveedor',430,370,urlo,'top=100, left=125');
+}
 </script>
 <? echo(Autocompletador::CSS()); ?>
 <form method=post action="<?= $SERVER[PHP_SELF] ?>"  id="form_gastos" autocomplete='off'>
@@ -597,6 +605,17 @@ else
 		}
 	}
 ?>
+
+	<tr>
+		<td align=right>
+			<?=__('Proveedor')?>
+		</td>
+		<td align=left>
+			<?= Html::SelectQuery($sesion, "SELECT id_proveedor, glosa FROM prm_proveedor","id_proveedor", $gasto->fields['id_proveedor'] ? $gasto->fields['id_proveedor'] : '0', '','Cualquiera',"160"); ?>
+			<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?=Conf::ImgDir()?>/agregar.gif" border=0 ></a>
+		</td>
+	</tr>
+
 	<tr>
 		<td align=right>
 			<?=__('Monto')?>

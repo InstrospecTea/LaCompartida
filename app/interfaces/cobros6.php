@@ -415,13 +415,13 @@
 		$max_largo_titulo_asunto = 30;
 		for($x=0; $x<count($cobro->asuntos); $x++)
 		{
-			
+			$separador = ', ';
 			if($x==0)
 				$separador_inicio = '  -  ';
-			else if($x==count($cobro->asuntos))
+			else if($x==(count($cobro->asuntos))-1)
 				$separador = '.';
-			else
-				$separador = ', ';
+			
+				
 			$glosa_asunto_titulo .=   Utiles::Glosa($sesion, $cobro->asuntos[$x],'glosa_asunto','asunto','codigo_asunto') . $separador;
 		}
 		$glosa_asunto_alt = $glosa_asunto_titulo;
