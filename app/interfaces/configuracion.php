@@ -6,7 +6,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
+	$sesion = new Sesion(array('ADM'));
 	$pagina = new Pagina($sesion);
 
 	$pagina->titulo = __('Configuración');

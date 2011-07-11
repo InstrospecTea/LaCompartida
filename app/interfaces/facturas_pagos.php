@@ -38,18 +38,19 @@
 		// Es necesaria esta bestialidad para que no se caiga cuando es llamada desde otro lado.
 		$no_activo = !$activo;
 		$multiple = true;
-		require_once Conf::ServerDir().'/interfaces/facturas_listado_xls.php';
+		require_once Conf::ServerDir().'/interfaces/facturas_pagos_listado_xls.php';
 		exit;
 	}
 	
 
-	$pagina->titulo = __('Revisar Documentos Tributarios');
+	$pagina->titulo = __('Revisar Pago de Documentos Tributarios');
 	$pagina->PrintTop();
 
 	
 
 	if( $opc == 'buscar' || $opc == 'generar_factura' )
 	{
+
 		if($orden == "")
 			$orden = "fecha DESC";
 
@@ -57,14 +58,49 @@
 		{
 			$join = "";
 			$where = 1;
+
+			/*
+			 * INICIO - obtener listado facturas con pago parcial o total
+			 */
+			$lista_facturas_con_pagos = '';
+			$where_pactura_pago = 1;
+			if( $id_concepto )
+				$where_pactura_pago .= " AND fp.id_concepto = '".$id_concepto."' ";
+			if( $id_banco )
+				$where_pactura_pago .= " AND fp.id_banco = '".$id_banco."' ";
+			if( $id_cuenta )
+				$where_pactura_pago .= " AND fp.id_cuenta = '".$id_cuenta."' ";
+			if( $pago_retencion )
+				$where_pactura_pago .= " AND fp.pago_retencion = '".$pago_retencion."' ";
+			if($fecha1 && $fecha2)
+				$where_pactura_pago .= " AND fp.fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+			else if( $fecha1 )
+				$where_pactura_pago .= " AND fp.fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
+			else if( $fecha2 )
+				$where_pactura_pago .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+			
+
+			$query_facturas_con_pago = "SELECT GROUP_CONCAT(ccfm2.id_factura) as lista_factiras_con_pagos, '1' as con_pago
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
+					WHERE $where_pactura_pago GROUP BY con_pago ";
+			//echo "<br>".$query_facturas_con_pago;
+			$resp_facturas_con_pago = mysql_query($query_facturas_con_pago, $sesion->dbh) or Utiles::errorSQL($query_facturas_con_pago, __FILE__, __LINE__, $sesion->dbh);
+			list($lista_facturas_con_pagos,$con_pago) = mysql_fetch_array($resp_facturas_con_pago);
+			if($lista_facturas_con_pagos!='')
+				$where .= " AND factura.id_factura IN (".$lista_facturas_con_pagos.")";
+			else
+				$where .= " AND factura.id_factura = 0 ";
+			/*
+			 * INICIO - obtener listado facturas con pago parcial o total
+			 */
+
 			if($numero != '')
 				$where .= " AND numero = '$numero'";
-			if($fecha1 && $fecha2)
-				$where .= " AND fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
-			else if( $fecha1 )
-				$where .= " AND fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
-			else if( $fecha2 ) 
-				$where .= " AND fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+			
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario )
 				{
 					$cliente = new Cliente($sesion);
@@ -145,7 +181,7 @@
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 							WHERE $where";
-
+	
 		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_saldo_total = 0;
 		$glosa_monto_saldo_total = '';
@@ -168,35 +204,49 @@
 		$x_pag = 12;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_facturas";
-		$b->titulo = "Documentos Tributarios <br />".$glosa_monto_saldo_total;
+		$b->titulo = "Pago de Documentos Tributarios <br />".$glosa_monto_saldo_total;
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
 		$b->AgregarEncabezado("numero",__('N°'),"align=right width=30px");
 		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left width=40px");
 		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
-		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
+		//$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
 		$b->AgregarEncabezado("estado",__('Estado'),"align=center");
 		$b->AgregarEncabezado("id_cobro",__('Cobro'),"align=center");
-		$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
-		$b->AgregarFuncion("iva","Iva","align=right nowrap");
+		$b->AgregarEncabezado("retencion_impuesto",__('Retención Impuesto'),"align=center");
+		$b->AgregarEncabezado("concepto_pago",__('Concepto Pago'),"align=center");
+		$b->AgregarEncabezado("descripcion_pago",__('Descripción Pago'),"align=center");
+		$b->AgregarEncabezado("id_banco",__('Banco'),"align=center");
+		$b->AgregarEncabezado("id_cuenta",__('Cuenta'),"align=center");
+		$b->AgregarFuncion("Fecha último pago",__('Fecha último pago'),"align=right nowrap");
+		//$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
+		//$b->AgregarFuncion("iva","Iva","align=right nowrap");
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
-		$b->AgregarFuncion("Fecha último pago",__('Fecha último pago'),"align=right nowrap");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		$b->color_mouse_over = "#bcff5c";
 		$b->funcionTR = "funcionTR";
 	}
 
-	function Opciones(& $fila)
+	function Opciones(& $fila, $sesion)
 	{
 		global $where;
-		$id_factura = $fila->fields['id_factura'];
-		$codigo_cliente = $fila->fields['codigo_cliente'];
-		$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
+
+		$query = "SELECT fp.id_factura_pago as id_factura_pago
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+		//echo "<br>".$query;
+		$banco = '';
+		$id_factura_pago = '';
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list($id_factura_pago) = mysql_fetch_array($resp);
+		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumentoPago(".$id_factura_pago.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
 		return $html_opcion;
 	}
 	
@@ -263,6 +313,89 @@
 		return  $ultima_fecha_pago;
 	}
 
+	function BancoPago(& $fila, $sesion)
+	{
+		$query = "SELECT b.nombre as banco
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_banco b ON fp.id_banco = b.id_banco
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$banco = '';
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list($banco) = mysql_fetch_array($resp);
+		return  $banco;
+	}
+
+	function CuentaPago(& $fila, $sesion)
+	{
+		$query = "SELECT cta.numero as cuenta
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$cuenta = '';
+		list($cuenta) = mysql_fetch_array($resp);
+		return  $cuenta;
+	}
+
+	function DescripcionPago(& $fila, $sesion)
+	{
+		$query = "SELECT fp.descripcion as descripcion
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$descripcion = '';
+		list($descripcion) = mysql_fetch_array($resp);
+		return  $descripcion;
+	}
+
+	function ConceptoPago(& $fila, $sesion)
+	{
+		$query = "SELECT co.glosa as concepto
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$concepto = '';
+		list($concepto) = mysql_fetch_array($resp);
+		return  $concepto;
+	}
+
+	function RetencionImpuestoPago(& $fila, $sesion)
+	{
+		$query = "SELECT if(fp.pago_retencion=1,'Si','No') as pago_retencion
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$pago_retencion = '';
+		list($pago_retencion) = mysql_fetch_array($resp);
+		return  $pago_retencion;
+	}
+
 	function Glosa_asuntos(& $fila, $sesion)
 	{
 		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
@@ -297,21 +430,27 @@
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
 		$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
-		$html .= "<td align=right nowrap>".Glosa_asuntos(& $fila, $sesion)."</td>";
+		$html .= "<td align=right>".Glosa_asuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
-		$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
+		//$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			$html .= "<td align=center>".$fila->fields['estado']."</td>";
 		else
 			$html .= "<td align=center>".$fila->fields['anulado']."</td>";
-		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar Cobro',950,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
-		$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
-		$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
+		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar Cobro',750,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
+
+		$html .= "<td align=right >".RetencionImpuestoPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right >".ConceptoPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right >".DescripcionPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right >".BancoPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right nowrap>".CuentaPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right>".FechaUltimoPago(& $fila, $sesion)."</td>";
+		//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
+		//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right nowrap>".Saldo(& $fila)."</td>";
-		$html .= "<td align=right>".FechaUltimoPago(& $fila, $sesion)."</td>";
-		$html .= "<td align=center nowrap>".Opciones(& $fila)."</td>";
+		$html .= "<td align=center nowrap>".Opciones(& $fila, $sesion)."</td>";
 		$html .= "</tr>";
 
     $i++;
@@ -320,12 +459,9 @@
 
 ?>
 <script style="text/javascript">
-function ImprimirDocumento( id_factura )
+function ImprimirDocumentoPago( id_factura_pago )
 {
-	var fecha1=$('fecha1').value;
-	var fecha2=$('fecha2').value;
-	var vurl = 'facturas.php?opc=generar_factura&id_factura_grabada=' + id_factura + '&fecha1=' + fecha1 + '&fecha2=' + fecha2;
-	
+	var vurl = "agregar_pago_factura.php?id_factura_pago="+id_factura_pago+"&popup=1&opcion=imprimir_voucher";
 	self.location.href=vurl;
 }
 
@@ -334,15 +470,15 @@ function Refrescar()
 		BuscarFacturas('','buscar');
 }
 
-function BuscarFacturas( form, from )
+function BuscarFacturasPago( form, from )
 {
 	if(!form)
 		var form = $('form_facturas');
 	if(from == 'buscar') {
-		form.action = 'facturas.php?buscar=1';
+		form.action = 'facturas_pagos.php?buscar=1';
 	}
 	else if(from == 'exportar_excel'){
-		form.action = 'facturas.php?exportar_excel=1';
+		form.action = 'facturas_pagos.php?exportar_excel=1';
 	}
 	else
 		return false;
@@ -354,6 +490,68 @@ function AgregarNuevo()
 {
 	var urlo = "agregar_factura.php?popup=1";
 	nuevaVentana('Agregar_Factura',730,470,urlo,'top=100, left=125');
+}
+
+function CargarCuenta( origen, destino )
+{
+	var http = getXMLHTTP();
+	var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
+
+loading("Actualizando campo");
+http.open('get', url);
+http.onreadystatechange = function()
+{
+   if(http.readyState == 4)
+   {
+	  var response = http.responseText;
+	  if( response == "~noexiste" )
+		alert( "Ústed no tiene cuentas en este banco." );
+	  else
+		{
+			$(destino).options.length = 0;
+			cuentas = response.split('//');
+
+			for(var i=0;i<cuentas.length;i++)
+			{
+				valores = cuentas[i].split('|');
+
+				var option = new Option();
+				option.value = valores[0];
+				option.text = valores[1];
+
+				try
+				{
+					$(destino).add(option);
+				}
+				catch(err)
+				{
+					$(destino).add(option,null);
+				}
+			}
+		}
+				offLoading();
+   }
+};
+http.send(null);
+}
+
+function SetBanco( origen, destino )
+{
+	var http = getXMLHTTP();
+	var url = 'ajax.php?accion=buscar_banco&id=' + $(origen).value;
+
+	loading("Actualizando campo");
+	http.open('get', url);
+	http.onreadystatechange = function()
+	{
+	   if(http.readyState == 4)
+	   {
+		  var response = http.responseText;
+					$(destino).value = response;
+		  offLoading();
+	   }
+	};
+http.send(null);
 }
 </script>
 
@@ -430,8 +628,10 @@ $class_diseno = '';
 		<td align=left >
 			<?= Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal",'tipo_documento_legal_buscado',$tipo_documento_legal_buscado,'','Cualquiera',150); ?>
 		</td>
-		<td align=right>
+		<td align=right width="25%">
 			<?=__('Grupo Ventas')?>
+		</td>
+		<td align=left >
 			<input type=checkbox name=grupo_ventas id=grupo_ventas value=1 <?=$grupo_ventas ? 'checked' : '' ?>>
 		</td>
     </tr>
@@ -467,25 +667,65 @@ $class_diseno = '';
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Fecha')?>
+			<?=__('Concepto')?>
+		</td>
+		<td align=left>
+			<?= Html::SelectQuery($sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden","id_concepto", $id_concepto, '','Cualquiera',"150"); ?>
+		</td>
+		<?php if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PagoRetencionImpuesto') ) { ?>
+		<td align=right>
+			<?=__('Pago retención impuestos')?>
+		</td>
+		<td align=left>
+			<?php
+			$pago_retencion_check = '';
+			if($pago_retencion)
+				$pago_retencion_check = "checked='checked'";
+			?>
+			<input type="checkbox" name="pago_retencion" id="pago_retencion" value=1 <?=$pago_retencion_check ?> />
+		</td>
+		<?php	}?>
+	</tr>
+	<tr>
+		<td align=right>
+			<?=__('Banco')?>
+		</td>
+		<td align=left>
+			<?=Html::SelectQuery($sesion,"SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"',"Cualquiera","190")?>
+		</td>
+		<td align=right>
+			<?=__('N° Cuenta')?>
+		</td>
+		<td align=left>
+			<?=Html::SelectQuery($sesion,"SELECT cuenta_banco.id_cuenta
+				, CONCAT( cuenta_banco.numero,
+					 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
+				FROM cuenta_banco
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta", $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"',"Cualquiera","150")?>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+			<?=__('Fecha inicio pago')?>
 		</td>
 		<td nowrap align=left>
 			<input type="text" id="fecha1" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
 		</td>
-		<td>
+		<td align=right>
+			<?=__('Fecha fin pago')?>
 		</td>
-		<td nowrap align=right>
+		<td nowrap align=left>
 			<input type="text" id="fecha2" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
 		</td>
 	</tr>
 	<tr>
 		<td colspan=3 align=right>
-			<input name=boton_buscar id='boton_buscar' type=button value="<?=__('Buscar')?>" onclick="BuscarFacturas(this.form,'buscar')" class=btn>
+			<input name=boton_buscar id='boton_buscar' type=button value="<?=__('Buscar')?>" onclick="BuscarFacturasPago(this.form,'buscar')" class=btn>
 		</td>
 		<td align="right">
-			<input type="button" value="<?php echo  __('Descargar Excel');?>" class="btn" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
+			<input type="button" value="<?php echo  __('Descargar Excel');?>" class="btn" name="boton_excel" onclick="BuscarFacturasPago(this.form, 'exportar_excel')">
 		</td>
 	</tr>
 </table>

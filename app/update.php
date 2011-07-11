@@ -5908,7 +5908,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.34:
 						$query = array();
 						$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_proveedor`  `id_proveedor` INT( 11 ) NULL DEFAULT  '0'";
-
+						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5916,7 +5916,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.35:
 						$query = array();
 						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `CCI` VARCHAR( 50 ) NOT NULL ;";
-
+						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5924,7 +5924,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.36:
 						$query = array();
 						$query[] = "DROP TABLE  `usuario_tarifa_cliente`;";
-
+						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5932,6 +5932,23 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.37:
 						$query = array();
 						$query[] = "ALTER TABLE  `cobro_historial` ADD  `id_factura` INT( 11 ) NOT NULL DEFAULT  '0' AFTER  `id_cobro` ;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.38:
+						$query = array();
+						$query[] = "DELETE FROM `menu` WHERE CONVERT(`codigo` USING utf8) = 'CONF' LIMIT 1 ";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+					
+					case 4.39:
+						$query = array();
+						$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACT_PAGO', 'Factura Pago', '/app/interfaces/facturas_pagos.php', '', '', 0, 53, 'COBRANZA');";
+						$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACT_PAGO');";
 
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6144,6 +6161,8 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 	$VERSIONES[$num++] = 4.35;
 	$VERSIONES[$num++] = 4.36;
 	$VERSIONES[$num++] = 4.37;
+	$VERSIONES[$num++] = 4.38;
+	$VERSIONES[$num++] = 4.39;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

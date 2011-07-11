@@ -6541,10 +6541,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$moneda_opc_total->Load($this->fields['opc_moneda_total']);
 
 				if($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']]>0) {
-					$html2 = str_replace('%frase_moneda%', strtolower($moneda_opc_total->fields['glosa_moneda_plural']) ,$html2);
+					$html2 = str_replace('%frase_moneda%', __(strtolower($moneda_opc_total->fields['glosa_moneda_plural'])) ,$html2);
 				}
 				else {
-					$html2 = str_replace('%frase_moneda%', strtolower($moneda_opc_total->fields['glosa_moneda']) ,$html2);
+					$html2 = str_replace('%frase_moneda%', __(strtolower($moneda_opc_total->fields['glosa_moneda'])) ,$html2);
 				}
 
 				if( $this->fields['opc_moneda_total'] != $this->fields['id_moneda'] )

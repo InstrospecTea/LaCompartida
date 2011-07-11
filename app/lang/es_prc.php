@@ -11,7 +11,7 @@
 	$_LANG['Impuesto'] = "IGV";
 	$_LANG['Monto Impuesto'] = "Monto IGV";
 	$_LANG['Total con IVA']     = "Total con IGV";
-	$_LANG['Pago retenciÃ³n impuestos']     = "DetracciÃ³n";
+	$_LANG['Pago retención impuestos']     = "Detracción";
 	$_LANG['Director proyecto']     = "Encargado comercial";
 
 	$_LANG['Dólares']     = "Dólares Americanos";
@@ -132,4 +132,7 @@
 	$_LANG['borradores'] = "pre-liquidaciones";
 	$_LANG['Descargar Archivo'] = "Pre-liquidación";
 	$_LANG['Descargar Excel'] = "Planillón Excel";
+
+
+	
 ?>

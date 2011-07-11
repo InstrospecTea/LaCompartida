@@ -104,7 +104,7 @@
 		$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].")";
 	$select_usuario = Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ".$where_usuario." ORDER BY nombre ASC","id_usuario",$id_usuario,'','Todos','200');
 
-	if(isset($cobro) || $opc == 'buscar')
+	if(isset($cobro) || $opc == 'buscar' || $excel)
 	{
 		$where = base64_decode($where);
 		if( $where == '')

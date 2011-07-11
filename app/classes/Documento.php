@@ -97,7 +97,7 @@ class Documento extends Objeto
 				$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				}
 				
-		$query = "SELECT activo FROM cliente WHERE codigo_cliente=".$codigo_cliente;
+		$query = "SELECT activo FROM cliente WHERE codigo_cliente='".$codigo_cliente."'";
 		$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($activo)=mysql_fetch_array($resp);
 		
