@@ -11,6 +11,7 @@
 		require_once Conf::ServerDir().'/../app/classes/InputId.php';
 		require_once Conf::ServerDir().'/../app/classes/Debug.php';
 		require_once Conf::ServerDir().'/../app/classes/Funciones.php';
+		require_once Conf::ServerDir().'/../app/classes/Tarifa.php';
 		require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 		require_once Conf::ServerDir().'/../app/classes/Archivo.php';
 		require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
@@ -103,7 +104,6 @@
 		{
 			if (empty($glosa_cliente)) $pagina->AddError(__("Por favor ingrese la nombre del cliente"));
 			if (empty($codigo_cliente)) $pagina->AddError(__("Por favor ingrese el codigo del cliente"));
-			if (empty($id_grupo_cliente)) $pagina->AddError(__("Por favor ingrese el grupo del cliente"));
 			if (empty($id_usuario_encargado)) $pagina->AddError(__("Por favor ingrese usuario encargado para el cliente"));
 			
 			if (empty($factura_rut)) $pagina->AddError(__("Por favor ingrese ROL/RUT de la factura"));
@@ -111,7 +111,6 @@
 			if (empty($factura_giro)) $pagina->AddError(__("Por favor ingrese el giro de la factura"));
 			if (empty($factura_direccion)) $pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 			if (empty($factura_telefono)) $pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
-			if (empty($glosa_contrato)) $pagina->AddError(__("Por favor ingrese la glosa de la factura"));
 			
 			if((method_exists('Conf','GetConf') and Conf::GetConf($sesion,'TituloContacto')) or 
 			(method_exists('Conf','TituloContacto') and Conf::TituloContacto()))
@@ -167,26 +166,6 @@
 			}
 			
 			if (empty($opc_moneda_total)) $pagina->AddError(__("Por favor ingrese la moneda a mostrar el total de la tarifa en la tarificación"));
-			
-			if (empty($tipo_descuento))
-			{
-				$pagina->AddError(__("Por favor ingrese el descuento en la tarificación"));
-			}
-			else
-			{
-				switch ($tipo_descuento)
-				{
-					case "VALOR":
-						if (empty($descuento))  $pagina->AddError(__("Por favor ingrese el valor del descuento en la tarificación"));
-						break;
-					case "PORCENTAJE":
-						if (empty($porcentaje_descuento))  $pagina->AddError(__("Por favor ingrese el porcentaje del descuento en la tarificación"));
-						break;
-					default:
-						$pagina->AddError(__("Por favor ingrese el descuento en la tarificación"));
-				}
-			}
-			
 			if (empty($observaciones)) $pagina->AddError(__("Por favor ingrese la observacion en la tarificación"));
 
 		}
@@ -241,11 +220,23 @@
 						elseif($forma_cobro == 'TASA')
 							$monto = '0';
 					
+						if($tipo_tarifa=='flat'){
+							if(empty($tarifa_flat)){
+								$pagina->AddError( __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto') );
+								$val=true;
+							}
+							else{
+								$tarifa = new Tarifa($sesion);
+								$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+							}
+						}
+						
 						$contrato->Edit("activo",$activo_contrato ? 'SI' : 'NO');
 						$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0');
 						$contrato->Edit("usa_impuesto_gastos", $impuesto_gastos ? '1' : '0');
 						$contrato->Edit("glosa_contrato",$glosa_contrato);
 						$contrato->Edit("codigo_cliente",$codigo_cliente);
+						$contrato->Edit("id_pais",$id_pais);
 						$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
 						$contrato->Edit("observaciones",$observaciones);
 						if( method_exists('Conf','GetConf') )
@@ -563,7 +554,6 @@ function Validar(form)
 		var form = $('formulario');
 	
 	
-	
 	if(!form.glosa_cliente.value)
 	{
 		alert("<?=__('Debe ingresar el nombre del cliente')?>");
@@ -582,7 +572,159 @@ function Validar(form)
 			}
 		}
 	}
+
+<? if( $validaciones_segun_config ) { ?>
+	// DATOS FACTURACION
 	
+	if(!form.factura_rut.value)
+	{
+		alert("<?=__('Debe ingresar el').' '.__('RUT').' '.__('del cliente')?>");
+		MuestraPorValidacion('datos_factura');
+		form.factura_rut.focus();
+		return false;
+	}
+
+	if(!form.factura_razon_social.value)
+	{
+		alert("<?=__('Debe ingresar la razón social del cliente')?>");
+		MuestraPorValidacion('datos_factura');
+		form.factura_razon_social.focus();
+		return false;
+	}
+
+	if(!form.factura_giro.value)
+	{
+		alert("<?=__('Debe ingresar el giro del cliente')?>");
+		MuestraPorValidacion('datos_factura');
+		form.factura_giro.focus();
+		return false;
+	}
+
+	if(!form.factura_direccion.value)
+	{
+		alert("<?=__('Debe ingresar la dirección del cliente')?>");
+		MuestraPorValidacion('datos_factura');
+		form.factura_direccion.focus();
+		return false;
+	}
+
+	if(form.id_pais.options[0].selected == true)
+	{
+		alert("<?=__('Debe ingresar el pais del cliente')?>");
+		MuestraPorValidacion('datos_factura');
+		form.id_pais.focus();
+		return false;
+	}
+
+	if(!form.cod_factura_telefono.value)
+	{
+		alert("<?=__('Debe ingresar el codigo de area del teléfono')?>");
+		MuestraPorValidacion('datos_factura');
+		form.cod_factura_telefono.focus();
+		return false;
+	}
+
+	if(!form.factura_telefono.value)
+	{
+		alert("<?=__('Debe ingresar el número de telefono')?>");
+		MuestraPorValidacion('datos_factura');
+		form.factura_telefono.focus();
+		return false;
+	}
+
+	// SOLICITANTE
+	if(form.titulo_contacto.options[0].selected == true)
+	{
+		alert("<?=__('Debe ingresar el titulo del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.titulo_contacto.focus();
+		return false;
+	}
+
+	if(!form.nombre_contacto.value)
+	{
+		alert("<?=__('Debe ingresar el nombre del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.nombre_contacto.focus();
+		return false;
+	}
+
+	if(!form.apellido_contacto.value)
+	{
+		alert("<?=__('Debe ingresar el apellido del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.apellido_contacto.focus();
+		return false;
+	}
+
+	if(!form.fono_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar el teléfono del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.fono_contacto_contrato.focus();
+		return false;
+	}
+
+	if(!form.email_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar el email del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.email_contacto_contrato.focus();
+		return false;
+	}
+
+	if(!form.direccion_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar la dirección de envío del solicitante')?>");
+		MuestraPorValidacion('datos_solicitante');
+		form.direccion_contacto_contrato.focus();
+		return false;
+	}
+
+	// DATOS DE TARIFICACION
+	if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
+	{
+		alert("<?=__('Debe seleccionar un tipo de tarifa')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.tipo_tarifa[0].focus();
+		return false;
+	}
+
+	/*if(!form.id_moneda.options[0].selected == true)
+	{
+		alert("<?=__('Debe seleccionar una moneda para la tarifa')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.id_moneda.focus();
+		return false;
+	}*/
+
+	if(!(form.forma_cobro[0].checked || form.forma_cobro[1].checked ||form.forma_cobro[2].checked ||form.forma_cobro[3].checked ||form.forma_cobro[4].checked ))
+	{
+		alert("<?=__('Debe seleccionar una forma de cobro para la tarifa')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.forma_cobro[0].focus();
+		return false;
+	}
+/*
+	if(!form.opc_moneda_total.value)
+	{
+		alert("<?=__('Debe seleccionar una moneda para mostrar el total')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.opc_moneda_total.focus();
+		return false;
+	}*/
+
+	if(!form.observaciones.value)
+	{
+		alert("<?=__('Debe ingresar un detalle para la cobranza')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.observaciones.focus();
+		return false;
+	}
+
+<? } ?>
+
+	// NUEVO MODULO FACTURA
 	<? 
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 	{ ?>
@@ -634,6 +776,17 @@ function Validar(form)
 	form.submit();
 	return true;
 }
+
+
+function MuestraPorValidacion(divID)
+{
+	var divArea = $(divID);
+	var divAreaImg = $(divID+"_img");
+	var divAreaVisible = divArea.style['display'] != "none";
+	divArea.style['display'] = "inline";
+	divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
+}
+
 function calcHeight(idIframe, idMainElm){
     ifr = $(idIframe);
     the_size = ifr.$(idMainElm).offsetHeight + 20;
@@ -642,6 +795,8 @@ function calcHeight(idIframe, idMainElm){
         duration: 0.2
     });
 }
+
+
 function ShowMonto()
 {
     div = document.getElementById("div_monto");
@@ -734,7 +889,6 @@ else { ?>
 <tr>
 	<td align="right">
 		<?=__('Grupo')?>
-		<?php if ($validaciones_segun_config) echo $obligatorio ?>
 	</td>
 	<td align="left">
 		<?= Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno') ) ?>

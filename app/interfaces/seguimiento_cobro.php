@@ -72,8 +72,14 @@
 		$where = 1;
 		if($id_cobro)
 			$where .= " AND cobro.id_cobro = '$id_cobro' ";
-		else if($factura){
-			$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
+		else if($factura || $tipo_documento_legal){
+			//$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
+			$factura_obj = new Factura($sesion);
+			$lista_cobros_x_factura = $factura_obj->GetlistaCobroSoyDatoFactura('',$tipo_documento_legal,$factura);
+			if($lista_cobros_x_factura == '')
+				$where .= " AND cobro.id_cobro = 0";
+			else
+			$where .= " AND cobro.id_cobro IN ($lista_cobros_x_factura)";
 		}
 		else
 		{
@@ -440,7 +446,7 @@ function Refrescar(id_foco)
 		<tr>
 			<td align=right width='30%'><b><?=__('Documento legal')?></b></td>
 			<td colspan=2 align=left>
-				<?= Html::SelectQuery($sesion, "SELECT codigo, glosa FROM prm_documento_legal", 'tipo_documento_legal', $tipo_documento_legal, '', __('Cualquiera'), 100); ?>
+				<?= Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal', $tipo_documento_legal, '', __('Cualquiera'), 100); ?>
 				#<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=text size=6 name=factura id=factura value="<?=$factura ?>">
 			</td>
 		</tr>

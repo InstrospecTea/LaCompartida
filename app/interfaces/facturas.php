@@ -183,6 +183,7 @@
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
+		$b->AgregarFuncion("Fecha último pago",__('Fecha último pago'),"align=right nowrap");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		$b->color_mouse_over = "#bcff5c";
 		$b->funcionTR = "funcionTR";
@@ -243,6 +244,25 @@
 		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,",",".");
 	}
 
+	function FechaUltimoPago(& $fila, $sesion)
+	{
+		$query = "SELECT MAX(ccfm.fecha_modificacion) as ultima_fecha_pago
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
+					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
+
+		//echo "<br>".$query;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$monto_pago = 0;
+		$simbolo_aporte_pago = $fila->fields['simbolo'];
+		$cifras_decimales_aporte_pago = $fila->fields['cifras_decimales'];
+		list($ultima_fecha_pago) = mysql_fetch_array($resp);
+		return  $ultima_fecha_pago;
+	}
+
 	function Glosa_asuntos(& $fila, $sesion)
 	{
 		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
@@ -290,6 +310,7 @@
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right nowrap>".Saldo(& $fila)."</td>";
+		$html .= "<td align=right>".FechaUltimoPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=center nowrap>".Opciones(& $fila)."</td>";
 		$html .= "</tr>";
 

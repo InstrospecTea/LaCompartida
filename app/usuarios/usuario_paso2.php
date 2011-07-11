@@ -872,12 +872,15 @@ function CargarPermisos()
 	//Eliminar Vacaciones
 	$$('.cls_eliminar_vacacion').each(function(elemento){
 		elemento.observe('click', function(evento){ 
-			evento.stop();
-			var ide = elemento.id;
-			var tmp = ide.split('_');
-			$('opc').value = 'elimina_vacacion';
-			$('vacacion_id_tmp').value = tmp[1];
-			$('form_usuario').submit();
+			evento.stop(); 
+			if( confirm('¿Está seguro que quiere borrar las vacaciones de este usuario?') )
+			{
+				var ide = elemento.id;
+				var tmp = ide.split('_');
+				$('opc').value = 'elimina_vacacion';
+				$('vacacion_id_tmp').value = tmp[1];
+				$('form_usuario').submit();
+			}
 		});
 	});
 	

@@ -89,6 +89,17 @@
 			$monto = '0';
 		}
 
+		if($tipo_tarifa=='flat'){
+			if(empty($tarifa_flat)){
+				$pagina->AddError( __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto') );
+				$val=true;
+			}
+			else{
+				$tarifa = new Tarifa($sesion);
+				$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+			}
+		}
+
 		$contrato->Edit("glosa_contrato",$glosa_contrato);
 		$contrato->Edit("codigo_cliente",$codigo_cliente);
 		$contrato->Edit("id_usuario_responsable",$id_usuario_responsable ? $id_usuario_responsable : '1');
@@ -104,6 +115,8 @@
 		$contrato->Edit("fono_contacto",$fono_contacto_contrato);
 		$contrato->Edit("email_contacto",$email_contacto_contrato);
 		$contrato->Edit("direccion_contacto",$direccion_contacto_contrato);
+		$contrato->Edit("id_pais",$id_pais);
+		$contrato->Edit("id_cuenta",$id_cuenta);
 		$contrato->Edit("es_periodico",$es_periodico);
 		$contrato->Edit("activo",$activo_contrato ? 'SI' : 'NO');
 		$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0');
@@ -224,6 +237,15 @@
 	$tarifa_default = $tarifa->SetTarifaDefecto();
 	$tramite_tarifa_default = $tramite_tarifa->SetTarifaDefecto();
 
+	if(empty($tarifa_flat) && !empty($contrato->fields['id_tarifa'])){
+		$tarifa->Load($contrato->fields['id_tarifa']);
+		$valor_tarifa_flat = $tarifa->fields['tarifa_flat'];
+	}
+	else if(!empty($tarifa_flat) && $tipo_tarifa!='flat'){
+		$valor_tarifa_flat = null;
+	}
+	else $valor_tarifa_flat = $tarifa_flat;
+
 	if($popup && !$motivo)
 		$pagina->PrintTop($popup);
 
@@ -273,10 +295,17 @@ function ValidarContrato(form)
 		alert('<?=__("Debe seleccionar una forma de cobro")?>');
 		return false;
 	}*/
-	
+	<?php
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+	{
+	?>
 	if (!validar_doc_legales(true)){
 		return false;
 	}
+	<?php
+	}
+	?>
+
 	
 	if($('fc5').checked)
 	{
@@ -736,6 +765,68 @@ document.observe("dom:loaded", function() {
 	
 	mostrarOpcionMonedaParaGastos($('separar_liquidaciones'));
 });
+
+function CargarCuenta( origen, destino )
+   {
+       var http = getXMLHTTP();
+       var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
+
+    loading("Actualizando campo");
+    http.open('get', url);
+    http.onreadystatechange = function()
+    {
+       if(http.readyState == 4)
+       {
+          var response = http.responseText;
+          if( response == "~noexiste" )
+           alert( "Ústed no tiene cuentas en este banco." );
+          else
+           {
+               $(destino).options.length = 0;
+               cuentas = response.split('//');
+
+               for(var i=0;i<cuentas.length;i++)
+               {
+                   valores = cuentas[i].split('|');
+
+                   var option = new Option();
+                   option.value = valores[0];
+                   option.text = valores[1];
+
+                   try
+                   {
+                       $(destino).add(option);
+                   }
+                   catch(err)
+                   {
+                       $(destino).add(option,null);
+                   }
+               }
+           }
+                   offLoading();
+       }
+    };
+    http.send(null);
+   }
+
+function SetBanco( origen, destino )
+   {
+       var http = getXMLHTTP();
+    var url = 'ajax.php?accion=buscar_banco&id=' + $(origen).value;
+
+    loading("Actualizando campo");
+    http.open('get', url);
+    http.onreadystatechange = function()
+    {
+       if(http.readyState == 4)
+       {
+          var response = http.responseText;
+                   $(destino).value = response;
+          offLoading();
+       }
+    };
+    http.send(null);
+   }
 </script>
 <? if($popup && !$motivo){?>
 <form name='formulario' id='formulario' method=post>
@@ -894,6 +985,14 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	</tr>
 	<tr>
 		<td align="right" colspan="1">
+			<?=__('País')?>
+		</td>
+		<td align="left" colspan='3'>
+			<?= Html::SelectQuery($sesion, "SELECT id_pais, nombre FROM prm_pais ORDER BY preferencia DESC, nombre ASC","id_pais", $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : '', '','Vacio',260); ?>&nbsp;&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td align="right" colspan="1">
 			<?=__('Teléfono')?>
 			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
@@ -904,13 +1003,42 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	<tr>
 		<td align="right" colspan="1">
 			<?=__('Glosa factura')?>
-			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="5">
 			<textarea name='glosa_contrato' rows=4 cols="55" ><?= $contrato->fields['glosa_contrato'] ?></textarea>
 		</td>
 	</tr>
+	<tr>
+       <td align="right" colspan="1">
+           <?=__('Banco')?>
+       </td>
+       <td align="left" colspan="5">
+           <?=Html::SelectQuery($sesion,"SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $contrato->fields['id_banco'] ? $contrato->fields['id_banco'] : $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"',"Cualquiera","150")?>
+       </td>
+   </tr>
+   <tr>
+       <td align="right" colspan="1">
+           <?=__('Cuenta')?>
+       </td>
+       <td align="left" colspan="5">
+           <?=Html::SelectQuery($sesion,"SELECT cuenta_banco.id_cuenta
+																						, CONCAT( cuenta_banco.numero,
+																						     IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
+																						FROM cuenta_banco
+																						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"',"Cualquiera","150")?>
+       </td>
+   </tr>
+
 	</table>
+	<?php
+	   if($contrato->fields['id_cuenta']>0) {
+	       ?>
+	   <script>
+	   SetBanco('id_cuenta','id_banco');
+	   </script>
+	   <?php
+	   }
+	?>
 </fieldset>
 <!-- FIN DATOS FACTURACION -->
 <br>
@@ -1042,12 +1170,26 @@ else
 					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td align="left" width="75%" style="font-size:10pt;">
-					<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, ""); ?>&nbsp;&nbsp;
-					<?=__('Tarifa en')?>
-					<?php if ($validaciones_segun_config) echo $obligatorio ?>
-					<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda();"','',"80"); ?>&nbsp;&nbsp;
-					<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
-					<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+					<table>
+						<tr>
+							<td>
+								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?=empty($valor_tarifa_flat) ? 'checked' : ''?>/>
+								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true"'); ?>
+								<br/>
+								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?=empty($valor_tarifa_flat) ? '' : 'checked'?>/>
+								<label for="tipo_tarifa_flat">Plana por </label>
+								<input id="tarifa_flat" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?=$valor_tarifa_flat?>"/>
+								<input type="hidden" id="id_tarifa_flat" name="id_tarifa_flat" value="<?=$contrato->fields['id_tarifa']?>"/>
+							</td>
+							<td>
+								<?=__('Tarifa en')?>
+								<?php if ($validaciones_segun_config) echo $obligatorio ?>
+								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda();"','',"80"); ?>&nbsp;&nbsp;
+								<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
+								<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		  <tr>
@@ -1134,7 +1276,6 @@ else
 			<tr>
 				<td align="right">
 					<?=__('Descuento')?>
-					<?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td align="left">
 					<input type=text name=descuento id=descuento size=6 value=<?=$contrato->fields['descuento']?>> <input type=radio name=tipo_descuento id=tipo_descuento value='VALOR' <?=$contrato->fields['tipo_descuento'] == 'VALOR' ? 'checked="checked"' : '' ?> /><?=__('Valor')?>

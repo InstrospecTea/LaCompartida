@@ -425,8 +425,15 @@
 			else
 			{
 				$asunto->Edit("id_contrato", $cliente->fields['id_contrato']);
-				if($asunto->Write())
+
+				$contrato_indep = $asunto->fields['id_contrato_indep'];
+				$asunto->Edit("id_contrato_indep", null);
+				if($asunto->Write()) {
 					$pagina->AddInfo(__('Asunto').' '.__('Guardado con exito'));
+					$contrato_obj = new Contrato($sesion);
+					$contrato_obj->Load($contrato_indep);
+					$contrato_obj->Eliminar();
+				}
 				else
 					$pagina->AddError($asunto->error);
 			}
@@ -755,7 +762,7 @@ function CopiarDatosCliente(form)
 			<?=__('Área').' '.__('asunto')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto","id_area_proyecto", $asunto->fields['id_area_proyecto'],"","",""); ?>&nbsp;&nbsp;
+			<?= Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden","id_area_proyecto", $asunto->fields['id_area_proyecto'],"","",""); ?>&nbsp;&nbsp;
 		</td>
 	</tr>
 	<tr>

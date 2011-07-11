@@ -116,7 +116,7 @@
 		if( $fecha_fin )
 			{
 				$fecha_fin = Utiles::fecha2sql($fecha_fin);
-				$where .= " AND UV.fecha_inicio < '$fecha_ini' ";
+				$where .= " AND UV.fecha_inicio < '$fecha_fin' ";
 				$select_fecha2 = " IF( '$fecha_fin' < UV.fecha_fin, '$fecha_fin', UV.fecha_fin ) as fecha_fin ";
 			}
 		else
@@ -190,17 +190,19 @@
 			$i=0;
 			if( trim($row['nombre_dato']) == 'id_categoria_usuario' )
 			{
-				$row['nombre_dato'] = 'categoría';
+				$nombre_dato  = "Categoría";
 				$glosa_actual = (!empty($row['valor_actual'])) ? Utiles::Glosa($sesion, $row['valor_actual'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
 				$glosa_origen = (!empty($row['valor_original'])) ? Utiles::Glosa($sesion, $row['valor_original'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
 			}
 			else if( trim($row['nombre_dato']) == 'activo' )
 			{
+				$nombre_dato  = "Activo";
 				$glosa_actual = (!empty($row['valor_actual'])) ? 'activo' : 'inactivo';
 				$glosa_origen = (!empty($row['valor_original'])) ? 'activo' : 'inactivo';
 			}
 			else if( trim($row['nombre_dato']) == 'permisos' )
 			{
+				$nombre_dato  = "Permisos";
 				$glosa_actual = str_replace('ADM','Administración',$row['valor_actual']);
 				$glosa_actual = str_replace('COB','Cobranza',$glosa_actual);
 				$glosa_actual = str_replace('DAT','Administración datos',$glosa_actual);
@@ -225,11 +227,19 @@
 			}
 			else if( trim($row['nombre_dato']) == 'visible' )
 			{
+				$nombre_dato  = "Visible";
 				$glosa_actual = (!empty($row['valor_actual'])) ? 'visible' : 'invisible';
 				$glosa_origen = (!empty($row['valor_original'])) ? 'visible' : 'invisible';
 			}
 			else
 			{
+				switch( $row['nombre_dato'] ) {
+					case 'dir_comuna' : $nombre_dato = "Comuna";
+					case 'id_area_usuario' : $nombre_dato = "Area";
+					case 'apellido1' : $nombre_dato = "Apellido paterno";
+					case 'apellido2' : $nombre_dato = "Apellido materno";
+					case 'username' : $nombre_dato = "Código Usuario";
+				}
 				$glosa_actual = $row['valor_actual'];
 				$glosa_origen = $row['valor_original'];
 			}
@@ -237,7 +247,7 @@
 			$ws1->write($fila_inicial, 1, $row[nombre], $f4);
 			$ws1->write($fila_inicial, 2, Utiles::sql2date($row[fecha_creacion]), $f4);
 	    $ws1->write($fila_inicial, 3, Utiles::sql2date($row[fecha]), $f4);
-	    $ws1->write($fila_inicial, 4, $row[nombre_dato], $f4);
+	    $ws1->write($fila_inicial, 4, $nombre_dato, $f4);
 	    $ws1->write($fila_inicial, 5, $glosa_actual, $f4);
 	    $ws1->write($fila_inicial, 6, $glosa_origen, $f4);
 	    $ws1->write($fila_inicial, 7, Utiles::Glosa($sesion, $row['id_usuario_creador'], "CONCAT_WS(' ',nombre,apellido1,apellido2) AS glosa", 'usuario','id_usuario'), $f4);

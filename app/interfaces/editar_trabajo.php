@@ -1431,9 +1431,15 @@ Calendar.setup(
 	(( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'LimpiarTrabajo') ) ||
 	( method_exists('Conf','LimpiarTrabajo') && Conf::LimpiarTrabajo() )) ) { ?>
 
-	$$('#codigo_asunto_hide, #id_cobro, #campo_codigo_cliente, #codigo_cliente, #campo_codigo_cliente_secundario, #codigo_cliente_secundario, #campo_codigo_asunto_secundario, #codigo_asunto_secundario, #codigo_actividad, #campo_codigo_actividad, #duracion, #duracion_cobrada, #descripcion, #solicitante').each(function(elem){ elem.value = ''; });
+	$$('#codigo_asunto_hide, #id_cobro, #campo_codigo_cliente, #codigo_cliente, #campo_codigo_cliente_secundario, #codigo_cliente_secundario, #campo_codigo_asunto_secundario, #codigo_asunto_secundario, #codigo_actividad, #campo_codigo_actividad, #descripcion, #solicitante').each(function(elem){ elem.value = ''; });
 
-<?php } ?>
+<?php 
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+	{ ?>
+		$$('#glosa_cliente').each(function(elem){ elem.value = ''; });
+	<?php
+	}
+} ?>
 
 <?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PrellenarTrabajoConActividad') ) || ( method_exists('Conf','PrellenarTrabajoConActividad') && Conf::PrellenarTrabajoConActividad() ) )

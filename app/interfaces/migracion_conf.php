@@ -1,10 +1,10 @@
 <?
 	class ConfMigracion 
 	{
-		function dbHost() { return 'localhost'; 		}
-		function dbName() { return 'Payet_dbo'; 		}
-		function dbUser() { return 'root'; 					}
-		function dbPass() { return 'chantasio'; 		}
+		function dbHost() { return 'lab.lemontech.cl'; }
+		function dbName() { return 'Payet_dbo'; }
+		function dbUser() { return 'Mario'; }
+		function dbPass() { return 'Mario.asdwsx'; }
 		/*function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
 																					'campo_glosa' 					=> 'glosa_categoria', 
 																				  'campo_id'            	=> 'id_categoria_usuario', 
@@ -121,6 +121,8 @@
 								Cliente.Actividad																														as contrato_FFF_factura_giro,
 								Cliente.NombreCliente																												as asunto_FFF_razon_social, 
 								Cliente.NombreCliente																												as contrato_FFF_factura_razon_social
+								,IF(OrdenFacturacion.HonorarioPactado>0, if(OrdenFacturacion.HonorarioPactado=OrdenFacturacion.HonorarioFacturado,NULL,'FLAT FEE' ),'TASA')        as contrato_FFF_forma_cobro
+								,IF(OrdenFacturacion.HonorarioPactado>0, if(OrdenFacturacion.HonorarioPactado=OrdenFacturacion.HonorarioFacturado, OrdenFacturacion.HonorarioPactado , OrdenFacturacion.HonorarioPactado ),0)        as contrato_FFF_monto
 							FROM OrdenFacturacion 
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
@@ -148,12 +150,59 @@
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=htd.hojatiempoid
 								LEFT JOIN HojaTiempoajustado hta ON hta.hojatiempoajustadoid = htr.hojatiempoajustadoid";
 		}
-		function QueryGastos() { return ""; }
-		function QueryCobros() { return "SELECT 
-																				id_contrato, 
-																				'2010-01-01' as fecha_ini, 
-																				'2010-12-31' as fecha_fin 
-																			 FROM contrato"; }
+		function QueryGastos() 
+		{ 
+			return "SELECT
+									CodigoGasto 																																			as gasto_FFF_id_movimiento,
+									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
+									Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
+									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
+									Gastos.FechaGasto 																																as gasto_FFF_fecha,
+									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario,
+									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
+									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
+									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,
+									Gastos.CodigoCliente 																															as gasto_FFF_codigo_cliente,
+									IF(Gastos.flagfacturable='S','1','0') 																						as gasto_FFF_cobrable,
+									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda
+									FROM Gastos "; 
+		}
+		function QueryCobros() 
+		{ 
+			return "SELECT 
+									Factura.NumeroFactura 																					as cobro_FFF_id_cobro,
+									Factura.FechaGeneracion 																				as cobro_FFF_fecha_creacion,
+									Factura.CodigoFacturaBoleta 																		as cobro_FFF_documento,
+									Factura.CodigoCliente 																					as cobro_FFF_codigo_cliente,
+									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2'))				as cobro_FFF_opc_moneda_total,
+									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda_monto,
+									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda,
+									Factura.MontoBruto 																							as cobro_FFF_monto,
+									Factura.MontoImpuesto 																					as cobro_FFF_impuesto,
+									Factura.MontoNeto 																							as cobro_FFF_subtotal,
+									Factura.PorcentajeImpuesto 																			as cobro_FFF_porcentaje_impuesto,
+									Periodo.FechaInicio 																						as cobro_FFF_fecha_ini,
+									Periodo.FechaTermino 																						as cobro_FFF_fecha_fin,
+									CONCAT(SUBSTRING(Factura.NumeroOrdenFact,1,4),'-0',SUBSTRING(Factura.NumeroOrdenFact,-3)) as cobro_FFF_codigo_asunto 
+									FROM Factura
+									LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija"; 
+		}
+
+		function QueryTarifas() { return "SELECT
+									CodigoTarifaCliente as id_tarifa
+									,Descripcion as glosa_tarifa
+									FROM TbTarifaCliente"; }
+
+		function QueryUsuariosTarifas() { return "SELECT
+									id_usuario_tarifa_LMT as id_usuario_tarifa
+									, CodigoEmpleado AS id_usuario
+									, if(moneda='D' ,'2',if(moneda = 'E','3',if(moneda = 'S','1','0'))) AS id_moneda
+									, TarifaHora AS tarifa
+									, CodigoTarifaCliente as id_tarifa
+									FROM  `TbTarifaCategoria`
+									Group by CodigoTarifaCliente, CodigoEmpleado, moneda
+									Order by CodigoPeriodo DESC "; }
+
 		function QueryFacturas() { return ""; }
 	}
 ?>

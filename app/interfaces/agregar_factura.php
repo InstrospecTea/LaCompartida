@@ -180,6 +180,8 @@
 				
 				$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
+				
+				
 				# Esto se puede descomentar para imprimir facturas desde la edición
 				
 				if($id_cobro)
@@ -209,13 +211,23 @@
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ImprimirFacturaPdf') ) || ( method_exists('Conf','ImprimirFacturaPdf') && Conf::ImprimirFacturaPdf() ) )
 				{
 	?>
-				<script type='text/javascript'>
+<script type='text/javascript'>
 					window.open("agregar_factura.php?opc=generar_factura&id_factura=<?=$factura->fields['id_factura']?>","Factura",'width=500,height=500,toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,copyhistory=yes,resizable=yes');
 				</script>
-	<?
+<?
 				}
 			}
+			
+			//echo "entré";
+			$observacion = new Observacion($sesion);
+			$observacion->Edit('fecha', date('Y-m-d H:i:s'));
+			$observacion->Edit('comentario', "MODIFICACIÓN FACTURA");
+			$observacion->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
+			$observacion->Edit('id_factura', $factura->fields['id_factura']);
+			$observacion->Write();			
 		}
+		
+		#Se ingresa la anotación de modificación de factura en el historial	
 		if(!$id_factura && $factura->loaded())
 			$id_factura = $factura->fields['id_factura'];
 			
@@ -271,8 +283,7 @@
 
 		if($factura->loaded())
 		{
-			if($factura->fields['porcentaje_impuesto'] > 0)
-				$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
+			$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
 		}
 		else if($id_cobro > 0)
 		{
@@ -608,7 +619,7 @@ function Validar(form)
 			form.glosa_cliente.focus();
 			return false;
 		}
-<?}
+<? }
 	else if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	{ ?>
 		if( form.codigo_cliente_secundario.value == "" )
@@ -617,7 +628,7 @@ function Validar(form)
 			form.codigo_cliente_secundario.focus();
 			return false;
 		}
-<?}
+<? }
 	else 
 	{ ?>
 		if( form.codigo_cliente.value == "" )
@@ -626,7 +637,7 @@ function Validar(form)
 			form.codigo_cliente.focus();
 			return false;
 		}
-<?} ?>
+<? } ?>
 	
 	<?php
 		if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
@@ -844,50 +855,44 @@ function ActualizarDocumentoMonedaPago()
 	CancelarDocumentoMonedaPago();
 }
 </script>
-
 <? echo Autocompletador::CSS(); ?>
 
 <form method=post id="form_facturas" name="form_facturas">
-<input type=hidden name=opcion value="" />
-<input type=hidden name=id_factura id=id_factura value="<?=$factura->fields['id_factura']?>" />
-<input type=hidden name=id_documento_legal value="<?=$id_documento_legal?>" />
-<input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
-<input type=hidden name=id_cobro id=id_cobro value='<?=$id_cobro?>'/>
-<input type=hidden name="id_moneda_factura" id="id_moneda_factura" value='<?=$id_moneda_factura?>'/>
-
-
-<input type=hidden name="honorario_disp" id="honorario_disp" value='<?=$honorario_disp?>'/>
-<input type=hidden name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?=$gastos_con_impuestos_disp?>'/>
-<input type=hidden name="gastos_sin_impuestos_disp" id="gastos_sin_impuestos_disp" value='<?=$gastos_sin_impuestos_disp?>'/>
-
-<input type='hidden' name='opc' id='opc' value='buscar'>
-
-<input type="hidden" name="porcentaje_impuesto" id="porcentaje_impuesto" value="<?=$porcentaje_impuesto;?>">
-
-<!-- Calendario DIV -->
-<div id="calendar-container" style="width:221px; position:absolute; display:none;">
-	<div class="floating" id="calendar"></div>
-</div>
-<!-- Fin calendario DIV -->
-<br>
-<table width='90%'>
-	<tr>
-		<td align=left><b><?=$txt_pagina ?></b></td>
-	</tr>
-</table>
-<br>
-
-<table style="border: 0px solid black;" width='90%'>
-	<tr>
-		<td align=left>
-			<b><?=__('Información de').' '.$tipo_documento_legal?></b>
-		</td>
-	</tr>
-</table>
-<table class="border_plomo" style="background-color:#FFFFFF;" width='90%'>
-
-
-	<?
+  <input type=hidden name=opcion value="" />
+  <input type=hidden name=id_factura id=id_factura value="<?=$factura->fields['id_factura']?>" />
+  <input type=hidden name=id_documento_legal value="<?=$id_documento_legal?>" />
+  <input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
+  <input type=hidden name=id_cobro id=id_cobro value='<?=$id_cobro?>'/>
+  <input type=hidden name="id_moneda_factura" id="id_moneda_factura" value='<?=$id_moneda_factura?>'/>
+  <input type=hidden name="honorario_disp" id="honorario_disp" value='<?=$honorario_disp?>'/>
+  <input type=hidden name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?=$gastos_con_impuestos_disp?>'/>
+  <input type=hidden name="gastos_sin_impuestos_disp" id="gastos_sin_impuestos_disp" value='<?=$gastos_sin_impuestos_disp?>'/>
+  <input type='hidden' name='opc' id='opc' value='buscar'>
+  <input type="hidden" name="porcentaje_impuesto" id="porcentaje_impuesto" value="<?=$porcentaje_impuesto;?>">
+  
+  <!-- Calendario DIV -->
+  <div id="calendar-container" style="width:221px; position:absolute; display:none;">
+    <div class="floating" id="calendar"></div>
+  </div>
+  <!-- Fin calendario DIV --> 
+  <br>
+  <table width='90%'>
+    <tr>
+      <td align=left><b>
+        <?=$txt_pagina ?>
+        </b></td>
+    </tr>
+  </table>
+  <br>
+  <table style="border: 0px solid black;" width='90%'>
+    <tr>
+      <td align=left><b>
+        <?=__('Información de').' '.$tipo_documento_legal?>
+        </b></td>
+    </tr>
+  </table>
+  <table class="border_plomo" style="background-color:#FFFFFF;" width='90%'>
+    <?
 	$numero_documento = '';
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaNumeracionAutomatica') ) || ( method_exists('Conf','UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() ) )
 	{ 
@@ -898,22 +903,13 @@ function ActualizarDocumentoMonedaPago()
 		$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal);
 	} 
 	?>
-	
-	<tr>
-		<td align=right>
-			<?=__('Número')?>
-		</td>
-		<td align=left>
-			<input type="text" name="numero" value="<?=$factura->fields['numero'] ? $factura->fields['numero']:$numero_documento ?>" id="numero" size="11" maxlength="10" />
-		</td>
-		<td align=right>
-			<?=__('Estado')?>
-		</td>
-		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC","id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado']:$id_estado, 'onchange="mostrarAccionesEstado(this.form)"','',"160"); ?>
-		</td>
-	</tr>
-	<?  //Se debe elegir un documento legal padre si:
+    <tr>
+      <td align=right><?=__('Número')?></td>
+      <td align=left><input type="text" name="numero" value="<?=$factura->fields['numero'] ? $factura->fields['numero']:$numero_documento ?>" id="numero" size="11" maxlength="10" /></td>
+      <td align=right><?=__('Estado')?></td>
+      <td align=left><?= Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC","id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado']:$id_estado, 'onchange="mostrarAccionesEstado(this.form)"','',"160"); ?></td>
+    </tr>
+    <?  //Se debe elegir un documento legal padre si:
 		$buscar_padre = false;
 	  
 		$query_doc = " SELECT codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";		
@@ -939,33 +935,24 @@ function ActualizarDocumentoMonedaPago()
 			
 		if($buscar_padre){
 	?>
-	<tr>
-		<td align=right>
-			<?=__('Para Documento Tributario:')?>
-		</td>
-		<td align=left colspan=3>
-			<?=Html::SelectQuery( $sesion, $query_padre, 'id_factura_padre',$factura->fields['id_factura_padre'],'','--','160')?>		
-		</td>
-	</tr>
-	<?}?>
-	<tr>
-		<td align=right>
-			<?=__('Fecha')?>
-		</td>
-		<td align=left colspan=2>
-			<input type="text" name="fecha" value="<?=$factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
-		</td>
-		<td>
-			<span style='display:none' id=letra_inicial>&nbsp;&nbsp;<?=__('Letra')?>:&nbsp;<input name='letra_inicial' value='<?=$factura->fields['letra'] ? $factura->fields['letra']:'' ?>' size=10/> </span>
-		</td>
-	</tr>
-	<tr>
-		<td align=right>
-			<?=__('Cliente')?>
-		</td>
-		<td align=left colspan=3>
-			<?
+    <tr>
+      <td align=right><?=__('Para Documento Tributario:')?></td>
+      <td align=left colspan=3><?=Html::SelectQuery( $sesion, $query_padre, 'id_factura_padre',$factura->fields['id_factura_padre'],'','--','160')?></td>
+    </tr>
+    <?}?>
+    <tr>
+      <td align=right><?=__('Fecha')?></td>
+      <td align=left colspan=2><input type="text" name="fecha" value="<?=$factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+        <img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" /></td>
+      <td><span style='display:none' id=letra_inicial>&nbsp;&nbsp;
+        <?=__('Letra')?>
+        :&nbsp;
+        <input name='letra_inicial' value='<?=$factura->fields['letra'] ? $factura->fields['letra']:'' ?>' size=10/>
+        </span></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('Cliente')?></td>
+      <td align=left colspan=3><?
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -989,197 +976,129 @@ function ActualizarDocumentoMonedaPago()
 						}
 				}
 			?>
-			<!--<input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70" maxlength="99" />-->
-			<span style="color:#FF0000; font-size:10px">*</span>
-		</td>
-	</tr>
-	<tr>
-		<td align=right>
-			<?=__('RUT/NIT')?>
-		</td>
-		<td align=left colspan=3>
-			<input type="text" name="RUT_cliente" value="<?=$factura->fields['RUT_cliente']?>" id="RUT_cliente" size="70" maxlength="20" />
-		</td>
-	</tr>
-	<tr>
-		<td align=right>
-			<?=__('Raz&oacute;n Social Cliente')?>
-		</td>
-		<td align=left colspan=3>
-			<input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70" maxlength="20" />
-		</td>
-	</tr>    
-	<tr>
-		<td align=right>
-			<?=__('Dirección Cliente')?>
-		</td>
-		<td align=left colspan=3>
-			<input type="text" name="direccion_cliente" value="<?=$factura->fields['direccion_cliente']?>" id="direccion_cliente" size="70" maxlength="255" />
-		</td>
-	</tr>
-	
-	<?php
+        
+        <!--<input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70" maxlength="99" />--> 
+        <span style="color:#FF0000; font-size:10px">*</span></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('RUT/NIT')?></td>
+      <td align=left colspan=3><input type="text" name="RUT_cliente" value="<?=$factura->fields['RUT_cliente']?>" id="RUT_cliente" size="70" maxlength="20" /></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('Raz&oacute;n Social Cliente')?></td>
+      <td align=left colspan=3><input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70" maxlength="20" /></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('Dirección Cliente')?></td>
+      <td align=left colspan=3><input type="text" name="direccion_cliente" value="<?=$factura->fields['direccion_cliente']?>" id="direccion_cliente" size="70" maxlength="255" /></td>
+    </tr>
+    <?php
 	
 	
 	
 	if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
 	{ 	
 	?>
-	<tr id='descripcion_factura'>
-		<td align=right width="100">
-			&nbsp;
-		</td>
-		<td align=left style="vertical-align:bottom" width="250">
-			<?=__('Descripción');?>
-		</td>
-		<td align=left width="100">
-			<?=__('Monto');?>
-		</td>
-		<td align=left>
-			<?=__('Monto Impuesto');?>
-		</td>
-	</tr>
-	<tr>
-		<td align=right>
-			<?=__('Honorarios legales');?>
-		</td>
-		<td align=left>
-			<input type="text" name="descripcion_honorarios_legales" value="<?=$descripcion_honorario;?>" size="40" maxlength="300">
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)";>
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_iva_honorarios_legales" value="<?=$impuesto;?>" disabled="true" value="0" size="10" maxlength="30">
-		</td>	
-	</tr>
-	<tr>	
-		<td align=right>
-			<?=__('Gastos c/ IVA');?>
-		</td>
-		<td align=left>
-			<input type="text" name="descripcion_gastos_con_iva" value="<?=$descripcion_subtotal_gastos;?>" size="40" maxlength="30">
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_gastos_con_iva" value="<?php echo isset($gastos_con_iva) ? $gastos_con_iva : $monto_subtotal_gastos;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)">
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_iva_gastos_con_iva" value="<?=$impuesto_gastos;?>" disabled="true" value="0" size="10" maxlength="30">
-		</td>
-	</tr>
-	<?php
+    <tr id='descripcion_factura'>
+      <td align=right width="100">&nbsp;</td>
+      <td align=left style="vertical-align:bottom" width="250"><?=__('Descripción');?></td>
+      <td align=left width="100"><?=__('Monto');?></td>
+      <td align=left><?=__('Monto Impuesto');?></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('Honorarios legales');?></td>
+      <td align=left><input type="text" name="descripcion_honorarios_legales" value="<?=$descripcion_honorario;?>" size="40" maxlength="300"></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)";></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_iva_honorarios_legales" value="<?=$impuesto;?>" disabled="true" value="0" size="10" maxlength="30"></td>
+    </tr>
+    <tr>
+      <td align=right><?=__('Gastos c/ IVA');?></td>
+      <td align=left><input type="text" name="descripcion_gastos_con_iva" value="<?=$descripcion_subtotal_gastos;?>" size="40" maxlength="30"></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_gastos_con_iva" value="<?php echo isset($gastos_con_iva) ? $gastos_con_iva : $monto_subtotal_gastos;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_iva_gastos_con_iva" value="<?=$impuesto_gastos;?>" disabled="true" value="0" size="10" maxlength="30"></td>
+    </tr>
+    <?php
 		if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'UsarGastosConSinImpuesto')=='1'))) {
 	?>
-	<tr>	
-		<td align=right>
-			<?=__('Gastos s/ IVA');?>
-		</td>
-		<td align=left>
-			<input type="text" name="descripcion_gastos_sin_iva" value="<?=$descripcion_subtotal_gastos_sin_impuesto;?>" size="40" maxlength="30">
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)">
-		</td>
-		<td align=left>
-			&nbsp;
-		</td>
-	</tr>	
-	<?php
+    <tr>
+      <td align=right><?=__('Gastos s/ IVA');?></td>
+      <td align=left><input type="text" name="descripcion_gastos_sin_iva" value="<?=$descripcion_subtotal_gastos_sin_impuesto;?>" size="40" maxlength="30"></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"></td>
+      <td align=left>&nbsp;</td>
+    </tr>
+    <?php
 		}
 	?>
-	<tr>	
-		<td align=right colspan=2 >
-			<?=__('Monto')?>
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" name="monto_neto" id='monto_neto' value="<?=$suma_monto;?>" size="10" maxlength="30" disabled="true" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" />
-		</td>
-		<td align=left>
-			&nbsp;
-		</td>	
-	</tr>
-	<tr id='descripcion_factura'>
-		<td align=right colspan=2>
-			<?=__('Impuesto')?>
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" id='iva' name="iva" value="<?=$suma_iva;?>" size="10" maxlength="30" disabled="true" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" />
-			<input type="hidden" id='iva_hidden' name="iva_hidden">
-		</td>
-	</tr>
-	<tr id='descripcion_factura'>
-		<td align=right colspan=2>
-			<?=__('Monto Total')?>
-		</td>
-		<td align=left>
-			<?=$simbolo;?><input type="text" id='total' name="total" value="<?=$suma_total;?>" size="10" maxlength="30"  readonly onfocus="this.blur();">	
-		</td>
-		<td>&nbsp;</td>
-	</tr>   
-	  
-	<?php	
+    <tr>
+      <td align=right colspan=2 ><?=__('Monto')?></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" name="monto_neto" id='monto_neto' value="<?=$suma_monto;?>" size="10" maxlength="30" disabled="true" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" /></td>
+      <td align=left>&nbsp;</td>
+    </tr>
+    <tr id='descripcion_factura'>
+      <td align=right colspan=2><?=__('Impuesto')?></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" id='iva' name="iva" value="<?=$suma_iva;?>" size="10" maxlength="30" disabled="true" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" />
+        <input type="hidden" id='iva_hidden' name="iva_hidden"></td>
+    </tr>
+    <tr id='descripcion_factura'>
+      <td align=right colspan=2><?=__('Monto Total')?></td>
+      <td align=left><?=$simbolo;?>
+        <input type="text" id='total' name="total" value="<?=$suma_total;?>" size="10" maxlength="30"  readonly onfocus="this.blur();"></td>
+      <td>&nbsp;</td>
+    </tr>
+    <?php	
 	}
 	else
 	{
 	?>
-	<tr id='descripcion_factura'>
-		<td align=right>
-			<?=__('Descripción')?>
-		</td>
-		<td align=left>
-			<textarea id='descripcion' name=descripcion cols="45" rows="3"><?=$factura->fields['descripcion']?></textarea>
-		</td>
-	</tr>
-	<tr id='descripcion_factura'>
-		<td align=right>
-			<?=__('Monto')?>
-		</td>
-		<td align=left>
-			<input type="text" name="monto_neto" id='monto_neto' value="<?=$suma_monto;?>" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" />
-		</td>
-	</tr>    
-	<tr id='descripcion_factura'>
-		<td align=right>
-			<?=__('Impuesto')?>
-		</td>
-		<td align=left>
-			<input type="text" id='iva' name="iva" value="<?=$suma_iva;?>" size="10" maxlength="30"   onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" />
-		</td>
-	</tr>
-	<tr id='descripcion_factura'>
-		<td align=right>
-			<?=__('Monto Total')?>
-		</td>
-		<td align=left>
-			<input type="text" id='total' name="total" value="<?=$suma_total;?>" size="10" maxlength="30"  readonly onfocus="this.blur();">
-		</td>
-	</tr> 
-	<?php
+    <tr id='descripcion_factura'>
+      <td align=right><?=__('Descripción')?></td>
+      <td align=left><textarea id='descripcion' name=descripcion cols="45" rows="3"><?=$factura->fields['descripcion']?>
+</textarea></td>
+    </tr>
+    <tr id='descripcion_factura'>
+      <td align=right><?=__('Monto')?></td>
+      <td align=left><input type="text" name="monto_neto" id='monto_neto' value="<?=$suma_monto;?>" onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" /></td>
+    </tr>
+    <tr id='descripcion_factura'>
+      <td align=right><?=__('Impuesto')?></td>
+      <td align=left><input type="text" id='iva' name="iva" value="<?=$suma_iva;?>" size="10" maxlength="30"   onchange="var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.')); $('total').value = total.toFixed(2);" /></td>
+    </tr>
+    <tr id='descripcion_factura'>
+      <td align=right><?=__('Monto Total')?></td>
+      <td align=left><input type="text" id='total' name="total" value="<?=$suma_total;?>" size="10" maxlength="30"  readonly onfocus="this.blur();"></td>
+    </tr>
+    <?php
 	}
-	?>       
-	<tr>
-		<td align=right colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="4" align=center>
-			<img src="<?=Conf::ImgDir()?>/money_16.gif" border=0> <a href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?=__('Tipo de Cambio del Documento de Pago al ser pagado.')?>"><?=__('Actualizar Tipo de Cambio')?></a>
-		</td>
-	</tr>
-	<tr>
-		<td align=right colspan="4">
-			&nbsp;
-		</td>
-	</tr>	
-	<tr>
-		<td align=right colspan="4">
-			<div id="TipoCambioFactura" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
-				<fieldset style="background-color:white;">
-				<legend><?=__('Tipo de Cambio Docuemnto de Pago')?></legend>
-				<div id="contenedor_tipo_load">&nbsp;</div>
-				<div id="contenedor_tipo_cambio">
-				<table style='border-collapse:collapse;' cellpadding='3'>
-					<tr>
-						<?
+	?>
+    <tr>
+      <td align=right colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="4" align=center><img src="<?=Conf::ImgDir()?>/money_16.gif" border=0> <a href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?=__('Tipo de Cambio del Documento de Pago al ser pagado.')?>">
+        <?=__('Actualizar Tipo de Cambio')?>
+        </a></td>
+    </tr>
+    <tr>
+      <td align=right colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td align=right colspan="4"><div id="TipoCambioFactura" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
+          <fieldset style="background-color:white;">
+            <legend>
+            <?=__('Tipo de Cambio Docuemnto de Pago')?>
+            </legend>
+            <div id="contenedor_tipo_load">&nbsp;</div>
+            <div id="contenedor_tipo_cambio">
+              <table style='border-collapse:collapse;' cellpadding='3'>
+                <tr>
+                  <?
 						if( $factura->fields['id_factura'] )
 							{
 								$query = "SELECT count(*) 
@@ -1214,47 +1133,38 @@ function ActualizarDocumentoMonedaPago()
 						while(list($id_moneda,$glosa_moneda,$tipo_cambio) = mysql_fetch_array($resp))
 						{
 						?>
-							<td>
-									<span><b><?=$glosa_moneda?></b></span><br>
-									<input type='text' size=9 id='factura_moneda_<?=$id_moneda?>' name='factura_moneda_<?=$id_moneda?>' value='<?=$tipo_cambio?>' />
-							</td>
-						<?
+                  <td><span><b>
+                    <?=$glosa_moneda?>
+                    </b></span><br>
+                    <input type='text' size=9 id='factura_moneda_<?=$id_moneda?>' name='factura_moneda_<?=$id_moneda?>' value='<?=$tipo_cambio?>' /></td>
+                  <?
 							$num_monedas++;
 							$ids_monedas[] = $id_moneda;
 							$tipo_cambios[] = $tipo_cambio;
 						}
 						?>
-					<tr>
-						<td colspan=<?=$num_monedas?> align=center>
-							<input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?=__('Guardar')?>" />
-							<input type=button onclick="CancelarDocumentoMonedaPago()" value="<?=__('Cancelar')?>" />
-							<input type=hidden id="tipo_cambios_factura" name="tipo_cambios_factura" value="<?=implode(',',$tipo_cambios)?>" />
-							<input type=hidden id="ids_monedas_factura" name="ids_monedas_factura" value="<?=implode(',',$ids_monedas)?>" />
-						</td>
-					</tr>
-			</table>
-			</div>
-			</fieldset>
-			
-			</div>
-		</td>
-	</tr>
-</table>
-
-<br>
-<table style="border: 0px solid black;" width='90%'>
-	<tr>
-		<td align=left>
-			<input type=button class=btn value="<?=__('Guardar')?>" onclick='return Validar(this.form);' />
-			<input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
-			<?if($factura->loaded() && $factura->fields['anulado']==1){?>
-			<input type=button class=btn value="<?=__('Restaurar')?>" onclick="return Cambiar(this.form,'restaurar');" />
-			<?}?>
-			
-			
-		</td>
-	</tr>
-</table>
+                <tr>
+                  <td colspan=<?=$num_monedas?> align=center><input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?=__('Guardar')?>" />
+                    <input type=button onclick="CancelarDocumentoMonedaPago()" value="<?=__('Cancelar')?>" />
+                    <input type=hidden id="tipo_cambios_factura" name="tipo_cambios_factura" value="<?=implode(',',$tipo_cambios)?>" />
+                    <input type=hidden id="ids_monedas_factura" name="ids_monedas_factura" value="<?=implode(',',$ids_monedas)?>" /></td>
+                </tr>
+              </table>
+            </div>
+          </fieldset>
+        </div></td>
+    </tr>
+  </table>
+  <br>
+  <table style="border: 0px solid black;" width='90%'>
+    <tr>
+      <td align=left><input type=button class=btn value="<?=__('Guardar')?>" onclick='return Validar(this.form);' />
+        <input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
+        <?if($factura->loaded() && $factura->fields['anulado']==1){?>
+        <input type=button class=btn value="<?=__('Restaurar')?>" onclick="return Cambiar(this.form,'restaurar');" />
+        <?}?></td>
+    </tr>
+  </table>
 </form>
 <?php
 if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
@@ -1318,7 +1228,7 @@ $(document).observe('dom:loaded', aproximarDecimales);
 		if(empty($id_factura))
 		{
 ?>
-		<script type="text/javascript">
+<script type="text/javascript">
 			CargarDatosCliente();
 		</script>
 <?

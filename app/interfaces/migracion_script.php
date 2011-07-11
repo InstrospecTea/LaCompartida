@@ -1,4 +1,4 @@
-<? 
+<?
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../app/interfaces/migracion_conf.php';
 	require_once Conf::ServerDir().'/../app/classes/Migracion.php';
@@ -7,11 +7,11 @@
 
 	$sesion = new Sesion();
 	$migracion = new Migracion($sesion);
-	
+
 	// Conectarse a la base de datos antiguo
 	$dbhOrigen = @mysql_connect(ConfMigracion::dbHost(), ConfMigracion::dbUser(),ConfMigracion::dbPass()) or die(mysql_error());
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
-	
+
 	// Nombre de función para revisar datos recibidos: "ImprimirDataEnPantalla"
 	
 	set_time_limit(0);
@@ -28,13 +28,12 @@
 		//$migracion->ImprimirDataEnPantalla($responseUsuario);
 		$migracion->Query2ObjetoUsuario($responseUsuario);
 	}
-
-
-
+*/
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryCliente') && ConfMigracion::QueryCliente() != "" )
 	{
 		$responseCliente = mysql_query(ConfMigracion::QueryCliente(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCliente(),__FILE__,__LINE__,$dbhOrigen);
-		$migracion->Query2ObjetosCliente($responseCliente);
+		$migracion->Query2ObjetosCliente( $responseCliente, true );
 	}
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
@@ -43,34 +42,53 @@
 		$responseAsunto = mysql_query(ConfMigracion::QueryAsunto(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryAsunto(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoAsunto($responseAsunto);
 	}
-	*/
-
+	
+/*
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )
 	{
 		$responseHoras = mysql_query(ConfMigracion::QueryHoras(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);
-		
 		$migracion->Query2ObjetoHora($responseHoras);
 		//$horas = mysql_fetch_assoc($responseHoras);
 		//$migracion->AgregarHoras($responseHoras);
-
 	}
-	/*
+
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryGastos') && ConfMigracion::QueryGastos() != "" )
 	{
 		$responseGastos = mysql_query(ConfMigracion::QueryGastos(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);
-		$gastos = mysql_fetch_assoc($responseGastos);
+		$migracion->ImprimirDataEnPantalla($responseGastos);
 	}
 	
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryCobros') && ConfMigracion::QueryCobros() )
 	{
-		$responseCobros = mysql_query(ConfMigracion::QueryCobros(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCobros(),__FILE__,__LINE__,$dbhOrigen);
-		$cobros = mysql_fetch_assoc($responseCobros);
+		$responseCobros = mysql_query(ConfMigracion::QueryCobros(), $dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCobros(), __FILE__, __LINE__, $dbhOrigen);
+		$migracion->Query2ArrayCobros($responseCobros);
 	}
 	
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
+	if( method_exists('ConfMigracion','QueryTarifas') && ConfMigracion::QueryTarifas() )
+	{
+		$responseTarifas = mysql_query(ConfMigracion::QueryTarifas(), $dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryTarifas(), __FILE__, __LINE__, $dbhOrigen);
+		$migracion->Query2ObjetoTarifa($responseTarifas);
+	}
+	
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
+	if( method_exists('ConfMigracion','QueryUsuariosTarifas') && ConfMigracion::QueryUsuariosTarifas() )
+	{
+		$responseTarifasUsuario = mysql_query(ConfMigracion::QueryUsuariosTarifas(), $dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryUsuariosTarifas(), __FILE__, __LINE__, $dbhOrigen);
+		$migracion->Query2ObjetoUsuarioTarifa($responseTarifasUsuario);
+	}
+
+	
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryFacturas') && ConfMigracion::QueryFacturas() )
 	{
 		$responseFacturas = mysql_query(ConfMigracion::QueryFacturas(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryFacturas(),__FILE__,__LINE__,$dbhOrigen);
 		$facturas = mysql_fetch_assoc($responseFacturas);
 	}*/
+	echo '<pre>';
+	print_r($migracion->logs);
+	echo '</pre>';
 ?>

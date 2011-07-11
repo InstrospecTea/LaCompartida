@@ -105,6 +105,7 @@
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
+					, '' as fecha_ultimo_pago
 				FROM factura
 				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -218,12 +219,12 @@
 
 		// ancho celdas
 		if(in_array($col_name[$i],array('descripcion')) ) {
-			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 14); }
-		else if(in_array($col_name[$i],array('saldo','iva','honorarios','saldo_moneda_base','glosa_cliente')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 12); }
+		else if(in_array($col_name[$i],array('saldo','iva','honorarios','saldo_moneda_base')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11); }
 		else if(in_array($col_name[$i],array('numero','cobro','tipo','saldo_pagos','estado','id_cobro')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 8); }
-		else if(in_array($col_name[$i],array('encargado_comercial')) ) {
+		else if(in_array($col_name[$i],array('encargado_comercial','fecha_ultimo_pago','glosa_asunto','glosa_cliente')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 
@@ -232,7 +233,7 @@
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 		// css celdas
-		if(in_array($col_name[$i],array('fecha')) ) {
+		if(in_array($col_name[$i],array('fecha','fecha_ultimo_pago')) ) {
 			$arr_col[$col_name[$i]]['css'] = $formato_fecha_tiempo; }
 		else if(in_array($col_name[$i],array('glosa_cliente','descripcion','glosa_asunto')) ) {
 			$arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
@@ -257,6 +258,8 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Saldo'.' '.$simbolo_moneda_base); }
 		else if(in_array($col_name[$i],array('monto_pagos_moneda_base')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'.' '.$simbolo_moneda_base); }
+		else if(in_array($col_name[$i],array('fecha_ultimo_pago')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Fecha último pago'); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
 
 		//formato columna excel para formulas
@@ -308,7 +311,7 @@
 			$lista_asuntos_glosa = $lista_glosa_asunto;
 		}
 
-		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
+		$query = "SELECT SUM(ccfmn.monto) as monto_aporte, MAX(ccfm.fecha_modificacion) as ultima_fecha_pago
 					FROM factura_pago AS fp
 					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
@@ -317,9 +320,9 @@
 
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_pago = 0;
-		while(list($monto_aporte) = mysql_fetch_array($resp)){
-			$monto_pago = $monto_aporte;
-		}
+		list($monto_pago,$ultima_fecha_pago) = mysql_fetch_array($resp);
+			
+		
 
 		for($i=0; $i<$col_num; $i++) {
 	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
@@ -358,6 +361,11 @@
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 				}
+				if($col_name[$i] == 'fecha_ultimo_pago') {
+
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $ultima_fecha_pago, $arr_col[$col_name[$i]]['css']);
+				}
+
 				else {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
 				}

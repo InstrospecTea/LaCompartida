@@ -769,6 +769,21 @@ class Factura extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $id;
 	}
+
+	function GetlistaCobroSoyDatoFactura($id = null,$tipo = null,$numero = null){
+		$lista_cobros = '';
+		$where = " WHERE 1";
+		if($id)
+			$where .= " AND f.id_factura = '".$id."'";
+		if($tipo)
+			$where .= " AND f.id_documento_legal = '".$tipo."'";
+		if($numero)
+			$where .= " AND f.numero = '".$numero."'";
+		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f " . $where . " GROUP BY grupo";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($lista_cobros,$grupo) = mysql_fetch_array($resp);
+		return $lista_cobros;
+	}
 } #end Class
 
 class ListaFacturas extends Lista

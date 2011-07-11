@@ -60,7 +60,7 @@ class CobroMoneda extends Objeto
 		else
 		{
 			$query_monedas = "SELECT id_moneda, tipo_cambio FROM prm_moneda";
-			$resp2 = mysql_query($query_monedas);
+			$resp2 = mysql_query($query_monedas, $this->sesion->dbh) or Utiles::errorSQL($query_monedas,__FILE__,__LINE__,$this->sesion->dbh);
 			while($row = mysql_fetch_array($resp2))
 			{
 				$row['id_moneda'];

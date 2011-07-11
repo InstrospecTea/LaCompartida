@@ -5629,6 +5629,313 @@ VALUES (
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
+					case 4.31:
+						$query = array();
+						$query[] = "ALTER TABLE `tarifa` ADD `tarifa_flat` DOUBLE NULL COMMENT 'si es una tarifa flat (igual para todos los profesionales) se guarda el monto. si no, es null';";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.32:
+						$query = array();
+						$query[] = "ALTER TABLE  `contrato` ADD  `id_cuenta` INT( 11 ) NOT NULL ;";
+						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `cod_swift` VARCHAR( 50 ) NOT NULL ;";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.33:
+						$query = array();
+						$query[] = "ALTER TABLE  `contrato` ADD  `id_pais` INT( 11 ) NOT NULL ;";
+						$query[] = "CREATE TABLE `prm_pais` (
+  `id_pais` int(11) NOT NULL auto_increment,
+  `iso_num` smallint(6) default NULL,
+  `iso_2siglas` char(2) default NULL,
+  `iso_3siglas` char(3) default NULL,
+  `nombre` varchar(80) default NULL,
+  `preferencia` tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (`id_pais`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+						$query[] = "
+INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganist�n', 0),
+(2, 248, 'AX', 'ALA', 'Islas Gland', 0),
+(3, 8, 'AL', 'ALB', 'Albania', 0),
+(4, 276, 'DE', 'DEU', 'Alemania', 0),
+(5, 20, 'AD', 'AND', 'Andorra', 0),
+(6, 24, 'AO', 'AGO', 'Angola', 0),
+(7, 660, 'AI', 'AIA', 'Anguilla', 0),
+(8, 10, 'AQ', 'ATA', 'Ant�rtida', 0),
+(9, 28, 'AG', 'ATG', 'Antigua y Barbuda', 0),
+(10, 530, 'AN', 'ANT', 'Antillas Holandesas', 0),
+(11, 682, 'SA', 'SAU', 'Arabia Saud�', 0),
+(12, 12, 'DZ', 'DZA', 'Argelia', 0),
+(13, 32, 'AR', 'ARG', 'Argentina', 1),
+(14, 51, 'AM', 'ARM', 'Armenia', 0),
+(15, 533, 'AW', 'ABW', 'Aruba', 0),
+(16, 36, 'AU', 'AUS', 'Australia', 0),
+(17, 40, 'AT', 'AUT', 'Austria', 0),
+(18, 31, 'AZ', 'AZE', 'Azerbaiy�n', 0),
+(19, 44, 'BS', 'BHS', 'Bahamas', 0),
+(20, 48, 'BH', 'BHR', 'Bahr�in', 0),
+(21, 50, 'BD', 'BGD', 'Bangladesh', 0),
+(22, 52, 'BB', 'BRB', 'Barbados', 0),
+(23, 112, 'BY', 'BLR', 'Bielorrusia', 0),
+(24, 56, 'BE', 'BEL', 'B�lgica', 0),
+(25, 84, 'BZ', 'BLZ', 'Belice', 0),
+(26, 204, 'BJ', 'BEN', 'Benin', 0),
+(27, 60, 'BM', 'BMU', 'Bermudas', 0),
+(28, 64, 'BT', 'BTN', 'Bhut�n', 0),
+(29, 68, 'BO', 'BOL', 'Bolivia', 1),
+(30, 70, 'BA', 'BIH', 'Bosnia y Herzegovina', 0),
+(31, 72, 'BW', 'BWA', 'Botsuana', 0),
+(32, 74, 'BV', 'BVT', 'Isla Bouvet', 0),
+(33, 76, 'BR', 'BRA', 'Brasil', 1),
+(34, 96, 'BN', 'BRN', 'Brun�i', 0),
+(35, 100, 'BG', 'BGR', 'Bulgaria', 0),
+(36, 854, 'BF', 'BFA', 'Burkina Faso', 0),
+(37, 108, 'BI', 'BDI', 'Burundi', 0),
+(38, 132, 'CV', 'CPV', 'Cabo Verde', 0),
+(39, 136, 'KY', 'CYM', 'Islas Caim�n', 0),
+(40, 116, 'KH', 'KHM', 'Camboya', 0),
+(41, 120, 'CM', 'CMR', 'Camer�n', 0),
+(42, 124, 'CA', 'CAN', 'Canad�', 0),
+(43, 140, 'CF', 'CAF', 'Rep�blica Centroafricana', 0),
+(44, 148, 'TD', 'TCD', 'Chad', 0),
+(45, 203, 'CZ', 'CZE', 'Rep�blica Checa', 0),
+(46, 152, 'CL', 'CHL', 'Chile', 1),
+(47, 156, 'CN', 'CHN', 'China', 0),
+(48, 196, 'CY', 'CYP', 'Chipre', 0),
+(49, 162, 'CX', 'CXR', 'Isla de Navidad', 0),
+(50, 336, 'VA', 'VAT', 'Ciudad del Vaticano', 0),
+(51, 166, 'CC', 'CCK', 'Islas Cocos', 0),
+(52, 170, 'CO', 'COL', 'Colombia', 1),
+(53, 174, 'KM', 'COM', 'Comoras', 0),
+(54, 180, 'CD', 'COD', 'Rep�blica Democr�tica del Congo', 0),
+(55, 178, 'CG', 'COG', 'Congo', 0),
+(56, 184, 'CK', 'COK', 'Islas Cook', 0),
+(57, 408, 'KP', 'PRK', 'Corea del Norte', 0),
+(58, 410, 'KR', 'KOR', 'Corea del Sur', 0),
+(59, 384, 'CI', 'CIV', 'Costa de Marfil', 0),
+(60, 188, 'CR', 'CRI', 'Costa Rica', 1),
+(61, 191, 'HR', 'HRV', 'Croacia', 0),
+(62, 192, 'CU', 'CUB', 'Cuba', 1),
+(63, 208, 'DK', 'DNK', 'Dinamarca', 0),
+(64, 212, 'DM', 'DMA', 'Dominica', 0),
+(65, 214, 'DO', 'DOM', 'Rep�blica Dominicana', 0),
+(66, 218, 'EC', 'ECU', 'Ecuador', 1),
+(67, 818, 'EG', 'EGY', 'Egipto', 0),
+(68, 222, 'SV', 'SLV', 'El Salvador', 1),
+(69, 784, 'AE', 'ARE', 'Emiratos �rabes Unidos', 0),
+(70, 232, 'ER', 'ERI', 'Eritrea', 0),
+(71, 703, 'SK', 'SVK', 'Eslovaquia', 0),
+(72, 705, 'SI', 'SVN', 'Eslovenia', 0),
+(73, 724, 'ES', 'ESP', 'Espa�a', 0),
+(74, 581, 'UM', 'UMI', 'Islas ultramarinas de Estados Unidos', 0),
+(75, 840, 'US', 'USA', 'Estados Unidos', 0),
+(76, 233, 'EE', 'EST', 'Estonia', 0),
+(77, 231, 'ET', 'ETH', 'Etiop�a', 0),
+(78, 234, 'FO', 'FRO', 'Islas Feroe', 0),
+(79, 608, 'PH', 'PHL', 'Filipinas', 0),
+(80, 246, 'FI', 'FIN', 'Finlandia', 0),
+(81, 242, 'FJ', 'FJI', 'Fiyi', 0),
+(82, 250, 'FR', 'FRA', 'Francia', 0),
+(83, 266, 'GA', 'GAB', 'Gab�n', 0),
+(84, 270, 'GM', 'GMB', 'Gambia', 0),
+(85, 268, 'GE', 'GEO', 'Georgia', 0),
+(86, 239, 'GS', 'SGS', 'Islas Georgias del Sur y Sandwich del Sur', 0),
+(87, 288, 'GH', 'GHA', 'Ghana', 0),
+(88, 292, 'GI', 'GIB', 'Gibraltar', 0),
+(89, 308, 'GD', 'GRD', 'Granada', 0),
+(90, 300, 'GR', 'GRC', 'Grecia', 0),
+(91, 304, 'GL', 'GRL', 'Groenlandia', 0),
+(92, 312, 'GP', 'GLP', 'Guadalupe', 0),
+(93, 316, 'GU', 'GUM', 'Guam', 0),
+(94, 320, 'GT', 'GTM', 'Guatemala', 1),
+(95, 254, 'GF', 'GUF', 'Guayana Francesa', 0),
+(96, 324, 'GN', 'GIN', 'Guinea', 0),
+(97, 226, 'GQ', 'GNQ', 'Guinea Ecuatorial', 0),
+(98, 624, 'GW', 'GNB', 'Guinea-Bissau', 0),
+(99, 328, 'GY', 'GUY', 'Guyana', 0),
+(100, 332, 'HT', 'HTI', 'Hait�', 0),
+(101, 334, 'HM', 'HMD', 'Islas Heard y McDonald', 0),
+(102, 340, 'HN', 'HND', 'Honduras', 1),
+(103, 344, 'HK', 'HKG', 'Hong Kong', 0),
+(104, 348, 'HU', 'HUN', 'Hungr�a', 0),
+(105, 356, 'IN', 'IND', 'India', 0),
+(106, 360, 'ID', 'IDN', 'Indonesia', 0),
+(107, 364, 'IR', 'IRN', 'Ir�n', 0),
+(108, 368, 'IQ', 'IRQ', 'Iraq', 0),
+(109, 372, 'IE', 'IRL', 'Irlanda', 0),
+(110, 352, 'IS', 'ISL', 'Islandia', 0),
+(111, 376, 'IL', 'ISR', 'Israel', 0),
+(112, 380, 'IT', 'ITA', 'Italia', 0),
+(113, 388, 'JM', 'JAM', 'Jamaica', 0),
+(114, 392, 'JP', 'JPN', 'Jap�n', 0),
+(115, 400, 'JO', 'JOR', 'Jordania', 0),
+(116, 398, 'KZ', 'KAZ', 'Kazajst�n', 0),
+(117, 404, 'KE', 'KEN', 'Kenia', 0),
+(118, 417, 'KG', 'KGZ', 'Kirguist�n', 0),
+(119, 296, 'KI', 'KIR', 'Kiribati', 0),
+(120, 414, 'KW', 'KWT', 'Kuwait', 0),
+(121, 418, 'LA', 'LAO', 'Laos', 0),
+(122, 426, 'LS', 'LSO', 'Lesotho', 0),
+(123, 428, 'LV', 'LVA', 'Letonia', 0),
+(124, 422, 'LB', 'LBN', 'L�bano', 0),
+(125, 430, 'LR', 'LBR', 'Liberia', 0),
+(126, 434, 'LY', 'LBY', 'Libia', 0),
+(127, 438, 'LI', 'LIE', 'Liechtenstein', 0),
+(128, 440, 'LT', 'LTU', 'Lituania', 0),
+(129, 442, 'LU', 'LUX', 'Luxemburgo', 0),
+(130, 446, 'MO', 'MAC', 'Macao', 0),
+(131, 807, 'MK', 'MKD', 'ARY Macedonia', 0),
+(132, 450, 'MG', 'MDG', 'Madagascar', 0),
+(133, 458, 'MY', 'MYS', 'Malasia', 0),
+(134, 454, 'MW', 'MWI', 'Malawi', 0),
+(135, 462, 'MV', 'MDV', 'Maldivas', 0),
+(136, 466, 'ML', 'MLI', 'Mal�', 0),
+(137, 470, 'MT', 'MLT', 'Malta', 0),
+(138, 238, 'FK', 'FLK', 'Islas Malvinas', 0),
+(139, 580, 'MP', 'MNP', 'Islas Marianas del Norte', 0),
+(140, 504, 'MA', 'MAR', 'Marruecos', 0),
+(141, 584, 'MH', 'MHL', 'Islas Marshall', 0),
+(142, 474, 'MQ', 'MTQ', 'Martinica', 0),
+(143, 480, 'MU', 'MUS', 'Mauricio', 0),
+(144, 478, 'MR', 'MRT', 'Mauritania', 0),
+(145, 175, 'YT', 'MYT', 'Mayotte', 0),
+(146, 484, 'MX', 'MEX', 'M�xico', 0),
+(147, 583, 'FM', 'FSM', 'Micronesia', 0),
+(148, 498, 'MD', 'MDA', 'Moldavia', 0),
+(149, 492, 'MC', 'MCO', 'M�naco', 0),
+(150, 496, 'MN', 'MNG', 'Mongolia', 0),
+(151, 500, 'MS', 'MSR', 'Montserrat', 0),
+(152, 508, 'MZ', 'MOZ', 'Mozambique', 0),
+(153, 104, 'MM', 'MMR', 'Myanmar', 0),
+(154, 516, 'NA', 'NAM', 'Namibia', 0),
+(155, 520, 'NR', 'NRU', 'Nauru', 0),
+(156, 524, 'NP', 'NPL', 'Nepal', 0),
+(157, 558, 'NI', 'NIC', 'Nicaragua', 0),
+(158, 562, 'NE', 'NER', 'N�ger', 0),
+(159, 566, 'NG', 'NGA', 'Nigeria', 0),
+(160, 570, 'NU', 'NIU', 'Niue', 0),
+(161, 574, 'NF', 'NFK', 'Isla Norfolk', 0),
+(162, 578, 'NO', 'NOR', 'Noruega', 0),
+(163, 540, 'NC', 'NCL', 'Nueva Caledonia', 0),
+(164, 554, 'NZ', 'NZL', 'Nueva Zelanda', 0),
+(165, 512, 'OM', 'OMN', 'Om�n', 0),
+(166, 528, 'NL', 'NLD', 'Pa�ses Bajos', 0),
+(167, 586, 'PK', 'PAK', 'Pakist�n', 0),
+(168, 585, 'PW', 'PLW', 'Palau', 0),
+(169, 275, 'PS', 'PSE', 'Palestina', 0),
+(170, 591, 'PA', 'PAN', 'Panam�', 0),
+(171, 598, 'PG', 'PNG', 'Pap�a Nueva Guinea', 0),
+(172, 600, 'PY', 'PRY', 'Paraguay', 1),
+(173, 604, 'PE', 'PER', 'Per�', 1),
+(174, 612, 'PN', 'PCN', 'Islas Pitcairn', 0),
+(175, 258, 'PF', 'PYF', 'Polinesia Francesa', 0),
+(176, 616, 'PL', 'POL', 'Polonia', 0),
+(177, 620, 'PT', 'PRT', 'Portugal', 0),
+(178, 630, 'PR', 'PRI', 'Puerto Rico', 0),
+(179, 634, 'QA', 'QAT', 'Qatar', 0),
+(180, 826, 'GB', 'GBR', 'Reino Unido', 0),
+(181, 638, 'RE', 'REU', 'Reuni�n', 0),
+(182, 646, 'RW', 'RWA', 'Ruanda', 0),
+(183, 642, 'RO', 'ROU', 'Rumania', 0),
+(184, 643, 'RU', 'RUS', 'Rusia', 0),
+(185, 732, 'EH', 'ESH', 'Sahara Occidental', 0),
+(186, 90, 'SB', 'SLB', 'Islas Salom�n', 0),
+(187, 882, 'WS', 'WSM', 'Samoa', 0),
+(188, 16, 'AS', 'ASM', 'Samoa Americana', 0),
+(189, 659, 'KN', 'KNA', 'San Crist�bal y Nevis', 0),
+(190, 674, 'SM', 'SMR', 'San Marino', 0),
+(191, 666, 'PM', 'SPM', 'San Pedro y Miquel�n', 0),
+(192, 670, 'VC', 'VCT', 'San Vicente y las Granadinas', 0),
+(193, 654, 'SH', 'SHN', 'Santa Helena', 0),
+(194, 662, 'LC', 'LCA', 'Santa Luc�a', 0),
+(195, 678, 'ST', 'STP', 'Santo Tom� y Pr�ncipe', 0),
+(196, 686, 'SN', 'SEN', 'Senegal', 0),
+(197, 891, 'CS', 'SCG', 'Serbia y Montenegro', 0),
+(198, 690, 'SC', 'SYC', 'Seychelles', 0),
+(199, 694, 'SL', 'SLE', 'Sierra Leona', 0),
+(200, 702, 'SG', 'SGP', 'Singapur', 0),
+(201, 760, 'SY', 'SYR', 'Siria', 0),
+(202, 706, 'SO', 'SOM', 'Somalia', 0),
+(203, 144, 'LK', 'LKA', 'Sri Lanka', 0),
+(204, 748, 'SZ', 'SWZ', 'Suazilandia', 0),
+(205, 710, 'ZA', 'ZAF', 'Sud�frica', 0),
+(206, 736, 'SD', 'SDN', 'Sud�n', 0),
+(207, 752, 'SE', 'SWE', 'Suecia', 0),
+(208, 756, 'CH', 'CHE', 'Suiza', 0),
+(209, 740, 'SR', 'SUR', 'Surinam', 0),
+(210, 744, 'SJ', 'SJM', 'Svalbard y Jan Mayen', 0),
+(211, 764, 'TH', 'THA', 'Tailandia', 0),
+(212, 158, 'TW', 'TWN', 'Taiw�n', 0),
+(213, 834, 'TZ', 'TZA', 'Tanzania', 0),
+(214, 762, 'TJ', 'TJK', 'Tayikist�n', 0),
+(215, 86, 'IO', 'IOT', 'Territorio Brit�nico del Oc�ano �ndico', 0),
+(216, 260, 'TF', 'ATF', 'Territorios Australes Franceses', 0),
+(217, 626, 'TL', 'TLS', 'Timor Oriental', 0),
+(218, 768, 'TG', 'TGO', 'Togo', 0),
+(219, 772, 'TK', 'TKL', 'Tokelau', 0),
+(220, 776, 'TO', 'TON', 'Tonga', 0),
+(221, 780, 'TT', 'TTO', 'Trinidad y Tobago', 0),
+(222, 788, 'TN', 'TUN', 'T�nez', 0),
+(223, 796, 'TC', 'TCA', 'Islas Turcas y Caicos', 0),
+(224, 795, 'TM', 'TKM', 'Turkmenist�n', 0),
+(225, 792, 'TR', 'TUR', 'Turqu�a', 0),
+(226, 798, 'TV', 'TUV', 'Tuvalu', 0),
+(227, 804, 'UA', 'UKR', 'Ucrania', 0),
+(228, 800, 'UG', 'UGA', 'Uganda', 0),
+(229, 858, 'UY', 'URY', 'Uruguay', 1),
+(230, 860, 'UZ', 'UZB', 'Uzbekist�n', 0),
+(231, 548, 'VU', 'VUT', 'Vanuatu', 0),
+(232, 862, 'VE', 'VEN', 'Venezuela', 1),
+(233, 704, 'VN', 'VNM', 'Vietnam', 0),
+(234, 92, 'VG', 'VGB', 'Islas V�rgenes Brit�nicas', 0),
+(235, 850, 'VI', 'VIR', 'Islas V�rgenes de los Estados Unidos', 0),
+(236, 876, 'WF', 'WLF', 'Wallis y Futuna', 0),
+(237, 887, 'YE', 'YEM', 'Yemen', 0),
+(238, 262, 'DJ', 'DJI', 'Yibuti', 0),
+(239, 894, 'ZM', 'ZMB', 'Zambia', 0),
+(240, 716, 'ZW', 'ZWE', 'Zimbabue', 0);";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+
+					case 4.34:
+						$query = array();
+						$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_proveedor`  `id_proveedor` INT( 11 ) NULL DEFAULT  '0'";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.35:
+						$query = array();
+						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `CCI` VARCHAR( 50 ) NOT NULL ;";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.36:
+						$query = array();
+						$query[] = "DROP TABLE  `usuario_tarifa_cliente`;";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.37:
+						$query = array();
+						$query[] = "ALTER TABLE  `cobro_historial` ADD  `id_factura` INT( 11 ) NOT NULL DEFAULT  '0' AFTER  `id_cobro` ;";
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
 
  	}
 }
@@ -5830,6 +6137,13 @@ VALUES (
 	$VERSIONES[$num++] = 4.28;
 	$VERSIONES[$num++] = 4.29;
 	$VERSIONES[$num++] = 4.30;
+	$VERSIONES[$num++] = 4.31;
+	$VERSIONES[$num++] = 4.32;
+	$VERSIONES[$num++] = 4.33;
+	$VERSIONES[$num++] = 4.34;
+	$VERSIONES[$num++] = 4.35;
+	$VERSIONES[$num++] = 4.36;
+	$VERSIONES[$num++] = 4.37;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

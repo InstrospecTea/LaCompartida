@@ -3398,6 +3398,8 @@ class Cobro extends Objeto
 			$html = str_replace('%profesional%',__('Profesional'), $html);
 			$html = str_replace('%staff%',__('Staff'), $html);
 			$html = str_replace('%abogado%',__('Abogado'), $html);
+			$html = str_replace('%duracion_cobrable%',__('Duración cobrable'), $html);
+			$html = str_replace('%monto_total%',__('Monto total'), $html);
 			$html = str_replace('%horas%',__('Horas'), $html);
 
 			if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) ) )
@@ -6105,6 +6107,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
+				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				$html2 = str_replace('%valor_direccion%', nl2br($contrato->fields['direccion_contacto']), $html2);
 
 				#formato especial
@@ -6167,9 +6170,28 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				}
 				$html2 = str_replace('%asunto_mb%',__('%asunto_mb%'),$html2);
 				$html2 = str_replace('%presente%',__('Presente'),$html2);
+
+				if($contrato->fields['id_pais']>0){
+					$query = "SELECT nombre FROM prm_pais
+										WHERE id_pais=".$contrato->fields['id_pais'];
+					$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					list($nombre_pais) = mysql_fetch_array($resp);
+					$html2 = str_replace('%nombre_pais%',$nombre_pais,$html2);
+					$html2 = str_replace('%nombre_pais_mayuscula%',strtoupper($nombre_pais),$html2);
+				}
+				else {
+					$html2 = str_replace('%nombre_pais%','',$html2);
+					$html2 = str_replace('%nombre_pais_mayuscula%','',$html2);
+				}
+
 			break;
 
 			case 'DETALLE':
+
+				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
+				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
+				
+
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */
 				#carta mb
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
@@ -6515,6 +6537,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$html2 = str_replace('%monto_total_sin_iva%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].' '.number_format($x_resultados['monto_cobro_original'][$this->fields['opc_moneda_total']],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				}
 
+				$moneda_opc_total = new Moneda($this->sesion);
+				$moneda_opc_total->Load($this->fields['opc_moneda_total']);
+
+				if($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']]>0) {
+					$html2 = str_replace('%frase_moneda%', strtolower($moneda_opc_total->fields['glosa_moneda_plural']) ,$html2);
+				}
+				else {
+					$html2 = str_replace('%frase_moneda%', strtolower($moneda_opc_total->fields['glosa_moneda']) ,$html2);
+				}
+
 				if( $this->fields['opc_moneda_total'] != $this->fields['id_moneda'] )
 					$html2 = str_replace('%equivalente_a_baz%', ', equivalentes a '.$moneda->fields['simbolo'].' '.number_format($this->fields['monto'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html2);
 				else
@@ -6705,7 +6737,26 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html2 = str_replace('%encargado_comercial%',$nombre_encargado,$html2);
 				$simbolo_opc_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
 				$html2 = str_replace('%simbolo_opc_moneda_totall%',$simbolo_opc_moneda_total,$html2);
-				
+
+				if($contrato->fields['id_cuenta']>0) {
+					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI
+								FROM cuenta_banco cb
+								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
+								WHERE cb.id_cuenta = '".$contrato->fields['id_cuenta']."'";
+					$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					list($glosa_banco,$numero_cuenta,$codigo_swift,$codigo_cci) = mysql_fetch_array($resp);
+					$html2 = str_replace('%numero_cuenta_contrato%',$numero_cuenta,$html2);
+					$html2 = str_replace('%glosa_banco_contrato%',$glosa_banco,$html2);
+					$html2 = str_replace('%codigo_swift%',$codigo_swift,$html2);
+					$html2 = str_replace('%codigo_cci%',$codigo_cci,$html2);
+				}
+				else {
+					$html2 = str_replace('%numero_cuenta_contrato%','',$html2);
+					$html2 = str_replace('%glosa_banco_contrato%','',$html2);
+					$html2 = str_replace('%codigo_swift%','',$html2);
+					$html2 = str_replace('%codigo_cci%','',$html2);
+				}
+
 			break;
 
 			case 'ADJ':
@@ -7865,6 +7916,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%servicios_prestados%',__('Servicios Prestados'), $html);
 			$html = str_replace('%detalle_trabajo%',__('Detalle del Trabajo Realizado'),$html);
 			$html = str_replace('%profesional%',__('Profesional'), $html);
+			$html = str_replace('%duracion_cobrable%',__('Duración cobrable'), $html);
+			$html = str_replace('%monto_total%',__('Monto total'), $html);
 			$html = str_replace('%staff%',__('Staff'), $html);
 			$html = str_replace('%abogado%',__('Abogado'), $html);
 			$html = str_replace('%horas%',__('Horas'), $html);

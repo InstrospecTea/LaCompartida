@@ -15,11 +15,11 @@ require_once Conf::ServerDir().'/../app/classes/UsuarioExt.php';
 require_once Conf::ServerDir().'/../app/classes/UsuarioExt.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
+require_once Conf::ServerDir().'/../app/classes/Tarifa.php';
 
 class Migracion
 {
-	var 
-$sesion = null;
+	var $sesion = null;
 	var $logs = array();
 
 	public function Migracion()
@@ -195,7 +195,7 @@ $sesion = null;
 	}
 	
 	
-function ImprimirDataEnPantalla($response)
+	function ImprimirDataEnPantalla($response)
 	{
 	 	echo "<table border='1px solid black'>";
 	 	$i=0;
@@ -277,10 +277,7 @@ function ImprimirDataEnPantalla($response)
 			}
 
 
-			//self::AgregarAsunto($asunto, $contrato);
 			self::AgregarAsunto($asunto, $contrato, NULL, NULL, $cliente);
-			//echo '<pre>';print_r($asunto->fields);echo '</pre>';
-			//echo '<pre>';print_r($contrato->fields);echo '</pre>';
 		}
 	}
  
@@ -297,7 +294,7 @@ function ImprimirDataEnPantalla($response)
 			$permisos = $this->PermisosSegunCategoria($row);
 			$row      = $this->LimpiarCategoriaUsuario($row);
 			
-			if( $row['usuario_FFF_email'] == "" ) 
+			if( $row['usuario_FFF_email'] == "" )
 				$row['usuario_FFF_email'] = 'mail@estudio.pais';
 			if( $row['usuario_FFF_rut'] == "" || trim($row['usuario_FFF_rut']) == "000" || trim($row['usuario_FFF_rut']) == "0000" ) 
 				$row['usuario_FFF_rut']   = $row['usuario_FFF_id_usuario'];
@@ -311,6 +308,104 @@ function ImprimirDataEnPantalla($response)
 			$this->AgregarUsuario($usuario, $permisos);
 			//echo '<pre>';print_r($usuario->fields);echo '</pre>';
 			//echo "<br><br>--------------------------------------------<br><br>";
+		}
+	}
+	
+	public function Query2ArrayCobros($responseCobros)
+	{
+		$cobros = array();
+		while ($cobro = mysql_fetch_assoc($responseCobros))
+		{
+			$cobros[] = array
+			(
+				'id_contrato' => $cobro['id_contrato'],
+				'fecha_ini' => $cobro['fecha_ini'],
+				'fecha_fin' => $cobro['fecha_fin']
+			);
+		}
+		$this->GenerarCobros($cobros);
+	}
+	
+	public function Query2Gastos($responseGastos)
+	{
+		$gastos = array();
+		while($gasto_ = mysql_fetch_assoc($responseGastos))
+		{
+			$gasto = new Gasto($this->sesion);
+			$gasto->guardar_fecha = false;
+
+			foreach ($gasto_ as $key => $val)
+			{
+				$keys = explode('_FFF_', $key);
+				$gasto->Edit($keys[1], $val);
+			}
+
+			if ($this->ValidarGasto($gasto))
+			{
+				$this->GenerarGasto($gasto);
+			}
+			else
+			{
+				echo "Error al generar el gasto";
+			}
+		}
+	}
+
+	function Query2ObjetoTarifa($response)
+	{
+
+		while($row = mysql_fetch_assoc($response))
+		{
+			$sesion = new Sesion();
+			$tarifa = new Tarifa($sesion);
+			//$tarifa->guardar_fecha = false;
+			$forzar_insert = true;
+
+			foreach( $row as $key => $val )
+			{
+				$tarifa->Edit($key,$val);
+			}
+
+			if (!$this->Write($tarifa, $forzar_insert))
+			{
+				echo "Error al generar el tarifa<br/>\n";
+				return false;
+			}
+			else
+			{
+				echo "<br>tarifa creada --> ";
+				print_r($tarifa->fields);
+			}
+
+		}
+	}
+
+	function Query2ObjetoUsuarioTarifa($response)
+	{
+
+		while($row = mysql_fetch_assoc($response))
+		{
+			$sesion = new Sesion();
+			$usuario_tarifa = new UsuarioTarifa($sesion);
+			$usuario_tarifa->guardar_fecha = false;
+			$forzar_insert = true;
+
+			foreach( $row as $key => $val )
+			{
+				$usuario_tarifa->Edit($key,$val);
+			}
+
+			if (!$this->Write($usuario_tarifa, $forzar_insert))
+			{
+				echo "Error al generar el usuario_tarifa<br/>\n";
+				return false;
+			}
+			else
+			{
+				echo "<br>usuario_tarifa creada --> ";
+				print_r($usuario_tarifa->fields);
+			}
+
 		}
 	}
 	
@@ -889,20 +984,14 @@ function ImprimirDataEnPantalla($response)
 			$this->log .= "<br>Error en usuario: '".$usuario->fields['username']."': ".$usuario->error;
 		}
 	}
-	
-	function Loaded()
-  {
- 		if($this->fields[$this->campo_id])
-        return true;
-    return false;
-  }
- 
+
    /*
     * Agregar Trabajos
     * Se recive un Array de varios Objetos,
     * y se ingresa cada objeto durante la iteracion
     */
-	function Query2ObjetoHora($response)
+	
+    function Query2ObjetoHora($response)
 	{
 		while($row = mysql_fetch_assoc($response))
 		{
@@ -921,72 +1010,61 @@ function ImprimirDataEnPantalla($response)
 		}
 	}
 
-  public function AgregarHora($hora = null)
-  {
-	/*
-	* Validar FK
-	*/
-
-
-	 
-	#Instancio Clases a usar en validaciÃ³n de FK
-	$usuario    = new Usuario($this->sesion);
-	$asunto     = new Asunto($this->sesion);
-	$moneda     = new Moneda($this->sesion);
-
-	#Confirmo que el id_usuario exista
-	$id_usuario = (int)$hora->fields['id_usuario'];
-	$hora->Edit('id_usuario', $id_usuario);
-
-	$codigo_asunto = substr($hora->fields['codigo_asunto'],0,4).'-0'.substr($hora->fields['codigo_asunto'],-3);
-	$hora->Edit('codigo_asunto', $codigo_asunto);
-
- 
-	#Confirmo que el id_moneda exista
-	$id_moneda=9;
-	$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora->fields['id_moneda']."%'";
-	$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-	list($id_moneda) = mysql_fetch_array($resp);
-	if(!$id_moneda)
+	public function AgregarHora($hora = null)
 	{
-		//$this->log .= '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
-		echo '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
-		//return false;
+		/*
+		* Validar FK
+		*/
+
+		#Instancio Clases a usar en validaciÃ³n de FK
+		$usuario    = new Usuario($this->sesion);
+		$asunto     = new Asunto($this->sesion);
+		$moneda     = new Moneda($this->sesion);
+		
+		#Confirmo que el id_usuario exista
+		$id_usuario = (int)$hora->fields['id_usuario'];
+		$hora->Edit('id_usuario', $id_usuario);
+		
+		$codigo_asunto = substr($hora->fields['codigo_asunto'],0,4).'-0'.substr($hora->fields['codigo_asunto'],-3);
+		$hora->Edit('codigo_asunto', $codigo_asunto);
+		
+		
+		#Confirmo que el id_moneda exista
+		$id_moneda=9;
+		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora->fields['id_moneda']."%'";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id_moneda) = mysql_fetch_array($resp);
+		if(!$id_moneda)
+		{
+			//$this->log .= '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
+			echo '<br>Error ingreso hora: id_moneda "'.$hora->fields['id_moneda'].'" no existe';
+			//return false;
+		}
+		$hora->Edit('id_moneda', $id_moneda);
+		
+		/*
+		* Registrar información
+		*/
+		if($this->Write($hora))
+		{
+		  echo "<br>trabajo ingresado correctamente";
+		}
+		else
+		{
+			echo "<br><b>trabajo NO FUE ingresado</b>";
+			//$this->log .= '<br>Error ingreso hora: el trabajo no fue ingresado';
+		}
 	}
-	$hora->Edit('id_moneda', $id_moneda);
 
-	/*
-	* Registrar información
-	*/
-	if($this->Write($hora))
-	{
-	  echo "<br>trabajo ingresado correctamente";
-	}
-	else
-	{
-		echo "<br><b>trabajo NO FUE ingresado</b>";
-		//$this->log .= '<br>Error ingreso hora: el trabajo no fue ingresado';
-	}
-}
-
-
-
-  //Por defecto retona verdadero (no chequea nada al escribir)
-  //Esta funcion debe ser sustituida en la clase que hereda
-	function Check()
-  {
- 		return true;
-  }
-	
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
-	public function Write($objeto)
+	public function Write($objeto, $forzar_insert = false)
 	{
 		$objeto->error = "";
 
-		if(!$this->Check())
+		if(!$objeto->Check())
 			return false;
 	
-		if($objeto->loaded)
+		if($objeto->Loaded() and !$forzar_insert)
 		{
 			$query = "UPDATE ".$objeto->tabla." SET ";
 			if($objeto->guardar_fecha)
@@ -1014,7 +1092,9 @@ function ImprimirDataEnPantalla($response)
 				$resp = mysql_query($query, $this->sesion->dbh);
 				if (!$resp)
 				{
-					$this->logs[] = mysql_errno($this->sesion->dbh) . " " . mysql_error($this->sesion->dbh);
+					echo "<b>Error explicacion:</b> " . mysql_error($this->sesion->dbh). "<br/>";
+					echo "<b>Datos:</b> " .$error_string . "<br/>";
+					echo "<b>Query:</b> " . $query."</br>";
 					return false;
 				}
 				return true;
@@ -1052,16 +1132,628 @@ function ImprimirDataEnPantalla($response)
 			$resp = mysql_query($query, $this->sesion->dbh);
 			if (!$resp)
 			{
-				echo "<br>Query = ".$query."<br><br>";
-				$this->logs[] = mysql_errno($this->sesion->dbh) . " <b>Error explicacion:</b> " . mysql_error($this->sesion->dbh). " <b>Datos:</b> " .$error_string;
+				
+				echo "<b>Error explicacion:</b> " . mysql_error($this->sesion->dbh). "<br/>";
+				echo "<b>Datos:</b> " .$error_string . "<br/>";
+				echo "<b>Query:</b> " . $query."</br>";
 				return false;
 			}
 			$objeto->fields[$objeto->campo_id] = mysql_insert_id($this->sesion->dbh);
-			#Utiles::CrearLog($objeto->sesion, "reserva", $objeto->fields['id_reserva'], "INSERTAR","",$query);
 		}
 		return true;
 	}
 
+	public function TieneTrabajos($id_contrato, $fecha_ini, $fecha_fin)
+	{
+		$query = "SELECT COUNT(*)  FROM trabajo JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto  LEFT JOIN contrato ON asunto.id_contrato=contrato.id_contrato WHERE contrato.id_contrato='$id_contrato'  AND trabajo.fecha < '" . date("Y-m-d", $fecha_fin) . "' AND trabajo.fecha > '" . date("Y-m-d", $fecha_ini) . "'";
+		$res_nro_trabajos = mysql_query($query, $this->sesion->dbh);
+		if (!$nro_trabajos)
+		{
+			$this->logs[] = "Error: " . mysql_error($this->sesion->dbh);
+			return false;
+		}
+		list($nro_trabajos) = mysql_fetch_array($res_nro_trabajos);
+		if ($nro_trabajos == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	function GenerarCobroBase($id_contrato, $fecha_ini, $fecha_fin, $usuario_generador, $cobro = null, $incluye_gastos = true, $incluye_honorarios = true, $con_gastos = false, $solo_gastos = false)
+	{
+		//Variable cobro puede venir null o como objeto con o sin ID.
+		
+		$cobro_guardado = true;
+
+		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
+		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
+
+		if (empty($cobro))
+		{
+			$cobro = new Cobro($this->sesion);
+			echo "Generando cobro con datos, Contrato ID: " . $id_contrato . " Fecha Inicio: " . $fecha_ini . " Fecha Fin: " . $fecha_fin . "</br>";
+	
+			$contrato = new Contrato($this->sesion, null, null, 'contrato', 'id_contrato');
+			if(!$contrato->Load($id_contrato))
+			{
+				echo "Contrato con ID " . $id_contrato . " no existe</br>";
+				return false;
+			}
+	
+			$contrato->EliminarBorrador($incluye_gastos, $incluye_honorarios);
+	
+			$moneda_base = Utiles::MonedaBase($this->sesion);
+			$moneda = new Objeto($this->sesion, null, null, 'prm_moneda', 'id_moneda');
+			$moneda->Load($contrato->fields['id_moneda']);
+		
+			$cobro->Edit('id_usuario', $usuario_generador);
+			$cobro->Edit('codigo_cliente', $contrato->fields['codigo_cliente']);
+			$cobro->Edit('id_contrato', $contrato->fields['id_contrato']);
+			$cobro->Edit('id_moneda', $contrato->fields['id_moneda']);
+			$cobro->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
+			$cobro->Edit('forma_cobro', $contrato->fields['forma_cobro']);
+		
+			//Este es el monto fijo, pero si no se inclyen honorarios no va
+			$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
+			if(empty($incluye_honorarios)) $monto = '0';
+			$cobro->Edit('monto_contrato', $monto);
+		
+			$cobro->Edit('retainer_horas', $contrato->fields['retainer_horas']);
+			
+			//Opciones
+			$cobro->Edit('id_carta' ,$contrato->fields['id_carta']);
+			$cobro->Edit("opc_ver_modalidad", $contrato->fields['opc_ver_modalidad']);
+			$cobro->Edit("opc_ver_profesional", $contrato->fields['opc_ver_profesional']);
+			$cobro->Edit("opc_ver_gastos", $contrato->fields['opc_ver_gastos']);
+			$cobro->Edit("opc_ver_morosidad", $contrato->fields['opc_ver_morosidad']);
+			$cobro->Edit("opc_ver_resumen_cobro", $contrato->fields['opc_ver_resumen_cobro']);
+			$cobro->Edit("opc_ver_descuento", $contrato->fields['opc_ver_descuento']);
+			$cobro->Edit("opc_ver_tipo_cambio", $contrato->fields['opc_ver_tipo_cambio']);
+			$cobro->Edit("opc_ver_solicitante", $contrato->fields['opc_ver_solicitante']);
+			$cobro->Edit("opc_ver_numpag", $contrato->fields['opc_ver_numpag']);
+			$cobro->Edit("opc_ver_carta", $contrato->fields['opc_ver_carta']);
+			$cobro->Edit("opc_papel", $contrato->fields['opc_papel']);
+			$cobro->Edit("opc_restar_retainer", $contrato->fields['opc_restar_retainer']);
+			$cobro->Edit("opc_ver_detalle_retainer", $contrato->fields['opc_ver_detalle_retainer']);
+			$cobro->Edit("opc_ver_valor_hh_flat_fee", $contrato->fields['opc_ver_valor_hh_flat_fee']);
+	
+			//Configuración moneda del cobro
+			$moneda_cobro_configurada = $contrato->fields['opc_moneda_total'];
+			
+			//Si incluye solo gastos, utilizar la moneda configurada para ello
+			if ($incluye_gastos && !$incluye_honorarios)
+			{
+				$moneda_cobro_configurada = $contrato->fields['opc_moneda_gastos'];
+			}
+
+			$cobro->Edit("opc_moneda_total", $moneda_cobro_configurada);
+
+			$cobro->Edit("opc_ver_asuntos_separados", $contrato->fields['opc_ver_asuntos_separados']);
+			$cobro->Edit("opc_ver_horas_trabajadas", $contrato->fields['opc_ver_horas_trabajadas']);
+			$cobro->Edit("opc_ver_cobrable", $contrato->fields['opc_ver_cobrable']);
+
+			// Guardamos datos de la moneda base
+			$cobro->Edit('id_moneda_base', $moneda_base['id_moneda']);
+			$cobro->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']);
+			$cobro->Edit('etapa_cobro','4');
+			$cobro->Edit('codigo_idioma', $contrato->fields['codigo_idioma'] != '' ? $contrato->fields['codigo_idioma'] : 'es');
+			$cobro->Edit('id_proceso', $cobro->GeneraProceso());
+
+			//Descuento
+			$cobro->Edit("tipo_descuento", $contrato->fields['tipo_descuento']);
+			$cobro->Edit("descuento",$contrato->fields['descuento']);
+			$cobro->Edit("porcentaje_descuento",$contrato->fields['porcentaje_descuento']);
+			$cobro->Edit("id_moneda_monto",$contrato->fields['id_moneda_monto']);
+
+			if(!empty($fecha_ini) and $fecha_ini != '0000-00-00')
+			{
+				$cobro->Edit('fecha_ini', $fecha_ini);
+			}
+
+			if(!empty($fecha_fin))
+			{
+				$cobro->Edit('fecha_fin', $fecha_fin);
+			}
+			
+			if($solo_gastos)
+			{
+				$cobro->Edit('solo_gastos', 1);
+			}
+		
+			$cobro->Edit("incluye_honorarios", $incluye_honorarios);
+			$cobro->Edit("incluye_gastos", $incluye_gastos);
+			
+			if (!$this->Write($cobro))
+			{
+				echo "Error al guardar el cobro</br>";
+				$cobro_guardado = false;
+			}
+
+			echo "Cobro " . $cobro->fields['id_cobro'] . " generado</br>";
+			
+			$contrato->AddCobroAsuntos($cobro->fields['id_cobro']);
+		}
+
+		if($cobro_guardado)
+		{
+			//Moneda cobro
+			$cobro_moneda = new CobroMoneda($this->sesion);
+			$cobro_moneda->ActualizarTipoCambioCobro($cobro->fields['id_cobro']);
+	
+			//Gastos
+			if(!empty($incluye_gastos))
+			{
+				if( $solo_gastos == true )
+				{
+					$where = '(cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)';
+				}
+				else
+				{
+					$where = '1';
+				}
+	
+				$query_gastos = "SELECT cta_corriente.*
+					FROM cta_corriente
+						LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto OR cta_corriente.codigo_asunto IS NULL
+					WHERE $where
+						AND (cta_corriente.id_cobro IS NULL)
+						AND cta_corriente.incluir_en_cobro = 'SI'
+						AND cta_corriente.cobrable = 1 
+						AND cta_corriente.codigo_cliente = '".$cobro->fields['codigo_cliente']."'
+						AND (asunto.id_contrato = '".$cobro->fields['id_contrato']."')
+						AND cta_corriente.fecha <= '$fecha_fin'";
+				$lista_gastos = new ListaGastos($this->sesion, null, $query_gastos);
+				for($v=0; $v<$lista_gastos->num; $v++)
+				{
+					$gasto = $lista_gastos->Get($v);
+					$cta_gastos = new Objeto($this->sesion, null, null, 'cta_corriente', 'id_movimiento');
+					if($cta_gastos->Load($gasto->fields['id_movimiento']))
+					{
+						$cta_gastos->Edit('id_cobro', $cobro->fields['id_cobro']);
+						$this->Write($cta_gastos);
+					}
+				}
+			}
+	
+			//Trabajos
+			if (!empty($incluye_honorarios) and !$solo_gastos)
+			{
+				echo "Asociando trabajos al cobro " . $cobro->fields['id_cobro'] . "</br>";
+				$where_up = '1';
+				if(empty($fecha_ini) or $fecha_ini == '0000-00-00')
+				{
+					$where_up .= " AND fecha <= '$fecha_fin' ";
+				}
+				else
+				{
+					$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+				}
+	
+				$query = "SELECT *
+					FROM trabajo
+						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+						LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+					WHERE " . $where_up . "
+						AND contrato.id_contrato = '" . $cobro->fields['id_contrato'] . "'
+						AND cobro.estado IS NULL
+						AND trabajo.id_cobro IS NULL";
+
+				$lista_trabajos = new ListaTrabajos($this->sesion, null, $query);
+				echo $lista_trabajos->num . " trabajos encontrados</br>";
+				for($x=0; $x<$lista_trabajos->num; $x++)
+				{
+					$trabajo = $lista_trabajos->Get($x);
+					$emitir_trabajo = new Objeto($this->sesion, null, null, 'trabajo', 'id_trabajo');
+					$emitir_trabajo->Load($trabajo->fields['id_trabajo']);
+					$emitir_trabajo->Edit('id_cobro', $cobro->fields['id_cobro']);
+					if (!$this->Write($emitir_trabajo))
+					{
+						echo "Error al modificar trabajo " . $trabajo->fields['id_trabajo'] . "</br>";
+						continue;
+					}
+					echo "Trabajo " . $emitir_trabajo->fields['id_trabajo'] . " asociado al cobro " . $cobro->fields['id_cobro'] . "</br>";
+				}
+				
+				
+				$emitir_tramite = new Objeto($this->sesion, null, null, 'tramite', 'id_tramite');
+				$where_up = '1';
+				if($fecha_ini == '' || $fecha_ini == '0000-00-00')
+				{
+					$where_up .= " AND fecha <= '$fecha_fin' ";
+				}
+				else
+				{
+					$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+				}
+				$query_tramites = "SELECT *
+					FROM tramite 
+						JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+						LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
+					WHERE $where_up
+						AND contrato.id_contrato = '".$cobro->fields['id_contrato']."'
+						AND cobro.estado IS NULL";
+				$lista_tramites = new ListaTrabajos($this->sesion, null, $query_tramites);
+				for($y=0; $y<$lista_tramites->num; $y++)
+				{
+					$tramite = $lista_tramites->Get($y);
+					$emitir_tramite->Load($tramite->fields['id_tramite']);
+					$emitir_tramite->Edit('id_cobro', $cobro->fields['id_cobro']);
+					$this->Write($emitir_tramite);
+				}
+			}
+			
+			//Se ingresa la anotación en el historial
+			$his = new Observacion($this->sesion);
+			$his->Edit('fecha',date('Y-m-d H:i:s'));
+			$his->Edit('comentario',__('COBRO CREADO'));
+			$his->Edit('id_usuario',$usuario_generador);
+			$his->Edit('id_cobro',$cobro->fields['id_cobro']);
+			$this->Write($his);
+		}
+
+		return $cobro->fields['id_cobro'];
+	}
+
+	public function ObtenerIDsCobroDeTrabajos()
+	{
+		$ids_cobro = array();
+		$query = "SELECT id_cobro FROM trabajo WHERE id_cobro IS NOT NULL AND id_cobro NOT IN (SELECT id_cobro FROM cobro) GROUP BY id_cobro ORDER BY id_cobro";
+		$res_ids_cobro = mysql_query($query, $this->sesion->dbh);
+		while(list($id_cobro) = mysql_fetch_array($res_ids_cobro))
+		{
+			$ids_cobro[] = $id_cobro;
+		}
+		return $ids_cobro;
+	}
+
+	public function ObtenerTrabajosConIDCobro($id_cobro)
+	{
+		$trabajos = array();
+
+		if (empty($id_cobro))
+		{
+			return $trabajos;
+		}
+
+		$query = "SELECT * FROM trabajo WHERE id_cobro = " . $id_cobro ;
+		$lista_trabajos = new ListaTrabajos($this->sesion, null, $query);
+		for($x=0; $x<$lista_trabajos->num; $x++)
+		{
+			$trabajos[] = $lista_trabajos->Get($x);
+		}
+		
+		return $trabajos;
+	}
+	
+	public function PertenecenAlContrato($trabajos)
+	{
+		$trabajo = $trabajos[0];
+		$asunto = new Asunto($this->sesion);
+		if (empty($trabajo->fields['codigo_asunto']))
+		{
+			echo "El trabajo " . $trabajo->fields['id_trabajo'] . " no contiene codigo asunto</br>";
+			return array("error" => true, "contrato" => null);
+		}
+		$asunto->LoadByCodigo($trabajo->fields['codigo_asunto']);
+		if (!$asunto->Loaded())
+		{
+			echo "Para el trabajo " . $trabajo->fields['id_trabajo'] . " no exite el asunto con codigo " . $trabajo->fields['codigo_asunto'] . "</br>";
+			return array("error" => true, "contrato" => null);
+		}
+		return array("error" => false, "contrato" => $asunto->fields['id_contrato']);
+	}
+	
+	public function ObtenerFechasInicioFin($id_cobro)
+	{
+		$query = "SELECT MAX(fecha), MIN(fecha) FROM trabajo WHERE id_cobro = " . $id_cobro; 
+		list($fecha_ini, $fecha_fin) = mysql_fetch_array(mysql_query($query, $this->sesion->dbh));
+		return array("inicio" => $fecha_ini, "fin" => $fecha_fin);
+	}
+
+	function GenerarCobrosBase()
+	{
+		//Buscar todos los trabajos que tengan ID cobro y que el ID cobro no exista en la tabla cobro
+		$lista_ids_cobros = $this->ObtenerIDsCobroDeTrabajos();
+		foreach ($lista_ids_cobros as $id_cobro)
+		{
+			$trabajos = $this->ObtenerTrabajosConIDCobro($id_cobro);
+			//Comprueba que todos los trabajos pertenescan al mismo contrato
+			$mismo_contrato = $this->PertenecenAlContrato($trabajos);
+			if ($mismo_contrato['error']) continue;
+			$id_contrato = $mismo_contrato['contrato'];
+			$fechas = $this->ObtenerFechasInicioFin($id_cobro);
+			$this->GenerarCobroBase($id_contrato, $fechas['inicio'], $fechas['fin'], $usuario_generador = 1, $cobro = null, $incluye_gastos = false, $incluye_honorarios = false);
+		}
+	}
+
+	public function GenerarCobros($datos = array())
+	{
+		//Genera los cobros con los trabajos que tienen ID cobro
+		$this->GenerarCobrosBase();
+		
+		if (!is_array($datos))
+		{
+			echo "Parametros incorrectos</br>";
+			return false;
+		}
+
+		foreach ($datos as $indice => $dato)
+		{
+			if (empty($dato['id_contrato']) or empty($dato['fecha_ini']) or empty($dato['fecha_fin']))//empty($dato['cobro']) or //
+			{
+				echo "Si desea generar cobros entre fechas debe ingresar el contrato y las fechas, para la fila " . $indice . "</br>";
+				continue;
+			}
+			$this->GenerarCobroBase($dato['id_contrato'], $dato['fecha_ini'], $dato['fecha_fin'], $usuario_generador = 1);
+		}
+	}
+
+	public function GenerarPago($pago)
+	{
+		$ingreso = new Gasto($this->sesion);
+		$ingreso->Load($pago->fields['id_movimiento']);
+
+		$ingreso->Edit('fecha', $pago->fields['fecha_pago'] ? Utiles::fecha2sql($pago->fields['fecha_pago']) : "NULL");
+		$ingreso->Edit("id_usuario", $pago->fields['id_usuario']);
+		$ingreso->Edit("descripcion", $pago->fields['descripcion']);
+		$ingreso->Edit("id_moneda", $pago->fields['id_moneda'] ? $pago->fields['id_moneda'] : $id_moneda);
+		$ingreso->Edit("codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : "NULL");
+		$ingreso->Edit("codigo_asunto", $pago->fields['codigo_asunto'] ? $pago->fields['codigo_asunto'] : "NULL");
+		$ingreso->Edit("id_usuario_orden", $pago->fields['id_usuario_orden']);
+		if(( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsaMontoCobrable')) or (method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable()) && $pago->fields['monto_cobrable'] > 0)
+		{
+			$ingreso->Edit('ingreso',$pago->fields['monto_pago'] ? $pago->fields['monto_pago'] : $monto_cobrable );
+		}
+		else
+		{
+			$ingreso->Edit('ingreso', $pago->fields['monto_pago'] ? $pago->fields['monto_pago'] : '0');
+		}
+		if ((method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsaMontoCobrable')) or (method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable()))
+		{
+			$ingreso->Edit('monto_cobrable', $pago->fields['monto_cobrable'] ? $pago->fields['monto_cobrable'] : $pago->fields['ingreso']);
+		}
+		else
+		{
+			$ingreso->Edit('monto_cobrable', $pago->fields['ingreso']);
+		}
+		$ingreso->Edit("documento_pago", $pago->fields['documento_pago'] ? $pago->fields['documento_pago'] : "NULL");
+		if(!$this->Write($ingreso))
+		{
+			return false;
+		}
+		return $ingreso->fields['id_movimiento'];
+	}
+
+	public function GenerarGasto($gasto_generar, $pagado = false)
+	{
+		$gasto = new Gasto($this->sesion);
+		
+		if (!preg_match("/^[[:digit:]]+$/", $gasto_generar->fields['id_movimiento']) or $gasto_generar->fields['id_movimiento'] == 0)
+		{
+			$gasto_generar->Edit('id_movimiento', '999' . sprintf("%04d", (int)$gasto_generar->fields['id_movimiento']));
+			echo "ID cambiado " . $gasto_generar->fields['id_movimiento'] . " al gasto<br/>\n";
+		}
+		
+		$gasto->Load($gasto_generar->fields['id_movimiento']);
+
+		if (!$gasto->Loaded())
+		{
+			echo "---Generando gasto---<br/>\n";
+			$gasto->Edit("id_movimiento", $gasto_generar->fields['id_movimiento']);
+			$forzar_insert = true;
+		}
+		else
+		{
+			echo "---Editando gasto ID " . $gasto->fields['id_movimiento'] . "---<br/>\n";
+		}
+
+		$cambio_asunto = $gasto_generar->fields['codigo_asunto'] != $gasto->fields['codigo_asunto'];
+
+		if($gasto_generar->fields["cobrable"] == 1)
+		{
+			$gasto->Edit("cobrable", "1");
+		}
+		else
+		{
+			if ((method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarGastosCobrable')) or ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable()))
+			{
+				$gasto->Edit("cobrable", "0");
+			}
+			else
+			{	
+				$gasto->Edit("cobrable", "1");
+			}
+		}
+
+		if($gasto_generar->fields['con_impuesto'])
+		{
+			$gasto->Edit("con_impuesto", $gasto_generar->fields['con_impuesto']);
+		}
+		else
+		{
+			if ((method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarGastosConSinImpuesto')) or ( method_exists('Conf','UsarGastosConSinImpuesto') && Conf::UsarGastosConSinImpuesto()))
+			{
+				$gasto->Edit("con_impuesto", "NO");
+			}
+			else
+			{
+				$gasto->Edit("con_impuesto", "SI");
+			}
+		}
+
+		if(!empty($gasto_generar->fields['ingreso']))
+		{
+			$monto = str_replace(',', '.', $gasto_generar->fields['ingreso']);
+			$gasto->Edit("ingreso", $monto);
+			$gasto->Edit("monto_cobrable", $monto);
+		}
+
+		if(!empty($gasto_generar->fields['egreso']))
+		{
+			$monto = str_replace(',', '.', $gasto_generar->fields['egreso']);
+			$monto_cobrable = str_replace(',', '.', $gasto_generar->fields['monto_cobrable']);
+
+			if ((method_exists('Conf','GetConf') && Conf::GetConf($this->sesion, 'UsaMontoCobrable')) or (method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable()))
+			{				
+				if($monto <= 0)
+				{
+					$gasto->Edit("egreso", $monto_cobrable);
+				}
+				else
+				{
+					$gasto->Edit("egreso", $monto);
+				}
+
+				if($monto_cobrable  >= 0)
+				{
+					$gasto->Edit("monto_cobrable", $monto_cobrable);
+				}
+				else
+				{
+					$gasto->Edit("monto_cobrable", $monto);
+				}
+			}
+			else
+			{
+				$gasto->Edit("egreso", $monto);
+				$gasto->Edit("monto_cobrable", $monto);
+			}
+		}
+
+		$gasto->Edit("fecha", Utiles::fecha2sql($gasto_generar->fields['fecha']));
+		$gasto->Edit("id_usuario", $gasto_generar->fields['id_usuario']);
+		$gasto->Edit("descripcion", $gasto_generar->fields['descripcion']);
+		$gasto->Edit("id_moneda", $gasto_generar->fields['id_moneda']);
+		$gasto->Edit("codigo_cliente",$gasto_generar->fields['codigo_cliente'] ? $gasto_generar->fields['codigo_cliente'] : "NULL");
+		$gasto->Edit("codigo_asunto", $gasto_generar->fields['codigo_asunto'] ? $gasto_generar->fields['codigo_asunto'] : "NULL");
+		$gasto->Edit("id_usuario_orden", $gasto_generar->fields['id_usuario_orden'] ? $gasto_generar->fields['id_usuario_orden'] : "NULL");
+		$gasto->Edit("id_cta_corriente_tipo", $gasto_generar->fields['id_cta_corriente_tipo'] ? $gasto_generar->fields['id_cta_corriente_tipo'] : "NULL");
+		$gasto->Edit("numero_documento",$gasto_generar->fields['numero_documento'] ? $gasto_generar->fields['numero_documento'] : "NULL");
+		$gasto->Edit("numero_ot", $gasto_generar->fields['numero_ot'] ? $gasto_generar->fields['numero_ot'] : "NULL");
+
+		if($pagado and !empty($gasto_generar->fields['egreso']))
+		{
+			$this->GenerarPago($gasto_generar);
+		}
+		else
+		{
+			$gasto->Edit('id_movimiento_pago', NULL);
+		}
+
+		if($cambio_asunto)
+		{
+			$gasto->Edit('id_cobro', 'NULL');
+		}
+
+		$gasto->Edit('id_proveedor', $gasto_generar->fields['id_proveedor'] ? $gasto_generar->fields['id_proveedor'] : "NULL");
+
+		if (!$this->Write($gasto, $forzar_insert))
+		{
+			echo "Error al generar el gasto<br/>\n";
+			return false;
+		}
+		
+		echo "Gasto " . $gasto->fields['id_movimiento'] . " generado<br/>\n";
+	}
+
+	public function ValidarGasto($gasto)
+	{
+		$valido = true;
+		if (!$this->ExisteCodigo($gasto->fields['codigo_asunto'], "asunto", "codigo_asunto"))
+		{
+			echo "No existe el codigo asunto " . $gasto->fields['codigo_asunto'] . " para el gasto " . $gasto->fields['id_movimiento'] . "<br/>\n";
+			$valido = false;
+		}
+		if (!$this->ExisteCodigo($gasto->fields['id_usuario'], "usuario", "id_usuario"))
+		{
+			echo "No existe el usuario ID " . $gasto->fields['id_usuario'] . " para el gasto " . $gasto->fields['id_movimiento'] . "<br/>\n";
+			$valido = false;
+		}
+		return $valido;
+	}
+	
+	public function ExisteCodigo($codigo_asunto, $tabla, $campo)
+	{
+		$query = "SELECT COUNT(*) FROM " . $tabla . " WHERE " . $campo . " = " . $codigo_asunto;
+		list($existe) = mysql_fetch_array(mysql_query($query, $this->sesion->dbh));
+		if (empty($existe))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public function ExistenCodigo($lista_objetos, $tabla, $campo, $string = true)
+	{
+		$codigos_asunto = array();
+		foreach ($lista_objetos as $objeto)
+		{
+			$codigos_asunto[] = (!$string) ? (int)$objeto->fields[$campo] : $objeto->fields[$campo];
+		}
+		$codigos_asunto = array_unique($codigos_asunto);
+
+		if ($string)
+		{
+			$select = "(SELECT 'COD' " . $campo . " UNION SELECT '" . implode("' UNION SELECT '", $codigos_asunto) . "') AS COD";
+		}
+		else
+		{
+			$select = "(SELECT 0 " . $campo ." UNION SELECT " . implode(" UNION SELECT ", $codigos_asunto) . ") AS COD";
+		}
+		$campo_falso = ($string) ? "'COD'" : "0";
+
+		$query = "SELECT
+				" . $campo . "
+			FROM
+				" . $select . "
+			WHERE
+				" . $campo . " NOT IN (SELECT DISTINCT " . $campo . " FROM " . $tabla . ") AND
+				" . $campo . " != " . $campo_falso;
+
+		$response_codigos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+		$codigos_asunto = array();
+		while (list($codigo_asunto) = mysql_fetch_array($response_codigos))
+		{
+			$codigos_asunto[] = $codigo_asunto;
+		}
+		
+		$objetos_sin_asunto = array();
+
+		if (!empty($codigos_asunto))
+		{
+			foreach ($codigos_asunto as $codigo_asunto)
+			{
+				foreach ($lista_objetos as $indice => $objeto)
+				{
+					if ($objeto->fields[$campo] == $codigo_asunto)
+					{
+						$objetos_sin_asunto[] = $indice;
+					}
+				}
+			}
+
+			echo "Los siguientes " . $campo . " no existen: " . implode(", ", $codigos_asunto) . "</br>";
+		}
+
+		return $objetos_sin_asunto;
+	}
+
+	public function ExtraerObjetoLista($lista, $lista_extraer)
+	{
+		if (!empty($lista_extraer))
+		{
+			foreach($lista_extraer as $extraer)
+			{
+				unset($lista[$extraer]);
+			}
+			echo "Eliminados de la lista objetos con indice: " . implode(", ", $lista_extraer) . "</br>";
+		}
+		return $lista;
+	}
 }
 
 ?>

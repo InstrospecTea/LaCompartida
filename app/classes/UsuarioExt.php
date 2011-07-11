@@ -34,7 +34,10 @@ class UsuarioExt extends Usuario
 	
 	//Agrega Vacaciones del Usuario
 	function GuardarVacacion($fecha_ini, $fecha_fin)
-	{
+	{ 
+		if( $fecha_ini == "" || $fecha_fin == "" )
+			return false;
+			
 		$query = "INSERT INTO usuario_vacacion (id_usuario,id_usuario_creador,fecha_inicio,fecha_fin)";
 		$query .= "	VALUES(".$this->fields['id_usuario'].", ".$this->sesion->usuario->fields['id_usuario'].", '".Utiles::fecha2sql($fecha_ini)."', '".Utiles::fecha2sql($fecha_fin)."')";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);

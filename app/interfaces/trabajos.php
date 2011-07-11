@@ -104,242 +104,245 @@
 		$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].")";
 	$select_usuario = Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ".$where_usuario." ORDER BY nombre ASC","id_usuario",$id_usuario,'','Todos','200');
 
-	$where = base64_decode($where);
-	if( $where == '')
-		$where .= 1;
-	if($id_usuario != '')
-		$where .= " AND trabajo.id_usuario= ".$id_usuario;
-	else if(!$p_revisor->fields['permitido']) // Se buscan trabajos de los usuarios a los que se puede revisar.
-		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
-	if($revisado == 'NO')
-		$where.= " AND trabajo.revisado = 0 ";
-	if($revisado == 'SI')
-		$where.= " AND trabajo.revisado = 1 ";
-	if($codigo_asunto != '' || $codigo_asunto_secundario != "")
+	if(isset($cobro) || $opc == 'buscar')
 	{
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+		$where = base64_decode($where);
+		if( $where == '')
+			$where .= 1;
+		if($id_usuario != '')
+			$where .= " AND trabajo.id_usuario= ".$id_usuario;
+		else if(!$p_revisor->fields['permitido']) // Se buscan trabajos de los usuarios a los que se puede revisar.
+			$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
+		if($revisado == 'NO')
+			$where.= " AND trabajo.revisado = 0 ";
+		if($revisado == 'SI')
+			$where.= " AND trabajo.revisado = 1 ";
+		if($codigo_asunto != '' || $codigo_asunto_secundario != "")
 		{
-			$where.= " AND asunto.codigo_asunto_secundario = '$codigo_asunto_secundario' ";
-		}
-		else
-		{
-			$where.= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
-		}
-	}
-	if($cobrado == 'NO')
-		$where .= " AND ( trabajo.id_cobro is null OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
-	if($cobrado == 'SI')
-		$where .= " AND trabajo.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'INCOBRABLE') ";
-
-	if($from == 'reporte')
-	{
-		if($id_cobro)
-			$where .= " AND trabajo.id_cobro = $id_cobro ";
-
-		if($mes)
-			$where .= " AND DATE_FORMAT(trabajo.fecha, '%m-%y') = '$mes' ";
-
-		if($cobro_nulo)
-			$where .= " AND trabajo.id_cobro IS NULL ";
-
-		if($estado)
-		if($estado != 'abiertos')
-		{
-			if($estado == 'Indefinido')
-				$where .= " AND cobro.id_cobro IS NULL";
+			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			{
+				$where.= " AND asunto.codigo_asunto_secundario = '$codigo_asunto_secundario' ";
+			}
 			else
-				$where .= " AND cobro.estado = '$estado' ";
+			{
+				$where.= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
+			}
 		}
-
-		if($lis_clientes)
-			$where .= " AND cliente.codigo_cliente IN (".$lis_clientes.") ";
-		if($lis_usuarios)
-			$where .= " AND usuario.id_usuario IN (".$lis_usuarios.") ";
-
-	}
-
-	//Estos filtros son tambien para la pag. mis horas
-	if($activo)
-	{
-		if($activo== 'SI')
-			$activo = 1;
-		else
-			$activo = 0;
-
-    $where .= " AND a1.activo = $activo ";
-	}
-	if($codigo_cliente != "" || $codigo_cliente_secundario != "")
-	{
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+		if($cobrado == 'NO')
+			$where .= " AND ( trabajo.id_cobro is null OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		if($cobrado == 'SI')
+			$where .= " AND trabajo.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'INCOBRABLE') ";
+	
+		if($from == 'reporte')
 		{
-			$where .= " AND cliente.codigo_cliente_secundario ='$codigo_cliente_secundario' ";
+			if($id_cobro)
+				$where .= " AND trabajo.id_cobro = $id_cobro ";
+	
+			if($mes)
+				$where .= " AND DATE_FORMAT(trabajo.fecha, '%m-%y') = '$mes' ";
+	
+			if($cobro_nulo)
+				$where .= " AND trabajo.id_cobro IS NULL ";
+	
+			if($estado)
+			if($estado != 'abiertos')
+			{
+				if($estado == 'Indefinido')
+					$where .= " AND cobro.id_cobro IS NULL";
+				else
+					$where .= " AND cobro.estado = '$estado' ";
+			}
+	
+			if($lis_clientes)
+				$where .= " AND cliente.codigo_cliente IN (".$lis_clientes.") ";
+			if($lis_usuarios)
+				$where .= " AND usuario.id_usuario IN (".$lis_usuarios.") ";
+	
 		}
-		else
+	
+		//Estos filtros son tambien para la pag. mis horas
+		if($activo)
 		{
-			$where .= " AND cliente.codigo_cliente ='$codigo_cliente' ";
+			if($activo== 'SI')
+				$activo = 1;
+			else
+				$activo = 0;
+	
+	    $where .= " AND a1.activo = $activo ";
 		}
-	}
-	#SQL FECHAS
-	if($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00')
-		$where .= " AND trabajo.fecha >= '".$fecha_ini."' ";
-
-	if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00')
-		$where .= " AND trabajo.fecha <= '".$fecha_fin."' ";
-
-	if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
-	{
-		$cobro->LoadAsuntos();
-		$query_asuntos = implode("','", $cobro->asuntos);
-		$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
-		//$where .= " AND trabajo.cobrable = 1";
-		if($opc == 'buscar')
-			$where .= " AND (cobro.estado IS NULL OR trabajo.id_cobro = '$id_cobro')";
-		else
-			$where .= " AND trabajo.id_cobro = '$id_cobro'";
-	}
-
-	if($cobrable == 'SI')
-		$where .= " AND trabajo.cobrable = 1";
-	if($cobrable == 'NO')
-		$where .= " AND trabajo.cobrable <> 1";
-
-	//Filtros que se mandan desde el reporte Periodico
-	if($id_grupo)
-	{
-		if($id_grupo == 'NULL')
-			$where .= " AND cliente.id_grupo_cliente IS NULL";
-		else
-			$where .= " AND cliente.id_grupo_cliente = $id_grupo";
-	}
-	if($clientes)
-		$where .= "	AND cliente.codigo_cliente IN ('".base64_decode($clientes)."')";
-
-	if($usuarios)
-		$where .= "	AND usuario.id_usuario IN (".base64_decode($usuarios).")";
+		if($codigo_cliente != "" || $codigo_cliente_secundario != "")
+		{
+			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			{
+				$where .= " AND cliente.codigo_cliente_secundario ='$codigo_cliente_secundario' ";
+			}
+			else
+			{
+				$where .= " AND cliente.codigo_cliente ='$codigo_cliente' ";
+			}
+		}
+		#SQL FECHAS
+		if($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00')
+			$where .= " AND trabajo.fecha >= '".$fecha_ini."' ";
+	
+		if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00')
+			$where .= " AND trabajo.fecha <= '".$fecha_fin."' ";
+	
+		if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
+		{
+			$cobro->LoadAsuntos();
+			$query_asuntos = implode("','", $cobro->asuntos);
+			$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
+			//$where .= " AND trabajo.cobrable = 1";
+			if($opc == 'buscar')
+				$where .= " AND (cobro.estado IS NULL OR trabajo.id_cobro = '$id_cobro')";
+			else
+				$where .= " AND trabajo.id_cobro = '$id_cobro'";
+		}
+	
+		if($cobrable == 'SI')
+			$where .= " AND trabajo.cobrable = 1";
+		if($cobrable == 'NO')
+			$where .= " AND trabajo.cobrable <> 1";
+	
+		//Filtros que se mandan desde el reporte Periodico
+		if($id_grupo)
+		{
+			if($id_grupo == 'NULL')
+				$where .= " AND cliente.id_grupo_cliente IS NULL";
+			else
+				$where .= " AND cliente.id_grupo_cliente = $id_grupo";
+		}
+		if($clientes)
+			$where .= "	AND cliente.codigo_cliente IN ('".base64_decode($clientes)."')";
+	
+		if($usuarios)
+			$where .= "	AND usuario.id_usuario IN (".base64_decode($usuarios).")";
+			
+			$where .= " AND trabajo.id_tramite = 0 ";
 		
-		$where .= " AND trabajo.id_tramite = 0 ";
+		if($id_encargado_comercial)
+			$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
+		
+		#TOTAL HORAS
+		$query = "SELECT 
+								SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
+								SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada
+							FROM trabajo
+							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+		          LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
+		          LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
+		          LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
+		          LEFT JOIN contrato ON asunto.id_contrato =contrato.id_contrato
+	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
+		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+		          WHERE $where ";
+	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
 	
-	if($id_encargado_comercial)
-		$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
-	
-	#TOTAL HORAS
-	$query = "SELECT 
-							SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
-							SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada
-						FROM trabajo
-						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-	          LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
-	          LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
-	          LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
-	          LEFT JOIN contrato ON asunto.id_contrato =contrato.id_contrato
-            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
-	          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
-	          WHERE $where ";
-  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
-
-	#BUSCAR
-	$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
-											trabajo.id_cobro,
-											trabajo.revisado, 
-											trabajo.id_trabajo, 
-											trabajo.codigo_asunto,
-											trabajo.cobrable,
-											prm_moneda.simbolo as simbolo,
-											asunto.codigo_cliente as codigo_cliente, 
-											contrato.id_moneda as id_moneda_asunto, 
-											asunto.id_asunto AS id,
-											trabajo.fecha_cobro as fecha_cobro_orden, 
-											trabajo.descripcion, 
-											IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
-											trabajo.visible, 
-											cobro.estado as estado_cobro, 
-											CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre, 
-											usuario.username, 
-											usuario.id_usuario, 
-											CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'), 
-											DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
-											TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas, 
-											trabajo.tarifa_hh, 
-											tramite_tipo.id_tramite_tipo,
-	              			DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
-	              			cobro.estado, 
-	              			asunto.forma_cobro, 
-	              			asunto.monto, 
-	              			asunto.glosa_asunto,
-	              			contrato.descuento, 
-	              			tramite_tipo.glosa_tramite, 
-	              			trabajo.fecha, 
-	              			contrato.id_tarifa  
-	              FROM trabajo
-	              JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-	              LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
-	              LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-	              LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-	              LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-	              LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-	              LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
-	              LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
-	              LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
-	              WHERE $where ";
-	if($check_trabajo == 1 && isset($cobro) && !$excel)	//Check_trabajo vale 1 cuando aprietan boton buscar
-	{
-		$query2 = "UPDATE trabajo SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
-		$resp = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
-		$lista_trabajos = new ListaTrabajos($sesion,'',$query);
-		for($x=0;$x<$lista_trabajos->num;$x++)
+		#BUSCAR
+		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
+												trabajo.id_cobro,
+												trabajo.revisado, 
+												trabajo.id_trabajo, 
+												trabajo.codigo_asunto,
+												trabajo.cobrable,
+												prm_moneda.simbolo as simbolo,
+												asunto.codigo_cliente as codigo_cliente, 
+												contrato.id_moneda as id_moneda_asunto, 
+												asunto.id_asunto AS id,
+												trabajo.fecha_cobro as fecha_cobro_orden, 
+												trabajo.descripcion, 
+												IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
+												trabajo.visible, 
+												cobro.estado as estado_cobro, 
+												CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre, 
+												usuario.username, 
+												usuario.id_usuario, 
+												CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'), 
+												DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
+												TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas, 
+												trabajo.tarifa_hh, 
+												tramite_tipo.id_tramite_tipo,
+		              			DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
+		              			cobro.estado, 
+		              			asunto.forma_cobro, 
+		              			asunto.monto, 
+		              			asunto.glosa_asunto,
+		              			contrato.descuento, 
+		              			tramite_tipo.glosa_tramite, 
+		              			trabajo.fecha, 
+		              			contrato.id_tarifa  
+		              FROM trabajo
+		              JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+		              LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
+		              LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		              LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		              LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+		              LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+		              LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+		              LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
+		              LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
+		              WHERE $where ";
+		if($check_trabajo == 1 && isset($cobro) && !$excel)	//Check_trabajo vale 1 cuando aprietan boton buscar
 		{
-			$trabajo = $lista_trabajos->Get($x);
-			$emitir_trabajo = new Trabajo($sesion);
-			$emitir_trabajo->Load($trabajo->fields['id_trabajo']);
-			$emitir_trabajo->Edit('id_cobro',$id_cobro);
-			$emitir_trabajo->Write();
+			$query2 = "UPDATE trabajo SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
+			$resp = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
+			$lista_trabajos = new ListaTrabajos($sesion,'',$query);
+			for($x=0;$x<$lista_trabajos->num;$x++)
+			{
+				$trabajo = $lista_trabajos->Get($x);
+				$emitir_trabajo = new Trabajo($sesion);
+				$emitir_trabajo->Load($trabajo->fields['id_trabajo']);
+				$emitir_trabajo->Edit('id_cobro',$id_cobro);
+				$emitir_trabajo->Write();
+			}
 		}
+		//Se hace la lista para la edición de TODOS los trabajos del query
+		//A la página de editar multiples trabajos se le pasa encriptado el where
+		//de esta manera no se sobrecarga esta página
+		//Esta comentado hasta encontrar una buena manera de encriptarlo
+		//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
+		
+		
+		
+		if($orden == "")
+			$orden = " trabajo.fecha ASC, trabajo.descripcion";
+		if(stristr($orden,".") === FALSE)
+			$orden = str_replace("codigo_asunto","a1.codigo_asunto",$orden);
+	
+		$x_pag = 15;
+		$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
+		$b->mensaje_error_fecha = "N/A";
+		$b->nombre = "busc_gastos";
+		$b->titulo = __('Listado de').' '.__('trabajos');
+		if($p_revisor->fields['permitido'])
+			$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas trabajadas').": </b>".number_format($total_duracion_trabajada,1)."</span></td></tr></table>";
+		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas cobrables').": </b>".number_format($total_duracion,1)."</span></td></tr></table>";
+		$b->AgregarFuncion("Editar",'Editar',"align=center nowrap");
+		$b->AgregarEncabezado("trabajo.fecha",__('Fecha'));
+		$b->AgregarEncabezado("cliente.glosa_cliente",__('Cliente'),"align=left");
+		$b->AgregarEncabezado("asunto.codigo_asunto",__('Asunto'),"align=left");
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+		{
+			$b->AgregarEncabezado("actividad.glosa_actividad",__('Actividad'),"align=left");
+		}
+		$b->AgregarEncabezado("glosa_cobrable",__('Cobrable'),"","","");
+		if($p_revisor->fields['permitido'])
+			$glosa_duracion=__('Hrs Trab./Cobro.');
+		else
+			$glosa_duracion=__('Hrs trab.');
+		$b->AgregarEncabezado("duracion",$glosa_duracion,"","","SplitDuracion");
+		if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'])
+			$b->AgregarEncabezado("trabajo.id_cobro",__('Cobro'),"align=left");
+		#$b->AgregarEncabezado("estado",__('Estado'),"align=left");
+		if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164)
+			$b->AgregarEncabezado("usr_nombre",__('Usuario'),"align=left");
+		#if($p_adm->fields['permitido'])
+		$b->AgregarFuncion("Opc.",'Opciones',"align=center nowrap");
+		$b->color_mouse_over = "#bcff5c";
+		$b->funcionTR = "funcionTR";
 	}
-	//Se hace la lista para la edición de TODOS los trabajos del query
-	//A la página de editar multiples trabajos se le pasa encriptado el where
-	//de esta manera no se sobrecarga esta página
-	//Esta comentado hasta encontrar una buena manera de encriptarlo
-	//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
-	
-	
-	
-	if($orden == "")
-		$orden = " trabajo.fecha ASC, trabajo.descripcion";
-	if(stristr($orden,".") === FALSE)
-		$orden = str_replace("codigo_asunto","a1.codigo_asunto",$orden);
-
-	$x_pag = 15;
-	$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
-	$b->mensaje_error_fecha = "N/A";
-	$b->nombre = "busc_gastos";
-	$b->titulo = __('Listado de').' '.__('trabajos');
-	if($p_revisor->fields['permitido'])
-		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas trabajadas').": </b>".number_format($total_duracion_trabajada,1)."</span></td></tr></table>";
-	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas cobrables').": </b>".number_format($total_duracion,1)."</span></td></tr></table>";
-	$b->AgregarFuncion("Editar",'Editar',"align=center nowrap");
-	$b->AgregarEncabezado("trabajo.fecha",__('Fecha'));
-	$b->AgregarEncabezado("cliente.glosa_cliente",__('Cliente'),"align=left");
-	$b->AgregarEncabezado("asunto.codigo_asunto",__('Asunto'),"align=left");
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
-	{
-		$b->AgregarEncabezado("actividad.glosa_actividad",__('Actividad'),"align=left");
-	}
-	$b->AgregarEncabezado("glosa_cobrable",__('Cobrable'),"","","");
-	if($p_revisor->fields['permitido'])
-		$glosa_duracion=__('Hrs Trab./Cobro.');
-	else
-		$glosa_duracion=__('Hrs trab.');
-	$b->AgregarEncabezado("duracion",$glosa_duracion,"","","SplitDuracion");
-	if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'])
-		$b->AgregarEncabezado("trabajo.id_cobro",__('Cobro'),"align=left");
-	#$b->AgregarEncabezado("estado",__('Estado'),"align=left");
-	if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164)
-		$b->AgregarEncabezado("usr_nombre",__('Usuario'),"align=left");
-	#if($p_adm->fields['permitido'])
-	$b->AgregarFuncion("Opc.",'Opciones',"align=center nowrap");
-	$b->color_mouse_over = "#bcff5c";
-	$b->funcionTR = "funcionTR";
 
 	if($excel)
 	{

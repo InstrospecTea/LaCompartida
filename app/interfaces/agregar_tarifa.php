@@ -223,7 +223,7 @@ function CrearTarifa( from, id )
 		$colspan=5;
 ?>
 			<td align=right><?=__('Tarifa')?>:&nbsp;</td>
-			<td align=left><?= Html::SelectQuery($sesion, "SELECT * FROM tarifa ORDER BY glosa_tarifa","id_tarifa", $tarifa->fields['id_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
+			<td align=left><?= Html::SelectQuery($sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa","id_tarifa", $tarifa->fields['id_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
 <?
 	} 
 ?>

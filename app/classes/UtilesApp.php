@@ -198,6 +198,22 @@ class UtilesApp extends Utiles
 				return $valor;
 			}
 	}
+	
+	function CantidadDiasHabiles( $fecha_ini, $fecha_fin )
+	{
+			$fecha1 = strtotime($fecha_ini);
+			$fecha2 = strtotime($fecha_fin);
+			
+			$cont = 0;
+			//echo date("d-m-Y",$fecha);
+			while($fecha1 <= $fecha2)
+			{
+				if( date("N",$fecha1) < 6 )
+					$cont++;
+				$fecha1 = mktime(0,0,0,date('m',$fecha1),date('d',$fecha1)+1,date('Y',$fecha1));
+			}
+			return $cont;
+	}
 
 
 	/*
