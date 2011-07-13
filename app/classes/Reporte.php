@@ -172,6 +172,7 @@ class Reporte
 		switch($s)
 		{
 			case "profesional":
+			case "username":
 				$this->id_agrupador[] = "id_usuario";
 				break;
 			case "glosa_grupo_cliente":
@@ -204,6 +205,7 @@ class Reporte
 		{
 			//Agrupadores que no existen para Cobro sin trabajos:
 			case "profesional":
+			case "username":
 			case "glosa_asunto":
 			case "area_asunto":
 			case "tipo_asunto":
@@ -262,7 +264,7 @@ class Reporte
 
 		$campo_fecha = $this->alt($this->campo_fecha_cobro,$this->campo_fecha_cobro_2);
 
-		$s = 'SELECT \''.__('Indefinido').'\' as profesional, \''.__('Indefinido').'\' as categoria_usuario, \''.__('Indefinido').'\' as area_usuario,
+		$s = 'SELECT \''.__('Indefinido').'\' as profesional, \''.__('Indefinido').'\' as username, \''.__('Indefinido').'\' as categoria_usuario, \''.__('Indefinido').'\' as area_usuario,
 				-1 as id_usuario,
 				cliente.codigo_cliente,
 				cliente.glosa_cliente,
@@ -395,6 +397,7 @@ class Reporte
 			$dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
 			
 		$s = 'SELECT	'.$dato_usuario.' as profesional,
+						usuario.username as username,
 						usuario.id_usuario,
 						cliente.id_cliente,
 						cliente.codigo_cliente,

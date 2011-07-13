@@ -841,7 +841,7 @@ function UpdateCap(monto_update, guardar)
 <!-- fin Moneda -->
 
 <!-- Modalidad -->
-<fieldset id="forma_cobro" style="width: 95%">
+<fieldset id="forma_cobro" style="width: 95%; display: <?php echo ( $cobro->fields['incluye_honorarios'] != 0 ? "block" : "none"); ?>">
 <legend><?=__('Forma de cobro')?></legend>
 <table width='100%' cellspacing='3' cellpadding='3'>
  <tr>

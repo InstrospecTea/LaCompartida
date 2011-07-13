@@ -83,21 +83,23 @@
 	else
 		$where = base64_decode($where);
 
-	$query = "SELECT  fecha
-					, prm_documento_legal.glosa as tipo
+	$query = "SELECT glosa_cliente
+					, fecha
+					, prm_documento_legal.codigo as tipo
 					, numero
-					, glosa_cliente
 					, '' glosa_asunto
 					, '' codigo_asunto
 					, CONCAT(LEFT(nombre,1),LEFT(apellido1,1),LEFT(apellido2,1)) AS encargado_comercial
 					, descripcion
-					, prm_estado_factura.glosa as estado
 					, factura.id_cobro
 					, prm_moneda.simbolo
 					, prm_moneda.cifras_decimales
 					, prm_moneda.tipo_cambio
 					, factura.id_moneda
 					, factura.honorarios
+					, factura.subtotal_gastos
+					, factura.subtotal_gastos_sin_impuesto
+					, '' as subtotal
 					, factura.iva
 					, total
 					, '' as saldo_pagos
@@ -106,6 +108,8 @@
 					, '' as saldo_moneda_base
 					, factura.id_factura
 					, '' as fecha_ultimo_pago
+					, prm_estado_factura.codigo as estado
+					, prm_estado_factura.glosa as estado_glosa
 				FROM factura
 				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -220,16 +224,20 @@
 		// ancho celdas
 		if(in_array($col_name[$i],array('descripcion')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 12); }
-		else if(in_array($col_name[$i],array('saldo','iva','honorarios','saldo_moneda_base')) ) {
+		else if(in_array($col_name[$i],array('saldo','iva','subtotal','saldo_moneda_base')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11); }
-		else if(in_array($col_name[$i],array('numero','cobro','tipo','saldo_pagos','estado','id_cobro')) ) {
+		else if(in_array($col_name[$i],array('numero','cobro','saldo_pagos','id_cobro')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 8); }
-		else if(in_array($col_name[$i],array('encargado_comercial','fecha_ultimo_pago','glosa_asunto','glosa_cliente')) ) {
+		else if(in_array($col_name[$i],array('encargado_comercial','fecha_ultimo_pago','glosa_asunto')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
+		else if(in_array($col_name[$i],array('tipo','estado')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 3); }
+		else if(in_array($col_name[$i],array('glosa_cliente')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 20); }
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 
 		// ancho celdas ocultos
-		if(in_array($col_name[$i],array('total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
+		if(in_array($col_name[$i],array('numeracion_excel','estado_glosa','honorarios','subtotal_gastos','subtotal_gastos_sin_impuesto','total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 		// css celdas
@@ -252,7 +260,7 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('IVA'); }
 		else if(in_array($col_name[$i],array('saldo_pagos')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'); }
-		else if(in_array($col_name[$i],array('honorarios')) ) {
+		else if(in_array($col_name[$i],array('subtotal')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Subtotal'); }
 		else if(in_array($col_name[$i],array('saldo_moneda_base')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Saldo'.' '.$simbolo_moneda_base); }
@@ -260,6 +268,8 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'.' '.$simbolo_moneda_base); }
 		else if(in_array($col_name[$i],array('fecha_ultimo_pago')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Fecha último pago'); }
+		else if(in_array($col_name[$i],array('numeracion_excel')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __(''); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
 
 		//formato columna excel para formulas
@@ -271,6 +281,7 @@
 
 	$col_formula_pago = $arr_col['monto_pagos_moneda_base']['celda_excel'];
 	$col_formula_saldo = $arr_col['saldo_moneda_base']['celda_excel'];
+	$col_formula_numeracion_excel = $arr_col['numeracion_excel']['celda_excel'];
 
 	// Escribir encabezado reporte
 	$ws1->write($fila, 0, __('Documentos tributarios'), $formato_encabezado);
@@ -326,8 +337,12 @@
 
 		for($i=0; $i<$col_num; $i++) {
 	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
-				if($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'iva') {
+				if($col_name[$i] == 'total' || $col_name[$i] == 'iva') {
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
+				}
+				else if( $col_name[$i] == 'subtotal') {
+					$subtotal = $proc->fields['honorarios'] + $proc->fields['subtotal_gastos'] + $proc->fields['subtotal_gastos_sin_impuesto'];
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $subtotal, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
 				else if($col_name[$i] == 'saldo') {
 					$saldo = $proc->fields[$col_name[$i]]*(-1);
@@ -364,6 +379,14 @@
 				if($col_name[$i] == 'fecha_ultimo_pago') {
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $ultima_fecha_pago, $arr_col[$col_name[$i]]['css']);
+				}
+				if($col_name[$i] == 'estado_glosa') {
+
+					$ws1->writeNote($fila, $arr_col['estado']['celda'], $proc->fields[$col_name[$i]]);
+				}
+				if($col_name[$i] == 'numeracion_excel') {
+
+					$ws1->writeFormula($fila, $arr_col['numeracion_excel']['celda'], "=SUM(".$arr_col['numeracion_excel']['celda_excel']."$fila + 1)", $arr_col[$col_name[$i]]['css']);
 				}
 
 				else {

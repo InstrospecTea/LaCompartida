@@ -115,19 +115,22 @@
 			$where = base64_decode($where);
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS *
-					, fecha
-					, prm_documento_legal.glosa as tipo
+					
+					, prm_documento_legal.codigo as tipo
 					, numero
 					, glosa_cliente
+					, fecha
 					, CONCAT(LEFT(nombre,1),LEFT(apellido1,1),LEFT(apellido2,1)) AS encargado_comercial
 					, descripcion
-					, prm_estado_factura.glosa as estado
+					, prm_estado_factura.codigo as estado
 					, factura.id_cobro
 					, prm_moneda.simbolo
 					, prm_moneda.cifras_decimales
 					, prm_moneda.tipo_cambio
 					, factura.id_moneda
 					, factura.honorarios
+					, factura.subtotal_gastos
+					, factura.subtotal_gastos_sin_impuesto
 					, factura.iva
 					, total
 					, '' as saldo_pagos
@@ -178,7 +181,7 @@
 		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
 		$b->AgregarEncabezado("estado",__('Estado'),"align=center");
 		$b->AgregarEncabezado("id_cobro",__('Cobro'),"align=center");
-		$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
+		$b->AgregarFuncion("SubTotal","SubTotal","align=right nowrap");
 		$b->AgregarFuncion("iva","Iva","align=right nowrap");
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
@@ -202,7 +205,9 @@
 	
 	function SubTotal(& $fila)
 	{
-		return $fila->fields['honorarios'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['honorarios'],$fila->fields['cifras_decimales'],",",".") : '';
+		$subtotal = $fila->fields['honorarios'] +$fila->fields['subtotal_gastos'] +$fila->fields['subtotal_gastos_sin_impuesto'];
+		
+		return $subtotal > 0 ? $fila->fields['simbolo'].' '.number_format($subtotal,$fila->fields['cifras_decimales'],",",".") : '';
 	}
 	function Iva(& $fila)
 	{

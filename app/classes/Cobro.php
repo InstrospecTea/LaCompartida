@@ -1655,6 +1655,7 @@ class Cobro extends Objeto
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */
 				#carta mb
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
 				if (count($this->asuntos)>1)
 				{
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -6187,6 +6188,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			break;
 
 			case 'DETALLE':
+
+				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
 
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);

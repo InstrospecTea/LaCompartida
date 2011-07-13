@@ -7,6 +7,16 @@ class UsuarioExt extends Usuario
 {
 	var $secretarios = null;
 
+	function Loaded()
+	{
+		if($this->fields[$this->campo_id])
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	function LoadSecretario($id)
 	{
 		$query = "SELECT id_profesional FROM usuario_secretario

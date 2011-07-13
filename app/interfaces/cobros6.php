@@ -269,6 +269,9 @@
 		if($facturado == 1 && !$cobro->fields['fecha_facturacion'])
 			$cobro->Edit('fecha_facturacion',date('Y-m-d H:i:s'));
 
+		if($informado == 1)
+			$cobro->Edit('informado','SI');
+
 		$cobro->Edit('facturado', $facturado ? $facturado : 0);
 		$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 		$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
@@ -1476,6 +1479,19 @@ function AgregarFactura(idx){
 							<input type="hidden" id="gastos_sin_iva_disponibles" value="<?=$saldo_disponible_gastos_sin_impuestos?>"/>
 							</td>
 						</tr>
+						<? if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'InformarContabilidad')){?>
+							<tr>
+								<td align=center>
+									<? if($cobro->fields['informado']=='NO') 
+									{
+									?>
+										<?=__('Informar')?>: <input type="checkbox" value="1" name="informado" />
+									<?} else {?>
+										<?=__('Informado a Contabilidad')?>
+									<?}?>
+								</td>
+							</tr>
+						<?}?>
 					</table>
 					<?
 				}

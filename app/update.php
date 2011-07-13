@@ -5515,13 +5515,13 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_cobro` );";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_estado` );";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_moneda` );";
-						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_cobro` ) REFERENCES `rebaza_timetracking`.`cobro` (
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_cobro` ) REFERENCES `cobro` (
 												`id_cobro`
 												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
-						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_estado` ) REFERENCES `rebaza_timetracking`.`prm_estado_factura` (
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_estado` ) REFERENCES `prm_estado_factura` (
 												`id_estado`
 												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
-						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_moneda` ) REFERENCES `rebaza_timetracking`.`prm_moneda` (
+						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_moneda` ) REFERENCES `prm_moneda` (
 												`id_moneda`
 												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
 						
@@ -5954,6 +5954,35 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
+					case 4.40:
+						$query = array();
+						$query[] = "ALTER TABLE  `cobro` ADD  `monto_ajustado` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_subtotal`;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+					case 4.41:
+						$query = array();
+						$query[] = "ALTER TABLE  `prm_moneda` ADD  `codigo` VARCHAR( 7 ) NOT NULL DEFAULT  'CLP' AFTER  `simbolo` ;";
+						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'USD' WHERE  `id_moneda`=2;";
+						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UF' WHERE  `id_moneda`=3;";
+						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UTM' WHERE  `id_moneda`=4;";
+						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'EUR ' WHERE  `id_moneda`=5;";
+						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UTA' WHERE  `id_moneda`=6;";
+
+						$query[] = "ALTER TABLE  `cobro` ADD  `informado` VARCHAR( 2 ) NOT NULL DEFAULT  'NO' AFTER  `facturado` ,
+												ADD  `fecha_informado` DATETIME NULL DEFAULT NULL AFTER  `informado` ;";
+
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+								NULL ,  'InformarContabilidad',  '0',  'Permite que los cobros se informen a la area de contabilidad mediante Webservice 3',  'boolean',  '6',  '-1'
+								);";
+
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
  	}
 }
 
@@ -6163,6 +6192,8 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 	$VERSIONES[$num++] = 4.37;
 	$VERSIONES[$num++] = 4.38;
 	$VERSIONES[$num++] = 4.39;
+	$VERSIONES[$num++] = 4.40;
+	$VERSIONES[$num++] = 4.41;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

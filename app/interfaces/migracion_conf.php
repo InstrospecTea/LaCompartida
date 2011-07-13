@@ -16,14 +16,16 @@
 																				'grupo_cliente'         => array( 
 																					'campo_glosa' 					=> 'glosa_grupo_cliente', 
 																				  'campo_id'            	=> 'id_grupo_cliente',
-																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario')),
+																				  'datos'               	=> array('GRUPO BACKUS','GRUPO VALE','GRUPO SCOTIA','GRUPO AMOV','GRUPO CHINALCO','GRUPO AC CAPITALES','GRUPO GOLD',
+																				  																 'GRUPO WWG','GRUPO BBVA','GRUPO ENDESA','GRUPO BREADT','FAMILIA SARFATY','GRUPO ILASA','GRUPO BNP','GRUPO URÍA','GRUPO GOURMET')),
 																				'prm_area_proyecto'     => array( 
 																					'campo_glosa' 					=> 'glosa', 
 																				  'campo_id'            	=> 'id_area_proyecto',
 																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
-																			); }*/
+																			); }
+		*/
 		function QueryUsuario() 
-		{ 
+		{
 			return "SELECT 
 								Empleado.CodigoEmpleado 																				as usuario_FFF_id_usuario,
 								Empleado.Nombres 																								as usuario_FFF_nombre,
@@ -82,7 +84,7 @@
 								GROUP_CONCAT( Titulo, Nombre, Telefono SEPARATOR '//' ) 																		as cliente_FFF_nombre_contacto  
 							FROM Cliente 
 							LEFT JOIN ContactosCliente ON Cliente.CodigoCliente = ContactosCliente.CodigoCliente 
-							GROUP BY Cliente.CodigoCliente"; 
+							GROUP BY Cliente.CodigoCliente";
 		}
 		function QueryAsunto() 
 		{ 
@@ -100,9 +102,9 @@
 								IF(OrdenFacturacion.HojaTiemposFlag='O','1','0')														as asunto_FFF_activo,
 								IF(OrdenFacturacion.HojaTiemposFlag='O','SI','NO')													as contrato_FFF_activo,
 								OrdenFacturacion.Asunto 																										as asunto_FFF_glosa_asunto,
-								OrdenFacturacion.Moneda 																										as asunto_FFF_id_moneda,
-								OrdenFacturacion.Moneda 																										as contrato_FFF_id_moneda,
-								OrdenFacturacion.Moneda 																										as contrato_FFF_opc_moneda_total,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) ) 																										as asunto_FFF_id_moneda,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )																										as contrato_FFF_id_moneda,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )																									as contrato_FFF_opc_moneda_total,
 								OrdenFacturacion.TarifaHora 																								as contrato_FFF_id_tarifa,
 								OrdenFacturacion.FechaModificacion 																					as asunto_FFF_fecha_modificacion,
 								OrdenFacturacion.FechaCreacion 																							as asunto_FFF_fecha_creacion,
@@ -128,7 +130,6 @@
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
 							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente";
 		}
-		
 		function QueryHoras()
 		{
 			return "SELECT
@@ -150,6 +151,7 @@
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=htd.hojatiempoid
 								LEFT JOIN HojaTiempoajustado hta ON hta.hojatiempoajustadoid = htr.hojatiempoajustadoid";
 		}
+		
 		function QueryGastos() 
 		{ 
 			return "SELECT
@@ -165,10 +167,11 @@
 									Gastos.CodigoCliente 																															as gasto_FFF_codigo_cliente,
 									IF(Gastos.flagfacturable='S','1','0') 																						as gasto_FFF_cobrable,
 									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda
-									FROM Gastos "; 
+									FROM Gastos";
 		}
+
 		function QueryCobros() 
-		{ 
+		{
 			return "SELECT 
 									Factura.NumeroFactura 																					as cobro_FFF_id_cobro,
 									Factura.FechaGeneracion 																				as cobro_FFF_fecha_creacion,
@@ -179,13 +182,32 @@
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda,
 									Factura.MontoBruto 																							as cobro_FFF_monto,
 									Factura.MontoImpuesto 																					as cobro_FFF_impuesto,
-									Factura.MontoNeto 																							as cobro_FFF_subtotal,
+									Factura.MontoNeto 																							as cobro_FFF_monto_subtotal,
 									Factura.PorcentajeImpuesto 																			as cobro_FFF_porcentaje_impuesto,
 									Periodo.FechaInicio 																						as cobro_FFF_fecha_ini,
 									Periodo.FechaTermino 																						as cobro_FFF_fecha_fin,
-									CONCAT(SUBSTRING(Factura.NumeroOrdenFact,1,4),'-0',SUBSTRING(Factura.NumeroOrdenFact,-3)) as cobro_FFF_codigo_asunto 
+									CONCAT(SUBSTRING(Factura.NumeroOrdenFact,1,4),'-0',SUBSTRING(Factura.NumeroOrdenFact,-3)) as cobro_FFF_codigo_asunto,
+									Empleado.CodigoEmpleado as cobro_FFF_id_usuario
 									FROM Factura
-									LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija"; 
+									LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
+									LEFT JOIN Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
+		}
+		function QueryFacturas()
+		{
+			return "SELECT 
+									Factura.NumeroFactura 																					as factura_FFF_id_cobro,
+									Factura.NumeroFactura 																					as factura_FFF_id_factura,
+									Factura.CodigoFacturaBoleta																		as factura_FFF_numero,
+									Factura.FechaGeneracion 																				as factura_FFF_fecha_creacion,
+									Factura.CodigoCliente 																					as cobro_FFF_codigo_cliente,
+									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2'))				as factura_FFF_id_moneda,
+									Factura.MontoBruto 																							as factura_FFF_total,
+									Factura.MontoImpuesto 																					as factura_FFF_iva,
+									Factura.MontoNeto 																							as factura_FFF_honorarios,
+									Factura.PorcentajeImpuesto 																			as factura_FFF_porcentaje_impuesto
+								FROM Factura
+								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
+								WHERE Factura.CodigoFacturaBoleta IS NOT NULL"; 
 		}
 
 		function QueryTarifas() { return "SELECT
@@ -203,6 +225,5 @@
 									Group by CodigoTarifaCliente, CodigoEmpleado, moneda
 									Order by CodigoPeriodo DESC "; }
 
-		function QueryFacturas() { return ""; }
 	}
 ?>
