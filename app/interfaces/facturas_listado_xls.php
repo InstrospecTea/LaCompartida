@@ -13,7 +13,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Factura.php';
 
 	$sesion = new Sesion(array('ADM', 'COB'));
-	set_time_limit(400);
+	set_time_limit(0);
 	ini_set("memory_limit","256M");
 	$where_cobro = ' 1 ';
 

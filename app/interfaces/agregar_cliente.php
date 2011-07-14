@@ -551,7 +551,7 @@ function validarUnicoCliente(dato,campo,id_cliente)
 function Validar(form)
 {
 	if(!form)
-		var form = $('formulario_ac');
+		var form = $('formulario');
 	
 	
 	if(!form.glosa_cliente.value)
@@ -830,10 +830,11 @@ function iframeLoad(url)
 }
 
 </script>
-<form name='formulario_ac' id='formulario_ac' method="post" action="<?= $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
+<form name='formulario' id='formulario' method="post" action="<?= $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
 <input type="hidden" name="opcion" value="guardar" />
 <input type="hidden" name="id_cliente" value="<?=$cliente->fields['id_cliente'] ?>" />
 <input type="hidden" name="id_contrato" value="<?=$contrato->fields['id_contrato'] ?>" />
+<input type="hidden" name="desde" id="desde" value="agregar_cliente" />
 <?
 $tip_tasa = __('Tip tasa');
 $tip_suma = __('Tip suma');

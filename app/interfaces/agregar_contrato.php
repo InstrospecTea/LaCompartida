@@ -884,7 +884,7 @@ function SetBanco( origen, destino )
 					respuesta_revisar_tarifa = true;
 					if( !desde_combo )
 					{
-						if( f.name == 'formulario_ac')
+						if( f.desde.value == 'agregar_cliente')
 						{
 							Validar(f);
 						}
@@ -909,6 +909,7 @@ function SetBanco( origen, destino )
 <input type=hidden name=codigo_cliente value="<?=$cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
 <input type=hidden name=opcion_contrato value="guardar_contrato" />
 <input type=hidden name='id_contrato' value="<?=$contrato->fields['id_contrato'] ?>" />
+<input type="hidden" name="desde" value="agregar_contrato" />
 <? } ?>
 <br>
 <!-- Calendario DIV -->
