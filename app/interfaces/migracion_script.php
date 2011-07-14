@@ -15,7 +15,7 @@
 	// Nombre de función para revisar datos recibidos: "ImprimirDataEnPantalla"
 	
 	set_time_limit(0);
-	
+	 
 	/*
 	if( method_exists('ConfMigracion','DatosPrm') && ConfMigracion::DatosPrm() != "" )
 	{
@@ -46,9 +46,14 @@
 		$migracion->Query2ObjetoAsunto($responseAsunto);
 	}
 
+	$migracion->ActualizarAreaAsuntosPRC();
+	
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )
 	{
+		$query = "ALTER TABLE  `trabajo` DROP FOREIGN KEY  `trabajo_ibfk_4` ;";
+		mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
 		$responseHoras = mysql_query(ConfMigracion::QueryHoras(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryHoras(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoHora($responseHoras);
 		//$horas = mysql_fetch_assoc($responseHoras);
@@ -63,7 +68,7 @@
 		$migracion->Query2ObjetoGasto($responseGastos);
 	}
 
-*/
+
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryCobros') && ConfMigracion::QueryCobros() )
@@ -71,7 +76,7 @@
 		$responseCobros = mysql_query(ConfMigracion::QueryCobros(), $dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCobros(), __FILE__, __LINE__, $dbhOrigen);
 		$migracion->Query2ObjetoCobro($responseCobros);
 	}
-	/*
+
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryTarifas') && ConfMigracion::QueryTarifas() )
 	{
