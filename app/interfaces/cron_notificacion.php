@@ -127,6 +127,9 @@
 				$profesional = new Usuario($sesion);
 				$profesional->LoadId($id_usuario);
 				
+				if( $revisados != "" ) 
+					$revisados .= ','.$id_usuario;
+				
 				// Comentado por Stefan Moers 5.4.2011, siempre se debería hacer el intersect con el array de los revisados.
 				/*if($codigo_permiso == 'REV') //Si es revisor, informo sobre todos en cache_revisados
 					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
