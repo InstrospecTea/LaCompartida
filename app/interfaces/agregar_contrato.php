@@ -315,6 +315,7 @@ function ValidarContrato(form)
 						form.limite_monto.value = form.monto.value; 
 			}
 	}
+	
 	form.submit();
 	if( window.opener )
 		window.opener.Refrescar();
@@ -827,6 +828,81 @@ function SetBanco( origen, destino )
     };
     http.send(null);
    }
+   
+	
+	var respuesta_revisar_tarifa = false;
+	
+	function RevisarTarifasRequest( tarifa, moneda )
+	{
+		//loading("Verificanco datos");
+		//cargando = true;
+		var text_window = "";
+		
+		var http = getXMLHTTP();
+		var url = 'ajax.php?accion=revisar_tarifas&id_tarifa=' + $(tarifa).value + '&id_moneda=' + $(moneda).value;
+		if(http) {
+
+			http.open('get',url,false);
+			http.send(null);
+
+			var response = http.responseText;
+			return response;
+		}
+		//cargando = false;
+		//offLoading();
+		return "0::&nbsp;";
+	}
+	
+	function RevisarTarifas(tarifa, moneda, f, desde_combo)
+	{
+		var text_window = "";
+		var respuesta = RevisarTarifasRequest(tarifa, moneda);
+		var parts = respuesta.split("::");
+		if( parts[0] > 0)
+		{
+			text_window += "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
+			if( parts[0] < 10 )
+			{
+				text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin precio para la moneda seleccionada.')?></span><br><br>';
+				text_window += '<span style="font-size:12px; text-align:left;">' + parts[1] + '</span><br><br>';
+			}
+			else
+			{
+				text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin precio, para la moneda y tarifa seleccionadas.')?></span><br><br>'
+			}
+			text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?=__('Modificar tarifa.')?></a></span>';
+
+			Dialog.confirm(text_window, 
+			{
+				top:100, left:80, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+				id: "myDialogId",
+				cancel:function(win){ 
+					respuesta_revisar_tarifa = false; 
+					return respuesta_revisar_tarifa; 
+				},
+				ok:function(win){ 
+					respuesta_revisar_tarifa = true;
+					if( !desde_combo )
+					{
+						if( f.name == 'formulario_ac')
+						{
+							Validar(f);
+						}
+						else
+						{
+							ValidarContrato(f);
+						}
+					}
+					return respuesta_revisar_tarifa; 
+				}
+			});
+		}
+		else
+		{
+			respuesta_revisar_tarifa = true;
+			return respuesta_revisar_tarifa;
+		}
+	}
 </script>
 <? if($popup && !$motivo){?>
 <form name='formulario' id='formulario' method=post>
@@ -1174,7 +1250,7 @@ else
 						<tr>
 							<td>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?=empty($valor_tarifa_flat) ? 'checked' : ''?>/>
-								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true"'); ?>
+								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true; RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true); "'); ?>
 								<br/>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?=empty($valor_tarifa_flat) ? '' : 'checked'?>/>
 								<label for="tipo_tarifa_flat">Plana por </label>
@@ -1184,7 +1260,7 @@ else
 							<td>
 								<?=__('Tarifa en')?>
 								<?php if ($validaciones_segun_config) echo $obligatorio ?>
-								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda();"','',"80"); ?>&nbsp;&nbsp;
+								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true); "','',"80"); ?>&nbsp;&nbsp;
 								<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
 								<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
 							</td>
@@ -1305,7 +1381,7 @@ else
 						<?=!$div_show ? '<span id="datos_tramites_img"><img src="'.Conf::ImgDir().'/mas.gif" border="0" id="datos_tramites_img"></span>' : '' ?>
 						&nbsp;<?=__('Tr&aacute;mites')?>
 					</legend>
-						<div id='datos_tramites' style="display:<?=$show?>;' width="100%">
+						<div id='datos_tramites' style="display:<?=$show?>;" width="100%">
 							<table width="100%">
 								<tr>
 									<td align="right" width="25%">

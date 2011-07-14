@@ -551,7 +551,7 @@ function validarUnicoCliente(dato,campo,id_cliente)
 function Validar(form)
 {
 	if(!form)
-		var form = $('formulario');
+		var form = $('formulario_ac');
 	
 	
 	if(!form.glosa_cliente.value)
@@ -772,7 +772,7 @@ function Validar(form)
 			}
 		}
 	}
-	
+
 	form.submit();
 	return true;
 }
@@ -830,7 +830,7 @@ function iframeLoad(url)
 }
 
 </script>
-<form name='formulario' id='formulario' method="post" action="<?= $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
+<form name='formulario_ac' id='formulario_ac' method="post" action="<?= $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
 <input type="hidden" name="opcion" value="guardar" />
 <input type="hidden" name="id_cliente" value="<?=$cliente->fields['id_cliente'] ?>" />
 <input type="hidden" name="id_contrato" value="<?=$contrato->fields['id_contrato'] ?>" />
@@ -982,7 +982,7 @@ else { ?>
 <tr>
 	<td colspan="2" align="center">
 <? if($cant_encargados > 0){ ?>
-		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return Validar(this.form)" />
+		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false)" />
 <? }else{ ?>
 		<span style="font-size:10px;background-color:#C6DEAD"><?=__('No se han configurado encargados comerciales').'<br>'.__('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.')?></span>
 <? } ?>

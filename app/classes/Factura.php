@@ -339,20 +339,24 @@ class Factura extends Objeto
 					}
 					$moneda_factura = new Moneda($this->sesion);
 					$moneda_factura->Load($factura_id_moneda);
-					$query = "SELECT glosa_asunto
+					$query = "SELECT glosa_asunto , codigo_asunto
 											FROM cobro
 											JOIN contrato ON cobro.id_contrato=contrato.id_contrato
 											JOIN asunto ON contrato.id_contrato=asunto.id_contrato
 											WHERE cobro.id_cobro='".$id_cobro."'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__, $this->sesion->dbh);
 					$i=1;
-					while( list($glosa_asunto) = mysql_fetch_array($resp) )
+					while( list($glosa_asunto, $codigo_asunto) = mysql_fetch_array($resp) )
 					{
-					if($i==1)
-						$asuntos = $glosa_asunto;
-					else
-						$asuntos .= ', '.$glosa_asunto;
-					$i++;
+						if($i==1) {
+							$asuntos = $glosa_asunto;
+							$cod_asuntos = $codigo_asunto;
+						}
+						else {
+							$asuntos .= ', '.$glosa_asunto;
+							$cod_asuntos .= ', '.$codigo_asunto;
+						}
+						$i++;
 					}
 					if( $lang == 'es' )
 						{
@@ -432,6 +436,7 @@ class Factura extends Objeto
 							$html2 = str_replace('%firma%', 'Signature', $html2);
 						}
 					$html2 = str_replace('%asuntos%', $asuntos, $html2);
+					$html2 = str_replace('%cod_asuntos%', $cod_asuntos, $html2);
 					if( method_exists('Conf','Server') && method_exists('Conf','ImgDir') )
 					$html2 = str_replace('%logo_cobro%', Conf::Server().'/'.Conf::ImgDir(), $html2);
 					$html2 = str_replace('%glosa_moneda_factura%', '%'.$cobro_moneda->moneda[$factura_id_moneda]['glosa_moneda'].'%', $html2);
@@ -447,6 +452,7 @@ class Factura extends Objeto
 						$html2 = str_replace('%porcentaje%', Conf::ValorImpuesto().'%', $html2);
 					$monto_gastos_sin_impuesto = $monto_gastos / ( 1 + ( $porcentaje_impuesto / 100 ) ) ;
 					$impuesto_gastos = $monto_gastos - $monto_gastos_sin_impuesto;
+					
 					if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'CalculacionCYC') ) || ( method_exists('Conf','CalculacionCyC') && Conf::CalculacionCyC() ) ) )
 						{
 							$html2 = str_replace('%monto_honorarios%', number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);

@@ -5949,7 +5949,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						$query = array();
 						$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACT_PAGO', 'Factura Pago', '/app/interfaces/facturas_pagos.php', '', '', 0, 53, 'COBRANZA');";
 						$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACT_PAGO');";
-
+						$query[] = "INSERT INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('COB',  'FACT_PAGO');";
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;

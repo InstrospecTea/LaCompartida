@@ -41,12 +41,19 @@ class Reporte
 	var $campo_fecha_cobro = 'cobro.fecha_fin';
 	var $campo_fecha_cobro_2 = 'cobro.fecha_emision';
 	
+	var $conf = array();
+
 	//Cuanto se repite la fila para cada agrupador
 	var $filas = array();
 
 	function Reporte($sesion)
 	{
 		$this->sesion = $sesion;
+	}
+
+	function configuracion($opcs = array())
+	{
+		$this->conf = array();
 	}
 
 	//Agrega un filtro
@@ -433,6 +440,41 @@ class Reporte
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
 		$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE',".$s_monto_thh_estandar.",".$s_monto_thh_simple.")";
 
+		$monto_honorarios = "SUM(
+									(
+										".$s_tarifa."
+										* TIME_TO_SEC( duracion_cobrada)/3600
+									)
+									*	(cobro.monto_trabajos / ".$s_monto_thh." )
+									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+								)";
+		$monto_estandar = "SUM(
+									trabajo.tarifa_hh_estandar 
+									* (TIME_TO_SEC( duracion_cobrada)/3600)
+									* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+							  )";
+		$monto_predicho = "SUM( 			
+									usuario_tarifa.tarifa
+									* TIME_TO_SEC( duracion_cobrada )
+									* moneda_por_cobrar.tipo_cambio
+									/ (moneda_display.tipo_cambio * 3600)
+								)";
+		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
+		if( 1 && $this->tipo_dato != 'valor_por_cobrar')
+		{
+			$monto_honorarios = "SUM(
+										(
+											".$s_tarifa."
+											* TIME_TO_SEC( duracion_cobrada)/3600
+										)
+										*	(
+												( (documento.subtotal_sin_descuento)  * cobro_moneda_documento.tipo_cambio )	
+												/   (".$s_monto_thh." * cobro_moneda_cobro.tipo_cambio )
+											)
+										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+									)";
+		}
+
 		switch($this->tipo_dato)
 		{
 			case "horas_trabajadas": case "horas_cobrables": case "horas_no_cobrables":
@@ -453,25 +495,7 @@ class Reporte
 			case 'valor_por_cobrar':
 			{
 				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando. 
-				$s .= "
-					IF
-					(
-						cobro.id_cobro IS NOT NULL,
-							SUM(
-									(
-										".$s_tarifa."
-										*
-										TIME_TO_SEC( duracion_cobrada)/3600
-									)
-									*	(cobro.monto_trabajos / ".$s_monto_thh." )
-									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-									/	cobro_moneda.tipo_cambio
-								),
-									SUM( 
-											
-												usuario_tarifa.tarifa * TIME_TO_SEC( duracion_cobrada ) * moneda_por_cobrar.tipo_cambio / (moneda_display.tipo_cambio * 3600)
-										)
-					)";
+				$s .= "IF( cobro.id_cobro IS NOT NULL, $monto_honorarios ,	$monto_predicho)";
 				break;
 			}
 			case "valor_cobrado":
@@ -479,53 +503,23 @@ class Reporte
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			{
-				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, SUM(
-						(
-							".$s_tarifa."
-							*
-							TIME_TO_SEC( duracion_cobrada)/3600
-						)
-					*	(cobro.monto_trabajos / ".$s_monto_thh." )
-					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio
-					)";
+				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_honorarios";
 				break;
 			}
 			case "valor_estandar":
 			{
-				$s .= "	SUM(
-						(trabajo.tarifa_hh_estandar*TIME_TO_SEC( duracion_cobrada)/3600)
-					*	(cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-					/	cobro_moneda.tipo_cambio
-					)";
+				$s .= "	$monto_estandar ";
 				break;
 			}
 			case "diferencia_valor_estandar":
 			{
-				$s .= "(SUM(
-						(
-							".$s_tarifa."
-						*
-							TIME_TO_SEC( duracion_cobrada)/3600
-						)
-					*	(cobro.monto_trabajos / ".$s_monto_thh." )
-					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio
-					) - SUM(
-						(trabajo.tarifa_hh_estandar*TIME_TO_SEC( duracion_cobrada)/3600)
-					*	(cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-					/	cobro_moneda.tipo_cambio
-					))";
+				$s .= "( $monto_honorarios - $monto_estandar )";
 				break;
 			}
 			case 'rentabilidad':
 				/*Se necesita resultado extra: lo que se habría cobrado*/
-				$s .= "SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-						/	cobro_moneda.tipo_cambio) AS valor_divisor, ";
-				$s .= "SUM((".$s_tarifa."*TIME_TO_SEC(duracion_cobrada)/3600) 
-						* (cobro.monto_trabajos/".$s_monto_thh.") *	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-						/	cobro_moneda.tipo_cambio
-						)";
+				$s .= " $monto_estandar  AS valor_divisor, ";
+				$s .= " $monto_honorarios ";
 				break;
 			case "valor_hora":
 			{
@@ -533,15 +527,7 @@ class Reporte
 				$s .= "SUM(
 						(TIME_TO_SEC( duracion_cobrada)/3600)
 					) as valor_divisor, ";
-				$s .= "SUM(
-						(
-							".$s_tarifa."
-						*
-							TIME_TO_SEC( duracion_cobrada)/3600)
-					*	(cobro.monto_trabajos/".$s_monto_thh.")
-					*	(cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio
-					)";
+				$s .= " $monto_honorarios ";
 				break;
 			}
 		}
@@ -586,8 +572,10 @@ class Reporte
 			}
 			else
 			{ 
-				$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
 				$tabla = 'documento';
+				$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";
+				//moneda_del_documento
+				$s .= " LEFT JOIN documento_moneda as cobro_moneda_documento on (cobro_moneda_documento.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_documento.id_moneda = documento.id_moneda )";
 			}
 			//moneda buscada
 			$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda ON (cobro_moneda.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda.id_moneda = '".$this->id_moneda."' )";

@@ -83,7 +83,7 @@
 	else
 		$where = base64_decode($where);
 
-	$query = "SELECT glosa_cliente
+	$query = "SELECT cliente.glosa_cliente
 					, fecha
 					, prm_documento_legal.codigo as tipo
 					, numero
@@ -113,10 +113,10 @@
 				FROM factura
 				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN cliente ON cliente.codigo_cliente=factura.codigo_cliente
 				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+				LEFT JOIN cobro ON cobro.id_cobro=cobro.id_cobro
+				LEFT JOIN cliente ON cliente.codigo_cliente=factura.codigo_cliente
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 				$join
