@@ -120,7 +120,7 @@
 					, numero
 					, cliente.glosa_cliente
 					, fecha
-					, CONCAT(LEFT(nombre,1),LEFT(apellido1,1),LEFT(apellido2,1)) AS encargado_comercial
+					, usuario.username AS encargado_comercial
 					, descripcion
 					, prm_estado_factura.codigo as estado
 					, factura.id_cobro

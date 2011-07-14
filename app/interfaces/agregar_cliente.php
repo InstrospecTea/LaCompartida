@@ -981,9 +981,22 @@ else { ?>
 <table width="100%" cellspacing="3" cellpadding="3">
 <tr>
 	<td colspan="2" align="center">
-<? if($cant_encargados > 0){ ?>
-		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false)" />
-<? }else{ ?>
+<?php 
+	if($cant_encargados > 0)
+	{
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') )
+		{
+?>
+		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false);" />
+<? 
+		}
+		else
+		{
+?>
+		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return Validar(this.form);" />
+<?php
+		}
+	}else{ ?>
 		<span style="font-size:10px;background-color:#C6DEAD"><?=__('No se han configurado encargados comerciales').'<br>'.__('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.')?></span>
 <? } ?>
 	</td>

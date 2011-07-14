@@ -1230,6 +1230,8 @@ else
 		$opc_moneda_total = GetMonedaTotalPorDefecto($sesion);
 	if(!$opc_moneda_total)
 		$opc_moneda_total = GetMonedaBase($sesion);
+	
+	$config_validar_tarifa = ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 ?>
 
 <!-- COBRANZA -->
@@ -1250,7 +1252,7 @@ else
 						<tr>
 							<td>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?=empty($valor_tarifa_flat) ? 'checked' : ''?>/>
-								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true; RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true); "'); ?>
+								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '') ); ?>
 								<br/>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?=empty($valor_tarifa_flat) ? '' : 'checked'?>/>
 								<label for="tipo_tarifa_flat">Plana por </label>
@@ -1260,7 +1262,7 @@ else
 							<td>
 								<?=__('Tarifa en')?>
 								<?php if ($validaciones_segun_config) echo $obligatorio ?>
-								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true); "','',"80"); ?>&nbsp;&nbsp;
+								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . ' "','',"80"); ?>&nbsp;&nbsp;
 								<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
 								<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
 							</td>
@@ -1763,7 +1765,20 @@ else
 	<table>
 		<tr>
 	    <td colspan=6 align="center">
-	        <input type=button class=btn value=<?=__('Guardar')?> onclick="ValidarContrato(this.form)" />
+<?php
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') )
+	{
+?>
+	        <input type="button" class=btn value="<?=__('Guardar')?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false);" />
+<?php
+	}
+	else
+	{
+?>
+			<input type="button" class=btn value="<?=__('Guardar')?>" onclick="ValidarContrato(this.form)" />
+<?php
+	}
+?>
 	  	</td>
 		</tr>
 	</table>

@@ -89,7 +89,7 @@
 					, numero
 					, '' glosa_asunto
 					, '' codigo_asunto
-					, CONCAT(LEFT(nombre,1),LEFT(apellido1,1),LEFT(apellido2,1)) AS encargado_comercial
+					, usuario.username AS encargado_comercial
 					, descripcion
 					, factura.id_cobro
 					, prm_moneda.simbolo
