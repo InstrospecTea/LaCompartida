@@ -302,7 +302,7 @@
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
 		$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
-		$html .= "<td align=right nowrap>".Glosa_asuntos(& $fila, $sesion)."</td>";
+		$html .= "<td align=left>".Glosa_asuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
 		$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
