@@ -62,7 +62,7 @@
 			$id_contrato = $asunto->fields['id_contrato'];
 		}
 		if($id_contrato) {
-			$join = " JOIN cobro ON cobro.id_cobro=factura.id_cobro ";
+			//$join = " JOIN cobro ON cobro.id_cobro=factura.id_cobro ";
 			$where .= " AND cobro.id_contrato=".$id_contrato." ";
 		}
 		if($id_cobro) {
@@ -115,11 +115,10 @@
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
 				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=cobro.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=factura.codigo_cliente
+				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-				$join
 				WHERE $where";
 
 	$lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
