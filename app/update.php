@@ -6033,6 +6033,13 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 						}
 						break;
+			case 4.46:
+						$query = array();
+						$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_factura` INT( 11 ) NULL , ADD  `fecha_factura` DATE NULL ;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
  	}
 }
 
@@ -6248,6 +6255,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 	$VERSIONES[$num++] = 4.43;
 	$VERSIONES[$num++] = 4.44;
 	$VERSIONES[$num++] = 4.45;
+	$VERSIONES[$num++] = 4.46;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

@@ -76,8 +76,14 @@ class Factura extends Objeto
 				{
 					$cobro->Edit('documento',$this->fields['numero']);
 				}
+				
 				$cobro->Write();
-			}
+				
+				if( ( $this->fields['subtotal_gastos'] > 0 || $this->fields['subtotal_gastos_sin_impuesto'] > 0 ) && $this->ComparaGastos() )
+				{
+					$this->GastosAsociaCobro();
+				}
+			}			
 			return true;
 		}
 		else
@@ -86,6 +92,59 @@ class Factura extends Objeto
 		}
 	}
 
+	function ComparaGastos()
+	{
+		$factura_subtotal_gastos = 0; 		$factura_subtotal_gastos_sin_impuesto = 0;		
+		$documento_subtotal_gastos = 0;		$documento_subtotal_gastos_sin_impuesto = 0;
+		
+		$query = "SELECT subtotal_gastos, subtotal_gastos_sin_impuesto FROM factura 
+					WHERE id_cobro = " . $this->fields['id_cobro'] . " 
+					AND ( subtotal_gastos > 0 OR subtotal_gastos_sin_impuesto > 0 ) ";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list( $factura_subtotal_gastos, $factura_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp);
+		
+		$query = "SELECT subtotal_gastos, subtotal_gastos_sin_impuesto FROM documento 
+					WHERE id_cobro = " . $this->fields['id_cobro'] . " 
+					AND ( subtotal_gastos > 0 OR subtotal_gastos_sin_impuesto > 0 ) ";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list( $documento_subtotal_gastos, $documento_subtotal_gastos_sin_impuesto ) = mysql_fetch_array($resp);
+		
+		if( $factura_subtotal_gastos != $documento_subtotal_gastos || $factura_subtotal_gastos_sin_impuesto != $documento_subtotal_gastos_sin_impuesto )
+		{
+			return false;
+		}
+		return true;		
+	}
+	
+	function GastosAsociaCobro()
+	{
+		$query = "SELECT id_movimiento FROM cta_corriente WHERE id_cobro = " . $this->fields['id_cobro'] . "";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		$gasto = new Gasto( $this->sesion );
+		while( list($id_movimiento) = mysql_fetch_array($resp) )
+		{
+			$gasto->Load($id_movimiento);
+			
+			if( $this->fields['id_estado'] == 5 )
+			{
+				$gasto->Edit('id_factura', "NULL" );
+				$gasto->Edit('fecha_factura', "NULL");
+			}
+			else
+			{
+				$gasto->Edit('id_factura', $this->fields['id_factura']);
+				$gasto->Edit('fecha_factura', $this->fields['fecha']);
+			}
+			if( !$gasto->Write())
+			{
+				//return false;
+			}
+		}
+		
+		return true;
+		
+	}
 	function PrimerTipoDocumentoLegal()
 	{
 		$query = "SELECT id_documento_legal FROM prm_documento_legal ORDER BY id_documento_legal ASC LIMIT 1";
