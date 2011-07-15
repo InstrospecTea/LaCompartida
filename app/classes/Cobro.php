@@ -1077,9 +1077,15 @@ class Cobro extends Objeto
 				$this->Edit('id_carta',$contrato->fields['id_carta']);
 				$this->Edit("opc_ver_modalidad",$contrato->fields['opc_ver_modalidad']);
 				$this->Edit("opc_ver_profesional",$contrato->fields['opc_ver_profesional']);
+				$this->Edit("opc_ver_profesional_iniciales",$contrato->fields['opc_ver_profesional_iniciales']);
+				$this->Edit("opc_ver_profesional_tarifa",$contrato->fields['opc_ver_profesional_tarifa']);
+				$this->Edit("opc_ver_profesional_importe",$contrato->fields['opc_ver_profesional_importe']);
 				$this->Edit("opc_ver_gastos",$contrato->fields['opc_ver_gastos']);
 				$this->Edit("opc_ver_morosidad",$contrato->fields['opc_ver_morosidad']);
 				$this->Edit("opc_ver_resumen_cobro",$contrato->fields['opc_ver_resumen_cobro']);
+				$this->Edit("opc_ver_resumen_cobro_categoria",$contrato->fields['opc_ver_resumen_cobro_categoria']);
+				$this->Edit("opc_ver_resumen_cobro_tarifa",$contrato->fields['opc_ver_resumen_cobro_tarifa']);
+				$this->Edit("opc_ver_resumen_cobro_importe",$contrato->fields['opc_ver_resumen_cobro_importe']);
 				$this->Edit("opc_ver_descuento",$contrato->fields['opc_ver_descuento']);
 				$this->Edit("opc_ver_tipo_cambio",$contrato->fields['opc_ver_tipo_cambio']);
 				$this->Edit("opc_ver_solicitante",$contrato->fields['opc_ver_solicitante']);

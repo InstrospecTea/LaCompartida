@@ -297,12 +297,18 @@
 						#Opc contrato
 						$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 						$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
+						$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+						$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
+						$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 						$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
 						$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 						$contrato->Edit("opc_ver_descuento",$opc_ver_descuento);
 						$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 						$contrato->Edit("opc_ver_numpag",$opc_ver_numpag);
 						$contrato->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+						$contrato->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
+						$contrato->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
+						$contrato->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
 						$contrato->Edit("opc_ver_carta",$opc_ver_carta);
 						$contrato->Edit("opc_papel",$opc_papel);
 						

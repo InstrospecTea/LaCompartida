@@ -431,7 +431,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 			&nbsp;
 		</td>
 		<td valign="top" class="texto" align="left">
-			<input id="activo" type="checkbox" name="activo" value="1" <?=(($usuario->fields['activo'] || $activo )?'checked':'')?> <? if($usuario->loaded) { ?> onClick="CheckActivo(this);" <? } ?>/>
+			<input id="activo" type="checkbox" name="activo" value="1" <?=(($usuario->fields['activo'] || $activo || !$usuario->loaded )?'checked':'')?> <? if($usuario->loaded) { ?> onClick="CheckActivo(this);" <? } ?>/>
 			<label for="activo"><?=__('Usuario Activo')?></label><br/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;"><?=__('(sólo los usuarios activos pueden ingresar al sistema)')?></span>
 		</td>

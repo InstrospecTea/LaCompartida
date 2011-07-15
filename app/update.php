@@ -5991,12 +5991,42 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
+					
 					case 4.43:
 						$query = array();
 						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  
 							`comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( NULL ,  'RevisarTarifas',  '0',  
 							'Revisa si los abogados tienen fijados los precios para la tarifa y moneda seleccionada',  'boolean',  '6',  '-1');";
+						
+						foreach( $query as $q)
+						{
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+						}
+						break;
+						
+					case 4.44:
+						$query = array();
+						$query[] = "ALTER TABLE `cobro` ADD  `monto_original` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_ajustado` ;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+					
+					case 4.45:
+						$query = array();
+						$query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ,
+																	ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ,
+																	ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ,
+																	ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ,
+																	ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ,
+																	ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
+																							$query[] = "ALTER TABLE `contrato` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ,
+																	ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ,
+																	ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ,
+																	ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ,
+																	ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ,
+																	ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
 						
 						foreach( $query as $q)
 						{
@@ -6216,6 +6246,8 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 	$VERSIONES[$num++] = 4.41;
 	$VERSIONES[$num++] = 4.42;
 	$VERSIONES[$num++] = 4.43;
+	$VERSIONES[$num++] = 4.44;
+	$VERSIONES[$num++] = 4.45;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

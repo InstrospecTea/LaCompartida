@@ -32,7 +32,7 @@
 			{
 				$factura_pago->Load($eliminar_pago);
 				if( $factura_pago->Eliminar() )
-					$pagina->addInfo(__('Pago borrado con exitó'));
+					$pagina->addInfo(__('Pago borrado con éxito'));
 			}
 	}
 	if($opc == "eliminar_documento")
@@ -333,9 +333,15 @@
 	{
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
+		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+		$cobro->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
+		$cobro->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
+		$cobro->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
 		$cobro->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$cobro->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$cobro->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -370,9 +376,15 @@
 	{
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
+		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+		$cobro->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
+		$cobro->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
+		$cobro->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
 		$cobro->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$cobro->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$cobro->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -983,7 +995,7 @@ function AgregarFactura(idx){
 					</td>
 					<td rowspan="2" align="right">
 							<!-- Imprimir -->
-							<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="220" height=100>
+							<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="230" height=100>
 								<tr>
 									<td align="left" style="font-size: 11px; font-weight: bold; vertical-align: middle;">
 										<input type="hidden" name="guardar_opciones" value="1" />
@@ -1009,12 +1021,34 @@ function AgregarFactura(idx){
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_resumen_cobro"><?=__('Mostrar resumen del cobro')?></label></td>
 												</tr>
 												<tr>
+													<td/>
+													<td align="left" style="font-size: 10px;">
+														<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
+														<label for="opc_ver_resumen_cobro_categoria"><?=__('Categoría')?></label>
+														<input type="checkbox" name="opc_ver_resumen_cobro_tarifa" id="opc_ver_resumen_cobro_tarifa" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_tarifa']=='1'?'checked':''?>>
+														<label for="opc_ver_resumen_cobro_tarifa"><?=__('Tarifa')?></label>
+														<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
+														<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
+													</td>
+												</tr>
+												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
 												</tr>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
+												</tr>
+												<tr>
+													<td/>
+													<td align="left" style="font-size: 10px;">
+														<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$cobro->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
+														<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+														<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+													</td>
 												</tr>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?=$cobro->fields['opc_ver_gastos']=='1'?'checked':''?>></td>
@@ -1030,7 +1064,7 @@ function AgregarFactura(idx){
 												</tr>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?=$cobro->fields['opc_ver_descuento']=='1'?'checked':''?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?=_('Mostrar el descuento del cobro')?></label></td>
+													<td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?=__('Mostrar el descuento del cobro')?></label></td>
 												</tr>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?=$cobro->fields['opc_ver_numpag']=='1'?'checked':''?>></td>

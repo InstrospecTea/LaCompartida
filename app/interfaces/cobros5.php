@@ -69,6 +69,21 @@
 	}
 	elseif($opc == 'guardar_cobro') #Guardamos todos los datos del cobro
 	{
+		// Si se ajustar el valor del cobro por monto, 
+		// llamar a la function AjustarPorMonto de la clase Cobro
+		
+		if( !is_numeric($cobro_monto_honorarios) )
+			$cobro_monto_honorarios = 0;
+		
+		if( $ajustar_monto_hide && $ajustar_monto_hide != "false" )
+			{
+			$cobro->Edit('monto_ajustado',$cobro_monto_honorarios);
+			}
+		else
+			{
+			$cobro->Edit('monto_ajustado',"0");
+			}
+			
 		$cobro->Edit('id_moneda',$cobro_id_moneda);
 		$cobro->Edit('tipo_cambio_moneda',$cobro_tipo_cambio);
 		$cobro->Edit('forma_cobro',$cobro_forma_cobro);
@@ -82,6 +97,13 @@
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+ 		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
+ 		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
+		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
+		$cobro->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
+		$cobro->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
+		$cobro->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
 		$cobro->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$cobro->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$cobro->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -268,6 +290,32 @@ function Anterior( form )
 	return true;
 }
 
+function AjustarMonto( accion )
+{
+	form = document.getElementById('form_cobro5');
+	
+	if( accion == 'ajustar' )
+	{
+		document.getElementById('cobro_monto_honorarios').value = "";
+		document.getElementById('cobro_monto_honorarios').readOnly = false;
+		document.getElementById('ajustar_monto_hide').value = true;
+		document.getElementById('cancelar_ajustacion').style.display = 'inline';
+		document.getElementById('tr_monto_original').style.display = 'table-row';
+		document.getElementById('cobro_monto_honorarios').focus();
+	}
+	else if( accion == 'cancelar' )
+	{
+		document.getElementById('cobro_monto_honorarios').value = document.getElementById('monto_original').value;
+		document.getElementById('cobro_monto_honorarios').readOnly = true;
+		document.getElementById('ajustar_monto_hide').value = false;
+		document.getElementById('cancelar_ajustacion').style.display = 'none';
+		document.getElementById('tr_monto_original').style.display = 'none';
+		
+		form.submit();
+		return true;
+	}
+}
+
 function MontoValido( id_campo )
 {
 	document.getElementById( id_campo ).value = document.getElementById( id_campo ).value.replace('\,','.');
@@ -441,10 +489,10 @@ function GuardaCobro( form )
 {
 	if(!form)
 		var form = $('form_cobro5');
-
+	
 	if( !AgregarParametros( form ) )
 		return false;
-
+	
 	form.accion.value = '';
 	form.opc.value = 'guardar_cobro';
 	form.submit();
@@ -486,6 +534,7 @@ function ShowMonto( showHoras )
 		div = document.getElementById("div_horas");
 		div.style.display = "none";
 	}
+	document.getElementById('ajustar_monto').style.display = 'none';
 }
 
 function ShowCapMsg(valor)
@@ -506,6 +555,8 @@ function HideMonto()
 
     div = document.getElementById("div_horas");
     div.style.display = "none";
+    
+    document.getElementById('ajustar_monto').style.display = 'inline';
 }
 
 function RecalcularTotal(desc) //isCap -> pasa true si es forma_cobro CAP
@@ -717,6 +768,7 @@ function UpdateCap(monto_update, guardar)
 <form method="post" id="form_cobro5" name="form_cobro5" >
 <input type="hidden" name="existe_factura" id="existe_factura" value="<?=$existe_factura?>" />
 <input type="hidden" name="id_cobro" id="id_cobro" value="<?=$id_cobro?>">
+<input type="hidden" name="ajustar_monto_hide" id="ajustar_monto_hide" value="<?=$cobro->fields['monto_ajustado'] > 0 ? true : false ?>" />
 <input type="hidden" name="opc" value="guardar_cobro">
 <input type="hidden" name="id_contrato" value="<?=$cobro->fields['id_contrato']?>" id="id_contrato">
 <input type="hidden" name="excedido" value="<?=$excedido?>" />
@@ -831,8 +883,8 @@ function UpdateCap(monto_update, guardar)
 				<tr>
 					<td colspan='<?=$monedas->num ?>' align='center' style='padding-left:20px; padding-right:10px'>
 						<div id='msg_cambio' style='font-size:10px;display:none;color:#FF7D7D'><?=__('Los tipos de cambio han sido actualizados correctamente') ?></div>
-                   </td>
-                </tr>
+          </td>
+        </tr>
 			</table>
     </td>
  	</tr>
@@ -910,6 +962,34 @@ function UpdateCap(monto_update, guardar)
     </td>
   </tr>
 </table>
+
+<? 
+	if( $cobro->fields['forma_cobro'] == 'TASA' )
+	{
+		if( $cobro->fields['monto_ajustado'] > 0 )
+		{
+			$display_ajustar = 'style="display: table-row;"';
+			$deshabilitar = '';
+			$display_buton_cancelar = 'style="display: inline;"';
+			$display_buton_ajuste = 'style="display: none;"';
+		}
+		else
+		{
+			$display_ajustar = 'style="display: none;"';
+			$deshabilitar = 'readonly="readonly"';
+			$display_buton_cancelar = 'style="display: none;"';
+			$display_buton_ajuste = 'style="display: inline;"';
+		}
+	}
+	else
+	{
+		$display_ajustar = 'style="display: none;"';
+		$deshabilitar = 'readonly="readonly"';
+		$display_buton_cancelar = 'style="display: none;"';
+		$display_buton_ajuste = 'style="display: none;"';
+	}
+?>
+
 <table width=100% cellspacing="3" cellpadding="3">
   <tr>
     <td align="left">
@@ -919,9 +999,19 @@ function UpdateCap(monto_update, guardar)
 			    		<?=__('Trabajos')?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
 			    </td>
 			    <td align="left" width="55%" nowrap>
-			    	<input type="text" id="cobro_monto_honorarios" value="<?=number_format($cobro->fields['monto_subtotal']-$cobro->CalculaMontoTramites( $cobro ),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
+			    	<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?=number_format($cobro->fields['monto_subtotal']-$cobro->CalculaMontoTramites( $cobro ),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" <?=$deshabilitar ?> style="text-align: right;">
 			    	&nbsp;&nbsp;<img src="<?=Conf::ImgDir()?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?=TTip($tip_actualizar)?>>
-			    </td>
+			    	<img id="ajustar_monto" <?=$display_buton_ajuste ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Ajustar Monto')?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
+			    	<img id="cancelar_ajustacion" <?=$display_buton_cancelar ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
+			 </td>
+			  </tr>
+			  <tr id="tr_monto_original" <?=$display_ajustar ?>>
+			  	<td>
+			  		<?=__('Monto Original')?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
+			  	</td>
+			  	<td align="left">
+			  		<input type="text" id="monto_original" name="monto_original" value="<?=number_format($cobro->fields['monto_original'],$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" disabled style="text-align: right;">
+			   	</td>
 			  </tr>
 			  <tr>
 			    <td align="right" width="45%" nowrap>
@@ -1154,12 +1244,34 @@ function UpdateCap(monto_update, guardar)
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_resumen_cobro"><?=__('Mostrar resumen del cobro')?></label></td>
 								</tr>
 								<tr>
+									<td/>
+									<td align="left" colspan="2" style="font-size: 10px;">
+										<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
+										<label for="opc_ver_resumen_cobro_categoria"><?=__('Categoría')?></label>
+										<input type="checkbox" name="opc_ver_resumen_cobro_tarifa" id="opc_ver_resumen_cobro_tarifa" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_tarifa']=='1'?'checked':''?>>
+										<label for="opc_ver_resumen_cobro_tarifa"><?=__('Tarifa')?></label>
+										<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
+										<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
+									</td>
+								</tr>
+								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
 								</tr>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
+								</tr>
+								<tr>
+									<td/>
+									<td align="left" colspan="2" style="font-size: 10px;">
+										<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$cobro->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
+										<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
+										<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+										<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+										<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+										<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+									</td>
 								</tr>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?=$cobro->fields['opc_ver_gastos']=='1'?'checked':''?>></td>
@@ -1364,6 +1476,7 @@ if( form )
 	else if( form.cobro_forma_cobro[4].checked )
 		ShowMonto(true);
 }
+
 function ActivaCarta(check)
 {
 	if( !form )

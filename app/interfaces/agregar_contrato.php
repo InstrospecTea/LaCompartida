@@ -148,9 +148,15 @@
 		#Opc contrato
 		$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
+		$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$contrato->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+		$contrato->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
+		$contrato->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
+		$contrato->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
 		$contrato->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$contrato->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -1621,12 +1627,34 @@ else
 			<td align="left" colspan='5'><?=__('Mostrar resumen del cobro')?></td>
 		</tr>
 		<tr>
+			<td/>
+			<td align="left" colspan='5'>
+				<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
+				<label for="opc_ver_resumen_cobro_categoria"><?=__('Categoría')?></label>
+				<input type="checkbox" name="opc_ver_resumen_cobro_tarifa" id="opc_ver_resumen_cobro_tarifa" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_tarifa']=='1'?'checked':''?>>
+				<label for="opc_ver_resumen_cobro_tarifa"><?=__('Tarifa')?></label>
+				<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
+				<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
+			</td>
+		</tr>
+		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_modalidad" value="1" <?=$contrato->fields['opc_ver_modalidad']=='1'?'checked="checked"': ''?> <?=$checked?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar modalidad del cobro')?></td>
 		</tr>
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_profesional" value="1" <?=$contrato->fields['opc_ver_profesional']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar detalle por profesional')?></td>
+		</tr>
+		<tr>
+			<td/>
+			<td align="left" colspan='5'>
+				<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$contrato->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
+				<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
+				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$contrato->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+				<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+				<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$contrato->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+				<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+			</td>
 		</tr>
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_descuento" value="1" <?=$contrato->fields['opc_ver_descuento']=='1'?'checked="checked"':''?> <?=$checked?> /></td>

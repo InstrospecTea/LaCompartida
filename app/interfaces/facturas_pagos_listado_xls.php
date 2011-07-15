@@ -55,20 +55,7 @@
 				$where_pactura_pago .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 
 
-			$query_facturas_con_pago = "SELECT GROUP_CONCAT(ccfm2.id_factura) as lista_factiras_con_pagos, '1' as con_pago
-					FROM factura_pago AS fp
-					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
-					WHERE $where_pactura_pago GROUP BY con_pago ";
-			//echo "<br>".$query_facturas_con_pago;
-			$resp_facturas_con_pago = mysql_query($query_facturas_con_pago, $sesion->dbh) or Utiles::errorSQL($query_facturas_con_pago, __FILE__, __LINE__, $sesion->dbh);
-			list($lista_facturas_con_pagos,$con_pago) = mysql_fetch_array($resp_facturas_con_pago);
-			if($lista_facturas_con_pagos!='')
-				$where .= " AND factura.id_factura IN (".$lista_facturas_con_pagos.")";
-			else
-				$where .= " AND factura.id_factura = 0 ";
+			
 			/*
 			 * INICIO - obtener listado facturas con pago parcial o total
 			 */
@@ -125,44 +112,48 @@
 	else
 		$where = base64_decode($where);
 
-	$query = "SELECT  fecha
-					, prm_documento_legal.glosa as tipo
-					, numero
-					, glosa_cliente
-					, '' glosa_asunto
-					, '' codigo_asunto
+	$query = "SELECT
+					 factura.id_factura
+					, prm_documento_legal.codigo as tipo
+					, factura.numero
+					, factura.fecha as fecha_factura
+					, cliente.glosa_cliente
 					, usuario.username AS encargado_comercial
-					, descripcion
-					, prm_estado_factura.glosa as estado
-					, factura.id_cobro
+					, prm_estado_factura.codigo as estado_factura
+					, fp.id_factura_pago as id_pago
+					, fp.fecha as fecha_pago
+					, prm_factura_pago_concepto.glosa as concepto
+					, fp.descripcion as descripcion_pago
+					, b.nombre as banco
+					, cta.numero as cuenta
 					, prm_moneda.simbolo
 					, prm_moneda.cifras_decimales
 					, prm_moneda.tipo_cambio
 					, factura.id_moneda
-					, '' as pago_retencion
-					, '' as concepto
-					, '' as descripcion_pago
-					, '' as banco
-					, '' as cuenta
-					, '' as fecha_ultimo_pago
 					, factura.honorarios
 					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
+					, factura.total
+					, ccfmn.monto AS monto_aporte
+					, ccfm.saldo as saldo
+					, fp.id_moneda AS id_moneda_factura_pago
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+				FROM factura_pago AS fp
+				JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+				JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+				LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+				LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
 				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
 				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-				$join
+				LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+				LEFT JOIN prm_factura_pago_concepto ON prm_factura_pago_concepto.id_concepto = fp.id_concepto
+				LEFT JOIN prm_banco b ON fp.id_banco = b.id_banco
+				LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
 				WHERE $where";
 
 	$lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
@@ -267,14 +258,16 @@
 		// ancho celdas
 		if(in_array($col_name[$i],array('saldo','saldo_moneda_base')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11); }
-		else if(in_array($col_name[$i],array('numero','cobro','tipo','saldo_pagos','estado','id_cobro','pago_retencion','banco','cuenta')) ) {
+		else if(in_array($col_name[$i],array('numero','cobro','saldo_pagos','id_cobro','pago_retencion','banco','cuenta')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 8); }
 		else if(in_array($col_name[$i],array('fecha_ultimo_pago','glosa_asunto','glosa_cliente','concepto','descripcion_pago')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
+		else if(in_array($col_name[$i],array('tipo','estado_factura','id_pago')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 3); }
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 
 		// ancho celdas ocultos
-		if(in_array($col_name[$i],array('descripcion','encargado_comercial','total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto','iva','honorarios')) ) {
+		if(in_array($col_name[$i],array('id_moneda_factura_pago','descripcion','encargado_comercial','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto','iva','honorarios')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 		// css celdas
@@ -295,8 +288,8 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Cobro'); }
 		else if(in_array($col_name[$i],array('iva')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('IVA'); }
-		else if(in_array($col_name[$i],array('saldo_pagos')) ) {
-			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'); }
+		else if(in_array($col_name[$i],array('monto_aporte')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Pago'); }
 		else if(in_array($col_name[$i],array('honorarios')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Subtotal'); }
 		else if(in_array($col_name[$i],array('saldo_moneda_base')) ) {
@@ -360,28 +353,6 @@
 			$lista_asuntos_glosa = $lista_glosa_asunto;
 		}
 
-		$query = "SELECT  SUM(ccfmn.monto) as monto_aporte
-						, MAX(ccfm.fecha_modificacion) as ultima_fecha_pago
-						, b.nombre as banco
-						, cta.numero as cuenta
-						, fp.descripcion as descripcion
-						, co.glosa as concepto
-						, if(fp.pago_retencion=1,'Si','No') as pago_retencion
-					FROM factura_pago AS fp
-					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_banco b ON fp.id_banco = b.id_banco
-					LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
-					LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
-					WHERE ccfm2.id_factura =  '".$proc->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
-
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$monto_pago = 0;
-		list($monto_pago, $ultima_fecha_pago, $banco, $cuenta, $descripcion_pago, $concepto, $pago_retencion) = mysql_fetch_array($resp);
-			
-		
-
 		for($i=0; $i<$col_num; $i++) {
 	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
 				if($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'iva') {
@@ -391,11 +362,8 @@
 					$saldo = $proc->fields[$col_name[$i]]*(-1);
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
-				else if($col_name[$i] == 'saldo_pagos') {
-					//$factura = new Factura($sesion);
-					//$lista_pagos_fact = $factura->GetPagosSoyFactura($proc->fields['id_factura']);
-					
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
+				else if($col_name[$i] == 'monto_aporte') {
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['monto_aporte'], $formatos_moneda[$proc->fields['id_moneda_factura_pago']]);
 				}
 				else if($col_name[$i] == 'saldo_moneda_base') {
 					$saldo_moneda_base = UtilesApp::CambiarMoneda($saldo, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
@@ -418,35 +386,6 @@
 				if($col_name[$i] == 'codigo_asunto') {
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
-				}
-				if($col_name[$i] == 'fecha_ultimo_pago') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $ultima_fecha_pago, $arr_col[$col_name[$i]]['css']);
-				}
-
-				if($col_name[$i] == 'pago_retencion') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $pago_retencion, $arr_col[$col_name[$i]]['css']);
-				}
-
-				if($col_name[$i] == 'concepto') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $concepto, $arr_col[$col_name[$i]]['css']);
-				}
-
-				if($col_name[$i] == 'descripcion_pago') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $descripcion_pago, $arr_col[$col_name[$i]]['css']);
-				}
-
-				if($col_name[$i] == 'banco') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $banco, $arr_col[$col_name[$i]]['css']);
-				}
-
-				if($col_name[$i] == 'cuenta') {
-
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $cuenta, $arr_col[$col_name[$i]]['css']);
 				}
 
 				else {

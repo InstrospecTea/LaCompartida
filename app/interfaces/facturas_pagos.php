@@ -52,7 +52,7 @@
 	{
 
 		if($orden == "")
-			$orden = "fecha DESC";
+			$orden = "fp.fecha DESC";
 
 		if($where == '')
 		{
@@ -79,27 +79,13 @@
 			else if( $fecha2 )
 				$where_pactura_pago .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			
-
-			$query_facturas_con_pago = "SELECT GROUP_CONCAT(ccfm2.id_factura) as lista_factiras_con_pagos, '1' as con_pago
-					FROM factura_pago AS fp
-					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
-					WHERE $where_pactura_pago GROUP BY con_pago ";
-			//echo "<br>".$query_facturas_con_pago;
-			$resp_facturas_con_pago = mysql_query($query_facturas_con_pago, $sesion->dbh) or Utiles::errorSQL($query_facturas_con_pago, __FILE__, __LINE__, $sesion->dbh);
-			list($lista_facturas_con_pagos,$con_pago) = mysql_fetch_array($resp_facturas_con_pago);
-			if($lista_facturas_con_pagos!='')
-				$where .= " AND factura.id_factura IN (".$lista_facturas_con_pagos.")";
-			else
-				$where .= " AND factura.id_factura = 0 ";
+		
 			/*
 			 * INICIO - obtener listado facturas con pago parcial o total
 			 */
 
 			if($numero != '')
-				$where .= " AND numero = '$numero'";
+				$where .= " factura.AND numero = '$numero'";
 			
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario )
 				{
@@ -151,12 +137,14 @@
 			$where = base64_decode($where);
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS *
-					, fecha
-					, prm_documento_legal.glosa as tipo
-					, numero
-					, glosa_cliente
+					, factura.id_factura
+					, factura.fecha
+					, fp.fecha as fecha_pago
+					, prm_documento_legal.codigo as tipo
+					, factura.numero
+					, cliente.glosa_cliente
 					, usuario.username AS encargado_comercial
-					, descripcion
+					, fp.descripcion
 					, prm_estado_factura.glosa as estado
 					, factura.id_cobro
 					, prm_moneda.simbolo
@@ -165,23 +153,27 @@
 					, factura.id_moneda
 					, factura.honorarios
 					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
+					, factura.total
+					, ccfm2.saldo as saldo_pagos
+					, ccfm.saldo as saldo
+					, ccfmn.monto AS monto_aporte
+					, fp.id_moneda AS id_moneda_factura_pago
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+					FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+					LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
+					LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+					LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+					LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+					LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+					LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+					LEFT JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+					LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 							WHERE $where";
-	
 		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_saldo_total = 0;
 		$glosa_monto_saldo_total = '';
@@ -219,12 +211,13 @@
 		$b->AgregarEncabezado("descripcion_pago",__('Descripción Pago'),"align=center");
 		$b->AgregarEncabezado("id_banco",__('Banco'),"align=center");
 		$b->AgregarEncabezado("id_cuenta",__('Cuenta'),"align=center");
-		$b->AgregarFuncion("Fecha último pago",__('Fecha último pago'),"align=right nowrap");
+		$b->AgregarFuncion("Fecha pago",__('Fecha pago'),"align=right nowrap");
 		//$b->AgregarFuncion("honorarios","SubTotal","align=right nowrap");
 		//$b->AgregarFuncion("iva","Iva","align=right nowrap");
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
-		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
+		$b->AgregarFuncion("Saldo Pago","MontoTotal","align=right nowrap");
+		$b->AgregarFuncion("Saldo Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		$b->color_mouse_over = "#bcff5c";
 		$b->funcionTR = "funcionTR";
@@ -262,55 +255,20 @@
 	{
 		return $fila->fields['total'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['total'],$fila->fields['cifras_decimales'],",",".") : '';
 	}
+	function MontoPago(& $fila)
+	{
+		return $fila->fields['monto_aporte'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['monto_aporte'],$fila->fields['cifras_decimales'],",",".") : '';
+	}
+	function SaldoPago(& $fila)
+	{
+		$saldo = $fila->fields['saldo_pagos']*(-1);
+		return  $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],",",".");
+	}
 
 	function Saldo(& $fila)
 	{
 		$saldo = $fila->fields['saldo']*(-1);
 		return  $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],",",".");
-	}
-	function Pago(& $fila, $sesion)
-	{
-		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
-						,ccfm.id_moneda as id_moneda
-						,mo.cifras_decimales
-						,mo.simbolo
-					FROM factura_pago AS fp
-					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
-					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
-
-		//echo "<br>".$query;
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$monto_pago = 0;
-		$simbolo_aporte_pago = $fila->fields['simbolo'];
-		$cifras_decimales_aporte_pago = $fila->fields['cifras_decimales'];
-		while(list($monto_aporte,$id_moneda_aporte,$cifras_decimales_aporte,$simbolo_aporte) = mysql_fetch_array($resp)){
-			$monto_pago = $monto_aporte;
-			$simbolo_aporte_pago = $simbolo_aporte;
-			$cifras_decimales_aporte_pago = $cifras_decimales_aporte;
-		}
-		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,",",".");
-	}
-
-	function FechaUltimoPago(& $fila, $sesion)
-	{
-		$query = "SELECT MAX(ccfm.fecha_modificacion) as ultima_fecha_pago
-					FROM factura_pago AS fp
-					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
-					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
-
-		//echo "<br>".$query;
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$monto_pago = 0;
-		$simbolo_aporte_pago = $fila->fields['simbolo'];
-		$cifras_decimales_aporte_pago = $fila->fields['cifras_decimales'];
-		list($ultima_fecha_pago) = mysql_fetch_array($resp);
-		return  $ultima_fecha_pago;
 	}
 
 	function BancoPago(& $fila, $sesion)
@@ -444,11 +402,13 @@
 		$html .= "<td align=right >".DescripcionPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right >".BancoPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right nowrap>".CuentaPago(& $fila, $sesion)."</td>";
-		$html .= "<td align=right>".FechaUltimoPago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right nowrap>".$fila->fields['fecha_pago']."</td>";
 		//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 		//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";
-		$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
+		//$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
+		$html .= "<td align=right nowrap>".MontoPago(& $fila)."</td>";
+		$html .= "<td align=right nowrap>".SaldoPago(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Saldo(& $fila)."</td>";
 		$html .= "<td align=center nowrap>".Opciones(& $fila, $sesion)."</td>";
 		$html .= "</tr>";
