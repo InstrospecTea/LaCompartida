@@ -5,7 +5,7 @@
 		function dbName() { return 'Payet_dbo'; }
 		function dbUser() { return 'Mario'; }
 		function dbPass() { return 'Mario.asdwsx'; }
-		/*function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
+		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
 																					'campo_glosa' 					=> 'glosa_categoria', 
 																				  'campo_id'            	=> 'id_categoria_usuario', 
 																				  'datos'              	  => array('Administrativo','Asistente','Asociado','Asociado Junior','Asociado Senior','Practicante','Secretaria','Socio','NT','Procurador')),
@@ -22,8 +22,8 @@
 																					'campo_glosa' 					=> 'glosa', 
 																				  'campo_id'            	=> 'id_area_proyecto',
 																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
-																			); }
-		*/
+																			); 
+		}
 		function QueryUsuario() 
 		{
 			return "SELECT 
@@ -41,7 +41,6 @@
 								Empleado.CorreoElectronico 																			as usuario_FFF_email,
 								IF(Empleado.Status='A','1','0') 																as usuario_FFF_activo,
 								Empleado.FechaCreacion 																					as usuario_FFF_fecha_creacion,
-								IF(Empleado.moneda='D','2','1') 																as usuario_FFF_id_moneda,
 								IF(Empleado.moneda='D','2','1') 																as usuario_FFF_id_moneda_costo
 							FROM Empleado
 							LEFT JOIN TbCategoriaEmpleados ON Empleado.Categoria = TbCategoriaEmpleados.CodigoCategoria 
@@ -136,6 +135,7 @@
 								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
 								,htd.Fecha																																					as fecha 
 								,htd.horaInicio 																																		as hora_inicio
+								,hta.NumeroFactura																																	as id_cobro 
 								,SEC_TO_TIME(htd.Tiempo*60)																													as duracion
 								,SEC_TO_TIME(hta.TiempoFacturable*60) 																							as duracion_cobrada
 								,htd.CodigoEmpleadoFacturable 																											as id_usuario
@@ -157,6 +157,7 @@
 			return "SELECT
 									CodigoGasto 																																			as gasto_FFF_id_movimiento,
 									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
+									Gastos.NumeroFactura																															as gasto_FFF_id_cobro,
 									Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
 									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
