@@ -375,7 +375,7 @@ class Migracion
 			{
 				$keys = explode('_FFF_', $key);
 				//Transformar codigo asunto a ID contrato
-				if ($keys[1] == "codigo_asunto")
+				if ($keys[1] == "codigo_asunto" && !empty($val))
 				{
 					$id_contrato = $this->ObtenerIDContratoSegunCodigoAsunto($val);
 					if (empty($id_contrato))
@@ -386,7 +386,20 @@ class Migracion
 					$keys[1] = "id_contrato";
 					$val = $id_contrato;
 				}
-				$cobro->Edit($keys[1], $val);
+				else if($keys[1] == "codigo_cliente")
+				{
+					$id_contrato = $this->ObtenerIDContratoSegunCodigoCliente
+					if (empty($id_contrato))
+					{
+						echo "No se encontro el ID de contrato para el cobro " . $cobro->fields['id_cobro'] . "\n";
+						continue 2;
+					}
+					$cobro->Edit($keys[1], $val);
+					$keys[1] = "id_contrato";
+					$val = $id_contrato;
+				}
+				if( $keys[1] != "codigo_asunto" )
+					$cobro->Edit($keys[1], $val);
 			}
 			$this->GenerarCobroBase($cobro);
 		}
@@ -485,6 +498,24 @@ class Migracion
 			}
 
 		}
+	}
+	
+	public function ObtenerIDContratoSegunCodigoCliente($codigo_cliente)
+	{
+		if (empty($codigo_cliente))
+		{
+			echo "El codigo asunto esta vacio\n";
+			return false;
+		}
+		
+		$cliente = new Cliente($this->sesion);
+		$cliente->LoadByCodigo($codigo_cliente);
+		if($cliente->Loaded())
+		{
+			return $cliente->fields['id_contrato'];
+		}
+		echo "El codigo cliente " . $codigo_cliente . " no existe\n";
+		return false;
 	}
 	
 	public function ObtenerIDContratoSegunCodigoAsunto($codigo_asunto)
@@ -764,8 +795,8 @@ class Migracion
                                 cobro.opc_papel,contrato.id_carta, cobro.fecha_creacion 
                                 FROM cobro
                                 LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-                                AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
-            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                                WHERE cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
             while($cob = mysql_fetch_assoc($resp))
             {
@@ -786,11 +817,51 @@ class Migracion
                         $his->Edit('comentario',__('COBRO EMITIDO'));
                         $his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
                         $his->Edit('id_cobro',$cobro->fields['id_cobro']);
-                        $his->Write();
+                        //$his->Write();
                         $cobro->Write();
+                        echo "cobro ".$cobro->fields['id_cobro']." emitido con exito \n";
                     }
+                    echo "no se pudo emitir cobro ".$cobro->fields['id_cobro']."\n";
                 }
             }
+	}
+	
+	public function EmitirFacturasPRC()
+	{
+		$query = "SELECT 
+									cobro.id_cobro 																as id_factura,
+									cobro.id_cobro 																as id_cobro,
+									cobro.porcentaje_impuesto 										as porcentaje_impuesto,
+									documento.impuesto 														as iva,
+									documento.monto 															as total, 
+									DATE( cobro.fecha_creacion ) 									as fecha,
+									contrato.factura_razon_social 								as cliente,
+									contrato.rut 																	as RUT_cliente,
+									cobro.codigo_cliente 													as codigo_cliente,
+									cobro.documento 															as numero,
+									documento.subtotal_honorarios 								as subtotal,
+									documento.subtotal_sin_descuento 							as honorarios,
+									documento.subtotal_sin_descuento 							as subtotal_sin_descuento,
+									documento.subtotal_gastos 										as subtotal_gastos, 
+									documento.subtotal_gastos_sin_impuesto 				as subtotal_gastos_sin_impuesto,
+								FROM documento 
+								LEFT JOIN cobro USING( id_cobro ) AND tipo_doc = 'N' 
+								LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
+								WHERE cobro.documento IS NOT NULL 
+									AND cobro.documento != '' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		while( $arreglo_factura = mysql_fetch_assoc($resp) )
+		{
+			$factura = new Factura($this->sesion);
+			$factura->guardar_fecha = true;
+			
+			foreach( $arreglo_factura as $key => $val ) 
+			{
+				$factura->Edit($key, $val);
+			}
+			$this->GenerarFactura($factura);
+		}
 	}
 	
 	public function ValidarCliente($cliente)
@@ -1529,7 +1600,8 @@ class Migracion
 		$cobro->Edit("impuesto", (!empty($cobro_generar->fields['impuesto'])) ? $cobro_generar->fields['impuesto'] : '0');
 		$cobro->Edit("monto_subtotal", (!empty($cobro_generar->fields['monto_subtotal'])) ? $cobro_generar->fields['monto_subtotal'] : '0');
 		$cobro->Edit("porcentaje_impuesto", (!empty($cobro_generar->fields['porcentaje_impuesto'])) ? $cobro_generar->fields['porcentaje_impuesto'] : '0');
-
+		$cobro->Edit('estado','EN REVISION');
+		
 		if (!$this->Write($cobro, $forzar_insert))
 		{
 			if (empty($cobro->fields['id_cobro']))
@@ -1542,6 +1614,7 @@ class Migracion
 			}
 			return false;
 		}
+		
 
 		echo "Cobro " . $cobro->fields['id_cobro'] . " generado\n";
 		
