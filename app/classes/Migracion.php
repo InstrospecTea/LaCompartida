@@ -756,6 +756,42 @@ class Migracion
 		echo "Cliente ID " . $cliente->fields['id_cliente'] .  " guardado\n";
 		return true;
 	}
+
+	public function EmitirCobros()
+	{
+			$cobro = new Cobro($this->sesion);
+			$query = "SELECT cobro.id_cobro, cobro.id_usuario, cobro.codigo_cliente, cobro.id_contrato, contrato.id_carta, cobro.estado,
+                                cobro.opc_papel,contrato.id_carta, cobro.fecha_creacion 
+                                FROM cobro
+                                LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+                                AND cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+
+            while($cob = mysql_fetch_assoc($resp))
+            {
+                if( $cobro->Load($cob['id_cobro']) )
+                {
+                    $cobro->Edit('id_carta',$cob['id_carta']);
+                    $ret = $cobro->GuardarCobro(true);
+                    $cobro->Edit('etapa_cobro','5');
+                    $cobro->Edit('fecha_emision',$cob['fecha_creacion']);
+                    if( $cob['estado']=='CREADO' )
+                        $cobro->Edit('estado','INCOBRABLE');
+                    else
+                        $cobro->Edit('estado','EMITIDO');
+                    if( $ret == '' )
+                    {
+                        $his = new Observacion($sesion);
+                        $his->Edit('fecha',date('Y-m-d H:i:s'));
+                        $his->Edit('comentario',__('COBRO EMITIDO'));
+                        $his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
+                        $his->Edit('id_cobro',$cobro->fields['id_cobro']);
+                        $his->Write();
+                        $cobro->Write();
+                    }
+                }
+            }
+	}
 	
 	public function ValidarCliente($cliente)
 	{
@@ -1541,8 +1577,8 @@ class Migracion
 					AND cta_corriente.codigo_cliente = '".$cobro->fields['codigo_cliente']."'
 					AND (asunto.id_contrato = '".$cobro->fields['id_contrato']."')
 					AND cta_corriente.fecha <= '$fecha_fin'";
-			$lista_gastos = new ListaGastos($this->sesion, null, $query_gastos);
-			for($v=0; $v<$lista_gastos->num; $v++)
+			//$lista_gastos = new ListaGastos($this->sesion, null, $query_gastos);
+			for($v=0; $v<0; $v++)
 			{
 				$gasto = $lista_gastos->Get($v);
 				$cta_gastos = new Objeto($this->sesion, null, null, 'cta_corriente', 'id_movimiento');
@@ -1583,9 +1619,9 @@ class Migracion
 					AND cobro.estado IS NULL
 					AND trabajo.id_cobro IS NULL";
 
-			$lista_trabajos = new ListaTrabajos($this->sesion, null, $query);
-			echo $lista_trabajos->num . " trabajos encontrados\n";
-			for($x=0; $x<$lista_trabajos->num; $x++)
+			//$lista_trabajos = new ListaTrabajos($this->sesion, null, $query);
+			//echo $lista_trabajos->num . " trabajos encontrados\n";
+			for($x=0; $x<0; $x++)
 			{
 				$trabajo = $lista_trabajos->Get($x);
 				$emitir_trabajo = new Objeto($this->sesion, null, null, 'trabajo', 'id_trabajo');
@@ -1598,7 +1634,6 @@ class Migracion
 				}
 				echo "Trabajo " . $emitir_trabajo->fields['id_trabajo'] . " asociado al cobro " . $cobro->fields['id_cobro'] . "\n";
 			}
-			
 			
 			$emitir_tramite = new Objeto($this->sesion, null, null, 'tramite', 'id_tramite');
 			$where_up = '1';
@@ -1618,8 +1653,8 @@ class Migracion
 				WHERE $where_up
 					AND contrato.id_contrato = '".$cobro->fields['id_contrato']."'
 					AND cobro.estado IS NULL";
-			$lista_tramites = new ListaTrabajos($this->sesion, null, $query_tramites);
-			for($y=0; $y<$lista_tramites->num; $y++)
+			//$lista_tramites = new ListaTrabajos($this->sesion, null, $query_tramites);
+			for($y=0; $y<0; $y++)
 			{
 				$tramite = $lista_tramites->Get($y);
 				$emitir_tramite->Load($tramite->fields['id_tramite']);

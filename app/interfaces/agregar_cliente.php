@@ -102,7 +102,7 @@
         //Validaciones segun la configuración
         if ($validaciones_segun_config)
 		{
-			if (empty($glosa_cliente)) $pagina->AddError(__("Por favor ingrese la nombre del cliente"));
+			if (empty($glosa_cliente)) $pagina->AddError(__("Por favor ingrese el nombre del cliente"));
 			if (empty($codigo_cliente)) $pagina->AddError(__("Por favor ingrese el codigo del cliente"));
 			if (empty($id_usuario_encargado)) $pagina->AddError(__("Por favor ingrese usuario encargado para el cliente"));
 			

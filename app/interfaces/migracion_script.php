@@ -15,6 +15,7 @@
 	// Nombre de función para revisar datos recibidos: "ImprimirDataEnPantalla"
 	
 	set_time_limit(0);
+	ini_set('memory_limit','256M');
 	 
 	/*
 	if( method_exists('ConfMigracion','DatosPrm') && ConfMigracion::DatosPrm() != "" )
@@ -46,8 +47,6 @@
 		$migracion->Query2ObjetoAsunto($responseAsunto);
 	}
 
-	$migracion->ActualizarAreaAsuntosPRC();
-	
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryHoras') && ConfMigracion::QueryHoras() )
 	{
@@ -59,8 +58,8 @@
 		//$horas = mysql_fetch_assoc($responseHoras);
 		//$migracion->AgregarHoras($responseHoras);
 	}
-*/	
-/*
+
+
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryGastos') && ConfMigracion::QueryGastos() != "" )
 	{
@@ -68,13 +67,14 @@
 		$migracion->Query2ObjetoGasto($responseGastos);
 	}
 
-
+*/
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryCobros') && ConfMigracion::QueryCobros() )
 	{
 		$responseCobros = mysql_query(ConfMigracion::QueryCobros(), $dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryCobros(), __FILE__, __LINE__, $dbhOrigen);
 		$migracion->Query2ObjetoCobro($responseCobros);
+		$migracion->EmitirCobros();
 	}
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
@@ -98,5 +98,4 @@
 		$responseFacturas = mysql_query(ConfMigracion::QueryFacturas(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryFacturas(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoFactura($responseFacturas);
 	}
-*/
 ?>

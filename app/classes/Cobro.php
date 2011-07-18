@@ -258,7 +258,28 @@ class Cobro extends Objeto
 		return $monto_total;
 	}
 	
-	
+	function AjustarPorMonto($monto, $monto_original)
+	{
+		$moneda = new Moneda($this->sesion);
+		$moneda->Load($this->fields['id_moneda']);
+		
+		$factor = number_format($monto / $monto_original, $moneda->fields['cifras_decimales'], '.', '' );
+		
+		$query = "SELECT id_trabajo, tarifa_hh FROM trabajo WHERE id_cobro = '".$this->fields['id_cobro']."' ";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		while( list($id, $tarifa_hh) = mysql_fetch_array($resp) )
+		{
+			$tarifa_hh_corrigido = $factor * $tarifa_hh;
+			
+			$query = " UPDATE trabajo SET tarifa_hh = '$tarifa_hh_corrigido' WHERE id_trabajo = '$id' ";
+			mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		}
+		
+		$this->Edit("monto_ajustado",$monto);
+		
+		if($this->Write()) return true; else return false; 
+	}
 	
 	function CalculaMontoTramites($cobro)
 	{
@@ -390,6 +411,8 @@ class Cobro extends Objeto
 			// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 			if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
 			{
+				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = $trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal']; 
+				
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
@@ -487,7 +510,10 @@ class Cobro extends Objeto
 			$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-			$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+			if( $this->fields['monto_ajustado'] > 0 )
+				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado']);
+			else
+				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
 			$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
 			$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
 
@@ -559,6 +585,11 @@ class Cobro extends Objeto
 			}
 		}
 		
+		$cobro_total_honorario_cobrable_original = $cobro_total_honorario_cobrable;
+		if( $this->fields['monto_ajustado'] ) 
+		{
+			$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
+		}
 		
 		#GASTOS del Cobro
 		$no_generado = '';
@@ -734,6 +765,7 @@ class Cobro extends Objeto
 			
 		// Se guarda la información del cobro
 		$this->Edit('saldo_final_gastos', number_format($saldo_final_gastos,6,".","") );
+		$this->Edit('monto_original',number_format($cobro_total_honorario_cobrable_original,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],".","") );
 		$this->Edit('monto_subtotal',number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],".","") );
 		$this->Edit('monto',number_format($cobro_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],".","") );
 		$this->Edit('monto_trabajos',number_format($cobro_total_honorario_cobrable,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],".","") );
@@ -1077,15 +1109,9 @@ class Cobro extends Objeto
 				$this->Edit('id_carta',$contrato->fields['id_carta']);
 				$this->Edit("opc_ver_modalidad",$contrato->fields['opc_ver_modalidad']);
 				$this->Edit("opc_ver_profesional",$contrato->fields['opc_ver_profesional']);
-				$this->Edit("opc_ver_profesional_iniciales",$contrato->fields['opc_ver_profesional_iniciales']);
-				$this->Edit("opc_ver_profesional_tarifa",$contrato->fields['opc_ver_profesional_tarifa']);
-				$this->Edit("opc_ver_profesional_importe",$contrato->fields['opc_ver_profesional_importe']);
 				$this->Edit("opc_ver_gastos",$contrato->fields['opc_ver_gastos']);
 				$this->Edit("opc_ver_morosidad",$contrato->fields['opc_ver_morosidad']);
 				$this->Edit("opc_ver_resumen_cobro",$contrato->fields['opc_ver_resumen_cobro']);
-				$this->Edit("opc_ver_resumen_cobro_categoria",$contrato->fields['opc_ver_resumen_cobro_categoria']);
-				$this->Edit("opc_ver_resumen_cobro_tarifa",$contrato->fields['opc_ver_resumen_cobro_tarifa']);
-				$this->Edit("opc_ver_resumen_cobro_importe",$contrato->fields['opc_ver_resumen_cobro_importe']);
 				$this->Edit("opc_ver_descuento",$contrato->fields['opc_ver_descuento']);
 				$this->Edit("opc_ver_tipo_cambio",$contrato->fields['opc_ver_tipo_cambio']);
 				$this->Edit("opc_ver_solicitante",$contrato->fields['opc_ver_solicitante']);
@@ -3073,8 +3099,8 @@ class Cobro extends Objeto
 			$aproximacion_descuento = number_format($this->fields['descuento'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','');
 			$valor_trabajos_demo = number_format($this->fields['monto_trabajos'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idoma->fields['separador_miles']);
 			$valor_descuento_demo = number_format($this->fields['descuento'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
-			$valor_honorarios = number_format( $aproximacion_honorarios*$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.','');
-			$valor_descuento = number_format( $aproximacion_descuento*$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.','');
+			$valor_honorarios = number_format( $aproximacion_honorarios*$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			$valor_descuento = number_format( $aproximacion_descuento*$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 			
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) )
 				{
@@ -7609,8 +7635,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			if( $this->fields['descuento'] == 0 ){
 				return '';
 			}
-			$valor_honorarios = $x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']];
-			$valor_descuento = $x_resultados['descuento'][$this->fields['opc_moneda_total']];
+			$valor_honorarios = number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			$valor_descuento = number_format($x_resultados['descuento'][$this->fields['opc_moneda_total']],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 			$valor_honorarios_demo = $x_resultados['monto_trabajos'][$this->fields['id_moneda']];
 			if( $this->EsCobrado() )
 				$valor_descuento_demo = $x_resultados['descuento_honorarios'][$this->fields['id_moneda']];

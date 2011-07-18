@@ -862,10 +862,12 @@ function EditarTodosLosArchivos()
 		else
 			$color = "#ffffff";
 		
-		if($trabajo->fields['id_tramite_tipo'] == 0)
-		$tarifa = Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']);
+		if( $trabajo->fields['tarifa_hh'] > 0 )
+			$tarifa = $trabajo->fields['tarifa_hh'];
+		else if($trabajo->fields['id_tramite_tipo'] == 0)
+			$tarifa = Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']);
 		else
-		$tarifa = Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']); 
+			$tarifa = Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']); 
 		list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
 		$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 		$total = round($tarifa * $duracion, 2);

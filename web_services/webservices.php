@@ -320,11 +320,13 @@ function EntregarListaAsuntos($usuario, $password)
 			$query = "SELECT asunto.codigo_asunto_secundario ,asunto.glosa_asunto,cliente.codigo_cliente_secundario
 								FROM asunto 
 								JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
-								WHERE asunto.activo=1 ORDER BY asunto.glosa_asunto";
+								WHERE asunto.activo=1 AND cliente.activo=1 ORDER BY asunto.glosa_asunto";
 		}
 		else
 		{
-			$query = "SELECT codigo_asunto ,glosa_asunto,codigo_cliente FROM asunto WHERE activo=1 ORDER BY glosa_asunto";
+			$query = "SELECT asunto.codigo_asunto ,asunto.glosa_asunto, asunto.codigo_cliente FROM asunto 
+								JOIN cliente ON cliente.codigo_cliente = asunto.codigo_cliente 
+								WHERE asunto.activo=1 AND cliente.activo ORDER BY glosa_asunto";
 		}
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '','Error SQL.','');
