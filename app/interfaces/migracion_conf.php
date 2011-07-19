@@ -133,23 +133,22 @@
 		{
 			return "SELECT
 								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
-								,htd.Fecha																																					as fecha 
-								,htd.horaInicio 																																		as hora_inicio
+								,hta.FechaFacturable																																as fecha 
+								,hta.HoraInicio 																																		as hora_inicio
 								,hta.NumeroFactura																																	as id_cobro 
-								,SEC_TO_TIME(htd.Tiempo*60)																													as duracion
+								,SEC_TO_TIME(hta.Tiempo*60)																													as duracion
 								,SEC_TO_TIME(hta.TiempoFacturable*60) 																							as duracion_cobrada
-								,htd.CodigoEmpleadoFacturable 																											as id_usuario
-								,IF(htd.FlagFacturable = 'S',1,0) 																									as cobrable
-								,htd.AsuntoLargo 																																		as descripcion
+								,IF(hta.FlagFacturable = 'S',1,0) 																									as cobrable
+								,IF(hta.AsuntoLargoFacurable IS NOT NULL,hta.AsuntoLargoFacurable, htd.AsuntoLargo) as descripcion
 								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 						as fecha_creacion
 								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) as fecha_modificacion
 								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 						as tarifa_hh
-								,htd.moneda 																																				as id_moneda
-								,htd.NumeroOrdenFacturacion 																												as codigo_asunto
-								,htd.id_trabajo_lemontech 																													as id_trabajo
-								FROM HojaTiempoDetalle htd
-								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=htd.hojatiempoid
-								LEFT JOIN HojaTiempoajustado hta ON hta.hojatiempoajustadoid = htr.hojatiempoajustadoid";
+								,IF(hta.moneda IS NOT NULL, hta.moneda, htd.moneda)																	as id_moneda
+								,IF(hta.NumeroOrdenFacturacionFact, hta.NumeroOrdenFacturacionFact,htd.NumeroOrdenFacturacion) as codigo_asunto
+								,hta.id_trabajo_lemontech 																													as id_trabajo
+								FROM HojaTiempoajustado hta
+								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=hta.hojatiempoid
+								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoajustadoid = htr.hojatiempoajustadoid";
 		}
 		
 		function QueryGastos() 
