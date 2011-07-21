@@ -2410,7 +2410,10 @@ class Migracion
 			$factura_pago = new FacturaPago($this->sesion);
 			if( $factura_pago_generar->fields['id_factura_pago'] > 0 )
 			{
-				$factura_pago->Load($factura_pago_generar->fields['id_factura_pago']);
+				if( $factura_pago->Load($factura_pago_generar->fields['id_factura_pago']) )
+					echo "Editando Factura Pago No. ".$factura_pago_generar->fields['id_factura_pago']."\n";
+				else
+					echo "Ingresando Factura Pago No. ".$factura_pago_generar->fields['id_factura_pago']."\n";
 				$factura_pago->Edit('id_factura_pago', $factura_pago_generar->fields['id_factura_pago']);
 			}
 			
@@ -2441,8 +2444,13 @@ class Migracion
 			
 			if( $factura_pago->Write() )
 			{
-				$cta_cte_fact->IngresarPago($factura_pago, $neteos, $factura_asoc->fields['id_cobro'], &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
+				if( $cta_cte_fact->IngresarPago($factura_pago, $neteos, $factura_asoc->fields['id_cobro'], &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago) )
+					echo "Factura_pago y Movimiento guardado con exito \n";
+				else	
+					echo "Error al guardar el movimiento de factura pago ".$factura_pago_generar->fields['id_factura_pago']."\n";
 			}
+			else 
+				echo "Error al guardar la el factura pago ".$factura_pago_generar->fields['id_factura_pago']."\n";
 		}
 		else
 		{
@@ -2452,7 +2460,10 @@ class Migracion
 			$documento = new Documento($this->sesion);
 			if( !empty($documento_pago_generar->fields['id_documento']) )
 				{
-					$documento->Load($documento_pago_generar->fields['id_documento']);
+					if( $documento->Load($documento_pago_generar->fields['id_documento']) )
+						echo "Editando documento pago No ".$documento_pago_generar->fields['id_documento']."\n";
+					else
+						echo "Ingresando documento pago No ".$documento_pago_generar->fields['id_documento']."\n";
 					$documento->Edit('id_documento', $documento_pago_generar->fields['id_documento']);
 				}
 			
@@ -2495,11 +2506,14 @@ class Migracion
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($ids_monedas_documento, $tipo_cambios_documento) = mysql_fetch_array($resp);
 				
-			$this->IngresoDocumentoPago($documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
+			if( $this->IngresoDocumentoPago($documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
 																				$id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, 
 																				$id_banco, $id_cuenta, $numero_operacion, $numero_cheque, 
 																				$ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, 
-																				$id_pago);
+																				$id_pago) )
+					echo "Documento Pago guardado con exito \n";
+				else
+					echo "Error al guardar el documento pago No ".$documento_pago_generar->fields['id_documento']."\n";
 		}
 	}
 	
