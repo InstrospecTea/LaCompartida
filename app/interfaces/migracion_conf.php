@@ -101,9 +101,9 @@
 								IF(OrdenFacturacion.HojaTiemposFlag='O','1','0')														as asunto_FFF_activo,
 								IF(OrdenFacturacion.HojaTiemposFlag='O','SI','NO')													as contrato_FFF_activo,
 								OrdenFacturacion.Asunto 																										as asunto_FFF_glosa_asunto,
-								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) ) 																										as asunto_FFF_id_moneda,
-								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )																										as contrato_FFF_id_moneda,
-								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )																									as contrato_FFF_opc_moneda_total,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) ) 	as asunto_FFF_id_moneda,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )		as contrato_FFF_id_moneda,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )		as contrato_FFF_opc_moneda_total,
 								OrdenFacturacion.TarifaHora 																								as contrato_FFF_id_tarifa,
 								OrdenFacturacion.FechaModificacion 																					as asunto_FFF_fecha_modificacion,
 								OrdenFacturacion.FechaCreacion 																							as asunto_FFF_fecha_creacion,
@@ -133,19 +133,19 @@
 		{
 			return "SELECT
 								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
-								,hta.FechaFacturable																																as fecha 
-								,hta.HoraInicio 																																		as hora_inicio
-								,hta.NumeroFactura																																	as id_cobro 
-								,SEC_TO_TIME(hta.Tiempo*60)																													as duracion
-								,SEC_TO_TIME(hta.TiempoFacturable*60) 																							as duracion_cobrada
-								,IF(hta.FlagFacturable = 'S',1,0) 																									as cobrable
-								,IF(hta.AsuntoLargoFacurable IS NOT NULL,hta.AsuntoLargoFacurable, htd.AsuntoLargo) as descripcion
-								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 						as fecha_creacion
-								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) as fecha_modificacion
-								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 						as tarifa_hh
-								,IF(hta.moneda IS NOT NULL, hta.moneda, htd.moneda)																	as id_moneda
+								,hta.FechaFacturable																																					as fecha 
+								,hta.HoraInicio 																																							as hora_inicio
+								,hta.NumeroFactura																																						as id_cobro 
+								,SEC_TO_TIME(hta.Tiempo*60)																																		as duracion
+								,SEC_TO_TIME(hta.TiempoFacturable*60) 																												as duracion_cobrada
+								,IF(hta.FlagFacturable = 'S',1,0) 																														as cobrable
+								,IF(hta.AsuntoLargoFacurable IS NOT NULL,hta.AsuntoLargoFacurable, htd.AsuntoLargo) 					as descripcion
+								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion
+								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
+								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 											as tarifa_hh
+								,IF(hta.moneda IS NOT NULL, hta.moneda, htd.moneda)																						as id_moneda
 								,IF(hta.NumeroOrdenFacturacionFact, hta.NumeroOrdenFacturacionFact,htd.NumeroOrdenFacturacion) as codigo_asunto
-								,hta.id_trabajo_lemontech 																													as id_trabajo
+								,hta.id_trabajo_lemontech 																																		as id_trabajo
 								FROM HojaTiempoajustado hta
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=hta.hojatiempoid
 								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoajustadoid = htr.hojatiempoajustadoid";
@@ -154,13 +154,14 @@
 		function QueryGastos() 
 		{ 
 			return "SELECT
-									CodigoGasto 																																			as gasto_FFF_id_movimiento,
+									IdGastoLemontech																																	as gasto_FFF_id_movimiento,
+									CodigoGasto																																				as gasto_FFF_numero_documento, 
 									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro,
 									Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
 									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
-									Gastos.NumeroFactura																														as gasto_FFF_id_cobro, 
+									Gastos.NumeroFactura																															as gasto_FFF_id_cobro, 
 									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario,
 									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
 									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
@@ -212,13 +213,16 @@
 								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
 								WHERE Factura.CodigoFacturaBoleta IS NOT NULL"; 
 		}
-
-		function QueryTarifas() { return "SELECT
+		function QueryTarifas() 
+		{ 
+			return "SELECT
 									CodigoTarifaCliente as id_tarifa
 									,Descripcion as glosa_tarifa
-									FROM TbTarifaCliente"; }
-
-		function QueryUsuariosTarifas() { return "SELECT
+									FROM TbTarifaCliente"; 
+		}
+		function QueryUsuariosTarifas() 
+		{ 
+			return "SELECT
 									id_usuario_tarifa_LMT as id_usuario_tarifa
 									, CodigoEmpleado AS id_usuario
 									, if(moneda='D' ,'2',if(moneda = 'E','3',if(moneda = 'S','1','0'))) AS id_moneda
@@ -226,7 +230,34 @@
 									, CodigoTarifaCliente as id_tarifa
 									FROM  `TbTarifaCategoria`
 									Group by CodigoTarifaCliente, CodigoEmpleado, moneda
-									Order by CodigoPeriodo DESC "; }
-
+									Order by CodigoPeriodo DESC "; 
+		}
+		function QueryPagos()
+		{
+			return "SELECT 
+								NumeroFactura 																			as documento_FFF_id_cobro,
+								NumeroFactura 																			as factura_FFF_id_factura,
+								FechaDePago																					as factura_FFF_fecha,
+								FechaDePago																					as documento_FFF_fecha,
+								NumeroDocumentoPago																	as documento_FFF_numero_doc,
+								NumeroDocumentoPago																	as factura_FFF_nro_documento,
+								MontoSoles																					as documento_FFF_monto_base,
+								IF(MonedaPago='D','2',IF(MonedaPago='E','3','1'))		as documento_FFF_id_moneda,
+								IF(MonedaPago='D','2',IF(MonedaPago='E','3','1'))		as factura_FFF_id_moneda,
+								MontoPago																						as documento_FFF_monto,
+								MontoPago																						as factura_FFF_monto,
+								NombreBanco																					as factura_FFF_glosa_banco,
+								CodigoCuentaBanco																		as factura_FFF_cuenta_banco,
+								NombreBanco																					as documento_FFF_glosa_banco,
+								CodigoCuentaBanco																		as documento_FFF_cuenta_banco,
+								FechaModificacion																		as factura_FFF_fecha_modificacion,
+								FechaModificacion																		as documento_FFF_fecha_modificacion,
+								CodigoBancoCheque																		as documento_FFF_numero_cheque,
+								CodigoBancoCheque																		as factura_FFF_nro_cheque,
+								id_factura_pago_lemontech														as factura_FFF_id_factura_pago,
+								id_factura_pago_lemontech 													as documento_FFF_id_documento
+							FROM PagosRecibidos
+							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = PagosRecibidos.CodigoBanco";
+		}
 	}
 ?>

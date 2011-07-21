@@ -67,7 +67,7 @@
 		$migracion->Query2ObjetoGasto($responseGastos);
 	}
 
-*/
+
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryCobros') && ConfMigracion::QueryCobros() )
@@ -91,11 +91,20 @@
 		$migracion->Query2ObjetoUsuarioTarifa($responseTarifasUsuario);
 	}
 
+	$migracion->EmitirFacturas();
 
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryFacturas') && ConfMigracion::QueryFacturas() )
 	{
 		$responseFacturas = mysql_query(ConfMigracion::QueryFacturas(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryFacturas(),__FILE__,__LINE__,$dbhOrigen);
 		$migracion->Query2ObjetoFactura($responseFacturas);
+	}
+	*/
+	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
+	if( method_exists('ConfMigracion','QueryPagos') && ConfMigracion::QueryPagos() )
+	{
+		$responsePagos = mysql_query(ConfMigracion::QueryPagos(),$dbhOrigen) or Utiles::errorSQL(ConfMigracion::QueryPagos(),__FILE__,__LINE__,$dbhOrigen);
+		$migracion->Query2ObjetoPago($responsePagos);
+		//$migracion->ImprimirDataEnPantalla($responsePagos);
 	}
 ?>

@@ -8,6 +8,7 @@ require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 require_once Conf::ServerDir().'/../app/classes/CobroPendiente.php';
 require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
+require_once Conf::ServerDir().'/../app/classes/FacturaPago.php';
 require_once Conf::ServerDir().'/../app/classes/Asunto.php';
 require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
@@ -388,7 +389,7 @@ class Migracion
 				}
 				else if($keys[1] == "codigo_cliente")
 				{
-					$id_contrato = $this->ObtenerIDContratoSegunCodigoCliente
+					$id_contrato = $this->ObtenerIDContratoSegunCodigoCliente($val);
 					if (empty($id_contrato))
 					{
 						echo "No se encontro el ID de contrato para el cobro " . $cobro->fields['id_cobro'] . "\n";
@@ -406,6 +407,38 @@ class Migracion
 
 		//Buscar trabajos sin ID de cobro y genera sus cobros
 		//$this->GenerarCobrosBase();
+	}
+	
+	public function Query2ObjetoPago($responsePago)
+	{
+		while($datos_pago = mysql_fetch_assoc($responsePago))
+		{
+			$factura_pago = new FacturaPago($this->sesion);
+			$factura_pago->guardar_fecha = false;
+			
+			$documento_pago = new Documento($this->sesion);
+			$documento_pago->guardar_fecha = false;
+			
+			foreach($factura_pago as $key => $val)
+			{ 
+				$keys = explode('_FFF_', $key);
+				if( $keys[1] == "glosa_banco" )
+					{
+						$keys[1] = "id_banco";
+						list($val) = mysql_fetch_array(mysql_query("SELECT id_banco FROM prm_banco WHERE nombre = TRIM('$val')",$this->sesion->dbh));
+					}
+				else if( $keys[1] == "cuenta_banco" )
+					{
+						$keys[1] = "id_cuenta";
+						list($val) = mysql_fetch_array(mysql_query("SELECT id_cuenta FROM cuenta_banco WHERE numero = TRIM('$val')",$this->sesion->dbh));
+					}
+				if( $keys[0] == "documento" )
+					$documento_pago->Edit($keys[1], $val);
+				else if( $keys[0] == "factura" )
+					$factura_pago->Edit($keys[1], $val);
+			}
+			$this->GenerarPagos($factura_pago, $documento_pago);
+		}
 	}
 
 	public function Query2ObjetoGasto($responseGastos)
@@ -837,6 +870,7 @@ class Migracion
 									DATE( cobro.fecha_creacion ) 									as fecha,
 									contrato.factura_razon_social 								as cliente,
 									contrato.rut 																	as RUT_cliente,
+									contrato.factura_direccion										as direccion_cliente, 
 									cobro.codigo_cliente 													as codigo_cliente,
 									cobro.documento 															as numero,
 									documento.subtotal_honorarios 								as subtotal,
@@ -1272,7 +1306,7 @@ class Migracion
 		}
 	}
 	
-    function Query2ObjetoHora($response)
+	function Query2ObjetoHora($response)
 	{
 		while($row = mysql_fetch_assoc($response))
 		{
@@ -1288,27 +1322,32 @@ class Migracion
 		}
 	}
 
-	public function AgregarHora($hora = null)
+	public function AgregarHora($hora_generar = null)
 	{
 		/*
 		* Validar FK
 		*/
-
+		
+		$hora = new Trabajo($this->sesion);
+		
+		if( $hora_generar->fields['id_trabajo'] > 0 )
+			$hora->Load($hora_generar->fields['id_trabajo']);
+		
 		#Instancio Clases a usar en validación de FK
 		$usuario    = new Usuario($this->sesion);
 		$asunto     = new Asunto($this->sesion);
 		$moneda     = new Moneda($this->sesion);
-
+		
 		#Confirmo que el id_usuario exista
-		$id_usuario = (int)$hora->fields['id_usuario'];
+		$id_usuario = (int)$hora_generar->fields['id_usuario'];
 		$hora->Edit('id_usuario', $id_usuario);
 		
-		$codigo_asunto = substr($hora->fields['codigo_asunto'],0,4).'-0'.substr($hora->fields['codigo_asunto'],-3);
+		$codigo_asunto = substr($hora_generar->fields['codigo_asunto'],0,4).'-0'.substr($hora_generar->fields['codigo_asunto'],-3);
 		$hora->Edit('codigo_asunto', $codigo_asunto);
-
+		
 		#Confirmo que el id_moneda exista
 		$id_moneda=9;
-		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora->fields['id_moneda']."%'";
+		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora_generar->fields['id_moneda']."%'";
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($id_moneda) = mysql_fetch_array($resp);
 		if(!$id_moneda)
@@ -1317,6 +1356,16 @@ class Migracion
 			//return false;
 		}
 		$hora->Edit('id_moneda', $id_moneda);
+		
+		$hora->Edit('fecha', 							!empty($hora_generar->fields['fecha']) 							? $hora_generar->fields['fecha'] 										: "0000-00-00" );
+		$hora->Edit('id_cobro', 					!empty($hora_generar->fields['id_cobro']) 					? $hora_generar->fields['id_cobro'] 								: "NULL" );
+		$hora->Edit('duracion', 					!empty($hora_generar->fields['duracion']) 					? $hora_generar->fields['duracion'] 								: "00:00:00" );
+		$hora->Edit('duracion_cobrada', 	!empty($hora_generar->fields['cobrable']) 					? $hora_generar->fields['cobrable'] 								: "1" );
+		$hora->Edit('descripcion', 				!empty($hora_generar->fields['descripcion']) 				? addslashes($hora_generar->fields['descripcion']) 	: "" );
+		$hora->Edit('fecha_creacion', 		!empty($hora_generar->fields['fecha_creacion']) 		? $hora_generar->fields['fecha_creacion'] 					: "0000-00-00 00:00:00" );
+		$hora->Edit('fecha_modificacion', !empty($hora_generar->fields['fecha_modificacion']) ? $hora_generar->fields['fecha_modificacion'] 			: "0000-00-00 00:00:00" );
+		$hora->Edit('tarifa_hh', 					!empty($hora_generar->fields['tarifa_hh']) 					? $hora_generar->fields['tarifa_hh'] 								: "0" );
+		$hora->Edit('solicitante', 				!empty($hora_generar->fields['solicitante']) 				? addslashes($hora_generar->fields['solicitante']) 	: "" );
 		
 		/*
 		* Registrar información
@@ -1907,8 +1956,6 @@ class Migracion
 			}
 		}
 
-		$cambio_asunto = $gasto_generar->fields['codigo_asunto'] != $gasto->fields['codigo_asunto'];
-
 		if($gasto_generar->fields["cobrable"] == 1)
 		{
 			$gasto->Edit("cobrable", "1");
@@ -1984,12 +2031,13 @@ class Migracion
 		$gasto->Edit("id_usuario", $gasto_generar->fields['id_usuario']);
 		$gasto->Edit("descripcion", $gasto_generar->fields['descripcion']);
 		$gasto->Edit("id_moneda", $gasto_generar->fields['id_moneda']);
-		$gasto->Edit("codigo_cliente",$gasto_generar->fields['codigo_cliente'] ? $gasto_generar->fields['codigo_cliente'] : "NULL");
+		$gasto->Edit("codigo_cliente", $gasto_generar->fields['codigo_cliente'] ? $gasto_generar->fields['codigo_cliente'] : "NULL");
 		$gasto->Edit("codigo_asunto", $gasto_generar->fields['codigo_asunto'] ? $gasto_generar->fields['codigo_asunto'] : "NULL");
 		$gasto->Edit("id_usuario_orden", $gasto_generar->fields['id_usuario_orden'] ? $gasto_generar->fields['id_usuario_orden'] : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $gasto_generar->fields['id_cta_corriente_tipo'] ? $gasto_generar->fields['id_cta_corriente_tipo'] : "NULL");
-		$gasto->Edit("numero_documento",$gasto_generar->fields['numero_documento'] ? $gasto_generar->fields['numero_documento'] : "NULL");
+		$gasto->Edit("numero_documento", $gasto_generar->fields['numero_documento'] ? $gasto_generar->fields['numero_documento'] : "NULL");
 		$gasto->Edit("numero_ot", $gasto_generar->fields['numero_ot'] ? $gasto_generar->fields['numero_ot'] : "NULL");
+		$gasto->Edit("id_cobro", $gasto_generar->fields['id_cobro'] ? $gasto_generar->fields['id_cobro'] : "NULL" );
 
 		if($pagado and !empty($gasto_generar->fields['egreso']))
 		{
@@ -1998,11 +2046,6 @@ class Migracion
 		else
 		{
 			$gasto->Edit('id_movimiento_pago', NULL);
-		}
-
-		if($cambio_asunto)
-		{
-			$gasto->Edit('id_cobro', 'NULL');
 		}
 
 		$gasto->Edit('id_proveedor', $gasto_generar->fields['id_proveedor'] ? $gasto_generar->fields['id_proveedor'] : "NULL");
@@ -2238,15 +2281,15 @@ class Migracion
 		if (method_exists("Conf", "GetConf") && (Conf::GetConf($this->sesion, "DesgloseFactura") == "con_desglose"))
 		{
 			$factura->Edit("descripcion", $factura_generar->fields['descripcion']);
-			$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "NULL" : $factura_generar->fields['honorarios']);
-			$factura->Edit("subtotal", empty($factura_generar->fields['subtotal']) ? "NULL" : $factura_generar->fields['subtotal']);
-			$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "NULL" : $factura_generar->fields['subtotal_sin_descuento']);
+			$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "0" : $factura_generar->fields['honorarios']);
+			$factura->Edit("subtotal", empty($factura_generar->fields['subtotal']) ? "0" : $factura_generar->fields['subtotal']);
+			$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "0" : $factura_generar->fields['subtotal_sin_descuento']);
 			$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "NULL" : $factura_generar->fields['descripcion_subtotal_gastos']);
-			$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "NULL" : $factura_generar->fields['subtotal_gastos']);
+			$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "0" : $factura_generar->fields['subtotal_gastos']);
 			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "NULL" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
-			$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "NULL" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
-			$factura->Edit("total", empty($factura_generar->fields['total']) ? "NULL" : $factura_generar->fields['total']);
-			$factura->Edit("iva", empty($factura_generar->fields['iva']) ? "NULL" : $factura_generar->fields['iva']);
+			$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "0" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
+			$factura->Edit("total", empty($factura_generar->fields['total']) ? "0" : $factura_generar->fields['total']);
+			$factura->Edit("iva", empty($factura_generar->fields['iva']) ? "0" : $factura_generar->fields['iva']);
 		}
 		else
 		{
@@ -2341,6 +2384,113 @@ class Migracion
 		$observacion->Write();
 	}
 
+	public function GenerarPagos($factura_pago_generar = null, $documento_pago_generar = null)
+	{
+		$query = "SELECT numero FROM factura WHERE id_factura = '".$factura_pago_generar->fields['id_factura']."' ";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($numero_factura) = mysql_fetch_array($resp);
+		
+		if( !empty($numero_factura) )
+		{
+			$factura_asoc = new Factura($this->sesion);
+			$cta_cte_fact = new CtaCteFact($this->sesion);
+			
+			$moneda_factura = new Moneda($this->sesion);
+			$moneda_cobro = new Moneda($this->sesion);
+			
+			$moneda_factura->Load($factura_pago_generar->fields['id_moneda']);
+			
+			if( $factura_pago_generar->fields['id_moneda_cobro'] )
+				$moneda_cobro->Load($factura_pago_generar->fields['id_moneda_cobro']);
+			else
+				$moneda_cobro->Load($factura_pago_generar->fields['id_moneda']);
+			
+			$factura_asoc->Load($factura_pago_generar->fields['id_factura']);
+			
+			$factura_pago = new FacturaPago($this->sesion);
+			if( $factura_pago_generar->fields['id_factura_pago'] > 0 )
+				$factura_pago->Load($factura_pago_generar->fields['id_factura_pago']);
+			
+			$factura_pago->Edit('fecha', 							!empty($factura_pago_generar->fields['fecha']) ? $factura_pago_generar->fields['fecha'] : "000-00-00 00:00:00" );
+			$factura_pago->Edit('codigo_cliente', 		!empty($factura_asoc->fields['codigo_cliente']) ? $factura_asoc->fields['codigo_cliente'] : "NULL" );
+			$factura_pago->Edit('monto', 							!empty($factura_pago_generar->fields['monto']) ? number_format($factura_pago_generar->fields['monto'],$moneda_factura->fields['cifras_decimales'],'.','') : "0" );
+			$factura_pago->Edit('id_moneda', 					!empty($factura_pago_generar->fields['id_moneda']) ? $factura_pago_generar->fields['id_moneda'] : "1" );
+			$factura_pago->Edit('monto_moneda_cobro', !empty($factura_pago_generar->fields['monto_moneda_cobro']) ? number_format($factura_pago_generar->fields['monto_moneda_cobro'],$moneda_cobro->fields['cifras_decimales'],'.','') : "0" );
+			$factura_pago->Edit('id_moneda_cobro', 		!empty($factura_pago_generar->fields['id_moneda_cobro']) ? $factura_pago_generar->fields['id_moneda_cobro'] : "1" );
+			$factura_pago->Edit('tipo_doc', 					!empty($factura_pago_generar->fields['tipo_doc']) ? $factura_pago_generar->fields['tipo_doc'] : "NULL" );
+			$factura_pago->Edit('nro_documento', 			!empty($factura_pago_generar->fields['numero_doc']) ? $factura_pago_generar->fields['numero_doc'] : "NULL" );
+			$factura_pago->Edit('nro_cheque', 				!empty($factura_pago_generar->fields['numero_cheque']) ? $factura_pago_generar->fields['numero_cheque'] : "NULL" );
+			$factura_pago->Edit('descripcion', 				!empty($factura_pago_generar->fields['glosa_documento']) ? $factura_pago_generar->fields['glosa_documento'] : "NULL" );
+			$factura_pago->Edit('id_banco', 					!empty($factura_pago_generar->fields['id_banco']) ? $factura_pago_generar->fields['id_banco'] : "NULL" );
+			$factura_pago->Edit('id_cuenta',					!empty($factura_pago_generar->fields['id_cuenta']) ? $factura_pago_generar->fields['id_cuenta'] : "NULL" );
+			$factura_pago->Edit('pago_retencion', 		!empty($factura_pago_generar->fields['pago_retencion']) ? $factura_pago_generar->fields['pago_retencion'] : "NULL" );
+			$factura_pago->Edit('id_concepto', 				!empty($factura_pago_generar->fields['id_concepto']) ? $factura_pago_generar->fields['id_concepto'] : "NULL" );
+			
+			$neteos = array();
+			$neteos[] = array( $factura_pago_generar->fields['id_factura'], number_format($factura_pago->fields['monto'],$moneda_factura->fields['cifras_decimales'],'.','') );
+			
+			$id_cobro = $factura_asoc->fields['id_cobro'];
+			// Buscar tipos de cambios para los pagos:
+			$query = " SELECT GROUP_CONCAT( id_moneda ), GROUP_CONCAT( tipo_cambio ) 
+									FROM cobro_moneda WHERE id_cobro = '$id_cobro' GROUP BY id_cobro ";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($ids_monedas_factura_pago, $tipo_cambios_factura_pago) = mysql_fetch_array($resp);
+			
+			if( $factura_pago->Write() )
+			{
+				$cta_cte_fact->IngresarPago($factura_pago, $neteos, $factura_asoc->fields['id_cobro'], &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
+			}
+		}
+		else
+		{
+			$cobro_asoc = new Cobro($this->sesion);
+			$cobro_asoc->Load($documento_pago_generar->fields['id_cobro']);
+			
+			$documento = new Documento($this->sesion);
+			
+			$documento_cobro = new Documento($this->sesion);
+			$documento_cobro->LoadByCobro($documento_pago_generar->fields['id_cobro']);
+			
+			$moneda_documento = new Moneda($this->sesion);
+			$moneda_documento->Load($documento_pago_generar->fields['id_moneda']);
+			
+			$moneda_cobro = new Moneda($this->sesion);
+			$moneda_cobro->Load($documento_pago_generar->fields['id_moneda_monto']);
+			
+			$fecha 							= !empty($documento_pago_generar->fields['fecha']) ? $documento_pago_generar->fields['fecha'] : "0000-00-00";
+			$codigo_cliente 		= !empty($cobro_asoc->fields['codigo_cliente']) ? $cobro_asoc->fields['codigo_cliente'] : "0001";
+			$id_cobro						= !empty($documento_pago_generar->fields['id_cobro']) ? $documento_pago_generar->fields['id_cobro'] : "NULL";
+			$monto 							= number_format($documento_pago_generar->fields['monto'], $moneda_documento->fields['cifras_decimales'], '.','');
+			$id_moneda 					= !empty($documento_pago_generar->fields['id_moneda']) ? $documento_pago_generar->fields['id_moneda'] : "1";
+			$monto_moneda_cobro = !empty($documento_pago_generar->fields['monto_moneda_cobro']) ? number_format($documento_pago_generar->fields['monto_moneda_cobro'], $moneda_cobro->fields['cifras_decimales'], '.', '') : number_format($documento_pago_generar->fields['monto'], $moneda_documento->fields['cifras_decimales'], '.','');
+			$id_moneda_cobro 		= !empty($documento_pago_generar->fields['id_moneda_cobro']) ? $documento_pago_generar->fields['id_moneda_cobro'] : $documento_pago_generar->fields['id_cobro'];
+			$tipo_doc 					= !empty($documento_pago_generar->fields['tipo_doc']) ? $documento_pago_generar->fields['tipo_doc'] : "T";
+			$numero_doc 				= !empty($documento_pago_generar->fields['numero_doc']) ? $documento_pago_generar->fields['numero_doc'] : "0";
+			$numero_cheque 			= !empty($documento_pago_generar->fields['numero_cheque']) ? $documento_pago_generar->fields['numero_cheque'] : "NULL";
+			$glosa_documento 		= !empty($documento_pago_generar->fields['glosa_documento']) ? $documento_pago_generar->fields['glosa_documento'] : "";
+			$id_banco 					= !empty($documento_pago_generar->fields['id_banco']) ? $documento_pago_generar->fields['id_banco'] : "NULL";
+			$id_cuenta 					= !empty($documento_pago_generar->fields['id_cuenta']) ? $documento_pago_generar->fields['id_cuenta'] : "NULL";
+			$numero_operacion 	= !empty($documento_pago_generar->fields['numero_operacion']) ? $documento_pago_generar->fields['numero_operacion'] : "NULL";
+			
+			$arreglo_pagos_detalle = array();
+			$arreglo_data = array();
+			$arreglo_data['id_moneda'] 					= $id_moneda;
+			$arreglo_data['id_documento_cobro'] = $documento_cobro->fields['id_documento'];
+			$arreglo_data['monto_honorarios']		= $monto;
+			$arreglo_data['monto_gastos']				= "0";
+			$arreglo_data['id_cobro'] 					= $id_cobro;
+			array_push($arreglo_pagos_detalle, $arreglo_data);
+			
+			// Buscar tipos de cambios para los pagos:
+			$query = " SELECT GROUP_CONCAT( id_moneda ), GROUP_CONCAT( tipo_cambio ) 
+									FROM cobro_moneda WHERE id_cobro = '$id_cobro' GROUP BY id_cobro ";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($ids_monedas_factura_pago, $tipo_cambios_factura_pago) = mysql_fetch_array($resp);
+				
+			$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
+		}
+	}
+	
 	function Escribir($objeto, $forzar_insert = false)
 	{
 		if(!$this->Write($objeto, $forzar_insert))
