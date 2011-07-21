@@ -246,6 +246,16 @@
 								IF(MonedaPago='D','2',IF(MonedaPago='E','3','1'))		as factura_FFF_id_moneda,
 								MontoPago																						as documento_FFF_monto,
 								MontoPago																						as factura_FFF_monto,
+								IF(Factura.Moneda='D','2',IF(Factura.Moneda='E','3','1'))		as factura_FFF_id_moneda_cobro,
+								IF(Factura.Moneda='D','2',IF(Factura.Moneda='E','3','1'))		as documento_FFF_id_moneda_cobro,
+								IF( Factura.Moneda = PagosRecibidos.MonedaPago,
+										MontoPago, IF( Factura.Moneda = 'S', MontoSoles,
+											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * PagosRecibidos.TipoCambioPago / PagosRecibidos.TipoCambioFacturacion ) ) )
+																																		as factura_FFF_monto_cobro,
+								IF( Factura.Moneda = PagosRecibidos.MonedaPago,
+										MontoPago, IF( Factura.Moneda = 'S', MontoSoles,
+											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * PagosRecibidos.TipoCambioPago / PagosRecibidos.TipoCambioFacturacion ) ) )
+																																		as documento_FFF_monto_cobro,
 								NombreBanco																					as factura_FFF_glosa_banco,
 								CodigoCuentaBanco																		as factura_FFF_cuenta_banco,
 								NombreBanco																					as documento_FFF_glosa_banco,
@@ -257,6 +267,7 @@
 								id_factura_pago_lemontech														as factura_FFF_id_factura_pago,
 								id_factura_pago_lemontech 													as documento_FFF_id_documento
 							FROM PagosRecibidos
+							LEFT JOIN Factura ON Factura.NumeroFactura = PagosRecibidos.NumeroFactura 
 							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = PagosRecibidos.CodigoBanco";
 		}
 	}
