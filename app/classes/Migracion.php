@@ -2495,12 +2495,123 @@ class Migracion
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($ids_monedas_documento, $tipo_cambios_documento) = mysql_fetch_array($resp);
 				
-			$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
+			$this->IngresoDocumentoPago($documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
 																				$id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, 
 																				$id_banco, $id_cuenta, $numero_operacion, $numero_cheque, 
 																				$ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, 
 																				$id_pago);
 		}
+	}
+	
+	function IngresoDocumentoPago($documento_generado, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null)
+	{
+		if($id_cobro)
+				{
+				$query="UPDATE cobro SET fecha_cobro='".Utiles::fecha2sql($fecha)." 00:00:00' WHERE id_cobro=".$id_cobro;
+				$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				}
+				
+			$monto=str_replace(',','.',$monto);
+			
+			/*Es pago, asi que monto es negativo*/
+			$multiplicador = -1.0;
+			$moneda = new Moneda($this->sesion);
+			$moneda->Load($id_moneda);
+			$moneda_base = Utiles::MonedaBase($this->sesion);
+			$monto_base = $monto * $moneda->fields['tipo_cambio'] / $moneda_base['tipo_cambio'];
+	
+			$documento_generado->Edit("monto",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
+			$documento_generado->Edit("monto_base",number_format($monto_base*$multiplicador,$moneda_base['cifras_decimales'],".",""));
+			$documento_generado->Edit("saldo_pago",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
+			if($id_cobro) $documento_generado->Edit("id_cobro",$id_cobro);
+			$documento_generado->Edit('tipo_doc',$tipo_doc);
+			$documento_generado->Edit("numero_doc",$numero_doc);
+			$documento_generado->Edit("id_moneda",$id_moneda);
+			$documento_generado->Edit("fecha",Utiles::fecha2sql($fecha));
+			$documento_generado->Edit("glosa_documento",$glosa_documento);
+			$documento_generado->Edit("codigo_cliente",$codigo_cliente);
+			$documento_generado->Edit("id_banco",$id_banco);
+			$documento_generado->Edit("id_cuenta",$id_cuenta);
+			$documento_generado->Edit("numero_operacion",$numero_operacion);
+			$documento_generado->Edit("numero_cheque",$numero_cheque);
+			$documento_generado->Edit("id_factura_pago",$id_factura_pago ? $id_factura_pago : "NULL" );
+			if( $pago_retencion ) $documento_generado->Edit("pago_retencion","1");
+			
+			$out_neteos = "";
+			
+			if($this->Write($documento_generado, true))
+				{
+					$id_documento = $documento_generado->fields['id_documento'];
+					$ids_monedas = explode(',',$ids_monedas_documento);
+					$tipo_cambios = explode(',',$tipo_cambios_documento);
+					$tipo_cambio = array();
+					foreach($tipo_cambios as $key => $tc)
+					{
+						$tipo_cambio[$ids_monedas[$key]] = $tc;
+					}
+					$documento_generado->ActualizarDocumentoMoneda($tipo_cambio);
+					
+							//Si se ingresa el documento, se ingresan los pagos
+							foreach($arreglo_pagos_detalle as $key => $data)
+							{
+									$moneda_documento_cobro = new Moneda($this->sesion);
+									$moneda_documento_cobro->Load($data['id_moneda']);
+									
+									// Guardo los saldos, para indicar cuales fueron actualizados
+									$id_cobro_neteado   = $data['id_cobro'];
+									$documento_cobro_aux = new Documento($this->sesion);
+									if($documento_cobro_aux->LoadByCobro($id_cobro_neteado))
+									{
+										$saldo_honorarios_anterior = $documento_cobro_aux->fields['saldo_honorarios'];
+										$saldo_gastos_anterior = $documento_cobro_aux->fields['saldo_gastos'];
+									}
+									
+									$id_documento_cobro = $documento_cobro_aux->fields['id_documento'];
+									$pago_honorarios    = $data['monto_honorarios'];
+									$pago_gastos        = $data['monto_gastos'];
+									$cambio_cobro       = $documento_generado->TipoCambioDocumento($this->sesion, $id_documento_cobro, $documento_cobro_aux->fields['id_moneda']);
+									$cambio_pago        = $documento_generado->TipoCambioDocumento($this->sesion, $id_documento_cobro,$id_moneda);
+									$decimales_cobro    = $moneda_documento_cobro->fields['cifras_decimales'];
+									$decimales_pago     = $moneda->fields['cifras_decimales'];
+									
+									if(!$pago_gastos) 		$pago_gastos = 0;
+									if(!$pago_honorarios) $pago_honorarios = 0;
+									
+									$neteo_documento = new NeteoDocumento($this->sesion);
+									//Si el neteo existía, está siendo modificado y se debe partir de 0:
+									if( $neteo_documento->Ids($id_documento,$id_documento_cobro)) 
+										$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro);
+									else
+										$out_neteos .= "<tr><td>No</td><td>0</td><td>0</td>";
+									
+									//Luego se modifica
+									if($pago_honorarios != 0 || $pago_gastos != 0)
+										$out_neteos .= $neteo_documento->Escribir($pago_honorarios,$pago_gastos,$cambio_pago,$cambio_cobro,$decimales_pago,$decimales_cobro,$id_cobro_neteado);
+									
+									/*Compruebo cambios en saldos para mostrar mensajes de actualizacion*/
+									$documento_cobro_aux = new Documento($this->sesion);
+									if($documento_cobro_aux->Load($id_documento_cobro))
+									{
+										if($saldo_honorarios_anterior != $documento_cobro_aux->fields['saldo_honorarios'])
+											$cambios_en_saldo_honorarios[] = $id_documento_cobro;
+										if($saldo_gastos_anterior != $documento_cobro_aux->fields['saldo_gastos'])
+											$cambios_en_saldo_gastos[] = $id_documento_cobro;
+
+										$neteo_documento->CambiarEstadoCobro($id_cobro_neteado,$documento_cobro_aux->fields['saldo_honorarios'],$documento_cobro_aux->fields['saldo_gastos']);
+									}
+								}
+						
+						?>
+						<script type="text/javascript">
+						window.opener.Refrescar();
+						</script> 
+						<?
+				}
+		
+		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";
+		//echo $out_neteos;
+		
+		return $id_documento;
 	}
 	
 	function Escribir($objeto, $forzar_insert = false)
