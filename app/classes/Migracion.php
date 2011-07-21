@@ -2409,7 +2409,10 @@ class Migracion
 			
 			$factura_pago = new FacturaPago($this->sesion);
 			if( $factura_pago_generar->fields['id_factura_pago'] > 0 )
+			{
 				$factura_pago->Load($factura_pago_generar->fields['id_factura_pago']);
+				$factura_pago->Edit('id_factura_pago', $factura_pago_generar->fields['id_factura_pago']);
+			}
 			
 			$factura_pago->Edit('fecha', 							!empty($factura_pago_generar->fields['fecha']) ? $factura_pago_generar->fields['fecha'] : "000-00-00 00:00:00" );
 			$factura_pago->Edit('codigo_cliente', 		!empty($factura_asoc->fields['codigo_cliente']) ? $factura_asoc->fields['codigo_cliente'] : "NULL" );
@@ -2448,9 +2451,10 @@ class Migracion
 			
 			$documento = new Documento($this->sesion);
 			if( !empty($documento_pago_generar->fields['id_documento']) )
-				$documento->Load($documento_pago_generar->fields['id_documento']);
-			else 
-				$documento->Edit('id_documento', $documento_pago_generar->fields['id_documento']);
+				{
+					$documento->Load($documento_pago_generar->fields['id_documento']);
+					$documento->Edit('id_documento', $documento_pago_generar->fields['id_documento']);
+				}
 			
 			$documento_cobro = new Documento($this->sesion);
 			$documento_cobro->LoadByCobro($documento_pago_generar->fields['id_cobro']);
