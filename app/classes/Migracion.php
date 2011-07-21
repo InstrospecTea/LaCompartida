@@ -2474,11 +2474,11 @@ class Migracion
 			$id_moneda_cobro 		= !empty($documento_pago_generar->fields['id_moneda_cobro']) ? $documento_pago_generar->fields['id_moneda_cobro'] : $documento_pago_generar->fields['id_cobro'];
 			$tipo_doc 					= !empty($documento_pago_generar->fields['tipo_doc']) ? $documento_pago_generar->fields['tipo_doc'] : "T";
 			$numero_doc 				= !empty($documento_pago_generar->fields['numero_doc']) ? $documento_pago_generar->fields['numero_doc'] : "0";
-			$numero_cheque 			= !empty($documento_pago_generar->fields['numero_cheque']) ? $documento_pago_generar->fields['numero_cheque'] : "NULL";
+			$numero_cheque 			= !empty($documento_pago_generar->fields['numero_cheque']) ? $documento_pago_generar->fields['numero_cheque'] : "";
 			$glosa_documento 		= !empty($documento_pago_generar->fields['glosa_documento']) ? $documento_pago_generar->fields['glosa_documento'] : "";
 			$id_banco 					= !empty($documento_pago_generar->fields['id_banco']) ? $documento_pago_generar->fields['id_banco'] : "0";
 			$id_cuenta 					= !empty($documento_pago_generar->fields['id_cuenta']) ? $documento_pago_generar->fields['id_cuenta'] : "0";
-			$numero_operacion 	= !empty($documento_pago_generar->fields['numero_operacion']) ? $documento_pago_generar->fields['numero_operacion'] : "NULL";
+			$numero_operacion 	= !empty($documento_pago_generar->fields['numero_operacion']) ? $documento_pago_generar->fields['numero_operacion'] : "";
 			
 			$arreglo_pagos_detalle = array();
 			$arreglo_data = array();
