@@ -235,40 +235,40 @@
 		function QueryPagos()
 		{
 			return "SELECT 
-								NumeroFactura 																			as documento_FFF_id_cobro,
-								NumeroFactura 																			as factura_FFF_id_factura,
-								FechaDePago																					as factura_FFF_fecha,
-								FechaDePago																					as documento_FFF_fecha,
-								NumeroDocumentoPago																	as documento_FFF_numero_doc,
-								NumeroDocumentoPago																	as factura_FFF_nro_documento,
-								MontoSoles																					as documento_FFF_monto_base,
+								P.NumeroFactura 																			as documento_FFF_id_cobro,
+								P.NumeroFactura 																			as factura_FFF_id_factura,
+								P.FechaDePago																					as factura_FFF_fecha,
+								P.FechaDePago																					as documento_FFF_fecha,
+								P.NumeroDocumentoPago																	as documento_FFF_numero_doc,
+								P.NumeroDocumentoPago																	as factura_FFF_nro_documento,
+								P.MontoSoles																					as documento_FFF_monto_base,
 								IF(MonedaPago='D','2',IF(MonedaPago='E','3','1'))		as documento_FFF_id_moneda,
 								IF(MonedaPago='D','2',IF(MonedaPago='E','3','1'))		as factura_FFF_id_moneda,
-								MontoPago																						as documento_FFF_monto,
-								MontoPago																						as factura_FFF_monto,
+								P.MontoPago																						as documento_FFF_monto,
+								P.MontoPago																						as factura_FFF_monto,
 								IF(Factura.Moneda='D','2',IF(Factura.Moneda='E','3','1'))		as factura_FFF_id_moneda_cobro,
 								IF(Factura.Moneda='D','2',IF(Factura.Moneda='E','3','1'))		as documento_FFF_id_moneda_cobro,
-								IF( Factura.Moneda = PagosRecibidos.MonedaPago,
+								IF( Factura.Moneda = P.MonedaPago,
 										MontoPago, IF( Factura.Moneda = 'S', MontoSoles,
-											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * PagosRecibidos.TipoCambioPago / PagosRecibidos.TipoCambioFacturacion ) ) )
+											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * P.TipoCambioPago / P.TipoCambioFacturacion ) ) )
 																																		as factura_FFF_monto_cobro,
-								IF( Factura.Moneda = PagosRecibidos.MonedaPago,
+								IF( Factura.Moneda = P.MonedaPago,
 										MontoPago, IF( Factura.Moneda = 'S', MontoSoles,
-											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * PagosRecibidos.TipoCambioPago / PagosRecibidos.TipoCambioFacturacion ) ) )
+											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * P.TipoCambioPago / P.TipoCambioFacturacion ) ) )
 																																		as documento_FFF_monto_cobro,
-								NombreBanco																					as factura_FFF_glosa_banco,
-								CodigoCuentaBanco																		as factura_FFF_cuenta_banco,
-								NombreBanco																					as documento_FFF_glosa_banco,
-								CodigoCuentaBanco																		as documento_FFF_cuenta_banco,
-								FechaModificacion																		as factura_FFF_fecha_modificacion,
-								FechaModificacion																		as documento_FFF_fecha_modificacion,
-								CodigoBancoCheque																		as documento_FFF_numero_cheque,
-								CodigoBancoCheque																		as factura_FFF_nro_cheque,
-								id_factura_pago_lemontech														as factura_FFF_id_factura_pago,
-								id_factura_pago_lemontech 													as documento_FFF_id_documento
-							FROM PagosRecibidos
-							LEFT JOIN Factura ON Factura.NumeroFactura = PagosRecibidos.NumeroFactura 
-							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = PagosRecibidos.CodigoBanco";
+								P.NombreBanco																					as factura_FFF_glosa_banco,
+								P.CodigoCuentaBanco																		as factura_FFF_cuenta_banco,
+								P.NombreBanco																					as documento_FFF_glosa_banco,
+								P.CodigoCuentaBanco																		as documento_FFF_cuenta_banco,
+								P.FechaModificacion																		as factura_FFF_fecha_modificacion,
+								P.FechaModificacion																		as documento_FFF_fecha_modificacion,
+								P.CodigoBancoCheque																		as documento_FFF_numero_cheque,
+								P.CodigoBancoCheque																		as factura_FFF_nro_cheque,
+								P.id_factura_pago_lemontech														as factura_FFF_id_factura_pago,
+								P.id_factura_pago_lemontech 													as documento_FFF_id_documento
+							FROM PagosRecibidos P 
+							LEFT JOIN Factura ON Factura.NumeroFactura = P.NumeroFactura 
+							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = P.CodigoBanco";
 		}
 	}
 ?>
