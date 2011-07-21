@@ -2421,8 +2421,8 @@ class Migracion
 			$factura_pago->Edit('nro_documento', 			!empty($factura_pago_generar->fields['numero_doc']) ? $factura_pago_generar->fields['numero_doc'] : "NULL" );
 			$factura_pago->Edit('nro_cheque', 				!empty($factura_pago_generar->fields['numero_cheque']) ? $factura_pago_generar->fields['numero_cheque'] : "NULL" );
 			$factura_pago->Edit('descripcion', 				!empty($factura_pago_generar->fields['glosa_documento']) ? $factura_pago_generar->fields['glosa_documento'] : "NULL" );
-			$factura_pago->Edit('id_banco', 					!empty($factura_pago_generar->fields['id_banco']) ? $factura_pago_generar->fields['id_banco'] : "NULL" );
-			$factura_pago->Edit('id_cuenta',					!empty($factura_pago_generar->fields['id_cuenta']) ? $factura_pago_generar->fields['id_cuenta'] : "NULL" );
+			$factura_pago->Edit('id_banco', 					!empty($factura_pago_generar->fields['id_banco']) ? $factura_pago_generar->fields['id_banco'] : "0" );
+			$factura_pago->Edit('id_cuenta',					!empty($factura_pago_generar->fields['id_cuenta']) ? $factura_pago_generar->fields['id_cuenta'] : "0" );
 			$factura_pago->Edit('pago_retencion', 		!empty($factura_pago_generar->fields['pago_retencion']) ? $factura_pago_generar->fields['pago_retencion'] : "NULL" );
 			$factura_pago->Edit('id_concepto', 				!empty($factura_pago_generar->fields['id_concepto']) ? $factura_pago_generar->fields['id_concepto'] : "NULL" );
 			
@@ -2447,6 +2447,10 @@ class Migracion
 			$cobro_asoc->Load($documento_pago_generar->fields['id_cobro']);
 			
 			$documento = new Documento($this->sesion);
+			if( !empty($documento_pago_generar->fields['id_documento']) )
+				$documento->Load($documento_pago_generar->fields['id_documento']);
+			else 
+				$documento->Edit('id_documento', $documento_pago_generar->fields['id_documento']);
 			
 			$documento_cobro = new Documento($this->sesion);
 			$documento_cobro->LoadByCobro($documento_pago_generar->fields['id_cobro']);
@@ -2468,8 +2472,8 @@ class Migracion
 			$numero_doc 				= !empty($documento_pago_generar->fields['numero_doc']) ? $documento_pago_generar->fields['numero_doc'] : "0";
 			$numero_cheque 			= !empty($documento_pago_generar->fields['numero_cheque']) ? $documento_pago_generar->fields['numero_cheque'] : "NULL";
 			$glosa_documento 		= !empty($documento_pago_generar->fields['glosa_documento']) ? $documento_pago_generar->fields['glosa_documento'] : "";
-			$id_banco 					= !empty($documento_pago_generar->fields['id_banco']) ? $documento_pago_generar->fields['id_banco'] : "NULL";
-			$id_cuenta 					= !empty($documento_pago_generar->fields['id_cuenta']) ? $documento_pago_generar->fields['id_cuenta'] : "NULL";
+			$id_banco 					= !empty($documento_pago_generar->fields['id_banco']) ? $documento_pago_generar->fields['id_banco'] : "0";
+			$id_cuenta 					= !empty($documento_pago_generar->fields['id_cuenta']) ? $documento_pago_generar->fields['id_cuenta'] : "0";
 			$numero_operacion 	= !empty($documento_pago_generar->fields['numero_operacion']) ? $documento_pago_generar->fields['numero_operacion'] : "NULL";
 			
 			$arreglo_pagos_detalle = array();
@@ -2485,9 +2489,13 @@ class Migracion
 			$query = " SELECT GROUP_CONCAT( id_moneda ), GROUP_CONCAT( tipo_cambio ) 
 									FROM cobro_moneda WHERE id_cobro = '$id_cobro' GROUP BY id_cobro ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			list($ids_monedas_factura_pago, $tipo_cambios_factura_pago) = mysql_fetch_array($resp);
+			list($ids_monedas_documento, $tipo_cambios_documento) = mysql_fetch_array($resp);
 				
-			$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
+			$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
+																				$id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, 
+																				$id_banco, $id_cuenta, $numero_operacion, $numero_cheque, 
+																				$ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, 
+																				$id_pago);
 		}
 	}
 	
