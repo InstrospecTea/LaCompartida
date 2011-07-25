@@ -6082,7 +6082,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
 						);";
-						$query = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
+						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
 
 						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 						VALUES (
@@ -6090,7 +6090,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trámites'
 						);";
-						$query = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
+						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
 
 
 						foreach($query as $q)
