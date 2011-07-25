@@ -19,13 +19,17 @@
 	{
 		$moneda = new Moneda($sesion);
 		$error = false;
+		$fecha_hist = date("Y-m-d H:i:s");
 	    for($x=0;$x<$lista->num;$x++)
 	    {
     	    $mon = $lista->Get($x);
 			$moneda->Load($mon->fields['id_moneda']);
+			$moneda->GuardaHistorial($sesion, $fecha_hist);
  			$moneda->Edit('moneda_base','0');
 			if(!$moneda->Write())
-				$error = true;
+			{
+				$error = true;			
+			}
 		}
 
 		if(!$moneda->Load($moneda_base))

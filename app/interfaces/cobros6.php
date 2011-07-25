@@ -403,10 +403,20 @@
 		if($cobro->Write())
 		{
 		$desde_cobros_emitidos = true;
+		/*
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
 			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
 		else
 			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+		*/
+		if(!UtilesApp::GetConf($sesion,'XLSFormatoEspecial'))
+		{
+			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+		}
+		else
+		{
+			require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
+		}
 		exit;
 	}
 		$desde_cobros_emitidos = true;
@@ -1021,6 +1031,14 @@ function AgregarFactura(idx){
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_resumen_cobro"><?=__('Mostrar resumen del cobro')?></label></td>
 												</tr>
 												<tr>
+													<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
+													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
+												</tr>
+												<tr>
+													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
+													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
+												</tr>
+												<!--tr>
 													<td/>
 													<td align="left" style="font-size: 10px;">
 														<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
@@ -1030,15 +1048,7 @@ function AgregarFactura(idx){
 														<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
 														<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
 													</td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
-												</tr>
+												</tr-->
 												<tr>
 													<td/>
 													<td align="left" style="font-size: 10px;">
@@ -1191,7 +1201,7 @@ function AgregarFactura(idx){
 										<br>
 										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?>" onclick="return VerDetalles(this.form);" \>
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Excel')?>" onclick="return DescargarExcel(this.form);" \>
+										<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form);" \>
 									</td>
 								</tr>
 							</table>
@@ -1253,6 +1263,14 @@ function AgregarFactura(idx){
 					<tr style="height: 26px;">
 						<td align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan=3>
 							<img src="<?=Conf::ImgDir()?>/imprimir_16.gif" border="0" alt="Imprimir"/> <?=__('Documentos Tributarios')?>
+							<?php
+							if($cobro->DiferenciaCobroConFactura() != '')
+							{
+								?>
+								<span style="border: 1px solid #bfbfcf; color: #ffffff; background-color: #ff0000; float: right; padding: 2px"><?=$cobro->DiferenciaCobroConFactura();?></span>
+								<?php
+							}
+							?>
 						</td>
 					</tr>
 					<tr>

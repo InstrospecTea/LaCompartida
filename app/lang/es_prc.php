@@ -5,17 +5,23 @@
 	$_LANG['ROL/RUT'] = "RUC";
 	$_LANG['RUT/NIT'] = "RUC";
 	$_LANG['RUT']     = "RUC";
+	$_LANG['RUT personal'] = "DNI";
 	$_LANG['Gastos c/ IVA'] = "Gastos c/ IGV";
 	$_LANG['Gastos s/ IVA'] = "Gastos s/ IGV";
+	$_LANG['Gasto c/ IVA'] = "Gasto c/ IGV";
+	$_LANG['Gasto s/ IVA'] = "Gasto s/ IGV";
+	$_LANG['G SIN IVA'] = 'G SIN IGV';
 	$_LANG['IVA'] = "IGV";
 	$_LANG['Impuesto'] = "IGV";
 	$_LANG['Monto Impuesto'] = "Monto IGV";
 	$_LANG['Total con IVA']     = "Total con IGV";
 	$_LANG['Pago retención impuestos']     = "Detracción";
 	$_LANG['Director proyecto']     = "Encargado comercial";
-
 	$_LANG['Dólares']     = "Dólares Americanos";
 	$_LANG['Dolar']     = "Dólar Americano";
+
+	$_LANG['WIP'] = 'Stock';
+	$_LANG['WIP (Work in progress)'] = 'Stock';
 	
 	# Menú
 	$_LANG['Cobranza']  = "Facturación";
@@ -43,10 +49,14 @@
 	$_LANG['Generar cobro individual'] = "Generar liquidación individual";
 	$_LANG['Generar cobro individual para gastos'] = "Generar liquidación individual para gastos";
 	$_LANG['Generar cobro individual para honorarios'] = "Generar liquidación individual para honorarios";
-	
+
 	#Attache
 	$_LANG['Encargado Comercial'] = "Attache Primario";
+	$_LANG['Encargado comercial'] = "Attache principal";
 	$_LANG['Usuario encargado'] = "Attache Secundario";
+
+	$_LANG['Cobrado'] = 'Facturado';
+	$_LANG['Cobrable'] = 'Facturable';
 	
 	$_LANG['Detalle Cobro'] = "Detalle liquidación";
 	$_LANG['No hay gastos en este cobro'] = "No hay gastos en esta liquidación";
@@ -131,8 +141,15 @@
 	$_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de asuntos si la liquidación tiene trabajos";
 	$_LANG['borradores'] = "pre-liquidaciones";
 	$_LANG['Descargar Archivo'] = "Pre-liquidación";
+	$_LANG['Descargar Excel Cobro'] = 'Descargar Liquidación';
+	#$_LANG['Descargar Excel'] = "Planillón Excel";
 	$_LANG['Descargar Excel'] = "Planillón Excel";
 
-
+	$_LANG['Debe ingresar un monto IVA para los honorarios']	= 'Debe ingresar un monto IGV para los honorarios';
+	$_LANG['Debe ingresar una descripción para los gastos c/ IVA'] = 'Debe ingresar una descripción para los gastos c/ IGV';
+	$_LANG['Debe ingresar un monto para los gastos c/ IVA'] = 'Debe ingresar un monto para los gastos c/ IGV';
+	$_LANG['Debe ingresar un monto iva para los gastos c/ IVA'] = 'Debe ingresar un monto IGV para los gastos c/ IGV';
+	$_LANG['Debe ingresar una descripción para los gastos s/ IVA'] = 'Debe ingresar una descripción para los gastos s/ IGV';
+	$_LANG['Debe ingresar un monto para los gastos s/ IVA'] = 'Debe ingresar un monto para los gastos s/ IGV';
 	
 ?>

@@ -398,6 +398,7 @@
 	var continuar = 1;
 	function Guardar(form)
 	{
+		$('boton_guardar').disabled = true;
 		continuar = 1;
 		ValidaMontoSaldoPago(form);
 
@@ -710,7 +711,7 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuen
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left>
-			<input type=button class=btn value="<?=__('Guardar')?>" onclick='Guardar(this.form);' />
+			<input type=button class=btn id="boton_guardar" value="<?=__('Guardar')?>" onclick='Guardar(this.form);' />
 			<input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
 		</td>
 	</tr>

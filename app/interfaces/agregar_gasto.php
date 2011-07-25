@@ -136,6 +136,8 @@
 		$gasto->Edit("id_usuario_orden",$id_usuario_orden ? $id_usuario_orden : $sesion->usuario->fields[id_usuario]);
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
+		$gasto->Edit("id_factura",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
+		$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
 		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
 		
 		
@@ -683,6 +685,23 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 <?
 	}
 ?>
+	<?
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') ) || ( method_exists('Conf','FacturaAsociada') && Conf::FacturaAsociada() ) )
+	{
+?>
+	<tr>
+		<td align=right>
+			<?=__('Factura asociada')?>
+		</td>
+		<td align=left>
+			<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['id_factura'] && $gasto->fields['id_factura'] != 'NULL') ? $gasto->fields['id_factura'] : '' ?>" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=$gasto->fields['fecha_factura'] ? Utiles::sql2date($gasto->fields['fecha_factura']) : date('d-m-Y') ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
+			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura_asociada" style="cursor:pointer" />
+		</td>
+	</tr>
+<?
+	}
+?>
 <?
 //la OT es la orden de trabajo de las notarías
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) ) && $prov=='false')
@@ -900,6 +919,16 @@ if (document.getElementById('img_fecha'))
 			inputField	: "fecha",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
 			button			: "img_fecha"		// ID of the button
+		}
+	);
+}
+if (document.getElementById('fecha_factura_asociada'))
+{
+	Calendar.setup(
+		{
+			inputField	: "fecha_factura_asociada",				// ID of the input field
+			ifFormat		: "%d-%m-%Y",			// the date format
+			button			: "img_fecha_factura_asociada"		// ID of the button
 		}
 	);
 }

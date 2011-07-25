@@ -50,9 +50,13 @@ class Factura extends Objeto
 
 	function Escribir()
 	{
+		$cobro = new Cobro($this->sesion);
+		if($cobro->Load($this->fields['id_cobro']))
+		{
+			$this->Edit('id_contrato',$cobro->fields['id_contrato']);
+		}
 		if($this->Write())
 		{
-			$cobro = new Cobro($this->sesion);
 			if($cobro->Load($this->fields['id_cobro']))
 			{
 				if( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
@@ -79,10 +83,10 @@ class Factura extends Objeto
 				
 				$cobro->Write();
 				
-				if( ( $this->fields['subtotal_gastos'] > 0 || $this->fields['subtotal_gastos_sin_impuesto'] > 0 ) && $this->ComparaGastos() )
+				/*if( ( $this->fields['subtotal_gastos'] > 0 || $this->fields['subtotal_gastos_sin_impuesto'] > 0 ) && $this->ComparaGastos() )
 				{
 					$this->GastosAsociaCobro();
-				}
+				}*/
 			}			
 			return true;
 		}
@@ -92,7 +96,7 @@ class Factura extends Objeto
 		}
 	}
 
-	function ComparaGastos()
+	/*function ComparaGastos()
 	{
 		$factura_subtotal_gastos = 0; 		$factura_subtotal_gastos_sin_impuesto = 0;		
 		$documento_subtotal_gastos = 0;		$documento_subtotal_gastos_sin_impuesto = 0;
@@ -144,7 +148,7 @@ class Factura extends Objeto
 		
 		return true;
 		
-	}
+	}*/
 	function PrimerTipoDocumentoLegal()
 	{
 		$query = "SELECT id_documento_legal FROM prm_documento_legal ORDER BY id_documento_legal ASC LIMIT 1";
@@ -444,9 +448,9 @@ class Factura extends Objeto
 						if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) ) )
 							{
 							if( method_exists( 'Conf', 'GetConf' ) )
-								$html2 = str_replace('%texto_impuesto%', 'IVA ('.Conf::GetConf($this->sesion,'ValorImpuesto').'%)',$html2);
+								$html2 = str_replace('%texto_impuesto%', __('IVA') . ' ('.Conf::GetConf($this->sesion,'ValorImpuesto').'%)',$html2);
 							else if( method_exists('Conf','ValorImpuesto') )
-								$html2 = str_replace('%texto_impuesto%', 'IVA ('.$porcentaje_impuesto.'%)', $html2);
+								$html2 = str_replace('%texto_impuesto%', __('IVA') . ' ('.$porcentaje_impuesto.'%)', $html2);
 							}
 						else
 							$html2 = str_replace('%texto_impuesto%', '', $html2);
@@ -476,9 +480,9 @@ class Factura extends Objeto
 							if( ( (  method_exists('Conf','GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) ) )
 								{
 								if( method_exists( 'Conf', 'GetConf' ) )
-									$html2 = str_replace('%texto_impuesto%', 'IVA ('.Conf::GetConf($this->sesion,'ValorImpuesto').'%)',$html2);
+									$html2 = str_replace('%texto_impuesto%', __('IVA') . ' ('.Conf::GetConf($this->sesion,'ValorImpuesto').'%)',$html2);
 								else if( method_exists('Conf','ValorImpuesto') )
-									$html2 = str_replace('%texto_impuesto%', 'IVA ('.Conf::ValorImpuesto().'%)', $html2);
+									$html2 = str_replace('%texto_impuesto%', __('IVA') . ' ('.Conf::ValorImpuesto().'%)', $html2);
 								}
 							else
 								$html2 = str_replace('%texto_impuesto%', '', $html2);

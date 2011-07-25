@@ -74,6 +74,13 @@ function Listar( form, from )
 	form.submit();
 	return true;
 }
+
+function DescargarIncompletos(form)
+{
+	form.action = 'contrato_datos_incompletos_xls.php';
+	form.submit();
+	return true;
+}
 //funcion java para eliminar
 function EliminaCliente(id_cliente)
 {
@@ -157,6 +164,14 @@ else { ?>
 				<td align=left>
 					<input type=button class=btn name=buscar value=<?=__('Buscar')?> onclick="Listar(this.form, 'buscar')">
 					<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="Listar(this.form, 'xls')" >
+<?php
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente') )
+	{
+?>
+					<input type=button class=btn value="<?=__('Descargar listado clientes datos incompletos')?>" onclick="DescargarIncompletos(this.form);" >
+<?php
+	}
+?>
 				</td>
 			</tr>
 		</table>

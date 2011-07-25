@@ -108,6 +108,12 @@
 			{
 				$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 			}
+			if($razon_social){
+				$where .= " AND factura.cliente LIKE '%".$razon_social."%'";
+			}
+			if($descripcion_factura){
+				$where .= " AND (fp.descripcion LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%".$descripcion_factura."%')";
+			}
 	}
 	else
 		$where = base64_decode($where);
@@ -139,6 +145,7 @@
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 				FROM factura_pago AS fp
 				JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 				JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
@@ -249,7 +256,7 @@
 	for($i=0; $i<$col_num; ++$i)
 	{
 		// ocultar celdas con PHP
-		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','id_factura')) ) {
+		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','id_factura','mostrar_diferencia_razon_social')) ) {
 			$arr_col[$col_name[$i]]['hidden'] = 'SI'; }
 		else { $arr_col[$col_name[$i]]['celda'] = $col++; }
 
@@ -376,8 +383,12 @@
 					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				if($col_name[$i] == 'glosa_cliente') {
-					
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
+					$glosa_cliente = $proc->fields['glosa_cliente'];
+					if($proc->fields['mostrar_diferencia_razon_social']!='no')
+					{
+						$glosa_cliente .= " (".$proc->fields['mostrar_diferencia_razon_social'].")";
+					}
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $glosa_clientes, $arr_col[$col_name[$i]]['css']);
 				}
 				if($col_name[$i] == 'glosa_asunto') {
 

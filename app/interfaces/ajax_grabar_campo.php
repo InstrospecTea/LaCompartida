@@ -88,6 +88,7 @@
 		$valor=str_replace(',','.',$valor);
         $query = "UPDATE prm_moneda SET tipo_cambio='$valor' WHERE id_moneda='$id_moneda'";
         $result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		
         echo(utf8_encode("OK"));
 	}
 	else if ($accion == "asunto_actividad")

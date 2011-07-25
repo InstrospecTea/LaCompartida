@@ -166,10 +166,14 @@
 		}
 		elseif($accion == 'descargar_excel')
 		{
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
-				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
-			else
+			if(!UtilesApp::GetConf($sesion,'XLSFormatoEspecial'))
+			{
 				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+			}
+			else
+			{
+				require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
+			}
 			exit;
 		}
 		elseif($accion == 'anterior')									################## ANTERIOR PASO ###################
@@ -1244,6 +1248,14 @@ function UpdateCap(monto_update, guardar)
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_resumen_cobro"><?=__('Mostrar resumen del cobro')?></label></td>
 								</tr>
 								<tr>
+									<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
+									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
+								</tr>
+								<tr>
+									<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
+									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
+								</tr>
+								<!--tr>
 									<td/>
 									<td align="left" colspan="2" style="font-size: 10px;">
 										<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
@@ -1253,15 +1265,7 @@ function UpdateCap(monto_update, guardar)
 										<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
 										<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
 									</td>
-								</tr>
-								<tr>
-									<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
-									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
-								</tr>
-								<tr>
-									<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
-									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
-								</tr>
+								</tr-->
 								<tr>
 									<td/>
 									<td align="left" colspan="2" style="font-size: 10px;">
@@ -1431,7 +1435,7 @@ function UpdateCap(monto_update, guardar)
 							</tr>
 							<tr>
 								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?=__('Descargar Excel')?>" onclick="ImprimirExcel(this.form);" />
+									<input type="button" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="ImprimirExcel(this.form);" />
 								</td>
 							</tr>
 						</table>

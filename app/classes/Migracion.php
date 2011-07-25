@@ -418,14 +418,15 @@ class Migracion
 			
 			$documento_pago = new Documento($this->sesion);
 			$documento_pago->guardar_fecha = false;
-			
-			foreach($factura_pago as $key => $val)
+		//echo '<pre>'; print_r($datos_pago); echo '</pre>'; exit;	
+			foreach($datos_pago as $key => $val)
 			{ 
 				$keys = explode('_FFF_', $key);
 				if( $keys[1] == "glosa_banco" )
 					{
 						$keys[1] = "id_banco";
 						list($val) = mysql_fetch_array(mysql_query("SELECT id_banco FROM prm_banco WHERE nombre = TRIM('$val')",$this->sesion->dbh));
+				
 					}
 				else if( $keys[1] == "cuenta_banco" )
 					{
@@ -836,7 +837,7 @@ class Migracion
                 if( $cobro->Load($cob['id_cobro']) )
                 {
                     $cobro->Edit('id_carta',$cob['id_carta']);
-                    $ret = $cobro->GuardarCobro(true);
+                    $ret = $cobro->GuardarCobro(true, true);
                     $cobro->Edit('etapa_cobro','5');
                     $cobro->Edit('fecha_emision',$cob['fecha_creacion']);
                     if( $cob['estado']=='CREADO' )
@@ -865,6 +866,7 @@ class Migracion
 									cobro.id_cobro 																as id_factura,
 									cobro.id_cobro 																as id_cobro,
 									cobro.porcentaje_impuesto 										as porcentaje_impuesto,
+									cobro.id_estado_factura												as id_estado,
 									documento.impuesto 														as iva,
 									documento.monto 															as total, 
 									DATE( cobro.fecha_creacion ) 									as fecha,
@@ -872,12 +874,14 @@ class Migracion
 									contrato.rut 																	as RUT_cliente,
 									contrato.factura_direccion										as direccion_cliente, 
 									cobro.codigo_cliente 													as codigo_cliente,
-									cobro.documento 															as numero,
+									cobro.id_cobro	 															as numero,
+									cobro.factura_razon_social										as cliente,
+									cobro.factura_rut															as RUT_cliente,
 									documento.subtotal_honorarios 								as subtotal,
 									documento.subtotal_sin_descuento 							as honorarios,
 									documento.subtotal_sin_descuento 							as subtotal_sin_descuento,
 									documento.subtotal_gastos 										as subtotal_gastos, 
-									documento.subtotal_gastos_sin_impuesto 				as subtotal_gastos_sin_impuesto,
+									documento.subtotal_gastos_sin_impuesto 				as subtotal_gastos_sin_impuesto
 								FROM documento 
 								LEFT JOIN cobro USING( id_cobro ) AND tipo_doc = 'N' 
 								LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
@@ -1311,7 +1315,6 @@ class Migracion
 		while($row = mysql_fetch_assoc($response))
 		{
 			$trabajo = new Trabajo($this->sesion);
-			$trabajo->guardar_fecha = false;
 
 			foreach( $row as $key => $val )
 			{
@@ -1329,6 +1332,7 @@ class Migracion
 		*/
 		
 		$hora = new Trabajo($this->sesion);
+		$hora->guardar_fecha = false;
 		
 		if( $hora_generar->fields['id_trabajo'] > 0 )
 			$hora->Load($hora_generar->fields['id_trabajo']);
@@ -1382,6 +1386,7 @@ class Migracion
 
 	public function Write($objeto, $forzar_insert = false)
 	{
+	//echo '<pre>'; print_r($objeto->fields); echo '</pre>';	
 		$objeto->error = "";
 	
 		if($objeto->Loaded() and !$forzar_insert)
@@ -1432,7 +1437,7 @@ class Migracion
 			
 			$c = 0;
 			$error_string = "";
-	
+		
 			foreach ( $objeto->fields as $key => $val )
 			{
 				$error_string .= " $key: $val , ";
@@ -2389,7 +2394,7 @@ class Migracion
 		$query = "SELECT numero FROM factura WHERE id_factura = '".$factura_pago_generar->fields['id_factura']."' ";
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($numero_factura) = mysql_fetch_array($resp);
-		
+	//echo '<pre>'; print_r($documento_pago_generar->fields); echo '</pre>';exit;	
 		if( !empty($numero_factura) )
 		{
 			$factura_asoc = new Factura($this->sesion);
@@ -2411,9 +2416,15 @@ class Migracion
 			if( $factura_pago_generar->fields['id_factura_pago'] > 0 )
 			{
 				if( $factura_pago->Load($factura_pago_generar->fields['id_factura_pago']) )
+				{
 					echo "Editando Factura Pago No. ".$factura_pago_generar->fields['id_factura_pago']."\n";
+					$forzar_insert = false;
+				}
 				else
+				{
 					echo "Ingresando Factura Pago No. ".$factura_pago_generar->fields['id_factura_pago']."\n";
+					$forzar_insert = true;
+				}
 				$factura_pago->Edit('id_factura_pago', $factura_pago_generar->fields['id_factura_pago']);
 			}
 			
@@ -2421,19 +2432,19 @@ class Migracion
 			$factura_pago->Edit('codigo_cliente', 		!empty($factura_asoc->fields['codigo_cliente']) ? $factura_asoc->fields['codigo_cliente'] : "NULL" );
 			$factura_pago->Edit('monto', 							!empty($factura_pago_generar->fields['monto']) ? number_format($factura_pago_generar->fields['monto'],$moneda_factura->fields['cifras_decimales'],'.','') : "0" );
 			$factura_pago->Edit('id_moneda', 					!empty($factura_pago_generar->fields['id_moneda']) ? $factura_pago_generar->fields['id_moneda'] : "1" );
-			$factura_pago->Edit('monto_moneda_cobro', !empty($factura_pago_generar->fields['monto_moneda_cobro']) ? number_format($factura_pago_generar->fields['monto_moneda_cobro'],$moneda_cobro->fields['cifras_decimales'],'.','') : "0" );
+			$factura_pago->Edit('monto_moneda_cobro', !empty($factura_pago_generar->fields['monto_cobro']) ? number_format($factura_pago_generar->fields['monto_cobro'],$moneda_cobro->fields['cifras_decimales'],'.','') : "0" );
 			$factura_pago->Edit('id_moneda_cobro', 		!empty($factura_pago_generar->fields['id_moneda_cobro']) ? $factura_pago_generar->fields['id_moneda_cobro'] : "1" );
-			$factura_pago->Edit('tipo_doc', 					!empty($factura_pago_generar->fields['tipo_doc']) ? $factura_pago_generar->fields['tipo_doc'] : "NULL" );
-			$factura_pago->Edit('nro_documento', 			!empty($factura_pago_generar->fields['numero_doc']) ? $factura_pago_generar->fields['numero_doc'] : "NULL" );
-			$factura_pago->Edit('nro_cheque', 				!empty($factura_pago_generar->fields['numero_cheque']) ? $factura_pago_generar->fields['numero_cheque'] : "NULL" );
-			$factura_pago->Edit('descripcion', 				!empty($factura_pago_generar->fields['glosa_documento']) ? $factura_pago_generar->fields['glosa_documento'] : "NULL" );
+			$factura_pago->Edit('tipo_doc', 					!empty($factura_pago_generar->fields['tipo_doc']) ? $factura_pago_generar->fields['tipo_doc'] : "" );
+			$factura_pago->Edit('nro_documento', 			!empty($factura_pago_generar->fields['numero_doc']) ? $factura_pago_generar->fields['numero_doc'] : "" );
+			$factura_pago->Edit('nro_cheque', 				!empty($factura_pago_generar->fields['numero_cheque']) ? $factura_pago_generar->fields['numero_cheque'] : "" );
+			$factura_pago->Edit('descripcion', 				!empty($factura_pago_generar->fields['glosa_documento']) ? $factura_pago_generar->fields['glosa_documento'] : "" );
 			$factura_pago->Edit('id_banco', 					!empty($factura_pago_generar->fields['id_banco']) ? $factura_pago_generar->fields['id_banco'] : "0" );
 			$factura_pago->Edit('id_cuenta',					!empty($factura_pago_generar->fields['id_cuenta']) ? $factura_pago_generar->fields['id_cuenta'] : "0" );
-			$factura_pago->Edit('pago_retencion', 		!empty($factura_pago_generar->fields['pago_retencion']) ? $factura_pago_generar->fields['pago_retencion'] : "NULL" );
-			$factura_pago->Edit('id_concepto', 				!empty($factura_pago_generar->fields['id_concepto']) ? $factura_pago_generar->fields['id_concepto'] : "NULL" );
-			
+			$factura_pago->Edit('pago_retencion', 		!empty($factura_pago_generar->fields['pago_retencion']) ? $factura_pago_generar->fields['pago_retencion'] : "0" );
+			$factura_pago->Edit('id_concepto', 				!empty($factura_pago_generar->fields['id_concepto']) ? $factura_pago_generar->fields['id_concepto'] : "0" );
+			//echo '<pre>';print_r($factura_pago->fields); echo '</pre>';
 			$neteos = array();
-			$neteos[] = array( $factura_pago_generar->fields['id_factura'], number_format($factura_pago->fields['monto'],$moneda_factura->fields['cifras_decimales'],'.','') );
+			$neteos[] = array( $factura_pago_generar->fields['id_factura'], number_format($factura_pago->fields['monto_moneda_cobro'],$moneda_factura->fields['cifras_decimales'],'.',''), number_format($factura_pago->fields['monto'],$moneda_factura->fields['cifras_decimales'],'.',''));
 			
 			$id_cobro = $factura_asoc->fields['id_cobro'];
 			// Buscar tipos de cambios para los pagos:
@@ -2442,9 +2453,9 @@ class Migracion
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($ids_monedas_factura_pago, $tipo_cambios_factura_pago) = mysql_fetch_array($resp);
 			
-			if( $factura_pago->Write() )
+			if( $this->Write($factura_pago, $forzar_insert) )
 			{
-				if( $cta_cte_fact->IngresarPago($factura_pago, $neteos, $factura_asoc->fields['id_cobro'], &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago) )
+				if( $this->IngresarPago( $cta_cte_fact, $factura_pago, $neteos, $factura_asoc->fields['id_cobro'], &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago, $documento_pago_generar->fields['id_documento'] ) )
 					echo "Factura_pago y Movimiento guardado con exito \n";
 				else	
 					echo "Error al guardar el movimiento de factura pago ".$factura_pago_generar->fields['id_factura_pago']."\n";
@@ -2461,9 +2472,15 @@ class Migracion
 			if( !empty($documento_pago_generar->fields['id_documento']) )
 				{
 					if( $documento->Load($documento_pago_generar->fields['id_documento']) )
+					{
 						echo "Editando documento pago No ".$documento_pago_generar->fields['id_documento']."\n";
+						$forzar_insert = false;
+					}
 					else
+					{
 						echo "Ingresando documento pago No ".$documento_pago_generar->fields['id_documento']."\n";
+						$forzar_insert = true;
+					}
 					$documento->Edit('id_documento', $documento_pago_generar->fields['id_documento']);
 				}
 			
@@ -2482,7 +2499,7 @@ class Migracion
 			$monto 							= number_format($documento_pago_generar->fields['monto'], $moneda_documento->fields['cifras_decimales'], '.','');
 			$id_moneda 					= !empty($documento_pago_generar->fields['id_moneda']) ? $documento_pago_generar->fields['id_moneda'] : "1";
 			$monto_moneda_cobro = !empty($documento_pago_generar->fields['monto_moneda_cobro']) ? number_format($documento_pago_generar->fields['monto_moneda_cobro'], $moneda_cobro->fields['cifras_decimales'], '.', '') : number_format($documento_pago_generar->fields['monto'], $moneda_documento->fields['cifras_decimales'], '.','');
-			$id_moneda_cobro 		= !empty($documento_pago_generar->fields['id_moneda_cobro']) ? $documento_pago_generar->fields['id_moneda_cobro'] : $documento_pago_generar->fields['id_cobro'];
+			$id_moneda_cobro 		= !empty($documento_pago_generar->fields['id_moneda_cobro']) ? $documento_pago_generar->fields['id_moneda_cobro'] : $documento_pago_generar->fields['id_moneda'];
 			$tipo_doc 					= !empty($documento_pago_generar->fields['tipo_doc']) ? $documento_pago_generar->fields['tipo_doc'] : "T";
 			$numero_doc 				= !empty($documento_pago_generar->fields['numero_doc']) ? $documento_pago_generar->fields['numero_doc'] : "0";
 			$numero_cheque 			= !empty($documento_pago_generar->fields['numero_cheque']) ? $documento_pago_generar->fields['numero_cheque'] : "";
@@ -2505,8 +2522,8 @@ class Migracion
 									FROM cobro_moneda WHERE id_cobro = '$id_cobro' GROUP BY id_cobro ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($ids_monedas_documento, $tipo_cambios_documento) = mysql_fetch_array($resp);
-				
-			if( $this->IngresoDocumentoPago($documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
+		
+			if( $this->IngresoDocumentoPago($forzar_insert, $documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, 
 																				$id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, 
 																				$id_banco, $id_cuenta, $numero_operacion, $numero_cheque, 
 																				$ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, 
@@ -2517,7 +2534,98 @@ class Migracion
 		}
 	}
 	
-	function IngresoDocumentoPago($documento_generado, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null)
+	function IngresarPago( $mvto_pago, $pago, $neteos, $id_cobro, &$pagina, $ids_monedas_documento='', $tipo_cambios_documento='', $id_documento_generar){
+
+		$fecha = $pago->fields['fecha'];
+		$codigo_cliente = $pago->fields['codigo_cliente'];
+		$monto = $pago->fields['monto'];
+		$id_moneda = $pago->fields['id_moneda'];
+		$monto_moneda_cobro = $pago->fields['monto_moneda_cobro'];
+		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
+		$tipo_doc = $pago->fields['tipo_doc'];
+		$numero_doc = $pago->fields['nro_documento'];
+		$numero_cheque = $pago->fields['nro_cheque'];
+		$glosa_documento = $pago->fields['descripcion'];
+		$id_banco = $pago->fields['id_banco'];
+		$id_cuenta = $pago->fields['id_cuenta'];
+		$id_pago = $pago->Id();
+
+		$numero_operacion = ''; //?????
+		
+		//echo '<pre>RegistrarMvto: ';
+		//print_r(array($id_moneda, $monto, '0', $monto, $fecha, $neteos, null, $id_pago, 'P'));
+
+		//si el pago no es en la moneda del cobro, guardo tb el equivalente de cada neteo en la moneda del pago
+		if($monto != $monto_moneda_cobro){
+			foreach($neteos as $k => $neteo){
+				$neteos[$k][2] = $neteo[1] * $monto / $monto_moneda_cobro;
+			}
+		}
+
+		//ingresar un pago a los movimientos de ctacte (con sus neteos)
+		$mvto = $mvto_pago->RegistrarMvto($id_moneda, $monto, '0', $monto, $fecha, $neteos, null, $id_pago, 'P', $ids_monedas_documento, $tipo_cambios_documento);
+		
+		$arreglo_monedas = ArregloMonedas($this->sesion);
+		
+		$arreglo_pagos_detalle = array();
+		foreach($neteos as $neteo){
+			$id_fac = $neteo[0];
+			$monto_neteo = $neteo[1];
+			if(empty($id_fac) || empty($monto_neteo)) continue;
+			
+			$fac = new Factura($this->sesion);
+			$fac->Load($id_fac);
+			
+			$fac_hon = $fac->fields['subtotal'];
+			$fac_gasto_con = $fac->fields['subtotal_gastos'];
+			$fac_gasto_sin = $fac->fields['subtotal_gastos_sin_impuesto'];
+			$fac_iva = $fac->fields['iva'];
+			$fac_total = $fac->fields['total'];
+			$fac_cobro = $fac->fields['id_cobro'];
+			
+			if( $fac_gasto_con + $fac_hon != 0 )
+				$monto_honorarios = $fac_hon + $fac_iva * $fac_hon / ($fac_gasto_con + $fac_hon);
+			else
+				$monto_honorarios = 0;
+			$monto_gastos = $fac_total - $monto_honorarios;
+			
+			if(!isset($arreglo_pagos_detalle[$fac_cobro])){
+				$cobro_moneda = new CobroMoneda($this->sesion);
+				$cobro_moneda->Load($fac_cobro);
+				
+				$arreglo_pagos_detalle[$fac_cobro] = array(
+					'id_cobro' => $fac_cobro,
+					'monto_honorarios' => 0,
+					'monto_gastos' => 0,
+					'id_moneda' => $fac->fields['id_moneda']
+				);
+			}
+			
+			$monto_honorarios *= $monto_neteo / $fac_total;
+			$monto_gastos *= $monto_neteo / $fac_total;
+			
+			$arreglo_pagos_detalle[$fac_cobro]['monto_honorarios'] += $monto_honorarios;
+			$arreglo_pagos_detalle[$fac_cobro]['monto_gastos'] += $monto_gastos;
+		}
+		
+		$documento = new Documento($this->sesion);
+		$id_documento = $mvto->GetIdDocumentoLiquidacionSoyMvto();
+		if( $id_documento )
+			{
+				$documento->Load( $id_documento );
+				$forzar_insert = false;
+			}
+		else
+			{
+				$forzar_insert = true;
+				$documento->Edit('id_documento', $id_documento_generar);
+			}
+		$this->IngresoDocumentoPago($forzar_insert, $documento, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
+		
+		return true;
+	}
+	
+	function IngresoDocumentoPago($forzar_insert, $documento_generado, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null)
 	{
 		if($id_cobro)
 				{
@@ -2553,7 +2661,7 @@ class Migracion
 			
 			$out_neteos = "";
 			
-			if($this->Write($documento_generado, true))
+			if($this->Write($documento_generado, $forzar_insert))
 				{
 					$id_documento = $documento_generado->fields['id_documento'];
 					$ids_monedas = explode(',',$ids_monedas_documento);

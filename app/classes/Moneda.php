@@ -14,6 +14,17 @@ class Moneda extends Objeto
 		$this->fields = $fields;
 		$this->guardar_fecha = false;
 	}
+	
+	 function GuardaHistorial($sesion,$fecha)
+	{
+		$query = "INSERT INTO moneda_historial (id_moneda, fecha, valor, moneda_base, id_usuario) 
+					VALUES('" . $this->fields["id_moneda"] . "', '" . $fecha . "', '" . $this->fields["tipo_cambio"] . "', '" . 
+					$this->fields["moneda_base"] . "', '" . $sesion->usuario->fields['id_usuario'] . "')";
+		$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+
+		return true;
+	}
+
 }
 
 class ListaMonedas extends Lista
@@ -90,4 +101,3 @@ function ArregloMonedas($sesion)
     }
     return $moneda;
   }
-

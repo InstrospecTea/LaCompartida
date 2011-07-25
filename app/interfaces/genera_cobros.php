@@ -72,6 +72,8 @@
 			$where .= " AND contrato.activo = 'NO' ";
 		if($id_usuario)
 			$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
+		if($codigo_asunto)
+			$where .= " AND asunto.codigo_asunto ='".$codigo_asunto."' ";
 		if($codigo_cliente)
 			$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 		if($id_grupo_cliente)
@@ -232,13 +234,13 @@ function GeneraCobros(form, desde, opcion)
 		text_window += '</table><br>';
 		text_window += '<br><br><span style="font-size:12px; text-align:center; color:#FF0000;"><?=__('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos')?></span><br>';
 		text_window += '<br><span style="font-size:12px; text-align:center;font-weight:bold"><?=__('¿Desea generar los borradores?')?></span><br><br>';
-		text_window += '<input type="radio" name="radio_generacion" id="radio_wip" checked /><?=__('WIP, se incluirán horas hasta el')?> '+$('fecha_fin').value+'<br>';
+		text_window += '<input type="radio" name="radio_generacion" id="radio_wip" checked /><?=__('WIP') . __(', se incluirán horas hasta el')?> '+$('fecha_fin').value+'<br>';
 		text_window += '<input type="radio" name="radio_generacion" id="radio_programado" /><?=__('Cobros Programados')?><br>';
 <?
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SoloGastos') ) || ( method_exists('Conf','SoloGastos') && Conf::SoloGastos() ) )
 		{
 ?>
-		text_window += '<input type="radio" name="radio_generacion" id="radio_gastos" /><?=__('WIP y solo Gastos.')?><br>';
+		text_window += '<input type="radio" name="radio_generacion" id="radio_gastos" /><?=__('WIP') . __(' y solo Gastos.')?><br>';
 <?
 		}
 ?>
@@ -525,22 +527,41 @@ function GenerarIndividual(
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-					echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
+					echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, true);
 				else
-					echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+					echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '',true);
 			}
 		else
 			{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 					{
-						echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","", 280);
+						#echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","", 280);
+						echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "","CargarSelect('campo_codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 280,$codigo_asunto_secundario);
 					}
 					else
 					{
-						echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","", 280);
+						#echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","", 280);
+						echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('campo_codigo_cliente','codigo_asunto','cargar_asuntos',1);", 280,$codigo_asunto);
 					}
 			}
 					?>
+			</td>
+		</tr>
+		<tr>
+			<td align=right style="font-weight:bold;">
+				<?=__('Asunto')?>
+			</td>
+			<td nowrap align=left colspan=2>
+			<?php
+			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			{
+				echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+			}
+			else
+			{
+				echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
+			}
+			?>
 			</td>
 		</tr>
 		<tr>
@@ -933,7 +954,7 @@ Calendar.setup(
 // indicar false para que el sitema no intenta de cargar asuntos
 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 {
-	echo(Autocompletador::Javascript($sesion, false ));
+	echo(Autocompletador::Javascript($sesion, true ));
 }
 echo(InputId::Javascript($sesion));
 $pagina->PrintBottom($popup);

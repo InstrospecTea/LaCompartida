@@ -179,6 +179,12 @@ $col=0;
 		$where .= " AND codigo_cliente = '$codigo'";
 	if( $id_grupo_cliente > 0 )
 		$where .= " AND cliente.id_grupo_cliente = ".$id_grupo_cliente."";
+	if(!empty($fecha1)){
+			$where .= " AND cliente.fecha_creacion >= '".Utiles::fecha2sql($fecha1)."' ";
+		}
+		if(!empty($fecha2)){
+			$where .= " AND cliente.fecha_creacion <= '".Utiles::fecha2sql($fecha2)."' ";
+		}
 	if($solo_activos == 1)
 		$where .= " AND cliente.activo = 1 ";
 

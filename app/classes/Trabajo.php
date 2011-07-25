@@ -176,7 +176,10 @@ class Trabajo extends Objeto
 
 		// Las columnas están definidas en /interfaces/cobros_xls.php
 		$col_id_trabajo = 1;
-		$col_fecha = 2;
+		$col_fecha_ini = 2;
+		$col_fecha_med = 3;
+		$col_fecha_fin = 4;
+
 		// Desde aquí en adelante las columnas pueden estar en distintas posiciones.
 		$col_solicitante = 23;
 		$col_descripcion = 23;
@@ -187,13 +190,26 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(!($excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('Nº') && 
-					($excel->sheets[0]['cells'][$fila_base][$col_fecha] == 'Fecha' ||
-					 $excel->sheets[0]['cells'][$fila_base][$col_fecha] == 'Date') ) && 
+		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('Nº') 
+					&& 
+					in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day','Month','Mes')) ) 
+				&& 
 					$fila_base<$excel->sheets[0]['numRows'] )
 						{
 							++$fila_base;
 						}
+		//Paso de ubicación ini,med,fin (2,3,4) a glosa dia,mes,anyo (2,3,4)-> español (3,2,4)->inglés
+		if(in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day')) )
+		{
+			$col_fecha_dia = $col_fecha_ini;
+			$col_fecha_mes = $col_fecha_med;
+		}
+		else
+		{
+			$col_fecha_dia = $col_fecha_med;
+			$col_fecha_mes = $col_fecha_ini;
+		}
+		$col_fecha_anyo = $col_fecha_fin;
 		
 		// Encontrar las posiciones de las columnas, usando los nombres de la base de datos.
 		$nombre_descripcion_es = Utiles::glosa($sesion, 'descripcion', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
@@ -323,9 +339,37 @@ class Trabajo extends Objeto
 					
 				$descripcion = $hoja['cells'][$fila][$col_descripcion];
 				
-				//La fecha viene como un número de días de timestamp excel.
-				$fecha = Trabajo::FechaExcel2sql($hoja['cells'][$fila][$col_fecha]);
+				//La fecha se genera concatenando.
+				$error_en_fecha = '';
+
 				
+				$dia = intval($hoja['cells'][$fila][$col_fecha_dia]);
+				$mes = intval($hoja['cells'][$fila][$col_fecha_mes]);
+				if($mes < 1 && $mes > 13)
+				{
+					$mensajes .= "Error en el trabajo $id_trabajo - Fecha: mes = ".$hoja['cells'][$fila][$col_fecha_mes].'<br />';
+					continue;
+				}
+				if($dia < 1 && $dia > 32)
+				{
+					$mensajes .= "Error en el trabajo $id_trabajo - Fecha: día = ".$hoja['cells'][$fila][$col_fecha_dia].'<br />';
+					continue;
+				}
+				if($hoja['cells'][$fila][$col_fecha_anyo] < 1930)
+				{
+					$mensajes .= "Error en el trabajo $id_trabajo - Fecha: año = ".$hoja['cells'][$fila][$col_fecha_anyo].'<br />';
+					continue;
+				}
+
+				if($mes < 10)
+					$mes = '0'.$mes;
+				if($dia < 10)
+					$dia = '0'.$dia;
+
+				$fecha = $hoja['cells'][$fila][$col_fecha_anyo].'-'.$mes.'-'.$dia;
+				$mensajes .= "Trabajo $id_trabajo - Fecha: ".$fecha.'<br />';
+					
+
 				if($col_solicitante != 23)
 					$solicitante = $hoja['cells'][$fila][$col_solicitante];
 					
@@ -451,6 +495,8 @@ class Trabajo extends Objeto
 				else
 					{
 						$estado_cobro = Utiles::Glosa($sesion, $trabajo_original->fields['id_cobro'], 'estado', 'cobro');
+						if($estado_cobro == 'No existe información')
+							continue;
 						if($estado_cobro != 'CREADO' && $estado_cobro != 'EN REVISION')
 						{
 							$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el cobro se encuentra en estado $estado_cobro.<br />";

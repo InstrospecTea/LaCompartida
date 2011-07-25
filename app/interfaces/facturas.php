@@ -110,6 +110,12 @@
 			{
 				$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 			}
+			if($razon_social){
+				$where .= " AND factura.cliente LIKE '%".$razon_social."%'";
+			}
+			if($descripcion_factura){
+				$where .= " AND (factura.descripcion LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%".$descripcion_factura."%')";
+			}
 		}
 		else
 			$where = base64_decode($where);
@@ -138,6 +144,7 @@
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 				FROM factura
 				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -268,7 +275,7 @@
 		return  $ultima_fecha_pago;
 	}
 
-	function Glosa_asuntos(& $fila, $sesion)
+	function GlosaAsuntos(& $fila, $sesion)
 	{
 		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
 					FROM cobro_asunto ca
@@ -283,6 +290,18 @@
 		}
 		$lista_asuntos_glosa = str_replace(', ','<br />',$lista_asuntos_glosa);
 		return  $lista_asuntos_glosa;
+	}
+
+	function GlosaCliente(& $fila)
+	{
+		//por defecto se muestra la glosa del cliente
+		// si el rut de la factura no es el mismo que el rut del cobro (que viene del contrato), se agrega entre parentesis la razon social de la factura
+		$glosa_cliente = $fila->fields['glosa_cliente'];
+		if($fila->fields['mostrar_diferencia_razon_social']!='no')
+		{
+			$glosa_cliente .= "<br />(".$fila->fields['mostrar_diferencia_razon_social'].")";
+		}
+		return $glosa_cliente;
 	}
 	
 	function funcionTR(& $fila)
@@ -301,8 +320,8 @@
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],'%d-%m-%y')."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
-		$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
-		$html .= "<td align=left>".Glosa_asuntos(& $fila, $sesion)."</td>";
+		$html .= "<td align=left>".GlosaCliente(& $fila)."</td>";
+		$html .= "<td align=left>".GlosaAsuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
 		$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -430,6 +449,22 @@ $class_diseno = '';
     </tr>
     <tr>
 		<td align=right>
+			<?=__('Razón Social')?>
+		</td>
+		<td align=left colspan="3" >
+			<input type="text" name="razon_social" id="razon_social" value="<?=$razon_social; ?>" size="72">
+		</td>
+    </tr>
+	<tr>
+		<td align=right>
+			<?=__('Descripción')?>
+		</td>
+		<td align=left colspan="3" >
+			<input type="text" name="descripcion_factura" id="descripcion_factura" value="<?=$descripcion_factura; ?>" size="72">
+		</td>
+    </tr>
+    <tr>
+		<td align=right>
 			<?=__('Tipo de Documento')?>
 		</td>
 		<td align=left >
@@ -472,15 +507,15 @@ $class_diseno = '';
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Fecha')?>
+			<?=__('Fecha Inicio')?>
 		</td>
 		<td nowrap align=left>
 			<input type="text" id="fecha1" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
 		</td>
-		<td>
+		<td align=right>
 		</td>
-		<td nowrap align=right>
+		<td align=left width="44%">
 			<input type="text" id="fecha2" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
 		</td>

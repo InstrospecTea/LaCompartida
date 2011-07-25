@@ -211,7 +211,7 @@
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ImprimirFacturaPdf') ) || ( method_exists('Conf','ImprimirFacturaPdf') && Conf::ImprimirFacturaPdf() ) )
 				{
 	?>
-<script type='text/javascript'>
+				<script type='text/javascript'>
 					window.open("agregar_factura.php?opc=generar_factura&id_factura=<?=$factura->fields['id_factura']?>","Factura",'width=500,height=500,toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,copyhistory=yes,resizable=yes');
 				</script>
 <?
@@ -260,6 +260,8 @@
 		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion,$id_cobro);
 		$opc_moneda_total = $x_resultados['opc_moneda_total'];
 		$id_moneda_factura = $opc_moneda_total;
+		if($factura->loaded())
+			$id_moneda_factura = $factura->fields['id_moneda'];
 		$cifras_decimales_opc_moneda_total = $x_resultados['cifras_decimales_opc_moneda_total'];
 		$subtotal_honorarios = $x_resultados['monto_honorarios'][$opc_moneda_total];
 		$subtotal_gastos_sin_impuestos = $x_resultados['subtotal_gastos_sin_impuesto'][$opc_moneda_total];
@@ -297,12 +299,12 @@
 			$porcentaje_impuesto = 0;
 		}
 		
-		if($factura->fields['total'] >0){
+		
 			
-			$query_moneda = "SELECT m.simbolo , m.glosa_moneda FROM prm_moneda m WHERE m.id_moneda = ".$opc_moneda_total;
+			$query_moneda = "SELECT m.simbolo , m.glosa_moneda FROM prm_moneda m WHERE m.id_moneda = ".$id_moneda_factura;
 			$resp_moneda = mysql_query($query_moneda,$sesion->dbh) or Utiles::errorSQL($resp_moneda,__FILE__,__LINE__,$sesion->dbh);
 			list($simbolo, $glosa_moneda)=mysql_fetch_array($resp_moneda);
-			
+	if($factura->fields['total'] >0){
 			$simbolo = "<span style='padding-left:5px'>".$simbolo."</span>";
 			
 			//SIN DESGLOSE 

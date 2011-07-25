@@ -132,6 +132,13 @@
 			{
 				$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 			}
+			if($razon_social){
+				$where .= " AND factura.cliente LIKE '%".$razon_social."%'";
+			}
+			if($descripcion_factura){
+				$where .= " AND (fp.descripcion LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%".$descripcion_factura."%')";
+			}
+
 		}
 		else
 			$where = base64_decode($where);
@@ -161,6 +168,7 @@
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 					FROM factura_pago AS fp
 					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
@@ -370,6 +378,18 @@
 		$lista_asuntos_glosa = str_replace(', ','<br />',$lista_asuntos_glosa);
 		return  $lista_asuntos_glosa;
 	}
+
+	function GlosaCliente(& $fila)
+	{
+		//por defecto se muestra la glosa del cliente
+		// si el rut de la factura no es el mismo que el rut del cobro (que viene del contrato), se agrega entre parentesis la razon social de la factura
+		$glosa_cliente = $fila->fields['glosa_cliente'];
+		if($fila->fields['mostrar_diferencia_razon_social']!='no')
+		{
+			$glosa_cliente .= "<br />(".$fila->fields['mostrar_diferencia_razon_social'].")";
+		}
+		return $glosa_cliente;
+	}
 	
 	function funcionTR(& $fila)
 	{
@@ -387,7 +407,7 @@
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],'%d-%m-%y')."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
-		$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
+		$html .= "<td align=left>".GlosaCliente(& $fila)."</td>";
 		$html .= "<td align=right>".Glosa_asuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
 		//$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
@@ -580,6 +600,22 @@ $class_diseno = '';
 
 ?>
        </td>
+    </tr>
+    <tr>
+		<td align=right>
+			<?=__('Razón Social')?>
+		</td>
+		<td align=left colspan="3" >
+			<input type="text" name="razon_social" id="razon_social" value="<?=$razon_social; ?>" size="72">
+		</td>
+    </tr>
+	<tr>
+		<td align=right>
+			<?=__('Descripción Recaudación')?>
+		</td>
+		<td align=left colspan="3" >
+			<input type="text" name="descripcion_factura" id="descripcion_factura" value="<?=$descripcion_factura; ?>" size="72">
+		</td>
     </tr>
     <tr>
 		<td align=right>

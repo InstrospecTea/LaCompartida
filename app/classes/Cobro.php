@@ -292,7 +292,9 @@ class Cobro extends Objeto
 		return $total_monto_tramites;
 	}
 
-	function GuardarCobro($emitir = false)
+	// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos 
+	// actual guardado en la configuracion sino el dato traspasado 
+	function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false)
 	{
 		if($this->fields['estado'] != 'CREADO' AND $this->fields['estado'] != 'EN REVISION' AND $this->fields['estado'] != '')
 			return "No se puede guardar el cobro ya que ya se encuentra emitido. Usted debe volver el cobro a estado creado o en revisión para poder actualizarlo";
@@ -331,15 +333,17 @@ class Cobro extends Objeto
 		// Si es necesario calcular el impuesto por separado se actualiza el porcentaje de impuesto que se cobra.
 		$contrato = new Contrato($this->sesion);
 		$contrato->Load($this->fields['id_contrato']);
-		if( ( ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado'])
-			$this->Edit('porcentaje_impuesto', (method_exists('Conf','GetConf')?Conf::GetConf($this->sesion,'ValorImpuesto'):Conf::ValorImpuesto()));
-		else
-			$this->Edit('porcentaje_impuesto', '0');
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos'])
-			$this->Edit('porcentaje_impuesto_gastos', (method_exists('Conf','GetConf')?Conf::GetConf($this->sesion,'ValorImpuestoGastos'):Conf::ValorImpuestoGastos())); 
-		else
-			$this->Edit('porcentaje_impuesto_gastos', '0');
-		
+		if( !$mantener_porcentaje_impuesto ) 
+		{
+			if( ( ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado'])
+				$this->Edit('porcentaje_impuesto', (method_exists('Conf','GetConf')?Conf::GetConf($this->sesion,'ValorImpuesto'):Conf::ValorImpuesto()));
+			else
+				$this->Edit('porcentaje_impuesto', '0');
+			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos'])
+				$this->Edit('porcentaje_impuesto_gastos', (method_exists('Conf','GetConf')?Conf::GetConf($this->sesion,'ValorImpuestoGastos'):Conf::ValorImpuestoGastos())); 
+			else
+				$this->Edit('porcentaje_impuesto_gastos', '0');
+		}
       $query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
                                    tramite.tarifa_tramite,
                                    tramite.id_moneda_tramite,
@@ -411,7 +415,8 @@ class Cobro extends Objeto
 			// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 			if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
 			{
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = $trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal']; 
+				if( $this->fields['monto_subtotal'] > 0 )
+					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = $trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal']; 
 				
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
@@ -1772,19 +1777,31 @@ class Cobro extends Objeto
 									ORDER BY fecha ASC";
 				$lista_gastos = new ListaGastos($this->sesion,'',$query);
 
+			$sum_egreso = 0;
+			$sum_ingreso = 0;
 			for($i=0;$i<$lista_gastos->num;$i++)
 			{
 				$gasto = $lista_gastos->Get($i);
 
 				//Cargar cobro_moneda
 
-				if($gasto->fields['egreso'] > 0)
+				if($gasto->fields['egreso'] > 0) {
 					$saldo = $gasto->fields['monto_cobrable'];
-				elseif($gasto->fields['ingreso'] > 0)
+					if($gasto->fields['cobrable_actual'] == 1) {
+						$sum_egreso += $gasto->fields['monto_cobrable'];
+					}
+				}
+				elseif($gasto->fields['ingreso'] > 0) {
 					$saldo = -$gasto->fields['monto_cobrable'];
-
+					if($gasto->fields['cobrable_actual'] == 1) {
+						$sum_ingreso += $gasto->fields['monto_cobrable'];
+					}
+				}
 				$monto_gasto = $saldo;
 				$saldo_moneda_total = $saldo * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']);
+
+				$saldo_egreso_moneda_total = $sum_egreso * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']);
+				$saldo_ingreso_moneda_total = $sum_ingreso * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']);
 				//$total_gastos += $saldo_moneda_total;
 			 	$total_gastos=$this->fields['monto_gastos'];
 			}
@@ -1793,13 +1810,19 @@ class Cobro extends Objeto
 			 * INICIO - CARTA GASTOS DE VFCabogados, 2011-03-04 
 			 */
 			if( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() )
-			{	
+			{
+				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 			}
 			else
-			{	
+			{
+				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
@@ -2849,7 +2872,7 @@ class Cobro extends Objeto
 				$html = str_replace('%valor_total_cobro_cyc%', $moneda_total->fields['simbolo'].number_format($total_cobro_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 			else
 				$html = str_replace('%valor_total_cobro_cyc%', $moneda_total->fields['simbolo'].' '.number_format($total_cobro_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%iva_cyc%','IVA('.$this->fields['porcentaje_impuesto'].'%)',$html);
+			$html = str_replace('%iva_cyc%',__('IVA') . '('.$this->fields['porcentaje_impuesto'].'%)',$html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
 				$html =str_replace('%valor_iva_cyc%', $moneda_total->fields['simbolo'].number_format($iva_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idoma->fields['separador_miles']), $html);
 			else
@@ -7433,7 +7456,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%valor_total_cobro_cyc%', $moneda_total->fields['simbolo'].number_format($total_cobro_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 			else
 				$html = str_replace('%valor_total_cobro_cyc%', $moneda_total->fields['simbolo'].' '.number_format($total_cobro_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%iva_cyc%','IVA('.$this->fields['porcentaje_impuesto'].'%)',$html);
+			$html = str_replace('%iva_cyc%',__('IVA') . '('.$this->fields['porcentaje_impuesto'].'%)',$html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
 				$html =str_replace('%valor_iva_cyc%', $moneda_total->fields['simbolo'].number_format($iva_cyc,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idoma->fields['separador_miles']), $html);
 			else
@@ -8215,8 +8238,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'],$idioma->fields['formato_fecha']), $row);
 				$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 				$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante']?$trabajo->fields['solicitante']:'', $row);
-				$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
-				$row = str_replace('%username%', $trabajo->fields['username'], $row);
+				
+				if( $this->fields['opc_ver_profesional_iniciales'] == 1) {
+					$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
+					$row = str_replace('%username%', $trabajo->fields['username'], $row);
+				}
+				else {
+					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+					$row = str_replace('%username%', $trabajo->fields['nombre_usuario'], $row);
+				}
+
 				//paridad
 				$row = str_replace('%paridad%', $i%2? 'impar' : 'par', $row);
 				
@@ -8923,7 +8954,12 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				}
 
 				$html = str_replace('%nombre%', __('ABOGADO'), $html);
-				$html = str_replace('%valor_hh%', __('TARIFA'), $html);
+				if($this->fields['opc_ver_profesional_tarifa'] == 1) {
+					$html = str_replace('%valor_hh%', __('TARIFA'), $html);
+				}
+				else  {
+					$html = str_replace('%valor_hh%', '', $html);
+				}
 				$html = str_replace('%hrs_trabajadas%', ($mostrar_columnas_retainer || $columna_hrs_trabajadas) ?__('HRS TOT TRABAJADAS'):'', $html);
 				$html = str_replace('%porcentaje_participacion%', __('PARTICIPACIÓN POR ABOGADO'), $html);
 				$html = str_replace('%hrs_retainer%', $mostrar_columnas_retainer?__('HRS TRABAJADAS VALOR RETAINER'):'', $html);
@@ -9098,7 +9134,13 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%valor_hh%',__('Tarifa'), $html);
 			$html = str_replace('%tarifa_fee%',__('%tarifa_fee%'), $html);
 			$html = str_replace('%simbolo_moneda%',$flatfee ? '' : ' ('.$moneda->fields['simbolo'].')',$html);
-			$html = str_replace('%total%',__('Total'), $html);
+
+			if($this->fields['opc_ver_profesional_importe']==1) {
+				$html = str_replace('%total%',__('Total'), $html);
+			}
+			else {
+				$html = str_replace('%total%','', $html);
+			}
 			$html = str_replace('%honorarios%',__('Honorarios'),$html);
 			$html = str_replace('%profesional%',__('Profesional'), $html);
 			$html = str_replace('%staff%',__('Staff'), $html);
@@ -9652,8 +9694,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$resumen_valor						+= $data['valor_tarificada'];
 				
 				$html3 = $parser->tags['PROFESIONAL_FILAS'];
-				$html3 = str_replace('%nombre%',$data['nombre_usuario'], $html3);
-				$html3 = str_replace('%username%', $data['username'], $html3);
+				if($this->fields['opc_ver_profesional_iniciales'] == 1) {
+					$html3 = str_replace('%nombre%',$data['username'], $html3);
+					$html3 = str_replace('%username%', $data['username'], $html3);
+				}
+				else  {
+					$html3 = str_replace('%nombre%',$data['nombre_usuario'], $html3);
+					$html3 = str_replace('%username%', $data['nombre_usuario'], $html3);
+				}
 				//muestra las iniciales de los profesionales
 				list($nombre,$apellido_paterno,$extra,$extra2) = split(' ',$data['nombre_usuario'],4);
 				$html3 = str_replace('%iniciales%',$nombre[0].$apellido_paterno[0].$extra[0].$extra2[0],$html3);
@@ -9730,14 +9778,29 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						$html3 = str_replace('%hh_retainer%', '', $html3);
 					}
 				$html3 = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $html3);
-				$html3 = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
-				$html3 = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
 				if($han_trabajado_menos_del_retainer)
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto(0), $html3);
 				else
 					$html3 = str_replace('%hh%', $data['glosa_duracion_tarificada'], $html3);
-				$html3 = str_replace('%tarifa_horas%',number_format($data['tarifa'] > 0 ? $data['tarifa'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
-				$html3 = str_replace('%total_horas%',number_format($data['valor_tarificada'] > 0 ? $data['valor_tarificada'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+
+				if($this->fields['opc_ver_profesional_tarifa']==1) {
+					$html3 = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
+					$html3 = str_replace('%tarifa_horas%',number_format($data['tarifa'] > 0 ? $data['tarifa'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+				}
+				else {
+					$html3 = str_replace('%tarifa_horas_demo%', '', $html3);
+					$html3 = str_replace('%tarifa_horas%','', $html3);
+				}
+
+				if($this->fields['opc_ver_profesional_importe']==1) {
+					$html3 = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
+					$html3 = str_replace('%total_horas%',number_format($data['valor_tarificada'] > 0 ? $data['valor_tarificada'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+				}
+				else {
+					$html3 = str_replace('%total_horas_demo%', '', $html3);
+					$html3 = str_replace('%total_horas%','', $html3);
+				}
+
 				$resumen_filas[$prof] = $html3;
 			}
 			// Se escriben después porque necesitan que los totales ya estén calculados para calcular porcentajes.
@@ -9860,7 +9923,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html3 = str_replace('%hh%',UtilesApp::Hora2HoraMinuto($resumen_hrs_cobradas-$resumen_hrs_incobrables-$this->fields['retainer_horas']),$html3);
 			else
 				$html3 = str_replace('%hh%',UtilesApp::Hora2HoraMinuto(round($resumen_hh,2)), $html3);
-			$html3 = str_replace('%total_horas_demo%', number_format( $resumen_valor, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+
+			if($this->fields['opc_ver_profesional_importe'] == 1)
+				$html3 = str_replace('%total_horas_demo%', number_format( $resumen_valor, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+			else
+				$html3 = str_replace('%total_horas_demo%','',$html3);
 			
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
 				{
@@ -10815,6 +10882,59 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$array_resumen_profesionales[$id_usuario]['valor_tarificada'] 		= $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
 		}
 		return array($array_profesionales, $array_resumen_profesionales);
+	}
+
+	function MontoFacturado()
+	{
+		$query = "SELECT if(f.id_documento_legal IN (1,3,4),'INGRESO','EGRESO') as modo
+						,f.total
+						,m1.cifras_decimales as cifras_decimales_ini
+						,m1.tipo_cambio as tipo_cambio_ini
+						,m2.cifras_decimales as cifras_decimales_fin
+						,m2.tipo_cambio as tipo_cambio_fin
+					FROM factura f
+					LEFT JOIN prm_moneda m1 ON m1.id_moneda = f.id_moneda
+					LEFT JOIN prm_moneda m2 ON m2.id_moneda = '".$this->fields['opc_moneda_total']."'
+					WHERE f.id_estado NOT IN (3,5)
+					AND f.id_cobro = '".$this->fields['id_cobro']."'";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$ingreso = 0;
+		$egrso = 0;
+		$monto_facturado = 0;
+		while( $row = mysql_fetch_assoc($resp) )
+		{
+			$total = UtilesApp::CambiarMoneda($row['total'],$row['tipo_cambio_ini'],$row['cifras_decimales_ini'],$row['tipo_cambio_fin'],$row['cifras_decimales_fin'],false);
+			if($row['modo']=='INGRESO')
+			{
+				$ingreso += $total;
+			}
+			else
+			{
+				$egreso += $total;
+			}
+		}
+		$monto_facturado = $ingreso - $egreso;
+		return $monto_facturado;
+	}
+
+	function DiferenciaCobroConFactura()
+	{
+		$calculos_cobro = UtilesApp::ProcesaCobroIdMoneda($this->sesion,$this->fields['id_cobro']);
+		$monto_cobrado = $calculos_cobro['monto_total_cobro'][$calculos_cobro['opc_moneda_total']];
+		$monto_facturado = $this->MontoFacturado();
+		$mensaje = '';
+		if($monto_cobrado != $monto_facturado)
+		{
+			$moneda = new Moneda($this->sesion);
+			$moneda->Load($this->fields['opc_moneda_total']);
+			$simbolo = $moneda->fields['simbolo'];
+			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
+			$idioma->Load($this->fields['codigo_idioma']);
+			$monto_cobrado = number_format($monto_cobrado,$calculos_cobro['cifras_decimales_opc_moneda_total'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			$monto_facturado = number_format($monto_facturado,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			$mensaje = __('El monto liquidado').' ('.$simbolo.' '.$monto_cobrado.') '.__('no coincide con el monto facturado ').'('.$simbolo.' '.$monto_facturado.')';
+		}
+		return $mensaje;
 	}
 
 }

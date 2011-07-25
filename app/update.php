@@ -786,7 +786,7 @@ echo $query;
         if(! ($resp = mysql_query($query,$dbh)))
         throw new Exception($query ."---".mysql_error());
 
-    $query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este c√É¬≥digo es vac√É¬≠o si la actividad sirve para todos los asuntos'";
+    $query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este c√f¬≥digo es vac√f¬≠o si la actividad sirve para todos los asuntos'";
         if(! ($resp = mysql_query($query,$dbh)))
         throw new Exception($query ."---".mysql_error());
 
@@ -5659,7 +5659,7 @@ VALUES (
   PRIMARY KEY  (`id_pais`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 						$query[] = "
-INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'AfganistÔøΩn', 0),
+INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganist·n', 0),
 (2, 248, 'AX', 'ALA', 'Islas Gland', 0),
 (3, 8, 'AL', 'ALB', 'Albania', 0),
 (4, 276, 'DE', 'DEU', 'Alemania', 0),
@@ -5676,34 +5676,34 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (15, 533, 'AW', 'ABW', 'Aruba', 0),
 (16, 36, 'AU', 'AUS', 'Australia', 0),
 (17, 40, 'AT', 'AUT', 'Austria', 0),
-(18, 31, 'AZ', 'AZE', 'AzerbaiyÔøΩn', 0),
+(18, 31, 'AZ', 'AZE', 'Azerbaiy·n', 0),
 (19, 44, 'BS', 'BHS', 'Bahamas', 0),
-(20, 48, 'BH', 'BHR', 'BahrÔøΩin', 0),
+(20, 48, 'BH', 'BHR', 'BahrÈin', 0),
 (21, 50, 'BD', 'BGD', 'Bangladesh', 0),
 (22, 52, 'BB', 'BRB', 'Barbados', 0),
 (23, 112, 'BY', 'BLR', 'Bielorrusia', 0),
-(24, 56, 'BE', 'BEL', 'BÔøΩlgica', 0),
+(24, 56, 'BE', 'BEL', 'BÈlgica', 0),
 (25, 84, 'BZ', 'BLZ', 'Belice', 0),
 (26, 204, 'BJ', 'BEN', 'Benin', 0),
 (27, 60, 'BM', 'BMU', 'Bermudas', 0),
-(28, 64, 'BT', 'BTN', 'BhutÔøΩn', 0),
+(28, 64, 'BT', 'BTN', 'Bhut·n', 0),
 (29, 68, 'BO', 'BOL', 'Bolivia', 1),
 (30, 70, 'BA', 'BIH', 'Bosnia y Herzegovina', 0),
 (31, 72, 'BW', 'BWA', 'Botsuana', 0),
 (32, 74, 'BV', 'BVT', 'Isla Bouvet', 0),
 (33, 76, 'BR', 'BRA', 'Brasil', 1),
-(34, 96, 'BN', 'BRN', 'BrunÔøΩi', 0),
+(34, 96, 'BN', 'BRN', 'BrunÈi', 0),
 (35, 100, 'BG', 'BGR', 'Bulgaria', 0),
 (36, 854, 'BF', 'BFA', 'Burkina Faso', 0),
 (37, 108, 'BI', 'BDI', 'Burundi', 0),
 (38, 132, 'CV', 'CPV', 'Cabo Verde', 0),
-(39, 136, 'KY', 'CYM', 'Islas CaimÔøΩn', 0),
+(39, 136, 'KY', 'CYM', 'Islas Caim·n', 0),
 (40, 116, 'KH', 'KHM', 'Camboya', 0),
-(41, 120, 'CM', 'CMR', 'CamerÔøΩn', 0),
-(42, 124, 'CA', 'CAN', 'CanadÔøΩ', 0),
-(43, 140, 'CF', 'CAF', 'RepÔøΩblica Centroafricana', 0),
+(41, 120, 'CM', 'CMR', 'Camer˙n', 0),
+(42, 124, 'CA', 'CAN', 'Canad·', 0),
+(43, 140, 'CF', 'CAF', 'Rep˙blica Centroafricana', 0),
 (44, 148, 'TD', 'TCD', 'Chad', 0),
-(45, 203, 'CZ', 'CZE', 'RepÔøΩblica Checa', 0),
+(45, 203, 'CZ', 'CZE', 'Rep˙blica Checa', 0),
 (46, 152, 'CL', 'CHL', 'Chile', 1),
 (47, 156, 'CN', 'CHN', 'China', 0),
 (48, 196, 'CY', 'CYP', 'Chipre', 0),
@@ -5712,7 +5712,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (51, 166, 'CC', 'CCK', 'Islas Cocos', 0),
 (52, 170, 'CO', 'COL', 'Colombia', 1),
 (53, 174, 'KM', 'COM', 'Comoras', 0),
-(54, 180, 'CD', 'COD', 'RepÔøΩblica DemocrÔøΩtica del Congo', 0),
+(54, 180, 'CD', 'COD', 'Rep˙blica Democr·tica del Congo', 0),
 (55, 178, 'CG', 'COG', 'Congo', 0),
 (56, 184, 'CK', 'COK', 'Islas Cook', 0),
 (57, 408, 'KP', 'PRK', 'Corea del Norte', 0),
@@ -5723,25 +5723,25 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (62, 192, 'CU', 'CUB', 'Cuba', 1),
 (63, 208, 'DK', 'DNK', 'Dinamarca', 0),
 (64, 212, 'DM', 'DMA', 'Dominica', 0),
-(65, 214, 'DO', 'DOM', 'RepÔøΩblica Dominicana', 0),
+(65, 214, 'DO', 'DOM', 'Rep˙blica Dominicana', 0),
 (66, 218, 'EC', 'ECU', 'Ecuador', 1),
 (67, 818, 'EG', 'EGY', 'Egipto', 0),
 (68, 222, 'SV', 'SLV', 'El Salvador', 1),
-(69, 784, 'AE', 'ARE', 'Emiratos ÔøΩrabes Unidos', 0),
+(69, 784, 'AE', 'ARE', 'Emiratos ¡rabes Unidos', 0),
 (70, 232, 'ER', 'ERI', 'Eritrea', 0),
 (71, 703, 'SK', 'SVK', 'Eslovaquia', 0),
 (72, 705, 'SI', 'SVN', 'Eslovenia', 0),
-(73, 724, 'ES', 'ESP', 'EspaÔøΩa', 0),
+(73, 724, 'ES', 'ESP', 'EspaÒa', 0),
 (74, 581, 'UM', 'UMI', 'Islas ultramarinas de Estados Unidos', 0),
 (75, 840, 'US', 'USA', 'Estados Unidos', 0),
 (76, 233, 'EE', 'EST', 'Estonia', 0),
-(77, 231, 'ET', 'ETH', 'EtiopÔøΩa', 0),
+(77, 231, 'ET', 'ETH', 'EtiopÌa', 0),
 (78, 234, 'FO', 'FRO', 'Islas Feroe', 0),
 (79, 608, 'PH', 'PHL', 'Filipinas', 0),
 (80, 246, 'FI', 'FIN', 'Finlandia', 0),
 (81, 242, 'FJ', 'FJI', 'Fiyi', 0),
 (82, 250, 'FR', 'FRA', 'Francia', 0),
-(83, 266, 'GA', 'GAB', 'GabÔøΩn', 0),
+(83, 266, 'GA', 'GAB', 'GabÛn', 0),
 (84, 270, 'GM', 'GMB', 'Gambia', 0),
 (85, 268, 'GE', 'GEO', 'Georgia', 0),
 (86, 239, 'GS', 'SGS', 'Islas Georgias del Sur y Sandwich del Sur', 0),
@@ -5758,31 +5758,31 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (97, 226, 'GQ', 'GNQ', 'Guinea Ecuatorial', 0),
 (98, 624, 'GW', 'GNB', 'Guinea-Bissau', 0),
 (99, 328, 'GY', 'GUY', 'Guyana', 0),
-(100, 332, 'HT', 'HTI', 'HaitÔøΩ', 0),
+(100, 332, 'HT', 'HTI', 'HaitÌ', 0),
 (101, 334, 'HM', 'HMD', 'Islas Heard y McDonald', 0),
 (102, 340, 'HN', 'HND', 'Honduras', 1),
 (103, 344, 'HK', 'HKG', 'Hong Kong', 0),
-(104, 348, 'HU', 'HUN', 'HungrÔøΩa', 0),
+(104, 348, 'HU', 'HUN', 'HungrÌa', 0),
 (105, 356, 'IN', 'IND', 'India', 0),
 (106, 360, 'ID', 'IDN', 'Indonesia', 0),
-(107, 364, 'IR', 'IRN', 'IrÔøΩn', 0),
+(107, 364, 'IR', 'IRN', 'Ir·n', 0),
 (108, 368, 'IQ', 'IRQ', 'Iraq', 0),
 (109, 372, 'IE', 'IRL', 'Irlanda', 0),
 (110, 352, 'IS', 'ISL', 'Islandia', 0),
 (111, 376, 'IL', 'ISR', 'Israel', 0),
 (112, 380, 'IT', 'ITA', 'Italia', 0),
 (113, 388, 'JM', 'JAM', 'Jamaica', 0),
-(114, 392, 'JP', 'JPN', 'JapÔøΩn', 0),
+(114, 392, 'JP', 'JPN', 'JapÛn', 0),
 (115, 400, 'JO', 'JOR', 'Jordania', 0),
-(116, 398, 'KZ', 'KAZ', 'KazajstÔøΩn', 0),
+(116, 398, 'KZ', 'KAZ', 'Kazajst·n', 0),
 (117, 404, 'KE', 'KEN', 'Kenia', 0),
-(118, 417, 'KG', 'KGZ', 'KirguistÔøΩn', 0),
+(118, 417, 'KG', 'KGZ', 'Kirguist·n', 0),
 (119, 296, 'KI', 'KIR', 'Kiribati', 0),
 (120, 414, 'KW', 'KWT', 'Kuwait', 0),
 (121, 418, 'LA', 'LAO', 'Laos', 0),
 (122, 426, 'LS', 'LSO', 'Lesotho', 0),
 (123, 428, 'LV', 'LVA', 'Letonia', 0),
-(124, 422, 'LB', 'LBN', 'LÔøΩbano', 0),
+(124, 422, 'LB', 'LBN', 'LÌbano', 0),
 (125, 430, 'LR', 'LBR', 'Liberia', 0),
 (126, 434, 'LY', 'LBY', 'Libia', 0),
 (127, 438, 'LI', 'LIE', 'Liechtenstein', 0),
@@ -5794,7 +5794,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (133, 458, 'MY', 'MYS', 'Malasia', 0),
 (134, 454, 'MW', 'MWI', 'Malawi', 0),
 (135, 462, 'MV', 'MDV', 'Maldivas', 0),
-(136, 466, 'ML', 'MLI', 'MalÔøΩ', 0),
+(136, 466, 'ML', 'MLI', 'MalÌ', 0),
 (137, 470, 'MT', 'MLT', 'Malta', 0),
 (138, 238, 'FK', 'FLK', 'Islas Malvinas', 0),
 (139, 580, 'MP', 'MNP', 'Islas Marianas del Norte', 0),
@@ -5804,10 +5804,10 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (143, 480, 'MU', 'MUS', 'Mauricio', 0),
 (144, 478, 'MR', 'MRT', 'Mauritania', 0),
 (145, 175, 'YT', 'MYT', 'Mayotte', 0),
-(146, 484, 'MX', 'MEX', 'MÔøΩxico', 0),
+(146, 484, 'MX', 'MEX', 'MÈxico', 0),
 (147, 583, 'FM', 'FSM', 'Micronesia', 0),
 (148, 498, 'MD', 'MDA', 'Moldavia', 0),
-(149, 492, 'MC', 'MCO', 'MÔøΩnaco', 0),
+(149, 492, 'MC', 'MCO', 'MÛnaco', 0),
 (150, 496, 'MN', 'MNG', 'Mongolia', 0),
 (151, 500, 'MS', 'MSR', 'Montserrat', 0),
 (152, 508, 'MZ', 'MOZ', 'Mozambique', 0),
@@ -5816,22 +5816,22 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (155, 520, 'NR', 'NRU', 'Nauru', 0),
 (156, 524, 'NP', 'NPL', 'Nepal', 0),
 (157, 558, 'NI', 'NIC', 'Nicaragua', 0),
-(158, 562, 'NE', 'NER', 'NÔøΩger', 0),
+(158, 562, 'NE', 'NER', 'NÌger', 0),
 (159, 566, 'NG', 'NGA', 'Nigeria', 0),
 (160, 570, 'NU', 'NIU', 'Niue', 0),
 (161, 574, 'NF', 'NFK', 'Isla Norfolk', 0),
 (162, 578, 'NO', 'NOR', 'Noruega', 0),
 (163, 540, 'NC', 'NCL', 'Nueva Caledonia', 0),
 (164, 554, 'NZ', 'NZL', 'Nueva Zelanda', 0),
-(165, 512, 'OM', 'OMN', 'OmÔøΩn', 0),
-(166, 528, 'NL', 'NLD', 'PaÔøΩses Bajos', 0),
-(167, 586, 'PK', 'PAK', 'PakistÔøΩn', 0),
+(165, 512, 'OM', 'OMN', 'Om·n', 0),
+(166, 528, 'NL', 'NLD', 'PaÌses Bajos', 0),
+(167, 586, 'PK', 'PAK', 'Pakist·n', 0),
 (168, 585, 'PW', 'PLW', 'Palau', 0),
 (169, 275, 'PS', 'PSE', 'Palestina', 0),
-(170, 591, 'PA', 'PAN', 'PanamÔøΩ', 0),
-(171, 598, 'PG', 'PNG', 'PapÔøΩa Nueva Guinea', 0),
+(170, 591, 'PA', 'PAN', 'Panam·', 0),
+(171, 598, 'PG', 'PNG', 'Pap˙a Nueva Guinea', 0),
 (172, 600, 'PY', 'PRY', 'Paraguay', 1),
-(173, 604, 'PE', 'PER', 'PerÔøΩ', 1),
+(173, 604, 'PE', 'PER', 'Per˙', 1),
 (174, 612, 'PN', 'PCN', 'Islas Pitcairn', 0),
 (175, 258, 'PF', 'PYF', 'Polinesia Francesa', 0),
 (176, 616, 'PL', 'POL', 'Polonia', 0),
@@ -5839,21 +5839,21 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (178, 630, 'PR', 'PRI', 'Puerto Rico', 0),
 (179, 634, 'QA', 'QAT', 'Qatar', 0),
 (180, 826, 'GB', 'GBR', 'Reino Unido', 0),
-(181, 638, 'RE', 'REU', 'ReuniÔøΩn', 0),
+(181, 638, 'RE', 'REU', 'ReuniÛn', 0),
 (182, 646, 'RW', 'RWA', 'Ruanda', 0),
 (183, 642, 'RO', 'ROU', 'Rumania', 0),
 (184, 643, 'RU', 'RUS', 'Rusia', 0),
 (185, 732, 'EH', 'ESH', 'Sahara Occidental', 0),
-(186, 90, 'SB', 'SLB', 'Islas SalomÔøΩn', 0),
+(186, 90, 'SB', 'SLB', 'Islas SalomÛn', 0),
 (187, 882, 'WS', 'WSM', 'Samoa', 0),
 (188, 16, 'AS', 'ASM', 'Samoa Americana', 0),
-(189, 659, 'KN', 'KNA', 'San CristÔøΩbal y Nevis', 0),
+(189, 659, 'KN', 'KNA', 'San CristÛbal y Nevis', 0),
 (190, 674, 'SM', 'SMR', 'San Marino', 0),
-(191, 666, 'PM', 'SPM', 'San Pedro y MiquelÔøΩn', 0),
+(191, 666, 'PM', 'SPM', 'San Pedro y MiquelÛn', 0),
 (192, 670, 'VC', 'VCT', 'San Vicente y las Granadinas', 0),
 (193, 654, 'SH', 'SHN', 'Santa Helena', 0),
-(194, 662, 'LC', 'LCA', 'Santa LucÔøΩa', 0),
-(195, 678, 'ST', 'STP', 'Santo TomÔøΩ y PrÔøΩncipe', 0),
+(194, 662, 'LC', 'LCA', 'Santa LucÌa', 0),
+(195, 678, 'ST', 'STP', 'Santo TomÈ y PrÌncipe', 0),
 (196, 686, 'SN', 'SEN', 'Senegal', 0),
 (197, 891, 'CS', 'SCG', 'Serbia y Montenegro', 0),
 (198, 690, 'SC', 'SYC', 'Seychelles', 0),
@@ -5863,37 +5863,37 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (202, 706, 'SO', 'SOM', 'Somalia', 0),
 (203, 144, 'LK', 'LKA', 'Sri Lanka', 0),
 (204, 748, 'SZ', 'SWZ', 'Suazilandia', 0),
-(205, 710, 'ZA', 'ZAF', 'SudÔøΩfrica', 0),
-(206, 736, 'SD', 'SDN', 'SudÔøΩn', 0),
+(205, 710, 'ZA', 'ZAF', 'Sud·frica', 0),
+(206, 736, 'SD', 'SDN', 'Sud·n', 0),
 (207, 752, 'SE', 'SWE', 'Suecia', 0),
 (208, 756, 'CH', 'CHE', 'Suiza', 0),
 (209, 740, 'SR', 'SUR', 'Surinam', 0),
 (210, 744, 'SJ', 'SJM', 'Svalbard y Jan Mayen', 0),
 (211, 764, 'TH', 'THA', 'Tailandia', 0),
-(212, 158, 'TW', 'TWN', 'TaiwÔøΩn', 0),
+(212, 158, 'TW', 'TWN', 'Taiw·n', 0),
 (213, 834, 'TZ', 'TZA', 'Tanzania', 0),
-(214, 762, 'TJ', 'TJK', 'TayikistÔøΩn', 0),
-(215, 86, 'IO', 'IOT', 'Territorio BritÔøΩnico del OcÔøΩano ÔøΩndico', 0),
+(214, 762, 'TJ', 'TJK', 'Tayikist·n', 0),
+(215, 86, 'IO', 'IOT', 'Territorio Brit·nico del OcÈano Õndico', 0),
 (216, 260, 'TF', 'ATF', 'Territorios Australes Franceses', 0),
 (217, 626, 'TL', 'TLS', 'Timor Oriental', 0),
 (218, 768, 'TG', 'TGO', 'Togo', 0),
 (219, 772, 'TK', 'TKL', 'Tokelau', 0),
 (220, 776, 'TO', 'TON', 'Tonga', 0),
 (221, 780, 'TT', 'TTO', 'Trinidad y Tobago', 0),
-(222, 788, 'TN', 'TUN', 'TÔøΩnez', 0),
+(222, 788, 'TN', 'TUN', 'T˙nez', 0),
 (223, 796, 'TC', 'TCA', 'Islas Turcas y Caicos', 0),
-(224, 795, 'TM', 'TKM', 'TurkmenistÔøΩn', 0),
-(225, 792, 'TR', 'TUR', 'TurquÔøΩa', 0),
+(224, 795, 'TM', 'TKM', 'Turkmenist·n', 0),
+(225, 792, 'TR', 'TUR', 'TurquÌa', 0),
 (226, 798, 'TV', 'TUV', 'Tuvalu', 0),
 (227, 804, 'UA', 'UKR', 'Ucrania', 0),
 (228, 800, 'UG', 'UGA', 'Uganda', 0),
 (229, 858, 'UY', 'URY', 'Uruguay', 1),
-(230, 860, 'UZ', 'UZB', 'UzbekistÔøΩn', 0),
+(230, 860, 'UZ', 'UZB', 'Uzbekist·n', 0),
 (231, 548, 'VU', 'VUT', 'Vanuatu', 0),
 (232, 862, 'VE', 'VEN', 'Venezuela', 1),
 (233, 704, 'VN', 'VNM', 'Vietnam', 0),
-(234, 92, 'VG', 'VGB', 'Islas VÔøΩrgenes BritÔøΩnicas', 0),
-(235, 850, 'VI', 'VIR', 'Islas VÔøΩrgenes de los Estados Unidos', 0),
+(234, 92, 'VG', 'VGB', 'Islas VÌrgenes Brit·nicas', 0),
+(235, 850, 'VI', 'VIR', 'Islas VÌrgenes de los Estados Unidos', 0),
 (236, 876, 'WF', 'WLF', 'Wallis y Futuna', 0),
 (237, 887, 'YE', 'YEM', 'Yemen', 0),
 (238, 262, 'DJ', 'DJI', 'Yibuti', 0),
@@ -6040,6 +6040,82 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
+
+			case 4.47:
+						$query = array();
+						$query[] = "CREATE TABLE  `moneda_historial` (
+							 `id_moneda_historial` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+							 `id_moneda` INT( 11 ) NOT NULL DEFAULT  '0',
+							 `fecha` DATETIME NULL ,
+							 `valor` DOUBLE NOT NULL DEFAULT  '0',
+							 `moneda_base` TINYINT( 1 ) NOT NULL DEFAULT  '0'
+							) ENGINE = INNODB;";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+			case 4.48:
+						$query = array();
+						$query[] = "ALTER TABLE  `moneda_historial` ADD  `id_usuario` INT( 11 ) NOT NULL DEFAULT  '0';";
+						
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+					break;
+
+			case 4.49:
+				$query = array();
+				$query[] = "UPDATE  `configuracion` SET  `comentario` =  '',
+valores_posibles =  'string',
+valor_opcion =  'cobros_xls.php'
+WHERE  `id` =105 LIMIT 1 ;";
+
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+
+			case 4.50:
+						$query = array();
+
+						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						VALUES (
+						NULL ,  'fecha_dia',  'DÌa',  'Day',  '4',  'Listado de trabajos'
+						), (
+						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
+						);";
+						$query = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'AÒo', 'Year', '6', 'Listado de trabajos');";
+
+						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						VALUES (
+						NULL ,  'fecha_dia',  'DÌa',  'Day',  '4',  'Listado de tr·mites'
+						), (
+						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de tr·mites'
+						);";
+						$query = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'AÒo', 'Year', '6', 'Listado de tr·mites');";
+
+
+						foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+
+			break;
+
+
+			case 4.51:
+				$query = array();
+				$query[] = "ALTER TABLE  `factura` CHANGE  `codigo_cliente`  `codigo_cliente` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'daro secundario, ocupar el codigo_cliente del COBRO'";
+
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+
+			case 4.52:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociada',  '0',  'Permite asociar una factura a un gasto',  'boolean',  '6',  '-1');";
+				$query[] = "ALTER TABLE  `factura` ADD  `id_contrato` INT NOT NULL ;";
+
+			foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+
  	}
 }
 
@@ -6256,7 +6332,12 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 	$VERSIONES[$num++] = 4.44;
 	$VERSIONES[$num++] = 4.45;
 	$VERSIONES[$num++] = 4.46;
-
+	$VERSIONES[$num++] = 4.47;
+	$VERSIONES[$num++] = 4.48;
+	$VERSIONES[$num++] = 4.49;
+	$VERSIONES[$num++] = 4.50;
+	$VERSIONES[$num++] = 4.51;
+	$VERSIONES[$num++] = 4.52;
 /* LISTO, NO MODIFICAR NADA M√ÅS A PARTIR DE ESTA L√çNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

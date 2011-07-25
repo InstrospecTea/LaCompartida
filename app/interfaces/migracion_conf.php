@@ -1,10 +1,35 @@
 <?
 	class ConfMigracion 
 	{
-		function dbHost() { return 'lab.lemontech.cl'; }
+		function dbHost() { return 'db1.ccvvg39btzna.us-east-1.rds.amazonaws.com'; }
 		function dbName() { return 'Payet_dbo'; }
-		function dbUser() { return 'Mario'; }
-		function dbPass() { return 'Mario.asdwsx'; }
+		function dbUser() { return 'admin'; }
+		function dbPass() { return 'admin1awdx'; }
+		function QueriesModificacionesAntes() 
+		{
+			$queries = array();
+			$queries[] = "ALTER TABLE `trabajo` DROP FOREIGN KEY  `trabajo_ibfk_4` ;";
+			$queries[] = "ALTER TABLE `cta_corriente` DROP FOREIGN KEY `cta_corriente_ibfk_7`;";
+			$queries[] = "ALTER TABLE `cobro` ADD `id_estado_factura` INT( 11 ) NULL ;";
+			$queries[] = "ALTER TABLE `cobro` ADD  `estado_real` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;";
+			$queries[] = "ALTER TABLE `cobro` ADD  `factura_rut` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+											ADD `factura_razon_social` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;";
+			
+			return $queries;
+		}
+		function QueriesModificacionesDespues()
+		{
+			$queries = array();
+			$queries[] = "UPDATE trabajo LEFT JOIN cobro USING( id_cobro ) SET trabajo.id_cobro = NULL WHERE cobro.id_cobro IS NULL";
+			$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+			$queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+			$queries[] = "ALTER TABLE `cobro`
+												  DROP `id_estado_factura`,
+												  DROP `estado_real`;";
+			$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
+												  
+			return $queries;
+		}
 		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
 																					'campo_glosa' 					=> 'glosa_categoria', 
 																				  'campo_id'            	=> 'id_categoria_usuario', 
@@ -122,8 +147,8 @@
 								Cliente.Actividad																														as contrato_FFF_factura_giro,
 								Cliente.NombreCliente																												as asunto_FFF_razon_social, 
 								Cliente.NombreCliente																												as contrato_FFF_factura_razon_social
-								,IF(OrdenFacturacion.HonorarioPactado>0, if(OrdenFacturacion.HonorarioPactado=OrdenFacturacion.HonorarioFacturado,NULL,'FLAT FEE' ),'TASA')        as contrato_FFF_forma_cobro
-								,IF(OrdenFacturacion.HonorarioPactado>0, if(OrdenFacturacion.HonorarioPactado=OrdenFacturacion.HonorarioFacturado, OrdenFacturacion.HonorarioPactado , OrdenFacturacion.HonorarioPactado ),0)        as contrato_FFF_monto
+								,IF(OrdenFacturacion.TipoFactExtraordinaria='A','FLAT FEE','TASA')					as contrato_FFF_forma_cobro
+								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,0)	as contrato_FFF_monto
 							FROM OrdenFacturacion 
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
@@ -139,7 +164,7 @@
 								,SEC_TO_TIME(hta.Tiempo*60)																																		as duracion
 								,SEC_TO_TIME(hta.TiempoFacturable*60) 																												as duracion_cobrada
 								,IF(hta.FlagFacturable = 'S',1,0) 																														as cobrable
-								,IF(hta.AsuntoLargoFacurable IS NOT NULL,hta.AsuntoLargoFacurable, htd.AsuntoLargo) 					as descripcion
+								,IF(hta.AsuntoLargoFacturable IS NOT NULL,hta.AsuntoLargoFacturable, htd.AsuntoLargo) 					as descripcion
 								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion
 								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
 								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 											as tarifa_hh
@@ -147,8 +172,8 @@
 								,IF(hta.NumeroOrdenFacturacionFact, hta.NumeroOrdenFacturacionFact,htd.NumeroOrdenFacturacion) as codigo_asunto
 								,hta.id_trabajo_lemontech 																																		as id_trabajo
 								FROM HojaTiempoajustado hta
-								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoid=hta.hojatiempoid
-								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoajustadoid = htr.hojatiempoajustadoid";
+								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
+								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid";
 		}
 		
 		function QueryGastos() 
@@ -158,6 +183,7 @@
 									CodigoGasto																																				as gasto_FFF_numero_documento, 
 									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro,
+									Gastos.CodigoGasto																																as gasto_FFF_numero_documento,
 									Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
 									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
@@ -178,30 +204,38 @@
 									Factura.NumeroFactura 																					as cobro_FFF_id_cobro,
 									Factura.FechaGeneracion 																				as cobro_FFF_fecha_creacion,
 									Factura.CodigoFacturaBoleta 																		as cobro_FFF_documento,
+									IF(Factura.Status='A','5',IF(Factura.Status='C','2','1'))				as cobro_FFF_id_estado_factura, 
 									Factura.CodigoCliente 																					as cobro_FFF_codigo_cliente,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2'))				as cobro_FFF_opc_moneda_total,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda_monto,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda,
-									Factura.MontoBruto 																							as cobro_FFF_monto,
-									Factura.MontoBruto 																						as cobro_FFF_monto_contrato, 
+									Factura.MontoNeto 																							as cobro_FFF_monto,
+									Factura.MontoBruto 																							as cobro_FFF_monto_contrato, 
 									Factura.MontoImpuesto 																					as cobro_FFF_impuesto,
-									'FLAT FEE'																								as cobro_FFF_forma_cobro, 
-									Factura.MontoNeto 																							as cobro_FFF_monto_subtotal,
-									Factura.PorcentajeImpuesto 																			as cobro_FFF_porcentaje_impuesto,
+									'FLAT FEE'																											as cobro_FFF_forma_cobro, 
+									Factura.MontoBruto 																							as cobro_FFF_monto_subtotal,
+									IF(Factura.PorcentajeImpuesto='19.00','19',
+										IF(Factura.PorcentajeImpuesto='0.19','19',
+											IF(Factura.PorcentajeImpuesto='0.18','18','0')))						as cobro_FFF_porcentaje_impuesto,
 									Periodo.FechaInicio 																						as cobro_FFF_fecha_ini,
 									Periodo.FechaTermino 																						as cobro_FFF_fecha_fin,
+									IF(Factura.Status='A','INCOBRABLE',IF(Factura.Status='C','PAGADO',
+										IF(Factura.Status='I','ENVIADO AL CLIENTE','EMITIDO')))				as cobro_FFF_estado_real,
 									CONCAT(SUBSTRING(Factura.NumeroOrdenFact,1,4),'-0',SUBSTRING(Factura.NumeroOrdenFact,-3)) as cobro_FFF_codigo_asunto,
+									Factura.NombreClienteFacturacion																as cobro_FFF_factura_razon_social,
+									Factura.DocIdentidadNumeroFacturacion														as cobro_FFF_factura_rut,
 									Empleado.CodigoEmpleado as cobro_FFF_id_usuario
-									FROM Factura
-									LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
-									LEFT JOIN Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
+								FROM Factura
+								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
+								LEFT JOIN Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
+
 		}
 		function QueryFacturas()
 		{
 			return "SELECT 
 									Factura.NumeroFactura 																					as factura_FFF_id_cobro,
 									Factura.NumeroFactura 																					as factura_FFF_id_factura,
-									Factura.CodigoFacturaBoleta																		as factura_FFF_numero,
+									Factura.NumeroFactura																						as factura_FFF_numero,
 									Factura.FechaGeneracion 																				as factura_FFF_fecha_creacion,
 									Factura.CodigoCliente 																					as cobro_FFF_codigo_cliente,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2'))				as factura_FFF_id_moneda,
@@ -256,9 +290,9 @@
 										MontoPago, IF( Factura.Moneda = 'S', MontoSoles,
 											IF( Factura.Moneda = 'D', MontoDolares, MontoPago * P.TipoCambioPago / P.TipoCambioFacturacion ) ) )
 																																		as documento_FFF_monto_cobro,
-								P.NombreBanco																					as factura_FFF_glosa_banco,
+								NombreBanco																					as factura_FFF_glosa_banco,
 								P.CodigoCuentaBanco																		as factura_FFF_cuenta_banco,
-								P.NombreBanco																					as documento_FFF_glosa_banco,
+								NombreBanco																					as documento_FFF_glosa_banco,
 								P.CodigoCuentaBanco																		as documento_FFF_cuenta_banco,
 								P.FechaModificacion																		as factura_FFF_fecha_modificacion,
 								P.FechaModificacion																		as documento_FFF_fecha_modificacion,

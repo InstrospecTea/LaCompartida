@@ -108,7 +108,7 @@ tr.extendido
 <legend><?=__('Datos personales')?></legend>
 <table width=100%>
           <tr> 
-            <td width="147" align="right" valign="top" class="texto"> <strong><?=__('RUT')?></strong> 
+            <td width="147" align="right" valign="top" class="texto"> <strong><?=__('RUT personal')?></strong> 
             </td>
             <td width="223" align="left" valign="top" class="texto"> <strong> 
               <?=$sesion->usuario->fields['rut']?>

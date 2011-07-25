@@ -211,7 +211,7 @@
 		else if($col_name[$i] == 'ultimo_monto_cobro') { $arr_col[$col_name[$i]]['titulo'] = __('Monto Ult.').' '.__('Cobro'); }
 		else if($col_name[$i] == 'fecha_ultimo_cobro') { $arr_col[$col_name[$i]]['titulo'] = __('Fecha Ult.').' '.__('Cobro'); }
 		else if($col_name[$i] == 'horas_castigadas') { $arr_col[$col_name[$i]]['titulo'] = __('Horas Castigadas'); }
-		else if($col_name[$i] == 'hh_val_cobrado') { $arr_col[$col_name[$i]]['titulo'] = __('Horas Cobrables (WIP)'); }
+		else if($col_name[$i] == 'hh_val_cobrado') { $arr_col[$col_name[$i]]['titulo'] = __('Horas Cobrables (') . __('WIP') . __(')'); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
 
 	}
