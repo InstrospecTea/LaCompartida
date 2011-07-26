@@ -141,17 +141,6 @@ if($opc != "entregar_asunto" && $from != "agregar_cliente")
 				</td>
     </tr>
     <tr>
-        <td width=25% align=right style="font-weight:bold;">
-            <?=__('Código asunto')?>
-        </td>
-        <td nowrap align=left colspan=4>
-        	<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?=$codigo_asunto?>" onchange="this.value=this.value.toUpperCase();">
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <b><?=__('Título asunto')?></b>
-          <input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?=$glosa_asunto?>">
-        </td>
-    </tr>
-    <tr>
     	<td align=right style="font-weight:bold;">
           <?=__('Cliente')?>
       </td>
@@ -173,6 +162,17 @@ if($opc != "entregar_asunto" && $from != "agregar_cliente")
 					}
 ?>
       </td>
+    </tr>
+    <tr>
+        <td width=25% align=right style="font-weight:bold;">
+            <?=__('Código asunto')?>
+        </td>
+        <td nowrap align=left colspan=4>
+        	<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?=$codigo_asunto?>" onchange="this.value=this.value.toUpperCase();">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <b><?=__('Título asunto')?></b>
+          <input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?=$glosa_asunto?>">
+        </td>
     </tr>
     <tr>
         <td align=right style="font-weight:bold;">
