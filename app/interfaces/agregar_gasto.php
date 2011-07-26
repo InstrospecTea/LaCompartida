@@ -649,7 +649,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 	<? if($prov=='false' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) ) { ?>
 	<tr>
 		<td align=right>
-			<?=__('Monto cobrable')?>&nbsp;
+			<?=__('Monto facturable')?>&nbsp;
 		</td>
 		<td align=left>
 			<input name=monto_cobrable size=10 value="<?=$gasto->fields['monto_cobrable']?>" />
