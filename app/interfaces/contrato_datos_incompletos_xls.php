@@ -47,6 +47,7 @@
 	                              'Align' => 'justify',
 	                              'Border' => 1,
 	                              'Color' => 'black'));
+	$f4->setNumFormat("0000");
 	$f5 =& $wb->addFormat(array('Size' => 10,
 	                              'VAlign' => 'top',
 	                              'Align' => 'center',
