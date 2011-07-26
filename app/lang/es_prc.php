@@ -43,9 +43,9 @@
 	$_LANG['¿Desea emitir los cobros?'] = "¿Desea emitir las liquidaciones?";
 	$_LANG['Cobros generado con &eacute;xito'] = "Liquidaciones generado con &eacute;xito";
 	$_LANG['Cobros emitidos con &eacute;xito'] = "Liquidaciones emitidas con &eacute;xito";
-	$_LANG['Generar borradores'] = "Generar Pre-liquidación y planillón";
+	$_LANG['Generar borradores'] = "Generar Pre-liquidaciones";
 	$_LANG['Excel borradores'] = "Planillón Excel";
-	$_LANG['Imprimir borradores'] = "Pre-liquidaciones";
+	$_LANG['Imprimir borradores'] = "Imprimir Pre-liquidaciones";
 	$_LANG['Generar cobro individual'] = "Generar liquidación individual";
 	$_LANG['Generar cobro individual para gastos'] = "Generar liquidación individual para gastos";
 	$_LANG['Generar cobro individual para honorarios'] = "Generar liquidación individual para honorarios";
