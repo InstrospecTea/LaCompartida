@@ -704,11 +704,11 @@ if($opc == 'buscar')
 		</tr>
 		<tr>
 			<td align="center" colspan="2">
-				<input type="button" value="<?php echo  __('Asuntos por') .' '.__('cobrar');?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
+				<input type="button" value="<?php echo  __('Reportes Asuntos por') .' '.__('cobrar');?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
 				<input type="button" value="<?=__('Generar borradores')?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
 				<input type="button" value="<?=__('Excel borradores')?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
 				<input type="button" value="<?=__('Imprimir borradores')?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
-				<input type="button" value="<?=__('Emitir cobros')?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
+				<!--<input type="button" value="<?=__('Emitir cobros')?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)"> -->
 			</td>
 		</tr>
 	</table>
