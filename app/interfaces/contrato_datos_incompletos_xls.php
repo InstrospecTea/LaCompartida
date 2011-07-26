@@ -47,12 +47,12 @@
 	                              'Align' => 'justify',
 	                              'Border' => 1,
 	                              'Color' => 'black'));
-	$f4->setNumFormat("0000");
 	$f5 =& $wb->addFormat(array('Size' => 10,
 	                              'VAlign' => 'top',
 	                              'Align' => 'center',
 	                              'Border' => 1,
 	                              'Color' => 'black'));
+	$f5->setNumFormat("0000");
 	$ws1 =& $wb->addWorksheet(__('Tipo de Cambio'));
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1,0);
