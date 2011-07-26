@@ -52,7 +52,7 @@
 															'Align' => 'justify',
 															'Border' => 1,
 															'Color' => 'black'));
-	$f4->setNumFormat("0");
+	$f4->setNumFormat("0000");
 	
 		$formatos_moneda = array();
 		$query = 'SELECT id_moneda, simbolo, cifras_decimales 
