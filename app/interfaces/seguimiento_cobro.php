@@ -227,13 +227,6 @@
 			$html .= $ht;
 			$html .= "<tr onmouseover=\"this.bgColor='#bcff5c'\" onmouseout=\"this.bgColor='#F2F2F2'\"><td align=right style='font-size:10px; width: 70px;'>#".$cobro->fields['id_cobro']."</td>";
 
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') ) || ( method_exists('Conf','FacturaSeguimientoCobros') && Conf::FacturaSeguimientoCobros() ) )
-			{
-					$html .= "<td align=right style='font-size:10px; width: 70px;'>&nbsp;";
-					if($cobro->fields['documento'])
-						$html.= "#".$cobro->fields['documento'];
-					$html .= "</td>";
-			}
 
 			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 				(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
@@ -251,7 +244,11 @@
 				$fecha_cobro .= ' '.__('hasta').' '.Utiles::sql2date($cobro->fields['fecha_fin']).' ';
 			$html .= $fecha_cobro ? __('durante').' '.$fecha_cobro : '';
 			#$html .= ' -  [Proc. '.$cobro->fields['id_proceso'].'] ';
-			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span></td>";
+			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span>";
+					$html .= "&nbsp;";
+					if($cobro->fields['documento'])
+						$html.= "#".$cobro->fields['documento'];
+					$html .= "</td>";
 			$html .= "<td align=center style=\"width: 52px;\"><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1000,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
 			#if($cobro->fields['estado'] == 'EMITIDO' || $cobro->fields['estado'] == 'CREADO')
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
