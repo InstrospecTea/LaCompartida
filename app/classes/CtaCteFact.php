@@ -53,6 +53,7 @@ class CtaCteFact extends Objeto
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$moneda = new Moneda($this->sesion);
 		$moneda->Load($id_moneda);
+
 		if($id_factura){
 			$mvto->LoadByFactura($id_factura);	//Intento cargar el movimiento
 			$mvto->Edit('id_factura',$id_factura);
@@ -92,9 +93,9 @@ class CtaCteFact extends Objeto
 		else{
 			$lista_ids_monedas = explode(',', $ids_monedas_documento);
 			$lista_tipos_cambios = explode(',', $tipo_cambios_documento);
-			foreach($lista_ids_monedas as $k => $moneda){
+			foreach($lista_ids_monedas as $k => $mon){
 				$tipos_cambio[] = array(
-					'id_moneda' => $moneda,
+					'id_moneda' => $mon,
 					'tipo_cambio' => $lista_tipos_cambios[$k]);
 			}
 		}
@@ -117,6 +118,7 @@ class CtaCteFact extends Objeto
 		}
 
 		//a todos los neteos q apunto yo ($neteos=array(array(id_fact, monto), ...)), restarles el saldo
+
 		if(!empty($neteos) && !$anulando){
 			$fact = new Factura($this->sesion);
 			foreach($neteos as $detalles_neteo){
