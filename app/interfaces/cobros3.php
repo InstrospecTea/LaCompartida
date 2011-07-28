@@ -46,7 +46,7 @@
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
-					<?=___('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;?>
+					<?=__('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #').$id_cobro.__(' ').$nombre_cliente;?>
 				</td>
 			</tr>
 		</table>

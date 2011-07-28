@@ -1280,8 +1280,8 @@ function AgregarFactura(idx){
 									<td>Tipo Documento</td>
 									<td>Número</td>
 									<td>Honorarios</td>
-									<td>Gastos c/iva</td>
-									<td>Gastos s/iva</td>
+									<td><?php echo __('Gasto c/IVA') ?></td>
+									<td><?php echo __('Gasto s/IVA') ?></td>
 									<td>Impuesto</td>
 									<td>Total</td>
 									<td>Estado</td>

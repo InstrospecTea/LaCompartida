@@ -1,17 +1,25 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-  require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-  require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-  require_once Conf::ServerDir().'/../app/classes/Debug.php';
-  require_once Conf::ServerDir().'/classes/Asunto.php';
-  require_once Conf::ServerDir().'/classes/Cliente.php';
-  require_once Conf::ServerDir().'/classes/InputId.php';
+	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
+	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
+	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+	require_once Conf::ServerDir().'/classes/Asunto.php';
+	require_once Conf::ServerDir().'/classes/Cliente.php';
+	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/CobroAsunto.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
-
+	
 	$sesion = new Sesion(array('DAT','COB'));
 	$pagina = new Pagina($sesion);
+	
+	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
+	{
+		require_once Conf::ServerDir().'/classes/AutocompletadorAsunto.php';
+	}
+	else
+	{
+		require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	}
 
 	$params_array['codigo_permiso'] = 'DAT';
 	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array); #tiene permiso de admin de datos
@@ -96,7 +104,16 @@ function EliminaAsunto(from,id_asunto)
 }
 	//top.frames.iframe_asuntos.location.reload();
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php
+	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
+	{
+		echo AutocompletadorAsunto::CSS();
+	}
+	else
+	{
+		echo Autocompletador::CSS();
+	}
+?>
 <form method=post name='form' id='form'>
 <input type="hidden" name="busqueda" value="TRUE">
 <!-- Calendario DIV -->	
@@ -145,21 +162,32 @@ if($opc != "entregar_asunto" && $from != "agregar_cliente")
           <?=__('Cliente')?>
       </td>
       <td nowrap align=left colspan=3>
-<?
-      	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-      		{
-      			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-      				echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-      			else	
-      				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-      		}
-      	else
-      		{
-						if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-							echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","", 320);
-						else
-							echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","", 320);
-					}
+<?php
+	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
+	{
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","", 320);
+		else
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","", 320);
+	}
+	else
+	{
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+		{
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+				echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
+			else	
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+		}
+		else
+		{
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+				echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","", 320);
+			else
+				echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","", 320);
+		}
+	}
+	
 ?>
       </td>
     </tr>
@@ -168,10 +196,24 @@ if($opc != "entregar_asunto" && $from != "agregar_cliente")
             <?=__('Código asunto')?>
         </td>
         <td nowrap align=left colspan=4>
-        	<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?=$codigo_asunto?>" onchange="this.value=this.value.toUpperCase();">
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <b><?=__('Título asunto')?></b>
-          <input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?=$glosa_asunto?>">
+<?php
+	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
+	{
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, '', $codigo_asunto_secundario, $codigo_cliente);
+		else
+			echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, '', $codigo_cliente);
+	}
+	else
+	{
+?>
+			<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?=$codigo_asunto?>" onchange="this.value=this.value.toUpperCase();">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<b><?=__('Título asunto')?></b>
+			<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?=$glosa_asunto?>">
+<?php
+	}
+?>
         </td>
     </tr>
     <tr>
@@ -445,12 +487,23 @@ $query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secun
         $i++;
         return $html;
     }
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{ 
+	
+	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
+	{
 		if( empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente' )
 		{
-			echo(Autocompletador::Javascript($sesion,false));
-		}		
+			echo(AutocompletadorAsunto::Javascript($sesion,false));
+		}
+	}
+	else
+	{
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+		{ 
+			if( empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente' )
+			{
+				echo(Autocompletador::Javascript($sesion,false));
+			}		
+		}
 	}
     echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom($popup);

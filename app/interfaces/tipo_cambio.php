@@ -23,24 +23,39 @@
 	    for($x=0;$x<$lista->num;$x++)
 	    {
     	    $mon = $lista->Get($x);
-			$moneda->Load($mon->fields['id_moneda']);
-			$moneda->GuardaHistorial($sesion, $fecha_hist);
- 			$moneda->Edit('moneda_base','0');
+			$moneda->Load($mon->fields['id_moneda']);			
+			//echo "valor " . $moneda->fields['glosa_moneda'] . ": " . ${"valor_".$moneda->fields['id_moneda']} . "<br />";
+ 			//$moneda->Edit('moneda_base','0'); //ya no se permite cambiar moneda base
+			if( $moneda->fields['moneda_base'] == 1 )
+			{
+				$moneda->Edit('tipo_cambio', '1');
+			}
+			else
+			{
+				$moneda->Edit('tipo_cambio', ${"valor_".$moneda->fields['id_moneda']});
+			}
 			if(!$moneda->Write())
 			{
 				$error = true;			
+			}
+			else
+			{
+				$moneda->GuardaHistorial($sesion, $fecha_hist);
 			}
 		}
 
 		if(!$moneda->Load($moneda_base))
 			$pagina->AddError(__('Debe selecciona una moneda base'));
 
-		$moneda->Edit('moneda_base','1');
+		/*$moneda->Edit('moneda_base','1');
         $moneda->Edit('tipo_cambio','1');
-        $moneda->Write();
-
+        $moneda->Write();*/  #ya no es necesario este paso
+		
+		
 		if(!$error)
+		{
 			$pagina->AddInfo(__('Datos actualizados correctamente'));
+		}
 	}
 
 	$pagina->PrintTop();
@@ -77,11 +92,12 @@
 	 <?=$mon->fields['glosa_moneda']?>: 
 	</td>
 	<td align=center>
-        <input style='display:none' type=radio name="moneda_base" <?=$mon->fields['moneda_base'] ? "checked":""?> value="<?=$mon->fields['id_moneda']?>" onchange="Input('<?=$mon->fields['glosa_moneda']?>')" readonly>
+        <input style='display:none' type=radio name="moneda_base" <?=$mon->fields['moneda_base'] ? "checked":""?> value="<?=$mon->fields['id_moneda']?>" onchange="Input('valor_<?=$mon->fields['glosa_moneda']?>')" readonly>
 	</td>
 	<td>
 		<input type=hidden id="moneda_<?=$mon->fields['id_moneda']?>" name="moneda_<?=$mon->fields['id_moneda']?>" value="<?=$mon->fields['tipo_cambio']?>"/>
-		<input type=text class=txt_input size=10 value="<?=$mon->fields['tipo_cambio']?>" <?=$mon->fields['moneda_base'] ? "disabled":""?> name="<?=$mon->fields['glosa_moneda']?>" id="<?=$mon->fields['glosa_moneda']?>" onchange="GrabarCampo('moneda','<?=$mon->fields['id_moneda']?>',this.value,'<?=$mon->fields['glosa_moneda']?>');"/>
+		<input type=text class=txt_input size=10 value="<?=$mon->fields['tipo_cambio']?>" <?=$mon->fields['moneda_base'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
+		<!-- onchange="GrabarCampo('moneda','<?=$mon->fields['id_moneda']?>',this.value,'<?=$mon->fields['glosa_moneda']?>');" -->
 	</td>
 </tr>
 <?
@@ -96,7 +112,7 @@
 </tr>
 <tr>
 	<td colspan=3 align=center>
-		<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form);">
+		<input type="submit" class="btn" value="<?=__('Guardar')?>" onclick="return Validar(this.form);">
 	</td>
 </tr>
 </table>
@@ -106,7 +122,7 @@
 
 function Validar(form)
 {
-	var m_base;
+	/*var m_base;
 	for( var i=0; actual = form.elements.moneda_base[i]; i++ )
     {
     	if(form.elements.moneda_base[i].checked)
@@ -120,6 +136,27 @@ function Validar(form)
 	{
 		if(!confirm("<?=__('Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?')?>"))
 			return false;
+	}
+	return true;*/
+	//form.<?="valor_".$mon->fields['id_moneda']?>;
+	var f = document.getElementById('formulario');
+	var errores = "";
+<?	
+	for($x=0;$x<$lista->num;$x++)
+    {
+        $mon = $lista->Get($x);
+?>
+		if( f.<?="valor_".$mon->fields['id_moneda']?>.value.length == 0 || f.<?="valor_".$mon->fields['id_moneda']?>.value == 0 )
+		{
+			errores += "- <?php echo $mon->fields['glosa_moneda']; ?> \n";
+		}
+<?
+    }	
+?>
+	if( errores.length > 0 )
+	{
+		alert("<?php echo __('Se encontraron errores al guardar los tipos de cambio, por favor revise los siguientes valores'); ?>: \n\n" + errores + "<?php echo __('\ne intentelo nuevamente'); ?>");
+		return false;
 	}
 	return true;
 }
@@ -162,9 +199,9 @@ function Input(name)
     {
         $mon = $lista->Get($x);
 ?>
-        form.<?=$mon->fields['glosa_moneda']?>.disabled = false;
-		if(form.<?=$mon->fields['glosa_moneda']?>.name == name)
-			form.<?=$mon->fields['glosa_moneda']?>.disabled = true;
+        form.<?="valor_".$mon->fields['id_moneda']?>.disabled = false;
+		if(form.<?="valor_".$mon->fields['id_moneda']?>.name == name)
+			form.<?="valor_".$mon->fields['id_moneda']?>.disabled = true;
 <?
     }
 ?>

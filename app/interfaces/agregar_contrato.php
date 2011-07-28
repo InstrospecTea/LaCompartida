@@ -860,7 +860,7 @@ function SetBanco( origen, destino )
 		}
 		//cargando = false;
 		//offLoading();
-		return "0::&nbsp;";
+		return "0::&nbsp;::0";
 	}
 	
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
@@ -897,12 +897,16 @@ function SetBanco( origen, destino )
 				text_window += "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
 				if( parts[0] < 10 )
 				{
-					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin precio para la moneda seleccionada.')?></span><br><br>';
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin valor para la moneda seleccionada.')?></span><br><br>';
 					text_window += '<span style="font-size:12px; text-align:left;">' + parts[1] + '</span><br><br>';
+				}
+				else if( parts[0] == parts[2] )
+				{
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Puede que la tarifa y moneda elegidas sean incorrectas<br> debido a que ningún abogado tiene fijado el valor para la tarifa y moneda seleccionadas.')?></span><br><br>'
 				}
 				else
 				{
-					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin precio, para la moneda y tarifa seleccionadas.')?></span><br><br>'
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin valor para la tarifa y moneda seleccionadas.')?></span><br><br>'
 				}
 				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?=__('Modificar tarifa.')?></a></span>';
 

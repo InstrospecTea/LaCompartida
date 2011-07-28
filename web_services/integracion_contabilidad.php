@@ -546,7 +546,7 @@ function PagoCobro($pagos,$usuario,$password)
 			list($estado) = mysql_fetch_array($resp);
 			if($estado=='PAGADO')
 			{
-				$resultado['resultado']='El cobro #'.$pago['id_cobro'].' se encontraba pagado.';
+				$resultado['resultado']=__('El cobro') . ' #'.$pago['id_cobro'].' se encontraba pagado.';
 				array_push($resultados,$resultado);
 			}
 			else

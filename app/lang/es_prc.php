@@ -11,6 +11,8 @@
 	$_LANG['Gastos s/ IVA'] = "Gastos s/ IGV";
 	$_LANG['Gasto c/ IVA'] = "Gasto c/ IGV";
 	$_LANG['Gasto s/ IVA'] = "Gasto s/ IGV";
+	$_LANG['Gasto c/IVA'] = "Gasto c/IGV";
+	$_LANG['Gasto s/IVA'] = "Gasto s/IGV";
 	$_LANG['G SIN IVA'] = 'G SIN IGV';
 	$_LANG['IVA'] = "IGV";
 	$_LANG['Impuesto'] = "IGV";

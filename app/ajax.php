@@ -324,6 +324,29 @@
 		$glosa = str_replace('/','|#slash|',$glosa);
 		echo $glosa.'/'.$codigo_cliente;
 	}
+	elseif( $accion == "cargar_glosa_asunto" )
+	{
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		{
+			$codigo = 'codigo_asunto_secundario';
+		}
+		else
+		{
+			$codigo = 'codigo_asunto';
+		}
+		if( $id_cliente > 0 )
+		{
+			$query = "SELECT glosa_asunto FROM asunto WHERE activo=1 AND ".$codigo."='$id' AND codigo_cliente='$id_cliente'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($glosa)=mysql_fetch_array($resp);
+			$glosa = str_replace('/','|#slash|',$glosa);
+			echo $glosa.'/'.$id;
+		}
+		else
+		{
+			echo "";
+		}
+	}
 	elseif( $accion == "cargar_cuenta_banco" )
 	{
 		$query = "SELECT id_cuenta, numero FROM cuenta_banco 
