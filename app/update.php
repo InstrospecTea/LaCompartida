@@ -6128,7 +6128,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 			foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-
+	}
+}
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
 	(No olvidar agregar la notificacion de los cambios)*/
