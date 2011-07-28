@@ -460,7 +460,7 @@ function ActualizaCobro(valor)
 	}
 	if(cambio)
 	{
-		if(confirm('Ud. está modificando un trámite que pertenece al cobro: '+id_cobro[i]+' . Si acepta, el trámite se desvinculará de este cobro y eventualmente se vinculará a un cobro pendiente para el nuevo asunto en caso de que exista.'))
+		if(confirm('Ud. está modificando un trabajo que pertenece <?php echo __('al cobro'); ?>: '+id_cobro[i]+' . Si acepta, el trabajo se desvinculará de este <?php echo __('cobro'); ?> y eventualmente se vinculará a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.'))
 		{
 		var hacer_submit = true;
 			for (i in codigosOriginales)

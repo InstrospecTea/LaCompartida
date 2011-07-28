@@ -20,7 +20,7 @@
 	
 	#Tooltips para las modalidades de cobro.
 	$tip_tasa				= __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
-	$tip_suma				= __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de cobro que no puede tener límites.");
+	$tip_suma				= __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de ") . __("cobro") . __(" que no puede tener límites.");
 	$tip_retainer			= __("El cliente compra un número de HH. El límite puede ser por horas o por un monto.");
 	$tip_proporcional		= __("El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.");
 	$tip_flat				= __("El cliente acuerda cancelar un <strong>monto fijo</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
@@ -28,9 +28,9 @@
 	$tip_honorarios			= __("Solamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.");
 	$tip_mensual			= __("El cobro se hará de forma mensual.");
 	$tip_tarifa_especial	= __("Al ingresar una nueva tarifa, esta se actualizará automáticamente.");
-	$tip_subtotal			= __("El monto total del cobro hasta el momento sin incluir descuentos.");
+	$tip_subtotal			= __("El monto total ")  . __("del cobro") . __(" hasta el momento sin incluir descuentos.");
 	$tip_descuento			= __("El monto del descuento.");
-	$tip_total				= __("El monto total del cobro hasta el momento incluidos descuentos.");
+	$tip_total				= __("El monto total ")  . __("del cobro") . __(" hasta el momento incluidos descuentos.");
 	$tip_actualizar			= __("Actualizar los montos");
 	$tip_refresh			= __("Actualizar a cambio actual");
 
@@ -81,7 +81,7 @@
 		$enviar_mail = 1;
 		if($forma_cobro != 'TASA' && $monto == 0)
 		{
-			$pagina->AddError( __('Ud. ha seleccionado forma de cobro:').' '.$forma_cobro.' '.__('y no ha ingresado monto') );
+			$pagina->AddError( __('Ud. ha seleccionado forma de ') . __('cobro').': '.$forma_cobro.' '.__('y no ha ingresado monto') );
 			$val=true;
 		}
 		elseif($forma_cobro == 'TASA')
@@ -103,6 +103,10 @@
 		$contrato->Edit("glosa_contrato",$glosa_contrato);
 		$contrato->Edit("codigo_cliente",$codigo_cliente);
 		$contrato->Edit("id_usuario_responsable",$id_usuario_responsable ? $id_usuario_responsable : '1');
+		if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
+			$id_usuario_secundario = $id_usuario_responsable;
+		}
+		$contrato->Edit("id_usuario_secundario",$id_usuario_secundario ? $id_usuario_secundario : '1');
 		$contrato->Edit("observaciones",$observaciones);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 			{
@@ -470,7 +474,7 @@ function InactivaContrato(alerta, opcion)
 	if(!alerta)
 	{
 		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está desactivando este contrato, por lo tanto este contrato no aparecerá en la lista de la generación de cobros')?>.</span><br>';
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está desactivando este contrato, por lo tanto este contrato no aparecerá en la lista de la generación de ') . __('cobros')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '<td align="right"><span style="text-align:center; font-size:11px;color:#FF0000; "><?=__('¿Está seguro de desactivar este contrato?')?>:</span></td></tr>';
 		text_window += '</table>';
@@ -500,7 +504,7 @@ function generarFechas()
 		$('periodo_intervalo').focus();
 		return;
 	}
-	if($('valor_fecha_2') && !confirm('¿Está seguro que desea generar la tabla nuevamente?\nEl primer cobro de la tabla será el '+$('periodo_fecha_inicio').value))
+	if($('valor_fecha_2') && !confirm('¿Está seguro que desea generar la tabla nuevamente?\n<?php echo __('El primer cobro'); ?> de la tabla será el '+$('periodo_fecha_inicio').value))
 		return;
 	//Se elimina la tabla para poner los nuevos datos
 	eliminarTabla();
@@ -599,7 +603,7 @@ function addTable()
 			$('valor_fecha_1').value=dia_str+'-'+mes_str+'-'+anio;
 		}
 		numero_cobro= <?=$numero_cobro ?>+i;
-		$('valor_descripcion_1').value="Cobro N° "+numero_cobro;
+		$('valor_descripcion_1').value="<?php echo __('Cobro N°'); ?> "+numero_cobro;
 		if($('fc3').checked==true)
 			$('valor_monto_estimado_1').value=$('monto').value;
 		else
@@ -861,52 +865,114 @@ function SetBanco( origen, destino )
 	
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
 	{
-		var text_window = "";
-		var respuesta = RevisarTarifasRequest(tarifa, moneda);
-		var parts = respuesta.split("::");
-		if( parts[0] > 0)
+		var ejecutar = true;
+		if ( !desde_combo )
 		{
-			text_window += "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
-			if( parts[0] < 10 )
+			radio_tarifas = document.getElementsByName('tipo_tarifa');
+			var seleccionado = "";
+			for( k=0; k < radio_tarifas.length; k++ )
 			{
-				text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin precio para la moneda seleccionada.')?></span><br><br>';
-				text_window += '<span style="font-size:12px; text-align:left;">' + parts[1] + '</span><br><br>';
+				if( radio_tarifas[k].checked )
+				{
+					seleccionado = radio_tarifas[k].value;
+				}
+			}
+			if( seleccionado == 'flat')
+			{
+				ejecutar = false;
 			}
 			else
 			{
-				text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin precio, para la moneda y tarifa seleccionadas.')?></span><br><br>'
+				ejecutar = true;
 			}
-			text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?=__('Modificar tarifa.')?></a></span>';
-
-			Dialog.confirm(text_window, 
+		}
+		
+		if( ejecutar ) // cant::lista
+		{
+			var text_window = "";
+			var respuesta = RevisarTarifasRequest(tarifa, moneda);
+			var parts = respuesta.split("::");
+			if( parts[0] > 0)
 			{
-				top:100, left:80, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
-				id: "myDialogId",
-				cancel:function(win){ 
-					respuesta_revisar_tarifa = false; 
-					return respuesta_revisar_tarifa; 
-				},
-				ok:function(win){ 
-					respuesta_revisar_tarifa = true;
-					if( !desde_combo )
-					{
-						if( f.desde.value == 'agregar_cliente')
-						{
-							Validar(f);
-						}
-						else
-						{
-							ValidarContrato(f);
-						}
-					}
-					return respuesta_revisar_tarifa; 
+				text_window += "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
+				if( parts[0] < 10 )
+				{
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin precio para la moneda seleccionada.')?></span><br><br>';
+					text_window += '<span style="font-size:12px; text-align:left;">' + parts[1] + '</span><br><br>';
 				}
-			});
+				else
+				{
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin precio, para la moneda y tarifa seleccionadas.')?></span><br><br>'
+				}
+				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?=__('Modificar tarifa.')?></a></span>';
+
+				Dialog.confirm(text_window, 
+				{
+					top:100, left:80, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+					id: "myDialogId",
+					cancel:function(win){ 
+						respuesta_revisar_tarifa = false; 
+						return respuesta_revisar_tarifa; 
+					},
+					ok:function(win){ 
+						respuesta_revisar_tarifa = true;
+						if( !desde_combo )
+						{
+							if( f.desde.value == 'agregar_cliente')
+							{
+								Validar(f);
+							}
+							else
+							{
+								ValidarContrato(f);
+							}
+						}
+						return respuesta_revisar_tarifa; 
+					}
+				});
+			}
+			else
+			{
+				respuesta_revisar_tarifa = true;
+				if( !desde_combo )
+				{
+					if( f.desde.value == 'agregar_cliente')
+					{
+						Validar(f);
+					}
+					else
+					{
+						ValidarContrato(f);
+					}
+				}
+				return respuesta_revisar_tarifa;
+			}
 		}
 		else
 		{
-			respuesta_revisar_tarifa = true;
-			return respuesta_revisar_tarifa;
+			if( !desde_combo )
+			{
+				if( f.desde.value == 'agregar_cliente')
+				{
+					Validar(f);
+				}
+				else
+				{
+					ValidarContrato(f);
+				}
+			}
+		}
+	}
+
+	var mismoEncargado = <?= UtilesApp::GetConf($sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
+	function CambioEncargado(){
+		if(mismoEncargado){
+			if(confirm('¿Desea cambiar también el <?=__('Encargado Secundario')?>?')){
+				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+			}
+			else{
+				mismoEncargado = false;
+			}
 		}
 	}
 </script>
@@ -1017,9 +1083,24 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 			<?=__('Encargado Comercial')?>
 		</td>
 		<td align="left" width = '70%'>
-			<?= Html::SelectQuery($sesion, $query,"id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable']:$sesion->usuario->fields['id_usuario'], "","","200");?>
+			<?= Html::SelectQuery($sesion, $query,"id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable']:$sesion->usuario->fields['id_usuario'], 'onchange="CambioEncargado()"',"","200");?>
 		</td>
 	</tr>
+<?	if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
+		$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+				FROM usuario
+				WHERE activo = 1 OR id_usuario = '".$contrato->fields['id_usuario_secundario']."'
+				ORDER BY apellido1";
+?>
+	<tr>
+		<td align="left" width='30%'>
+			<?=__('Encargado Secundario')?>
+		</td>
+		<td align="left" width = '70%'>
+			<?= Html::SelectQuery($sesion, $query,"id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario']:$sesion->usuario->fields['id_usuario'], "","","200");?>
+		</td>
+	</tr>
+	<?php } ?>
 </table>
 <br><br>
 <!-- FIN RESPONSABLE -->
@@ -1426,7 +1507,7 @@ else
 							<table width="100%">
 								<tr>
 									<td align="right" width="30%">
-										<?=__('Generar Cobros a partir del')?>
+										<?=__('Generar ') . __('Cobros') . __(' a partir del')?>
 									</td>
 									<td align="left">
 										<input type="text" name="periodo_fecha_inicio" value="<?=$fecha_ini ?>" id="periodo_fecha_inicio" size="11" maxlength="10" />

@@ -195,7 +195,7 @@ class Cliente extends Objeto
 			$query = "SELECT id_cobro FROM cobro WHERE codigo_cliente = '".$this->fields['codigo_cliente']."' LIMIT 1";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
-			$this->error = __('No se puede eliminar un').' '.__('cliente').' '.__('que tiene un cobro asociado. Cobro asociado: #').$cobro;
+			$this->error = __('No se puede eliminar un').' '.__('cliente').' '.__('que tiene cobros asociados') . ". " . __('Cobro asociado') .': #'.$cobro;
 			return false;
 		}
 		#Valida si no tiene algún asunto relacionado

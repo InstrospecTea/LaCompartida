@@ -232,9 +232,9 @@
 
 	//HOJA 1, TABLA 1
 	$ws1 =& $wb->addWorksheet(__('Hrs Declaradas x FC x mes'));
-	iniciar_hoja($ws1,'Horas Declaradas Corregidas por Forma de Cobro',$fila,$col,$f);
+	iniciar_hoja($ws1,__('Horas Declaradas Corregidas por Forma de Cobro'),$fila,$col,$f);
 
-	$encabezados = array('Forma de Cobro','Horas');
+	$encabezados = array(__('Forma de Cobro'),'Horas');
 	print_headers($ws1,$encabezados,$fila,$f);
 	
 	$fila_ini = $fila;
@@ -262,7 +262,7 @@ ORDER BY trabajo.cobrable";
 	}
 	$fila+=2;
 
-	escribir_multiple($ws1,$fila,0,8,__('Horas Declaradas Corregidas por Forma de Cobro desagregadas por mes'),$f['titulo']);
+	escribir_multiple($ws1,$fila,0,8,__('Horas Declaradas Corregidas por Forma de Cobro') . " " . __('desagregadas por mes'),$f['titulo']);
 	$fila+=2;
   
 	//HOJA 1, TABLA 2
@@ -323,7 +323,7 @@ ORDER BY fecha ";
 
 	//HOJA 2 TABLA 1
 	$ws2 =& $wb->addWorksheet(__('Hrs Declaradas x FC x grupo'));
-	iniciar_hoja($ws2,'Horas Declaradas por Forma de Cobro desagregadas por Grupo',$fila,$col,$f);
+	iniciar_hoja($ws2,'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Grupo',$fila,$col,$f);
 	
 	$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
 	print_headers($ws2,$encabezados,$fila,$f);
@@ -383,7 +383,7 @@ GROUP BY glosa_cliente2 order by total desc";
 
 	//HOJA 3 TABLA 1
 	$ws3 =& $wb->addWorksheet(__('Hrs Declaradas x FC x prof'));
-	iniciar_hoja($ws3,'Horas Declaradas por Forma de Cobro desagregadas por Profesional',$fila,$col,$f);
+	iniciar_hoja($ws3,'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Profesional',$fila,$col,$f);
 	
 	$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
 	print_headers($ws3,$encabezados,$fila,$f);
@@ -444,9 +444,9 @@ order by total desc";
 
 	//HOJA 4, TABLA 1
 	$ws1 =& $wb->addWorksheet(__('Hrs Liquidadas x FC x mes'));
-	iniciar_hoja($ws1,'Horas Liquidadas por Forma de Cobro',$fila,$col,$f);
+	iniciar_hoja($ws1,__('Horas Liquidadas por Forma de Cobro'),$fila,$col,$f);
 
-	$encabezados = array('Forma de Cobro','Horas');
+	$encabezados = array(__('Forma de Cobro'),'Horas');
 	print_headers($ws1,$encabezados,$fila,$f);
 	
 	$fila_ini = $fila;
@@ -473,7 +473,7 @@ ORDER BY trabajo.cobrable";
 	$fila+=2;
 	
 	//HOJA 4, TABLA 2
-	escribir_multiple($ws1,$fila,0,8,__('Horas Liquidadas por Forma de Cobro desagregadas por mes'),$f['titulo']);
+	escribir_multiple($ws1,$fila,0,8,__('Horas Liquidadas por Forma de Cobro') . " " . _('desagregadas por mes'),$f['titulo']);
 	$fila+=2;
   
 	$encabezados = array('Mes','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
@@ -530,7 +530,7 @@ ORDER BY fecha ";
 
 	//HOJA 5 TABLA 1
 	$ws2 =& $wb->addWorksheet(__('Hrs Liquidadas x FC x grupo'));
-	iniciar_hoja($ws2,'Horas Liquidadas por Forma de Cobro desagregadas por Grupo',$fila,$col,$f);
+	iniciar_hoja($ws2,__('Horas Liquidadas por Forma de Cobro') . ' desagregadas por Grupo',$fila,$col,$f);
 	
 	$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
 	print_headers($ws2,$encabezados,$fila,$f);
@@ -590,7 +590,7 @@ GROUP BY glosa_cliente2 order by total desc";
 
 	//HOJA 6 TABLA 1
 	$ws3 =& $wb->addWorksheet(__('Hrs Liquidadas x FC x prof'));
-	iniciar_hoja($ws3,'Horas Liquidadas por Forma de Cobro desagregadas por Profesional',$fila,$col,$f);
+	iniciar_hoja($ws3,__('Horas Liquidadas por Forma de Cobro') . " " . 'desagregadas por Profesional',$fila,$col,$f);
 	
 	$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
 	print_headers($ws3,$encabezados,$fila,$f);

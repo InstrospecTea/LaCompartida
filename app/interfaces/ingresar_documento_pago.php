@@ -532,7 +532,7 @@ function ActualizarDocumentoMonedaPago()
 				if($documento->fields['glosa_documento'])
 					echo $documento->fields['glosa_documento'];
 				else if($id_cobro)
-					echo "Pago de Cobro #".$id_cobro;
+					echo "Pago de " . __('Cobro') . " #".$id_cobro;
 			?></textarea>
 		</td>
 	</tr>
@@ -586,7 +586,7 @@ function ActualizarDocumentoMonedaPago()
 				<legend><?=__('Tipo de Cambio Documento de Pago')?></legend>
 				<div id="contenedor_tipo_load">&nbsp;</div>
 				<div id="contenedor_tipo_cambio">
-				<div style="padding-top:5px; padding-bottom:5px;">&nbsp;<img src="<?=Conf::ImgDir()?>/alerta_16.gif" title="Alerta" />&nbsp;&nbsp;<?=__('Este tipo de cambio sólo afecta al Documento de Pago en los Reportes. No modifica la Carta de Cobro.')?></div>
+				<div style="padding-top:5px; padding-bottom:5px;">&nbsp;<img src="<?=Conf::ImgDir()?>/alerta_16.gif" title="Alerta" />&nbsp;&nbsp;<?=__('Este tipo de cambio sólo afecta al Documento de Pago en los Reportes. No modifica la Carta de') .  " " . __('Cobro') . "."?></div>
 				<table style='border-collapse:collapse;' cellpadding='3'>
 					<tr>
 						<?

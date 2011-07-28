@@ -16,7 +16,7 @@
 	$cliente = new Cliente($sesion);
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 	$nombre_cliente = $cliente->fields['glosa_cliente'];
-	$pagina->titulo = __('Emitir Cobro :: Selección de asuntos #').$id_cobro.__(' ').$nombre_cliente;
+	$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de asuntos #').$id_cobro.__(' ').$nombre_cliente;
 
 	if($id_cobro)
 	{	
@@ -87,7 +87,7 @@
 		}
 	}
 	else
-		$pagina->FatalError(__('Debe especificar un cliente o cobro'));
+		$pagina->FatalError(__('Debe especificar un cliente o') . ' ' . __('cobro'));
 
 	if($cobro->fields['estado'] <> 'CREADO' && $cobro->fields['estado'] <> 'EN REVISION')
 	    $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro);	
@@ -119,7 +119,7 @@ function calcHeight(idIframe, idMainElm){
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
-					<?=__('Emitir Cobro :: Selección de asuntos #').$id_cobro.__(' ').$nombre_cliente;?>
+					<?=__('Emitir') . ' ' . __('Cobro') . __(' :: Selección de asuntos #').$id_cobro.__(' ').$nombre_cliente;?>
 				</td>
 			</tr>
 		</table>

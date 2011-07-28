@@ -23,6 +23,9 @@
 	$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
 
+	$query_usuario_activo = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
+			WHERE activo = 1 ORDER BY nombre";
+
 	$query_cliente = "SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo = 1 ORDER BY glosa_cliente ASC";
 
 	$query_moneda = "SELECT glosa_moneda, tipo_cambio FROM prm_moneda ORDER BY moneda_base DESC";
@@ -72,6 +75,8 @@
 			$where .= " AND contrato.activo = 'NO' ";
 		if($id_usuario)
 			$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
+		if($id_usuario_secundario)
+			$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
 		if($codigo_asunto)
 			$where .= " AND asunto.codigo_asunto ='".$codigo_asunto."' ";
 		if($codigo_cliente)
@@ -106,7 +111,7 @@
 		$b->titulo = __('Proceso masivo de emisión de cobros');
 		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"","","SplitDuracion");
 		$b->AgregarEncabezado("asuntos",__('Asunto'),"align=left nowrap");
-		$b->AgregarEncabezado("fecha_ultimo_cobro",__('Ultimo Cobro'),"align=left nowrap");
+		$b->AgregarEncabezado("fecha_ultimo_cobro",__('Último Cobro'),"align=left nowrap");
 		$b->AgregarEncabezado("id_contrato",__('Acuerdo'),"align=left");
 		$b->AgregarFuncion("$link",'Opciones',"align=center nowrap width=8%");
 		$b->color_mouse_over = "#bcff5c";
@@ -144,7 +149,7 @@ function DeleteCobro(form, id, i, id_contrato)
 	if(id)
 	{
 		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('¿Desea eliminar el cobro seleccionado?')?>.</span><br>';
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('¿Desea eliminar') . " " . __('el cobro') . " " . __('seleccionado?')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,
@@ -421,6 +426,7 @@ function Refrescar()
 	var codigo_cliente = $('codigo_cliente').value;
 <?} ?>
 	var id_usuario = $('id_usuario').value;
+	var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
 	var id_proceso = $('id_proceso').value;
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
@@ -435,9 +441,9 @@ function Refrescar()
 		echo "var pagina_desde = '';";
 ?> 
 	if( $('codigo_cliente') )
-		var url = "genera_cobros.php?codigo_cliente="+codigo_cliente+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
+		var url = "genera_cobros.php?codigo_cliente="+codigo_cliente+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
 	else if( $('codigo_cliente_secundario') ) 
-		var url = "genera_cobros.php?codigo_cliente_secundario="+codigo_cliente_secundario+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
+		var url = "genera_cobros.php?codigo_cliente_secundario="+codigo_cliente_secundario+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
 		
 	self.location.href= url;
 }//fin refrescar para popup
@@ -452,7 +458,7 @@ function GenerarIndividual(
 	text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Al generar este borrador se eliminarán todos los borradores antiguos asociados a este contrato')?><br><br>';
 	if(modalidad == 'FLAT FEE' && monto_estimado > 0 && monto_real!=monto_estimado)
 	{
-		text_window += '<?=__('El monto estipulado en el contrato no coincide con el monto del cobro programado, seleccione el monto a utilizar:')?><br><br>';
+		text_window += '<?=__('El monto estipulado en el contrato no coincide con el monto') . " " . __('del cobro') . " " . _('programado, seleccione el monto a utilizar:')?><br><br>';
 		text_window += '<input type="radio" name="radio_monto" id="radio_real" checked /><?=__('Monto del Contrato')?> '+moneda+' '+monto_real+'<br>';
 		text_window += '<input type="radio" name="radio_monto" id="radio_estimado" /><?=__('Monto del Cobro Programado')?> '+moneda+' '+monto_estimado+'<br><br>';
 	}
@@ -571,6 +577,15 @@ function GenerarIndividual(
 				<input type=hidden size=6 name=id_proceso id=id_proceso value='<?=$id_proceso?>' >
 			</td>
 		</tr>
+		<?php if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){ ?>
+		<tr>
+			<td align=right><b><?=__('Encargado Secundario')?>&nbsp;</b></td>
+			<td colspan=2 align=left><?=Html::SelectQuery($sesion,$query_usuario_activo,"id_usuario_secundario",$id_usuario_secundario, '',__('Cualquiera'),'width="200"')?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type=hidden size=6 name=id_proceso id=id_proceso value='<?=$id_proceso?>' >
+			</td>
+		</tr>
+		<?php } ?>
 		<tr>
 			<td align=right><b><?=__('Forma de Tarificación')?>&nbsp;</b></td>
 			<td colspan=2 align=left>

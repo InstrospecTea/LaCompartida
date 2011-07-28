@@ -275,6 +275,7 @@ class Reporte
 				-1 as id_usuario,
 				cliente.codigo_cliente,
 				cliente.glosa_cliente,
+				contrato.id_contrato,
 				'.(in_array('codigo_cliente_secundario',$this->agrupador)?'cliente.codigo_cliente_secundario,':'').'
 				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?"'".__('Indefinido')."' AS glosa,":'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?'CONCAT_WS(\' \',usuario_responsable.nombre, usuario_responsable.apellido1, LEFT(usuario_responsable.apellido2,1)) AS nombre_usuario_responsable,':'').'
@@ -357,7 +358,7 @@ class Reporte
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
 						LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
 						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
-						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato':'').'
+						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
 						LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
 					';
@@ -418,6 +419,7 @@ class Reporte
 						cliente.glosa_cliente,
 						asunto.glosa_asunto,
 						asunto.codigo_asunto,
+						contrato.id_contrato,
 						tipo.glosa_tipo_proyecto AS tipo_asunto,
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
@@ -549,13 +551,13 @@ class Reporte
 		$s = ' FROM trabajo
 				LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
 				LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
-				LEFT JOIN contrato ON contrato.id_contrato = asunto.id_contrato
+				LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
+				LEFT JOIN contrato ON ( contrato.id_contrato = IFNULL(cobro.id_contrato, asunto.id_contrato))
 				'.($this->tipo_dato=='valor_por_cobrar'? $join_por_cobrar:'').'
 				LEFT JOIN prm_area_proyecto AS area ON asunto.id_area_proyecto = area.id_area_proyecto
 				LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
 				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-				LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
 				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?'LEFT JOIN prm_area_proyecto ON prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto':'').'
 				'.(in_array('area_usuario',$this->agrupador)?'LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario':'').'
 				'.(in_array('categoria_usuario',$this->agrupador)?'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario':'').'

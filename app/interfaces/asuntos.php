@@ -214,9 +214,7 @@ if($opc != "entregar_asunto" && $from != "agregar_cliente")
 </table>
 </fieldset>
 </td></tr></table>
-<?
-}
-?>
+
 </form>
 <script type="text/javascript">
 Calendar.setup(
@@ -234,12 +232,14 @@ Calendar.setup(
 	}
 );
 </script>
-
+<?
+}
+?>
 <?
   	if ($busqueda)
 			$link ="Opciones";
   	else	
-			$link = __('Cobrar')." <br /><a href='asuntos.php?codigo_cliente=".$codigo_cliente."&opc=entregar_asunto&id_cobro=".$id_cobro."&popup=1&motivo=cobros&checkall=1'>".__('Todos')."</a>";
+				$link = __('Cobrar')." <br /><a href='asuntos.php?codigo_cliente=".$codigo_cliente."&opc=entregar_asunto&id_cobro=".$id_cobro."&popup=1&motivo=cobros&checkall=1'>".__('Todos')."</a>";
 	
 	
 	if($checkall == '1')
@@ -445,10 +445,13 @@ $query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secun
         $i++;
         return $html;
     }
-if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+	{ 
+		if( empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente' )
 		{
 			echo(Autocompletador::Javascript($sesion,false));
-		}
+		}		
+	}
     echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom($popup);
 ?>

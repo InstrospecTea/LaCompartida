@@ -921,7 +921,7 @@ function EditarTodosLosArchivos()
 		//echo $duracion."fin<br>";
 		if($p_cobranza->fields['permitido'])
 		{
-			$editar_cobro = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Generar Cobro',750,660,'cobros5.php?popup=1&id_cobro=".$trabajo->fields['id_cobro']."');\"'>".$trabajo->fields['id_cobro']."</a>";
+			$editar_cobro = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Generar " . __("Cobro") . "',750,660,'cobros5.php?popup=1&id_cobro=".$trabajo->fields['id_cobro']."');\"'>".$trabajo->fields['id_cobro']."</a>";
 		}
 		elseif($p_revisor->fields['permitido'])
 		{

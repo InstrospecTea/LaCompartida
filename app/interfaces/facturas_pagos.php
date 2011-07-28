@@ -415,7 +415,7 @@
 			$html .= "<td align=center>".$fila->fields['estado']."</td>";
 		else
 			$html .= "<td align=center>".$fila->fields['anulado']."</td>";
-		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar Cobro',750,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
+		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar " . __("Cobro") . "',750,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
 
 		$html .= "<td align=right >".RetencionImpuestoPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right >".ConceptoPago(& $fila, $sesion)."</td>";

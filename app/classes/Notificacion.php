@@ -32,11 +32,11 @@ class Notificacion
 			case 'asunto_limite_ultimo_cobro':
 			case 'contrato_limite_ultimo_cobro':
 			case 'cliente_limite_ultimo_cobro':
-				return 'El monto ingresado desde el &uacute;ltimo cobro, %MONEDA %ACTUAL, supera el l&iacute;mite de %MONEDA %MAX.';
+				return 'El monto ingresado desde ' . __('el &uacute;ltimo cobro') . ', %MONEDA %ACTUAL, supera el l&iacute;mite de %MONEDA %MAX.';
 			case 'asunto_alerta_hh':
 			case 'contrato_alerta_hh':
 			case 'cliente_alerta_hh':
-				return 'Las horas ingresadas desde el &uacute;ltimo cobro, %ACTUAL, superan el l&iacute;mite de %MAX.';
+				return 'Las horas ingresadas desde ' . __('el &uacute;ltimo cobro') . ', %ACTUAL, superan el l&iacute;mite de %MAX.';
 		}
 	}
 

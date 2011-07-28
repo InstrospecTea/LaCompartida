@@ -175,8 +175,8 @@
 		$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
 		$ws1->write($filas, $col_usuario_encargado, __('Encargado'), $formato_titulo);
 		$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
-		$ws1->write($filas, $col_ultimo_cobro, __('Ultimo cobro'), $formato_titulo);
-		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado ultimo cobro'), $formato_titulo);
+		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
+		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
 		$ws1->write($filas, $col_valor_estimado, __('Valor estimado'), $formato_titulo);
 		$ws1->write($filas, $col_tipo_cambio, __('Tipo Cambio'), $formato_titulo);

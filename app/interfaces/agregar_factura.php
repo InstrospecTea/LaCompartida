@@ -427,7 +427,7 @@
 						
 						select_destino.options.length = 1;
 						offLoading();
-						alert('No existen cobros para este cliente.');
+						alert('No existen <?php echo __('cobros'); ?> para este cliente.');
 					}
 					else
 					{

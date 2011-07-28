@@ -171,7 +171,7 @@
 				$b->AgregarEncabezado("con_impuesto","Impuesto","align=center");
 			}
 		$b->AgregarFuncion(__('Cobro'),"CobroFila","align=left nowrap");
-		$b->AgregarEncabezado("estado",__('Estado Cobro'),"align=left");
+		$b->AgregarEncabezado("estado",__('Estado') . " " . __("Cobro") ,"align=left");
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
 			$b->AgregarEncabezado("esCobrable","Cobrable","align=center");
@@ -184,7 +184,7 @@
 
 		function CobroFila(& $fila)
 		{
-			$html_cobro .= "&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1&contitulo=true');\" title='".__('Ver cobro asociado')."'>".$fila->fields['id_cobro']."</a>&nbsp;";
+			$html_cobro .= "&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1&contitulo=true');\" title='".__('Ver ') . __('Cobro asociado')."'>".$fila->fields['id_cobro']."</a>&nbsp;";
 			return $html_cobro;
 		}
 		
@@ -210,7 +210,7 @@
 					$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a>";
 			}
 			else
-				$html_opcion .= "<a href='javascript:void(0)' onclick=\"alert('".__('No se puede modificar este gasto.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" ><img src='".Conf::ImgDir()."/editar_off.gif' border=0 title=\"".__('Cobro ya Emitido al Cliente')."\"></a>&nbsp;";
+				$html_opcion .= "<a href='javascript:void(0)' onclick=\"alert('".__('No se puede modificar este gasto.\n') . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.')."');\" ><img src='".Conf::ImgDir()."/editar_off.gif' border=0 title=\"".__('Cobro ya Emitido al Cliente')."\"></a>&nbsp;";
 			return $html_opcion;
 		}
 		/*function Nombre(& $fila)

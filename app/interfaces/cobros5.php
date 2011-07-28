@@ -30,7 +30,7 @@
 	$cliente = new Cliente($sesion);
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 	$nombre_cliente = $cliente->fields['glosa_cliente'];
-	$pagina->titulo = __('Emitir Cobro :: Detalle #').$id_cobro.__(' ').$nombre_cliente;
+	$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Detalle #').$id_cobro.__(' ').$nombre_cliente;
 	
 	//Contrato
 	$contrato = new Contrato($sesion);
@@ -198,7 +198,7 @@
 		$cobro->Edit('estado','EN REVISION');
 		$cobro->Edit('fecha_en_revision',date('Y-m-d H:i:s'));
 		if($cobro->Write())
-			$pagina->AddInfo(__('El Cobro ha sido transferido al estado: En Revisión'));
+			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . _('al estado: En Revisión'));
 		$historial_comentario = __('COBRO EN REVISION');
 		##Historial##
 		$his = new Observacion($sesion);
@@ -212,7 +212,7 @@
 	{
 		$cobro->Edit('estado','CREADO');
 		if($cobro->Write())
-			$pagina->AddInfo(__('El Cobro ha sido transferido al estado: Creado'));
+			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
 		$historial_comentario = __('REVISION ANULADO');
 		##Historial##
 		$his = new Observacion($sesion);
@@ -238,7 +238,7 @@
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
-					<?=__('Emitir Cobro :: Detalle #').$id_cobro.__(' ').$nombre_cliente;?>
+					<?=__('Emitir') . " " . __('Cobro') . __(' :: Detalle #').$id_cobro.__(' ').$nombre_cliente;?>
 				</td>
 			</tr>
 		</table>
@@ -251,7 +251,7 @@
 
 	#Tooltips para las modalidades de cobro.
 	$tip_tasa				= __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
-	$tip_suma				= __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de cobro que no puede tener límites.");
+	$tip_suma				= __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de ") . __("cobro") . __(" que no puede tener límites.");
 	$tip_retainer			= __("El cliente compra un número de HH. El límite puede ser por horas o por un monto.");
 	$tip_proporcional		= __("El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.");
 	$tip_flat				= __("El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
@@ -259,9 +259,9 @@
 	$tip_honorarios 		= __("Sólamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.");
 	$tip_mensual			= __("El cobro se hará de forma mensual.");
 	$tip_tarifa_especial	= __("Al ingresar una nueva tarifa, esta se actualizará automáticamente.");
-	$tip_subtotal			= __("El monto total del cobro hasta el momento sin gastos y sin incluir descuentos.");
+	$tip_subtotal			= __("El monto total") . " " . __("del cobro") . " " . __("hasta el momento sin gastos y sin incluir descuentos.");
 	$tip_descuento			= __("El monto del descuento.");
-	$tip_total				= __("El monto total del cobro hasta el momento incluidos descuentos.");
+	$tip_total				= __("El monto total") . " " . __("del cobro") . " " . __("hasta el momento incluidos descuentos.");
 	$tip_actualizar			= __("Actualizar los montos");
 	$tip_refresh			= __("Actualizar a cambio actual");
 	function TTip($texto)
@@ -393,7 +393,7 @@ function VolverACreado( form )
 {
 	if($('existe_factura').value == 1)
 	{
-			alert("<?=__('No se puede regresar a estado CREADO. Existen Documentos Tributarios creados para este cobro')?>");
+			alert("<?=__('No se puede regresar a estado CREADO. Existen Documentos Tributarios creados para') . " " . __('este cobro')?>");
 			return false;
 	}
 	
@@ -434,7 +434,7 @@ function Emitir(form)
 							text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?=__(" no estan definidos.")?></span><br>';
 						text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';
 					}
-				text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Una vez efectuado el cobro, la información no podrá ser modificada sin reemitir el cobro, ¿Está seguro que desea Emitir el Cobro?")?></span><br>';
+				text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?"?></span><br>';
 				text_window += '<br><table><tr>';
 				text_window += '</table>';
 				Dialog.confirm(text_window,

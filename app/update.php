@@ -6116,8 +6116,18 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 
- 	}
-}
+			case 4.53:
+				$query = array();
+				$query[] = "ALTER TABLE `contrato` ADD `id_usuario_secundario` INT NULL COMMENT 'encargado secundario' AFTER `id_usuario_responsable` ;";
+				$query[] = "ALTER TABLE `contrato` ADD INDEX ( `id_usuario_secundario` ) ;";
+				$query[] = "ALTER TABLE `contrato` ADD CONSTRAINT `contrato_ibfk_13` FOREIGN KEY (`id_usuario_secundario`) REFERENCES `usuario` (`id_usuario`);";
+				$query[] = "UPDATE `contrato` SET `id_usuario_secundario` = `id_usuario_responsable`;";
+				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+				VALUES (NULL , 'EncargadoSecundario', '0', NULL , 'boolean', '6', '-1');";
+
+			foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
@@ -6338,6 +6348,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.50;
 	$VERSIONES[$num++] = 4.51;
 	$VERSIONES[$num++] = 4.52;
+	$VERSIONES[$num++] = 4.53;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

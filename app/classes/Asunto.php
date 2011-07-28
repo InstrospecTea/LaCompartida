@@ -330,7 +330,8 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 			$query = "SELECT id_cobro FROM cobro INNER JOIN asunto ON cobro.id_contrato = asunto.id_contrato WHERE cobro.id_contrato = '".$this->fields['id_contrato']."'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
-			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene cobros asociados. Cobro asociado: #'.$cobro);
+			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene cobros asociados') . ". " . 
+					__('Cobro asociado') . __(': #'.$cobro);
 			return false;
 		}
 		

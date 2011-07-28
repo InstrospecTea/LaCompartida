@@ -15,10 +15,12 @@
 		require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 		require_once Conf::ServerDir().'/../app/classes/Archivo.php';
 		require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
+		require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
     $sesion = new Sesion(array('DAT'));
     $pagina = new Pagina($sesion);
     $id_usuario = $sesion->usuario->fields['id_usuario'];
+	$desde_agrega_cliente = true;
 
     $cliente = new Cliente($sesion);
     $contrato = new Contrato($sesion);
@@ -133,7 +135,7 @@
 
 			if (empty($forma_cobro))
 			{
-				$pagina->AddError(__("Por favor ingrese la forma de cobro en la tarificación"));
+				$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificación"));
 			}
 			else
 			{
@@ -161,7 +163,7 @@
 					case "TASA":
 						break;
 					default:
-						$pagina->AddError(__("Por favor ingrese la forma de cobro en la tarificación"));
+						$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificación"));
 				}
 			}
 			
@@ -238,6 +240,9 @@
 						$contrato->Edit("codigo_cliente",$codigo_cliente);
 						$contrato->Edit("id_pais",$id_pais);
 						$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
+						if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
+							$contrato->Edit("id_usuario_secundario",$id_usuario_secundario);
+						}
 						$contrato->Edit("observaciones",$observaciones);
 						if( method_exists('Conf','GetConf') )
 						{
@@ -695,6 +700,16 @@ function Validar(form)
 		form.tipo_tarifa[0].focus();
 		return false;
 	}
+	
+	/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
+	
+	if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
+	{
+		alert("<?=__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.')?>");
+		MuestraPorValidacion('datos_cobranza');
+		form.tarifa_flat.focus();
+		return false;
+	}
 
 	/*if(!form.id_moneda.options[0].selected == true)
 	{
@@ -706,7 +721,7 @@ function Validar(form)
 
 	if(!(form.forma_cobro[0].checked || form.forma_cobro[1].checked ||form.forma_cobro[2].checked ||form.forma_cobro[3].checked ||form.forma_cobro[4].checked ))
 	{
-		alert("<?=__('Debe seleccionar una forma de cobro para la tarifa')?>");
+		alert("<?=__('Debe seleccionar una forma de cobro') . __('para la tarifa')?>");
 		MuestraPorValidacion('datos_cobranza');
 		form.forma_cobro[0].focus();
 		return false;
@@ -845,7 +860,7 @@ function iframeLoad(url)
 $tip_tasa = __('Tip tasa');
 $tip_suma = __('Tip suma');
 $tip_retainer = __('Tip retainer');
-$tip_proporcional = __('El cliente compra un nÃºmero de horas, el exceso de horas trabajadas se cobra proporcional a la duraciÃ³n de cada trabajo.');
+$tip_proporcional = __('El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.');
 $tip_flat = __('Tip flat');
 $tip_honorarios = __('Tip honorarios');
 $tip_mensual = __('Tip mensual');

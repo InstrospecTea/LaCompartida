@@ -20,13 +20,13 @@
 
 
 	$tip_tasa = "En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.";
-	$tip_suma = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de cobro que no puede tener límites.";
+	$tip_suma = "Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de " . __('cobro') . " que no puede tener límites.";
 	$tip_retainer = "El cliente compra un número de HH. El límite puede ser por horas o por un monto.";
 	$tip_flat = "El cliente acuerda cancelar un <strong>monto fijo mensual</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total";
 	$tip_honorarios = "Sólamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.";
-	$tip_mensual = "El cobro se hará de forma mensual.";
+	$tip_mensual = __('El cobro') . " se hará de forma mensual.";
 	$tip_tarifa_especial = "Al ingresar una nueva tarifa, esta se actualizará automáticamente.";
-	$tip_individual = "El cobro se hará de forma individual de acuerdo al monto definido por Cliente.";
+	$tip_individual = __('El cobro') . " se hará de forma individual de acuerdo al monto definido por Cliente.";
 	function TTip($texto)
 	{
 		return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
@@ -223,6 +223,8 @@
 						$contrato->Edit("opc_moneda_total",$contra_clie->fields['opc_moneda_total']);
 						$contrato->Edit("codigo_idioma",$codigo_idioma != '' ? $codigo_idioma : 'es');
 						$contrato->Edit("tipo_descuento",$tipo_descuento);
+
+
 						if($tipo_descuento == 'PORCENTAJE')
 						{
 							$contrato->Edit("porcentaje_descuento",$porcentaje_descuento > 0 ? $porcentaje_descuento : '0');
@@ -234,6 +236,11 @@
 							$contrato->Edit("porcentaje_descuento",'0');
 						}
 						$contrato->Edit("id_moneda_monto",$id_moneda_monto);
+
+						$contrato->Edit("alerta_hh",$contra_clie->fields['alerta_hh']);
+						$contrato->Edit("alerta_monto",$contra_clie->fields['alerta_monto']);
+						$contrato->Edit("limite_hh",$contra_clie->fields['limite_hh']);
+						$contrato->Edit("limite_monto",$contra_clie->fields['limite_monto']);
 
 						$contrato->Edit("separar_liquidaciones", $separar_liquidaciones);
 
@@ -295,7 +302,7 @@
 
 					if($forma_cobro != 'TASA' && $monto == 0)
 					{
-						$pagina->AddError( __('Ud. a seleccionado forma de cobro:').' '.$forma_cobro.' '.__('y no ha ingresado monto') );
+						$pagina->AddError( __('Ud. a seleccionado forma de ') . __('cobro') . ': '.$forma_cobro.' '.__('y no ha ingresado monto') );
 						$val=true;
 					}
 					elseif($forma_cobro == 'TASA')
@@ -368,6 +375,11 @@
 						$contrato->Edit("porcentaje_descuento",'0');
 					}
 					$contrato->Edit("id_moneda_monto",$id_moneda_monto);
+					$contrato->Edit("alerta_hh",$alerta_hh);
+					$contrato->Edit("alerta_monto",$alerta_monto);
+					$contrato->Edit("limite_hh",$limite_hh);
+					$contrato->Edit("limite_monto",$limite_monto);
+
 					if($contrato->Write())
 					{
 						#Subiendo Archivo

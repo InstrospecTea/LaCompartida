@@ -328,7 +328,7 @@ window.opener.Refrescar(true);
 																if($opc=='guardar')
 																	echo $documento->fields['glosa_documento'];
 																else
-																	echo "Pago de Cobro N° ".$id_cobro;
+																	echo "Pago de " . __('Cobro') . " N° ".$id_cobro;
 																?></textarea>
 		</td>
 	</tr>

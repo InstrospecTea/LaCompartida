@@ -150,14 +150,14 @@
 			}
 		else
 		{ ?>
-			<script type="text/javascript">alert('¡No se puede modificar un pago de un cliente inactivo!');</script>
+			<script type="text/javascript">alert('�No se puede modificar un pago de un cliente inactivo!');</script>
 <?	}
 		
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";
 		//echo $out_neteos;
 	}
 
-	 $txt_pagina = $id_documento ? __('Edición de Pago') : __('Documento de Pago');
+	 $txt_pagina = $id_documento ? __('Edici�n de Pago') : __('Documento de Pago');
 	 $txt_tipo = __('Documento de Pago');
 
 	$pagina->titulo = $txt_pagina;
@@ -497,7 +497,7 @@ function SetMontoPagos()
 				if($documento->fields['glosa_documento'])
 					echo $documento->fields['glosa_documento'];
 				else if($id_cobro)
-					echo "Pago de Cobro #".$id_cobro.'. Generado automaticamente por el sistema el '.date('d-m-Y').'.';
+					echo "Pago de " . __('Cobro') . " #".$id_cobro.'. Generado automaticamente por el sistema el '.date('d-m-Y').'.';
 			?></textarea>
 		</td>
 	</tr>

@@ -556,7 +556,7 @@ function ActualizaCobro(valor)
 	}
 	if(cambio)
 	{
-		if(confirm('Ud. está modificando un trabajo que pertenece al cobro: '+id_cobro[i]+' . Si acepta, el trabajo se desvinculará de este cobro y eventualmente se vinculará a un cobro pendiente para el nuevo asunto en caso de que exista.'))
+		if(confirm('Ud. está modificando un trabajo que pertenece <?php echo __('al cobro'); ?>: '+id_cobro[i]+' . Si acepta, el trabajo se desvinculará de este <?php echo __('cobro'); ?> y eventualmente se vinculará a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.'))
 		{
 		var hacer_submit = true;
 			for (i in codigosOriginales)
@@ -853,7 +853,7 @@ if($txt_opcion)
 						break;
 					}
 ?>
-				id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la Nota de Cobro')" onMouseout="hideddrivetip()" />
+				id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()" />
 			<? }
 				else
 				{

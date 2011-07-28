@@ -67,7 +67,7 @@ class PDFcobro extends FPDF
         $this->SetY( $y );
 
         $this->SetFont( 'Arial', '', 7 );
-        $this->Cell( 0, 8, 'Cobro :: Impreso el '.$this->fecha_actual );
+        $this->Cell( 0, 8, __('Cobro') . ' :: Impreso el '.$this->fecha_actual );
         $this->Cell( 0, 8, 'Página '.$this->PageNo(), '', '', 0, 'R' );
     }
 }

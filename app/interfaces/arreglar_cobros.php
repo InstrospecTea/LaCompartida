@@ -35,7 +35,7 @@
 	<tr>
 		<td>
 			<hr size="1">
-			<b>Cobro <?=$cobro->fields['id_cobro']?>, por un monto de <?=$cobro->fields['monto']?></b><br>
+			<b><?php echo __('Cobro'); ?> <?=$cobro->fields['id_cobro']?>, por un monto de <?=$cobro->fields['monto']?></b><br>
 
 <?
 		$cobro->LoadAsuntos();
@@ -69,7 +69,7 @@
 
 		if( $cobro->fields['tipo_cambio_moneda'] == 0 )
 		{
-			if( $fix != '1' ) echo " - Campo tipo_cambio_moneda cobro en 0 -> Se actualizará a ".$moneda->fields['tipo_cambio']."<br>";
+			if( $fix != '1' ) echo " - Campo tipo_cambio_moneda " . __('cobro') . " en 0 -> Se actualizará a ".$moneda->fields['tipo_cambio']."<br>";
 			$cobro->Edit('tipo_cambio_moneda', $moneda->fields['tipo_cambio']);
 		}
 

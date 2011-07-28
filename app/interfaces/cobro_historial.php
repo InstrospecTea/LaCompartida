@@ -75,7 +75,7 @@ echo(Autocompletador::CSS());
 	<table width="90%" style="border: 1px solid #BDBDBD;">
 		<tr>
 			<td align="right" width="20%">
-				<?=__('ID cobro')?>
+				<?=__('ID') . " " . __('cobro')?>
 			</td>
 			<td align="left" width="80%" colspan="3">
 				<input type="text" size="3" name="id_cobro" name="id_cobro" value="<?=$id_cobro?>" />
@@ -127,11 +127,11 @@ echo(Autocompletador::CSS());
 		<td align="left" colspan="3">
 			<select name="comentario" id="comentario" width="150">
 				<option value=''></option>
-				<option value='COBRO CREADO' <?=$comentario=='COBRO CREADO'?'selected':''?>>COBRO CREADO</option>
-				<option value='COBRO EMITIDO' <?=$comentario=='COBRO EMITIDO'?'selected':''?>>COBRO EMITIDO</option>
-				<option value='COBRO ANULADO' <?=$comentario=='COBRO ANULADO'?'selected':''?>>COBRO ANULADO</option>
-				<option value='COBRO PAGADO' <?=$comentario=='COBRO PAGADO'?'selected':''?>>COBRO PAGADO</option>
-				<option value='COBRO EN REVISION' <?=$comentario=='COBRO EN REVISION'?'selected':''?>>COBRO EN REVISION</option>
+				<option value='COBRO CREADO' <?=$comentario=='COBRO CREADO'?'selected':''?>><?=__('COBRO CREADO') ?></option>
+				<option value='COBRO EMITIDO' <?=$comentario=='COBRO EMITIDO'?'selected':''?>><?=__('COBRO EMITIDO') ?></option>
+				<option value='COBRO ANULADO' <?=$comentario=='COBRO ANULADO'?'selected':''?>><?=__('COBRO ANULADO') ?></option>
+				<option value='COBRO PAGADO' <?=$comentario=='COBRO PAGADO'?'selected':''?>><?=__('COBRO PAGADO') ?></option>
+				<option value='COBRO EN REVISION' <?=$comentario=='COBRO EN REVISION'?'selected':''?>><?=__('COBRO EN REVISION') ?></option>
 			</select>
 	<tr>
 		<td align="center" colspan="4">

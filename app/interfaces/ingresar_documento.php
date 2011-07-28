@@ -91,7 +91,7 @@
 		$x_pag = 0;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_cobros";
-		$b->titulo = "Si el documento corresponde al Pago de un Cobro pendiente, marque los montos cuyo pago estará completo:";
+		$b->titulo = "Si el documento corresponde al Pago de " . __('un Cobro') . " pendiente, marque los montos cuyo pago estará completo:";
 		$b->AgregarEncabezado("id_cobro",__('N°'), "align=left");
 		$b->AgregarEncabezado("glosa_documento",__('Descripción'), "align=left");
 		$b->AgregarEncabezado("fecha_ini",__('desde'),"align=left");
@@ -130,8 +130,8 @@
 	}
 	else
 	{
-		$txt_pagina = $id_documento ? __('Edición de Documento de Cobro') : __('Documento de Cobro');
-		$txt_tipo = __('Documento de Cobro');
+		$txt_pagina = $id_documento ? __('Edición de Documento de') . ' ' . _('Cobro') : __('Documento de') . ' ' . _('Cobro');
+		$txt_tipo = __('Documento de') . ' ' . _('Cobro');
 	}
 	
 	$pagina->titulo = $txt_pagina;

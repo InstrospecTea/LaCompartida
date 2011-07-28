@@ -76,8 +76,8 @@
 			$pagina->AddError($documento->error);
 	}
 
-	$txt_pagina = $id_documento ? __('Edición de Documento de Cobro') : __('Documento de Cobro');
-	$txt_tipo = __('Documento de Cobro');
+	$txt_pagina = $id_documento ? __('Edición de Documento de') . ' ' . _('Cobro') : __('Documento de') . ' ' . _('Cobro');
+	$txt_tipo = __('Documento de') . ' ' . _('Cobro');
 
 	$pagina->titulo = $txt_pagina;
 	$pagina->PrintTop($popup);

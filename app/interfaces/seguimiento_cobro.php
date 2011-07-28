@@ -22,6 +22,9 @@
 	$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
 
+	$query_usuario_activo = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
+			WHERE activo = 1 ORDER BY nombre";
+
 	$query_cliente = "SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo = 1 ORDER BY glosa_cliente ASC";
 
 	$query_proceso = "SELECT id_proceso FROM cobro_proceso ORDER BY id_proceso ASC";
@@ -42,11 +45,11 @@
 			
 			if( $cont_documentos > 0 )
 			{
-				$pagina->AddError(__('El cobro N°'.$cobros->fields['id_cobro'].' no se puede borrar porque tiene un pago asociado.'));
+				$pagina->AddError(__('El cobro N°').$cobros->fields['id_cobro'].__(' no se puede borrar porque tiene un pago asociado.'));
 			}
 			else if( $cont_facturas > 0 )
 			{
-				$pagina->AddError(__('El cobro N°'.$cobros->fields['id_cobro'].' no se puede borrar porque tiene un documento tributario asociado.'));
+				$pagina->AddError(__('El cobro N°').$cobros->fields['id_cobro'].__(' no se puede borrar porque tiene un documento tributario asociado.'));
 			}
 			else if($cobros->Eliminar())
 			{
@@ -89,6 +92,8 @@
 			*/
 			if($id_usuario)
 				$where .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
+			if($id_usuario_secundario)
+				$where .= " AND contrato.id_usuario_secundario = '$id_usuario_secundario' ";
 			if($forma_cobro)
 				$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 			if($tipo_liquidacion) //1-2 = honorarios-gastos, 3 = mixtas
@@ -203,19 +208,25 @@
 								<b>".__('N° Cobro')."</b>
 							</td>";
 
-				if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') ) || ( method_exists('Conf','FacturaSeguimientoCobros') && Conf::FacturaSeguimientoCobros() ) )
+				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') && !( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) )
 				{
-				$ht .=		"<td align=center style='font-size:10px; width: 70px;'>
+				$ht .=	"<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
 							</td>";
 				}
+				
 				$ht .=	    "<td style='font-size:10px; ' align=left>
-								<b>&nbsp;&nbsp;&nbsp;Descripción del cobro</b>
-							</td>
-							<td style='font-size:10px; width: 52px;' align=center>
+								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
+							</td>";
+				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+				{
+				$ht .=	"<td align=left style='font-size:10px; width: 200px;'>
+								<b>N° Factura</b>
+							</td>";
+				}
+				$ht .= "<td style='font-size:10px; width: 52px;' align=center>
 								<b>Opción</b>
-							</td>
-						<tr>";
+							</td></tr>";
 	    		$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
 				$codigo_cliente_ultimo = $cobro->fields['codigo_cliente'];
 	            $id_contrato_ultimo = $cobro->fields['id_contrato'];
@@ -227,7 +238,14 @@
 			$html .= $ht;
 			$html .= "<tr onmouseover=\"this.bgColor='#bcff5c'\" onmouseout=\"this.bgColor='#F2F2F2'\"><td align=right style='font-size:10px; width: 70px;'>#".$cobro->fields['id_cobro']."</td>";
 
-
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') && !( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) )
+			{
+					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
+					if($cobro->fields['documento'])
+						$html.= "#".$cobro->fields['documento'];
+					$html .= "</td>";
+			}
+			
 			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 				(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
 			$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['cobro_monto'],2,',','.')
@@ -244,11 +262,14 @@
 				$fecha_cobro .= ' '.__('hasta').' '.Utiles::sql2date($cobro->fields['fecha_fin']).' ';
 			$html .= $fecha_cobro ? __('durante').' '.$fecha_cobro : '';
 			#$html .= ' -  [Proc. '.$cobro->fields['id_proceso'].'] ';
-			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span>";
-					$html .= "&nbsp;";
+			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span></td>";
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+					$html .= "<td align=left style='font-size:10px; width: 200px;'>&nbsp;";
 					if($cobro->fields['documento'])
 						$html.= "#".$cobro->fields['documento'];
 					$html .= "</td>";
+			}
 			$html .= "<td align=center style=\"width: 52px;\"><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1000,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
 			#if($cobro->fields['estado'] == 'EMITIDO' || $cobro->fields['estado'] == 'CREADO')
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
@@ -383,6 +404,7 @@ function Refrescar(id_foco)
 	var proceso = $('proceso').value;
 	var codigo_cliente = $('codigo_cliente').value;
 	var id_usuario = $('id_usuario').value;
+	var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
 	var id_cobro = $('id_cobro').value;
 	if ( $('usar_periodo').checked == true )
 		var usar_periodo = $('usar_periodo').value;
@@ -408,7 +430,7 @@ function Refrescar(id_foco)
 	else
 		echo "var pagina_desde = '';";
 ?>
-	var url = "seguimiento_cobro.php?id_usuario="+id_usuario+"&id_cobro="+id_cobro+"&codigo_cliente="+codigo_cliente+"&opc=buscar"+pagina_desde+"&usar_periodo="+usar_periodo+"&rango="+rango+"&proceso="+proceso+"&fecha_ini="+fecha_ini+"&fecha_mes="+fecha_mes+"&fecha_anio="+fecha_anio+"&fecha_fin="+fecha_fin+"&estado="+estado+orden+"&id_foco="+id_foco;
+	var url = "seguimiento_cobro.php?id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_cobro="+id_cobro+"&codigo_cliente="+codigo_cliente+"&opc=buscar"+pagina_desde+"&usar_periodo="+usar_periodo+"&rango="+rango+"&proceso="+proceso+"&fecha_ini="+fecha_ini+"&fecha_mes="+fecha_mes+"&fecha_anio="+fecha_anio+"&fecha_fin="+fecha_fin+"&estado="+estado+orden+"&id_foco="+id_foco;
 
 	self.location.href = url;
 } 
@@ -492,6 +514,15 @@ function Refrescar(id_foco)
 			<td align=right><b><?=__('Encargado comercial')?>&nbsp;</b></td>
 			<td colspan=2 align=left><?=Html::SelectQuery($sesion,$query_usuario,"id_usuario",$id_usuario,'',__('Cualquiera'),'width="200"')?>
 		</tr>
+		<?php if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){ ?>
+		<tr>
+			<td align=right><b><?=__('Encargado Secundario')?>&nbsp;</b></td>
+			<td colspan=2 align=left><?=Html::SelectQuery($sesion,$query_usuario_activo,"id_usuario_secundario",$id_usuario_secundario, '',__('Cualquiera'),'width="200"')?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type=hidden size=6 name=id_proceso id=id_proceso value='<?=$id_proceso?>' >
+			</td>
+		</tr>
+		<?php } ?>
 		<tr>
 			<td align=right><b><?=__('Forma de Tarificación')?>&nbsp;</b></td>
 			<td colspan=2 align=left>

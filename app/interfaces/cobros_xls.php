@@ -1337,17 +1337,17 @@ $mostrar_resumen_de_profesionales = 1;
 						$filas += 3;
 						// Informacion general sobre el cobro:
 						$ws->mergeCells($filas,$col_fecha_ini,$filas,$col_fecha_ini+1);
-						$ws->write($filas,$col_fecha_ini, 'Información según cobro:',$formato_resumen_text_titulo);
+						$ws->write($filas,$col_fecha_ini, 'Información según ' . __('Cobro') . ':',$formato_resumen_text_titulo);
 						$ws->write($filas++,$col_fecha_ini+1,'',$formato_resumen_text);
-						$ws->write($filas,$col_fecha_ini, 'Número Cobro',$formato_resumen_text);
+						$ws->write($filas,$col_fecha_ini, 'Número ' . __('Cobro') . '',$formato_resumen_text);
 						$ws->writeNumber($filas++,$col_fecha_ini+1, $cobro->fields['id_cobro'],$numeros);
 						$ws->write($filas,$col_fecha_ini, 'Número Factura',$formato_resumen_text_amarillo);
 						$ws->writeNumber($filas++,$col_fecha_ini+1,$cobro->fields['documento'],$numeros_amarillo);
-						$ws->write($filas,$col_fecha_ini, 'Forma Cobro',$formato_resumen_text);
+						$ws->write($filas,$col_fecha_ini, 'Forma ' . __('Cobro') . '',$formato_resumen_text);
 						$ws->write($filas++,$col_fecha_ini+1, $cobro->fields['forma_cobro'],$formato_resumen_text_derecha);
-						$ws->write($filas,$col_fecha_ini, 'Periodo Cobro',$formato_resumen_text);
+						$ws->write($filas,$col_fecha_ini, 'Periodo ' . __('Cobro') . '',$formato_resumen_text);
 						$ws->write($filas++,$col_fecha_ini+1, $cobro->fields['fecha_ini'].' - '.$cobro->fields['fecha_fin'],$formato_resumen_text_derecha); 
-						$ws->write($filas,$col_fecha_ini, 'Total Cobro',$formato_resumen_text);
+						$ws->write($filas,$col_fecha_ini, 'Total ' . __('Cobro') . '',$formato_resumen_text);
 						$ws->writeNumber($filas++,$col_fecha_ini+1,$cobro->fields['monto']*$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']+$cobro->fields['monto_gastos'],$formato_moneda_resumen_cobro);
 						
 						// Si la forma del cobro es cap imprime una lista de todos los cobros anteriores incluido en este CAP:

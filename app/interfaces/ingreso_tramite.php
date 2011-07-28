@@ -894,8 +894,8 @@ function ActualizaCobro(valor)
 	if(codigo_asunto_hide != valor && id_cobro && id_trabajo)
 	{
 		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
-		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de este cobro y eventualmente se vinculará a un cobro pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está modificando un trabajo que pertenece') . " " . _('al cobro')?>:'+id_cobro+' ';
+		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de') . " " . _('este cobro') . " " . __('y eventualmente se vinculará a') . " " . _('un cobro') . " " . _('pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,

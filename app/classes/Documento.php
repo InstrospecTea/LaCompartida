@@ -474,7 +474,7 @@ class Documento extends Objeto
 					$documento->Edit('id_moneda',$cobro->fields['opc_moneda_total']);
 					$documento->Edit('codigo_cliente',$cobro->fields['codigo_cliente']);
 					$documento->Edit('id_cobro',$cobro->fields['id_cobro']);
-					$documento->Edit('glosa_documento',"Documento de Cobro #".$cobro->fields['id_cobro']);
+					$documento->Edit('glosa_documento',"Documento de " . __('Cobro') . " #".$cobro->fields['id_cobro']);
 
 					$moneda_total = new Objeto($sesion,'','','prm_moneda','id_moneda');
 					$moneda_total->Load($cobro->fields['opc_moneda_total'] > 0 ? $cobro->fields['opc_moneda_total'] : 1);

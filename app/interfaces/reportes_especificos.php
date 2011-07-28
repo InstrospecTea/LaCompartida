@@ -187,6 +187,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 		<td>
 			<ul style="list-style-position: outside; text-align: left;">
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/reporte_diario.php' style="color:#000;text-decoration: none;"><?=__('Reporte Diario')?></a></li>
+			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_alertas_graficas.php' style="color:#000;text-decoration: none;"><?=__('Reporte Alertas')?></a></li>
 			</ul>
 			</td>
 

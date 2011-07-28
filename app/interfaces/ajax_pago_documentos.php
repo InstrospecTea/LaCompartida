@@ -107,7 +107,7 @@
 		$x_pag = 0;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_cobros";
-		$b->titulo = "Indique el Pago de Documentos de Cobro pendientes";
+		$b->titulo = "Indique el Pago de Documentos de " . __('Cobros') . " pendientes";
 		$b->AgregarEncabezado("id_documento",__('N°'), "align=left");
 		//$b->AgregarEncabezado("id_documento",__('N° Doc'), "align=left");
 
@@ -438,7 +438,7 @@
 			$cambio_cobro_actual = $fila->fields['t_c_moneda_cobro'];
 			$cambio_pago_actual = $fila->fields['t_c_moneda_pago'];
 			
-			$html .= '<img style="cursor:pointer" src="'.Conf::ImgDir().'/money_16.gif" title="Tipo de cambio Cobro: '.$cambio_cobro.'. Tipo de cambio Pago: '.$cambio_pago.' " onclick="$(\'calculos_'.$fila->fields['id_documento'].'\').toggle();" />';
+			$html .= '<img style="cursor:pointer" src="'.Conf::ImgDir().'/money_16.gif" title="Tipo de cambio ' . __('Cobro') . ': '.$cambio_cobro.'. Tipo de cambio Pago: '.$cambio_pago.' " onclick="$(\'calculos_'.$fila->fields['id_documento'].'\').toggle();" />';
 			
 			$html .="</td></tr><tr id='calculos_".$fila->fields['id_documento']."' style='display:none;'>
 			<td colspan=8>

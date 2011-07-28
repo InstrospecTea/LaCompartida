@@ -297,7 +297,11 @@ class Contrato extends Objeto
 							AND asunto.id_contrato='".$this->fields['id_contrato']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($total_horas_no_cobradas) = mysql_fetch_array($resp);
-		return $total_horas_no_cobradas;
+
+		if($total_horas_no_cobradas)
+			return $total_horas_no_cobradas;
+		else
+			return 0;
 	}
 
 	function TotalMonto($emitido = true)
@@ -319,7 +323,17 @@ class Contrato extends Objeto
 							
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($total_monto_trabajado, $moneda) = mysql_fetch_array($resp);
-		return array($total_monto_trabajado,$moneda);
+		
+		if($moneda)
+			return array($total_monto_trabajado,$moneda);
+		
+		$query = "SELECT prm_moneda.simbolo   
+							FROM contrato 
+							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+							WHERE contrato.id_contrato='".$this->fields['id_contrato']."'"; 		
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($moneda) = mysql_fetch_array($resp);
+		return array(0,$moneda);
 	}
 
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()

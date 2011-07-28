@@ -579,7 +579,7 @@ function ValidarTodo(form)
 		{
 			if( form.existe_factura.value == 1 )
 			{
-				alert( 'No se puede anular un cobro que tiene facturas asociados.' );
+				alert( 'No se puede anular <?php echo __('un cobro') ?> que tiene facturas asociados.' );
 				form.estado.value = form.estado_original.value;
 				return false;
 			}
@@ -608,7 +608,7 @@ function ValidarTodo(form)
 	
 	if(form.estado.value == 'INCOBRABLE') //Significa que estoy dando como INCOBRABLE el cobro
 	{
-		if(!confirm('<?=__("¿Está seguro que desea definir este cobro como \"Incobrable\"?")?>'))
+		if(!confirm('<?=__("¿Está seguro que desea definir ") . __("este cobro") . __(" como \"Incobrable\"?")?>'))
 			return false;
 		else
 		{
@@ -620,7 +620,7 @@ function ValidarTodo(form)
 	
 	if(form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && !form.existe_pago.value) //No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
 	{
-		alert('<?=__("No puede definir el Cobro como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente.")?>');
+		alert('<?=__("No puede definir ") . __("el Cobro") . __(" como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente.")?>');
 		return false;
 	}
 	
@@ -1872,7 +1872,7 @@ function AgregarFactura(idx){
 			<table cellspacing="0" cellpadding="3" width="220px" style='border:1px dotted #bfbfcf'>
 				<tr>
 					<td bgcolor="#dfdfdf">
-						<span style="font-weight: bold; font-size: 11px;"><?=__('Se esta cobrando:')?></span>
+						<span style="font-weight: bold; font-size: 11px;"><?=__('Se está cobrando:')?></span>
 					</td>
 				</tr>
 				<tr>

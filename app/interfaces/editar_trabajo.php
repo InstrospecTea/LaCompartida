@@ -818,7 +818,7 @@ function ActualizaCobro(valor)
 	{
 		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
 		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
-		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de este cobro y eventualmente se vinculará a un cobro pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
+		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,
@@ -1322,7 +1322,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					<div id=divVisible <? if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
 					<? if($permisos->fields['permitido']) { ?>
 						<?=__('Visible')?>
-						<input type=checkbox name=visible value=1 <?= $t->fields['visible'] == 1 ? "checked" : "" ?> id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la Nota de Cobro')" onMouseout="hideddrivetip()">
+						<input type=checkbox name=visible value=1 <?= $t->fields['visible'] == 1 ? "checked" : "" ?> id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()">
 					<? }
 						 else
 						 {
@@ -1417,7 +1417,7 @@ Calendar.setup(
 	{
 		inputField	: "fecha",				// ID of the input field
 		ifFormat	: "%d-%m-%Y",			// the date format
-<?
+<?php
 	if (!$permiso_cobranza->fields['permitido'])
 	{
 		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";

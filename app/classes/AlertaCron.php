@@ -95,18 +95,18 @@ class Alerta
 		//Notificacion "Monto desde el último cobro"
 		if(($total_monto_ult_cobro > $asunto->fields['alerta_monto']) && ($asunto->fields['alerta_monto'] > 0) && ($asunto->fields['notificado_monto_excedido_ult_cobro']==0))
 		{
-			echo $asunto->fields['glosa_asunto']."Limite Monto Ultimo cobro : ".$asunto->fields['alerta_monto']." >> Actual :".$total_monto_ult_cobro."<br>".$moneda_desde_ult_cobro;
+			echo $asunto->fields['glosa_asunto']."Limite Monto " . __('Último Cobro') . " : ".$asunto->fields['alerta_monto']." >> Actual :".$total_monto_ult_cobro."<br>".$moneda_desde_ult_cobro;
 
-			$asunto->AlertaAdministrador("En el Asunto " .$asunto->fields['glosa_asunto'] ." (Cliente ".$asunto->fields['codigo_cliente'].") Se ha superado el monto asignado desde el Ultimo Cobro. Siendo el limite $moneda_desde_ult_cobro".$asunto->fields['alerta_monto']." El monto actual es $moneda_desde_ult_cobro $total_monto_ult_cobro ", $this->sesion);
+			$asunto->AlertaAdministrador("En el Asunto " .$asunto->fields['glosa_asunto'] ." (Cliente ".$asunto->fields['codigo_cliente'].") Se ha superado el monto asignado desde el " . __('Último Cobro') . ". Siendo el limite $moneda_desde_ult_cobro".$asunto->fields['alerta_monto']." El monto actual es $moneda_desde_ult_cobro $total_monto_ult_cobro ", $this->sesion);
 		 	$asunto->Edit('notificado_monto_excedido_ult_cobro','1');
             $asunto->Write();
 		}
 
 		//Notificacion "Horas desde el último cobro"
 		if(($total_horas_ult_cobro > $asunto->fields['alerta_hh']) &&  ($asunto->fields['alerta_hh'] > 0) && ($asunto->fields['notificado_hr_excedida_ult_cobro']==0)){
-			echo $asunto->fields['glosa_asunto']."Limite Horas Ultimo Cobro : ".$asunto->fields['alerta_hh']." >> Actual : ".$total_horas_ult_cobro."<br>";
+			echo $asunto->fields['glosa_asunto']."Limite Horas " . __('Último Cobro') . " : ".$asunto->fields['alerta_hh']." >> Actual : ".$total_horas_ult_cobro."<br>";
 
-			$asunto->AlertaAdministrador("En el Asunto " .$asunto->fields['glosa_asunto'] ." (Cliente ".$asunto->fields['codigo_cliente'].") Se ha superado el limite de horas trabajadas desde el ultimo cobro. Siendo el limite ".$asunto->fields['alerta_hh']." hrs. se han trabajado $total_horas_ult_cobro", $this->sesion);
+			$asunto->AlertaAdministrador("En el Asunto " .$asunto->fields['glosa_asunto'] ." (Cliente ".$asunto->fields['codigo_cliente'].") Se ha superado el limite de horas trabajadas desde " . __('el último cobro') . ". Siendo el limite ".$asunto->fields['alerta_hh']." hrs. se han trabajado $total_horas_ult_cobro", $this->sesion);
             $asunto->Edit('notificado_hr_excedida_ult_cobro','1');
             $asunto->Write();
 		}

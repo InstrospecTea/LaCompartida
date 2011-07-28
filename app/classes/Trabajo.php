@@ -299,7 +299,7 @@ class Trabajo extends Objeto
 							
 							if(!$id_cobro)
 									{
-										$mensajes .= "<br/>no se pude detectar el numero del cobro.";
+										$mensajes .= "<br/>no se pude detectar el numero " . __("del cobro.");
 										continue;
 									}
 										
@@ -499,7 +499,7 @@ class Trabajo extends Objeto
 							continue;
 						if($estado_cobro != 'CREADO' && $estado_cobro != 'EN REVISION')
 						{
-							$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el cobro se encuentra en estado $estado_cobro.<br />";
+							$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque " . __("el cobro") . " se encuentra en estado $estado_cobro.<br />";
 							continue;
 						}
 		

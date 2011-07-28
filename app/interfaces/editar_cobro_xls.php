@@ -8,7 +8,7 @@
 	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
 
-	$pagina->titulo = __('Editar glosa planilla de cobros');
+	$pagina->titulo = __('Editar glosa planilla de') . " " . __('cobros');
 	$pagina->PrintTop();
 
 	if($opc == 'guardar')

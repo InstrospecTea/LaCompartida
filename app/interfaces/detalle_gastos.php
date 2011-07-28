@@ -9,7 +9,7 @@
 
 	$sesion = new Sesion(array('REV','ADM'));
 	$pagina = new Pagina($sesion);
-	$pagina->titulo = "Emitir Cobro :: Seleccion de Gastos";
+	$pagina->titulo = "Emitir " . __("Cobro") . " :: Seleccion de Gastos";
 
 
     $cobro = new Cobro($sesion);

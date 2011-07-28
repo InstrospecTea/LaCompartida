@@ -181,7 +181,7 @@
 		$b->titulo = "Documentos Tributarios <br />".$glosa_monto_saldo_total;
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
-		$b->AgregarEncabezado("numero",__('N°'),"align=right width=30px");
+		$b->AgregarEncabezado("numero",__('N° Factura'),"align=right width=30px");
 		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left width=40px");
 		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
@@ -328,7 +328,7 @@
 			$html .= "<td align=center>".$fila->fields['estado']."</td>";
 		else
 			$html .= "<td align=center>".$fila->fields['anulado']."</td>";
-		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar Cobro',950,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
+		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar " . __("Cobro") . "',950,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
 		$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";

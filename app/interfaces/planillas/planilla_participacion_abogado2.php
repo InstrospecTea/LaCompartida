@@ -808,7 +808,7 @@
 				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
 
 				$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
-				$ws2->write($filas2, $col2_fecha, "Historial Cobro ".$cobro['id_cobro'].' ('.$cobro['glosa_cliente'].')', $titulo_filas);
+				$ws2->write($filas2, $col2_fecha, "Historial " . __('Cobro') . " ".$cobro['id_cobro'].' ('.$cobro['glosa_cliente'].')', $titulo_filas);
 				++$filas2;
 				$ws2->write($filas2, $col2_fecha, __('Fecha'), $titulo_filas);
 				$ws2->write($filas2, $col2_comentario, __('Comentario'), $titulo_filas);

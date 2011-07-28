@@ -70,7 +70,7 @@ cobro.estado = 'PAGADO' AND (documento.saldo_honorarios >0 OR documento.saldo_ga
 			?>
 		</td>
 		<td align=center>
-			<img src='<?=Conf::ImgDir()?>/coins_16.png' title='Ver cobro' border=0 style='cursor:pointer' onclick="nuevaVentana('Editar_Cobro',730,580,'cobros6.php?id_cobro=<?=$id_cobro?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');"/>
+			<img src='<?=Conf::ImgDir()?>/coins_16.png' title='Ver <?php echo __('cobro'); ?>' border=0 style='cursor:pointer' onclick="nuevaVentana('Editar_Cobro',730,580,'cobros6.php?id_cobro=<?=$id_cobro?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');"/>
 		</td>
 		<td align=center>
 			<a href= 'javascript:void(0);' onclick="nuevaVentana('Agregar Pago',730,580,'ingresar_documento_pago_automatico.php?id_cobro=<?=$id_cobro?>&codigo_cliente=<?=$codigo_cliente?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');">Arreglar</a>

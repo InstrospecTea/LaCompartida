@@ -297,7 +297,7 @@ class Cobro extends Objeto
 	function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false)
 	{
 		if($this->fields['estado'] != 'CREADO' AND $this->fields['estado'] != 'EN REVISION' AND $this->fields['estado'] != '')
-			return "No se puede guardar el cobro ya que ya se encuentra emitido. Usted debe volver el cobro a estado creado o en revisión para poder actualizarlo";
+			return "No se puede guardar " . __('el cobro') . " ya que ya se encuentra emitido. Usted debe volver " . __('el cobro') . " a estado creado o en revisión para poder actualizarlo";
 		// Carga de asuntos del cobro
 		$this->LoadAsuntos();
 		$comma_separated = implode("','", $this->asuntos);
@@ -865,10 +865,10 @@ class Cobro extends Objeto
 			}
 		}
 	else
-		return __('Error no se pudo guardar cobro #').' '.$this->fields['id_cobro'];
+		return __('Error no se pudo guardar ') . __('cobro') . ' # '.$this->fields['id_cobro'];
 		
 		if( ! $this->Write() )
-			return __('Error no se pudo guardar cobro #').' '.$this->fields['id_cobro'];
+			return __('Error no se pudo guardar ') . __('cobro') . ' # '.$this->fields['id_cobro'];
 
 		return '';
 	}
@@ -1266,7 +1266,7 @@ class Cobro extends Objeto
 					#Se ingresa la anotación en el historial
 					$his = new Observacion($this->sesion);
 					$his->Edit('fecha',date('Y-m-d H:i:s'));
-					$his->Edit('comentario',__('COBRO CREADO'));
+					$his->Edit('comentario','COBRO CREADO');
 					$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 					$his->Edit('id_cobro',$this->fields['id_cobro']);
 					$his->Write();
@@ -2645,7 +2645,7 @@ class Cobro extends Objeto
 			$html = str_replace('%fecha_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : __('Fecha desde'), $html);
 			$html = str_replace('%fecha_ini_primer_trabajo%', __('Fecha desde'), $html);
 
-			$html = str_replace('%nota_transferencia%','<u>'.__('Nota').'</u>:'.__('Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'),$html);
+			$html = str_replace('%nota_transferencia%','<u>'.__('Nota').'</u>:'.__('Por favor recuerde incluir cualquier tarifa o ') . __('cobro') . __(' por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'),$html);
 
 			//Se saca la fecha inicial según el primer trabajo
 			//esto es especial para LyR
@@ -4551,9 +4551,9 @@ class Cobro extends Objeto
 					$html = str_replace('%hrs_trabajadas%', '', $html);
 				$html = str_replace('%porcentaje_participacion%', __('PARTICIPACIÓN POR ABOGADO'), $html);
 				$html = str_replace('%hrs_retainer%', $mostrar_columnas_retainer?__('HRS TRABAJADAS VALOR RETAINER'):'', $html);
-				$html = str_replace('%valor_retainer%', $mostrar_columnas_retainer?__('COBRO HRS VALOR RETAINER'):'', $html);
+				$html = str_replace('%valor_retainer%', $mostrar_columnas_retainer?__('COBRO').__(' HRS VALOR RETAINER'):'', $html);
 				$html = str_replace('%hh%', __('HRS TRABAJADAS VALOR TARIFA'), $html);
-				$html = str_replace('%valor_cobrado_hh%', __('COBRO HRS VALOR TARIFA'), $html);
+				$html = str_replace('%valor_cobrado_hh%', __('COBRO').__(' HRS VALOR TARIFA'), $html);
 			}
 		else
 			$html = str_replace('%horas_trabajadas%', '', $html);
@@ -7241,7 +7241,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%fecha_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : __('Fecha desde'), $html);
 			$html = str_replace('%fecha_ini_primer_trabajo%', __('Fecha desde'), $html);
 
-			$html = str_replace('%nota_transferencia%','<u>'.__('Nota').'</u>:'.__('Por favor recuerde incluir cualquier tarifa o cobro por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'),$html);
+			$html = str_replace('%nota_transferencia%','<u>'.__('Nota').'</u>:'.__('Por favor recuerde incluir cualquier tarifa o ') . __('cobro') . __(' por transferencia por parte de vuestro banco con el fin de evitar cargos en las próximas facturas.'),$html);
 
 			//Se saca la fecha inicial según el primer trabajo
 			//esto es especial para LyR
@@ -8963,9 +8963,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%hrs_trabajadas%', ($mostrar_columnas_retainer || $columna_hrs_trabajadas) ?__('HRS TOT TRABAJADAS'):'', $html);
 				$html = str_replace('%porcentaje_participacion%', __('PARTICIPACIÓN POR ABOGADO'), $html);
 				$html = str_replace('%hrs_retainer%', $mostrar_columnas_retainer?__('HRS TRABAJADAS VALOR RETAINER'):'', $html);
-				$html = str_replace('%valor_retainer%', $mostrar_columnas_retainer?__('COBRO HRS VALOR RETAINER'):'', $html);
+				$html = str_replace('%valor_retainer%', $mostrar_columnas_retainer?__('COBRO').__(' HRS VALOR RETAINER'):'', $html);
 				$html = str_replace('%hh%', __('HRS TRABAJADAS VALOR TARIFA'), $html);
-				$html = str_replace('%valor_cobrado_hh%', __('COBRO HRS VALOR TARIFA'), $html);
+				$html = str_replace('%valor_cobrado_hh%',__('COBRO').__(' HRS VALOR TARIFA'), $html);
 			}
 		else
 			$html = str_replace('%horas_trabajadas%', '', $html);

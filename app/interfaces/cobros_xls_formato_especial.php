@@ -324,7 +324,7 @@
 		}
 	else
 		{
-			$ws->write($filas, $col_asunto, 'No existen horas en este cobro.', $formato_normal_center);
+			$ws->write($filas, $col_asunto, 'No existen horas en este ' . __('cobro') . '.', $formato_normal_center);
 			$ws->write($filas, $col_asunto+1, '',$formato_normal);
 			$ws->write($filas, $col_asunto+2, '', $formato_normal);
 			$ws->mergeCells($filas, $col_asunto, $filas, $col_asunto+2);
