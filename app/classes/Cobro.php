@@ -2545,6 +2545,7 @@ class Cobro extends Objeto
 				if(($k+1)<count($this->asuntos))
 					$imprimir_asuntos .= '<br />';
 			}
+
 			$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
 			$html = str_replace('%materia%', __('Materia'),$html);
 			$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos,$html);
@@ -2572,10 +2573,11 @@ class Cobro extends Objeto
 				$detalle_modalidad_lowercase .= '<br>'.sprintf( __('Hasta').' %s '.__('Horas'), $this->fields['retainer_horas']);
 			}
 			
-			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) ) )
+			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) ) ) {
 				$html = str_replace('%glosa_cobro%', __('Liquidación de honorarios profesionales %desde% hasta %hasta%'), $html);
-
-			$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
+			} else {
+				$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
+			}
 			$html = str_replace('%cobro%', __('Cobro').' '.__('N°'), $html);
 			$html = str_replace('%reference%',__('%reference_no%'),$html);
 			$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -3050,7 +3052,7 @@ class Cobro extends Objeto
 		break;
 		
 		case 'DETALLE_TRAMITES':
-			$html = str_replace('%tramites%',__('Tramites'),$html);
+			$html = str_replace('%tramites%',__('Trámites'),$html);
 			$aproximacion_tramites = number_format($this->fields['monto_tramites'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','');
 			$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
 			$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'].number_format($valor_tramites,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
@@ -3457,6 +3459,7 @@ class Cobro extends Objeto
 			$html = str_replace('%duracion_cobrable%',__('Duración cobrable'), $html);
 			$html = str_replace('%monto_total%',__('Monto total'), $html);
 			$html = str_replace('%horas%',__('Horas'), $html);
+			$html = str_replace('%monto%',__('Monto'), $html);
 
 			if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) ) )
 			{
@@ -3892,6 +3895,7 @@ class Cobro extends Objeto
 				else
 					{
 						$row = str_replace('%valor%', number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+						$row = str_replace('%valor_con_moneda%', $moneda->fields['simbolo'] . " " . number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 						$row = str_replace('%valor_cyc%', number_format($trabajo->fields['monto_cobrado'] * ($cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']),$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 					}
 				$row = str_replace('%valor_siempre%', number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
@@ -7168,10 +7172,12 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$detalle_modalidad_lowercase .= '<br>'.sprintf( __('Hasta').' %s '.__('Horas'), $this->fields['retainer_horas']);
 			}
 
-			if(( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) ))
+			if(( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) )) {
 				$html = str_replace('%glosa_cobro%', __('Liquidación de honorarios profesionales %desde% hasta %hasta%'), $html);
+			} else {
+				$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
+			}
 
-			$html = str_replace('%glosa_cobro%', __('Detalle Cobro'), $html);
 			$html = str_replace('%cobro%', __('Cobro').' '.__('N°'), $html);
 			$html = str_replace('%reference%',__('%reference_no%'),$html);
 			$html = str_replace('%valor_cobro%', $this->fields['id_cobro'], $html);
@@ -7979,6 +7985,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%staff%',__('Staff'), $html);
 			$html = str_replace('%abogado%',__('Abogado'), $html);
 			$html = str_replace('%horas%',__('Horas'), $html);
+			$html = str_replace('%monto%',__('Monto'), $html);
 
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) )
 			{
@@ -8338,6 +8345,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else
 					{
 						$row = str_replace('%valor%', number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+						$row = str_replace('%valor_con_moneda%', $moneda->fields['simbolo'] . number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 						$row = str_replace('%valor_cyc%', number_format($trabajo->fields['monto_cobrado'] * ($cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']),$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 					}
 				$row = str_replace('%valor_siempre%', number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
@@ -8856,7 +8864,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada'])/60);
 			$minutos_cobrables = sprintf("%02d",$asunto->fields['trabajos_total_duracion_trabajada']%60);
 
-			$html = str_replace('%glosa_tramites%',__('Total Trámites'), $html);
+			$html = str_replace('%glosa_tramites%',__('Total') . ' ' . __('Trámites'), $html);
 			$html = str_replace('%glosa%',__('Total'), $html);
 			$minutos_decimal=$minutos_cobrables/60;
 			$duracion_decimal=$horas_cobrables+$minutos_decimal;

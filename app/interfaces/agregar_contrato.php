@@ -246,6 +246,8 @@
 	$tramite_tarifa = new TramiteTarifa($sesion);
 	$tarifa_default = $tarifa->SetTarifaDefecto();
 	$tramite_tarifa_default = $tramite_tarifa->SetTarifaDefecto();
+	
+	$idioma_default = $contrato->IdiomaPorDefecto($sesion); 
 
 	if(empty($tarifa_flat) && !empty($contrato->fields['id_tarifa'])){
 		$tarifa->Load($contrato->fields['id_tarifa']);
@@ -1667,7 +1669,7 @@ else
 				<?=__('Idioma')?>
 			</td>
 			<td align="left" colspan="5">
-				<?= Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","codigo_idioma",$contrato->fields['codigo_idioma'],'','',80);?>
+				<?= Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","codigo_idioma",$contrato->fields['codigo_idioma'] ? $contrato->fields['codigo_idioma'] : $idioma_default,'','',80);?>
 			</td>
 		</tr>
 		<tr>
@@ -1727,7 +1729,13 @@ else
 			<td align="left" colspan='5'><?=__('Mostrar modalidad del cobro')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_profesional" value="1" <?=$contrato->fields['opc_ver_profesional']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<?php
+				if (empty($contrato->fields['id_contrato']) && method_exists('Conf','GetConf'))
+				{
+					$contrato->Edit('opc_ver_profesional', Conf::GetConf($sesion, 'MostrarDetalleProfesionalCartaCobro') == 1 ? 1 : 0);
+				}
+			?>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_profesional" <?=$contrato->fields['opc_ver_profesional']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar detalle por profesional')?></td>
 		</tr>
 		<tr>

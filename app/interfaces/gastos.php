@@ -22,6 +22,8 @@
 	
 	$gasto = new Gasto($sesion);
 
+	set_time_limit(300);
+	
 	if($id_gasto != "")
 	{
 		$gasto->Load($id_gasto);
@@ -171,6 +173,11 @@
 				$b->AgregarEncabezado("con_impuesto","Impuesto","align=center");
 			}
 		$b->AgregarFuncion(__('Cobro'),"CobroFila","align=left nowrap");
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+		{
+			$b->AgregarEncabezado("codigo_factura_gasto","Factura","align=left nowrap");
+			$b->AgregarFuncion(__('Fecha Factura'),"FechaFactura","align=center nowrap");
+		}
 		$b->AgregarEncabezado("estado",__('Estado') . " " . __("Cobro") ,"align=left");
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
@@ -178,17 +185,20 @@
 		}
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		
-		
-		
 		$b->color_mouse_over = "#bcff5c";
 
+		function FechaFactura(& $fila)
+		{
+			$html_fecha_factura .= "&nbsp;".( !empty($fila->fields['fecha_factura']) ? Utiles::sql2fecha($fila->fields['fecha_factura'],"%d/%m/%Y") : "-")."&nbsp;";
+			return $html_fecha_factura;
+		}
+		
 		function CobroFila(& $fila)
 		{
 			$html_cobro .= "&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1&contitulo=true');\" title='".__('Ver ') . __('Cobro asociado')."'>".$fila->fields['id_cobro']."</a>&nbsp;";
 			return $html_cobro;
 		}
 		
-
 		function Opciones(& $fila)
 		{
 			global $sesion;

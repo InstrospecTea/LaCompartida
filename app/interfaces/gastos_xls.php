@@ -14,6 +14,7 @@
 
     $pagina = new Pagina( $sesion );
 
+		set_time_limit(300);
     #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
     $wb = new Spreadsheet_Excel_Writer();
@@ -163,7 +164,7 @@
 		$query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
 					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
-					cta_corriente.numero_ot,prm_moneda.cifras_decimales, cobro.estado
+					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_moneda.cifras_decimales, cobro.estado
 					$col_select
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
@@ -223,6 +224,11 @@
 	{
 		$ws1->write($fila_inicial, $columna_actual++,utf8_decode(__('N° OT')), $tit);
 	}
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+	{
+		$ws1->write($fila_inicial, $columna_actual++,utf8_decode(__('N° Factura')), $tit);
+		$ws1->write($fila_inicial, $columna_actual++,__('Fecha Factura'), $tit);
+	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 	{
 		$ws1->write($fila_inicial, $columna_actual++, __('Tipo'), $tit);
@@ -263,10 +269,16 @@
 		{
 				$ws1->write($fila_inicial, $columna_actual++, $row[numero_ot], $f4);
 		}
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+		{
+			$ws1->write($fila_inicial, $columna_actual++, !empty($row['codigo_factura_gasto']) ? $row['codigo_factura_gasto'] : "", $f4);
+			$ws1->write($fila_inicial, $columna_actual++, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],'%d/%m/%y') : '-' , $f4);
+		}
 	    if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 		{
 				$ws1->write($fila_inicial, $columna_actual++, $row[glosa_tipo], $f4);
 		}
+		
 	    $ws1->write($fila_inicial, $columna_actual++, $row[descripcion], $f4);
 	    $ws1->write($fila_inicial, $columna_actual++, $row[ingreso] ? '' : $row[simbolo] . " " .number_format($row[egreso],$row[cifras_decimales],",","."), $f4);            
 	    $ws1->write($fila_inicial, $columna_actual++, $row[egreso] ? '' : $row[simbolo] . " " .number_format($row[ingreso],$row[cifras_decimales],",","."), $f4);

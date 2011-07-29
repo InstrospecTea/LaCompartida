@@ -62,8 +62,29 @@ class Contrato extends Objeto
         	$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		}
        	return true;
-
-
+	}
+	
+	function IdiomaPorDefecto($sesion)
+	{
+		if( method_exists('Conf','GetConf') )
+			$codigo_idioma = Conf::GetConf($sesion,'IdiomaPorDefecto');
+		
+		if( empty($codigo_idioma) )
+			$codigo_idioma = 'es';
+		
+		return $codigo_idioma;
+	}
+	
+	function IdIdiomaPorDefecto($sesion)
+	{
+		$codigo_idioma = $this->IdiomaPorDefecto($sesion);
+		
+		$query = "SELECT id_idioma FROM prm_idioma WHERE codigo_idioma = '$codigo_idioma'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		
+		list($id_idioma) = mysql_fetch_array($resp);
+		
+		return $id_idioma;
 	}
 
 	#NUEVA FUNCION, acepta más de 60 asuntos en un cliente (la otra no lo permitía)

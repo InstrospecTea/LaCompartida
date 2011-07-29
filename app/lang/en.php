@@ -325,6 +325,7 @@ $_LANG['Biblioteca del Congreso'] = "Congress Library Fees";
 $_LANG['Traducciones'] = "Translator Fees";
 $_LANG['Arriendo Casilla Banco'] = "Bank Safe";
 $_LANG['Impuestos'] = "Taxes";
+$_LANG['Impuesto'] = "Tax";
 $_LANG['Notaría'] = "Notary Public";
 $_LANG['Patente Municipal'] = "Municipal Tax";
 $_LANG['Hotel y Comidas'] = "Food & Lodging";
@@ -727,4 +728,7 @@ $_LANG['honorario_yo_gastos'] = 'Legal Fees and Expenses';
 $_LANG['nuevos soles'] = "peruvian nuevos soles";
 $_LANG['dólares americanos'] = "american dollars";
 
+$_LANG['Trámites'] = "Other charges";
+$_LANG['Honorarios totales'] = "Total amount";
+$_LANG['Hrs. Castigadas'] = "Non Billable Hours";
 ?>

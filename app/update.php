@@ -4862,7 +4862,6 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 								throw new Exception($q."---".mysql_error());
 					break;
 
-
 					case 4.08:
 					$query = array();
 
@@ -5740,6 +5739,28 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 				break;
+			case 4.55:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'MostrarDetalleProfesionalCartaCobro', '1', 'Mostrar el detalle de los profesionales en la carta de cobro', 'boolean', '4', '-1');";
+				
+				foreach( $query as $q )
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+				break;
+				
+			case 4.56:
+				$query = array();
+					
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+												VALUES (
+												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
+												);";
+					$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_factura` `codigo_factura_gasto` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+					
+					foreach($query as $q)
+							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				break;
 	}
 }
 
@@ -5963,6 +5984,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.52;
 	$VERSIONES[$num++] = 4.53;
 	$VERSIONES[$num++] = 4.54;
+	$VERSIONES[$num++] = 4.55;
+	$VERSIONES[$num++] = 4.56;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

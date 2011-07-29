@@ -465,6 +465,8 @@
 			#$pagina->AddError($asunto->error);
 	}
 
+	$id_idioma_default = $contrato->IdIdiomaPorDefecto($sesion);
+	
 	$pagina->titulo = "Ingreso de ".__('asunto');
 	$pagina->PrintTop($popup);
 ?>
@@ -764,7 +766,7 @@ function CopiarDatosCliente(form)
 			<?=__('Idioma')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_idioma","id_idioma", $asunto->fields['id_idioma'],"","","80"); ?>&nbsp;&nbsp;
+			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_idioma","id_idioma", $asunto->fields['id_idioma'] ? $asunto->fields['id_idioma'] : $id_idioma_default ,"","","80"); ?>&nbsp;&nbsp;
 			<?=__('Categoría de asunto')?>
 			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto","id_tipo_asunto", $asunto->fields['id_tipo_asunto'],""); ?>
 		</td>
