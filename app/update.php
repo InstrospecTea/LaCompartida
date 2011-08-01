@@ -5761,6 +5761,37 @@ WHERE  `id` =105 LIMIT 1 ;";
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				break;
+				
+				case 4.57:
+           $query = array();
+           $query[] = "ALTER TABLE `cobro` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
+           $query[] = "ALTER TABLE `contrato` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
+                               
+           foreach( $query as $q )
+           {
+             if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+           }
+           break;
+           
+         case 4.58:
+         		$query = array();
+         		$query[] = "ALTER TABLE `contrato` 
+         									CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
+													CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
+													CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
+						$query[] = "ALTER TABLE `cobro` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
+						
+						foreach( $query as $q )
+            {
+              if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+            }
+         break;
 	}
 }
 
@@ -5986,6 +6017,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.54;
 	$VERSIONES[$num++] = 4.55;
 	$VERSIONES[$num++] = 4.56;
+	$VERSIONES[$num++] = 4.57;
+	$VERSIONES[$num++] = 4.58;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

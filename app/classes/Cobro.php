@@ -132,6 +132,15 @@ class Cobro extends Objeto
 		}
 		return true;
 	}
+	
+	function FechaPrimerTrabajo()
+	{
+		$query = "SELECT MIN( fecha ) FROM trabajo WHERE id_cobro = '".$this->fields['id_cobro']."' ";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($fecha_ini) = mysql_fetch_array($resp);
+		
+		return $fecha_ini;
+	}
 
 	function Eliminar()
 	{
@@ -4558,7 +4567,10 @@ class Cobro extends Objeto
 					$html = str_replace('%columna_horas_no_cobrables%','',$html);
 					}
 				$html = str_replace('%nombre%', __('ABOGADO'), $html);
-				$html = str_replace('%valor_hh%', __('TARIFA'), $html);
+				if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+					$html = str_replace('%valor_hh%', __('TARIFA'), $html);
+				else
+					$html = str_replace('%valor_hh%', '', $html);
 				if( $mostrar_columnas_retainer || $columna_hrs_descontadas || $this->fields['opc_ver_horas_trabajadas'] )
 					$html = str_replace('%hrs_trabajadas%', __('HRS TOT TRABAJADAS'), $html);
 				else	
@@ -4679,7 +4691,10 @@ class Cobro extends Objeto
 			$html = str_replace('%valor_hh%',__('Tarifa'), $html);
 			$html = str_replace('%tarifa_fee%',__('%tarifa_fee%'), $html);
 			$html = str_replace('%simbolo_moneda%',$flatfee ? '' : ' ('.$moneda->fields['simbolo'].')',$html);
-			$html = str_replace('%total%',__('Total'), $html);
+			if( $this->fields['opc_ver_profesional_importe'] ) 
+				$html = str_replace('%total%',__('Total'), $html);
+			else
+				$html = str_replace('%total%', '', $html);
 			$html = str_replace('%valor_siempre%',__('Valor'), $html);
 			$html = str_replace('%honorarios%',__('Honorarios'),$html);
 			$html = str_replace('%profesional%',__('Profesional'), $html);
@@ -9301,10 +9316,18 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							$row = str_replace('%td_retainer%', '', $row);
 							$row = str_replace('%hh_cobrable%', '', $row);
 							$row = str_replace('%hh_retainer%', '', $row);
-						}
+						} 
 					$row = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $row);
-					$row = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $row);
-					$row = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+					if( $this->fields['opc_ver_profesional_tarifa'] == 1 ) {
+						$row = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $row);
+					}
+					else{ 
+						$row = str_replace('%tarifa_horas_demo%', '', $row);
+					}
+					if( $this->fields['opc_ver_profesional_importe'] == 1 )
+						$row = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+					else
+						$row = str_replace('%total_horas_demo%', '', $row);
 					
 					if(!$asunto->fields['cobrable'])
 					{
@@ -9536,7 +9559,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%hh_retainer%', '', $html);
 			}
 			$html = str_replace('%hh_demo%', $horas_cobrables.':'.$minutos_cobrables, $html);
-			$html = str_replace('%total_horas_demo%', number_format($totales['valor_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			if( $this->fields['opc_ver_profesional_importe'] == 1 )
+				$html = str_replace('%total_horas_demo%', number_format($totales['valor_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			else
+				$html = str_replace('%total_horas_demo%', '', $html);
 			 
 			if($descontado || $retainer || $flatfee)
 				{
@@ -9664,7 +9690,6 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 
 		case 'RESUMEN_PROFESIONAL':
-			
 			$columna_hrs_retainer = $GLOBALS['columna_hrs_retainer'];
 			$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
 			$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
@@ -9784,7 +9809,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						$html3 = str_replace('%hh_trabajada%', '', $html3);
 						$html3 = str_replace('%hh_descontada%', '', $html3);
 					}
-				if( $retainer || $flatfee ) 
+				if( $retainer || $flatfee )
 					{
 						$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
 						$html3 = str_replace('%hh_cobrable%', $data['glosa_duracion_cobrada'], $html3);
@@ -9813,7 +9838,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$html3 = str_replace('%hh%', $data['glosa_duracion_tarificada'], $html3);
 
 				if($this->fields['opc_ver_profesional_tarifa']==1) {
-					$html3 = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
+					$html3 = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					$html3 = str_replace('%tarifa_horas%',number_format($data['tarifa'] > 0 ? $data['tarifa'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
 				}
 				else {
@@ -9822,8 +9847,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				}
 
 				if($this->fields['opc_ver_profesional_importe']==1) {
-					$html3 = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $html3);
-					$html3 = str_replace('%total_horas%',number_format($data['valor_tarificada'] > 0 ? $data['valor_tarificada'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+					$html3 = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+					$html3 = str_replace('%total_horas%', number_format($data['valor_tarificada'] > 0 ? $data['valor_tarificada'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
 				}
 				else {
 					$html3 = str_replace('%total_horas_demo%', '', $html3);

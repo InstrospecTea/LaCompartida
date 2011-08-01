@@ -303,7 +303,7 @@
 						$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 						$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 						$contrato->Edit("opc_ver_profesional", empty($opc_ver_profesional) ? '0' : '1');
-						$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+						$contrato->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 						$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 						$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 						$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
@@ -312,9 +312,10 @@
 						$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 						$contrato->Edit("opc_ver_numpag",$opc_ver_numpag);
 						$contrato->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
-						$contrato->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
-						$contrato->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
-						$contrato->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
+						$contrato->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
+						$contrato->Edit("opc_ver_detalles_por_hora_categoria",$opc_ver_detalles_por_hora_categoria);
+						$contrato->Edit("opc_ver_detalles_por_hora_tarifa",$opc_ver_detalles_por_hora_tarifa);
+						$contrato->Edit("opc_ver_detalles_por_hora_importe",$opc_ver_detalles_por_hora_importe);
 						$contrato->Edit("opc_ver_carta",$opc_ver_carta);
 						$contrato->Edit("opc_papel",$opc_papel);
 						

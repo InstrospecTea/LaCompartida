@@ -695,7 +695,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 		<td align=left>
 			<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['codigo_factura_gasto'] && $gasto->fields['codigo_factura_gasto'] != 'NULL') ? $gasto->fields['codigo_factura_gasto'] : '' ?>" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=$gasto->fields['fecha_factura'] ? Utiles::sql2date($gasto->fields['fecha_factura']) : date('d-m-Y') ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
+			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=$gasto->fields['fecha_factura'] ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura_asociada" style="cursor:pointer" />
 		</td>
 	</tr>

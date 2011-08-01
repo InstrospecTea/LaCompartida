@@ -200,7 +200,7 @@ $_LANG['Desplegar'] = "Desplegar";
 $_LANG['Excel'] = "Excel";
 $_LANG['anterior'] = "anterior";
 $_LANG['siguiente'] = "siguiente";
-
+$_LANG['descargar_excel_modificable'] = "Descargar Excel";
 
 #PROVISION
 $_LANG['Ingresar provisión para gastos'] = "Ingresar provisión para gastos";

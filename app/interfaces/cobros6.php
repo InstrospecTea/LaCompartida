@@ -334,15 +334,16 @@
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
-		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
-		$cobro->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
-		$cobro->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
-		$cobro->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
+		$cobro->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
+		$cobro->Edit("opc_ver_detalles_por_hora_categoria",$opc_ver_detalles_por_hora_categoria);
+		$cobro->Edit("opc_ver_detalles_por_hora_tarifa",$opc_ver_detalles_por_hora_tarifa);
+		$cobro->Edit("opc_ver_detalles_por_hora_importe",$opc_ver_detalles_por_hora_importe);
 		$cobro->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$cobro->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$cobro->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -373,20 +374,21 @@
 		include dirname(__FILE__).'/factura_doc.php';
 		exit;
 	}
-	elseif($opc == 'descargar_excel')
+	elseif($opc == 'descargar_excel' || $opc == 'descargar_excel_especial')
 	{
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
-		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
-		$cobro->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
-		$cobro->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
-		$cobro->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
+		$cobro->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
+		$cobro->Edit("opc_ver_detalles_por_hora_categoria",$opc_ver_detalles_por_hora_categoria);
+		$cobro->Edit("opc_ver_detalles_por_hora_tarifa",$opc_ver_detalles_por_hora_tarifa);
+		$cobro->Edit("opc_ver_detalles_por_hora_importe",$opc_ver_detalles_por_hora_importe);
 		$cobro->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$cobro->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$cobro->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -404,23 +406,30 @@
 		$cobro->Edit('codigo_idioma',$lang);
 		if($cobro->Write())
 		{
-		$desde_cobros_emitidos = true;
-		/*
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
-			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
-		else
-			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
-		*/
-		if(!UtilesApp::GetConf($sesion,'XLSFormatoEspecial'))
-		{
-			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
-		}
-		else
-		{
-			require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
-		}
+			$desde_cobros_emitidos = true;
+			/*
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
+				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
+			else
+				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+			*/
+			if( $opc == 'descargar_excel_especial' )
+			{
+				require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
+			}
+			else
+			{
+				if( UtilesApp::GetConf($sesion,'XLSFormatoEspecial') != "cobros_xls_formato_especial" )
+				{
+					require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+				}
+				else
+				{
+					require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
+				}
+			}
 		exit;
-	}
+		}
 		$desde_cobros_emitidos = true;
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ) )
 			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
@@ -550,6 +559,14 @@ function AgregarPagoFactura()
 	lista_facturas = lista_facturas.substr(1);
 	var codigo_cliente = '<?=$cobro->fields['codigo_cliente']?>';
 	nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?=$cobro->fields['id_cobro']?>&popup=1', 'top=100, left=155, scrollbars=yes');
+}
+
+function showOpcionDetalle( id, bloqueDetalle )
+{
+	if( $(id).checked )
+		$(bloqueDetalle).style.display = "table-row";
+	else
+		$(bloqueDetalle).style.display = "none";
 }
 
 function EliminarPago( id_pago )
@@ -733,9 +750,12 @@ function VerDetalles( form )
 	return true;
 }
 
-function DescargarExcel(form)
+function DescargarExcel(form, formato_especial)
 {
-	form.opc.value = 'descargar_excel';
+	if( formato_especial == 'especial' )
+		form.opc.value = 'descargar_excel_especial';
+	else
+		form.opc.value = 'descargar_excel';
 	form.submit();
 	return true;
 }
@@ -1037,37 +1057,53 @@ function AgregarFactura(idx){
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
 												</tr>
 												<tr>
+													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?> onchange="showOpcionDetalle( this.id, 'tr_detalle_profesional');"></td>
+													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
+												</tr>
+												<tr>
+													<td/>
+													<td align="left" style="font-size: 10px;">
+														<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
+														<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+														<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+														<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+													</td>
+												</tr>
+												<tr>
 													<td align="right">
-														<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?>>
+														<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?> onchange="showOpcionDetalle( this.id, 'tr_detalle_por_hora');">
 													</td>
 													<td align="left" colspan="2" style="font-size: 10px;">
 														<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
 													</td>
 												</tr>
 												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
-												</tr>
-												<!--tr>
 													<td/>
-													<td align="left" style="font-size: 10px;">
-														<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
-														<label for="opc_ver_resumen_cobro_categoria"><?=__('Categoría')?></label>
-														<input type="checkbox" name="opc_ver_resumen_cobro_tarifa" id="opc_ver_resumen_cobro_tarifa" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_tarifa']=='1'?'checked':''?>>
-														<label for="opc_ver_resumen_cobro_tarifa"><?=__('Tarifa')?></label>
-														<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$cobro->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
-														<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
-													</td>
-												</tr-->
-												<tr>
-													<td/>
-													<td align="left" style="font-size: 10px;">
-														<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$cobro->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
-														<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
-														<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+													<td align="left" colspan="2" style="font-size: 10px;">
+														<table width="100%">
+															<tr>
+																<td width="40%" align="left">
+																	<input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora_iniciales']=='1'?'checked':''?>>
+																	<label for="opc_ver_detalles_por_hora_iniciales"><?=__('Iniciales')?></label>
+																</td>
+																<td width="60%" align="left">
+																	<input type="checkbox" name="opc_ver_detalles_por_hora_categoria" id="opc_ver_detalles_por_hora_categoria" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora_categoria']=='1'?'checked':''?>>
+																	<label for="opc_ver_detalles_por_hora_categoria"><?=__('Categoría')?></label>
+																</td>
+															</tr>
+															<tr>
+																<td width="40%" align="left">
+																	<input type="checkbox" name="opc_ver_detalles_por_hora_tarifa" id="opc_ver_detalles_por_hora_tarifa" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora_tarifa']=='1'?'checked':''?>>
+																	<label for="opc_ver_detalles_por_hora_tarifa"><?=__('Tarifa')?></label>
+																</td>
+																<td width="60%" align="left">
+																	<input type="checkbox" name="opc_ver_detalles_por_hora_importe" id="opc_ver_detalles_por_hora_importe" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora_importe']=='1'?'checked':''?>>
+																	<label for="opc_ver_detalles_por_hora_importe"><?=__('Importe')?></label>
+																</td>
+															</tr>
+														</table>
 													</td>
 												</tr>
 												<tr>
@@ -1211,7 +1247,9 @@ function AgregarFactura(idx){
 										<br>
 										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?>" onclick="return VerDetalles(this.form);" \>
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form);" \>
+										<input type="submit" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="return DescargarExcel(this.form);" \>
+										<br>
+										<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form, 'especial');" \>
 									</td>
 								</tr>
 							</table>

@@ -153,15 +153,16 @@
 		$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
-		$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
+		$contrato->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$contrato->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
-		$contrato->Edit("opc_ver_resumen_cobro_categoria",$opc_ver_resumen_cobro_categoria);
-		$contrato->Edit("opc_ver_resumen_cobro_tarifa",$opc_ver_resumen_cobro_tarifa);
-		$contrato->Edit("opc_ver_resumen_cobro_importe",$opc_ver_resumen_cobro_importe);
+		$contrato->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
+		$contrato->Edit("opc_ver_detalles_por_hora_categoria",$opc_ver_detalles_por_hora_categoria);
+		$contrato->Edit("opc_ver_detalles_por_hora_tarifa",$opc_ver_detalles_por_hora_tarifa);
+		$contrato->Edit("opc_ver_detalles_por_hora_importe",$opc_ver_detalles_por_hora_importe);
 		$contrato->Edit("opc_ver_descuento",$opc_ver_descuento);
 		$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
 		$contrato->Edit("opc_ver_numpag",$opc_ver_numpag);
@@ -1715,26 +1716,28 @@ else
 			<td align="left" colspan='5'><?=__('Mostrar resumen del cobro')?></td>
 		</tr>
 		<tr>
-			<td/>
-			<td align="left" colspan='5'>
-				<input type="checkbox" name="opc_ver_resumen_cobro_categoria" id="opc_ver_resumen_cobro_categoria" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_categoria']=='1'?'checked':''?>>
-				<label for="opc_ver_resumen_cobro_categoria"><?=__('Categoría')?></label>
-				<input type="checkbox" name="opc_ver_resumen_cobro_tarifa" id="opc_ver_resumen_cobro_tarifa" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_tarifa']=='1'?'checked':''?>>
-				<label for="opc_ver_resumen_cobro_tarifa"><?=__('Tarifa')?></label>
-				<input type="checkbox" name="opc_ver_resumen_cobro_importe" id="opc_ver_resumen_cobro_importe" value="1" <?=$contrato->fields['opc_ver_resumen_cobro_importe']=='1'?'checked':''?>>
-				<label for="opc_ver_resumen_cobro_importe"><?=__('Importe')?></label>
-			</td>
-		</tr>
-		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_modalidad" value="1" <?=$contrato->fields['opc_ver_modalidad']=='1'?'checked="checked"': ''?> <?=$checked?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar modalidad del cobro')?></td>
 		</tr>
 		<tr>
 			<td align="right">
-				<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$contrato->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora']=='1' || !$contrato->loaded)?'checked':''?>>
 			</td>
 			<td align="left" colspan="2" style="font-size: 10px;">
 				<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
+			</td>
+		</tr>
+		<tr>
+			<td/>
+			<td align="left" colspan='5'>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_iniciales']=='1' || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_detalles_por_hora_iniciales"><?=__('Iniciales')?></label>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_categoria" id="opc_ver_detalles_por_hora_categoria" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_categoria']=='1' || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_detalles_por_hora_categoria"><?=__('Categoría')?></label>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_tarifa" id="opc_ver_detalles_por_hora_tarifa" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_tarifa']=='1' || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_detalles_por_hora_tarifa"><?=__('Tarifa')?></label>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_importe" id="opc_ver_detalles_por_hora_importe" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_importe']=='1'  || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_detalles_por_hora_importe"><?=__('Importe')?></label>
 			</td>
 		</tr>
 		<tr>
@@ -1750,11 +1753,11 @@ else
 		<tr>
 			<td/>
 			<td align="left" colspan='5'>
-				<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$contrato->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
-				<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
-				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$contrato->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=($contrato->fields['opc_ver_profesional_categoria']=='1' || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
+				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=($contrato->fields['opc_ver_profesional_tarifa']=='1' || !$contrato->loaded)?'checked':''?>>
 				<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
-				<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$contrato->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=($contrato->fields['opc_ver_profesional_importe']=='1' || !$contrato->loaded)?'checked':''?>>
 				<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
 			</td>
 		</tr>
