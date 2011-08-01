@@ -36,7 +36,7 @@ class Cobro extends Objeto
 
 	//Guarda los pagos que pudo haber hecho un documento
 	function SetPagos($pago_honorarios,$pago_gastos,$id_documento=null)
-	{
+	{ 
 		$nuevo_pago = false;
 		$pagado = false;
 		if($pago_honorarios)
