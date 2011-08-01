@@ -150,6 +150,7 @@
 		$contrato->Edit("factura_telefono",$factura_telefono);
 		$contrato->Edit("cod_factura_telefono",$cod_factura_telefono);
 		#Opc contrato
+		$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
 		$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
@@ -1727,6 +1728,14 @@ else
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_modalidad" value="1" <?=$contrato->fields['opc_ver_modalidad']=='1'?'checked="checked"': ''?> <?=$checked?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar modalidad del cobro')?></td>
+		</tr>
+		<tr>
+			<td align="right">
+				<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$contrato->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?>>
+			</td>
+			<td align="left" colspan="2" style="font-size: 10px;">
+				<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
+			</td>
 		</tr>
 		<tr>
 			<?php

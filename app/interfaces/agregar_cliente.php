@@ -300,6 +300,7 @@
 						$contrato->Edit("cod_factura_telefono",$cod_factura_telefono);
 
 						#Opc contrato
+						$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 						$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 						$contrato->Edit("opc_ver_profesional", empty($opc_ver_profesional) ? '0' : '1');
 						$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);

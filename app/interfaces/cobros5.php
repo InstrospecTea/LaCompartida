@@ -83,7 +83,8 @@
 			{
 			$cobro->Edit('monto_ajustado',"0");
 			}
-			
+
+		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit('id_moneda',$cobro_id_moneda);
 		$cobro->Edit('tipo_cambio_moneda',$cobro_tipo_cambio);
 		$cobro->Edit('forma_cobro',$cobro_forma_cobro);
@@ -1250,6 +1251,14 @@ function UpdateCap(monto_update, guardar)
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
+								</tr>
+								<tr>
+									<td align="right">
+										<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?>>
+									</td>
+									<td align="left" colspan="2" style="font-size: 10px;">
+										<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
+									</td>
 								</tr>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>

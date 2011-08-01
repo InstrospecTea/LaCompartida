@@ -331,6 +331,7 @@
 
 	if($opc == 'grabar_documento' || $opc == 'guardar')
 	{
+		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
 		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
@@ -374,6 +375,7 @@
 	}
 	elseif($opc == 'descargar_excel')
 	{
+		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
 		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
@@ -1033,6 +1035,14 @@ function AgregarFactura(idx){
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
+												</tr>
+												<tr>
+													<td align="right">
+														<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?>>
+													</td>
+													<td align="left" colspan="2" style="font-size: 10px;">
+														<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
+													</td>
 												</tr>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?>></td>

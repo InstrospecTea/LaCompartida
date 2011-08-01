@@ -3298,14 +3298,24 @@ class Cobro extends Objeto
 				$row = str_replace('%registro%',__('Registro de Tiempo'),$row);
 				$row = str_replace('%telefono%',empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 				$row = str_replace('%valor_telefono%',empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
-				
 				if( $cont_trabajos > 0 )
 					{
-						$row = str_replace('%espacio_trabajo%','<br>',$row);
-						$row = str_replace('%servicios%',__('Servicios prestados'),$row);
-						$row = str_replace('%TRABAJOS_ENCABEZADO%', $this->GenerarDocumento($parser,'TRABAJOS_ENCABEZADO',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
-						$row = str_replace('%TRABAJOS_FILAS%', $this->GenerarDocumento($parser,'TRABAJOS_FILAS',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
-						$row = str_replace('%TRABAJOS_TOTAL%', $this->GenerarDocumento($parser,'TRABAJOS_TOTAL',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+						if ($this->fields["opc_ver_detalles_por_hora"] == 1)
+						{
+							$row = str_replace('%espacio_trabajo%','<br>',$row);
+							$row = str_replace('%servicios%',__('Servicios prestados'),$row);
+							$row = str_replace('%TRABAJOS_ENCABEZADO%', $this->GenerarDocumento($parser,'TRABAJOS_ENCABEZADO',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+							$row = str_replace('%TRABAJOS_FILAS%', $this->GenerarDocumento($parser,'TRABAJOS_FILAS',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+							$row = str_replace('%TRABAJOS_TOTAL%', $this->GenerarDocumento($parser,'TRABAJOS_TOTAL',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+						}
+						else
+						{
+							$row = str_replace('%espacio_trabajo%','',$row);
+							$row = str_replace('%servicios%','',$row);
+							$row = str_replace('%TRABAJOS_ENCABEZADO%','',$row);
+							$row = str_replace('%TRABAJOS_FILAS%','',$row);
+							$row = str_replace('%TRABAJOS_TOTAL%','',$row);
+						}
 						$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento($parser,'DETALLE_PROFESIONAL',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
 					}
 				else
@@ -7606,7 +7616,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 
 		case 'DETALLE_TRAMITES':
-			$html = str_replace('%tramites%',__('Tramites'),$html);
+			$html = str_replace('%tramites%',__('Trámites'),$html);
 				$valor_tramites = $x_resultados['monto_tramites'][$this->fields['opc_moneda_total']];
 			$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'].number_format($valor_tramites,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 		break;
@@ -7841,11 +7851,22 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 				if( $cont_trabajos > 0 )
 					{
-						$row = str_replace('%espacio_trabajo%','<br>',$row);
-						$row = str_replace('%servicios%',__('Servicios prestados'),$row);
-						$row = str_replace('%TRABAJOS_ENCABEZADO%', $this->GenerarDocumento2($parser,'TRABAJOS_ENCABEZADO',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
-						$row = str_replace('%TRABAJOS_FILAS%', $this->GenerarDocumento2($parser,'TRABAJOS_FILAS',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
-						$row = str_replace('%TRABAJOS_TOTAL%', $this->GenerarDocumento2($parser,'TRABAJOS_TOTAL',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+						if ($this->fields["opc_ver_detalles_por_hora"] == 1)
+						{
+							$row = str_replace('%espacio_trabajo%','<br>',$row);
+							$row = str_replace('%servicios%',__('Servicios prestados'),$row);
+							$row = str_replace('%TRABAJOS_ENCABEZADO%', $this->GenerarDocumento2($parser,'TRABAJOS_ENCABEZADO',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+							$row = str_replace('%TRABAJOS_FILAS%', $this->GenerarDocumento2($parser,'TRABAJOS_FILAS',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+							$row = str_replace('%TRABAJOS_TOTAL%', $this->GenerarDocumento2($parser,'TRABAJOS_TOTAL',					$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
+						}
+						else
+						{
+							$row = str_replace('%espacio_trabajo%','',$row);
+							$row = str_replace('%servicios%','',$row);
+							$row = str_replace('%TRABAJOS_ENCABEZADO%','',$row);
+							$row = str_replace('%TRABAJOS_FILAS%','',$row);
+							$row = str_replace('%TRABAJOS_TOTAL%','',$row);
+						}
 						$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser,'DETALLE_PROFESIONAL',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
 					}
 				else

@@ -824,149 +824,151 @@ $mostrar_resumen_de_profesionales = 1;
 
 
 	 		//Hoja Detalle por profesional
-			$nombre_pagina = ++$numero_pagina . ' ';
-	 		$ws = &$wb->addWorksheet("Detalle por profesional");
-	 		$ws->setPaper(2);
-
-			$filas = 0;
-			$col = 0;
-			$columna_inicial = 0;
-			$columna_sigla = $col++;
-			$columna_abogado = $col++;
-			$columna_categoria = $col++;
-			$columna_descripcion = $col++;
-			$columna_hora = $col++;
-			$col_formula_hora = Utiles::NumToColumnaExcel($columna_hora);
-			$columna_tarifa = $col++;
-			$col_formula_tarifa = Utiles::NumToColumnaExcel($columna_tarifa);
-			$columna_importe = $col++;
-			$col_formula_importe = Utiles::NumToColumnaExcel($columna_importe);
-			
-
-			$ws->write($filas, $columna_inicial, __('DETALLE DE SERVICIOS PRESTADOS'), $formato_encabezado);
-			$filas += 1;
-			$ws->write($filas, $columna_inicial, __('Período').$fecha_ini_titulo.__(' al ').$cobro->fields['fecha_fin'], $formato_encabezado);
-			$filas += 2;
-			$ws->write($filas, $columna_inicial, __('Cliente: ').$cliente->fields['glosa_cliente'], $formato_encabezado);
-			$filas += 3;
-
-			$ws->write($filas, $columna_sigla, __('Sigla'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_abogado, __('Abogado'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_descripcion, __('Descripcion'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
-			$ws->write($filas, $columna_importe, __('Importe '), $letra_encabezado_lista);
-			$filas += 1;
-
-			$where_trabajos = " 1 ";
-			if($opc_ver_asuntos_separados)
-				$where_trabajos .= " AND trabajo.codigo_asunto ='".$asunto->fields['codigo_asunto']."' ";
-			if(!$opc_ver_cobrable)
-				$where_trabajos .= " AND trabajo.visible = 1 ";
-			if(!$opc_ver_horas_trabajadas)
-				$where_trabajos .= " AND trabajo.duracion_cobrada != '00:00:00' ";
-
-			$query_cont_trabajos = "SELECT COUNT(*) FROM trabajo WHERE $where_trabajos AND id_cobro='".$cobro->fields['id_cobro']."' AND id_tramite = 0";
-			$resp_cont_trabajos = mysql_query($query_cont_trabajos,$sesion->dbh) or Utiles::errorSQL($query_cont_trabajos,__FILE__,__LINE__,$sesion->dbh);
-			list($cont_trabajos) = mysql_fetch_array($resp_cont_trabajos);
-
-			if($cont_trabajos>0)
-			{
-				// Buscar todos los trabajos de este asunto/cobro
-				$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
-														trabajo.id_cobro,
-														trabajo.id_trabajo,
-														trabajo.codigo_asunto,
-														trabajo.id_usuario,
-														trabajo.cobrable,
-														prm_moneda.simbolo AS simbolo,
-														asunto.codigo_cliente AS codigo_cliente,
-														asunto.id_asunto AS id,
-														trabajo.fecha_cobro AS fecha_cobro_orden,
-														IF( trabajo.cobrable = 1, 'SI', 'NO') AS glosa_cobrable,
-														trabajo.visible,
-														username AS usr_nombre,
-														DATE_FORMAT(duracion, '%H:%i') AS duracion,
-														DATE_FORMAT(duracion_cobrada, '%H:%i') AS duracion_cobrada,
-														TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_decimal,
-														DATE_FORMAT(duracion_retainer, '%H:%i') AS duracion_retainer,
-														TIME_TO_SEC(duracion)/3600 AS duracion_horas,
-														IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
-														DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
-														asunto.codigo_asunto_secundario as codigo_asunto_secundario
-													FROM trabajo
-														JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-														LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-														JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-														LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-														LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-														LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-													WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=".$cobro->fields['id_cobro'];
-
-				$orden = "usuario.id_categoria_usuario, trabajo.fecha, trabajo.descripcion";
-				$b1 = new Buscador($sesion, $query_trabajos, "Trabajo", $desde, '', $orden);
-				$lista_trabajos = $b1->lista;
-				$fila_inicial = $filas;
-				$id_categoria_actual = 0;
-				for($i=0;$i<$lista_trabajos->num;$i++)
-				{
-					$trabajo = $lista_trabajos->Get($i);
-
-					if($id_categoria_actual != $trabajo->fields['id_categoria_usuario']) {
-						$filas += 1;
-						$id_categoria_actual = $trabajo->fields['id_categoria_usuario'];
-					}
-
-					
-						$siglas = $trabajo->fields['username'];
-						$nombre = $trabajo->fields['nombre'] .' '. $trabajo->fields['apellido1'] .' '. $trabajo->fields['apellido2'];
-					$ws->write($filas, $columna_sigla, $siglas, $letra_datos_lista);
-					$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista);
-					$categoria_usuario = '';
-					if($trabajo->fields['id_categoria_usuario']) {
-						$query_categoria_usuario = "SELECT glosa_categoria FROM prm_categoria_usuario WHERE id_categoria_usuario = ".$trabajo->fields['id_categoria_usuario'];
-						$resp_query_categoria_usuario = mysql_query($query_categoria_usuario,$sesion->dbh) or Utiles::errorSQL($query_categoria_usuario,__FILE__,__LINE__,$sesion->dbh);
-						list($categoria_usuario) = mysql_fetch_array($resp_query_categoria_usuario);
-					}
-					$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista);
-
-					$ws->write($filas, $columna_descripcion, $trabajo->fields['descripcion'], $letra_datos_lista);
-
-					$ws->write($filas, $columna_tarifa, $trabajo->fields['tarifa_hh'], $formato_moneda2);
-
-					$duracion = $trabajo->fields['duracion'];
-					list($h, $m) = split(':', $duracion);
-					$duracion = $h/24 + $m/(24*60);
-					$ws->writeNumber($filas, $columna_hora,$duracion, $formato_tiempo2);
-
-					$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora".($filas+1), $formato_moneda2);
-
-					$filas += 1;
-				}
+	 		if ($cobro->fields["opc_ver_detalles_por_hora"] == 1)
+		 	{
+				$nombre_pagina = ++$numero_pagina . ' ';
+		 		$ws = &$wb->addWorksheet("Detalle por profesional");
+		 		$ws->setPaper(2);
+	
+				$filas = 0;
+				$col = 0;
+				$columna_inicial = 0;
+				$columna_sigla = $col++;
+				$columna_abogado = $col++;
+				$columna_categoria = $col++;
+				$columna_descripcion = $col++;
+				$columna_hora = $col++;
+				$col_formula_hora = Utiles::NumToColumnaExcel($columna_hora);
+				$columna_tarifa = $col++;
+				$col_formula_tarifa = Utiles::NumToColumnaExcel($columna_tarifa);
+				$columna_importe = $col++;
+				$col_formula_importe = Utiles::NumToColumnaExcel($columna_importe);
+				
+	
+				$ws->write($filas, $columna_inicial, __('DETALLE DE SERVICIOS PRESTADOS'), $formato_encabezado);
 				$filas += 1;
-				$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe".($fila_inicial+1).":$col_formula_importe".($filas).")", $formato_moneda2);
+				$ws->write($filas, $columna_inicial, __('Período').$fecha_ini_titulo.__(' al ').$cobro->fields['fecha_fin'], $formato_encabezado);
+				$filas += 2;
+				$ws->write($filas, $columna_inicial, __('Cliente: ').$cliente->fields['glosa_cliente'], $formato_encabezado);
+				$filas += 3;
+	
+				$ws->write($filas, $columna_sigla, __('Sigla'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_abogado, __('Abogado'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_descripcion, __('Descripcion'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
+				$ws->write($filas, $columna_importe, __('Importe '), $letra_encabezado_lista);
+				$filas += 1;
+	
+				$where_trabajos = " 1 ";
+				if($opc_ver_asuntos_separados)
+					$where_trabajos .= " AND trabajo.codigo_asunto ='".$asunto->fields['codigo_asunto']."' ";
+				if(!$opc_ver_cobrable)
+					$where_trabajos .= " AND trabajo.visible = 1 ";
+				if(!$opc_ver_horas_trabajadas)
+					$where_trabajos .= " AND trabajo.duracion_cobrada != '00:00:00' ";
+	
+				$query_cont_trabajos = "SELECT COUNT(*) FROM trabajo WHERE $where_trabajos AND id_cobro='".$cobro->fields['id_cobro']."' AND id_tramite = 0";
+				$resp_cont_trabajos = mysql_query($query_cont_trabajos,$sesion->dbh) or Utiles::errorSQL($query_cont_trabajos,__FILE__,__LINE__,$sesion->dbh);
+				list($cont_trabajos) = mysql_fetch_array($resp_cont_trabajos);
+	
+				if($cont_trabajos>0)
+				{
+					// Buscar todos los trabajos de este asunto/cobro
+					$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
+															trabajo.id_cobro,
+															trabajo.id_trabajo,
+															trabajo.codigo_asunto,
+															trabajo.id_usuario,
+															trabajo.cobrable,
+															prm_moneda.simbolo AS simbolo,
+															asunto.codigo_cliente AS codigo_cliente,
+															asunto.id_asunto AS id,
+															trabajo.fecha_cobro AS fecha_cobro_orden,
+															IF( trabajo.cobrable = 1, 'SI', 'NO') AS glosa_cobrable,
+															trabajo.visible,
+															username AS usr_nombre,
+															DATE_FORMAT(duracion, '%H:%i') AS duracion,
+															DATE_FORMAT(duracion_cobrada, '%H:%i') AS duracion_cobrada,
+															TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_decimal,
+															DATE_FORMAT(duracion_retainer, '%H:%i') AS duracion_retainer,
+															TIME_TO_SEC(duracion)/3600 AS duracion_horas,
+															IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
+															DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
+															asunto.codigo_asunto_secundario as codigo_asunto_secundario
+														FROM trabajo
+															JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+															LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+															JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+															LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+															LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+															LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
+														WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=".$cobro->fields['id_cobro'];
+	
+					$orden = "usuario.id_categoria_usuario, trabajo.fecha, trabajo.descripcion";
+					$b1 = new Buscador($sesion, $query_trabajos, "Trabajo", $desde, '', $orden);
+					$lista_trabajos = $b1->lista;
+					$fila_inicial = $filas;
+					$id_categoria_actual = 0;
+					for($i=0;$i<$lista_trabajos->num;$i++)
+					{
+						$trabajo = $lista_trabajos->Get($i);
+	
+						if($id_categoria_actual != $trabajo->fields['id_categoria_usuario']) {
+							$filas += 1;
+							$id_categoria_actual = $trabajo->fields['id_categoria_usuario'];
+						}
+	
+						
+							$siglas = $trabajo->fields['username'];
+							$nombre = $trabajo->fields['nombre'] .' '. $trabajo->fields['apellido1'] .' '. $trabajo->fields['apellido2'];
+						$ws->write($filas, $columna_sigla, $siglas, $letra_datos_lista);
+						$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista);
+						$categoria_usuario = '';
+						if($trabajo->fields['id_categoria_usuario']) {
+							$query_categoria_usuario = "SELECT glosa_categoria FROM prm_categoria_usuario WHERE id_categoria_usuario = ".$trabajo->fields['id_categoria_usuario'];
+							$resp_query_categoria_usuario = mysql_query($query_categoria_usuario,$sesion->dbh) or Utiles::errorSQL($query_categoria_usuario,__FILE__,__LINE__,$sesion->dbh);
+							list($categoria_usuario) = mysql_fetch_array($resp_query_categoria_usuario);
+						}
+						$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista);
+	
+						$ws->write($filas, $columna_descripcion, $trabajo->fields['descripcion'], $letra_datos_lista);
+	
+						$ws->write($filas, $columna_tarifa, $trabajo->fields['tarifa_hh'], $formato_moneda2);
+	
+						$duracion = $trabajo->fields['duracion'];
+						list($h, $m) = split(':', $duracion);
+						$duracion = $h/24 + $m/(24*60);
+						$ws->writeNumber($filas, $columna_hora,$duracion, $formato_tiempo2);
+	
+						$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora".($filas+1), $formato_moneda2);
+	
+						$filas += 1;
+					}
+					$filas += 1;
+					$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe".($fila_inicial+1).":$col_formula_importe".($filas).")", $formato_moneda2);
+				}
+	
+	
+				$ws->setColumn($columna_sigla, $columna_sigla, 11);
+				$ws->setColumn($columna_abogado, $columna_abogado, 23);
+				$ws->setColumn($columna_categoria, $columna_categoria, 9);
+				$ws->setColumn($columna_descripcion, $columna_descripcion, 73);
+				$ws->setColumn($columna_hora, $columna_hora, 7);
+				if(!$cobro->fields['opc_ver_profesional_tarifa'] == 1) {
+					$ws->setColumn($columna_tarifa, $columna_tarifa, 0,0,1);
+				}
+				else {
+					$ws->setColumn($columna_tarifa, $columna_tarifa, 7);
+				}
+				if(!$cobro->fields['opc_ver_profesional_importe'] == 1) {
+					$ws->setColumn($columna_importe, $columna_importe, 0,0,1);
+				}
+				else {
+					$ws->setColumn($columna_importe, $columna_importe, 7);
+				}
 			}
-
-
-			$ws->setColumn($columna_sigla, $columna_sigla, 11);
-			$ws->setColumn($columna_abogado, $columna_abogado, 23);
-			$ws->setColumn($columna_categoria, $columna_categoria, 9);
-			$ws->setColumn($columna_descripcion, $columna_descripcion, 73);
-			$ws->setColumn($columna_hora, $columna_hora, 7);
-			if(!$cobro->fields['opc_ver_profesional_tarifa'] == 1) {
-				$ws->setColumn($columna_tarifa, $columna_tarifa, 0,0,1);
-			}
-			else {
-				$ws->setColumn($columna_tarifa, $columna_tarifa, 7);
-			}
-			if(!$cobro->fields['opc_ver_profesional_importe'] == 1) {
-				$ws->setColumn($columna_importe, $columna_importe, 0,0,1);
-			}
-			else {
-				$ws->setColumn($columna_importe, $columna_importe, 7);
-			}
-
 			/*
 			 * HOJA GASTOS
 			 */
