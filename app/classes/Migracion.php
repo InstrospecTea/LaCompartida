@@ -570,6 +570,19 @@ class Migracion
 		return false;
 	}
 	
+	function TraspasarMonedaHistorial( $response )
+	{
+		while( $data = mysql_fetch_assoc($response) )
+		{
+			$query = "INSERT INTO moneda_historial 
+									SET id_moneda = ".( $data['CodigoMonedaFacturacion']=='D' ? '2' : ( $data['CodigoMonedaFacturacion']=='E' ? '3' : '1' ) )." ,
+											fecha = '".$data['FechaTipoCambio']."' ,
+											valor = '".$data['TipoDeCambio']."' ,
+											moneda_base = ".( $data['CodigoMonedaFacturacion']=='S' ? '1' : '0' );
+			mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		}
+	}
+	
 	function LimpiarCategoriaUsuario( $data )
 	{ 
 		switch ( $data['usuario_FFF_id_categoria_usuario'] ) {
@@ -874,7 +887,7 @@ class Migracion
 									contrato.rut 																	as RUT_cliente,
 									contrato.factura_direccion										as direccion_cliente, 
 									cobro.codigo_cliente 													as codigo_cliente,
-									cobro.id_cobro	 															as numero,
+									cobro.documento	 															as numero,
 									cobro.factura_razon_social										as cliente,
 									cobro.factura_rut															as RUT_cliente,
 									documento.subtotal_honorarios 								as subtotal,
@@ -883,7 +896,7 @@ class Migracion
 									documento.subtotal_gastos 										as subtotal_gastos, 
 									documento.subtotal_gastos_sin_impuesto 				as subtotal_gastos_sin_impuesto
 								FROM documento 
-								LEFT JOIN cobro USING( id_cobro ) AND tipo_doc = 'N' 
+								LEFT JOIN cobro ON cobro.id_cobro = documento.id_cobro AND tipo_doc = 'N' 
 								LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
 								WHERE cobro.documento IS NOT NULL 
 									AND cobro.documento != '' ";
@@ -1553,11 +1566,6 @@ class Migracion
 		$cobro->Edit('forma_cobro',
 			empty($cobro_generar->fields['forma_cobro']) ? $contrato->fields['forma_cobro'] : $cobro_generar->fields['forma_cobro']);
 
-		//Este es el monto fijo, pero si no se inclyen honorarios no va
-		$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
-		if(empty($incluye_honorarios)) $monto = '0';
-		$cobro->Edit('monto_contrato', $monto);
-
 		$cobro->Edit('retainer_horas',
 			empty($cobro_generar->fields['retainer_horas']) ? $contrato->fields['retainer_horas'] : $cobro_generar->fields['retainer_horas']);
 
@@ -1633,7 +1641,7 @@ class Migracion
 		{
 			$cobro->Edit('fecha_ini', $fecha_ini);
 		}
-
+		
 		$fecha_fin = $cobro_generar->fields['fecha_fin'];
 		if (!empty($fecha_fin))
 		{
@@ -1644,7 +1652,7 @@ class Migracion
 		{
 			$cobro->Edit('solo_gastos', 1);
 		}
-	
+		
 		$cobro->Edit("incluye_honorarios", $incluye_honorarios);
 		$cobro->Edit("incluye_gastos", $incluye_gastos);
 		
@@ -1653,8 +1661,16 @@ class Migracion
 		$cobro->Edit("monto", (!empty($cobro_generar->fields['monto'])) ? $cobro_generar->fields['monto'] : "NULL");
 		$cobro->Edit("impuesto", (!empty($cobro_generar->fields['impuesto'])) ? $cobro_generar->fields['impuesto'] : '0');
 		$cobro->Edit("monto_subtotal", (!empty($cobro_generar->fields['monto_subtotal'])) ? $cobro_generar->fields['monto_subtotal'] : '0');
+		$cobro->Edit("monto_contrato", (!empty($cobro_generar->fields['monto_contrato'])) ? $cobro_generar->fields['monto_contrato'] : '0');
+		$cobro->Edit("documento", (!empty($cobro_generar->fields['documento'])) ? $cobro_generar->fields['documento'] : "");
 		$cobro->Edit("porcentaje_impuesto", (!empty($cobro_generar->fields['porcentaje_impuesto'])) ? $cobro_generar->fields['porcentaje_impuesto'] : '0');
 		$cobro->Edit('estado','EN REVISION');
+		
+		if(!empty($cobro_generar->fields['factura_razon_social']))
+			$cobro->Edit('factura_razon_social', $cobro_generar->fields['factura_razon_social']);
+		
+		if(!empty($cobro_generar->fields['factura_rut']))
+			$cobro->Edit('factura_rut', $cobro_generar->fields['factura_rut']);
 		
 		if (!$this->Write($cobro, $forzar_insert))
 		{
@@ -1668,7 +1684,6 @@ class Migracion
 			}
 			return false;
 		}
-		
 
 		echo "Cobro " . $cobro->fields['id_cobro'] . " generado\n";
 		
@@ -1680,7 +1695,7 @@ class Migracion
 
 		//Moneda cobro
 		$cobro_moneda = new CobroMoneda($this->sesion);
-		$cobro_moneda->ActualizarTipoCambioCobro($cobro->fields['id_cobro']);
+		$this->IngresarCobroMoneda($cobro);
 
 		//Gastos
 		if(!empty($incluye_gastos))
@@ -1799,6 +1814,38 @@ class Migracion
 		$this->Write($observacion);
 
 		return $cobro->fields['id_cobro'];
+	}
+
+	public function IngresarCobroMoneda( $cobro )
+	{
+		$query_monedas = "SELECT id_moneda, tipo_cambio FROM prm_moneda";
+		$resp = mysql_query($query_monedas,$this->sesion->dbh) or Utiles::errorSQL($query_monedas,__FILE__,__LINE__,$this->sesion->dbh);
+		while( list($id_moneda, $tipo_cambio_actual) = mysql_fetch_array($resp) )
+		{ 
+			$query_revision = "SELECT valor FROM moneda_historial WHERE id_moneda = '$id_moneda' AND fecha < '".$cobro->fields['fecha_creacion']."' ORDER BY fecha DESC LIMIT 1";
+			$resp_revision = mysql_query($query_revision,$this->sesion->dbh) or Utiles::errorSQL($query_revision,__FILE__,__LINE__,$this->sesion->dbh);
+			list($tipo_cambio) = mysql_fetch_array($resp_revision);
+			
+			if( empty($tipo_cambio) ) 
+			{
+				$query_revision2 = "SELECT valor FROM moneda_historial WHERE id_moneda = '$id_moneda' ORDER BY fecha ASC LIMIT 1";
+				$resp2 = mysql_query($query_revision2,$this->sesion->dbh) or Utiles::errorSQL($query_revision2,__FILE__,__LINE__,$this->sesion->dbh);
+				list($tipo_cambio) = mysql_fetch_array($resp2);
+			}
+			
+			if(empty($tipo_cambio))
+				$tipo_cambio = $tipo_cambio_actual;
+		
+			$query_rev = "SELECT count(*) FROM cobro_moneda WHERE id_moneda = '$id_moneda' AND id_cobro = '".$cobro->fields['id_cobro']."' ";
+			$resp_rev = mysql_query($query_rev,$this->sesion->dbh) or Utiles::errorSQL($query_rev,__FILE__,__LINE__,$this->sesion->dbh);
+			list($cantidad) = mysql_fetch_array($resp_rev);
+			
+			if($cantidad > 0)
+				$query_insert = "UPDATE cobro_moneda SET tipo_cambio = '$tipo_cambio' WHERE id_moneda = '$id_moneda' AND id_cobro = '".$cobro->fields['id_cobro']."' ";
+			else
+				$query_insert = "INSERT INTO cobro_moneda SET id_cobro = '".$cobro->fields['id_cobro']."', tipo_cambio = '".$tipo_cambio."', id_moneda = '".$id_moneda."'";
+			mysql_query($query_insert,$this->sesion->dbh) or Utiles::errorSQL($query_insert,__FILE__,__LINE__,$this->sesion->dbh);
+		}
 	}
 
 	public function ObtenerIDsCobroDeTrabajos()
@@ -2255,7 +2302,7 @@ class Migracion
 		
 		$mensaje_accion = 'guardado';
 		$factura->Edit('subtotal', $factura_generar->fields['subtotal']);
-		$factura->Edit('porcentaje_impuesto', $factura_generar->fields['porcentaje_impuesto']);
+		$factura->Edit('porcentaje_impuesto', empty($factura_generar->fields['porcentaje_impuesto']) ? "0" : $factura_generar->fields['porcentaje_impuesto'] );
 		$factura->Edit('iva', $factura_generar->fields['iva']);
 		$factura->Edit('total', '' . ($factura_generar->fields['subtotal'] + $factura_generar->fields['iva']));
 		$factura->Edit("id_factura_padre", empty($factura_generar->fields['id_factura_padre']) ? "NULL" : $factura_generar->fields['id_factura_padre']);
@@ -2267,7 +2314,7 @@ class Migracion
 		$factura->Edit("id_cobro", empty($factura_generar->fields['id_cobro']) ? "NULL" : $factura_generar->fields['id_cobro']);
 		$factura->Edit("id_documento_legal", empty($factura_generar->fields['id_documento_legal']) ? '1' : $factura_generar->fields['id_documento_legal']);
 		$factura->Edit("serie_documento_legal", Conf::GetConf($this->sesion, 'SerieDocumentosLegales'));
-		$factura->Edit("numero", empty($factura_generar->fields['numero']) ? '1' : $factura_generar->fields['numero']);
+		$factura->Edit("numero", empty($factura_generar->fields['numero']) ? '' : $factura_generar->fields['numero']);
 		$factura->Edit("id_estado", empty($factura_generar->fields['id_estado']) ? '1' : $factura_generar->fields['id_estado']);
 		$factura->Edit("id_moneda", empty($factura_generar->fields['id_moneda']) ? $factura_generar->fields['id_moneda'] : '1');
 
@@ -2289,9 +2336,9 @@ class Migracion
 			$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "0" : $factura_generar->fields['honorarios']);
 			$factura->Edit("subtotal", empty($factura_generar->fields['subtotal']) ? "0" : $factura_generar->fields['subtotal']);
 			$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "0" : $factura_generar->fields['subtotal_sin_descuento']);
-			$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "NULL" : $factura_generar->fields['descripcion_subtotal_gastos']);
+			$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos']);
 			$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "0" : $factura_generar->fields['subtotal_gastos']);
-			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "NULL" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
+			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
 			$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "0" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
 			$factura->Edit("total", empty($factura_generar->fields['total']) ? "0" : $factura_generar->fields['total']);
 			$factura->Edit("iva", empty($factura_generar->fields['iva']) ? "0" : $factura_generar->fields['iva']);
@@ -2309,7 +2356,6 @@ class Migracion
 			$factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
 		}
 
-		$factura->Edit("numero", $factura->ObtenerNumeroDocLegal($factura->fields['id_documento_legal']));
 		if (!$factura->Loaded())
 		{
 			$generar_nuevo_numero = true;

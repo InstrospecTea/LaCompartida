@@ -197,7 +197,10 @@
 									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda
 									FROM Gastos";
 		}
-
+		function QueryMonedaHistorial() 
+		{
+			return "SELECT * FROM TipoDeCambio";
+		}
 		function QueryCobros() 
 		{
 			return "SELECT 
@@ -207,6 +210,7 @@
 									IF(Factura.Status='A','5',IF(Factura.Status='C','2','1'))				as cobro_FFF_id_estado_factura, 
 									Factura.CodigoCliente 																					as cobro_FFF_codigo_cliente,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2'))				as cobro_FFF_opc_moneda_total,
+									Factura.Observacion																							as cobro_FFF_observaciones,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda_monto,
 									IF(Factura.Moneda='S','1',IF(Factura.Moneda='E','3','2')) 			as cobro_FFF_id_moneda,
 									Factura.MontoNeto 																							as cobro_FFF_monto,
