@@ -1377,12 +1377,13 @@ class Migracion
 		$hora->Edit('fecha', 							!empty($hora_generar->fields['fecha']) 							? $hora_generar->fields['fecha'] 										: "0000-00-00" );
 		$hora->Edit('id_cobro', 					!empty($hora_generar->fields['id_cobro']) 					? $hora_generar->fields['id_cobro'] 								: "NULL" );
 		$hora->Edit('duracion', 					!empty($hora_generar->fields['duracion']) 					? $hora_generar->fields['duracion'] 								: "00:00:00" );
-		$hora->Edit('duracion_cobrada', 	!empty($hora_generar->fields['cobrable']) 					? $hora_generar->fields['cobrable'] 								: "1" );
+		$hora->Edit('duracion_cobrada', 	!empty($hora_generar->fields['duracion_cobrada'])		? $hora_generar->fields['duracion_cobrada'] 				: "00:00:00" );
 		$hora->Edit('descripcion', 				!empty($hora_generar->fields['descripcion']) 				? addslashes($hora_generar->fields['descripcion']) 	: "" );
 		$hora->Edit('fecha_creacion', 		!empty($hora_generar->fields['fecha_creacion']) 		? $hora_generar->fields['fecha_creacion'] 					: "0000-00-00 00:00:00" );
 		$hora->Edit('fecha_modificacion', !empty($hora_generar->fields['fecha_modificacion']) ? $hora_generar->fields['fecha_modificacion'] 			: "0000-00-00 00:00:00" );
 		$hora->Edit('tarifa_hh', 					!empty($hora_generar->fields['tarifa_hh']) 					? $hora_generar->fields['tarifa_hh'] 								: "0" );
 		$hora->Edit('solicitante', 				!empty($hora_generar->fields['solicitante']) 				? addslashes($hora_generar->fields['solicitante']) 	: "" );
+		$hora->Edit('cobrable',						!empty($hora_generar->fields['cobrable'])						? $hora_generar->fields['cobrable']									: "1");
 		
 		/*
 		* Registrar información
