@@ -1056,11 +1056,17 @@ function AgregarFactura(idx){
 													<td align="right"><input type="checkbox" name="opc_ver_modalidad" id="opc_ver_modalidad" value="1" <?=$cobro->fields['opc_ver_modalidad']=='1'?'checked':''?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_modalidad"><?=__('Mostrar modalidad del cobro')?></label></td>
 												</tr>
+												<?
+													if( $cobro->fields['opc_ver_profesional'] == 1 )
+														$display_detalle_profesional = "style='display: table_row;'";
+													else
+														$display_detalle_profesional = "style='display: none;'";
+												?>
 												<tr>
 													<td align="right"><input type="checkbox" name="opc_ver_profesional" id="opc_ver_profesional" value="1" <?=$cobro->fields['opc_ver_profesional']=='1'?'checked':''?> onchange="showOpcionDetalle( this.id, 'tr_detalle_profesional');"></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_profesional"><?=__('Mostrar detalle por profesional')?></label></td>
 												</tr>
-												<tr>
+												<tr id="tr_detalle_profesional" <?=$display_detalle_profesional ?> >
 													<td/>
 													<td align="left" style="font-size: 10px;">
 														<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
@@ -1071,6 +1077,12 @@ function AgregarFactura(idx){
 														<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
 													</td>
 												</tr>
+												<?
+													if( $cobro->fields['opc_ver_detalles_por_hora'] == 1 )
+														$display_detalle_por_hora = "style='display: table-row;'";
+													else
+														$display_detalle_por_hora = "style='display: none;'";
+												?>
 												<tr>
 													<td align="right">
 														<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=$cobro->fields['opc_ver_detalles_por_hora']=='1'?'checked':''?> onchange="showOpcionDetalle( this.id, 'tr_detalle_por_hora');">
@@ -1079,7 +1091,7 @@ function AgregarFactura(idx){
 														<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
 													</td>
 												</tr>
-												<tr>
+												<tr id="tr_detalle_por_hora" <?=$display_detalle_por_hora ?> >
 													<td/>
 													<td align="left" colspan="2" style="font-size: 10px;">
 														<table width="100%">
