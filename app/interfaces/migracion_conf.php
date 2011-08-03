@@ -253,22 +253,27 @@
 		}
 		function QueryTarifas() 
 		{ 
-			return "SELECT
-									CodigoTarifaCliente as id_tarifa
-									,Descripcion as glosa_tarifa
+			return "SELECT 
+									CodigoTarifaCliente as id_tarifa 
+									,Descripcion as glosa_tarifa 
 									FROM TbTarifaCliente"; 
 		}
 		function QueryUsuariosTarifas() 
 		{ 
-			return "SELECT
-									id_usuario_tarifa_LMT as id_usuario_tarifa
-									, CodigoEmpleado AS id_usuario
-									, if(moneda='D' ,'2',if(moneda = 'E','3',if(moneda = 'S','1','0'))) AS id_moneda
-									, TarifaHora AS tarifa
-									, CodigoTarifaCliente as id_tarifa
-									FROM  `TbTarifaCategoria`
-									Group by CodigoTarifaCliente, CodigoEmpleado, moneda
-									Order by CodigoPeriodo DESC "; 
+			return "SELECT 
+								T1.id_usuario_tarifa_LMT as id_usuario_tarifa 
+								, T1.CodigoEmpleado AS id_usuario 
+								, if(T1.moneda='D' ,'2',if(T1.moneda = 'E','3',if(T1.moneda = 'S','1','0'))) AS id_moneda 
+								, T1.TarifaHora AS tarifa 
+								, T1.CodigoTarifaCliente as id_tarifa 
+								, T1.CodigoPeriodo 
+								FROM  `TbTarifaCategoria` as T1 
+								WHERE T1.CodigoPeriodo = 
+									( SELECT MAX(T2.CodigoPeriodo) 
+										FROM TbTarifaCategoria as T2 
+										WHERE T2.CodigoEmpleado = T1.CodigoEmpleado 
+											AND T2.CodigoTarifaCliente = T1.CodigoTarifaCliente 
+											AND T2.moneda = T1.moneda )"; 
 		}
 		function QueryPagos()
 		{
