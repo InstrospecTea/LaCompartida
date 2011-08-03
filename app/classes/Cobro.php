@@ -133,6 +133,63 @@ class Cobro extends Objeto
 		return true;
 	}
 	
+	#revisa si tiene pagos asociados
+	function TienePago()
+	{
+		$query="SELECT * FROM documento WHERE tipo_doc != 'N' AND id_cobro='".$this->fields['id_cobro']."'";
+		$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$numrows = mysql_num_rows($resp);
+		if( $numrows > 0 )
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	function CalcularEstadoAlBorrarPago()
+	{
+		$query = "SELECT * FROM prm_estado_cobro WHERE ( codigo_estado_cobro != 'CREADO' AND codigo_estado_cobro != 'EN REVISION' ) ORDER BY orden ASC";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$estado_anterior_temp = "";
+		while( list( $codigo_estado_cobro, $orden ) = mysql_fetch_array($resp) )
+		{
+			if( $codigo_estado_cobro == 'EMITIDO' || $codigo_estado_cobro == 'ENVIADO AL CLIENTE' )
+			{
+				$estado_anterior_temp = ( $this->TieneFacturasSinAnular() ? "ENVIADO AL CLIENTE" : "EMITIDO" );
+			}
+		}
+		return $estado_anterior_temp;
+	}
+	
+	function CambiarEstadoAnterior()
+	{
+		$nuevo_estado = $this->CalcularEstadoAlBorrarPago();
+		if( !$this->TienePago() )
+		{
+			$query_update_cobro = "UPDATE cobro SET estado='$nuevo_estado', fecha_pago_parcial=NULL WHERE id_cobro='".$this->fields['id_cobro']."'";
+			//echo $query_update_cobro . "<br />";
+			mysql_query($query_update_cobro, $this->sesion->dbh) or Utiles::errorSQL($query_update_cobro,__FILE__,__LINE__,$this->sesion->dbh);
+		}
+	}
+	
+	function CantidadFacturasSinAnular()
+	{
+		$query = "SELECT * FROM factura WHERE id_cobro = '".$this->fields['id_cobro']."' AND id_estado != 5 AND estado != 'ANULADA' AND anulado = 0";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$cantidad_facturas = mysql_num_rows( $resp );
+		return $cantidad_facturas;
+	}
+	
+	function TieneFacturasSinAnular()
+	{
+		$cantidad_facturas = $this->CantidadFacturasSinAnular();
+		if( $cantidad_facturas > 0 )
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	function FechaPrimerTrabajo()
 	{
 		$query = "SELECT MIN( fecha ) FROM trabajo WHERE id_cobro = '".$this->fields['id_cobro']."' ";
@@ -364,8 +421,8 @@ class Cobro extends Objeto
                                JOIN tramite_tipo USING( id_tramite_tipo )
                                WHERE tramite.id_cobro = '".$this->fields['id_cobro']."'
                                ORDER BY tramite.fecha ASC";
-
-       $lista_tramites = new ListaTramites($this->sesion,'',$query);
+			 if( !$mantener_porcentaje_impuesto )	
+			 	$lista_tramites = new ListaTramites($this->sesion,'',$query);
 
        for($z=0;$z<$lista_tramites->num;$z++)
 				{
@@ -408,8 +465,10 @@ class Cobro extends Objeto
 				WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "' 
 				AND trabajo.id_tramite=0 
 				ORDER BY trabajo.fecha ASC";
-
-		$lista_trabajos = new ListaTrabajos($this->sesion,'',$query);
+		if( !$mantener_porcentaje_impuesto )
+			$lista_trabajos = new ListaTrabajos($this->sesion,'',$query);
+		else	
+			$lista_trabajos->num = 0;
 
 		for($z=0;$z<$lista_trabajos->num;$z++)
 		{
@@ -625,7 +684,11 @@ class Cobro extends Objeto
 					AND cta_corriente.incluir_en_cobro = 'SI'
 					$no_generado
 				ORDER BY cta_corriente.fecha ASC";
-		$lista_gastos = new ListaGastos($this->sesion,'',$query);
+				
+		if( !$mantener_porcentaje_impuesto )
+			$lista_gastos = new ListaGastos($this->sesion,'',$query);
+		else
+			$lista_gastos->num = 0;
 
 		for( $v=0; $v<$lista_gastos->num; $v++ )
 		{
@@ -721,14 +784,15 @@ class Cobro extends Objeto
 
 		#Obtenemos el saldo_final de GASTOS diferencia de: saldo_inicial - (la suma de los gastos-provisiones de este cobro)
 		#En moneda OPC opciones ver
-		$saldo_final_gastos = $this->SaldoFinalCuentaCorriente();
+		if( !$mantener_porcentaje_impuesto )
+			$saldo_final_gastos = $this->SaldoFinalCuentaCorriente();
 
 		#Carga del cliente del cobro
 		$cliente = new Cliente($this->sesion);
 		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
 
 		#Calculo de la cuenta corriente del cliente para el cobro
-		if( $cliente->Loaded() )
+		if( $cliente->Loaded() && !$mantener_porcentaje_impuesto )
 			$saldo_cta_corriente = $cliente->TotalCuentaCorriente();
 			
 		if(!$moneda_del_cobro)
@@ -4687,8 +4751,17 @@ class Cobro extends Objeto
 			$html = str_replace('%horas_retainer%',$retainer ? __('Hrs. Retainer') : '', $html);
 			$html = str_replace('%horas_mins%',$retainer ? __('Hrs.:Mins. Tarificadas') : __('Horas'), $html);
 			$html = str_replace('%horas_mins_retainer%',$retainer ? __('Hrs.:Mins. Retainer') : '', $html);
-			$html = str_replace('%valor_horas%',$flatfee ? '' : __('Tarifa'), $html);
-			$html = str_replace('%valor_hh%',__('Tarifa'), $html);
+			
+			if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+				{
+					$html = str_replace('%valor_hh%',__('Tarifa'), $html);
+					$html = str_replace('%valor_horas%',$flatfee ? '' : __('Tarifa'), $html);
+				}
+			else
+				{
+					$html = str_replace('%valor_hh%', '', $html);
+					$html = str_replace('%valor_horas%', '', $html);
+				}
 			$html = str_replace('%tarifa_fee%',__('%tarifa_fee%'), $html);
 			$html = str_replace('%simbolo_moneda%',$flatfee ? '' : ' ('.$moneda->fields['simbolo'].')',$html);
 			if( $this->fields['opc_ver_profesional_importe'] ) 
@@ -4991,7 +5064,10 @@ class Cobro extends Objeto
 					$minutos_decimal=$minutos_cobrables/60;
 					$duracion_decimal=$horas_cobrables+$minutos_decimal;
 					$row = str_replace('%horas%',number_format($duracion_decimal,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
-					$row = str_replace('%tarifa_horas%', $flatfee ? '' : number_format($data['tarifa'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+					if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+						$row = str_replace('%tarifa_horas%', $flatfee ? '' : number_format($data['tarifa'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+					else
+						$row = str_replace('%tarifa_horas%', '', $row);
 					$row = str_replace('%total_horas%',$flatfee ? '' : number_format($data['valor'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
 					if($this->fields['opc_ver_horas_trabajadas'] && $horas_trabajadas_real.':'.$minutos_trabajadas != '0:00')
 						$html .= $row;
@@ -5247,7 +5323,10 @@ class Cobro extends Objeto
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto(0), $html3);
 				else
 					$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto($resumen_profesional_hh[$k]), $html3);
-				$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesional_valor_hh[$k] > 0 ? $resumen_profesional_valor_hh[$k] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+				if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+					$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesional_valor_hh[$k] > 0 ? $resumen_profesional_valor_hh[$k] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+				else
+					$html3 = str_replace('%tarifa_horas%', '', $html3);
 				$html3 = str_replace('%total_horas%',number_format($subtotal > 0 ? $subtotal : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
 				$resumen_filas[$k] = $html3;
 			}
@@ -5418,7 +5497,10 @@ class Cobro extends Objeto
 					else
 						$html3 = str_replace('%total_horas%',$moneda->fields['simbolo'].' '.number_format($resumen_total,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
 					// Se asume que dentro de la misma categoría todos tienen la misma tarifa.
-					$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesionales[$k-1]['valor_hh'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+					if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+						$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesionales[$k-1]['valor_hh'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+					else
+						$html3 = str_replace('%tarifa_horas%', '', $html3);
 
 					// Para imprimir la siguiente categorí­a de usuarios
 					$siguiente = " \n%RESUMEN_PROFESIONAL_FILAS%\n";
@@ -5448,7 +5530,10 @@ class Cobro extends Objeto
 			$html3 = str_replace('%hrs_descontadas%',($columna_hrs_descontadas?UtilesApp::Hora2HoraMinuto($resumen_hrs_descontadas):''), $html3);
 			$html3 = str_replace('%hh%',UtilesApp::Hora2HoraMinuto($resumen_hh), $html3);
 			// Se asume que dentro de la misma categoría todos tienen la misma tarifa.
-			$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesionales[$k-1]['valor_hh'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+			if( $this->fields['opc_ver_profesional_tarifa'] )
+				$html3 = str_replace('%tarifa_horas%', number_format($resumen_profesionales[$k-1]['valor_hh'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
+			else
+				$html3 = str_replace('%tarifa_horas%', '', $html3);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
 				$html3 = str_replace('%total_horas%',$moneda->fields['simbolo'].number_format($resumen_total,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
 			else 
@@ -9174,8 +9259,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%horas_retainer%',$retainer ? __('Hrs. Retainer') : '', $html);
 			$html = str_replace('%horas_mins%',$retainer ? __('Hrs.:Mins. Tarificadas') : __('Horas'), $html);
 			$html = str_replace('%horas_mins_retainer%',$retainer ? __('Hrs.:Mins. Retainer') : '', $html);
-			$html = str_replace('%valor_horas%',$flatfee ? '' : __('Tarifa'), $html);
-			$html = str_replace('%valor_hh%',__('Tarifa'), $html);
+			if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+			{
+				$html = str_replace('%valor_horas%',$flatfee ? '' : __('Tarifa'), $html);
+				$html = str_replace('%valor_hh%',__('Tarifa'), $html);
+			}
+			else
+			{
+				$html = str_replace('%valor_horas%', '', $html);
+				$html = str_replace('%valor_hh%', '', $html);
+			}
 			$html = str_replace('%tarifa_fee%',__('%tarifa_fee%'), $html);
 			$html = str_replace('%simbolo_moneda%',$flatfee ? '' : ' ('.$moneda->fields['simbolo'].')',$html);
 
