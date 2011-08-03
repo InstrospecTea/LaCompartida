@@ -1019,7 +1019,7 @@ function AgregarFactura(idx){
 										else if($cobro->fields['estado']=='PAGADO')
 											$fecha_pago = Utiles::sql2date($documento_cobro->FechaPagos());
 									?>
-									<input type="text" name="fecha_pago" value="<?=$fecha_pago?>" id="fecha_pago" size="11" maxlength="10" />
+									<input type="text" name="fecha_pago" value="<?=(substr($fecha_pago,1,2) != '000' ? $fecha_pago : "")?>" id="fecha_pago" size="11" maxlength="10" />
 									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_pago" style="cursor:pointer" />
 								</td>
 							</tr>
