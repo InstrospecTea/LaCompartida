@@ -523,7 +523,6 @@ class Migracion
 			if (!$this->Write($usuario_tarifa, $forzar_insert))
 			{
 				echo "Error al generar el usuario_tarifa\n";
-				return false;
 			}
 			else
 			{
