@@ -22,6 +22,7 @@
 	$_LANG['Director proyecto']     = "Encargado comercial";
 	$_LANG['Dólares']     = "Dólares Americanos";
 	$_LANG['Dolar']     = "Dólar Americano";
+	$_LANG['Mostrar detalle por profesional'] = 'Mostrar resumen por profesional';
 
 	$_LANG['WIP'] = 'Stock';
 	$_LANG['WIP (Work in progress)'] = 'Stock';
