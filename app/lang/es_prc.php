@@ -23,6 +23,7 @@
 	$_LANG['Dólares']     = "Dólares Americanos";
 	$_LANG['Dolar']     = "Dólar Americano";
 	$_LANG['Mostrar detalle por profesional'] = 'Mostrar resumen por profesional';
+	$_LANG['Mostrar detalle por hora'] = 'Mostrar detalle por trabajo';
 
 	$_LANG['WIP'] = 'Stock';
 	$_LANG['WIP (Work in progress)'] = 'Stock';

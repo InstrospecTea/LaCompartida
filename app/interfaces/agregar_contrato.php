@@ -906,7 +906,7 @@ function SetBanco( origen, destino )
 				}
 				else if( parts[0] == parts[2] )
 				{
-					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Puede que la tarifa y moneda elegidas sean incorrectas<br> debido a que ningún abogado tiene fijado el valor para la tarifa y moneda seleccionadas.')?></span><br><br>'
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Puede que la tarifa o moneda elegida sea incorrecta<br> debido a que ningún abogado tiene fijado el valor para la tarifa o moneda seleccionada.')?></span><br><br>'
 				}
 				else
 				{

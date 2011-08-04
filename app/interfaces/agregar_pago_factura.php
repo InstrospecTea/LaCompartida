@@ -443,6 +443,7 @@
 <form method=post action="" id="form_documentos" autocomplete='off'>
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name='id_doc_cobro' id='id_doc_cobro' value='<?=$id_doc_cobro?>' />
+<input type=hidden name='id_cobro' id='id_cobro' value='<?=$id_cobro?>' />
 <input type=hidden name='lista_facturas' id='lista_facturas' value='<?=$lista_facturas?>' />
 <input type=hidden name='id_factura_pago' id='id_factura_pago' value='<?=$pago->fields['id_factura_pago'];?>' />
 <input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?=$moneda_cobro->fields['cifras_decimales']?>" />

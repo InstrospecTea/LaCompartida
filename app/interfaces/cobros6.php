@@ -29,11 +29,11 @@
 	if( $opc == 'eliminar_pago' )
 	{
 		if( $eliminar_pago > 0 )
-			{
-				$factura_pago->Load($eliminar_pago);
-				if( $factura_pago->Eliminar() )
-					$pagina->addInfo(__('Pago borrado con éxito'));
-			}
+		{
+			$factura_pago->Load($eliminar_pago);
+			if( $factura_pago->Eliminar() )
+				$pagina->addInfo(__('Pago borrado con éxito'));
+		}
 	}
 	if($opc == "eliminar_documento")
 	{
@@ -313,6 +313,10 @@
 				$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			if($estado == 'ENVIADO AL CLIENTE' && !$cobro->fields['fecha_enviado_cliente'])
 				$cobro->Edit('fecha_enviado_cliente',date('Y-m-d H:i:s'));
+			if($estado == 'FACTURADO' && !$cobro->fields['fecha_facturacion'])
+				$cobro->Edit('fecha_facturacion',date('Y-m-d H:i:s'));
+			if($estado == 'PAGO PARCIAL' && !$cobro->fields['fecha_pago_parcial'])
+				$cobro->Edit('fecha_pago_parcial',date('Y-m-d H:i:s'));
 			if($estado == 'PAGADO' && !$cobro->fields['fecha_cobro'])
 				$cobro->Edit('fecha_cobro',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado',$estado);
@@ -985,19 +989,25 @@ function AgregarFactura(idx){
 							<tr height=3>
 								<?=TArriba("BORRADOR",$cobro->fields['estado'])?>
 								<?=TArriba("EMITIDO",$cobro->fields['estado'])?>
+								<?=TArriba("FACTURADO",$cobro->fields['estado'])?>
 								<?=TArriba("ENVIADO AL CLIENTE",$cobro->fields['estado'])?>
+								<?=TArriba("PAGO PARCIAL",$cobro->fields['estado'])?>
 								<?=TArriba("PAGADO",$cobro->fields['estado'])?>
 							</tr>
 							<tr height=13>
 								<?=TMedio("BORRADOR",$cobro->fields['estado'])?>
 								<?=TMedio("EMITIDO",$cobro->fields['estado'])?>
+								<?=TMedio("FACTURADO",$cobro->fields['estado'])?>
 								<?=TMedio("ENVIADO AL CLIENTE",$cobro->fields['estado'])?>
+								<?=TMedio("PAGO PARCIAL",$cobro->fields['estado'])?>
 								<?=TMedio("PAGADO",$cobro->fields['estado'])?>
 							</tr>
 							<tr height=3>
 								<?=TAbajo("BORRADOR",$cobro->fields['estado'])?>
 								<?=TAbajo("EMITIDO",$cobro->fields['estado'])?>
+								<?=TAbajo("FACTURADO",$cobro->fields['estado'])?>
 								<?=TAbajo("ENVIADO AL CLIENTE",$cobro->fields['estado'])?>
+								<?=TAbajo("PAGO PARCIAL",$cobro->fields['estado'])?>
 								<?=TAbajo("PAGADO",$cobro->fields['estado'])?>
 							<tr>
 							<tr>
@@ -1009,8 +1019,16 @@ function AgregarFactura(idx){
 									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_emision" style="cursor:pointer" />
 								</td>
 								<td nowrap>
-									<input type="text" name="fecha_envio" value="<?= Utiles::sql2date($cobro->fields['fecha_enviado_cliente']) ?>" id="fecha_envio" size="11" maxlength="10" />
+									<input type="text" name="fecha_facturacion" value="<?= Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_facturado" style="cursor:pointer" />
+								</td>
+								<td nowrap>
+									<input type="text" name="fecha_envio" value="<?= Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
 									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_envio" style="cursor:pointer" />
+								</td>
+								<td nowrap>
+									<input type="text" name="fecha_pago_parcial" value="<?= Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
+									<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_pago_parcial" style="cursor:pointer" />
 								</td>
 								<td nowrap>
 									<?
@@ -2029,11 +2047,26 @@ Calendar.setup(
 		button			: "img_fecha_emision"		// ID of the button
 	}
 );
+	
+Calendar.setup(
+	{
+		inputField	: "fecha_facturado",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha_facturado"		// ID of the button
+	}
+);
 Calendar.setup(
 	{
 		inputField	: "fecha_envio",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha_envio"		// ID of the button
+	}
+);
+Calendar.setup(
+	{
+		inputField	: "fecha_pago_parcial",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha_pago_parcial"		// ID of the button
 	}
 );
 Calendar.setup(

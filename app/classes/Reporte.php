@@ -71,7 +71,7 @@ class Reporte
 	//Indica si el tipo de dato está basado en Moneda.
 	function requiereMoneda($tipo_dato)
 	{
-		if(in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','valor_hora','diferencia_valor_estandar','valor_estandar','rentabilidad')))
+		if(in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','valor_hora','diferencia_valor_estandar','valor_estandar','rentabilidad','valor_pagado_parcial','valor_por_pagar_parcial')))
 			return true;
 		return false;
 	}
@@ -100,10 +100,13 @@ class Reporte
 			case "rentabilidad":
 			case "diferencia_valor_estandar":
 			case "valor_estandar":
+			case "valor_pagado_parcial":
 			{
 				$this->addFiltro('trabajo','cobrable','1');
 				$this->addFiltro('cobro','estado','EMITIDO');
+				$this->addFiltro('cobro','estado','FACTURADO');
 				$this->addFiltro('cobro','estado','ENVIADO AL CLIENTE');
+				$this->addFiltro('cobro','estado','PAGO PARCIAL');
 				$this->addFiltro('cobro','estado','PAGADO');
 				break;
 			}
@@ -112,7 +115,9 @@ class Reporte
 			{
 				$this->addFiltro('trabajo','cobrable','1');
 				$this->addFiltro('cobro','estado','EMITIDO',false);
+				$this->addFiltro('cobro','estado','FACTURADO',false);
 				$this->addFiltro('cobro','estado','ENVIADO AL CLIENTE',false);
+				$this->addFiltro('cobro','estado','PAGO PARCIAL',false);
 				$this->addFiltro('cobro','estado','PAGADO',false);
 				$this->addFiltro('cobro','estado','INCOBRABLE',false);
 				break;
@@ -126,10 +131,13 @@ class Reporte
 			}
 			case "horas_por_pagar":
 			case "valor_por_pagar":
+			case "valor_por_pagar_parcial":
 			{
 				$this->addFiltro('trabajo','cobrable','1');
 				$this->addFiltro('cobro','estado','EMITIDO');
+				$this->addFiltro('cobro','estado','FACTURADO');
 				$this->addFiltro('cobro','estado','ENVIADO AL CLIENTE');
+				$this->addFiltro('cobro','estado','PAGO PARCIAL');
 				break;
 			}
 			case "horas_incobrables":
@@ -287,6 +295,7 @@ class Reporte
 				CONCAT(cliente.codigo_cliente,\'-0000\') as codigo_asunto,
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 				cobro.id_cobro,
 				'.$campo_fecha.' as fecha_final,
 				DATE_FORMAT( '.$campo_fecha.' , \'%m-%y\') as mes_reporte,
@@ -316,6 +325,22 @@ class Reporte
 									/	cobro_moneda.tipo_cambio
 									),
 									0) )';
+					break;
+				}
+				case 'valor_pagado_parcial':
+				{
+					$s .= ' SUM( (cobro.monto_trabajos
+									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+									*  ( 1 - documento.saldo_honorarios / documento.honorarios)
+									/	cobro_moneda.tipo_cambio) )';
+					break;
+				}
+				case 'valor_por_pagar_parcial':
+				{
+					$s .= ' SUM( (cobro.monto_trabajos
+									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+									*  ( documento.saldo_honorarios / documento.honorarios)
+									/	cobro_moneda.tipo_cambio) )';
 					break;
 				}
 				case 'valor_por_pagar':
@@ -424,6 +449,7 @@ class Reporte
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 						trabajo.fecha as fecha_final,
 						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes_reporte,':'').'
 						'.(in_array('dia_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,':'').'
@@ -442,14 +468,7 @@ class Reporte
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
 		$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE',".$s_monto_thh_estandar.",".$s_monto_thh_simple.")";
 
-		$monto_honorarios = "SUM(
-									(
-										".$s_tarifa."
-										* TIME_TO_SEC( duracion_cobrada)/3600
-									)
-									*	(cobro.monto_trabajos / ".$s_monto_thh." )
-									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
-								)";
+		
 		$monto_estandar = "SUM(
 									trabajo.tarifa_hh_estandar 
 									* (TIME_TO_SEC( duracion_cobrada)/3600)
@@ -461,9 +480,9 @@ class Reporte
 									* moneda_por_cobrar.tipo_cambio
 									/ (moneda_display.tipo_cambio * 3600)
 								)";
+
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
-		if( 1 && $this->tipo_dato != 'valor_por_cobrar')
-		{
+		if($this->tipo_dato != 'valor_por_cobrar')
 			$monto_honorarios = "SUM(
 										(
 											".$s_tarifa."
@@ -475,7 +494,29 @@ class Reporte
 											)
 										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 									)";
-		}
+		else
+			$monto_honorarios = "SUM(
+									(
+										".$s_tarifa."
+										* TIME_TO_SEC( duracion_cobrada)/3600
+									)
+									*	(cobro.monto_trabajos / ".$s_monto_thh." )
+									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+								)";
+		
+		//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
+		$monto_por_pagar_parcial = "SUM(
+										(
+											".$s_tarifa."
+											* TIME_TO_SEC( duracion_cobrada)/3600
+										)
+										*	(
+												( documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio )	
+												/   (".$s_monto_thh." * cobro_moneda_cobro.tipo_cambio )
+											)
+										*   ( documento.saldo_honorarios / documento.honorarios)
+										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+									)";
 
 		switch($this->tipo_dato)
 		{
@@ -506,6 +547,16 @@ class Reporte
 			case "valor_incobrable":
 			{
 				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_honorarios";
+				break;
+			}
+			case "valor_por_pagar_parcial":
+			{
+				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_por_pagar_parcial";
+				break;
+			}
+			case "valor_pagado_parcial":
+			{
+				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_honorarios - $monto_por_pagar_parcial";
 				break;
 			}
 			case "valor_estandar":
@@ -657,7 +708,7 @@ class Reporte
 		if(in_array
 			(
 				$this->tipo_dato,
-				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar')
+				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar','valor_pagado_parcial','valor_por_pagar_parcial')
 			))
 			$agrupa[] = "id_cobro";
 
@@ -702,7 +753,7 @@ class Reporte
 			in_array
 			(
 				$this->tipo_dato,
-				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar','valor_estandar')
+				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar','valor_estandar','valor_pagado_parcial','valor_por_pagar_parcial')
 			) 
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
@@ -1213,6 +1264,8 @@ class Reporte
 			case "valor_incobrable":
 			case "diferencia_valor_estandar":
 			case "valor_estandar":
+			case "valor_pagado_parcial":
+			case "valor_por_pagar_parcial":
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);
@@ -1251,13 +1304,11 @@ class Reporte
 			case "valor_incobrable":
 			case "diferencia_valor_estandar":
 			case "valor_estandar":
-			{
+			case "valor_pagado_parcial":
+			case "valor_por_pagar_parcial":
 				return "$";
-			}
 			case "valor_hora":
-			{
 				return "$/Hr.";
-			}
 		}
 		return "%";
 	}
@@ -1273,6 +1324,8 @@ class Reporte
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			case "valor_hora":
+			case "valor_pagado_parcial":
+			case "valor_por_pagar_parcial":
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);

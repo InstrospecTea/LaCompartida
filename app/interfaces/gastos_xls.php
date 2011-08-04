@@ -118,7 +118,7 @@
 		if($cobrado == 'NO')
 				$where .= " AND cta_corriente.id_cobro is null ";
 			if($cobrado == 'SI')
-				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE') ";
+				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL') ";
 		if($codigo_cliente)
 		{
 			$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
@@ -165,7 +165,8 @@
 					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
 					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_moneda.cifras_decimales, cobro.estado
-					$col_select
+					$col_select,
+					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
 					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
@@ -173,6 +174,7 @@
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
+					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					WHERE $where";
 		$lista_gastos = new ListaGastos($sesion,'',$query);
 		for( $v=0; $v < $lista_gastos->num; $v++ )
@@ -246,6 +248,8 @@
 	{
 		$ws1->write($fila_inicial, $columna_actual++, __('Cobrable'), $tit);
 	}
+	$ws1->write($fila_inicial, $columna_actual++, __('RUT Proveedor'), $tit);
+	$ws1->write($fila_inicial, $columna_actual++, __('Nombre Proveedor'), $tit);
 	
 	
     $fila_inicial++;    
@@ -309,7 +313,8 @@
 		{
 			$ws1->write($fila_inicial, $columna_actual++, $row['esCobrable'], $f4);
 		}
-		
+		$ws1->write($fila_inicial, $columna_actual++, $row[rut_proveedor], $f4);
+		$ws1->write($fila_inicial, $columna_actual++, $row[nombre_proveedor], $f4);
 		$fila_inicial++;
 		}
 		

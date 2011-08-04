@@ -648,7 +648,7 @@ if($horas_sql == 'valor_cobrado')
 					) as monto_cobrado_UF,";
 
 	$join = " LEFT JOIN cobro_moneda on (cobro_moneda.id_cobro = cobro.id_cobro && cobro_moneda.id_moneda=3) \n";
-	$where .= " AND cobro.estado IN ('EMITIDO', 'ENVIADO AL CLIENTE', 'PAGADO', 'INCOBRABLE') AND trabajo.cobrable = 1 ";
+	$where .= " AND cobro.estado IN ('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE') AND trabajo.cobrable = 1 ";
 	$horas_sql = 'monto_cobrado_UF' ;
 	$col_resultado = "UF";
 }

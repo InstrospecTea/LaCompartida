@@ -809,10 +809,12 @@ $mostrar_resumen_de_profesionales = 1;
 			//seteamos el ancho y columnas ocultas segun corresponda
 			
 			$ws->setColumn($columna_abogado, $columna_abogado, 32);
-			$ws->setColumn($columna_categoria, $columna_categoria, 14);
 			$ws->setColumn($columna_hora, $columna_hora, 8);
 			if(!$cobro->fields['opc_ver_profesional_categoria'] == 1) {
 				$ws->setColumn($columna_categoria, $columna_categoria, 0,0,1);
+			}
+			else{
+				$ws->setColumn($columna_categoria, $columna_categoria, 14);
 			}
 			if(!$cobro->fields['opc_ver_profesional_tarifa'] == 1) {
 				$ws->setColumn($columna_tarifa, $columna_tarifa, 0,0,1);
@@ -837,9 +839,9 @@ $mostrar_resumen_de_profesionales = 1;
 	
 				$filas = 0;
 				$col = 0;
-				$columna_inicial = 0;
 				$columna_sigla = $col++;
 				$columna_abogado = $col++;
+				$columna_inicial = empty($opc_ver_detalles_por_hora_iniciales) ? $columna_abogado : $columna_sigla;
 				$columna_categoria = $col++;
 				$columna_descripcion = $col++;
 				$columna_hora = $col++;

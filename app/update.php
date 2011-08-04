@@ -19,7 +19,7 @@ function Actualizaciones( &$dbh, $new_version )
 	case 1.1:
 		echo 'Mensaje de prueba 2.<br>';
 
-		$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresi√≥n del DOC';";
+		$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresiÛn del DOC';";
 
 		if( !mysql_query($query,$dbh) )
 			throw new Exception(mysql_error());
@@ -126,8 +126,8 @@ CHANGE `fono_contacto` `fono_contacto` INT( 20 ) NULL DEFAULT NULL";
 
 	case 1.7:
 				echo 'Mensaje de prueba 7.<br>';
-        $query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresi√≥n del DOC',
-									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresi√≥n del DOC'";
+        $query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresiÛn del DOC',
+									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresiÛn del DOC'";
         if( !mysql_query($query,$dbh) )
             throw new Exception(mysql_error());
 
@@ -5268,10 +5268,10 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 (5, 20, 'AD', 'AND', 'Andorra', 0),
 (6, 24, 'AO', 'AGO', 'Angola', 0),
 (7, 660, 'AI', 'AIA', 'Anguilla', 0),
-(8, 10, 'AQ', 'ATA', 'AntÔøΩrtida', 0),
+(8, 10, 'AQ', 'ATA', 'Ant·rtida', 0),
 (9, 28, 'AG', 'ATG', 'Antigua y Barbuda', 0),
 (10, 530, 'AN', 'ANT', 'Antillas Holandesas', 0),
-(11, 682, 'SA', 'SAU', 'Arabia SaudÔøΩ', 0),
+(11, 682, 'SA', 'SAU', 'Arabia SaudÌ', 0),
 (12, 12, 'DZ', 'DZA', 'Argelia', 0),
 (13, 32, 'AR', 'ARG', 'Argentina', 1),
 (14, 51, 'AM', 'ARM', 'Armenia', 0),
@@ -5792,6 +5792,17 @@ WHERE  `id` =105 LIMIT 1 ;";
               if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
             }
          break;
+		 case 4.59:
+				$query = array();
+				$query[] = "INSERT INTO `prm_estado_cobro` (`codigo_estado_cobro`, `orden`) VALUES ('FACTURADO', '4'), ('PAGO PARCIAL', '6');";
+				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '5' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'ENVIADO AL CLIENTE' AND  `orden` =4 LIMIT 1 ;";
+				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '7' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'PAGADO' AND  `orden` =5 LIMIT 1 ;";
+				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '8' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'INCOBRABLE' AND  `orden` =6 LIMIT 1 ;";
+				$query[] = "ALTER TABLE  `cobro` ADD  `fecha_pago_parcial` DATETIME NULL AFTER  `fecha_enviado_cliente` ;";
+
+			foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6019,7 +6030,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.56;
 	$VERSIONES[$num++] = 4.57;
 	$VERSIONES[$num++] = 4.58;
-/* LISTO, NO MODIFICAR NADA M√ÅS A PARTIR DE ESTA L√çNEA */
+	$VERSIONES[$num++] = 4.59;
+/* LISTO, NO MODIFICAR NADA M¡S A PARTIR DE ESTA LÕNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 {
@@ -6055,14 +6067,14 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 	$versionFileName = dirname(__FILE__).'/../app/version.php';
 
 	if( !file_exists($versionFileName) )
-		die('Error, el archivo de versi√≥n no se encuentra.');
+		die('Error, el archivo de versiÛn no se encuentra.');
 	if( !is_writable($versionFileName) )
-		die('Error, el archivo de versi√≥n no se puede escribir.');
+		die('Error, el archivo de versiÛn no se puede escribir.');
 
     require_once $versionFileName;
 
 	if( !isset($VERSION) or $VERSION < 0.01 )
-		die('Error en la versi√≥n del software.');
+		die('Error en la versiÛn del software.');
 
 	$sesion = new Sesion();
 
@@ -6070,7 +6082,7 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 	{
 		if( $VERSION <  $new_version )
 		{
-			echo '<hr>Comienzo de proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').'<br>';
+			echo '<hr>Comienzo de proceso de cambios para versiÛn '.number_format($new_version,2,'.','').'<br>';
 
 			try
 			{
@@ -6090,13 +6102,13 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 				if(!mysql_query("ROLLBACK", $sesion->dbh))
 					echo 'Error en ROLLBACK: '.mysql_error($sesion->dbh);
 
-				echo 'Error en proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').'<br>';
-				echo( 'Se encontr√≥ un error: '.$exc->getMessage() );
+				echo 'Error en proceso de cambios para versiÛn '.number_format($new_version,2,'.','').'<br>';
+				echo( 'Se encontrÛ un error: '.$exc->getMessage() );
 				exit(1);
 			}
 
 			GuardarVersion( $versionFileName, $new_version );
-			echo 'Proceso de cambios para versi√≥n '.number_format($new_version,2,'.','').' finalizado<br>';
+			echo 'Proceso de cambios para versiÛn '.number_format($new_version,2,'.','').' finalizado<br>';
 		}
 	}
 

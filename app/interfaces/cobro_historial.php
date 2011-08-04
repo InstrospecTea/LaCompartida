@@ -129,7 +129,9 @@ echo(Autocompletador::CSS());
 				<option value=''></option>
 				<option value='COBRO CREADO' <?=$comentario=='COBRO CREADO'?'selected':''?>><?=__('COBRO CREADO') ?></option>
 				<option value='COBRO EMITIDO' <?=$comentario=='COBRO EMITIDO'?'selected':''?>><?=__('COBRO EMITIDO') ?></option>
+				<option value='COBRO FACTURADO' <?=$comentario=='COBRO FACTURADO'?'selected':''?>><?=__('COBRO FACTURADO') ?></option>
 				<option value='COBRO ANULADO' <?=$comentario=='COBRO ANULADO'?'selected':''?>><?=__('COBRO ANULADO') ?></option>
+				<option value='COBRO PAGO PARCIAL' <?=$comentario=='COBRO PAGO PARCIAL'?'selected':''?>><?=__('COBRO PAGO PARCIAL') ?></option>
 				<option value='COBRO PAGADO' <?=$comentario=='COBRO PAGADO'?'selected':''?>><?=__('COBRO PAGADO') ?></option>
 				<option value='COBRO EN REVISION' <?=$comentario=='COBRO EN REVISION'?'selected':''?>><?=__('COBRO EN REVISION') ?></option>
 			</select>

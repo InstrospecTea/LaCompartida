@@ -235,7 +235,9 @@
 				if($estado=='CREADO') $where_estado='fecha_creacion';
 				if($estado=='EN REVISION') $where_estado='fecha_en_revision';
 				if($estado=='EMITIDO') $where_estado='fecha_emision';
+				if($estado=='FACTURADO') $where_estado='fecha_facturacion';
 				if($estado=='ENVIADO AL CLIENTE') $where_estado='fecha_enviado_cliente';
+				if($estado=='PAGO PARCIAL') $where_estado='fecha_pago_parcial';
 				if($estado=='INCOBRABLE' || $estado=='PAGADO') $where_estado='fecha_cobro';
 				if($estado=='CORTE') $where_estado='fecha_fin';
 
@@ -246,7 +248,9 @@
 				if($estado=='CREADO') $where_estado='fecha_creacion';
 				if($estado=='EN REVISION') $where_estado='fecha_en_revision';
 				if($estado=='EMITIDO') $where_estado='fecha_emision';
+				if($estado=='FACTURADO') $where_estado='fecha_facturacion';
 				if($estado=='ENVIADO AL CLIENTE') $where_estado='fecha_enviado_cliente';
+				if($estado=='PAGO PARCIAL') $where_estado='fecha_pago_parcial';
 				if($estado=='INCOBRABLE' || $estado=='PAGADO') $where_estado='fecha_cobro';
 				if($estado=='CORTE') $where_estado='fecha_fin';
 
@@ -263,7 +267,9 @@
 				if($estado=='CREADO') $where_estado='fecha_creacion';
 				if($estado=='EN REVISION') $where_estado='fecha_en_revision';
 				if($estado=='EMITIDO') $where_estado='fecha_emision';
+				if($estado=='FACTURADO') $where_estado='fecha_facturacion';
 				if($estado=='ENVIADO AL CLIENTE') $where_estado='fecha_enviado_cliente';
+				if($estado=='PAGO PARCIAL') $where_estado='fecha_pago_parcial';
 				if($estado=='INCOBRABLE' || $estado=='PAGADO') $where_estado='fecha_cobro';
 				if($estado=='CORTE') $where_estado='fecha_fin';
 
@@ -274,7 +280,9 @@
 				if($estado=='CREADO') $where_estado='fecha_creacion';
 				if($estado=='EN REVISION') $where_estado='fecha_en_revision';
 				if($estado=='EMITIDO') $where_estado='fecha_emision';
+				if($estado=='FACTURADO') $where_estado='fecha_facturacion';
 				if($estado=='ENVIADO AL CLIENTE') $where_estado='fecha_enviado_cliente';
+				if($estado=='PAGO PARCIAL') $where_estado='fecha_pago_parcial';
 				if($estado=='INCOBRABLE' || $estado=='PAGADO') $where_estado='fecha_cobro';
 				if($estado=='CORTE') $where_estado='fecha_fin';
 
@@ -764,7 +772,9 @@ $hoy = date("Y-m-d");
 			<option value='CREADO'>CREADO</option>
 			<option value='EN REVISION'>EN REVISION</option>
 			<option value='EMITIDO'>EMITIDO</option>
+			<option value='FACTURADO'>FACTURADO</option>
 			<option value='ENVIADO AL CLIENTE'>ENVIADO AL CLIENTE</option>
+			<option value='PAGO PARCIAL'>PAGO PARCIAL</option>
 			<option value='PAGADO'>PAGADO</option>
 			<option value='INCOBRABLE'>INCOBRABLE</option>
 		</select></td>

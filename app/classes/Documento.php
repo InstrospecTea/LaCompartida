@@ -92,10 +92,29 @@ class Documento extends Objeto
 	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null)
 	{
 		if($id_cobro)
+		{
+			list($dtemp,$mtemp,$atemp) = split("-",$fecha);
+			if( strlen( $dtemp ) == 2 )
+			{
+				$fecha = Utiles::fecha2sql($fecha);
+			}
+			/*$query="UPDATE cobro SET fecha_cobro='".$fecha." 00:00:00' WHERE id_cobro=".$id_cobro;
+			$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);*/
+			
+			//revisar si el monto pagado es igual al total, en caso contrario cambiar estado a pago parcial
+			$cobrox = new Cobro($this->sesion);
+			$cobrox->Load($id_cobro);
+			if( $cobrox->Loaded() )
+			{
+				$cobrox->Edit('fecha_cobro', "$fecha 00:00:00");
+				if( !$cobrox->TienePago() )
 				{
-				$query="UPDATE cobro SET fecha_cobro='".Utiles::fecha2sql($fecha)." 00:00:00' WHERE id_cobro=".$id_cobro;
-				$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					$cobrox->Edit('estado', 'PAGO PARCIAL');
+					$cobrox->Edit('fecha_pago_parcial', "$fecha 00:00:00");
 				}
+				$cobrox->Write();
+			}
+		}
 				
 		$query = "SELECT activo FROM cliente WHERE codigo_cliente='".$codigo_cliente."'";
 		$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -618,7 +637,7 @@ class Documento extends Objeto
 		//echo $this->tabla($out);
 		//echo $this->tabla_neteos($out_neteos);
 	}
-
+	
 	function EliminarDesdeFacturaPago($id_factura_pago){
 		
 		$query = "SELECT id_documento FROM documento WHERE id_factura_pago = '$id_factura_pago'";
@@ -631,8 +650,28 @@ class Documento extends Objeto
 		$this->EliminarNeteos();
 		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '".$id."' ";
 		mysql_query($query_p, $this->sesion->dbh) or Utiles::errorSQL($query_p,__FILE__,__LINE__,$this->sesion->dbh);
-
-		return $this->Delete();
+		
+		$query_id_cobro = "SELECT id_cobro FROM documento WHERE id_factura_pago = '$id_factura_pago'";
+		$resp = mysql_query($query_id_cobro, $this->sesion->dbh) or Utiles::errorSQL($query_id_cobro,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id_cobro_temp) = mysql_fetch_array($resp);
+			
+		if( $this->Delete() )
+		{
+			if($id_cobro_temp)
+			{
+				$cobrotmp = new Cobro($this->sesion);
+				$cobrotmp->Load($id_cobro_temp);
+				if( $cobrotmp->Loaded() )
+				{
+					$cobrotmp->CambiarEstadoAnterior();
+				}
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 

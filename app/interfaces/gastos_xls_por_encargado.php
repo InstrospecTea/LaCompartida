@@ -141,7 +141,7 @@
 		if($cobrado == 'NO')
 			$where .= " AND cta_corriente.id_cobro is null ";
 		if($cobrado == 'SI')
-			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE') ";
+			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL') ";
 		if($codigo_cliente)
 		{
 			$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";

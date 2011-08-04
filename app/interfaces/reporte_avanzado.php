@@ -79,6 +79,13 @@
 	$tipos_de_dato[] ='valor_hora';
 	$tipos_de_dato[] ='diferencia_valor_estandar';
 	$tipos_de_dato[] ='valor_estandar';
+	if($debug == 1)
+	{
+		$tipos_de_dato[] ='valor_pagado_parcial';
+		$tipos_de_dato[] ='valor_por_pagar_parcial';
+	
+	}
+
 
 	$agrupadores = array(
 	'glosa_cliente',
@@ -101,6 +108,7 @@
 		$agrupadores[] = 'dia_corte';
 		$agrupadores[] = 'dia_emision';
 		$agrupadores[] = 'id_contrato';
+		$agrupadores[] = 'grupo_o_cliente';
 	}
 
 	$glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";

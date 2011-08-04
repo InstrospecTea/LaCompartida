@@ -97,7 +97,7 @@
 			if($cobrado == 'NO')
 				$where .= " AND cta_corriente.id_cobro is null ";
 			if($cobrado == 'SI')
-				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
+				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 			if($codigo_asunto && $lista_asuntos)
 				$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 			if($codigo_asunto_secundario && $lista_asuntos_secundario)

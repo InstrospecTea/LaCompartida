@@ -686,7 +686,9 @@ $hoy = date("Y-m-d");
 			<option value='CREADO'>CREADO</option>
 			<option value='EN REVISION'>EN REVISION</option>
 			<option value='EMITIDO'>EMITIDO</option>
+			<option value='FACTURADO'>FACTURADO</option>
 			<option value='ENVIADO AL CLIENTE'>ENVIADO AL CLIENTE</option>
+			<option value='PAGO PARCIAL'>PAGO PARCIAL</option>
 			<option value='PAGADO'>PAGADO</option>
 			<option value='INCOBRABLE'>INCOBRABLE</option>
 		</select></td>

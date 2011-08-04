@@ -76,6 +76,20 @@
 			{
 				$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
+				if( $id_cobro )
+				{
+					$cobror = new Cobro( $sesion ); #cobro restaurar
+					$cobror->Load($id_cobro);
+					if( $cobror->Loaded() )
+					{
+						$fsa = $cobror->CantidadFacturasSinAnular(); #fsa = facturas sin anular
+						if ( $fsa == 1 )
+						{
+							$cobror->Edit('estado', 'FACTURADO');
+						}
+					}
+					$cobror->Write();
+				}
 			}
 		}
 		if($opcion == "anular")
@@ -149,7 +163,7 @@
 				$cobro = new Cobro($sesion);
 				if(!$cobro->Load($id_cobro)) $cobro = null;
 				if($cobro) $factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
-			}
+				}
 
 			if (!$factura->ValidarDocLegal())
 			{
@@ -158,6 +172,41 @@
 			}
 			else if($factura->Escribir())
 			{
+				if($id_cobro)
+				{
+					$cobro = new Cobro($sesion);
+					if(!$cobro->Load($id_cobro)) $cobro = null;
+					if($cobro)
+					{
+						$factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
+						if($id_estado=='5')
+						{
+							if( !$cobro->TieneFacturasSinAnular() )
+							{
+								$cobro->Edit('estado', 'EMITIDO');
+							}
+							elseif( $cobro->TieneFacturasSinAnular() && !$cobro->TienePago() )
+							{
+								$cobro->Edit('estado', 'ENVIADO AL CLIENTE');
+							}
+							elseif( $cobro->TieneFacturasSinAnular() && $cobro->TienePago() )
+							{
+								$cobro->Edit('estado', 'PAGO PARCIAL');
+							}
+						}
+						elseif($id_estado == '1')
+						{
+							$facturas_sin_anular = $cobro->CantidadFacturasSinAnular();
+							if ( $facturas_sin_anular == 1 )
+							{
+								$cobro->Edit('estado', 'FACTURADO');
+								$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
+							}
+						}
+						$cobro->Write();
+					}
+				}
+					
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero);
 				}

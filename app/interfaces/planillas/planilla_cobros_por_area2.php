@@ -149,6 +149,12 @@
 			case 'emitido':
 				$query_estado .= "'EMITIDO'";
 				break;
+			case 'facturado':
+				$query_estado .= "'FACTURADO'";
+				break;
+			case 'pago_parcial':
+				$query_estado .= "'PAGO PARCIAL'";
+				break;
 			case 'enviado':
 				$query_estado .= "'ENVIADO AL CLIENTE'";
 				break;
@@ -395,9 +401,11 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 				<select name="estado" id="estado" >
 					<option value="todos" ><?=__('Todos') ?></option>
 					<option value="creado" ><?=__('Creado') ?></option>
-					<option value="en_revision" ><?=__('En Revisiï¿½n') ?></option>
+					<option value="en_revision" ><?=__('En Revisión') ?></option>
 					<option value="emitido" ><?=__('Emitido') ?></option>
-					<option value="enviado" ><?=__('Facturado') ?></option>
+					<option value="facturado"><?=__('Facturado') ?></option>
+					<!--<option value="enviado"><?=__('Facturado') ?></option>-->
+					<option value="enviado" ><?=__('Enviado al Cliente') ?></option>
 					<option value="pagado" ><?=__('Pagado') ?></option>
 				</select>
 			</td>

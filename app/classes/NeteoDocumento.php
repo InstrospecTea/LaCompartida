@@ -251,11 +251,29 @@ class NeteoDocumento extends Objeto
 		$cobro->Load($id_cobro);
 		if($cobro->Loaded())
 		{
-			if(($cobro->fields['estado']=='PAGADO') && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
+			//echo $cobro->fields['estado'] . "<br>" . $saldo_cobro_honorarios . "<br>" . $saldo_cobro_gastos;
+			if( ( ( $cobro->fields['estado']=='PAGADO')  || ($cobro->fields['estado']=='PAGO_PARCIAL') ) && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
 			{
-				$cobro->Edit('estado','EMITIDO');
+				if( $cobro->TienePago() )
+				{
+					$cobro->Edit('estado','PAGO PARCIAL');
+				}
+				elseif( $cobro->TieneFacturasSinAnular() )
+				{
+					if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
+					{
+						$cobro->Edit('estado','FACTURADO');
+					}
+					else
+					{
+						$cobro->Edit('estado','ENVIADO AL CLIENTE');
+					}					
+				}
+				else {
+					$cobro->Edit('estado','EMITIDO');					
+				}
 			}
-			else if((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE')) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
+			elseif((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE') || ($cobro->fields['estado']=='FACTURADO') || ($cobro->fields['estado']=='PAGO_PARCIAL') ) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
 			{
 				$cobro->Edit('estado','PAGADO');
 			}

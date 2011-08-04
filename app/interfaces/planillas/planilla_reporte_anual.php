@@ -17,7 +17,6 @@
     $wb->setCustomColor ( 35, 15, 40, 190 );
     $wb->setCustomColor ( 36, 255, 255, 220 );
 
-
 	/*
 	$fmi = $fecha_mes_ini; 
 	if($fecha_mes_ini < 10)
@@ -230,6 +229,113 @@
 	if(is_array($usuariosF))
 		$where_fecha .= " AND trabajo.id_usuario IN ('".implode("','",$usuariosF)."') ";
 
+
+	//Reportes: se puede utilizar el modulo de Reportes Avanzados. A continuación se pueden crear hasta 14 reportes, quedando los resultados en un arreglo. Luego se llama cada resultado en la tabla que corresponde.
+
+	//Arreglo de tipos de datos de los 14 reportes:
+	$tipo_dato = array(	'horas_trabajadas',
+						'horas_trabajadas',
+						'horas_trabajadas',
+						'horas_trabajadas',
+						'horas_visibles',
+						'horas_visibles',
+						'horas_visibles',
+						'horas_visibles',
+						'valor_cobrado',
+						'valor_estandar',
+						'valor_cobrado',
+						'valor_estandar',
+						'valor_cobrado',
+						'valor_estandar');
+	//Los agrupadores de los 14 reportes
+	$vista = array(	'forma_cobro',
+					'mes_reporte-forma_cobro',
+					'grupo_o_cliente-forma_cobro',
+					'profesional-forma_cobro',
+					'forma_cobro',
+					'mes_reporte-forma_cobro',
+					'grupo_o_cliente-forma_cobro',
+					'profesional-forma_cobro',
+					'mes_reporte',
+					'mes_reporte',
+					'grupo_o_cliente',
+					'grupo_o_cliente',
+					'profesional',
+					'profesional');
+	//Forma del arreglo resultado de los 14 reportes.
+	$forma = array( 'arreglo',
+					'tabla',
+					'tabla',
+					'tabla',
+					'arreglo',
+					'tabla',
+					'tabla',
+					'tabla',
+					'arreglo',
+					'arreglo',
+					'arreglo',
+					'arreglo',
+					'arreglo',
+					'arreglo');
+
+	//Que reportes se usan. Por el momento, sólo los de valores.
+	$usa_reporte_horas = false;
+	$usa_reporte_valores = true;
+
+	//Se cargan los primeros 8 reportes (de Hora), si es que se usan.
+	$numero_reportes_horas = 8;
+	if($usa_reporte_horas)
+		for($i = 0; $i < $numero_reportes_horas; $i++)
+		{
+			$reporte[$i] = new Reporte($sesion);
+			$reporte[$i]->addRangoFecha($fecha_ini,$fecha_fin);
+			if($clientes)
+				foreach($clientes as $cliente)
+					if($cliente)
+						$reporte[$i]->addFiltro('cliente','codigo_cliente',$cliente);
+			if($usuarios)
+				foreach($usuarios as $usuario)
+					if($usuario)
+						$reporte[$i]->addFiltro('usuario','id_usuario',$usuario);
+
+			$reporte[$i]->setTipoDato($tipo_dato[$i]);
+			$reporte[$i]->setVista($vista[$i]);
+
+			$reporte[$i]->Query();
+			if($forma[$i]=='arreglo')
+				$resultado[$i] = $reporte[$i]->toArray();
+			else
+				$resultado[$i] = $reporte[$i]->toCross();
+		}
+
+	//Se cargan los 6 reportes de valores, si es que se usan
+	$numero_reportes_valores = 6;
+	$id_moneda=3;
+	if($usa_reporte_valores)
+		for($i = $numero_reportes_horas; $i <  $numero_reportes_horas + $numero_reportes_valores; $i++)
+		{
+			$reporte[$i] = new Reporte($sesion);
+			$reporte[$i]->addRangoFecha($fecha_ini,$fecha_fin);
+			if($clientes)
+				foreach($clientes as $cliente)
+					if($cliente)
+						$reporte[$i]->addFiltro('cliente','codigo_cliente',$cliente);
+			if($usuarios)
+				foreach($usuarios as $usuario)
+					if($usuario)
+						$reporte[$i]->addFiltro('usuario','id_usuario',$usuario);
+
+			$reporte[$i]->setTipoDato($tipo_dato[$i]);
+			$reporte[$i]->setVista($vista[$i]);
+			$reporte[$i]->id_moneda = $id_moneda;
+
+			$reporte[$i]->Query();
+			if($forma[$i]=='arreglo')
+				$resultado[$i] = $reporte[$i]->toArray();
+			else
+				$resultado[$i] = $reporte[$i]->toCross();
+		}
+
 	//HOJA 1, TABLA 1
 	$ws1 =& $wb->addWorksheet(__('Hrs Declaradas x FC x mes'));
 	iniciar_hoja($ws1,__('Horas Declaradas Corregidas por Forma de Cobro'),$fila,$col,$f);
@@ -238,23 +344,39 @@
 	print_headers($ws1,$encabezados,$fila,$f);
 	
 	$fila_ini = $fila;
-	$query = "SELECT 
+
+	if($usa_reporte_horas)
+	{
+		foreach($resultado[0] as $forma_cobro => $r)
+		{
+			if(is_array($r))
+			{
+				$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
+				$ws1->write($fila,1,n($r['valor']),$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+			$query = "SELECT 
 			IF(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC,
 			SUM(TIME_TO_SEC( trabajo.duracion ))/3600
-FROM trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE $where_fecha
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro))
-ORDER BY trabajo.cobrable";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($forma_cobro,$duracion) = mysql_fetch_array($resp))
-	{
-		$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
-		$ws1->write($fila,1,n($duracion),$f['numeros']);
-		$fila++;
+			FROM trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+			LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+			WHERE $where_fecha
+			group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro))
+			ORDER BY trabajo.cobrable";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			while(list($forma_cobro,$duracion) = mysql_fetch_array($resp))
+			{	
+				$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
+				$ws1->write($fila,1,n($duracion),$f['numeros']);
+				$fila++;
+			}
 	}
 	$fila_fin = $fila-1;
-	
+
 	if($fila_fin > $fila_ini)
 	{
 		$ws1->write($fila,0,__('Total'),$f['txt_total']);
@@ -264,40 +386,77 @@ ORDER BY trabajo.cobrable";
 
 	escribir_multiple($ws1,$fila,0,8,__('Horas Declaradas Corregidas por Forma de Cobro') . " " . __('desagregadas por mes'),$f['titulo']);
 	$fila+=2;
-  
+	  
 	//HOJA 1, TABLA 2
-	$encabezados = array('Mes','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws1,$encabezados,$fila,$f);
-	
-		
-	$query = "Select mes, fecha
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE' 
-FROM ( 
-select CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE $where_fecha
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), MONTH(trabajo.fecha)
-) as tabla1
-GROUP BY mes
-ORDER BY fecha ";
-
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($mes,$fecha,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws1->write($fila,0,$mes,$f['txt_valor']);
-		$ws1->write($fila,1,n($tasa),$f['numeros']);
-		$ws1->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws1->write($fila,3,n($retainer),$f['numeros']);
-		$ws1->write($fila,4,n($proporcional),$f['numeros']);
-		$ws1->write($fila,5,n($cap),$f['numeros']);
-		$ws1->write($fila,6,n($no_cobrable),$f['numeros']);
-		$ws1->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros']);
-		$fila++;
+		$r = $resultado[1];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array('Mes');
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws1,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws1->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+					{	
+						$ws1->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					}
+					else
+					{
+						$ws1->write($fila,$col,'',$f['numeros']);
+					}
+					$col++;		
+				}
+				$ws1->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$encabezados = array('Mes','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+		print_headers($ws1,$encabezados,$fila,$f);
+			
+		$query = "Select mes, fecha
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE' 
+		FROM ( 
+		select CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		WHERE $where_fecha
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), MONTH(trabajo.fecha)
+		) as tabla1
+		GROUP BY mes
+		ORDER BY fecha ";
+
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($mes,$fecha,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+		{
+			$ws1->write($fila,0,$mes,$f['txt_valor']);
+			$ws1->write($fila,1,n($tasa),$f['numeros']);
+			$ws1->write($fila,2,n($flat_fee),$f['numeros']);
+			$ws1->write($fila,3,n($retainer),$f['numeros']);
+			$ws1->write($fila,4,n($proporcional),$f['numeros']);
+			$ws1->write($fila,5,n($cap),$f['numeros']);
+			$ws1->write($fila,6,n($no_cobrable),$f['numeros']);
+			$ws1->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 	
@@ -324,43 +483,76 @@ ORDER BY fecha ";
 	//HOJA 2 TABLA 1
 	$ws2 =& $wb->addWorksheet(__('Hrs Declaradas x FC x grupo'));
 	iniciar_hoja($ws2,'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Grupo',$fila,$col,$f);
-	
-	$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws2,$encabezados,$fila,$f);
-	
-	$query ="select glosa_cliente2
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
-, sum(horas) as total 
-FROM ( 
-select if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo
-LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE $where_fecha
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), glosa_cliente2
-) as tabla1
-GROUP BY glosa_cliente2 order by total desc";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($cliente,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws2->write($fila,0,$cliente,$f['txt_valor']);
-		$ws2->write($fila,1,n($tasa),$f['numeros']);
-		$ws2->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws2->write($fila,3,n($retainer),$f['numeros']);
-		$ws2->write($fila,4,n($proporcional),$f['numeros']);
-		$ws2->write($fila,5,n($cap),$f['numeros']);
-		$ws2->write($fila,6,n($no_cobrable),$f['numeros']);
-		
-		$ws2->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
-		$fila++;
+		$r = $resultado[2];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array(__('Grupo o Cliente'));
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws2,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws2->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+						$ws2->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					else
+						$ws2->write($fila,$col,'',$f['numeros']);
+					$col++;		
+				}
+				$ws2->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+			$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+			print_headers($ws2,$encabezados,$fila,$f);
+			
+			$query ="select glosa_cliente2
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
+		, sum(horas) as total 
+		FROM ( 
+		select if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo
+		LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+		LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		WHERE $where_fecha
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), glosa_cliente2
+		) as tabla1
+		GROUP BY glosa_cliente2 order by total desc";
+			$fila_ini = $fila;
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			while(list($cliente,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+			{
+				$ws2->write($fila,0,$cliente,$f['txt_valor']);
+				$ws2->write($fila,1,n($tasa),$f['numeros']);
+				$ws2->write($fila,2,n($flat_fee),$f['numeros']);
+				$ws2->write($fila,3,n($retainer),$f['numeros']);
+				$ws2->write($fila,4,n($proporcional),$f['numeros']);
+				$ws2->write($fila,5,n($cap),$f['numeros']);
+				$ws2->write($fila,6,n($no_cobrable),$f['numeros']);
+				
+				$ws2->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
+				$fila++;
+			}
 	}
 	$fila_fin = $fila-1;
 
@@ -384,44 +576,77 @@ GROUP BY glosa_cliente2 order by total desc";
 	//HOJA 3 TABLA 1
 	$ws3 =& $wb->addWorksheet(__('Hrs Declaradas x FC x prof'));
 	iniciar_hoja($ws3,'Horas Declaradas por ' . __('Forma de Cobro') . ' desagregadas por Profesional',$fila,$col,$f);
-	
-	$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws3,$encabezados,$fila,$f);
-	
-	$query ="select username
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
-, sum(horas) as total 
-FROM ( 
-select usuario.username, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo
-LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-WHERE $where_fecha
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), usuario.id_usuario
-) as tabla1
-GROUP BY username
-order by total desc";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($profesional,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws3->write($fila,0,$profesional,$f['txt_valor']);
-		$ws3->write($fila,1,n($tasa),$f['numeros']);
-		$ws3->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws3->write($fila,3,n($retainer),$f['numeros']);
-		$ws3->write($fila,4,n($proporcional),$f['numeros']);
-		$ws3->write($fila,5,n($cap),$f['numeros']);
-		$ws3->write($fila,6,n($no_cobrable),$f['numeros']);
+		$r = $resultado[3];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array(__('Profesional'));
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws3,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws3->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+						$ws3->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					else
+						$ws3->write($fila,$col,'',$f['numeros']);
+					$col++;		
+				}
+				$ws3->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+		print_headers($ws3,$encabezados,$fila,$f);
 		
-		$ws3->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
-		$fila++;
+		$query ="select username
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
+		, sum(horas) as total 
+		FROM ( 
+		select usuario.username, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion))/3600 as horas from trabajo
+		LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+		WHERE $where_fecha
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), usuario.id_usuario
+		) as tabla1
+		GROUP BY username
+		order by total desc";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($profesional,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+		{
+			$ws3->write($fila,0,$profesional,$f['txt_valor']);
+			$ws3->write($fila,1,n($tasa),$f['numeros']);
+			$ws3->write($fila,2,n($flat_fee),$f['numeros']);
+			$ws3->write($fila,3,n($retainer),$f['numeros']);
+			$ws3->write($fila,4,n($proporcional),$f['numeros']);
+			$ws3->write($fila,5,n($cap),$f['numeros']);
+			$ws3->write($fila,6,n($no_cobrable),$f['numeros']);
+			
+			$ws3->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -450,20 +675,35 @@ order by total desc";
 	print_headers($ws1,$encabezados,$fila,$f);
 	
 	$fila_ini = $fila;
-	$query = "SELECT 
-			IF(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC,
-			SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600
-FROM trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE') AND $where_fecha
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro))
-ORDER BY trabajo.cobrable";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($forma_cobro,$duracion) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
-		$ws1->write($fila,1,n($duracion),$f['numeros']);
-		$fila++;
+		foreach($resultado[4] as $forma_cobro => $r)
+		{
+			if(is_array($r))
+			{
+				$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
+				$ws1->write($fila,1,n($r['valor']),$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$query = "SELECT 
+				IF(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC,
+				SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600
+	FROM trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+	LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+	WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE') AND $where_fecha
+	group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro))
+	ORDER BY trabajo.cobrable";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($forma_cobro,$duracion) = mysql_fetch_array($resp))
+		{
+			$ws1->write($fila,0,$forma_cobro,$f['txt_valor']);
+			$ws1->write($fila,1,n($duracion),$f['numeros']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 	
@@ -476,38 +716,75 @@ ORDER BY trabajo.cobrable";
 	escribir_multiple($ws1,$fila,0,8,__('Horas Liquidadas por Forma de Cobro') . " " . _('desagregadas por mes'),$f['titulo']);
 	$fila+=2;
   
-	$encabezados = array('Mes','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws1,$encabezados,$fila,$f);
-	
-		
-	$query = "Select mes, fecha
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE' 
-FROM ( 
-select CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), mes
-) as tabla1
-GROUP BY mes
-ORDER BY fecha ";
-
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($mes,$fecha,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws1->write($fila,0,$mes,$f['txt_valor']);
-		$ws1->write($fila,1,n($tasa),$f['numeros']);
-		$ws1->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws1->write($fila,3,n($retainer),$f['numeros']);
-		$ws1->write($fila,4,n($proporcional),$f['numeros']);
-		$ws1->write($fila,5,n($cap),$f['numeros']);
-		$ws1->write($fila,6,n($no_cobrable),$f['numeros']);
-		$ws1->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
-		$fila++;
+		$r = $resultado[5];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array('Mes');
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws1,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws1->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+					{	
+						$ws1->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					}
+					else
+					{
+						$ws1->write($fila,$col,'',$f['numeros']);
+					}
+					$col++;		
+				}
+				$ws1->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$encabezados = array('Mes','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+		print_headers($ws1,$encabezados,$fila,$f);
+		
+		$query = "Select mes, fecha
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE' 
+		FROM ( 
+		select CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), mes
+		) as tabla1
+		GROUP BY mes
+		ORDER BY fecha ";
+
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($mes,$fecha,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+		{
+			$ws1->write($fila,0,$mes,$f['txt_valor']);
+			$ws1->write($fila,1,n($tasa),$f['numeros']);
+			$ws1->write($fila,2,n($flat_fee),$f['numeros']);
+			$ws1->write($fila,3,n($retainer),$f['numeros']);
+			$ws1->write($fila,4,n($proporcional),$f['numeros']);
+			$ws1->write($fila,5,n($cap),$f['numeros']);
+			$ws1->write($fila,6,n($no_cobrable),$f['numeros']);
+			$ws1->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -532,42 +809,76 @@ ORDER BY fecha ";
 	$ws2 =& $wb->addWorksheet(__('Hrs Liquidadas x FC x grupo'));
 	iniciar_hoja($ws2,__('Horas Liquidadas por Forma de Cobro') . ' desagregadas por Grupo',$fila,$col,$f);
 	
-	$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws2,$encabezados,$fila,$f);
-	
-	$query ="select glosa_cliente2
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
-, sum(horas) as total 
-FROM ( 
-select if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo
-LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), glosa_cliente2
-) as tabla1
-GROUP BY glosa_cliente2 order by total desc";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($cliente,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+	if($usa_reporte_horas)
 	{
-		$ws2->write($fila,0,$cliente,$f['txt_valor']);
-		$ws2->write($fila,1,n($tasa),$f['numeros']);
-		$ws2->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws2->write($fila,3,n($retainer),$f['numeros']);
-		$ws2->write($fila,4,n($proporcional),$f['numeros']);
-		$ws2->write($fila,5,n($cap),$f['numeros']);
-		$ws2->write($fila,6,n($no_cobrable),$f['numeros']);
+		$r = $resultado[6];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array(__('Grupo o Cliente'));
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws2,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws2->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+						$ws2->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					else
+						$ws2->write($fila,$col,'',$f['numeros']);
+					$col++;		
+				}
+				$ws2->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$encabezados = array('Grupo o Cliente','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+		print_headers($ws2,$encabezados,$fila,$f);
 		
-		$ws2->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
-		$fila++;
+		$query ="select glosa_cliente2
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
+		, sum(horas) as total 
+		FROM ( 
+		select if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo
+		LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+		LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), glosa_cliente2
+		) as tabla1
+		GROUP BY glosa_cliente2 order by total desc";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($cliente,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+		{
+			$ws2->write($fila,0,$cliente,$f['txt_valor']);
+			$ws2->write($fila,1,n($tasa),$f['numeros']);
+			$ws2->write($fila,2,n($flat_fee),$f['numeros']);
+			$ws2->write($fila,3,n($retainer),$f['numeros']);
+			$ws2->write($fila,4,n($proporcional),$f['numeros']);
+			$ws2->write($fila,5,n($cap),$f['numeros']);
+			$ws2->write($fila,6,n($no_cobrable),$f['numeros']);
+			
+			$ws2->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -591,44 +902,79 @@ GROUP BY glosa_cliente2 order by total desc";
 	//HOJA 6 TABLA 1
 	$ws3 =& $wb->addWorksheet(__('Hrs Liquidadas x FC x prof'));
 	iniciar_hoja($ws3,__('Horas Liquidadas por Forma de Cobro') . " " . 'desagregadas por Profesional',$fila,$col,$f);
-	
-	$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
-	print_headers($ws3,$encabezados,$fila,$f);
-	
-	$query ="select username
-, sum(if(FC='TASA',horas,0)) as 'TASA'
-, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
-, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
-, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
-, sum(if(FC='CAP',horas,0)) as 'CAP'
-, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
-, sum(horas) as total 
-FROM ( 
-select usuario.username, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo
-LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
-LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), usuario.id_usuario
-) as tabla1
-GROUP BY username
-order by total desc";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($profesional,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+
+	if($usa_reporte_horas)
 	{
-		$ws3->write($fila,0,$profesional,$f['txt_valor']);
-		$ws3->write($fila,1,n($tasa),$f['numeros']);
-		$ws3->write($fila,2,n($flat_fee),$f['numeros']);
-		$ws3->write($fila,3,n($retainer),$f['numeros']);
-		$ws3->write($fila,4,n($proporcional),$f['numeros']);
-		$ws3->write($fila,5,n($cap),$f['numeros']);
-		$ws3->write($fila,6,n($no_cobrable),$f['numeros']);
+		$r = $resultado[7];
+		if(is_array($r['labels']))
+		{
+			//Encabezados
+			$encabezados = array(__('Profesional'));
+			foreach($r['labels_col'] as $id_col => $nombre_col)
+				$encabezados[] = __($nombre_col['nombre']);
+			$encabezados[] = __('Total');
+			$encabezados[] = __('Porcentaje');
+			print_headers($ws3,$encabezados,$fila,$f);
+
+			$fila_ini = $fila;
+			foreach($r['labels'] as $id => $nombre)
+			{
+				$ws3->write($fila,0,$nombre['nombre'],$f['txt_valor']);
+				$col = 1;
+				foreach($r['labels_col'] as $id_col => $nombre_col)
+				{
+					if(isset($r['celdas'][$id][$id_col]['valor']))
+						$ws3->write($fila,$col,n($r['celdas'][$id][$id_col]['valor']),$f['numeros']);
+					else
+						$ws3->write($fila,$col,'',$f['numeros']);
+					$col++;		
+				}
+				$ws3->write($fila,$col,'=SUM('.fila_col($fila,1).':'.fila_col($fila,$col-1).')',$f['numeros']);
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+	
+		$encabezados = array('Profesional','TASA','FLAT FEE','RETAINER','PROPORCIONAL','CAP','NO COBRABLE','Total','Porcentaje');
+		print_headers($ws3,$encabezados,$fila,$f);
 		
-		$ws3->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
-		$fila++;
+		$query ="select username
+		, sum(if(FC='TASA',horas,0)) as 'TASA'
+		, sum(if(FC='FLAT FEE',horas,0)) as 'FLET FEE'
+		, sum(if(FC='RETAINER',horas,0)) as 'RETAINER'
+		, sum(if(FC='PROPORCIONAL',horas,0)) as 'PROPORCIONAL'
+		, sum(if(FC='CAP',horas,0)) as 'CAP'
+		, sum(if(FC='NO COBRABLE',horas,0)) as 'NO COBRABLE'
+		, sum(horas) as total 
+		FROM ( 
+		select usuario.username, if(trabajo.cobrable=0,'NO COBRABLE',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)) as FC, sum(TIME_TO_SEC(duracion_cobrada))/3600 as horas from trabajo
+		LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		LEFT JOIN contrato as contrato_asunto ON asunto.id_contrato=contrato_asunto.id_contrato
+		LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+		WHERE $where_fecha AND cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		group by if(trabajo.cobrable=0,'No Cobrable',if(cobro.forma_cobro IS NOT NULL,cobro.forma_cobro, contrato_asunto.forma_cobro)), usuario.id_usuario
+		) as tabla1
+		GROUP BY username
+		order by total desc";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($profesional,$tasa,$flat_fee,$retainer,$proporcional,$cap,$no_cobrable) = mysql_fetch_array($resp))
+		{
+			$ws3->write($fila,0,$profesional,$f['txt_valor']);
+			$ws3->write($fila,1,n($tasa),$f['numeros']);
+			$ws3->write($fila,2,n($flat_fee),$f['numeros']);
+			$ws3->write($fila,3,n($retainer),$f['numeros']);
+			$ws3->write($fila,4,n($proporcional),$f['numeros']);
+			$ws3->write($fila,5,n($cap),$f['numeros']);
+			$ws3->write($fila,6,n($no_cobrable),$f['numeros']);
+			
+			$ws3->write($fila,7,'=SUM('.fila_col($fila,1).':'.fila_col($fila,6).')',$f['numeros_total']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -785,31 +1131,57 @@ ORDER BY hrs_declaradas DESC";
 	$encabezados = array('Mes','Total Liquidado','Tarifa Estándar','Rentabilidad');
 	print_headers($ws7,$encabezados,$fila,$f);
 	
-	$query ="
-SELECT
-CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha AS fecha,
-SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
-SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-                     /   cobro_moneda.tipo_cambio) as total_tarifa_std 
-from trabajo
-JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-and $where_fecha
-GROUP BY mes
-ORDER BY fecha";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($mes,$fecha,$liquidado,$estandar) = mysql_fetch_array($resp))
+	if($usa_reporte_valores)
 	{
-		$ws7->write($fila,0,$mes,$f['txt_valor']);
-		$ws7->write($fila,1,n($liquidado),$f['moneda']);
-		$ws7->write($fila,2,n($estandar),$f['moneda']);
-		
-		$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
-		$ws7->write($fila,3,$estandar? $formula:'0',$f['porcentaje']);
-		$fila++;
+		//Valor y Valor estándar:
+		$r = $resultado[8];
+		$r_c = $resultado[9];
+		$r = Reporte::fixArray($r,$r_c);
+		$r_c = Reporte::fixArray($r_c,$r);
+
+		foreach($r as $k_a => $a)
+		{
+			if(is_array($a))
+			{
+				$ws7->write($fila,0,$k_a,$f['txt_valor']);
+				$ws7->write($fila,1,n($a['valor']),$f['numeros']);
+				$ws7->write($fila,2,n($r_c[$k_a]['valor']),$f['numeros']);
+
+				$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+				$ws7->write($fila,3,n($r_c[$k_a]['valor'])? $formula:'0',$f['porcentaje']);
+
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$query ="
+		SELECT
+		CONCAT(Month(trabajo.fecha), '-', Year(trabajo.fecha)) as mes, trabajo.fecha AS fecha,
+		SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
+		SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
+							 /   cobro_moneda.tipo_cambio) as total_tarifa_std 
+		from trabajo
+		JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		and $where_fecha
+		GROUP BY mes
+		ORDER BY fecha";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($mes,$fecha,$liquidado,$estandar) = mysql_fetch_array($resp))
+		{
+			$ws7->write($fila,0,$mes,$f['txt_valor']);
+			$ws7->write($fila,1,n($liquidado),$f['moneda']);
+			$ws7->write($fila,2,n($estandar),$f['moneda']);
+			
+			$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+			$ws7->write($fila,3,$estandar? $formula:'0',$f['porcentaje']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -828,32 +1200,58 @@ ORDER BY fecha";
 	$encabezados = array('Grupo o Cliente','Total Liquidado','Tarifa Estándar','Rentabilidad');
 	print_headers($ws7,$encabezados,$fila,$f);
 	
-	$query ="SELECT
-if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, 
-SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
-SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-                        /   cobro_moneda.tipo_cambio) as total_tarifa_std 
-from trabajo
-JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-and $where_fecha
-GROUP BY glosa_cliente2
-ORDER BY total_liquidado DESC ";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($cliente,$liquidado,$estandar) = mysql_fetch_array($resp))
+	if($usa_reporte_valores)
 	{
-		$ws7->write($fila,0,$cliente,$f['txt_valor']);
-		$ws7->write($fila,1,n($liquidado),$f['moneda']);
-		$ws7->write($fila,2,n($estandar),$f['moneda']);
-		
-		$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
-		$ws7->write($fila,3,$estandar? $formula:'0',$f['porcentaje']);
-		$fila++;
+		//Valor y Valor estándar:
+		$r = $resultado[10];
+		$r_c = $resultado[11];
+		$r = Reporte::fixArray($r,$r_c);
+		$r_c = Reporte::fixArray($r_c,$r);
+
+		foreach($r as $k_a => $a)
+		{
+			if(is_array($a))
+			{
+				$ws7->write($fila,0,$k_a,$f['txt_valor']);
+				$ws7->write($fila,1,n($a['valor']),$f['numeros']);
+				$ws7->write($fila,2,n($r_c[$k_a]['valor']),$f['numeros']);
+
+				$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+				$ws7->write($fila,3,n($r_c[$k_a]['valor'])? $formula:'0',$f['porcentaje']);
+
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$query ="SELECT
+		if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, 
+		SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
+		SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
+								/   cobro_moneda.tipo_cambio) as total_tarifa_std 
+		from trabajo
+		JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+		WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		and $where_fecha
+		GROUP BY glosa_cliente2
+		ORDER BY total_liquidado DESC ";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($cliente,$liquidado,$estandar) = mysql_fetch_array($resp))
+		{
+			$ws7->write($fila,0,$cliente,$f['txt_valor']);
+			$ws7->write($fila,1,n($liquidado),$f['moneda']);
+			$ws7->write($fila,2,n($estandar),$f['moneda']);
+			
+			$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+			$ws7->write($fila,3,$estandar? $formula:'0',$f['porcentaje']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
@@ -872,32 +1270,58 @@ ORDER BY total_liquidado DESC ";
 	$encabezados = array('Profesional','Total Liquidado','Tarifa Estándar','Rentabilidad');
 	print_headers($ws7,$encabezados,$fila,$f);
 	
-	$query ="select  
-usuario.username,
-SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
-SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-
-                        /   cobro_moneda.tipo_cambio) as total_tarifa_std 
-from trabajo
-JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
-LEFT JOIN usuario ON usuario.id_usuario=trabajo.id_usuario
-LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-and $where_fecha 
-GROUP BY usuario.id_usuario
-ORDER BY total_liquidado DESC";
-	$fila_ini = $fila;
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	while(list($usuario,$liquidado,$estandar) = mysql_fetch_array($resp))
+	if($usa_reporte_valores)
 	{
-		$ws7->write($fila,0,$usuario,$f['txt_valor']);
-		$ws7->write($fila,1,n($liquidado),$f['moneda']);
-		$ws7->write($fila,2,n($estandar),$f['moneda']);
-		
-		$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
-		$ws7->write($fila,3, $estandar? $formula:'0' ,$f['porcentaje']);
-		$fila++;
+		//Valor y Valor estándar:
+		$r = $resultado[12];
+		$r_c = $resultado[13];
+		$r = Reporte::fixArray($r,$r_c);
+		$r_c = Reporte::fixArray($r_c,$r);
+
+		foreach($r as $k_a => $a)
+		{
+			if(is_array($a))
+			{
+				$ws7->write($fila,0,$k_a,$f['txt_valor']);
+				$ws7->write($fila,1,n($a['valor']),$f['numeros']);
+				$ws7->write($fila,2,n($r_c[$k_a]['valor']),$f['numeros']);
+
+				$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+				$ws7->write($fila,3,n($r_c[$k_a]['valor'])? $formula:'0',$f['porcentaje']);
+
+				$fila++;
+			}
+		}
+	}
+	else
+	{
+		$query ="select  
+		usuario.username,
+		SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
+		SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
+
+								/   cobro_moneda.tipo_cambio) as total_tarifa_std 
+		from trabajo
+		JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+		LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
+		LEFT JOIN usuario ON usuario.id_usuario=trabajo.id_usuario
+		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+		WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+		and $where_fecha 
+		GROUP BY usuario.id_usuario
+		ORDER BY total_liquidado DESC";
+		$fila_ini = $fila;
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($usuario,$liquidado,$estandar) = mysql_fetch_array($resp))
+		{
+			$ws7->write($fila,0,$usuario,$f['txt_valor']);
+			$ws7->write($fila,1,n($liquidado),$f['moneda']);
+			$ws7->write($fila,2,n($estandar),$f['moneda']);
+			
+			$formula = '='.fila_col($fila,1).'/'.fila_col($fila,2);
+			$ws7->write($fila,3, $estandar? $formula:'0' ,$f['porcentaje']);
+			$fila++;
+		}
 	}
 	$fila_fin = $fila-1;
 
