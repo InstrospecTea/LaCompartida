@@ -78,10 +78,11 @@ class Asunto extends Objeto
 						}
 						$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
 					}
-					if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') ) 
+					if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') )  //Formato XXXX-AAXX
 						$anio="";
 					else
 						$anio="AND STR_TO_DATE(SUBSTR(codigo_asunto,6,2),'%y')=YEAR(NOW())";
+
 			}
 		else
 			{
@@ -97,7 +98,7 @@ class Asunto extends Objeto
 						$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
 					}
 				}
-				if (method_exists('Conf','TipoCodigoAsunto'))
+				if (method_exists('Conf','TipoCodigoAsunto') == 1) //Formato XXXX-AAXX
 				{
 					if (Conf::TipoCodigoAsunto())
 						$anio="";
@@ -117,10 +118,13 @@ class Asunto extends Objeto
 			$g=substr($codigo,2)+1;
 		if( method_exists('Conf','GetConf') )
 		{
-			if (Conf::GetConf($this->sesion,'TipoCodigoAsunto'))
+			if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 1)
 				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
+                       else if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 2)
+                                $codigo_asunto=$codigo_cliente.'-'.sprintf("%03d",$f);
 			else
 				$codigo_asunto=$codigo_cliente.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
+
 		}
 		else if (method_exists('Conf','TipoCodigoAsunto'))
 		{
