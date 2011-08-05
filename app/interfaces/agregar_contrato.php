@@ -896,6 +896,7 @@ function SetBanco( origen, destino )
 			var text_window = "";
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
 			var parts = respuesta.split("::");
+			var todos = false;
 			if( parts[0] > 0)
 			{
 				text_window += "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
@@ -903,41 +904,70 @@ function SetBanco( origen, destino )
 				{
 					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Listado de usuario con tarifa sin valor para la moneda seleccionada.')?></span><br><br>';
 					text_window += '<span style="font-size:12px; text-align:left;">' + parts[1] + '</span><br><br>';
+					todos = false;
 				}
 				else if( parts[0] == parts[2] )
 				{
-					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Puede que la tarifa o moneda elegida sea incorrecta<br> debido a que ningún abogado tiene fijado el valor para la tarifa o moneda seleccionada.')?></span><br><br>'
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('La tarifa seleccionada no tiene valor definido en la moneda elegida.')?></span><br><br>';
+					todos = true;
 				}
 				else
 				{
-					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin valor para la tarifa y moneda seleccionadas.')?></span><br><br>'
+					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Hay más de 10 abogados sin valor para la tarifa y moneda seleccionadas.')?></span><br><br>';
+					todos = false;
 				}
 				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?=__('Modificar tarifa.')?></a></span>';
 
-				Dialog.confirm(text_window, 
+				if( todos && !desde_combo )
 				{
-					top:100, left:80, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
-					id: "myDialogId",
-					cancel:function(win){ 
-						respuesta_revisar_tarifa = false; 
-						return respuesta_revisar_tarifa; 
-					},
-					ok:function(win){ 
-						respuesta_revisar_tarifa = true;
-						if( !desde_combo )
-						{
-							if( f.desde.value == 'agregar_cliente')
+					Dialog.alert(text_window, 
+					{
+						top:100, left:80, width:400, okLabel: "<?=__('Cerrar')?>",
+						buttonClass: "btn", className: "alphacube", id: 'myDialogId', destroyOnClose: true,
+						ok:function(win){ 
+								document.getElementById('id_tarifa').value=document.getElementById('id_tarifa_hidden').value;
+								document.getElementById('id_moneda').value=document.getElementById('id_moneda_hidden').value;
+								document.getElementById('id_moneda').focus();
+								win.close();
+								return false;
+							}
+					});
+				}
+				else
+				{
+					Dialog.confirm(text_window, 
+					{
+						top:100, left:80, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+						id: "myDialogId",
+						cancel:function(win){ 
+							document.getElementById('id_tarifa').value=document.getElementById('id_tarifa_hidden').value;
+							document.getElementById('id_moneda').value=document.getElementById('id_moneda_hidden').value;
+							document.getElementById('id_moneda').focus();
+							respuesta_revisar_tarifa = false; 
+							return respuesta_revisar_tarifa; 
+						},
+						ok:function(win){ 
+							respuesta_revisar_tarifa = true;
+							if( !desde_combo )
 							{
-								Validar(f);
+								if( f.desde.value == 'agregar_cliente')
+								{
+									Validar(f);
+								}
+								else
+								{
+									ValidarContrato(f);
+								}
 							}
 							else
 							{
-								ValidarContrato(f);
+								document.getElementById('id_tarifa_hidden').value=document.getElementById('id_tarifa').value;
+								document.getElementById('id_moneda_hidden').value=document.getElementById('id_moneda').value;
 							}
+							return respuesta_revisar_tarifa; 
 						}
-						return respuesta_revisar_tarifa; 
-					}
-				});
+					});
+				}
 			}
 			else
 			{
@@ -1349,6 +1379,7 @@ else
 							<td>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?=empty($valor_tarifa_flat) ? 'checked' : ''?>/>
 								<?= Html::SelectQuery($sesion, "SELECT tarifa.id_tarifa, tarifa.glosa_tarifa FROM tarifa WHERE tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa","id_tarifa", $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '') ); ?>
+								<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
 								<br/>
 								<input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?=empty($valor_tarifa_flat) ? '' : 'checked'?>/>
 								<label for="tipo_tarifa_flat">Plana por </label>
@@ -1358,7 +1389,9 @@ else
 							<td>
 								<?=__('Tarifa en')?>
 								<?php if ($validaciones_segun_config) echo $obligatorio ?>
-								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . ' "','',"80"); ?>&nbsp;&nbsp;
+								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . ' "','',"80"); ?>
+								<input type="hidden" name="id_moneda_hidden" id="id_moneda_hidden" value="<?php echo $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda; ?>" />
+								&nbsp;&nbsp;
 								<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
 								<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
 							</td>

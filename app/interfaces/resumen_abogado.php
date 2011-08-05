@@ -7,7 +7,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
-
+ 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];

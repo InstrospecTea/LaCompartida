@@ -62,6 +62,9 @@ class CtaCteFact extends Objeto
 			$mvto->LoadByPago($id_pago);	//Intento cargar el movimiento
 			$mvto->Edit('id_factura_pago',$id_pago);
 		}
+		
+		if( $tipo_mvto == 'NC' )
+			$id_factura_nc = $id_factura;
 
 		if(!$mvto->Id()){
 			$saldo = $monto_bruto;
@@ -151,6 +154,8 @@ class CtaCteFact extends Objeto
 							//quedo en 0 -> pasar de FACTURADO a COBRADO
 							//dejo de ser 0 -> pasar de COBRADO a FACTURADO
 							//si estaba en otro estado, no tocar
+							if( $id_factura_nc > 0 )
+								$fact->CambiarEstado('C', $id_factura_nc);
 							if(floatval($mvto_neteado->fields['saldo']) == 0 || $era_cero){
 								$cod_estado = $fact->GetCodigoEstado($id_factura);
 								if($cod_estado == 'F' && floatval($mvto_neteado->fields['saldo']) == 0){

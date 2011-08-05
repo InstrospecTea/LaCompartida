@@ -214,7 +214,7 @@
 				$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo*$factura->fields['total']));
 
 				$cta_cte_fact = new CtaCteFact($sesion);
-				$cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'],
+				$mvto_guardado = $cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'],
 					$signo*($factura->fields['total']-$factura->fields['iva']),
 					$signo*$factura->fields['iva'],
 					$signo*$factura->fields['total'],
@@ -227,6 +227,15 @@
 					$tipo_cambios_documento,
 					!empty($factura->fields['anulado']));
 				
+				if( $mvto_guardado->fields['tipo_mvto'] = 'NC' && $mvto_guardado->fields['saldo'] == 0 )
+				{
+					$query = "SELECT id_estado FROM prm_estado_factura WHERE codigo = 'C'";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list($id_estado_cobrado) = mysql_fetch_array($resp);
+					
+					$factura->Edit('id_estado',$id_estado_cobrado);
+				}
+				
 				$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
 				
@@ -234,11 +243,11 @@
 				# Esto se puede descomentar para imprimir facturas desde la edición
 				
 				if($id_cobro)
-				{					
+				{
 					$documento = new Documento($sesion);
 					$documento->LoadByCobro($id_cobro);
 					
-					$valores = array( 
+					$valores = array(
 						$factura->fields['id_factura'],
 						$id_cobro,
 						$documento->fields['id_documento'],
@@ -254,7 +263,6 @@
 					$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
 					VALUES ('".implode("','",$valores)."')";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-				
 				}
 				
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ImprimirFacturaPdf') ) || ( method_exists('Conf','ImprimirFacturaPdf') && Conf::ImprimirFacturaPdf() ) )

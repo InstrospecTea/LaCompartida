@@ -100,6 +100,14 @@ Class TramiteValor extends Objeto
 	function GuardarTarifa( $id_tramite_tarifa, $id_tramite_tipo, $id_moneda, $valor)
 	{
 		$valor=str_replace(',','.',$valor);
+		if( empty($id_tramite_tarifa) ) 
+		{
+			$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list( $id_tramite_tarifa ) = mysql_fetch_array($resp);
+		}
+		if( empty($id_tramite_tarifa) )
+			return false;
 		if($valor == '')
 		{
 			$query = "DELETE FROM tramite_valor WHERE id_moneda = '$id_moneda' AND id_tramite_tipo = '$id_tramite_tipo' AND id_tramite_tarifa = '$id_tramite_tarifa'";

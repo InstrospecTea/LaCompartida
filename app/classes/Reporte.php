@@ -4,7 +4,7 @@ require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
-
+ 
 class Reporte
 {
 	// Sesion PHP
@@ -199,6 +199,9 @@ class Reporte
 			case "glosa_asunto":
 				$this->id_agrupador[] = "codigo_asunto";
 				break;
+			case "glosa_cliente_asunto":
+				$this->id_agrupador[] = "codigo_asunto";
+				break;
 			default:
 				$this->id_agrupador[] = $s;
 		}
@@ -289,6 +292,7 @@ class Reporte
 				'.(in_array('id_usuario_responsable',$this->agrupador)?'CONCAT_WS(\' \',usuario_responsable.nombre, usuario_responsable.apellido1, LEFT(usuario_responsable.apellido2,1)) AS nombre_usuario_responsable,':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?' usuario_responsable.id_usuario AS id_usuario_responsable,':'').'
 				cliente.glosa_cliente,
+				CONCAT(cliente.codigo_cliente,\' - \') as glosa_cliente_asunto, 
 				\' - \' as glosa_asunto,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
@@ -298,7 +302,7 @@ class Reporte
 				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 				cobro.id_cobro,
 				'.$campo_fecha.' as fecha_final,
-				DATE_FORMAT( '.$campo_fecha.' , \'%m-%y\') as mes_reporte,
+				DATE_FORMAT( '.$campo_fecha.' , \'%m-%Y\') as mes_reporte,
 				DATE_FORMAT( '.$campo_fecha.' , \'%d-%m-%Y\') as dia_reporte,
 				'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
 				'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
@@ -449,9 +453,10 @@ class Reporte
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+						CONCAT(cliente.glosa_cliente,\' - \',asunto.glosa_asunto) as glosa_cliente_asunto,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 						trabajo.fecha as fecha_final,
-						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%y\') as mes_reporte,':'').'
+						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,':'').'
 						'.(in_array('dia_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,':'').'
 						'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
 						'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
@@ -758,6 +763,7 @@ class Reporte
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
+			&& !$this->ignorar_cobros_sin_horas
 		)
 		{
 			$resp = mysql_query($this->cobroQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->cobroQuery(),__FILE__,__LINE__,$this->sesion->dbh);
