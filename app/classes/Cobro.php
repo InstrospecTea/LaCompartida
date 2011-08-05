@@ -9920,8 +9920,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$resumen_hh 							+= $data['duracion_tarificada'];
 				$resumen_valor						+= $data['valor_tarificada'];
 				
-				$html3 = str_replace('%username%', $data['username'], $html3);
 				$html3 = $parser->tags['PROFESIONAL_FILAS'];
+				$html3 = str_replace('%username%', $data['username'], $html3);
 				if($this->fields['opc_ver_profesional_iniciales'] == 1) {
 					$html3 = str_replace('%nombre%', $data['username'], $html3);
 				}
