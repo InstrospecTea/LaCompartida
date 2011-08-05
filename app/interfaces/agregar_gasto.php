@@ -750,6 +750,14 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 		<td align=left>
 			<textarea id='descripcion' name=descripcion cols="45" rows="3"><?=$checked_general == '' ? $gasto->fields['descripcion'] : $gastoGeneral->fields['descripcion'];?></textarea>
+		
+			<script type="text/javascript">
+				var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
+				googie2.setLanguages({'es': 'Español', 'en': 'English'});
+				googie2.dontUseCloseButtons();
+				googie2.setSpellContainer("spell_container");
+				googie2.decorateTextarea("descripcion");
+			</script>
 		</td>
 	</tr>
 	<? 

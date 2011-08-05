@@ -63,22 +63,21 @@
 			 * INICIO - obtener listado facturas con pago parcial o total
 			 */
 			$lista_facturas_con_pagos = '';
-			$where_pactura_pago = 1;
+			$where = 1;
 			if( $id_concepto )
-				$where_pactura_pago .= " AND fp.id_concepto = '".$id_concepto."' ";
+				$where .= " AND fp.id_concepto = '".$id_concepto."' ";
 			if( $id_banco )
-				$where_pactura_pago .= " AND fp.id_banco = '".$id_banco."' ";
+				$where .= " AND fp.id_banco = '".$id_banco."' ";
 			if( $id_cuenta )
-				$where_pactura_pago .= " AND fp.id_cuenta = '".$id_cuenta."' ";
+				$where .= " AND fp.id_cuenta = '".$id_cuenta."' ";
 			if( $pago_retencion )
-				$where_pactura_pago .= " AND fp.pago_retencion = '".$pago_retencion."' ";
+				$where .= " AND fp.pago_retencion = '".$pago_retencion."' ";
 			if($fecha1 && $fecha2)
-				$where_pactura_pago .= " AND fp.fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+				$where .= " AND fp.fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			else if( $fecha1 )
-				$where_pactura_pago .= " AND fp.fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
+				$where .= " AND fp.fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
 			else if( $fecha2 )
-				$where_pactura_pago .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
-			
+				$where .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 		
 			/*
 			 * INICIO - obtener listado facturas con pago parcial o total
@@ -438,7 +437,7 @@
 	}
 
 ?>
-<script style="text/javascript">
+<script type="text/javascript">
 function ImprimirDocumentoPago( id_factura_pago )
 {
 	var vurl = "agregar_pago_factura.php?id_factura_pago="+id_factura_pago+"&popup=1&opcion=imprimir_voucher";

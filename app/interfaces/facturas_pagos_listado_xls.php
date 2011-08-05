@@ -38,21 +38,21 @@
 			 * INICIO - obtener listado facturas con pago parcial o total
 			 */
 			$lista_facturas_con_pagos = '';
-			$where_pactura_pago = 1;
+			$where = 1;
 			if( $id_concepto )
-				$where_pactura_pago .= " AND fp.id_concepto = '".$id_concepto."' ";
+				$where .= " AND fp.id_concepto = '".$id_concepto."' ";
 			if( $id_banco )
-				$where_pactura_pago .= " AND fp.id_banco = '".$id_banco."' ";
+				$where .= " AND fp.id_banco = '".$id_banco."' ";
 			if( $id_cuenta )
-				$where_pactura_pago .= " AND fp.id_cuenta = '".$id_cuenta."' ";
+				$where .= " AND fp.id_cuenta = '".$id_cuenta."' ";
 			if( $pago_retencion )
-				$where_pactura_pago .= " AND fp.pago_retencion = '".$pago_retencion."' ";
+				$where .= " AND fp.pago_retencion = '".$pago_retencion."' ";
 			if($fecha1 && $fecha2)
-				$where_pactura_pago .= " AND fp.fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+				$where .= " AND fp.fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			else if( $fecha1 )
-				$where_pactura_pago .= " AND fp.fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
+				$where .= " AND fp.fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
 			else if( $fecha2 )
-				$where_pactura_pago .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
+				$where .= " AND fp.fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 
 
 			
@@ -379,7 +379,7 @@
 				}
 				else if($col_name[$i] == 'monto_pagos_moneda_base') {
 					$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
-					$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=".$arr_col['saldo_pagos']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
+					$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=".$arr_col['monto_aporte']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
 					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				if($col_name[$i] == 'glosa_cliente') {
@@ -398,7 +398,6 @@
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 				}
-
 				else {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
 				}

@@ -98,6 +98,7 @@
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
  		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
  		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
@@ -1284,12 +1285,28 @@ function UpdateCap(monto_update, guardar)
 								<tr id="tr_detalle_profesional" <?=$display_detalle_profesional ?> >
 									<td/>
 									<td align="left" colspan="2" style="font-size: 10px;">
-										<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
-										<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
-										<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
-										<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
-										<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
-										<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+										<table width="100%">
+											<tr>
+												<td width="40%" align="left">
+													<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$cobro->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
+													<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
+												</td>
+												<td width="60%" align="left">
+													<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
+													<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
+												</td>
+											</tr>
+											<tr>
+												<td width="40%" align="left">
+													<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+													<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+												</td>
+												<td width="60%" align="left">
+													<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+													<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+												</td>
+											</tr>
+										</table>
 									</td>
 								</tr>
 								<tr>
@@ -1488,11 +1505,15 @@ function UpdateCap(monto_update, guardar)
 									<input type="button" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="ImprimirExcel(this.form);" />
 								</td>
 							</tr>
+							<?
+								if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' )
+								{ ?>
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="ImprimirExcel(this.form, 'especial');" />
 								</td>
 							</tr>
+						<? } ?>
 						</table>
 					</td>
 				</tr>

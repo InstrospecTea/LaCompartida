@@ -754,6 +754,7 @@ $mostrar_resumen_de_profesionales = 1;
 														IF( trabajo.cobrable = 1, 'SI', 'NO') AS glosa_cobrable,
 														trabajo.visible,
 														CONCAT(usuario.apellido1,' ',usuario.apellido2,', ',usuario.nombre) AS usr_nombre,
+														usuario.username as siglas,
 														usuario.id_categoria_usuario,
 														SEC_TO_TIME( SUM( TIME_TO_SEC(duracion) ) ) AS duracion,
 														SEC_TO_TIME( SUM( TIME_TO_SEC(duracion_cobrada) ) ) AS duracion_cobrada,
@@ -782,7 +783,11 @@ $mostrar_resumen_de_profesionales = 1;
 				{
 					$trabajo = $lista_trabajos->Get($i);
 					
-					$nombre = $trabajo->fields['usr_nombre'];
+					if( $cobro->fields['opc_ver_profesional_iniciales'] == 1 )
+						$nombre = $trabajo->fields['siglas'];
+					else
+						$nombre = $trabajo->fields['usr_nombre'];
+					
 					$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista);
 					$categoria_usuario = '';
 					if($trabajo->fields['id_categoria_usuario'] && $cobro->fields['opc_ver_profesional_categoria'] == 1) {

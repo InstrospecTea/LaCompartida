@@ -2,6 +2,9 @@
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
 
+$ancho = 900;
+$alto = 900;
+$radio = 100;
 
 $sesion = new Sesion();
 # The data for the pie chart
@@ -12,7 +15,7 @@ $labels = $nombres;
 
 # Create a PieChart object of size 560 x 270 pixels, with a golden background and a 1
 # pixel 3D border
-$c = new PieChart(730, 350, goldColor(), -1, 1);
+$c = new PieChart($ancho, $alto, goldColor(), -1, 1);
 
 # Add a title box using 15 pts Times Bold Italic font and metallic pink background
 # color
@@ -20,7 +23,7 @@ $textBoxObj = $c->addTitle($titulo, "timesb.ttf", 15);
 $textBoxObj->setBackground(metalColor(0xA7DF60));
 
 # Set the center of the pie at (280, 135) and the radius to 110 pixels
-$c->setPieSize(365, 175, 110);
+$c->setPieSize($ancho / 2, $alto / 2, $radio);
 
 # Draw the pie in 3D with 20 pixels 3D depth
 $c->set3D(20);

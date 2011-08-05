@@ -338,6 +338,7 @@
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
@@ -383,6 +384,7 @@
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
@@ -1086,13 +1088,29 @@ function AgregarFactura(idx){
 												</tr>
 												<tr id="tr_detalle_profesional" <?=$display_detalle_profesional ?> >
 													<td/>
-													<td align="left" style="font-size: 10px;">
-														<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
-														<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
-														<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
-														<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+													<td align="left" colspan="2" style="font-size: 10px;">
+														<table width="100%">
+															<tr>
+																<td width="40%" align="left">
+																	<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=$cobro->fields['opc_ver_profesional_iniciales']=='1'?'checked':''?>>
+																	<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
+																</td>
+																<td width="60%" align="left">
+																	<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=$cobro->fields['opc_ver_profesional_categoria']=='1'?'checked':''?>>
+																	<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
+																</td>
+															</tr>
+															<tr>
+																<td width="40%" align="left">
+																	<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=$cobro->fields['opc_ver_profesional_tarifa']=='1'?'checked':''?>>
+																	<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
+																</td>
+																<td width="60%" align="left">
+																	<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=$cobro->fields['opc_ver_profesional_importe']=='1'?'checked':''?>>
+																	<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
+																</td>
+															</tr>
+														</table>
 													</td>
 												</tr>
 												<?
@@ -1279,7 +1297,11 @@ function AgregarFactura(idx){
 										<br>
 										<input type="submit" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="return DescargarExcel(this.form);" \>
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form, 'especial');" \>
+										<?
+										if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' )
+										{ ?>
+									<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form, 'especial');" \>
+								<? } ?>
 									</td>
 								</tr>
 							</table>

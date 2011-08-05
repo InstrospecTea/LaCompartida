@@ -303,6 +303,7 @@
 						$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 						$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 						$contrato->Edit("opc_ver_profesional", empty($opc_ver_profesional) ? '0' : '1');
+						$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 						$contrato->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 						$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 						$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);

@@ -153,6 +153,7 @@
 		$contrato->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
+		$contrato->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 		$contrato->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
 		$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
@@ -1786,6 +1787,8 @@ else
 		<tr>
 			<td/>
 			<td align="left" colspan='5'>
+				<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=($contrato->fields['opc_ver_profesional_iniciales']=='1' || !$contrato->loaded)?'checked':''?>>
+				<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
 				<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=($contrato->fields['opc_ver_profesional_categoria']=='1' || !$contrato->loaded)?'checked':''?>>
 				<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
 				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=($contrato->fields['opc_ver_profesional_tarifa']=='1' || !$contrato->loaded)?'checked':''?>>

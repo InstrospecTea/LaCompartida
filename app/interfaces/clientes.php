@@ -8,6 +8,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 	require_once Conf::ServerDir().'/../app/classes/InputId.php';
+	require_once Conf::ServerDir().'/../app/classes/Autocompletador.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
 
 	$sesion = new Sesion(array('DAT','PRO'));
@@ -90,7 +91,9 @@ function EliminaCliente(id_cliente)
 	return true;
 }
 </script>
-
+<?
+	echo Autocompletador::CSS();
+?>
 <form method=post action="<?= $_SERVER[PHP_SELF] ?>" name="form_cliente" id="form_cliente">
 <!--<input type=hidden name=opcion value="Buscar" />-->
 <input type=hidden name=id_cliente value="<?= $cliente->fields['id_cliente'] ?>" />
@@ -120,7 +123,11 @@ else { ?>
 					<?=__('Nombre Cliente')?>
 				</td>
 				<td align=left>
-					<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="glosa_cliente" size="35" value="<?=$glosa_cliente?>">
+					<input type="text" name="glosa_cliente" id="glosa_cliente" size="35" value="<?=$glosa_cliente?>">
+					<span id="indicador_glosa_cliente" style="display: none;">
+					<img src=<?=Conf::ImgDir()."/ajax_loader.gif"?> alt=<?=__('Trabajando')?>."..." />
+					</span>
+					<div id="sugerencias_glosa_cliente" class="autocomplete" style="display:none; z-index:100;"></div>
 				</td>
 			</tr>
 			<tr>
@@ -178,7 +185,10 @@ else { ?>
 	</fieldset>
 </td></tr></table>
 </form>
+<script src=<?=Conf::RootDir()."/fw/js/prototype.js"?> type="text/javascript"></script>
+<script src=<?=Conf::RootDir()."/fw/js/src/scriptaculous.js?load=effects,controls"?> type="text/javascript"></script>
 <script type="text/javascript">
+Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cliente", "ajax_seleccionar_cliente.php", {minChars: 1, indicator: 'indicador_glosa_cliente'});
 Calendar.setup(
 	{
 		inputField	: "fecha1",				// ID of the input field

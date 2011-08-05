@@ -8216,6 +8216,23 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%valor_siempre%',__('Valor'), $html);
 			$html = str_replace('%tarifa_fee%',__('%tarifa_fee%'), $html);
 			
+			if( $this->fields['opc_ver_detalles_por_hora_categoria'] == 1 )
+				$html = str_replace('%td_categoria%','<td width="100" align="left">%categoria%</td>', $html);
+			else	
+				$html = str_replace('%td_categoria%','', $html);
+			$html = str_replace('%categoria%', __('Categoría'), $html);
+			
+			if( $this->fields['opc_ver_detalles_por_hora_tarifa'] == 1 )
+				$html = str_replace('%td_tarifa%','<td width="80" align="center">%tarifa%</td>',$html);
+			else
+				$html = str_replace('%td_tarifa%','',$html);
+			$html = str_replace('%tarifa%',__('Tarifa'),$html);
+			
+			if( $this->fields['opc_ver_detalles_por_hora_importe'] == 1 )
+				$html = str_replace('%td_importe%','<td width="80" align="center">%importe%</td>',$html);
+			else
+				$html = str_replace('%td_importe%','',$html);
+			$html = str_replace('%importe%',__('Importe'),$html);
 		break;
 
 		case 'TRAMITES_ENCABEZADO':
@@ -8278,32 +8295,27 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) )
 			{
-				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 			}
 			elseif ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'SepararPorUsuario') ) || ( method_exists('Conf','SepararPorUsuario') && Conf::SepararPorUsuario() ) )
 			{
-				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
 			}
 			elseif ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf','OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ) )
 			{
 				$select_categoria = "";
-				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 				$order_categoria = "usuario.id_categoria_usuario DESC, ";
 			}
 			elseif ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorFechaCategoria') ) || ( method_exists('Conf','OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() ) )
 			{
-				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
-				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
+				$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 				$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 			}
 			else
 			{
 				$select_categoria = "";
-				$join_categoria = "";
 				$order_categoria = "";
 			}
 
@@ -8326,22 +8338,25 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$query = "SELECT SQL_CALC_FOUND_ROWS 
 									trabajo.duracion_cobrada, 
 									trabajo.duracion_retainer, 
-									trabajo.descripcion,
-									trabajo.fecha,
-									trabajo.id_usuario,
+									trabajo.descripcion, 
+									trabajo.fecha, 
+									trabajo.id_usuario, 
 									$dato_monto_cobrado as monto_cobrado, 
 									trabajo.visible, 
 									trabajo.cobrable, 
 									trabajo.id_trabajo, 
-									trabajo.tarifa_hh,
+									trabajo.tarifa_hh, 
+									trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ) as importe,
 									trabajo.codigo_asunto, 
 									trabajo.solicitante, 
-									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
+									prm_categoria_usuario.glosa_categoria AS categoria, 
+									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario, 
 									trabajo.duracion, 
-									usuario.username as username $select_categoria
-							FROM trabajo
-							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-							$join_categoria
+									usuario.username as username $select_categoria 
+							FROM trabajo 
+							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
+							LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro 
+							LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario 
 							WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '".$asunto->fields['codigo_asunto']."'
 							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
@@ -8369,15 +8384,32 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 				$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante']?$trabajo->fields['solicitante']:'', $row);
 				
-				if( $this->fields['opc_ver_profesional_iniciales'] == 1) {
+				$row = str_replace('%username%', $trabajo->fields['username'], $row);
+				if( $this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
 					$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
-					$row = str_replace('%username%', $trabajo->fields['username'], $row);
 				}
 				else {
 					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
-					$row = str_replace('%username%', $trabajo->fields['nombre_usuario'], $row);
 				}
-
+				
+				if( $this->fields['opc_ver_detalles_por_hora_categoria'] == 1 )
+					$row = str_replace('%td_categoria%','<td align="left">%categoria%</td>', $row);
+				else
+					$row = str_replace('%td_categoria%','', $row);
+				$row = str_replace('%categoria%', $trabajo->fields['categoria'], $row);
+				
+				if( $this->fields['opc_ver_detalles_por_hora_tarifa'] == 1 )
+					$row = str_replace('%td_tarifa%','<td align="center">%tarifa%</td>', $row);
+				else
+					$row = str_replace('%td_tarifa%','', $row);
+				$row = str_replace('%tarifa%', number_format($trabajo->fields['tarifa_hh'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+				
+				if( $this->fields['opc_ver_detalles_por_hora_importe'] == 1 )
+					$row = str_replace('%td_importe%','<td align="center">%importe%</td>', $row);
+				else
+					$row = str_replace('%td_importe%','', $row);
+				$row = str_replace('%importe%', number_format($trabajo->fields['importe'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
+				
 				//paridad
 				$row = str_replace('%paridad%', $i%2? 'impar' : 'par', $row);
 				
@@ -8903,6 +8935,21 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$duracion_cobrada_total = ($asunto->fields['trabajos_total_duracion'])/60;
 				$duracion_descontada_total = $duracion_trabajada_total - $duracion_cobrada_total;
 				
+				if( $this->fields['opc_ver_detalles_por_hora_categoria'] == 1 )
+					$html = str_replace('%td_categoria%', '<td>&nbsp;</td>', $html);
+				else
+					$html = str_replace('%td_categoria%', '', $html);
+					
+				if( $this->fields['opc_ver_detalles_por_hora_tarifa'] == 1 )
+					$html = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $html);
+				else
+					$html = str_replace('%td_tarifa%', '', $html);
+					
+				if( $this->fields['opc_ver_detalles_por_hora_tarifa'] == 1 )
+					$html = str_replace('%td_importe%', '<td align="center">%importe%</td>', $html);
+				else
+					$html = str_replace('%td_importe%', '', $html);
+				$html = str_replace('%importe%',number_format($asunto->fields['trabajos_total_valor'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 			if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 			{
 				$html = str_replace('%duracion_decimal_trabajada%','',$html);
@@ -9263,11 +9310,13 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%horas_mins_retainer%',$retainer ? __('Hrs.:Mins. Retainer') : '', $html);
 			if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
 			{
+				$html = str_replace('%td_tarifa%','<td align="center" width="60">%valor_hh%</td>',$html);
 				$html = str_replace('%valor_horas%',$flatfee ? '' : __('Tarifa'), $html);
-				$html = str_replace('%valor_hh%',__('Tarifa'), $html);
+				$html = str_replace('%valor_hh%',__('TARIFA'), $html);
 			}
 			else
 			{
+				$html = str_replace('%td_tarifa%','',$html);
 				$html = str_replace('%valor_horas%', '', $html);
 				$html = str_replace('%valor_hh%', '', $html);
 			}
@@ -9275,13 +9324,20 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%simbolo_moneda%',$flatfee ? '' : ' ('.$moneda->fields['simbolo'].')',$html);
 
 			if($this->fields['opc_ver_profesional_importe']==1) {
-				$html = str_replace('%total%',__('Total'), $html);
+				$html = str_replace('%td_importe%','<td align="center" width="70">%importe%</td>',$html);
+				$html = str_replace('%importe%',__('IMPORTE'), $html);
 			}
 			else {
-				$html = str_replace('%total%','', $html);
+				$html = str_replace('%td_importe%','',$html);
+				$html = str_replace('%importe%','', $html);
 			}
+			$html = str_replace('%total%',__('Total'), $html);
 			$html = str_replace('%honorarios%',__('Honorarios'),$html);
 			$html = str_replace('%profesional%',__('Profesional'), $html);
+			if( $this->fields['opc_ver_profesional_categoria'] == 1 )
+				$html = str_replace('%categoria%', __('CATEGORÍA'), $html);
+			else
+				$html = str_replace('%categoria%', '', $html);
 			$html = str_replace('%staff%',__('Staff'), $html);
 			$html = str_replace('%valor_siempre%',__('Valor'), $html);
 			$html = str_replace('%nombre_profesional%',__('Nombre Profesional'),$html);
@@ -9357,7 +9413,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						$totales['tiempo_descontado_real'] 	+= 60*$data['duracion_descontada'];
 						$totales['valor_total']							+= $data['valor_tarificada'];
 
-					$row = $row_tmpl;
+					if( $this->fields['opc_ver_profesional_iniciales'] == 1 )
+						$row = str_replace('%nombre_siglas%', $data['username'], $row);
+					else
+						$row = str_replace('%nombre_siglas%', $data['nombre_usuario'], $row);
 					$row = str_replace('%nombre%', $data['nombre_usuario'], $row);
 					$row = str_replace('%username%', $data['username'], $row);
 
@@ -9414,15 +9473,21 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						} 
 					$row = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $row);
 					if( $this->fields['opc_ver_profesional_tarifa'] == 1 ) {
+						$row = str_replace('%td_tarifa%','<td align="center">%tarifa_horas_demo%</td>',$row);
 						$row = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $row);
 					}
 					else{ 
+						$row = str_replace('%td_tarifa%','',$row);
 						$row = str_replace('%tarifa_horas_demo%', '', $row);
 					}
-					if( $this->fields['opc_ver_profesional_importe'] == 1 )
+					if( $this->fields['opc_ver_profesional_importe'] == 1 ) {
+						$row = str_replace('%td_importe%','<td align="right">%total_horas_demo%</td>',$row);
 						$row = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
-					else
+					}
+					else {
+						$row = str_replace('%td_importe%','',$row);
 						$row = str_replace('%total_horas_demo%', '', $row);
+					}
 					
 					if(!$asunto->fields['cobrable'])
 					{
@@ -9533,6 +9598,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$row = str_replace('%hrs_trabajadas_previo%', '',$row);
 					$row = str_replace('%horas_trabajadas_especial%','',$row);
 					$row = str_replace('%horas_cobrables%', '', $row);
+					if( $this->fields['opc_ver_profesional_categoria'] == 1 )
+						$row = str_replace('%categoria%', $data['glosa_categoria'], $row);
+					else
+						$row = str_replace('%categoria%', '', $row);
 					//$row = str_replace('%horas_cobrables%', $horas_trabajadas.':'.sprintf("%02d",$minutos_trabajadas),$row);
 					#horas en decimal
 					if( $this->fields['forma_cobro'] == 'FLAT FEE' )
@@ -9654,11 +9723,20 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%hh_retainer%', '', $html);
 			}
 			$html = str_replace('%hh_demo%', $horas_cobrables.':'.$minutos_cobrables, $html);
-			if( $this->fields['opc_ver_profesional_importe'] == 1 )
+			if( $this->fields['opc_ver_profesional_importe'] == 1 ) {
+				$html = str_replace('%td_importe%','<td align="right">%total_horas_demo%</td>', $html);
 				$html = str_replace('%total_horas_demo%', number_format($totales['valor_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			else
+			}
+			else {
+				$html = str_replace('%td_importe%','', $html);
 				$html = str_replace('%total_horas_demo%', '', $html);
-			 
+			}
+			if( $this->fields['opc_ver_profesional_importe'] == 1 ) {
+				$html = str_replace('%td_importe%','<td>&nbsp;</td>', $html);
+			}
+			else {
+				$html = str_replace('%td_importe%','', $html);
+			}
 			if($descontado || $retainer || $flatfee)
 				{
 					if( $this->fields['opc_ver_horas_trabajadas'] )
@@ -9842,15 +9920,22 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$resumen_hh 							+= $data['duracion_tarificada'];
 				$resumen_valor						+= $data['valor_tarificada'];
 				
+				$html3 = str_replace('%username%', $data['username'], $html3);
 				$html3 = $parser->tags['PROFESIONAL_FILAS'];
 				if($this->fields['opc_ver_profesional_iniciales'] == 1) {
-					$html3 = str_replace('%nombre%',$data['username'], $html3);
-					$html3 = str_replace('%username%', $data['username'], $html3);
+					$html3 = str_replace('%nombre%', $data['username'], $html3);
 				}
 				else  {
 					$html3 = str_replace('%nombre%',$data['nombre_usuario'], $html3);
-					$html3 = str_replace('%username%', $data['nombre_usuario'], $html3);
 				}
+				if( $this->fields['opc_ver_profesional_tarifa'] == 1 )
+					$html3 = str_replace('%td_tarifa%','<td align="center">%tarifa_horas_demo%</td>', $html3);
+				else
+					$html3 = str_replace('%td_tarifa%','', $html3);
+				if( $this->fields['opc_ver_profesional_importe'] == 1 )
+					$html3 = str_replace('%td_importe%','<td align="right">%total_horas_demo%</td>', $html3);
+				else
+					$html3 = str_replace('%td_importe%','', $html3);
 				//muestra las iniciales de los profesionales
 				list($nombre,$apellido_paterno,$extra,$extra2) = split(' ',$data['nombre_usuario'],4);
 				$html3 = str_replace('%iniciales%',$nombre[0].$apellido_paterno[0].$extra[0].$extra2[0],$html3);
@@ -9932,6 +10017,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else
 					$html3 = str_replace('%hh%', $data['glosa_duracion_tarificada'], $html3);
 
+				if( $this->fields['opc_ver_profesional_categoria'] == 1 )
+					$html3 = str_replace('%categoria%', $data['glosa_categoria'], $html3);
+				else
+					$html3 = str_replace('%categoria%', '', $html3);
+				
 				if($this->fields['opc_ver_profesional_tarifa']==1) {
 					$html3 = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					$html3 = str_replace('%tarifa_horas%',number_format($data['tarifa'] > 0 ? $data['tarifa'] : 0,$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
@@ -10073,11 +10163,20 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			else
 				$html3 = str_replace('%hh%',UtilesApp::Hora2HoraMinuto(round($resumen_hh,2)), $html3);
 
-			if($this->fields['opc_ver_profesional_importe'] == 1)
+			if($this->fields['opc_ver_profesional_importe'] == 1) {
+				$html3 = str_replace('%td_importe%','<td align="right">%total_horas_demo%</td>', $html3);
 				$html3 = str_replace('%total_horas_demo%', number_format( $resumen_valor, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);
-			else
+			}
+			else {
+				$html3 = str_replace('%td_importe%','', $html3);
 				$html3 = str_replace('%total_horas_demo%','',$html3);
+			}
 			
+			if($this->fields['opc_ver_profesional_tarifa'] == 1)
+				$html3 = str_replace('%td_tarifa%','<td>&nbsp;</td>', $html3);
+			else
+				$html3 = str_replace('%td_tarifa%','',$html3);
+				
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
 				{
 					$html3 = str_replace('%total%',$moneda->fields['simbolo'].number_format($this->fields['monto_trabajos'], $moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html3);

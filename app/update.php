@@ -5782,7 +5782,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 						$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
-						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
 						$query[] = "ALTER TABLE `cobro` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
@@ -5792,6 +5792,7 @@ WHERE  `id` =105 LIMIT 1 ;";
               if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
             }
          break;
+         
 		 case 4.59:
 				$query = array();
 				$query[] = "INSERT INTO `prm_estado_cobro` (`codigo_estado_cobro`, `orden`) VALUES ('FACTURADO', '4'), ('PAGO PARCIAL', '6');";
@@ -5801,6 +5802,15 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "ALTER TABLE  `cobro` ADD  `fecha_pago_parcial` DATETIME NULL AFTER  `fecha_enviado_cliente` ;";
 
 			foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			
+			case 4.60:
+				$query = array();
+				$query[] = "ALTER TABLE  `cobro` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
+				$query[] = "ALTER TABLE  `contrato` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
+				
+				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 	}
@@ -6031,6 +6041,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.57;
 	$VERSIONES[$num++] = 4.58;
 	$VERSIONES[$num++] = 4.59;
+	$VERSIONES[$num++] = 4.60;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
