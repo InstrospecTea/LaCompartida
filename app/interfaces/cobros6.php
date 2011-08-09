@@ -25,6 +25,7 @@
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	
 	$factura_pago = new FacturaPago($sesion);
+	$enpdf = ( $opc == 'grabar_documento_pdf' ? true : false );
 
 	if( $opc == 'eliminar_pago' )
 	{
@@ -333,7 +334,7 @@
 	}
 
 
-	if($opc == 'grabar_documento' || $opc == 'guardar')
+	if($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf')
 	{
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
@@ -367,7 +368,7 @@
 		$cobro->Edit('codigo_idioma',$lang);
 		if($cobro->Write())
 		{
-			if($opc == 'grabar_documento')
+			if($opc == 'grabar_documento' || $opc == 'grabar_documento_pdf')
 			{
 				include dirname(__FILE__).'/cobro_doc.php';
 				exit;
@@ -752,6 +753,13 @@ function ActivaCarta(check)
 function VerDetalles( form )
 {
 	form.opc.value = 'grabar_documento';
+	form.submit();
+	return true;
+}
+
+function VerDetallesPDF( form )
+{
+	form.opc.value = 'grabar_documento_pdf';
 	form.submit();
 	return true;
 }
@@ -1293,7 +1301,9 @@ function AgregarFactura(idx){
 									<td align="center" colspan="2">
 										<?=__('Idioma')?>: <?= Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","lang",$cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'],'','',80);?>
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?>" onclick="return VerDetalles(this.form);" \>
+										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> Word" onclick="return VerDetalles(this.form);" \>
+										<br>
+										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return VerDetallesPDF(this.form);" \>
 										<br>
 										<input type="submit" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="return DescargarExcel(this.form);" \>
 										<br>

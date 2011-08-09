@@ -27,6 +27,8 @@
 	if(!$cobro->Load($id_cobro))
 		$pagina->FatalError(__('Cobro inválido'));
 	
+	$enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
+	
 	$cliente = new Cliente($sesion);
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 	$nombre_cliente = $cliente->fields['glosa_cliente'];
@@ -67,7 +69,7 @@
 		if($his->Write())
 			$pagina->AddInfo(__('Historial ingresado'));
 	}
-	elseif($opc == 'guardar_cobro') #Guardamos todos los datos del cobro
+	elseif($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') #Guardamos todos los datos del cobro
 	{
 		// Si se ajustar el valor del cobro por monto, 
 		// llamar a la function AjustarPorMonto de la clase Cobro
@@ -162,7 +164,7 @@
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 			}
 		}
-		elseif($accion == 'imprimir' && $ret == '') 	#################### IMPRESION #####################
+		elseif($accion == 'imprimir' && $ret == '' ) 	#################### IMPRESION #####################
 		{
 			include dirname(__FILE__).'/cobro_doc.php';
 			exit;
@@ -486,6 +488,18 @@ function ImprimirCobro(form)
 		return false;
 	form.accion.value = 'imprimir';
 	form.opc.value = 'guardar_cobro';
+	form.submit();
+	return true;
+}
+
+function ImprimirCobroPDF(form)
+{
+	if(!form)
+		var form = $('form_cobro5');
+	if( !AgregarParametros( form ) )
+		return false;
+	form.accion.value = 'imprimir';
+	form.opc.value = 'guardar_cobro_pdf';
 	form.submit();
 	return true;
 }
@@ -1498,6 +1512,11 @@ function UpdateCap(monto_update, guardar)
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Archivo')?>" onclick="ImprimirCobro(this.form);" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" align="center">
+									<input type="button" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return ImprimirCobroPDF(this.form);" />
 								</td>
 							</tr>
 							<tr>

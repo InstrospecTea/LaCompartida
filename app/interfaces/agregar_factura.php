@@ -24,7 +24,7 @@
 	{
 		$factura->Load($id_factura);
 		$codigo_cliente=$factura->fields['codigo_cliente'];
-	  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	  	{
 	  		$cliente_factura = new Cliente($sesion);
 	  		$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
@@ -105,107 +105,121 @@
 		}
 		if($opcion == "guardar")
 		{
-			//chequear
-			$mensaje_accion = 'guardar';
-			$factura->Edit('subtotal',$monto_neto);
-			$factura->Edit('porcentaje_impuesto',$porcentaje_impuesto);
-			$factura->Edit('iva',$iva);
-			$factura->Edit('total',''.($monto_neto+$iva));
-			$factura->Edit("id_factura_padre", $id_factura_padre? $id_factura_padre : NULL);
-			$factura->Edit("fecha",Utiles::fecha2sql($fecha));
-			$factura->Edit("cliente",$cliente ? $cliente : NULL);
-			$factura->Edit("RUT_cliente",$RUT_cliente ? $RUT_cliente : NULL);
-			$factura->Edit("direccion_cliente",$direccion_cliente ? $direccion_cliente : NULL);
-			$factura->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : NULL);
-			$factura->Edit("id_cobro",$id_cobro ? $id_cobro: NULL);
-			$factura->Edit("id_documento_legal",$id_documento_legal? $id_documento_legal:1);
-			$factura->Edit("serie_documento_legal",Conf::GetConf($sesion,'SerieDocumentosLegales'));
-			$factura->Edit("serie_documento_legal",Conf::GetConf($sesion,'SerieDocumentosLegales'));
-			$factura->Edit("numero", $numero ? $numero : "1");
-			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
-			$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
-			if($id_estado=='5')
+			if( empty($RUT_cliente) ) $pagina->AddError(__('Debe ingresar el').' '.__('RUT').' '.__('del cliente.'));
+			if( empty($cliente) )			$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
+			
+			$errores = $pagina->GetErrors();
+			$guardar_datos = false;
+			if (!empty($errores))
 			{
-				$factura->Edit('estado','ANULADA');
-				$factura->Edit('anulado',1);
-				$mensaje_accion = 'anulado';
-			}
-			else if(!empty($factura->fields['anulado'])){
-				$factura->Edit('estado','ABIERTA');
-				$factura->Edit('anulado','0');
-			}
-
-			if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
-			{ 
-				$factura->Edit("descripcion", $descripcion_honorarios_legales);
-				$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
-				$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
-				$factura->Edit("subtotal_sin_descuento", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
-				$factura->Edit("descripcion_subtotal_gastos",$descripcion_gastos_con_iva ? $descripcion_gastos_con_iva: NULL);
-				$factura->Edit("subtotal_gastos",$monto_gastos_con_iva ? $monto_gastos_con_iva: NULL);
-				$factura->Edit("descripcion_subtotal_gastos_sin_impuesto",$descripcion_gastos_sin_iva ? $descripcion_gastos_sin_iva: NULL);
-				$factura->Edit("subtotal_gastos_sin_impuesto",$monto_gastos_sin_iva ? $monto_gastos_sin_iva: NULL);
-				$factura->Edit("total",$total ? $total: NULL);
-				$factura->Edit("iva",$iva_hidden ? $iva_hidden: NULL);
-			}
-			else
-			{
-				$factura->Edit("descripcion",$descripcion);
+				$guardar_datos = true;
 			}
 			
-			$factura->Edit('letra',$letra);
-			if($letra_inicial)
-				$factura->Edit('letra',$letra_inicial);
-
-			if (empty($factura->fields['id_factura'])) $generar_nuevo_numero = true;
-
-			if($id_cobro){
-				$cobro = new Cobro($sesion);
-				if(!$cobro->Load($id_cobro)) $cobro = null;
-				if($cobro) $factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
+			if( $guardar_datos )
+			{
+				//chequear
+				$mensaje_accion = 'guardar';
+				$factura->Edit('subtotal',$monto_neto);
+				$factura->Edit('porcentaje_impuesto',$porcentaje_impuesto);
+				$factura->Edit('iva',$iva);
+				$factura->Edit('total',''.($monto_neto+$iva));
+				$factura->Edit("id_factura_padre", $id_factura_padre? $id_factura_padre : NULL);
+				$factura->Edit("fecha",Utiles::fecha2sql($fecha));
+				$factura->Edit("cliente",$cliente ? $cliente : NULL);
+				$factura->Edit("RUT_cliente",$RUT_cliente ? $RUT_cliente : NULL);
+				$factura->Edit("direccion_cliente",$direccion_cliente ? $direccion_cliente : NULL);
+				$factura->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : NULL);
+				$factura->Edit("id_cobro",$id_cobro ? $id_cobro: NULL);
+				$factura->Edit("id_documento_legal",$id_documento_legal? $id_documento_legal:1);
+				if( !isset( $factura->fields['serie_documento_legal']) )
+				{
+					$factura->Edit("serie_documento_legal",Conf::GetConf($sesion,'SerieDocumentosLegales'));
+				}
+				$factura->Edit("numero", $numero ? $numero : "1");
+				$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+				$factura->Edit("id_moneda", $id_moneda_factura ? $id_moneda_factura : "1");
+				if($id_estado=='5')
+				{
+					$factura->Edit('estado','ANULADA');
+					$factura->Edit('anulado',1);
+					$mensaje_accion = 'anulado';
+				}
+				else if(!empty($factura->fields['anulado'])){
+					$factura->Edit('estado','ABIERTA');
+					$factura->Edit('anulado','0');
 				}
 
-			if (!$factura->ValidarDocLegal())
-			{
-				$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
-				$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal));
-			}
-			else if($factura->Escribir())
-			{
-				if($id_cobro)
+				if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
+				{ 
+					$factura->Edit("descripcion", $descripcion_honorarios_legales);
+					$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
+					$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
+					$factura->Edit("subtotal_sin_descuento", $monto_honorarios_legales ? $monto_honorarios_legales: NULL);
+					$factura->Edit("descripcion_subtotal_gastos",$descripcion_gastos_con_iva ? $descripcion_gastos_con_iva: NULL);
+					$factura->Edit("subtotal_gastos",$monto_gastos_con_iva ? $monto_gastos_con_iva: NULL);
+					$factura->Edit("descripcion_subtotal_gastos_sin_impuesto",$descripcion_gastos_sin_iva ? $descripcion_gastos_sin_iva: NULL);
+					$factura->Edit("subtotal_gastos_sin_impuesto",$monto_gastos_sin_iva ? $monto_gastos_sin_iva: NULL);
+					$factura->Edit("total",$total ? $total: NULL);
+					$factura->Edit("iva",$iva_hidden ? $iva_hidden: NULL);
+				}
+				else
 				{
+					$factura->Edit("descripcion",$descripcion);
+				}
+			
+				$factura->Edit('letra',$letra);
+				if($letra_inicial)
+					$factura->Edit('letra',$letra_inicial);
+	
+				if (empty($factura->fields['id_factura'])) $generar_nuevo_numero = true;
+	
+				if($id_cobro){
 					$cobro = new Cobro($sesion);
 					if(!$cobro->Load($id_cobro)) $cobro = null;
-					if($cobro)
-					{
-						$factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
-						if($id_estado=='5')
-						{
-							if( !$cobro->TieneFacturasSinAnular() )
-							{
-								$cobro->Edit('estado', 'EMITIDO');
-							}
-							elseif( $cobro->TieneFacturasSinAnular() && !$cobro->TienePago() )
-							{
-								$cobro->Edit('estado', 'ENVIADO AL CLIENTE');
-							}
-							elseif( $cobro->TieneFacturasSinAnular() && $cobro->TienePago() )
-							{
-								$cobro->Edit('estado', 'PAGO PARCIAL');
-							}
-						}
-						elseif($id_estado == '1')
-						{
-							$facturas_sin_anular = $cobro->CantidadFacturasSinAnular();
-							if ( $facturas_sin_anular == 1 )
-							{
-								$cobro->Edit('estado', 'FACTURADO');
-								$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
-							}
-						}
-						$cobro->Write();
+					if($cobro) $factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
 					}
+	
+				if (!$factura->ValidarDocLegal())
+				{
+					$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
+					$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal));
 				}
+				else if($factura->Escribir())
+				{
+					if($id_cobro)
+					{
+						$cobro = new Cobro($sesion);
+						if(!$cobro->Load($id_cobro)) $cobro = null;
+						if($cobro)
+						{
+							$factura->Edit('id_moneda', $cobro->fields['opc_moneda_total']);
+							if($id_estado=='5')
+							{
+								if( !$cobro->TieneFacturasSinAnular() )
+								{
+									$cobro->Edit('estado', 'EMITIDO');
+								}
+								elseif( $cobro->TieneFacturasSinAnular() && !$cobro->TienePago() )
+								{
+									$cobro->Edit('estado', 'ENVIADO AL CLIENTE');
+								}
+								elseif( $cobro->TieneFacturasSinAnular() && $cobro->TienePago() )
+								{
+									$cobro->Edit('estado', 'PAGO PARCIAL');
+								}
+							}
+							elseif($id_estado == '1')
+							{
+								$facturas_sin_anular = $cobro->CantidadFacturasSinAnular();
+								if ( $facturas_sin_anular == 1 )
+								{
+									$cobro->Edit('estado', 'FACTURADO');
+									$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
+								}
+							}
+							$cobro->Write();
+						}
+					}
 					
 				if ($generar_nuevo_numero) {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero);
@@ -283,6 +297,7 @@
 			$observacion->Edit('id_factura', $factura->fields['id_factura']);
 			$observacion->Write();			
 		}
+	}
 		
 		#Se ingresa la anotación de modificación de factura en el historial	
 		if(!$id_factura && $factura->loaded())
@@ -697,7 +712,19 @@ function Validar(form)
 			return false;
 		}
 <? } ?>
-	
+		
+		if( form.RUT_cliente.value == "")
+		{
+			alert("<?=__('Debe ingresar el').' '.__('RUT').' '.__('del cliente.')?>");
+			form.RUT_cliente.focus();
+			return false;
+		}
+		if( form.cliente.value == "" )
+		{
+			alert("<?=__('Debe ingresar la razon social del cliente.')?>");
+			form.cliente.focus();
+			return false;
+		}
 	<?php
 		if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose')))
 		{ 

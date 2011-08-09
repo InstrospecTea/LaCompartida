@@ -77,7 +77,92 @@
 	//echo '<style>'.$cssData.'</style>'.$html;
 	//exit;
 
-	$doc->output('cobro_'.$id_cobro.'_'.$valor_unico.'.doc');
+	if( $enpdf )
+	{
+		require_once '../dompdf/dompdf_config.inc.php';
+		$cambios = array("TR" => "tr", "TD" => "td", "TABLE" =>  "table", "TH"=>"th", "BR" => "br" , "HR" => "hr", "SPAN" => "span");
+		$cssData = strtr($cssData, $cambios);
+		$dompdf = new DOMPDF();
+		if( $cobro->fields['id_formato'] )
+		{
+			$query = "SELECT pdf_encabezado_imagen, pdf_encabezado_texto FROM cobro_rtf WHERE id_formato=". $cobro->fields['id_formato']; 
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+			list($encabezado_imagen, $encabezado_texto) = mysql_fetch_array($resp); 
+			
+			$img_dir = "../templates/".Conf::Templates()."/img/";
+			list($img_archivo, $img_formato, $img_ancho, $img_alto, $img_x, $img_y) = explode( "::", $encabezado_imagen);
+			list($texto_texto, $texto_tipografia, $texto_estilo,$texto_size, $texto_color, $texto_x, $texto_y) = explode("::", $encabezado_texto);
+		}
+		
+		ob_start();
+		if( isset($pdf))
+		{
+			$anchodoc = $pdf->get_width();
+		}
+		$margin_body = $img_alto -25;
+?>
+<html>
+	<head>
+		<style type="text/css">			
+			<?php echo $cssData; ?>
+			hr{
+				border: 0px;
+				border-top: 1px solid #999;
+				border-left: 1px solid #999;
+				height: 1px;
+			}
+			
+			table.tabla_normal tr.tr_total3 td {
+				border: 0px;
+				border-top: 1pt solid #999;
+			}
+		</style>
+	</head>
+	<body style="margin-top: <?php echo $margin_body; ?>px;">
+		<script type="text/php">
+		   if ( isset($pdf) )
+		   {
+			$anchodoc = $pdf->get_width();
+			$header = $pdf->open_object(); 
+			if( '<?php echo $img_archivo; ?>' != '&nbsp;' )
+			{
+				if( '<?php echo $img_x; ?>' != '-1' )
+				{
+					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", <?php echo $img_x; ?>, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
+				}
+				else
+				{
+					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", ( $anchodoc-  <?php echo ($img_ancho ); ?> ) / 2, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
+				}
+			} 
+			
+			if( '<?php echo $texto_texto; ?>' != '&nbsp;')
+			{
+				$font = Font_Metrics::get_font("<?php echo $texto_tipografia; ?>", "<?php echo $texto_estilo; ?>");
+				$pdf->page_text( <?php echo $texto_x; ?>, <?php echo $texto_y; ?>, '<?php echo $texto_texto; ?>', $font, <?php echo $texto_size; ?>, <?php echo $texto_color; ?>);
+			}
+			$pdf->close_object(); 
+			if( strlen( $header ) > 0 )
+			{
+				$pdf->add_object($header, 'all'); 
+			}
+		   }
+		   </script>
+		   <?php echo $html; ?>
+	</body>
+</html>
+<?php
+		$html = ob_get_clean(); 
+		$dompdf->load_html($html);
+		$dompdf->set_paper(strtolower($cobro->fields['opc_papel']), 'portrait'); //letter, landscape
+		$dompdf->render();
+		$dompdf->stream('cobro_'.$id_cobro.'_'.$valor_unico.'.pdf');
+		#echo $html;
+	}
+	else
+	{
+		$doc->output('cobro_'.$id_cobro.'_'.$valor_unico.'.doc');
+	}
 	exit;
 
 
