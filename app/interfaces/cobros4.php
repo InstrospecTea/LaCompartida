@@ -93,28 +93,28 @@
 
 function GrabarCampo(accion,id_gasto,id_cobro, valor)
 {
-    var http = getXMLHTTP();
+	var http = getXMLHTTP();
 	if(valor)
 		valor = '1';
 	else
 		valor = '0';
 
 	loading("Actualizando opciones");
-    http.open('get', 'ajax_grabar_campo.php?accion=' + accion +'&id_gasto=' + id_gasto + '&id_cobro=' + id_cobro + '&valor=' + valor);
-    http.onreadystatechange = function()
-    {
-        if(http.readyState == 4)
-        {
-            var response = http.responseText;
-            var update = new Array();
-            if(response.indexOf('OK') == -1)
-            {
-                alert(response);
-            }
+	http.open('get', 'ajax_grabar_campo.php?accion=' + accion +'&id_gasto=' + id_gasto + '&id_cobro=' + id_cobro + '&valor=' + valor);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			var response = http.responseText;
+			var update = new Array();
+			if(response.indexOf('OK') == -1)
+			{
+				alert(response);
+			}
 			offLoading();
-        }
-    };
-    http.send(null);
+		}
+	};
+	http.send(null);
 }
 
 function Refrescar()
@@ -135,6 +135,59 @@ function Refrescar()
 	self.location.href= url; 
 }
 
+// Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
+function getElementsByClassName(classname)
+{
+	node = document.getElementsByTagName("body")[0];
+	var a = [];
+	var re = new RegExp('\\b' + classname + '\\b');
+	var els = node.getElementsByTagName("*");
+	for(var i=0,j=els.length; i<j; i++)
+		if(re.test(els[i].className))a.push(els[i]);
+	return a;
+}
+// Función para seleccionar todos las filas para editar, basada en la de phpMyAdmin
+function seleccionarTodo(valor)
+{
+	var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
+	valores = "";
+	var checkbox;
+	for (var i=0; i<rows.length; i++)
+	{
+		checkbox = rows[i].getElementsByTagName( 'input' )[0];
+		if ( checkbox && checkbox.type == 'checkbox' && checkbox.disabled == false) {
+			checkbox.checked = valor
+			valores += ( valores.length > 0 ? "||" : "" ) + checkbox.id  ;
+		}
+	}
+	GrabarTodosCampos(valores, <?php echo $id_cobro; ?>, valor );
+	return true;
+}
+
+function GrabarTodosCampos(id_gastos,id_cobro, valor)
+{
+	var http = getXMLHTTP();
+	if(valor)
+		valor = '1';
+	else
+		valor = '0';
+
+	loading("Actualizando opciones");
+	http.open('get', 'ajax_grabar_campo.php?accion=varios_cobrables&id_gastos=' + id_gastos + '&id_cobro=' + id_cobro + '&valor=' + valor);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			var response = http.responseText;
+			if(response.indexOf('OK') == -1)
+			{
+				alert(response);
+			}
+			offLoading();
+		}
+	};
+	http.send(null);
+}
 // -->
 </script>
 
@@ -149,7 +202,7 @@ function Refrescar()
     </table>
     </form>
 
-<?
+<?php
 	$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 	$b->mensaje_sin_resultados = str_replace('%s', __('asuntos'), __('No existen gastos por cobrar en los %s seleccionados'));
 	$b->nombre = "busc_gastos";
@@ -166,6 +219,16 @@ function Refrescar()
 	//    $b->AgregarFuncion("Monto","Monto","align=center");
 	//    $b->AgregarFuncion("Cobrable","Cobrable","align=center");
 	$b->Imprimir();
+	if(isset($cobro) || $opc == 'buscar')
+	{
+?>
+	<center>
+		<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
+	</center>
+<?php
+	}
 
 	function Nombre(& $fila)
 	{
@@ -190,7 +253,7 @@ function Refrescar()
 			if($fila->fields['id_cobro'] == $id_cobro)
 		$checked = "checked";
 	
-			$Check = "<input type='checkbox' $checked onchange=GrabarCampo('cobrable','".$fila->fields['id_movimiento']."','".$id_cobro."',this.checked)>";
+			$Check = "<input type='checkbox' id='".$fila->fields['id_movimiento']."' $checked onchange=GrabarCampo('cobrable','".$fila->fields['id_movimiento']."','".$id_cobro."',this.checked)>";
 		return $Check;
 	}
 function Opciones(& $fila)

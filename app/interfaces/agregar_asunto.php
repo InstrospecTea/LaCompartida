@@ -705,6 +705,7 @@ function CopiarDatosCliente(form)
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name=opc_copiar value="" />
 <input type=hidden name=id_asunto value="<?= $asunto->fields['id_asunto'] ?>" />
+<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
 <table width="90%"><tr><td align="center">
 	<fieldset class="border_plomo tb_base">
@@ -942,7 +943,20 @@ function CopiarDatosCliente(form)
 <table>
 	<tr>
 		<td colspan=6 align="center">
-			<input type=button class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form);" />
+<?php 
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') )
+		{
+?>
+		<input type=button class=btn value=<?=__('Guardar')?> onclick="return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);" />
+<? 
+		}
+		else
+		{
+?>
+		<input type='button' class='btn' value="<?=__('Guardar')?>" onclick="return Validar(this.form);" />
+<?php
+		}
+?>
 		</td>
 	</tr>
 <?

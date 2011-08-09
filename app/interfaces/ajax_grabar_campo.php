@@ -14,17 +14,39 @@
 		$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		echo(utf8_encode("OK")); 
 		if($valor)
-        {
-            $query = "UPDATE cta_corriente SET id_cobro='$id_cobro' WHERE id_movimiento='$id_gasto'";
-            $result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-            echo(utf8_encode("OK"));
-        }
-        else
-        {
-            $query = "UPDATE cta_corriente SET id_cobro=NULL WHERE id_movimiento='$id_gasto'";
-            $result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-            echo(utf8_encode("OK"));
-        }
+		{
+			$query = "UPDATE cta_corriente SET id_cobro='$id_cobro' WHERE id_movimiento='$id_gasto'";
+			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			echo(utf8_encode("OK"));
+		}
+		else
+		{
+			$query = "UPDATE cta_corriente SET id_cobro=NULL WHERE id_movimiento='$id_gasto'";
+			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			echo(utf8_encode("OK"));
+		}
+	}
+	if($accion == "varios_cobrables")
+	{
+		$gastos = explode("||", $id_gastos);
+		for( $i=0; $i< sizeof($gastos); $i++)
+		{
+			$query = "UPDATE cta_corriente SET cobrable_actual='$valor' WHERE id_movimiento='$gastos[$i]'";
+			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			echo(utf8_encode("OK")); 
+			if($valor)
+			{
+				$query = "UPDATE cta_corriente SET id_cobro='$id_cobro' WHERE id_movimiento='$gastos[$i]'";
+				$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				echo(utf8_encode("OK"));
+			}
+			else
+			{
+				$query = "UPDATE cta_corriente SET id_cobro=NULL WHERE id_movimiento='$gastos[$i]'";
+				$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				echo(utf8_encode("OK"));
+			}
+		}
 	}
 	else if($accion == "trabajo_cobrable")
 	{

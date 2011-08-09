@@ -5820,6 +5820,14 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			case 4.62:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES (NULL ,  'MonedaTramitePorDefecto',  'Dólar', NULL ,  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299');";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6050,6 +6058,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.59;
 	$VERSIONES[$num++] = 4.60;
 	$VERSIONES[$num++] = 4.61;
+	$VERSIONES[$num++] = 4.62;
+	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

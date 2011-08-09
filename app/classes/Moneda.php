@@ -75,6 +75,21 @@ function GetMonedaTotalPorDefecto(&$sesion)
 		return false;
 }
 
+function GetMonedaTramitePorDefecto(&$sesion)
+{
+	if( method_exists('Conf','GetConf') )
+	{
+		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTramitePorDefecto')."'";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($id_moneda) = mysql_fetch_array($resp))
+			return $id_moneda;
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
 function GetTipoCambioMoneda (&$sesion, $id_moneda)
 {
   $query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda='$id_moneda'";

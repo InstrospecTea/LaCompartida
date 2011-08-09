@@ -951,7 +951,7 @@ function SetBanco( origen, destino )
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo )
 							{
-								if( f.desde.value == 'agregar_cliente')
+								if( f.desde.value == 'agregar_cliente' || d.desde.value == 'agregar_asunto')
 								{
 									Validar(f);
 								}
@@ -1352,7 +1352,10 @@ else
 		$id_moneda = GetMonedaTarifaPorDefecto($sesion);
 	if(!$id_moneda)
 		$id_moneda = GetMonedaBase($sesion);
-		
+	
+	if(!$id_moneda_tramite )
+		$id_moneda_tramite = GetMonedaTramitePorDefecto($sesion);
+	
 	if(!$opc_moneda_total)
 		$opc_moneda_total = GetMonedaTotalPorDefecto($sesion);
 	if(!$opc_moneda_total)

@@ -109,10 +109,10 @@
 			if( empty($cliente) )			$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
 			
 			$errores = $pagina->GetErrors();
-			$guardar_datos = false;
+			$guardar_datos = true;
 			if (!empty($errores))
 			{
-				$guardar_datos = true;
+				$guardar_datos = false;
 			}
 			
 			if( $guardar_datos )
