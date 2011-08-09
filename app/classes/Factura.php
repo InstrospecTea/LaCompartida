@@ -196,6 +196,7 @@ class Factura extends Objeto
 				}
 			}
 		}
+		$templateData = $this->ReemplazarMargenes($templateData);
 		$parser = new TemplateParser($templateData);
 		
 		$query = "SELECT cobro.codigo_idioma
@@ -223,6 +224,26 @@ class Factura extends Objeto
 		$html_css['css'] = $cssData;
 		
 		return $html_css;
+	}
+	
+	function ReemplazarMargenes($html)
+	{
+		$espacios_monto_palabra = "";
+		for($i=0; $i < UtilesApp::GetConf($this->sesion,'EspacioMontoPalabra');$i++)
+			$espacios_monto_palabra .= "&nbsp;";
+		$html = str_replace('%espacio_encabezado%', UtilesApp::GetConf($this->sesion,'EspacioEncabezado'), $html);
+		$html = str_replace('%margen_izquierda_rsocial%', UtilesApp::GetConf($this->sesion,'MargenIzquierdaRsocial'), $html);
+		$html = str_replace('%espacio_cuerpo%', UtilesApp::GetConf($this->sesion,'EspacioCuerpo'), $html);
+		$html = str_replace('%espacios_monto_palabra%', $espacios_monto_palabra, $html);
+		$html = str_replace('%margen_derecha_cuerpo%', UtilesApp::GetConf($this->sesion,'MargenDerechaCuerpo'), $html);
+		$html = str_replace('%ancho_columna_dia%', UtilesApp::GetConf($this->sesion,'AnchoColumnaDia'), $html);
+		$html = str_replace('%ancho_columna_mes%', UtilesApp::GetConf($this->sesion,'AnchoColumnaMes'), $html);
+		$html = str_replace('%ancho_columna_anyo%', UtilesApp::GetConf($this->sesion,'AnchoColumnaAnyo'), $html);
+		$html = str_replace('%ancho_columna_base_encabezado%', UtilesApp::GetConf($this->sesion,'AnchoColumnaBaseEncabezado'), $html);
+		$html = str_replace('%ancho_columna_base_cuerpo%', UtilesApp::GetConf($this->sesion,'AnchoColumnaBaseCuerpo'), $html);
+		$html = str_replace('%margen_izquierda_cuerpo%', UtilesApp::GetConf($this->sesion,'MargenIzquierdaCuerpo'), $html);
+		
+		return $html;
 	}
 	
 	function GenerarDocumento( $parser_factura, $theTag='', $lang='es' )

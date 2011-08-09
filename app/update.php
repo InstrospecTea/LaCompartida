@@ -5828,6 +5828,55 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.63:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
+											VALUES (
+											'7',  'Margenes Factura'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'EspacioEncabezado',  '88', NULL ,  'string',  '7',  '-1'
+											), (
+											NULL ,  'EspacioCuerpo',  '117', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'MargenIzquierdaRsocial',  '21', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'EspacioMontoPalabra',  '7', NULL ,  'string',  '7',  '-1'
+											);"
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'MargenDerechaCuerpo',  '105', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoColumnaMes',  '33', NULL ,  'string',  '7',  '-1'
+											), (
+											NULL ,  'AnchoColumnaAnyo',  '49', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoColumnaDia',  '35', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoColumnaBaseCuerpo',  '505', NULL ,  'string',  '7',  '-1'
+											), (
+											NULL ,  'AnchoColumnaBaseEncabezado',  '200', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'MargenIzquierdaCuerpo',  '7', NULL ,  'string',  '7',  '-1'
+											);";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6059,6 +6108,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.60;
 	$VERSIONES[$num++] = 4.61;
 	$VERSIONES[$num++] = 4.62;
+	$VERSIONES[$num++] = 4.63;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

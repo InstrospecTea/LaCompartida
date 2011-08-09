@@ -535,14 +535,14 @@ function Refrescar()
 	</tr>
 	<tr>
     <td align=right>
-			<?=__('Fecha')?>
+			<?=__('Fecha Desde')?>
     </td>
     <td nowrap align=left>
     	<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
     </td>
     <td nowrap align=left colspan=2>
-    	<?=__('Hasta')?>
+    	<?=__('Fecha Hasta')?>
     	<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
 	<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
     </td>

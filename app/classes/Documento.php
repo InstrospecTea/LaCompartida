@@ -638,6 +638,23 @@ class Documento extends Objeto
 		//echo $this->tabla_neteos($out_neteos);
 	}
 	
+	function SumaPagos() 
+	{
+		$query = "SELECT SUM( valor_cobro_honorarios ) FROM neteo_documento WHERE id_documento_cobro = '".$this->fields['id_documento']."' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($suma_pagos) = mysql_fetch_array($resp);
+		
+		$moneda_doc = new Moneda($this->sesion);
+		$moneda_doc->Load($this->fields['id_moneda']);
+		
+		$suma_pagos = number_format($suma_pagos, $moneda_doc->fields['cifras_decimales'], '.', '');
+		
+		if( $suma_pagos > 0 )
+			return $suma_pagos;
+		else
+			return "0";
+	}
+	
 	function EliminarDesdeFacturaPago($id_factura_pago){
 		
 		$query = "SELECT id_documento FROM documento WHERE id_factura_pago = '$id_factura_pago'";
