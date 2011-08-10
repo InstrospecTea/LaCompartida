@@ -23,7 +23,8 @@
 	if($id_factura != "")
 	{
 		$factura->Load($id_factura);
-		$codigo_cliente=$factura->fields['codigo_cliente'];
+		if( empty($codigo_cliente) )
+			$codigo_cliente=$factura->fields['codigo_cliente'];
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	  	{
 	  		$cliente_factura = new Cliente($sesion);
@@ -116,19 +117,19 @@
 			}
 			
 			if( $guardar_datos )
-			{
+			{ 
 				//chequear
 				$mensaje_accion = 'guardar';
 				$factura->Edit('subtotal',$monto_neto);
 				$factura->Edit('porcentaje_impuesto',$porcentaje_impuesto);
 				$factura->Edit('iva',$iva);
 				$factura->Edit('total',''.($monto_neto+$iva));
-				$factura->Edit("id_factura_padre", $id_factura_padre? $id_factura_padre : NULL);
+				$factura->Edit("id_factura_padre", $id_factura_padre? $id_factura_padre : "NULL");
 				$factura->Edit("fecha",Utiles::fecha2sql($fecha));
-				$factura->Edit("cliente",$cliente ? $cliente : NULL);
-				$factura->Edit("RUT_cliente",$RUT_cliente ? $RUT_cliente : NULL);
-				$factura->Edit("direccion_cliente",$direccion_cliente ? $direccion_cliente : NULL);
-				$factura->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : NULL);
+				$factura->Edit("cliente",$cliente ? $cliente : "NULL");
+				$factura->Edit("RUT_cliente",$RUT_cliente ? $RUT_cliente : "NULL");
+				$factura->Edit("direccion_cliente",$direccion_cliente ? $direccion_cliente : "NULL");
+				$factura->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "");
 				$factura->Edit("id_cobro",$id_cobro ? $id_cobro: NULL);
 				$factura->Edit("id_documento_legal",$id_documento_legal? $id_documento_legal:1);
 				if( !isset( $factura->fields['serie_documento_legal']) )
@@ -1072,7 +1073,7 @@ function ActualizarDocumentoMonedaPago()
     </tr>
     <tr>
       <td align=right><?=__('Raz&oacute;n Social Cliente')?></td>
-      <td align=left colspan=3><input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70" maxlength="20" /></td>
+      <td align=left colspan=3><input type="text" name="cliente" value="<?=$factura->fields['cliente']?>" id="cliente" size="70"/></td>
     </tr>
     <tr>
       <td align=right><?=__('Dirección Cliente')?></td>
