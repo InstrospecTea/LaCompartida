@@ -242,6 +242,9 @@ class Factura extends Objeto
 		$html = str_replace('%ancho_columna_base_encabezado%', UtilesApp::GetConf($this->sesion,'AnchoColumnaBaseEncabezado'), $html);
 		$html = str_replace('%ancho_columna_base_cuerpo%', UtilesApp::GetConf($this->sesion,'AnchoColumnaBaseCuerpo'), $html);
 		$html = str_replace('%margen_izquierda_cuerpo%', UtilesApp::GetConf($this->sesion,'MargenIzquierdaCuerpo'), $html);
+		$html = str_replace('%ancho_columna_monto_subtotal%', UtilesApp::GetConf($this->sesion,'AnchoColumnaMontoSubtotal'), $html);
+		$html = str_replace('%ancho_columna_monto_iva%', UtilesApp::GetConf($this->sesion,'AnchoColumnaMontoIVA'), $html);
+		$html = str_replace('%ancho_columna_monto_total%', UtilesApp::GetConf($this->sesion,'AnchoColumnaMontoTotal'), $html);
 		
 		return $html;
 	}

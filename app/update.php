@@ -5877,6 +5877,24 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.64:
+				$query = array();
+				
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoColumnaMontoSubtotal',  '90', NULL ,  'string',  '7',  '-1'
+											), (
+											NULL ,  'AnchoColumnaMontoIVA',  '32', NULL ,  'string',  '7',  '-1'
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoColumnaMontoTotal',  '40', NULL ,  'string',  '7',  '-1'
+											);";
+			
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6109,6 +6127,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.61;
 	$VERSIONES[$num++] = 4.62;
 	$VERSIONES[$num++] = 4.63;
+	$VERSIONES[$num++] = 4.64;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
