@@ -47,6 +47,38 @@
                                 'Locked' => 1,
                                 'Color' => 'black'));
 
+  if( $moneda_gasto > 0 )
+  {
+  	$obj_moneda_gasto = new Moneda($sesion);
+		$obj_moneda_gasto->Load($moneda_gasto);
+		
+		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
+		$simbolo_moneda = $obj_moneda_gasto->fields['simbolo'];
+		$cifras_decimales = $obj_moneda_gasto->fields['cifras_decimales'];
+		if($cifras_decimales)
+		{
+			$decimales = '.';
+			while($cifras_decimales--)
+				$decimales .= '0';
+		}
+		else
+			$decimales = '';
+  	$formato_moneda =& $wb->addFormat(array('Size' => 10,
+                                'VAlign' => 'top',
+                                'Align' => 'justify',
+                                'Border' => 1,
+                                'Color' => 'black',
+                                'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+  }
+  else
+  {
+		$formato_moneda =& $wb->addFormat(array('Size' => 10,
+                                'VAlign' => 'top',
+                                'Align' => 'justify',
+                                'Border' => 1,
+                                'Color' => 'black'));
+  }
+
     $f4 =& $wb->addFormat(array('Size' => 10,
                                 'VAlign' => 'top',
                                 'Align' => 'justify',
@@ -287,25 +319,43 @@
 		}
 		
 	    $ws1->write($fila_inicial, $columna_actual++, $row[descripcion], $f4);
-	    $ws1->write($fila_inicial, $columna_actual++, $row[ingreso] ? '' : $row[simbolo] . " " .number_format($row[egreso],$row[cifras_decimales],",","."), $f4);            
-	    $ws1->write($fila_inicial, $columna_actual++, $row[egreso] ? '' : $row[simbolo] . " " .number_format($row[ingreso],$row[cifras_decimales],",","."), $f4);
+	    if( $moneda_gasto > 0 )
+	    {
+	    	$ws1->write($fila_inicial, $columna_actual++, $row[egreso], $formato_moneda);            
+	    	$ws1->write($fila_inicial, $columna_actual++, $row[ingreso], $formato_moneda);
+	    }
+	    else
+	    {
+	    	$ws1->write($fila_inicial, $columna_actual++, $row[ingreso] ? '' : $row[simbolo] . " " .number_format($row[egreso],$row[cifras_decimales],",","."), $f4);            
+	    	$ws1->write($fila_inicial, $columna_actual++, $row[egreso] ? '' : $row[simbolo] . " " .number_format($row[ingreso],$row[cifras_decimales],",","."), $f4);
+	    }
 	    
-	    if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
+		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
 			if($row['esCobrable'] == 'No') {
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-				$ws1->write($fila_inicial, $columna_actual++, 0, $f4);
+					$ws1->write($fila_inicial, $columna_actual++, 0, $formato_moneda);
 			}
 			else 
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-				$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
+				{
+					if( $moneda_gasto > 0 )
+						$ws1->write($fila_inicial, $columna_actual++, $row[monto_cobrable], $formato_moneda); 
+					else
+						$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
+				}
 			}	
 		}
 		else
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
+			{
+	    	if( $moneda_gasto > 0 )
+	    		$ws1->write($fila_inicial, $columna_actual++, $row[monto_cobrable], $formato_moneda); 
+	    	else
+	    		$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
+	    }
 		}	
 	    
 	    

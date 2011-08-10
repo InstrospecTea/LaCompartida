@@ -117,6 +117,9 @@ $col=0;
 	$col_mail_contacto = $col++;
 	$col_dir_contacto = $col++;
 	
+	// Nueva columna estado del cliente
+	$col_estado = $col++;
+	
 	// se setea el ancho de las columnas
 	$columna=0;
 	$ws1->setColumn( $col_codigo, $col_codigo,  8.00);
@@ -136,6 +139,9 @@ $col=0;
 	$ws1->setColumn( $col_fono_contacto, $col_fono_contacto,  20.00);
 	$ws1->setColumn( $col_mail_contacto, $col_mail_contacto,  30.00);
 	$ws1->setColumn( $col_dir_contacto, $col_dir_contacto, 40.00);
+
+	// Nueva columna estado del cliente
+	$ws1->setColumn( $col_estado, $col_estado, 10.00);
 
 	$ws1->write(0, 0, 'LISTADO DE CLIENTES', $encabezado);
 			$ws1->mergeCells (0, 0, 0, 8);
@@ -167,6 +173,10 @@ $col=0;
 	$ws1->write($fila_inicial, $col_fono_contacto, __('Teléfono Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_mail_contacto, __('E-mail Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_dir_contacto, __('Dirección contacto'), $tit);
+	
+	// Nueva columna estado del cliente
+	$ws1->write($fila_inicial, $col_estado, __('Activo'), $tit);
+	
 	$fila_inicial++;
 	
 	$where = '1';
@@ -206,7 +216,8 @@ $col=0;
 								contrato.forma_cobro,
 								contrato.monto,
 								tarifa.glosa_tarifa,
-								contrato.id_moneda_monto 
+								contrato.id_moneda_monto,
+								cliente.activo
 						FROM cliente 
 						LEFT JOIN grupo_cliente USING (id_grupo_cliente)
 						LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato
@@ -243,6 +254,10 @@ $col=0;
 		$ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_mail_contacto, $row['email_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_dir_contacto, $row['direccion_contacto'], $f4);
+		
+		// Nueva columna estado del cliente
+		$ws1->write($fila_inicial, $col_estado, ($row['activo'] == 1 ? __('Si') : __('No')), $f4);
+		
 		$fila_inicial++;
 	}
 
