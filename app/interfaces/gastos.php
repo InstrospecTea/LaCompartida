@@ -92,8 +92,7 @@
 				}
 			if( $fecha1 != '' ) $fecha_ini = Utiles::fecha2sql($fecha1); else $fecha_ini = '';
 			if( $fecha2 != '' ) $fecha_fin = Utiles::fecha2sql($fecha2); else $fecha_fin = '';
-			$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $lista_asuntos,$codigo_cliente,$fecha_ini,$fecha_fin),0,",",".");
-
+			
 			if($cobrado == 'NO')
 				$where .= " AND cta_corriente.id_cobro is null ";
 			if($cobrado == 'SI')
@@ -104,6 +103,8 @@
 				$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
 			if($id_usuario_orden)
 				$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
+			if($id_usuario_responsable)
+				$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
 			if($id_tipo)
 				$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 			if($clientes_activos == 'activos')
@@ -126,6 +127,8 @@
 		else
 			$where = base64_decode($where);
 		
+		$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,",",".");
+
 		
 		$col_select ="";
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
@@ -139,6 +142,7 @@
 								$col_select
 								FROM cta_corriente
 								LEFT JOIN asunto USING(codigo_asunto)
+								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
 								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda

@@ -5848,7 +5848,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'EspacioMontoPalabra',  '7', NULL ,  'string',  '7',  '-1'
-											);"
+											);";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'MargenDerechaCuerpo',  '105', NULL ,  'string',  '7',  '-1'

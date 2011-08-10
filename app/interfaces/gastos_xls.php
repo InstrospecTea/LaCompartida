@@ -128,6 +128,8 @@
 		}		
 		if($codigo_asunto)
 			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
+		if($id_usuario_responsable)
+			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable'";
 		if($id_usuario_orden)
 			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
 		if($id_tipo)
@@ -169,7 +171,8 @@
 					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
-					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro 
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente

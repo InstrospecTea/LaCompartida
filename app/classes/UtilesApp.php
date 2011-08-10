@@ -249,23 +249,20 @@ class UtilesApp extends Utiles
 	La cuenta corriente funciona sólo restando de los ingresos para gastos,
 	todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	*/
-	function TotalCuentaCorriente(&$sesion, $lista_asuntos='',$codigo_cliente='',$fecha_ini='',$fecha_fin='')
+	function TotalCuentaCorriente(&$sesion, $where = '')
 	{
-		$where = 1;
-		if($lista_asuntos != '')
-			$where .= " AND codigo_asunto IN ('$lista_asuntos') ";
-		if($codigo_cliente != '')
-			$where .= " AND codigo_cliente = '$codigo_cliente' ";
-		if($fecha_ini != '')
-			$where .= " AND fecha > '".$fecha_ini." 00:00:00' ";
-		if($fecha_fin != '')
-			$where .= " AND fecha < '".$fecha_fin." 23:59:59' ";
-		
 		$total_ingresos=0;
 		$total_egresos=0;
 
 		$query = "SELECT ingreso*tipo_cambio, egreso*tipo_cambio, monto_cobrable*tipo_cambio
-							FROM cta_corriente JOIN prm_moneda on prm_moneda.id_moneda =cta_corriente.id_moneda
+							FROM cta_corriente 
+							LEFT JOIN asunto USING(codigo_asunto)
+								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
+								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
+								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while(list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp))

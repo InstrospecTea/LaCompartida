@@ -121,6 +121,8 @@
 			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
 		if($id_usuario_orden)
 			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
+		if($id_usuario_responsable)
+			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable'";
 		if($id_tipo)
 			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 		if($clientes_acitvos == 'activos')
@@ -145,6 +147,7 @@
 					prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
+					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
