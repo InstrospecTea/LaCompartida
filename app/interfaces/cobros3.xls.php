@@ -157,7 +157,7 @@
 		$trabajo = $lista->Get($i);
 //echo '<pre>'; var_dump($trabajo->fields); exit;
 		$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda_total->Load($trabajo->fields['id_moneda'] > 0 ? $trabajo->fields['id_moneda'] : 1);
+		$moneda_total->Load($trabajo->fields['id_moneda_cobro'] > 0 ? $trabajo->fields['id_moneda_cobro'] : ( $trabajo->fields['id_moneda_asunto'] ? $trabajo->fields['id_moneda_asunto'] : 1 ) );
 		
 		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
 		$simbolo_moneda = $moneda_total->fields['simbolo'];

@@ -7,6 +7,8 @@
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
+	require_once Conf::ServerDir().'/classes/Cobro.php';
+	require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Cobro.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
@@ -256,6 +258,7 @@
 												IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
 												trabajo.visible, 
 												cobro.estado as estado_cobro, 
+												cobro.id_moneda as id_moneda_cobro,
 												CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre, 
 												usuario.username, 
 												usuario.id_usuario, 
@@ -846,7 +849,13 @@ function EditarTodosLosArchivos()
 		global $p_profesional;
 		global $select_usuario;
 		static $i = 0;
-
+		
+		
+		if( $trabajo->fields['id_cobro'] > 0 )
+			{
+				$moneda_cobro = new Moneda($sesion);
+				$moneda_cobro->Load($trabajo->fields['id_moneda_cobro']);
+			}
 		if($trabajo->fields['id_tramite'] > 0)
 		{
 			$query = "SELECT glosa_tramite FROM tramite_tipo 
@@ -856,14 +865,13 @@ function EditarTodosLosArchivos()
 			list($glosa_tramite)=mysql_fetch_array($resp);
 		}
 		
-		
 		if($i % 2 == 0)
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
 		
 		if( $trabajo->fields['tarifa_hh'] > 0 )
-			$tarifa = $trabajo->fields['tarifa_hh'];
+			$tarifa = number_format($trabajo->fields['tarifa_hh'],$moneda_cobro->fields['cifras_decimales'],'.','');
 		else if($trabajo->fields['id_tramite_tipo'] == 0)
 			$tarifa = Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']);
 		else
@@ -954,7 +962,7 @@ function EditarTodosLosArchivos()
 		if( $p_revisor->fields['permitido'])
 		{
 			$html .= '<td>Rev.'.Revisado(& $trabajo).'</td>';
-			$html .= "<td colspan=2 align=center><strong>".__('Tarifa')."</strong><br>".Utiles::glosa($sesion,$trabajo->fields[id_moneda_asunto],'simbolo','prm_moneda','id_moneda')." ".$tarifa."</td>";
+			$html .= "<td colspan=2 align=center><strong>".__('Tarifa')."</strong><br>".( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion,$trabajo->fields[id_moneda_asunto],'simbolo','prm_moneda','id_moneda'))." ".$tarifa."</td>";
 		}
 		$html .= "</tr>\n";
         $i++;

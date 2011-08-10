@@ -293,6 +293,20 @@ class Cobro extends Objeto
 			$documento->Delete();
 		}
 	}
+	
+	function IdMoneda( $id_cobro = '' )
+	{
+		if( !empty($id_cobro) )
+			{
+				$query = "SELECT id_moneda FROM cobro WHERE id_cobro = '$id_cobro' ";
+				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				list($id_moneda) = mysql_fetch_array($resp);
+			}
+		else
+			$id_moneda = $this->fields['id_moneda'];
+		
+		return $id_moneda;
+	}
 
 	function FechaUltimoCobro ($codigo_cliente)
 	{
@@ -336,7 +350,7 @@ class Cobro extends Objeto
 		
 		while( list($id, $tarifa_hh) = mysql_fetch_array($resp) )
 		{
-			$tarifa_hh_corrigido = $factor * $tarifa_hh;
+			$tarifa_hh_corrigido = number_format($factor * $tarifa_hh,$moneda->fields['id_moneda'],'.','');
 			
 			$query = " UPDATE trabajo SET tarifa_hh = '$tarifa_hh_corrigido' WHERE id_trabajo = '$id' ";
 			mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -484,7 +498,7 @@ class Cobro extends Objeto
 			if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
 			{
 				if( $this->fields['monto_subtotal'] > 0 )
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = $trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal']; 
+					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = number_format($trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal'], 6,'.',''); 
 				
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
@@ -497,6 +511,7 @@ class Cobro extends Objeto
 			if($trabajo->fields['cobrable'] == '1')
 			{
 				$valor_trabajo = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa'];
+				$valor_trabajo_ajustado = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'];
 				$valor_trabajo_estandar = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'];
 			}
 			else
@@ -584,9 +599,15 @@ class Cobro extends Objeto
 			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 			if( $this->fields['monto_ajustado'] > 0 )
+			{
 				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado']);
+				$trabajo->Edit('monto_cobrado', number_format($valor_trabajo_ajustado,6,'.',''));
+			}
 			else
+			{
 				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+				$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
+			}
 			$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
 			$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
 
@@ -4497,7 +4518,6 @@ class Cobro extends Objeto
 			$aproximacion_monto_cyc = number_format($this->fields['monto_subtotal'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','');
 			$subtotal_en_moneda_cyc = $aproximacion_monto_cyc * ($cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']);
 			
-
 			if ($ImprimirValorTrabajo && $this->fields['estado']!='CREADO' && $this->fields['estado']!='EN REVISION')
 				{
 					$html = str_replace('%valor%','', $html);

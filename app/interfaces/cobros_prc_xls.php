@@ -960,7 +960,7 @@ $mostrar_resumen_de_profesionales = 1;
 					$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe".($fila_inicial+1).":$col_formula_importe".($filas).")", $formato_moneda2);
 				}
 				
-				$ws->setColumn($columna_sigla, $columna_sigla, 11);
+				
 				$ws->setColumn($columna_abogado, $columna_abogado, 23);
 				if( !$cobro->fields['opc_ver_detalles_por_hora_categoria'] == 1 ) {
 					$ws->setColumn($columna_categoria, $columna_categoria,0,0,1);
@@ -972,6 +972,8 @@ $mostrar_resumen_de_profesionales = 1;
 				if(!$cobro->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
 					$ws->setColumn($columna_sigla, $columna_sigla,0,0,1);
 				}
+				else 
+					$ws->setColumn($columna_sigla, $columna_sigla, 11);
 				if(!$cobro->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 					$ws->setColumn($columna_tarifa, $columna_tarifa, 0,0,1);
 				}
