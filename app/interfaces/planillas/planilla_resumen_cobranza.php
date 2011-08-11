@@ -129,6 +129,10 @@
 		$col_factura = ++$col;
 		$col_fecha_emision = ++$col;
 		$col_cliente = ++$col;
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			$col_cliente_facturable = ++$col;
+		}
 		$col_asuntos = ++$col;
 		$col_encargado = ++$col;
 		$col_fecha_primer_trabajo = ++$col;
@@ -173,6 +177,10 @@
 		$ws1->setColumn($col_factura, $col_factura, 15);
 		$ws1->setColumn($col_fecha_emision, $col_fecha_emision, 16);
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			$ws1->setColumn($col_cliente_facturable, $col_cliente_facturable, 40);
+		}
 		$ws1->setColumn($col_asuntos, $col_asuntos, 40);
 		$ws1->setColumn($col_encargado, $col_encargado, 20);
 		$ws1->setColumn($col_fecha_primer_trabajo, $col_fecha_primer_trabajo, 25);
@@ -382,9 +390,10 @@
 
 		#Clientes
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		//echo $query;
 		$fila_inicial = $filas + 2;
 		while($cobro = mysql_fetch_array($resp))
-		{
+		{			
 			if(!$tabla_creada)
 			{
 				$ws1->write($filas, $col_numero_cobro, __('N° del Cobro'), $titulo_filas);
@@ -393,6 +402,10 @@
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_creacion, __('Fecha Creación'), $titulo_filas);
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
+				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+				{
+					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+				}
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_primer_trabajo, __('Fecha primer trabajo'), $titulo_filas);
@@ -608,14 +621,45 @@
 			}
 			
 			++$filas;
+			
+			// Nombres de clientes segun facturas asociadas al cobro;
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+				$facturas = "";
+				$clientes_factura = "";
+				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo FROM factura f JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  WHERE f.id_cobro = '" . $cobro['id_cobro'] . "'";
+				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
+				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura )  = mysql_fetch_array($resp3))
+				{
+					if( strlen( $facturas ) > 0 )
+					{
+						$facturas .= "\n";
+						$clientes_factura .= "\n";
+					}
+					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " . $numero_factura : " "  );
+					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
+				}
+			}
+			
 			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $fecha);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 			{
 				$ws1->write($filas, $col_nota_cobro, $cobro['nota_cobro'], $fecha);
 			}
-			$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+				$ws1->write($filas, $col_factura, $facturas, $fecha);
+			}
+			else
+			{
+				$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
+			}
 			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2date($cobro['fecha_creacion']), $fecha);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $txt_opcion);
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
+			}
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_opcion);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
 				$ws1->write($filas, $col_encargado, $cobro['username'], $txt_opcion);
