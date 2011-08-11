@@ -1362,6 +1362,7 @@ else
 		$opc_moneda_total = GetMonedaBase($sesion);
 	
 	$config_validar_tarifa = ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
+
 ?>
 
 <!-- COBRANZA -->
@@ -1739,26 +1740,51 @@ else
 			</td>
 		</tr>
 		<?
-		if(!$contrato->loaded())
-			$checked = 'checked="checked"';
-		else
-			$checked = '';
+			
+				if (empty($contrato->fields['id_contrato']) && method_exists('Conf','GetConf'))
+				{ 
+					$contrato->Edit('opc_restar_retainer', Conf::GetConf($sesion, 'OpcRestarRetainer') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_asuntos_separados', Conf::GetConf($sesion, 'OpcVerAsuntosSeparado') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_carta', Conf::GetConf($sesion, 'OpcVerCarta') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_cobrable', Conf::GetConf($sesion, 'OpcVerCobrable') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_descuento', Conf::GetConf($sesion, 'OpcVerDescuento') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalle_retainer', Conf::GetConf($sesion, 'OpcVerDetalleRetainer') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalles_por_hora', Conf::GetConf($sesion, 'OpcVerDetallesPorHora') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalles_por_hora_categoria', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraCategoria') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalles_por_hora_importe', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraImporte') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalles_por_hora_iniciales', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraIniciales') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_detalles_por_hora_tarifa', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraTarifa') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_gastos', Conf::GetConf($sesion, 'OpcVerGastos') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_horas_trabajadas', Conf::GetConf($sesion, 'OpcVerHorasTrabajadas') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_modalidad', Conf::GetConf($sesion, 'OpcVerModalidad') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_morosidad', Conf::GetConf($sesion, 'OpcVerMorosidad') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_numpag', Conf::GetConf($sesion, 'OpcVerNumPag') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_profesional', Conf::GetConf($sesion, 'OpcVerProfesional') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_profesional_categoria', Conf::GetConf($sesion, 'OpcVerProfesionalCategoria') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_profesional_importe', Conf::GetConf($sesion, 'OpcVerProfesionalImporte') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_profesional_iniciales', Conf::GetConf($sesion, 'OpcVerProfesionalIniciales') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_profesional_tarifa', Conf::GetConf($sesion, 'OpcVerProfesionalTarifa') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_resumen_cobro', Conf::GetConf($sesion, 'OpcVerResumenCobro') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_solicitante', Conf::GetConf($sesion, 'OpcVerSolicitante') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_tipo_cambio', Conf::GetConf($sesion, 'OpcVerTipoCambio') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_valor_hh_flat_fee', Conf::GetConf($sesion, 'OpcVerValorHHFlatFee') == 1 ? 1 : 0);
+				}
 		?>
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_asuntos_separados" value="1" <?=$contrato->fields['opc_ver_asuntos_separados']=='1'?'checked="checked"': ''?>></td>
 			<td align="left" colspan='5'><?=__('Ver asuntos por separado')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_resumen_cobro" value="1" <?=$contrato->fields['opc_ver_resumen_cobro']=='1'?'checked="checked"': ''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_resumen_cobro" value="1" <?=$contrato->fields['opc_ver_resumen_cobro']=='1'?'checked="checked"': ''?>/></td>
 			<td align="left" colspan='5'><?=__('Mostrar resumen del cobro')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_modalidad" value="1" <?=$contrato->fields['opc_ver_modalidad']=='1'?'checked="checked"': ''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_modalidad" value="1" <?=$contrato->fields['opc_ver_modalidad']=='1'?'checked="checked"': ''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar modalidad del cobro')?></td>
 		</tr>
 		<tr>
 			<td align="right">
-				<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora" id="opc_ver_detalles_por_hora" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora']=='1' )?'checked':''?>>
 			</td>
 			<td align="left" colspan="2" style="font-size: 10px;">
 				<label for="opc_ver_detalles_por_hora"><?=__('Mostrar detalle por hora')?></label>
@@ -1767,57 +1793,51 @@ else
 		<tr>
 			<td/>
 			<td align="left" colspan='5'>
-				<input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_iniciales']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_iniciales']=='1' )?'checked':''?>>
 				<label for="opc_ver_detalles_por_hora_iniciales"><?=__('Iniciales')?></label>
-				<input type="checkbox" name="opc_ver_detalles_por_hora_categoria" id="opc_ver_detalles_por_hora_categoria" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_categoria']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_categoria" id="opc_ver_detalles_por_hora_categoria" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_categoria']=='1' )?'checked':''?>>
 				<label for="opc_ver_detalles_por_hora_categoria"><?=__('Categoría')?></label>
-				<input type="checkbox" name="opc_ver_detalles_por_hora_tarifa" id="opc_ver_detalles_por_hora_tarifa" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_tarifa']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_tarifa" id="opc_ver_detalles_por_hora_tarifa" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_tarifa']=='1')?'checked':''?>>
 				<label for="opc_ver_detalles_por_hora_tarifa"><?=__('Tarifa')?></label>
-				<input type="checkbox" name="opc_ver_detalles_por_hora_importe" id="opc_ver_detalles_por_hora_importe" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_importe']=='1'  || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_detalles_por_hora_importe" id="opc_ver_detalles_por_hora_importe" value="1" <?=($contrato->fields['opc_ver_detalles_por_hora_importe']=='1')?'checked':''?>>
 				<label for="opc_ver_detalles_por_hora_importe"><?=__('Importe')?></label>
 			</td>
 		</tr>
 		<tr>
-			<?php
-				if (empty($contrato->fields['id_contrato']) && method_exists('Conf','GetConf'))
-				{
-					$contrato->Edit('opc_ver_profesional', Conf::GetConf($sesion, 'MostrarDetalleProfesionalCartaCobro') == 1 ? 1 : 0);
-				}
-			?>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_profesional" <?=$contrato->fields['opc_ver_profesional']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar detalle por profesional')?></td>
 		</tr>
 		<tr>
 			<td/>
 			<td align="left" colspan='5'>
-				<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=($contrato->fields['opc_ver_profesional_iniciales']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?=($contrato->fields['opc_ver_profesional_iniciales']=='1')?'checked':''?>>
 				<label for="opc_ver_profesional_iniciales"><?=__('Iniciales')?></label>
-				<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=($contrato->fields['opc_ver_profesional_categoria']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?=($contrato->fields['opc_ver_profesional_categoria']=='1')?'checked':''?>>
 				<label for="opc_ver_profesional_categoria"><?=__('Categoría')?></label>
-				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=($contrato->fields['opc_ver_profesional_tarifa']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?=($contrato->fields['opc_ver_profesional_tarifa']=='1')?'checked':''?>>
 				<label for="opc_ver_profesional_tarifa"><?=__('Tarifa')?></label>
-				<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=($contrato->fields['opc_ver_profesional_importe']=='1' || !$contrato->loaded)?'checked':''?>>
+				<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?=($contrato->fields['opc_ver_profesional_importe']=='1')?'checked':''?>>
 				<label for="opc_ver_profesional_importe"><?=__('Importe')?></label>
 			</td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_descuento" value="1" <?=$contrato->fields['opc_ver_descuento']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_descuento" value="1" <?=$contrato->fields['opc_ver_descuento']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar el descuento del cobro')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_gastos" value="1" <?=$contrato->fields['opc_ver_gastos']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_gastos" value="1" <?=$contrato->fields['opc_ver_gastos']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar gastos del cobro')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_morosidad" value="1" <?=$contrato->fields['opc_ver_morosidad']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_morosidad" value="1" <?=$contrato->fields['opc_ver_morosidad']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar saldo adeudado')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_tipo_cambio" value="1" <?=$contrato->fields['opc_ver_tipo_cambio']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_tipo_cambio" value="1" <?=$contrato->fields['opc_ver_tipo_cambio']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar tipos de cambio')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_numpag" value="1" <?=$contrato->fields['opc_ver_numpag']=='1'?'checked="checked"':''?> <?=$checked?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_numpag" value="1" <?=$contrato->fields['opc_ver_numpag']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar números de página')?></td>
 		</tr>
 		<?
@@ -1838,7 +1858,7 @@ else
 				{
 ?>
 					<tr>
-						<td align="right" colspan='1'><input type="checkbox" name="opc_ver_solicitante" value="1" <?=$contrato->fields['opc_ver_solicitante']=='1'?'checked="checked"':''?> <?=$checked?>></td>
+						<td align="right" colspan='1'><input type="checkbox" name="opc_ver_solicitante" value="1" <?=$contrato->fields['opc_ver_solicitante']=='1'?'checked="checked"':''?>></td>
 						<td align="left" colspan='5'><?=__('Mostrar solicitante')?></td>
 					</tr>
 <?
@@ -1864,20 +1884,20 @@ else
 <? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) )
 		{ ?>
 		<tr> 
-			<td align="right" colspan='1'><input type="checkbox" name="opc_restar_retainer" value="1" <?=$contrato->fields['opc_restar_retainer']=='1'?'checked="checked"':''?> <?=$checked ?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_restar_retainer" value="1" <?=$contrato->fields['opc_restar_retainer']=='1'?'checked="checked"':''?>  /></td>
 			<td align="left" colspan='5'><?=__('Restar valor retainer')?></td>
  		</tr>
  		<tr>
- 			<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" value="1" <?=$contrato->fields['opc_ver_detalle_retainer']=='1'?'checked="checked"':''?> <?=$checked ?> /></td>
+ 			<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" value="1" <?=$contrato->fields['opc_ver_detalle_retainer']=='1'?'checked="checked"':''?> /></td>
  			<td align="left" colspan='5'><?=__('Mostrar detalle retainer')?></td>
  		</tr>
 <?  } ?>
 		<tr>
-			<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" value="1" <?=$contrato->fields['opc_ver_valor_hh_flat_fee']=='1'?'checked="checked"':''?> <?=$checked ?> /></td>
+			<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" value="1" <?=$contrato->fields['opc_ver_valor_hh_flat_fee']=='1'?'checked="checked"':''?>/></td>
 			<td align="left" colspan='5'><?=__('Mostrar valor HH en caso de Flat Flee')?></td>
 		</tr>
 		<tr>
-			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?=$contrato->fields['opc_ver_carta']=='1'?'checked="checked"':''?> <?=$checked ?> /></td>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?=$contrato->fields['opc_ver_carta']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar Carta')?></td>
 		</tr>
 	</table>

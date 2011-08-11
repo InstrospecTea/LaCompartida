@@ -70,6 +70,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 
 	//$cobrable = 0;
 	$total_minutos_cobrables=0;
+	$total_minutos_trabajados=0;
 	$horas_cobrables=0;
 	$minutos_cobrables=0;
 	for($i=0; $i<count($id); ++$i)
@@ -98,8 +99,14 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 		list($h,$m,$s)=split(':',$t[$i]->fields['duracion_cobrada']);
 		$minutos=($h*60)+$m;
 		$total_minutos_cobrables+=$minutos;//se calcula en minutos porque el intervalo es en minutos
+
+		list($h,$m,$s)=split(':',$t[$i]->fields['duracion']);
+		$minutos=($h*60)+$m;
+		//echo $minutos.' min. <br>';
+
+		$total_minutos_trabajados+=$minutos;//se calcula en minutos porque el intervalo es en minutos
 	}
-	if(empty($total_duracion_cobrable_horas) && empty($total_duracion_cobrable_minutos))
+	if(!isset($total_duracion_cobrable_horas) && !isset($total_duracion_cobrable_minutos))
 	{
 		$total_duracion_cobrable_horas=floor($total_minutos_cobrables/60);
 		$total_duracion_cobrable_minutos=floor($total_minutos_cobrables%60);
@@ -150,7 +157,15 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 		}
 		$contadorModificados = 0;
 		$tiempo_total_minutos_editado=($total_duracion_cobrable_horas*60)+$total_duracion_cobrable_minutos;//total escrito por usuario en minutos
-		$divisor=$tiempo_total_minutos_editado/$total_minutos_cobrables;
+
+		if($total_minutos_cobrables)
+			$divisor=$tiempo_total_minutos_editado/$total_minutos_cobrables;
+		else if( $tiempo_total_minutos_editado > 0 && $total_minutos_cobrables == 0)
+		{//Si el divisor es 0, cambiamos el divisor por el numero de trabajos. Más adelante se debe cambiar la duracion de cada trabajo (0) por 1 minuto.
+			$divisor= $tiempo_total_minutos_editado/$total_minutos_trabajados;
+			$forzar_editado_divisor_cero = true;
+		}
+	
 		$cont=0;
 		for($i=0; $i<count($id); ++$i)
 		{
@@ -175,12 +190,25 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 			//Se modifica las horas cobrables de los trabajos con prorrateo según nuevo/total
 			//Se tiene en cuenta que no puede quedar entremedio del intervalo
 			if($cont==1)$tiempo_total_minutos_temporal=0;
-			if($tiempo_total_minutos_editado!=$total_minutos_cobrables)
+
+			if($forzar_editado_divisor_cero)
+				$total_minutos_cobrables = $total_minutos_trabajados;
+			if($tiempo_total_minutos_editado!=$total_minutos_cobrables || $forzar_editado_divisor_cero)
 			{
 				list($h,$m,$s)=split(':',$t[$i]->fields['duracion_cobrada']);
 				$minutos=($h*60)+$m;
+				//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
+				if($forzar_editado_divisor_cero)
+				{
+					list($h,$m,$s)=split(':',$t[$i]->fields['duracion']);
+					$minutos=($h*60)+$m;
+				}
 				$tiempo_trabajo_minutos_contador+=$minutos;
+				
 				$tiempo_trabajo_minutos_temporal=$tiempo_trabajo_minutos_contador*$divisor;
+				
+				//echo $tiempo_trabajo_minutos_temporal." = ".$tiempo_trabajo_minutos_contador." * ".$divisor." <br>";
+
 				$tiempo_trabajo_minutos_editado=$tiempo_trabajo_minutos_temporal-$tiempo_total_minutos_temporal;
 				if( method_exists('Conf','GetConf') && ( (1000*$tiempo_trabajo_minutos_editado)%(1000*Conf::GetConf($sesion,'Intervalo'))!=0 ) )
 				{
@@ -200,14 +228,28 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 				{
 					$tiempo_total_minutos_temporal+=$tiempo_trabajo_minutos_editado;
 				}
+				//echo " Editado: ".$tiempo_trabajo_minutos_editado."<br>";
+
+
+				if($tiempo_trabajo_minutos_editado >= 1440)
+					$dia_sobrepasado = true;
 				$t[$i]->Edit('duracion_cobrada',UtilesApp::Decimal2Time($tiempo_trabajo_minutos_editado/60));
+				
+				
 			}
 
-			if($t[$i]->Write())
+			
+		}
+		for($i=0; $i<count($id); ++$i)
+		{
+			if(!$dia_sobrepasado && $t[$i]->Write())
 			{
 				++$contadorModificados;
 			}
 		}
+
+		if($dia_sobrepasado)				
+				$pagina->AddError(__('No se pudo modificar los ').__('trabajo').'s. '.__('Una duración sobrepasó las 24 horas.'));
 		if($contadorModificados == 1)
 		{
 			$pagina->AddInfo(__('Trabajo').' '.__('Guardado con exito'));

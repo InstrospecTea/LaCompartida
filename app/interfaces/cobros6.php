@@ -1301,16 +1301,29 @@ function AgregarFactura(idx){
 									<td align="center" colspan="2">
 										<?=__('Idioma')?>: <?= Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","lang",$cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'],'','',80);?>
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> Word" onclick="return VerDetalles(this.form);" \>
+										<?php
+											if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
+											{
+										?>
+										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> Word" onclick="return VerDetalles(this.form);" />
 										<br>
-										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return VerDetallesPDF(this.form);" \>
+										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return VerDetallesPDF(this.form);" />
+										<?php
+											}
+											else
+											{
+										?>
+										<input type="submit" class="btn" value="<?=__('Descargar Archivo')?>" onclick="return VerDetalles(this.form);" />
+										<?php		
+											}
+										?>
 										<br>
-										<input type="submit" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="return DescargarExcel(this.form);" \>
+										<input type="submit" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="return DescargarExcel(this.form);" />
 										<br>
 										<?
 										if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' )
 										{ ?>
-									<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form, 'especial');" \>
+									<input type="submit" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="return DescargarExcel(this.form, 'especial');" />
 								<? } ?>
 									</td>
 								</tr>

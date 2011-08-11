@@ -99,8 +99,10 @@
 		{
 			$anchodoc = $pdf->get_width();
 		}
-		$margin_body = $img_alto -25;
+		$margin_body = ceil(($img_alto + $img_y )/2) +10;
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
 		<style type="text/css">			
@@ -118,7 +120,7 @@
 			}
 		</style>
 	</head>
-	<body style="margin-top: <?php echo $margin_body; ?>px;">
+	<body style="margin-top: <?php echo $margin_body; ?>pt;">
 		<script type="text/php">
 		   if ( isset($pdf) )
 		   {
@@ -132,7 +134,7 @@
 				}
 				else
 				{
-					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", ( $anchodoc-  <?php echo ($img_ancho ); ?> ) / 2, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
+					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", ( $anchodoc -  <?php echo ($img_ancho ); ?> ) / 2, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
 				}
 			} 
 			
@@ -152,7 +154,9 @@
 	</body>
 </html>
 <?php
+		$cambio_html = array("<br size=\"1\" class=\"separador_vacio_salto\">" => '<div style="page-break-after: always;"></div>');
 		$html = ob_get_clean(); 
+		$html = strtr($html, $cambio_html);
 		$dompdf->load_html($html);
 		$dompdf->set_paper(strtolower($cobro->fields['opc_papel']), 'portrait'); //letter, landscape
 		$dompdf->render();

@@ -1514,11 +1514,18 @@ function UpdateCap(monto_update, guardar)
 									<input type="button" class="btn" value="<?=__('Descargar Archivo')?>" onclick="ImprimirCobro(this.form);" />
 								</td>
 							</tr>
+							<?php
+								if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
+								{
+							?>							
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return ImprimirCobroPDF(this.form);" />
 								</td>
 							</tr>
+							<?php
+								}
+							?>
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="ImprimirExcel(this.form);" />
