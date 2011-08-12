@@ -106,7 +106,6 @@
 		}
 		if($opcion == "guardar")
 		{
-			if( empty($RUT_cliente) ) $pagina->AddError(__('Debe ingresar el').' '.__('RUT').' '.__('del cliente.'));
 			if( empty($cliente) )			$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
 			
 			$errores = $pagina->GetErrors();
@@ -714,12 +713,6 @@ function Validar(form)
 		}
 <? } ?>
 		
-		if( form.RUT_cliente.value == "")
-		{
-			alert("<?=__('Debe ingresar el').' '.__('RUT').' '.__('del cliente.')?>");
-			form.RUT_cliente.focus();
-			return false;
-		}
 		if( form.cliente.value == "" )
 		{
 			alert("<?=__('Debe ingresar la razon social del cliente.')?>");

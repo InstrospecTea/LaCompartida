@@ -8965,7 +8965,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else
 					$html = str_replace('%td_tarifa%', '', $html);
 					
-				if( $this->fields['opc_ver_detalles_por_hora_tarifa'] == 1 )
+				if( $this->fields['opc_ver_detalles_por_hora_importe'] == 1 )
 					$html = str_replace('%td_importe%', '<td align="center">%importe%</td>', $html);
 				else
 					$html = str_replace('%td_importe%', '', $html);
