@@ -403,6 +403,9 @@ function Refrescar(id_foco)
 	var factura = $('factura').value;
 	var proceso = $('proceso').value;
 	var codigo_cliente = $('codigo_cliente').value;
+	var codigo_asunto = $('codigo_asunto').value;
+	var forma_cobro = $('forma_cobro').value;
+	var tipo_liquidacion = $('tipo_liquidacion').value;
 	var id_usuario = $('id_usuario').value;
 	var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
 	var id_cobro = $('id_cobro').value;
@@ -430,7 +433,7 @@ function Refrescar(id_foco)
 	else
 		echo "var pagina_desde = '';";
 ?>
-	var url = "seguimiento_cobro.php?id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_cobro="+id_cobro+"&codigo_cliente="+codigo_cliente+"&opc=buscar"+pagina_desde+"&usar_periodo="+usar_periodo+"&rango="+rango+"&proceso="+proceso+"&fecha_ini="+fecha_ini+"&fecha_mes="+fecha_mes+"&fecha_anio="+fecha_anio+"&fecha_fin="+fecha_fin+"&estado="+estado+orden+"&id_foco="+id_foco;
+	var url = "seguimiento_cobro.php?id_usuario="+id_usuario+"&tipo_liquidacion="+tipo_liquidacion+"&forma_cobro="+forma_cobro+"&id_usuario_secundario="+id_usuario_secundario+"&id_cobro="+id_cobro+"&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto+"&opc=buscar"+pagina_desde+"&usar_periodo="+usar_periodo+"&rango="+rango+"&proceso="+proceso+"&fecha_ini="+fecha_ini+"&fecha_mes="+fecha_mes+"&fecha_anio="+fecha_anio+"&fecha_fin="+fecha_fin+"&estado="+estado+orden+"&id_foco="+id_foco;
 
 	self.location.href = url;
 } 
