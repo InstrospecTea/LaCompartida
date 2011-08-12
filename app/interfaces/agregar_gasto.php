@@ -137,7 +137,7 @@
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
 		$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
+		$gasto->Edit("fecha_factura",$fecha_factura ? Utiles::fecha2sql($fecha_factura) : "");
 		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
 		
 		
@@ -308,7 +308,7 @@ function Validar(form)
 	{
 		alert('<?=__('Debe seleccionar un cliente')?>');
 		form.codigo_cliente.focus();
-    	return false;
+		return false;
 	}
 
 	if($('campo_codigo_asunto').value == '')
@@ -339,6 +339,17 @@ function Validar(form)
 		form.descripcion.focus();
 		return false;
 	}
+<?php
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
+	{
+?>
+	if(form.descripcion.value != "")
+	{
+		form.descripcion.value=form.descripcion.value.toUpperCase();
+	}
+<?php
+	}
+?>
 
 	var radio_choice = false;
 	for( i=0; i < form.id_moneda.options.length; i++ )
@@ -695,8 +706,9 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 		<td align=left>
 			<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['codigo_factura_gasto'] && $gasto->fields['codigo_factura_gasto'] != 'NULL') ? $gasto->fields['codigo_factura_gasto'] : '' ?>" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=$gasto->fields['fecha_factura'] ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura_asociada" style="cursor:pointer" />
+			<?=__('Fecha Factura')?>
+			<input type="text" name="fecha_factura" value="<?=( isset( $gasto->fields['fecha_factura']) && strlen($gasto->fields['fecha_factura']) > 0 ? Utiles::sql2date($gasto->fields['fecha_factura']) : '') ?>" id="fecha_factura" size="11" maxlength="10" />
+			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura" style="cursor:pointer" />
 		</td>
 	</tr>
 <?
@@ -930,13 +942,13 @@ if (document.getElementById('img_fecha'))
 		}
 	);
 }
-if (document.getElementById('fecha_factura_asociada'))
+if (document.getElementById('fecha_factura'))
 {
 	Calendar.setup(
 		{
-			inputField	: "fecha_factura_asociada",				// ID of the input field
+			inputField	: "fecha_factura",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_factura_asociada"		// ID of the button
+			button			: "img_fecha_factura"		// ID of the button
 		}
 	);
 }

@@ -503,91 +503,102 @@ function Refrescar( text )
 
 function Validar(form)
 {
-<?
-			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-			{
-				echo "if(!form.codigo_asunto_secundario.value){";
-			}
-			else
-			{
-				echo "if(!form.codigo_asunto.value){";
-			}
+<?php
+	if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+	{
 ?>
-			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
-<?
-			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-			{
-				echo "form.codigo_asunto_secundario.focus();";
-			}
-			else
-			{
-				echo "form.codigo_asunto.focus();";
-			}
+	if(!form.codigo_asunto_secundario.value)
+	{
+		alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
+		form.codigo_asunto_secundario.focus();
+		return false;
+	}
+<?php
+	}
+	else
+	{
 ?>
-			return false;
-    } 
-    if(!form.fecha.value)
-    {
-        alert("<?=__('Debe ingresar una fecha.')?>");
-        form.fecha.focus();
-        return false;
-    }
-    
-    if(!form.lista_tramite.value)
-    {
-        alert("<?=__('Debe seleccionar un Tipo Trámite')?>");
-        form.lista_tramite.focus();
-        return false;
-    }
-    
-   
- <?
+	if(!form.codigo_asunto.value)
+	{
+		alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
+		form.codigo_asunto.focus();
+		return false;
+	}
+<?php
+	}
+?>
+	
+	if(!form.fecha.value)
+	{
+		alert("<?=__('Debe ingresar una fecha.')?>");
+		form.fecha.focus();
+		return false;
+	}
+	
+	if(!form.lista_tramite.value)
+	{
+		alert("<?=__('Debe seleccionar un Tipo Trámite')?>");
+		form.lista_tramite.focus();
+		return false;
+	}
+	
 	//Revisa el Conf si esta permitido y la función existe
-	?>
 	if(form.como_trabajo.checked)
-	{ <?
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
-		{
-	?>
-				var dur=form.duracion.value.replace(",",".");
-				if(isNaN(dur))
-				{
-					alert("<?=__('Solo se aceptan valores numéricos')?>");
-					form.duracion.focus();
-					return false;
-				}
-				var decimales=dur.split(".");
-				if(decimales[1].length > 1)
-				{
-					alert("<?=__('Solo se permite ingresar un decimal')?>");
-					form.duracion.focus();
-					return false;
-				}
-	<?
-		}
+	{
+<?php
+	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
+	{
 ?>
- }
-
+		var dur=form.duracion.value.replace(",",".");
+		if(isNaN(dur))
+		{
+			alert("<?=__('Solo se aceptan valores numéricos')?>");
+			form.duracion.focus();
+			return false;
+		}
+		var decimales=dur.split(".");
+		if(decimales[1].length > 1)
+		{
+			alert("<?=__('Solo se permite ingresar un decimal')?>");
+			form.duracion.focus();
+			return false;
+		}
+<?php
+	}
+?>
+	}
+	
 	//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
 	if(form.id_cobro.value != '' && $('id_tramite').value != '')
 	{
-		<?
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) ) 
-			{ ?> 
-				if(ActualizaCobro(form.codigo_asunto_secundario.value))
-					return true;
-				else
-					return false;
-	<? 	} 
-		else 
-			{ ?> 
-				if(ActualizaCobro(form.codigo_asunto.value))
-					return true;
-				else
-					return false;
-	<? } ?> 
-	}
-<?
+<?php
+	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) ) 
+	{
+?> 
+		if(ActualizaCobro(form.codigo_asunto_secundario.value))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+<?php
+	}else{ 
+?> 
+		if(ActualizaCobro(form.codigo_asunto.value))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+<?php
+	} 
+?> 
+	}	
+<?php
 	if (method_exists('Conf','GetConf'))
 	{
 		$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -600,7 +611,7 @@ function Validar(form)
 	{
 		$Ordenado_por = 0;
 	}
-
+	
 	if($Ordenado_por==1)
 	{
 ?> 
@@ -610,12 +621,15 @@ function Validar(form)
 		form.solicitante.focus();
 		return false;
 	}
-<?
-	} 
-	//Se pasa todo a mayúscula por conf
-	if ( ( method_exists('Conf','TodoMayuscula') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
+<?php
+	}
+	
+	if ( (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
 	{
-		echo "form.descripcion.value=form.descripcion.value.toUpperCase();";
+?>
+	//Se pasa todo a mayúscula por configuración
+	form.descripcion.value=form.descripcion.value.toUpperCase();
+<?php
 		if (method_exists('Conf','GetConf'))
 		{
 			$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -630,8 +644,13 @@ function Validar(form)
 		}
 
 		if ($Ordenado_por!=0)
-			echo "form.solicitante.value=form.solicitante.value.toUpperCase();";
+		{
+?>
+	form.solicitante.value=form.solicitante.value.toUpperCase();
+<?php
+		}
 	}
+
 	// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
 	if (!$permiso_cobranza->fields['permitido'])
 	{
@@ -646,8 +665,9 @@ function Validar(form)
 		$('fecha').focus;
 		return false;
 	}
-<?
+<?php
 	}
+	
 	//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
 	if(isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo')
 	{
@@ -656,11 +676,12 @@ function Validar(form)
 	/*if(string.search('/ingreso_tramite.php') > 0)//revisa que esté en la página de ingreso de trámites
 		if(!confirm('Está modificando un trámite, desea continuar?'))
 			return false;*/
-<?
+<?php
 	}
-?> 
-form.action='ingreso_tramite.php'
-form.submit();
+?>
+	
+	form.action='ingreso_tramite.php'
+	form.submit();
 
 	return true;
 }
