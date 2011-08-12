@@ -79,6 +79,10 @@
 			$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 		}
 
+		if( $id_cia && ( method_exists('Conf','dbUser') && Conf::dbUser() == "rebaza" ) )
+		{
+			$where .= " AND factura.id_cia = '$id_cia' ";
+		}
 		if($razon_social){
 			$where .= " AND factura.cliente LIKE '%".$razon_social."%'";
 		}
@@ -90,43 +94,43 @@
 		$where = base64_decode($where);
 
 	$query = "SELECT cliente.glosa_cliente
-					, fecha
-					, prm_documento_legal.codigo as tipo
-					, numero
-					, '' glosa_asunto
-					, '' codigo_asunto
-					, usuario.username AS encargado_comercial
-					, descripcion
-					, factura.id_cobro
-					, prm_moneda.simbolo
-					, prm_moneda.cifras_decimales
-					, prm_moneda.tipo_cambio
-					, factura.id_moneda
-					, factura.honorarios
-					, factura.subtotal_gastos
-					, factura.subtotal_gastos_sin_impuesto
-					, '' as subtotal
-					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
-					, '' as monto_pagos_moneda_base
-					, '' as saldo_moneda_base
-					, factura.id_factura
-					, '' as fecha_ultimo_pago
-					, prm_estado_factura.codigo as estado
-					, prm_estado_factura.glosa as estado_glosa
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-				WHERE $where";
+						, fecha
+						, prm_documento_legal.codigo as tipo
+						, numero
+						, '' glosa_asunto
+						, '' codigo_asunto
+						, usuario.username AS encargado_comercial
+						, descripcion
+						, factura.id_cobro
+						, prm_moneda.simbolo
+						, prm_moneda.cifras_decimales
+						, prm_moneda.tipo_cambio
+						, factura.id_moneda
+						, factura.honorarios
+						, factura.subtotal_gastos
+						, factura.subtotal_gastos_sin_impuesto
+						, '' as subtotal
+						, factura.iva
+						, total
+						, '' as saldo_pagos
+						, cta_cte_fact_mvto.saldo as saldo
+						, '' as monto_pagos_moneda_base
+						, '' as saldo_moneda_base
+						, factura.id_factura
+						, '' as fecha_ultimo_pago
+						, prm_estado_factura.codigo as estado
+						, prm_estado_factura.glosa as estado_glosa
+						, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+					FROM factura
+					JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+					JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+					LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+					LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+					LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+					LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+					LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+					LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+					WHERE $where";
 
 	$lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 	if($lista_suntos_liquidar->num == 0)

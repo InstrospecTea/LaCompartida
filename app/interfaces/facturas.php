@@ -76,7 +76,7 @@
 			
 /*			if($codigo_cliente)
 				{
-				$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+					$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 				}
 */			if($codigo_cliente)
 				{
@@ -97,6 +97,10 @@
 			if($id_contrato)
 				{
 					$where .= " AND cobro.id_contrato=".$id_contrato." ";
+				}
+			if($id_cia && ( method_exists('Conf','dbUser') && Conf::dbUser() == "rebaza" ) )
+				{
+					$where .= " AND factura.id_cia = '$id_cia' ";
 				}
 			if($id_cobro)
 				{
@@ -438,7 +442,6 @@ $class_diseno = '';
         </td>
         <td colspan="3" align=left nowrap>
 <?
-
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
@@ -447,7 +450,6 @@ $class_diseno = '';
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
-
 ?>
        </td>
     </tr>
@@ -509,6 +511,24 @@ $class_diseno = '';
 			<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="id_cobro" name="id_cobro" size="15" value="<?=$id_cobro?>">
 		</td>
 	</tr>
+	<?php 
+	if( method_exists('Conf','dbUser') && Conf::dbUser() == "rebaza" )
+	{ ?>
+		<tr>
+			<td align=right>
+				<?=__('Companía')?>
+			</td>
+			<td align=left width="18%">
+				<select name="id_cia" id="id_cia" value="<?=$id_cia ?>">
+					<option value="">Todos</option>
+					<option value="1">Rebaza Alcazar</option>
+					<option value="2">Acerta</option>
+				</select>
+			</td>
+		</tr>
+	<?php 
+	}
+	?>
 	<tr>
 		<td align=right>
 			<?=__('Fecha Inicio')?>
