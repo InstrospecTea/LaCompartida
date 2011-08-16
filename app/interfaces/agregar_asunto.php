@@ -992,10 +992,10 @@ if($motivo == "agregar_proyecto")
 	{
 		global $sesion;
 
-		$glosa = $asunto->fields[glosa_asunto];
-		$codigo = $asunto->fields[codigo_asunto];
-		$cod_cliente = $asunto->fields[codigo_cliente];
-		$desc = $asunto->fields[descripcion_asunto];
+		$glosa = $asunto->fields['glosa_asunto'];
+		$codigo = $asunto->fields['codigo_asunto'];
+		$cod_cliente = $asunto->fields['codigo_cliente'];
+		$desc = $asunto->fields['descripcion_asunto'];
 
 		$query = "SELECT glosa_cliente FROM cliente WHERE codigo_cliente='$cod_cliente'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -1005,18 +1005,29 @@ if($motivo == "agregar_proyecto")
 			$MailSistema = Conf::GetConf($sesion,'MailSistema');
 		else if( method_exists('Conf','MailSistema') )
 			$MailSistema = Conf::MailSistema();
-
-		$query = "SELECT usuario.nombre,usuario.email FROM usuario LEFT JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo=1 AND usuario_permiso.codigo_permiso='ADM'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		while(list($nombre,$email) = mysql_fetch_array($resp))
+		
+		if( UtilesApp::GetConf($sesion,'MailAsuntoNuevoATodosLosAdministradores') )
 		{
-
+			$query = "SELECT usuario.nombre,usuario.email FROM usuario LEFT JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo=1 AND usuario_permiso.codigo_permiso='ADM'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			while(list($nombre,$email) = mysql_fetch_array($resp))
+			{
+				$from = Conf::AppName();
+				$headers = "From: Time & Billing <". $MailSistema .">" . "\r\n" .
+							 "Reply-To: " . $MailSistema . "\r\n" .
+							 'X-Mailer: PHP/' . phpversion();
+				$mensaje = "Estimado(a) $nombre,\nse ha agregado el asunto $glosa ($codigo) al cliente $cliente en el sistema de Time & Billing.\nDescripción: $desc\nRecuerda refrescar las listas de la aplicación local Time & Billing.";
+				Utiles::Insertar( $sesion, "Nuevo asunto - ".Conf::AppName(), $mensaje, $email, $nombre);
+			}
+		}
+		else
+		{
 			$from = Conf::AppName();
 			$headers = "From: Time & Billing <". $MailSistema .">" . "\r\n" .
-						 "Reply-To: " . $MailSistema . "\r\n" .
-						 'X-Mailer: PHP/' . phpversion();
-
-			$mensaje = "Estimado(a) $nombre,\nse ha agregado el asunto $glosa ($codigo) al cliente $cliente en el sistema de Time & Billing.\nDescripción: $desc\nRecuerda refrescar las listas de la aplicación local Time & Billing.";
+							 "Reply-To: " . $MailSistema . "\r\n" .
+							 'X-Mailer: PHP/' . phpversion();
+			$mensaje = "Estimado(a) Admin,\nse ha agregado el asunto $glosa ($codigo) al cliente $cliente en el sistema de Time & Billing.\nDescripción: $desc\nRecuerda refrescar las listas de la aplicación local Time & Billing.";
+			$email = UtilesApp::GetConf($sesion,'MailAdmin');
 			Utiles::Insertar( $sesion, "Nuevo asunto - ".Conf::AppName(), $mensaje, $email, $nombre);
 		}
 	}
