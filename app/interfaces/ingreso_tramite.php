@@ -1256,7 +1256,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 						&nbsp;
 						<?=__('Ordenado por')?>
 						&nbsp;
-						<input type="text" name="solicitante" value="<?=$t->fields['solicitante'] ? $t->fields['solicitante'] : ''?>" id="solicitante" size="32" />
+						<input type="text" name="solicitante" value="<?=$t->fields['solicitante'] ? $t->fields['solicitante'] : $solicitante?>" id="solicitante" size="32" />
 <?
 						} //   
 ?>

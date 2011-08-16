@@ -367,7 +367,7 @@ class Contrato extends Objeto
 	}
 
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
-	function Write()
+	function Write( $enviar_mail_asunto_nuevo = true )
 	{
 		$this->error = "";
 		if(!$this->Check())
@@ -441,46 +441,49 @@ class Contrato extends Objeto
 										LIMIT 1";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			
-			// Mandar un email al encargado comercial
-			if (method_exists('Conf','GetConf'))
+			if( $enviar_mail_asunto_nuevo )
 			{
-				$CorreosModificacionAdminDatos = Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
-			}
-			else if (method_exists('Conf','CorreosModificacionAdminDatos'))
-			{
-				$CorreosModificacionAdminDatos = Conf::CorreosModificacionAdminDatos();
-			}
-			else
-			{
-				$CorreosModificacionAdminDatos = '';
-			}
-			if ($CorreosModificacionAdminDatos != '')
-			{
-				// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
-				$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=".$this->fields['id_usuario_responsable'];
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				if(list($nombre,$email) = mysql_fetch_array($resp))
+				// Mandar un email al encargado comercial
+				if (method_exists('Conf','GetConf'))
 				{
-					$email .= ','.$CorreosModificacionAdminDatos;
-								 
-					$subject = 'Creación de contrato'; 
-
-					// Obtener el nombre del cliente asociado al contrato.
-					$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
-					$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
-					list($nombre_cliente) = mysql_fetch_array($resp2);
-
-					// Revisar si el contrato está asociado a algún asunto.
-					$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
-					$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
-					if(list($glosa_asunto) = mysql_fetch_array($resp2))
-						$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
-					else
-						$asunto_contrato = '';
-					$mensaje = "Estimado ".$nombre.": \r\n   El contrato del cliente ".$nombre_cliente.$asunto_contrato." ha sido creado por ".$this->sesion->usuario->fields['nombre'].' '.$this->sesion->usuario->fields['apellido1'].' '.$this->sesion->usuario->fields['apellido2']." el día ".date('d-m-Y')." a las ".date('H:i')." en el sistema de Time & Billing.";
-						
-					Utiles::Insertar( $this->sesion, $subject, $mensaje, $email, $nombre, false);
+					$CorreosModificacionAdminDatos = Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
+				}
+				else if (method_exists('Conf','CorreosModificacionAdminDatos'))
+				{
+					$CorreosModificacionAdminDatos = Conf::CorreosModificacionAdminDatos();
+				}
+				else
+				{
+					$CorreosModificacionAdminDatos = '';
+				}
+				if ($CorreosModificacionAdminDatos != '')
+				{
+					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
+					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=".$this->fields['id_usuario_responsable'];
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+					if(list($nombre,$email) = mysql_fetch_array($resp))
+					{
+						$email .= ','.$CorreosModificacionAdminDatos;
+									 
+						$subject = 'Creación de contrato'; 
+	
+						// Obtener el nombre del cliente asociado al contrato.
+						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
+						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
+						list($nombre_cliente) = mysql_fetch_array($resp2);
+	
+						// Revisar si el contrato está asociado a algún asunto.
+						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
+						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
+						if(list($glosa_asunto) = mysql_fetch_array($resp2))
+							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
+						else
+							$asunto_contrato = '';
+						$mensaje = "Estimado ".$nombre.": \r\n   El contrato del cliente ".$nombre_cliente.$asunto_contrato." ha sido creado por ".$this->sesion->usuario->fields['nombre'].' '.$this->sesion->usuario->fields['apellido1'].' '.$this->sesion->usuario->fields['apellido2']." el día ".date('d-m-Y')." a las ".date('H:i')." en el sistema de Time & Billing.";
+							
+						Utiles::Insertar( $this->sesion, $subject, $mensaje, $email, $nombre, false);
 					}
+				}
 			}
 		}
 		return true;
