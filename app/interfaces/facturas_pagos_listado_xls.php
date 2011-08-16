@@ -121,8 +121,12 @@
 	$query = "SELECT
 					 factura.id_factura
 					, prm_documento_legal.codigo as tipo
-					, factura.numero
-					, factura.fecha as fecha_factura
+					, factura.numero";
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+	{
+		$query .= "			, cliente as cliente_facturable";
+	}
+	$query .= "			, factura.fecha as fecha_factura
 					, cliente.glosa_cliente
 					, usuario.username AS encargado_comercial
 					, prm_estado_factura.codigo as estado_factura
@@ -287,6 +291,11 @@
 		// titulos celdas
 		if(in_array($col_name[$i],array('glosa_cliente')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Cliente'); }
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			if(in_array($col_name[$i],array('cliente_facturable')) ) {
+				$arr_col[$col_name[$i]]['titulo'] = __('Cliente Facturable'); }
+		}
 		if(in_array($col_name[$i],array('glosa_asunto')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Asuntos'); }
 		else if(in_array($col_name[$i],array('encargado_comercial')) ) {

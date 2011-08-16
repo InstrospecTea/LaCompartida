@@ -136,6 +136,11 @@
 		$gasto->Edit("id_usuario_orden",$id_usuario_orden ? $id_usuario_orden : $sesion->usuario->fields[id_usuario]);
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
+
+		if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
+		{ 
+			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada; 
+		}
 		$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
 		$gasto->Edit("fecha_factura",$fecha_factura ? Utiles::fecha2sql($fecha_factura) : "");
 		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
@@ -697,7 +702,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 	}
 ?>
 	<?
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') ) || ( method_exists('Conf','FacturaAsociada') && Conf::FacturaAsociada() ) )
+	if( UtilesApp::GetConf($sesion,'FacturaAsociada') )
 	{
 ?>
 	<tr>
@@ -705,10 +710,29 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Factura asociada')?>
 		</td>
 		<td align=left>
-			<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['codigo_factura_gasto'] && $gasto->fields['codigo_factura_gasto'] != 'NULL') ? $gasto->fields['codigo_factura_gasto'] : '' ?>" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<?=__('Fecha Factura')?>
-			<input type="text" name="fecha_factura" value="<?=( isset( $gasto->fields['fecha_factura']) && strlen($gasto->fields['fecha_factura']) > 0 ? Utiles::sql2date($gasto->fields['fecha_factura']) : '') ?>" id="fecha_factura" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura" style="cursor:pointer" />
+			<?
+			if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
+			{
+				$numero_factura = explode('-',$gasto->fields['codigo_factura_gasto']);
+				if(sizeof($numero_factura) == 2)
+				{
+					$pre_numero_factura_asociada = $numero_factura[0];
+					$post_numero_factura_asociada = $numero_factura[1];
+				}
+			?>
+				<input name="pre_numero_factura_asociada" size=3 maxlength=3 value="<?=$pre_numero_factura_asociada? $pre_numero_factura_asociada:''?>" />
+				<span>-</span>
+				<input name="post_numero_factura_asociada" size=10 maxlength=10 value="<?=$post_numero_factura_asociada? $post_numero_factura_asociada:''?>" />
+				
+			<?} else {?>
+				<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['codigo_factura_gasto'] && $gasto->fields['codigo_factura_gasto'] != 'NULL') ? $gasto->fields['codigo_factura_gasto'] : '' ?>" />
+			<?}?>
+			
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=($gasto->fields['fecha_factura'] && $gasto->fields['fecha_factura']!='NULL') ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
+			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura_asociada" style="cursor:pointer" />
 		</td>
 	</tr>
 <?

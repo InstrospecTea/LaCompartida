@@ -7,11 +7,53 @@
     require_once Conf::ServerDir().'/../app/classes/CtaCteFactMvto.php';
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
 		require_once Conf::ServerDir().'/../app/classes/Cobro.php';
+		require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
     $sesion = new Sesion('');
     #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 		
-		if( $accion == "existen_borradores" )
+		if( $accion == "cargar_moneda_contrato" )
+		{
+			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
+			{
+				$dato_cliente = "codigo_cliente_secundario";
+				$dato_asunto  = "codigo_asunto_secundario";
+			}
+			else
+			{
+				$dato_cliente = "codigo_cliente";
+				$dato_asunto  = "codigo_asunto";
+			}
+			if( !empty($codigo_asunto) )
+			{
+				$query = "SELECT prm_moneda.simbolo, prm_moneda.id_moneda, tramite_valor.tarifa 
+										FROM contrato 
+										JOIN asunto USING( id_contrato ) 
+							 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = contrato.id_moneda_tramite 
+							 LEFT JOIN tramite_valor ON 
+							 					 tramite_valor.id_moneda = contrato.id_moneda_tramite AND 
+							 					 tramite_valor.id_tramite_tipo = '$id_tramite_tipo' AND 
+							 					 tramite_valor.id_tramite_tarifa = contrato.id_tramite_tarifa 
+									 WHERE asunto.".$dato_asunto." = '$codigo_asunto' ";
+			}
+			else
+			{
+				$query = "SELECT prm_moneda.simbolo, prm_moneda.id_moneda, tramite_valor.tarifa 
+										FROM contrato 
+										JOIN cliente USING( id_contrato ) 
+							 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = contrato.id_moneda_tramite 
+							 LEFT JOIN tramite_valor ON 
+							 					 tramite_valor.id_moneda = contrato.id_moneda_tramite AND 
+							 					 tramite_valor.id_tramite_tipo = '$id_tramite_tipo' AND 
+							 					 tramite_valor.id_tramite_tarifa = contrato.id_tramite_tarifa 
+									 WHERE cliente.".$dato_cliente." = '$codigo_cliente' ";
+			}
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+			list( $simbolo, $id_moneda, $tarifa ) = mysql_fetch_array($resp);
+			
+			echo $simbolo."//".$id_moneda."//".$tarifa;
+		}
+		else if( $accion == "existen_borradores" )
 		{
 			$query = "SELECT count(*) FROM cobro WHERE estado = 'CREADO' OR estado = 'EN REVISION'";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);

@@ -961,8 +961,8 @@ class Migracion
 		}
 	
 		$contrato->Edit("activo", $contrato_generar->fields["activo_contrato"] ? 'SI' : 'NO');
-		$contrato->Edit("usa_impuesto_separado", $contrato_generar->fields["impuesto_separado"] ? '1' : '0');
-		$contrato->Edit("usa_impuesto_gastos", $contrato_generar->fields["impuesto_gastos"] ? '1' : '0');
+		$contrato->Edit("usa_impuesto_separado", $contrato_generar->fields["usa_impuesto_separado"] ? '1' : '0');
+		$contrato->Edit("usa_impuesto_gastos", $contrato_generar->fields["usa_impuesto_gastos"] ? '1' : '0');
 
 		$contrato->Edit("glosa_contrato", $contrato_generar->fields["glosa_contrato"]);
 		$contrato->Edit("codigo_cliente",
@@ -2046,6 +2046,8 @@ class Migracion
 			$gasto->Edit("ingreso", $monto);
 			$gasto->Edit("monto_cobrable", $monto);
 		}
+		
+		$id_proveedor = $this->DeterminarProveedorGasto( $gasto_generar->fields['proveedor_ruc'], $gasto->fields['proveedor_rsocial']);
 
 		if(!empty($gasto_generar->fields['egreso']))
 		{
@@ -2115,6 +2117,29 @@ class Migracion
 		}
 		
 		echo "Gasto " . $gasto->fields['id_movimiento'] . " guardado\n";
+	}
+
+	public function DeterminarProveedorGasto($ruc, $rsocial)
+	{
+		if( !empty($ruc) && !empty($rsocial) )
+		{
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM($rut) AND TRIM(glosa) = TRIM($rsocial)";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($id_proveedor) = mysql_fetch_array($resp);
+		}
+		else if( !empty($ruc) )
+		{
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM($ruc) ORDER BY id_proveedor ASC LIMIT 1";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($id_proveedor) = mysql_fetch_array($resp);
+		}
+		else
+		{
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(glosa) = TRIM($rsocial) ORDER BY id_proveedor ASC LIMIT 1";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($id_proveedor) = mysql_fetch_array($resp);
+		}
+		return $id_proveedor;
 	}
 
 	public function ValidarGasto($gasto)

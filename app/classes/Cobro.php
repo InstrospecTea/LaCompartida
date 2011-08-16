@@ -430,13 +430,15 @@ class Cobro extends Objeto
                                    tramite.fecha,
                                    tramite.codigo_asunto,
                                    tramite.id_tramite_tipo,
-                                   tramite_tipo.glosa_tramite as glosa_tramite 
+                                   tramite_tipo.glosa_tramite as glosa_tramite,
+                                   tramite.id_moneda_tramite_individual,
+                                   tramite.tarifa_tramite_individual 
                                FROM tramite
                                JOIN tramite_tipo USING( id_tramite_tipo )
                                WHERE tramite.id_cobro = '".$this->fields['id_cobro']."'
                                ORDER BY tramite.fecha ASC";
-			 if( !$mantener_porcentaje_impuesto )	
-			 	$lista_tramites = new ListaTramites($this->sesion,'',$query);
+				if( !$mantener_porcentaje_impuesto )
+					$lista_tramites = new ListaTramites($this->sesion,'',$query);
 
        for($z=0;$z<$lista_tramites->num;$z++)
 				{
@@ -451,7 +453,11 @@ class Cobro extends Objeto
                $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar'] = Funciones::MejorTramiteTarifa($this->sesion,$tramite->fields['id_tramite_tipo'],$this->fields['id_moneda'],$this->fields['id_cobro']);
            }
            $tramite->Edit('id_moneda_tramite',$this->fields['id_moneda']);
-           $tramite->Edit('tarifa_tramite',$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa']);
+           if( $tramite->fields['tarifa_tramite_individual'] > 0 )
+           	 $valor_tramite = number_format( $tramite->fields['tarifa_tramite_individual'] * ( $cobro_moneda->moneda[$tramite->fields['id_moneda_tramite_individual']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','');
+           else
+           	 $valor_tramite = $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'];
+           $tramite->Edit('tarifa_tramite',$valor_tramite);
            $tramite->Edit('tarifa_tramite_defecto',$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto']);
            $tramite->Edit('tarifa_tramite_estandar',$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 

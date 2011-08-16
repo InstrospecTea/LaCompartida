@@ -180,6 +180,8 @@
 		{ 
 			return "SELECT
 									IdGastoLemontech																																	as gasto_FFF_id_movimiento,
+									rucproveedor																																			as gasto_FFF_proveedor_ruc,
+									razonsocialproveedor																															as gasto_FFF_proveedor_rsocial,
 									CodigoGasto																																				as gasto_FFF_numero_documento, 
 									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro,

@@ -95,6 +95,10 @@
 		$col_fecha_envio = $indice_columnas++;
 		$col_cobro = $indice_columnas++;
 		$col_factura = $indice_columnas++;
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			$col_cliente_facturable = $indice_columnas++;
+		}
 		$col_moneda = $indice_columnas++;
 		$col_monto = $indice_columnas++;
 		$col_monto_honorarios_pesos = $indice_columnas++;
@@ -114,6 +118,10 @@
 		$ws1->setColumn($col_cobro, $col_cobro, 14);
 		$ws1->setColumn($col_asuntos, $col_asuntos, 30);
 		$ws1->setColumn($col_factura, $col_factura, 10);
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			$ws1->setColumn($col_cliente_facturable, $col_cliente_facturable, 30);
+		}
 		$ws1->setColumn($col_moneda, $col_moneda, 14);
 		$ws1->setColumn($col_monto, $col_monto, 14);
 		$ws1->setColumn($col_monto_honorarios_pesos, $col_monto_honorarios_pesos, 30);
@@ -259,6 +267,10 @@
 				$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 				$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
+				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+				{
+					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+				}
 				$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 				$ws1->write($filas, $col_monto, __('Monto'), $titulo_filas);
 				$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Honorarios en Pesos'), $titulo_filas);
@@ -294,6 +306,10 @@
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
+					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+					{
+						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 					$ws1->write($filas, $col_monto, __('Monto'), $titulo_filas);
 					$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Honorarios en Pesos'), $titulo_filas);
@@ -331,6 +347,10 @@
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
+					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+					{
+						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 					$ws1->write($filas, $col_monto, __('Monto Honorarios'), $titulo_filas);
 					$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Gastos'), $titulo_filas);
@@ -405,6 +425,10 @@
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
+					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+					{
+						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 					$ws1->write($filas, $col_monto, __('Monto Honorarios'), $titulo_filas);
 					$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Gastos'), $titulo_filas);
@@ -441,6 +465,10 @@
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
+					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+					{
+						$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
+					}
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 					$ws1->write($filas, $col_monto, __('Monto Honorarios'), $titulo_filas);
 					$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Gastos'), $titulo_filas);
@@ -450,6 +478,24 @@
 				}
 			}
 			++$filas;
+			// Nombres de clientes segun facturas asociadas al cobro;
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+				$facturas = "";
+				$clientes_factura = "";
+				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo FROM factura f JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  WHERE f.id_cobro = '" . $cobro['id_cobro'] . "'";
+				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
+				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura )  = mysql_fetch_array($resp3))
+				{
+					if( strlen( $facturas ) > 0 )
+					{
+						$facturas .= "\n";
+						$clientes_factura .= "\n";
+					}
+					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " . $numero_factura : " "  );
+					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
+				}
+			}
 			if($nombre_cliente != $cobro['glosa_cliente']||$nueva_tabla)
 			{
 				if($cliente_creado)
@@ -499,7 +545,16 @@
 			$ws1->write($filas, $col_fecha_envio, Utiles::sql2date($cobro['fecha_enviado_cliente']), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
-			$ws1->write($filas, $col_factura, $cobro['documento'] ? $cobro['documento'] : '-', $txt_centro);
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+			{
+				$ws1->write($filas, $col_factura, $facturas, $fecha);
+				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
+			}
+			else
+			{
+				//$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
+				$ws1->write($filas, $col_factura, $cobro['documento'] ? $cobro['documento'] : '-', $txt_centro);
+			}
 			$ws1->write($filas, $col_moneda, $cobro['simbolo'], $txt_centro);
 
 			if($sin_desglose||($desglosar_por_encargado&&!$desglosar_por_moneda))

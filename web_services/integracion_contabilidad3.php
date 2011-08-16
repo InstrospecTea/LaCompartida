@@ -184,7 +184,7 @@ function ListaCobrosFacturados($usuario,$password)
 											LEFT JOIN carta ON carta.id_carta=cobro.id_carta
 											LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 											LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-											WHERE cobro.informado = 'SI'
+											WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
 											GROUP BY cobro.id_cobro";
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '','Error SQL.','');
@@ -274,7 +274,8 @@ function ListaCobrosFacturados($usuario,$password)
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
 
 			//Actualizo los datos:
-			$query_actualiza = "UPDATE cobro SET fecha_informado = NOW() WHERE id_cobro = '".$id_cobro."'";
+			$query_actualiza = "UPDATE cobro SET fecha_contabilidad = NOW() WHERE id_cobro = '".$id_cobro."'";
+
 			$respuesta = mysql_query($query_actualiza, $sesion->dbh) or Utiles::errorSQL($query_actualiza, __FILE__, __LINE__, $sesion->dbh);
 
 			$query_facturas = " SELECT

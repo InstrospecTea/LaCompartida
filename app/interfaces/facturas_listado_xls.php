@@ -96,8 +96,12 @@
 	$query = "SELECT cliente.glosa_cliente
 						, fecha
 						, prm_documento_legal.codigo as tipo
-						, numero
-						, '' glosa_asunto
+						, numero";
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+	{
+		$query .= "			, cliente as cliente_facturable";
+	}
+	$query .= "			, '' glosa_asunto
 						, '' codigo_asunto
 						, usuario.username AS encargado_comercial
 						, descripcion
@@ -131,7 +135,6 @@
 					LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 					WHERE $where";
-
 	$lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 	if($lista_suntos_liquidar->num == 0)
 		$pagina->FatalError('No existe información con este criterio');
@@ -260,6 +263,11 @@
 		// titulos celdas
 		if(in_array($col_name[$i],array('glosa_cliente')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Cliente'); }
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
+		{
+			if(in_array($col_name[$i],array('cliente_facturable')) ) {
+				$arr_col[$col_name[$i]]['titulo'] = __('Cliente Facturable'); }
+		}
 		if(in_array($col_name[$i],array('glosa_asunto')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Asuntos'); }
 		else if(in_array($col_name[$i],array('encargado_comercial')) ) {

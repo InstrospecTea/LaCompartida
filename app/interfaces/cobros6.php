@@ -270,9 +270,6 @@
 		if($facturado == 1 && !$cobro->fields['fecha_facturacion'])
 			$cobro->Edit('fecha_facturacion',date('Y-m-d H:i:s'));
 
-		if($informado == 1)
-			$cobro->Edit('informado','SI');
-
 		$cobro->Edit('facturado', $facturado ? $facturado : 0);
 		$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 		$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
@@ -994,7 +991,7 @@ function AgregarFactura(idx){
 						<?=__('Avance del Cobro')?>:&nbsp;&nbsp;
 						<!-- <br/><br/><?=__('Forma de cobro')?>: <?= $cobro->fields['forma_cobro'] ?> -->
 					</td>
-					<td align="left" style="font-size: 11px; font-weight: bold;">
+					<td align="left" style="font-size: 11px; font-weight: bold;" colspan=2>
 						<table cellpadding="3">
 							<tr height=3>
 								<?=TArriba("BORRADOR",$cobro->fields['estado'])?>
@@ -1335,8 +1332,32 @@ function AgregarFactura(idx){
 					<td align=right style="vertical-align: top;" nowrap>
 						<?=__('Cambiar a')?>:&nbsp;&nbsp;
 					</td>
-					<td align=left style="vertical-align: top;">
+					<td align=left style="vertical-align: top;" width="170px">
 						<?= Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden",'estado',$cobro->fields['estado'],'onchange="RevisarPagado(this.value);"','',150); ?>
+					</td>
+					<td align=left style="vertical-align: top;">
+
+						<? if( UtilesApp::GetConf($sesion,'InformarContabilidad') ){?>
+							<div align=left>
+								<input type=button value="<?=__('Informar a Contabilidad')?>" />
+								&nbsp;
+								<input type=button value="<?=__('Informar y Facturar')?>" />
+								
+								<span id="estado_contabilidad">
+								<? if($cobro->fields['estado_contabilidad']=='POR INFORMAR') 
+								{
+								?>
+									<?=__('Por informar')?>
+								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR') {?>
+									<?=__('Para informar')?>
+								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR Y FACTURAR') {?>
+									<?=__('Para informar y facturar')?>
+								<?} else {?>
+									<?=__('Informado')?>
+								<?}?>
+								</span>
+							</div>
+						<?} else {?> &nbsp; <?} ?>
 					</td>
 				</tr>
 			</table>
@@ -1654,19 +1675,6 @@ function AgregarFactura(idx){
 							<input type="hidden" id="gastos_sin_iva_disponibles" value="<?=$saldo_disponible_gastos_sin_impuestos?>"/>
 							</td>
 						</tr>
-						<? if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'InformarContabilidad')){?>
-							<tr>
-								<td align=center>
-									<? if($cobro->fields['informado']=='NO') 
-									{
-									?>
-										<?=__('Informar')?>: <input type="checkbox" value="1" name="informado" />
-									<?} else {?>
-										<?=__('Informado a Contabilidad')?>
-									<?}?>
-								</td>
-							</tr>
-						<?}?>
 					</table>
 					<?
 				}

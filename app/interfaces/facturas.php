@@ -521,8 +521,8 @@ $class_diseno = '';
 			<td align=left width="18%">
 				<select name="id_cia" id="id_cia" value="<?=$id_cia ?>">
 					<option value="">Todos</option>
-					<option value="1">Rebaza Alcazar</option>
-					<option value="2">Acerta</option>
+					<option value="1" <?=$id_cia==1 ? 'selected' : '' ?>>Rebaza Alcazar</option>
+					<option value="2" <?=$id_cia==2 ? 'selected' : '' ?>>Acerta</option>
 				</select>
 			</td>
 		</tr>

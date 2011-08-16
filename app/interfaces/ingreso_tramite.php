@@ -251,7 +251,16 @@
 				$t->Edit("id_usuario",$id_usuario);
 				$tramite->Edit("id_usuario",$id_usuario);
 				}
-				
+			
+			if( $monto_modificar == "1")
+			{
+				$tramite->Edit("tarifa_tramite_individual",$tarifa_tramite_individual);
+			}
+			else
+			{
+				$tramite->Edit("tarifa_tramite_individual", "0");
+			}
+			$tramite->Edit("id_moneda_tramite_individual",$id_moneda_tramite_individual);
 			$tramite->Edit("trabajo_si_no",$como_trabajo);
 			$tramite->Edit("id_tramite_tipo",$lista_tramite);
 
@@ -260,9 +269,8 @@
 			$asunto->LoadByCodigo($tramite->fields['codigo_asunto']);
 			$contrato = new Contrato($sesion);
 			$contrato->Load($asunto->fields['id_contrato']);
-			$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda']);
-			if(!$tramite->fields['tarifa_tramite'])
-				$tramite->Edit('tarifa_tramite', Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda'], $codigo_asunto));
+			$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda_tramite']);
+			$tramite->Edit('tarifa_tramite', Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto));
 			if($t) {
 			if(!$t->fields['tarifa_hh'])
 				$t->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
@@ -426,6 +434,24 @@ function ShowTime()
 		}
 }
 
+function ModificarMonto( tipo ) 
+{
+	if( tipo == "modificar" )
+	{
+		$('tr_tarifa_mod').style.display = "table-row";
+		$('modificar_monto').style.display = "none";
+		$('usar_monto_original').style.display = "inline";
+		$('monto_modificar').value = "1";
+	}
+	else
+	{
+		$('tr_tarifa_mod').style.display = "none";
+		$('modificar_monto').style.display = "inline";
+		$('usar_monto_original').style.display = "none";
+		$('monto_modificar').value = "0";
+	}
+}
+
 function Confirmar(form, id_trab)
 {
 			var r=confirm("Está modificando un trámite, desea continuar?");
@@ -452,6 +478,42 @@ function Confirmar(form, id_trab)
 				{
 				return false;
 				}
+}
+
+function CargarMonedaContrato()
+{ 
+	var id_tramite_tipo = $('lista_tramite').value;
+	<?php
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
+		{ ?>
+			var codigo_asunto = $('codigo_asunto_secundario').value;
+			var codigo_cliente = $('codigo_cliente_secundario').value;
+<?php }
+		else
+		{ ?>
+			var codigo_asunto = $('codigo_asunto').value;
+			var codigo_cliente = $('codigo_cliente').value;
+<?php } ?>
+
+	var http = getXMLHTTP();
+	var vurl = 'ajax.php?accion=cargar_moneda_contrato&id_tramite_tipo='+id_tramite_tipo+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente;
+	
+	cargando = true;
+	http.open('get', vurl, true);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			var response = http.responseText;
+			
+			response = response.split('//');
+			$('simbolo_moneda_contrato').value = response[0];
+			$('id_moneda_contrato').value = response[1];
+			$('tarifa_tramite').value = response[2];
+		}
+		cargando = false;
+	};
+	http.send(null);
 }
 
 function SetDuracionDefecto( form )
@@ -684,14 +746,6 @@ function Validar(form)
 	form.submit();
 
 	return true;
-}
-
-function IngresarNuevo(form)
-{
-	form.opcion.value = 'nuevo';
-	form.id_trabajo.value = '';
-	var url="semana.php?popup=1&semana="+form.semana.value+"&id_usuario="+<?=$id_usuario?>+"&opcion=nuevo";
-	self.location.href = url;
 }
 
 function CambiaDuracion(form, input)
@@ -983,12 +1037,20 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 </div>
 <!-- Fin calendario DIV -->
 
+<?php
+	if( $tramite->fields['tarifa_tramite_individual'] > 0 )
+		$monto_modificar = "1";
+	else
+		$monto_modificar = "0";
+?>
+
 <form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?=$_SERVER[PHP_SELF]?>">
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type=hidden name=max_hora id=max_hora value=14 />
 <input type=hidden name='codigo_asunto_hide' id=codigo_asunto_hide value="<?=$tramite->fields['codigo_asunto']?>" />
+<input type=hidden name='monto_modificar' id='monto_modificar' value="<?=$monto_modificar ?>" />
 <?
 	if( $opcion != 'nuevo' )
 	{
@@ -1126,11 +1188,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarMonedaContrato();CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
 		}
 		else
 		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarMonedaContrato();CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
 		}
 	}
 ?>
@@ -1144,11 +1206,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarMonedaContrato();CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
 					}
 					else
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $tramite->fields['codigo_asunto'] ? $tramite->fields['codigo_asunto'] : $codigo_asunto ,"","CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $tramite->fields['codigo_asunto'] ? $tramite->fields['codigo_asunto'] : $codigo_asunto ,"","CargarMonedaContrato();CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 
 ?>
@@ -1159,7 +1221,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     ?>
     <tr nowrap>
     	<td align=right nowrap>Tipo Trámite </td><td width="440" align=left id='seleccion_tramite_text_2'>
-    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange=SetDuracionDefecto(this.form);','',320);?>
+    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
 			</td>
 		</tr>
   	<?
@@ -1293,12 +1355,61 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
 			WHERE $where GROUP BY id_usuario ORDER BY nombre"
 		,"id_usuario",$id_usuario,'','','width="200"');
+
+if( $tramite->fields['id_tramite'] > 0 )
+{
+	$query = "SELECT prm_moneda.simbolo, prm_moneda.id_moneda, tramite_valor.tarifa 
+										FROM contrato 
+										JOIN asunto USING( id_contrato ) 
+							 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = contrato.id_moneda_tramite 
+							 LEFT JOIN tramite_valor ON 
+							 					 tramite_valor.id_moneda = contrato.id_moneda_tramite AND 
+							 					 tramite_valor.id_tramite_tipo = '".$tramite->fields['id_tramite_tipo']."' AND 
+							 					 tramite_valor.id_tramite_tarifa = contrato.id_tramite_tarifa 
+									 WHERE asunto.codigo_asunto = '".$tramite->fields['codigo_asunto']."' "; 
+	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	list($simbolo_moneda_tramite_contrato, $id_moneda_tramite_contrato, $tarifa_tramite_contrato) = mysql_fetch_array($resp);
+}
+
+if( $tramite->fields['tarifa_tramite_individual'] > 0 )
+{
+	$display_tr_mod = 'style="display: table-row;"';
+	$display_buton_modificar_monto = 'style="display: none;"';
+	$display_buton_usar_monto_original = 'style="display: inline;"';
+}
+else
+{
+	$display_tr_mod = 'style="display: none;"';
+	$display_buton_modificar_monto = 'style="display: inline;"';
+	$display_buton_usar_monto_original = 'style="display: none;"';
+}
 ?>
 
 			</tr>
 		</table>
         </td>
     </tr>
+    <tr>
+    	<td align="right">
+    		<?=__('Valor según tarifa')?>
+    	</td>
+    	<td align="left">
+    		<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?=$tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'?>" />
+    		<input type="text" size="2" id="simbolo_moneda_contrato" disabled style="background-color: white; display: inline; border: 0px;" value="<?=$simbolo_moneda_tramite_contrato != '' ? $simbolo_moneda_tramite_contrato : ''?>" />
+     		<img id="modificar_monto" <?=$display_buton_modificar_monto ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Modificar Monto')?>" border=0 style="cursor:pointer" onclick="ModificarMonto('modificar');">
+			  <img id="usar_monto_original" <?=$display_buton_usar_monto_original ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="ModificarMonto('cancelar');"/>
+			</td>
+    </tr>
+    <tr id="tr_tarifa_mod" <?=$display_tr_mod ?>>
+    	<td align="right">
+    		<?=__('Tarifa modificado')?>
+    	</td>
+    	<td align="left">
+    		<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?=$tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'?>" />
+    		<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda","id_moneda_tramite_individual",$tramite->fields['id_moneda_tramite_individual'] ? $tramite->fields['id_moneda_tramite_individual'] : '0','','','70')?>
+       </td>
+    </tr>
+    <input type="hidden" name="id_moneda_contrato" id="id_moneda_contrato" value="1" />
     <tr>
         <td align=right>
         	<?

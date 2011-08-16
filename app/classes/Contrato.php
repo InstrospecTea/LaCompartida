@@ -193,8 +193,8 @@ class Contrato extends Objeto
 			$query_select = " , (SUM( TIME_TO_SEC( duracion ) ) /3600) AS horas_trabajadas ";
 		}
 		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 AS horas_por_cobrar,
-								(SUM(TIME_TO_SEC(duracion_cobrada)* usuario_tarifa.tarifa/3600)) AS monto_por_cobrar
-								$query_select
+										(SUM(TIME_TO_SEC(duracion_cobrada)* usuario_tarifa.tarifa/3600)) AS monto_por_cobrar
+										$query_select
 								FROM trabajo
 								JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
 								JOIN contrato on asunto.id_contrato = contrato.id_contrato
@@ -216,20 +216,29 @@ class Contrato extends Objeto
 			list($horas_por_cobrar,$monto_por_cobrar) = mysql_fetch_row($resp);
 		}
 		
-		$query = "SELECT tramite_valor.tarifa, tramite.duracion 
+		$query = "SELECT 
+									SUM(IF( 
+										tramite.tarifa_tramite_individual > 0, 
+										tramite.tarifa_tramite_individual * ( moneda_tramite_individual.tipo_cambio / moneda_contrato.tipo_cambio ), 
+										tramite_valor.tarifa 
+										)) as monto_por_cobrar_tramite,
+									SUM(TIME_TO_SEC(tramite.duracion))/3600 AS horas_por_cobrar_tramite
 								FROM tramite
 								JOIN asunto on tramite.codigo_asunto = asunto.codigo_asunto
 								JOIN contrato on asunto.id_contrato = contrato.id_contrato 
+								JOIN prm_moneda as moneda_tramite_individual ON moneda_tramite_individual.id_moneda = tramite.id_moneda_tramite_individual 
+								JOIN prm_moneda as moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda 
 								JOIN tramite_tipo on tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo 
-								JOIN tramite_valor ON (tramite.id_tramite_tipo=tramite_valor.id_tramite_tipo AND contrato.id_moneda_tramite=tramite_valor.id_moneda AND contrato.id_tramite_tarifa=tramite_valor.id_tramite_tarifa)
+								JOIN tramite_valor ON (tramite.id_tramite_tipo=tramite_valor.id_tramite_tipo AND contrato.id_moneda=tramite_valor.id_moneda AND contrato.id_tramite_tarifa=tramite_valor.id_tramite_tarifa)
 								LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
 								WHERE tramite.fecha <= '$fecha_fin' AND (cobro.estado IS NULL) 
 									AND tramite.cobrable=1 
-									AND contrato.id_contrato = '$id_contrato'";
+									AND contrato.id_contrato = '$id_contrato'
+								GROUP BY contrato.id_contrato";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		while( list($tarifa, $duracion)=mysql_fetch_array($resp) )
+		while( list($monto_por_cobrar_tramite, $horas_por_cobrar_tramite)=mysql_fetch_array($resp) )
 			{
-				$monto_por_cobrar += $tarifa;
+				$monto_por_cobrar += $monto_por_cobrar_tramite;
 			}
 		$horas_por_cobrar += $horas_por_cobrar_tramite;
 		
