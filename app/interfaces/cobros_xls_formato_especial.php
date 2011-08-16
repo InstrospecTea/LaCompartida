@@ -205,10 +205,17 @@
 
 	$ws =& $wb->addWorksheet('Reporte');
 	// Seteamas el ancho de las columnas
-	$ws->setLandscape();
+	$ws->setPortrait();
+	# $ws->setLandscape;
+	// margenes
+	$ws->setMarginLeft(0.25);
+	$ws->setMarginRight(0.25);
+	$ws->setMarginTop(0.75);
+	$ws->setMarginBottom(0.75);
+	$ws->fitToPages(1,1);
 	$ws->hideGridlines();
 	$ws->hideScreenGridlines();
-	$ws->setColumn(0, 0, 5);
+	$ws->setColumn(0, 0, 2);
 	$ws->setColumn($col_asunto, $col_asunto, 30);
 	foreach($col_abogados as $id => $col)
 		$ws->setColumn($col, $col, 12);

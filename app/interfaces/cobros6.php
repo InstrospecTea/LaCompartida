@@ -423,7 +423,7 @@
 			}
 			else
 			{
-				if( UtilesApp::GetConf($sesion,'XLSFormatoEspecial') != "cobros_xls_formato_especial" )
+				if( UtilesApp::GetConf($sesion,'XLSFormatoEspecial') != "cobros_xls_formato_especial.php" )
 				{
 					require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
 				}

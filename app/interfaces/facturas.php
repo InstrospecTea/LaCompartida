@@ -128,42 +128,52 @@
 		else
 			$where = base64_decode($where);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS *
-					
-					, prm_documento_legal.codigo as tipo
-					, numero
-					, cliente.glosa_cliente
-					, fecha
-					, usuario.username AS encargado_comercial
-					, descripcion
-					, prm_estado_factura.codigo as estado
-					, factura.id_cobro
-					, prm_moneda.simbolo
-					, prm_moneda.cifras_decimales
-					, prm_moneda.tipo_cambio
-					, factura.id_moneda
-					, factura.honorarios
-					, factura.subtotal_gastos
-					, factura.subtotal_gastos_sin_impuesto
-					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
-					, '' as monto_pagos_moneda_base
-					, '' as saldo_moneda_base
-					, factura.id_factura
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+		$query = "SELECT SQL_CALC_FOUND_ROWS * 
+					, prm_documento_legal.codigo as tipo 
+					, numero 
+					, cliente.glosa_cliente 
+					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ), 
+								factura.cliente, 
+								IF( contrato.factura_razon_social IN ('',' '),
+										factura.cliente, 
+										IF( contrato.factura_razon_social IS NULL, 
+												factura.cliente, 
+												CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')') 
+											) 
+									) 
+							) as factura_rsocial 
+					, fecha , usuario.username AS encargado_comercial
+					, fecha 
+					, usuario.username AS encargado_comercial 
+					, descripcion 
+					, prm_estado_factura.codigo as estado 
+					, factura.id_cobro 
+					, prm_moneda.simbolo 
+					, prm_moneda.cifras_decimales 
+					, prm_moneda.tipo_cambio 
+					, factura.id_moneda 
+					, factura.honorarios 
+					, factura.subtotal_gastos 
+					, factura.subtotal_gastos_sin_impuesto 
+					, factura.iva 
+					, total 
+					, '' as saldo_pagos 
+					, cta_cte_fact_mvto.saldo as saldo 
+					, '' as monto_pagos_moneda_base 
+					, '' as saldo_moneda_base 
+					, factura.id_factura 
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social 
+				FROM factura 
+				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal) 
+				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda 
+				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado 
+				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura 
+				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro 
+				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente 
+				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato 
+				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable 
 							WHERE $where";
-
+		
 		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_saldo_total = 0;
 		$glosa_monto_saldo_total = '';
@@ -190,7 +200,7 @@
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
 		$b->AgregarEncabezado("numero",__('N° Factura'),"align=right width=30px");
-		$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left width=40px");
+		$b->AgregarEncabezado("factura_rsocial",__('Cliente'),"align=left width=40px");
 		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
 		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
@@ -217,7 +227,7 @@
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
 		return $html_opcion;
 	}
-	
+
 	function SubTotal(& $fila)
 	{
 		$subtotal = $fila->fields['honorarios'] +$fila->fields['subtotal_gastos'] +$fila->fields['subtotal_gastos_sin_impuesto'];
@@ -300,18 +310,6 @@
 		return  $lista_asuntos_glosa;
 	}
 
-	function GlosaCliente(& $fila)
-	{
-		//por defecto se muestra la glosa del cliente
-		// si el rut de la factura no es el mismo que el rut del cobro (que viene del contrato), se agrega entre parentesis la razon social de la factura
-		$glosa_cliente = $fila->fields['glosa_cliente'];
-		if($fila->fields['mostrar_diferencia_razon_social']!='no')
-		{
-			$glosa_cliente .= "<br />(".$fila->fields['mostrar_diferencia_razon_social'].")";
-		}
-		return $glosa_cliente;
-	}
-	
 	function funcionTR(& $fila)
 	{
 		global $sesion;
@@ -328,7 +326,10 @@
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],'%d-%m-%y')."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
-		$html .= "<td align=left>".GlosaCliente(& $fila)."</td>";
+		if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
+			$html .= "<td align=left>".$fila->fields['factura_rsocial']."</td>";
+		else
+			$html .= "<td align=left>".$fila->fields['glosa_cliente']."</td>";
 		$html .= "<td align=left>".GlosaAsuntos(& $fila, $sesion)."</td>";
 		$html .= "<td align=left>".$fila->fields['encargado_comercial']."</td>";
 		$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
