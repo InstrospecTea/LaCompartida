@@ -13,10 +13,14 @@ if( $argv[1] != 'ambienteprueba' )
 if( method_exists( 'Conf','EsAmbientePrueba' ) && Conf::EsAmbientePrueba() )
 	{
 		/* Query para borrar factura */
-		$query = "DELETE FROM factura 
-							 WHERE 1";
+		$query = "TRUNCATE TABLE  `cta_cte_fact_mvto_neteo`;";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		echo 'Facturas borrado.<br>';
+		echo 'Neteos borrados.<br>';
+		
+		/* Query para borrar factura */
+		$query = "TRUNCATE TABLE  `cta_cte_fact_mvto`;";
+		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		echo 'Movimientos borrados.<br>';
 		
 		/* Query para borrar los neteos de documentos */
 		$query = "DELETE FROM neteo_documento WHERE 1";
@@ -27,6 +31,17 @@ if( method_exists( 'Conf','EsAmbientePrueba' ) && Conf::EsAmbientePrueba() )
 		$query = "DELETE FROM documento WHERE 1";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		echo 'Documentos borrado.<br>';
+		
+		/* Query para borrar factura */
+		$query = "TRUNCATE TABLE `factura_pago`;";
+		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		echo 'Facturas Pagos borrado.<br>';
+		
+		/* Query para borrar factura */
+		$query = "DELETE FROM factura 
+							 WHERE 1";
+		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		echo 'Facturas borrado.<br>';
 		
 		/* Elimina todos los entradas en cobro_asunto */
 		$query = "DELETE FROM cobro_asunto WHERE 1";
