@@ -96,7 +96,7 @@
 	</td>
 	<td>
 		<input type=hidden id="moneda_<?=$mon->fields['id_moneda']?>" name="moneda_<?=$mon->fields['id_moneda']?>" value="<?=$mon->fields['tipo_cambio']?>"/>
-		<input type=text class=txt_input size=10 value="<?=$mon->fields['tipo_cambio']?>" <?=$mon->fields['moneda_base'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
+		<input type=text class=txt_input size=10 value="<?=$mon->fields['tipo_cambio']?>" <?=$mon->fields['tipo_cambio_referencia'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
 		<!-- onchange="GrabarCampo('moneda','<?=$mon->fields['id_moneda']?>',this.value,'<?=$mon->fields['glosa_moneda']?>');" -->
 	</td>
 </tr>

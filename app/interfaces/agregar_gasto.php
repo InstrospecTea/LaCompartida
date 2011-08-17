@@ -142,7 +142,7 @@
 			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada; 
 		}
 		$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura",$fecha_factura ? Utiles::fecha2sql($fecha_factura) : "");
+		$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
 		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
 		
 		
@@ -966,13 +966,13 @@ if (document.getElementById('img_fecha'))
 		}
 	);
 }
-if (document.getElementById('fecha_factura'))
+if (document.getElementById('fecha_factura_asociada'))
 {
 	Calendar.setup(
 		{
-			inputField	: "fecha_factura",				// ID of the input field
+			inputField	: "fecha_factura_asociada",				// ID of the input field
 			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_factura"		// ID of the button
+			button			: "img_fecha_factura_asociada"		// ID of the button
 		}
 	);
 }
