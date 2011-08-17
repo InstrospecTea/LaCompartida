@@ -262,9 +262,6 @@
 				}
 			}
 
-
-
-
 			if(!$sin_area&&empty($cobro['id_area_proyecto']))
 			{
 				$filas += 2;
