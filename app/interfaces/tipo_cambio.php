@@ -26,7 +26,7 @@
 			$moneda->Load($mon->fields['id_moneda']);			
 			//echo "valor " . $moneda->fields['glosa_moneda'] . ": " . ${"valor_".$moneda->fields['id_moneda']} . "<br />";
  			//$moneda->Edit('moneda_base','0'); //ya no se permite cambiar moneda base
-			if( $moneda->fields['moneda_base'] == 1 )
+			if( $moneda->fields['tipo_cambio_referencia'] == 1 )
 			{
 				$moneda->Edit('tipo_cambio', '1');
 			}
