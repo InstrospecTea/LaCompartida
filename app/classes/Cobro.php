@@ -2340,7 +2340,7 @@ class Cobro extends Objeto
 				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%',$nombre_encargado,$html2);
-				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html);
+				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
 			break;
 
 			case 'ADJ':
@@ -6935,7 +6935,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%',$nombre_encargado,$html2);
-				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html);
+				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
 				$simbolo_opc_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
 				$html2 = str_replace('%simbolo_opc_moneda_totall%',$simbolo_opc_moneda_total,$html2);
 
