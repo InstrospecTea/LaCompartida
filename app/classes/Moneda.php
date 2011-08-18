@@ -25,6 +25,100 @@ class Moneda extends Objeto
 		return true;
 	}
 
+	function GetGlosaMonedaBase(&$sesion)
+	{
+		$query = "SELECT glosa_moneda FROM prm_moneda WHERE moneda_base = 1";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($glosa_moneda)= mysql_fetch_array($resp))
+			return $glosa_moneda;
+	  else
+			return false;
+	}
+	
+	function GetGlosaPluralMonedaBase(&$sesion)
+	{
+		$query = "SELECT glosa_moneda_plural FROM prm_moneda WHERE moneda_base = 1";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($glosa_moneda_plural)= mysql_fetch_array($resp))
+			return $glosa_moneda_plural;
+	  else
+			return false;
+	}
+	
+	function GetSimboloMoneda(&$sesion,$id_moneda)
+	{
+		$query = "SELECT simbolo FROM prm_moneda WHERE id_moneda = '$id_moneda'";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($simbolo) = mysql_fetch_array($resp))
+			return $simbolo;
+		else
+			return false;
+	}
+	
+	function GetMonedaBase(&$sesion)
+	{
+		$query = "SELECT id_moneda FROM prm_moneda WHERE moneda_base = 1";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($id_moneda)= mysql_fetch_array($resp))
+			return $id_moneda;
+	  else
+			return false;	
+	}
+	
+	function GetTipoCambioMoneda (&$sesion, $id_moneda)
+	{
+	  $query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda='$id_moneda'";
+	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	  if(list($tipo_cambio)= mysql_fetch_array($resp))
+			return $tipo_cambio;
+	  else
+			return false;	
+	}
+	
+	function GetMonedaTarifaPorDefecto(&$sesion)
+	{
+		if( method_exists('Conf','GetConf') )
+			{
+				$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTarifaPorDefecto')."'";
+				$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				if(list($id_moneda) = mysql_fetch_array($resp))
+					return $id_moneda;
+				else
+					return false;
+			}
+		else
+			return false;
+	}
+
+	function GetMonedaTotalPorDefecto(&$sesion)
+	{
+		if( method_exists('Conf','GetConf') )
+		{
+			$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTotalPorDefecto')."'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			if(list($id_moneda) = mysql_fetch_array($resp))
+				return $id_moneda;
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+	
+	function GetMonedaTramitePorDefecto(&$sesion)
+	{
+		if( method_exists('Conf','GetConf') )
+		{
+			$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTramitePorDefecto')."'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			if(list($id_moneda) = mysql_fetch_array($resp))
+				return $id_moneda;
+			else
+				return false;
+		}
+		else
+			return false;
+	}
 }
 
 class ListaMonedas extends Lista
@@ -34,72 +128,6 @@ class ListaMonedas extends Lista
         $this->Lista($sesion, 'Moneda', $params, $query);
     }
 }
-
-function GetMonedaBase(&$sesion)
-{
-	$query = "SELECT id_moneda FROM prm_moneda WHERE moneda_base = 1";
-	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	if(list($id_moneda)= mysql_fetch_array($resp))
-		return $id_moneda;
-  else
-		return false;	
-}
-
-function GetMonedaTarifaPorDefecto(&$sesion)
-{
-	if( method_exists('Conf','GetConf') )
-		{
-			$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTarifaPorDefecto')."'";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			if(list($id_moneda) = mysql_fetch_array($resp))
-				return $id_moneda;
-			else
-				return false;
-		}
-	else
-		return false;
-}
-
-function GetMonedaTotalPorDefecto(&$sesion)
-{
-	if( method_exists('Conf','GetConf') )
-	{
-		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTotalPorDefecto')."'";
-		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($id_moneda) = mysql_fetch_array($resp))
-			return $id_moneda;
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-function GetMonedaTramitePorDefecto(&$sesion)
-{
-	if( method_exists('Conf','GetConf') )
-	{
-		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '".Conf::GetConf($sesion,'MonedaTramitePorDefecto')."'";
-		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($id_moneda) = mysql_fetch_array($resp))
-			return $id_moneda;
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-function GetTipoCambioMoneda (&$sesion, $id_moneda)
-{
-  $query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda='$id_moneda'";
-  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-  if(list($tipo_cambio)= mysql_fetch_array($resp))
-		return $tipo_cambio;
-  else
-		return false;	
-}
-
 
 function ArregloMonedas($sesion)
   {

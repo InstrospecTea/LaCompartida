@@ -629,7 +629,7 @@ else
 			<?=__('Proveedor')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT id_proveedor, glosa FROM prm_proveedor","id_proveedor", $gasto->fields['id_proveedor'] ? $gasto->fields['id_proveedor'] : '0', '','Cualquiera',"160"); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_proveedor, glosa FROM prm_proveedor ORDER BY glosa","id_proveedor", $gasto->fields['id_proveedor'] ? $gasto->fields['id_proveedor'] : '0', '','Cualquiera',"160"); ?>
 			<a href='javascript:void(0)' onclick="AgregarProveedor();" title="Agregar Proveedor"><img src="<?=Conf::ImgDir()?>/agregar.gif" border=0 ></a>
 		</td>
 	</tr>

@@ -193,29 +193,32 @@
 		$cont_filas_cliente = 0;
 		$total_cliente = 0;
 		$total_moneda = 0;
-		$query = "SELECT cobro.fecha_enviado_cliente,
+		$query = "SELECT 
+					cobro.fecha_enviado_cliente,
 					cobro.fecha_emision,
 					cliente.glosa_cliente,
 					cobro.documento,
 					CONCAT(usuario.nombre, ' ', usuario.apellido1) AS nombre,
 					documento.saldo_honorarios,
 					documento.saldo_gastos,
-					documento.saldo_honorarios*cobro_moneda.tipo_cambio as saldo_honorarios_pesos,
-					documento.saldo_gastos*cobro_moneda.tipo_cambio as saldo_gastos_pesos,
+					documento.saldo_honorarios*(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) as saldo_honorarios_pesos,
+					documento.saldo_gastos*(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) as saldo_gastos_pesos,
 					cobro.estado,
 					cobro.id_cobro,
-					prm_moneda.simbolo,
-					prm_moneda.glosa_moneda,
+					documento_moneda.simbolo,
+					documento_moneda.glosa_moneda,
 					documento.id_moneda,
-					cobro.id_moneda_base,
+					moneda_base.id_moneda as id_moneda_base,
 					cobro.modalidad_calculo
 				FROM cobro
 					LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro $where_documento 
 					LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 					LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
-					LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
-					LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro = cobro.id_cobro AND cobro_moneda.id_moneda = documento.id_moneda
+					LEFT JOIN prm_moneda as documento_moneda ON documento_moneda.id_moneda = documento.id_moneda
+					LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
+					LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = documento.id_moneda
+					LEFT JOIN cobro_moneda as cobro_moneda_base ON cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = moneda_base.id_moneda 
 				WHERE $where 
 				ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
@@ -261,7 +264,7 @@
 				++$filas;
 				//se ponen los titulos por tabla
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
-				$ws1->write($filas, $col_total_pesos, __('Total en Pesos'), $titulo_filas);
+				$ws1->write($filas, $col_total_pesos, __('Total en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
@@ -273,8 +276,8 @@
 				}
 				$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 				$ws1->write($filas, $col_monto, __('Monto'), $titulo_filas);
-				$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Honorarios en Pesos'), $titulo_filas);
-				$ws1->write($filas, $col_monto_gastos_pesos, __('Monto Gastos en Pesos'), $titulo_filas);
+				$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Honorarios en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
+				$ws1->write($filas, $col_monto_gastos_pesos, __('Monto Gastos en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$fila_inicial_tabla = $filas+1;
 				$tabla_creada = true;
 			}

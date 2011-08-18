@@ -231,7 +231,7 @@
 	for($v=0; $v < $lista_gastos->num; $v++)
 	{
 		$gasto = $lista_gastos->Get($v);
-		$tipo_cambio = GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
+		$tipo_cambio = Moneda::GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
 		$columna_actual = 0;
 		
 		

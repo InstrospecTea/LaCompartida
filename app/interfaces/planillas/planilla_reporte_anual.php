@@ -1226,20 +1226,20 @@ ORDER BY hrs_declaradas DESC";
 	else
 	{
 		$query ="SELECT
-		if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, 
-		SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cobro_moneda.tipo_cambio ) as total_liquidado, 
-		SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base)
-								/   cobro_moneda.tipo_cambio) as total_tarifa_std 
-		from trabajo
-		JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-		LEFT JOIN cobro_moneda ON (cobro.id_cobro = cobro_moneda.id_cobro AND cobro_moneda.id_moneda = '3')
-		LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-		WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
-		and $where_fecha
-		GROUP BY glosa_cliente2
-		ORDER BY total_liquidado DESC ";
+							if(grupo_cliente.id_grupo_cliente IS NULL,cliente.glosa_cliente, grupo_cliente.glosa_grupo_cliente) as glosa_cliente2, 
+							SUM( ( IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh) * TIME_TO_SEC( duracion_cobrada)/3600 ) * (cobro.monto_trabajos / IF(cobro.forma_cobro='FLAT FEE',IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1)),
+							IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))) ) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cm_cobro.tipo_cambio ) as total_liquidado, 
+							SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) / cm_cobro.tipo_cambio) as total_tarifa_std 
+						from trabajo
+						JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
+						LEFT JOIN cobro_moneda as cm_cobro ON (cobro.id_cobro = cm_cobro.id_cobro AND cm_cobro.id_moneda = '3')
+						LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+						LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+						LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+						WHERE cobro.estado NOT IN ('CREADO', 'EN REVISION','INCOBRABLE')
+						and $where_fecha
+						GROUP BY glosa_cliente2
+						ORDER BY total_liquidado DESC ";
 		$fila_ini = $fila;
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while(list($cliente,$liquidado,$estandar) = mysql_fetch_array($resp))

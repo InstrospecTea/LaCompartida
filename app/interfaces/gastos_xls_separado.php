@@ -307,7 +307,7 @@
 		{
 			$gasto = $lista_gastos->Get($v);
 			
-			$tipo_cambio = GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
+			$tipo_cambio = Moneda::GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
 			if($gasto->fields['egreso'] > 0 )
 				$total_balance_egreso += ($gasto->fields['egreso'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 			if($gasto->fields['ingreso'] > 0)

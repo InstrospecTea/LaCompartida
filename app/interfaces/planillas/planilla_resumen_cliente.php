@@ -173,7 +173,6 @@ $fila_debug = 20;
 						cliente.codigo_cliente as codigo_cliente
 						,cliente.glosa_cliente as glosa_cliente
 						,fecha_emision
-						,id_moneda_base
 						$select_col
 						FROM cobro
 						LEFT JOIN cliente AS cliente ON cobro.codigo_cliente=cliente.codigo_cliente

@@ -510,9 +510,9 @@ function InactivaContrato(alerta, opcion)
 		$fecha_ini = Utiles::sql2date($contrato->fields['periodo_fecha_inicio']);
 		
 	if(!$id_moneda) 
-		$id_moneda = GetMonedaTarifaPorDefecto($sesion);
+		$id_moneda = Moneda::GetMonedaTarifaPorDefecto($sesion);
 	if(!$id_moneda)
-		$id_moneda = GetMonedaBase($sesion);
+		$id_moneda = Moneda::GetMonedaBase($sesion);
 ?>
 
 <!-- COBRANZA -->

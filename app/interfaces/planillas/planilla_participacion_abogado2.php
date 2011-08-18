@@ -465,7 +465,7 @@
 						cobro.documento,
 						cobro.monto_gastos,
 						cobro.id_moneda,
-						cobro.id_moneda_base, 
+						moneda_base.id_moneda as id_moneda_base, 
 						cobro.modalidad_calculo  						
 					FROM cobro
 						LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
@@ -473,6 +473,7 @@
 						LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 						LEFT JOIN prm_moneda as prm_moneda_cobro ON prm_moneda_cobro.id_moneda = cobro.id_moneda
 						LEFT JOIN prm_moneda as prm_moneda_titulo ON prm_moneda_titulo.id_moneda = ".$moneda."
+						LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
 						LEFT JOIN
 							(SELECT id_cobro,tipo_cambio FROM cobro_moneda WHERE id_moneda=".$moneda.")
 							AS cambio ON cambio.id_cobro=cobro.id_cobro

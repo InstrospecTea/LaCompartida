@@ -7,6 +7,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Cliente.php';
+	require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 
 	$sesion = new Sesion(array('REP'));
@@ -185,20 +186,19 @@
 							,cobro.id_cobro
 							,cobro.opc_moneda_total
 							,area.glosa
-							,prm_moneda.simbolo
-							,prm_moneda.id_moneda
+							,moneda_cobro.simbolo
+							,moneda_cobro.id_moneda
 							,cobro.total_minutos
 							,cobro.opc_moneda_total
 							,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
 							,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
-							,IF((SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto) = 0,
-								 (SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto),
-								 ROUND(cobro.monto_subtotal-cobro.descuento,prm_moneda.cifras_decimales))
+							,IF( SUM( TIME_TO_SEC(duracion_cobrada))/60 != cobro.total_minutos,
+								 ( ( ( SUM( TIME_TO_SEC(duracion_cobrada))/60 ) / cobro.total_minutos ) * ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales)),
+								 ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales))
 								 AS monto_proporcional
-							,IF((SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto) = 0,
-								(SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto * cobro.tipo_cambio_moneda),
-								ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,prm_moneda.cifras_decimales) * cobro.tipo_cambio_moneda,0)) AS total_pesos
-							,IF((SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto) = 0,0,1) AS total_pesos_bool
+							,IF( SUM( TIME_TO_SEC(duracion_cobrada))/60 != cobro.total_minutos,
+								( ( ( SUM( TIME_TO_SEC(duracion_cobrada))/60 ) / cobro.total_minutos ) * ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio )),
+								ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales)) AS total_moneda_base
 							FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
@@ -207,14 +207,17 @@
 							LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 							LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN prm_area_proyecto AS area ON area.id_area_proyecto = asunto.id_area_proyecto
-							LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+							LEFT JOIN prm_moneda as moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
+							LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda 
+							LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
+							LEFT JOIN cobro_moneda as cobro_moneda_moneda_base ON cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda 
 							WHERE 1 $query_fecha $query_estado $query_usuarios 
 							GROUP BY cobro.id_cobro, asunto.id_area_proyecto 
 							ORDER BY asunto.id_area_proyecto, cliente.glosa_cliente, cobro.id_cobro;";
 
 		#Clientes
 		$area = '';
-		$area_total_pesos=0;
+		$area_total_moneda_base=0;
 		$sin_area = false; //@todo: esto es temporal
 		$tabla_creada = false;
                 //echo "<script></script>$query";
@@ -232,19 +235,8 @@
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro['id_cobro']);
 			$saldo_monto=$x_resultados['monto'][$cobro['opc_moneda_total']];
 			$saldo_honorarios=$x_resultados['monto_honorarios'][$cobro['opc_moneda_total']];
-			$saldo_total_pesos2=$cobro['total_pesos'];
-			if($cobro['total_pesos_bool']==0)
-			{
-				//(SUM( TIME_TO_SEC(duracion_cobrada))/60 / cobro.total_minutos * cobro.monto * cobro.tipo_cambio_moneda),
-				$saldo_total_pesos=$cobro['duracion_cobrada']/$cobro['total_minutos']*$saldo_monto;
-			}
-			else
-			{
-				$saldo_total_pesos=$saldo_honorarios;
-				//ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,prm_moneda.cifras_decimales) * cobro.tipo_cambio_moneda,0)
-			}
-			//echo "<br>".$cobro['id_cobro']." --> ".$saldo_total_pesos." == ".$saldo_total_pesos2;
-
+			$saldo_total_moneda_base=$cobro['total_moneda_base'];
+			
 			for($i=0;$i<$lista_gastos->num;$i++)
 			{
 				$gasto = $lista_gastos->Get($i);
@@ -278,7 +270,7 @@
 				$ws1->write($filas, $col_duracion_trabajada,__('Duración Trabajada'),$formato_titulo);
 				$ws1->write($filas, $col_duracion_cobrada,__('Duración Cobrada'),$formato_titulo);
 				$ws1->write($filas, $col_ingreso,__('Ingreso'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en Pesos'),$formato_titulo);
+				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en '.Moneda::GetGlosaPluralMonedaBase($sesion)),$formato_titulo);
 				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
 				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
 				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Cobro'),$formato_titulo);
@@ -298,7 +290,7 @@
 					$ws1->writeFormula($filas, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada$fila_inicial:$col_formula_duracion_cobrada$filas)", $formato_tiempo);
 					$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
 					$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
-					$area_total_pesos = 0;
+					$area_total_moneda_base = 0;
 					$area_total_cobros = 0;
 					$total_horas = 0;
 					$total_minutos = 0;
@@ -320,7 +312,7 @@
 				$ws1->write($filas, $col_duracion_trabajada,__('Duración Trabajada'),$formato_titulo);
 				$ws1->write($filas, $col_duracion_cobrada,__('Duración Cobrada'),$formato_titulo);
 				$ws1->write($filas, $col_ingreso,__('Ingreso'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en Pesos'),$formato_titulo);
+				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en '.Moneda::GetGlosaPluralMonedaBase($sesion)),$formato_titulo);
 				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
 				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
 				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Cobro'),$formato_titulo);
@@ -329,7 +321,7 @@
 				$fila_inicial = $filas + 2;
 			}
 			$area_total_cobros += $saldo_gastos;
-			$area_total_pesos += $cobro['total_pesos'];
+			$area_total_moneda_base += $cobro['total_moneda_base'];
 			$area=$cobro['glosa'];
 			$filas +=1;
 			$ws1->write($filas, $col_numero_factura,$cobro['numero'], $formato_texto_centrado);
@@ -341,7 +333,7 @@
 			$ws1->write($filas, $col_duracion_cobrada, str_replace(',', '.', $cobro['duracion']/60/24), $formato_tiempo);
 			$valor_estimado = $cobro['monto_proporcional'];
 			$ws1->writeNumber($filas, $col_ingreso,$valor_estimado,$formatos_moneda[$cobro['id_moneda']]);
-			$ws1->writeNumber($filas, $col_ingreso_en_moneda_base,$saldo_total_pesos,$formatos_moneda[$moneda_base['id_moneda']]);
+			$ws1->writeNumber($filas, $col_ingreso_en_moneda_base,$saldo_total_moneda_base,$formatos_moneda[$moneda_base['id_moneda']]);
 			$ws1->writeNumber($filas, $col_gastos_en_moneda_base,$saldo_gastos,$formatos_moneda[$moneda_base['id_moneda']]);
 			$ws1->write($filas, $col_estado,$cobro['estado'],$formato_texto_centrado);
 			$ws1->write($filas, $col_forma_de_cobro,$cobro['forma_cobro'],$formato_texto_centrado);
@@ -353,7 +345,7 @@
 			$ws1->write($filas, $col_numero_factura,__('Total'), $formato_encabezado);
 			$ws1->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$fila_inicial:$col_formula_duracion_trabajada$filas)", $formato_tiempo);
 			$ws1->writeFormula($filas, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada$fila_inicial:$col_formula_duracion_cobrada$filas)", $formato_tiempo);
-$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
+			$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
 			$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);		}
 		else
 		{

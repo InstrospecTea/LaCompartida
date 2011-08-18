@@ -227,7 +227,7 @@
 		{
 			$gasto = $lista_gastos->Get($v);
 			
-			$tipo_cambio = GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
+			$tipo_cambio = Moneda::GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 			{
 				if($gasto->fields['esCobrable'] == 'Si' ){

@@ -1349,17 +1349,17 @@ else
 		$fecha_ini = Utiles::sql2date($contrato->fields['periodo_fecha_inicio']);
 		
 	if(!$id_moneda )
-		$id_moneda = GetMonedaTarifaPorDefecto($sesion);
+		$id_moneda = Moneda::GetMonedaTarifaPorDefecto($sesion);
 	if(!$id_moneda)
-		$id_moneda = GetMonedaBase($sesion);
+		$id_moneda = Moneda::GetMonedaBase($sesion);
 	
 	if(!$id_moneda_tramite )
-		$id_moneda_tramite = GetMonedaTramitePorDefecto($sesion);
+		$id_moneda_tramite = Moneda::GetMonedaTramitePorDefecto($sesion);
 	
 	if(!$opc_moneda_total)
-		$opc_moneda_total = GetMonedaTotalPorDefecto($sesion);
+		$opc_moneda_total = Moneda::GetMonedaTotalPorDefecto($sesion);
 	if(!$opc_moneda_total)
-		$opc_moneda_total = GetMonedaBase($sesion);
+		$opc_moneda_total = Moneda::GetMonedaBase($sesion);
 	
 	$config_validar_tarifa = ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 

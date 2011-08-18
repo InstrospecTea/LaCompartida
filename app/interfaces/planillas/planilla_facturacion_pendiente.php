@@ -180,8 +180,8 @@
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
 		$ws1->write($filas, $col_valor_estimado, __('Valor estimado'), $formato_titulo);
 		$ws1->write($filas, $col_tipo_cambio, __('Tipo Cambio'), $formato_titulo);
-		$ws1->write($filas, $col_valor_en_moneda_base, __('Valor en $'), $formato_titulo);
-		$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, __('Valor en $ según THH'), $formato_titulo);
+		$ws1->write($filas, $col_valor_en_moneda_base, __('Valor en '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion))), $formato_titulo);
+		$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, __('Valor en '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion)).' según THH'), $formato_titulo);
 		$ws1->write($filas, $col_horas_trabajadas, __('Horas trabajadas'), $formato_titulo);
 		if($debug)
 		{
