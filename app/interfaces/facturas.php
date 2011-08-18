@@ -539,6 +539,7 @@ $class_diseno = '';
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
 		</td>
 		<td align=right>
+			<?=__('Fecha Fin')?>
 		</td>
 		<td align=left width="44%">
 			<input type="text" id="fecha2" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />

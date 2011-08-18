@@ -450,7 +450,7 @@ function Refrescar()
 
 //Confirmación de generación de cobros individuales
 function GenerarIndividual(
-	modalidad, id_contrato, fecha_ultimo_cobro, fecha_fin,
+	modalidad, id_contrato, fecha_ultimo_cobro, fecha_ini, fecha_fin,
 	monto_estimado, monto_real, moneda,
 	id_cobro_pendiente, incluye_honorarios, incluye_gastos)
 {
@@ -478,6 +478,7 @@ function GenerarIndividual(
 						'GeneraCobroIndividual', 780, 680,
 						"genera_cobros_guarda.php?id_contrato=" + id_contrato +
 						"&fecha_ultimo_cobro=" + fecha_ultimo_cobro + 
+						"&fecha_ini=" + fecha_ini + 
 						"&fecha_fin=" + fecha_fin + 
 						"&id_cobro_pendiente=" + id_cobro_pendiente +
 						"&monto=" + monto_estimado +
@@ -492,6 +493,7 @@ function GenerarIndividual(
 					'GeneraCobroIndividual', 780, 680,
 					"genera_cobros_guarda.php?id_contrato=" + id_contrato + 
 					"&fecha_ultimo_cobro=" + fecha_ultimo_cobro + 
+					"&fecha_ini=" + fecha_ini + 
 					"&fecha_fin=" + fecha_fin + 
 					"&id_cobro_pendiente=" + id_cobro_pendiente +
 					"&incluye_honorarios=" + incluye_honorarios +
@@ -747,6 +749,7 @@ if($opc == 'buscar')
 		global $p_revisor;
 		global $cobros;
 		global $opc;
+		global $fecha_ini;
 		global $fecha_fin;
 		global $id_proceso;
 		static $i = 0;
@@ -870,19 +873,19 @@ if($opc == 'buscar')
 				if ($contrato->fields['separar_liquidaciones']) {
 					if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
 						$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 0)\" >";
 					}
 					if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
 					if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
 						$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 0, 1)\" >";
 					}
 				} else {
 					// Flujo Actual, solo uno que hace ambas cosas
 					$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 1)\" >";
 				}
 
@@ -897,7 +900,7 @@ if($opc == 'buscar')
 			#FIN DIV cobros pendientes.
 		}
 		#WIP
-		$wip = $contrato->ProximoCobroEstimado($contrato->fields['fecha_ultimo_cobro'],Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
+		$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : $contrato->fields['fecha_ultimo_cobro'],Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 		$html .= "<td style='border:1px dashed #999999; font-size:10px'>".__('WIP (Work in progress)')."</td><td colspan=4 style='border:1px dashed #999999'>";
 		$html .= "<div id='wip_$i'>";
@@ -921,17 +924,17 @@ if($opc == 'buscar')
 		if ($contrato->fields['separar_liquidaciones']) {
 			if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
 				$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('',";
-				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 1, 0);\" />";
+				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 1, 0);\" />";
 			}
 			if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
 			if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
 				$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('',";
-				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 0, 1);\" />";
+				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 0, 1);\" />";
 			}
 		} else {
 			// Flujo Actual, solo uno que hace ambas cosas
 			$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('',";
-			$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_fin."',0,0,'',0, 1, 1);\" >";
+			$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 1, 1);\" >";
 		}
 		
 		$html .= "</tr></table></div>";

@@ -168,7 +168,6 @@
 			$fecha_ini_cobro = "";
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaFechaDesdeCobranza') ) || ( method_exists('Conf','UsaFechaDesdeCobranza') && Conf::UsaFechaDesdeCobranza() ) ) && $fecha_ini)
 				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
-
 			$id = $cobro->PrepararCobro(
 				$fecha_ini_cobro,
 				Utiles::fecha2sql($fecha_fin),
