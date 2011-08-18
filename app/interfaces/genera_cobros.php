@@ -462,6 +462,8 @@ function GenerarIndividual(
 		text_window += '<input type="radio" name="radio_monto" id="radio_real" checked /><?=__('Monto del Contrato')?> '+moneda+' '+monto_real+'<br>';
 		text_window += '<input type="radio" name="radio_monto" id="radio_estimado" /><?=__('Monto del Cobro Programado')?> '+moneda+' '+monto_estimado+'<br><br>';
 	}
+	if( fecha_ini != '' )
+		text_window += 'Fecha desde: '+fecha_ini+'<br>';
 	text_window += 'Fecha hasta: '+fecha_fin+'';
 	text_window += '<br><?=__('¿Desea generar el borrador?')?></span><br>';
 	Dialog.confirm(text_window,

@@ -5,6 +5,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
@@ -70,18 +71,10 @@
 		 *  se calcula en base al porcentaje impuesto gasto
 		 *  del cobro
 		 */
+		if( !UtilesApp::GetConf($sesion,'UsarGastosConSinImpuesto') )
+			$con_impuesto = 1;
+		$gasto->Edit("con_impuesto",$con_impuesto==1 ? "SI" : "NO");
 		
-		if($con_impuesto)
-		{
-			$gasto->Edit("con_impuesto",$con_impuesto);
-		}
-		else
-		{
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosConSinImpuesto') ) || ( method_exists('Conf','UsarGastosConSinImpuesto') && Conf::UsarGastosConSinImpuesto() ) )
-				$gasto->Edit("con_impuesto","NO");
-			else
-				$gasto->Edit("con_impuesto","SI");
-		}
 		if(!$codigo_cliente && $codigo_cliente_secundario)
 		{
 			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
@@ -817,7 +810,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			?>
 		</td>
 		<td align=left>
-			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="SI" <?php echo $con_impuesto_check; ?>>
+			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="1" <?php echo $con_impuesto_check; ?>>
  		</td>
 	</tr>
 			<?	} 
@@ -876,8 +869,10 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 ?>
 <br>
 
-
-<div id='tabla_gastos' style="display:<?=$gasto->fields['id_movimiento_pago'] > 0 ? 'inline' : 'none'?>">
+<?php
+	if( $gasto->fields['id_movimiento_pago'] > 0 )
+	{ ?>
+<div id='tabla_gastos'>
 <table style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right>
@@ -930,10 +925,11 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			?>
 		</td>
 		<td align=left>
-			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="SI" <?php echo $con_impuesto_check; ?>>
+			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="1" <?php echo $con_impuesto_check; ?>>
 		</td>
 	</tr>
 	<?	 }	
+		}
 	} ?>
 	
 	
