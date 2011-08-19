@@ -331,7 +331,10 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 		list($count) = mysql_fetch_array($resp);
 		if($count > 0)
 		{
-			$query = "SELECT id_cobro FROM cobro INNER JOIN asunto ON cobro.id_contrato = asunto.id_contrato WHERE cobro.id_contrato = '".$this->fields['id_contrato']."'";
+			$query = "SELECT cobro.id_cobro 
+									FROM cobro_asunto 
+									JOIN cobro ON cobro.id_cobro = cobro_asunto.id_cobro 
+									WHERE cobro_asunto.codigo_asunto = '".$this->fields['codigo_asunto']."'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
 			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene cobros asociados') . ". " . 
@@ -339,7 +342,7 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 			return false;
 		}
 		
-		#solo se puede eliminar asuntos que no tangan carpetas asociados
+		#solo se pueden eliminar asuntos que no tengan carpetas asociados
 		$query = "SELECT COUNT(*) FROM carpeta WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);

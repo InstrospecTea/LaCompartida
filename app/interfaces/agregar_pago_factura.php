@@ -173,6 +173,19 @@
 		$('TipoCambioDocumentoPago').show();
 	}
 	
+	function MontoValido( id_campo )
+	{
+		var monto = document.getElementById( id_campo ).value.replace('\,','.');
+		var arr_monto = monto.split('\.');
+		var monto = arr_monto[0];
+		for($i=1;$i<arr_monto.length-1;$i++)
+			monto += arr_monto[$i];
+		if( arr_monto.length > 1 )
+			monto += '.' + arr_monto[arr_monto.length-1];
+		
+		document.getElementById( id_campo ).value = monto;
+	}
+	
 	function CancelarDocumentoMonedaPago()
 	{
 		$('TipoCambioDocumentoPago').hide();
@@ -533,14 +546,14 @@
 			</td>
 			<td align=left colspan="3">
 				<?php $monto_pago=str_replace(',','.',$monto_pago);?>
-				<input name=monto id=monto size=10 onchange="ActualizarMontoMonedaCobro();" value="<?=number_format($pago->fields['monto'] ? $pago->fields['monto'] : $monto_pago,$moneda_pago->fields['cifras_decimales'],'.','')?>" />
+				<input name="monto" id="monto" size=10 onchange="ActualizarMontoMonedaCobro();" value="<?=number_format($pago->fields['monto'] ? $pago->fields['monto'] : $monto_pago,$moneda_pago->fields['cifras_decimales'],'.','')?>" onkeydown="MontoValido( this.id );"/>
 
 				<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"','',"80"); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
 				<span id="span_monto_equivalente" style="visibility:<?=$id_moneda_cobro==$id_moneda ? 'hidden' : 'visible'?>">
 					Equivalente a <?=$moneda_cobro->fields['simbolo']?>
-					<input id="monto_moneda_cobro" name="monto_moneda_cobro" onchange="ActualizarMontosIndividuales( this.id );" value="<?=number_format($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago,$moneda_cobro->fields['cifras_decimales'],'.','')?>" />
+					<input id="monto_moneda_cobro" name="monto_moneda_cobro" onchange="ActualizarMontosIndividuales( this.id );" value="<?=number_format($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago,$moneda_cobro->fields['cifras_decimales'],'.','')?>" onkeydown="MontoValido( this.id );" />
 					<input type="hidden" id="id_moneda_cobro" name="id_moneda_cobro" value="<?=$id_moneda_cobro?>" />
 				</span>
 			</td>
@@ -748,7 +761,7 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuen
 		else
 			$monto_a_pagar = "0";
 			
-		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" onchange=\"ActualizarMonto();\" value=\"".$monto_a_pagar."\" />";
+		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" onchange=\"ActualizarMonto();\" value=\"".$monto_a_pagar."\" onkeydown=\"MontoValido( this.id );\"/>";
 		$opc_html .= "<input type=hidden name=\"x_saldo_hide_".$fila->fields['id_factura']."\" id=\"x_saldo_hide_".$fila->fields['id_factura']."\" value=\"".$fila->fields['saldo_factura']."\" />";
 		$opc_html .= "<input type=hidden name=\"tipo_cambio_".$fila->fields['id_factura']."\" id=\"tipo_cambio_".$fila->fields['id_factura']."\" value=\"".$fila->fields['tipo_cambio']."\" />";
 		$opc_html .= "<input type=hidden name=\"cifras_decimales_".$fila->fields['id_factura']."\" id=\"cifras_decimales_".$fila->fields['id_factura']."\" value=\"".$fila->fields['cifras_decimales']."\" />";
@@ -765,13 +778,6 @@ Calendar.setup(
 		inputField	: "fecha",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_pago"		// ID of the button
 	}
 );
 </script>

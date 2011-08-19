@@ -523,6 +523,19 @@ function CancelarDocumentoMoneda()
 	$('TipoCambioDocumento').hide();
 }
 
+function MontoValido( id_campo )
+{
+	var monto = document.getElementById( id_campo ).value.replace('\,','.');
+	var arr_monto = monto.split('\.');
+	var monto = arr_monto[0];
+	for($i=1;$i<arr_monto.length-1;$i++)
+		monto += arr_monto[$i];
+	if( arr_monto.length > 1 )
+		monto += '.' + arr_monto[arr_monto.length-1];
+	
+	document.getElementById( id_campo ).value = monto;
+}
+
 function ActualizarDocumentoMoneda()
 {
 	ids_monedas = $('ids_monedas_documento').value;
@@ -1606,13 +1619,13 @@ function AgregarFactura(idx){
 												<?= Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal",'tipo_documento_legal_'.$idx,$agregar_tipo,'','',100); ?>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="honorarios_<?=$idx?>" value="<?=$honorarios_doc?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="honorarios_<?=$idx?>" value="<?=$honorarios_doc?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_con_impuestos_<?=$idx?>" value="<?=$gastos_con_impuestos_doc?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_con_impuestos_<?=$idx?>" value="<?=$gastos_con_impuestos_doc?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_sin_impuestos_<?=$idx?>" value="<?=$gastos_sin_impuestos_doc?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_sin_impuestos_<?=$idx?>" value="<?=$gastos_sin_impuestos_doc?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td align="center">
 												<button type="button" onclick="AgregarFactura(<?=$idx?>)" >
@@ -1641,13 +1654,13 @@ function AgregarFactura(idx){
 												<?= Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal",'tipo_documento_legal_0','','','',100); ?>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="honorarios_0" value="<?=$saldo_honorarios?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="honorarios_0" value="<?=$saldo_honorarios?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_con_impuestos_0" value="<?=$saldo_gastos_con_impuestos?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_con_impuestos_0" value="<?=$saldo_gastos_con_impuestos?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td nowrap>
-												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_sin_impuestos_0" value="<?=$saldo_gastos_sin_impuestos?>" size="8"/>
+												<?=$moneda_documento->fields['simbolo']?>&nbsp;<input type="text" id="gastos_sin_impuestos_0" value="<?=$saldo_gastos_sin_impuestos?>" size="8" onkeydown="MontoValido( this.id );"/>
 											</td>
 											<td align="center">
 												<button type="button" onclick="AgregarFactura(0)" >
@@ -2103,7 +2116,7 @@ Calendar.setup(
 	
 Calendar.setup(
 	{
-		inputField	: "fecha_facturado",				// ID of the input field
+		inputField	: "fecha_facturacion",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha_facturado"		// ID of the button
 	}
@@ -2120,13 +2133,6 @@ Calendar.setup(
 		inputField	: "fecha_pago_parcial",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha_pago_parcial"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago_gastos",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "imgfecha_fecha_pago_gastos"		// ID of the button
 	}
 );
 </script>

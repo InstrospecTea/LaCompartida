@@ -337,6 +337,33 @@ function ValidarContrato(form)
 	return true;
 }
 
+function SetFormatoRut()
+{
+	var rut = $('rut').value;
+	var con_raya = rut.indexOf('-');
+	
+	if( con_raya != -1 )
+	{
+		var arr_rut = rut.split('-');
+		var rut = arr_rut[0];
+		var dv  = arr_rut[1];
+	}
+	else
+	{
+		var dv = rut.substr(rut.length-1);
+		var rut = rut.substr(0,rut.length-1);
+	}
+	var rut3 = rut.substr(rut.length-3,3);
+	var rut2 = rut.substr(rut.length-6,3);
+	var rut1 = rut.substr(0,rut.length-6);
+	
+	if(rut.length > 5)
+		var rut = rut1 + '.' + rut2 + '.' + rut3 + '-' + dv;
+	else
+		var rut = rut2 + '.' + rut3 + '-' + dv;
+	$('rut').value = rut;
+}
+
 function MuestraOculta(divID)
 {
 	var divArea = $(divID);
@@ -1156,7 +1183,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="3">
-        	<input type="text" size=20 name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ?>" onblur="validarUnicoCliente(this.value,'rut');" />
+        	<input type="text" size=20 name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ?>" onblur="SetFormatoRut();validarUnicoCliente(this.value,'rut');" />
 		</td>
 	</tr>
    	<tr>

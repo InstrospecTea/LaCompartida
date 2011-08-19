@@ -394,6 +394,7 @@
 
 			$descripcion_honorario = $factura->fields['descripcion'];
 			$monto_honorario = $factura->fields['subtotal'];
+			$honorario = $factura->fields['subtotal'];
 			$descripcion_subtotal_gastos = $factura->fields['descripcion_subtotal_gastos'];
 			$monto_subtotal_gastos = $factura->fields['subtotal_gastos'];
 			$descripcion_subtotal_gastos_sin_impuesto = $factura->fields['descripcion_subtotal_gastos_sin_impuesto'];
@@ -600,6 +601,19 @@ function showCalendar(element, input, container, source)
     //finally show the calendar =)
     calendar.openCalendar();
 };
+
+function MontoValido( id_campo )
+{
+	var monto = document.getElementById( id_campo ).value.replace('\,','.');
+	var arr_monto = monto.split('\.');
+	var monto = arr_monto[0];
+	for($i=1;$i<arr_monto.length-1;$i++)
+		monto += arr_monto[$i];
+	if( arr_monto.length > 1 )
+		monto += '.' + arr_monto[arr_monto.length-1];
+	
+	document.getElementById( id_campo ).value = monto;
+}
 
 function MostrarTipoCambioPago()
 {
@@ -1089,26 +1103,26 @@ function ActualizarDocumentoMonedaPago()
       <td align=right><?=__('Honorarios legales');?></td>
       <td align=left><input type="text" name="descripcion_honorarios_legales" value="<?=$descripcion_honorario;?>" size="40" maxlength="300"></td>
       <td align=left><?=$simbolo;?>
-        <input type="text" name="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)";></td>
+        <input type="text" name="monto_honorarios_legales" id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"; onkeydown="MontoValido( this.id );"></td>
       <td align=left><?=$simbolo;?>
-        <input type="text" name="monto_iva_honorarios_legales" value="<?=$impuesto;?>" disabled="true" value="0" size="10" maxlength="30"></td>
+        <input type="text" name="monto_iva_honorarios_legales" id="monto_iva_honorarios_legales" value="<?=$impuesto;?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido( this.id );"></td>
     </tr>
     <tr>
       <td align=right><?=__('Gastos c/ IVA');?></td>
       <td align=left><input type="text" name="descripcion_gastos_con_iva" value="<?=$descripcion_subtotal_gastos;?>" size="40" maxlength="30"></td>
       <td align=left><?=$simbolo;?>
-        <input type="text" name="monto_gastos_con_iva" value="<?php echo isset($gastos_con_iva) ? $gastos_con_iva : $monto_subtotal_gastos;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"></td>
+        <input type="text" name="monto_gastos_con_iva" id="monto_gastos_con_iva" value="<?php echo isset($gastos_con_iva) ? $gastos_con_iva : $monto_subtotal_gastos;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)" onkeydown="MontoValido( this.id );"></td>
       <td align=left><?=$simbolo;?>
-        <input type="text" name="monto_iva_gastos_con_iva" value="<?=$impuesto_gastos;?>" disabled="true" value="0" size="10" maxlength="30"></td>
+        <input type="text" name="monto_iva_gastos_con_iva" id="monto_iva_gastos_con_iva" value="<?=$impuesto_gastos;?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido( this.id );"></td>
     </tr>
     <?php
 		if(( method_exists('Conf','GetConf') && (Conf::GetConf($sesion,'UsarGastosConSinImpuesto')=='1'))) {
 	?>
     <tr>
       <td align=right><?=__('Gastos s/ IVA');?></td>
-      <td align=left><input type="text" name="descripcion_gastos_sin_iva" value="<?=$descripcion_subtotal_gastos_sin_impuesto;?>" size="40" maxlength="30"></td>
+      <td align=left><input type="text" name="descripcion_gastos_sin_iva" id="descripcion_gastos_sin_iva" value="<?=$descripcion_subtotal_gastos_sin_impuesto;?>" size="40" maxlength="30" onkeydown="MontoValido( this.id );"></td>
       <td align=left><?=$simbolo;?>
-        <input type="text" name="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"></td>
+        <input type="text" name="monto_gastos_sin_iva" id="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto;?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)" onkeydown="MontoValido( this.id );"></td>
       <td align=left>&nbsp;</td>
     </tr>
     <?php

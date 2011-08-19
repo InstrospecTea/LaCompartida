@@ -84,7 +84,7 @@
 			 */
 
 			if($numero != '')
-				$where .= " factura.AND numero = '$numero'";
+				$where .= " AND numero = '$numero'";
 			
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario )
 				{

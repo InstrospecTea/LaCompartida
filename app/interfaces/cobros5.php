@@ -337,7 +337,15 @@ function AjustarMonto( accion )
 
 function MontoValido( id_campo )
 {
-	document.getElementById( id_campo ).value = document.getElementById( id_campo ).value.replace('\,','.');
+	var monto = document.getElementById( id_campo ).value.replace('\,','.');
+	var arr_monto = monto.split('\.');
+	var monto = arr_monto[0];
+	for($i=1;$i<arr_monto.length-1;$i++)
+		monto += arr_monto[$i];
+	if( arr_monto.length > 1 )
+		monto += '.' + arr_monto[arr_monto.length-1];
+	
+	document.getElementById( id_campo ).value = monto;
 }
 
 function AgregarParametros( form )
@@ -1033,7 +1041,7 @@ function UpdateCap(monto_update, guardar)
 			    		<?=__('Trabajos')?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
 			    </td>
 			    <td align="left" width="55%" nowrap>
-			    	<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?=number_format($cobro->fields['monto_subtotal']-$cobro->CalculaMontoTramites( $cobro ),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" <?=$deshabilitar ?> style="text-align: right;">
+			    	<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido( this.id );" value="<?=number_format($cobro->fields['monto_subtotal']-$cobro->CalculaMontoTramites( $cobro ),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" <?=$deshabilitar ?> style="text-align: right;" onkeydown="MontoValido( this.id );">
 			    	&nbsp;&nbsp;<img src="<?=Conf::ImgDir()?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?=TTip($tip_actualizar)?>>
 			    	<img id="ajustar_monto" <?=$display_buton_ajuste ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Ajustar Monto')?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
 			    	<img id="cancelar_ajustacion" <?=$display_buton_cancelar ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
@@ -1075,15 +1083,15 @@ function UpdateCap(monto_update, guardar)
 							$chk = $cobro->fields['tipo_descuento'];
 						#$moneda_cobro->fields['cifras_decimales']
 ?>
-						<input type=text name=cobro_descuento style="text-align: right;" id=cobro_descuento size=12 value=<?=number_format($cobro->fields['descuento'],$moneda_cobro->fields['cifras_decimales'],'.','')?> onchange="RecalcularTotal(this.value);" <?=TTip($tip_descuento)?>>
-						<input type=radio name=tipo_descuento id=tipo_descuento value='VALOR' <?=$chk == 'VALOR' ? 'checked' : '' ?> ><?=__('Valor')?>
+						<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onkeydown="MontoValido( this.id );" size=12 value=<?=number_format($cobro->fields['descuento'],$moneda_cobro->fields['cifras_decimales'],'.','')?> onchange="RecalcularTotal(this.value);" <?=TTip($tip_descuento)?>>
+						<input type="radio" name="tipo_descuento" id="tipo_descuento" value='VALOR' <?=$chk == 'VALOR' ? 'checked' : '' ?> ><?=__('Valor')?>
 					</td>
 				</tr>
 				<tr bgcolor='#F3F3F3'>
 					<td align=right>&nbsp;</td>
 					<td align=left>
-						<input type=text name=porcentaje_descuento style="text-align: right;" id=porcentaje_descuento size=12 value=<?=number_format($cobro->fields['porcentaje_descuento'],$moneda_cobro->fields['cifras_decimales'],'.','') ?>>
-						<input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?=$chk == 'PORCENTAJE' ? 'checked' : '' ?>><?=__('%')?>
+						<input type="text" name="porcentaje_descuento" style="text-align: right;" id="porcentaje_descuento" onkeydown="MontoValido( this.id );" size=12 value=<?=number_format($cobro->fields['porcentaje_descuento'],$moneda_cobro->fields['cifras_decimales'],'.','') ?>>
+						<input type="radio" name="tipo_descuento" id="tipo_descuento" value='PORCENTAJE' <?=$chk == 'PORCENTAJE' ? 'checked' : '' ?>><?=__('%')?>
 					</td>
 				</tr>
 <?
