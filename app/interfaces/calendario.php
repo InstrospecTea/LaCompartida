@@ -14,7 +14,7 @@
 
 	$pagina->titulo = __('Calendario');
 	$pagina->PrintTop($popup);
-
+	
 	$params = array();
 	
 	if(!$opcion)

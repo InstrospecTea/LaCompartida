@@ -17,7 +17,7 @@
 
 	$sesion = new Sesion(array('PRO','REV'));
 	$pagina = new Pagina($sesion);
-
+	
 	$tramite = new Tramite($sesion);
 	if($id_tramite > 0)
 		$tramite->Load($id_tramite);
@@ -85,7 +85,7 @@
 				$id_usuario = $sesion->usuario->fields['id_usuario'];
 			if( $opcion != 'guardar' )
 			{
-			$tramite->fields['cobrable']=1;
+				$tramite->fields['cobrable']=1;
 			}
 			$es_tramite_nuevo=1;
 	}
@@ -283,7 +283,6 @@
 				$t->Eliminar();
 			}
 		
-		
 	if($tramite->Write())
 			{
 			if($t)
@@ -343,19 +342,7 @@ else if($t->Write())
 						}
 				}
 			}
-
 		unset($id_trab);
-		if($es_tramite_nuevo)//Significa que estoy agregando más que editando, así que debo dejar en limpio el formulario
-		{
-			if($t)
-			unset($t);
-			unset($tramite);
-			if($como_trabajo==1)
-			$t = new Trabajo($sesion);
-			$tramite = new Tramite($sesion);
-			
-		}
-
 		
 		// Nuevo en el caso de ser llamado desde Resumen semana, para que haga
 		// refresh al form
@@ -370,7 +357,7 @@ else if($t->Write())
 			</script>
 <?
 		}
-	}
+	} 
 	else if($opcion == "eliminar")  #ELIMINAR TRABAJO
 	{
 		$tramite = new Tramite($sesion);
@@ -405,7 +392,6 @@ else if($t->Write())
 		$txt_opcion = __('Agregando nuevo Trámite');
 	else if($opcion == '')
 		$txt_opcion = '';
-
 	
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente != '' && !$codigo_cliente_secundario)
 	{
@@ -510,10 +496,23 @@ function CargarMonedaContrato()
 			$('simbolo_moneda_contrato').value = response[0];
 			$('id_moneda_contrato').value = response[1];
 			$('tarifa_tramite').value = response[2];
+			DefinirAlertaTarifa( response[2] );
 		}
 		cargando = false;
 	};
 	http.send(null);
+}
+
+function DefinirAlertaTarifa( tarifa_valor )
+{
+	if( ( tarifa_valor == 0 || tarifa_valor == '' ) && $('monto_modificar').value != 1 ) {
+		$('tr_contenedor_alerta').style.background = 'red';
+		$('tr_contenedor_alerta').innerHTML = 'La tarifa de este trámite no está definida.';
+	}
+	else {
+		$('tr_contenedor_alerta').style.background = 'white';
+		$('tr_contenedor_alerta').innerHTML = '';
+	}
 }
 
 function SetDuracionDefecto( form )
@@ -1043,7 +1042,14 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	else
 		$monto_modificar = "0";
 ?>
-
+<table width="80%">
+	<tr>
+		<td height="30px" id="tr_contenedor_alerta" style="color: white; vertical-align: middle; text-align: center; font-size: 12px; font_weight: bold;">
+			&nbsp;
+		</td>
+	</tr>
+</table>
+	
 <form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?=$_SERVER[PHP_SELF]?>">
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
@@ -1396,8 +1402,8 @@ else
     	<td align="left">
     		<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?=$tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'?>" />
     		<input type="text" size="2" id="simbolo_moneda_contrato" disabled style="background-color: white; display: inline; border: 0px;" value="<?=$simbolo_moneda_tramite_contrato != '' ? $simbolo_moneda_tramite_contrato : ''?>" />
-     		<img id="modificar_monto" <?=$display_buton_modificar_monto ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Modificar Monto')?>" border=0 style="cursor:pointer" onclick="ModificarMonto('modificar');">
-			  <img id="usar_monto_original" <?=$display_buton_usar_monto_original ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="ModificarMonto('cancelar');"/>
+     		<img id="modificar_monto" <?=$display_buton_modificar_monto ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Modificar Monto')?>" border=0 style="cursor:pointer" onclick="ModificarMonto('modificar');CargarMonedaContrato();">
+			  <img id="usar_monto_original" <?=$display_buton_usar_monto_original ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="ModificarMonto('cancelar');CargarMonedaContrato();"/>
 			</td>
     </tr>
     <tr id="tr_tarifa_mod" <?=$display_tr_mod ?>>
