@@ -587,6 +587,7 @@ $_LANG['Profesional vs. Asunto'] = "Profesional vs. Asunto";
 $_LANG['Profesional vs. Cliente'] = "Profesional vs. Cliente";
 $_LANG['Horas por Cliente'] = "Horas por Cliente";
 $_LANG['Informe'] = "Informe";
+$_LANG['Reporte Morosidad'] = "Reporte Deuda cliente";
 $_LANG['Dimensión 1'] = "Dimensión 1";
 $_LANG['Asuntos trabajados'] = "Asuntos trabajados";
 $_LANG['Mi semana'] = "Mi semana";

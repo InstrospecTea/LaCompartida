@@ -101,7 +101,7 @@
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_facturacion_pendiente.php' style="color:#000;text-decoration: none;"><?=__('Horas por facturar')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_cobros_por_area.php' style="color:#000;text-decoration: none;"><?=__('Cobros por Area')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?=__('Resumen Cobranzas')?></a></li>
-			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_morosidad.php' style="color:#000;text-decoration: none;"><?=__('Cobros Morosos')?></a></li>
+			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_morosidad.php' style="color:#000;text-decoration: none;"><?=__('Reporte Morosidad')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/tipo_cambio_historico.php' style="color:#000;text-decoration: none;"><?=__('Histórico de Tipo de Cambio')?></a></li>
 		</ul>
 		</td>
