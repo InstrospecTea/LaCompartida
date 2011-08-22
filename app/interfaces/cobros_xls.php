@@ -401,6 +401,7 @@ $mostrar_resumen_de_profesionales = 1;
 			$ff = str_replace('%d','DD',$idioma->fields['formato_fecha']);
 			$ff = str_replace('%m','MM',$ff);
 			$ff = str_replace('%y','YY',$ff);
+			$ff = str_replace('%Y','YY',$ff);
 			$formato_fecha =& $wb->addFormat(array('Size' => 7,
 									'Valign' => 'top',
 									'Color' => 'black'));

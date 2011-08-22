@@ -27,7 +27,17 @@
 												  DROP `id_estado_factura`,
 												  DROP `estado_real`;";
 			$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
-												  
+			$queries[] = "UPDATE cobro SET estado = 'FACTURADO' WHERE ( SELECT count(*) FROM factura WHERE factura.id_cobro = cobro.id_cobro ) > 0 AND estado IN ('CREADO','EN REVISION','EMISION');";
+			$queries[] = "UPDATE cobro 
+											JOIN factura USING( id_cobro ) 
+											JOIN cta_cte_fact_mvto USING( id_factura ) 
+											JOIN cta_cte_fact_mvto_neteo ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_neteo.id_mvto_deuda 
+											SET cobro.estado = 'PAGO PARCIAL';";
+			$queries[] = "UPDATE cobro 
+											JOIN factura USING( id_cobro ) 
+											JOIN cta_cte_fact_mvto USING( id_factura ) 
+											SET cobro.estado = 'PAGADO' 
+											WHERE cta_cte_fact_mvto.saldo = 0;";
 			return $queries;
 		}
 		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
@@ -191,6 +201,7 @@
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro, 
 									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario,
+									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario_orden,
 									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
 									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
 									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,

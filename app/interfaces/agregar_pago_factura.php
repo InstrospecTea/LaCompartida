@@ -257,7 +257,7 @@
 
 	var suma_saldo = 0;
 	var monto_tmp = 0;
-	function ActualizarMontoMonedaCobro(){
+	function ActualizarMontoMonedaCobro(){ 
 		var moneda = $('id_moneda').value;
 		if(moneda == '<?=$id_moneda_cobro?>'){
 			$('span_monto_equivalente').style.visibility = 'hidden';
@@ -546,14 +546,14 @@
 			</td>
 			<td align=left colspan="3">
 				<?php $monto_pago=str_replace(',','.',$monto_pago);?>
-				<input name="monto" id="monto" size=10 onchange="ActualizarMontoMonedaCobro();" value="<?=number_format($pago->fields['monto'] ? $pago->fields['monto'] : $monto_pago,$moneda_pago->fields['cifras_decimales'],'.','')?>" onkeydown="MontoValido( this.id );"/>
+				<input name="monto" id="monto" size=10 value="<?=number_format($pago->fields['monto'] ? $pago->fields['monto'] : $monto_pago,$moneda_pago->fields['cifras_decimales'],'.','')?>" onkeyup="MontoValido( this.id );ActualizarMontoMonedaCobro();"/>
 
 				<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"','',"80"); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
 				<span id="span_monto_equivalente" style="visibility:<?=$id_moneda_cobro==$id_moneda ? 'hidden' : 'visible'?>">
 					Equivalente a <?=$moneda_cobro->fields['simbolo']?>
-					<input id="monto_moneda_cobro" name="monto_moneda_cobro" onchange="ActualizarMontosIndividuales( this.id );" value="<?=number_format($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago,$moneda_cobro->fields['cifras_decimales'],'.','')?>" onkeydown="MontoValido( this.id );" />
+					<input id="monto_moneda_cobro" name="monto_moneda_cobro"  value="<?=number_format($pago->fields['monto_moneda_cobro'] ? $pago->fields['monto_moneda_cobro'] : $monto_pago,$moneda_cobro->fields['cifras_decimales'],'.','')?>" onkeyup="MontoValido( this.id );ActualizarMontosIndividuales( this.id );" />
 					<input type="hidden" id="id_moneda_cobro" name="id_moneda_cobro" value="<?=$id_moneda_cobro?>" />
 				</span>
 			</td>
@@ -761,7 +761,7 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuen
 		else
 			$monto_a_pagar = "0";
 			
-		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" onchange=\"ActualizarMonto();\" value=\"".$monto_a_pagar."\" onkeydown=\"MontoValido( this.id );\"/>";
+		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" value=\"".$monto_a_pagar."\" onkeyup=\"MontoValido( this.id );ActualizarMonto();\"/>";
 		$opc_html .= "<input type=hidden name=\"x_saldo_hide_".$fila->fields['id_factura']."\" id=\"x_saldo_hide_".$fila->fields['id_factura']."\" value=\"".$fila->fields['saldo_factura']."\" />";
 		$opc_html .= "<input type=hidden name=\"tipo_cambio_".$fila->fields['id_factura']."\" id=\"tipo_cambio_".$fila->fields['id_factura']."\" value=\"".$fila->fields['tipo_cambio']."\" />";
 		$opc_html .= "<input type=hidden name=\"cifras_decimales_".$fila->fields['id_factura']."\" id=\"cifras_decimales_".$fila->fields['id_factura']."\" value=\"".$fila->fields['cifras_decimales']."\" />";
