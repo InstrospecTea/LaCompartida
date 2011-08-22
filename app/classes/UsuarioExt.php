@@ -17,10 +17,11 @@ class UsuarioExt extends Usuario
 		return false;
 	}
 
-	function LoadSecretario($id)
+	function LoadSecretario($id, $secretario=null)
 	{
+		if(empty($secretario)) $secretario = $this->fields['id_usuario'];
 		$query = "SELECT id_profesional FROM usuario_secretario
-							WHERE id_secretario = '".$this->fields['id_usuario']."'
+							WHERE id_secretario = '".$secretario."'
 							AND id_profesional = '$id' ";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 

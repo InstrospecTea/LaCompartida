@@ -167,7 +167,6 @@ $fila_debug = 20;
 						codigo_cliente
 						,glosa_cliente
 						,fecha_emision
-						,id_moneda_base
 						$select_group
 						FROM(SELECT
 						cliente.codigo_cliente as codigo_cliente

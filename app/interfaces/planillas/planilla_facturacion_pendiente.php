@@ -132,6 +132,10 @@
 		$col_cliente = ++$col;
 		$col_usuario_encargado = ++$col;
 		$col_asunto = ++$col;
+		
+		$col_ultimo_trabajo = ++$col;
+		$col_ultimo_gasto = ++$col;
+		
 		$col_ultimo_cobro = ++$col;
 		$col_estado_ultimo_cobro = ++$col;
 		$col_horas_trabajadas = ++$col;
@@ -154,6 +158,10 @@
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
 		$ws1->setColumn($col_usuario_encargado, $col_usuario_encargado, 40);
 		$ws1->setColumn($col_asunto, $col_asunto, 40);
+		
+		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
+		$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
+		
 		$ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
 		$ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
 		$ws1->setColumn($col_forma_cobro, $col_forma_cobro, 14);
@@ -175,6 +183,10 @@
 		$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
 		$ws1->write($filas, $col_usuario_encargado, __('Encargado'), $formato_titulo);
 		$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
+		
+		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
+		$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
+		
 		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
@@ -213,12 +225,23 @@
 				FROM cobro
 				WHERE cobro.codigo_cliente = tabla1.codigo_cliente
 					AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION') AS fecha_ultimo_cobro,
+			(SELECT
+				MAX(cta_corriente.fecha)
+			FROM
+				cta_corriente
+				LEFT JOIN cobro on cobro.id_cobro = cta_corriente.id_cobro
+			WHERE
+				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
+				cobrable = 1 AND
+				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
 			tabla1.glosa_contrato,
 			tabla1.id_moneda_retainer,
 			tabla1.id_moneda_total,
 			tabla1.id_moneda_tarifa,
 			tabla1.valor_descuento,
-			tabla1.porcentaje_descuento 
+			tabla1.porcentaje_descuento,
+			tabla1.fecha_ultimo_trabajo,
+			REPLACE(tabla1.codigos_asunto, ', ', '\n') as codigos_asunto
 		FROM
 			(	-- Selecciono Todos los asuntos con sus horas por cobrar y con el monto según THH --
 			SELECT cliente.`codigo_cliente`,
@@ -226,6 +249,7 @@
 				CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario,
 				usuario.username as usuario_username,
 				GROUP_CONCAT( distinct glosa_asunto SEPARATOR '\n' ) AS asuntos	,
+				GROUP_CONCAT( distinct asunto.codigo_asunto SEPARATOR ', ' ) AS codigos_asunto,
 				contrato.forma_cobro AS forma_cobro,
 				asunto.codigo_asunto,
 				asunto.glosa_asunto,
@@ -248,7 +272,8 @@
 				contrato.opc_moneda_total AS id_moneda_total,
 				contrato.id_moneda AS id_moneda_tarifa,
 				contrato.descuento AS valor_descuento,
-				contrato.porcentaje_descuento AS porcentaje_descuento 
+				contrato.porcentaje_descuento AS porcentaje_descuento,
+				MAX(trabajo.fecha) as fecha_ultimo_trabajo
 			FROM 
 				trabajo
 				LEFT JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
@@ -271,13 +296,17 @@
 		while($cobro = mysql_fetch_array($resp))
 		{
 			++$filas;
-			$ws1->write($filas, $col_codigo_cliente, $cobro['codigo_asunto'], $formato_texto);
+			$ws1->write($filas, $col_codigo_cliente, $cobro['codigos_asunto'], $formato_texto);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
 				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario_username'], $formato_texto);
 			else
 				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario'], $formato_texto);
 			$ws1->write($filas, $col_asunto,$cobro['asuntos'], $formato_texto);
+			
+			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_trabajo'])), $formato_texto);
+			$ws1->write($filas, $col_ultimo_gasto, empty($cobro['fecha_ultimo_gasto']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_gasto'])), $formato_texto);
+			
 			$ws1->write($filas, $col_ultimo_cobro,$cobro['fecha_ultimo_cobro'] != '' ? Utiles::sql2date($cobro['fecha_ultimo_cobro']) : '', $formato_texto);
 			$ws1->write($filas, $col_estado_ultimo_cobro,$cobro['estado_ultimo_cobro'] != '' ? $cobro['estado_ultimo_cobro'] : '', $formato_texto);
 			$ws1->write($filas, $col_forma_cobro,$cobro['forma_cobro'], $formato_texto);

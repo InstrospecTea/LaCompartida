@@ -13,6 +13,7 @@
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
 
 	$sesion = new Sesion(array('PRO','REV'));
 	$pagina = new Pagina($sesion);
@@ -24,6 +25,8 @@
 	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	$params_array['codigo_permiso'] = 'PRO';
 	$permiso_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+
+	$tipo_ingreso = UtilesApp::GetConf($sesion,'TipoIngresoHoras');
 
 	if($id_trabajo > 0)
 	{
@@ -118,75 +121,14 @@
 				else
 					$t->Edit('id_cobro','NULL');
 			}
-			//Revisa el Conf si esta permitido y la función existe
-			if( method_exists('Conf','GetConf') )
-			{
-				if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
-					$t->Edit("duracion",UtilesApp::Decimal2Time($duracion));
-				else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
-					$t->Edit("duracion",$duracion);
-				else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
-					$t->Edit("duracion",$duracion);
-			}
-			else if (method_exists('Conf','TipoIngresoHoras'))
-			{
-				if(Conf::TipoIngresoHoras()=='decimal')
-					$t->Edit("duracion",UtilesApp::Decimal2Time($duracion));
-				else if(Conf::TipoIngresoHoras()=='java')
-					$t->Edit("duracion",$duracion);
-				else if(Conf::TipoIngresoHoras()=='selector')
-					$t->Edit("duracion",$duracion);
-			}
-			else
-				$t->Edit("duracion",$duracion);
-			if($duracion_cobrada == '' )
-			{
-				//Revisa el Conf si esta permitido y la función existe
-				if( method_exists('Conf','GetConf') )
-				{
-					if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
-						$t->Edit('duracion_cobrada',UtilesApp::Decimal2Time($duracion));
-					else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
-						$t->Edit("duracion_cobrada",$duracion);
-					else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
-						$t->Edit("duracion_cobrada",$duracion);
-				}
-				else if (method_exists('Conf','TipoIngresoHoras'))
-				{
-					if(Conf::TipoIngresoHoras()=='decimal')
-						$t->Edit('duracion_cobrada',UtilesApp::Decimal2Time($duracion));
-					else if(Conf::TipoIngresoHoras()=='java')
-						$t->Edit("duracion_cobrada",$duracion);
-					else if(Conf::TipoIngresoHoras()=='selector')
-						$t->Edit("duracion_cobrada",$duracion);
-				}
-				else
-					$t->Edit("duracion_cobrada",$duracion);
-			}
-			else
-			{
-				//Revisa el Conf si esta permitido y la función existe
-				if( method_exists('Conf','GetConf') )
-				{
-					if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
-						$t->Edit('duracion_cobrada',UtilesApp::Decimal2Time($duracion_cobrada));
-					else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
-						$t->Edit("duracion_cobrada",$duracion_cobrada);
-					else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
-						$t->Edit("duracion_cobrada",$duracion_cobrada);
-				}
-				else if (method_exists('Conf','TipoIngresoHoras'))
-				{
-					if(Conf::TipoIngresoHoras()=='decimal')
-						$t->Edit('duracion_cobrada',UtilesApp::Decimal2Time($duracion_cobrada));
-					else if(Conf::TipoIngresoHoras()=='java')
-						$t->Edit("duracion_cobrada",$duracion_cobrada);
-					else if(Conf::TipoIngresoHoras()=='selector')
-						$t->Edit("duracion_cobrada",$duracion_cobrada);
-				}
-				else
-					$t->Edit("duracion_cobrada",$duracion_cobrada);
-			}
+
+			$t->Edit("duracion", $tipo_ingreso == 'decimal' ?
+				UtilesApp::Decimal2Time($duracion) : $duracion);
+
+			if($duracion_cobrada == '') $duracion_cobrada = $duracion;
+
+			$t->Edit("duracion_cobrada", $tipo_ingreso == 'decimal' ?
+				UtilesApp::Decimal2Time($duracion_cobrada) : $duracion_cobrada);
 
 			$t->Edit('id_usuario', $id_usuario);
 			$t->Edit('codigo_asunto', $codigo_asunto);
@@ -407,7 +349,7 @@ function Validar(form)
     }
  <?
 	//Revisa el Conf si esta permitido y la función existe
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
+	if($tipo_ingreso=='decimal')
 	{
 ?>
 			var dur=form.duracion.value.replace(",",".");
@@ -1138,46 +1080,30 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			  <tr>
 				<td>
 <?
-	//Revisa el Conf si esta permitido y la función existe
-	if( method_exists('Conf','GetConf') )
-	{
-		if( Conf::GetConf($sesion,'TipoIngresoHoras')=='selector' )
-		{ 
-			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, Conf::GetConf($sesion,'MaxDuracionTrabajo'), '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
-		}
-		else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' )
-		{
-?>
-					<input type="text" name="duracion" value="<?=$t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?
-		}
-		else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
-		{
-			echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario);
-		}
+	$duracion_editable = $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario;
+	if(!$duracion_editable){
+		$usuario = new UsuarioExt($sesion);
+		$duracion_editable = $usuario->LoadSecretario($id_usuario, $sesion->usuario->fields['id_usuario']);
 	}
-	else if (method_exists('Conf','TipoIngresoHoras'))
+
+	if( $tipo_ingreso=='selector' )
+	{ 
+		if(!$duracion) $duracion = '00:00:00';
+		echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, Conf::GetConf($sesion,'MaxDuracionTrabajo'), '', $duracion_editable );
+	}
+	else if( $tipo_ingreso=='decimal' )
 	{
-		if(Conf::TipoIngresoHoras()=='selector')
-		{ 
-			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $t->fields['duracion'] ? $t->fields['duracion'] : $duracion, Conf::GetConf($sesion,'MaxDuracionTrabajo'), '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
-		}
-		else if(Conf::TipoIngresoHoras()=='decimal')
-		{
 ?>
-					<input type="text" name="duracion" value="<?=$t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
+		<input type="text" name="duracion" value="<?=$t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$duracion_editable ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
 <?
-		}
-		else if(Conf::TipoIngresoHoras()=='java')
-		{
-			echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario);
-		}
+	}
+	else if( $tipo_ingreso=='java')
+	{
+		echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $duracion_editable);
 	}
 	else
 	{
-		echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario);
+		echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $duracion_editable);
 	}
 ?>
 			</td>
@@ -1207,42 +1133,20 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		</td>
 		<td>
 <?
-		//Revisa el Conf si esta permitido y la función existe
-		if( method_exists('Conf','GetConf') )
+		if($tipo_ingreso=='selector')
 		{
-			if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
-			{
-				$duracion_cobrada = '00:00:00';
-				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, Conf::GetConf($sesion,'MaxDuracionTrabajo'));
-			}
-			else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
-			{
-?>
-						<input type="text" name="duracion_cobrada" value="<?=$t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
-<?
-			}
-			else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
-			{
-				echo Html::PrintTime("duracion_cobrada",$t->fields['duracion_cobrada']);
-			}
+			$duracion_cobrada = '00:00:00';
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, Conf::GetConf($sesion,'MaxDuracionTrabajo'));
 		}
-		else if (method_exists('Conf','TipoIngresoHoras'))
+		else if($tipo_ingreso=='decimal')
 		{
-			if(Conf::TipoIngresoHoras()=='selector')
-			{
-				$duracion_cobrada = '00:00:00';
-				echo SelectorHoras::PrintTimeSelector($sesion,"duracion_cobrada", $t->fields['duracion_cobrada'] ? $t->fields['duracion_cobrada'] : $duracion_cobrada, Conf::GetConf($sesion,'MaxDuracionTrabajo'));
-			}
-			else if(Conf::TipoIngresoHoras()=='decimal')
-			{
 ?>
-						<input type="text" name="duracion_cobrada" value="<?=$t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
+			<input type="text" name="duracion_cobrada" value="<?=$t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
 <?
-			}
-			else if(Conf::TipoIngresoHoras()=='java')
-			{
-				echo Html::PrintTime("duracion_cobrada",$t->fields['duracion_cobrada']);
-			}
+		}
+		else if($tipo_ingreso=='java')
+		{
+			echo Html::PrintTime("duracion_cobrada",$t->fields['duracion_cobrada']);
 		}
 		else
 		{
