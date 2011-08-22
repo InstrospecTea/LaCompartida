@@ -621,7 +621,7 @@
 				$ws->setColumn($columna_importe, $columna_importe, 0,0,1);
 			}
 			else {
-				$ws->setColumn($columna_importe, $columna_importe, 9);
+				$ws->setColumn($columna_importe, $columna_importe, 12);
 			}
 		}
 
@@ -787,7 +787,7 @@
 					$ws->setColumn($columna_importe, $columna_importe, 0,0,1);
 				}
 				else {
-					$ws->setColumn($columna_importe, $columna_importe, 10);
+					$ws->setColumn($columna_importe, $columna_importe, 12);
 				}
 			}
 			
