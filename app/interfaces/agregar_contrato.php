@@ -106,7 +106,7 @@
 		if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
 			$id_usuario_secundario = $id_usuario_responsable;
 		}
-		$contrato->Edit("id_usuario_secundario",$id_usuario_secundario ? $id_usuario_secundario : '1');
+		$contrato->Edit("id_usuario_secundario",!empty($id_usuario_secundario) ? $id_usuario_secundario : "NULL");
 		$contrato->Edit("observaciones",$observaciones);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 			{
@@ -978,7 +978,7 @@ function SetBanco( origen, destino )
 							respuesta_revisar_tarifa = true;
 							if( !desde_combo )
 							{
-								if( f.desde.value == 'agregar_cliente' || d.desde.value == 'agregar_asunto')
+								if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto')
 								{
 									Validar(f);
 								}

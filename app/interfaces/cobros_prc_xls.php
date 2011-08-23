@@ -1,5 +1,4 @@
 <?php
-
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -9,15 +8,15 @@
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/Funciones.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
- 
+
 	$sesion = new Sesion(array('ADM', 'COB'));
 	set_time_limit(400);
 	ini_set("memory_limit","256M");
 	$where_cobro = ' 1 ';
-	
+
 	if($id_cobro)
 		$where_cobro .= " AND cobro.id_cobro=$id_cobro ";
-	
+
 	// Procesar los filtros
 	if($codigo_cliente_secundario)
 	{
@@ -39,7 +38,7 @@
 		$where_cobro .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 	if($id_grupo_cliente)
 		$where_cobro .= " AND cliente.id_grupo_cliente = '$id_grupo_cliente' ";
-	
+
 	if($forma_cobro)
 	   $where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	if($tipo_liquidacion){ //1:honorarios, 2:gastos, 3:mixtas
@@ -55,7 +54,7 @@
 			$opc_ver_gastos = 1; 
 		}
 	$mostrar_resumen_de_profesionales = 1; 
-		
+
 	if($guardar_respaldo)
 		{
 			$wb = new Spreadsheet_Excel_Writer(Conf::ServerDir().'/respaldos/ResumenCobros'.date('ymdHis').'.xls');
@@ -77,47 +76,39 @@
 		$formato_encabezado =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'middle',
 												'Align' => 'left',
-												'FontFamily' => 'Times New Roman',
 												'Bold' => 1,
 												'Color' => 'black'));
 		$formato_encabezado_center =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'middle',
 												'Align' => 'center',
-												'FontFamily' => 'Times New Roman',
 												'Bold' => 1,
 												'Color' => 'black'));
 		$formato_tiempo =& $wb->addFormat(array('Size' => 7,
 												'VAlign' => 'middle',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' =>'[h]:mm'));
 		$formato_tiempo2 =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'top',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' =>'[h]:mm'));
 		$formato_tiempo_total =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'top',
 												'Bold' => '1',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' =>'[h]:mm'));
 		$formato_tiempo_total_tabla =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'top',
 												'Bold' => '1',
 												'Top' => '1',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' =>'[h]:mm'));
 		$formato_total =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'top',
 												'Bold' => 1,
-												'FontFamily' => 'Times New Roman',
 												'Top' => 1,
 												'Color' => 'black'));
 		$formato_resumen_text =& $wb->addFormat(array('Size' => 8,
 												'Valign' => 'top',
-												'FontFamily' => 'Times New Roman',
 												'Bold' => '1',
 												'Align' => 'left',
 												'Color' => 'black',
@@ -125,21 +116,18 @@
 		$letra_chica = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'left',
 			'Italic' => 1
 		));
 		$letra_chica_derecha = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'right',
 			'Italic' => 1
 		));
 		$letra_chica_bold = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'left',
 			'Bold' => 1,
 			'Italic' => 1
@@ -147,7 +135,6 @@
 		$letra_chica_bold_derecha = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'right',
 			'Bold' => 1,
 			'Italic' => 1
@@ -155,7 +142,6 @@
 		$letra_chica_underline = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'left',
 			'Bold' => 1,
 			'Italic' => 1,
@@ -164,7 +150,6 @@
 		$letra_chica_bottomgrid = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Bottom' => '2',
 			'Align' => 'left',
 			'Italic' => 1
@@ -172,7 +157,6 @@
 		$letra_chica_derecha_bottomgrid = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Bottom' => '2',
 			'Align' => 'right',
 			'Italic' => 1
@@ -181,14 +165,12 @@
 			'Size' => 8,
 			'Valign' => 'top',
 			'Align' => 'left',
-			'FontFamily' => 'Times New Roman',
 			'FgColor' => '55',
 			'Bold' => 1
 		));
 		$letra_datos_lista = &$wb->addFormat(array(
 			'Size' => 8,
 			'Valign' => 'top',
-			'FontFamily' => 'Times New Roman',
 			'Align' => 'left',
 			'TextWrap' => 1
 		));
@@ -318,7 +300,6 @@
 			$ff = str_replace('%Y','YY',$ff);
 			$formato_fecha =& $wb->addFormat(array('Size' => 8,
 									'Valign' => 'middle',
-									'FontFamily' => 'Times New Roman',
 									'Color' => 'black'));
 			$formato_fecha->setNumFormat($ff);
 
@@ -350,14 +331,12 @@
 			// ----------------- Define formatos specificos dentro del cobro ------------------
 			$formato_moneda_gastos =& $wb->addFormat(array('Size' => 7,
 															'VAlign' => 'top',
-															'FontFamily' => 'Times New Roman',
 															'Align' => 'right',
 															'Color' => 'black',
 															'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 			$formato_moneda_gastos_total =& $wb->addFormat(array('Size' => 10,
 															'VAlign' => 'top',
 															'Align' => 'right',
-															'FontFamily' => 'Times New Roman',
 															'Bold' => 1,
 															'Top' => 1,
 															'Color' => 'black',
@@ -376,26 +355,22 @@
 			$formato_moneda =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'top',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 			$formato_moneda2 =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'middle',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 			$formato_moneda_total =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'middle',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Bold' => '1',
 												'Color' => 'black',
 												'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 			$formato_moneda_total_tabla =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'middle',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Top' => '1',
 												'Bold' => '1',
 												'Color' => 'black',
@@ -403,13 +378,11 @@
 			$formato_monto =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'middle',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Color' => 'black',
 												'NumFormat' => "#,###,0$decimales")); 
 			$formato_total =& $wb->addFormat(array('Size' => 8,
 												'VAlign' => 'middle',
 												'Align' => 'right',
-												'FontFamily' => 'Times New Roman',
 												'Bold' => '1',
 												'Color' => 'black',
 												'NumFormat' => "#,###,0$decimales")); 

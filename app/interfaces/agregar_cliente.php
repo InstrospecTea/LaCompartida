@@ -241,7 +241,7 @@
 						$contrato->Edit("id_pais",$id_pais);
 						$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
 						if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
-							$contrato->Edit("id_usuario_secundario",$id_usuario_secundario);
+							$contrato->Edit("id_usuario_secundario",!empty($id_usuario_secundario) ? $id_usuario_secundario : "NULL");
 						}
 						$contrato->Edit("observaciones",$observaciones);
 						if( method_exists('Conf','GetConf') )
