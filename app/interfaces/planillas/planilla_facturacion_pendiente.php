@@ -15,6 +15,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	set_time_limit(300);
 	
@@ -111,12 +112,14 @@
 		$ws1->write($filas,2,date("d-m-Y H:i:s"),$formato_texto);
 		
 		$where = '';
+		$where_gasto = '';
 		if( $fecha1 != '' and $fecha2 != '' )
 		{
 			$where .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
+			$where_gasto = "cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' AND ";
 			$filas +=1;
 			$ws1->write($filas,1,__('FECHA CONSULTA:'),$formato_texto);
-			$ws1->write($filas,2,Utiles::sql2date($fecha1).' - '.Utiles::sql2date($fecha2),$formato_texto);
+			$ws1->write($filas,2,Utiles::sql2fecha($fecha1, $formato_fecha, "-").' - '.Utiles::sql2fecha($fecha2, $formato_fecha, "-"),$formato_texto);
 		}
 		if(is_array($socios))
 		{
@@ -250,13 +253,13 @@
 				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
 			(SELECT
 				SUM(IF(cta_corriente.egreso > 0,
-					IF(ISNULL(cta_corriente.id_moneda),
-						monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
-						monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0)) - 
+				IF(ISNULL(cta_corriente.id_moneda),
+					monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
+					monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0)) - 
 				SUM(IF(cta_corriente.ingreso > 0,
 					IF(ISNULL(cta_corriente.id_moneda),
-						monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
-						monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0))
+					monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
+					monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0))
 			FROM
 				cta_corriente
 				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
@@ -270,6 +273,7 @@
 				cta_corriente.cobrable = 1 AND
 				moneda_cobro_gasto.id_moneda = cta_corriente.id_moneda AND
 				moneda_cobro_total.id_moneda = tabla1.id_moneda_total AND
+				" . $where_gasto . "
 				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS monto_gastos,
 			tabla1.glosa_contrato,
 			tabla1.id_moneda_retainer,
@@ -351,11 +355,11 @@
 			}
 			$ws1->write($filas, $col_asunto,$cobro['asuntos'], $formato_texto);
 			
-			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_trabajo'])), $formato_texto);
-			$ws1->write($filas, $col_ultimo_gasto, empty($cobro['fecha_ultimo_gasto']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_gasto'])), $formato_texto);
-			$ws1->write($filas, $col_monto_gastos, $cobro['monto_gastos'], $formato_texto);
+			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, "-" ), $formato_texto);
+			$ws1->write($filas, $col_ultimo_gasto, empty($cobro['fecha_ultimo_gasto']) ? "" : Utiles::sql2fecha($cobro['fecha_ultimo_gasto'], $formato_fecha, "-"), $formato_texto);
+			$ws1->write($filas, $col_monto_gastos, $cobro['monto_gastos'], $formatos_moneda[$cobro['id_moneda_total']]);
 			
-			$ws1->write($filas, $col_ultimo_cobro,$cobro['fecha_ultimo_cobro'] != '' ? Utiles::sql2date($cobro['fecha_ultimo_cobro']) : '', $formato_texto);
+			$ws1->write($filas, $col_ultimo_cobro,$cobro['fecha_ultimo_cobro'] != '' ? Utiles::sql2fecha($cobro['fecha_ultimo_cobro'], $formato_fecha, "-") : '', $formato_texto);
 			$ws1->write($filas, $col_estado_ultimo_cobro,$cobro['estado_ultimo_cobro'] != '' ? $cobro['estado_ultimo_cobro'] : '', $formato_texto);
 			$ws1->write($filas, $col_forma_cobro,$cobro['forma_cobro'], $formato_texto);
 

@@ -9,12 +9,14 @@
 	require_once Conf::ServerDir().'/classes/CobroMoneda.php';
 	require_once Conf::ServerDir().'/classes/Gasto.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
 	
 
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	if($xls)
 	{
@@ -717,7 +719,7 @@
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 				$ws1->write($filas, $col_nota_cobro, $cobro['nota_cobro'], $fecha);
 			$ws1->write($filas, $col_factura, $cobro['documento'], $fecha);
-			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2date($cobro['fecha_creacion']), $fecha);
+			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $txt_opcion);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_opcion);
 			$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_opcion);
@@ -760,12 +762,12 @@
 			if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  ) )
 				$ws1->writeNumber($filas, $col_iva, number_format($monto_iva,$cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->write($filas, $col_estado, $cobro['estado'], $txt_centro);
-			$ws1->write($filas, $col_fecha_revision,Utiles::sql2date($cobro['fecha_en_revision']) ? Utiles::sql2date($cobro['fecha_en_revision']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_emision,Utiles::sql2date($cobro['fecha_emision']) ? Utiles::sql2date($cobro['fecha_emision']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_corte,Utiles::sql2date($cobro['fecha_fin']) ? Utiles::sql2date($cobro['fecha_fin']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_facturacion,Utiles::sql2date($cobro['fecha_facturacion']) ? Utiles::sql2date($cobro['fecha_facturacion']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_envio_a_cliente,Utiles::sql2date($cobro['fecha_enviado_cliente']) ? Utiles::sql2date($cobro['fecha_enviado_cliente']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_pago,Utiles::sql2date($cobro['fecha_cobro']) ? Utiles::sql2date($cobro['fecha_cobro']) : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_revision,Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, "-") : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_emision,Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-") : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_corte,Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, "-") : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_facturacion,Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, "-") : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_envio_a_cliente,Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-") : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_pago,Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, "-") ? Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, "-") : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_monto_pago_honorarios, number_format($monto_pago_honorarios, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->writeNumber($filas, $col_monto_pago_gastos, number_format($monto_pago_gastos, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 
@@ -783,8 +785,8 @@
 				++$filas2;
 				while($historial = mysql_fetch_array($resp_historial))
 				{
-					$comentario .= Utiles::sql2date($historial['fecha']).": ".$historial['comentario']."\n";
-					$ws2->write($filas2, $col2_fecha, Utiles::sql2date($historial['fecha']), $fecha);
+					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-").": ".$historial['comentario']."\n";
+					$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-"), $fecha);
 					$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
 					++$filas2;
 				}

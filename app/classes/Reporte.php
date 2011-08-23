@@ -453,7 +453,7 @@ class Reporte
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
-						CONCAT(cliente.glosa_cliente,\' - \',asunto.glosa_asunto) as glosa_cliente_asunto,
+						CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
 						IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
 						trabajo.fecha as fecha_final,
 						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,':'').'

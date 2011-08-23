@@ -80,8 +80,10 @@
 		$ws->setColumn(0 , $offset_columnas-1, 5);
 	if($vista == 'glosa_asunto')
 	{
-		$ws->setColumn($offset_columnas, $offset_columnas+1, 30);
-		$ws->setColumn($offset_columnas+2, $offset_columnas+12, 15);
+		$ws->setColumn($offset_columnas, $offset_columnas, 30);
+		$ws->setColumn($offset_columnas+1, $offset_columnas+1, 15);
+		$ws->setColumn($offset_columnas+2, $offset_columnas+2, 30);
+		$ws->setColumn($offset_columnas+3, $offset_columnas+13, 15);
 	}
 	else
 	{
@@ -98,6 +100,8 @@
 	if($vista == 'glosa_asunto')
 	{
 		$ws->write($offset_filas, $offset_columnas, __('glosa_cliente'), $formato_titulo_1);
+		++$offset_columnas;
+		$ws->write($offset_filas, $offset_columnas, __('Código'), $formato_titulo_1);
 		++$offset_columnas;
 	}
 	$ws->write($offset_filas, $offset_columnas, __($vista), $formato_titulo_1);
@@ -223,14 +227,15 @@
 				// Revisar si hay que fusionar varias celdas verticalmente.
 				if($n_clientes>0)
 				{
-					$ws->mergeCells($fila-$n_clientes, $offset_columnas-1, $fila-1, $offset_columnas-1);
+					$ws->mergeCells($fila-$n_clientes, $offset_columnas-2, $fila-1, $offset_columnas-2);
 					$n_clientes = 0;
 				}
-				$ws->write($fila, $offset_columnas-1, $nombre_cliente, $formato_nombre);
+				$ws->write($fila, $offset_columnas-2, $nombre_cliente, $formato_nombre);
 				$nombre_temp = $nombre_cliente;
 			}
 			++$n_clientes;
 
+			$ws->write($fila, $offset_columnas-1, $codigo_asunto, $formato_nombre);
 			$ws->write($fila, $offset_columnas, $nombre_asunto, $formato_nombre);
 			// Se lleva un registro de las celdas vacías para después rellenarlas con ceros.
 			// Se necesita porque Excel detecta un error si una celda ha sido sobreescrita y no muestra bien el archivo.

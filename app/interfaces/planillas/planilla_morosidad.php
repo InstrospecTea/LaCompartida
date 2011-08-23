@@ -6,6 +6,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Cobro.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
@@ -13,6 +14,7 @@
 	set_time_limit(300);
 	
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	if($xls)
 	{
 		$filas = 1;
@@ -142,7 +144,7 @@
 		$ws1->write($filas, $col_cliente, __('REPORTE MOROSIDAD'), $encabezado);
 		$filas += 2;
 		$ws1->write($filas, $col_cliente, __('GENERADO EL:'), $txt_opcion);
-		$ws1->write($filas, $col_total_pesos, date("d-m-Y H:i:s"), $txt_opcion);
+		$ws1->write($filas, $col_total_pesos, date("d/m/Y H:i:s"), $txt_opcion);
 
 		$where = "1";
 		if(is_array($clientes))
@@ -580,8 +582,8 @@
 			$total_gastos_moneda += $cobro['saldo_gastos'];
 			$total_gastos_pesos += $x_saldo_gastos_pesos;
 
-			$ws1->write($filas, $col_fecha_emision, Utiles::sql2date($cobro['fecha_emision']), $fecha);
-			$ws1->write($filas, $col_fecha_envio, Utiles::sql2date($cobro['fecha_enviado_cliente']), $fecha);
+			$ws1->write($filas, $col_fecha_emision, Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-"), $fecha);
+			$ws1->write($filas, $col_fecha_envio, Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			if(!$desglosar_por_encargado)

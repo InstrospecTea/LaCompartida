@@ -780,6 +780,13 @@ Calendar.setup(
 		button			: "img_fecha"		// ID of the button
 	}
 );
+Calendar.setup(
+	{
+		inputField	: "fecha_pago",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "img_fecha_pago"		// ID of the button
+	}
+);
 </script>
 <?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )

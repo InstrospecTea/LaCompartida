@@ -185,7 +185,7 @@ $mostrar_resumen_de_profesionales = 1;
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	$idioma->Load($cobro->fields['codigo_idioma']);
 	
-	if($idioma->fields['formato_fecha'] == '%d/%m/%y')
+	if( strtolower($idioma->fields['formato_fecha']) == '%d/%m/%y' )
 	{
 		$col_fecha_dia = $col_fecha_ini;
 		$col_fecha_mes = $col_fecha_med;
@@ -400,7 +400,8 @@ $mostrar_resumen_de_profesionales = 1;
 
 			$ff = str_replace('%d','DD',$idioma->fields['formato_fecha']);
 			$ff = str_replace('%m','MM',$ff);
-			$ff = str_replace('%y','YY',$ff);
+			$ff = str_replace('%y','YYYY',$ff);
+			$ff = str_replace('%Y','YYYY',$ff);
 			$ff = str_replace('%Y','YY',$ff);
 			$formato_fecha =& $wb->addFormat(array('Size' => 7,
 									'Valign' => 'top',
@@ -958,6 +959,7 @@ $mostrar_resumen_de_profesionales = 1;
 										$query_total_cobrable = "select if(sum(TIME_TO_SEC(duracion_cobrada)/3600)<=0,1,sum(TIME_TO_SEC(duracion_cobrada)/3600)) as duracion_total from trabajo where id_cobro = '".$cobro->fields['id_cobro']."' and cobrable = 1";
 										$resp_total_cobrable = mysql_query($query_total_cobrable,$sesion->dbh) or Utiles::errorSQL($query_total_cobrable,__FILE__,__LINE__,$sesion->dbh);
 										list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
+										$xtotal_hh_cobrable  = ($xtotal_hh_cobrable > 0 ? $xtotal_hh_cobrable : 1  );   //se evita la división por cero.
 										$factor = $cobro->fields['retainer_horas']/$xtotal_hh_cobrable;
 										
 										if( $cobro->fields['forma_cobro'] =='PROPORCIONAL' ) {

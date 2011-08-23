@@ -9,6 +9,7 @@
 	require_once Conf::ServerDir().'/classes/CobroMoneda.php';
 	require_once Conf::ServerDir().'/classes/Gasto.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
@@ -16,6 +17,7 @@
 	 set_time_limit(300);
 	 
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	if($xls)
 	{ 
@@ -665,7 +667,7 @@
 			{
 				$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
 			}
-			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2date($cobro['fecha_creacion']), $fecha);
+			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, '-'), $fecha);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $txt_opcion);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
@@ -682,8 +684,8 @@
 				if($mostrar_encargado_secundario)
 					$ws1->write($filas, $col_encargado_secundario, $cobro['nombre_secundario'], $txt_opcion);
 			}
-			$ws1->write($filas, $col_fecha_primer_trabajo, Utiles::sql2date($cobro['fecha_primer_trabajo']) ? Utiles::sql2date($cobro['fecha_primer_trabajo']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2date($cobro['fecha_ultimo_trabajo']) ? Utiles::sql2date($cobro['fecha_ultimo_trabajo']) : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_primer_trabajo, Utiles::sql2fecha($cobro['fecha_primer_trabajo'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_primer_trabajo'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 			$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) )
@@ -714,12 +716,12 @@
 			else
 				$ws1->write($filas, $col_estado, __('PAGO PARCIAL'), $txt_centro);
 				
-			$ws1->write($filas, $col_fecha_revision,Utiles::sql2date($cobro['fecha_en_revision']) ? Utiles::sql2date($cobro['fecha_en_revision']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_emision,Utiles::sql2date($cobro['fecha_emision']) ? Utiles::sql2date($cobro['fecha_emision']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_corte,Utiles::sql2date($cobro['fecha_fin']) ? Utiles::sql2date($cobro['fecha_fin']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_facturacion,Utiles::sql2date($cobro['fecha_facturacion']) ? Utiles::sql2date($cobro['fecha_facturacion']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_envio_a_cliente,Utiles::sql2date($cobro['fecha_enviado_cliente']) ? Utiles::sql2date($cobro['fecha_enviado_cliente']) : ' - ', $fecha);
-			$ws1->write($filas, $col_fecha_pago,Utiles::sql2date($cobro['fecha_cobro']) ? Utiles::sql2date($cobro['fecha_cobro']) : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_revision,Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_emision,Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_corte,Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_facturacion,Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_envio_a_cliente,Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, '-') : ' - ', $fecha);
+			$ws1->write($filas, $col_fecha_pago,Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_monto_pago_honorarios, number_format($monto_pago_honorarios, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->writeNumber($filas, $col_monto_pago_gastos, number_format($monto_pago_gastos, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 
@@ -736,8 +738,8 @@
 				++$filas2;
 				while($historial = mysql_fetch_array($resp_historial))
 				{
-					$comentario .= Utiles::sql2date($historial['fecha']).": ".$historial['comentario']."\n";
-					$ws2->write($filas2, $col2_fecha, Utiles::sql2date($historial['fecha']), $fecha);
+					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-').": ".$historial['comentario']."\n";
+					$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-'), $fecha);
 					$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
 					++$filas2;
 				}

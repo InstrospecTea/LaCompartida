@@ -8,9 +8,11 @@
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/CobroAsunto.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	
 	$sesion = new Sesion(array('DAT','COB'));
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	
 	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1 )
 	{
@@ -363,7 +365,7 @@ $query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secun
 					) AS horas_trabajadas,
 
 					ca.id_cobro AS id_cobro_asunto,
-					(SELECT MAX(fecha_fin) FROM cobro AS c1 WHERE c1.id_contrato = a1.id_contrato) as fecha_ultimo_cobro
+					DATE_FORMAT( (SELECT MAX(fecha_fin) FROM cobro AS c1 WHERE c1.id_contrato = a1.id_contrato), '$formato_fecha') as fecha_ultimo_cobro
 					FROM asunto AS a1
 					LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
 					LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
@@ -379,6 +381,7 @@ $query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secun
 			else
 				$x_pag = 7;
 			$b = new Buscador($sesion, $query, "Asunto", $desde, $x_pag, $orden);
+			$b->formato_fecha = "$formato_fecha";
 			$b->mensaje_error_fecha = "N/A";
 			$b->nombre = "busc_gastos";
 			$b->titulo = __('Listado de').' '.__('Asuntos');
@@ -470,14 +473,15 @@ $query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secun
 	function funcionTR(& $asunto)
     {
         global $sesion;
+		global $formato_fecha;
         static $i = 0;
 
         if($i % 2 == 0)
             $color = "#dddddd";
         else
             $color = "#ffffff";
-        $formato_fecha = "%d/%m/%y";
-        $fecha = Utiles::sql2fecha($asunto->fields['fecha_ultimo_cobro'],$formato_fecha);
+        
+        $fecha = Utiles::sql2fecha($asunto->fields['fecha_ultimo_cobro'],$formato_fecha, "N/A");
         $html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
         $html .= "<td align=center>".$asunto->fields['codigo_asunto']."</td>";
         $html .= "<td align=center>".$asunto->fields['glosa_asunto']."</td>";

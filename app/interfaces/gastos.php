@@ -21,6 +21,7 @@
 	$pagina = new Pagina($sesion);
 	
 	$gasto = new Gasto($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	set_time_limit(300);
 	
@@ -151,6 +152,7 @@
 								WHERE $where";
 		$x_pag = 12;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
+		$b->formato_fecha = "$formato_fecha";
 		$b->nombre = "busc_gastos";
 		$b->titulo = "Gastos por ".__('asunto');
 		#$b->AgregarFuncion("Nombre",__('Nombre'));
@@ -193,7 +195,7 @@
 
 		function FechaFactura(& $fila)
 		{
-			$html_fecha_factura .= "&nbsp;".( !empty($fila->fields['fecha_factura']) ? Utiles::sql2fecha($fila->fields['fecha_factura'],"%d/%m/%Y") : "-")."&nbsp;";
+			$html_fecha_factura .= "&nbsp;".( !empty($fila->fields['fecha_factura']) ? Utiles::sql2fecha($fila->fields['fecha_factura'],"%m/%d/%Y") : "-")."&nbsp;";
 			return $html_fecha_factura;
 		}
 		

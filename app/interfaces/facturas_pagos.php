@@ -400,10 +400,11 @@
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
+		$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
 		
 		$html .= "<tr id=\"t".$fila->fields['id_factura']."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 		$glosa_tramite = $tramite->fields['glosa_tramite'];
-		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],'%d-%m-%y')."</td>";
+		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],$formato_fechas, '-')."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
 		$html .= "<td align=left>".GlosaCliente(& $fila)."</td>";
@@ -421,7 +422,7 @@
 		$html .= "<td align=right >".DescripcionPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right >".BancoPago(& $fila, $sesion)."</td>";
 		$html .= "<td align=right nowrap>".CuentaPago(& $fila, $sesion)."</td>";
-		$html .= "<td align=right nowrap>".$fila->fields['fecha_pago']."</td>";
+		$html .= "<td align=right nowrap>".Utiles::sql2fecha($fila->fields['fecha_pago'],$formato_fechas, '-')."</td>";
 		//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 		//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";

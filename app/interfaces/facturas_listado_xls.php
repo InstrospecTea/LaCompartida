@@ -19,6 +19,10 @@
 
 //void Worksheet::setLandscape();
 	$contrato = new Contrato($sesion);
+	
+	$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
+	$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
+	$formato_fechas_php = strtr( $formato_fechas, $cambios);
 
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
@@ -94,7 +98,7 @@
 		$where = base64_decode($where);
 
 	$query = "SELECT cliente.glosa_cliente
-						, fecha
+						, DATE_FORMAT(fecha, '" . $formato_fechas . "') as fecha
 						, prm_documento_legal.codigo as tipo
 						, numero";
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -304,7 +308,8 @@
 	// Escribir encabezado reporte
 	$ws1->write($fila, 0, __('Documentos tributarios'), $formato_encabezado);
 	$fila++;
-
+	
+	$fecha_actual = date( $formato_fechas_php );
 	$ws1->write($fila, 0, $fecha_actual, $formato_encabezado);
 	$fila++;
 	$fila++;
@@ -406,7 +411,7 @@
 				}
 				if($col_name[$i] == 'fecha_ultimo_pago') {
 
-					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $ultima_fecha_pago, $arr_col[$col_name[$i]]['css']);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], Utiles::sql2fecha($ultima_fecha_pago, $formato_fechas, "-"), $arr_col[$col_name[$i]]['css']);
 				}
 				if($col_name[$i] == 'estado_glosa') {
 

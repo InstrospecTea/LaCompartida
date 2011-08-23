@@ -128,10 +128,10 @@
 		else
 			$where = base64_decode($where);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS * 
-					, prm_documento_legal.codigo as tipo 
-					, numero 
-					, cliente.glosa_cliente 
+		$query = "SELECT SQL_CALC_FOUND_ROWS *
+					, prm_documento_legal.codigo as tipo
+					, numero
+					, cliente.glosa_cliente
 					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ), 
 								factura.cliente, 
 								IF( contrato.factura_razon_social IN ('',' '),
@@ -143,37 +143,37 @@
 									) 
 							) as factura_rsocial 
 					, fecha , usuario.username AS encargado_comercial
-					, fecha 
-					, usuario.username AS encargado_comercial 
-					, descripcion 
-					, prm_estado_factura.codigo as estado 
-					, factura.id_cobro 
-					, prm_moneda.simbolo 
-					, prm_moneda.cifras_decimales 
-					, prm_moneda.tipo_cambio 
-					, factura.id_moneda 
-					, factura.honorarios 
-					, factura.subtotal_gastos 
-					, factura.subtotal_gastos_sin_impuesto 
-					, factura.iva 
-					, total 
-					, '' as saldo_pagos 
-					, cta_cte_fact_mvto.saldo as saldo 
-					, '' as monto_pagos_moneda_base 
-					, '' as saldo_moneda_base 
-					, factura.id_factura 
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social 
-				FROM factura 
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal) 
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda 
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado 
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura 
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro 
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente 
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato 
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable 
+					, fecha
+					, usuario.username AS encargado_comercial
+					, descripcion
+					, prm_estado_factura.codigo as estado
+					, factura.id_cobro
+					, prm_moneda.simbolo
+					, prm_moneda.cifras_decimales
+					, prm_moneda.tipo_cambio
+					, factura.id_moneda
+					, factura.honorarios
+					, factura.subtotal_gastos
+					, factura.subtotal_gastos_sin_impuesto
+					, factura.iva
+					, total
+					, '' as saldo_pagos
+					, cta_cte_fact_mvto.saldo as saldo
+					, '' as monto_pagos_moneda_base
+					, '' as saldo_moneda_base
+					, factura.id_factura
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+				FROM factura
+				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 							WHERE $where";
-		
+
 		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_saldo_total = 0;
 		$glosa_monto_saldo_total = '';
@@ -227,7 +227,7 @@
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
 		return $html_opcion;
 	}
-
+	
 	function SubTotal(& $fila)
 	{
 		$subtotal = $fila->fields['honorarios'] +$fila->fields['subtotal_gastos'] +$fila->fields['subtotal_gastos_sin_impuesto'];
@@ -320,10 +320,11 @@
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
+		$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
 		
 		$html .= "<tr id=\"t".$fila->fields['id_factura']."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 		$glosa_tramite = $tramite->fields['glosa_tramite'];
-		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'],'%d-%m-%y')."</td>";
+		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas)."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
 		if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') )

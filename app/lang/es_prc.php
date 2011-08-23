@@ -27,10 +27,10 @@
 
 	$_LANG['WIP'] = 'Stock';
 	$_LANG['WIP (Work in progress)'] = 'Stock';
-	
+
 	# Menú
 	$_LANG['Cobranza']  = "Facturación";
-	
+
 	$_LANG['Generar borradores'] = "Generar Pre-liquidaciones";
 	$_LANG['Excel borradores'] = "Planillón Excel";
 	$_LANG['Imprimir borradores'] = "Imprimir Pre-liquidaciones";
@@ -39,10 +39,12 @@
 	$_LANG['Encargado Comercial'] = "Attache Primario";
 	$_LANG['Encargado comercial'] = "Attache principal";
 	$_LANG['Usuario encargado'] = "Attache Secundario";
+	$_LANG['Encargado'] = "Attache";
+	$_LANG['Encargado Secundario'] = "Attache Secundario";
 
 	$_LANG['Cobrado'] = 'Facturado';
 	$_LANG['Cobrable'] = 'Facturable';
-	
+
 	#$_LANG['Descargar Excel'] = "Planillón Excel";
 	$_LANG['Descargar Excel'] = "Planillón Excel";
 

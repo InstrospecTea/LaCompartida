@@ -437,8 +437,8 @@ class Cobro extends Objeto
                                JOIN tramite_tipo USING( id_tramite_tipo )
                                WHERE tramite.id_cobro = '".$this->fields['id_cobro']."'
                                ORDER BY tramite.fecha ASC";
-				if( !$mantener_porcentaje_impuesto )
-					$lista_tramites = new ListaTramites($this->sesion,'',$query);
+			 if( !$mantener_porcentaje_impuesto )	
+			 	$lista_tramites = new ListaTramites($this->sesion,'',$query);
 
        for($z=0;$z<$lista_tramites->num;$z++)
 				{
@@ -10076,7 +10076,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$total_valor = 0;
 				foreach( $x_resumen_profesional as $prof => $data )
 				{
-					$resumen_filas[$prof] = str_replace('%porcentaje_participacion%', number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas*100, 2,$idioma->fields['separador_decimales'], $idioma->fields['separador_miles']).'%', $resumen_filas[$prof]);
+					$resumen_hrs_cobradas_temp = $resumen_hrs_cobradas > 0 ? $resumen_hrs_cobradas : 1;
+					$resumen_filas[$prof] = str_replace('%porcentaje_participacion%', number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas_temp*100, 2,$idioma->fields['separador_decimales'], $idioma->fields['separador_miles']).'%', $resumen_filas[$prof]);
 					
 					if( $incobrables ) 
 						$resumen_filas[$prof] = str_replace('%columna_horas_no_cobrables%','<td align="center">'.$x_resumen_profesional[$prof]['glosa_duracion_incobrables'].'</td>', $resumen_filas[$prof]);
@@ -10088,9 +10089,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
 						}
 					else
-						$resumen_filas[$prof] = str_replace('%valor_retainer%', $columna_hrs_retainer?number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas*$this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']):'', $resumen_filas[$prof]);
+						$resumen_filas[$prof] = str_replace('%valor_retainer%', $columna_hrs_retainer?number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas_temp*$this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']):'', $resumen_filas[$prof]);
 					if( $this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
-						$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas*$this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
+						$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', number_format($x_resumen_profesional[$prof]['duracion_cobrada']/$resumen_hrs_cobradas_temp*$this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
 					else
 						$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
 					if($han_trabajado_menos_del_retainer)

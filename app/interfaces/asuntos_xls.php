@@ -13,6 +13,8 @@
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('REV','ADM') );
+	
+   set_time_limit(150);
 
     $pagina = new Pagina( $sesion );
 
@@ -223,34 +225,34 @@
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
     $query = "SELECT SQL_CALC_FOUND_ROWS
 					*,
-					a1.codigo_asunto,
-					a1.id_moneda, 
-					a1.activo,
-					a1.fecha_creacion, 
-					(
-						SELECT 
-							SUM(TIME_TO_SEC(duracion_cobrada))/3600 
-						FROM trabajo AS t2
-						LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
-						WHERE (cobro.estado IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
-							AND t2.codigo_asunto=a1.codigo_asunto
-							AND t2.cobrable = 1
-					) AS horas_no_cobradas,
-					(
-						SELECT 
-							SUM(TIME_TO_SEC(duracion))/3600
-						FROM trabajo AS t3
-						WHERE
-							t3.codigo_asunto=a1.codigo_asunto
-							AND t3.cobrable = 1
-					) AS horas_trabajadas,
-					ca.id_cobro AS id_cobro_asunto, 
-					tarifa.glosa_tarifa,
-					prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
-					prm_area_proyecto.glosa AS area_proyecto, 
-					a1.codigo_asunto_secundario as codigo_secundario,
-					contrato.monto,
-					contrato.forma_cobro,
+			    							a1.codigo_asunto,
+			    							a1.id_moneda, 
+			    							a1.activo,
+			            			a1.fecha_creacion, 
+			            			(
+			            				SELECT 
+			            					SUM(TIME_TO_SEC(duracion_cobrada))/3600 
+				            			FROM trabajo AS t2
+													LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
+													WHERE (cobro.estado IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
+													AND t2.codigo_asunto=a1.codigo_asunto
+													AND t2.cobrable = 1
+												) AS horas_no_cobradas,
+												(
+													SELECT 
+														SUM(TIME_TO_SEC(duracion))/3600
+			                    FROM trabajo AS t3
+			                    WHERE
+			                      t3.codigo_asunto=a1.codigo_asunto
+			                    AND t3.cobrable = 1
+			                  ) AS horas_trabajadas,
+												ca.id_cobro AS id_cobro_asunto, 
+												tarifa.glosa_tarifa,
+												prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
+												prm_area_proyecto.glosa AS area_proyecto, 
+												a1.codigo_asunto_secundario as codigo_secundario,
+												contrato.monto,
+												contrato.forma_cobro,
 					prm_moneda.glosa_moneda,
 					usuario.username as username,
 					usuario.apellido1 as apellido1,
@@ -258,20 +260,20 @@
 					usuario_secundario.username as username_secundario,
 					usuario_secundario.apellido1 as apellido1_secundario,
 					usuario_secundario.nombre as nombre_secundario
-				FROM asunto AS a1
-				LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
-				LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
-				LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
-				LEFT JOIN prm_idioma ON a1.id_idioma = prm_idioma.id_idioma
-				LEFT JOIN prm_tipo_proyecto ON a1.id_tipo_asunto=prm_tipo_proyecto.id_tipo_proyecto
-				LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
-				LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-				LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
+                    FROM asunto AS a1
+                    LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
+                    LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
+                    LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+                    LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
+                    LEFT JOIN prm_idioma ON a1.id_idioma = prm_idioma.id_idioma
+                    LEFT JOIN prm_tipo_proyecto ON a1.id_tipo_asunto=prm_tipo_proyecto.id_tipo_proyecto
+                    LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
+                    LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+                    LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
 				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-				WHERE $where
-				GROUP BY a1.codigo_asunto ORDER BY
-				a1.codigo_asunto, a1.codigo_cliente ASC";
+                    WHERE $where
+                    GROUP BY a1.codigo_asunto ORDER BY
+                    a1.codigo_asunto, a1.codigo_cliente ASC";
 
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  while($row = mysql_fetch_array($resp))
@@ -298,12 +300,12 @@
             $ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
             $ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
             if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
-				$ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
+	            $ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
 				if($mostrar_encargado_secundario)
 					$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
 			}
 			else{
-				$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
+	          	$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
 				if($mostrar_encargado_secundario)
 					$ws1->write($fila_inicial, $col_encargado_secundario,
 						empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
@@ -314,7 +316,9 @@
 						$ws1->write($fila_inicial, $col_monto_asunto, $row['monto'], $f4);
             $ws1->write($fila_inicial, $col_tipo_proyecto, $row['tipo_proyecto'], $f4);
             $ws1->write($fila_inicial, $col_area_proyecto, $row['area_proyecto'], $f4);
-            $ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion']), $f4);
+	   $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+	   $formato_fecha = str_replace( "/", "-", $formato_fecha);
+            $ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion'], $formato_fecha, '-'), $f4);
             $ws1->write($fila_inicial, $col_nombre_contacto, $row['contacto'], $f4);
             $ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
 						$ws1->write($fila_inicial, $col_mail_contacto, $row['email_contacto'], $f4);

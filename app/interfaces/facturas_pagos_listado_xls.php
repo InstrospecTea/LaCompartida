@@ -19,6 +19,10 @@
 
 //void Worksheet::setLandscape();
 	$contrato = new Contrato($sesion);
+	
+	$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
+	$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
+	$formato_fechas_php = strtr( $formato_fechas, $cambios);
 
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
@@ -126,12 +130,12 @@
 	{
 		$query .= "			, cliente as cliente_facturable";
 	}
-	$query .= "			, factura.fecha as fecha_factura
+	$query .= "			, DATE_FORMAT(factura.fecha, '" . $formato_fechas . "') as fecha_factura
 					, cliente.glosa_cliente
 					, usuario.username AS encargado_comercial
 					, prm_estado_factura.codigo as estado_factura
 					, fp.id_factura_pago as id_pago
-					, fp.fecha as fecha_pago
+					, DATE_FORMAT(fp.fecha, '" . $formato_fechas . "') as fecha_pago
 					, prm_factura_pago_concepto.glosa as concepto
 					, fp.descripcion as descripcion_pago
 					, b.nombre as banco

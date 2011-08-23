@@ -207,14 +207,14 @@
 									asunto.monto, 
 									asunto.glosa_asunto, 
 									tramite.descripcion, 
-									contrato.id_contrato, 
+									contrato.id_contrato,
 	            		contrato.descuento, 
 	            		tramite_tipo.glosa_tramite, 
 	            		tramite.tarifa_tramite, 
 	            		tramite.id_moneda_tramite_individual, 
 	            		tramite.tarifa_tramite_individual, 
 	            		tramite.duracion, 
-	            		tramite.cobrable 
+	            		tramite.cobrable  
 	              FROM tramite
 	              JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
 	              JOIN contrato ON asunto.id_contrato = contrato.id_contrato
@@ -798,14 +798,16 @@ function editarMultiplesArchivos()
 		if( $tramite->fields['tarifa_tramite_individual'] > 0 )
 			$tarifa = $tramite->fields['tarifa_tramite_individual'];
 		else
-			$tarifa = $tramite->fields['tarifa_tramite']; 
+		$tarifa = $tramite->fields['tarifa_tramite']; 
 		list($h,$m,$s) = split(":",$tramite->fields['duracion_defecto']);
 		$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 		$total = round($tarifa, 2);
 		$total_horas += $duracion;
 		#	if(substr($h,0,1)=='0')
 		#		$h=substr($h,1);
-		$formato_fecha = "%d/%m/%y";
+		$queryformato = "SELECT pi.formato_fecha FROM prm_idioma pi JOIN cobro c ON (  pi.codigo_idioma = c.codigo_idioma) WHERE c.id_cobro='" . $id_cobro . "' LIMIT 1";
+		$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+		
 		$fecha = Utiles::sql2fecha($tramite->fields['fecha'],$formato_fecha);
 		$html .= "<tr id=\"t".$tramite->fields[id_tramite]."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 		$html .= '<td><input type="checkbox" onmouseover="ddrivetip(\'Para editar múltiples trámites haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
@@ -861,15 +863,7 @@ function editarMultiplesArchivos()
 		}
 		
 		$moneda_tramite = new Moneda($sesion);
-		$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
-		
-		$moneda_tramite_individual = new Moneda($sesion);
-		$moneda_tramite_individual->Load($tramite->fields['id_moneda_tramite_individual']);
-		
-		if( $tramite->fields['tarifa_tramite_individual'] > 0 )
-			$simbolo = $moneda_tramite_individual->fields['simbolo'];
-		else
-			$simbolo = $moneda_tramite->fields['simbolo'];
+		$moneda_tramite->Load($tramite->fields['id_moneda_asunto']);
 
         $html .= "<td align=center>".$duracion."</td>";
         $html .= "<td>".$editar_cobro."</td>";
@@ -879,12 +873,12 @@ function editarMultiplesArchivos()
         		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
         			$html .= "<td align=center>".$tramite->fields['username']."</td>";
         		else
-        			$html .= "<td align=center>".substr($tramite->fields['nombre'],0,1).substr($tramite->fields['apellido1'],0,1).substr($tramite->fields['apellido2'],0,1)."</td>";
+        			$html .= "<td align=center>".substr($tramite->fields[nombre],0,1).substr($tramite->fields[apellido1],0,1).substr($tramite->fields[apellido2],0,1)."</td>";
         	}
         if( $p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido'] )
 					{
 					//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
-					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$simbolo." ".number_format($tarifa, $moneda_tramite_individual->fields['cifras_decimales'], ',','.')."</td>";
+					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['decimales'], ',','.')."</td>";
 					}
 		$html .= '<td align=center nowrap>'.Opciones(& $tramite).'</td>';
         $html .= "</tr>";

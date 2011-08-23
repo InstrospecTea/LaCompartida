@@ -113,7 +113,7 @@
 			$url_usuarios = '';
 ?>
 		<br />
-		<img src=graficos/grafico_<?=$tipo_reporte?>.php?popup=1<?=$url_clientes?><?=$url_usuarios?>&fecha_ini=<?=Utiles::fecha2sql($fecha_ini)?>&fecha_fin=<?=Utiles::fecha2sql($fecha_fin)?> alt='' />
+		<img src="graficos/grafico_<?=$tipo_reporte?>.php?popup=1<?=$url_clientes?><?=$url_usuarios?>&fecha_ini=<?=Utiles::fecha2sql($fecha_ini)?>&fecha_fin=<?=Utiles::fecha2sql($fecha_fin)?>" alt='' />
 
 		<!--
 		<?

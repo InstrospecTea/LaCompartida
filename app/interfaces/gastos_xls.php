@@ -8,6 +8,7 @@
     require_once Conf::ServerDir().'/../app/classes/Moneda.php';
     require_once Conf::ServerDir().'/../app/classes/Gasto.php';
     require_once Conf::ServerDir().'/classes/Funciones.php';
+	require_once Conf::ServerDir().'/clases/UtilesApp.php';
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('OFI','COB') );
@@ -292,10 +293,12 @@
 			$orden = "fecha DESC";		
 		
 		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	  while($row = mysql_fetch_array($resp2))
-    {
+	{
+		  
     	$columna_actual=0;
-	    $ws1->write($fila_inicial, $columna_actual++, Utiles::sql2date($row[fecha]), $f4);
+	    $ws1->write($fila_inicial, $columna_actual++, Utiles::sql2date($row[fecha], $formato_fecha), $f4);
 	    if(!$codigo_cliente)
 	    	$ws1->write($fila_inicial, $columna_actual++, $row[glosa_cliente], $f4);
 	    if(!$codigo_asunto)
@@ -311,7 +314,7 @@
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
 			$ws1->write($fila_inicial, $columna_actual++, !empty($row['codigo_factura_gasto']) ? $row['codigo_factura_gasto'] : "", $f4);
-			$ws1->write($fila_inicial, $columna_actual++, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],'%d/%m/%y') : '-' , $f4);
+			$ws1->write($fila_inicial, $columna_actual++, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],$formato_fecha) : '-' , $f4);
 		}
 	    if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 		{

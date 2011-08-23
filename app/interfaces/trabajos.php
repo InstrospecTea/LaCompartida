@@ -883,7 +883,8 @@ function EditarTodosLosArchivos()
 		#	if(substr($h,0,1)=='0')
 		#		$h=substr($h,1);
 		$dur_cob = "$h:$m";
-		$formato_fecha = "%d/%m/%y";
+		$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+		
 		$fecha = Utiles::sql2fecha($trabajo->fields[fecha],$formato_fecha);
 		if( $trabajo->fields['id_tramite_tipo'] > 0 ) {
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";

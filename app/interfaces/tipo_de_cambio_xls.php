@@ -12,6 +12,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
     require_once Conf::ServerDir().'/classes/Moneda.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once 'Spreadsheet/Excel/Writer.php';
 
 	//Parámetros generales para los 2 casos de listas a extraer
@@ -90,7 +91,6 @@
 		$i=0;
 		$fila_inicial = 7;
 		
-		
 		$query = "SELECT 
 						fecha, ";
 						/*,    
@@ -140,12 +140,13 @@
 		$query .= "FROM moneda_historial" . $where . "
 			GROUP BY fecha;";
 		
+		$fecha_formato = UtilesApp::ObtenerFormatoFecha($sesion);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
 		while($row = mysql_fetch_array($resp))
 		{
 			$i=0;
 			
-			$ws1->write($fila_inicial, 1, Utiles::sql2date($row[0]), $f5);
+			$ws1->write($fila_inicial, 1, Utiles::sql2date($row[0], $fecha_formato, "-"), $f5);
 			for( $cm= 1; $cm <= $num_monedas_tmp; $cm++)
 			{
 				$ws1->write( $fila_inicial , ($cm+1), $row[$cm], $f5);

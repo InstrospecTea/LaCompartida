@@ -21,6 +21,7 @@
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 
 	if($id_documento != "")
@@ -85,6 +86,7 @@
 
 		$x_pag = 13;
 		$b = new Buscador($sesion, $query, "Documento", $desde, $x_pag, $orden);
+		$b->formato_fecha = "$formato_fecha";
 		$b->nombre = "busc_documentos";
 		$b->titulo = "Documentos";
 

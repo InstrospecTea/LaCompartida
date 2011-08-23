@@ -15,6 +15,32 @@ class UtilesApp extends Utiles
 		return false;
 	}
 
+	
+	#obtener el formato de la fecha segun un query, o el seteado en el idioma por defecto
+	function ObtenerFormatoFecha($sesion,$query=""){
+		if ( strlen( $query ) > 0 ) //si tiene query para intentar obtener el idioma según asunto, cobro, u otro ejecutamos query
+		{
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			if (mysql_num_rows($resp) > 0)
+			{
+				list($formato) = mysql_fetch_array($resp);
+			}
+			else //si la clase (objeto, cobro, asunto, etc, no tiene idioma asociado, buscamos el formato del idioma por defecto)
+			{
+				$query_idioma_defecto = "SELECT pi.formato_fecha FROM prm_idioma pi WHERE pi.codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma' )  ";
+				$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				list($formato) = mysql_fetch_array($resp);
+			}
+		}
+		else //si no buscamos el idioma por defecto.
+		{
+			$query_idioma_defecto = "SELECT pi.formato_fecha FROM prm_idioma pi WHERE pi.codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma' )  ";
+			$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($formato) = mysql_fetch_array($resp);
+		}
+		return ($formato);
+	}
+	
 	####################### Formato carta #############################
 	function TemplateCarta( &$sesion, $id_carta=1 )
 	{

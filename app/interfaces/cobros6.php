@@ -2135,6 +2135,13 @@ Calendar.setup(
 		button			: "img_fecha_pago_parcial"		// ID of the button
 	}
 );
+Calendar.setup(
+	{
+		inputField	: "fecha_pago_gastos",				// ID of the input field
+		ifFormat		: "%d-%m-%Y",			// the date format
+		button			: "imgfecha_fecha_pago_gastos"		// ID of the button
+	}
+);
 </script>
 <?
 	$pagina->PrintBottom($popup);

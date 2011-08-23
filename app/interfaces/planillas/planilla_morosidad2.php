@@ -6,6 +6,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Cobro.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
@@ -13,6 +14,7 @@
 	set_time_limit(300);
 	
 	$pagina = new Pagina($sesion);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	if($xls)
 	{
 		$filas = 1;
@@ -495,8 +497,8 @@
 			$total_gastos_moneda += $cobro['saldo_gastos'];
 			$total_gastos_pesos += $x_saldo_gastos_pesos;
 
-			$ws1->write($filas, $col_fecha_emision, Utiles::sql2date($cobro['fecha_emision']), $fecha);
-			$ws1->write($filas, $col_fecha_envio, Utiles::sql2date($cobro['fecha_enviado_cliente']), $fecha);
+			$ws1->write($filas, $col_fecha_emision, Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-"), $fecha);
+			$ws1->write($filas, $col_fecha_envio, Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			$ws1->write($filas, $col_factura, $cobro['documento'] ? $cobro['documento'] : '-', $txt_centro);

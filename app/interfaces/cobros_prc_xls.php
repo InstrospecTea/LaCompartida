@@ -390,7 +390,7 @@
 			$nombre_pagina = ++$numero_pagina.' ';
 			$ws = &$wb->addWorksheet("Liquidación");
 			$ws->setPaper(1);
-
+			$ws->hideScreenGridlines(1);
 			$ws->setColumn( $col_id_trabajo, $col_id_trabajo, 15 );
 			$ws->setColumn( $col_fecha, $col_fecha, 15 );
 			$ws->setColumn( $col_abogado, $col_abogado, 15 );

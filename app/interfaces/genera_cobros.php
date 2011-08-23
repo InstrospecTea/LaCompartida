@@ -19,6 +19,8 @@
 	$contrato = new Contrato($sesion);
 
 	$cobros = new Cobro($sesion);
+	
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre";
@@ -756,6 +758,7 @@ if($opc == 'buscar')
 		global $id_proceso;
 		static $i = 0;
 		global $tipo_liquidacion;
+		global $formato_fecha;
 		
 		if($i % 2 == 0)
 			$color = "#dddddd";
@@ -763,7 +766,7 @@ if($opc == 'buscar')
 			$color = "#ffffff";
 
 		if($contrato->fields['fecha_ultimo_cobro'] != $cobros->FechaUltimoCobro($contrato->fields['codigo_cliente']))
-			$fecha_ultimo_cobro = Utiles::sql2date($contrato->fields['fecha_ultimo_cobro']);
+			$fecha_ultimo_cobro = Utiles::sql2fecha($contrato->fields['fecha_ultimo_cobro'], $formato_fecha, "-");
 		else
 			$fecha_ultimo_cobro = 'N/A';
 
@@ -824,7 +827,7 @@ if($opc == 'buscar')
 			{
 				$cobro = $lista_cobros->Get($z);
 				$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
-				$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2date($cobro->fields['fecha_ini']).' '._('hasta').' '.Utiles::sql2date($cobro->fields['fecha_fin']) : __('hasta').' '.Utiles::sql2date($cobro->fields['fecha_fin']);
+				$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-").' '._('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 
 				$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
@@ -875,19 +878,19 @@ if($opc == 'buscar')
 				if ($contrato->fields['separar_liquidaciones']) {
 					if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
 						$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-")."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 0)\" >";
 					}
 					if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
 					if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
 						$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-")."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 0, 1)\" >";
 					}
 				} else {
 					// Flujo Actual, solo uno que hace ambas cosas
 					$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('"
-						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2date($pendiente->fields['fecha_cobro'])."',"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-")."',"
 						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 1)\" >";
 				}
 
