@@ -86,11 +86,17 @@
 		$ws1->hideGridlines();
 		$ws1->setLandscape();
 
+		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+
 		// Definir columnas a usar
 		$indice_columnas = 1;
 		$col_cliente = $indice_columnas++;
 		$col_total_pesos = $indice_columnas++;
 		$col_asuntos = $indice_columnas++;
+		if(!$desglosar_por_encargado)
+			$col_encargado = $indice_columnas++;
+		if($mostrar_encargado_secundario)
+			$col_encargado_secundario = $indice_columnas++;
 		$col_fecha_emision = $indice_columnas++;
 		$col_fecha_envio = $indice_columnas++;
 		$col_cobro = $indice_columnas++;
@@ -117,6 +123,10 @@
 		$ws1->setColumn($col_fecha_envio, $col_fecha_envio, 14);
 		$ws1->setColumn($col_cobro, $col_cobro, 14);
 		$ws1->setColumn($col_asuntos, $col_asuntos, 30);
+		if(!$desglosar_por_encargado)
+			$ws1->setColumn($col_encargado, $col_encargado, 30);
+		if($mostrar_encargado_secundario)
+			$ws1->setColumn($col_encargado_secundario, $col_encargado_secundario, 30);
 		$ws1->setColumn($col_factura, $col_factura, 10);
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 		{
@@ -199,6 +209,7 @@
 					cliente.glosa_cliente,
 					cobro.documento,
 					CONCAT(usuario.nombre, ' ', usuario.apellido1) AS nombre,
+					CONCAT(usuario_secundario.nombre, ' ', usuario_secundario.apellido1) AS nombre_secundario,
 					documento.saldo_honorarios,
 					documento.saldo_gastos,
 					documento.saldo_honorarios*(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) as saldo_honorarios_pesos,
@@ -215,6 +226,7 @@
 					LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 					LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
+					LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
 					LEFT JOIN prm_moneda as documento_moneda ON documento_moneda.id_moneda = documento.id_moneda
 					LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
 					LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = documento.id_moneda
@@ -266,6 +278,10 @@
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 				$ws1->write($filas, $col_total_pesos, __('Total en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+				if(!$desglosar_por_encargado)
+					$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 				$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -305,6 +321,10 @@
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total en Pesos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+					if(!$desglosar_por_encargado)
+						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					if($mostrar_encargado_secundario)
+						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -346,6 +366,10 @@
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+					if(!$desglosar_por_encargado)
+						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					if($mostrar_encargado_secundario)
+						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -391,6 +415,10 @@
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+					if(!$desglosar_por_encargado)
+						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					if($mostrar_encargado_secundario)
+						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -424,6 +452,10 @@
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+					if(!$desglosar_por_encargado)
+						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					if($mostrar_encargado_secundario)
+						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -464,6 +496,10 @@
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
+					if(!$desglosar_por_encargado)
+						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					if($mostrar_encargado_secundario)
+						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
@@ -548,6 +584,10 @@
 			$ws1->write($filas, $col_fecha_envio, Utiles::sql2date($cobro['fecha_enviado_cliente']), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
+			if(!$desglosar_por_encargado)
+				$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_izquierda);
+			if($mostrar_encargado_secundario)
+				$ws1->write($filas, $col_encargado_secundario, $cobro['nombre_secundario'], $txt_izquierda);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
 				$ws1->write($filas, $col_factura, $facturas, $fecha);

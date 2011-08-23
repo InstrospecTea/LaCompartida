@@ -11,6 +11,7 @@
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Reporte.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
@@ -56,6 +57,8 @@
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
+
+		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
 
 		$formatos_moneda = array();
 		$query = 'SELECT id_moneda, simbolo, cifras_decimales
@@ -131,6 +134,8 @@
 		$col_codigo_cliente = ++$col;
 		$col_cliente = ++$col;
 		$col_usuario_encargado = ++$col;
+		if($mostrar_encargado_secundario)
+			$col_usuario_encargado_secundario = ++$col;
 		$col_asunto = ++$col;
 		
 		$col_ultimo_trabajo = ++$col;
@@ -158,6 +163,8 @@
 		$ws1->setColumn($col_codigo_cliente, $col_codigo_cliente, 16);
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
 		$ws1->setColumn($col_usuario_encargado, $col_usuario_encargado, 40);
+		if($mostrar_encargado_secundario)
+			$ws1->setColumn($col_usuario_encargado_secundario, $col_usuario_encargado_secundario, 40);
 		$ws1->setColumn($col_asunto, $col_asunto, 40);
 		
 		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
@@ -184,6 +191,8 @@
 		$ws1->write($filas, $col_codigo_cliente, __('Código Asunto'), $formato_titulo);
 		$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
 		$ws1->write($filas, $col_usuario_encargado, __('Encargado'), $formato_titulo);
+		if($mostrar_encargado_secundario)
+			$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
 		$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
 		
 		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
@@ -218,6 +227,8 @@
 			tabla1.id_contrato,
 			usuario,
 			usuario_username,
+			nombre_usuario_secundario,
+			usuario_secundario_username,
 			hr_por_cobrar AS horas_por_cobrar,
 			retainer_horas AS retainer_horas,
 			(SELECT cobro.estado
@@ -273,6 +284,8 @@
 				cliente.glosa_cliente,
 				CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario,
 				usuario.username as usuario_username,
+				CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as nombre_usuario_secundario,
+				usuario_secundario.username as usuario_secundario_username,
 				GROUP_CONCAT( distinct glosa_asunto SEPARATOR '\n' ) AS asuntos	,
 				GROUP_CONCAT( distinct asunto.codigo_asunto SEPARATOR ', ' ) AS codigos_asunto,
 				contrato.forma_cobro AS forma_cobro,
@@ -306,6 +319,7 @@
 				LEFT JOIN contrato ON (contrato.id_contrato = IF(asunto.id_contrato > 0, asunto.id_contrato, cliente.id_contrato))
 				LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+				LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
 			WHERE trabajo.cobrable =1 AND trabajo.id_tramite = 0 
 				$where
 				AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
@@ -324,10 +338,16 @@
 			++$filas;
 			$ws1->write($filas, $col_codigo_cliente, $cobro['codigos_asunto'], $formato_texto);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario_username'], $formato_texto);
-			else
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['usuario_secundario_username'], $formato_texto);
+			}
+			else{
 				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario'], $formato_texto);
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_usuario_secundario'], $formato_texto);
+			}
 			$ws1->write($filas, $col_asunto,$cobro['asuntos'], $formato_texto);
 			
 			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_trabajo'])), $formato_texto);
