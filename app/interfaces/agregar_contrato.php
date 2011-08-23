@@ -36,6 +36,19 @@
 
 	$sesion = new Sesion(array('DAT'));
 	$archivo = new Archivo($sesion);
+	
+	$query_permiso_tarifa = "SELECT count(*) 
+														 FROM usuario_permiso 
+														WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."' 
+															AND codigo_permiso = 'TAR' ";
+	$resp_permiso_tarifa = mysql_query($query_permiso_tarifa, $sesion->dbh) or Utiles::errorSQL($query_permiso_tarifa,__FILE__,__LINE__,$sesion->dbh);
+	list( $cantidad_permisos ) = mysql_fetch_array($resp_permiso_tarifa);
+	
+	if( $cantidad_permisos > 0 ) 
+		$tarifa_permitido = true;
+	else
+		$tarifa_permitido = false;
+	
 	if($popup && !$motivo)
 	{
 		$pagina = new Pagina($sesion);
@@ -53,7 +66,6 @@
 			$cobro = new Cobro($sesion);
 		}
 		
-
 		if($contrato->fields['codigo_cliente'] != '')
 		{
 			$cliente = new Cliente($sesion);
@@ -1424,8 +1436,10 @@ else
 								<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda, 'onchange="actualizarMoneda(); ' . $config_validar_tarifa . ' "','',"80"); ?>
 								<input type="hidden" name="id_moneda_hidden" id="id_moneda_hidden" value="<?php echo $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda; ?>" />
 								&nbsp;&nbsp;
-								<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
-								<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+								<?php if( $tarifa_permitido ) { ?> 
+									<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
+									<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+								<?php } ?>
 							</td>
 						</tr>
 					</table>
@@ -1554,8 +1568,10 @@ else
 										<?= Html::SelectQuery($sesion, "SELECT tramite_tarifa.id_tramite_tarifa, tramite_tarifa.glosa_tramite_tarifa FROM tramite_tarifa ORDER BY tramite_tarifa.glosa_tramite_tarifa","id_tramite_tarifa", $contrato->fields['id_tramite_tarifa'] ? $contrato->fields['id_tramite_tarifa'] : $tramite_tarifa_default, ""); ?>&nbsp;&nbsp;
 										<?=__('Tarifa en')?>
 										<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda_tramite", $contrato->fields['id_moneda_tramite'] ? $contrato->fields['id_moneda_tramite'] : $id_moneda_tramite, 'onchange="actualizarMoneda();"','',"80"); ?>&nbsp;&nbsp;
-										<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTramiteTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
-										<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTramiteTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+										<?php if( $tarifa_permitido ) { ?> 
+											<span style='cursor:pointer' <?=TTip(__('Agregar nueva tarifa'))?> onclick='CreaTramiteTarifa(this.form,true)'><img src="<?=Conf::ImgDir()?>/mas.gif" border="0"></span>
+											<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTramiteTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
+										<?php } ?>
 									</td>
 								</tr>
 							</table>

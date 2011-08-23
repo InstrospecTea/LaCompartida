@@ -10,7 +10,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../app/classes/Funciones.php';
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
+	$sesion = new Sesion(array('TAR'));
 
 	$pagina = new Pagina($sesion);
 

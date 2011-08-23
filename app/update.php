@@ -5987,6 +5987,19 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.72:
+				$query = array();
+				$query[] = "INSERT INTO `prm_permisos` ( `codigo_permiso` , `glosa` ) VALUES ( 'TAR', 'Tarifa' );";
+				$query[] = "INSERT INTO `usuario_permiso` SELECT DISTINCT id_usuario, 'TAR' FROM `usuario_permiso` WHERE codigo_permiso IN ( 'ADM', 'COB' );";
+				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'COBRANZA' );";
+				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'TARIFA' );";
+				$query[] = "DELETE FROM menu_permiso WHERE codigo_permiso = 'COB' AND codigo_menu = 'TARIFA'";
+				$query[] = "UPDATE `menu_permiso` SET `codigo_permiso` = 'TAR' WHERE CONVERT( `codigo_permiso` USING utf8 ) = 'COB' AND CONVERT( `codigo_menu` USING utf8 ) = 'TAR_TRA' LIMIT 1;";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6227,6 +6240,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.69;
 	$VERSIONES[$num++] = 4.70;
 	$VERSIONES[$num++] = 4.71;
+	$VERSIONES[$num++] = 4.72;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
