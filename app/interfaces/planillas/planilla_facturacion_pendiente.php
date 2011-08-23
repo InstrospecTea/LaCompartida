@@ -261,11 +261,12 @@
 				cta_corriente
 				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
 				LEFT JOIN prm_moneda as moneda_gasto ON moneda_gasto.id_moneda = cta_corriente.id_moneda
-				LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = tabla1.id_moneda_total
+				LEFT JOIN prm_moneda as moneda_total ON 1=1 
 				LEFT JOIN cobro_moneda as moneda_cobro_gasto ON moneda_cobro_gasto.id_cobro = cta_corriente.id_cobro
 				LEFT JOIN cobro_moneda as moneda_cobro_total ON moneda_cobro_total.id_cobro = cta_corriente.id_cobro
 			WHERE
 				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
+				moneda_total.id_moneda = tabla1.id_moneda_total AND
 				cta_corriente.cobrable = 1 AND
 				moneda_cobro_gasto.id_moneda = cta_corriente.id_moneda AND
 				moneda_cobro_total.id_moneda = tabla1.id_moneda_total AND
