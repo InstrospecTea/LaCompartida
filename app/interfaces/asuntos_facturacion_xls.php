@@ -8,6 +8,7 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
     require_once Conf::ServerDir().'/../app/classes/Cliente.php';
     require_once Conf::ServerDir().'/../app/classes/InputId.php';
+    require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
     require_once Conf::ServerDir().'/classes/Funciones.php';
     require_once 'Spreadsheet/Excel/Writer.php';
 
@@ -91,6 +92,7 @@
 		'Código',
 		'Nombre cliente',
 		'Encargado Comercial',
+		'Encargado Secundario',
 		'Rut',
 		'Dirección'
    );
@@ -104,21 +106,28 @@
 		'tarifa'
    );
    
-    // se setea el ancho de las columnas
-    $ws1->setColumn( 0,0,  15.00);
-	$ws1->setColumn( 1,1,  15.00);
-	$ws1->setColumn( 2,2,  35.00);
-	$ws1->setColumn( 3,3,  18.00);
-	$ws1->setColumn( 4,4,  16.00);
-	$ws1->setColumn( 5,5,  30.00);
-	$ws1->setColumn( 6,6,  22.80);
-	$ws1->setColumn( 7,7,  17.50);
-	$ws1->setColumn( 8,8,  30.00);
-	$ws1->setColumn( 9,9,  20.00);
-	$ws1->setColumn( 10,10,  18.00);
-	$ws1->setColumn( 11,11,  22.00);
-	$ws1->setColumn( 12,12,  27.00);
-	$ws1->setColumn( 13,13,  18.00);
+	$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+	$mostrar_codigo_secundario = UtilesApp::GetConf($sesion,'CodigoSecundario');
+
+	$col=0;
+	// se setea el ancho de las columnas
+	$ws1->setColumn( $col, $col++,  15.00);
+	$ws1->setColumn( $col, $col++,  15.00);
+	$ws1->setColumn( $col, $col++,  35.00);
+	$ws1->setColumn( $col, $col++,  18.00);
+	if($mostrar_encargado_secundario)
+		$ws1->setColumn( $col, $col++,  18.00);
+	else unset($headers1[4]);
+	$ws1->setColumn( $col, $col++,  16.00);
+	$ws1->setColumn( $col, $col++,  30.00);
+	$ws1->setColumn( $col, $col++,  22.80);
+	$ws1->setColumn( $col, $col++,  17.50);
+	$ws1->setColumn( $col, $col++,  30.00);
+	$ws1->setColumn( $col, $col++,  20.00);
+	$ws1->setColumn( $col, $col++,  18.00);
+	$ws1->setColumn( $col, $col++,  22.00);
+	$ws1->setColumn( $col, $col++,  27.00);
+	$ws1->setColumn( $col, $col++,  18.00);
 
 	if (method_exists('Conf','GetConf'))
 	{
@@ -171,7 +180,7 @@
 
 	if($codigo_cliente || $codigo_cliente_secundario)
 	{
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+		if ($mostrar_codigo_secundario)
 		{
 			$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
 			$cliente = new Cliente($sesion);
@@ -216,7 +225,13 @@
 						tarifa.glosa_tarifa,
 						a1.id_moneda, 
 						a1.activo,
-						a1.fecha_creacion
+						a1.fecha_creacion,
+						usuario.username as username,
+						usuario.apellido1 as apellido1,
+						usuario.nombre as nombre,
+						usuario_secundario.username as username_secundario,
+						usuario_secundario.apellido1 as apellido1_secundario,
+						usuario_secundario.nombre as nombre_secundario
                     FROM asunto AS a1
                     LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
 					LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
@@ -224,6 +239,7 @@
                     LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
                     LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
                     LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
+					LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
                     WHERE $where
                     ORDER BY
                     grupo_cliente.glosa_grupo_cliente, cliente.codigo_cliente, a1.codigo_asunto, a1.codigo_cliente ASC ";
@@ -234,7 +250,7 @@
 			$col = 0;
 			$ws1->write($fila_inicial, $col++, $row['glosa_grupo_cliente'], $f4);
 
-			if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			if($mostrar_codigo_secundario)
 			{
 				$ws1->write($fila_inicial, $col++, $row['codigo_cliente_secundario'], $f4);
 			}
@@ -246,11 +262,17 @@
             $ws1->write($fila_inicial, $col++, $row['glosa_cliente'], $f4);
 
 
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+			if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 	            $ws1->write($fila_inicial, $col++, $row['username'], $f4);
-	        else
+				if($mostrar_encargado_secundario)
+					$ws1->write($fila_inicial, $col++, $row['username_secundario'], $f4);
+			}
+	        else{
 	          	$ws1->write($fila_inicial, $col++, $row['apellido1'].', '.$row['nombre'], $f4);
-
+				if($mostrar_encargado_secundario)
+					$ws1->write($fila_inicial, $col++,
+						empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
+			}
 
 			
 			$ws1->write($fila_inicial, $col++, $row['rut_cliente'], $f4);
@@ -259,7 +281,7 @@
 			
             $ws1->write($fila_inicial, $col++, $row['glosa_asunto'], $f5);
 
-            if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+            if($mostrar_codigo_secundario)
 			{
 				$ws1->write($fila_inicial, $col++, $row['codigo_asunto'], $f5);
 			}

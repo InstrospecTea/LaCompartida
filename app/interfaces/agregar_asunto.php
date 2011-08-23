@@ -13,6 +13,7 @@
 	require_once Conf::ServerDir().'/../app/classes/CobroPendiente.php';
 	require_once Conf::ServerDir().'/../app/classes/Archivo.php';
 	require_once Conf::ServerDir().'/../app/classes/ContratoDocumentoLegal.php';
+	require_once Conf::ServerDir().'/../app/classes/Tarifa.php';
 
 	$sesion = new Sesion(array('DAT'));
 	$pagina = new Pagina($sesion);
@@ -174,6 +175,7 @@
 						$contrato->Edit("glosa_contrato",$contra_clie->fields['glosa_contrato']);
 						$contrato->Edit("codigo_cliente",$contra_clie->fields['codigo_cliente']);
 						$contrato->Edit("id_usuario_responsable",$contra_clie->fields['id_usuario_responsable']);
+						$contrato->Edit("id_usuario_secundario",$contra_clie->fields['id_usuario_secundario']);
 						if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 							{
 								$contrato->Edit("titulo_contacto",$contra_clie->fields['titulo_contacto']);
@@ -307,10 +309,22 @@
 					}
 					elseif($forma_cobro == 'TASA')
 						$monto = '0';
+					
+					if($tipo_tarifa=='flat'){
+						if(empty($tarifa_flat)){
+							$pagina->AddError( __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto') );
+							$val=true;
+						}
+						else{
+							$tarifa = new Tarifa($sesion);
+							$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+						}
+					}
 
 					$contrato->Edit("glosa_contrato",$glosa_contrato);
 					$contrato->Edit("codigo_cliente",$codigo_cliente);
 					$contrato->Edit("id_usuario_responsable",$id_usuario_responsable);
+					$contrato->Edit("id_usuario_secundario",$id_usuario_secundario);
 					$contrato->Edit("observaciones",$observaciones);
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 						{

@@ -77,6 +77,8 @@
 									'Color' => 'black',
 									'NumFormat' => '[h]:mm'));
 
+		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+
 		// Generar formatos para los distintos tipos de moneda
 		$formatos_moneda = array();
 		$query = 'SELECT id_moneda, simbolo, cifras_decimales 
@@ -135,6 +137,8 @@
 		}
 		$col_asuntos = ++$col;
 		$col_encargado = ++$col;
+		if($mostrar_encargado_secundario)
+			$col_encargado_secundario = ++$col;
 		$col_fecha_primer_trabajo = ++$col;
 		$col_fecha_ultimo_trabajo = ++$col;
 		$col_horas_trabajadas = ++$col;
@@ -183,6 +187,8 @@
 		}
 		$ws1->setColumn($col_asuntos, $col_asuntos, 40);
 		$ws1->setColumn($col_encargado, $col_encargado, 20);
+		if($mostrar_encargado_secundario)
+			$ws1->setColumn( $col_encargado_secundario, $col_encargado_secundario,  20);
 		$ws1->setColumn($col_fecha_primer_trabajo, $col_fecha_primer_trabajo, 25);
 		$ws1->setColumn($col_fecha_ultimo_trabajo, $col_fecha_ultimo_trabajo, 25);
 		$ws1->setColumn($col_horas_trabajadas, $col_horas_trabajadas, 17);
@@ -314,6 +320,8 @@
 								cliente.glosa_cliente, 
 								CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre, 
 								usuario.username as username, 
+								CONCAT(usuario_secundario.nombre,' ', usuario_secundario.apellido1) AS nombre_secundario, 
+								usuario_secundario.username as username_secundario, 
 								cobro.saldo_final_gastos * (cobro_moneda.tipo_cambio /cambio.tipo_cambio)*-1 as gastos, 
 								cobro.estado, 
 								cobro.id_cobro, 
@@ -362,6 +370,7 @@
 								LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 								LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 								LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
+								LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
 								LEFT JOIN prm_moneda as prm_moneda_cobro ON prm_moneda_cobro.id_moneda = cobro.id_moneda
 								LEFT JOIN prm_moneda as prm_moneda_titulo ON prm_moneda_titulo.id_moneda = ".$moneda."
 								LEFT JOIN
@@ -408,6 +417,8 @@
 				}
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_primer_trabajo, __('Fecha primer trabajo'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_ultimo_trabajo, __('Fecha ultimo trabajo'), $titulo_filas);
 				$ws1->write($filas, $col_horas_trabajadas, __('Hrs. Trabajadas'), $titulo_filas);
@@ -661,10 +672,16 @@
 				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
 			}
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_opcion);
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 				$ws1->write($filas, $col_encargado, $cobro['username'], $txt_opcion);
-			else
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_encargado_secundario, $cobro['username_secundario'], $txt_opcion);
+			}
+			else{
 				$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_opcion);
+				if($mostrar_encargado_secundario)
+					$ws1->write($filas, $col_encargado_secundario, $cobro['nombre_secundario'], $txt_opcion);
+			}
 			$ws1->write($filas, $col_fecha_primer_trabajo, Utiles::sql2date($cobro['fecha_primer_trabajo']) ? Utiles::sql2date($cobro['fecha_primer_trabajo']) : ' - ', $fecha);
 			$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2date($cobro['fecha_ultimo_trabajo']) ? Utiles::sql2date($cobro['fecha_ultimo_trabajo']) : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);

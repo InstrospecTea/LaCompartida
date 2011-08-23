@@ -8,6 +8,7 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
     require_once Conf::ServerDir().'/../app/classes/Cliente.php';
     require_once Conf::ServerDir().'/../app/classes/InputId.php';
+	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
     require_once Conf::ServerDir().'/classes/Funciones.php';
     require_once 'Spreadsheet/Excel/Writer.php';
 
@@ -69,6 +70,8 @@
                                 'Color' => 'black'));
     $total->setNumFormat("0");
 
+	$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+	$mostrar_codigo_secundario = UtilesApp::GetConf($sesion,'CodigoSecundario');
 
    $ws1 =& $wb->addWorksheet(__('Asuntos'));
    $ws1->setInputEncoding('utf-8');
@@ -85,6 +88,8 @@
    $col_horas_trabajadas = $col++;
    $col_horas_a_cobrar = $col++;
    $col_encargado = $col++;
+	if($mostrar_encargado_secundario)
+		$col_encargado_secundario = $col++;
    $col_tarifa = $col++;
    $col_moneda = $col++;
    $col_forma_cobro = $col++;
@@ -109,6 +114,8 @@
 	$ws1->setColumn( $col_horas_trabajadas, $col_horas_trabajadas,  19.80);
 	$ws1->setColumn( $col_horas_a_cobrar, $col_horas_a_cobrar,  19.80);
 	$ws1->setColumn( $col_encargado, $col_encargado,  28.50);
+	if($mostrar_encargado_secundario)
+		$ws1->setColumn( $col_encargado_secundario, $col_encargado_secundario,  28.50);
 	$ws1->setColumn( $col_tarifa, $col_tarifa,  30.00);
 	$ws1->setColumn( $col_moneda, $col_moneda,  20.00);
 	$ws1->setColumn( $col_forma_cobro, $col_forma_cobro,  20.00);
@@ -124,16 +131,8 @@
 	$ws1->setColumn( $col_cobrable, $col_cobrable, 10.00);$i++;
 	$ws1->setColumn( $col_act_oblicatorio, $col_act_oblicatorio, 20.00);
 
-	if (method_exists('Conf','GetConf'))
-	{
-		$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
-		$PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
-	}
-	else
-	{
-		$PdfLinea1 = Conf::PdfLinea1();
-		$PdfLinea2 = Conf::PdfLinea2();
-	}
+	$PdfLinea1 = UtilesApp::GetConf($sesion, 'PdfLinea1');
+	$PdfLinea2 = UtilesApp::GetConf($sesion, 'PdfLinea2');
 
 	$ws1->write(0, 0, 'LISTADO DE ASUNTOS', $encabezado);
 	$ws1->mergeCells (0, 0, 0, 8);
@@ -153,6 +152,8 @@
     $ws1->write($fila_inicial, $col_horas_trabajadas, __('Horas Trabajadas'), $tit);
     $ws1->write($fila_inicial, $col_horas_a_cobrar, __('Horas a cobrar'), $tit);
     $ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
+	if($mostrar_encargado_secundario)
+		$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado Secundario'), $tit);
     $ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
 		$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
 		$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
@@ -191,7 +192,7 @@
 
 		if($codigo_cliente || $codigo_cliente_secundario)
 		{
-			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			if ($mostrar_codigo_secundario)
 			{
 				$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
 				$cliente = new Cliente($sesion);
@@ -220,55 +221,64 @@
 			$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
 			
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
-    $query = "SELECT SQL_CALC_FOUND_ROWS *, 
-			    							a1.codigo_asunto,
-			    							a1.id_moneda, 
-			    							a1.activo,
-			            			a1.fecha_creacion, 
-			            			(
-			            				SELECT 
-			            					SUM(TIME_TO_SEC(duracion_cobrada))/3600 
-				            			FROM trabajo AS t2
-													LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
-													WHERE (cobro.estado IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
-													AND t2.codigo_asunto=a1.codigo_asunto
-													AND t2.cobrable = 1
-												) AS horas_no_cobradas,
-												(
-													SELECT 
-														SUM(TIME_TO_SEC(duracion))/3600
-			                    FROM trabajo AS t3
-			                    WHERE
-			                      t3.codigo_asunto=a1.codigo_asunto
-			                    AND t3.cobrable = 1
-			                  ) AS horas_trabajadas,
-												ca.id_cobro AS id_cobro_asunto, 
-												tarifa.glosa_tarifa,
-												prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
-												prm_area_proyecto.glosa AS area_proyecto, 
-												a1.codigo_asunto_secundario as codigo_secundario,
-												contrato.monto,
-												contrato.forma_cobro,
-												prm_moneda.glosa_moneda
-                    FROM asunto AS a1
-                    LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
-                    LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
-                    LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
-                    LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
-                    LEFT JOIN prm_idioma ON a1.id_idioma = prm_idioma.id_idioma
-                    LEFT JOIN prm_tipo_proyecto ON a1.id_tipo_asunto=prm_tipo_proyecto.id_tipo_proyecto
-                    LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
-                    LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
-                    LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-                    WHERE $where
-                    GROUP BY a1.codigo_asunto ORDER BY
-                    a1.codigo_asunto, a1.codigo_cliente ASC";
+    $query = "SELECT SQL_CALC_FOUND_ROWS
+					*,
+					a1.codigo_asunto,
+					a1.id_moneda, 
+					a1.activo,
+					a1.fecha_creacion, 
+					(
+						SELECT 
+							SUM(TIME_TO_SEC(duracion_cobrada))/3600 
+						FROM trabajo AS t2
+						LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
+						WHERE (cobro.estado IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
+							AND t2.codigo_asunto=a1.codigo_asunto
+							AND t2.cobrable = 1
+					) AS horas_no_cobradas,
+					(
+						SELECT 
+							SUM(TIME_TO_SEC(duracion))/3600
+						FROM trabajo AS t3
+						WHERE
+							t3.codigo_asunto=a1.codigo_asunto
+							AND t3.cobrable = 1
+					) AS horas_trabajadas,
+					ca.id_cobro AS id_cobro_asunto, 
+					tarifa.glosa_tarifa,
+					prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
+					prm_area_proyecto.glosa AS area_proyecto, 
+					a1.codigo_asunto_secundario as codigo_secundario,
+					contrato.monto,
+					contrato.forma_cobro,
+					prm_moneda.glosa_moneda,
+					usuario.username as username,
+					usuario.apellido1 as apellido1,
+					usuario.nombre as nombre,
+					usuario_secundario.username as username_secundario,
+					usuario_secundario.apellido1 as apellido1_secundario,
+					usuario_secundario.nombre as nombre_secundario
+				FROM asunto AS a1
+				LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
+				LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
+				LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+				LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
+				LEFT JOIN prm_idioma ON a1.id_idioma = prm_idioma.id_idioma
+				LEFT JOIN prm_tipo_proyecto ON a1.id_tipo_asunto=prm_tipo_proyecto.id_tipo_proyecto
+				LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
+				LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+				LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
+				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+				WHERE $where
+				GROUP BY a1.codigo_asunto ORDER BY
+				a1.codigo_asunto, a1.codigo_cliente ASC";
+
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  while($row = mysql_fetch_array($resp))
     {
-						if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+						if($mostrar_codigo_secundario)
 						{
-							$ws1->write($fila_inicial, $col_codigo, $row[codigo_secundario], $f4);
+							$ws1->write($fila_inicial, $col_codigo, $row['codigo_secundario'], $f4);
 						}
 						else
 						{
@@ -276,7 +286,7 @@
 						}
             $ws1->write($fila_inicial, $col_titulo, $row['glosa_asunto'], $f4);
             $ws1->write($fila_inicial, $col_glosa_cliente, $row['glosa_cliente'], $f4);
-            if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+            if($mostrar_codigo_secundario)
 						{
 							$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_asunto'], $f4);
 						}
@@ -287,10 +297,17 @@
             $ws1->write($fila_inicial, $col_descripcion, $row['descripcion_asunto'], $f4);
             $ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
             $ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
-            if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
-	            $ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
-	          else
-	          	$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
+            if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
+				$ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
+				if($mostrar_encargado_secundario)
+					$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
+			}
+			else{
+				$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
+				if($mostrar_encargado_secundario)
+					$ws1->write($fila_inicial, $col_encargado_secundario,
+						empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
+			}
             $ws1->write($fila_inicial, $col_tarifa, $row['glosa_tarifa'], $f4);
 						$ws1->write($fila_inicial, $col_moneda, $row['glosa_moneda'], $f4);
 						$ws1->write($fila_inicial, $col_forma_cobro, $row['forma_cobro'], $f4);

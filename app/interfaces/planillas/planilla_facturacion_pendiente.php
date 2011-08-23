@@ -135,6 +135,7 @@
 		
 		$col_ultimo_trabajo = ++$col;
 		$col_ultimo_gasto = ++$col;
+		$col_monto_gastos = ++$col;
 		
 		$col_ultimo_cobro = ++$col;
 		$col_estado_ultimo_cobro = ++$col;
@@ -161,6 +162,7 @@
 		
 		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
 		$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
+		$ws1->setColumn($col_monto_gastos, $col_monto_gastos, 18);
 		
 		$ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
 		$ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
@@ -186,6 +188,7 @@
 		
 		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
 		$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
+		$ws1->write($filas, $col_monto_gastos, __('Monto gastos'), $formato_titulo);
 		
 		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
@@ -217,7 +220,7 @@
 			usuario_username,
 			hr_por_cobrar AS horas_por_cobrar,
 			retainer_horas AS retainer_horas,
-		(SELECT cobro.estado
+			(SELECT cobro.estado
 				FROM cobro
 				WHERE cobro.codigo_cliente = tabla1.codigo_cliente
 					AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' ORDER BY cobro.fecha_fin DESC LIMIT 1) AS estado_ultimo_cobro,
@@ -226,14 +229,36 @@
 				WHERE cobro.codigo_cliente = tabla1.codigo_cliente
 					AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION') AS fecha_ultimo_cobro,
 			(SELECT
-				MAX(cta_corriente.fecha)
+				MAX(cta_corriente.fecha) as fecha_ultimo_gasto
 			FROM
 				cta_corriente
-				LEFT JOIN cobro on cobro.id_cobro = cta_corriente.id_cobro
+				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
 			WHERE
 				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
-				cobrable = 1 AND
+				cta_corriente.cobrable = 1 AND
 				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
+			(SELECT
+				SUM(IF(cta_corriente.egreso > 0,
+					IF(ISNULL(cta_corriente.id_moneda),
+						monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
+						monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0)) - 
+				SUM(IF(cta_corriente.ingreso > 0,
+					IF(ISNULL(cta_corriente.id_moneda),
+						monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
+						monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0))
+			FROM
+				cta_corriente
+				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
+				LEFT JOIN prm_moneda as moneda_gasto ON moneda_gasto.id_moneda = cta_corriente.id_moneda
+				LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = tabla1.id_moneda_total
+				LEFT JOIN cobro_moneda as moneda_cobro_gasto ON moneda_cobro_gasto.id_cobro = cta_corriente.id_cobro
+				LEFT JOIN cobro_moneda as moneda_cobro_total ON moneda_cobro_total.id_cobro = cta_corriente.id_cobro
+			WHERE
+				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
+				cta_corriente.cobrable = 1 AND
+				moneda_cobro_gasto.id_moneda = cta_corriente.id_moneda AND
+				moneda_cobro_total.id_moneda = tabla1.id_moneda_total AND
+				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS monto_gastos,
 			tabla1.glosa_contrato,
 			tabla1.id_moneda_retainer,
 			tabla1.id_moneda_total,
@@ -287,6 +312,7 @@
 --				AND asunto.`activo` = 1    No se bien pq estÃ¡ esta linea --
 			GROUP BY $group_by
 			ORDER BY cliente.glosa_cliente) AS tabla1
+			
 	";	
 		//LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = tabla1.id_moneda_total";
 		#Clientes
@@ -306,6 +332,7 @@
 			
 			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_trabajo'])), $formato_texto);
 			$ws1->write($filas, $col_ultimo_gasto, empty($cobro['fecha_ultimo_gasto']) ? "" : date("d-m-Y", strtotime($cobro['fecha_ultimo_gasto'])), $formato_texto);
+			$ws1->write($filas, $col_monto_gastos, $cobro['monto_gastos'], $formato_texto);
 			
 			$ws1->write($filas, $col_ultimo_cobro,$cobro['fecha_ultimo_cobro'] != '' ? Utiles::sql2date($cobro['fecha_ultimo_cobro']) : '', $formato_texto);
 			$ws1->write($filas, $col_estado_ultimo_cobro,$cobro['estado_ultimo_cobro'] != '' ? $cobro['estado_ultimo_cobro'] : '', $formato_texto);
