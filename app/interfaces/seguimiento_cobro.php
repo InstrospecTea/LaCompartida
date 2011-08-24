@@ -135,22 +135,42 @@
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ".
 				" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS cobro.id_cobro,cobro.monto as cobro_monto, cobro.monto_gastos as monto_gastos, cobro.fecha_ini,cobro.fecha_fin,moneda.simbolo, cobro.id_proceso, cobro.forma_cobro as cobro_forma, cobro.documento as documento,
-				cobro.estado, moneda_monto.simbolo as simbolo_moneda_contrato, moneda_monto.cifras_decimales as cifras_decimales_moneda_contrato, 
-				contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente, contrato.forma_cobro,contrato.monto,
-				moneda.simbolo,moneda.cifras_decimales,
-				cobro.incluye_honorarios as incluye_honorarios, cobro.incluye_gastos as incluye_gastos, 
-				GROUP_CONCAT('<li>', asunto.glosa_asunto SEPARATOR '</li>') as asuntos, asunto.glosa_asunto as asunto_lista,
-				CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total, tarifa.glosa_tarifa 
-				FROM cobro 
-				LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda 
-				LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente 
-				LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
-				LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda 
-				LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato 
-				LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa 
-				WHERE $where 
-				GROUP BY cobro.id_cobro, cobro.id_contrato"; 
+		$query = "SELECT SQL_CALC_FOUND_ROWS 
+								cobro.id_cobro,
+								cobro.monto as cobro_monto, 
+								cobro.monto_gastos as monto_gastos, 
+								cobro.fecha_ini,
+								cobro.fecha_fin,
+								moneda.simbolo, 
+								cobro.id_proceso, 
+								cobro.codigo_idioma,
+								cobro.forma_cobro as cobro_forma, 
+								cobro.documento as documento,
+								cobro.estado, 
+								moneda_monto.simbolo as simbolo_moneda_contrato, 
+								moneda_monto.cifras_decimales as cifras_decimales_moneda_contrato, 
+								contrato.id_contrato, 
+								contrato.codigo_cliente, 
+								cliente.glosa_cliente, 
+								contrato.forma_cobro,
+								contrato.monto,
+								moneda.simbolo,
+								moneda.cifras_decimales,
+								cobro.incluye_honorarios as incluye_honorarios, 
+								cobro.incluye_gastos as incluye_gastos, 
+								GROUP_CONCAT('<li>', asunto.glosa_asunto SEPARATOR '</li>') as asuntos, 
+								asunto.glosa_asunto as asunto_lista,
+								CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total, 
+								tarifa.glosa_tarifa 
+							FROM cobro 
+							LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda 
+							LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente 
+							LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
+							LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda 
+							LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato 
+							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa 
+							WHERE $where 
+							GROUP BY cobro.id_cobro, cobro.id_contrato"; 
 
 		$x_pag = 20;
 		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
@@ -180,7 +200,13 @@
 				$color = "#dddddd";
 			else
 				$color = "#ffffff";
-
+			
+			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+			if( $cobro->fields['codigo_idioma'] != '' )
+				$idioma->Load($cobro->fields['codigo_idioma']);
+			else
+				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+			
 			$cols = 4;
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaSeguimientoCobros') ) || ( method_exists('Conf','FacturaSeguimientoCobros') && Conf::FacturaSeguimientoCobros() ) )
 				{
@@ -193,15 +219,15 @@
 				$html .= $codigo_cliente_ultimo != '' ? "<tr bgcolor=$color style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'><td colspan=4><hr size='1px'></td>" : "";
 
 				$html .= "<tr id=foco".$j." bgcolor=$color style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'>";
-				$html .= "<td style='font-size:10px' align=center valing=top><b>".$cobro->fields[glosa_cliente]."</b></td>";
-				$html .= "<td style='font-size:10px' id=tip_$j align=left valing=top><b>".$cobro->fields[asuntos]."..</b></td>";
+				$html .= "<td style='font-size:10px' align=center valing=top><b>".$cobro->fields['glosa_cliente']."</b></td>";
+				$html .= "<td style='font-size:10px' id=tip_$j align=left valing=top><b>".$cobro->fields['asuntos']."..</b></td>";
 				if($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL')
-					$texto_acuerdo = $cobro->fields['forma_cobro']." de ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],',','.')." por ".$cobro->fields['retainer_horas']." Hrs.";
+					$texto_acuerdo = $cobro->fields['forma_cobro']." de ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ".$cobro->fields['retainer_horas']." Hrs.";
 				else
-					$texto_acuerdo = $cobro->fields['forma_cobro'] != 'TASA' ? $cobro->fields['forma_cobro']." por ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],',','.') : $cobro->fields['forma_cobro'];
+					$texto_acuerdo = $cobro->fields['forma_cobro'] != 'TASA' ? $cobro->fields['forma_cobro']." por ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : $cobro->fields['forma_cobro'];
 		    	$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>".$texto_acuerdo.', Tarifa: '.$cobro->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuevaVentana('Editar_Contrato',730,600,'agregar_contrato.php?popup=1&id_contrato=".$cobro->fields['id_contrato']."');\" title='".__('Editar Información Comercial')."'>Editar</a></td>";
 		    	$html .= "</tr>";
-		    	$html .="<script> new Tip('tip_".$j."', '".$cobro->fields[asuntos]."', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";
+		    	$html .="<script> new Tip('tip_".$j."', '".$cobro->fields['asuntos']."', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";
 
 		    	$ht = "<tr bgcolor='#F2F2F2'>
 							<td align=center style='font-size:10px; width: 70px;'>
@@ -248,9 +274,9 @@
 			
 			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 				(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
-			$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['cobro_monto'],2,',','.')
+			$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['cobro_monto'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])
 								.' por '.number_format($total_horas, 1, ',','.').' Hrs. ';
-			$texto_gastos = $cobro->fields['simbolo'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_opcion'], ',', '.').' en gastos ';
+			$texto_gastos = $cobro->fields['simbolo'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_opcion'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).' en gastos ';
 			$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ?
 				$texto_honorarios.' y '.$texto_gastos :
 				(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);

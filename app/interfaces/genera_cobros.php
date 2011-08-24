@@ -90,10 +90,25 @@
 		if($tipo_liquidacion) //1-2 = honorarios-gastos, 3 = mixtas
 			$where .= " AND contrato.separar_liquidaciones = '".($tipo_liquidacion=='3' ? 0 : 1)."' ";
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato, contrato.codigo_cliente, cliente.glosa_cliente, contrato.forma_cobro, contrato.monto, moneda.simbolo,
-								GROUP_CONCAT('<li>', glosa_asunto SEPARATOR '</li>') as asuntos, asunto.glosa_asunto as asunto_lista, contrato.forma_cobro, CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total, contrato.activo,
-								(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro, tarifa.glosa_tarifa,
-								contrato.incluir_en_cierre, contrato.retainer_horas, moneda_monto.simbolo as simbolo_moneda_monto, moneda_monto.cifras_decimales as cifras_decimales_moneda_monto,
+		$query = "SELECT SQL_CALC_FOUND_ROWS 
+								contrato.id_contrato, 
+								contrato.codigo_cliente, 
+								cliente.glosa_cliente, 
+								contrato.forma_cobro, 
+								contrato.monto, 
+								contrato.codigo_idioma, 
+								moneda.simbolo,
+								GROUP_CONCAT('<li>', glosa_asunto SEPARATOR '</li>') as asuntos, 
+								asunto.glosa_asunto as asunto_lista, 
+								contrato.forma_cobro, 
+								CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total, 
+								contrato.activo,
+								(SELECT MAX(fecha_fin) FROM cobro WHERE cobro.id_contrato = contrato.id_contrato) as fecha_ultimo_cobro, 
+								tarifa.glosa_tarifa,
+								contrato.incluir_en_cierre, 
+								contrato.retainer_horas, 
+								moneda_monto.simbolo as simbolo_moneda_monto, 
+								moneda_monto.cifras_decimales as cifras_decimales_moneda_monto,
 								contrato.separar_liquidaciones
 						FROM contrato
 						JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
@@ -764,6 +779,12 @@ if($opc == 'buscar')
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
+			
+		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+		if( $contrato->fields['codigo_idioma'] != '' )
+			$idioma->Load($contrato->fields['codigo_idioma']);
+		else
+			$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 
 		if($contrato->fields['fecha_ultimo_cobro'] != $cobros->FechaUltimoCobro($contrato->fields['codigo_cliente']))
 			$fecha_ultimo_cobro = Utiles::sql2fecha($contrato->fields['fecha_ultimo_cobro'], $formato_fecha, "-");
@@ -777,8 +798,13 @@ if($opc == 'buscar')
 				$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ".
 					" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
 
-			$query_pendientes = "SELECT cobro_pendiente.id_cobro_pendiente,cobro_pendiente.monto_estimado,cobro_pendiente.descripcion,
-														cobro_pendiente.fecha_cobro,prm_moneda.simbolo,prm_moneda.cifras_decimales
+			$query_pendientes = "SELECT 
+															cobro_pendiente.id_cobro_pendiente,
+															cobro_pendiente.monto_estimado,
+															cobro_pendiente.descripcion,
+															cobro_pendiente.fecha_cobro,
+															prm_moneda.simbolo,
+															prm_moneda.cifras_decimales
 														FROM cobro_pendiente
 														JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
 														JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
@@ -786,15 +812,25 @@ if($opc == 'buscar')
 														AND cobro_pendiente.fecha_cobro <= '".Utiles::fecha2sql($fecha_fin)."' ORDER BY cobro_pendiente.fecha_cobro ASC";
 			$lista_pendientes = new ListaCobrosPendientes($sesion,'',$query_pendientes);
 			#se dejó igual hasta que todos los clientes esten ordenados... 08-03-09
-			$query_cobros = "SELECT id_cobro, monto, monto_gastos, fecha_ini, fecha_fin, 
-								prm_moneda.simbolo, prm_moneda.cifras_decimales, 
-								moneda_opcion.simbolo as simbolo_moneda_opcion, moneda_opcion.cifras_decimales as cifras_decimales_moneda_opcion, 
-								cobro.id_proceso, incluye_gastos, incluye_honorarios
-							FROM cobro
-							JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-							JOIN prm_moneda as moneda_opcion ON moneda_opcion.id_moneda = cobro.opc_moneda_total
-							WHERE $where AND cobro.id_contrato = '".$contrato->fields['id_contrato']."'
-							AND ( cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ORDER BY cobro.fecha_creacion ASC";
+			$query_cobros = "SELECT 
+													id_cobro, 
+													monto, 
+													cobro.codigo_idioma,
+													monto_gastos, 
+													fecha_ini, 
+													fecha_fin, 
+													prm_moneda.simbolo, 
+													prm_moneda.cifras_decimales, 
+													moneda_opcion.simbolo as simbolo_moneda_opcion, 
+													moneda_opcion.cifras_decimales as cifras_decimales_moneda_opcion, 
+													cobro.id_proceso, 
+													incluye_gastos, 
+													incluye_honorarios
+												FROM cobro
+												JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
+												JOIN prm_moneda as moneda_opcion ON moneda_opcion.id_moneda = cobro.opc_moneda_total
+												WHERE $where AND cobro.id_contrato = '".$contrato->fields['id_contrato']."'
+												AND ( cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ORDER BY cobro.fecha_creacion ASC";
 			$lista_cobros = new ListaCobros($sesion,'',$query_cobros);
 		}
 
@@ -802,17 +838,17 @@ if($opc == 'buscar')
 		$html .= "<td style='font-size:10px' valing=top><b>".$contrato->fields[glosa_cliente]."</b></td>";
 		$html .= "<td style='font-size:10px' align=left id=tip_$i valing=top><b>".$contrato->fields[asuntos]."</b></td>";
 		$html .= "<td style='font-size:10px' align=center valing=top><b>".$fecha_ultimo_cobro."</b></td>";
-		
+
 		if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
-			$texto_acuerdo = $contrato->fields['forma_cobro']." de ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],',','.')." por ".$contrato->fields['retainer_horas']." Hrs.";
+			$texto_acuerdo = $contrato->fields['forma_cobro']." de ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ".$contrato->fields['retainer_horas']." Hrs.";
 		} else {
-			$texto_acuerdo = $contrato->fields['forma_cobro'] != 'TASA' ? $contrato->fields['forma_cobro']." por ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],',','.') : $contrato->fields['forma_cobro'];
+			$texto_acuerdo = $contrato->fields['forma_cobro'] != 'TASA' ? $contrato->fields['forma_cobro']." por ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : $contrato->fields['forma_cobro'];
 		}
-		
+
 		$html .= "<td style='font-size:10px' align=left valign=top colspan=2>";
 		$html .= "&nbsp;&nbsp;<b>".$texto_acuerdo.', Tarifa: '.$contrato->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',730,600,'agregar_contrato.php?popup=1&id_contrato=".$contrato->fields['id_contrato']."');\" style='font-size:10px' title='".__('Editar Información Comercial')."'>Editar</a></td>";
 		$html .= "</tr>";
-		
+
 		if ($lista_cobros->num > 0 && $contrato->fields['id_contrato'] > 0)
 		{
 			$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
@@ -826,14 +862,19 @@ if($opc == 'buscar')
 			for($z=0;$z<$lista_cobros->num;$z++)
 			{
 				$cobro = $lista_cobros->Get($z);
+				$idioma_cobro = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+				if( $cobro->fields['codigo_idioma'] != '' )
+					$idioma_cobro->Load($cobro->fields['codigo_idioma']);
+				else
+					$idioma_cobro->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 				$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
 				$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-").' '._('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
-
+			
 				$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
-				$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['monto'],2,',','.')
-									.' por '.number_format($total_horas, 1, ',','.').' Hrs. ';
-				$texto_gastos = $cobro->fields['simbolo_moneda_opcion'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_opcion'], ',', '.').' en gastos ';
+				$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['monto'],2,$idioma_cobro->fields['separador_decimales'],$idioma_cobro->fields['separador_miles'])
+									.' por '.number_format($total_horas, 1, $idioma_cobro->fields['separador_decimales'],$idioma->fields['separador_miles']).' Hrs. ';
+				$texto_gastos = $cobro->fields['simbolo_moneda_opcion'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_opcion'],$idioma_cobro->fields['separador_decimales'],$idioma_cobro->fields['separador_miles']).' en gastos ';
 				$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ?
 									$texto_honorarios.' y '.$texto_gastos :
 									(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
@@ -869,7 +910,7 @@ if($opc == 'buscar')
 				$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;''><td width=2% align=center>&nbsp;<img src='".Conf::ImgDir()."/color_verde.gif' style='vertical-align:middle;' border=0></td>" .
 						"<td align=left width=90% style='font-size:10px; vertical-align:middle;' colspan='2' id='glosa_programado_".$i."_".$z."'>".__('Para el').' '.Utiles::sql2date($pendiente->fields['fecha_cobro']) . ":" .
 						"&nbsp;".$pendiente->fields['descripcion'].' '.(empty($pendiente->fields['monto_estimado']) ? "" : __('por la suma estimada de').' '.$pendiente->fields['simbolo']
-						." ".number_format($pendiente->fields['monto_estimado'],$pendiente->fields['cifras_decimales'],',','.'))."</td>"
+						." ".number_format($pendiente->fields['monto_estimado'],$pendiente->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']))."</td>"
 						."<script> new Tip('glosa_programado_".$i."_".$z."', '".__('Para editar o eliminar el Cobro Programado debe hacerlo desde la edición del contrato')."', {title : '', effect: '', offset: {x:-2, y:19}}); </script>";
 						
 				$html .= "<td align=center width=8%>";
@@ -913,9 +954,9 @@ if($opc == 'buscar')
 		$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'>";
 		$html .= "<td width=2% align=center><img src='".Conf::ImgDir()."/color_verde.gif' style='align:center; vertical-align:middle;' border=0></td>";
 
-		$wip_honorarios = ($wip[0] != '' ? number_format($wip[0],1,',','.').' Hrs.' : '0 Hrs.').
-			" (Según HH en ".$contrato->fields['simbolo'].' '.number_format($wip[1],2,",",".").")";
-		$wip_gastos = $wip[4].' '.number_format($wip[3],2,",",".").' en gastos';
+		$wip_honorarios = ($wip[0] != '' ? number_format($wip[0],1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).' Hrs.' : '0 Hrs.').
+			" (Según HH en ".$contrato->fields['simbolo'].' '.number_format($wip[1],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).")";
+		$wip_gastos = $wip[4].' '.number_format($wip[3],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).' en gastos';
 		switch($tipo_liquidacion){ //1-2 = honorarios-gastos, 3 = mixtas
 			case 1: $txt_wip = $wip_honorarios; break;
 			case 2: $txt_wip = $wip_gastos; break;

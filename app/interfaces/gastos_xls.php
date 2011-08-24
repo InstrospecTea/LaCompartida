@@ -109,19 +109,20 @@
 		$ws1->setZoom(75);
 
 		// se setea el ancho de las columnas
-		$ws1->setColumn( 0, 0,  18.00);
-		$ws1->setColumn( 1, 1,  45.00);
-		$ws1->setColumn( 2, 2,  40.00);
-		$ws1->setColumn( 3, 3,  30.00);
-		$ws1->setColumn( 4, 4,  30.00);
-		$ws1->setColumn( 5, 5,  30.00);
-		$ws1->setColumn( 6, 6,  30.00);
-		$ws1->setColumn( 7, 7,  30.00);
-		$ws1->setColumn( 8, 8,  30.00);
-		$ws1->setColumn( 9, 9,  30.00);
-		$ws1->setColumn( 10, 10,  30.00);
-		$ws1->setColumn( 11, 11,  30.00);
-		$ws1->setColumn( 12, 12,  30.00);
+		$ws1->setColumn( 0, 0, 18.00);
+		$ws1->setColumn( 1, 1, 45.00);
+		$ws1->setColumn( 2, 2, 15.00);
+		$ws1->setColumn( 3, 3, 40.00);
+		$ws1->setColumn( 4, 4, 30.00);
+		$ws1->setColumn( 5, 5, 30.00);
+		$ws1->setColumn( 6, 6, 30.00);
+		$ws1->setColumn( 7, 7, 30.00);
+		$ws1->setColumn( 8, 8, 30.00);
+		$ws1->setColumn( 9, 9, 30.00);
+		$ws1->setColumn( 10, 10, 30.00);
+		$ws1->setColumn( 11, 11, 30.00);
+		$ws1->setColumn( 12, 12, 30.00);
+		$ws1->setColumn( 13, 13, 30.00);
 		
 		$ws1->write(1, 0, __('Resumen de gastos'), $encabezado);
 		$ws1->mergeCells (1, 0, 1, 8);
@@ -197,7 +198,7 @@
 		$total_balance_ingreso = 0;
 
 		$query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
-					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.glosa_asunto,
+					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.codigo_asunto, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
 					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_moneda.cifras_decimales, cobro.estado
 					$col_select,
@@ -252,26 +253,28 @@
     $ws1->write($fila_inicial, $columna_actual++, __('Fecha'), $tit);
     if(!$codigo_cliente)
     	$ws1->write($fila_inicial, $columna_actual++, __('Cliente'), $tit);
-    if(!$codigo_asunto)
+    if(!$codigo_asunto){
+    	$ws1->write($fila_inicial, $columna_actual++, __('Código'), $tit);
     	$ws1->write($fila_inicial, $columna_actual++, __('Asunto'), $tit);
+	}
 	if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++, utf8_decode(__('NÂ° Documento')), $tit);
+		$ws1->write($fila_inicial, $columna_actual++, (__('N° Documento')), $tit);
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++,utf8_decode(__('NÂ° OT')), $tit);
+		$ws1->write($fila_inicial, $columna_actual++,(__('N° OT')), $tit);
 	}
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 	{
-		$ws1->write($fila_inicial, $columna_actual++,utf8_decode(__('NÂ° Factura')), $tit);
+		$ws1->write($fila_inicial, $columna_actual++,(__('N° Factura')), $tit);
 		$ws1->write($fila_inicial, $columna_actual++,__('Fecha Factura'), $tit);
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 	{
 		$ws1->write($fila_inicial, $columna_actual++, __('Tipo'), $tit);
 	}
-    $ws1->write($fila_inicial, $columna_actual++, utf8_decode(__('DescripciÃ³n')), $tit);
+    $ws1->write($fila_inicial, $columna_actual++, (__('Descripción')), $tit);
     $ws1->write($fila_inicial, $columna_actual++, __('Egreso'), $tit);
     $columna_balance_glosa = $columna_actual;
     $ws1->write($fila_inicial, $columna_actual++, __('Ingreso'), $tit);
@@ -301,8 +304,10 @@
 	    $ws1->write($fila_inicial, $columna_actual++, Utiles::sql2date($row[fecha], $formato_fecha), $f4);
 	    if(!$codigo_cliente)
 	    	$ws1->write($fila_inicial, $columna_actual++, $row[glosa_cliente], $f4);
-	    if(!$codigo_asunto)
+	    if(!$codigo_asunto){
+	    	$ws1->write($fila_inicial, $columna_actual++, $row['codigo_asunto'], $f4);
 	    	$ws1->write($fila_inicial, $columna_actual++, $row[glosa_asunto], $f4);
+		}
 	    if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
 		{
 				$ws1->write($fila_inicial, $columna_actual++, $row[numero_documento], $f4);

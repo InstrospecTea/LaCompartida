@@ -275,9 +275,11 @@
 		              			contrato.descuento, 
 		              			tramite_tipo.glosa_tramite, 
 		              			trabajo.fecha, 
+		              			prm_idioma.codigo_idioma as codigo_idioma,
 		              			contrato.id_tarifa  
 		              FROM trabajo
 		              JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+		              LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
 		              LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 		              LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 		              LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
@@ -865,17 +867,25 @@ function EditarTodosLosArchivos()
 			list($glosa_tramite)=mysql_fetch_array($resp);
 		}
 		
+		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+		if( $trabajo->fields['codigo_idioma'] != '' ) {
+			$idioma->Load($trabajo->fields['codigo_idioma']);
+		}
+		else {
+			$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+		}
+		
 		if($i % 2 == 0)
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
 		
 		if( $trabajo->fields['tarifa_hh'] > 0 )
-			$tarifa = number_format($trabajo->fields['tarifa_hh'],$moneda_cobro->fields['cifras_decimales'],'.','');
+			$tarifa = number_format($trabajo->fields['tarifa_hh'],$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		else if($trabajo->fields['id_tramite_tipo'] == 0)
-			$tarifa = Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']);
+			$tarifa = number_format(Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		else
-			$tarifa = Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']); 
+			$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
 		list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
 		$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 		$total = round($tarifa * $duracion, 2);
@@ -963,7 +973,7 @@ function EditarTodosLosArchivos()
 		if( $p_revisor->fields['permitido'])
 		{
 			$html .= '<td>Rev.'.Revisado(& $trabajo).'</td>';
-			$html .= "<td colspan=2 align=center><strong>".__('Tarifa')."</strong><br>".( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion,$trabajo->fields[id_moneda_asunto],'simbolo','prm_moneda','id_moneda'))." ".$tarifa."</td>";
+			$html .= "<td colspan=2 align=center><strong>".__('Tarifa')."</strong><br>".( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion,$trabajo->fields['id_moneda_cobro'],'simbolo','prm_moneda','id_moneda'))." ".$tarifa."</td>";
 		}
 		$html .= "</tr>\n";
         $i++;

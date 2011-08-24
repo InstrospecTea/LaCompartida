@@ -128,7 +128,10 @@
 		else
 			$where = base64_decode($where);
 		
-		$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,",",".");
+		$idioma_default = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+		$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+		
+		$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles']);
 
 		
 		$col_select ="";
@@ -137,12 +140,21 @@
 			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 		}
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS *, cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, 
-								cta_corriente.codigo_cliente, cliente.glosa_cliente, prm_moneda.cifras_decimales,
-								prm_cta_corriente_tipo.glosa as tipo, cobro.estado, cta_corriente.con_impuesto
-								$col_select
+		$query = "SELECT SQL_CALC_FOUND_ROWS *, 
+									cta_corriente.egreso, 
+									cta_corriente.ingreso, 
+									cta_corriente.monto_cobrable, 
+									cta_corriente.codigo_cliente, 
+									cliente.glosa_cliente, 
+									prm_moneda.cifras_decimales,
+									prm_cta_corriente_tipo.glosa as tipo, 
+									cobro.estado, 
+									cta_corriente.con_impuesto,
+									prm_idioma.codigo_idioma
+									$col_select
 								FROM cta_corriente
 								LEFT JOIN asunto USING(codigo_asunto)
+								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
 								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
 								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
@@ -235,12 +247,24 @@
 		}*/
 		function Monto(& $fila)
 		{
-			return $fila->fields[egreso] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields[monto_cobrable],$fila->fields[cifras_decimales],",",".") : '';
+			global $sesion;
+			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+			if( $fila->fields['codigo_idioma'] != '' )
+				$idioma->Load($fila->fields['codigo_idioma']);
+			else
+				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+			return $fila->fields['egreso'] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields['monto_cobrable'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 		}
 
 		function Ingreso(& $fila)
 		{
-			return $fila->fields[ingreso] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields[monto_cobrable],$fila->fields[cifras_decimales],",",".") : '';
+			global $sesion;
+			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+			if( $fila->fields['codigo_idioma'] != '' )
+				$idioma->Load($fila->fields['codigo_idioma']);
+			else
+				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+			return $fila->fields['ingreso'] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields['monto_cobrable'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 		}
 	}
 	elseif($opc == 'xls')

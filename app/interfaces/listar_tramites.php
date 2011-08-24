@@ -214,9 +214,11 @@
 	            		tramite.id_moneda_tramite_individual, 
 	            		tramite.tarifa_tramite_individual, 
 	            		tramite.duracion, 
-	            		tramite.cobrable  
+	            		prm_idioma.codigo_idioma, 
+	            		tramite.cobrable 
 	              FROM tramite
 	              JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
+	              LEFT JOIN prm_idioma ON prm_idioma.id_idioma = asunto.id_idioma 
 	              JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 	              JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 	              JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
@@ -795,6 +797,14 @@ function editarMultiplesArchivos()
 		else
 			$color = "#ffffff";
 		
+		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+		if( $tramite->fields['codigo_idioma'] != '' ) {
+			$idioma->Load($tramite->fields['codigo_idioma']);
+		}
+		else {
+			$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+		}
+		
 		if( $tramite->fields['tarifa_tramite_individual'] > 0 )
 			$tarifa = $tramite->fields['tarifa_tramite_individual'];
 		else
@@ -878,7 +888,7 @@ function editarMultiplesArchivos()
         if( $p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido'] )
 					{
 					//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
-					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['decimales'], ',','.')."</td>";
+					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['decimales'], $idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])."</td>";
 					}
 		$html .= '<td align=center nowrap>'.Opciones(& $tramite).'</td>';
         $html .= "</tr>";

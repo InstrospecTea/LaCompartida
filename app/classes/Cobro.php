@@ -1911,21 +1911,21 @@ class Cobro extends Objeto
 			 */
 			if( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() )
 			{
-				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
-				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo']. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // suma ingresos cobrables
 
-				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 			}
 			else
 			{
-				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
-				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_egreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // suma ingresos cobrables
+				$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'].' '. number_format($saldo_ingreso_moneda_total,$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // suma ingresos cobrables
 
-				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 			}/*
 			 * FIN - CARTA GASTOS DE VFCabogados, 2011-03-04 
 			 */	
@@ -2131,7 +2131,7 @@ class Cobro extends Objeto
 					$html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].number_format($monto_moneda,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				else
 					$html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].' '.number_format($monto_moneda,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
-				$html2 = str_replace('%monto_solo_gastos%','$ '.number_format($gasto_en_pesos,0,',','.'), $html2);
+				$html2 = str_replace('%monto_solo_gastos%','$ '.number_format($gasto_en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
 					$html2 = str_replace('%monto_sin_gasto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].number_format($monto_moneda_sin_gasto,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				else
@@ -2169,7 +2169,7 @@ class Cobro extends Objeto
 				if($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) #!= $moneda_cli->fields['id_moneda']
 				{
 					$en_pesos = (double)$this->fields['monto']*($this->fields['tipo_cambio_moneda']/$tipo_cambio_moneda_base_cobro);
-					$html2 = str_replace('%monto_en_pesos%', __(', equivalentes a esta fecha a $ ').number_format($en_pesos,0,',','.').'.-', $html2);
+					$html2 = str_replace('%monto_en_pesos%', __(', equivalentes a esta fecha a $ ').number_format($en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2);
 				}
 				else
 					$html2 = str_replace('%monto_en_pesos%', '', $html2);
@@ -2181,7 +2181,7 @@ class Cobro extends Objeto
 					#icc$gasto_en_pesos = ($total_gastos*($moneda_total->fields['tipo_cambio']/$tipo_cambio_moneda_base_cobro))/$tipo_cambio_moneda_total;#error gastos 1
 					$gasto_en_pesos = $total_gastos;
 					$txt_gasto = "Asimismo, se agregan los gastos por la suma total de";
-					$html2 = str_replace('%monto_gasto_separado%', $txt_gasto.' $'.number_format($gasto_en_pesos,0,',','.'), $html2);
+					$html2 = str_replace('%monto_gasto_separado%', $txt_gasto.' $'.number_format($gasto_en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				}
 				else
 					$html2 = str_replace('%monto_gasto_separado%', '', $html2);
@@ -3287,9 +3287,9 @@ class Cobro extends Objeto
 			$html = str_replace('%COBROS_DEL_CAP%',  $this->GenerarDocumento($parser, 'COBROS_DEL_CAP', $parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			$html = str_replace('%restante%', __('Monto restante'), $html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
-				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 			else
-				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 		break;
 
 		case 'COBROS_DEL_CAP':
@@ -3310,9 +3310,9 @@ class Cobro extends Objeto
 						
 						$row = str_replace('%numero_cobro%', __('Cobro').' '.$id_cobro, $row);
 						if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
-							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $row);
+							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 						else
-							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $row);
+							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 						
 						$html .= $row;
 					}
@@ -6499,15 +6499,15 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			 */
 			if( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() )
 			{	
-				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 			}
 			else
 			{	
-				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','').'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 			}/*
 			 * FIN - CARTA GASTOS DE VFCabogados, 2011-03-04 
 			 */	
@@ -6716,7 +6716,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].number_format($monto_moneda,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				else
 					$html2 = str_replace('%monto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].' '.number_format($monto_moneda,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
-				$html2 = str_replace('%monto_solo_gastos%','$ '.number_format($gasto_en_pesos,0,',','.'), $html2);
+				$html2 = str_replace('%monto_solo_gastos%','$ '.number_format($gasto_en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
 					$html2 = str_replace('%monto_sin_gasto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].number_format($monto_moneda_sin_gasto,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				else
@@ -6762,7 +6762,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				if($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) #!= $moneda_cli->fields['id_moneda']
 				{
 					$en_pesos = (double)$this->fields['monto']*($this->fields['tipo_cambio_moneda']/$tipo_cambio_moneda_base_cobro);
-					$html2 = str_replace('%monto_en_pesos%', __(', equivalentes a esta fecha a $ ').number_format($en_pesos,0,',','.').'.-', $html2);
+					$html2 = str_replace('%monto_en_pesos%', __(', equivalentes a esta fecha a $ ').number_format($en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2);
 				}
 				else
 					$html2 = str_replace('%monto_en_pesos%', '', $html2);
@@ -6774,7 +6774,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					#icc$gasto_en_pesos = ($total_gastos*($moneda_total->fields['tipo_cambio']/$tipo_cambio_moneda_base_cobro))/$tipo_cambio_moneda_total;#error gastos 1
 					$gasto_en_pesos = $total_gastos;
 					$txt_gasto = "Asimismo, se agregan los gastos por la suma total de";
-					$html2 = str_replace('%monto_gasto_separado%', $txt_gasto.' $'.number_format($gasto_en_pesos,0,',','.'), $html2);
+					$html2 = str_replace('%monto_gasto_separado%', $txt_gasto.' $'.number_format($gasto_en_pesos,0,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html2);
 				}
 				else
 					$html2 = str_replace('%monto_gasto_separado%', '', $html2);
@@ -7871,9 +7871,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%COBROS_DEL_CAP%',  $this->GenerarDocumento2($parser, 'COBROS_DEL_CAP', $parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			$html = str_replace('%restante%', __('Monto restante'), $html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
-				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 			else
-				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_restante,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 		break;
 
 		case 'COBROS_DEL_CAP':
@@ -7894,9 +7894,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 						$row = str_replace('%numero_cobro%', __('Cobro').' '.$id_cobro, $row);
 						if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
-							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $row);
+							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 						else
-							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],',','.'), $row);
+							$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'].' '.number_format($monto_cap,$cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 
 						$html .= $row;
 					}
@@ -9502,7 +9502,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$row = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $row);
 					if( $this->fields['opc_ver_profesional_tarifa'] == 1 ) {
 						$row = str_replace('%td_tarifa%','<td align="center">%tarifa_horas_demo%</td>',$row);
-						$row = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $row);
+						$row = str_replace('%tarifa_horas_demo%', number_format($data['tarifa'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $row);
 					}
 					else{ 
 						$row = str_replace('%td_tarifa%','',$row);
@@ -9842,7 +9842,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else // retainer simple, no imprime segundos
 					$html = str_replace('%hh%', $horas_cobrables.':'.sprintf("%02d",$minutos_cobrables), $html);
 
-			$aproximacion_monto_cyc = number_format($this->fields['monto_subtotal'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.','');
+			$aproximacion_monto_cyc = number_format($this->fields['monto_subtotal'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 			$subtotal_en_moneda_cyc = $aproximacion_monto_cyc * ($cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio']);
 
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))

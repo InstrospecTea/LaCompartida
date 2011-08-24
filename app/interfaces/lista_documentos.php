@@ -70,19 +70,21 @@
 			$where .= " AND doc.codigo_cliente = '$codigo_cliente' ";
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS doc.id_documento as id_documento,
-					doc.tipo_doc,
-					doc.monto as monto,
-					doc.glosa_documento,
-					doc.fecha,
-					moneda.simbolo,
-					moneda.cifras_decimales,
-					doc.id_cobro,
-					doc.codigo_cliente,
-					cliente.glosa_cliente AS nombre_cliente
-				FROM documento as doc
-					JOIN prm_moneda moneda ON doc.id_moneda = moneda.id_moneda
-					LEFT JOIN cliente ON cliente.codigo_cliente=doc.codigo_cliente
-				WHERE 1 ".$where." GROUP BY doc.id_documento ";
+								doc.tipo_doc,
+								doc.monto as monto,
+								doc.glosa_documento,
+								doc.fecha,
+								cobro.codigo_idioma as codigo_idioma,
+								moneda.simbolo,
+								moneda.cifras_decimales,
+								doc.id_cobro,
+								doc.codigo_cliente,
+								cliente.glosa_cliente AS nombre_cliente
+							FROM documento as doc
+								LEFT JOIN cobro USING( id_cobro ) 
+								JOIN prm_moneda moneda ON doc.id_moneda = moneda.id_moneda
+								LEFT JOIN cliente ON cliente.codigo_cliente=doc.codigo_cliente
+							WHERE 1 ".$where." GROUP BY doc.id_documento ";
 
 		$x_pag = 13;
 		$b = new Buscador($sesion, $query, "Documento", $desde, $x_pag, $orden);
@@ -121,14 +123,27 @@
 
 			return $html_opcion;
 		}
+		
 		function Monto(& $fila)
 		{
-			return $fila->fields[monto] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields[monto],$fila->fields[cifras_decimales],",",".") : '';
+			global $sesion;
+			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+			if( $fila->fields['codigo_idioma'] != '' )
+				$idioma->Load($fila->fields['codigo_idioma']);
+			else
+				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+			return $fila->fields['monto'] > 0 ? $fila->fields['simbolo'] . " " .number_format($fila->fields['monto'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 		}
-
+		
 		function Ingreso(& $fila)
 		{
-			return $fila->fields[monto] < 0 ? $fila->fields[simbolo] . " " .str_replace("-","",number_format($fila->fields[monto],$fila->fields[cifras_decimales],",",".")) : '';
+			global $sesion;
+			$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+			if( $fila->fields['codigo_idioma'] != '' )
+				$idioma->Load($fila->fields['codigo_idioma']);
+			else
+				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+			return $fila->fields['monto'] < 0 ? $fila->fields['simbolo'] . " " .str_replace("-","",number_format($fila->fields['monto'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])) : '';
 		}
 	}
 	elseif($opc=='excel_cuenta_corriente_cliente')

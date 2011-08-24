@@ -46,7 +46,8 @@
 	$pagina->titulo = __('Revisar Documentos Tributarios');
 	$pagina->PrintTop();
 
-	
+	$idioma_default = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+	$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 
 	if( $opc == 'buscar' || $opc == 'generar_factura' )
 	{
@@ -129,49 +130,50 @@
 			$where = base64_decode($where);
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS *
-					, prm_documento_legal.codigo as tipo
-					, numero
-					, cliente.glosa_cliente
-					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ), 
-								factura.cliente, 
-								IF( contrato.factura_razon_social IN ('',' '),
-										factura.cliente, 
-										IF( contrato.factura_razon_social IS NULL, 
-												factura.cliente, 
-												CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')') 
-											) 
-									) 
-							) as factura_rsocial 
-					, fecha , usuario.username AS encargado_comercial
-					, fecha
-					, usuario.username AS encargado_comercial
-					, descripcion
-					, prm_estado_factura.codigo as estado
-					, factura.id_cobro
-					, prm_moneda.simbolo
-					, prm_moneda.cifras_decimales
-					, prm_moneda.tipo_cambio
-					, factura.id_moneda
-					, factura.honorarios
-					, factura.subtotal_gastos
-					, factura.subtotal_gastos_sin_impuesto
-					, factura.iva
-					, total
-					, '' as saldo_pagos
-					, cta_cte_fact_mvto.saldo as saldo
-					, '' as monto_pagos_moneda_base
-					, '' as saldo_moneda_base
-					, factura.id_factura
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-				FROM factura
-				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+								, prm_documento_legal.codigo as tipo
+								, numero
+								, cliente.glosa_cliente
+								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ), 
+											factura.cliente, 
+											IF( contrato.factura_razon_social IN ('',' '),
+													factura.cliente, 
+													IF( contrato.factura_razon_social IS NULL, 
+															factura.cliente, 
+															CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')') 
+														) 
+												) 
+										) as factura_rsocial 
+								, fecha , usuario.username AS encargado_comercial
+								, fecha
+								, usuario.username AS encargado_comercial
+								, descripcion
+								, prm_estado_factura.codigo as estado
+								, factura.id_cobro
+								, cobro.codigo_idioma as codigo_idioma 
+								, prm_moneda.simbolo
+								, prm_moneda.cifras_decimales
+								, prm_moneda.tipo_cambio
+								, factura.id_moneda
+								, factura.honorarios
+								, factura.subtotal_gastos
+								, factura.subtotal_gastos_sin_impuesto
+								, factura.iva
+								, total
+								, '' as saldo_pagos
+								, cta_cte_fact_mvto.saldo as saldo
+								, '' as monto_pagos_moneda_base
+								, '' as saldo_moneda_base
+								, factura.id_factura
+								, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+							FROM factura
+							JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+							JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+							LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+							LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+							LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+							LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+							LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+							LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 							WHERE $where";
 
 		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -189,7 +191,7 @@
 			{
 				$monto_saldo_total += UtilesApp::CambiarMoneda($row['saldo'],$row['tipo_cambio'],$row['cifras_decimales'],$tipo_cambio_tmp,$cifras_decimales_tmp);
 			}
-			$glosa_monto_saldo_total = '<b>'.__('Saldo'). ' ' . $simbolo_moneda_tmp. ' ' .number_format($monto_saldo_total,$cifras_decimales_tmp,",",".")."</b>";
+			$glosa_monto_saldo_total = '<b>'.__('Saldo'). ' ' . $simbolo_moneda_tmp. ' ' .number_format($monto_saldo_total,$cifras_decimales_tmp,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles'])."</b>";
 		}
 		// calcular el saldo en moneda base
 		
@@ -230,26 +232,31 @@
 	
 	function SubTotal(& $fila)
 	{
+		global $idioma;
 		$subtotal = $fila->fields['honorarios'] +$fila->fields['subtotal_gastos'] +$fila->fields['subtotal_gastos_sin_impuesto'];
 		
-		return $subtotal > 0 ? $fila->fields['simbolo'].' '.number_format($subtotal,$fila->fields['cifras_decimales'],",",".") : '';
+		return $subtotal > 0 ? $fila->fields['simbolo'].' '.number_format($subtotal,$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 	}
 	function Iva(& $fila)
 	{
-		return $fila->fields['iva'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['iva'],$fila->fields['cifras_decimales'],",",".") : '';
+		global $idioma;
+		return $fila->fields['iva'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['iva'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 	}
 	function MontoTotal(& $fila)
 	{
-		return $fila->fields['total'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['total'],$fila->fields['cifras_decimales'],",",".") : '';
+		global $idioma;
+		return $fila->fields['total'] > 0 ? $fila->fields['simbolo'].' '.number_format($fila->fields['total'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 	}
 
 	function Saldo(& $fila)
 	{
+		global $idioma;
 		$saldo = $fila->fields['saldo']*(-1);
-		return  $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],",",".");
+		return  $fila->fields['simbolo'].' '.number_format($saldo,$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 	}
 	function Pago(& $fila, $sesion)
 	{
+		global $idioma;
 		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
 						,ccfm.id_moneda as id_moneda
 						,mo.cifras_decimales
@@ -271,7 +278,7 @@
 			$simbolo_aporte_pago = $simbolo_aporte;
 			$cifras_decimales_aporte_pago = $cifras_decimales_aporte;
 		}
-		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,",",".");
+		return  $simbolo_aporte_pago.' '.number_format($monto_pago,$cifras_decimales_aporte_pago,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 	}
 
 	function FechaUltimoPago(& $fila, $sesion)
@@ -316,6 +323,13 @@
 		global $id_cobro;
 		static $i = 0;
 		
+		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+		if( $fila->fields['codigo_idioma'] ) {
+			$idioma->Load($fila->fields['codigo_idioma']);
+		}
+		else {
+			$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+		}
 		if($i % 2 == 0)
 			$color = "#dddddd";
 		else
