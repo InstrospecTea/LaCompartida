@@ -193,7 +193,7 @@
 
 		$ws1->write($filas, $col_codigo_cliente, __('Código Asunto'), $formato_titulo);
 		$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
-		$ws1->write($filas, $col_usuario_encargado, __('Encargado'), $formato_titulo);
+		$ws1->write($filas, $col_usuario_encargado, __('Encargado Comercial'), $formato_titulo);
 		if($mostrar_encargado_secundario)
 			$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
 		$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);

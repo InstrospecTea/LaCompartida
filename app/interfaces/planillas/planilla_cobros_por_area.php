@@ -9,7 +9,7 @@
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/clases/UtilesApp.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);

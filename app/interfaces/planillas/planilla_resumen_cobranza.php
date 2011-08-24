@@ -418,7 +418,7 @@
 					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 				}
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
-				$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+				$ws1->write($filas, $col_encargado, __('Encargado Comercial'), $titulo_filas);
 				if($mostrar_encargado_secundario)
 					$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_primer_trabajo, __('Fecha primer trabajo'), $titulo_filas);

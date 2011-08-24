@@ -356,16 +356,18 @@ span.indefinido { color: #550000; }
 			global $sesion;
 			global $tipo_dato_comparado;
 			global $tipo_dato;
+			global $formato_valor;
+			
 			if($tipo_dato_comparado)
 			{
 				echo "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato),$filtros,$formato_valor);
+				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros);
 				echo "</td> <tr > <td class=\"valor secundario\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado),$filtros,$formato_valor);
+				echo url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado,'',$formato_valor),$filtros);
 				echo "</td> </tr> </table>";
 			}
 			else
-				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato),$filtros);
+				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros);
 		}
 
 		function celda_campo($orden,$filas,$valor)

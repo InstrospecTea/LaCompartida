@@ -1386,7 +1386,7 @@ class Reporte
 				$valor_tiempo=sprintf('%02d',$valor_horas).":".sprintf('%02d',$valor_minutos);
 			return $valor_tiempo;
 		}
-		if(strpos($tipo_dato,'valor_')!==false)
+		if(strpos($tipo_dato,'valor_')!==false) 
 			return number_format($valor,$formato_valor['cifras_decimales'],$formato_valor['decimales'],$formato_valor['miles']);
 		return $valor;
 	}

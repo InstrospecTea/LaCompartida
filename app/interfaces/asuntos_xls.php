@@ -153,7 +153,7 @@
     $ws1->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
     $ws1->write($fila_inicial, $col_horas_trabajadas, __('Horas Trabajadas'), $tit);
     $ws1->write($fila_inicial, $col_horas_a_cobrar, __('Horas a cobrar'), $tit);
-    $ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
+    $ws1->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
 	if($mostrar_encargado_secundario)
 		$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado Secundario'), $tit);
     $ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
