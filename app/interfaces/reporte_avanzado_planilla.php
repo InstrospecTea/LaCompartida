@@ -193,6 +193,17 @@ span.indefinido { color: #550000; }
 			$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
 
 	$reporte->id_moneda = $id_moneda;	
+
+	//genero el formato valor a ser usado en las celdas (
+	$moneda	= new Moneda($sesion);
+	$moneda->Load($id_moneda);
+	
+	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
+	$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
+	$formato_valor=array('cifras_decimales'=>$moneda->fields['cifras_decimales'],
+	'miles'=>$idioma->fields['separador_miles'],
+	'decimales'=>$idioma->fields['separador_decimales']);
+
 	$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 	
 	if($campo_fecha)
@@ -348,9 +359,9 @@ span.indefinido { color: #550000; }
 			if($tipo_dato_comparado)
 			{
 				echo "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato),$filtros);
+				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato),$filtros,$formato_valor);
 				echo "</td> <tr > <td class=\"valor secundario\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado),$filtros);
+				echo url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado),$filtros,$formato_valor);
 				echo "</td> </tr> </table>";
 			}
 			else

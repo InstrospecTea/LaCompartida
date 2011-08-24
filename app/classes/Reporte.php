@@ -4,6 +4,7 @@ require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
  
 class Reporte
 {
@@ -196,7 +197,7 @@ class Reporte
 			case "glosa_cliente":
 				$this->id_agrupador[] = "codigo_cliente";
 				break;
-			case "glosa_asunto":
+			case "glosa_asunto": case "glosa_asunto_con_codigo":
 				$this->id_agrupador[] = "codigo_asunto";
 				break;
 			case "glosa_cliente_asunto":
@@ -225,6 +226,7 @@ class Reporte
 			case "profesional":
 			case "username":
 			case "glosa_asunto":
+			case "glosa_asunto_con_codigo":
 			case "area_asunto":
 			case "tipo_asunto":
 			case "id_trabajo":
@@ -275,6 +277,13 @@ class Reporte
 			return " IF( $opc1 IS NULL OR $opc1 = '00-00-0000' , $opc2 , $opc1 )";
 	}
 
+	function nombre_usuario($usuario)
+	{
+		if( UtilesApp::GetConf($this->sesion,'UsaUsernameEnTodoElSistema') )
+			return $usuario.'.username ';
+		return 'CONCAT_WS(\' \','.$usuario.'.nombre, '.$usuario.'.apellido1, LEFT('.$usuario.'.apellido2,1)) ';
+	}
+
 	function cobroQuery()	//Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
 	{
 		if(empty($this->id_agrupador_cobro))
@@ -289,11 +298,17 @@ class Reporte
 				contrato.id_contrato,
 				'.(in_array('codigo_cliente_secundario',$this->agrupador)?'cliente.codigo_cliente_secundario,':'').'
 				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?"'".__('Indefinido')."' AS glosa,":'').'
-				'.(in_array('id_usuario_responsable',$this->agrupador)?'CONCAT_WS(\' \',usuario_responsable.nombre, usuario_responsable.apellido1, LEFT(usuario_responsable.apellido2,1)) AS nombre_usuario_responsable,':'').'
+				'.(in_array('id_usuario_responsable',$this->agrupador)? $this->nombre_usuario('usuario_responsable').' AS nombre_usuario_responsable,':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?' usuario_responsable.id_usuario AS id_usuario_responsable,':'').'
 				cliente.glosa_cliente,
+				'.(in_array('id_usuario_secundario',$this->agrupador)? $this->nombre_usuario('usuario_secundario').' AS nombre_usuario_secundario,':'').'
+				'.(in_array('id_usuario_secundario',$this->agrupador)?' usuario_secundario.id_usuario AS id_usuario_secundario,':'').'
+				cliente.glosa_cliente,
+
+
 				CONCAT(cliente.codigo_cliente,\' - \') as glosa_cliente_asunto, 
 				\' - \' as glosa_asunto,
+				\' - \' as glosa_asunto_con_codigo,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
 				CONCAT(cliente.codigo_cliente,\'-0000\') as codigo_asunto,
@@ -389,6 +404,7 @@ class Reporte
 						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
 						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
+						'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
 						LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
 					';
 
@@ -442,11 +458,14 @@ class Reporte
 						'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?'prm_area_proyecto.glosa,':'').'
 						'.(in_array('area_usuario',$this->agrupador)?'IFNULL(prm_area_usuario.glosa,\'-\') as area_usuario,':'').'
 						'.(in_array('categoria_usuario',$this->agrupador)?'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\') as categoria_usuario,':'').'
-						'.(in_array('id_usuario_responsable',$this->agrupador)?'IF(usuario_responsable.id_usuario IS NULL,\'Sin Resposable\',CONCAT_WS(\' \',usuario_responsable.nombre, usuario_responsable.apellido1, LEFT(usuario_responsable.apellido2,1))) AS nombre_usuario_responsable,':'').'
+						'.(in_array('id_usuario_responsable',$this->agrupador)?'IF(usuario_responsable.id_usuario IS NULL,\'Sin Resposable\', ' .$this->nombre_usuario('usuario_responsable').') AS nombre_usuario_responsable,':'').'
 						'.(in_array('id_usuario_responsable',$this->agrupador)?' usuario_responsable.id_usuario AS id_usuario_responsable,':'').'
+						'.(in_array('id_usuario_secundario',$this->agrupador)?' usuario_secundario.id_usuario AS id_usuario_secundario,':'').'
 						'.(!$this->vista?"'Indefinido' AS agrupador_general,":'').'
+						'.(in_array('id_usuario_secundario',$this->agrupador)?'IF(usuario_secundario.id_usuario IS NULL,\'Sin Resposable Secundario\','.$this->nombre_usuario('usuario_secundario').') AS nombre_usuario_secundario,':'').'
 						cliente.glosa_cliente,
 						asunto.glosa_asunto,
+						CONCAT(asunto.codigo_asunto,\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 						asunto.codigo_asunto,
 						contrato.id_contrato,
 						tipo.glosa_tipo_proyecto AS tipo_asunto,
@@ -618,6 +637,7 @@ class Reporte
 				'.(in_array('area_usuario',$this->agrupador)?'LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario':'').'
 				'.(in_array('categoria_usuario',$this->agrupador)?'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
+				'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
 				';
 		//Se requiere: Moneda Buscada (en el reporte), Moneda Original (del cobro), Moneda Base. 
 		//Se usa CobroMoneda (cobros por cobrar) o DocumentoMoneda (cobros cobrados).
@@ -789,6 +809,11 @@ class Reporte
 		{
 			$id = 'id_usuario_responsable';
 			$label = 'nombre_usuario_responsable';
+		}
+		elseif($this->agrupador[0]=='id_usuario_secundario')
+		{
+			$id = 'id_usuario_secundario';
+			$label = 'nombre_usuario_secundario';
 		}
 		elseif($this->agrupador[0]=='prm_area_proyecto.glosa')
 		{
@@ -1010,8 +1035,15 @@ class Reporte
 		$id_temp = array('id_a', 'id_b', 'id_c', 'id_d', 'id_e', 'id_f');
 		for($k=0; $k<6; ++$k)
 		{
-			${$agrupador_temp[$k]} = $this->agrupador[$k]=='id_usuario_responsable'?'nombre_usuario_responsable':($this->agrupador[$k]=='prm_area_proyecto.glosa'?'glosa':$this->agrupador[$k]);
-			${$id_temp[$k]} = $this->id_agrupador[$k]=='id_usuario_responsable'?'id_usuario_responsable':($this->id_agrupador[$k]=='prm_area_proyecto.glosa'?'glosa':$this->id_agrupador[$k]);
+			${$agrupador_temp[$k]} = $this->agrupador[$k];
+			
+			if($this->agrupador[$k]=='id_usuario_responsable')
+				${$agrupador_temp[$k]} = 'nombre_usuario_responsable';
+			if($this->agrupador[$k]=='id_usuario_secundario')
+				${$agrupador_temp[$k]} = 'nombre_usuario_secundario';
+			elseif($this->agrupador[$k]=='prm_area_proyecto.glosa')
+				${$agrupador_temp[$k]} ='glosa';
+			${$id_temp[$k]} = ($this->id_agrupador[$k]=='prm_area_proyecto.glosa'?'glosa':$this->id_agrupador[$k]);
 		}
 
 		foreach($this->row as $row)
@@ -1342,7 +1374,7 @@ class Reporte
 	}
 
 	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
-	function FormatoValor($sesion,$valor,$tipo_dato="horas_",$tipo_reporte="")
+	function FormatoValor($sesion,$valor,$tipo_dato="horas_",$tipo_reporte="",$formato_valor=array('cifras_decimales'=>2,'miles'=>'.','decimales'=>','))
 	{
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) ) && strpos($tipo_dato,"oras_"))
 		{
@@ -1354,6 +1386,8 @@ class Reporte
 				$valor_tiempo=sprintf('%02d',$valor_horas).":".sprintf('%02d',$valor_minutos);
 			return $valor_tiempo;
 		}
+		if(strpos($tipo_dato,'valor_')!==false)
+			return number_format($valor,$formato_valor['cifras_decimales'],$formato_valor['decimales'],$formato_valor['miles']);
 		return $valor;
 	}
 }

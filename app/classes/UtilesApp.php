@@ -718,7 +718,7 @@ HTML;
             		$activo_adentro_otros = '';
             		}
 	$menu_html .= <<<HTML
-            			<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>${row3['glosa']}</span></a></li><![endif]-->
+            			<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>$glosa_submenu</span></a></li><![endif]-->
             			<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>$glosa_submenu</span></a></li><!--<![endif]-->
 HTML;
      }

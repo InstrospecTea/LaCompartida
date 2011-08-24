@@ -54,6 +54,14 @@
 	$_LANG['Debe ingresar un monto iva para los gastos c/ IVA'] = 'Debe ingresar un monto IGV para los gastos c/ IGV';
 	$_LANG['Debe ingresar una descripción para los gastos s/ IVA'] = 'Debe ingresar una descripción para los gastos s/ IGV';
 	$_LANG['Debe ingresar un monto para los gastos s/ IVA'] = 'Debe ingresar un monto para los gastos s/ IGV';
+
+	#Reportes Avanzados
+	$_LANG['horas_cobrables'] = 'Horas Facturables';
+	$_LANG['horas_no_cobrables'] = 'Horas no Facturables';
+	$_LANG['horas_por_cobrar'] = 'Horas Pendientes de Facturar';
+	$_LANG['horas_cobradas'] = 'Horas Facturadas';
+	$_LANG['valor_cobrado'] = 'Valor Facturado';
+	$_LANG['valor_por_cobrar'] = 'Valor Pendiente de Facturar';
 	
 	### Reportes - Tipo de Dato ###
 	$_LANG['horas_cobrables'] = "Horas Facturables";

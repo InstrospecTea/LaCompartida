@@ -661,7 +661,7 @@ $query ="SELECT
 						cliente.codigo_cliente, 
 						cliente.codigo_cliente_secundario, 
 						cliente.glosa_cliente,
-						asunto.glosa_asunto, 
+						CONCAT(asunto.glosa_asunto,' (',asunto.codigo_asunto,')') AS glosa_asunto,
 						asunto.codigo_asunto, 
 						asunto.codigo_asunto_secundario, 
 						grupo_cliente.id_grupo_cliente, 

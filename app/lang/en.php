@@ -661,11 +661,14 @@ $_LANG['profesional'] = "Professional";
 $_LANG['glosa_grupo_cliente'] = "Group";
 $_LANG['glosa_cliente'] = "Client";
 $_LANG['glosa_asunto'] = "Project";
+$_LANG['glosa_asunto_con_codigo'] = "Project";
 $_LANG['id_cobro'] = "Invoice N°";
 $_LANG['Resumen cobro'] = "Invoice summary";
 $_LANG['Tipo de Honorarios:'] = "Type of fee:";
 $_LANG['forma_cobro'] = "Type of Fee Agreement";
 $_LANG['cliente'] = "Client";
+$_LANG['id_usuario_responsable'] = "Commercial Manager";
+$_LANG['id_usuario_secundario'] = "Secundary Manager";
 
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";

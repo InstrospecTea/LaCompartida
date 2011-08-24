@@ -17,19 +17,22 @@
 	if(!is_array($clientes))	
 		$clientes = array($clientes);
 
+	$vista_cliente = "glosa_cliente-profesional-profesional-profesional-profesional-profesional";
+	$vista_empleado = "profesional-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente"; 
+	$vista_asunto = "glosa_cliente-codigo_asunto-glosa_asunto-glosa_asunto-glosa_asunto-glosa_asunto";
 
 	switch($tipo_reporte)
 	{
 		case "hh_por_cliente":
-			$vista = "glosa_cliente-profesional";
+			$vista = $vista_cliente;
 			$titulo_reporte = __('Reporte de Horas por Cliente');
 			break;
 		case "hh_por_empleado":
-			$vista = "profesional-glosa_cliente";
+			$vista = $vista_empleado;
 			$titulo_reporte = __('Reporte de Horas por Profesional');
 			break;
 		case "hh_por_asunto":
-			$vista = "glosa_cliente-codigo_asunto-glosa_asunto-glosa_asunto";
+			$vista = $vista_asunto;
 			$titulo_reporte = __('Reporte de Horas por Asunto');
 			break;
 	}
@@ -59,9 +62,9 @@
 		$reporte[$dato]->Query();
 
 
-		if($vista == "profesional-glosa_cliente" || $vista == "glosa_cliente-profesional")
+		if($vista == $vista_empleado || $vista == $vista_cliente)
 			$resultado[$dato] = $reporte[$dato]->toBars();
-		else if($vista == "glosa_cliente-codigo_asunto-glosa_asunto-glosa_asunto")
+		else if($vista == $vista_asunto)
 			$resultado[$dato] = $reporte[$dato]->toArray();
 		else
 			echo "error";
@@ -180,7 +183,7 @@
 
 	
 	//VISTA cliente y profesional usan Arreglo de Barras.
-	if($vista == "profesional-glosa_cliente" || $vista == "glosa_cliente-profesional")
+	if($vista == $vista_empleado || $vista == $vista_cliente)
 	{
 		foreach($datos as $col => $dato)
 		{
@@ -225,7 +228,7 @@
 		}
 	}
 	//VISTA asunto usa arreglo en forma de Planilla. Sólo llega hasta la tercera profundidad del arreglo.
-	else if($vista == "glosa_cliente-codigo_asunto-glosa_asunto-glosa_asunto")
+	else if($vista == $vista_asunto)
 	{
 		function extender($fila,$columna,$filas)
 		{

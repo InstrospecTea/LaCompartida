@@ -24,7 +24,7 @@
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
-
+		//$wb->setVersion(8); //esto permite mas de 255 caracteres por celda, pero se corta en los acentos y muestra un error en excel 2010
 
 		$wb->setCustomColor (35, 220, 255, 220);
 		$wb->setCustomColor (36, 255, 255, 220);
@@ -385,7 +385,7 @@
 								cobro.fecha_creacion";
 		// Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
-							GROUP_CONCAT(distinct glosa_asunto SEPARATOR '\n') as asuntos
+							GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos
 						FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato

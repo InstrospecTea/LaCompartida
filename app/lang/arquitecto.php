@@ -9,6 +9,7 @@ $_LANG['Título asunto'] = "Título proyectos";
 
 $_LANG['prm_area_proyecto.glosa'] = "Área Proyecto";
 $_LANG['glosa_asunto'] = "Proyecto";
+$_LANG['codigo_asunto'] = "Código Proyecto";
 
 $_LANG['Debes guardar primero el contrato para seleccionar los asuntos'] = "Debes guardar primero el contrato para seleccionar los proyectos";
 $_LANG['Listado de asuntos'] = "Listado de proyectos";

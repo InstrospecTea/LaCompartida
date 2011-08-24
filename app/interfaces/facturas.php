@@ -352,7 +352,7 @@
 			$html .= "<td align=center>".$fila->fields['estado']."</td>";
 		else
 			$html .= "<td align=center>".$fila->fields['anulado']."</td>";
-		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar " . __("Cobro") . "',950,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
+		$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',950,660,'cobros6.php?id_cobro=".$fila->fields['id_cobro']."&popup=1');\">".$fila->fields['id_cobro']."</a></td>";
 		$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 		$html .= "<td align=right nowrap>".MontoTotal(& $fila)."</td>";

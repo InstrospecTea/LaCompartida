@@ -887,10 +887,15 @@ $_LANG['honorario_yo_gastos'] = 'Honorario y/o Gastos';
 $_LANG['profesional'] = "Profesional";
 $_LANG['glosa_grupo_cliente'] = "Grupo";
 $_LANG['glosa_cliente'] = "Cliente";
+$_LANG['glosa_asunto'] = "Asunto";
+$_LANG['codigo_asunto'] = "Código Asunto";
+$_LANG['glosa_asunto_con_codigo'] = "Asunto";
+
 $_LANG['id_cobro'] = "N° Cobro";
 $_LANG['forma_cobro'] = "Forma de Cobro";
 $_LANG['cliente'] = "Cliente";
 $_LANG['id_usuario_responsable'] = "Encargado comercial";
+$_LANG['id_usuario_secundario'] = "Encargado secundario";
 
 $_LANG['area_usuario'] = "Área Profesional";
 $_LANG['categoria_usuario'] = "Categoría Profesional";

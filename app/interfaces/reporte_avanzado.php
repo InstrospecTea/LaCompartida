@@ -89,6 +89,7 @@
 
 	$agrupadores = array(
 	'glosa_cliente',
+	'codigo_asunto',
 	'glosa_asunto',
 	'profesional',
 	'estado',
@@ -100,6 +101,7 @@
 	'area_usuario',
 	'glosa_grupo_cliente',
 	'id_usuario_responsable',
+	'id_usuario_secundario',
 	'mes_reporte',
 	'dia_reporte');
 	if($debug==1)
