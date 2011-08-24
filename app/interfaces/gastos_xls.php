@@ -7,8 +7,8 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
     require_once Conf::ServerDir().'/../app/classes/Moneda.php';
     require_once Conf::ServerDir().'/../app/classes/Gasto.php';
-    require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once Conf::ServerDir().'/clases/UtilesApp.php';
+    require_once Conf::ServerDir().'/classes/Funciones.php'; 
+    require_once Conf::ServerDir().'/classes/UtilesApp.php';
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('OFI','COB') );
