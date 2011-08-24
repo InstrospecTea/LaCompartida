@@ -106,7 +106,10 @@
 		}
 		if($opcion == "guardar")
 		{
-			if( empty($cliente) )			$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
+			if( empty($cliente) )													$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
+			if( !is_numeric($monto_honorarios_legales) )	$pagina->AddError(__('Debe ingresar un monto válido para los honorarios.'));
+			if( !is_numeric($monto_gastos_con_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA.'));
+			if( !is_numeric($monto_gastos_sin_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA.'));
 			
 			$errores = $pagina->GetErrors();
 			$guardar_datos = true;
@@ -561,6 +564,12 @@ Object.extend(scal.prototype,
     }
 });
 
+
+	function isNumber(n) {
+  	return !isNaN(parseFloat(n)) && isFinite(n);
+	}
+
+
 //this is a global variable to have only one instance of the calendar
 var calendar = null;
 
@@ -697,7 +706,6 @@ function ValidaSaldoPendienteCobro(form)
 enviado = 0;
 function Validar(form)
 {
-	
 <? 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{ ?>
@@ -749,11 +757,23 @@ function Validar(form)
 			form.monto_honorarios_legales.focus();
 			return false;
 		}
+		if( !isNumber( form.monto_honorarios_legales.value ) )
+		{
+			alert('<?=__('Debe ingresar un monto válido para los honorarios')?>');
+			form.monto_honorarios_legales.focus();
+			return false;
+		}
 		if(form.monto_iva_honorarios_legales.value == "")
 		{
 			alert('<?=__('Debe ingresar un monto IVA para los honorarios')?>');
 			form.monto_iva_honorarios_legales.focus();
 			return false;
+		}
+		if( !isNumber( form.monto_iva_honorarios_legales.value ) )
+		{
+			alert('<?=__('Debe ingresar un monto IVA válido para los honorarios.')?>');
+			form.monto_iva_honorarios_legales.focus();
+			return false; 
 		}
 		if(form.descripcion_gastos_con_iva.value == "")
 		{
@@ -767,11 +787,23 @@ function Validar(form)
 			form.monto_gastos_con_iva.focus();
 			return false;
 		}
+		if( !isNumber( form.monto_gastos_con_iva.value ) )
+		{
+			alert('<?=__('Debe ingresar un monto válido para los gastos c/ IVA')?>');
+			form.monto_gastos_con_iva.focus();
+			return false;
+		}
 		if(form.monto_iva_gastos_con_iva.value == "")
 		{
 			alert('<?=__('Debe ingresar un monto iva para los gastos c/ IVA')?>');
 			form.monto_iva_gastos_con_iva.focus();
 			return false;
+		}
+		if( !isNumber( form.monto_iva_gastos_con_iva.value ) )
+		{
+			alert('<?=__('Debe ingresar un monto iva válido para los gastos c/ IVA')?>');
+			form.monto_iva_gastos_con_iva.focus();
+			return false; 
 		}
 		<?php
 		if(!$factura->loaded() && ($id_documento_legal!=2)){
@@ -806,6 +838,12 @@ function Validar(form)
 				if(form.monto_gastos_sin_iva.value == "")
 				{
 					alert('<?=__('Debe ingresar un monto para los gastos s/ IVA')?>');
+					form.monto_gastos_sin_iva.focus();
+					return false;
+				}
+				if( !isNumber( form.monto_gastos_sin_iva.value ) )
+				{
+					alert('<?=__('Debe ingresar un monto válido para los gastos s/ IVA')?>');
 					form.monto_gastos_sin_iva.focus();
 					return false;
 				}

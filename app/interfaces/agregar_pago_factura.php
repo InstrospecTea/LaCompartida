@@ -54,56 +54,65 @@
 		include dirname(__FILE__).'/factura_pago_doc.php';
 		exit;
 	}
-	
-	if($opcion == 'guardar'){
 
-		if(!empty($id_factura_pago))
+	if( $opcion == 'guardar' )
+	{
+		if( !is_numeric($monto) )								$pagina->AddError(__('El monto ingresado en el campo "Monto" no es válido.'));
+		if( !is_numeric($monto_moneda_cobro) && $monto_moneda_cobro != '' )	
+			$pagina->AddError(__('El monto ingresado en el campo "Equivalente a" no es válido.'));
+
+		$errores = $pagina->GetErrors();
+		$guardar_datos = true;
+		if (!empty($errores))
 		{
-			$pago->Edit('id_factura_pago',$id_factura_pago);
+			$guardar_datos = false;
 		}
-		$pago->Edit('fecha', Utiles::fecha2sql($fecha));
-		//$pago->Edit('codigo_cliente', $codigo_cliente);
-		$pago->Edit('codigo_cliente', $codigo_cliente_factura);
-		$pago->Edit('monto', $monto);
-		$pago->Edit('id_moneda', $id_moneda);
-		$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
-		$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
-		$pago->Edit('tipo_doc', $tipo_doc);
-		$pago->Edit('nro_documento', $numero_doc);
-		$pago->Edit('nro_cheque', $numero_cheque);
-		$pago->Edit('descripcion', $glosa_documento);
-		$pago->Edit('id_banco', $id_banco);
-		$pago->Edit('id_cuenta', $id_cuenta);
-		$pago->Edit('pago_retencion', $pago_retencion);
-		$pago->Edit('id_concepto', $id_concepto);
 
-		if($pago->Write()){
-			$cta_cte_fact = new CtaCteFact($sesion);
-			$neteos = array();
-			foreach($_POST as $nombre_variable => $valor){
-				if(strpos($nombre_variable, 'saldo_') === 0){
-					$saldo_fact = explode('_', $nombre_variable);
-					$factura = $saldo_fact[1];
-					$saldo = $valor;
-					$neteos[] = array($factura, $saldo);
-				}
+		if( $guardar_datos)
+		{
+			if(!empty($id_factura_pago))
+			{
+				$pago->Edit('id_factura_pago',$id_factura_pago);
 			}
+			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
+			//$pago->Edit('codigo_cliente', $codigo_cliente);
+			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
+			$pago->Edit('monto', $monto);
+			$pago->Edit('id_moneda', $id_moneda);
+			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
+			$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
+			$pago->Edit('tipo_doc', $tipo_doc);
+			$pago->Edit('nro_documento', $numero_doc);
+			$pago->Edit('nro_cheque', $numero_cheque);
+			$pago->Edit('descripcion', $glosa_documento);
+			$pago->Edit('id_banco', $id_banco);
+			$pago->Edit('id_cuenta', $id_cuenta);
+			$pago->Edit('pago_retencion', $pago_retencion);
+			$pago->Edit('id_concepto', $id_concepto);
+
+			if($pago->Write()){
+				$cta_cte_fact = new CtaCteFact($sesion);
+				$neteos = array();
+				foreach($_POST as $nombre_variable => $valor){
+					if(strpos($nombre_variable, 'saldo_') === 0){
+						$saldo_fact = explode('_', $nombre_variable);
+						$factura = $saldo_fact[1];
+						$saldo = $valor;
+						$neteos[] = array($factura, $saldo);
+					}
+				}
 			$documento->LoadByCobro($id_cobro);
-
 			$id_factura_pago = $pago->fields['id_factura_pago'];
-			
 			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
-
 			$monto_pago -= $monto;
 
-			
 			?>
 			<script type="text/javascript">
 				window.opener.Refrescar();
 			</script>
 			<?
 
-			
+			}
 		}
 	}
 
@@ -415,6 +424,27 @@
 		continuar = 1;
 		ValidaMontoSaldoPago(form);
 
+		// Validaciones de montos
+		if( !isNumber( $('monto').value ) ) {
+			alert( 'El formato del monto ingresado no es valido.' );
+			$('monto').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		}
+		else if( !isNumber( $('monto_moneda_cobro').value ) ) {
+			alert( 'El formato del monto ingresado no es valido.' );
+			$('monto_moneda_cobro').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		}
+		$$('[id^="saldo_"]').each(function(elem){
+			if( !isNumber( $(elem.id).value ) ) {
+				alert( 'El formato del monto ingresado no es valido.' );
+				$(elem.id).focus();
+				$('boton_guardar').disabled = false;
+				return false;
+			}
+		});
 		if(continuar==0){
 			return false;
 		}
@@ -431,8 +461,11 @@
 			form.opcion.value = 'guardar';
 			form.submit();
 			return Validar(form);
-			
 		}
+	}
+	
+	function isNumber(n) {
+  	return !isNaN(parseFloat(n)) && isFinite(n);
 	}
 
 	function ValidaMontoSaldoPago(form)
