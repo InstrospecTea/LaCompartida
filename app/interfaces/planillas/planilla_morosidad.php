@@ -281,7 +281,7 @@
 				$ws1->write($filas, $col_total_pesos, __('Total en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				if(!$desglosar_por_encargado)
-					$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
+					$ws1->write($filas, $col_encargado, __('Encargado Comercial'), $titulo_filas);
 				if($mostrar_encargado_secundario)
 					$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
