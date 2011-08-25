@@ -674,7 +674,7 @@ class Cobro extends Objeto
 		}
 		
 		$cobro_total_honorario_cobrable_original = $cobro_total_honorario_cobrable;
-		if( $this->fields['monto_ajustado'] > 0 ) 
+		if( $this->fields['monto_ajustado'] > 0 )
 		{
 			$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
 			for($z=0; $z<$lista_trabajos->num; ++$z)
