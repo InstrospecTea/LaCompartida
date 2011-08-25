@@ -503,9 +503,6 @@ class Cobro extends Objeto
 			// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 			if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
 			{
-				if( $this->fields['monto_subtotal'] > 0 )
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'] = number_format($trabajo->fields['tarifa_hh'] * $this->fields['monto_ajustado'] / $this->fields['monto_subtotal'], 6,'.',''); 
-				
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
@@ -517,7 +514,6 @@ class Cobro extends Objeto
 			if($trabajo->fields['cobrable'] == '1')
 			{
 				$valor_trabajo = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa'];
-				$valor_trabajo_ajustado = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado'];
 				$valor_trabajo_estandar = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'];
 			}
 			else
@@ -604,16 +600,8 @@ class Cobro extends Objeto
 			$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-			if( $this->fields['monto_ajustado'] > 0 )
-			{
-				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_ajustado']);
-				$trabajo->Edit('monto_cobrado', number_format($valor_trabajo_ajustado,6,'.',''));
-			}
-			else
-			{
-				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-				$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
-			}
+			$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
 			$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
 
@@ -686,9 +674,19 @@ class Cobro extends Objeto
 		}
 		
 		$cobro_total_honorario_cobrable_original = $cobro_total_honorario_cobrable;
-		if( $this->fields['monto_ajustado'] ) 
+		if( $this->fields['monto_ajustado'] > 0 ) 
 		{
 			$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
+			for($z=0; $z<$lista_trabajos->num; ++$z)
+			{
+				$trabajo = $lista_trabajos->Get($z);
+				$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original, 6,'.','') );
+				list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+				$duracion = $h + ($m > 0 ? ($m / 60) :'0');
+				$monto_cobrado = number_format($trabajo->fields['tarifa_hh'] * $duracion, 6,'.','');
+				$trabajo->Edit('monto_cobrado', $monto_cobrado);
+				$trabajo->Write();
+			}
 		}
 		
 		#GASTOS del Cobro
