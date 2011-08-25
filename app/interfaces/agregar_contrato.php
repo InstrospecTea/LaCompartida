@@ -48,6 +48,9 @@
 		$tarifa_permitido = true;
 	else
 		$tarifa_permitido = false;
+		
+	$validaciones_segun_config = method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente');
+	$obligatorio = '<span class="req">*</span>';
 	
 	if($popup && !$motivo)
 	{
@@ -332,7 +335,148 @@ function ValidarContrato(form)
 	<?php
 	}
 	?>
+	
+	<? if( $validaciones_segun_config ) { ?>
+	// DATOS FACTURACION
 
+	if(!form.factura_rut.value)
+	{
+		alert("<?=__('Debe ingresar el').' '.__('RUT').' '.__('del cliente')?>");
+		form.factura_rut.focus();
+		return false;
+	}
+
+	if(!form.factura_razon_social.value)
+	{
+		alert("<?=__('Debe ingresar la razón social del cliente')?>");
+		form.factura_razon_social.focus();
+		return false;
+	}
+
+	if(!form.factura_giro.value)
+	{
+		alert("<?=__('Debe ingresar el giro del cliente')?>");
+		form.factura_giro.focus();
+		return false;
+	}
+
+	if(!form.factura_direccion.value)
+	{
+		alert("<?=__('Debe ingresar la dirección del cliente')?>");
+		form.factura_direccion.focus();
+		return false;
+	}
+
+	if(form.id_pais.options[0].selected == true)
+	{
+		alert("<?=__('Debe ingresar el pais del cliente')?>");
+		form.id_pais.focus();
+		return false;
+	}
+
+	if(!form.cod_factura_telefono.value)
+	{
+		alert("<?=__('Debe ingresar el codigo de area del teléfono')?>");
+		form.cod_factura_telefono.focus();
+		return false;
+	}
+
+	if(!form.factura_telefono.value)
+	{
+		alert("<?=__('Debe ingresar el número de telefono')?>");
+		form.factura_telefono.focus();
+		return false;
+	}
+
+	// SOLICITANTE
+	if(form.titulo_contacto.options[0].selected == true)
+	{
+		alert("<?=__('Debe ingresar el titulo del solicitante')?>");
+		form.titulo_contacto.focus();
+		return false;
+	}
+
+	if(!form.nombre_contacto.value)
+	{
+		alert("<?=__('Debe ingresar el nombre del solicitante')?>");
+		form.nombre_contacto.focus();
+		return false;
+	}
+
+	if(!form.apellido_contacto.value)
+	{
+		alert("<?=__('Debe ingresar el apellido del solicitante')?>");
+		form.apellido_contacto.focus();
+		return false;
+	}
+
+	if(!form.fono_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar el teléfono del solicitante')?>");
+		form.fono_contacto_contrato.focus();
+		return false;
+	}
+
+	if(!form.email_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar el email del solicitante')?>");
+		form.email_contacto_contrato.focus();
+		return false;
+	}
+
+	if(!form.direccion_contacto_contrato.value)
+	{
+		alert("<?=__('Debe ingresar la dirección de envío del solicitante')?>");
+		form.direccion_contacto_contrato.focus();
+		return false;
+	}
+
+	// DATOS DE TARIFICACION
+	if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
+	{
+		alert("<?=__('Debe seleccionar un tipo de tarifa')?>");
+		form.tipo_tarifa[0].focus();
+		return false;
+	}
+	
+	/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
+	
+	if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
+	{
+		alert("<?=__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.')?>");
+		form.tarifa_flat.focus();
+		return false;
+	}
+
+	/*if(!form.id_moneda.options[0].selected == true)
+	{
+		alert("<?=__('Debe seleccionar una moneda para la tarifa')?>");
+		form.id_moneda.focus();
+		return false;
+	}*/
+
+	if(!(form.forma_cobro[0].checked || form.forma_cobro[1].checked ||form.forma_cobro[2].checked ||form.forma_cobro[3].checked ||form.forma_cobro[4].checked ))
+	{
+		alert("<?=__('Debe seleccionar una forma de cobro') . __('para la tarifa')?>");
+		form.forma_cobro[0].focus();
+		return false;
+	}
+/*
+	if(!form.opc_moneda_total.value)
+	{
+		alert("<?=__('Debe seleccionar una moneda para mostrar el total')?>");
+		form.opc_moneda_total.focus();
+		return false;
+	}*/
+
+	if(!form.observaciones.value)
+	{
+		alert("<?=__('Debe ingresar un detalle para la cobranza')?>");
+		form.observaciones.focus();
+		return false;
+	}
+
+<? } ?>
 	
 	if($('fc5').checked)
 	{
@@ -352,6 +496,10 @@ function ValidarContrato(form)
 function SetFormatoRut()
 {
 	var rut = $('rut').value;
+	if( rut == "" )
+		return true;
+	while( rut.indexOf('.') != -1 )
+		rut = rut.replace('.','');
 	var con_raya = rut.indexOf('-');
 	
 	if( con_raya != -1 )
@@ -369,7 +517,7 @@ function SetFormatoRut()
 	var rut2 = rut.substr(rut.length-6,3);
 	var rut1 = rut.substr(0,rut.length-6);
 	
-	if(rut.length > 5)
+	if(rut.length > 6)
 		var rut = rut1 + '.' + rut2 + '.' + rut3 + '-' + dv;
 	else
 		var rut = rut2 + '.' + rut3 + '-' + dv;
@@ -1014,7 +1162,7 @@ function SetBanco( origen, destino )
 				respuesta_revisar_tarifa = true;
 				if( !desde_combo )
 				{
-					if( f.desde.value == 'agregar_cliente')
+					if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
 					{
 						Validar(f);
 					}
@@ -1030,7 +1178,7 @@ function SetBanco( origen, destino )
 		{
 			if( !desde_combo )
 			{
-				if( f.desde.value == 'agregar_cliente')
+				if( f.desde.value == 'agregar_cliente' || f.desde.value == 'agregar_asunto' )
 				{
 					Validar(f);
 				}

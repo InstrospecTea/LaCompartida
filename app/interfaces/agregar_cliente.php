@@ -560,13 +560,12 @@ function validarUnicoCliente(dato,campo,id_cliente)
 	cargando = false;
 	offLoading();
 	return true;
-}	
-	
+}
+
 function Validar(form)
 {
 	if(!form)
 		var form = $('formulario');
-	
 	
 	if(!form.glosa_cliente.value)
 	{
@@ -574,7 +573,7 @@ function Validar(form)
 		form.glosa_cliente.focus();
 		return false;
 	}
-	
+
 	if(validarUnicoCliente(form.glosa_cliente.value,'glosa',form.id_cliente.value))
 	{
 		if(!glosa_cliente_unica)
@@ -589,7 +588,7 @@ function Validar(form)
 
 <? if( $validaciones_segun_config ) { ?>
 	// DATOS FACTURACION
-	
+
 	if(!form.factura_rut.value)
 	{
 		alert("<?=__('Debe ingresar el').' '.__('RUT').' '.__('del cliente')?>");
@@ -801,7 +800,6 @@ function Validar(form)
 	return true;
 }
 
-
 function MuestraPorValidacion(divID)
 {
 	var divArea = $(divID);
@@ -819,7 +817,6 @@ function calcHeight(idIframe, idMainElm){
         duration: 0.2
     });
 }
-
 
 function ShowMonto()
 {
