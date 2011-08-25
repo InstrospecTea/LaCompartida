@@ -101,7 +101,7 @@
 		$enviar_mail = 1;
 
 		#Validaciones
-		if ( $validaciones_segun_config )
+		if ( $validaciones_segun_config && $cobro_independiente )
 		{
 			if (empty($glosa_asunto)) $pagina->AddError(__("Por favor ingrese el nombre del cliente"));
 			if (empty($codigo_cliente)) $pagina->AddError(__("Por favor ingrese el codigo del cliente"));
@@ -628,15 +628,16 @@ function Validar(form)
 	{
 ?>
 		if(!form.codigo_cliente.value)
-		{ 
+		{
 			alert("Debe ingresar un cliente");
 			form.codigo_cliente.focus();
 			return false;
 		}
 <?
 	}
-?> 
+?>
 
+if( document.getElementById('cobro_independiente').checked ) {
 <? if( $validaciones_segun_config ) { ?>
 	// DATOS FACTURACION
 
@@ -797,6 +798,7 @@ function Validar(form)
 	}
 
 <? } ?>
+}
 
 form.submit();
 return true;
