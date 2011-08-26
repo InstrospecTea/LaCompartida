@@ -61,18 +61,18 @@
 	#Reportes Avanzados
 	$_LANG['horas_cobrables'] = 'Horas Facturables';
 	$_LANG['horas_no_cobrables'] = 'Horas no Facturables';
-	$_LANG['horas_por_cobrar'] = 'Horas Pendientes de Facturar';
-	$_LANG['horas_cobradas'] = 'Horas Facturadas';
-	$_LANG['valor_cobrado'] = 'Valor Facturado';
-	$_LANG['valor_por_cobrar'] = 'Valor Pendiente de Facturar';
+	$_LANG['horas_por_cobrar'] = 'Horas Pendientes de liquidar';
+	$_LANG['horas_cobradas'] = 'Horas liquidadas';
+	$_LANG['valor_cobrado'] = 'Valor liquidado';
+	$_LANG['valor_por_cobrar'] = 'Valor Pendiente de liquidar';
 	
 	### Reportes - Tipo de Dato ###
 	$_LANG['horas_cobrables'] = "Horas Facturables";
 	$_LANG['horas_no_cobrables'] = "Horas no Facturables";
 	$_LANG['horas_visibles'] = "Horas Facturables Corregidas";
-	$_LANG['horas_cobradas'] = "Horas Facturadas";
-	$_LANG['horas_por_cobrar'] = "Horas Pendientes de Facturar";
-	$_LANG['valor_cobrado'] = "Valor Facturado";
-	$_LANG['valor_por_cobrar'] = "Valor por Facturar";
+	$_LANG['horas_cobradas'] = "Horas liquidadas";
+	$_LANG['horas_por_cobrar'] = "Horas Pendientes de liquidar";
+	$_LANG['valor_cobrado'] = "Valor liquidado";
+	$_LANG['valor_por_cobrar'] = "Valor por liquidar";
 
 ?>
