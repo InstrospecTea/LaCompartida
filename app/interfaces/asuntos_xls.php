@@ -153,9 +153,13 @@
     $ws1->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
     $ws1->write($fila_inicial, $col_horas_trabajadas, __('Horas Trabajadas'), $tit);
     $ws1->write($fila_inicial, $col_horas_a_cobrar, __('Horas a cobrar'), $tit);
-    $ws1->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
-	if($mostrar_encargado_secundario)
-		$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado Secundario'), $tit);
+		if($mostrar_encargado_secundario) {
+   		$ws1->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
+			$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado Secundario'), $tit);
+		}
+		else {
+			$ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
+		}
     $ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
 		$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
 		$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
@@ -253,13 +257,16 @@
 												a1.codigo_asunto_secundario as codigo_secundario,
 												contrato.monto,
 												contrato.forma_cobro,
-					prm_moneda.glosa_moneda,
-					usuario.username as username,
-					usuario.apellido1 as apellido1,
-					usuario.nombre as nombre,
-					usuario_secundario.username as username_secundario,
-					usuario_secundario.apellido1 as apellido1_secundario,
-					usuario_secundario.nombre as nombre_secundario
+											prm_moneda.glosa_moneda,
+											usuario.username as username,
+											usuario.apellido1 as apellido1,
+											usuario.nombre as nombre,
+											usuario_ec.username as username_ec,
+											usuario_ec.apellido1 as apellido1_ec,
+											usuario_ec.nombre as nombre_ec,
+											usuario_secundario.username as username_secundario,
+											usuario_secundario.apellido1 as apellido1_secundario,
+											usuario_secundario.nombre as nombre_secundario
                     FROM asunto AS a1
                     LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
                     LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
@@ -270,14 +277,15 @@
                     LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
                     LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
                     LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-				LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+										LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario 
+										LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
                     WHERE $where
                     GROUP BY a1.codigo_asunto ORDER BY
                     a1.codigo_asunto, a1.codigo_cliente ASC";
 
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	  while($row = mysql_fetch_array($resp))
-    {
+		while($row = mysql_fetch_array($resp))
+		{
 						if($mostrar_codigo_secundario)
 						{
 							$ws1->write($fila_inicial, $col_codigo, $row['codigo_secundario'], $f4);
@@ -286,9 +294,9 @@
 						{
 							$ws1->write($fila_inicial, $col_codigo, $row['codigo_asunto'], $f4);
 						}
-            $ws1->write($fila_inicial, $col_titulo, $row['glosa_asunto'], $f4);
-            $ws1->write($fila_inicial, $col_glosa_cliente, $row['glosa_cliente'], $f4);
-            if($mostrar_codigo_secundario)
+						$ws1->write($fila_inicial, $col_titulo, $row['glosa_asunto'], $f4);
+						$ws1->write($fila_inicial, $col_glosa_cliente, $row['glosa_cliente'], $f4);
+						if($mostrar_codigo_secundario)
 						{
 							$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_asunto'], $f4);
 						}
@@ -296,31 +304,40 @@
 						{
 							$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_secundario'], $f4);
 						}
-            $ws1->write($fila_inicial, $col_descripcion, $row['descripcion_asunto'], $f4);
-            $ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
-            $ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
-            if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
-	            $ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
-				if($mostrar_encargado_secundario)
-					$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
-			}
-			else{
-	          	$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
-				if($mostrar_encargado_secundario)
-					$ws1->write($fila_inicial, $col_encargado_secundario,
-						empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
-			}
-            $ws1->write($fila_inicial, $col_tarifa, $row['glosa_tarifa'], $f4);
+						$ws1->write($fila_inicial, $col_descripcion, $row['descripcion_asunto'], $f4);
+						$ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
+						$ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
+						if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
+							if($mostrar_encargado_secundario) {
+							$ws1->write($fila_inicial, $col_encargado, $row['username_ec'], $f4);
+								$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
+							}
+							else {
+								$ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
+							}
+						}
+						else{
+							if($mostrar_encargado_secundario) {
+								$ws1->write($fila_inicial, $col_encargado, $row['apellido1_ec'].', '.$row['nombre_ec'], $f4);
+								$ws1->write($fila_inicial, $col_encargado_secundario, empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
+							}
+							else {
+								$ws1->write($fila_inicial, $col_encargado, $row['apellido1'].', '.$row['nombre'], $f4);
+							}
+						}
+						$ws1->write($fila_inicial, $col_tarifa, $row['glosa_tarifa'], $f4);
 						$ws1->write($fila_inicial, $col_moneda, $row['glosa_moneda'], $f4);
 						$ws1->write($fila_inicial, $col_forma_cobro, $row['forma_cobro'], $f4);
 						$ws1->write($fila_inicial, $col_monto_asunto, $row['monto'], $f4);
-            $ws1->write($fila_inicial, $col_tipo_proyecto, $row['tipo_proyecto'], $f4);
-            $ws1->write($fila_inicial, $col_area_proyecto, $row['area_proyecto'], $f4);
-	   $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
-	   $formato_fecha = str_replace( "/", "-", $formato_fecha);
-            $ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion'], $formato_fecha, '-'), $f4);
-            $ws1->write($fila_inicial, $col_nombre_contacto, $row['contacto'], $f4);
-            $ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
+						$ws1->write($fila_inicial, $col_tipo_proyecto, $row['tipo_proyecto'], $f4);
+						$ws1->write($fila_inicial, $col_area_proyecto, $row['area_proyecto'], $f4);
+
+						$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+						$formato_fecha = str_replace( "/", "-", $formato_fecha);
+
+						$ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion'], $formato_fecha, '-'), $f4);
+						$ws1->write($fila_inicial, $col_nombre_contacto, $row['contacto'], $f4);
+						$ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
 						$ws1->write($fila_inicial, $col_mail_contacto, $row['email_contacto'], $f4);
 						$ws1->write($fila_inicial, $col_dir_contacto, $row['direccion_contacto'], $f4);
 						$ws1->write($fila_inicial, $col_idioma, $row['glosa_idioma'], $f4);
