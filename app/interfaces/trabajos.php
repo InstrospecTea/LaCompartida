@@ -323,7 +323,7 @@
 		$b->titulo = __('Listado de').' '.__('trabajos');
 		if($p_revisor->fields['permitido'])
 			$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas trabajadas').": </b>".number_format($total_duracion_trabajada,1)."</span></td></tr></table>";
-		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas cobrables').": </b>".number_format($total_duracion,1)."</span></td></tr></table>";
+		$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>".__('Total horas cobrables corregidas').": </b>".number_format($total_duracion,1)."</span></td></tr></table>";
 		$b->AgregarFuncion("Editar",'Editar',"align=center nowrap");
 		$b->AgregarEncabezado("trabajo.fecha",__('Fecha'));
 		$b->AgregarEncabezado("cliente.glosa_cliente",__('Cliente'),"align=left");
