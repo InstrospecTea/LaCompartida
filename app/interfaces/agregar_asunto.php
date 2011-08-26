@@ -255,7 +255,7 @@
 									$contrato->Edit("glosa_contrato",$contra_clie->fields['glosa_contrato']);
 									$contrato->Edit("codigo_cliente",$contra_clie->fields['codigo_cliente']);
 									$contrato->Edit("id_usuario_responsable",!empty($contra_clie->fields['id_usuario_responsable']) ? $contra_clie->fields['id_usuario_responsable'] : "NULL" );
-									$contrato->Edit("id_usuario_secundario",!empty($contra_clie->fields['id_usuario_secundario']) ? $contra_clie->fields['id_usuario_secundario'] : "NULL" );
+									$contrato->Edit("id_usuario_secundario",( !empty($contra_clie->fields['id_usuario_secundario']) && $contra_clie->fields['id_usuario_secundario'] != -1 ) ? $contra_clie->fields['id_usuario_secundario'] : "NULL" );
 									if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 										{
 											$contrato->Edit("titulo_contacto",$contra_clie->fields['titulo_contacto']);
@@ -404,7 +404,7 @@
 								$contrato->Edit("glosa_contrato",$glosa_contrato);
 								$contrato->Edit("codigo_cliente",$codigo_cliente);
 								$contrato->Edit("id_usuario_responsable",!empty($id_usuario_responsable) ? $id_usuario_responsable : "NULL");
-								$contrato->Edit("id_usuario_secundario",!empty($id_usuario_secundario) ? $id_usuario_secundario : "NULL");
+								$contrato->Edit("id_usuario_secundario",( !empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
 								$contrato->Edit("observaciones",$observaciones);
 								if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 									{

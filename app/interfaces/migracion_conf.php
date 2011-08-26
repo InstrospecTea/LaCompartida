@@ -115,6 +115,7 @@
 								IF(Cliente.FlagRetainer='S','Retainer','TASA') 																							as contrato_FFF_forma_cobro, 
 								Cliente.CodigoClienteAlterno 																																as cliente_FFF_codigo_cliente_secundario, 
 								Cliente.attachesecundario 																																	as cliente_FFF_id_usuario_encargado, 
+								Cliente.attachesecundario 																																	as contrato_FFF_id_usuario_secundario, 
 								GROUP_CONCAT( Titulo, Nombre, Telefono SEPARATOR '//' ) 																		as cliente_FFF_nombre_contacto  
 							FROM Cliente 
 							LEFT JOIN ContactosCliente ON Cliente.CodigoCliente = ContactosCliente.CodigoCliente 
@@ -130,6 +131,7 @@
 								CONCAT_WS(' ',ContactosCliente.Titulo, ContactosCliente.Nombre) 						as asunto_FFF_contacto,
 								CONCAT_WS(' ',Titulo, Nombre) 																							as contrato_FFF_contacto,
 								OrdenFacturacion.CodigoAbogadoResponsable 																	as asunto_FFF_id_encargado,
+								OrdenFacturacion.CodigoAbogadoResponsable 																	as contrato_FFF_id_usuario_secundario,
 								OrdenFacturacion.CodigoAbogadoResponsable 																	as asunto_FFF_id_usuario,
 								OrdenFacturacion.Attache 																										as contrato_FFF_id_usuario_responsable,
 								IF(OrdenFacturacion.FlagFacturable='S','1','0') 														as asunto_FFF_cobrable,

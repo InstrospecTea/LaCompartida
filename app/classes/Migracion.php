@@ -969,6 +969,7 @@ class Migracion
 			empty($contrato_generar->fields["codigo_cliente"]) ? $cliente->fields['codigo_cliente'] : $contrato_generar->fields["codigo_cliente"]);
 	
 		$contrato->Edit("id_usuario_responsable", $contrato_generar->fields["id_usuario_responsable"]);
+		$contrato->Edit("id_usuario_responsable", $contrato_generar->fields["id_usuario_secundario"]);
 		$contrato->Edit("centro_costo", $contrato_generar->fields["centro_costo"]);
 	
 		$contrato->Edit("observaciones", $contrato_generar->fields["observaciones"]);

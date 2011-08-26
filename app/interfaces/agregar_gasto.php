@@ -126,7 +126,7 @@
 		$gasto->Edit("id_moneda",$id_moneda);
 		$gasto->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
 		$gasto->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
-		$gasto->Edit("id_usuario_orden",$id_usuario_orden ? $id_usuario_orden : $sesion->usuario->fields[id_usuario]);
+		$gasto->Edit("id_usuario_orden",(!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
 
@@ -190,7 +190,7 @@
 		}
 	}
 
-	if($gasto->fields['id_usuario_orden'] == "")
+	if($gasto->fields['id_usuario_orden'] == "" && !$gasto->fields['id_movimiento'])
 		$gasto->fields['id_usuario_orden'] = $sesion->usuario->fields['id_usuario'];
 
 	$pagina->titulo = $txt_pagina;
@@ -855,7 +855,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Ordenado por')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'], "", __('Ninguno'),'170'); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'], "", "Vacio",'170'); ?>
 		</td>
 	</tr>
 <?

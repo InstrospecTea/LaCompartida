@@ -121,7 +121,7 @@
 		if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
 			$id_usuario_secundario = $id_usuario_responsable;
 		}
-		$contrato->Edit("id_usuario_secundario",!empty($id_usuario_secundario) ? $id_usuario_secundario : "NULL");
+		$contrato->Edit("id_usuario_secundario",(!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
 		$contrato->Edit("observaciones",$observaciones);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TituloContacto') ) || ( method_exists('Conf','TituloContacto') && Conf::TituloContacto() ) )
 			{
@@ -1323,7 +1323,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 			<?=__('Encargado Secundario')?>
 		</td>
 		<td align="left" width = '70%'>
-			<?= Html::SelectQuery($sesion, $query,"id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario']:$sesion->usuario->fields['id_usuario'], "","","200");?>
+			<?= Html::SelectQuery($sesion, $query,"id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario']:'', "","Vacio","200");?>
 		</td>
 	</tr>
 	<?php } ?>
