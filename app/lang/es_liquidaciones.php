@@ -116,6 +116,7 @@
 	$_LANG['COBRO ENVIADO AL CLIENTE'] = 'LIQUIDACIÓN ENVIADO AL CLIENTE';
 	$_LANG['COBRO PAGO PARCIAL'] = 'LIQUIDACIÓN PAGO PARCIAL';
 	$_LANG['COBRO EN REVISION'] = 'LIQUIDACIÓN EN REVISIÓN';
+	$_LANG['COBRO INCOBRABLE'] = 'LIQUIDACIÓN INCOBRABLE';
 	$_LANG['Total Nota de Cobro'] = "Total Nota de Liquidación";
 	$_LANG['Total Cobro'] = "Total Liquidación";
 	$_LANG['Historial Cobro'] = "Historial Liquidación";

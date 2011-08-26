@@ -67,7 +67,7 @@
 		#Se ingresa la anotación en el historial
 		$his = new Observacion($sesion);
 		$his->Edit('fecha',date('Y-m-d H:i:s'));
-		$his->Edit('comentario',"COBRO INCOBRABLE");
+		$his->Edit('comentario',__('COBRO INCOBRABLE'));
 		$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 		$his->Edit('id_cobro',$cobro->fields['id_cobro']);
 		if($his->Write())
@@ -306,7 +306,7 @@
 	
 
 	if($cambiar_estado)
-	{				
+	{
 			if($estado == 'EMITIDO' && !$cobro->fields['fecha_emision'])
 				$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			if($estado == 'ENVIADO AL CLIENTE' && !$cobro->fields['fecha_enviado_cliente'])
@@ -329,7 +329,6 @@
 			if($his->Write())
 				$pagina->AddInfo(__('Historial ingresado'));
 	}
-
 
 	if($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf')
 	{
