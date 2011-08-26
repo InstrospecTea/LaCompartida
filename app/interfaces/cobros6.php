@@ -323,7 +323,7 @@
 			#Se ingresa la anotación en el historial
 			$his = new Observacion($sesion);
 			$his->Edit('fecha',date('Y-m-d H:i:s'));
-			$his->Edit('comentario',"COBRO $estado");
+			$his->Edit('comentario',__("COBRO $estado"));
 			$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro',$cobro->fields['id_cobro']);
 			if($his->Write())
