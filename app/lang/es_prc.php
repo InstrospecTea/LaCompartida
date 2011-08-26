@@ -7,6 +7,7 @@
 	$_LANG['RUT']     = "RUC";
 	$_LANG['Rut']     = "Ruc";
 	$_LANG['RUT personal'] = "DNI";
+	$_LANG['RUT Proveedor'] = "RUC Proveedor";
 	$_LANG['Gastos c/ IVA'] = "Gastos c/ IGV";
 	$_LANG['Gastos s/ IVA'] = "Gastos s/ IGV";
 	$_LANG['Gasto c/ IVA'] = "Gasto c/ IGV";

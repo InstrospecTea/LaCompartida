@@ -99,7 +99,7 @@ class Cobro extends Objeto
 			#Se ingresa la anotación en el historial
 			$his = new Observacion($this->sesion);
 			$his->Edit('fecha',date('Y-m-d H:i:s'));
-			$his->Edit('comentario',"COBRO PAGADO");
+			$his->Edit('comentario',__('COBRO PAGADO'));
 			$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro',$this->fields['id_cobro']);
 			if($his->Write())
@@ -237,7 +237,7 @@ class Cobro extends Objeto
 			#Se ingresa la anotación en el historial
 			$his = new Observacion($this->sesion);
 			$his->Edit('fecha',date('Y-m-d H:i:s'));
-			$his->Edit('comentario',"COBRO ELIMINADO");
+			$his->Edit('comentario',__('COBRO ELIMINADO'));
 			$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro',$id_cobro);
 			$his->Write();
@@ -1364,7 +1364,7 @@ class Cobro extends Objeto
 					#Se ingresa la anotación en el historial
 					$his = new Observacion($this->sesion);
 					$his->Edit('fecha',date('Y-m-d H:i:s'));
-					$his->Edit('comentario','COBRO CREADO');
+					$his->Edit('comentario',__('COBRO CREADO'));
 					$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 					$his->Edit('id_cobro',$this->fields['id_cobro']);
 					$his->Write();
