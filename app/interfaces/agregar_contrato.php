@@ -117,7 +117,7 @@
 
 		$contrato->Edit("glosa_contrato",$glosa_contrato);
 		$contrato->Edit("codigo_cliente",$codigo_cliente);
-		$contrato->Edit("id_usuario_responsable",$id_usuario_responsable ? $id_usuario_responsable : '1');
+		$contrato->Edit("id_usuario_responsable",( !empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL");
 		if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')){
 			$id_usuario_secundario = $id_usuario_responsable;
 		}
@@ -1309,7 +1309,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 			<?=__('Encargado Comercial')?>
 		</td>
 		<td align="left" width = '70%'>
-			<?= Html::SelectQuery($sesion, $query,"id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable']:$sesion->usuario->fields['id_usuario'], 'onchange="CambioEncargado()"',"","200");?>
+			<?= Html::SelectQuery($sesion, $query,"id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable']:'', 'onchange="CambioEncargado()"',"Vacio","200");?>
 		</td>
 	</tr>
 <?	if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){

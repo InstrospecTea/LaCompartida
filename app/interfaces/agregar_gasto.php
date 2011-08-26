@@ -148,7 +148,7 @@
 			$ingreso->Edit("id_moneda",$gasto->fields['id_moneda'] ? $gasto->fields['id_moneda'] : $id_moneda);
 			$ingreso->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
 			$ingreso->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
-			$ingreso->Edit("id_usuario_orden",$id_usuario_orden ? $id_usuario_orden : $sesion->usuario->fields[id_usuario]);
+			$ingreso->Edit("id_usuario_orden",( !empty($id_usuario_orden) && $id_usuario_orden != -1 ) ? $id_usuario_orden : "NULL");
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) && $monto_cobrable > 0)
 			$ingreso->Edit('ingreso',$monto_pago ? $monto_pago : $monto_cobrable );
 			else
@@ -189,9 +189,6 @@
 <?
 		}
 	}
-
-	if($gasto->fields['id_usuario_orden'] == "" && !$gasto->fields['id_movimiento'])
-		$gasto->fields['id_usuario_orden'] = $sesion->usuario->fields['id_usuario'];
 
 	$pagina->titulo = $txt_pagina;
 	$pagina->PrintTop($popup);
