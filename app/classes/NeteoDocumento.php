@@ -203,7 +203,7 @@ class NeteoDocumento extends Objeto
 							#Se ingresa la anotación en el historial
 							$his = new Observacion($this->sesion);
 							$his->Edit('fecha',date('Y-m-d H:i:s'));
-							$his->Edit('comentario',"COBRO PAGADO");
+							$his->Edit('comentario',__('COBRO PAGADO'));
 							$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 							$his->Edit('id_cobro',$id_cobro);
 							$his->Write();
