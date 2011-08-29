@@ -41,6 +41,30 @@ class UtilesApp extends Utiles
 		return ($formato);
 	}
 	
+	/**
+	 * Obtiene los margenes para ser utilizados en la carta de cobro
+	 * @param objeto $sesion
+	 * @param int $id_carta 
+	 * @return array $margenes
+	 */
+	function ObtenerMargenesCarta( $sesion, $id_carta)
+	{
+		$margenes = array();
+		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM carta WHERE id_carta ='$id_carta' LIMIT 1";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if( mysql_num_rows( $resp) > 0 )
+		{
+			$margenes = mysql_fetch_array($resp);
+			
+		}
+		else
+		{
+			$margenes = array(1.5, 2, 2, 2 , 0.88, 0.88);
+		}
+		return $margenes;
+		
+	}
+	
 	####################### Formato carta #############################
 	function TemplateCarta( &$sesion, $id_carta=1 )
 	{

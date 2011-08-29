@@ -6000,6 +6000,19 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			case 4.73:
+				$query = array();
+				$query[] = "ALTER TABLE  `carta` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
+ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2',
+ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2',
+ADD  `margen_derecho` DOUBLE NOT NULL DEFAULT  '2',
+ADD  `margen_encabezado` DOUBLE NOT NULL DEFAULT  '0.88',
+ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '0.88';";
+				foreach($query as $q)
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+			break;
 	}
 }
 
@@ -6240,7 +6253,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.69;
 	$VERSIONES[$num++] = 4.70;
 	$VERSIONES[$num++] = 4.71;
-	$VERSIONES[$num++] = 4.72;
+	$VERSIONES[$num++] = 4.72;	
+	$VERSIONES[$num++] = 4.73;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

@@ -14,6 +14,8 @@ class DocGenerator
 	var $pageOrientation;
 	var $pageType;
 	var $pageNums;
+	var $headerMargin;
+	var $footerMargin;
 	
 	var $documentLang;
 	var $documentCharset;
@@ -50,8 +52,13 @@ class DocGenerator
 	 * @param $rightMargin: right margin of the document
 	 * @param $bottomMargin: bottom margin of the document
 	 * @param $leftMargin: left margin of the document 
+	 * @param $estado: ni idea para que sirve este parametro preguntar al que lo agregó
+	 * @param $id_format: ?????????
+	 * @param $configuracion: ????????
+	 * @param $headerMargin: margen del encabezado del documento, en centímetros
+	 * @param $footerMargin: margen del pie de página del documento, en centímetros
 	 */
-	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='', $configuracion = array())
+	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25)
 	{
 		global $desde;
 		
@@ -84,13 +91,15 @@ class DocGenerator
 		$this->rightMargin = $rightMargin;
 		$this->bottomMargin = $bottomMargin;
 		$this->leftMargin = $leftMargin;
+		$this->headerMargin = $headerMargin;
+		$this->footerMargin = $footerMargin;
 		
 		$this->numImages =0;
 		$this->estado=$estado;
 
 		$this->configuracion=$configuracion;
 		
-		$this->newSession($html, $this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin,$this->estado, $id_formato);
+		$this->newSession($html, $this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin,$this->estado, $id_formato, $this->headerMargin, $this->footerMargin);
 		$this->newPage();
 	}//end DocGenerator()
 
@@ -114,9 +123,13 @@ class DocGenerator
 	 * @param $rightMargin: right margin of the this session
 	 * @param $bottomMargin: bottom margin of the this session
 	 * @param $leftMargin: left margin of the this session
+	 * @param $estado: ni idea quien agregó este parametro y no le puso que era
+	 * @param $id_formato: ni idea quien agregó este parametro y no le puso que era
+	 * @param $headerMargin: margin of the header of the document
+	 * @param $footerMargin: margin of the footer of the document
 	 * @return int: the number of the new session
 	 */
-	function newSession($html='', $pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = ''){
+	function newSession($html='', $pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL){
 		setlocale(LC_ALL,'en_EN');
 
 		//don't setted now? then use document start values
@@ -126,6 +139,8 @@ class DocGenerator
 		$rightMargin = $rightMargin === NULL ? $this->rightMargin : $rightMargin;
 		$bottomMargin = $bottomMargin === NULL ? $this->bottomMargin : $bottomMargin;
 		$leftMargin = $leftMargin === NULL ? $this->leftMargin : $leftMargin;
+		$headerMargin = $headerMargin == NULL ? $this->headerMargin : $headerMargin;
+		$footerMargin = $footerMargin == NULL ? $this->footerMargin : $footerMargin;
 
 		$this->lastSessionNumber++;
 		
@@ -187,17 +202,21 @@ class DocGenerator
 		
 		$pageSize = number_format($this->atualPageWidth,4,'.','').'pt '.number_format($this->atualPageHeight,4,'.','').'pt';
 		$pageMargins = number_format($topMargin,1,'.','').'cm '.number_format($rightMargin,1,'.','').'cm '.number_format($bottomMargin,1,'.','').'cm '.number_format($leftMargin,1,'.','').'cm';
-		
+		$headerMargins = $headerMargin . 'cm';
+		$footerMargins = $footerMargin . 'cm';
 		$sessionName = "Section" . $this->lastSessionNumber;
 		
 		$this->formatBuffer .= "@page $sessionName\r\n";
 		$this->formatBuffer .= "   {size: $pageSize;\r\n";
 		$this->formatBuffer .= "   mso-page-orientation: $msoPageOrientation;\r\n";
 		$this->formatBuffer .= "   margin: $pageMargins;\r\n";
-		$this->formatBuffer .= "   mso-header-margin: 25pt;\r\n";
-		$this->formatBuffer .= "   mso-footer-margin: 25pt;\r\n";
+		$this->formatBuffer .= "   mso-header-margin: $headerMargins;\r\n";
+		$this->formatBuffer .= "   mso-footer-margin: $footerMargins;\r\n";
 		$this->formatBuffer .= "   mso-paper-source: 0;\r\n";
-		if( $this->pageNums && Conf::dbUser() != 'ebmo' && Conf::dbUser() != 'otero' && Conf::dbUser() != 'vergara' && Conf::dbUser() != 'blr' && Conf::dbUser() != 'barros' && Conf::dbUser() != 'kastpinochet' && $this->estado != 'CREADO' && $this->estado != 'EN REVISION') $this->formatBuffer .= "   mso-footer: url('".Conf::Host()."/app/templates/default/css/pie.htm') f1;\r\n";
+		if( $this->pageNums && Conf::dbUser() != 'ebmo' && Conf::dbUser() != 'otero' && Conf::dbUser() != 'vergara' && Conf::dbUser() != 'blr' && Conf::dbUser() != 'barros' && Conf::dbUser() != 'kastpinochet' && $this->estado != 'CREADO' && $this->estado != 'EN REVISION')
+		{
+			$this->formatBuffer .= "   mso-footer: url('".Conf::Host()."/app/templates/default/css/pie.htm') f1;\r\n";
+		}
 		if( Conf::dbUser() == 'barros' )
 		{
 			$this->formatBuffer .= "   mso-header: url('".Conf::Host()."/app/templates/default/css/barros.htm') h1;\r\n";

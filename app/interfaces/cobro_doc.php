@@ -71,7 +71,10 @@
 	$html .= $cobro->GeneraHTMLCobro(false,$cobro->fields['id_formato']);
 	$cssData = UtilesApp::TemplateCartaCSS($sesion,$cobro->fields['id_carta']);
 	$cssData .= UtilesApp::CSSCobro($sesion);
-	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',1.5,2.0,2.0,2.0,$cobro->fields['estado'], $cobro->fields['id_formato']);
+	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $sesion, $cobro->fields['id_carta']);
+	
+	// margenes 1.5, 2.0, 2.0, 2.0
+	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $cobro->fields['id_formato'], '',$docm_header, $docm_footer);
 	$valor_unico=substr(time(),-3);
 
 	//echo '<style>'.$cssData.'</style>'.$html;

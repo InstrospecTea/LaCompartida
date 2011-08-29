@@ -90,13 +90,11 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 <?
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 ?>
-<p class=MsoFooter align=center style='text-align:center'>
+<div class=MsoFooter align=center style='text-align:center'>
 	<span style='mso-no-proof:yes;'>
 		<? echo $html_pie; ?>
 	</span>
-</p>
-
-<p class=MsoFooter><o:p>&nbsp;</o:p></p>
+</div>
 
 </div>
 
