@@ -108,31 +108,105 @@
 		$ws1->fitToPages(1,0);
 		$ws1->setZoom(75);
 
-		// se setea el ancho de las columnas
-		$ws1->setColumn( 0, 0, 18.00);
-		$ws1->setColumn( 1, 1, 45.00);
-		$ws1->setColumn( 2, 2, 15.00);
-		$ws1->setColumn( 3, 3, 40.00);
-		$ws1->setColumn( 4, 4, 30.00);
-		$ws1->setColumn( 5, 5, 30.00);
-		$ws1->setColumn( 6, 6, 30.00);
-		$ws1->setColumn( 7, 7, 30.00);
-		$ws1->setColumn( 8, 8, 30.00);
-		$ws1->setColumn( 9, 9, 30.00);
-		$ws1->setColumn( 10, 10, 30.00);
-		$ws1->setColumn( 11, 11, 30.00);
-		$ws1->setColumn( 12, 12, 30.00);
-		$ws1->setColumn( 13, 13, 30.00);
+		// se setea las columnas para facilitar orden 
+		$col = 0;
+		$col_fecha = $col++;
+		$col_codigo = $col++;
+		$col_cliente = $col++;
+		$col_asunto = $col++;
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
+		{
+			$col_tipo = $col++;
+		}		
+		$col_descripcion = $col++;
+		$col_egreso_moneda = $col++;
+		$col_egreso = $col++;
+		$col_ingreso_moneda = $col++;
+		$col_ingreso = $col++;
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
+		{
+			$col_monto_cobrable_moneda = $col++;
+			$col_monto_cobrable = $col++;
+		}	
+		$col_liquidacion = $col++;
+		$col_estado = $col++;
+		$col_facturable = $col++;
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+		{
+			$col_factura = $col++;
+			$col_fecha_factura = $col++;
+		}
+		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
+		{
+			$col_numero_documento = $col++;
+		}
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
+		{
+			$col_numero_ot = $col++;
+		}
+		$col_rut_proveedor = $col++;
+		$col_nombre_proveedor = $col++;
+		$col_ingresado_por = $col++;
+		$col_ordenado_por = $col++;
+		
+		
+		// se setea el ancho de las columnas		
+		$ws1->setColumn( $col_fecha, $col_fecha, 18.00); #fecha
+		$ws1->setColumn( $col_cliente, $col_cliente, 30.00); #cliente
+		$ws1->setColumn( $col_codigo, $col_codigo, 15.00); #código
+		$ws1->setColumn( $col_asunto, $col_asunto, 30.00); #asunto
+		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
+		{
+			$ws1->setColumn( $col_numero_documento, $col_numero_documento, 25.00); #n° documento
+		}
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
+		{
+			$ws1->setColumn( $col_numero_ot, $col_numero_ot, 25.00); #n° orden de trabajo
+		}
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+		{
+			$ws1->setColumn( $col_factura, $col_factura, 25.00); #n° factura
+			$ws1->setColumn( $col_fecha_factura, $col_fecha_factura, 25.00); #fecha factura
+		}
+		
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
+		{
+			$ws1->setColumn( $col_tipo, $col_tipo, 25.00); #tipo gasto
+		}		
+		$ws1->setColumn( $col_descripcion, $col_descripcion, 25.00); #descripcion
+		$ws1->setColumn( $col_egreso_moneda, $col_egreso_moneda, 10.00); #egreso
+		$ws1->setColumn( $col_egreso, $col_egreso, 25.00); #egreso
+		$ws1->setColumn( $col_ingreso_moneda, $col_ingreso_moneda, 10.00); #ingreso
+		$ws1->setColumn( $col_ingreso, $col_ingreso, 25.00); #ingreso
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
+		{
+			$ws1->setColumn( $col_monto_cobrable_moneda, $col_monto_cobrable_moneda, 5.00);
+			$ws1->setColumn( $col_monto_cobrable, $col_monto_cobrable, 25.00); #monto cobrable
+		}		
+		$ws1->setColumn( $col_liquidacion, $col_liquidacion, 25.00); #liquidacion
+		$ws1->setColumn( $col_estado, $col_estado, 15.00); #estado cobro
+		$ws1->setColumn( $col_facturable, $col_facturable, 10.00); #facturable
+		$ws1->setColumn( $col_rut_proveedor, $col_rut_proveedor, 15.00); #rut ruc proveedor
+		$ws1->setColumn( $col_nombre_proveedor, $col_nombre_proveedor, 15.00); #nombre proveedor
+		$ws1->setColumn( $col_ingresado_por, $col_ingresado_por, 15.00); #código
+		$ws1->setColumn( $col_ordenadopor, $col_ordenado_por, 15.00); #código
+		
 		
 		$ws1->write(1, 0, __('Resumen de gastos'), $encabezado);
 		$ws1->mergeCells (1, 0, 1, 8);
 
 		if($fecha1 && $fecha2)
+		{
 			$ws1->write(3, 0, __('Entre el ').$fecha1.__(' y el ').$fecha2, $encabezado);
-		else if($fecha1)
+		}
+		elseif($fecha1)
+		{
 			$ws1->write(3, 0, __('Desde el ').$fecha1, $encabezado);
-		else if($fecha2)	
+		}
+		elseif($fecha2)
+		{
 			$ws1->write(3, 0, __('Antes de ').$fecha2, $encabezado);
+		}
 		$ws1->mergeCells (3, 0, 3, 8);
 		
 		if($codigo_cliente)
@@ -150,9 +224,13 @@
 		########################### SQL INFORME DE GASTOS #########################
 		$where = 1;
 		if($cobrado == 'NO')
-				$where .= " AND cta_corriente.id_cobro is null ";
-			if($cobrado == 'SI')
-				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL') ";
+		{
+			$where .= " AND cta_corriente.id_cobro is null ";
+		}
+		if($cobrado == 'SI')
+		{
+			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL') ";
+		}
 		if($codigo_cliente)
 		{
 			$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
@@ -202,17 +280,21 @@
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
 					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_moneda.cifras_decimales, cobro.estado
 					$col_select,
-					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor
+					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor,
+					CONCAT(usuario.apellido1 , ', ' , usuario.nombre) as usuario_ingresa,
+					CONCAT(usuario2.apellido1 , ', ' , usuario2.nombre) as usuario_ordena
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
 					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
 					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro 
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
+					LEFT JOIN usuario as usuario2 ON usuario2.id_usuario=cta_corriente.id_usuario_orden
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					WHERE $where";
+		
 		$lista_gastos = new ListaGastos($sesion,'',$query);
 		for( $v=0; $v < $lista_gastos->num; $v++ )
 		{
@@ -249,109 +331,128 @@
 		$ws1->mergeCells (5, 0, 5, 8);
     
     $fila_inicial = 7;
-    $columna_actual=0;
-    $ws1->write($fila_inicial, $columna_actual++, __('Fecha'), $tit);
-    if(!$codigo_cliente)
-    	$ws1->write($fila_inicial, $columna_actual++, __('Cliente'), $tit);
+	# titulos de columnas
+    $ws1->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
+    if(!$codigo_cliente){
+    	$ws1->write($fila_inicial, $col_cliente, __('Cliente'), $tit);
+	}
     if(!$codigo_asunto){
-    	$ws1->write($fila_inicial, $columna_actual++, __('Código'), $tit);
-    	$ws1->write($fila_inicial, $columna_actual++, __('Asunto'), $tit);
+    	$ws1->write($fila_inicial, $col_codigo, __('Código'), $tit);
+    	$ws1->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
 	}
 	if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++, (__('N° Documento')), $tit);
+		$ws1->write($fila_inicial, $col_numero_documento, (__('N° Documento')), $tit);
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++,(__('N° OT')), $tit);
+		$ws1->write($fila_inicial, $col_numero_ot,(__('N° OT')), $tit);
 	}
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 	{
-		$ws1->write($fila_inicial, $columna_actual++,(__('N° Factura')), $tit);
-		$ws1->write($fila_inicial, $columna_actual++,__('Fecha Factura'), $tit);
+		$ws1->write($fila_inicial, $col_factura,(__('N° Factura')), $tit);
+		$ws1->write($fila_inicial, $col_fecha_factura,__('Fecha Factura'), $tit);
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++, __('Tipo'), $tit);
+		$ws1->write($fila_inicial, $col_tipo, __('Tipo'), $tit);
 	}
-    $ws1->write($fila_inicial, $columna_actual++, (__('Descripción')), $tit);
-    $ws1->write($fila_inicial, $columna_actual++, __('Egreso'), $tit);
-    $columna_balance_glosa = $columna_actual;
-    $ws1->write($fila_inicial, $columna_actual++, __('Ingreso'), $tit);
-    $columna_balance_valor = $columna_actual;
+    $ws1->write($fila_inicial, $col_descripcion, (__('Descripción')), $tit);
+	$ws1->write($fila_inicial, $col_egreso_moneda, ' ', $tit);
+    $ws1->write($fila_inicial, $col_egreso, __('Egreso'), $tit);
+    $columna_balance_glosa = $col_egreso;
+	$ws1->write($fila_inicial, $col_ingreso_moneda, ' ', $tit);
+    $ws1->write($fila_inicial, $col_ingreso, __('Ingreso'), $tit);
+    $columna_balance_valor = $col_ingreso;
     if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-	    $ws1->write($fila_inicial, $columna_actual++, __('Monto cobrable'), $tit);
-    $ws1->write($fila_inicial, $columna_actual++, __('Cobro'), $tit);
-    $ws1->write($fila_inicial, $columna_actual++, __('Estado Cobro'), $tit);
+	{
+		$ws1->write($fila_inicial, $col_monto_cobrable_moneda, ' ', $tit);
+	    $ws1->write($fila_inicial, $col_monto_cobrable, __('Monto cobrable'), $tit);
+	}
+    $ws1->write($fila_inicial, $col_liquidacion, __('Cobro'), $tit);
+    $ws1->write($fila_inicial, $col_estado, __('Estado Cobro'), $tit);
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::TipoGasto() ) )
 	{
-		$ws1->write($fila_inicial, $columna_actual++, __('Cobrable'), $tit);
+		$ws1->write($fila_inicial, $col_facturable, __('Cobrable'), $tit);
 	}
-	$ws1->write($fila_inicial, $columna_actual++, __('RUT Proveedor'), $tit);
-	$ws1->write($fila_inicial, $columna_actual++, __('Nombre Proveedor'), $tit);
+	$ws1->write($fila_inicial, $col_rut_proveedor, __('RUT Proveedor'), $tit);
+	$ws1->write($fila_inicial, $col_nombre_proveedor, __('Nombre Proveedor'), $tit);
+	$ws1->write($fila_inicial, $col_ingresado_por, __('Creado por'), $tit);
+	$ws1->write($fila_inicial, $col_ordenado_por, __('Ordenado por'), $tit);
 	
 	
     $fila_inicial++;    
     if($orden == "")
+	{
 			$orden = "fecha DESC";		
-		
-		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
-	  while($row = mysql_fetch_array($resp2))
+	}
+	
+	#valores de columnas
+	$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+	while($row = mysql_fetch_array($resp2))
 	{
 		  
     	$columna_actual=0;
-	    $ws1->write($fila_inicial, $columna_actual++, Utiles::sql2date($row[fecha], $formato_fecha), $f4);
-	    if(!$codigo_cliente)
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[glosa_cliente], $f4);
+	    $ws1->write($fila_inicial, $col_fecha, Utiles::sql2date($row['fecha'], $formato_fecha), $f4);
+	    if(!$codigo_cliente){
+	    	$ws1->write($fila_inicial, $col_cliente, $row['glosa_cliente'], $f4);
+		}
 	    if(!$codigo_asunto){
-	    	$ws1->write($fila_inicial, $columna_actual++, $row['codigo_asunto'], $f4);
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[glosa_asunto], $f4);
+	    	$ws1->write($fila_inicial, $col_codigo, $row['codigo_asunto'], $f4);
+	    	$ws1->write($fila_inicial, $col_asunto, $row['glosa_asunto'], $f4);
 		}
 	    if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
 		{
-				$ws1->write($fila_inicial, $columna_actual++, $row[numero_documento], $f4);
+				$ws1->write($fila_inicial, $col_numero_documento, $row[numero_documento], $f4);
 		}
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
 		{
-				$ws1->write($fila_inicial, $columna_actual++, $row[numero_ot], $f4);
+				$ws1->write($fila_inicial, $col_numero_ot, $row[numero_ot], $f4);
 		}
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
-			$ws1->write($fila_inicial, $columna_actual++, !empty($row['codigo_factura_gasto']) ? $row['codigo_factura_gasto'] : "", $f4);
-			$ws1->write($fila_inicial, $columna_actual++, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],$formato_fecha) : '-' , $f4);
+			$ws1->write($fila_inicial, $col_factura, !empty($row['codigo_factura_gasto']) ? $row['codigo_factura_gasto'] : "", $f4);
+			$ws1->write($fila_inicial, $col_fecha_factura, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],$formato_fecha) : '-' , $f4);
 		}
 	    if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 		{
-				$ws1->write($fila_inicial, $columna_actual++, $row[glosa_tipo], $f4);
+				$ws1->write($fila_inicial, $col_tipo, $row['glosa_tipo'], $f4);
 		}
 		
-	    $ws1->write($fila_inicial, $columna_actual++, $row[descripcion], $f4);
+	    $ws1->write($fila_inicial, $col_descripcion, $row['descripcion'], $f4);
 	    if( $moneda_gasto > 0 )
 	    {
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[egreso], $formato_moneda);            
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[ingreso], $formato_moneda);
+	    	$ws1->write($fila_inicial, $col_egreso, $row['egreso'], $formato_moneda);            
+	    	$ws1->write($fila_inicial, $col_ingreso, $row['ingreso'], $formato_moneda);
 	    }
 	    else
 	    {
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[ingreso] ? '' : $row[simbolo] . " " .number_format($row[egreso],$row[cifras_decimales],",","."), $f4);            
-	    	$ws1->write($fila_inicial, $columna_actual++, $row[egreso] ? '' : $row[simbolo] . " " .number_format($row[ingreso],$row[cifras_decimales],",","."), $f4);
+			$ws1->write($fila_inicial, $col_egreso_moneda, $row['ingreso'] ? '' : $row['simbolo'], $f4);         
+	    	$ws1->write($fila_inicial, $col_egreso, $row['ingreso'] ? '' : number_format($row['egreso'],$row['cifras_decimales'],",","."), $f4);            
+	    	$ws1->write($fila_inicial, $col_ingreso_moneda, $row['egreso'] ? '' : $row['simbolo'], $f4);
+			$ws1->write($fila_inicial, $col_ingreso, $row['egreso'] ? '' : number_format($row['ingreso'],$row['cifras_decimales'],",","."), $f4);
 	    }
 	    
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
 			if($row['esCobrable'] == 'No') {
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-					$ws1->write($fila_inicial, $columna_actual++, 0, $formato_moneda);
+				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ){
+					$ws1->write($fila_inicial, $col_monto_cobrable, 0, $formato_moneda);
+				}
 			}
 			else 
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 				{
-					if( $moneda_gasto > 0 )
-						$ws1->write($fila_inicial, $columna_actual++, $row[monto_cobrable], $formato_moneda); 
+					if( $moneda_gasto > 0 ){
+						$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
+					}
 					else
-						$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
+					{
+						$ws1->write($fila_inicial, $col_monto_cobrable_moneda, $row['simbolo'] , $f4);
+						$ws1->write($fila_inicial, $col_monto_cobrable, number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4); 
+					}
 				}
 			}	
 		}
@@ -359,30 +460,36 @@
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 			{
-	    	if( $moneda_gasto > 0 )
-	    		$ws1->write($fila_inicial, $columna_actual++, $row[monto_cobrable], $formato_moneda); 
-	    	else
-	    		$ws1->write($fila_inicial, $columna_actual++, $row[simbolo] . " " .number_format($row[monto_cobrable],$row[cifras_decimales],",","."), $f4); 
-	    }
+				if( $moneda_gasto > 0 ){
+					$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
+				}
+				else
+				{
+					$ws1->write($fila_inicial, $col_monto_cobrable_moneda, $row['simbolo'] , $f4);
+					$ws1->write($fila_inicial, $col_monto_cobrable, number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4);
+				} 
+			}
 		}	
 	    
 	    
-	    $ws1->write($fila_inicial, $columna_actual++, $row[id_cobro], $f4);
-			$ws1->write($fila_inicial, $columna_actual++, $row[estado], $f4);
+	    $ws1->write($fila_inicial, $col_liquidacion, $row['id_cobro'], $f4);
+		$ws1->write($fila_inicial, $col_estado, $row['estado'], $f4);
 		
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
-			$ws1->write($fila_inicial, $columna_actual++, $row['esCobrable'], $f4);
+			$ws1->write($fila_inicial, $col_facturable, $row['esCobrable'], $f4);
 		}
-		$ws1->write($fila_inicial, $columna_actual++, $row[rut_proveedor], $f4);
-		$ws1->write($fila_inicial, $columna_actual++, $row[nombre_proveedor], $f4);
+		$ws1->write($fila_inicial, $col_rut_proveedor, $row['rut_proveedor'], $f4);
+		$ws1->write($fila_inicial, $col_nombre_proveedor, $row['nombre_proveedor'], $f4);
+		$ws1->write($fila_inicial, $col_ingresado_por, $row['usuario_ingresa'], $f4);
+		$ws1->write($fila_inicial, $col_ordenado_por, $row['usuario_ordena'], $f4);
 		$fila_inicial++;
-		}
-		
-		$fila_inicial += 2;
-		
-		$ws1->write($fila_inicial,$columna_balance_glosa, __("Total balance: "), $encabezado);
-		$ws1->write($fila_inicial,$columna_balance_valor, $moneda_base['simbolo'].' '.number_format($total_balance,$moneda_base['cifras_decimales'],',','.'), $encabezado);
+	}
+
+	$fila_inicial += 2;
+
+	$ws1->write($fila_inicial,$columna_balance_glosa, __("Total balance: "), $encabezado);
+	$ws1->write($fila_inicial,$columna_balance_valor, $moneda_base['simbolo'].' '.number_format($total_balance,$moneda_base['cifras_decimales'],',','.'), $encabezado);
 		
     $wb->close();
     exit;

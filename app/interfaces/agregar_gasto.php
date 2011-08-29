@@ -16,7 +16,7 @@
 
 	$sesion = new Sesion(array('OFI'));
 	$pagina = new Pagina($sesion);
-	$id_usuario = $sesion->usuario->fields['id_usuario'];
+	$id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_usuario'];
 
 	$gasto = new Gasto($sesion);
 	#$gastoGeneral = new GastoGeneral($sesion);
@@ -858,6 +858,15 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 <?
 	}
 ?>
+	<tr>
+		<td align=right>
+			<?=__('Ingresado por')?>
+		</td>
+		<td align=left>
+			<!-- $sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150' -->
+			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $sesion->usuario->fields['id_usuario'], "", "Vacio",'170'); ?>
+		</td>
+	</tr>
 </table>
 
 <?

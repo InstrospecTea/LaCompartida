@@ -13,6 +13,7 @@
 	require_once Conf::ServerDir().'/classes/Cobro.php';
 	require_once Conf::ServerDir().'/classes/NeteoDocumento.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Observacion.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
@@ -35,18 +36,11 @@
 	$cambios_en_saldo_honorarios = array();
 	$cambios_en_saldo_gastos = array();
 	
-	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente != '' )
-		{
-			$cliente = new Cliente($sesion);
-			$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario( $codigo_cliente );
-		}
-	
 	if($id_documento)
 	{
 		$documento->Load($id_documento);
-		$codigo_cliente = $documento->fields['codigo_cliente'];
 	}
-
+	
 	if($opcion == "guardar")
 	{
 		// Construir arreglo_pagos_detalle
@@ -79,15 +73,28 @@
 				array_push($arreglo_pagos_detalle,$arreglo_data);
 			}
 		}
-		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle);
+
+		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $pago_honorarios, $pago_gastos);
 		
 		$documento->Load($id_documento);
 		$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
 		$monto_pago = -1*$documento->fields['monto'];
 	}
 
-	 $txt_pagina = $id_documento ? __('Edición de Pago') : __('Documento de Pago');
-	 $txt_tipo = __('Documento de Pago');
+	if($documento->Loaded())
+	{
+		$codigo_cliente = $documento->fields['codigo_cliente'];
+	}
+
+	if (((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario')) || 
+		( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario())) && $codigo_cliente != '')
+	{
+		$cliente = new Cliente($sesion);
+		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario( $codigo_cliente );
+	}
+
+	$txt_pagina = $id_documento ? (empty($adelanto) ? __('Edición de Pago') : __('Edición del Adelanto')) : (empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelanto'));
+	$txt_tipo = empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelanto');
 
 	$pagina->titulo = $txt_pagina;
 	$pagina->PrintTop($popup);
@@ -174,13 +181,27 @@ function Validar(form)
 		form.monto.focus();
 		return false;
 	}
+	
+	<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+	var cod_cli_seg = document.getElementById('codigo_cliente_secundario').value
+	if (cod_cli_seg == '-1' || cod_cli_seg == "") {
+		alert('<?=__('Debe ingresar un cliente')?>');
+		return false;
+	}
+	<?php } else { ?>
+	var cod_cli = document.getElementById('codigo_cliente').value;
+	if (cod_cli == '-1' || cod_cli == "") {
+		alert('<?php echo __('Debe ingresar un cliente') ?>');
+		return false;
+	}
+	<?php } ?>
+	
 	if(monto < 0)
 	{
 		alert('<?=__('El monto de un pago debe ser siempre mayor a 0')?>');
 		form.monto.focus();
 		return false;
 	}
-
 
 	if(form.glosa_documento.value == "")
 	{
@@ -214,6 +235,10 @@ function CheckEliminaIngreso(chk)
 
 function CargarTabla(mostrar_actualizado)
 {
+	<?php if (!empty($adelanto)) { ?>
+	return true;
+	<?php } ?>
+
 	var select_moneda = document.getElementById('id_moneda');
 	var tabla_pagos = document.getElementById('tabla_pagos');
 	var id_documento = document.getElementById('id_documento');
@@ -569,6 +594,8 @@ function ActualizarDocumentoMonedaPago()
 				<input name=numero_cheque id=numero_cheque size=15 value="<? echo $documento->fields['numero_cheque'];  ?>" />
 		</td>
 	</tr>
+	
+	<?php if (empty($adelanto)) { ?>
 	<tr>
 		<td colspan="2" align=center>
 			<img src="<?=Conf::ImgDir()?>/money_16.gif" border=0> <a href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?=__('Tipo de Cambio del Documento de Pago al ser pagado.')?>"><?=__('Actualizar Tipo de Cambio')?></a>
@@ -645,6 +672,25 @@ function ActualizarDocumentoMonedaPago()
 			</div>
 		</td>
 	</tr>
+	<?php } ?>
+	<?php if (!empty($adelanto)) { ?>
+	<tr>
+		<td align="right">
+			<input type="checkbox" name="pago_honorarios" id="pago_honorarios" value="1" <?php echo empty($id_documento) ? "checked='checked'" : ($documento->fields['pago_honorarios'] ? "checked='checked'" : "") ?> />
+		</td>
+		<td align="left">
+			<label for="pago_honorarios"><?php echo __('Para el pago de honorarios') ?></label>
+		</td>
+	</tr>
+	<tr>
+		<td align="right">
+			<input type="checkbox" name="pago_gastos" id="pago_gastos" value="1" <?php echo empty($id_documento) ? "checked='checked'" : ($documento->fields['pago_gastos'] ? "checked='checked'" : "") ?> />
+		</td>
+		<td align="left">
+			<label for="pago_gastos"><?php echo __('Para el pago de gastos') ?></label>
+		</td>
+	</tr>
+	<?php } ?>
 </table>
 
 <br>
@@ -656,10 +702,12 @@ function ActualizarDocumentoMonedaPago()
 	</tr>
 </table>
 
+<?php if (empty($adelanto)) { ?>
 <div id = "tabla_pagos"> </div>
 <script>
 	CargarTabla(1);
 </script>
+<?php } ?>
 
 </form>
 <script type="text/javascript">

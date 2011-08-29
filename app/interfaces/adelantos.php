@@ -1,0 +1,163 @@
+<?
+	require_once dirname(__FILE__).'/../conf.php';
+	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
+	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+	require_once Conf::ServerDir().'/../fw/classes/Html.php';
+	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
+	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+	require_once Conf::ServerDir().'/classes/InputId.php';
+	require_once Conf::ServerDir().'/classes/Trabajo.php';
+	require_once Conf::ServerDir().'/classes/Funciones.php';
+	require_once Conf::ServerDir().'/classes/Documento.php';
+	require_once Conf::ServerDir().'/classes/Moneda.php';
+	require_once Conf::ServerDir().'/classes/Cliente.php';
+	require_once Conf::ServerDir().'/classes/Asunto.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
+	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+
+	$sesion = new Sesion(array('COB'));
+	$pagina = new Pagina($sesion);
+	$documento = new Documento($sesion);
+
+	$pagina->titulo = __('Revisar Adelantos');
+	$pagina->PrintTop();
+
+	$adelantos = $documento->ListaAdelantos($desde, $x_pag = 12, $orden);
+
+?>
+
+<script style="text/javascript">
+	function AgregarNuevo(tipo)
+	{
+		<?php
+		if (((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))) { ?>
+			var codigo_cliente = $('codigo_cliente_secundario').value;
+			var codigo_asunto = $('codigo_asunto_secundario').value;
+			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente+"&codigo_asunto_secundario=" + codigo_asunto;
+		<? } else { ?>
+			var codigo_cliente = $('codigo_cliente').value;
+			var codigo_asunto = $('codigo_asunto').value;
+			var url_extension = "&codigo_cliente=" + codigo_cliente + "&codigo_asunto=" + codigo_asunto;
+		<? } ?>
+		if(tipo == 'adelanto')
+		{
+			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
+			nuevaVentana('Agregar_Adelanto', 720, 420, urlo, 'top=100, left=125');
+		}
+	}
+	function Refrescar()
+	{
+	<?
+		if($desde)
+			echo "var pagina_desde = '&desde=".$desde."';";
+		else
+			echo "var pagina_desde = '';";
+		if($orden)
+			echo "var orden = '&orden=".$orden."';";
+		else
+			echo "var orden = '';";
+	?>
+		var opc= $('opc').value;
+		var codigo_cliente = $('codigo_cliente').value;
+		var codigo_asunto = $('codigo_asunto').value;
+		var fecha1 = $('fecha1').value;
+		var fecha2 = $('fecha2').value;
+		var id_usuario_orden = $('id_usuario_orden').value;
+		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+"&id_usuario_orden="+id_usuario_orden+pagina_desde+"&buscar=1";
+		self.location.href= url;
+	}
+</script>
+
+<?php echo Autocompletador::CSS(); ?>
+
+<table width="90%">
+	<tr>
+		<td>
+			<form method='post' name="form_adelantos" action='adelantos.php' id="form_adelantos">
+				<input type='hidden' name='opc' id='opc' value=buscar>
+				<!-- Calendario DIV -->
+				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
+					<div class="floating" id="calendar"></div>
+				</div>
+				<!-- Fin calendario DIV -->
+				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
+					<legend><?=__('Filtros')?></legend>
+					<table style="border: 0px solid black" width='720px'>
+						<tr>
+							<td align="right"><label for="id_documento">N° Adelanto</laber>
+							<td align="left">
+								<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_documento" id="id_documento" value="<?php echo $id_documento ?>">
+							</td>
+						</tr>
+						<tr>
+	    					<td align="right" width="30%"><?php echo __('Nombre Cliente') ?></td>
+	    					<td colspan="3" align="left">
+							<?php
+							if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') || 
+								(method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()))
+								{
+									if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))
+										echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
+									else	
+										echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+								} else {
+									if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))
+										echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
+									else
+										echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+								}
+							?>
+	  						</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Asunto'); ?></td>
+							<td colspan="3" align="left">
+							<?php
+								if ((( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario')) || 
+									( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))) {
+									echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+								} else {
+									echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto,"", "CargarSelectCliente(this.value);", 320,$codigo_cliente);
+								}
+							?>
+							</td>
+						</tr>
+						<tr>
+							<td align=right>
+								<?=__('Moneda')?>
+							</td>
+							<td colspan="2" align="left">
+								<?= Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'),''); ?>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td colspan=2 align=left>
+								<input name=boton_buscar id='boton_buscar' type=button value="<?=__('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
+							</td>
+							<td width='40%' align=right>
+								<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?=__('Agregar')?> <?php echo __('adelanto') ?></a>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</td>
+	</tr>
+</table>
+<?php
+	$adelantos->Imprimir();
+	if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') ||
+		( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()))
+	{
+		echo(Autocompletador::Javascript($sesion));
+	}
+	echo(InputId::Javascript($sesion));
+	$pagina->PrintBottom();
+?>
+<script type="text/javascript">
+Calendar.setup({ inputField	: "fecha1", ifFormat : "%d-%m-%Y", button : "img_fecha1" });
+Calendar.setup({ inputField	: "fecha2", ifFormat : "%d-%m-%Y", button : "img_fecha2" });
+</script>
