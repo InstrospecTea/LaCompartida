@@ -125,6 +125,7 @@
 									u.id_usuario, 
 									CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre, 
 									CONCAT( SUBSTRING(u.nombre,1,1), SUBSTRING(u.apellido1,1,1), SUBSTRING(u.apellido2,1,1) ) as iniciales, 
+									u.username, 
 									u.rut, 
 									u.dv_rut,
 									$select_fecha1, 
@@ -275,6 +276,7 @@
 		$i=0;
 		$col++;
 		$col_nombre = $col++;
+		$col_username = $col++;
 		$col_categoria = $col++;
 		$col_email = $col++;
 		$col_rut = $col++;
@@ -289,6 +291,7 @@
 	 
 		// se setea el ancho de las columnas
 		$ws1->setColumn( $col_nombre, $col_nombre,  25.00);
+		$ws1->setColumn( $col_username, $col_username, 25.00);
 		$ws1->setColumn( $col_categoria, $col_categoria,  25.00);
 		$ws1->setColumn( $col_email, $col_email,  30.00);
 		$ws1->setColumn( $col_rut, $col_rut, 20.00);
@@ -317,6 +320,7 @@
 			$glosa_rut = 'CNI';
 		
 		$ws1->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
+		$ws1->write($fila_inicial, $col_username, __('Código Usuario'), $tit);
 	  $ws1->write($fila_inicial, $col_categoria, __('Categoria'), $tit);
 	  $ws1->write($fila_inicial, $col_email, __('Email'), $tit);
 	  $ws1->write($fila_inicial, $col_rut, $glosa_rut, $tit);
@@ -331,43 +335,58 @@
 	  $fila_inicial++;
 	  
 	  ###################################### SQL ######################################
-		$query = "SELECT u.id_usuario,CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre,
-										cu.glosa_categoria, u.email, u.restriccion_min, u.restriccion_max,
-										u.retraso_max, u.restriccion_mensual, u.dias_ingreso_trabajo,
-										au.glosa, u.activo, u.rut, u.dv_rut 
-										FROM usuario AS u
-										LEFT JOIN prm_categoria_usuario AS cu on u.id_categoria_usuario=cu.id_categoria_usuario
-										LEFT JOIN prm_area_usuario AS au on u.id_area_usuario=au.id
-										WHERE $where ORDER BY nombre";
+		$query = "SELECT 
+									u.id_usuario,
+									CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre,
+									u.username,
+									cu.glosa_categoria, 
+									u.email, 
+									u.restriccion_min, 
+									u.restriccion_max,
+									u.retraso_max, 
+									u.restriccion_mensual, 
+									u.dias_ingreso_trabajo,
+									au.glosa, 
+									u.activo, 
+									u.rut, 
+									u.dv_rut 
+								FROM usuario AS u
+								LEFT JOIN prm_categoria_usuario AS cu on u.id_categoria_usuario=cu.id_categoria_usuario
+								LEFT JOIN prm_area_usuario AS au on u.id_area_usuario=au.id
+								WHERE $where ORDER BY nombre";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	  while($row = mysql_fetch_array($resp))
-	  {
-	  	$i=0;
-			$ws1->write($fila_inicial, $col_nombre, $row[nombre], $f4);
-	    $ws1->write($fila_inicial, $col_categoria, $row[glosa_categoria], $f4);
-	    $ws1->write($fila_inicial, $col_email, $row[email], $f4);
-	    $ws1->write($fila_inicial, $col_rut, $row[rut].($row[dv_rut]?'-'.$row[dv_rut]:''), $f4);
-	    $ws1->write($fila_inicial, $col_dias_ingreso_trabajo, $row[dias_ingreso_trabajo], $f4);
-	    $ws1->write($fila_inicial, $col_area, $row[glosa], $f4);
-	    if($row[activo]==0)
-	    {$ws1->write($fila_inicial, $col_activo, 'no', $f4);}
-	    if($row[activo]==1)
-	    {$ws1->write($fila_inicial, $col_activo, 'si', $f4);}
-	    $query_revisor="SELECT CONCAT_WS(' ',u.nombre,u.apellido1,u.apellido2) as nombre
-	    								FROM usuario_revisor AS ur
-	    								JOIN usuario AS u ON ur.id_revisado=u.id_usuario
-	    								WHERE ur.id_revisor=".$row[id_usuario];
-	    $resp_revisor = mysql_query($query_revisor, $sesion->dbh) or Utiles::errorSQL($query_revisor,__FILE__,__LINE__,$sesion->dbh);
+		while($row = mysql_fetch_array($resp))
+		{
+			$i=0;
+			$ws1->write($fila_inicial, $col_nombre, $row['nombre'], $f4);
+			$ws1->write($fila_inicial, $col_username, $row['username'], $f4);
+			$ws1->write($fila_inicial, $col_categoria, $row['glosa_categoria'], $f4);
+			$ws1->write($fila_inicial, $col_email, $row['email'], $f4);
+			$ws1->write($fila_inicial, $col_rut, $row['rut'].($row['dv_rut']?'-'.$row['dv_rut']:''), $f4);
+			$ws1->write($fila_inicial, $col_dias_ingreso_trabajo, $row['dias_ingreso_trabajo'], $f4);
+			$ws1->write($fila_inicial, $col_area, $row['glosa'], $f4);
+			if($row[activo]==0) {
+				$ws1->write($fila_inicial, $col_activo, 'no', $f4);
+			}
+			if($row[activo]==1) {
+				$ws1->write($fila_inicial, $col_activo, 'si', $f4);
+			}
+			$query_revisor="SELECT 
+												CONCAT_WS(' ',u.nombre,u.apellido1,u.apellido2) as nombre
+											FROM usuario_revisor AS ur
+											JOIN usuario AS u ON ur.id_revisado=u.id_usuario
+											WHERE ur.id_revisor=".$row['id_usuario'];
+			$resp_revisor = mysql_query($query_revisor, $sesion->dbh) or Utiles::errorSQL($query_revisor,__FILE__,__LINE__,$sesion->dbh);
 			$revisa="";
 			while($row_revisor = mysql_fetch_array($resp_revisor))
 			{
-				$revisa .= $row_revisor[nombre]."\n";
+				$revisa .= $row_revisor['nombre']."\n";
 			}
 			$ws1->write($fila_inicial, $col_revisa, $revisa, $f4);
-			$ws1->write($fila_inicial, $col_retraso_maximo, $row[retraso_max], $f4);
-	    $ws1->write($fila_inicial, $col_restriccion_minima, $row[restriccion_min], $f4);
-	    $ws1->write($fila_inicial, $col_restriccion_maxima, $row[restriccion_max], $f4);
-	    $ws1->write($fila_inicial, $col_restriccion_mensual, $row[restriccion_mensual], $f4);
+			$ws1->write($fila_inicial, $col_retraso_maximo, $row['retraso_max'], $f4);
+			$ws1->write($fila_inicial, $col_restriccion_minima, $row['restriccion_min'], $f4);
+			$ws1->write($fila_inicial, $col_restriccion_maxima, $row['restriccion_max'], $f4);
+			$ws1->write($fila_inicial, $col_restriccion_mensual, $row['restriccion_mensual'], $f4);
 			$fila_inicial++;
 		}
 	}
