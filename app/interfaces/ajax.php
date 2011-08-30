@@ -12,7 +12,59 @@
     $sesion = new Sesion('');
     #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 		
-		if( $accion == "cargar_moneda_contrato" )
+		if( $accion == "actualizar_tarifas_trabajo" )
+		{
+			$monedas = explode(',',$id_monedas);
+			$tarifas = explode(',',$trabajo_tarifas);
+			
+			foreach($monedas as $index => $valor) {
+				$query = "UPDATE trabajo_tarifa SET valor = '".$tarifas[$index]."' 
+									 WHERE id_moneda = '".$monedas[$index]."' AND id_trabajo = '$id_trabajo' ";
+				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			}
+			
+			echo "OK";
+		}
+		else if( $accion == "cargar_tarifa_trabajo" )
+		{
+			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
+			{
+				$dato_cliente = "codigo_cliente_secundario";
+				$dato_asunto  = "codigo_asunto_secundario";
+			}
+			else
+			{
+				$dato_cliente = "codigo_cliente";
+				$dato_asunto  = "codigo_asunto";
+			}
+			if( !empty($codigo_asunto) )
+			{
+				$query = "SELECT prm_moneda.simbolo, usuario_tarifa.tarifa 
+										FROM contrato 
+										JOIN asunto ON contrato.id_contrato = asunto.id_contrato 
+										JOIN prm_moneda ON prm_moneda.id_moneda = contrato.id_moneda 
+										LEFT JOIN usuario_tarifa ON usuario_tarifa.id_usuario = '$id_usuario' 
+																						AND usuario_tarifa.id_tarifa = contrato.id_tarifa 
+																						AND usuario_tarifa.id_moneda = contrato.id_moneda 
+										WHERE asunto.$dato_asunto = '$codigo_asunto'";
+			}
+			else
+			{
+				$query = "SELECT prm_moneda.simbolo, usuario_tarifa.tarifa 
+										FROM contrato 
+										JOIN cliente ON contrato.id_contrato = cliente.id_contrato
+										JOIN prm_moneda ON prm_moneda.id_moneda = contrato.id_moneda 
+										LEFT JOIN usuario_tarifa ON usuario_tarifa.id_usuario = '$id_usuario' 
+																						AND usuario_tarifa.id_tarifa = contrato.id_tarifa 
+																						AND usuario_tarifa.id_moneda = contrato.id_moneda 
+										WHERE cliente.$dato_cliente = '$codigo_cliente' ";
+			}
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+			list( $simbolo, $tarifa ) = mysql_fetch_array($resp);
+			
+			echo "$simbolo $tarifa";
+		}
+		else if( $accion == "cargar_moneda_contrato" )
 		{
 			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 			{

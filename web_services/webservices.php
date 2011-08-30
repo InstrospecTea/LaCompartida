@@ -2,7 +2,7 @@
 require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-
+require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
 
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
@@ -439,22 +439,27 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$descripcion=addslashes($descripcion);
 		$ordenado_por=addslashes($ordenado_por);
 		$query = "INSERT INTO trabajo SET 
-						id_usuario='$id_usuario',
-						id_trabajo_local='$id_trabajo_local',
-						codigo_asunto='$codigo_asunto',
-						codigo_actividad=$codigo_actividad,
-						descripcion='$descripcion',
-						solicitante='$ordenado_por',
-						id_moneda=$id_moneda,
-						cobrable='$cobrable',
-						fecha_creacion=NOW(),
-						fecha=DATE_SUB('$fecha', INTERVAL $duracion SECOND),
-						duracion='$hora:$min:00',
-						duracion_cobrada='$hora:$min:00' 
+								id_usuario='$id_usuario',
+								id_trabajo_local='$id_trabajo_local',
+								codigo_asunto='$codigo_asunto',
+								codigo_actividad=$codigo_actividad,
+								descripcion='$descripcion',
+								solicitante='$ordenado_por',
+								id_moneda=$id_moneda,
+								cobrable='$cobrable',
+								fecha_creacion=NOW(),
+								fecha=DATE_SUB('$fecha', INTERVAL $duracion SECOND),
+								duracion='$hora:$min:00',
+								duracion_cobrada='$hora:$min:00' 
 							";
-			
+		
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '',mysql_error(). ". Query: $query",'');
+		else {
+			$trabajo = new Trabajo( $sesion );
+			$trabajo->Load( mysql_insert_id( $sesion->dbh ) );
+			$trabajo->InsertarTrabajoTarifa();
+		}
 	}
 	else
 		return new soap_fault('Client', '','Error de login.','');

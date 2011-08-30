@@ -139,6 +139,7 @@
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
 			$col_factura = $col++;
+			$col_tipo_doc = $col++;
 			$col_fecha_factura = $col++;
 		}
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
@@ -170,8 +171,9 @@
 		}
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
-			$ws1->setColumn( $col_factura, $col_factura, 25.00); #n° factura
-			$ws1->setColumn( $col_fecha_factura, $col_fecha_factura, 25.00); #fecha factura
+			$ws1->setColumn( $col_factura, $col_factura, 15.00); #n° documento
+			$ws1->setColumn( $col_tipo_doc, $col_tipo_doc, 25.00); #tipo documento
+			$ws1->setColumn( $col_fecha_factura, $col_fecha_factura, 25.00); #fecha documnento
 		}
 		
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
@@ -291,7 +293,8 @@
 		$query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
 					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.codigo_asunto, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
-					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_moneda.cifras_decimales, cobro.estado
+					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_tipo_documento_asociado.glosa as tipo_doc_asoc, 
+					prm_moneda.cifras_decimales, cobro.estado
 					$col_select,
 					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor,
 					CONCAT(usuario.apellido1 , ', ' , usuario.nombre) as usuario_ingresa,
@@ -303,6 +306,7 @@
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN usuario as usuario2 ON usuario2.id_usuario=cta_corriente.id_usuario_orden
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+					LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
@@ -373,8 +377,9 @@
 	}
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 	{
-		$ws1->write($fila_inicial, $col_factura,(__('N° Factura')), $tit);
-		$ws1->write($fila_inicial, $col_fecha_factura,__('Fecha Factura'), $tit);
+		$ws1->write($fila_inicial, $col_factura,(__('N° Documento')), $tit);
+		$ws1->write($fila_inicial, $col_tipo_doc,(__('Tipo Documento')), $tit);
+		$ws1->write($fila_inicial, $col_fecha_factura,__('Fecha Documento'), $tit);
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 	{
@@ -460,6 +465,7 @@
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
 			$ws1->write($fila_inicial, $col_factura, !empty($row['codigo_factura_gasto']) ? $row['codigo_factura_gasto'] : "", $f4);
+			$ws1->write($fila_inicial, $col_tipo_doc, !empty($row['tipo_doc_asoc']) ? $row['tipo_doc_asoc'] : "", $f4);
 			$ws1->write($fila_inicial, $col_fecha_factura, !empty($row['fecha_factura']) && $row['fecha_factura'] != '0000-00-00' ? Utiles::sql2fecha($row['fecha_factura'],$formato_fecha) : '-' , $f4);
 		}
 	    if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )

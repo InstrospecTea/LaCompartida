@@ -6023,6 +6023,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+
 			case 4.75:
 				$query = array();
 				$query[] = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` ) VALUES ('ADELANTO', 'Adelantos', '/app/interfaces/adelantos.php', 'Adelantos', '', '0', '58', 'COBRANZA');";
@@ -6032,6 +6033,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+			
 			case 4.76:
 				$query = array();
 				$query[] = "CREATE TABLE `prm_tipo_documento_asociado` (
@@ -6051,27 +6053,29 @@ WHERE  `id` =105 LIMIT 1 ;";
 				}
 			break;
 				
-			/*
-			case 4.75:
+			case 4.77:
 				$query = array();
-				$query[] = "CREATE TABLE  `trabajo_tarifa` (
-										 `id_trabajo` INT( 11 ) NOT NULL ,
-										 `id_moneda` INT( 11 ) NOT NULL ,
-										 `valor` DOUBLE NOT NULL DEFAULT  '0'
-										) ENGINE = INNODB;";
-				$query[] = "ALTER TABLE `trabajo_tarifa` ADD INDEX (  `id_trabajo` );";
-				$query[] = "ALTER TABLE `trabajo_tarifa` ADD INDEX (  `id_moneda` );";
-				$query[] = "ALTER TABLE `trabajo_tarifa` ADD UNIQUE (`id_trabajo` ,`id_moneda`)";
+				$query[] = "CREATE TABLE `trabajo_tarifa` (
+										  `id_trabajo` int(11) NOT NULL default '0',
+										  `id_moneda` int(11) NOT NULL default '0',
+										  `valor` double NOT NULL default '0',
+										  UNIQUE KEY `id_trabajo_2` (`id_trabajo`,`id_moneda`),
+										  KEY `id_trabajo` (`id_trabajo`),
+										  KEY `id_moneda` (`id_moneda`)
+										) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+				$query[] = "ALTER TABLE `trabajo_tarifa`
+										  ADD CONSTRAINT `trabajo_tarifa_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
+										  ADD CONSTRAINT `trabajo_tarifa_ibfk_1` FOREIGN KEY (`id_trabajo`) REFERENCES `trabajo` (`id_trabajo`) ON DELETE CASCADE ON UPDATE CASCADE;";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
-												NULL ,  'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
+												NULL , 'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
 				
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
-			break; */
+			break; 
 	}
 }
 
@@ -6317,6 +6321,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.74;
 	$VERSIONES[$num++] = 4.75;
 	$VERSIONES[$num++] = 4.76;
+	$VERSIONES[$num++] = 4.77;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

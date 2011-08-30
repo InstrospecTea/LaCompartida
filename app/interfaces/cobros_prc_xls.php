@@ -494,8 +494,8 @@
 		{
 			//Hoja Resumen
 			$nombre_pagina = ++$numero_pagina . ' ';
-	 		$ws = &$wb->addWorksheet("Resumen");
-	 		$ws->setPaper(2);
+			$ws = &$wb->addWorksheet("Resumen");
+			$ws->setPaper(2);
 
 			$filas = 0;
 			$col = 0;
@@ -503,6 +503,14 @@
 			$columna_abogado = $col++;
 			$columna_categoria = $col++;
 			$columna_hora = $col++;
+			if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+				$columna_hora_tarificada = $col++;
+				$col_formula_hora_tarificada = Utiles::NumToColumnaExcel($columna_hora_tarificada);
+				$col_formula_hora_importe = Utiles::NumToColumnaExcel($columna_hora_tarificada);
+			}
+			else {
+				$col_formula_hora_importe = Utiles::NumToColumnaExcel($columna_hora);
+			}
 			$col_formula_hora = Utiles::NumToColumnaExcel($columna_hora);
 			$columna_tarifa = $col++;
 			$col_formula_tarifa = Utiles::NumToColumnaExcel($columna_tarifa);
@@ -533,14 +541,15 @@
 			$ws->write($filas, $columna_abogado, __('Abogado'), $letra_encabezado_lista);
 			$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
 			$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
+			if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+				$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista);
+			}
 			$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
 			$ws->write($filas, $columna_importe, __('Importe '.$cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista);
 			$filas += 1;
 			$ws->freezePanes(array($filas, 0));
 			
 			$where_trabajos = " 1 ";
-			if($opc_ver_asuntos_separados)
-				$where_trabajos .= " AND trabajo.codigo_asunto ='".$asunto->fields['codigo_asunto']."' ";
 			if(!$opc_ver_cobrable)
 				$where_trabajos .= " AND trabajo.visible = 1 ";
 			if(!$opc_ver_horas_trabajadas)
@@ -571,6 +580,7 @@
 														SEC_TO_TIME( SUM( TIME_TO_SEC(duracion_cobrada) ) ) AS duracion_cobrada,
 														SUM(TIME_TO_SEC(duracion_cobrada)) AS duracion_cobrada_decimal,
 														SEC_TO_TIME( SUM( TIME_TO_SEC(duracion_retainer) ) ) AS duracion_retainer,
+														SEC_TO_TIME( SUM( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) ) as duracion_tarificada,
 														SUM(TIME_TO_SEC(duracion)/3600) AS duracion_horas,
 														IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
 														DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
@@ -594,6 +604,17 @@
 				{
 					$trabajo = $lista_trabajos->Get($i);
 					
+					if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
+						$query_tarifa = "SELECT 
+																SUM( ( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) * tarifa_hh ) / SUM( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) as tarifa 
+															 FROM trabajo 
+															WHERE id_cobro = '".$trabajo->fields['id_cobro']."' 
+																AND id_usuario = '".$trabajo->fields['id_usuario']."' 
+																AND cobrable = 1";
+						$resp_tarifa = mysql_query($query_tarifa,$sesion->dbh) or Utiles::errorSQL($query_tarifa,__FILE__,__LINE__,$sesion->dbh);
+						list($trabajo->fields['tarifa_hh']) = mysql_fetch_array($resp_tarifa);
+					}
+					
 					if( $cobro->fields['opc_ver_profesional_iniciales'] == 1 )
 						$nombre = $trabajo->fields['siglas'];
 					else
@@ -614,13 +635,22 @@
 					list($h, $m) = split(':', $duracion);
 					$duracion = $h/24 + $m/(24*60);
 					$ws->writeNumber($filas, $columna_hora,$duracion, $formato_tiempo2);
+					
+					if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+						$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
+						list($ht, $mt) = split(':', $duracion_tarificada);
+						$duracion_tarificada = $ht/24 + $m/(24*60);
+						$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2);
+					}
 
-					$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora".($filas+1), $formato_moneda2);
+					$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora_importe".($filas+1), $formato_moneda2);
 					
 					$filas += 1;
 				}
 				$filas += 1;
 				$ws->writeFormula($filas, $columna_hora, "=SUM($col_formula_hora".($fila_inicial+1).":$col_formula_hora".($filas).")", $formato_tiempo_total_tabla);
+				if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' )
+					$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada".($fila_inicial+1).":$col_formula_hora_tarificada".($filas).")", $formato_tiempo_total_tabla);
 				$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe".($fila_inicial+1).":$col_formula_importe".($filas).")", $formato_moneda_total_tabla);
 			}
 			//seteamos el ancho y columnas ocultas segun corresponda
@@ -663,6 +693,12 @@
 				$columna_descripcion = $col++;
 				$columna_hora = $col++;
 				$col_formula_hora = Utiles::NumToColumnaExcel($columna_hora);
+				$col_formula_hora_importe = $col_formula_hora;
+				if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+					$columna_hora_tarificada = $col++;
+					$col_formula_hora_tarificada = Utiles::NumToColumnaExcel($columna_hora_tarificada);
+					$col_formula_hora_importe = $col_formula_hora_tarificada;
+				}
 				$columna_tarifa = $col++;
 				$col_formula_tarifa = Utiles::NumToColumnaExcel($columna_tarifa);
 				$columna_importe = $col++;
@@ -694,23 +730,24 @@
 				$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
 				$ws->write($filas, $columna_descripcion, __('Descripción de Servicio'), $letra_encabezado_lista);
 				$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
+				if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+					$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista);
+				}
 				$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
 				$ws->write($filas, $columna_importe, __('Importe '.$cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista);
 				$filas += 1;
 				$ws->freezePanes(array($filas,0));
-	
+				
 				$where_trabajos = " 1 ";
-				if($opc_ver_asuntos_separados)
-					$where_trabajos .= " AND trabajo.codigo_asunto ='".$asunto->fields['codigo_asunto']."' ";
 				if(!$opc_ver_cobrable)
 					$where_trabajos .= " AND trabajo.visible = 1 ";
 				if(!$opc_ver_horas_trabajadas)
 					$where_trabajos .= " AND trabajo.duracion_cobrada != '00:00:00' ";
-	
+				
 				$query_cont_trabajos = "SELECT COUNT(*) FROM trabajo WHERE $where_trabajos AND id_cobro='".$cobro->fields['id_cobro']."' AND id_tramite = 0";
 				$resp_cont_trabajos = mysql_query($query_cont_trabajos,$sesion->dbh) or Utiles::errorSQL($query_cont_trabajos,__FILE__,__LINE__,$sesion->dbh);
 				list($cont_trabajos) = mysql_fetch_array($resp_cont_trabajos);
-	
+				
 				if($cont_trabajos>0)
 				{
 					// Buscar todos los trabajos de este asunto/cobro
@@ -731,6 +768,7 @@
 															DATE_FORMAT(duracion_cobrada, '%H:%i') AS duracion_cobrada, 
 															TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_decimal, 
 															DATE_FORMAT(duracion_retainer, '%H:%i') AS duracion_retainer, 
+															SEC_TO_TIME( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) AS duracion_tarificada, 
 															TIME_TO_SEC(duracion)/3600 AS duracion_horas, 
 															IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh, 
 															DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro, 
@@ -776,13 +814,22 @@
 						list($h, $m) = split(':', $duracion);
 						$duracion = $h/24 + $m/(24*60);
 						$ws->writeNumber($filas, $columna_hora,$duracion, $formato_tiempo2);
-	
-						$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora".($filas+1), $formato_moneda2);
-	
+						
+						if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
+							$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
+							list($ht, $mt) = split(':', $duracion_tarificada);
+							$duracion_tarificada = $ht/24 + $mt/(24*60);
+							$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2);
+						}
+						
+						$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa".($filas+1)."*$col_formula_hora_importe".($filas+1), $formato_moneda2);
+						
 						$filas += 1;
 					}
 					$filas += 1;
 					$ws->writeFormula($filas, $columna_hora, "=SUM($col_formula_hora".($fila_inicial+1).":$col_formula_hora".($filas).")", $formato_tiempo_total_tabla);
+					if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' )
+						$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada".($fila_inicial+1).":$col_formula_hora_tarificada".($filas).")", $formato_tiempo_total_tabla);
 					$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe".($fila_inicial+1).":$col_formula_importe".($filas).")", $formato_moneda_total_tabla);
 				}
 				

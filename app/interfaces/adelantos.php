@@ -144,7 +144,7 @@
 	</tr>
 </table>
 <?php
-	//Lista de adellantos
+	//Lista de adelantos
 	include("lista_adelantos.php");
 
 	if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') ||

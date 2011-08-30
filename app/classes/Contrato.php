@@ -42,6 +42,14 @@ class Contrato extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
+	
+	function LoadByCodigoAsunto( $codigo_asunto )
+	{
+		$query = "SELECT id_contrato FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id) = mysql_fetch_array($resp);
+		return $this->Load($id);
+	}
 
 	function LoadByCodigo($codigo)
 	{

@@ -9,6 +9,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
+	require_once Conf::ServerDir().'/classes/Contrato.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
@@ -27,9 +28,11 @@
 	$permiso_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
 	$tipo_ingreso = UtilesApp::GetConf($sesion,'TipoIngresoHoras');
+	$actualizar_trabajo_tarifa = true;
 
 	if($id_trabajo > 0)
 	{
+		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
 		if($t->Estado() == 'Cobrado' && $opcion != 'nuevo')
 		{
@@ -74,6 +77,16 @@
 		}
 		if($codigo_asunto != $t->fields['codigo_asunto'])#revisar para codigo secundario
 		{
+			$contrato_anterior = new Contrato($sesion);
+			$contrato_modificado = new Contrato($sesion);
+			
+			$contrato_anterior->LoadByCodigoAsunto($t->fields['codigo_asunto']);
+			$contrato_modificado->LoadByCodigoAsunto($codigo_asunto);
+			
+			if( $contrato_anterior->fields['id_tarifa'] != $contrato_modificado->fields['id_tarifa'] ) {
+				$actualizar_trabajo_tarifa = true;
+			}
+			
 			$cambio_asunto = true;
 		}
 	}
@@ -193,6 +206,8 @@
 
 			if($t->Write())
 			{
+				if( $actualizar_trabajo_tarifa )
+					$t->InsertarTrabajoTarifa();
 				$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con exito'):__('editado con éxito')));
 #refresca el listado de horas.php cuando se graba la informacion desde el popup
 ?>
@@ -295,6 +310,55 @@ if(str_url.search('/trabajo.php') > 0)//Si la página está siendo llamada desde t
 ?>
 
 <script type=text/javascript>
+
+function MostrarTrabajoTarifas()
+{
+	$('TarifaTrabajo').show();
+}
+
+function CancelarTrabajoTarifas()
+{
+	$('TarifaTrabajo').hide();
+}
+
+function ActualizarTrabajosTarifas()
+{
+	var id_monedas='';
+	var trabajo_tarifas='';
+	var id_trabajo = $('id_trabajo').value;
+	var contador = 0;
+	
+	$$('[id^="trabajo_tarifa_"]').each(function(elem){
+		ids=elem.id.split('_');
+		if( contador == 0 ) {
+			id_monedas += ids[2];
+			trabajo_tarifas += elem.value;
+		}
+		else {
+			id_monedas += ','+ids[2];
+			trabajo_tarifas += ','+elem.value;
+		}
+		contador++;
+	});
+	
+	var http = getXMLHTTP();
+	var vurl = 'ajax.php?accion=actualizar_tarifas_trabajo&id_trabajo='+id_trabajo+'&id_monedas='+id_monedas+'&trabajo_tarifas='+trabajo_tarifas;
+	
+	cargando = true;
+	http.open('get', vurl, true);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			var response = http.responseText;
+			if( response == "OK" )
+				return true;
+		}
+		cargando = false;
+	};
+	http.send(null);
+	CancelarTrabajoTarifas();
+}
 
 function Confirmar(form)
 {
@@ -473,6 +537,55 @@ function Validar(form)
 	}
 ?>
 
+	return true;
+}
+
+function MontoValido( id_campo )
+{
+	var monto = document.getElementById( id_campo ).value.replace('\,','.');
+	var arr_monto = monto.split('\.');
+	var monto = arr_monto[0];
+	for($i=1;$i<arr_monto.length-1;$i++)
+		monto += arr_monto[$i];
+	if( arr_monto.length > 1 )
+		monto += '.' + arr_monto[arr_monto.length-1];
+	
+	document.getElementById( id_campo ).value = monto;
+}
+
+function CargarTarifa()
+{
+	var id_usuario = $('id_usuario').value;
+	<?php
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
+		{ ?>
+			var codigo_asunto = $('codigo_asunto_secundario').value;
+			var codigo_cliente = $('codigo_cliente_secundario').value;
+<?php }
+		else
+		{ ?>
+			var codigo_asunto = $('codigo_asunto').value;
+			var codigo_cliente = $('codigo_cliente').value;
+<?php } ?>
+
+	var http = getXMLHTTP();
+	var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario='+id_usuario+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente;
+	
+	cargando = true;
+	http.open('get', vurl, true);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			var response = http.responseText;
+			if( $('tarifa_trabajo') )
+				$('tarifa_trabajo').value = response;
+			else 
+				return false;
+		}
+		cargando = false;
+	};
+	http.send(null);
 	return true;
 }
 
@@ -978,16 +1091,16 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario, true);
+			echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario, true, '', "CargarTarifa();");
 		else
-			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'', true);
+			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'', true, '', "CargarTarifa();");
 	}
 	else
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "","CargarSelect('campo_codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "","CargarTarifa();CargarSelect('campo_codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
 		else
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('campo_codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
+			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarTarifa();CargarSelect('campo_codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
 	}
 ?>
         </td>
@@ -1004,11 +1117,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarTarifa();CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
 					}
 					else
 					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $t->fields['codigo_asunto'],"","CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
+						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $t->fields['codigo_asunto'],"","CargarTarifa();CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 
 ?>
@@ -1121,7 +1234,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			JOIN usuario_permiso USING(id_usuario)
 			LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
 			WHERE $where GROUP BY id_usuario ORDER BY nombre"
-		,"id_usuario",$id_usuario,'','','width="200"');
+		,"id_usuario",$id_usuario,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 ?>
 
 <?
@@ -1240,37 +1353,108 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?
 	if(strlen($select_usuario) > 164) // Depende de que no cambie la función Html::SelectQuery(...)
 	{
-		echo(__('Usuario'));;
+		echo(__('Usuario'));
 		echo($select_usuario);
 	}
 ?>
-        </td>
-    </tr>
-    <? 
-    if(isset($t) && $t->Loaded() && $opcion != 'nuevo') 
-    { 
-     echo("<tr><td colspan=5 align=center>"); 
-     echo("<a onclick=\"return confirm('".__('¿Desea eliminar este trabajo?')."')\" href=?opcion=eliminar&id_trabajo=".$t->fields['id_trabajo']."&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este trabajo&nbsp;</span></a>"); 
-     echo("</td></tr>");                       
-	  } 
-	 	?> 
-    <tr>
-        <td colspan='3' align='right'>
-        	<? if ($id_tabajo > 0)
-        			{ ?>
+			</td>
+		</tr>
+		<?
+		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') && $permisos->fields['permitido'] ) {
+			if( $t->fields['id_trabajo'] > 0 ) {
+				if( $t->fields['id_cobro'] > 0 ) {
+					$cobro = new Cobro($sesion);
+					$cobro->Load( $t->fields['id_cobro'] );
+					$id_moneda_trabajo = $cobro->fields['id_moneda'];
+				}
+				else {
+					$contrato = new Contrato($sesion);
+					$contrato->LoadByCodigoAsunto( $t->fields['codigo_asunto'] );
+					$id_moneda_trabajo = $contrato->fields['id_moneda'];
+				}
+				$tarifa_trabajo = Moneda::GetSimboloMoneda( $sesion, $t->fields['id_moneda'] );
+				$tarifa_trabajo .= " ".$t->GetTrabajoTarifa($id_moneda_trabajo);
+			}
+			?>
+		<tr>
+			<td colspan="2" align="right">
+				<?php echo __('Tarifa por hora')?>
+			</td>
+			<td align="left">
+				<input type="text" size="10" id="tarifa_trabajo" disabled style="background-color: white; display: inline; border: 0px; color:black; vertical-align:middle;" value="<?=$tarifa_trabajo != '' ? $tarifa_trabajo : ''?>" />
+				&nbsp;&nbsp;&nbsp;
+				<?php if( $t->fields['id_trabajo'] > 0 ) { ?>
+				<img src="<?=Conf::ImgDir()?>/money_16.gif" border=0 /><a href='javascript:void(0)' onclick="MostrarTrabajoTarifas()"><?=__('Modificar tarifa del trabajo')?></a>
+				<?php } ?>
+			</td>
+		</tr>
+<?php if( $t->fields['id_trabajo'] > 0 ) { ?>
+		<tr>
+			<td>
+				<div id="TarifaTrabajo" style="display:none; left: 50px; top: 250px; background-color: white; position:absolute; z-index: 4;">
+				<fieldset style="background-color:white;">
+				<legend><?=__('Tarifas por hora')?></legend>
+				<div id="contenedor_tipo_load">&nbsp;</div>
+				<div id="contenedor_tipo_cambio">
+				<table style='border-collapse:collapse;' cellpadding='3'>
+					<tr>
+						<?
+						$query = "SELECT 
+													prm_moneda.id_moneda, 
+													glosa_moneda, 
+													( SELECT valor FROM trabajo_tarifa WHERE id_trabajo = '".$t->fields['id_trabajo']."' 
+																					AND trabajo_tarifa.id_moneda = prm_moneda.id_moneda ) 
+												FROM prm_moneda";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$num_monedas=0; 
+						while(list($id_moneda,$glosa_moneda,$valor) = mysql_fetch_array($resp))
+						{
+						?>
+							<td>
+									<span><b><?=$glosa_moneda?></b></span><br>
+									<input type='text' size=9 id='trabajo_tarifa_<?=$id_moneda?>' name='trabajo_tarifa_<?=$id_moneda?>' onkeyup="MontoValido(this.id);" value='<?=$valor?>' />
+							</td>
+						<?
+							$num_monedas++;
+						}
+						?>
+					<tr>
+						<td colspan=<?=$num_monedas?> align=center>
+							<input type=button onclick="ActualizarTrabajosTarifas();" value="<?=__('Guardar')?>" />
+							<input type=button onclick="CancelarTrabajoTarifas();" value="<?=__('Cancelar')?>" />
+						</td>
+					</tr>
+			</table>
+			</div>
+			</fieldset>
+			
+			</div>
+			</td>
+		</tr> 
+<?php 
+		}
+		if(isset($t) && $t->Loaded() && $opcion != 'nuevo') 
+		{
+			echo("<tr><td colspan=5 align=center>"); 
+			echo("<a onclick=\"return confirm('".__('¿Desea eliminar este trabajo?')."')\" href=?opcion=eliminar&id_trabajo=".$t->fields['id_trabajo']."&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este trabajo&nbsp;</span></a>"); 
+			echo("</td></tr>");                       
+		}
+} ?>
+		<tr>
+		<td colspan='3' align='right'>
+					<? if ($id_tabajo > 0)
+							{ ?>
 					<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Confirmar(this.form)" />
-				  <?  }
-				  	 else
-				  	 	{ ?>
-				  <input type=submit class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form)" />
-				  	<?	} ?>
+					<?  }
+						else
+							{ ?>
+					<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form)" />
+						<?	} ?>
 				</td>
-    </tr>
+		</tr>
 </table>
 </center>
 </form>
-
-
 
 <?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )

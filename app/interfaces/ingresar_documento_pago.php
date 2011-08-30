@@ -435,24 +435,19 @@ function ActualizarDocumentoMonedaPago()
 		<td align=left width="50%">
 			<b><?=__('Información de Documento') ?> </b>
 		</td>
-<?
+		<td align=right width="50%">
+<?php
 	$query = "SELECT count(*) FROM documento WHERE pago_retencion = 1 AND id_cobro = '$id_cobro'";
 	$resp	 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list( $existe_pago_retencion ) = mysql_fetch_array($resp);
-	
-	if( !$existe_pago_retencion && $id_cobro && method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PagoRetencionImpuesto') )
-		{ ?>
-		<td align=right width="50%">
-			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>
+	if( !$existe_pago_retencion && $id_cobro && method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PagoRetencionImpuesto') ) { ?>
+		
+			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>&nbsp;
+<?php } ?>
+		<?php $saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? 1 : 0;  ?>
+		<?php $saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? 1 : 0;  ?>
+		<button onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1&pago_honorarios=<?php echo $saldo_honorarios ?>&pago_gastos=<?php echo $saldo_gastos ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>
 		</td>
-<?	}
-	else
-		{ ?>
-		<td align=right width="50%">
-			&nbsp;
-		</td>
-<?	}
-		?>
 	</tr>
 </table>
 <table style="border: 1px solid black;" width='90%'>

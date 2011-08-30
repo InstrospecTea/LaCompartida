@@ -501,7 +501,18 @@ class Cobro extends Objeto
 			$retainer_trabajo_minutos=0;
 
 			// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
-			if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
+			// Si el config "GuardarTarifaAlIngresoDeHora" existe saca la tarifa del registro de tarifas 
+			// por trabajo, si no saca lo del contrato actual
+			if( UtilesApp::GetConf($this->sesion,'GuardarTarifaAlIngresoDeHora') )
+			{
+				// Según Tarifa del contrato
+				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::TrabajoTarifa($this->sesion,$trabajo->fields['id_trabajo'],$this->fields['id_moneda']);
+				// Según Tarifa estándar del sistema
+				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
+				// Según tarifa estándar de sistema y si no existe tarifa en moneda indicada buscar mejor tarifa en otra moneda
+				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::MejorTarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$this->fields['id_cobro']);
+			}
+			else if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
 			{
 				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
@@ -598,7 +609,6 @@ class Cobro extends Objeto
 			$minutos_retainer = sprintf("%02d",$retainer_trabajo_minutos%60);
 			$trabajo->Edit('id_moneda',$this->fields['id_moneda']);
 			$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
-			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 			$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
 			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
@@ -3851,6 +3861,9 @@ class Cobro extends Objeto
 					$profesionales[$trabajo->fields['nombre_usuario']]['tarifa'] = $trabajo->fields['tarifa_hh'];
 					$profesionales[$trabajo->fields['nombre_usuario']]['id_categoria_usuario'] = $trabajo->fields['id_categoria_usuario']; //nombre de la categoria
 					$profesionales[$trabajo->fields['nombre_usuario']]['categoria'] = $trabajo->fields['categoria']; // nombre de la categoria
+				}
+				if( UtilesApp::GetConf($this->sesion,'GuardarTarifaAlIngresoDeHora') ) {
+					$profesionales[$trabajo->fields['nombre_usuario']]['tarifa'] = $trabajo->fields['tarifa_hh'];
 				}
 
 				// Para mostrar un resumen de horas de cada profesional al principio del documento.
@@ -10952,11 +10965,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 										SUM( TIME_TO_SEC(duracion)/3600 ) as duracion_trabajada, 
 										SUM( (TIME_TO_SEC(duracion)-TIME_TO_SEC(duracion_cobrada))/3600 ) as duracion_descontada, 
 										SUM( TIME_TO_SEC( duracion_retainer )/3600 ) as duracion_retainer, 
-										t.tarifa_hh as tarifa 
+										( 
+											SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) 
+												FROM trabajo AS t2 WHERE t2.id_cobro = '".$this->fields['id_cobro']."' 
+												 AND t2.id_usuario = u.id_usuario 
+												 AND t2.cobrable = 1 
+										) as tarifa 
 									FROM trabajo as t 
 									JOIN usuario as u ON u.id_usuario=t.id_usuario 
 									LEFT JOIN prm_categoria_usuario as cu ON u.id_categoria_usuario=cu.id_categoria_usuario
-									WHERE t.id_cobro = '".$this->fields['id_cobro']."'   
+									WHERE t.id_cobro = '".$this->fields['id_cobro']."' 
 										AND t.visible = 1 
 										AND t.id_tramite = 0 
 										$where_horas_cero 

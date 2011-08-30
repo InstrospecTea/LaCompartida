@@ -1192,7 +1192,7 @@ $mostrar_resumen_de_profesionales = 1;
 							$filas2 = $filas;
 							$filas = $fila_inicio_resumen_profesional;
 						}
-			
+						
 						// Escribir las condiciones (ocultas) para poder usar DSUM en las fórmulas
 						$filas+=2;
 						$contador = 0;
@@ -1242,6 +1242,16 @@ $mostrar_resumen_de_profesionales = 1;
 							{
 								foreach($detalle_profesional as $id => $data)
 									{
+										if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
+											$query_tarifa = "SELECT 
+																					SUM( ( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) * tarifa_hh ) / SUM( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) as tarifa
+																				 FROM trabajo 
+																				WHERE id_cobro = '".$cobro->fields['id_cobro']."' 
+																					AND id_usuario = '$id'
+																					AND cobrable = 1";
+											$resp_tarifa = mysql_query($query_tarifa,$sesion->dbh) or Utiles::errorSQL($query_tarifa,__FILE__,__LINE__,$sesion->dbh);
+											list($data['tarifa']) = mysql_fetch_array($resp_tarifa);
+										}
 										$ws->write($filas, $col_descripcion, $data['nombre'], $formato_normal);
 										if($opc_ver_horas_trabajadas)
 											$ws->writeFormula($filas, $col_duracion_trabajada, "=DSUM($inicio_datos:$fin_datos; \"".Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')."\"; ".Utiles::NumToColumnaExcel($col_fecha_ini+$contador).($fila_inicio_detalle_profesional-4).":".Utiles::NumToColumnaExcel($col_fecha_ini+$contador).($fila_inicio_detalle_profesional-3).")", $formato_tiempo);

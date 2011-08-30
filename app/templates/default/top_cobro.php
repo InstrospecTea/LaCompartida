@@ -9,7 +9,7 @@
 			array('cobros_tramites',__('Selección').'<br/>'.__('Trámites')),
 			array('cobros4',		__('Selección').'<br/>'.__('Gastos')),
 			array('cobros5',		__('Emisión').'<br/>'),
-			array('cobros6',		__('Facturación').'<br/>'.__('Cobranza')));
+			array('cobros6',		__('Facturación')));
 
 		//los pasos estan desordenados -_-
 		if($paso==6) $paso = 3;

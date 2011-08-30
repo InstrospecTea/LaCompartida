@@ -53,6 +53,15 @@ class Funciones
 
 		return $html;
 	}
+	
+	function TrabajoTarifa( $sesion, $id_trabajo, $id_moneda )
+	{
+		$query = "SELECT valor FROM trabajo_tarifa WHERE id_trabajo = '$id_trabajo' AND id_moneda = '$id_moneda' ";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		list( $valor ) = mysql_fetch_array($resp);
+		return $valor;
+	}
+	
     #retorna la tarifa para un cierto usuario, una cierta moneda y un cierto cliente. Si el cliente = "", es la tarifa por defecto para todos los clientes
 	function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "")
 	{

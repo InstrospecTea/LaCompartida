@@ -22,6 +22,7 @@ class Trabajo extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
+	
 	function get_codigo_cliente()
 	{
 		$query = "SELECT codigo_cliente
@@ -83,6 +84,43 @@ class Trabajo extends Objeto
 		return false;
 	}
 
+	function InsertarTrabajoTarifa()
+	{
+		$id_trabajo = $this->fields['id_trabajo'];
+		$codigo_asunto = $this->fields['codigo_asunto'];
+		$id_usuario = $this->fields['id_usuario'];
+		$dbh = $this->sesion->dbh;
+			
+		$query = "SELECT ut.id_moneda, ut.tarifa 
+								FROM usuario_tarifa as ut 
+								LEFT JOIN contrato ON contrato.id_tarifa = ut.id_tarifa 
+								LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato 
+							WHERE ut.id_usuario = '$id_usuario' 
+								AND asunto.codigo_asunto = '$codigo_asunto' ";
+		$resp = mysql_query($query, $dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$dbh);
+		
+		while( list( $id_moneda, $valor ) = mysql_fetch_array($resp) )
+		{
+			$query_insert = "INSERT trabajo_tarifa 
+													SET id_trabajo = '$id_trabajo',
+															id_moneda = '$id_moneda',
+															valor = '$valor' 
+												ON DUPLICATE KEY UPDATE valor = '$valor' ";
+			mysql_query($query_insert, $dbh) or Utiles::errorSQL($query_insert,__FILE__,__LINE__,$dbh);
+		}
+	}
+	
+	function GetTrabajoTarifa( $id_moneda )
+	{
+		$query = "SELECT valor 
+								FROM trabajo_tarifa 
+								WHERE id_trabajo = '".$this->fields['id_trabajo']."' 
+									AND id_moneda = '$id_moneda' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($valor) = mysql_fetch_array($resp);
+		return $valor;
+	}
+	
 	function Eliminar()
 	{
 		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario])

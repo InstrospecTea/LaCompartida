@@ -1,8 +1,21 @@
 <?php
+require_once dirname(__FILE__) . '/../conf.php';
+require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+$sesion = new Sesion(array('COB'));
+if ($popup)
+{
+	require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
+	require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
+	$pagina = new Pagina($sesion);
+	$pagina->titulo = $titulo ? $titulo : "Adelantos";
+	$pagina->PrintTop($popup);
+}
+
 $query = "
 SELECT
 	SQL_CALC_FOUND_ROWS
 	documento.id_documento,
+	documento.id_cobro,
 	documento.codigo_cliente,
 	documento.monto*-1 AS monto,
 	documento.saldo_pago*-1 AS saldo_pago,
@@ -14,20 +27,21 @@ FROM
 	documento
 	LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
 WHERE
-	id_cobro IS NULL AND
 	es_adelanto = 1";
 
 //Filtros
+if (isset($codigo_cliente)) $filtros['codigo_cliente'] = $codigo_cliente;
+if (isset($pago_honorarios)) $filtros['pago_honorarios'] = $pago_honorarios;
+if (isset($pago_gastos)) $filtros['pago_gastos'] = $pago_gastos;
+
 if (isset($filtros['id_documento']) and !empty($filtros['id_documento']))
 {
 	$query .= " AND documento.id_documento = " . $filtros['id_documento'];
 }
-
 if (isset($filtros['codigo_cliente']) and !empty($filtros['codigo_cliente']))
 {
 	$query .= " AND documento.codigo_cliente = " . $filtros['codigo_cliente'];
 }
-
 if (isset($filtros['fecha_inicio']) and !empty($filtros['fecha_inicio']))
 {
 	$query .= " AND documento.fecha >= " . $filtros['fecha_inicio'];
@@ -40,6 +54,14 @@ if (isset($filtros['moneda']) and !empty($filtros['moneda']))
 {
 	$query .= " AND documento.id_moneda = " . $filtros['moneda'];
 }
+if (isset($filtros['pago_honorarios']))
+{
+	$query .= " AND documento.pago_honorarios = " . $filtros['pago_honorarios'];
+}
+if (isset($filtros['pago_gastos']))
+{
+	$query .= " AND documento.pago_gastos = " . $filtros['pago_gastos'];
+}
 
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, $orden);
 $buscador->nombre = "buscador_adelantos";
@@ -49,20 +71,48 @@ $buscador->titulo = "Adelantos";
 $buscador->AgregarEncabezado("id_documento", __('N°'));
 $buscador->AgregarEncabezado("codigo_cliente", __('Cliente'));
 $buscador->AgregarEncabezado("fecha", __('Fecha'));
-$buscador->AgregarEncabezado("monto_con_simbolo", __('Monto'));
-$buscador->AgregarEncabezado("saldo_pago_con_simbolo", __('Saldo'));
+$buscador->AgregarEncabezado("monto_con_simbolo", __('Monto'), "align=\"right\"");
+$buscador->AgregarEncabezado("saldo_pago_con_simbolo", __('Saldo'), "align=\"right\"");
 $buscador->AgregarEncabezado("glosa_documento", __('Descripción'));
-$buscador->AgregarFuncion(__('Opción'), "OpcionesListaAdelanto", "align=\"right\"");
+
+if ($elegir_para_pago)
+{
+	$buscador->AgregarFuncion(__('Elegir para pago'), "ElegirParaPago");
+}
+else
+{
+	$buscador->AgregarFuncion(__('Opción'), "OpcionesListaAdelanto");
+}
 
 $buscador->Imprimir();
+
+function ElegirParaPago(&$fila)
+{
+	return "<img style='cursor:pointer;' id='elegirParaPago' src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Elegir para pago' onclick='ElegirParaPago(\"" . Conf::RootDir() . "/app/interfaces/ingresar_documento_pago.php?id_cobro=" . $fila->fields['id_cobro'] . "&id_documento=" . $fila->fields['id_documento'] . "&popup=1&pago=true&codigo_cliente=" . $fila->fields['codigo_cliente'] . "\")' />";
+}
 
 function OpcionesListaAdelanto(&$fila)
 {
 	$opc = "";
 	if ($fila->fields['saldo_pago'] > 0)
 	{
-		$opc = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>";
+		$opc = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
+	}
+	else
+	{
+		$opc = "<img src='" . Conf::ImgDir() . "/editar_off.gif' border='0' title='Editar' />";
 	}
 	return $opc;
 }
 ?>
+<script type="text/javascript" charset="utf-8">
+	<?php if ($elegir_para_pago) { ?>
+	function ElegirParaPago(url)
+	{
+		window.opener.location.href = url;
+		window.close();
+		return false;
+	}
+	<?php } ?>
+</script>
+<?php if ($popup) $pagina->PrintBottom($popup); ?>
