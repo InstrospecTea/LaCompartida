@@ -512,24 +512,26 @@
 										$pagina->AddError($asunto->error);
 			
 									ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-									foreach ($docs_legales as $doc_legal) {
-										if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
-											continue;
+									if( is_array($docs_legales) ) {
+										foreach ($docs_legales as $doc_legal) {
+											if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
+												continue;
+											}
+											$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
+											$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
+											$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+											if (!empty($doc_legal['honorario'])) {
+												$contrato_doc_legal->Edit('honorarios', 1);
+											}
+											if (!empty($doc_legal['gastos_con_iva'])) {
+												$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
+											}
+											if (!empty($doc_legal['gastos_sin_iva'])) {
+												$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
+											}
+											$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+											$contrato_doc_legal->Write();
 										}
-										$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-										$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-										$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-										if (!empty($doc_legal['honorario'])) {
-											$contrato_doc_legal->Edit('honorarios', 1);
-										}
-										if (!empty($doc_legal['gastos_con_iva'])) {
-											$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-										}
-										if (!empty($doc_legal['gastos_sin_iva'])) {
-											$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-										}
-										$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-										$contrato_doc_legal->Write();
 									}
 								}
 								else
@@ -1182,7 +1184,7 @@ function CopiarDatosCliente(form)
  </tr>
 </table>
 <br>
-<table width='100%' cellspacing='0' cellpadding='0' id='tbl_contrato' style='display:<?=$asunto->fields['cobro_independiente'] =='SI' ? 'inline' : 'none' ?>;'>
+<table width='100%' cellspacing='0' cellpadding='0' id='tbl_contrato' style="display:<?=$checked != '' ? 'inline' : 'none' ?>;">
  <tr>
 		<td width="100%">
 			<? require_once Conf::ServerDir().'/interfaces/agregar_contrato.php';?>
