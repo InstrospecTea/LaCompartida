@@ -228,6 +228,15 @@
 					$asunto->Edit("email_contacto",$email_contacto);
 					$asunto->Edit("actividades_obligatorias",$actividades_obligatorias ? '1' : '0');
 					$asunto->Edit("activo",$activo);
+					if( !$activo )
+					{
+						$fecha_inactivo = date('Y-m-d H:i:s');
+						$asunto->Edit("fecha_inactivo", $fecha_inactivo);
+					}
+					else
+					{
+						$asunto->Edit("fecha_inactivo", '');
+					}
 					$asunto->Edit("cobrable",$cobrable);
 					$asunto->Edit("mensual",$mensual ? "SI":"NO");
 					$asunto->Edit("alerta_hh",$alerta_hh);

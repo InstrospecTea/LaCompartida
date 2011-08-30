@@ -106,6 +106,7 @@
    $col_idioma = $col++;
    $col_cobrable = $col++;
    $col_act_oblicatorio = $col++;
+   $col_fecha_inactivo = $col++;
    
     // se setea el ancho de las columnas
     $ws1->setColumn( $col_codigo, $col_codigo,  15.00);
@@ -132,6 +133,7 @@
 	$ws1->setColumn( $col_idioma, $col_idioma, 20.00);
 	$ws1->setColumn( $col_cobrable, $col_cobrable, 10.00);$i++;
 	$ws1->setColumn( $col_act_oblicatorio, $col_act_oblicatorio, 20.00);
+	$ws1->setColumn( $col_fecha_inactivo, $col_fecha_inactivo, 20.00);
 
 	$PdfLinea1 = UtilesApp::GetConf($sesion, 'PdfLinea1');
 	$PdfLinea2 = UtilesApp::GetConf($sesion, 'PdfLinea2');
@@ -161,9 +163,9 @@
 			$ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
 		}
     $ws1->write($fila_inicial, $col_tarifa, __('Tarifa'), $tit);
-		$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
-		$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
-		$ws1->write($fila_inicial, $col_monto_asunto, __('Monto(FF/R/C)'), $tit);
+	$ws1->write($fila_inicial, $col_moneda, __('Moneda'), $tit);
+	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Cobro'), $tit);
+	$ws1->write($fila_inicial, $col_monto_asunto, __('Monto(FF/R/C)'), $tit);
     $ws1->write($fila_inicial, $col_tipo_proyecto, __('Tipo de Proyecto'), $tit);
     $ws1->write($fila_inicial, $col_area_proyecto, __('Area de Práctica'), $tit);
     $ws1->write($fila_inicial, $col_fecha_creacion, __('Fecha Creación'), $tit);
@@ -172,8 +174,9 @@
     $ws1->write($fila_inicial, $col_mail_contacto, __('E-mail Contacto'), $tit);
     $ws1->write($fila_inicial, $col_dir_contacto, __('Dirección Contacto'), $tit);
     $ws1->write($fila_inicial, $col_idioma, __('Idioma'), $tit);
-		$ws1->write($fila_inicial, $col_cobrable, __('Cobrable'), $tit);
-		$ws1->write($fila_inicial, $col_act_oblicatorio, __('Act. Obligatorias'), $tit);
+	$ws1->write($fila_inicial, $col_cobrable, __('Cobrable'), $tit);
+	$ws1->write($fila_inicial, $col_act_oblicatorio, __('Act. Obligatorias'), $tit);
+	$ws1->write($fila_inicial, $col_fecha_inactivo, __('Fecha Inactivo'), $tit);
     $fila_inicial++;
 
     ###################################### SQL ######################################
@@ -232,6 +235,7 @@
 			    							a1.codigo_asunto,
 			    							a1.id_moneda, 
 			    							a1.activo,
+											a1.fecha_inactivo,
 			            			a1.fecha_creacion, 
 			            			(
 			            				SELECT 
@@ -332,7 +336,7 @@
 						$ws1->write($fila_inicial, $col_tipo_proyecto, $row['tipo_proyecto'], $f4);
 						$ws1->write($fila_inicial, $col_area_proyecto, $row['area_proyecto'], $f4);
 
-						$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+						$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);						
 						$formato_fecha = str_replace( "/", "-", $formato_fecha);
 
 						$ws1->write($fila_inicial, $col_fecha_creacion, Utiles::sql2date($row['fecha_creacion'], $formato_fecha, '-'), $f4);
@@ -343,6 +347,8 @@
 						$ws1->write($fila_inicial, $col_idioma, $row['glosa_idioma'], $f4);
 						$ws1->write($fila_inicial, $col_cobrable, $row['cobrable'] == 1 ? 'SI':'NO', $f4);
 						$ws1->write($fila_inicial, $col_act_oblicatorio, $row['actividades_obligatorias'] == 1 ? 'SI':'NO', $f4);
+						
+						$ws1->write($fila_inicial, $col_fecha_inactivo, $row['fecha_inactivo'] != '0000-00-00 00:00:00' ? Utiles::sql2fecha($row['fecha_inactivo'], $formato_fecha, '-') :'-', $f4);
 						$fila_inicial++;
 		}
 
