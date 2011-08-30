@@ -327,6 +327,10 @@ function ActualizarTrabajosTarifas()
 	var trabajo_tarifas='';
 	var id_trabajo = $('id_trabajo').value;
 	var contador = 0;
+	var id_moneda_trabajo = $('id_moneda_trabajo').value;
+	var tarifa_trabajo = $('tarifa_trabajo').value;
+	var tarifa_trabajo_split = tarifa_trabajo.split(' ');
+	var simbolo = tarifa_trabajo_split[0];
 	
 	$$('[id^="trabajo_tarifa_"]').each(function(elem){
 		ids=elem.id.split('_');
@@ -338,6 +342,8 @@ function ActualizarTrabajosTarifas()
 			id_monedas += ','+ids[2];
 			trabajo_tarifas += ','+elem.value;
 		}
+		if( id_moneda_trabajo == ids[2] )
+			$('tarifa_trabajo').value = simbolo + ' ' + elem.value;
 		contador++;
 	});
 	
@@ -1372,7 +1378,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					$contrato->LoadByCodigoAsunto( $t->fields['codigo_asunto'] );
 					$id_moneda_trabajo = $contrato->fields['id_moneda'];
 				}
-				$tarifa_trabajo = Moneda::GetSimboloMoneda( $sesion, $t->fields['id_moneda'] );
+				$tarifa_trabajo = Moneda::GetSimboloMoneda( $sesion, $id_moneda_trabajo );
 				$tarifa_trabajo .= " ".$t->GetTrabajoTarifa($id_moneda_trabajo);
 			}
 			?>
@@ -1391,6 +1397,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?php if( $t->fields['id_trabajo'] > 0 ) { ?>
 		<tr>
 			<td>
+				<input type="hidden" id="id_moneda_trabajo" value="<?=$id_moneda_trabajo ?>" />
 				<div id="TarifaTrabajo" style="display:none; left: 50px; top: 250px; background-color: white; position:absolute; z-index: 4;">
 				<fieldset style="background-color:white;">
 				<legend><?=__('Tarifas por hora')?></legend>
