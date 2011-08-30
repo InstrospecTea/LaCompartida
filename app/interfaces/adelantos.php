@@ -24,7 +24,7 @@
 	$pagina->PrintTop();
 
 	//Filtros
-	$filtros = array('id_documento' => $id_documento, 'codigo_cliente' => $codigo_cliente, 'fecha_inicio' => $fecha1, 'fecha_termino' => $fecha2, 'moneda' => $moneda_adelanto);
+	$filtros = array('id_documento' => $id_documento, 'codigo_cliente' => $codigo_cliente, 'fecha_inicio' => $fecha1, 'fecha_fin' => $fecha2, 'moneda' => $moneda_adelanto);
 
 ?>
 

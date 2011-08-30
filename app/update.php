@@ -6023,6 +6023,34 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+			case 4.75:
+				$query = array();
+				$query[] = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` ) VALUES ('ADELANTO', 'Adelantos', '/app/interfaces/adelantos.php', 'Adelantos', '', '0', '58', 'COBRANZA');";
+				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ('COB', 'ADELANTO');";
+				foreach($query as $q)
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+			break;
+			case 4.76:
+				$query = array();
+				$query[] = "CREATE TABLE `prm_tipo_documento_asociado` (
+						  `id_tipo_documento_asociado` int(11) NOT NULL auto_increment,
+						  `glosa` varchar(250) NOT NULL default '',
+						  PRIMARY KEY  (`id_tipo_documento_asociado`)
+						) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
+				
+				$query[] = "INSERT INTO `prm_tipo_documento_asociado` (`id_tipo_documento_asociado`, `glosa`) VALUES (NULL, 'Factura Asociada'),
+					(NULL, 'Boleta Asociada'),
+					(NULL, 'Recibo por honorarios');";
+				
+				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_tipo_documento_asociado` INT(11) NULL AFTER  `id_proveedor` ;";
+				foreach($query as $q)
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+			break;
+				
 			/*
 			case 4.75:
 				$query = array();
@@ -6287,6 +6315,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.72;
 	$VERSIONES[$num++] = 4.73;	
 	$VERSIONES[$num++] = 4.74;
+	$VERSIONES[$num++] = 4.75;
+	$VERSIONES[$num++] = 4.76;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

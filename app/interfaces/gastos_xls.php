@@ -48,37 +48,40 @@
                                 'Locked' => 1,
                                 'Color' => 'black'));
 
-  if( $moneda_gasto > 0 )
-  {
-  	$obj_moneda_gasto = new Moneda($sesion);
+	if( $moneda_gasto > 0 )
+	{
+		$obj_moneda_gasto = new Moneda($sesion);
 		$obj_moneda_gasto->Load($moneda_gasto);
-		
+
 		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
 		$simbolo_moneda = $obj_moneda_gasto->fields['simbolo'];
 		$cifras_decimales = $obj_moneda_gasto->fields['cifras_decimales'];
 		if($cifras_decimales)
 		{
 			$decimales = '.';
-			while($cifras_decimales--)
+			while($cifras_decimales--){
 				$decimales .= '0';
+			}
 		}
 		else
+		{
 			$decimales = '';
-  	$formato_moneda =& $wb->addFormat(array('Size' => 10,
-                                'VAlign' => 'top',
-                                'Align' => 'justify',
-                                'Border' => 1,
-                                'Color' => 'black',
-                                'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-  }
-  else
-  {
+		}
 		$formato_moneda =& $wb->addFormat(array('Size' => 10,
-                                'VAlign' => 'top',
-                                'Align' => 'justify',
-                                'Border' => 1,
-                                'Color' => 'black'));
-  }
+						'VAlign' => 'top',
+						'Align' => 'justify',
+						'Border' => 1,
+						'Color' => 'black',
+						'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+	}
+	else
+	{
+		$formato_moneda =& $wb->addFormat(array('Size' => 10,
+					'VAlign' => 'top',
+					'Align' => 'justify',
+					'Border' => 1,
+					'Color' => 'black'));
+	}
 
     $f4 =& $wb->addFormat(array('Size' => 10,
                                 'VAlign' => 'top',
@@ -111,21 +114,23 @@
 		// se setea las columnas para facilitar orden 
 		$col = 0;
 		$col_fecha = $col++;
-		$col_codigo = $col++;
-		$col_cliente = $col++;
-		$col_asunto = $col++;
+		$ws1->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
+		if(!$codigo_cliente){
+			$col_cliente = $col++;
+		}
+		if(!$codigo_asunto){
+			$col_codigo = $col++;		
+			$col_asunto = $col++;
+		}
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
 		{
 			$col_tipo = $col++;
 		}		
 		$col_descripcion = $col++;
-		$col_egreso_moneda = $col++;
 		$col_egreso = $col++;
-		$col_ingreso_moneda = $col++;
 		$col_ingreso = $col++;
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 		{
-			$col_monto_cobrable_moneda = $col++;
 			$col_monto_cobrable = $col++;
 		}	
 		$col_liquidacion = $col++;
@@ -174,13 +179,10 @@
 			$ws1->setColumn( $col_tipo, $col_tipo, 25.00); #tipo gasto
 		}		
 		$ws1->setColumn( $col_descripcion, $col_descripcion, 25.00); #descripcion
-		$ws1->setColumn( $col_egreso_moneda, $col_egreso_moneda, 10.00); #egreso
 		$ws1->setColumn( $col_egreso, $col_egreso, 25.00); #egreso
-		$ws1->setColumn( $col_ingreso_moneda, $col_ingreso_moneda, 10.00); #ingreso
 		$ws1->setColumn( $col_ingreso, $col_ingreso, 25.00); #ingreso
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 		{
-			$ws1->setColumn( $col_monto_cobrable_moneda, $col_monto_cobrable_moneda, 5.00);
 			$ws1->setColumn( $col_monto_cobrable, $col_monto_cobrable, 25.00); #monto cobrable
 		}		
 		$ws1->setColumn( $col_liquidacion, $col_liquidacion, 25.00); #liquidacion
@@ -238,30 +240,41 @@
 			$cliente->LoadByCodigo($codigo_cliente);
 			$total_cta = number_format($cliente->TotalCuentaCorriente(),0,",",".");
 		}		
-		if($codigo_asunto)
+		if($codigo_asunto){
 			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
-		if($id_usuario_responsable)
+		}
+		if($id_usuario_responsable){
 			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable'";
-		if($id_usuario_orden)
+		}
+		if($id_usuario_orden){
 			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-		if($id_tipo)
+		}
+		if($id_tipo){
 			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
-		if($clientes_activos == 'activos')
+		}
+		if($clientes_activos == 'activos'){
 			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		if( $clientes_activos == 'inactivos')
+		}
+		if( $clientes_activos == 'inactivos'){
 			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
-		if($fecha1 && $fecha2)
+		}
+		if($fecha1 && $fecha2){
 			$where .= " AND cta_corriente.fecha BETWEEN '".Utiles::fecha2sql($fecha1)."' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
-		else if($fecha1)
+		}
+		else if($fecha1){
 			$where .= " AND cta_corriente.fecha >= '".Utiles::fecha2sql($fecha1)."' ";
-		else if($fecha2)
+		}
+		else if($fecha2){
 			$where .= " AND cta_corriente.fecha <= '".Utiles::fecha2sql($fecha2)."' ";
-		else if(!empty($id_cobro))
+		}
+		else if(!empty($id_cobro)){
 			$where .= " AND cta_corriente.id_cobro = '$id_cobro' ";
+		}
 		
 		// Filtrar por moneda del gasto
-		if ($moneda_gasto != '')
+		if ($moneda_gasto != ''){
 			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
+		}
 		
 		$col_select ="";
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
@@ -296,6 +309,8 @@
 					WHERE $where";
 		
 		$lista_gastos = new ListaGastos($sesion,'',$query);
+		$moneda_unica = true; #para verificar en el ciclo si es la moneda única
+		$id_moneda_check = 0; #igual que el de arriba
 		for( $v=0; $v < $lista_gastos->num; $v++ )
 		{
 			$gasto = $lista_gastos->Get($v);
@@ -317,6 +332,14 @@
 					$total_balance_egreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 				if($gasto->fields['ingreso'] > 0)
 					$total_balance_ingreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
+			}
+			$id_moneda_check = $gasto->fields['id_moneda'];
+			if( $v > 0 ) #la primera vez que entra al ciclo nos saltamos este paso por que no hay con que comparar la moneda
+			{
+				if( $id_moneda_check != $gasto->fields['id_moneda'])
+				{
+					$moneda_unica = false;
+				}
 			}
 		}
 		if($total_balance_egreso > 0 && $total_balance_ingreso > 0)
@@ -358,15 +381,12 @@
 		$ws1->write($fila_inicial, $col_tipo, __('Tipo'), $tit);
 	}
     $ws1->write($fila_inicial, $col_descripcion, (__('Descripción')), $tit);
-	$ws1->write($fila_inicial, $col_egreso_moneda, ' ', $tit);
     $ws1->write($fila_inicial, $col_egreso, __('Egreso'), $tit);
-    $columna_balance_glosa = $col_egreso;
 	$ws1->write($fila_inicial, $col_ingreso_moneda, ' ', $tit);
     $ws1->write($fila_inicial, $col_ingreso, __('Ingreso'), $tit);
     $columna_balance_valor = $col_ingreso;
-    if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
+    if(( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable')) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ))
 	{
-		$ws1->write($fila_inicial, $col_monto_cobrable_moneda, ' ', $tit);
 	    $ws1->write($fila_inicial, $col_monto_cobrable, __('Monto cobrable'), $tit);
 	}
     $ws1->write($fila_inicial, $col_liquidacion, __('Cobro'), $tit);
@@ -385,6 +405,33 @@
     if($orden == "")
 	{
 			$orden = "fecha DESC";		
+	}
+	
+	#si es moneda unica creamos el formato de la moneda unida
+	if( $moneda_unica ){
+		$obj_moneda_unica = new Moneda($sesion);
+		$obj_moneda_unica->Load($id_moneda_check);
+
+		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
+		$simbolo_moneda = $obj_moneda_unica->fields['simbolo'];
+		$cifras_decimales = $obj_moneda_unica->fields['cifras_decimales'];
+		if($cifras_decimales)
+		{
+			$decimales = '.';
+			while($cifras_decimales--){
+				$decimales .= '0';
+			}
+		}
+		else
+		{
+			$decimales = '';
+		}
+		$formato_moneda =& $wb->addFormat(array('Size' => 10,
+						'VAlign' => 'top',
+						'Align' => 'justify',
+						'Border' => 1,
+						'Color' => 'black',
+						'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 	}
 	
 	#valores de columnas
@@ -421,17 +468,15 @@
 		}
 		
 	    $ws1->write($fila_inicial, $col_descripcion, $row['descripcion'], $f4);
-	    if( $moneda_gasto > 0 )
+	    if( $moneda_gasto > 0 || $moneda_unica )
 	    {
 	    	$ws1->write($fila_inicial, $col_egreso, $row['egreso'], $formato_moneda);            
 	    	$ws1->write($fila_inicial, $col_ingreso, $row['ingreso'], $formato_moneda);
 	    }
 	    else
-	    {
-			$ws1->write($fila_inicial, $col_egreso_moneda, $row['ingreso'] ? '' : $row['simbolo'], $f4);         
-	    	$ws1->write($fila_inicial, $col_egreso, $row['ingreso'] ? '' : number_format($row['egreso'],$row['cifras_decimales'],",","."), $f4);            
-	    	$ws1->write($fila_inicial, $col_ingreso_moneda, $row['egreso'] ? '' : $row['simbolo'], $f4);
-			$ws1->write($fila_inicial, $col_ingreso, $row['egreso'] ? '' : number_format($row['ingreso'],$row['cifras_decimales'],",","."), $f4);
+	    {      
+	    	$ws1->write($fila_inicial, $col_egreso, $row['ingreso'] ? '' : $row['simbolo'] . " " . number_format($row['egreso'],$row['cifras_decimales'],",","."), $f4);
+			$ws1->write($fila_inicial, $col_ingreso, $row['egreso'] ? '' : $row['simbolo'] . " " . number_format($row['ingreso'],$row['cifras_decimales'],",","."), $f4);
 	    }
 	    
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
@@ -445,13 +490,12 @@
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 				{
-					if( $moneda_gasto > 0 ){
+					if( $moneda_gasto > 0 || $moneda_unica ){
 						$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
 					}
 					else
 					{
-						$ws1->write($fila_inicial, $col_monto_cobrable_moneda, $row['simbolo'] , $f4);
-						$ws1->write($fila_inicial, $col_monto_cobrable, number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4); 
+						$ws1->write($fila_inicial, $col_monto_cobrable, $row['simbolo'] . " " . number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4); 
 					}
 				}
 			}	
@@ -460,13 +504,12 @@
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 			{
-				if( $moneda_gasto > 0 ){
+				if( $moneda_gasto > 0 || $moneda_unica ){
 					$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
 				}
 				else
 				{
-					$ws1->write($fila_inicial, $col_monto_cobrable_moneda, $row['simbolo'] , $f4);
-					$ws1->write($fila_inicial, $col_monto_cobrable, number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4);
+					$ws1->write($fila_inicial, $col_monto_cobrable, $row['simbolo'] . " " . number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4);
 				} 
 			}
 		}	

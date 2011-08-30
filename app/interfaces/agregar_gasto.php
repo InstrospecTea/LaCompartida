@@ -129,7 +129,8 @@
 		$gasto->Edit("id_usuario_orden",(!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
-
+		
+		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
 		if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
 		{ 
 			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada; 
@@ -697,9 +698,10 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 ?>
 	<tr>
 		<td align=right>
-			<?=__('Factura asociada')?>
+			<?= __('Documento Asociado')?>
 		</td>
 		<td align=left>
+			<?= Html::SelectQuery($sesion, "SELECT id_tipo_documento_asociado, glosa FROM prm_tipo_documento_asociado ORDER BY id_tipo_documento_asociado","id_tipo_documento_asociado", $gasto->fields['id_tipo_documento_asociado'] ? $gasto->fields['id_tipo_documento_asociado'] : '', '','Vacio',"140"); ?>
 			<?
 			if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
 			{
@@ -719,9 +721,14 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?}?>
 			
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-			<?=__('Fecha Factura')?> <input type="text" name="fecha_factura_asociada" value="<?=($gasto->fields['fecha_factura'] && $gasto->fields['fecha_factura']!='NULL') ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
+		</td>
+	</tr>
+	<tr>
+		<td align="right">
+			<?=__('Fecha Documento')?> 
+		</td>
+		<td>
+			<input type="text" name="fecha_factura_asociada" value="<?=($gasto->fields['fecha_factura'] && $gasto->fields['fecha_factura']!='NULL') ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_factura_asociada" style="cursor:pointer" />
 		</td>
 	</tr>
