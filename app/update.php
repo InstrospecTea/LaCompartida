@@ -6000,19 +6000,50 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
 			case 4.73:
 				$query = array();
 				$query[] = "ALTER TABLE  `carta` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
-ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2',
-ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2',
-ADD  `margen_derecho` DOUBLE NOT NULL DEFAULT  '2',
-ADD  `margen_encabezado` DOUBLE NOT NULL DEFAULT  '0.88',
-ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '0.88';";
+											ADD `margen_inferior` DOUBLE NOT NULL DEFAULT  '2',
+											ADD `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2',
+											ADD `margen_derecho` DOUBLE NOT NULL DEFAULT  '2',
+											ADD `margen_encabezado` DOUBLE NOT NULL DEFAULT  '0.88',
+											ADD `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '0.88';";
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+			
+			case 4.74:
+				$query = array();
+				$query[] = "ALTER TABLE  `asunto` ADD  `fecha_inactivo` DATETIME NOT NULL AFTER  `activo` ;";
+				foreach($query as $q)
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+			break;
+			/*
+			case 4.75:
+				$query = array();
+				$query[] = "CREATE TABLE  `trabajo_tarifa` (
+										 `id_trabajo` INT( 11 ) NOT NULL ,
+										 `id_moneda` INT( 11 ) NOT NULL ,
+										 `valor` DOUBLE NOT NULL DEFAULT  '0'
+										) ENGINE = INNODB;";
+				$query[] = "ALTER TABLE `trabajo_tarifa` ADD INDEX (  `id_trabajo` );";
+				$query[] = "ALTER TABLE `trabajo_tarifa` ADD INDEX (  `id_moneda` );";
+				$query[] = "ALTER TABLE `trabajo_tarifa` ADD UNIQUE (`id_trabajo` ,`id_moneda`)";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+												NULL ,  'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
+											);";
+				
+				foreach($query as $q)
+				{
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+				}
+			break; */
 	}
 }
 
@@ -6253,8 +6284,9 @@ ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '0.88';";
 	$VERSIONES[$num++] = 4.69;
 	$VERSIONES[$num++] = 4.70;
 	$VERSIONES[$num++] = 4.71;
-	$VERSIONES[$num++] = 4.72;	
-	$VERSIONES[$num++] = 4.73;
+	$VERSIONES[$num++] = 4.72;
+	$VERSIONES[$num++] = 4.73;	
+	$VERSIONES[$num++] = 4.74;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

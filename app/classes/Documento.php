@@ -89,7 +89,7 @@ class Documento extends Objeto
 		return $tc;
 	}
 	
-	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $pago_honorarios = null, $pago_gastos = null)
+	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null)
 	{
 		if($id_cobro)
 		{
@@ -147,6 +147,7 @@ class Documento extends Objeto
 			$this->Edit("numero_cheque",$numero_cheque);
 			$this->Edit("id_factura_pago",$id_factura_pago ? $id_factura_pago : "NULL" );
 			if( $pago_retencion ) $this->Edit("pago_retencion","1");
+			$this->Edit("es_adelanto", $adelanto ? 1 : 0);
 			$this->Edit("pago_honorarios",$pago_honorarios ? 1 : 0);
 			$this->Edit("pago_gastos", $pago_gastos ? 1 : 0);
 			$out_neteos = "";
@@ -167,7 +168,8 @@ class Documento extends Objeto
 					{
 						$this->ActualizarDocumentoMoneda($tipo_cambio);
 					}
-					$pagina->addInfo(__('Pago ingresado con éxito'));
+					$msg = empty($adelanto) ? __('Pago ingresado con éxito') : __('Adelanto ingresado con éxito');
+					$pagina->addInfo($msg);
 					
 							//Si se ingresa el documento, se ingresan los pagos
 							foreach($arreglo_pagos_detalle as $key => $data)
@@ -695,23 +697,6 @@ class Documento extends Objeto
 		{
 			return false;
 		}
-	}
-
-	function ListaAdelantos($desde, $x_pag, $orden = "id_documento DESC") {
-		$query = "SELECT SQL_CALC_FOUND_ROWS id_documento, codigo_cliente, monto, saldo_pago, glosa_documento FROM documento WHERE id_cobro IS NULL";
-		
-		$buscador = new Buscador($this->sesion, $query, "Objeto", $desde, $x_pag, $orden);
-		$buscador->nombre = "buscador_adelantos";
-		$buscador->titulo = "Adelantos";
-		
-		//Encabezados
-		$buscador->AgregarEncabezado("id_documento", __('N°'));
-		$buscador->AgregarEncabezado("codigo_cliente", __('Cliente'));
-		$buscador->AgregarEncabezado("monto", __('Monto'));
-		$buscador->AgregarEncabezado("saldo_pago", __('Saldo'));
-		$buscador->AgregarEncabezado("glosa_documento", __('Descripción'));
-
-		return $buscador;
 	}
 }
 
