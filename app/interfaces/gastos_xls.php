@@ -135,7 +135,10 @@
 		}	
 		$col_liquidacion = $col++;
 		$col_estado = $col++;
-		$col_facturable = $col++;
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::TipoGasto() ) )
+		{
+			$col_facturable = $col++;
+		}
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
 		{
 			$col_factura = $col++;

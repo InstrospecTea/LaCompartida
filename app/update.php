@@ -6076,13 +6076,14 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+			
 			case 4.78:
 				$query = array();
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES (
 							NULL ,  'AnchoGraficoReporteGeneral',  '730',  'ancho que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
 							), (
-							NULL ,  'AltoGraficoReporteGeneral',  '350',  'alto que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
+							NULL ,  'AltoGraficoReporteGeneral',  '500',  'alto que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
 							);";
 				
 				foreach($query as $q)
