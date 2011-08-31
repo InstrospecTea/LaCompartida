@@ -19,7 +19,8 @@
 			$tarifas = explode(',',$trabajo_tarifas);
 			
 			foreach($monedas as $index => $valor) {
-				$query = "UPDATE trabajo_tarifa SET valor = '".$tarifas[$index]."' 
+				if( empty($valor) ) $valor = "0";
+				$query = "UPDATE trabajo_tarifa SET valor = '".$tarifas[$index]."'
 									 WHERE id_moneda = '".$monedas[$index]."' AND id_trabajo = '$id_trabajo' ";
 				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			}

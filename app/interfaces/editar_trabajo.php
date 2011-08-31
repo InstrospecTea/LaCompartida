@@ -561,7 +561,10 @@ function MontoValido( id_campo )
 
 function CargarTarifa()
 {
-	var id_usuario = $('id_usuario').value;
+	if( !$('tarifa_trabajo') )
+		return true;
+		
+		var id_usuario = $('id_usuario').value;
 	<?php
 		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 		{ ?>
@@ -1365,10 +1368,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		echo(__('Usuario'));
 		echo($select_usuario);
 	}
+	else 
+		echo("<input type='hidden' id='id_usuario' name='id_usuario' value='".$sesion->usuario->fields['id_usuario']."' />");
 ?>
 			</td>
 		</tr>
-		<?
+<?
 		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') && $permisos->fields['permitido'] ) {
 			if( $t->fields['id_trabajo'] > 0 ) {
 				if( $t->fields['id_cobro'] > 0 ) {
@@ -1384,7 +1389,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 				$tarifa_trabajo = Moneda::GetSimboloMoneda( $sesion, $id_moneda_trabajo );
 				$tarifa_trabajo .= " ".$t->GetTrabajoTarifa($id_moneda_trabajo);
 			}
-			?>
+?>
 		<tr>
 			<td colspan="2" align="right">
 				<?php echo __('Tarifa por hora')?>

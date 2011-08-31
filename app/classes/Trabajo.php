@@ -90,17 +90,22 @@ class Trabajo extends Objeto
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
 		$dbh = $this->sesion->dbh;
-			
-		$query = "SELECT ut.id_moneda, ut.tarifa 
-								FROM usuario_tarifa as ut 
-								LEFT JOIN contrato ON contrato.id_tarifa = ut.id_tarifa 
-								LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato 
-							WHERE ut.id_usuario = '$id_usuario' 
-								AND asunto.codigo_asunto = '$codigo_asunto' ";
+		
+		$query = "SELECT 
+									prm_moneda.id_moneda, 
+									( SELECT usuario_tarifa.tarifa 
+											FROM usuario_tarifa 
+											LEFT JOIN contrato ON contrato.id_tarifa = usuario_tarifa.id_tarifa 
+											LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato 
+										WHERE usuario_tarifa.id_usuario = '$id_usuario' AND 
+													asunto.codigo_asunto = '$codigo_asunto' 
+													AND usuario_tarifa.id_moneda = prm_moneda.id_moneda)
+								FROM prm_moneda";
 		$resp = mysql_query($query, $dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$dbh);
 		
 		while( list( $id_moneda, $valor ) = mysql_fetch_array($resp) )
 		{
+			if( empty($valor) ) $valor = 0;
 			$query_insert = "INSERT trabajo_tarifa 
 													SET id_trabajo = '$id_trabajo',
 															id_moneda = '$id_moneda',
