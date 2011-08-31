@@ -1,13 +1,30 @@
 <?php
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
-
-$ancho = 900;
-$alto = 900;
-$radio = 100;
+require_once "../../../fw/classes/Utiles.php";
+require_once dirname(__FILE__).'/../../conf.php';
 
 $sesion = new Sesion();
 # The data for the pie chart
+
+if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AnchoGraficoReporteGeneral') != NULL )
+{
+	$ancho = Conf::GetConf($sesion,'AnchoGraficoReporteGeneral');
+}
+else
+{
+	$ancho = 900;
+}
+if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AltoGraficoReporteGeneral') != NULL )
+{
+	$alto = Conf::GetConf($sesion,'AltoGraficoReporteGeneral');
+}
+else
+{
+	$alto = 900;
+}
+$radio = 100;
+
 
 $data = $tiempo;
 # The labels for the pie chart
