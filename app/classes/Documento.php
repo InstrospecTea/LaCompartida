@@ -752,6 +752,17 @@ class Documento extends Objeto
 			return false;
 		}
 	}
+	
+	function HayAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos){
+		$query = "SELECT COUNT(*)
+			FROM documento
+			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
+		if(empty($pago_honorarios)) $query.= ' AND pago_gastos = 1';
+		else if(empty($pago_gastos)) $query.= ' AND pago_honorarios = 1';
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($num) = mysql_fetch_array($resp);
+		return $num > 0;
+	}
 }
 
 

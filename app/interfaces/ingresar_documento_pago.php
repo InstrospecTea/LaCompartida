@@ -490,7 +490,13 @@ function ActualizarDocumentoMonedaPago()
 		
 			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>&nbsp;
 <?php }
-if(!$adelanto){
+if($id_cobro){
+	$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
+	$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
+	$hay_adelantos = $documento->HayAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos);
+}
+else $hay_adelantos = false;
+if(!$adelanto && $hay_adelantos){
 		$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
 		$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';  ?>
 		<button type="button" onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>

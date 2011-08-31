@@ -340,7 +340,7 @@
 				if($gasto->fields['ingreso'] > 0)
 					$total_balance_ingreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 			}
-			$id_moneda_check = $gasto->fields['id_moneda'];
+			
 			if( $v > 0 ) #la primera vez que entra al ciclo nos saltamos este paso por que no hay con que comparar la moneda
 			{
 				if( $id_moneda_check != $gasto->fields['id_moneda'])
@@ -348,6 +348,8 @@
 					$moneda_unica = false;
 				}
 			}
+			else
+				$id_moneda_check = $gasto->fields['id_moneda'];
 		}
 		if($total_balance_egreso > 0 && $total_balance_ingreso > 0)
 			$total_balance = $total_balance_ingreso  - $total_balance_egreso;
