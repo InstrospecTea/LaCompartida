@@ -304,6 +304,25 @@ function CargarTabla(mostrar_actualizado)
 				});
 			}
 			SetMontoPagos();
+			<?php if($documento->fields['es_adelanto']=='1' && $id_cobro){?>
+				var id_cobro = '<?=$documento_cobro->fields['id_documento']?>';
+				var saldo = Number($F('saldo_pago'));
+				var pago_honorarios = $('pago_honorarios_'+id_cobro);
+				var pago_gastos = $('pago_gastos_'+id_cobro);
+				if((!pago_honorarios || pago_honorarios.value == '0') && (!pago_gastos || pago_gastos.value == '0')){
+					if(pago_honorarios && !pago_honorarios.disabled){
+						var monto = Number($F('cobro_honorarios_'+id_cobro)) < saldo ? Number($F('cobro_honorarios_'+id_cobro)) : saldo;
+						pago_honorarios.value = monto;
+						saldo -= monto;
+					}
+					if(pago_gastos && !pago_gastos.disabled){
+						var monto = Number($F('cobro_gastos_'+id_cobro) < saldo) ? Number($F('cobro_gastos_'+id_cobro)) : saldo;
+						pago_gastos.value = monto;
+						saldo -= monto;
+					}
+				}
+				$('saldo_pago').value = saldo;
+			<?php } ?>
 		}
 	};
 	http.send(null);
@@ -467,14 +486,14 @@ function ActualizarDocumentoMonedaPago()
 	$query = "SELECT count(*) FROM documento WHERE pago_retencion = 1 AND id_cobro = '$id_cobro'";
 	$resp	 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list( $existe_pago_retencion ) = mysql_fetch_array($resp);
-	if( !$existe_pago_retencion && $id_cobro && method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PagoRetencionImpuesto') ) { ?>
+	if( !$existe_pago_retencion && $id_cobro && UtilesApp::GetConf($sesion,'PagoRetencionImpuesto') && (!$id_documento || $documento->fields['es_adelanto'] != '1')) { ?>
 		
 			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>&nbsp;
 <?php }
 if(!$adelanto){
 		$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
 		$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';  ?>
-		<button onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>
+		<button type="button" onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>
 <?php } ?>
 		</td>
 	</tr>

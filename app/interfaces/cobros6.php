@@ -594,6 +594,7 @@ function showOpcionDetalle( id, bloqueDetalle )
 function EliminarPago( id_pago )
 {
 	$('opc').value = 'eliminar_pago';
+	$('eliminar_pago').value = id_pago;
 	if( $('eliminar_pago').value == id_pago )
 		$('todo_cobro').submit();
 }
@@ -2118,7 +2119,6 @@ Calendar.setup(
 		button			: "img_fecha_emision"		// ID of the button
 	}
 );
-	
 Calendar.setup(
 	{
 		inputField	: "fecha_facturacion",				// ID of the input field
@@ -2138,13 +2138,6 @@ Calendar.setup(
 		inputField	: "fecha_pago_parcial",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha_pago_parcial"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago_gastos",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "imgfecha_fecha_pago_gastos"		// ID of the button
 	}
 );
 </script>

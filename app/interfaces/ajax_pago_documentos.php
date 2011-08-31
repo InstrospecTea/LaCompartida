@@ -70,6 +70,7 @@
 
 					documento.honorarios_pagados,
 					documento.gastos_pagados,
+					IF(documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO', 0, 1) as pagado,
 					".$orden_docs."
 					
 					cobro.fecha_ini,
@@ -337,9 +338,10 @@
 			if(isset($adelanto)) $html = $valor;
 			if( $fila->fields['honorarios'] != 0)
 			{
-				$html .= "<input type=\"".(isset($adelanto) ? 'hidden' : 'text')."\" name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> "; 
+				$html .= "<input type=\"".(isset($adelanto) ? 'hidden' : 'text')."\" ".($fila->fields['pagado'] ? 'readonly' : '')." name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> "; 
 
 				$html .= "<input type=\"hidden\" name=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\"  id=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" /> ";
+				$html .= "<input type=\"hidden\" name=\"cobro_honorarios_".$fila->fields['id_documento']."\"  id=\"cobro_honorarios_".$fila->fields['id_documento']."\" value=\"".$fila->fields['honorarios']."\" SIZE=\"9\" /> ";
 			}
 			return $html;
 		}
@@ -417,6 +419,7 @@
 				$html .= "<input type=\"".(isset($adelanto) ? 'hidden' : 'text')."\" name=\"pago_gastos_".$fila->fields['id_documento']."\" id=\"pago_gastos_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('gastos',".$fila->fields['id_documento'].");SetMontoPagos();\" /> ";
 
 				$html .= "<input type=\"hidden\" name=\"pago_gastos_anterior_".$fila->fields['id_documento']."\"  id=\"pago_gastos_anterior_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" /> ";
+				$html .= "<input type=\"hidden\" name=\"cobro_gastos_".$fila->fields['id_documento']."\"  id=\"cobro_gastos_".$fila->fields['id_documento']."\" value=\"".$fila->fields['gastos']."\" SIZE=\"9\" /> ";
 			}
 
 			return $html;

@@ -67,7 +67,9 @@ else{
 		$query .= " AND documento.pago_gastos = " . $filtros['pago_gastos'];
 	}
 }
-
+if($elegir_para_pago){
+	$query .= " AND saldo_pago < 0";
+}
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, $orden);
 $buscador->nombre = "buscador_adelantos";
 $buscador->titulo = "Adelantos";

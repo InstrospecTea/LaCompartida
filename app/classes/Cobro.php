@@ -690,7 +690,11 @@ class Cobro extends Objeto
 			for($z=0; $z<$lista_trabajos->num; ++$z)
 			{
 				$trabajo = $lista_trabajos->Get($z);
-				$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original, 6,'.','') );
+				if( $cobro_total_honorario_cobrable_original > 0 )
+					$factor = $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original;
+				else
+					$factor = 1;
+				$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6,'.','') );
 				list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 				$monto_cobrado = number_format($trabajo->fields['tarifa_hh'] * $duracion, 6,'.','');
