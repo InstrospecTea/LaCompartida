@@ -74,7 +74,7 @@
 			}
 		}
 
-		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos);
+		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto']);
 		
 		$documento->Load($id_documento);
 		$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
@@ -209,7 +209,7 @@ function Validar(form)
 		form.glosa_documento.focus();
 		return false;
 	}
-	if(monto > monto_pagos.value)
+	if(monto > monto_pagos.value && $('es_adelanto') && $F('es_adelanto')!='1')
 	{
 		alert("El Monto del documento ("+monto+") es superior a la suma de los Pagos ("+monto_pagos.value+").");
 		return false;
@@ -219,6 +219,17 @@ function Validar(form)
 		alert("La suma de los Pagos ("+monto_pagos.value+") es superior al Monto del documento ("+monto+").");
 		return false;
 	}
+	
+	<?php if (!empty($adelanto)) { ?>
+	if($$('input[id^="pago_honorarios_"]:not([value="0"])').length && !$('pago_honorarios').checked){
+		alert('El adelanto se ha usado para pagar honorarios. No puede deshabilitar esta opción.');
+		return false;
+	}
+	if($$('input[id^="pago_gastos_"]:not([value="0"])').length && !$('pago_gastos').checked){
+		alert('El adelanto se ha usado para pagar gastos. No puede deshabilitar esta opción.');
+		return false;
+	}
+	<?php } ?>
 
 }
 
@@ -235,10 +246,6 @@ function CheckEliminaIngreso(chk)
 
 function CargarTabla(mostrar_actualizado)
 {
-	<?php if (!empty($adelanto)) { ?>
-	return true;
-	<?php } ?>
-
 	var select_moneda = document.getElementById('id_moneda');
 	var tabla_pagos = document.getElementById('tabla_pagos');
 	var id_documento = document.getElementById('id_documento');
@@ -277,6 +284,10 @@ function CargarTabla(mostrar_actualizado)
 	if(id_documento.value)
 		url += '&id_documento='+id_documento.value;
 
+	<?php if (!empty($adelanto)) { ?>
+	url += '&adelanto=1';
+	<?php } ?>
+
 	http.open('get', url);
 	http.onreadystatechange = function()
 	{
@@ -284,6 +295,14 @@ function CargarTabla(mostrar_actualizado)
 		{
 			var response = http.responseText;
 			tabla_pagos.innerHTML = response;
+			var tipopago = ['honorarios', 'gastos'];
+			for(var i=0; i<2; i++){
+				var disable = $F('pago_'+tipopago[i]) == '0';
+				$$('input[id^="pago_'+tipopago[i]+'_"]').each(function(elem){
+					if(disable) elem.disabled = 'disabled';
+					else elem.removeAttribute('disabled');
+				});
+			}
 			SetMontoPagos();
 		}
 	};
@@ -337,7 +356,10 @@ function SetMontoPagos()
 		{
 			monto.value = Math.round(monto_pagos.value * 100) / 100;
 		}
-	<?}?>
+	<?}
+	else if($documento->fields['es_adelanto']=='1'){?>
+		$('saldo_pago').value = Math.round(($F('monto') - $F('monto_pagos')) * 100) / 100;
+	<?php } ?>
 }
 
 function ActualizarDocumentoMoneda(id_documento)
@@ -417,6 +439,11 @@ function ActualizarDocumentoMonedaPago()
 <input type=hidden name='cifras_decimales' id='cifras_decimales' value='<?=$cifras_decimales?>' />
 <input type=hidden name='cobro' value='<?=$id_cobro?>'>
 <input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
+<?php if(!$adelanto){ ?>
+<input type=hidden name='pago_honorarios' id='pago_honorarios' value='<?=$id_documento ? $documento->fields['pago_honorarios'] : ''?>'/>
+<input type=hidden name='pago_gastos' id='pago_gastos' value='<?=$id_documento ? $documento->fields['pago_gastos'] : ''?>'/>
+<input type=hidden name='es_adelanto' id='es_adelanto' value='<?=$id_documento ? $documento->fields['es_adelanto'] : ''?>'/>
+<?php } ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -443,22 +470,22 @@ function ActualizarDocumentoMonedaPago()
 	if( !$existe_pago_retencion && $id_cobro && method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PagoRetencionImpuesto') ) { ?>
 		
 			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>&nbsp;
+<?php }
+if(!$adelanto){
+		$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
+		$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';  ?>
+		<button onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>
 <?php } ?>
-		<?php if (!empty($id_cobro)) { ?>
-		<?php $saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? 1 : 0;  ?>
-		<?php $saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? 1 : 0;  ?>
-		<button onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1&pago_honorarios=<?php echo $saldo_honorarios ?>&pago_gastos=<?php echo $saldo_gastos ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Seleccionar un adelanto'); ?></button>
-		<?php } ?>
 		</td>
 	</tr>
 </table>
-<table style="border: 1px solid black;" width='90%'>
+<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right>
 			<?=__('Fecha')?>
 		</td>
 		<td align=left>
-			<input type="text" name="fecha" value="<?=$documento->fields[fecha] ? Utiles::sql2date($documento->fields[fecha]) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+			<input type="text" name="fecha" value="<?=$documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
 			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
 		</td>
 	</tr>
@@ -492,7 +519,7 @@ function ActualizarDocumentoMonedaPago()
 				<?=__('Monto')?>
 			</td>
 			<td align=left> 
-				<? if($id_cobro)
+				<? if($id_cobro && !$adelanto)
 				   {
 						$disabled_monto = ' readonly onclick="alert(\''.__('Modifique los Pagos individuales').'\')" ';
 				   }
@@ -512,12 +539,22 @@ function ActualizarDocumentoMonedaPago()
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
+		<?php if($id_documento && $documento->fields['es_adelanto']=='1'){ ?>
+		<tr>
+			<td align=right>
+				<?=__('Saldo Adelanto')?>
+			</td>
+			<td align=left>
+				<input name="saldo_pago" id="saldo_pago" size=10 value="<? echo str_replace("-","",$documento->fields['saldo_pago']); ?>" disabled="disabled"/>
+			</td>
+		</tr>
+		<?php } ?>
 		<tr>
 			<td align=right>
 				<?=__('Número Documento:')?>
 			</td>
 			<td align=left>
-				<input name=numero_doc size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
+				<input name="numero_doc" id="numero_doc" size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
 						<?=__('Tipo:')?>&nbsp;
 				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;'>
 				<? if($documento->fields['tipo_doc']=='E' || $documento->fields['tipo_doc']=='' || $documento->fields['tipo_doc']=='N' ) { ?>
@@ -550,7 +587,7 @@ function ActualizarDocumentoMonedaPago()
 			<?=__('Descripción')?>
 		</td>
 		<td align=left>
-			<textarea name=glosa_documento cols="45" rows="3"><?
+			<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?
 				if($documento->fields['glosa_documento'])
 					echo $documento->fields['glosa_documento'];
 				else if($id_cobro)
@@ -699,12 +736,15 @@ function ActualizarDocumentoMonedaPago()
 	</tr>
 </table>
 
-<?php if (empty($adelanto)) { ?>
 <div id = "tabla_pagos"> </div>
 <script>
+	<?php if(empty($adelanto) && $id_documento && $documento->fields['es_adelanto'] == '1') { ?>
+		$('tabla_informacion').select('input, select, textarea').each(function(elem){
+			elem.disabled = 'disabled';
+		});
+	<?php }?>
 	CargarTabla(1);
 </script>
-<?php } ?>
 
 </form>
 <script type="text/javascript">

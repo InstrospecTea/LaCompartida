@@ -41,12 +41,18 @@
 		$documento_eliminado = new Documento($sesion);
 		$documento_eliminado->Load($id_documento_eliminado);
 
-		$documento_eliminado->EliminarNeteos();
-		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '".$id_documento_eliminado."' ";
-		mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p,__FILE__,__LINE__,$sesion->dbh);
+		if(empty($documento_eliminado->fields['es_adelanto'])){
+			$documento_eliminado->EliminarNeteos();
+			$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '".$id_documento_eliminado."' ";
+			mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p,__FILE__,__LINE__,$sesion->dbh);
 
-		if($documento_eliminado->Delete())
-			$pagina->AddInfo(__('El documento ha sido eliminado satisfactoriamente'));
+			if($documento_eliminado->Delete())
+				$pagina->AddInfo(__('El documento ha sido eliminado satisfactoriamente'));
+		}
+		else{
+			$documento_eliminado->EliminarNeteo($id_cobro);
+			$pagina->AddInfo(__('El pago ha sido eliminado satisfactoriamente'));
+		}
 	}
 	if(!$cobro->Load($id_cobro))
 		$pagina->FatalError(__('Cobro inválido'));
@@ -588,7 +594,7 @@ function showOpcionDetalle( id, bloqueDetalle )
 function EliminarPago( id_pago )
 {
 	$('opc').value = 'eliminar_pago';
-	if( $('eliminar_pago').value = id_pago )	
+	if( $('eliminar_pago').value == id_pago )
 		$('todo_cobro').submit();
 }
 
@@ -858,7 +864,7 @@ function EditarPago(id)
 function EliminaDocumento(id_documento)
 {
 	var form = $('todo_cobro');
-	if(parseInt(id_documento) > 0 && confirm('¿Desea eliminar el documento #'+id_documento+'?') == true)
+	if(parseInt(id_documento) > 0 && confirm('¿Desea eliminar el pago #'+id_documento+'?') == true)
 		self.location.href = 'cobros6.php?popup=1&id_cobro='+<?=$id_cobro?>+'&id_documento_eliminado='+id_documento+'&opc=eliminar_documento';
 }
 

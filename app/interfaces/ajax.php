@@ -8,6 +8,7 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
 		require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 		require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+		require_once Conf::ServerDir().'/../app/classes/Documento.php';
 
     $sesion = new Sesion('');
     #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
@@ -640,6 +641,16 @@
 		{
 			echo $numrows . "::&nbsp;::" . $tup;
 		}
+	}
+	else if($accion == 'obtener_adelanto'){
+		$documento = new Documento($sesion);
+		$documento->Load($id_documento);
+		header('Content-type: application/json');
+		if($documento->Loaded())
+			echo json_encode(array_map(utf8_encode, $documento->fields));
+		else
+			echo json_encode(array('error' => utf8_encode('número')));
+			//echo '{"error":"No se pudo cargar el documento con número '.$id_documento.'"}';
 	}
 	else
 		echo("ERROR AJAX. Acción: $accion");

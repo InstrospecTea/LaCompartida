@@ -17,10 +17,10 @@ SELECT
 	documento.id_documento,
 	documento.id_cobro,
 	documento.codigo_cliente,
-	documento.monto*-1 AS monto,
-	documento.saldo_pago*-1 AS saldo_pago,
-	CONCAT(prm_moneda.simbolo, ' ', documento.monto*-1) AS monto_con_simbolo,
-	CONCAT(prm_moneda.simbolo, ' ', documento.saldo_pago*-1) AS saldo_pago_con_simbolo,
+	IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
+	IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
+	CONCAT(prm_moneda.simbolo, ' ', IF(documento.monto = 0, 0, documento.monto*-1)) AS monto_con_simbolo,
+	CONCAT(prm_moneda.simbolo, ' ', IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1)) AS saldo_pago_con_simbolo,
 	documento.glosa_documento,
 	documento.fecha
 FROM
@@ -40,27 +40,32 @@ if (isset($filtros['id_documento']) and !empty($filtros['id_documento']))
 }
 if (isset($filtros['codigo_cliente']) and !empty($filtros['codigo_cliente']))
 {
-	$query .= " AND documento.codigo_cliente = " . $filtros['codigo_cliente'];
+	$query .= " AND documento.codigo_cliente = '" . $filtros['codigo_cliente'] . "'";
 }
 if (isset($filtros['fecha_inicio']) and !empty($filtros['fecha_inicio']))
 {
-	$query .= " AND documento.fecha >= " . $filtros['fecha_inicio'];
+	$query .= " AND documento.fecha >= '" . date("Y-m-d", strtotime($filtros['fecha_inicio'])) . "'";
 }
 if (isset($filtros['fecha_fin']) and !empty($filtros['fecha_fin']))
 {
-	$query .= " AND documento.fecha <= " . $filtros['fecha_fin'];
+	$query .= " AND documento.fecha <= '" . date("Y-m-d", strtotime($filtros['fecha_fin'])) . "'";
 }
 if (isset($filtros['moneda']) and !empty($filtros['moneda']))
 {
 	$query .= " AND documento.id_moneda = " . $filtros['moneda'];
 }
-if (isset($filtros['pago_honorarios']))
-{
-	$query .= " AND documento.pago_honorarios = " . $filtros['pago_honorarios'];
+if(isset($filtros['pago_honorarios']) && isset($filtros['pago_gastos'])){
+	$query .= " AND (documento.pago_honorarios = 1 OR documento.pago_gastos = 1)";
 }
-if (isset($filtros['pago_gastos']))
-{
-	$query .= " AND documento.pago_gastos = " . $filtros['pago_gastos'];
+else{
+	if (isset($filtros['pago_honorarios']))
+	{
+		$query .= " AND documento.pago_honorarios = " . $filtros['pago_honorarios'];
+	}
+	if (isset($filtros['pago_gastos']))
+	{
+		$query .= " AND documento.pago_gastos = " . $filtros['pago_gastos'];
+	}
 }
 
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, $orden);
@@ -88,7 +93,8 @@ $buscador->Imprimir();
 
 function ElegirParaPago(&$fila)
 {
-	return "<img style='cursor:pointer;' id='elegirParaPago' src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Elegir para pago' onclick='ElegirParaPago(\"" . Conf::RootDir() . "/app/interfaces/ingresar_documento_pago.php?id_cobro=" . $fila->fields['id_cobro'] . "&id_documento=" . $fila->fields['id_documento'] . "&popup=1&pago=true&codigo_cliente=" . $fila->fields['codigo_cliente'] . "\")' />";
+	global $id_cobro;
+	return "<img style='cursor:pointer;' id='elegirParaPago' src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Elegir para pago' onclick='ElegirParaPago(\"" . Conf::RootDir() . "/app/interfaces/ingresar_documento_pago.php?id_cobro=" . $id_cobro . "&id_documento=" . $fila->fields['id_documento'] . "&popup=1&pago=true&codigo_cliente=" . $fila->fields['codigo_cliente'] . "\")' />";
 }
 
 function OpcionesListaAdelanto(&$fila)

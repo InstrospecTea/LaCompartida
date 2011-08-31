@@ -5191,7 +5191,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						list($cantidad) = mysql_fetch_array($resp_consulta);
 						
 						$query = array();
-						if( $cantidad = 0 )
+						if( $cantidad == 0 )
 							$query[] = "INSERT INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
 															 VALUES ( '1',  'TARIFA BASE',  '0000-00-00 00:00:00', NULL ,  '1',  '1' );";
 						
@@ -6090,6 +6090,19 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
+			
+			case 4.79:
+				$query = array();
+				$query[] = "ALTER TABLE `documento` ADD `id_contrato` INT NULL AFTER `codigo_cliente` ;";
+				$query[] = "ALTER TABLE `documento` ADD INDEX ( `id_contrato` ) ;";
+				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT `documento_ibfk_15` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON UPDATE CASCADE;";
+				$query[] = "ALTER TABLE `documento` ADD `pago_honorarios` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar honorarios',
+ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar gastos';";
+				$query[] = "ALTER TABLE `documento` ADD `es_adelanto` TINYINT( 1 ) NOT NULL DEFAULT '0';";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6337,6 +6350,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 	$VERSIONES[$num++] = 4.76;
 	$VERSIONES[$num++] = 4.77;
 	$VERSIONES[$num++] = 4.78;
+	$VERSIONES[$num++] = 4.79;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

@@ -114,6 +114,12 @@ class NeteoDocumento extends Objeto
 
 				$this->CambiarEstadoCobro($documento_cobro->fields['id_cobro'],$saldo_cobro_honorarios,$saldo_cobro_gastos);
 				
+				$documento_pago = new Documento($this->sesion);
+				$documento_pago->Load($this->fields['id_documento_pago']);
+				
+				$documento_pago->Edit('saldo_pago', $documento_pago->fields['saldo_pago'] - $this->fields['valor_pago_honorarios'] - $this->fields['valor_pago_gastos']);
+				$documento_pago->Write();
+				
 				$this->Edit('valor_cobro_honorarios','0');
 				$this->Edit('valor_cobro_gastos','0');
 				$this->Edit('valor_pago_honorarios','0');
