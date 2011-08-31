@@ -1227,24 +1227,27 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 ?>
 			</td>
 <?
+
 	if($permisos->fields['permitido'])
 		$where = " usuario_permiso.codigo_permiso='PRO' ";
 	else
 		$where = " (usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
 							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
 	$where .= " AND usuario.visible=1 OR usuario.id_usuario = '$id_usuario'";
-	$select_usuario = Html::SelectQuery($sesion,
-		"SELECT usuario.id_usuario,
+	
+	$query = "SELECT usuario.id_usuario,
 			CONCAT_WS(' ', apellido1, apellido2,',',nombre)
 			as nombre FROM usuario
 			JOIN usuario_permiso USING(id_usuario)
 			LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
-			WHERE $where GROUP BY id_usuario ORDER BY nombre"
-		,"id_usuario",$id_usuario,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
+			WHERE $where GROUP BY id_usuario ORDER BY nombre";
+	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	$cantidad_usuarios = count($resp);
+	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario",$id_usuario,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 ?>
 
 <?
-	if($permisos->fields['permitido'] || strlen($select_usuario) > 164)
+	if($permisos->fields['permitido'])
 	{
 ?>
 		<td>
@@ -1357,7 +1360,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					</div>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 <?
-	if(strlen($select_usuario) > 164) // Depende de que no cambie la función Html::SelectQuery(...)
+	if( $cantidad_usuarios > 1 ) // Depende de que no cambie la función Html::SelectQuery(...)
 	{
 		echo(__('Usuario'));
 		echo($select_usuario);
