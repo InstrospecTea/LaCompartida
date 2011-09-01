@@ -475,7 +475,7 @@ function GenerarIndividual(
 	text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Al generar este borrador se eliminarán todos los borradores antiguos asociados a este contrato')?><br><br>';
 	if(modalidad == 'FLAT FEE' && monto_estimado > 0 && monto_real!=monto_estimado)
 	{
-		text_window += '<?=__('El monto estipulado en el contrato no coincide con el monto') . " " . __('del cobro') . " " . _('programado, seleccione el monto a utilizar:')?><br><br>';
+		text_window += '<?=__('El monto estipulado en el contrato no coincide con el monto') . " " . __('del cobro') . " " . __('programado, seleccione el monto a utilizar:')?><br><br>';
 		text_window += '<input type="radio" name="radio_monto" id="radio_real" checked /><?=__('Monto del Contrato')?> '+moneda+' '+monto_real+'<br>';
 		text_window += '<input type="radio" name="radio_monto" id="radio_estimado" /><?=__('Monto del Cobro Programado')?> '+moneda+' '+monto_estimado+'<br><br>';
 	}
@@ -868,7 +868,7 @@ if($opc == 'buscar')
 				else
 					$idioma_cobro->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 				$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
-				$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-").' '._('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
+				$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-").' '.__('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta').' '.Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 			
 				$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
 					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');

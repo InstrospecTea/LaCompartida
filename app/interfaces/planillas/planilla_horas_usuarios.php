@@ -202,7 +202,7 @@
 	$ws1->write($filas,7,__('Valor cobrado'),$titulos);
 	$ws1->write($filas,8,__('Valor estimado p/cobrar'),$titulos);
 	$ws1->write($filas,9,__('Valor cobrado + p/cobrar'),$titulos);
-	$ws1->write($filas,10,-_('Valor Hr. Vendida Prom.'),$titulos);
+	$ws1->write($filas,10,-__('Valor Hr. Vendida Prom.'),$titulos);
 	$ws1->write($filas,11,__('Total vendido/H. Trabajadas'),$titulos);
 
 	for($i=0;$i<=$periodos;$i++)

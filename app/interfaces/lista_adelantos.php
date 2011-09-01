@@ -67,10 +67,10 @@ else{
 		$query .= " AND documento.pago_gastos = " . $filtros['pago_gastos'];
 	}
 }
-if($elegir_para_pago){
+if($elegir_para_pago || isset($filtros['tiene_saldo'])){
 	$query .= " AND saldo_pago < 0";
 }
-$buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, $orden);
+$buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'fecha_creacion DESC' : $orden);
 $buscador->nombre = "buscador_adelantos";
 $buscador->titulo = "Adelantos";
 
@@ -96,7 +96,7 @@ $buscador->Imprimir();
 function ElegirParaPago(&$fila)
 {
 	global $id_cobro;
-	return "<img style='cursor:pointer;' id='elegirParaPago' src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Elegir para pago' onclick='ElegirParaPago(\"" . Conf::RootDir() . "/app/interfaces/ingresar_documento_pago.php?id_cobro=" . $id_cobro . "&id_documento=" . $fila->fields['id_documento'] . "&popup=1&pago=true&codigo_cliente=" . $fila->fields['codigo_cliente'] . "\")' />";
+	return '<button type="button" onclick="ElegirParaPago(\'' . Conf::RootDir() . '/app/interfaces/ingresar_documento_pago.php?id_cobro=' . $id_cobro . '&id_documento=' . $fila->fields['id_documento'] . '&popup=1&pago=true&codigo_cliente=' . $fila->fields['codigo_cliente'] . '\')">Utilizar</button>';
 }
 
 function OpcionesListaAdelanto(&$fila)

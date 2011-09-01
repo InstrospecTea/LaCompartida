@@ -205,7 +205,7 @@
 		$cobro->Edit('estado','EN REVISION');
 		$cobro->Edit('fecha_en_revision',date('Y-m-d H:i:s'));
 		if($cobro->Write())
-			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . _('al estado: En Revisión'));
+			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: En Revisión'));
 		$historial_comentario = __('COBRO EN REVISION');
 		##Historial##
 		$his = new Observacion($sesion);
@@ -818,10 +818,16 @@ function UpdateCap(monto_update, guardar)
 <input type="hidden" name="cobro_tipo_cambio" value="<?=$cobro->fields['tipo_cambio_moneda']?>" size="8">
 <input type="hidden" name="id_tarifa" id="id_tarifa" value="<?=$contrato->fields['id_tarifa']?>" />
 <input type="hidden" name="accion" value="" id="accion">
+<input type="hidden" name="saldo_adelantos" value="<?php
+//$documento = new Documento($sesion);
+//$pago_honorarios = $cobro->fields[''];
+//echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $pago_honorarios, $pago_gastos);
+?>" id="saldo_adelantos" />
+<input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
 
 <table width='720px'>
 	<tr>
-		<td align=left><input type="button" class=btn value="<?=_('<< Anterior')?>" onclick="Anterior(this.form);"></td>
+		<td align=left><input type="button" class=btn value="<?=__('<< Anterior')?>" onclick="Anterior(this.form);"></td>
 		<td align=right>
 <?
 			if($cobro->fields['estado'] == 'CREADO')

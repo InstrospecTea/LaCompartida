@@ -100,7 +100,7 @@
 				$b->AgregarEncabezado("a.glosa_asunto",__('Asunto'),"align=center");
 				$b->AgregarEncabezado("gh.descripcion_modificado",__('Descripción'),"align=center");
 				$b->AgregarEncabezado("IF( gh.fecha_movimiento_modificado!='' OR gh.fecha_movimiento_modificado IS NOT NULL,gh.fecha_movimiento_modificado,gh.fecha_movimiento)",__('Fecha movimiento'),"align=center");
-				$b->AgregarEncabezado("IF(gh.egreso_modificado>0,gh.egreso_modificado,gh.egreso)",_('Egreso'),"align=center");
+				$b->AgregarEncabezado("IF(gh.egreso_modificado>0,gh.egreso_modificado,gh.egreso)",__('Egreso'),"align=center");
 				$b->AgregarEncabezado("IF(gh.ingreso_modificado>0,gh.ingreso_modificado,gh.ingreso)",__('Ingreso'),"align=center");
 				$b->color_mouse_over = "#bcff5c";
 				$b->funcionTR = "funcionTR";

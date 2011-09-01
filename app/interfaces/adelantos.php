@@ -24,11 +24,11 @@
 	$pagina->PrintTop();
 
 	//Filtros
-	$filtros = array('id_documento' => $id_documento, 'codigo_cliente' => $codigo_cliente, 'fecha_inicio' => $fecha1, 'fecha_fin' => $fecha2, 'moneda' => $moneda_adelanto);
+	$filtros = array('id_documento' => $id_documento, 'codigo_cliente' => $codigo_cliente, 'fecha_inicio' => $fecha1, 'fecha_fin' => $fecha2, 'moneda' => $moneda_adelanto, 'tiene_saldo' => $tiene_saldo);
 
 ?>
 
-<script style="text/javascript">
+<script type="text/javascript">
 	function AgregarNuevo(tipo)
 	{
 		<?php
@@ -61,7 +61,7 @@
 		var codigo_cliente = $('codigo_cliente').value;
 		var fecha1 = $('fecha1').value;
 		var fecha2 = $('fecha2').value;
-		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+pagina_desde+"&buscar=1";
+		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+pagina_desde+"&buscar=1"+($F('tiene_saldo') ? '&tiene_saldo=1' : '');
 		self.location.href= url;
 	}
 </script>
@@ -125,6 +125,15 @@
 							</td>
 							<td colspan="2" align="left">
 								<?= Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_adelanto", $moneda_adelanto, "", __('Todas'),''); ?>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td align=right>
+								<?php echo __('Sólo Adelantos con Saldo') ?>
+							</td>
+							<td colspan="2" align="left">
+								<input type="checkbox" id="tiene_saldo" name="tiene_saldo" value="1" <?=$tiene_saldo ? 'checked' : ''?>/>
 							</td>
 							<td></td>
 						</tr>

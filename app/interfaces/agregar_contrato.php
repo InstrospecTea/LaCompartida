@@ -1331,7 +1331,12 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 </table>
 <br><br>
 <!-- FIN RESPONSABLE -->
-
+<?php
+	if( UtilesApp::GetConf($sesion,'SetFormatoRut') )
+		$setformato = "SetFormatoRut();";
+	else
+		$setformato = "";
+?>
 <!-- DATOS FACTURACION -->
 <fieldset style="width: 97%;background-color: #FFFFFF;">
 	<legend <?=!$div_show ? 'onClick="MuestraOculta(\'datos_factura\')" style="cursor:pointer"' : ''?>>
@@ -1344,7 +1349,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 			<?php if ($validaciones_segun_config) echo $obligatorio ?>
 		</td>
 		<td align="left" colspan="3">
-        	<input type="text" size=20 name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ?>" onblur="SetFormatoRut();validarUnicoCliente(this.value,'rut');" />
+        	<input type="text" size=20 name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ?>" onblur="<?=$setformato?>validarUnicoCliente(this.value,'rut');" />
 		</td>
 	</tr>
    	<tr>

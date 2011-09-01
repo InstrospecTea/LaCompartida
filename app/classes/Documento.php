@@ -753,15 +753,67 @@ class Documento extends Objeto
 		}
 	}
 	
-	function HayAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos){
-		$query = "SELECT COUNT(*)
+	function SaldoAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos){
+		$query = "SELECT SUM(saldo_pago)
 			FROM documento
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
 		if(empty($pago_honorarios)) $query.= ' AND pago_gastos = 1';
 		else if(empty($pago_gastos)) $query.= ' AND pago_honorarios = 1';
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($num) = mysql_fetch_array($resp);
-		return $num > 0;
+		list($saldo) = mysql_fetch_array($resp);
+		return -$saldo;
+	}
+	
+	function GenerarPagosDesdeAdelantos($id_documento_cobro){
+		$documento_cobro = new Documento($this->sesion);
+		$documento_cobro->Load($id_documento_cobro);
+		
+		$codigo_cliente = $documento_cobro->fields['codigo_cliente'];
+		$honorarios = $documento_cobro->fields['honorarios'];
+		$gastos = $documento_cobro->fields['gastos'];
+		
+		$out_neteos = '';
+		$id_moneda = $documento_cobro->fields['id_moneda'];
+		$moneda = new Moneda($this->sesion);
+		$moneda->Load($id_moneda);
+		$id_cobro = $documento_cobro->fields['id_cobro'];
+		
+		$query = "SELECT id_documento, saldo_pago, pago_honorarios, pago_gastos
+			FROM documento
+			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
+		if($honorarios == 0) $query .= " AND pago_gastos = 1";
+		else if($gastos == 0) $query .= " AND pago_honorarios = 1";
+		$query .= " ORDER BY pago_honorarios ASC, pago_gastos ASC, fecha_creacion ASC";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		//tengo los adelantos del cliente con saldo positivo, primero los q solo pagan honorarios, despues los solo gastos, y despues los mixtos, cada grupo ordenado por fecha
+		while(list($id_adelanto, $saldo_pago, $pago_honorarios, $pago_gastos) = mysql_fetch_array($resp)){
+			$saldo_pago *= -1;
+			$monto_honorarios = 0;
+			if($honorarios > 0 && $pago_honorarios == 1){
+				$monto_honorarios = $saldo_pago > $honorarios ? $honorarios : $saldo_pago;
+				$saldo_pago -= $monto_honorarios;
+				$honorarios -= $monto_honorarios;
+			}
+			$monto_gastos = 0;
+			if($gastos > 0 && $pago_gastos == 1){
+				$monto_gastos = $saldo_pago > $gastos ? $gastos : $saldo_pago;
+				$saldo_pago -= $monto_gastos;
+				$gastos -= $monto_gastos;
+			}
+			if($monto_honorarios > 0 || $monto_gastos > 0){
+				$neteos = array(array(
+					'id_moneda' => $id_moneda,
+					'id_documento_cobro' => $id_documento_cobro,
+					'monto_honorarios' => $monto_honorarios,
+					'monto_gastos' => $monto_gastos,
+					'id_cobro' => $id_cobro
+				));
+				
+				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda, $moneda, $out_neteos);
+			}
+			
+			if($gastos == 0 && $honorarios == 0) break;
+		}
 	}
 }
 

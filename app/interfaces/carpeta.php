@@ -97,7 +97,7 @@
 		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			$b->AgregarEncabezado("codigo_asunto_secundario",__('Código'),"align=left");
 		else
-			$b->AgregarEncabezado("glosa_cliente",_('Cliente'),"align=left");
+			$b->AgregarEncabezado("glosa_cliente",__('Cliente'),"align=left");
 		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left");
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SistemaCarpetasEspecial') ) || ( method_exists('Conf','SistemaCarpetasEspecial') && Conf::SistemaCarpetasEspecial() ) )
 			$b->AgregarEncabezado("nombre_carpeta",__('Nombre'),"align=left");

@@ -29,7 +29,7 @@ $title = __('Horas trabajadas').' - '.$nombre_usuario;
 $c->Titulo($title);
 
 #Add a title to the y-axis
-$c->Ejes(__("Proyecto"),_("Horas"));
+$c->Ejes(__("Proyecto"),__("Horas"));
 
 #Set the x axis labels
 $c->Labels($asunto);

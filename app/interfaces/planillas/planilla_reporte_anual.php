@@ -713,7 +713,7 @@
 	$fila+=2;
 	
 	//HOJA 4, TABLA 2
-	escribir_multiple($ws1,$fila,0,8,__('Horas Liquidadas por Forma de Cobro') . " " . _('desagregadas por mes'),$f['titulo']);
+	escribir_multiple($ws1,$fila,0,8,__('Horas Liquidadas por Forma de Cobro') . " " . __('desagregadas por mes'),$f['titulo']);
 	$fila+=2;
   
 	if($usa_reporte_horas)

@@ -350,7 +350,7 @@
     							while($cobro = mysql_fetch_array($resp))
 									{
 										$total_horas = $cobros->TotalHorasCobro($cobro['id_cobro']);
-										$texto_horas = $cobro['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2date($cobro['fecha_ini']).' '._('hasta').' '.Utiles::sql2date($cobro['fecha_fin']) : __('hasta').' '.Utiles::sql2date($cobro['fecha_fin']);
+										$texto_horas = $cobro['fecha_ini'] != '0000-00-00' ? __('desde').' '.Utiles::sql2date($cobro['fecha_ini']).' '.__('hasta').' '.Utiles::sql2date($cobro['fecha_fin']) : __('hasta').' '.Utiles::sql2date($cobro['fecha_fin']);
 										$html .= "<tr valign='middle'>
 															<td width=2%><img src='".Conf::ImgDir()."/color_rojo.gif' border=0></td>
 															<td align=center style='font-size:10px' width=5%>#".$cobro['id_cobro']."</td>

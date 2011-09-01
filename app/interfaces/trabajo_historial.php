@@ -100,7 +100,7 @@ if( $buscar==1 )
 		$b->AgregarEncabezado("th.fecha_trabajo_modificado",__('Fecha trabajo'),"align=center");
 		$b->AgregarEncabezado("trabajador",__('Abogado'),"align=center");
 		$b->AgregarEncabezado("duracion",__('Duración'),"align=center");
-		$b->AgregarEncabezado("duracion_cobrable",_('Duración<br>cobrable'),"align=center");
+		$b->AgregarEncabezado("duracion_cobrable",__('Duración<br>cobrable'),"align=center");
 		$b->color_mouse_over = "#bcff5c";
 		$b->funcionTR = "funcionTR";
 		

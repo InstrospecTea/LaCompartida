@@ -35,8 +35,7 @@
 	//Normalmente no se incluyen Documentos pagados, pero si se está editando un documento, se deben mostrar los documentos pagados que este documento pague.
 	if($id_documento)
 	{
-		$join_neteo = isset($adelanto) ? '' : 'LEFT ';
-		$join_neteo .= "JOIN neteo_documento AS neteo ON (neteo.id_documento_cobro = documento.id_documento 
+		$join_neteo .= "LEFT JOIN neteo_documento AS neteo ON (neteo.id_documento_cobro = documento.id_documento 
 																AND neteo.id_documento_pago = '".$id_documento."')";
 		$or_neteo = "OR neteo.id_neteo_documento IS NOT NULL ";
 	}
@@ -48,7 +47,13 @@
 
 	if($id_cobro)
 	{
-		$orden_docs = " IF( documento.id_cobro = '$id_cobro' , 0, documento.id_documento  )  AS orden, ";
+		$orden2 = $id_documento ? 'IF(neteo.id_neteo_documento IS NOT NULL, 1, documento.id_documento)' : 'documento.id_documento';
+		$orden_docs = " IF( documento.id_cobro = '$id_cobro' , 0, $orden2 )  AS orden, ";
+		$orden = "orden ASC";
+	}
+	else if($adelanto)
+	{
+		$orden_docs = " IF(neteo.id_neteo_documento IS NOT NULL, 1, documento.id_documento) AS orden, ";
 		$orden = "orden ASC";
 	}
 	else
@@ -105,11 +110,12 @@
 					".$join_neteo."
 					WHERE (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO'  ".$or_neteo.")  
 					
-					AND (documento.monto > 0 OR documento.id_cobro IS NOT NULL) AND documento.codigo_cliente = '".$codigo_cliente."' AND documento.tipo_doc = 'N' ";
+					AND (documento.monto > 0 OR documento.id_cobro IS NOT NULL) AND documento.codigo_cliente = '".$codigo_cliente."' AND documento.tipo_doc = 'N' ";	
+		if($usar_adelanto) $query .= "AND (documento.id_cobro = '$id_cobro' OR neteo.id_neteo_documento IS NOT NULL)";
 		$x_pag = 0;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_cobros";
-		$b->titulo = isset($adelanto) ? 'Utilización del adelanto' : "Indique el Pago de Documentos de " . __('Cobros') . " pendientes";
+		$b->titulo = isset($adelanto) || isset($usar_adelanto) ? 'Utilización del adelanto' : "Indique el Pago de Documentos de " . __('Cobros') . " pendientes";
 		$b->AgregarEncabezado("id_documento",__('N°'), "align=left");
 		//$b->AgregarEncabezado("id_documento",__('N° Doc'), "align=left");
 
@@ -316,33 +322,36 @@
 			global $id_documento;
 			global $id_cobro;
 			global $pago_default;
-			global $adelanto;
+			global $usar_adelanto;
 
 			$neteo_documento = new NeteoDocumento($sesion);
+			$saldo = Valor_Saldo_Honorarios($fila,'');
 			if( $neteo_documento->Ids($id_documento, $fila->fields['id_documento']) )
 			{
-				$valor = $neteo_documento->fields['valor_pago_honorarios'];
-				$pago_default += $valor;
+				$valor_neteo = $neteo_documento->fields['valor_pago_honorarios'];
+				$valor = $valor_neteo;
 			}
 			else if($id_cobro===$fila->fields['id_cobro']&& !$id_documento)
 			{
-				$valor = Valor_Saldo_Honorarios($fila,'');
-				$pago_default += $valor;
+				$valor = $saldo;
 			}
 			else
 			{
 				$valor = 0;
 			}
+			$pago_default += $valor;
 
 			$html = '';
-			if(isset($adelanto)) $html = $valor;
+			$editable = !$fila->fields['pagado'] && (!isset($usar_adelanto) || $id_cobro == $fila->fields['id_cobro']);
+			if(!$editable) $html = $valor;
 			if( $fila->fields['honorarios'] != 0)
 			{
-				$html .= "<input type=\"".(isset($adelanto) ? 'hidden' : 'text')."\" ".($fila->fields['pagado'] ? 'readonly' : '')." name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> "; 
+				$html .= "<input type=\"".(!$editable ? 'hidden' : 'text')."\" name=\"pago_honorarios_".$fila->fields['id_documento']."\" id=\"pago_honorarios_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('honorarios',".$fila->fields['id_documento'].");SetMontoPagos();\" /> "; 
 
 				$html .= "<input type=\"hidden\" name=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\"  id=\"pago_honorarios_anterior_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" /> ";
-				$html .= "<input type=\"hidden\" name=\"cobro_honorarios_".$fila->fields['id_documento']."\"  id=\"cobro_honorarios_".$fila->fields['id_documento']."\" value=\"".$fila->fields['honorarios']."\" SIZE=\"9\" /> ";
+				$html .= "<input type=\"hidden\" name=\"cobro_honorarios_".$fila->fields['id_documento']."\"  id=\"cobro_honorarios_".$fila->fields['id_documento']."\" value=\"".($saldo - $valor_neteo)."\" SIZE=\"9\" /> ";
 			}
+			else $html = '0';
 			return $html;
 		}
 
@@ -394,34 +403,36 @@
 			global $id_documento;
 			global $id_cobro;
 			global $pago_default;
-			global $adelanto;
+			global $usar_adelanto;
 
 			$neteo_documento = new NeteoDocumento($sesion);
+			$valor_neteo = $neteo_documento->fields['valor_pago_gastos'];
+			$saldo = Valor_Saldo_Gastos($fila,'');
 			if( $neteo_documento->Ids($id_documento, $fila->fields['id_documento']) )
 			{
-				$valor = $neteo_documento->fields['valor_pago_gastos'];
-				$pago_default += $valor;
+				$valor = $valor_neteo;
 			}
 			else if($id_cobro===$fila->fields['id_cobro']&& !$id_documento)
 			{
-				$valor = Valor_Saldo_Gastos($fila,'');
-				$pago_default += $valor;
+				$valor = $saldo;
 			}
 			else
 			{
 				$valor = 0;
 			}
+			$pago_default += $valor;
 
 			$html = '';
-			if(isset($adelanto)) $html = $valor;
+			$editable = !$fila->fields['pagado'] && (!isset($usar_adelanto) || $id_cobro == $fila->fields['id_cobro']);
+			if(!$editable) $html = $valor;
 			if( $fila->fields['gastos'] != 0)
 			{
-				$html .= "<input type=\"".(isset($adelanto) ? 'hidden' : 'text')."\" name=\"pago_gastos_".$fila->fields['id_documento']."\" id=\"pago_gastos_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('gastos',".$fila->fields['id_documento'].");SetMontoPagos();\" /> ";
+				$html .= "<input type=\"".(!$editable ? 'hidden' : 'text')."\" name=\"pago_gastos_".$fila->fields['id_documento']."\" id=\"pago_gastos_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" onchange=\"Actualizar_Monto_Pagos('gastos',".$fila->fields['id_documento'].");SetMontoPagos();\" /> ";
 
 				$html .= "<input type=\"hidden\" name=\"pago_gastos_anterior_".$fila->fields['id_documento']."\"  id=\"pago_gastos_anterior_".$fila->fields['id_documento']."\" value=\"".$valor."\" SIZE=\"9\" /> ";
-				$html .= "<input type=\"hidden\" name=\"cobro_gastos_".$fila->fields['id_documento']."\"  id=\"cobro_gastos_".$fila->fields['id_documento']."\" value=\"".$fila->fields['gastos']."\" SIZE=\"9\" /> ";
+				$html .= "<input type=\"hidden\" name=\"cobro_gastos_".$fila->fields['id_documento']."\"  id=\"cobro_gastos_".$fila->fields['id_documento']."\" value=\"".($saldo + $valor_neteo)."\" SIZE=\"9\" /> ";
 			}
-
+			else $html = '0';
 			return $html;
 		}
 		

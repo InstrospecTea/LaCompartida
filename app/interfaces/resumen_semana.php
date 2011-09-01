@@ -211,7 +211,7 @@ else
 		echo("<tr>");
 		$nombre_usuario = $usr->fields['apellido1'].' '.$usr->fields['apellido2'].', '.$usr->fields['nombre'];
 		echo("<td style='width: 700px; text-align:left;' colspan='4'>".__('Usuario').": ".$nombre_usuario."</td>");
-		echo("<td align='right' colspan='2'>"._('Total mes actual').":</td>");
+		echo("<td align='right' colspan='2'>".__('Total mes actual').":</td>");
 		echo("<td style='vertical-align: middle'><strong>".$sesion->usuario->HorasTrabajadasEsteMes($id_usuario,$tipo_dato)."</strong></td>");
 		echo("</tr>");
 

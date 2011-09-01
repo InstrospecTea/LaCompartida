@@ -77,7 +77,7 @@ $fila_debug = 20;
   $periodo_final = substr($fecha_fin,0,4)*12+ substr($fecha_fin,5,2);
   $time_periodo = strtotime($fecha_ini);
 
-	$ws1 =& $wb->addWorksheet(_('Reportes'));
+	$ws1 =& $wb->addWorksheet(__('Reportes'));
   $ws1->setInputEncoding('utf-8');
   $ws1->fitToPages(1,0);
   $ws1->setZoom(75);
