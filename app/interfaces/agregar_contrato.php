@@ -748,11 +748,12 @@ function addTable()
 	if(repeticiones > 0)
 		cant_cobros=repeticiones;
 	var fecha_inicio = $('periodo_fecha_inicio').value.split('-');
-	var mes=parseInt(fecha_inicio[1]);
-	var anio=parseInt(fecha_inicio[2]);
+	var mes=parseInt(fecha_inicio[1]*1);
+	var anio=parseInt(fecha_inicio[2]*1);
 	var dia_str = '';
 	var mes_str = '';
 	var numero_cobro = 0;
+	
 	for(i=1;i<=cant_cobros;i++)
 	{
 		var dia=parseInt(fecha_inicio[0]);

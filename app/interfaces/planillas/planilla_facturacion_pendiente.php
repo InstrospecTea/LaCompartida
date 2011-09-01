@@ -250,7 +250,8 @@
 			WHERE
 				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
 				cta_corriente.cobrable = 1 AND
-				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
+				" . $where_gasto . "
+				(cta_corriente.id_cobro OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
 			(SELECT
 				SUM(IF(cta_corriente.egreso > 0,
 				IF(ISNULL(cta_corriente.id_moneda),
@@ -274,7 +275,7 @@
 				moneda_cobro_gasto.id_moneda = cta_corriente.id_moneda AND
 				moneda_cobro_total.id_moneda = tabla1.id_moneda_total AND
 				" . $where_gasto . "
-				(cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS monto_gastos,
+				(cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS monto_gastos,
 			tabla1.glosa_contrato,
 			tabla1.id_moneda_retainer,
 			tabla1.id_moneda_total,
