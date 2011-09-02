@@ -888,7 +888,7 @@ function EditarTodosLosArchivos()
 			else
 				$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
 			
-			$tarifa = $t->GetTrabajoTarifa( $id_moneda_trabajo, $trabajo->fields['id_trabajo'] );
+			$tarifa = number_format($t->GetTrabajoTarifa( $id_moneda_trabajo, $trabajo->fields['id_trabajo'] ),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		}
 		else if( $trabajo->fields['tarifa_hh'] > 0 )
 			$tarifa = number_format($trabajo->fields['tarifa_hh'],$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
