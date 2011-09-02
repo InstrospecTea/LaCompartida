@@ -91,6 +91,9 @@ class Trabajo extends Objeto
 		$id_usuario = $this->fields['id_usuario'];
 		$dbh = $this->sesion->dbh;
 		
+		$contrato = new Contrato($this->sesion);
+		$contrato->LoadByCodigoAsunto($codigo_asunto);
+		
 		$query = "SELECT 
 									prm_moneda.id_moneda, 
 									( SELECT usuario_tarifa.tarifa 
@@ -112,14 +115,22 @@ class Trabajo extends Objeto
 															valor = '$valor' 
 												ON DUPLICATE KEY UPDATE valor = '$valor' ";
 			mysql_query($query_insert, $dbh) or Utiles::errorSQL($query_insert,__FILE__,__LINE__,$dbh);
+			
+			if( $contrato->fields['id_moneda'] == $id_moneda ) {
+				$this->Edit("tarifa_hh", $valor);
+				$this->Write();
+			}
 		}
 	}
 	
-	function GetTrabajoTarifa( $id_moneda )
+	function GetTrabajoTarifa( $id_moneda, $id_trabajo = '')
 	{
+		if( $id_trabajo == '' ) {
+			$id_trabajo = $this->fields['id_trabajo'];
+		}
 		$query = "SELECT valor 
 								FROM trabajo_tarifa 
-								WHERE id_trabajo = '".$this->fields['id_trabajo']."' 
+								WHERE id_trabajo = '$id_trabajo' 
 									AND id_moneda = '$id_moneda' ";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($valor) = mysql_fetch_array($resp);

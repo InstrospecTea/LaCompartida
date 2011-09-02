@@ -278,6 +278,45 @@
 		$pagina->AddInfo(__('Trabajo').' '.__('eliminado con éxito'));
 		#$up = 1;
 	}
+	else if( $opcion == "actualizar_trabajo_tarifa" )
+	{ 
+		// Actualizar tarifas en tabla trabajo_tarifa
+		$valores = array();
+		foreach($_POST as $index => $valor) {
+			list( $key1, $key2, $id_moneda ) = split('_',$index);
+			if( $key1 == 'trabajo' && $key2 == 'tarifa' && $id_moneda > 0 ) {
+				if( empty($valor) ) $valor = "0";
+				$query = "INSERT INTO trabajo_tarifa 
+													SET id_trabajo = '$id_trabajo', 
+															id_moneda = '$id_moneda',
+															valor = '$valor' 
+									ON DUPLICATE KEY UPDATE valor = '$valor' ";
+				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				
+				$valores[$id_moneda] = $valor;
+			}
+		}
+		
+		// Actualizar campo tarifa_hh de la tabla trabajo
+		$asunto = new Asunto($sesion);
+		$asunto->LoadByCodigo($t->fields['codigo_asunto']);
+		$contrato = new Contrato($sesion);
+		$contrato->Load($asunto->fields['id_contrato']);
+		
+		if( $valores[$contrato->fields['id_moneda']] > 0 ) {
+			$t->Edit("tarifa_hh",$valores[$contrato->fields['id_moneda']]);
+			$t->Write();
+		}
+		
+?>
+		<script>
+			if(window.opener)
+				window.opener.Refrescar();
+		</script>
+<?
+		
+		$pagina->AddInfo(__('Tarifas').' '.__('guardado con éxito'));
+	}
 
 	/* Título opcion */
 	if($opcion == '' && $id_trabajo > 0)
@@ -323,47 +362,8 @@ function CancelarTrabajoTarifas()
 
 function ActualizarTrabajosTarifas()
 {
-	var id_monedas='';
-	var trabajo_tarifas='';
-	var id_trabajo = $('id_trabajo').value;
-	var contador = 0;
-	var id_moneda_trabajo = $('id_moneda_trabajo').value;
-	var tarifa_trabajo = $('tarifa_trabajo').value;
-	var tarifa_trabajo_split = tarifa_trabajo.split(' ');
-	var simbolo = tarifa_trabajo_split[0];
-	
-	$$('[id^="trabajo_tarifa_"]').each(function(elem){
-		ids=elem.id.split('_');
-		if( contador == 0 ) {
-			id_monedas += ids[2];
-			trabajo_tarifas += elem.value;
-		}
-		else {
-			id_monedas += ','+ids[2];
-			trabajo_tarifas += ','+elem.value;
-		}
-		if( id_moneda_trabajo == ids[2] )
-			$('tarifa_trabajo').value = simbolo + ' ' + elem.value;
-		contador++;
-	});
-	
-	var http = getXMLHTTP();
-	var vurl = 'ajax.php?accion=actualizar_tarifas_trabajo&id_trabajo='+id_trabajo+'&id_monedas='+id_monedas+'&trabajo_tarifas='+trabajo_tarifas;
-	
-	cargando = true;
-	http.open('get', vurl, true);
-	http.onreadystatechange = function()
-	{
-		if(http.readyState == 4)
-		{
-			var response = http.responseText;
-			if( response == "OK" )
-				return true;
-		}
-		cargando = false;
-	};
-	http.send(null);
-	CancelarTrabajoTarifas();
+	$('opcion').value = "actualizar_trabajo_tarifa";
+	$('form_editar_trabajo').submit();
 }
 
 function Confirmar(form)
@@ -964,30 +964,30 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?=$_SERVER[PHP_SELF]?>">
-<input type=hidden name=opcion value="guardar" />
-<input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
-<input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
-<input type=hidden name=max_hora id=max_hora value=<?=Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
-<input type=hidden name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?=$t->fields['codigo_asunto']?>" />
+<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?=$_SERVER[PHP_SELF]?>">
+<input type="hidden" id="opcion" name="opcion" value="guardar" />
+<input type="hidden" name="gIsMouseDown" id="gIsMouseDown" value=false />
+<input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
+<input type="hidden" name="max_hora" id="max_hora" value=<?=Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
+<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?=$t->fields['codigo_asunto']?>" />
 <?
 	if( $opcion != 'nuevo' )
 	{
 ?>
-<input type=hidden name='id_trabajo' value="<?= $t->fields['id_trabajo'] ?>" id='id_trabajo' />
-<input type=hidden name='edit' value="<?= $opcion == 'edit' ? 1 : '' ?>" id='edit' />
-<input type=hidden name='fecha_trabajo_hide' value="<?= $t->fields['fecha'] ?>" id='fecha_trabajo_hide' />
+<input type="hidden" name='id_trabajo' value="<?= $t->fields['id_trabajo'] ?>" id='id_trabajo' />
+<input type="hidden" name='edit' value="<?= $opcion == 'edit' ? 1 : '' ?>" id='edit' />
+<input type="hidden" name='fecha_trabajo_hide' value="<?= $t->fields['fecha'] ?>" id='fecha_trabajo_hide' />
 <?
 	}
 	if($id_trabajo == NULL) // si no tenemos id de trabajo es porque se estÃ¡ agregando uno nuevo.
 	{
 ?>
-<input type=hidden name='nuevo' value="1" id='nuevo' />
+<input type="hidden" name='nuevo' value="1" id='nuevo' />
 <?
 	}
 ?>
-<input type=hidden name=id_cobro id=id_cobro value="<?=$t->fields['id_cobro'] !='NULL' ? $t->fields['id_cobro'] : '' ?>" />
-<input type=hidden name=popup value='<?=$popup?>' id="popup">
+<input type="hidden" name=id_cobro id=id_cobro value="<?=$t->fields['id_cobro'] !='NULL' ? $t->fields['id_cobro'] : '' ?>" />
+<input type="hidden" name=popup value='<?=$popup?>' id="popup">
 
 <!-- TABLA HISTORIAL -->
 <?  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo' ) && Conf::UsaDisenoNuevo() ) )
@@ -1239,11 +1239,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	$where .= " AND usuario.visible=1 OR usuario.id_usuario = '$id_usuario'";
 	
 	$query = "SELECT SQL_CALC_FOUND_ROWS usuario.id_usuario,
-			CONCAT_WS(' ', apellido1, apellido2,',',nombre)
-			as nombre FROM usuario
-			JOIN usuario_permiso USING(id_usuario)
-			LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
-			WHERE $where GROUP BY id_usuario ORDER BY nombre";
+							CONCAT_WS(' ', apellido1, apellido2,',',nombre)
+							as nombre FROM usuario
+							JOIN usuario_permiso USING(id_usuario)
+							LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
+							WHERE $where GROUP BY id_usuario ORDER BY nombre";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario",$id_usuario,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
