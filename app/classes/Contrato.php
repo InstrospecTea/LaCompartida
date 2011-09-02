@@ -386,7 +386,44 @@ class Contrato extends Objeto
 						AND a1.id_contrato = '{$this->fields['id_contrato']}'
 					GROUP BY a1.id_contrato";
 			
-		}	
+		}
+		elseif( $this->fields['forma_cobro'] = 'PROPORCIONAL')
+		{
+			if(!$emitido)
+			{
+				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
+			}
+			
+			
+			$subquery = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600))   
+						FROM trabajo 
+						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+						JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+						LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario 
+							AND contrato.id_moneda=usuario_tarifa.id_moneda 
+							AND contrato.id_tarifa = usuario_tarifa.id_tarifa) 
+						LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
+						WHERE 1 $where  
+						AND trabajo.cobrable = 1 
+						AND asunto.id_contrato='".$this->fields['id_contrato']."' GROUP BY asunto.id_contrato";
+			$resp = mysql_query($subquery, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($duracion_total) = mysql_fetch_array($resp);
+			
+
+			$query = "SELECT SUM(((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa)*(1 - ( {$this->fields['retainer_horas']} / {$duracion_total} )), prm_moneda.simbolo   
+						FROM trabajo 
+						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
+						JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+						JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+						LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario 
+							AND contrato.id_moneda=usuario_tarifa.id_moneda 
+							AND contrato.id_tarifa = usuario_tarifa.id_tarifa) 
+						LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
+						WHERE 1 $where  
+						AND trabajo.cobrable = 1 
+						AND asunto.id_contrato='".$this->fields['id_contrato']."' GROUP BY asunto.id_contrato"; 
+		}
 		else
 		{
 			if(!$emitido)

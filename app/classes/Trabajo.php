@@ -137,6 +137,19 @@ class Trabajo extends Objeto
 		return $valor;
 	}
 	
+	function ActualizarTrabajoTarifa( $id_moneda, $valor, $id_trabajo = '')
+	{
+		if( $id_trabajo == '' ) {
+			$id_trabajo = $this->fields['id_trabajo'];
+		}
+		$query = "INSERT INTO trabajo_tarifa 
+													SET id_trabajo = '$id_trabajo', 
+															id_moneda = '$id_moneda',
+															valor = '$valor' 
+									ON DUPLICATE KEY UPDATE valor = '$valor' ";
+		mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+	}
+	
 	function Eliminar()
 	{
 		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario])

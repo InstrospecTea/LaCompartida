@@ -338,29 +338,6 @@ class Cobro extends Objeto
 		return $monto_total;
 	}
 	
-	function AjustarPorMonto($monto, $monto_original)
-	{
-		$moneda = new Moneda($this->sesion);
-		$moneda->Load($this->fields['id_moneda']);
-		
-		$factor = number_format($monto / $monto_original, $moneda->fields['cifras_decimales'], '.', '' );
-		
-		$query = "SELECT id_trabajo, tarifa_hh FROM trabajo WHERE id_cobro = '".$this->fields['id_cobro']."' ";
-		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		
-		while( list($id, $tarifa_hh) = mysql_fetch_array($resp) )
-		{
-			$tarifa_hh_corrigido = number_format($factor * $tarifa_hh,$moneda->fields['id_moneda'],'.','');
-			
-			$query = " UPDATE trabajo SET tarifa_hh = '$tarifa_hh_corrigido' WHERE id_trabajo = '$id' ";
-			mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		}
-		
-		$this->Edit("monto_ajustado",$monto);
-		
-		if($this->Write()) return true; else return false; 
-	}
-	
 	function CalculaMontoTramites($cobro)
 	{
 		$query = "SELECT SUM(tarifa_tramite)
@@ -611,6 +588,7 @@ class Cobro extends Objeto
 			$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 			$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+			$trabajo->ActualizarTrabajoTarifa( $this->fields['id_moneda'], $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
 			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
 			$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
 			$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
@@ -694,6 +672,7 @@ class Cobro extends Objeto
 					$factor = $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original;
 				else
 					$factor = 1;
+				$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6,'.','') );
 				$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6,'.','') );
 				list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) :'0');

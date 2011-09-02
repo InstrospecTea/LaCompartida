@@ -286,13 +286,7 @@
 			list( $key1, $key2, $id_moneda ) = split('_',$index);
 			if( $key1 == 'trabajo' && $key2 == 'tarifa' && $id_moneda > 0 ) {
 				if( empty($valor) ) $valor = "0";
-				$query = "INSERT INTO trabajo_tarifa 
-													SET id_trabajo = '$id_trabajo', 
-															id_moneda = '$id_moneda',
-															valor = '$valor' 
-									ON DUPLICATE KEY UPDATE valor = '$valor' ";
-				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-				
+				$t->ActualizarTrabajoTarifa($id_moneda,$valor);
 				$valores[$id_moneda] = $valor;
 			}
 		}
