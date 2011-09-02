@@ -249,6 +249,9 @@ function CheckEliminaIngreso(chk)
 
 function CargarTabla(mostrar_actualizado)
 {
+	<?php if(!empty($adelanto) && !$id_documento){?>
+		return;
+	<?php } ?>
 	var select_moneda = document.getElementById('id_moneda');
 	var tabla_pagos = document.getElementById('tabla_pagos');
 	var id_documento = document.getElementById('id_documento');

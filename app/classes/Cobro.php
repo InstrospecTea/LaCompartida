@@ -7687,8 +7687,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							else
 								$html = str_replace('%valor_equivalente%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].' '.number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 						}
-					break;
+					//break;
 				}
+				
+				$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			break;
 
 		case 'RESTAR_RETAINER':
@@ -9402,6 +9404,63 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 			else
 				$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'].'&nbsp;'.number_format($impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+		break;
+
+		case 'ADELANTOS_FILAS':
+			$saldo = 0;
+			$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+
+			//Adelantos
+			$query = "
+				SELECT documento.glosa_documento, documento.saldo_pago, prm_moneda.tipo_cambio
+				FROM documento
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto = 1 AND documento.saldo_pago < 0";
+			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($adelanto = mysql_fetch_assoc($adelantos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $moneda['simbolo'] . $adelanto['saldo_pago'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'], $fila_adelanto_);
+				$saldo += (int)$adelanto['saldo_pago'];
+				$fila_adelantos .= $fila_adelanto_;
+			}
+			
+			$fila_adelantos .= '<tr><td colspan="2">&nbsp;</td></tr>';
+			
+			//Pagos
+			$query = "
+				SELECT documento.glosa_documento, IF(documento.saldo_pago = 0, 0, (documento.saldo_pago * -1)) AS saldo_pago, prm_moneda.tipo_cambio
+				FROM documento
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc NOT IN ('N') AND documento.saldo_pago > 0";
+			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($adelanto = mysql_fetch_assoc($adelantos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $moneda['simbolo'] . $adelanto['saldo_pago'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'], $fila_adelanto_);
+				$saldo += (int)$adelanto['saldo_pago'];
+				$fila_adelantos .= $fila_adelanto_;
+			}
+			
+			$fila_adelantos .= '<tr><td colspan="2">&nbsp;</td></tr>';
+
+			//Deuda
+			$query = "
+				SELECT documento.glosa_documento, ( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio AS saldo_cobro
+				FROM documento
+				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda 
+				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro = '" . $this->fields['id_cobro'] . "' AND cm2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' AND documento.saldo_honorarios + documento.saldo_gastos > 0 AND documento.id_cobro <> " . $this->fields['id_cobro'];
+			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($adelanto = mysql_fetch_assoc($adelantos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
+				$fila_adelanto_ = str_replace('%saldo_pago%',$moneda['simbolo'] . $adelanto['saldo_cobro'], $fila_adelanto_);
+				$saldo += (int)$adelanto['saldo_cobro'];
+				$fila_adelantos .= $fila_adelanto_;
+			}
+			
+			$fila_adelantos .= '<tr><td colspan="2">&nbsp;</td></tr>';
+			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Total por pagar') .  '</td><td align="right">' . $moneda['simbolo'] . $saldo . '</td></tr>';
+
+			$html = $fila_adelantos;
 		break;
 
 		case 'PROFESIONAL_FILAS':

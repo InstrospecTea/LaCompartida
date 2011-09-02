@@ -406,10 +406,10 @@
 			global $usar_adelanto;
 
 			$neteo_documento = new NeteoDocumento($sesion);
-			$valor_neteo = $neteo_documento->fields['valor_pago_gastos'];
 			$saldo = Valor_Saldo_Gastos($fila,'');
 			if( $neteo_documento->Ids($id_documento, $fila->fields['id_documento']) )
 			{
+				$valor_neteo = $neteo_documento->fields['valor_pago_gastos'];
 				$valor = $valor_neteo;
 			}
 			else if($id_cobro===$fila->fields['id_cobro']&& !$id_documento)

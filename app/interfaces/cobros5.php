@@ -160,6 +160,11 @@
 			$his->Write();
 			if($cobro->Write())
 			{
+				if(!empty($usar_adelantos)){
+					$documento = new Documento($sesion);
+					$documento->LoadByCobro($id_cobro);
+					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
+				}
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 			}
@@ -470,6 +475,10 @@ function Emitir(form)
 									return false;
 								else
 								{
+									var adelantos = $F('saldo_adelantos');
+									if(adelantos && confirm('Tiene disponibles '+adelantos+' en adelantos.\n¿Desea utilizarlos automáticamente para pagar este cobro?')){
+										$('usar_adelantos').value = '1';
+									}
 									form.accion.value = 'emitir';
 									form.opc.value = 'guardar_cobro';
 									form.submit();
@@ -819,9 +828,10 @@ function UpdateCap(monto_update, guardar)
 <input type="hidden" name="id_tarifa" id="id_tarifa" value="<?=$contrato->fields['id_tarifa']?>" />
 <input type="hidden" name="accion" value="" id="accion">
 <input type="hidden" name="saldo_adelantos" value="<?php
-//$documento = new Documento($sesion);
-//$pago_honorarios = $cobro->fields[''];
-//echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $pago_honorarios, $pago_gastos);
+$documento = new Documento($sesion);
+$pago_honorarios = empty($cobro->fields['monto_subtotal']) ? 0 : 1;
+$pago_gastos = empty($cobro->fields['subtotal_gastos']) ? 0 : 1;
+echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $pago_honorarios, $pago_gastos, $cobro->fields['id_moneda']);
 ?>" id="saldo_adelantos" />
 <input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
 

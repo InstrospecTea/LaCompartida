@@ -753,15 +753,24 @@ class Documento extends Objeto
 		}
 	}
 	
-	function SaldoAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos){
-		$query = "SELECT SUM(saldo_pago)
+	function SaldoAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos, $id_moneda = null){
+		//pedir la moneda como parametro y convertir cada saldo a esa moneda antes de sumarlos
+		$query = "SELECT SUM(-saldo_pago*tipo_cambio)
 			FROM documento
+			JOIN prm_moneda ON documento.id_moneda = prm_moneda.id_moneda
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
 		if(empty($pago_honorarios)) $query.= ' AND pago_gastos = 1';
 		else if(empty($pago_gastos)) $query.= ' AND pago_honorarios = 1';
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($saldo) = mysql_fetch_array($resp);
-		return -$saldo;
+		if(!$saldo) return '';
+		if($id_moneda){
+			$cambio = Moneda::GetTipoCambioMoneda($this->sesion, $id_moneda);
+			if($cambio) $saldo /= $cambio;
+			$simbolo = Moneda::GetSimboloMoneda($this->sesion, $id_moneda);
+			if($simbolo) $saldo = $simbolo.$saldo;
+		}
+		return $saldo;
 	}
 	
 	function GenerarPagosDesdeAdelantos($id_documento_cobro){
@@ -777,8 +786,10 @@ class Documento extends Objeto
 		$moneda = new Moneda($this->sesion);
 		$moneda->Load($id_moneda);
 		$id_cobro = $documento_cobro->fields['id_cobro'];
+		$cobro_moneda = new CobroMoneda($this->sesion);
+		$cobro_moneda->Load($id_cobro);
 		
-		$query = "SELECT id_documento, saldo_pago, pago_honorarios, pago_gastos
+		$query = "SELECT id_documento, -saldo_pago, pago_honorarios, pago_gastos, documento.id_moneda
 			FROM documento
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
 		if($honorarios == 0) $query .= " AND pago_gastos = 1";
@@ -786,20 +797,25 @@ class Documento extends Objeto
 		$query .= " ORDER BY pago_honorarios ASC, pago_gastos ASC, fecha_creacion ASC";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		//tengo los adelantos del cliente con saldo positivo, primero los q solo pagan honorarios, despues los solo gastos, y despues los mixtos, cada grupo ordenado por fecha
-		while(list($id_adelanto, $saldo_pago, $pago_honorarios, $pago_gastos) = mysql_fetch_array($resp)){
-			$saldo_pago *= -1;
+		while(list($id_adelanto, $saldo_pago, $pago_honorarios, $pago_gastos, $id_moneda_adelanto) = mysql_fetch_array($resp)){
+			$honorarios_convertidos = $honorarios * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'];
+			$gastos_convertidos = $gastos * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'];
+			
 			$monto_honorarios = 0;
 			if($honorarios > 0 && $pago_honorarios == 1){
-				$monto_honorarios = $saldo_pago > $honorarios ? $honorarios : $saldo_pago;
+				$monto_honorarios = $saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago;
 				$saldo_pago -= $monto_honorarios;
-				$honorarios -= $monto_honorarios;
+				$honorarios_convertidos -= $monto_honorarios;
 			}
 			$monto_gastos = 0;
 			if($gastos > 0 && $pago_gastos == 1){
-				$monto_gastos = $saldo_pago > $gastos ? $gastos : $saldo_pago;
+				$monto_gastos = $saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago;
 				$saldo_pago -= $monto_gastos;
-				$gastos -= $monto_gastos;
+				$gastos_convertidos -= $monto_gastos;
 			}
+			$honorarios = $honorarios_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
+			$gastos = $gastos_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
+			
 			if($monto_honorarios > 0 || $monto_gastos > 0){
 				$neteos = array(array(
 					'id_moneda' => $id_moneda,
@@ -808,8 +824,9 @@ class Documento extends Objeto
 					'monto_gastos' => $monto_gastos,
 					'id_cobro' => $id_cobro
 				));
-				
-				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda, $moneda, $out_neteos);
+				$moneda_adelanto = new Moneda($this->sesion);
+				$moneda_adelanto->Load($id_moneda_adelanto);
+				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda_adelanto, $moneda_adelanto, $out_neteos);
 			}
 			
 			if($gastos == 0 && $honorarios == 0) break;

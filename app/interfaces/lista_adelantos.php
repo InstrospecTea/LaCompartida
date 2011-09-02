@@ -101,16 +101,7 @@ function ElegirParaPago(&$fila)
 
 function OpcionesListaAdelanto(&$fila)
 {
-	$opc = "";
-	if ($fila->fields['saldo_pago'] > 0)
-	{
-		$opc = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
-	}
-	else
-	{
-		$opc = "<img src='" . Conf::ImgDir() . "/editar_off.gif' border='0' title='Editar' />";
-	}
-	return $opc;
+	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
 }
 ?>
 <script type="text/javascript" charset="utf-8">
