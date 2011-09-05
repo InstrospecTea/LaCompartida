@@ -177,14 +177,14 @@ function Validar(form)
 {
 	monto = parseFloat(form.monto.value);
 
-	var monto_pagos = document.getElementById('monto_pagos');
-
 	if(isNaN(monto))
 	{
 		alert('<?=__('Debe ingresar un monto para el pago')?>');
 		form.monto.focus();
 		return false;
 	}
+	var monto_pagos = Math.round($F('monto_pagos')*1000)/1000;
+	monto = Math.round(monto*1000)/1000;
 	
 	<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
 	var cod_cli_seg = document.getElementById('codigo_cliente_secundario').value

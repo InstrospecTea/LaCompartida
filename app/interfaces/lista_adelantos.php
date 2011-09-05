@@ -17,6 +17,7 @@ SELECT
 	documento.id_documento,
 	documento.id_cobro,
 	cliente.glosa_cliente,
+	cliente.codigo_cliente,
 	IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
 	IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
 	CONCAT(prm_moneda.simbolo, ' ', IF(documento.monto = 0, 0, documento.monto*-1)) AS monto_con_simbolo,
