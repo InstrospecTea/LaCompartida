@@ -362,6 +362,11 @@
 		if($i == 0)
 			echo("VACIO|");
 	}
+	else if($accion == 'cargar_contratos'){
+		require_once Conf::ServerDir().'/classes/Contrato.php';
+		$contrato = new Contrato($sesion);
+		echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);');
+	}
 	else{
 		echo("ERROR");
 	}

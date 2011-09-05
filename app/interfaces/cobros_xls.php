@@ -402,7 +402,7 @@ $mostrar_resumen_de_profesionales = 1;
 			$ff = str_replace('%m','MM',$ff);
 			$ff = str_replace('%y','YYYY',$ff);
 			$ff = str_replace('%Y','YYYY',$ff);
-			$ff = str_replace('%Y','YY',$ff);
+			//$ff = str_replace('%Y','YY',$ff);
 			$formato_fecha =& $wb->addFormat(array('Size' => 7,
 									'Valign' => 'top',
 									'Color' => 'black'));
@@ -719,71 +719,81 @@ $mostrar_resumen_de_profesionales = 1;
 							$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 						
 							if( $cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total'] )
-								{
-									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-									$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*'.$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']."/".$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
-								}
+							{
+								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+								$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*'.$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']."/".$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
+							}
 							if($cobro->fields['descuento'] > 0)
-								{
-									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-									$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['descuento']*$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
-									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-									$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)."-$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
-								} 
+							{
+								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+								$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['descuento']*$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
+								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+								$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)."-$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
+							} 
 							if($cobro->fields['porcentaje_impuesto'] > 0 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValorImpuesto') > 0 ) || ( method_exists('Conf', 'ValorImpuesto') && Conf::ValorImpuesto()>0 ) ) )
+							{
+								if( $cobro->fields['porcentaje_impuesto_gastos'] > 0 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValorImpuestoGastos') > 0 ) || ( method_exists('Conf', 'ValorImpuestoGastos') && Conf::ValorImpuestoGastos()>0 ) ) )
 								{
-									if( $cobro->fields['porcentaje_impuesto_gastos'] > 0 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValorImpuestoGastos') > 0 ) || ( method_exists('Conf', 'ValorImpuestoGastos') && Conf::ValorImpuestoGastos()>0 ) ) )
-										{
-											if($opc_ver_gastos)
-											{
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['subtotal_gastos'], $formato_moneda_resumen);
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2).'*0.'.$cobro->fields['porcentaje_impuesto']."+$col_formula_valor_trabajo".($filas2-1).'*0.'.$cobro->fields['porcentaje_impuesto_gastos'], $formato_moneda_resumen);
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
-											}
-											else
-											{
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*0.'.(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ValorImpuesto'):Conf::ValorImpuesto()), $formato_moneda_resumen);
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
-											}
-										}
+									if($opc_ver_gastos)
+									{
+										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+										$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['subtotal_gastos'], $formato_moneda_resumen);
+										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+										
+										/*$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2).'*0.'.$cobro->fields['porcentaje_impuesto']."+$col_formula_valor_trabajo".($filas2-1).'*0.'.$cobro->fields['porcentaje_impuesto_gastos'], $formato_moneda_resumen);*/
+										$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
+										//ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2).'*0.'.$cobro->fields['porcentaje_impuesto']."+$col_formula_valor_trabajo".($filas2-1).'*0.'.$cobro->fields['porcentaje_impuesto_gastos'], $formato_moneda_resumen);
+										$ws->write( $filas2++, $col_valor_trabajo, $x_resultados_tmp['impuesto_gastos'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen );
+										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+										$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
+									}
 									else
-										{
-											$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-											$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*0.'.(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ValorImpuesto'):Conf::ValorImpuesto()), $formato_moneda_resumen);
-											if($opc_ver_gastos)
-											{
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_gastos'], $formato_moneda_resumen);
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
-											}
-											else
-											{
-												$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-												$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
-											}
-										}
+									{
+										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+										
+										$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
+										//$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*0.'.(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ValorImpuesto'):Conf::ValorImpuesto()), $formato_moneda_resumen);;
+										$ws->write( $filas2++, $col_valor_trabajo, $x_resultados_tmp['impuesto_gastos'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen );
+										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+										$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
+									}
 								}
-							else
+								else
 								{
+									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+									$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
+										//$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*0.'.(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ValorImpuesto'):Conf::ValorImpuesto()), $formato_moneda_resumen);
+										$ws->write( $filas2++, $col_valor_trabajo, $x_resultados_tmp['impuesto_gastos'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen );
 									if($opc_ver_gastos)
 									{
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_gastos'], $formato_moneda_resumen);
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-										$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-2).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
+										$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
+
 									}
 									else
 									{
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-										$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
+										$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
 									}
 								}
+							}
+							else
+							{
+								if($opc_ver_gastos)
+								{
+									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+									$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_gastos'], $formato_moneda_resumen);
+									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+									$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-2).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
+								}
+								else
+								{
+									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+									$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
+								}
+							}
 
 					// Para seguir imprimiendo datos hay definir en que linea será 
 					$filas = max($filas, $filas2);

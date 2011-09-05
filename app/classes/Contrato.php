@@ -582,6 +582,16 @@ class Contrato extends Objeto
 		}
 		return true;
 	}
+	
+	function ListaSelector($codigo_cliente, $onchange=null, $selected=null, $width=320){
+		$query = "SELECT contrato.id_contrato, SUBSTRING(GROUP_CONCAT(glosa_asunto), 1, 70) AS asuntos
+			FROM contrato
+			JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+			JOIN asunto ON asunto.id_contrato = contrato.id_contrato
+			WHERE cliente.codigo_cliente = '$codigo_cliente'
+			GROUP BY contrato.id_contrato";
+		return Html::SelectQuery($this->sesion, $query, 'id_contrato', $selected, empty($onchange) ? null : 'onchange='.$onchange, __("Cualquiera"), $width);
+	}
 }
 
 class ListaContrato extends Lista

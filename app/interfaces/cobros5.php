@@ -523,8 +523,9 @@ function ImprimirCobroPDF(form)
 
 function ImprimirExcel( form, formato_especial )
 {
-	if(!form)
+	if(!form){
 		var form = $('form_cobro5');
+	}
 	if( !AgregarParametros( form ) )
 		return false;
 	if( formato_especial == 'especial' )
@@ -831,7 +832,7 @@ function UpdateCap(monto_update, guardar)
 $documento = new Documento($sesion);
 $pago_honorarios = empty($cobro->fields['monto_subtotal']) ? 0 : 1;
 $pago_gastos = empty($cobro->fields['subtotal_gastos']) ? 0 : 1;
-echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $pago_honorarios, $pago_gastos, $cobro->fields['id_moneda']);
+echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos, $cobro->fields['opc_moneda_total']);
 ?>" id="saldo_adelantos" />
 <input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
 

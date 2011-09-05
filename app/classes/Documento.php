@@ -89,7 +89,7 @@ class Documento extends Objeto
 		return $tc;
 	}
 	
-	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false)
+	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null)
 	{
 		list($dtemp,$mtemp,$atemp) = split("-",$fecha);
 		if( strlen( $dtemp ) == 2 )
@@ -160,6 +160,7 @@ class Documento extends Objeto
 				$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 				$this->Edit("pago_honorarios",empty($pago_honorarios) ? '0' : '1');
 				$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
+				$this->Edit("id_contrato",empty($id_contrato) ? null : $id_contrato);
 
 				if($this->Write())
 				{
@@ -753,12 +754,12 @@ class Documento extends Objeto
 		}
 	}
 	
-	function SaldoAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos, $id_moneda = null){
+	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null){
 		//pedir la moneda como parametro y convertir cada saldo a esa moneda antes de sumarlos
 		$query = "SELECT SUM(-saldo_pago*tipo_cambio)
 			FROM documento
 			JOIN prm_moneda ON documento.id_moneda = prm_moneda.id_moneda
-			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
+			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND (id_contrato = '$id_contrato' OR id_contrato IS NULL) AND saldo_pago < 0";
 		if(empty($pago_honorarios)) $query.= ' AND pago_gastos = 1';
 		else if(empty($pago_gastos)) $query.= ' AND pago_honorarios = 1';
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -768,7 +769,7 @@ class Documento extends Objeto
 			$cambio = Moneda::GetTipoCambioMoneda($this->sesion, $id_moneda);
 			if($cambio) $saldo /= $cambio;
 			$simbolo = Moneda::GetSimboloMoneda($this->sesion, $id_moneda);
-			if($simbolo) $saldo = $simbolo.$saldo;
+			if($simbolo) $saldo = $simbolo.number_format($saldo, 2);
 		}
 		return $saldo;
 	}

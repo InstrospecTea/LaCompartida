@@ -859,7 +859,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Ordenado por')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'], "", "Vacio",'170'); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $sesion->usuario->fields['id_usuario'], "", "Vacio",'170'); ?>
 		</td>
 	</tr>
 <?

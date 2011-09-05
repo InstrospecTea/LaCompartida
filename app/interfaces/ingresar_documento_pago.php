@@ -16,6 +16,7 @@
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Observacion.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	require_once Conf::ServerDir().'/classes/Contrato.php';
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
@@ -77,7 +78,7 @@
 			}
 		}
 
-		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto']);
+		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
 		
 		$documento->Load($id_documento);
 		$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
@@ -290,7 +291,7 @@ function CargarTabla(mostrar_actualizado)
 	if(id_documento.value){
 		url += '&id_documento='+id_documento.value;
 	}
-
+	url += '&id_contrato='+$F('id_contrato');
 	<?php if (!empty($adelanto)) { ?>
 	url += '&adelanto=1';
 	<?php }
@@ -457,6 +458,24 @@ function ActualizarDocumentoMonedaPago()
 			CancelarDocumentoMonedaPago();
 		}
 }
+
+function CargarContratos(){
+	<?php if(!$adelanto){ ?>
+	return true;
+	<?php } ?>
+	var http = getXMLHTTP();
+	var url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente='+$F('codigo_cliente');	
+	http.open('get', url);
+	http.onreadystatechange = function()
+	{
+		if(http.readyState == 4)
+		{
+			$('td_selector_contrato').innerHTML = http.responseText;
+		}
+	}	
+	http.send(null);
+	
+}
 </script>
 <? echo Autocompletador::CSS(); ?>
 <form method=post action="<?= $SERVER[PHP_SELF] ?>" id="form_documentos" autocomplete='off'>
@@ -471,6 +490,7 @@ function ActualizarDocumentoMonedaPago()
 <input type=hidden name='pago_honorarios' id='pago_honorarios' value='<?=$id_documento ? $documento->fields['pago_honorarios'] : ''?>'/>
 <input type=hidden name='pago_gastos' id='pago_gastos' value='<?=$id_documento ? $documento->fields['pago_gastos'] : ''?>'/>
 <input type=hidden name='es_adelanto' id='es_adelanto' value='<?=$id_documento ? $documento->fields['es_adelanto'] : ''?>'/>
+<input type=hidden name='id_contrato' id='id_contrato' value='<?=$id_documento ? $documento->fields['id_contrato'] : ''?>'/>
 <?php } ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -502,13 +522,13 @@ function ActualizarDocumentoMonedaPago()
 if($id_cobro){
 	$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
 	$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
-	$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $pago_honorarios, $pago_gastos) > 0;
+	$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 }
 else $hay_adelantos = false;
 if(!$adelanto && $hay_adelantos){
 		$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
 		$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';  ?>
-		<button type="button" onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+		<button type="button" onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
 <?php } ?>
 		</td>
 	</tr>
@@ -530,24 +550,34 @@ if(!$adelanto && $hay_adelantos){
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarTabla(1);");
+						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarContratos(); CargarTabla(1);");
 					else
-						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', 280, "CargarTabla(1);");
+						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', 280, "CargarContratos(); CargarTabla(1);");
 				}
 			else
 				{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 						{
-							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente_secundario","glosa_cliente","codigo_cliente_secundario", $codigo_cliente_secundario,"","", 280);
+							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente_secundario","glosa_cliente","codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarContratos(); CargarTabla(1);", 280);
 						}
 						else
 						{
-							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente," ","CargarTabla(1);", 280);
+							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente," ","CargarContratos(); CargarTabla(1);", 280);
 						}
 				} ?>
 		</td>
 	</tr>
-
+	<?php if($adelanto){ ?>
+	<tr>
+		<td align="right">
+			<?php echo __('Asuntos'); ?>
+		</td>
+		<td id="td_selector_contrato">
+			<?php $contrato = new Contrato($sesion);
+			echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);', $id_contrato); ?>
+		</td>
+	</tr>
+	<?php } ?>
 		<tr>
 			<td align=right>
 				<?=__('Monto')?>

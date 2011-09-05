@@ -111,7 +111,8 @@
 					WHERE (documento.honorarios_pagados = 'NO' OR documento.gastos_pagados = 'NO'  ".$or_neteo.")  
 					
 					AND (documento.monto > 0 OR documento.id_cobro IS NOT NULL) AND documento.codigo_cliente = '".$codigo_cliente."' AND documento.tipo_doc = 'N' ";	
-		if($usar_adelanto) $query .= "AND (documento.id_cobro = '$id_cobro' OR neteo.id_neteo_documento IS NOT NULL)";
+		if($usar_adelanto) $query .= " AND (documento.id_cobro = '$id_cobro' OR neteo.id_neteo_documento IS NOT NULL)";
+		if($id_contrato) $query .= " AND (cobro.id_contrato = '$id_contrato' OR neteo.id_neteo_documento IS NOT NULL)";
 		$x_pag = 0;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_cobros";

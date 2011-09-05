@@ -7147,6 +7147,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 			$html = str_replace('%CLIENTE%', 				$this->GenerarDocumento2($parser,'CLIENTE',			$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			$html = str_replace('%DETALLE_COBRO%', 	$this->GenerarDocumento2($parser,'DETALLE_COBRO',$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
+			
+			if ($this->fields['opc_ver_morosidad']) {
+				//Saldo adeudado
+				$html = str_replace('%SALDO_ADEUDADO%', $this->GenerarDocumento2($parser,'SALDO_ADEUDADO',$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
+			}
+			else
+			{
+				$html = str_replace('%SALDO_ADEUDADO%', '', $html);
+			}
+			
 			if( $this->fields['forma_cobro'] == 'CAP' )
 				$html = str_replace('%RESUMEN_CAP%',  $this->GenerarDocumento2($parser,'RESUMEN_CAP',	$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			else
@@ -7669,8 +7679,77 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					//break;
 				}
 				
-				$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				//Adelantos
+				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			break;
+
+		case 'SALDO_ADEUDADO':
+			$html = str_replace('%titulo_saldo_adeudado%', __('Saldo Adeudado'), $html);
+			$html = str_replace('%SALDO_ADEUDADO_ENCABEZADO%', $this->GenerarDocumento2($parser, 'SALDO_ADEUDADO_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
+			$html = str_replace('%SALDO_ADEUDADO_FILAS%', $this->GenerarDocumento2($parser, 'SALDO_ADEUDADO_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
+		break;
+
+		case 'SALDO_ADEUDADO_ENCABEZADO':
+			$html = str_replace('%descripcion%', __('Descripción'), $html);
+			$html = str_replace('%fecha%', __('Fecha'), $html);
+			$html = str_replace('%monto%', __('Monto'), $html);
+			$html = str_replace('%saldo%', __('Saldo'), $html);
+		break;
+
+		case 'SALDO_ADEUDADO_FILAS':
+			$saldo = 0;
+			$monto_total = 0;
+			$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+
+			//Adelantos
+			$query = "
+				SELECT documento.id_documento, documento.fecha, documento.glosa_documento, documento.saldo_pago, documento.monto, prm_moneda.tipo_cambio
+				FROM documento
+				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto = 1 AND documento.saldo_pago < 0 
+				AND (documento.id_contrato = " . $this->fields['id_contrato'] . " OR documento.id_contrato IS NULL)";
+			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($adelanto = mysql_fetch_assoc($adelantos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
+				$monto = $moneda['simbolo'] . number_format($adelanto['saldo_pago'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $monto, $fila_adelanto_);
+				$monto = $moneda['simbolo'] . number_format($adelanto['monto'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%monto%', $monto, $fila_adelanto_);
+				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
+				$saldo += (int)$adelanto['saldo_pago'];
+				$monto_total += (int)$adelanto['monto'];
+				$fila_adelantos .= $fila_adelanto_;
+				
+			}
+
+			//Deuda
+			$query = "
+				SELECT documento.glosa_documento, documento.fecha, documento.monto * cm1.tipo_cambio / cm2.tipo_cambio AS monto, ( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio AS saldo_cobro
+				FROM documento
+				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda 
+				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro = '" . $this->fields['id_cobro'] . "' AND cm2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' AND documento.saldo_honorarios + documento.saldo_gastos > 0 AND documento.id_cobro <> " . $this->fields['id_cobro'];
+			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($adelanto = mysql_fetch_assoc($adelantos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
+				$monto = $moneda['simbolo'] . number_format($adelanto['saldo_cobro'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $monto, $fila_adelanto_);
+				$monto = $moneda['simbolo'] . number_format($adelanto['monto'] , $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%monto%', $monto, $fila_adelanto_);
+				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
+				$saldo += (int)$adelanto['saldo_cobro'];
+				$monto_total += (int)$adelanto['monto'];
+				$fila_adelantos .= $fila_adelanto_;
+			}
+			
+			$fila_adelantos .= '<tr class="tr_total">
+			<td align="left" colspan="2">' . __('Total') .  '</td>
+			<td align="right">' . $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+			<td align="right">' . $moneda['simbolo'] . number_format($saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+			</tr>';
+
+			$html = $fila_adelantos;
+		break;
 
 		case 'RESTAR_RETAINER':
 			if($columna_hrs_retainer || $this->fields['forma_cobro']=='RETAINER' || $this->fields['forma_cobro']=='PROPORCIONAL')

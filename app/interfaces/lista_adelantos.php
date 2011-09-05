@@ -33,6 +33,7 @@ WHERE
 if (isset($codigo_cliente)) $filtros['codigo_cliente'] = $codigo_cliente;
 if (isset($pago_honorarios)) $filtros['pago_honorarios'] = $pago_honorarios;
 if (isset($pago_gastos)) $filtros['pago_gastos'] = $pago_gastos;
+if (isset($id_contrato)) $filtros['id_contrato'] = $id_contrato;
 
 if (isset($filtros['id_documento']) and !empty($filtros['id_documento']))
 {
@@ -69,6 +70,9 @@ else{
 }
 if($elegir_para_pago || isset($filtros['tiene_saldo'])){
 	$query .= " AND saldo_pago < 0";
+}
+if(isset($filtros['id_contrato'])){
+	$query .= " AND (documento.id_contrato = '".$filtros['id_contrato']."' OR documento.id_contrato IS NULL)";
 }
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'fecha_creacion DESC' : $orden);
 $buscador->nombre = "buscador_adelantos";

@@ -44,6 +44,7 @@ $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
 $_LANG['Egreso'] = "Outcome";
 $_LANG['saldo'] = "balance";
+$_LANG['Saldo'] = "Balance";
 
 $_LANG['Estado Cta. Corriente'] = "Balance status";
 $_LANG['Total Honorarios'] = "Total Fees";
