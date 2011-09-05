@@ -257,14 +257,14 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('Nº') 
+		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°') 
 					&& 
 					in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day','Month','Mes')) ) 
 				&& 
 					$fila_base<$excel->sheets[0]['numRows'] )
-						{
+						{ 
 							++$fila_base;
-						}
+						} 
 		//Paso de ubicación ini,med,fin (2,3,4) a glosa dia,mes,anyo (2,3,4)-> español (3,2,4)->inglés
 		if(in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day')) )
 		{

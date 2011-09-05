@@ -6115,6 +6115,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.81:
+				$query = array();
+				$query[] = "ALTER TABLE  `prm_excel_cobro` CHANGE  `nombre_interno`  `nombre_interno` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+												CHANGE  `glosa_es`  `glosa_es` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+												CHANGE  `glosa_en`  `glosa_en` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+												CHANGE  `grupo`  `grupo` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+				$query[] = "UPDATE	`prm_excel_cobro` SET  `glosa_es` =  'N°',
+														`glosa_en` =  'N°' WHERE  `id_prm_excel_cobro` =1 LIMIT 1 ;";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6364,6 +6377,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.78;
 	$VERSIONES[$num++] = 4.79;
 	$VERSIONES[$num++] = 4.80;
+	$VERSIONES[$num++] = 4.81;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
