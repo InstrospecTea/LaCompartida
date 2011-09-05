@@ -89,7 +89,7 @@ class Documento extends Objeto
 		return $tc;
 	}
 	
-	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha, $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null)
+	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha = '', $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null)
 	{
 		list($dtemp,$mtemp,$atemp) = split("-",$fecha);
 		if( strlen( $dtemp ) == 2 )
@@ -160,7 +160,7 @@ class Documento extends Objeto
 				$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 				$this->Edit("pago_honorarios",empty($pago_honorarios) ? '0' : '1');
 				$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
-				$this->Edit("id_contrato",empty($id_contrato) ? null : $id_contrato);
+				$this->Edit("id_contrato",empty($id_contrato) ? 0 : $id_contrato); //'0' guarda 0, 0 guarda NULL, null guarda ''
 
 				if($this->Write())
 				{
@@ -790,6 +790,8 @@ class Documento extends Objeto
 		$cobro_moneda = new CobroMoneda($this->sesion);
 		$cobro_moneda->Load($id_cobro);
 		
+		$estado = null;
+		
 		$query = "SELECT id_documento, -saldo_pago, pago_honorarios, pago_gastos, documento.id_moneda
 			FROM documento
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
@@ -828,9 +830,19 @@ class Documento extends Objeto
 				$moneda_adelanto = new Moneda($this->sesion);
 				$moneda_adelanto->Load($id_moneda_adelanto);
 				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda_adelanto, $moneda_adelanto, $out_neteos);
+				$estado = 'PAGO PARCIAL';
 			}
 			
-			if($gastos == 0 && $honorarios == 0) break;
+			if($gastos == 0 && $honorarios == 0){
+				$estado = 'PAGADO';
+				break;
+			}
+		}
+		if($estado){
+			$cobro = new Cobro($this->sesion);
+			$cobro->Load($id_cobro);
+			$cobro->Edit('estado', $estado);
+			$cobro->Write();
 		}
 	}
 }

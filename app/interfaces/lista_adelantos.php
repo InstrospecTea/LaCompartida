@@ -16,7 +16,7 @@ SELECT
 	SQL_CALC_FOUND_ROWS
 	documento.id_documento,
 	documento.id_cobro,
-	documento.codigo_cliente,
+	cliente.glosa_cliente,
 	IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
 	IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
 	CONCAT(prm_moneda.simbolo, ' ', IF(documento.monto = 0, 0, documento.monto*-1)) AS monto_con_simbolo,
@@ -26,6 +26,7 @@ SELECT
 FROM
 	documento
 	LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
+	LEFT JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
 WHERE
 	es_adelanto = 1";
 
@@ -74,17 +75,17 @@ if($elegir_para_pago || isset($filtros['tiene_saldo'])){
 if(isset($filtros['id_contrato'])){
 	$query .= " AND (documento.id_contrato = '".$filtros['id_contrato']."' OR documento.id_contrato IS NULL)";
 }
-$buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'fecha_creacion DESC' : $orden);
+$buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'documento.fecha_creacion DESC' : $orden);
 $buscador->nombre = "buscador_adelantos";
 $buscador->titulo = "Adelantos";
 
 //Encabezados
 $buscador->AgregarEncabezado("id_documento", __('N°'));
-$buscador->AgregarEncabezado("codigo_cliente", __('Cliente'));
+$buscador->AgregarEncabezado("glosa_cliente", __('Cliente'));
 $buscador->AgregarEncabezado("fecha", __('Fecha'));
 $buscador->AgregarEncabezado("monto_con_simbolo", __('Monto'), "align=\"right\"");
 $buscador->AgregarEncabezado("saldo_pago_con_simbolo", __('Saldo'), "align=\"right\"");
-$buscador->AgregarEncabezado("glosa_documento", __('Descripción'));
+$buscador->AgregarEncabezado("glosa_documento", __('Descripción'), "align=\"center\"");
 
 if ($elegir_para_pago)
 {
