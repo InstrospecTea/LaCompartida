@@ -21,6 +21,12 @@
 	
 	if($xls)
 	{
+		$moneda = new Moneda($sesion);
+		$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
+		$id_moneda_base = $moneda->GetMonedaBase($sesion);
+		
+		$arreglo_monedas = ArregloMonedas($sesion); 
+		
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
@@ -82,6 +88,19 @@
 																'Color' => 'black',
 																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 		}
+		$formatos_moneda_tc = array();
+		$query = 'SELECT id_moneda, simbolo, cifras_decimales
+				FROM prm_moneda
+				ORDER BY id_moneda';
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		while(list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)){
+			$formatos_moneda_tc[$id_moneda] =& $wb->addFormat(array('Size' => 11,
+																'VAlign' => 'top',
+																'Align' => 'right',
+																'Border' => '1',
+																'Color' => 'black',
+																'NumFormat' => "[$$simbolo_moneda] #,###,0.00"));
+		}
 		$cifras_decimales = $moneda_base['cifras_decimales'];
 		if($cifras_decimales>0)
 		{
@@ -97,12 +116,12 @@
 														'Border' => 1,
 														'Color' => 'red',
 														'NumFormat' => '[$'.$moneda_base['simbolo']."] #,###,0$decimales"));
-
+		
 		$ws1 =& $wb->addWorksheet(__('Facturacion'));
 		$ws1->setInputEncoding('utf-8');
 		$ws1->fitToPages(1,0);
 		$ws1->setZoom(75);
-
+		
 		$filas += 1;
 		$ws1->mergeCells($filas, 1, $filas, 2);
 		$ws1->write($filas, 1, __('REPORTE HORAS POR FACTURAR'), $formato_encabezado);
@@ -111,49 +130,30 @@
 		$ws1->write($filas,1,__('GENERADO EL:'),$formato_texto);
 		$ws1->write($filas,2,date("d-m-Y H:i:s"),$formato_texto);
 		
-		$where = '';
-		$where_gasto = '';
-		if( $fecha1 != '' and $fecha2 != '' )
-		{
-			$where .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
-			$where_gasto = "cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' AND ";
-			$filas +=1;
-			$ws1->write($filas,1,__('FECHA CONSULTA:'),$formato_texto);
-			$ws1->write($filas,2,Utiles::sql2fecha($fecha1, $formato_fecha, "-").' - '.Utiles::sql2fecha($fecha2, $formato_fecha, "-"),$formato_texto);
-		}
-		if(is_array($socios))
-		{
-			$lista_socios = join("','", $socios);
-			$where .= " AND contrato.id_usuario_responsable IN ('$lista_socios')";
-		}
-		if($separar_asuntos)
-			$group_by="asunto.codigo_asunto";
-		else
-			$group_by="contrato.id_contrato";
-
 		$filas +=4;
 		$col = 0;
-
+		
 		$col_codigo_cliente = ++$col;
 		$col_cliente = ++$col;
 		$col_usuario_encargado = ++$col;
 		if($mostrar_encargado_secundario)
 			$col_usuario_encargado_secundario = ++$col;
 		$col_asunto = ++$col;
-		
 		$col_ultimo_trabajo = ++$col;
 		$col_ultimo_gasto = ++$col;
 		$col_monto_gastos = ++$col;
-		
 		$col_ultimo_cobro = ++$col;
 		$col_estado_ultimo_cobro = ++$col;
 		$col_horas_trabajadas = ++$col;
 		$col_forma_cobro = ++$col;
 		$col_valor_estimado = ++$col;
 		$col_tipo_cambio = ++$col;
+		if( $id_moneda_base != $id_moneda_referencia ) {
+			$col_tipo_cambio_moneda_base = ++$col;
+		}
 		$col_valor_en_moneda_base = ++$col;
 		$col_valor_en_moneda_base_segun_THH = ++$col;
-
+		
 		if($debug)
 		{
 			$col_monto_contrato = ++$col;
@@ -162,7 +162,7 @@
 			$col_porcentaje_retainer = ++$col;
 		}
 		unset($col);
-
+		
 		$ws1->setColumn($col_codigo_cliente, $col_codigo_cliente, 16);
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
 		$ws1->setColumn($col_usuario_encargado, $col_usuario_encargado, 40);
@@ -179,6 +179,9 @@
 		$ws1->setColumn($col_forma_cobro, $col_forma_cobro, 14);
 		$ws1->setColumn($col_valor_estimado, $col_valor_estimado, 18);
 		$ws1->setColumn($col_tipo_cambio, $col_tipo_cambio, 14);
+		if( $id_moneda_base != $id_moneda_referencia ) {
+			$ws1->setColumn($col_tipo_cambio_moneda_base, $col_tipo_cambio_moneda_base, 14);
+		}
 		$ws1->setColumn($col_valor_en_moneda_base, $col_valor_en_moneda_base, 18);
 		$ws1->setColumn($col_valor_en_moneda_base_segun_THH, $col_valor_en_moneda_base_segun_THH, 23);
 		$ws1->setColumn($col_horas_trabajadas, $col_horas_trabajadas, 19);
@@ -207,6 +210,9 @@
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
 		$ws1->write($filas, $col_valor_estimado, __('Valor estimado'), $formato_titulo);
 		$ws1->write($filas, $col_tipo_cambio, __('Tipo Cambio'), $formato_titulo);
+		if( $id_moneda_base != $id_moneda_referencia ) {
+			$ws1->write($filas, $col_tipo_cambio_moneda_base, __('Tipo Cambio '.$arreglo_monedas[$id_moneda_base]['simbolo']), $formato_titulo);
+		}
 		$ws1->write($filas, $col_valor_en_moneda_base, __('Valor en '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion))), $formato_titulo);
 		$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, __('Valor en '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion)).' seg˙n THH'), $formato_titulo);
 		$ws1->write($filas, $col_horas_trabajadas, __('Horas trabajadas'), $formato_titulo);
@@ -217,191 +223,139 @@
 			$ws1->write($filas, $col_valor_cap, __('Cap Usado'), $formato_titulo);
 			$ws1->write($filas, $col_porcentaje_retainer, __('Porcentaje Retainer'), $formato_titulo);
 		}
+		
+		$where_trabajo = " ( trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		$where_gasto   = " ( cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		if( $fecha1 != '' && $fecha2 != '' ) {
+			$where_trabajo .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
+			$where_gasto .= " AND cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' ";
+		}
+		
+		$where = " 1 ";
+		if(is_array($socios)) {
+			$lista_socios = join("','", $socios);
+			$where .= " AND contrato.id_usuario_responsable IN ('$lista_socios')";
+		}
+		if($separar_asuntos) {
+			$group_by="asunto.codigo_asunto";
+		}
+		else {
+			$group_by="contrato.id_contrato";
+		}
+		
+		$query = "SELECT 
+								asunto.codigo_asunto, 
+								asunto.glosa_asunto, 
+								GROUP_CONCAT( asunto.glosa_asunto ) as asuntos, 
+								cliente.codigo_cliente, 
+								cliente.glosa_cliente, 
+								GROUP_CONCAT( cliente.glosa_cliente ) as clientes, 
+								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial, 
+								ec.username as username_encargado_comercial, 
+								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario, 
+								es.username as username_encargado_secundario, 
+								contrato.id_contrato, 
+								contrato.forma_cobro, 
+								contrato.id_moneda as id_moneda_contrato, 
+								contrato.opc_moneda_total as id_moneda_total 
+							FROM asunto 
+							LEFT JOIN contrato USING( id_contrato ) 
+							LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente 
+							LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable 
+							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario 
+							WHERE $where 
+								AND ( ( SELECT count(*) 
+													FROM trabajo 
+										 LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro 
+										 		 WHERE trabajo.codigo_asunto = asunto.codigo_asunto 
+										 		 	 AND trabajo.cobrable = 1 
+										 		 	 AND trabajo.id_tramite = 0 
+										 		 	 AND trabajo.duracion_cobrada != '00:00:00' 
+										 		 	 AND $where_trabajo ) > 0
+										OR ( SELECT count(*) 
+														FROM cta_corriente 
+											LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro 
+													WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto 
+														AND cta_corriente.cobrable = 1 
+														AND $where_gasto ) > 0 )
+							GROUP BY $group_by ";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-		$query =
-		"SELECT glosa_cliente,
-			asuntos,
-			forma_cobro,
-			if(tabla1.forma_cobro <> 'TASA', tabla1.monto_contrato, tabla1.valor_hh) AS monto,
-			valor_hh AS valor_cobro,  -- Este dato est√° en la moneda de la tarifa --
-			valor_hh_std AS valor_cobro_std,  -- Este dato est√° en la moneda de la tarifa --
-			codigo_cliente,
-			codigo_asunto,
-			tabla1.id_contrato,
-			usuario,
-			usuario_username,
-			nombre_usuario_secundario,
-			usuario_secundario_username,
-			hr_por_cobrar AS horas_por_cobrar,
-			retainer_horas AS retainer_horas,
-			(SELECT cobro.estado
-				FROM cobro
-				WHERE cobro.codigo_cliente = tabla1.codigo_cliente
-					AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' ORDER BY cobro.fecha_fin DESC LIMIT 1) AS estado_ultimo_cobro,
-			(SELECT MAX(cobro.fecha_fin)
-				FROM cobro
-				WHERE cobro.codigo_cliente = tabla1.codigo_cliente
-					AND cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION') AS fecha_ultimo_cobro,
-			(SELECT
-				MAX(cta_corriente.fecha) as fecha_ultimo_gasto
-			FROM
-				cta_corriente
-				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
-			WHERE
-				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
-				cta_corriente.cobrable = 1 AND
-				" . $where_gasto . "
-				(cta_corriente.id_cobro OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS fecha_ultimo_gasto,
-			(SELECT
-				SUM(IF(cta_corriente.egreso > 0,
-				IF(ISNULL(cta_corriente.id_moneda),
-					monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
-					monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0)) - 
-				SUM(IF(cta_corriente.ingreso > 0,
-					IF(ISNULL(cta_corriente.id_moneda),
-					monto_cobrable * moneda_gasto.tipo_cambio / moneda_total.tipo_cambio,
-					monto_cobrable * moneda_cobro_gasto.tipo_cambio / moneda_cobro_total.tipo_cambio), 0))
-			FROM
-				cta_corriente
-				LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
-				LEFT JOIN prm_moneda as moneda_gasto ON moneda_gasto.id_moneda = cta_corriente.id_moneda
-				LEFT JOIN prm_moneda as moneda_total ON 1=1 
-				LEFT JOIN cobro_moneda as moneda_cobro_gasto ON moneda_cobro_gasto.id_cobro = cta_corriente.id_cobro
-				LEFT JOIN cobro_moneda as moneda_cobro_total ON moneda_cobro_total.id_cobro = cta_corriente.id_cobro
-			WHERE
-				cta_corriente.codigo_asunto IN (tabla1.codigos_asunto) AND
-				moneda_total.id_moneda = tabla1.id_moneda_total AND
-				cta_corriente.cobrable = 1 AND
-				moneda_cobro_gasto.id_moneda = cta_corriente.id_moneda AND
-				moneda_cobro_total.id_moneda = tabla1.id_moneda_total AND
-				" . $where_gasto . "
-				(cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')) AS monto_gastos,
-			tabla1.glosa_contrato,
-			tabla1.id_moneda_retainer,
-			tabla1.id_moneda_total,
-			tabla1.id_moneda_tarifa,
-			tabla1.valor_descuento,
-			tabla1.porcentaje_descuento,
-			tabla1.fecha_ultimo_trabajo,
-			REPLACE(tabla1.codigos_asunto, ', ', '\n') as codigos_asunto
-		FROM
-			(	-- Selecciono Todos los asuntos con sus horas por cobrar y con el monto seg˙n THH --
-			SELECT cliente.`codigo_cliente`,
-				cliente.glosa_cliente,
-				CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario,
-				usuario.username as usuario_username,
-				CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as nombre_usuario_secundario,
-				usuario_secundario.username as usuario_secundario_username,
-				GROUP_CONCAT( distinct glosa_asunto SEPARATOR '\n' ) AS asuntos	,
-				GROUP_CONCAT( distinct asunto.codigo_asunto SEPARATOR ', ' ) AS codigos_asunto,
-				contrato.forma_cobro AS forma_cobro,
-				asunto.codigo_asunto,
-				asunto.glosa_asunto,
-				SUM( TIME_TO_SEC( duracion_cobrada ) )/3600 AS hr_por_cobrar,
-				sum(
-					(SELECT tarifa FROM usuario_tarifa where usuario_tarifa.id_usuario = trabajo.id_usuario
-				   	AND usuario_tarifa.id_moneda = contrato.id_moneda
-						AND usuario_tarifa.id_tarifa = contrato.id_tarifa)
-				* TIME_TO_SEC( duracion_cobrada ))/3600 AS valor_hh,
-				sum(
-              (SELECT tarifa FROM usuario_tarifa where usuario_tarifa.id_usuario = trabajo.id_usuario
-                  AND usuario_tarifa.id_moneda = contrato.id_moneda
-                  AND usuario_tarifa.id_tarifa = (select id_tarifa FROM tarifa where tarifa_defecto=1))
-				* TIME_TO_SEC( duracion_cobrada ))/3600 AS valor_hh_std,
-				contrato.id_contrato,
-				contrato.monto AS monto_contrato,
-				contrato.`glosa_contrato`,
-				contrato.retainer_horas AS retainer_horas,
-				contrato.id_moneda_monto AS id_moneda_retainer,
-				contrato.opc_moneda_total AS id_moneda_total,
-				contrato.id_moneda AS id_moneda_tarifa,
-				contrato.descuento AS valor_descuento,
-				contrato.porcentaje_descuento AS porcentaje_descuento,
-				MAX(trabajo.fecha) as fecha_ultimo_trabajo
-			FROM 
-				trabajo
-				LEFT JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-				LEFT JOIN contrato ON (contrato.id_contrato = IF(asunto.id_contrato > 0, asunto.id_contrato, cliente.id_contrato))
-				LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
-				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-				LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
-			WHERE trabajo.cobrable =1 AND trabajo.id_tramite = 0 
-				$where
-				AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')
---				AND asunto.`activo` = 1    No se bien pq est√° esta linea --
-			GROUP BY $group_by
-			ORDER BY cliente.glosa_cliente) AS tabla1
-			
-	";	
-		//LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = tabla1.id_moneda_total";
-		#Clientes
-		$arreglo_monedas = ArregloMonedas($sesion);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		$fila_inicial = $filas+2;
 		while($cobro = mysql_fetch_array($resp))
 		{
+			$contrato = new Contrato($sesion);
+			$contrato->Load($cobro['id_contrato']);
+			
+			// Definir datos ...
+			if($separar_asuntos) {
+				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2, $cobro['codigo_asunto'] );
+				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2, $cobro['codigo_asunto'] );
+				$horas_no_cobradas = $contrato->TotalHoras( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+				list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+			}
+			else {
+				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2 );
+				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2 );
+				$horas_no_cobradas = $contrato->TotalHoras( false, '', $fecha1, $fecha2 );
+				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false );
+				list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, '', $fecha1, $fecha2 );
+				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, '', $fecha1, $fecha2 );
+			}
+			$id_ultimo_cobro = $contrato->UltimoCobro();
+			$ultimo_cobro = new Cobro($sesion);
+			$ultimo_cobro->Load($id_ultimo_cobro);
+			
+			if( empty( $id_moneda_trabajos ) ) {
+				$id_moneda_trabajos = $cobro['id_moneda_contrato'];
+			}
 			++$filas;
-			$ws1->write($filas, $col_codigo_cliente, $cobro['codigos_asunto'], $formato_texto);
+			$ws1->write($filas, $col_codigo_cliente, $cobro['codigo_asunto'], $formato_texto);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
-				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario_username'], $formato_texto);
+				$ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
 				if($mostrar_encargado_secundario)
-					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['usuario_secundario_username'], $formato_texto);
+					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['username_encargado_secundario'], $formato_texto);
 			}
 			else{
-				$ws1->write($filas, $col_usuario_encargado, $cobro['usuario'], $formato_texto);
+				$ws1->write($filas, $col_usuario_encargado, $cobro['nombre_encargado_comercial'], $formato_texto);
 				if($mostrar_encargado_secundario)
-					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_usuario_secundario'], $formato_texto);
+					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_encargado_secundario'], $formato_texto);
 			}
 			$ws1->write($filas, $col_asunto,$cobro['asuntos'], $formato_texto);
-			
-			$ws1->write($filas, $col_ultimo_trabajo, empty($cobro['fecha_ultimo_trabajo']) ? "" : Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, "-" ), $formato_texto);
-			$ws1->write($filas, $col_ultimo_gasto, empty($cobro['fecha_ultimo_gasto']) ? "" : Utiles::sql2fecha($cobro['fecha_ultimo_gasto'], $formato_fecha, "-"), $formato_texto);
-			$ws1->write($filas, $col_monto_gastos, $cobro['monto_gastos'], $formatos_moneda[$cobro['id_moneda_total']]);
-			
-			$ws1->write($filas, $col_ultimo_cobro,$cobro['fecha_ultimo_cobro'] != '' ? Utiles::sql2fecha($cobro['fecha_ultimo_cobro'], $formato_fecha, "-") : '', $formato_texto);
-			$ws1->write($filas, $col_estado_ultimo_cobro,$cobro['estado_ultimo_cobro'] != '' ? $cobro['estado_ultimo_cobro'] : '', $formato_texto);
-			$ws1->write($filas, $col_forma_cobro,$cobro['forma_cobro'], $formato_texto);
+			$ws1->write($filas, $col_ultimo_trabajo, empty($fecha_ultimo_trabajo) ? "" : Utiles::sql2fecha($fecha_ultimo_trabajo, $formato_fecha, "-" ), $formato_texto);
+			$ws1->write($filas, $col_ultimo_gasto, empty($fecha_ultimo_gasto) ? "" : Utiles::sql2fecha($fecha_ultimo_gasto, $formato_fecha, "-"), $formato_texto);
+			$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
+			$ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
+			$ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
+			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas/24,6,'.',''), $formato_tiempo);
+			$ws1->write($filas, $col_forma_cobro, $cobro['forma_cobro'], $formato_texto);
 
-			//El valor estimado lo manejareos en la moneda total para la coherencia del reporte.
-			$cobro['monto'] = $cobro['monto']   * ( $arreglo_monedas[$cobro['id_moneda_retainer']]['tipo_cambio']/$arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio']);
-			$cobro['valor_cobro'] = $cobro['valor_cobro'] * ( $arreglo_monedas[$cobro['id_moneda_tarifa']]['tipo_cambio']/$arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio']); //lo llevamos a moneda total
-			$cobro['valor_cobro_std'] = $cobro['valor_cobro_std'] * ( $arreglo_monedas[$cobro['id_moneda_tarifa']]['tipo_cambio']/$arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio']); //lo llevamos a moneda total
-			//Todo a moneda total para c√lculos
-			
 			// En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
 			if( $cobro['id_contrato'] != $id_contrato_anterior )
 				$valor_descuento = $cobro['valor_descuento'];
 			
-			$valor_estimado = $cobro['monto'];
+			$valor_estimado = $monto_estimado_trabajos;
 			
-			if($cobro['forma_cobro']=='CAP')	
+			if($cobro['forma_cobro']=='CAP')
 			{
 					$cobro_aux = new Cobro($sesion);
-					$usado = $cobro_aux->TotalCobrosCap($cobro['id_contrato'],$cobro['id_moneda_total']); //Llevamos lo cobrado en el CAP a la moneda TOTAL
-					if($cobro['valor_cobro']+$usado > $cobro['monto'] )
+					$usado = $cobro_aux->TotalCobrosCap($cobro['id_contrato']); //Llevamos lo cobrado en el CAP a la moneda TOTAL
+					if($monto_estimado_trabajos+$usado > $cobro['monto'] )
 					{
 						$valor_estimado = $cobro['monto'] - $usado;
 						if($valor_estimado < 0)
 							$valor_estimado = 0;
 					}
 					else
-						$valor_estimado = $cobro['valor_cobro'];
+						$valor_estimado = $monto_estimado_trabajos;
 			}
-			if($cobro['forma_cobro']=='PROPORCIONAL' || $cobro['forma_cobro']=='RETAINER')
-			{
-					if($cobro['retainer_horas'] > 0)
-					if($cobro['retainer_horas'] < $cobro['horas_por_cobrar'])
-					{
-						$porcentaje_retainer = 1.00*($cobro['horas_por_cobrar']-$cobro['retainer_horas'])/$cobro['horas_por_cobrar'];
-						$valor_estimado += $cobro['valor_cobro']*$porcentaje_retainer;
-					}
-			}
-			if($cobro['forma_cobro'] == 'TASA')
-			{
-				$valor_estimado = $cobro['valor_cobro'];
-			}
+			else
+				$valor_estimado = $monto_estimado_trabajos;
+				
 			// Aplicar descuentos del contrato al valor estimado
 			if( $cobro['porcentaje_descuento'] > 0 )
 				{
@@ -418,17 +372,35 @@
 					else
 						$valor_descuento = 0;
 				}
+			$valor_estimado = UtilesApp::CambiarMoneda( $valor_estimado, 
+																									number_format($arreglo_monedas[$cobro['id_moneda_contrato']]['tipo_cambio'],
+																																$arreglo_monedas[$cobro['id_moneda_contrato']]['cifras_decimales'],'.',''), 
+																									$arreglo_monedas[$cobro['id_moneda_contrato']]['cifras_decimales'], 
+																									number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'],
+																																$arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''), 
+																									$arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales']);
+			$valor_estimado_moneda_base = UtilesApp::CambiarMoneda( $valor_estimado, 
+																															number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'],
+																																						$arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''), 
+																															$arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'], 
+																															number_format($moneda_base['tipo_cambio'],
+																																						$moneda_base['cifras_decimales'],'.',''), 
+																															$moneda_base['cifras_decimales']);
+			$valor_thh_moneda_base = UtilesApp::CambiarMoneda( $monto_estimado_thh, 
+																												 number_format($arreglo_monedas[$id_moneda_thh]['tipo_cambio'],
+																																			 $arreglo_monedas[$id_moneda_thh]['cifras_decimales'],'.',''), 
+																												 $arreglo_monedas[$id_moneda_thh]['cifras_decimales'], 
+																												 number_format($moneda_base['tipo_cambio'],$moneda_base['cifras_decimales'],'.',''), 
+																												 $moneda_base['cifras_decimales']);
+			
 			$ws1->writeNumber($filas, $col_valor_estimado, $valor_estimado, $formatos_moneda[$cobro['id_moneda_total']]);
-			$ws1->writeNumber($filas, $col_tipo_cambio,$arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $formatos_moneda[$moneda_base['id_moneda']]);
-			//$valor_estimado_moneda_base = str_replace(',', '.', $valor_estimado *$cobro['tipo_cambio']/$moneda_base['tipo_cambio']);
-			$valor_estimado_moneda_base = UtilesApp::CambiarMoneda($valor_estimado, $arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'], $moneda_base['cifras_decimales'], $moneda_base['tipo_cambio'],$moneda_base['cifras_decimales']);
-			$texto_prueba = 'VE:'.$valor_estimado.' TC:'.$cobro['tipo_cambio'].'. VEMB:'.$valor_estimado_moneda_base;
+			$ws1->writeNumber($filas, $col_tipo_cambio,number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'],$arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'],'.',''), $formatos_moneda_tc[$id_moneda_referencia]);
+			if( $id_moneda_base != $id_moneda_referencia ) {
+				$ws1->writeNumber($filas, $col_tipo_cambio_moneda_base, number_format($arreglo_monedas[$id_moneda_base]['tipo_cambio'],$arreglo_monedas[$id_moneda_base]['cifras_decimales'],'.',''), $formatos_moneda_tc[$id_moneda_referencia]);
+			}
+			
 			$ws1->write($filas, $col_valor_en_moneda_base, $valor_estimado_moneda_base, $formatos_moneda[$moneda_base['id_moneda']]);
-			//$ws1->write($filas, $col_valor_en_moneda_base, $texto_prueba, $formato);
-
-			//$valor_thh_moneda_base = str_replace(',', '.', $cobro['valor_cobro'] * $cobro['tipo_cambio']/$moneda_base['tipo_cambio']);
-			//$valor_thh_moneda_base corresponde a el valor a tarifa standar
-			$valor_thh_moneda_base = UtilesApp::CambiarMoneda($cobro['valor_cobro_std'],$arreglo_monedas[ $cobro['id_moneda_total']]['tipo_cambio'], $moneda_base['cifras_decimales'], $moneda_base['tipo_cambio'],$moneda_base['cifras_decimales']);
+			
 			if($valor_estimado_moneda_base < $valor_thh_moneda_base )
 				$formato = $formato_moneda_base_rojo;
 			else
@@ -436,7 +408,7 @@
 			$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, $valor_thh_moneda_base, $formato);
 
 			// Excel guarda los tiempos en base a dÌas, por eso se divide en 24.
-			$ws1->writeNumber($filas, $col_horas_trabajadas, $cobro['horas_por_cobrar']/24, $formato_tiempo);
+			//$ws1->writeNumber($filas, $col_horas_trabajadas, $cobro['horas_por_cobrar']/24, $formato_tiempo);
 
 			if($debug)
 			{

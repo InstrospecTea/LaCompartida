@@ -1442,13 +1442,14 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		</tr> 
 <?php 
 		}
+	}
 		if(isset($t) && $t->Loaded() && $opcion != 'nuevo') 
 		{
 			echo("<tr><td colspan=5 align=center>"); 
 			echo("<a onclick=\"return confirm('".__('¿Desea eliminar este trabajo?')."')\" href=?opcion=eliminar&id_trabajo=".$t->fields['id_trabajo']."&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este trabajo&nbsp;</span></a>"); 
 			echo("</td></tr>");                       
 		}
-} ?>
+?>
 		<tr>
 		<td colspan='3' align='right'>
 					<? if ($id_tabajo > 0)
