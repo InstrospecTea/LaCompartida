@@ -31,7 +31,7 @@ class Moneda extends Objeto
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		if(list($glosa_moneda)= mysql_fetch_array($resp))
 			return $glosa_moneda;
-	  else
+		else
 			return false;
 	}
 	
@@ -41,7 +41,7 @@ class Moneda extends Objeto
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		if(list($glosa_moneda_plural)= mysql_fetch_array($resp))
 			return $glosa_moneda_plural;
-	  else
+		else
 			return false;
 	}
 	
@@ -61,17 +61,17 @@ class Moneda extends Objeto
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		if(list($id_moneda)= mysql_fetch_array($resp))
 			return $id_moneda;
-	  else
+		else
 			return false;	
 	}
 	
 	function GetTipoCambioMoneda (&$sesion, $id_moneda)
 	{
-	  $query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda='$id_moneda'";
-	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	  if(list($tipo_cambio)= mysql_fetch_array($resp))
+		$query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda='$id_moneda'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($tipo_cambio)= mysql_fetch_array($resp))
 			return $tipo_cambio;
-	  else
+		else
 			return false;	
 	}
 	
@@ -105,6 +105,16 @@ class Moneda extends Objeto
 			return false;
 	}
 	
+	function GetMonedaTipoCambioReferencia(&$sesion)
+	{
+		$query = "SELECT id_moneda FROM prm_moneda WHERE tipo_cambio_referencia = 1 ";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($id_moneda) = mysql_fetch_array($resp))
+			return $id_moneda;
+		else
+			return false;
+	}
+	
 	function GetMonedaTramitePorDefecto(&$sesion)
 	{
 		if( method_exists('Conf','GetConf') )
@@ -123,24 +133,28 @@ class Moneda extends Objeto
 
 class ListaMonedas extends Lista
 {
-    function ListaMonedas($sesion, $params, $query)
-    {
-        $this->Lista($sesion, 'Moneda', $params, $query);
-    }
+		function ListaMonedas($sesion, $params, $query)
+		{
+			$this->Lista($sesion, 'Moneda', $params, $query);
+		}
 }
 
 function ArregloMonedas($sesion)
-  {
-    $query = "SELECT prm_moneda.id_moneda, prm_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo 
-                  FROM prm_moneda 
-                   ";
-    $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-    while( list($id_moneda, $tipo_cambio, $cifras_decimales,$glosa_moneda, $simbolo) = mysql_fetch_array($resp) )
-    {
-      $moneda[$id_moneda]['tipo_cambio']  = $tipo_cambio;
-      $moneda[$id_moneda]['glosa_moneda']    = $glosa_moneda;
-      $moneda[$id_moneda]['cifras_decimales']      = $cifras_decimales;
-      $moneda[$id_moneda]['simbolo']         = $simbolo;
-    }
-    return $moneda;
-  }
+{
+	$query = "SELECT 
+							prm_moneda.id_moneda, 
+							prm_moneda.tipo_cambio, 
+							prm_moneda.cifras_decimales,
+							prm_moneda.glosa_moneda, 
+							prm_moneda.simbolo 
+						FROM prm_moneda";
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	while( list($id_moneda, $tipo_cambio, $cifras_decimales,$glosa_moneda, $simbolo) = mysql_fetch_array($resp) )
+	{
+		$moneda[$id_moneda]['tipo_cambio']			= $tipo_cambio;
+		$moneda[$id_moneda]['glosa_moneda']			= $glosa_moneda;
+		$moneda[$id_moneda]['cifras_decimales']	= $cifras_decimales;
+		$moneda[$id_moneda]['simbolo']					= $simbolo;
+	}
+	return $moneda;
+}
