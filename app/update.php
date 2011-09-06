@@ -6128,6 +6128,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.82:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+												VALUES (
+													NULL ,  'MostrarColumnasGastosEnHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
+												);";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6369,7 +6380,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.70;
 	$VERSIONES[$num++] = 4.71;
 	$VERSIONES[$num++] = 4.72;
-	$VERSIONES[$num++] = 4.73;	
+	$VERSIONES[$num++] = 4.73;
 	$VERSIONES[$num++] = 4.74;
 	$VERSIONES[$num++] = 4.75;
 	$VERSIONES[$num++] = 4.76;
@@ -6378,6 +6389,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.79;
 	$VERSIONES[$num++] = 4.80;
 	$VERSIONES[$num++] = 4.81;
+	$VERSIONES[$num++] = 4.82;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

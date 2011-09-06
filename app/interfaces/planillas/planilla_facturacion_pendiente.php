@@ -140,8 +140,10 @@
 			$col_usuario_encargado_secundario = ++$col;
 		$col_asunto = ++$col;
 		$col_ultimo_trabajo = ++$col;
-		$col_ultimo_gasto = ++$col;
-		$col_monto_gastos = ++$col;
+		if( UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar') ) {
+			$col_ultimo_gasto = ++$col;
+			$col_monto_gastos = ++$col;
+		}
 		$col_ultimo_cobro = ++$col;
 		$col_estado_ultimo_cobro = ++$col;
 		$col_horas_trabajadas = ++$col;
@@ -171,9 +173,10 @@
 		$ws1->setColumn($col_asunto, $col_asunto, 40);
 		
 		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
-		$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
-		$ws1->setColumn($col_monto_gastos, $col_monto_gastos, 18);
-		
+		if( UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar') ) {
+			$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
+			$ws1->setColumn($col_monto_gastos, $col_monto_gastos, 18);
+		}
 		$ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
 		$ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
 		$ws1->setColumn($col_forma_cobro, $col_forma_cobro, 14);
@@ -202,9 +205,10 @@
 		$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
 		
 		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
-		$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
-		$ws1->write($filas, $col_monto_gastos, __('Monto gastos'), $formato_titulo);
-		
+		if( UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar') ) {
+			$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
+			$ws1->write($filas, $col_monto_gastos, __('Monto gastos'), $formato_titulo);
+		}
 		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
@@ -327,8 +331,10 @@
 			}
 			$ws1->write($filas, $col_asunto,$cobro['asuntos'], $formato_texto);
 			$ws1->write($filas, $col_ultimo_trabajo, empty($fecha_ultimo_trabajo) ? "" : Utiles::sql2fecha($fecha_ultimo_trabajo, $formato_fecha, "-" ), $formato_texto);
-			$ws1->write($filas, $col_ultimo_gasto, empty($fecha_ultimo_gasto) ? "" : Utiles::sql2fecha($fecha_ultimo_gasto, $formato_fecha, "-"), $formato_texto);
-			$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
+			if( UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar') ) {
+				$ws1->write($filas, $col_ultimo_gasto, empty($fecha_ultimo_gasto) ? "" : Utiles::sql2fecha($fecha_ultimo_gasto, $formato_fecha, "-"), $formato_texto);
+				$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
+			}
 			$ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
 			$ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
 			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas/24,6,'.',''), $formato_tiempo);
