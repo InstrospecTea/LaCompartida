@@ -346,7 +346,7 @@ class Trabajo extends Objeto
 		// Leemos todas las hojas
 		foreach($excel->sheets as $hoja)
 		{
-			if( $hoja['cells'][1][$col_id_trabajo] == __('Nº') || $hoja['cells'][2][$col_id_trabajo] == __('Nº') || $hoja['cells'][3][$col_id_trabajo] == __('Nº') )
+			if( $hoja['cells'][1][$col_id_trabajo] == __('N°') || $hoja['cells'][2][$col_id_trabajo] == __('N°') || $hoja['cells'][3][$col_id_trabajo] == __('N°') )
 				continue;
 			// Busca numero de cobro
 					for ($i=1; $i< $hoja['numCols']; ++$i)

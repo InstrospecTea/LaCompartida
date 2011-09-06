@@ -165,9 +165,9 @@
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
 							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente";
-		}
-		function QueryHoras()
-		{
+		} 
+		function QueryHoras() 
+		{ 
 			return "SELECT
 								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
 								,hta.FechaFacturable																																					as fecha 
@@ -186,8 +186,7 @@
 								FROM HojaTiempoajustado hta
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
 								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid";
-		}
-		
+		} 
 		function QueryGastos() 
 		{ 
 			return "SELECT
@@ -202,15 +201,19 @@
 									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro, 
-									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario,
+									Empleado.CodigoEmpleado 																													as gasto_FFF_id_usuario,
 									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario_orden,
 									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
 									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
 									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,
 									Gastos.CodigoCliente 																															as gasto_FFF_codigo_cliente,
 									IF(Gastos.flagfacturable='S','1','0') 																						as gasto_FFF_cobrable,
-									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda
-									FROM Gastos";
+									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda,
+									Factura.CodigoFacturaBoleta																												as gasto_FFF_codigo_factura_gasto,
+									Factura.FechaImpresion																														as gasto_FFF_fecha_factura 
+									FROM Gastos
+									LEFT JOIN Empleado ON TRIM(Empleado.Siglas) = TRIM(Gastos.Creadopor)
+									LEFT JOIN Factura ON Gastos.NumeroFactura = Factura.NumeroFactura";
 		}
 		function QueryMonedaHistorial() 
 		{

@@ -2093,6 +2093,8 @@ class Migracion
 		$gasto->Edit("numero_documento", $gasto_generar->fields['numero_documento'] ? $gasto_generar->fields['numero_documento'] : "NULL");
 		$gasto->Edit("numero_ot", $gasto_generar->fields['numero_ot'] ? $gasto_generar->fields['numero_ot'] : "NULL");
 		$gasto->Edit("id_cobro", $gasto_generar->fields['id_cobro'] ? $gasto_generar->fields['id_cobro'] : "NULL" );
+		$gasto->Edit("fecha_factura", $gasto_generar->fields['fecha_factura'] ? $gasto_generar->fields['fecha_factura'] : "NULL" );
+		$gasto->Edit("codigo_factura_gasto", $gasto_generar->fields['codigo_factura_gasto'] ? $gasto_generar->fields['codigo_factura_gasto'] : "NULL" );
 
 		if($pagado and !empty($gasto_generar->fields['egreso']))
 		{
