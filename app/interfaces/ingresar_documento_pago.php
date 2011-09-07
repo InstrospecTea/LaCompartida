@@ -37,12 +37,9 @@
 	$cambios_en_saldo_honorarios = array();
 	$cambios_en_saldo_gastos = array();
 	
-	if($id_documento)
+	if($id_documento && !$adelanto)
 	{
 		$documento->Load($id_documento);
-		foreach($documento->fields as $campo => $valor){
-			if(!isset(${$campo})) ${$campo} = $valor;
-		}
 	}
 	
 	if($opcion == "guardar")
@@ -78,7 +75,12 @@
 			}
 		}
 
-		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') && $codigo_cliente_secundario != '' )
+		{
+			$cliente = new Cliente($sesion);
+			$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario ) ;
+		}
+		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
 		?>
 			<script type="text/javascript">
 				if( window.opener.Refrescar )
@@ -496,6 +498,11 @@ function CargarContratos(){
 <input type=hidden name='pago_gastos' id='pago_gastos' value='<?=$id_documento ? $documento->fields['pago_gastos'] : ''?>'/>
 <input type=hidden name='es_adelanto' id='es_adelanto' value='<?=$id_documento ? $documento->fields['es_adelanto'] : ''?>'/>
 <input type=hidden name='id_contrato' id='id_contrato' value='<?=$id_documento ? $documento->fields['id_contrato'] : ''?>'/>
+<?php } ?>
+<?php if(empty($adelanto) && $id_documento && $documento->fields['es_adelanto'] == '1'){ ?>
+<input type=hidden name='codigo_cliente' value='<?=$documento->fields['codigo_cliente']?>'/>
+<input type=hidden name='monto' value='<?=$documento->fields['monto']?>'/>
+<input type=hidden name='id_moneda' value='<?=$documento->fields['id_moneda']?>'/>
 <?php } ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
