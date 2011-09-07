@@ -110,12 +110,23 @@ function OpcionesListaAdelanto(&$fila)
 	$accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
 	if ($fila->fields['monto'] == $fila->fields['saldo_pago'])
 	{
-		$accion_adelanto .= "<a href='adelantos.php?id_documento_e=" . $fila->fields['id_documento'] .  "&opc=eliminar'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' /></a>";
+		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='EliminarAdelanto(" . $fila->fields['id_documento'] . ");return false;' /></a>";
+	}
+	else
+	{
+		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='alert(\"No se puede eliminar el adelanto porque ha sido utilizado como abono en algun " . __('Cobro') . "\");return false;' /></a>";
 	}
 	return $accion_adelanto;
 }
 ?>
 <script type="text/javascript" charset="utf-8">
+	function EliminarAdelanto(adelanto)
+	{
+		if (confirm('¿Esta seguro que desea eliminar el adelanto?'))
+		{
+			window.location.href = "adelantos.php?id_documento_e=" + adelanto + "&opc=eliminar";
+		}
+	}
 	<?php if ($elegir_para_pago) { ?>
 	function ElegirParaPago(url)
 	{
