@@ -120,16 +120,19 @@
         {
                 $moneda_factura = new Moneda($sesion);
                 $moneda_factura->Load($documento_cobro->fields['id_moneda']);
-                 
-                # Se genera una factura "base", esta puede ser modificada
-                $factura = new Factura($sesion);
-                if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaNumeracionAutomatica') ) || ( method_exists('Conf','UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() ) ) 
-                        { 
-                        $numero_documento = $factura->ObtieneNumeroFactura(); 
-                        $factura->Edit('numero',$numero_documento); 
-                        } 
-                else 
-                        $factura->Edit('numero',$documento); 
+
+								# Se genera una factura "base", esta puede ser modificada
+								$factura = new Factura($sesion);
+								if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaNumeracionAutomatica') ) || ( method_exists('Conf','UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() ) ) 
+								{ 
+									if( UtilesApp::GetConf($sesion,'PermitirFactura') )
+										$numero_documento = $factura->ObtieneNumeroFactura(); 
+									else
+										$numero_documento = $documento;
+									$factura->Edit('numero',$numero_documento); 
+								} 
+								else 
+									$factura->Edit('numero',$documento); 
                 $factura->Edit('fecha',date('Y-m-d')); 
                 $factura->Edit('cliente',$contrato->fields['factura_razon_social']); 
                 $factura->Edit('RUT_cliente',$contrato->fields['rut']); 
@@ -290,8 +293,10 @@
 		
 		if( !( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaNumeracionAutomatica') ) && !( method_exists('Conf','UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() ) ) 
 		{
-			$factura->Edit('numero',$documento);
-			$factura->Escribir();
+			if( UtilesApp::GetConf($sesion,'PermitirFactura') ) {
+				$factura->Edit('numero',$documento);
+				$factura->Escribir();
+			}
 			$cobro->Edit('documento',$documento);
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || (  method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) )
 				$cobro->Edit('nota_cobro',$nota_cobro);

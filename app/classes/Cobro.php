@@ -7787,7 +7787,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 			//Adelantos
 			$query = "
-				SELECT documento.id_documento, documento.fecha, documento.glosa_documento, documento.saldo_pago, documento.monto, prm_moneda.tipo_cambio
+				SELECT documento.id_documento, documento.fecha, documento.glosa_documento, IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago, IF(documento.monto = 0, 0, documento.monto*-1) AS monto, prm_moneda.tipo_cambio
 				FROM documento
 				LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
 				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto = 1 AND documento.saldo_pago < 0 
@@ -7795,7 +7795,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			while ($adelanto = mysql_fetch_assoc($adelantos)) {
 				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
-				
+
 				$monto_saldo = $adelanto['saldo_pago'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'];
 				$monto_saldo_simbolo = $moneda['simbolo'] . number_format($monto_saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$fila_adelanto_ = str_replace('%saldo_pago%', $monto_saldo_simbolo, $fila_adelanto_);
@@ -7829,9 +7829,15 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$query = "
 				SELECT documento.glosa_documento, documento.fecha, documento.monto * cm1.tipo_cambio / cm2.tipo_cambio AS monto, ( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio AS saldo_cobro
 				FROM documento
+				LEFT JOIN cobro ON cobro.id_cobro = documento.id_cobro
 				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda 
 				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro = '" . $this->fields['id_cobro'] . "' AND cm2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
-				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' AND documento.saldo_honorarios + documento.saldo_gastos > 0 AND documento.id_cobro <> " . $this->fields['id_cobro'];
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' 
+				AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' 
+				AND documento.saldo_honorarios + documento.saldo_gastos > 0 
+				AND documento.id_cobro <> " . $this->fields['id_cobro'] . "
+				AND cobro.estado NOT IN ('PAGADO', 'INCOBRABLE', 'CREADO', 'EN REVISION')";
+
 			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			while ($adelanto = mysql_fetch_assoc($adelantos)) {
 				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
@@ -7847,7 +7853,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			
 			if (empty($fila_adelantos))
 			{
-				$fila_adelantos .= '<tr><td colspan="4"><i>' .  __('Sin') . ' ' . __('Saldo anterior') . '</i></td></tr>';
+				$fila_adelantos .= '<tr><td colspan="4"><i>' .  __('Sin saldo anterior') . '</i></td></tr>';
 			}
 			else
 			{

@@ -46,6 +46,7 @@ $_LANG['Egreso'] = "Outcome";
 $_LANG['saldo'] = "balance";
 $_LANG['Saldo'] = "Balance";
 $_LANG['Saldo anterior'] = "Previous balance";
+$_LANG['Sin saldo anterior'] = "There is no previous balance";
 $_LANG['Adelantos por asignar'] = "Unused advance payments";
 $_LANG['Saldo a favor de cliente'] = "Balance in favor";
 $_LANG['Estado Cta. Corriente'] = "Balance status";
