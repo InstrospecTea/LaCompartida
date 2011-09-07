@@ -79,7 +79,12 @@
 		}
 
 		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, empty($codigo_cliente) ? $codigo_cliente_secundario : $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
-		
+		?>
+			<script type="text/javascript">
+				if( window.opener.Refrescar )
+					window.opener.Refrescar();
+			</script>
+		<?php
 		$documento->Load($id_documento);
 		$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
 		$monto_pago = -1*$documento->fields['monto'];
@@ -820,13 +825,6 @@ Calendar.setup(
 		inputField	: "fecha",				// ID of the input field
 		ifFormat		: "%d-%m-%Y",			// the date format
 		button			: "img_fecha"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_pago"		// ID of the button
 	}
 );
 </script>

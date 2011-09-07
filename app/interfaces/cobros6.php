@@ -24,6 +24,15 @@
 	$factura = new Factura($sesion);
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	
+	if( $refrescar ) {
+		?>
+			<script type="text/javascript">
+				if( window.opener.Refrescar )
+					window.opener.Refrescar();
+			</script>
+		<?php
+	}
+		
 	$factura_pago = new FacturaPago($sesion);
 	$enpdf = ( $opc == 'grabar_documento_pdf' ? true : false );
 

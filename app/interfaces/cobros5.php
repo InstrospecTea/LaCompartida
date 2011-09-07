@@ -166,7 +166,7 @@
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
 				}
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
-				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
+				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1");
 			}
 		}
 		elseif($accion == 'imprimir' && $ret == '' ) 	#################### IMPRESION #####################

@@ -252,11 +252,6 @@ class Documento extends Objeto
 		}
 		
 		$this->RecalcularSaldoPago($id_documento);
-		?>
-		<script type="text/javascript">
-		window.opener.Refrescar();
-		</script> 
-		<?
 	}
 	
 	function RecalcularSaldoPago($id_documento){
