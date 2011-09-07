@@ -21,11 +21,21 @@
 	$documento = new Documento($sesion);
 
 	$pagina->titulo = __('Revisar Adelantos');
-	$pagina->PrintTop();
 
 	//Filtros
 	$filtros = array('id_documento' => $id_documento, 'codigo_cliente' => $codigo_cliente, 'fecha_inicio' => $fecha1, 'fecha_fin' => $fecha2, 'moneda' => $moneda_adelanto, 'tiene_saldo' => $tiene_saldo);
 
+	if ($opc == "eliminar" and !empty($id_documento_e))
+	{
+		$sql = "DELETE FROM documento WHERE id_documento = " . mysql_real_escape_string($id_documento_e) . " AND es_adelanto = 1 AND monto = saldo_pago";
+		$query = mysql_query($sql, $sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $sesion->dbh);
+		if (mysql_affected_rows($sesion->dbh) > 0)
+		{
+			$pagina->AddInfo(__('Adelanto') . ' ' . __('eliminado con éxito'));
+		}
+	}
+
+	$pagina->PrintTop();
 ?>
 
 <script type="text/javascript">

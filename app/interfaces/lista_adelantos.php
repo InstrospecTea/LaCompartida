@@ -84,9 +84,9 @@ $buscador->titulo = "Adelantos";
 $buscador->AgregarEncabezado("id_documento", __('N°'));
 $buscador->AgregarEncabezado("glosa_cliente", __('Cliente'));
 $buscador->AgregarEncabezado("fecha", __('Fecha'));
+$buscador->AgregarEncabezado("glosa_documento", __('Descripción'), "align=\"center\"");
 $buscador->AgregarEncabezado("monto_con_simbolo", __('Monto'), "align=\"right\"");
 $buscador->AgregarEncabezado("saldo_pago_con_simbolo", __('Saldo'), "align=\"right\"");
-$buscador->AgregarEncabezado("glosa_documento", __('Descripción'), "align=\"center\"");
 
 if ($elegir_para_pago)
 {
@@ -107,7 +107,12 @@ function ElegirParaPago(&$fila)
 
 function OpcionesListaAdelanto(&$fila)
 {
-	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
+	$accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
+	if ($fila->fields['monto'] == $fila->fields['saldo_pago'])
+	{
+		$accion_adelanto .= "<a href='adelantos.php?id_documento_e=" . $fila->fields['id_documento'] .  "&opc=eliminar'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' /></a>";
+	}
+	return $accion_adelanto;
 }
 ?>
 <script type="text/javascript" charset="utf-8">
