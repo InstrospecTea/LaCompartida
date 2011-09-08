@@ -639,6 +639,15 @@
 			echo json_encode(array('error' => utf8_encode('número')));
 			//echo '{"error":"No se pudo cargar el documento con número '.$id_documento.'"}';
 	}
+	else if($accion == 'saldo_adelantos'){
+		$documento = new Documento($sesion);
+		$tipos_cambio = array();
+		foreach(explode(';', $tipocambio) as $tipocambio){
+			$tipo = explode(':', $tipocambio);
+			$tipos_cambio[$tipo[0]] = $tipo[1];
+		}
+		echo $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda, $tipos_cambio);
+	}
 	else
 		echo("ERROR AJAX. Acción: $accion");
 ?>

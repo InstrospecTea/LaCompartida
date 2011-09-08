@@ -7,6 +7,8 @@
 	$_LANG['RUT']     = "RUC";
 	$_LANG['Gastos c/ IVA'] = "Gastos c/ IGV";
 	$_LANG['Gastos s/ IVA'] = "Gastos s/ IGV";
+	$_LANG['Gastos c/IVA'] = "Gastos c/IGV";
+	$_LANG['Gastos s/IVA'] = "Gastos s/IGV";
 	$_LANG['IVA'] = "IGV";
 	$_LANG['Impuesto'] = "IGV";
 	$_LANG['Monto Impuesto'] = "Monto IGV";

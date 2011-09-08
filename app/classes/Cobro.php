@@ -7700,14 +7700,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					//break;
 				}
 			
+				$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
 				if ($this->fields['opc_ver_morosidad'])
 				{
-					$html = str_replace('%total_subtotal_cobro%', $this->TienePagosAdelantos() ?__('Subtotal Cobro') : __('Total Cobro'), $html);
+					
 					$html = str_replace('%DETALLES_PAGOS%', $this->GenerarDocumento2($parser, 'DETALLES_PAGOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				}
 				else
 				{
-					$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
 					$html = str_replace('%DETALLES_PAGOS%', '', $html);
 				}
 				
@@ -7719,6 +7719,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$fila = $html;
 			$monto_total = (float)$x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
 			$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+			$espacio_moneda = ' ';
+			if(((method_exists('Conf','GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio')) || (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio()))) {
+				$espacio_moneda = '';
+			}
 
 			//Pagos
 			if ($this->TienePagosAdelantos())
@@ -7733,17 +7737,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				while ($pago = mysql_fetch_assoc($pagos)) {
 					$fila_adelanto_ = str_replace('%descripcion%', $pago['glosa_documento'] . ' (' . $pago['fecha'] . ')', $html);
-					
 					$monto_pago = $pago['monto'];
-					$monto_pago_simbolo = $moneda['simbolo'] . number_format($monto_pago, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					$monto_pago_simbolo = $moneda['simbolo'] . $espacio_moneda.  number_format($monto_pago, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 					$fila_adelanto_ = str_replace('%saldo_pago%', $monto_pago_simbolo , $fila_adelanto_);
 					
 					$saldo += (float)$monto_pago;
 					$fila_adelantos .= $fila_adelanto_;
 				}
 				$monto_total += (float)$saldo;
-				$monto_total_simbolo = $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$fila_adelantos .= '<tr class="tr_total"><td>' . __('Total Cobro') . '</td><td align="right">' . $monto_total_simbolo . '</td></tr>';
+				$monto_total_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelantos .= '<tr class="tr_total"><td>' . __('Saldo del cobro') . '</td><td align="right">' . $monto_total_simbolo . '</td></tr>';
 			}
 
 			//Deuda
@@ -7756,11 +7759,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$saldo_total_cobro = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$saldo_total_cobro = mysql_fetch_assoc($saldo_total_cobro);
 			$saldo_total_cobro = (float)$saldo_total_cobro['saldo_total_cobro'];
-			$saldo_total_cobro_simbolo = $moneda['simbolo'] . number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+			$saldo_total_cobro_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Saldo anterior') . '</td><td align="right">' . $saldo_total_cobro_simbolo . '</td></tr>';
 			
-			$saldo_adeudado = $moneda['simbolo'] . number_format($monto_total + $saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Saldo adeudado') . '</td><td align="right">' . $saldo_adeudado . '</td></tr>';
+			$saldo_adeudado = $moneda['simbolo'] . $espacio_moneda . number_format($monto_total + $saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Saldo total adeudado') . '</td><td align="right">' . $saldo_adeudado . '</td></tr>';
 			
 			$html = $fila_adelantos;
 		break;
@@ -7801,11 +7804,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
 
 				$monto_saldo = $adelanto['saldo_pago'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'];
-				$monto_saldo_simbolo = $moneda['simbolo'] . number_format($monto_saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_saldo_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto_saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$fila_adelanto_ = str_replace('%saldo_pago%', $monto_saldo_simbolo, $fila_adelanto_);
 				
 				$monto = $adelanto['monto'] *  $adelanto['tipo_cambio'] / $moneda['tipo_cambio'];
-				$monto_simbolo = $moneda['simbolo'] . number_format($monto, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$fila_adelanto_ = str_replace('%monto%', $monto_simbolo, $fila_adelanto_);
 				
 				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
@@ -7817,8 +7820,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			
 			$fila_adelantos .= '<tr class="tr_total">
 			<td align="right" colspan="2">' . __('Saldo a favor de cliente') .  '</td>
-			<td align="right">' . $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
-			<td align="right">' . $moneda['simbolo'] . number_format($saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+			<td align="right">' . $moneda['simbolo'] . $espacio_moneda . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+			<td align="right">' . $moneda['simbolo'] . $espacio_moneda . number_format($saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
 			</tr>';
 
 			$html = $fila_adelantos;
@@ -7845,10 +7848,13 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			while ($adelanto = mysql_fetch_assoc($adelantos)) {
 				$fila_adelanto_ = str_replace('%descripcion%', $adelanto['glosa_documento'], $html);
-				$monto = $moneda['simbolo'] . number_format($adelanto['saldo_cobro'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$fila_adelanto_ = str_replace('%saldo_pago%', $monto, $fila_adelanto_);
-				$monto = $moneda['simbolo'] . number_format($adelanto['monto'] , $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$fila_adelanto_ = str_replace('%monto%', $monto, $fila_adelanto_);
+				
+				$monto_saldo_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($adelanto['saldo_cobro'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $monto_saldo_simbolo, $fila_adelanto_);
+				
+				$monto_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($adelanto['monto'] , $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%monto%', $monto_simbolo, $fila_adelanto_);
+				
 				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
 				$saldo += (float)$adelanto['saldo_cobro'];
 				$monto_total += (float)$adelanto['monto'];
@@ -7863,8 +7869,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			{
 				$fila_adelantos .= '<tr class="tr_total">
 				<td align="right" colspan="2">' . __('Saldo anterior') . '</td>
-				<td align="right">' . $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
-				<td align="right">' . $moneda['simbolo'] . number_format($saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+				<td align="right">' . $moneda['simbolo'] . $espacio_moneda .  number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
+				<td align="right">' . $moneda['simbolo'] . $espacio_moneda . number_format($saldo, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '</td>
 				</tr>';
 			}
 

@@ -749,22 +749,34 @@ class Documento extends Objeto
 		}
 	}
 	
-	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null){
+	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null, $tipos_cambio = null){
+		$monedas = ArregloMonedas($this->sesion);
+		if(empty($tipos_cambio)){
+			$tipos_cambio = array();
+			foreach($monedas as $id => $moneda){ //uf:20000, us:500, idmoneda:us. adelanto de 100 uf -> us4000
+				$tipos_cambio[$id] = $moneda['tipo_cambio'];
+			}
+		}
+		$cambios = array();
+		foreach($tipos_cambio as $id => $cambio){
+			$cambios[$id] = $id_moneda ? $cambio/$tipos_cambio[$id_moneda] : $cambio;
+		}
 		//pedir la moneda como parametro y convertir cada saldo a esa moneda antes de sumarlos
-		$query = "SELECT SUM(-saldo_pago*tipo_cambio)
+		$query = "SELECT saldo_pago, documento.id_moneda, prm_moneda.tipo_cambio
 			FROM documento
 			JOIN prm_moneda ON documento.id_moneda = prm_moneda.id_moneda
 			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND (id_contrato = '$id_contrato' OR id_contrato IS NULL) AND saldo_pago < 0";
 		if(empty($pago_honorarios)) $query.= ' AND pago_gastos = 1';
 		else if(empty($pago_gastos)) $query.= ' AND pago_honorarios = 1';
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($saldo) = mysql_fetch_array($resp);
+		$saldo = 0;
+		while(list($saldo_pago, $moneda_pago, $tipo_cambio) = mysql_fetch_array($resp)){
+			if($id_moneda) $tipo_cambio = $cambios[$moneda_pago];
+			$saldo += -$saldo_pago*$tipo_cambio;
+		}
 		if(!$saldo) return '';
 		if($id_moneda){
-			$cambio = Moneda::GetTipoCambioMoneda($this->sesion, $id_moneda);
-			if($cambio) $saldo /= $cambio;
-			$simbolo = Moneda::GetSimboloMoneda($this->sesion, $id_moneda);
-			if($simbolo) $saldo = $simbolo.number_format($saldo, 2);
+			return $monedas[$id_moneda]['simbolo'].' '.number_format($saldo, 2);
 		}
 		return $saldo;
 	}

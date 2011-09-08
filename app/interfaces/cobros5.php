@@ -744,7 +744,32 @@ function GuardaTipoCambio( id_moneda, tipo_cambio )
 					return false;
 			}
 		};
-	   http.send(null);
+		http.send(null);
+		ActualizarSaldoAdelantos();
+}
+
+function ActualizarSaldoAdelantos(){
+		var tipos_cambio = [];
+		$$('[id^="cobro_tipo_cambio_"]').each(function(elem){
+			tipos_cambio.push(elem.id.substr('cobro_tipo_cambio_'.length)+':'+elem.value);
+		});
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=saldo_adelantos&codigo_cliente=<?=$cobro->fields['codigo_cliente']?>&id_contrato=<?=$cobro->fields['id_contrato']?>&pago_honorarios='+(Number($F('total_honorarios'))>0?1:0)+'&pago_gastos='+(Number($F('total_gastos'))>0?1:0)+'&id_moneda='+$F('opc_moneda_total')+'&tipocambio='+tipos_cambio.join(';'));
+		http.onreadystatechange = function()
+		{
+			if(http.readyState == 4)
+		  	{
+				var response = http.responseText;
+				if(response)
+				{
+					$('saldo_adelantos').value = response;
+					return true;
+				}
+				else
+					return false;
+			}
+		};
+		http.send(null);
 	}
 }
 
@@ -832,7 +857,18 @@ function UpdateCap(monto_update, guardar)
 $documento = new Documento($sesion);
 $pago_honorarios = empty($cobro->fields['monto_subtotal']) ? 0 : 1;
 $pago_gastos = empty($cobro->fields['subtotal_gastos']) ? 0 : 1;
-echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos, $cobro->fields['opc_moneda_total']);
+$cobro_moneda = new ListaMonedas($sesion, '','SELECT * FROM cobro_moneda WHERE id_cobro = '.$id_cobro);
+$tipo_cambio_cobro = Array();
+for( $i=0; $i<$monedas->num; $i++ )
+{
+	$cambio_moneda = $cobro_moneda->Get($i);
+	if(empty($cambio_moneda->fields['tipo_cambio'])){
+		$moneda = $monedas->Get($i);
+		$tipo_cambio_cobro[$cambio_moneda->fields['id_moneda']] = $moneda->fields['tipo_cambio'];
+	}
+	else $tipo_cambio_cobro[$cambio_moneda->fields['id_moneda']] = $cambio_moneda->fields['tipo_cambio'];
+}
+echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos, $cobro->fields['opc_moneda_total'], $tipo_cambio_cobro);
 ?>" id="saldo_adelantos" />
 <input type="hidden" name="usar_adelantos" value="" id="usar_adelantos" />
 
@@ -1515,7 +1551,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									<?=__('Mostrar total en')?>: 
 								</td>
 								<td width="50%">
-									<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$cobro->fields['opc_moneda_total'],'onchange="ActualizarTipoCambioOpcion(this.form, this.value);"','','70');?>
+									<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$cobro->fields['opc_moneda_total'],'onchange="ActualizarSaldoAdelantos();"','','70');?>
 								</td>
 							</tr>
 							<tr>
