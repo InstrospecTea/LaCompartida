@@ -80,13 +80,18 @@
 			$cliente = new Cliente($sesion);
 			$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario ) ;
 		}
+		$nuevo = empty($id_documento);
 		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
 		?>
 			<script type="text/javascript">
 				if( window.opener.Refrescar )
 					window.opener.Refrescar();
 			</script>
-		<?php
+		<?php if($nuevo && $id_documento){ ?>
+			<script type="text/javascript">
+				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '&id_documento=<?=$id_documento?>';
+			</script>
+		<?php }
 		$documento->Load($id_documento);
 		$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
 		$monto_pago = -1*$documento->fields['monto'];
@@ -182,12 +187,12 @@ function Cerrar()
 
 function Validar(form)
 {
-	monto = parseFloat(form.monto.value);
+	monto = parseFloat($('monto').value);
 
 	if(isNaN(monto))
 	{
 		alert('<?=__('Debe ingresar un monto para el pago')?>');
-		form.monto.focus();
+		$('monto').focus();
 		return false;
 	}
 	var monto_pagos = Math.round($F('monto_pagos')*1000)/1000;
@@ -210,7 +215,7 @@ function Validar(form)
 	if(monto < 0)
 	{
 		alert('<?=__('El monto de un pago debe ser siempre mayor a 0')?>');
-		form.monto.focus();
+		$('monto').focus();
 		return false;
 	}
 

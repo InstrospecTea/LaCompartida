@@ -19,6 +19,7 @@
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
 	$documento = new Documento($sesion);
+	$cliente = new Cliente($sesion);
 
 	$pagina->titulo = __('Revisar Adelantos');
 
@@ -36,6 +37,8 @@
 	}
 
 	$pagina->PrintTop();
+	
+	$codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario) : $codigo_cliente;
 ?>
 
 <script type="text/javascript">
@@ -43,8 +46,8 @@
 	{
 		<?php
 		if (((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))) { ?>
-			var codigo_cliente = $('codigo_cliente_secundario').value;
-			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente;
+			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente_secundario;
 		<? } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
 			var url_extension = "&codigo_cliente=" + codigo_cliente;
