@@ -114,7 +114,7 @@ function OpcionesListaAdelanto(&$fila)
 	}
 	else
 	{
-		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='alert(\"No se puede eliminar el adelanto porque ha sido utilizado como abono en algun " . __('Cobro') . "\");return false;' /></a>";
+		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='alert(\"No se puede eliminar el adelanto porque ha sido utilizado como abono en algún " . __('Cobro') . "\");return false;' /></a>";
 	}
 	return $accion_adelanto;
 }

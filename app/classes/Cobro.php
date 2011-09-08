@@ -7617,9 +7617,6 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			
 			$html = str_replace('%total_cobro%',__('Total Cobro'),$html);
 
-			//Carta Facio
-			$html = str_replace('%total_subtotal_cobro%', $this->fields['opc_ver_morosidad'] ?__('Subtotal Cobro') : __('Total Cobro'), $html);
-
 			$html = str_replace('%total_cobro_cyc%',__('Honorarios y Gastos'),$html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ) )
 				$html = str_replace('%valor_total_cobro_demo%', $moneda_total->fields['simbolo'].number_format($total_cobro_demo,$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
@@ -7705,10 +7702,12 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			
 				if ($this->fields['opc_ver_morosidad'])
 				{
+					$html = str_replace('%total_subtotal_cobro%', $this->TienePagosAdelantos() ?__('Subtotal Cobro') : __('Total Cobro'), $html);
 					$html = str_replace('%DETALLES_PAGOS%', $this->GenerarDocumento2($parser, 'DETALLES_PAGOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				}
 				else
 				{
+					$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
 					$html = str_replace('%DETALLES_PAGOS%', '', $html);
 				}
 				
@@ -7718,30 +7717,35 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 		case 'DETALLES_PAGOS':
 			$fila = $html;
-			$total = (int)$x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
+			$monto_total = (float)$x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
 			$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
 
 			//Pagos
-			$query = "
-				SELECT doc_pago.glosa_documento, (neteo_documento.valor_cobro_honorarios + neteo_documento.valor_cobro_gastos) * -1 AS monto, doc_pago.fecha, prm_moneda.tipo_cambio
-				FROM documento AS doc_pago
-				JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
-				JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
-				JOIN prm_moneda ON prm_moneda.id_moneda = doc_pago.id_moneda
-				WHERE doc.id_cobro = " . $this->fields['id_cobro'];
-			$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			while ($pago = mysql_fetch_assoc($pagos)) {
-				$fila_adelanto_ = str_replace('%descripcion%', $pago['glosa_documento'] . ' (' . $pago['fecha'] . ')', $html);
-				$monto_pago = $pago['monto'];
-				$monto_pago_simbolo = $moneda['simbolo'] . number_format($monto_pago, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-				$fila_adelanto_ = str_replace('%saldo_pago%', $monto_pago_simbolo , $fila_adelanto_);
-				$saldo += (int)$monto_pago;
-				$fila_adelantos .= $fila_adelanto_;
+			if ($this->TienePagosAdelantos())
+			{
+				$query = "
+					SELECT doc_pago.glosa_documento, (neteo_documento.valor_cobro_honorarios + neteo_documento.valor_cobro_gastos) * -1 AS monto, doc_pago.fecha, prm_moneda.tipo_cambio
+					FROM documento AS doc_pago
+					JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
+					JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
+					JOIN prm_moneda ON prm_moneda.id_moneda = doc_pago.id_moneda
+					WHERE doc.id_cobro = " . $this->fields['id_cobro'];
+				$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				while ($pago = mysql_fetch_assoc($pagos)) {
+					$fila_adelanto_ = str_replace('%descripcion%', $pago['glosa_documento'] . ' (' . $pago['fecha'] . ')', $html);
+					
+					$monto_pago = $pago['monto'];
+					$monto_pago_simbolo = $moneda['simbolo'] . number_format($monto_pago, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					$fila_adelanto_ = str_replace('%saldo_pago%', $monto_pago_simbolo , $fila_adelanto_);
+					
+					$saldo += (float)$monto_pago;
+					$fila_adelantos .= $fila_adelanto_;
+				}
+				$monto_total += (float)$saldo;
+				$monto_total_simbolo = $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelantos .= '<tr class="tr_total"><td>' . __('Total Cobro') . '</td><td align="right">' . $monto_total_simbolo . '</td></tr>';
 			}
-			$monto_total = $total + $saldo;
-			$monto_total_simbolo = $moneda['simbolo'] . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Total Cobro') . '</td><td align="right">' . $monto_total_simbolo . '</td></tr>';
-			
+
 			//Deuda
 			$query = "
 				SELECT SUM(( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio) AS saldo_total_cobro
@@ -7751,7 +7755,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' AND documento.saldo_honorarios + documento.saldo_gastos > 0 AND documento.id_cobro <> " . $this->fields['id_cobro'];
 			$saldo_total_cobro = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$saldo_total_cobro = mysql_fetch_assoc($saldo_total_cobro);
-			$saldo_total_cobro = $saldo_total_cobro['saldo_total_cobro'];
+			$saldo_total_cobro = (float)$saldo_total_cobro['saldo_total_cobro'];
 			$saldo_total_cobro_simbolo = $moneda['simbolo'] . number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			$fila_adelantos .= '<tr class="tr_total"><td>' . __('Saldo anterior') . '</td><td align="right">' . $saldo_total_cobro_simbolo . '</td></tr>';
 			
@@ -7806,8 +7810,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				
 				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
 				
-				$saldo += (int)$monto_saldo;
-				$monto_total += (int)$monto;
+				$saldo += (float)$monto_saldo;
+				$monto_total += (float)$monto;
 				$fila_adelantos .= $fila_adelanto_;
 			}
 			
@@ -7846,8 +7850,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$monto = $moneda['simbolo'] . number_format($adelanto['monto'] , $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 				$fila_adelanto_ = str_replace('%monto%', $monto, $fila_adelanto_);
 				$fila_adelanto_ = str_replace('%fecha%', date("d-m-Y", strtotime($adelanto['fecha'])), $fila_adelanto_);
-				$saldo += (int)$adelanto['saldo_cobro'];
-				$monto_total += (int)$adelanto['monto'];
+				$saldo += (float)$adelanto['saldo_cobro'];
+				$monto_total += (float)$adelanto['monto'];
 				$fila_adelantos .= $fila_adelanto_;
 			}
 			
@@ -11162,6 +11166,19 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 		}
 		return $html;
+	}
+	
+	function TienePagosAdelantos()
+	{
+		$query = "
+			SELECT COUNT(*) AS nro_pagos
+			FROM documento AS doc_pago
+			JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
+			JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
+			WHERE doc.id_cobro = " . $this->fields['id_cobro'];
+		$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$nro_pagos = mysql_fetch_assoc($pagos);
+		return $nro_pagos['nro_pagos'] > 0;
 	}
 
 	function DetalleProfesional()

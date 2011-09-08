@@ -855,11 +855,13 @@ function EditarTodosLosArchivos()
 		
 		$t = new Trabajo($sesion);
 		
-		if( $trabajo->fields['id_cobro'] > 0 )
-			{
-				$moneda_cobro = new Moneda($sesion);
-				$moneda_cobro->Load($trabajo->fields['id_moneda_cobro']);
-			}
+		$moneda_cobro = new Moneda($sesion);
+		if( $trabajo->fields['id_cobro'] > 0 ) {
+			$moneda_cobro->Load($trabajo->fields['id_moneda_cobro']);
+		}
+		else {
+			$moneda_cobro->Load($trabajo->fields['id_moneda_asunto']);
+		}
 		if($trabajo->fields['id_tramite'] > 0)
 		{
 			$query = "SELECT glosa_tramite FROM tramite_tipo 

@@ -37,7 +37,7 @@
 	$cambios_en_saldo_honorarios = array();
 	$cambios_en_saldo_gastos = array();
 	
-	if($id_documento && !$adelanto)
+	if($id_documento)
 	{
 		$documento->Load($id_documento);
 	}
