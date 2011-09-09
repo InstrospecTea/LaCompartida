@@ -7753,9 +7753,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$query = "
 				SELECT SUM(( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio) AS saldo_total_cobro
 				FROM documento
+				LEFT JOIN cobro ON cobro.id_cobro = documento.id_cobro
 				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda 
 				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro = '" . $this->fields['id_cobro'] . "' AND cm2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
-				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' AND documento.saldo_honorarios + documento.saldo_gastos > 0 AND documento.id_cobro <> " . $this->fields['id_cobro'];
+				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' 
+				AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' 
+				AND (documento.saldo_honorarios + documento.saldo_gastos) > 0 
+				AND documento.id_cobro <> " . $this->fields['id_cobro'] . "
+				AND cobro.estado NOT IN ('PAGADO', 'INCOBRABLE', 'CREADO', 'EN REVISION')";
 			$saldo_total_cobro = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$saldo_total_cobro = mysql_fetch_assoc($saldo_total_cobro);
 			$saldo_total_cobro = (float)$saldo_total_cobro['saldo_total_cobro'];
@@ -7841,7 +7846,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro = '" . $this->fields['id_cobro'] . "' AND cm2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
 				WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' 
 				AND documento.es_adelanto <> 1 AND documento.tipo_doc = 'N' 
-				AND documento.saldo_honorarios + documento.saldo_gastos > 0 
+				AND (documento.saldo_honorarios + documento.saldo_gastos) > 0 
 				AND documento.id_cobro <> " . $this->fields['id_cobro'] . "
 				AND cobro.estado NOT IN ('PAGADO', 'INCOBRABLE', 'CREADO', 'EN REVISION')";
 
