@@ -6139,6 +6139,55 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.83:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'
+											), (
+											NULL ,  'AltoFacturaPdf',  '279', NULL ,  'numero',  '6',  '-1'
+											);";
+				$query[] = "CREATE TABLE `factura_pdf_datos` (
+										  `id_tipo_dato` int(11) NOT NULL auto_increment,
+										  `tipo_dato` varchar(30) NOT NULL default '',
+										  `glosa_dato` varchar(30) NOT NULL default '',
+										  `activo` tinyint(1) NOT NULL default '0',
+										  `coordinateX` int(11) NOT NULL default '0',
+										  `coordinateY` int(11) NOT NULL default '0',
+										  `font` varchar(30) NOT NULL default '',
+										  `style` varchar(30) NOT NULL default '',
+										  `mayuscula` varchar(10) NOT NULL default '',
+										  `tamano` int(11) NOT NULL default '0',
+										  PRIMARY KEY  (`id_tipo_dato`)
+										) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;";
+				$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
+											(2, 'fecha_ano', 'Fecha Año', 1, 90, 50, 'Times', '', '', 8),
+											(3, 'fecha_dia', 'Fecha Día', 1, 45, 50, 'Times', '', '', 8),
+											(4, 'fecha_mes', 'Fecha Mes', 1, 60, 50, 'Times', '', 'may', 8),
+											(5, 'razon_social', 'Razon Social', 1, 50, 60, 'Times', '', '', 8),
+											(6, 'rut', 'Rut', 1, 160, 60, 'Times', '', '', 8),
+											(7, 'descripcion_honorarios', 'Glosa honorarios', 1, 50, 100, 'Times', '', '', 8),
+											(8, 'moneda_honorarios', 'Moneda honorarios', 1, 160, 100, 'Times', '', '', 8),
+											(9, 'monto_honorarios', 'Monto honorarios', 1, 170, 100, 'Times', '', '', 8),
+											(10, 'descripcion_gastos_con_iva', 'Glosa gastos con IVA', 1, 50, 110, 'Times', '', '', 8),
+											(11, 'moneda_gastos_con_iva', 'Moneda gastos c/ IVA', 1, 160, 110, 'Times', '', '', 8),
+											(12, 'monto_gastos_con_iva', 'Monto gastos c/ IVA', 1, 170, 110, 'Times', '', '', 8),
+											(13, 'descripcion_gastos_sin_iva', 'Glosa gastos s/ IVA', 1, 50, 120, 'Times', '', '', 8),
+											(14, 'moneda_gastos_sin_iva', 'Moneda gastos s/ IVA', 1, 160, 120, 'Times', '', '', 8),
+											(15, 'monto_gastos_sin_iva', 'Monto gastos s/ IVA', 1, 170, 120, 'Times', '', '', 8),
+											(16, 'monto_en_palabra', 'Monto en palabra', 1, 50, 150, 'Times', '', '', 8),
+											(17, 'porcentaje_impuesto', 'Porcentaje IVA', 1, 150, 160, 'Times', '', '', 8),
+											(18, 'moneda_subtotal', 'Moneda subtotal', 1, 160, 150, 'Times', '', '', 8),
+											(19, 'monto_subtotal', 'Monto subtotal', 1, 170, 150, 'Times', '', '', 8),
+											(20, 'moneda_iva', 'Moneda IVA', 1, 160, 160, 'Times', '', '', 8),
+											(21, 'monto_iva', 'Monto IVA', 1, 170, 160, 'Times', '', '', 8),
+											(22, 'moneda_total', 'Moneda total', 1, 160, 170, 'Times', '', '', 8),
+											(23, 'monto_total', 'Monto total', 1, 170, 170, 'Times', '', '', 8);";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6390,6 +6439,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.80;
 	$VERSIONES[$num++] = 4.81;
 	$VERSIONES[$num++] = 4.82;
+	$VERSIONES[$num++] = 4.83;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

@@ -12,6 +12,7 @@
 	require_once Conf::ServerDir().'/classes/Factura.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	require_once Conf::ServerDir().'/../app/classes/FacturaPdfDatos.php';
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
@@ -32,6 +33,16 @@
 		else
 			echo "Error";
 		exit;
+	}
+	else if($opc == 'generar_factura_pdf')
+	{
+		if($id_factura_grabada) {
+			$factura_pdf_datos = new FacturaPdfDatos($sesion);
+			$factura_pdf_datos->generarFacturaPDF( $id_factura_grabada );
+		}
+		else { 
+			$pagina->AddError(__('Factura no existe!'));
+		}
 	}
 	if($exportar_excel)
 	{
@@ -221,12 +232,17 @@
 
 	function Opciones(& $fila)
 	{
+		global $sesion;
 		global $where;
+		
 		$id_factura = $fila->fields['id_factura'];
 		$codigo_cliente = $fila->fields['codigo_cliente'];
 		$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
+		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/doc.gif' border=0 title=\"Imprimir Word\"></a>";
+		if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') ) {
+			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirPDF(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=\"Imprimir Pdf\"></a>";
+		}
 		return $html_opcion;
 	}
 	
@@ -374,6 +390,12 @@ function ImprimirDocumento( id_factura )
 	var fecha2=$('fecha2').value;
 	var vurl = 'facturas.php?opc=generar_factura&id_factura_grabada=' + id_factura + '&fecha1=' + fecha1 + '&fecha2=' + fecha2;
 	
+	self.location.href=vurl;
+}
+
+function ImprimirPDF( id_factura )
+{
+	var vurl = 'facturas.php?opc=generar_factura_pdf&id_factura_grabada=' + id_factura;
 	self.location.href=vurl;
 }
 

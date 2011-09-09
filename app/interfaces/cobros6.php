@@ -14,6 +14,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../app/classes/Gasto.php';
 	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+	require_once Conf::ServerDir().'/../app/classes/FacturaPdfDatos.php';
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new PaginaCobro($sesion);
@@ -396,6 +397,10 @@
 		include dirname(__FILE__).'/factura_doc.php';
 		exit;
 	}
+	else if($opc == 'grabar_documento_factura_pdf') {
+		$factura_pdf_datos = new FacturaPdfDatos($sesion);
+		$factura_pdf_datos->generarFacturaPDF( $id_factura_grabada );
+	}
 	elseif($opc == 'descargar_excel' || $opc == 'descargar_excel_especial')
 	{
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
@@ -732,6 +737,11 @@ function ValidarFactura(form,id_factura,opcion)
 					form.id_factura_grabada.value = id_factura;
 			<?	}	?>
 		}
+		else if(opcion =='imprimir_pdf')
+		{
+			form.opc.value='grabar_documento_factura_pdf';
+			form.id_factura_grabada.value = id_factura;
+		}
 		else
 		{
 			$('facturado').checked = true;
@@ -867,7 +877,7 @@ function RevisarPagado(estado)
 function AgregarPago()
 {
 		<?="var urlo = \"ingresar_documento_pago.php?popup=1&pago=true&id_cobro=".$cobro->fields['id_cobro']."&codigo_cliente=".$cobro->fields['codigo_cliente']."\";"?>
-		nuevaVentana('Ingreso',730,470,urlo,'top=100, left=125, scrollbars=yes');
+		nuevaVentana('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
 }
 
 function EditarPago(id)
@@ -1545,9 +1555,12 @@ function AgregarFactura(idx){
 											<b><?= $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios + $subtotal_gastos + $subtotal_gastos_sin_impuesto + $impuesto, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></b>
 										</td>
 										<td><?php echo $estado ?></td>
-										<td>
+										<td nowrap>
 											<a href='javascript:void(0)' onclick="nuevaVentana('Editar_Factura', 730, 580, 'agregar_factura.php?id_factura=<?=$id_factura ?>&popup=1&id_cobro=<?=$id_cobro?>', 'top=100, left=155');" ><img src='<?=Conf::ImgDir()?>/editar_on.gif' border="0" title="Editar"/></a>
-											<a href='javascript:void(0)' onclick="ValidarFactura('', <?=$id_factura?>, 'imprimir');" ><img src='<?=Conf::ImgDir()?>/doc.gif' border="0" title="Descargar"/></a>
+											<a href='javascript:void(0)' onclick="ValidarFactura('', <?=$id_factura?>, 'imprimir');" ><img src='<?=Conf::ImgDir()?>/doc.gif' border="0" title="Descargar Word"/></a>
+										<?php if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') ) { ?>
+											<a href='javascript:void(0)' onclick="ValidarFactura('', <?=$id_factura?>, 'imprimir_pdf');" ><img src='<?=Conf::ImgDir()?>/pdf.gif' border="0" title="Descargar Pdf"/></a>
+										<?php } ?>
 										</td>
 										<td align="right">
 											<?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format(-$saldo, $moneda_documento->fields['cifras_decimales'], $idioma->fieldls['separador_decimales'], $idioma->fields['separador_miles']) ?>
