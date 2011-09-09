@@ -56,7 +56,7 @@
 	while( $row = mysql_fetch_assoc($resp) ) 
 	{
 		echo "<tr>";
-		echo "<td>".$row['glosa_dato']."</td>";
+		echo "<td>".__($row['glosa_dato'])."</td>";
 		echo "<td><input type=\"checkbox\" name=\"fac_activo_".$row['id_tipo_dato']."\" id=\"fac_activo_".$row['id_tipo_dato']."\" value=\"1\" ".( $row['activo'] == 1 ? 'checked' : '' )." /></td>";
 		echo "<td><input type=\"text\" size=\"4\" name=\"fac_coordinateX_".$row['id_tipo_dato']."\" id=\"fac_coordinateX_".$row['id_tipo_dato']."\" value=\"".$row['coordinateX']."\" /></td>";
 		echo "<td><input type=\"text\" size=\"4\" name=\"fac_coordinateY_".$row['id_tipo_dato']."\" id=\"fac_coordinateY_".$row['id_tipo_dato']."\" value=\"".$row['coordinateY']."\" /></td>";

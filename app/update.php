@@ -6143,8 +6143,6 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			case 4.83:
 				$query = array();
 				$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
-				$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso` ,`codigo_menu`)
-													VALUES ('ADM',  'MPDF'), ('COB',  'MPDF');";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'

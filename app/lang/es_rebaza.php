@@ -13,6 +13,16 @@
 	$_LANG['Impuesto'] = "IGV";
 	$_LANG['Monto Impuesto'] = "Monto IGV";
 	$_LANG['Total con IVA']     = "Total con IGV";
+	
+	$_LANG['Glosa gastos con IVA'] = "Glosa gastos con IGV";
+	$_LANG['Moneda gastos c/ IVA'] = "Moneda gastos c/ IGV";
+	$_LANG['Moneda gastos s/ IVA'] = "Moneda gastos s/ IGV";
+	$_LANG['Monto gastos c/ IVA'] = "Monto gastos c/ IGV";
+	$_LANG['Monto gastos s/ IVA'] = "Monto gastos s/ IGV";
+	$_LANG['Porcentaje IVA'] = "Porcentaje IGV";
+	$_LANG['Moneda IVA'] = "Moneda IGV";
+	$_LANG['Monto IVA'] = "Monto IGV";
+	
 	$_LANG['Pago retención impuestos']     = "Detracción";
 	$_LANG['Director proyecto']     = "Encargado comercial";
 
