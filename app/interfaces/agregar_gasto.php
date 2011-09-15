@@ -299,20 +299,35 @@ function Validar(form)
 	if(monto <= 0 || isNaN(monto))
 	monto=monto_cobrable;
 
-	
+<?php if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) { ?>
+	if($('codigo_cliente_secundario').value == '')
+	{
+		alert('<?=__('Debe seleccionar un cliente')?>');
+		form.codigo_cliente_secundario.focus();
+		return false;
+	}
+	if($('campo_codigo_asunto_secundario').value == '')
+	{
+		alert('<?=__('Ud. debe seleccionar un').' '.__('asunto')?>');
+		form.codigo_asunto_secundario.focus();
+		return false;
+	}
+<?php } else { ?>
 	if($('codigo_cliente').value == '')
 	{
 		alert('<?=__('Debe seleccionar un cliente')?>');
 		form.codigo_cliente.focus();
 		return false;
 	}
-
 	if($('campo_codigo_asunto').value == '')
 	{
 		alert('<?=__('Ud. debe seleccionar un').' '.__('asunto')?>');
 		form.codigo_asunto.focus();
 		return false;
 	}
+<?php } ?>
+
+	
 
 <? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) { ?>
 	if((monto <= 0 || isNaN(monto)) && (monto_cobrable <= 0 || isNaN(monto_cobrable)))

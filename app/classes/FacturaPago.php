@@ -40,19 +40,19 @@ class FacturaPago extends Objeto
 	
 	function HtmlListaPagos($sesion,& $factura)
 	{ 
+		$moneda = new Moneda($sesion);
+		$moneda->Load($factura->fields['id_moneda']);
 		$lista_pagos = $factura->GetPagosSoyFactura();
 		$html = "<table width=\"500\"><tr bgcolor=\"#aaffaa\" style=\"font-size: 10pt;\"><th width=\"50\" align=center>N°</th><th width=\"100\" align=center>".__('Fecha')."</th><th width=200>&nbsp;</th><th width=100>".__('Monto Pago')."</th><th width=50>Opc.</th>";
 		for($i=0;$i<$lista_pagos->num;$i++)
 		{ 
 			$pago = $lista_pagos->Get($i);
-			$moneda_pago = new Moneda($sesion);
-			$moneda_pago->Load($pago->fields['id_moneda']);
 			
 			$html .= "<tr heigth=\"16\">";
 			$html .= "<td align=center>".$pago->fields['id_factura_pago']."</td>";
 			$html .= "<td align=center>".Utiles::sql2fecha("d-m-Y",$pago->fields['fecha'])."</td>";
 			$html .= "<td align=center>&nbsp;</td>";
-			$html .= "<td align=center>".$moneda_pago->fields['simbolo']." ".number_format($pago->fields['monto_aporte'],$moneda_pago->fields['cifras_decimales'])."</td>";
+			$html .= "<td align=center>".$moneda->fields['simbolo']." ".number_format($pago->fields['monto_aporte'],$moneda->fields['cifras_decimales'])."</td>";
 			$html .= "<td align=center>
 									<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
 									<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' onclick=\"if( confirm('Está eliminando un pago. Se reajustarán los saldos de los documentos asociados. ¿Desea continuar?') )EliminarPago('".$pago->fields['id_factura_pago']."');\" />

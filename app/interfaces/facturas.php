@@ -40,7 +40,7 @@
 			$factura_pdf_datos = new FacturaPdfDatos($sesion);
 			$factura_pdf_datos->generarFacturaPDF( $id_factura_grabada );
 		}
-		else { 
+		else {
 			$pagina->AddError(__('Factura no existe!'));
 		}
 	}
@@ -52,7 +52,7 @@
 		require_once Conf::ServerDir().'/interfaces/facturas_listado_xls.php';
 		exit;
 	}
-	
+
 
 	$pagina->titulo = __('Revisar Documentos Tributarios');
 	$pagina->PrintTop();
@@ -75,7 +75,7 @@
 				$where .= " AND fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			else if( $fecha1 )
 				$where .= " AND fecha >= '".Utiles::fecha2sql($fecha1).' 00:00:00'."' ";
-			else if( $fecha2 ) 
+			else if( $fecha2 )
 				$where .= " AND fecha <= '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario )
 				{
@@ -85,10 +85,11 @@
 				}
 			if($tipo_documento_legal_buscado)
 				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
-			
+
 /*			if($codigo_cliente)
 				{
-					$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+					//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+					$where .= " AND cobro.codigo_cliente='".$codigo_cliente."' ";
 				}
 */			if($codigo_cliente)
 				{
@@ -144,23 +145,23 @@
 								, prm_documento_legal.codigo as tipo
 								, numero
 								, cliente.glosa_cliente
-								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ), 
-											factura.cliente, 
+								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
+											factura.cliente,
 											IF( contrato.factura_razon_social IN ('',' '),
-													factura.cliente, 
-													IF( contrato.factura_razon_social IS NULL, 
-															factura.cliente, 
-															CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')') 
-														) 
-												) 
-										) as factura_rsocial 
+													factura.cliente,
+													IF( contrato.factura_razon_social IS NULL,
+															factura.cliente,
+															CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+														)
+												)
+										) as factura_rsocial
 								, fecha , usuario.username AS encargado_comercial
 								, fecha
 								, usuario.username AS encargado_comercial
 								, descripcion
 								, prm_estado_factura.codigo as estado
 								, factura.id_cobro
-								, cobro.codigo_idioma as codigo_idioma 
+								, cobro.codigo_idioma as codigo_idioma
 								, prm_moneda.simbolo
 								, prm_moneda.cifras_decimales
 								, prm_moneda.tipo_cambio
@@ -205,7 +206,7 @@
 			$glosa_monto_saldo_total = '<b>'.__('Saldo'). ' ' . $simbolo_moneda_tmp. ' ' .number_format($monto_saldo_total,$cifras_decimales_tmp,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles'])."</b>";
 		}
 		// calcular el saldo en moneda base
-		
+
 		$x_pag = 12;
 		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
 		$b->nombre = "busc_facturas";
@@ -234,7 +235,7 @@
 	{
 		global $sesion;
 		global $where;
-		
+
 		$id_factura = $fila->fields['id_factura'];
 		$codigo_cliente = $fila->fields['codigo_cliente'];
 		$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
@@ -245,12 +246,12 @@
 		}
 		return $html_opcion;
 	}
-	
+
 	function SubTotal(& $fila)
 	{
 		global $idioma;
 		$subtotal = $fila->fields['honorarios'] +$fila->fields['subtotal_gastos'] +$fila->fields['subtotal_gastos_sin_impuesto'];
-		
+
 		return $subtotal > 0 ? $fila->fields['simbolo'].' '.number_format($subtotal,$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 	}
 	function Iva(& $fila)
@@ -338,7 +339,7 @@
 		global $sesion;
 		global $id_cobro;
 		static $i = 0;
-		
+
 		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 		if( $fila->fields['codigo_idioma'] ) {
 			$idioma->Load($fila->fields['codigo_idioma']);
@@ -351,7 +352,7 @@
 		else
 			$color = "#ffffff";
 		$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
-		
+
 		$html .= "<tr id=\"t".$fila->fields['id_factura']."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 		$glosa_tramite = $tramite->fields['glosa_tramite'];
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas)."</td>";
@@ -383,13 +384,13 @@
 	}
 
 ?>
-<script style="text/javascript">
+<script type="text/javascript">
 function ImprimirDocumento( id_factura )
 {
 	var fecha1=$('fecha1').value;
 	var fecha2=$('fecha2').value;
 	var vurl = 'facturas.php?opc=generar_factura&id_factura_grabada=' + id_factura + '&fecha1=' + fecha1 + '&fecha2=' + fecha2;
-	
+
 	self.location.href=vurl;
 }
 
@@ -436,9 +437,9 @@ function AgregarNuevo()
 </div>
 <!-- Fin calendario DIV -->
 <?
-if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
-{ 
-echo "<table width=\"90%\"><tr><td>"; 
+if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
+{
+echo "<table width=\"90%\"><tr><td>";
 $class_diseno = 'class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;"';
 }
 else
@@ -549,7 +550,7 @@ $class_diseno = '';
 			<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="id_cobro" name="id_cobro" size="15" value="<?=$id_cobro?>">
 		</td>
 	</tr>
-	<?php 
+	<?php
 	if( method_exists('Conf','dbUser') && Conf::dbUser() == "rebaza" )
 	{ ?>
 		<tr>
@@ -564,7 +565,7 @@ $class_diseno = '';
 				</select>
 			</td>
 		</tr>
-	<?php 
+	<?php
 	}
 	?>
 	<tr>
@@ -593,7 +594,7 @@ $class_diseno = '';
 	</tr>
 </table>
 </fieldset><?
-if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
+if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 	echo "</td></tr></table>"; ?>
 </form>
 <!--table style="border: 0px solid black" width='94%'>
@@ -603,7 +604,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 			<b><?=__('Nueva')?>:</b>&nbsp;
 			<?= Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal",'tipo_documento_legal','','','',150); ?>
 			<br>
-			<span onclick="CrearNuevoDocumentoLegal()" >			
+			<span onclick="CrearNuevoDocumentoLegal()" >
 				<img src="<?=Conf::ImgDir()?>/mas_16.gif" /><a href="javascript:void(0)"><?=__('Agregar Documento Tributario')?></a>
 				<br>&nbsp;
 			</span>
@@ -621,10 +622,10 @@ function CrearNuevoDocumentoLegal()
 		dl_url += '&id_cobro='+$('id_cobro').value
 		$('id_cobro').focus();
 	}
-	nuevaVentana('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';	
+	nuevaVentana('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';
 }
-	
-	
+
+
 Calendar.setup(
 	{
 		inputField	: "fecha1",				// ID of the input field

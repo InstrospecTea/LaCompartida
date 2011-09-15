@@ -19,14 +19,14 @@
 
 //void Worksheet::setLandscape();
 	$contrato = new Contrato($sesion);
-	
+
 	$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
 	$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
 	$formato_fechas_php = strtr( $formato_fechas, $cambios);
 
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
-		
+
 	// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 
 	$id_moneda_filtro = $id_moneda;
@@ -53,8 +53,10 @@
 		}
 		if($tipo_documento_legal_buscado)
 			$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
-		if($codigo_cliente)
-			$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+		if ($codigo_cliente) {
+			//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+			$where .= " AND cobro.codigo_cliente='".$codigo_cliente."' ";
+		}
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
 			$asunto = new Asunto($sesion);
 			$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
@@ -144,7 +146,7 @@
 		$pagina->FatalError('No existe información con este criterio');
 
 	$fecha_actual = date('Y-m-d');
-	
+
 	// Crear y preparar planilla
 	$wb = new Spreadsheet_Excel_Writer();
 	// Enviar headers a la pagina
@@ -236,7 +238,7 @@
 			$arr_col[$col_name[$i]]['hidden'] = 'SI'; }
 		else { $arr_col[$col_name[$i]]['celda'] = $col++; }
 
-		
+
 /*
 		// ancho celdas
 		if(in_array($col_name[$i],array('descripcion')) ) {
@@ -308,12 +310,12 @@
 	// Escribir encabezado reporte
 	$ws1->write($fila, 0, __('Documentos tributarios'), $formato_encabezado);
 	$fila++;
-	
+
 	$fecha_actual = date( $formato_fechas_php );
 	$ws1->write($fila, 0, $fecha_actual, $formato_encabezado);
 	$fila++;
 	$fila++;
-	
+
 	// Escribir titulos
 	for($i=0; $i<$col_num; ++$i)
 	{
@@ -356,7 +358,7 @@
 		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 		$monto_pago = 0;
 		list($monto_pago,$ultima_fecha_pago) = mysql_fetch_array($resp2);
-			
+
 		if($monto_pago<=0)
 			$monto_pago = 0;
 
@@ -380,7 +382,7 @@
 				else if($col_name[$i] == 'saldo_pagos') {
 					//$factura = new Factura($sesion);
 					//$lista_pagos_fact = $factura->GetPagosSoyFactura($proc->fields['id_factura']);
-					
+
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
 				else if($col_name[$i] == 'saldo_moneda_base') {

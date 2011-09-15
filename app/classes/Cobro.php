@@ -11108,7 +11108,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%moneda%',__('Total Honorarios Adeudados').':',$html);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ValorSinEspacio') ) || ( method_exists('Conf','ValorSinEspacio') && Conf::ValorSinEspacio() ) ))
 				{
-					$html = str_replace('%monto_moroso_documento%',number_format($totales['simbolo_moneda_total'].$totales['adeudado_documentos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+					$html = str_replace('%monto_moroso_documento%',$totales['simbolo_moneda_total'].number_format($totales['adeudado_documentos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 					$html = str_replace('%monto_moroso%',$totales['simbolo_moneda_total'].number_format($totales['adeudado'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 				}
 			else

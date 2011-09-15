@@ -111,7 +111,7 @@ class CtaCteFact extends Objeto
 		if($anulando){ //para no distorsionar las sumas de los saldos con saldos de cosas anuladas, se setea artificialmente en 0
 			$saldo = 0;
 		}
-		else if($estaba_anulado){ //tengo q recalcular el saldo... pa q me hicieron borrarlo? ¬¬
+		else{ //recalcular el saldo...
 			$saldo = $monto_bruto;
 			$lista = $mvto->GetNeteosSoyDeuda();
 			for($i=0;$i<$lista->num;$i++){
