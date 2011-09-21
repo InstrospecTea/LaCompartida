@@ -6200,6 +6200,14 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			case 4.85:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaAsociadaEsconderListado', '0', 'Esconder las columnas factura y fecha factura (de las asociadas al gasto), en gastos.php', 'boolean', '6', '-1');";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6453,6 +6461,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.82;
 	$VERSIONES[$num++] = 4.83;
 	$VERSIONES[$num++] = 4.84;
+	$VERSIONES[$num++] = 4.85;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

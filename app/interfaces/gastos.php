@@ -191,7 +191,7 @@
 				$b->AgregarEncabezado("con_impuesto","Impuesto","align=center");
 			}
 		$b->AgregarFuncion(__('Cobro'),"CobroFila","align=left nowrap");
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') && !(Conf::GetConf($sesion,'FacturaAsociadaEsconderListado')) )
 		{
 			$b->AgregarEncabezado("codigo_factura_gasto","Factura","align=left nowrap");
 			$b->AgregarFuncion(__('Fecha Factura'),"FechaFactura","align=center nowrap");
