@@ -123,6 +123,7 @@
 		$gasto->Edit("fecha",Utiles::fecha2sql($fecha));
 		$gasto->Edit("id_usuario",$id_usuario);
 		$gasto->Edit("descripcion",$descripcion);
+		$gasto->Edit("id_glosa_gasto", ( !empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
 		$gasto->Edit("id_moneda",$id_moneda);
 		$gasto->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
 		$gasto->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
@@ -391,7 +392,9 @@ function CheckEliminaIngreso(chk)
 
 function ActualizarDescripcion()
 {
-	$('descripcion').value = $('glosa_gasto').value;
+	var w = $('glosa_gasto').selectedIndex;
+	var selected_text = $('glosa_gasto').options[w].text;
+	$('descripcion').value = selected_text;
 }
 
 function CargaIdioma( codigo )
@@ -678,15 +681,22 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 	</tr>
 <?	}
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PrmGastos') ) || ( method_exists('Conf','PrmGastos') && Conf::PrmGastos() ) )
+	if( UtilesApp::GetConf($sesion,'PrmGastos') )
 	{
+		$_onchange = '';
+		$_titulo = 'Vacio';
+		if( UtilesApp::GetConf($sesion,'PrmGastosActualizarDescripcion') )
+		{
+			$_onchange = 'onchange="ActualizarDescripcion()"';
+			$_titulo = '';
+		}
 ?>
 	<tr>
 		<td align=right>
 			<?=__('Descripción Parametrizada')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT glosa_gasto,glosa_gasto FROM prm_glosa_gasto ORDER BY id_glosa_gasto","glosa_gasto", $gasto->fields['descripcion'] ? $gasto->fields['descripcion'] : '', 'onchange="ActualizarDescripcion()"','',"300"); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_glosa_gasto,glosa_gasto FROM prm_glosa_gasto ORDER BY id_glosa_gasto","glosa_gasto", $gasto->fields['id_glosa_gasto'] ? $gasto->fields['id_glosa_gasto'] : '', $_onchange,$_titulo,"300"); ?>
 		</td>
 	</tr>
 <?

@@ -15,7 +15,7 @@
 
     $pagina = new Pagina( $sesion );
 
-		set_time_limit(300);
+		set_time_limit(500);
     #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
     $wb = new Spreadsheet_Excel_Writer();
@@ -115,42 +115,39 @@
 		$col = 0;
 		$col_fecha = $col++;
 		$ws1->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
-		if(!$codigo_cliente){
+		if (!$codigo_cliente){
 			$col_cliente = $col++;
 		}
-		if(!$codigo_asunto){
+		if (!$codigo_asunto){
 			$col_codigo = $col++;		
 			$col_asunto = $col++;
 		}
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'TipoGasto') ){
 			$col_tipo = $col++;
-		}		
+		}
+		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
+			$col_concepto = $col++;
+		}
 		$col_descripcion = $col++;
 		$col_egreso = $col++;
 		$col_ingreso = $col++;
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'UsaMontoCobrable') ){
 			$col_monto_cobrable = $col++;
 		}	
 		$col_liquidacion = $col++;
 		$col_estado = $col++;
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::TipoGasto() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'UsarGastosCobrable') ){
 			$col_facturable = $col++;
 		}
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
-		{
+		if ( UtilesApp::GetConf($sesion,'FacturaAsociada') ){
 			$col_factura = $col++;
 			$col_tipo_doc = $col++;
 			$col_fecha_factura = $col++;
 		}
-		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'NumeroGasto') ){
 			$col_numero_documento = $col++;
 		}
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'NumeroOT') ){
 			$col_numero_ot = $col++;
 		}
 		$col_rut_proveedor = $col++;
@@ -164,30 +161,28 @@
 		$ws1->setColumn( $col_cliente, $col_cliente, 30.00); #cliente
 		$ws1->setColumn( $col_codigo, $col_codigo, 15.00); #código
 		$ws1->setColumn( $col_asunto, $col_asunto, 30.00); #asunto
-		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'NumeroGasto') ){
 			$ws1->setColumn( $col_numero_documento, $col_numero_documento, 25.00); #n° documento
 		}
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'NumeroOT') ){
 			$ws1->setColumn( $col_numero_ot, $col_numero_ot, 25.00); #n° orden de trabajo
 		}
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
-		{
+		if ( UtilesApp::GetConf($sesion,'FacturaAsociada') ){
 			$ws1->setColumn( $col_factura, $col_factura, 15.00); #n° documento
 			$ws1->setColumn( $col_tipo_doc, $col_tipo_doc, 25.00); #tipo documento
 			$ws1->setColumn( $col_fecha_factura, $col_fecha_factura, 25.00); #fecha documnento
 		}
 		
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'TipoGasto') ){
 			$ws1->setColumn( $col_tipo, $col_tipo, 25.00); #tipo gasto
-		}		
+		}
+		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
+			$ws1->setColumn( $col_concepto, $col_concepto, 25.00); #concepto nueva forma de gastos;
+		}
 		$ws1->setColumn( $col_descripcion, $col_descripcion, 25.00); #descripcion
 		$ws1->setColumn( $col_egreso, $col_egreso, 25.00); #egreso
 		$ws1->setColumn( $col_ingreso, $col_ingreso, 25.00); #ingreso
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'UsaMontoCobrable') ){
 			$ws1->setColumn( $col_monto_cobrable, $col_monto_cobrable, 25.00); #monto cobrable
 		}		
 		$ws1->setColumn( $col_liquidacion, $col_liquidacion, 25.00); #liquidacion
@@ -286,6 +281,9 @@
 		{
 			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 		}
+		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
+			$col_select .= ", IF( cta_corriente.id_glosa_gasto IS NOT NULL, prm_glosa_gasto.glosa_gasto, '-') as concepto";
+		}
 		
 		
 		$moneda_base = Utiles::MonedaBase($sesion);
@@ -313,6 +311,7 @@
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 					LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
+					LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 					WHERE $where";
 		
 		$lista_gastos = new ListaGastos($sesion,'',$query);
@@ -372,23 +371,22 @@
     	$ws1->write($fila_inicial, $col_codigo, __('Código'), $tit);
     	$ws1->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
 	}
-	if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroGasto') ) || ( method_exists('Conf','NumeroGasto') && Conf::NumeroGasto() ) )
-	{
+	if ( UtilesApp::GetConf($sesion,'NumeroGasto') ){
 		$ws1->write($fila_inicial, $col_numero_documento, (__('N° Documento')), $tit);
 	}
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NumeroOT') ) || ( method_exists('Conf','NumeroOT') && Conf::NumeroOT() ) )
-	{
+	if ( UtilesApp::GetConf($sesion,'NumeroOT') ){
 		$ws1->write($fila_inicial, $col_numero_ot,(__('N° OT')), $tit);
 	}
-	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') )
-	{
+	if ( UtilesApp::GetConf($sesion,'FacturaAsociada') ){
 		$ws1->write($fila_inicial, $col_factura,(__('N° Documento')), $tit);
 		$ws1->write($fila_inicial, $col_tipo_doc,(__('Tipo Documento')), $tit);
 		$ws1->write($fila_inicial, $col_fecha_factura,__('Fecha Documento'), $tit);
 	}
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) || ( method_exists('Conf','TipoGasto') && Conf::TipoGasto() ) )
-	{
+	if ( UtilesApp::GetConf($sesion,'TipoGasto') ){
 		$ws1->write($fila_inicial, $col_tipo, __('Tipo'), $tit);
+	}
+	if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
+		$ws1->write( $fila_inicial, $col_concepto, __('Concepto'), $tit); #concepto nueva forma de gastos;
 	}
     $ws1->write($fila_inicial, $col_descripcion, (__('Descripción')), $tit);
     $ws1->write($fila_inicial, $col_egreso, __('Egreso'), $tit);
@@ -477,7 +475,9 @@
 		{
 				$ws1->write($fila_inicial, $col_tipo, $row['glosa_tipo'], $f4);
 		}
-		
+		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
+			$ws1->write( $fila_inicial, $col_concepto, $row['concepto'], $f4); #concepto nueva forma de gastos;
+		}
 	    $ws1->write($fila_inicial, $col_descripcion, $row['descripcion'], $f4);
 	    if( $moneda_gasto > 0 || $moneda_unica )
 	    {

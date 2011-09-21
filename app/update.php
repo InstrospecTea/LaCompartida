@@ -6189,6 +6189,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+			
+			
+			case 4.84:
+				$query = array();
+				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_glosa_gasto` TINYINT( 4 ) NULL AFTER  `codigo_asunto` ;
+";
+				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualización del campo descripción al agregar gastos.', 'boolean', 6, -1);";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
 	}
 }
 
@@ -6441,6 +6452,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.81;
 	$VERSIONES[$num++] = 4.82;
 	$VERSIONES[$num++] = 4.83;
+	$VERSIONES[$num++] = 4.84;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
