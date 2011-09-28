@@ -262,7 +262,7 @@
 					$PdfLinea2 = Conf::PdfLinea2();
 				}
 
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				$html2 = str_replace('%direccion%', $PdfLinea1, $html2);
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
@@ -457,7 +457,7 @@
 
 			$html = str_replace('%logo%', Conf::LogoDoc(true), $html);
 			$html = str_replace('%titulo%', $PdfLinea1, $html);
-			$html = str_replace('%logo_cobro%', Conf::Server().'/'.Conf::ImgDir(), $html);
+			$html = str_replace('%logo_cobro%', Conf::Server().Conf::ImgDir(), $html);
 			$html = str_replace('%subtitulo%', $PdfLinea2, $html);
 			$html = str_replace('%direccion%', $PdfLinea3, $html);
 			$html = str_replace('%fecha%', ($cobro->fields['fecha_cobro'] == '0000-00-00' or $cobro->fields['fecha_cobro'] == '') ? Utiles::sql2fecha(date('Y-m-d'),$idioma->fields['formato_fecha']) : Utiles::sql2fecha($cobro->fields['fecha_cobro'],$idioma->fields['formato_fecha']), $html);
@@ -768,6 +768,7 @@
 		case 'CTA_CORRIENTE':
 			break;
 		}
+		
 		return $html;
 	}
 	######### FIN DOC COBRO #########

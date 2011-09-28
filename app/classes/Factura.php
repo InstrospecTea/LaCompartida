@@ -337,7 +337,7 @@ class Factura extends Objeto
 						}
 					$html2 = str_replace('%subtitulo%', '', $html2);
 					if( method_exists('Conf','Server') && method_exists('Conf','ImgDir') )
-					$html2 = str_replace('%logo_cobro%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+					$html2 = str_replace('%logo_cobro%', Conf::Server().Conf::ImgDir(), $html2);
 
 					$fecha_factura = $this->fields['fecha'];
 
@@ -525,7 +525,7 @@ class Factura extends Objeto
 					$html2 = str_replace('%asuntos%', $asuntos, $html2);
 					$html2 = str_replace('%cod_asuntos%', $cod_asuntos, $html2);
 					if( method_exists('Conf','Server') && method_exists('Conf','ImgDir') )
-					$html2 = str_replace('%logo_cobro%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+					$html2 = str_replace('%logo_cobro%', Conf::Server().Conf::ImgDir(), $html2);
 					$html2 = str_replace('%glosa_moneda_factura%', '%'.$cobro_moneda->moneda[$factura_id_moneda]['glosa_moneda'].'%', $html2);
 					$html2 = str_replace('%Peso%', 'PESOS', $html2);
 					if( $lang == 'es' )

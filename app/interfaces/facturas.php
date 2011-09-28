@@ -240,7 +240,9 @@
 		$codigo_cliente = $fila->fields['codigo_cliente'];
 		$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/doc.gif' border=0 title=\"Imprimir Word\"></a>";
+		if( UtilesApp::GetConf($sesion,'ImprimirFacturaDoc') ) {
+			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/doc.gif' border=0 title=\"Imprimir Word\"></a>";
+		}
 		if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') ) {
 			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirPDF(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=\"Imprimir Pdf\"></a>";
 		}

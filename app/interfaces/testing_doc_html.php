@@ -49,7 +49,7 @@
 			
 				$doc = $factura->GeneraHTMLFactura($id_factura_formato);
 			}
-			$ruta_cuadricula = Conf::Server().'/'.Conf::ImgDir().'/cuadricula_transp.png';
+			$ruta_cuadricula = Conf::Server().Conf::ImgDir().'/cuadricula_transp.png';
 		}
 	}	
 	

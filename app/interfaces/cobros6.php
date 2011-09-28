@@ -726,7 +726,7 @@ function ValidarFactura(form,id_factura,opcion)
 			var form = $('todo_cobro');
 		if(opcion=='imprimir')
 		{
-			<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ImprimirFacturaPdf') ) || ( method_exists('Conf','ImprimirFacturaPdf') && Conf::ImprimirFacturaPdf() ) )
+			<? if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
 		 			{ ?>
 					nuevaVentana('Imprimir_Factura',730,580,'agregar_factura.php?opc=generar_factura&id_cobro=<?=$id_cobro?>&id_factura='+id_factura, 'top=500, left=500');
 					//ValidarTodo(form);
@@ -1557,8 +1557,10 @@ function AgregarFactura(idx){
 										<td><?php echo $estado ?></td>
 										<td nowrap>
 											<a href='javascript:void(0)' onclick="nuevaVentana('Editar_Factura', 730, 580, 'agregar_factura.php?id_factura=<?=$id_factura ?>&popup=1&id_cobro=<?=$id_cobro?>', 'top=100, left=155');" ><img src='<?=Conf::ImgDir()?>/editar_on.gif' border="0" title="Editar"/></a>
+										<?php if( UtilesApp::GetConf($sesion,'ImprimirFacturaDoc') ) { ?>
 											<a href='javascript:void(0)' onclick="ValidarFactura('', <?=$id_factura?>, 'imprimir');" ><img src='<?=Conf::ImgDir()?>/doc.gif' border="0" title="Descargar Word"/></a>
-										<?php if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') ) { ?>
+										<?php }
+										 if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') ) { ?>
 											<a href='javascript:void(0)' onclick="ValidarFactura('', <?=$id_factura?>, 'imprimir_pdf');" ><img src='<?=Conf::ImgDir()?>/pdf.gif' border="0" title="Descargar Pdf"/></a>
 										<?php } ?>
 										</td>

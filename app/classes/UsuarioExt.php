@@ -71,7 +71,7 @@ class UsuarioExt extends Usuario
 		}
 		return $vacaciones_usuario;
 	}
-	//Elimina Vacaciones
+	//Elimina VacacionesSELECT EXTRACT(YEAR_MONTH FROM DATE_FORMat('2011-01-01 01:01:01') );
 	function EliminaVacacion($ide,$id_usuario)
 	{
 		$query = "DELETE FROM usuario_vacacion WHERE id = ".$ide." AND id_usuario = ".$id_usuario." LIMIT 1";
@@ -205,12 +205,13 @@ class UsuarioExt extends Usuario
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
-	function HorasTrabajadasEsteMes($id_usuario='',$tipo_dato = 'horas_trabajadas')
+	function HorasTrabajadasEsteMes($id_usuario='',$tipo_dato = 'horas_trabajadas',$fecha='')
 	{
 		if(!$id_usuario)
 			$id_usuario = $this->fields['id_usuario'];
 
-
+		$mes = empty($fecha) ? date('Ym') : date('Ym',strtotime($fecha));
+		
 		switch($tipo_dato)
 		{
 			case 'horas_castigadas':
@@ -224,7 +225,7 @@ class UsuarioExt extends Usuario
 		}
 		$query = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC($td)))
 							FROM trabajo
-							WHERE EXTRACT(YEAR_MONTH FROM fecha) = EXTRACT(YEAR_MONTH FROM NOW())
+							WHERE EXTRACT(YEAR_MONTH FROM fecha) = '$mes'
 							AND id_usuario=$id_usuario";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($horas) = mysql_fetch_array($resp);

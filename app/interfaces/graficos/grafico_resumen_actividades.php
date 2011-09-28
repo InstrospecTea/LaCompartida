@@ -30,6 +30,16 @@ $data = $tiempo;
 # The labels for the pie chart
 $labels = $nombres;
 
+$total = array_sum($data);
+$derecha = 0;
+foreach($data as $k => $v){
+	$derecha += $v;
+	if($derecha*2 > $total){
+		$alto = max($alto, 19 * ($k>count($data)/2 ? $k+2 : count($data)-$k) + 50);
+		break;
+	}
+}
+
 # Create a PieChart object of size 560 x 270 pixels, with a golden background and a 1
 # pixel 3D border
 $c = new PieChart($ancho, $alto, goldColor(), -1, 1);
@@ -46,7 +56,7 @@ $c->setPieSize($ancho / 2, $alto / 2, $radio);
 $c->set3D(20);
 
 # Use the side label layout method
-$c->setLabelLayout(SideLayout);
+$c->setLabelLayout(SideLayout, -1, 30, $alto - 10);
 $c->setLabelFormat("{label} {value|2}hrs. ({percent}%)");
 
 # Set the label box background color the same as the sector color, with glass effect,
@@ -64,7 +74,7 @@ $c->setLineColor(SameAsMainColor, 0x000000);
 # is because this makes the small sectors position near the horizontal axis, where
 # the text label has the least tendency to overlap. For data sorted in ascending
 # order, a start angle of 45 degrees can be used instead.
-$c->setStartAngle(135);
+$c->setStartAngle(0);
 
 # Set the pie data and the pie labels
 $c->setData($data, $labels);

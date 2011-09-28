@@ -6189,7 +6189,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			
 			case 4.84:
 				$query = array();
@@ -6204,6 +6204,43 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			case 4.85:
 				$query = array();
 				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaAsociadaEsconderListado', '0', 'Esconder las columnas factura y fecha factura (de las asociadas al gasto), en gastos.php', 'boolean', '6', '-1');";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			
+			case 4.86:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+							VALUES (NULL , 'ModuloAdelantos', '0', NULL , 'boolean', '6', '-1');";
+				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+							VALUES (NULL , 'UsarHorasMesConsulta', '0', NULL , 'boolean', '6', '-1');";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			
+			case 4.87:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				VALUES (
+				NULL ,  'ImprimirExcelCobrosUnaPagina',  '0',  'Imprimir excel cobros una página (fit to pages)',  'boolean',  '6',  '-1'
+				);";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			
+			case 4.88:
+				$query = array();
+				$query[] = "INSERT INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` ) 
+											VALUES (
+												NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
+											);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+											VALUES (
+												NULL ,  'ImprimirFacturaDoc',  '1', NULL ,  'boolean',  '6',  '-1'
+											);";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6462,6 +6499,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.83;
 	$VERSIONES[$num++] = 4.84;
 	$VERSIONES[$num++] = 4.85;
+	$VERSIONES[$num++] = 4.86;
+	$VERSIONES[$num++] = 4.87;
+	$VERSIONES[$num++] = 4.88;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

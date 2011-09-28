@@ -1530,7 +1530,7 @@ class Cobro extends Objeto
 		{
 			$html = $this->GenerarDocumento($parser,'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto);
 		}
-
+		
 		return $html;
 	}
 
@@ -1562,7 +1562,7 @@ class Cobro extends Objeto
 					$PdfLinea2 = Conf::PdfLinea2();
 					$PdfLinea3 = Conf::PdfLinea3();
 				}
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				$html2 = str_replace('%direccion%', $PdfLinea1, $html2);
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
@@ -1783,7 +1783,7 @@ class Cobro extends Objeto
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */
 				#carta mb
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				if (count($this->asuntos)>1)
 				{
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -2370,7 +2370,7 @@ class Cobro extends Objeto
 					$Email = Conf::Email();
 				}
 
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				$pie_pagina = $PdfLinea2.' '.$PdfLinea3.'<br>'.$SitioWeb.' - E-mail: '.$Email;
 				$html2 = str_replace('%direccion%', $pie_pagina, $html2);
 			break;
@@ -6208,7 +6208,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$PdfLinea2 = Conf::PdfLinea2();
 					$PdfLinea3 = Conf::PdfLinea3();
 				}
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				$html2 = str_replace('%direccion%', $PdfLinea1, $html2);
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
@@ -6380,7 +6380,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 			case 'DETALLE':
 
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
@@ -6990,7 +6990,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$Email = Conf::Email();
 				}
 
-				$html2 = str_replace('%logo_carta%', Conf::Server().'/'.Conf::ImgDir(), $html2);
+				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
 				$pie_pagina = $PdfLinea2.' '.$PdfLinea3.'<br>'.$SitioWeb.' - E-mail: '.$Email;
 				$html2 = str_replace('%direccion%', $pie_pagina, $html2);
 			break;

@@ -64,6 +64,7 @@
 				case 'fecha_dia': 	 								$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_mes':										$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':										$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
+				case 'fecha_ano_ultima_cifra':			$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
 				case 'direccion':										$glosa_dato = $factura->fields['direccion_cliente']; break;
 				case 'descripcion_honorarios':			$glosa_dato = $factura->fields['descripcion']; break;
 				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;

@@ -503,6 +503,13 @@ $hoy = date("Y-m-d");
 				<input type=button class=btn value="<?=__('Generar Gráfico')?>" onclick="Generar(this.form,'grafico');">
 	    </td>
 	</tr>
+	<tr>
+		<td colspan="3">
+			<?=__('Mostrar sólo los')?>
+			<input type="text" name="limite" value="<?=$limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" />
+			<?=__('resultados superiores agrupando el resto.')?>
+		</td>
+	</tr>
 </table>
 <div id="area_categoria" style="display:<?=$area_y_categoria ? 'inline' : 'none' ?>;">
 	<table>
@@ -728,9 +735,16 @@ if($opc=='grafico')
 			$total += $row[$horas_sql];
 		}
 	}
-	if($nombres)
-		foreach($nombres as $key => $nombre)
-			$datos_grafico .= "&nombres[]=".$nombre."&tiempo[]=".str_replace(',','.',$tiempos[$key]);
+	if($nombres){
+		arsort($tiempos);
+		$otros = 0;
+		
+		foreach($tiempos as $key => $tiempo){
+			if($limite-- > 0) $datos_grafico .= "&nombres[]=".$nombres[$key]."&tiempo[]=".str_replace(',','.',$tiempos[$key]);
+			else $otros += $tiempos[$key];
+		}
+		if($otros) $datos_grafico .= "&nombres[]=Otros&tiempo[]=".str_replace(',','.',$otros);
+	}
 	$html_info .= "<img src='graficos/grafico_resumen_actividades.php?titulo=".$titulo_reporte.$datos_grafico."' alt='' />";
 	//echo 'graficos/grafico_resumen_actividades.php?titulo='.$titulo_reporte.$datos_grafico;
 	echo $html_info;

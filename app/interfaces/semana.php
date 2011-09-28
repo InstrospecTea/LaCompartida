@@ -169,6 +169,8 @@ else
 
 <?
 	echo("<table style='width:600px'>");
+	
+	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 ?>
     <tr>
     		<td align='left' colspan='4'>
@@ -177,11 +179,11 @@ else
         </td>
         
         <td align='right' colspan='2'>
-        	<?=__('Total mes actual')?>:
+        	<?=$horas_mes_consulta ? __('Total mes') : __('Total mes actual')?>:
         </td>
         <td style="vertical-align: middle">
 <?
-$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario);
+$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
 ?>
             <strong><?=$horas_trabajadas_mes?></strong>
 		</td>

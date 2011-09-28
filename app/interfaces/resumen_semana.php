@@ -7,6 +7,7 @@
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/Semana.php';
 	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 
 	$sesion = new Sesion(array('REP'));
@@ -114,6 +115,7 @@ else
 <br />
 
 <?
+	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 	
 	if( is_array($usuarios) )
 		$objeto_semana = new Semana($sesion,"",$usuarios);
@@ -211,8 +213,8 @@ else
 		echo("<tr>");
 		$nombre_usuario = $usr->fields['apellido1'].' '.$usr->fields['apellido2'].', '.$usr->fields['nombre'];
 		echo("<td style='width: 700px; text-align:left;' colspan='4'>".__('Usuario').": ".$nombre_usuario."</td>");
-		echo("<td align='right' colspan='2'>".__('Total mes actual').":</td>");
-		echo("<td style='vertical-align: middle'><strong>".$sesion->usuario->HorasTrabajadasEsteMes($id_usuario,$tipo_dato)."</strong></td>");
+		echo("<td align='right' colspan='2'>".($horas_mes_consulta ? __('Total mes') : __('Total mes actual')).":</td>");
+		echo("<td style='vertical-align: middle'><strong>".$sesion->usuario->HorasTrabajadasEsteMes($id_usuario,$tipo_dato,$horas_mes_consulta ? $semana_actual : '')."</strong></td>");
 		echo("</tr>");
 
 		/* Listando días */
