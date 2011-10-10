@@ -255,33 +255,114 @@ class Migracion
 	 	echo "</table>";
 	}
 	
-	function Query2ObjetosCliente($response)
+	function Query2ObjetosCliente($response, $tipo='sql')
 	{
-		while ($row = mysql_fetch_assoc($response))
-		{
-			$sesion = new Sesion();
-			$cliente = new Cliente($this->sesion);
-			$contrato = new Contrato($this->sesion);
-			
-			$row['cliente_FFF_glosa_cliente'] = addslashes($row['cliente_FFF_glosa_cliente']);
-			$row['contrato_FFF_factura_razon_social'] = addslashes($row['contrato_FFF_factura_razon_social']);
-			$row['cliente_FFF_rsocial'] = addslashes($row['cliente_FFF_rsocial']);
-			
-			foreach ($row as $key => $val)
+		if( $tipo == 'sql' ) {
+			while ($row = mysql_fetch_assoc($response))
 			{
-				$keys = explode('_FFF_', $key);
-				if ($keys[0] == 'cliente')
+				$sesion = new Sesion();
+				$cliente = new Cliente($this->sesion);
+				$contrato = new Contrato($this->sesion);
+				
+				$row['cliente_FFF_glosa_cliente'] = addslashes($row['cliente_FFF_glosa_cliente']);
+				$row['contrato_FFF_factura_razon_social'] = addslashes($row['contrato_FFF_factura_razon_social']);
+				$row['cliente_FFF_rsocial'] = addslashes($row['cliente_FFF_rsocial']);
+				
+				foreach ($row as $key => $val)
 				{
-					$cliente->Edit($keys[1], $val);
+					$keys = explode('_FFF_', $key);
+					if ($keys[0] == 'cliente')
+					{
+						$cliente->Edit($keys[1], $val);
+					}
+					else if ($keys[0] == 'contrato')
+					{
+						$contrato->Edit($keys[1], $val);
+					}
 				}
-				else if ($keys[0] == 'contrato')
-				{
-					$contrato->Edit($keys[1], $val);
-				}
+	
+				$this->AgregarCliente($cliente, $contrato);
 			}
-
-			$this->AgregarCliente($cliente, $contrato);
 		}
+		else if( $tipo == 'excel' ) {
+			foreach($response as $id_usuario => $arreglo_cliente) {
+				$sesion = new Sesion();
+		
+				$sesion = new Sesion();
+				$cliente = new Cliente($this->sesion);
+				$contrato = new Contrato($this->sesion);
+				
+				$arreglo_cliente['cliente_FFF_dir_calle'] = 
+								 $arreglo_cliente['cliente_FFF_direccion'].', '.$arreglo_cliente['cliente_FFF_ciudad'].', '.
+								 $arreglo_cliente['cliente_FFF_provinicia'].', '.$arreglo_cliente['cliente_FFF_glosa_pais'];
+				$arreglo_cliente['contrato_FFF_direccion_contacto'] = 
+								 $arreglo_cliente['contrato_FFF_direccion'].', '.$arreglo_cliente['contrato_FFF_ciudad'].', '.
+								 $arreglo_cliente['contrato_FFF_provinicia'].', '.$arreglo_cliente['contrato_FFF_glosa_pais'];
+				$arreglo_cliente['contrato_FFF_id_pais'] = $this->GlosaPaisAIdPais($arreglo_cliente['contrato_FFF_glosa_pais']);
+				
+				if( strtoupper($arreglo_cliente['contrato_FFF_glosa_idioma'])=="INGLES" ) {
+					$arreglo_cliente['contrato_FFF_codigo_idioma'] = "en";
+				}
+				else {
+					$arreglo_cliente['contrato_FFF_codigo_idioma'] = "es";
+				}
+				if( strtoupper($arreglo_cliente['contrato_FFF_codigo_moneda'])=="DOL" ) {
+					$arreglo_cliente['contrato_FFF_id_moneda'] = "2";
+					$arreglo_cliente['contrato_FFF_id_moneda_moneda'] = "2";
+					$arreglo_cliente['contrato_FFF_opc_moneda_total'] = "2";
+				}
+				else {
+					$arreglo_cliente['contrato_FFF_id_moneda'] = "1";
+					$arreglo_cliente['contrato_FFF_id_moneda_moneda'] = "1";
+					$arreglo_cliente['contrato_FFF_opc_moneda_total'] = "1";
+				}
+				$arreglo_cliente['contrato_FFF_id_usuario_responsable'] = $this->UsernameAIdUsuario($arreglo_cliente['contrato_FFF_username_usuario_responsable']);
+				$arreglo_cliente['contrato_FFF_id_usuario_secundario'] = $this->UsernameAIdUsuario($arreglo_cliente['contrato_FFF_username_usuario_secundario']);
+				$arreglo_cliente['contrato_FFF_fecha_creacion'] = Utiles::fecha2sql($arreglo_cliente['contrato_FFF_fecha_creacion']);
+				
+				unset($arreglo_cliente['cliente_FFF_direccion']);
+				unset($arreglo_cliente['cliente_FFF_ciudad']);
+				unset($arreglo_cliente['cliente_FFF_provinicia']);
+				unset($arreglo_cliente['cliente_FFF_glosa_pais']);
+				unset($arreglo_cliente['contrato_FFF_direccion']);
+				unset($arreglo_cliente['contrato_FFF_ciudad']);
+				unset($arreglo_cliente['contrato_FFF_provinicia']);
+				unset($arreglo_cliente['contrato_FFF_glosa_pais']);
+				unset($arreglo_cliente['contrato_FFF_glosa_idioma']);
+				unset($arreglo_cliente['contrato_FFF_codigo_moneda']);
+				unset($arreglo_cliente['contrato_FFF_username_usuario_responsable']);
+				unset($arreglo_cliente['contrato_FFF_username_usuario_secundario']);
+				
+				foreach($arreglo_cliente as $key => $value) {
+					$keys = explode('_FFF_', $key);
+					if ($keys[0] == 'cliente')
+					{
+						$cliente->Edit($keys[1], $val);
+					}
+					else if ($keys[0] == 'contrato')
+					{
+						$contrato->Edit($keys[1], $val);
+					}
+				}
+				$this->AgregarCliente($cliente, $contrato);
+			}
+		}
+	}
+	
+	function GlosaPaisAIdPais( $glosa_pais ) 
+	{
+		$query = "SELECT id_pais FROM prm_pais WHERE nombre = TRIM('$glosa_pais')";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id_pais) = mysql_fetch_array($resp);
+		return $id_pais;
+	}
+	
+	function UsernameAIdUsuario( $username ) 
+	{
+		$query = "SELECT id_usuario FROM usuario WHERE username = TRIM('$username')";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id_usuario) = mysql_fetch_array($resp);
+		return $id_usuario;
 	}
 	
 	function DefinirGruposPRC()
@@ -337,31 +418,52 @@ class Migracion
 		}
 	}
  
-	function Query2ObjetoUsuario($response)
+	function Query2ObjetoUsuario($response,$tipo='sql')
 	{
-		while($row = mysql_fetch_assoc($response))
-		{
-			$sesion = new Sesion();
-
-			$usuario = new UsuarioExt($sesion);
-			$usuario->guardar_fecha = false;
-			$usuario->tabla = "usuario";
-			
-			$permisos = $this->PermisosSegunCategoria($row);
-			$row      = $this->LimpiarCategoriaUsuario($row);
-			
-			if( $row['usuario_FFF_email'] == "" )
-				$row['usuario_FFF_email'] = 'mail@estudio.pais';
-			if( $row['usuario_FFF_rut'] == "" || trim($row['usuario_FFF_rut']) == "000" || trim($row['usuario_FFF_rut']) == "0000" ) 
-				$row['usuario_FFF_rut']   = $row['usuario_FFF_id_usuario'];
-
-			foreach( $row as $key => $val )
+		if($tipo == 'sql'){
+			while($row = mysql_fetch_assoc($response))
 			{
-				$keys = explode('_FFF_',$key);
-				$usuario->Edit($keys[1],$val);
-			}
+				$sesion = new Sesion();
 	
-			$this->AgregarUsuario($usuario, $permisos);
+				$usuario = new UsuarioExt($sesion);
+				$usuario->guardar_fecha = false;
+				$usuario->tabla = "usuario";
+				
+				$permisos = $this->PermisosSegunCategoria($row);
+				$row      = $this->LimpiarCategoriaUsuario($row);
+				
+				if( $row['usuario_FFF_email'] == "" )
+					$row['usuario_FFF_email'] = 'mail@estudio.pais';
+				if( $row['usuario_FFF_rut'] == "" || trim($row['usuario_FFF_rut']) == "000" || trim($row['usuario_FFF_rut']) == "0000" ) 
+					$row['usuario_FFF_rut']   = $row['usuario_FFF_id_usuario'];
+	
+				foreach( $row as $key => $val )
+				{
+					$keys = explode('_FFF_',$key);
+					$usuario->Edit($keys[1],$val);
+				}
+		
+				$this->AgregarUsuario($usuario, $permisos);
+			}
+		}
+		else if( $tipo == 'excel' ){
+			foreach($response as $id_usuario => $arreglo_usuario) {
+				$sesion = new Sesion();
+		
+				$usuario = new UsuarioExt($sesion);
+				$usuario->guardar_fecha = false;
+				$usuario->tabla = "usuario";
+				
+				$permisos = $this->PermisosSegunCategoria($row);
+				foreach($arreglo_usuario as $key => $value) {
+					if( $key == "glosa_categoria" ) {
+						$key = "id_categoria_usuario";
+						$value = $this->GlosaCatAIdCat($value);
+					}
+					$usuario->Edit($key,$value);
+				}
+				$this->AgregarUsuario($usuario, $permisos);
+			}
 		}
 	}
 	
@@ -622,6 +724,14 @@ class Migracion
 		return $data;
 	}
 	
+	function GlosaCatAIdCat($glosa)
+	{
+		$query = "SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE glosa_categoria = TRIM('$glosa')";
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id_categoria_usuario) = mysql_fetch_array($resp);
+		return $id_categoria_usuario;
+	}
+	
 	function PermisosSegunCategoria($data)
 	{
 		$id = $data['usuario_FFF_id_usuario'];
@@ -871,7 +981,7 @@ class Migracion
                 }
             }
 	}
-	
+
 	public function EmitirFacturasPRC()
 	{
 		$query = "SELECT 
@@ -913,7 +1023,7 @@ class Migracion
 			$this->GenerarFactura($factura);
 		}
 	}
-	
+
 	public function ValidarCliente($cliente)
 	{
 		if (!$this->ValidarCodigo($cliente, "id_moneda", "prm_moneda", true))
@@ -968,8 +1078,8 @@ class Migracion
 		$contrato->Edit("codigo_cliente",
 			empty($contrato_generar->fields["codigo_cliente"]) ? $cliente->fields['codigo_cliente'] : $contrato_generar->fields["codigo_cliente"]);
 	
-		$contrato->Edit("id_usuario_responsable", $contrato_generar->fields["id_usuario_responsable"]);
-		$contrato->Edit("id_usuario_responsable", $contrato_generar->fields["id_usuario_secundario"]);
+		$contrato->Edit("id_usuario_responsable", !empty($contrato_generar->fields["id_usuario_responsable"]) ? $contrato_generar->fields["id_usuario_responsable"] : "NULL");
+		$contrato->Edit("id_usuario_secundario", !empty($contrato_generar->fields["id_usuario_secundario"]) ? $contrato_generar->fields["id_usuario_secundario"] : "NULL" );
 		$contrato->Edit("centro_costo", $contrato_generar->fields["centro_costo"]);
 	
 		$contrato->Edit("observaciones", $contrato_generar->fields["observaciones"]);
@@ -1363,16 +1473,7 @@ class Migracion
 		$hora->Edit('codigo_asunto', $codigo_asunto);
 		
 		#Confirmo que el id_moneda exista
-		$id_moneda=9;
-		$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda like '".$hora_generar->fields['id_moneda']."%'";
-		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($id_moneda) = mysql_fetch_array($resp);
-		if(!$id_moneda)
-		{
-			echo "Error ingreso hora: id_moneda " . $hora->fields['id_moneda'] . " no existe\n";
-			//return false;
-		}
-		$hora->Edit('id_moneda', $id_moneda);
+		$hora->Edit('id_moneda', !empty($hora_generar->fields['id_moneda']) ? $hora_generar->fields['id_moneda'] : "2");
 		
 		$hora->Edit('fecha', 							!empty($hora_generar->fields['fecha']) 							? $hora_generar->fields['fecha'] 										: "0000-00-00" );
 		$hora->Edit('id_cobro', 					!empty($hora_generar->fields['id_cobro']) 					? $hora_generar->fields['id_cobro'] 								: "NULL" );
@@ -1383,7 +1484,7 @@ class Migracion
 		$hora->Edit('fecha_modificacion', !empty($hora_generar->fields['fecha_modificacion']) ? $hora_generar->fields['fecha_modificacion'] 			: "0000-00-00 00:00:00" );
 		$hora->Edit('tarifa_hh', 					!empty($hora_generar->fields['tarifa_hh']) 					? $hora_generar->fields['tarifa_hh'] 								: "0" );
 		$hora->Edit('solicitante', 				!empty($hora_generar->fields['solicitante']) 				? addslashes($hora_generar->fields['solicitante']) 	: "" );
-		$hora->Edit('cobrable',						!empty($hora_generar->fields['cobrable'])						? $hora_generar->fields['cobrable']									: "1");
+		$hora->Edit('cobrable',						( !empty($hora_generar->fields['cobrable']) || $hora_generar->fields['cobrable'] == "0" )	? $hora_generar->fields['cobrable']		: "1");
 		
 		/*
 		* Registrar información
@@ -1657,7 +1758,7 @@ class Migracion
 		$cobro->Edit("incluye_honorarios", $incluye_honorarios);
 		$cobro->Edit("incluye_gastos", $incluye_gastos);
 		
-		$cobro->Edit("fecha_creacion", (!empty($cobro_generar->fields['fecha_creacion'])) ? $cobro_generar->fields['fecha_creacion'] : "NULL");
+		$cobro->Edit("fecha_creacion", !empty($cobro_generar->fields['fecha_creacion']) ? $cobro_generar->fields['fecha_creacion'] : "NULL");
 		$cobro->Edit("id_moneda", (!empty($cobro_generar->fields['id_moneda'])) ? $cobro_generar->fields['id_moneda'] : '1');
 		$cobro->Edit("monto", (!empty($cobro_generar->fields['monto'])) ? $cobro_generar->fields['monto'] : "NULL");
 		$cobro->Edit("impuesto", (!empty($cobro_generar->fields['impuesto'])) ? $cobro_generar->fields['impuesto'] : '0');
@@ -1949,12 +2050,12 @@ class Migracion
 		$ingreso->Load($pago->fields['id_movimiento']);
 
 		$ingreso->Edit('fecha', $pago->fields['fecha_pago'] ? Utiles::fecha2sql($pago->fields['fecha_pago']) : "NULL");
-		$ingreso->Edit("id_usuario", $pago->fields['id_usuario']);
+		$ingreso->Edit("id_usuario", !empty($pago->fields['id_usuario']) ? $pago->fields['id_usuario'] : "NULL" );
 		$ingreso->Edit("descripcion", $pago->fields['descripcion']);
 		$ingreso->Edit("id_moneda", $pago->fields['id_moneda'] ? $pago->fields['id_moneda'] : $id_moneda);
 		$ingreso->Edit("codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : "NULL");
 		$ingreso->Edit("codigo_asunto", $pago->fields['codigo_asunto'] ? $pago->fields['codigo_asunto'] : "NULL");
-		$ingreso->Edit("id_usuario_orden", $pago->fields['id_usuario_orden']);
+		$ingreso->Edit("id_usuario_orden", !empty($pago->fields['id_usuario_orden']) ? $pago->fields['id_usuario_orden'] : "NULL" );
 		if(( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsaMontoCobrable')) or (method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable()) && $pago->fields['monto_cobrable'] > 0)
 		{
 			$ingreso->Edit('ingreso',$pago->fields['monto_pago'] ? $pago->fields['monto_pago'] : $monto_cobrable );
@@ -2083,7 +2184,7 @@ class Migracion
 		}
 
 		$gasto->Edit("fecha", Utiles::fecha2sql($gasto_generar->fields['fecha']));
-		$gasto->Edit("id_usuario", $gasto_generar->fields['id_usuario']);
+		$gasto->Edit("id_usuario", !empty($gasto_generar->fields['id_usuario']) ? $gasto_generar->fields['id_usuario'] : "NULL" );
 		$gasto->Edit("descripcion", $gasto_generar->fields['descripcion']);
 		$gasto->Edit("id_moneda", $gasto_generar->fields['id_moneda']);
 		$gasto->Edit("codigo_cliente", $gasto_generar->fields['codigo_cliente'] ? $gasto_generar->fields['codigo_cliente'] : "NULL");
@@ -2105,7 +2206,7 @@ class Migracion
 			$gasto->Edit('id_movimiento_pago', NULL);
 		}
 
-		$gasto->Edit('id_proveedor', $gasto_generar->fields['id_proveedor'] ? $gasto_generar->fields['id_proveedor'] : "NULL");
+		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : "NULL");
 
 		if (!$this->ValidarGasto($gasto))
 		{
@@ -2126,19 +2227,19 @@ class Migracion
 	{
 		if( !empty($ruc) && !empty($rsocial) )
 		{
-			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM($rut) AND TRIM(glosa) = TRIM($rsocial)";
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM('$rut') AND TRIM(glosa) = TRIM('$rsocial')";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($id_proveedor) = mysql_fetch_array($resp);
 		}
 		else if( !empty($ruc) )
 		{
-			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM($ruc) ORDER BY id_proveedor ASC LIMIT 1";
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(rut) = TRIM('$ruc') ORDER BY id_proveedor ASC LIMIT 1";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($id_proveedor) = mysql_fetch_array($resp);
 		}
-		else
+		else if( !empty($rsocial) )
 		{
-			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(glosa) = TRIM($rsocial) ORDER BY id_proveedor ASC LIMIT 1";
+			$query = "SELECT id_proveedor FROM prm_proveedor WHERE TRIM(glosa) = TRIM('$rsocial') ORDER BY id_proveedor ASC LIMIT 1";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($id_proveedor) = mysql_fetch_array($resp);
 		}
@@ -2792,16 +2893,11 @@ class Migracion
 											$cambios_en_saldo_honorarios[] = $id_documento_cobro;
 										if($saldo_gastos_anterior != $documento_cobro_aux->fields['saldo_gastos'])
 											$cambios_en_saldo_gastos[] = $id_documento_cobro;
-
+										
 										$neteo_documento->CambiarEstadoCobro($id_cobro_neteado,$documento_cobro_aux->fields['saldo_honorarios'],$documento_cobro_aux->fields['saldo_gastos']);
 									}
 								}
 						
-						?>
-						<script type="text/javascript">
-						window.opener.Refrescar();
-						</script> 
-						<?
 				}
 		
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";

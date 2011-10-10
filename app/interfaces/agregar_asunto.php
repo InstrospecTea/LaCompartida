@@ -1193,7 +1193,7 @@ function CopiarDatosCliente(form)
 </table>
 <br>
 	<fieldset class="border_plomo tb_base">
-		<legend><?=__('Alertas')?></legend>
+		<legend><?=__('Alertas').' '.__('Asunto')?></legend>
 		<p>&nbsp;<?=__('El sistema enviará un email de alerta al encargado si se superan estos límites:')?></p>
 	<table>
 	<tr>

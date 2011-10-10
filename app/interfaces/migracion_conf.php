@@ -5,6 +5,7 @@
 		function dbName() { return 'Payet_dbo'; }
 		function dbUser() { return 'admin'; }
 		function dbPass() { return 'admin1awdx'; }
+		
 		function QueriesModificacionesAntes() 
 		{
 			$queries = array();
@@ -17,6 +18,7 @@
 			
 			return $queries;
 		}
+		
 		function QueriesModificacionesDespues()
 		{
 			$queries = array();
@@ -40,6 +42,7 @@
 											WHERE cta_cte_fact_mvto.saldo = 0;";
 			return $queries;
 		}
+		
 		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
 																					'campo_glosa' 					=> 'glosa_categoria', 
 																				  'campo_id'            	=> 'id_categoria_usuario', 
@@ -59,6 +62,7 @@
 																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
 																			); 
 		}
+		
 		function QueryUsuario() 
 		{
 			return "SELECT 
@@ -81,6 +85,7 @@
 							LEFT JOIN TbCategoriaEmpleados ON Empleado.Categoria = TbCategoriaEmpleados.CodigoCategoria 
 							AND Empleado.TipoEmpleado = TbCategoriaEmpleados.TipoEmpleado"; 
 		}
+		
 		function QueryCliente() 
 		{ 
 			return "SELECT 
@@ -116,16 +121,18 @@
 								Cliente.CodigoClienteAlterno 																																as cliente_FFF_codigo_cliente_secundario, 
 								Cliente.attachesecundario 																																	as cliente_FFF_id_usuario_encargado, 
 								Cliente.attachesecundario 																																	as contrato_FFF_id_usuario_secundario, 
-								GROUP_CONCAT( Titulo, Nombre, Telefono SEPARATOR '//' ) 																		as cliente_FFF_nombre_contacto  
+								GROUP_CONCAT( Titulo, Nombre, Telefono SEPARATOR '//' ) 																		as cliente_FFF_nombre_contacto, 
+								'1'																																													as contrato_FFF_separar_liquidaciones 
 							FROM Cliente 
 							LEFT JOIN ContactosCliente ON Cliente.CodigoCliente = ContactosCliente.CodigoCliente 
 							GROUP BY Cliente.CodigoCliente";
 		}
+		
 		function QueryAsunto() 
 		{ 
 			return "SELECT 
 								Cliente.Cobrador 																														as asunto_FFF_id_cobrador,
-								CONCAT(SUBSTRING(OrdenFacturacion.NumeroOrdenFact,1,4),'-0',SUBSTRING(OrdenFacturacion.NumeroOrdenFact,-3)) 	as asunto_FFF_codigo_asunto,
+								CONCAT(SUBSTRING(OrdenFacturacion.NumeroOrdenFact,1,4),'-',SUBSTRING(OrdenFacturacion.NumeroOrdenFact,-3)) 	as asunto_FFF_codigo_asunto,
 								OrdenFacturacion.CodigoCliente 																							as asunto_FFF_codigo_cliente,
 								OrdenFacturacion.CodigoCliente 																							as contrato_FFF_codigo_cliente,
 								CONCAT_WS(' ',ContactosCliente.Titulo, ContactosCliente.Nombre) 						as asunto_FFF_contacto,
@@ -160,7 +167,8 @@
 								Cliente.NombreCliente																												as asunto_FFF_razon_social, 
 								Cliente.NombreCliente																												as contrato_FFF_factura_razon_social
 								,IF(OrdenFacturacion.TipoFactExtraordinaria='A','FLAT FEE','TASA')					as contrato_FFF_forma_cobro
-								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,0)	as contrato_FFF_monto
+								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,0)	as contrato_FFF_monto,
+								'1'																																					as contrato_FFF_separar_liquidaciones 
 							FROM OrdenFacturacion 
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
@@ -179,13 +187,15 @@
 								,IF(hta.AsuntoLargoFacturable IS NOT NULL,hta.AsuntoLargoFacturable, htd.AsuntoLargo) 					as descripcion
 								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion
 								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
-								,IF(hta.tarifacliente IS NOT NULL,hta.tarifacliente ,htd.tarifacliente) 											as tarifa_hh
-								,IF(hta.moneda IS NOT NULL, hta.moneda, htd.moneda)																						as id_moneda
+								,IF(hta.TarifaFacturable IS NOT NULL,hta.TarifaFacturable ,htd.Tarifa) 												as tarifa_hh
+								,IF(Factura.Moneda IS NOT NULL, IF( Factura.Moneda = 'D','2',IF( Factura.Moneda = 'E', '3','1')), IF( hta.moneda = 'D','2',IF( hta.moneda = 'E', '3','1')) )
+																																																							as id_moneda
 								,IF(hta.NumeroOrdenFacturacionFact, hta.NumeroOrdenFacturacionFact,htd.NumeroOrdenFacturacion) as codigo_asunto
 								,hta.id_trabajo_lemontech 																																		as id_trabajo
 								FROM HojaTiempoajustado hta
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
-								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid";
+								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid 
+								LEFT JOIN Factura ON Factura.NumeroFactura = hta.NumeroFactura";
 		} 
 		function QueryGastos() 
 		{ 
@@ -204,8 +214,8 @@
 									Empleado.CodigoEmpleado 																													as gasto_FFF_id_usuario,
 									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario_orden,
 									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
-									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
-									IF(moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,
+									IF(Gastos.moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
+									IF(Gastos.moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,
 									Gastos.CodigoCliente 																															as gasto_FFF_codigo_cliente,
 									IF(Gastos.flagfacturable='S','1','0') 																						as gasto_FFF_cobrable,
 									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda,
@@ -274,6 +284,7 @@
 			return "SELECT 
 									CodigoTarifaCliente as id_tarifa 
 									,Descripcion as glosa_tarifa 
+									,'1' as guardado 
 									FROM TbTarifaCliente"; 
 		}
 		function QueryUsuariosTarifas() 
@@ -284,7 +295,6 @@
 								, if(T1.moneda='D' ,'2',if(T1.moneda = 'E','3',if(T1.moneda = 'S','1','0'))) AS id_moneda 
 								, T1.TarifaHora AS tarifa 
 								, T1.CodigoTarifaCliente as id_tarifa 
-								, T1.CodigoPeriodo 
 								FROM  `TbTarifaCategoria` as T1 
 								WHERE T1.CodigoPeriodo = 
 									( SELECT MAX(T2.CodigoPeriodo) 
@@ -326,7 +336,7 @@
 								P.CodigoBancoCheque																		as documento_FFF_numero_cheque,
 								P.CodigoBancoCheque																		as factura_FFF_nro_cheque,
 								P.id_factura_pago_lemontech														as factura_FFF_id_factura_pago,
-								P.id_factura_pago_lemontech 													as documento_FFF_id_documento
+								P.id_factura_pago_lemontech + 100000									as documento_FFF_id_documento 
 							FROM PagosRecibidos P 
 							LEFT JOIN Factura ON Factura.NumeroFactura = P.NumeroFactura 
 							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = P.CodigoBanco";

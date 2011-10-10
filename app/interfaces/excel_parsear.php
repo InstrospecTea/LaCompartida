@@ -7,6 +7,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
+	require_once Conf::ServerDir().'/classes/Migracion.php';
 	
 	require_once Conf::ServerDir().'/classes/Excel.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
@@ -17,9 +18,11 @@
 	$pagina->titulo = "Parseador de Excel.";
 	$pagina->PrintTop($pop);
 
+
 	if($opc=="guardar")
 	{
 		$nombre_archivo = $xls['tmp_name'];
+		$migracion = new Migracion($sesion);
 
 		//$e = new Excel($sesion,$nombre_archivo,1);
 		$insertar = 0;
@@ -30,8 +33,12 @@
 		}
 		$e = new Excel($sesion,$nombre_archivo,$insertar,$id_usuario);
 		$e->LeerTodo();
-
-		exit();
+		
+		switch($tipo_dato) {
+			case 'usuario': $migracion->Query2ObjetoUsuario($e->datos,'excel'); break;
+			case 'cliente': $migracion->Query2ObjetosCliente($e->datos,'excel'); break;
+			case 'asunto':  $migracion->Query2ObjetoAsunto($e->datos,'excel'); break;
+		}
 	}
 
 ?>
@@ -42,9 +49,9 @@
 
 <input type="file" name="xls"/>
 <br>
-Id usuario:
+Tipo Dato:
 <br>
-<input name="id_usuario" value="0" />
+<input name="tipo_dato" value="0" />
 
 <input type=hidden name=in value='<?=$in?>'/>
 <input type="submit" />

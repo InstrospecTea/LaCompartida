@@ -693,9 +693,9 @@ function ValidaSaldoPendienteCobro(form)
 				saltar_validacion_saldo=1;
 			}
 			saldos = response.split('//');
-			$('honorario_disp').value = saldos[0];
-			$('gastos_con_impuestos_disp').value = saldos[1];
-			$('gastos_sin_impuestos_disp').value = saldos[2];
+			$('honorario_disp').value = Number($('honorario_total').value) + Number(saldos[0]);
+			$('gastos_con_impuestos_disp').value = Number($('gastos_con_impuestos_total').value) + saldos[1];
+			$('gastos_sin_impuestos_disp').value = Number($('gastos_sin_impuestos_total').value) + saldos[2];
 
 			offLoading();
        }
@@ -999,6 +999,9 @@ function ActualizarDocumentoMonedaPago()
   <input type=hidden name="honorario_disp" id="honorario_disp" value='<?=$honorario_disp?>'/>
   <input type=hidden name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?=$gastos_con_impuestos_disp?>'/>
   <input type=hidden name="gastos_sin_impuestos_disp" id="gastos_sin_impuestos_disp" value='<?=$gastos_sin_impuestos_disp?>'/>
+  <input type=hidden name="honorario_total" id="honorario_total" value='<?=$honorario_total?>'/>
+  <input type=hidden name="gastos_con_impuestos_total" id="gastos_con_impuestos_total" value='<?=$gastos_con_impuestos_total?>'/>
+  <input type=hidden name="gastos_sin_impuestos_total" id="gastos_sin_impuestos_total" value='<?=$gastos_sin_impuestos_total?>'/>
   <input type='hidden' name='opc' id='opc' value='buscar'>
   <input type="hidden" name="porcentaje_impuesto" id="porcentaje_impuesto" value="<?=$porcentaje_impuesto;?>">
   

@@ -117,8 +117,37 @@ function Eliminar(id)
 				{
 					global $id_cliente;
 					global $id_asunto;
+					global $sesion;
 					$id_archivo = $fila->fields['id_archivo'];
-					$txt = "<a href=\"#\" onclick=\"nuevaVentana('Archivo','500','100','ver_archivo.php?id_archivo=".$id_archivo."')\"><img src='".Conf::ImgDir()."/doc.gif' border=0 style='cursor:pointer' /></a>";
+					$_archivo  = new Archivo($sesion);
+					$_icono = 'guardar.gif';
+					
+					if(!empty($id_archivo))
+					{
+						if($_archivo->Load($id_archivo))
+						{
+							switch( $_archivo->fields['data_tipo'] )
+							{
+								case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':    //docx
+								case 'application/msword': //doc
+									$_icono = 'doc.gif';
+									break;
+								case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': //xlsx
+								case 'application/msexcel':  //xls
+								case 'application/vnd.ms-excel': //xls
+									$_icono = 'excel.gif';
+									break;
+								case 'application/x-pdf': //pdf
+								case 'application/pdf': //pdf
+									$_icono = 'pdf.gif';
+									break;
+								default: $_icono = 'guardar.gif';
+							}
+						}
+					}
+
+					
+					$txt = "<a href=\"#\" onclick=\"nuevaVentana('Archivo','500','100','ver_archivo.php?id_archivo=".$id_archivo."')\"><img src='".Conf::ImgDir()."/".$_icono."' border=0 style='cursor:pointer' /></a>";
 					if (!empty($id_cliente))
 						$txt .= "&nbsp;<img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' onclick=\"return Eliminar('".$id_archivo."')\" class='mano_on' />";
 					else if (!empty($id_asunto))
@@ -130,3 +159,4 @@ function Eliminar(id)
 			}
 		} #fin id_cliente OR id_asunto
 ?>
+

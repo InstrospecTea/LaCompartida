@@ -1295,10 +1295,19 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	</tr>
 <?
 }
+	if( $contrato->loaded && $contrato->fields['separar_liquidaciones'] ) {
+		$separar_liquidaciones = '1';
+	}
+	else if( UtilesApp::GetConf($sesion,'SepararLiquidacionesPorDefecto') ) {
+		$separar_liquidaciones = '1';
+	}
+	else {
+		$separar_liquidaciones = '0';
+	}
 ?>
 <tr>
 	<td align="left"><?=__('Liquidar por separado (Por honorario y gastos)')?></td>
-	<td align="left"><input id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?=$contrato->fields['separar_liquidaciones']=='1'?'checked="checked"':''?>  /></td>
+	<td align="left"><input id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?=$separar_liquidaciones=='1'?'checked="checked"':''?> /></td>
 </tr>
 <?
 	$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)

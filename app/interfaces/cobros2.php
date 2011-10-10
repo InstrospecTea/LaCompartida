@@ -90,7 +90,7 @@
 		$pagina->FatalError(__('Debe especificar un cliente o') . ' ' . __('cobro'));
 
 	if($cobro->fields['estado'] <> 'CREADO' && $cobro->fields['estado'] <> 'EN REVISION')
-	    $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro);	
+	    $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");	
 	    
 	if($opc=="siguiente")
 	{

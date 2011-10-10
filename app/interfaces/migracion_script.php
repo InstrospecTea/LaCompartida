@@ -16,7 +16,7 @@
 	
 	set_time_limit(0);
 	ini_set('memory_limit','512M');
-	 /*
+	
 	if( method_exists('ConfMigracion','QueriesModificacionesAntes') && ConfMigracion::QueriesModificacionesAntes() != "" )
 	{
 		$queries = ConfMigracion::QueriesModificacionesAntes();
@@ -26,11 +26,12 @@
 		}
 	}
 	
-	
+	/*
 	if( method_exists('ConfMigracion','DatosPrm') && ConfMigracion::DatosPrm() != "" )
 	{
 		$migracion->SetDatosParametricos(ConfMigracion::DatosPrm());
 	}
+	*/
 	
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryUsuario') && ConfMigracion::QueryUsuario() != "" )
@@ -112,7 +113,6 @@
 		$migracion->Query2ObjetoFactura($responseFacturas);
 	}
 	
-*/
 	mysql_select_db(ConfMigracion::dbName()) or mysql_error($dbhOrigen);
 	if( method_exists('ConfMigracion','QueryPagos') && ConfMigracion::QueryPagos() )
 	{

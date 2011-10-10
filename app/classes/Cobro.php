@@ -1784,6 +1784,7 @@ class Cobro extends Objeto
 				#carta mb
 				$html2 = str_replace('%saludo_mb%', __('%saludo_mb%'), $html2);
 				$html2 = str_replace('%logo_carta%', Conf::Server().Conf::ImgDir(), $html2);
+				
 				if (count($this->asuntos)>1)
 				{
 					$html2 = str_replace('%detalle_mb%', __('%detalle_mb_asuntos%'), $html2);
@@ -5881,14 +5882,11 @@ class Cobro extends Objeto
 				return '';
 			//Tipos de Cambio
 			$html = str_replace('%titulo_tipo_cambio%',__('Tipos de Cambio'), $html);
-			$html = str_replace('%glosa_moneda_id_2%',__($cobro_moneda->moneda[2]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_3%',__($cobro_moneda->moneda[3]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_5%',__($cobro_moneda->moneda[5]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_6%',__($cobro_moneda->moneda[6]['glosa_moneda']), $html);
-			$html = str_replace('%valor_moneda_id_2%',number_format($cobro_moneda->moneda[2]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_3%',number_format($cobro_moneda->moneda[3]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_5%',number_format($cobro_moneda->moneda[5]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_6%',number_format($cobro_moneda->moneda[6]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			foreach($cobro_moneda->moneda as $id => $moneda){
+				$html = str_replace("%glosa_moneda_id_$id%",__($moneda['glosa_moneda']), $html);
+				$html = str_replace("%simbolo_moneda_id_$id%", $moneda['simbolo'], $html);
+				$html = str_replace("%valor_moneda_id_$id%",number_format($moneda['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			}
 		break;
 
 		//facturas morosas
@@ -6385,6 +6383,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
 				
+				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
+				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */
 				#carta mb
@@ -8990,7 +8990,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			//la duracion retainer.
 			$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
 							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria
+							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria,
+							usuario.username
 							FROM tramite
 							JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 							JOIN contrato ON asunto.id_contrato=contrato.id_contrato
@@ -9010,6 +9011,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
            {
                $row = $row_tmpl;
                $row = str_replace('%iniciales%', '&nbsp;',$row);
+			   $row = str_replace('%username%', $trabajo->fields['username'], $row);
                $row = str_replace('%fecha%', '&nbsp;',$row);
                $row = str_replace('%descripcion%', __('No hay trámites en este asunto'),$row);
                $row = str_replace('%valor%', '&nbsp;',$row);
@@ -10657,6 +10659,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 
 		case 'GASTOS_ENCABEZADO':
+			$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td align="center" width="80">%monto_original%</td>', $html);
+			
 			$html = str_replace('%glosa_gastos%',__('Gastos'), $html);
 			$html = str_replace('%descripcion_gastos%',__('Descripción de Gastos'),$html);
 			$html = str_replace('%fecha%',__('Fecha'), $html);
@@ -10686,6 +10690,8 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 
 		case 'GASTOS_FILAS':
+			$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td align="center">%monto_original%</td>', $html);
+			
 			$row_tmpl = $html;
 			$html = '';
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'SepararGastosPorAsunto') ) || ( method_exists('Conf','SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto() ) ) )
@@ -10808,6 +10814,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		break;
 
 		case 'GASTOS_TOTAL':
+			$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td>&nbsp;</td>', $html);
 			$html = str_replace('%total%',__('Total'), $html);
 			$html = str_replace('%glosa_total%',__('Total Gastos'), $html);
 
@@ -10991,14 +10998,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				return '';
 			//Tipos de Cambio
 			$html = str_replace('%titulo_tipo_cambio%',__('Tipos de Cambio'), $html);
-			$html = str_replace('%glosa_moneda_id_2%',__($cobro_moneda->moneda[2]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_3%',__($cobro_moneda->moneda[3]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_5%',__($cobro_moneda->moneda[5]['glosa_moneda']), $html);
-			$html = str_replace('%glosa_moneda_id_6%',__($cobro_moneda->moneda[6]['glosa_moneda']), $html);
-			$html = str_replace('%valor_moneda_id_2%',number_format($cobro_moneda->moneda[2]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_3%',number_format($cobro_moneda->moneda[3]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_5%',number_format($cobro_moneda->moneda[5]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
-			$html = str_replace('%valor_moneda_id_6%',number_format($cobro_moneda->moneda[6]['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			foreach($cobro_moneda->moneda as $id => $moneda){
+				$html = str_replace("%glosa_moneda_id_$id%",__($moneda['glosa_moneda']), $html);
+				$html = str_replace("%simbolo_moneda_id_$id%", $moneda['simbolo'], $html);
+				$html = str_replace("%valor_moneda_id_$id%",number_format($moneda['tipo_cambio'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
+			}
 		break;
 
 		//facturas morosas

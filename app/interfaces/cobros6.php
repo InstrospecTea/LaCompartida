@@ -912,14 +912,18 @@ function AgregarFactura(idx){
 		while(list($id, $codigo) = mysql_fetch_array($resp)) $id_tipo_documento[$codigo] = $id;
 	?>
 
-	var honorarios = Number($F('honorarios_'+idx).replace(',', '.'));
-	var gastos_con_impuestos = Number($F('gastos_con_impuestos_'+idx).replace(',', '.'));
-	var gastos_sin_impuestos = Number($F('gastos_sin_impuestos_'+idx).replace(',', '.'));
+	var honorarios = Numero($F('honorarios_'+idx));
+	var gastos_con_impuestos = Numero($F('gastos_con_impuestos_'+idx));
+	var gastos_sin_impuestos = Numero($F('gastos_sin_impuestos_'+idx));
 
-	var honorarios_disp = Number($F('honorarios_disponibles').replace(',', '.'));
-	var gastos_con_impuestos_disp = Number($F('gastos_con_iva_disponibles').replace(',', '.'));
-	var gastos_sin_impuestos_disp = Number($F('gastos_sin_iva_disponibles').replace(',', '.'));
+	var honorarios_disp = Numero($F('honorarios_disponibles'));
+	var gastos_con_impuestos_disp = Numero($F('gastos_con_iva_disponibles'));
+	var gastos_sin_impuestos_disp = Numero($F('gastos_sin_iva_disponibles'));
 
+	var honorarios_total = Numero($F('honorarios_total'));
+	var gastos_con_impuestos_total = Numero($F('gastos_con_iva_total'));
+	var gastos_sin_impuestos_total = Numero($F('gastos_sin_iva_total'));
+	
 	var esCredito = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['NC']?>;
 	var esFactura = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['FA']?>;
 	var esDebito = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['ND']?>;
@@ -955,8 +959,23 @@ function AgregarFactura(idx){
 		'&honorario_disp=' + honorarios_disp +
 		'&gastos_con_impuestos_disp=' + gastos_con_impuestos_disp +
 		'&gastos_sin_impuestos_disp=' + gastos_sin_impuestos_disp +
+		'&honorario_total=' + honorarios_total +
+		'&gastos_con_impuestos_total=' + gastos_con_impuestos_total +
+		'&gastos_sin_impuestos_total=' + gastos_sin_impuestos_total +
 		'&id_documento_legal='+$F('tipo_documento_legal_'+idx), 'top=100, left=155');
 
+}
+
+function Numero(texto){
+	var coma = texto.indexOf(',');
+	var punto = texto.indexOf('.');
+	if(coma>=0 && punto>=0){
+		texto = texto.replace(coma < punto ? /,/g : /\./g, '');
+	}
+	else if(coma>=0){
+		texto = texto.replace(/,/g, '.');
+	}
+	return Number(texto);
 }
 </script>
 <br>
@@ -1483,12 +1502,15 @@ function AgregarFactura(idx){
 										<td><?php echo $cobro->fields['id_cobro'] ?></td>
 										<td>
 											<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<?php echo number_format($saldo_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?>
+											<input type="hidden" name="honorarios_total" id="honorarios_total" value="<?=$saldo_honorarios?>" />
 										</td>
 										<td>
 											<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<?php echo number_format($saldo_gastos_con_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?>
+											<input type="hidden" name="gastos_con_iva_total" id="gastos_con_iva_total" value="<?=$saldo_gastos_con_impuestos?>" />
 										</td>
 										<td>
 											<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<?php echo number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?>
+											<input type="hidden" name="gastos_sin_iva_total" id="gastos_sin_iva_total" value="<?=$saldo_gastos_sin_impuestos?>" />
 										</td>
 										<td>
 										<?php if( $cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0 ): ?>

@@ -42,25 +42,33 @@ class Excel
 							);
 		$this->insertar = $insertar;
 
-		if(!$id_usuario)
-		{
-			echo "ERROR: ingrese id_usuario encargado";
-			exit();
-		}
 		$this->id_usuario = $id_usuario;
 	}
 
+	function CargarEncabezados()
+	{
+		for($i=1;$i<=$this->libro->sheets[0]['numCols'];$i++) {
+			$this->encabezado[$i] = $this->LeerEncabezado($i);
+		}
+	}
 
+	function LeerEncabezado($columna)
+	{
+		$encabezado = $this->libro->sheets[0]['cells'][1][$columna];
+		$encabezado = str_replace('\'','',$encabezado);
+		return trim($encabezado);
+	}
 	
 	function C($columna)
 	{
-			$out = $this->libro->sheets[ $this->info[$this->hoja]['hoja'] ]['cells'][$this->fila][$columna];
+			$out = $this->libro->sheets[0]['cells'][$this->fila][$columna];
 			$out = str_replace('\'','',$out);
 			return trim($out);
 	}
 
 	function LeerTodo()
 	{
+		/*
 		$this->hoja = 'base';
 		for($this->fila = $this->info[$this->hoja]['head']+1 ; $this->fila <= $this->info[$this->hoja]['rows']; $this->fila++)
 			$this->parsear();
@@ -68,9 +76,16 @@ class Excel
 		$this->hoja = 'asunto';
 		for($this->fila = $this->info[$this->hoja]['head']+1 ; $this->fila <= $this->info[$this->hoja]['rows']; $this->fila++)
 			$this->parsearAsunto();
-
-		$this->comprobar();
-		$this->ImprimirTablas();
+		*/
+		$this->CargarEncabezados();
+		$this->datos = array();
+		for($this->fila = 2; $this->fila <= $this->libro->sheets[0]['numRows']; $this->fila++) {
+			$this->datos[$this->fila] = array();
+			$this->parsearGeneral();
+		}
+		
+		//$this->comprobar();
+		//$this->ImprimirTablas();
 		if($this->insertar == 1)
 		{
 			echo "Asuntos con cliente no declarado:<br>";
@@ -86,7 +101,17 @@ class Excel
 		if(!isset($this->campos[$campo][$instancia]))
 			$this->campos[$campo][$instancia] = 1;
 		else
-		   $this->campos[$campo][$instancia]++;
+			$this->campos[$campo][$instancia]++;
+	}
+
+	function parsearGeneral()
+	{
+		if(!$this->C(1))
+			return 0;
+		
+		foreach($this->encabezado as $index => $data) {
+			$this->datos[$this->fila][$data] = $this->C($index);
+		}
 	}
 
 	function parsear()
