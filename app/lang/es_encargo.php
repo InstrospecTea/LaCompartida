@@ -33,6 +33,7 @@
 		  $_LANG['AgregarAsuntosPorDefecto'] = "Encargos que se agregan por defecto a clientes nuevos";
 		  $_LANG['SepararGastosPorAsunto'] = "Separar los gastos por encargos";
 		  $_LANG['ParafoAsuntosSoloSiHayTrabajos'] = "Solo imprime parafo de encargos si el cobro tiene trabajos";
+		  $_LANG['codigo_asunto'] = "Código Encargo";
 		  
 
 
