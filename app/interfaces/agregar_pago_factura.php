@@ -34,7 +34,7 @@
 
 	$pago = new FacturaPago($sesion);
 	if(isset($_GET['id_factura_pago'])) { $id_factura_pago = $_GET['id_factura_pago'];}
-	if(!empty($id_factura_pago))
+	if(!empty($id_factura_pago) && $opcion != "guardar")
 	{
 		$pago->Load($id_factura_pago);
 		$id_moneda = $pago->fields['id_moneda'];
@@ -42,7 +42,7 @@
 		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
 		$codigo_cliente = $pago->fields['codigo_cliente'];
 	}
-	
+        
 	$moneda_pago = new Moneda($sesion);
 	$moneda_pago->Load($id_moneda);
 	
@@ -606,13 +606,15 @@
 			<td align=left>
 				<select name='tipo_doc' id='tipo_doc'  style='width: 100px;' onchange="ShowCheque();">
 					<?php
-						$tipos = array(
-							'T'=>'Transferencia',
-							'E'=>'Efectivo',
-							'C'=>'Cheque',
-							'O'=>'Otro');
+                                                $query = "SELECT codigo, glosa FROM prm_tipo_pago ORDER BY orden ASC";
+                                                $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                                                
+                                                $tipos = array();
+                                                while(list($codigo,$glosa)=mysql_fetch_array($resp)) {
+                                                    $tipos[$codigo] = $glosa;
+                                                }
 						$cod_tipo = $pago->fields['tipo_doc'];
-						if(!in_array($cod_tipo, array('E', 'C', 'O'))) $cod_tipo = 'T';
+						if(!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) $cod_tipo = 'T';
 						foreach($tipos as $k => $v){?>
 							<option value="<?=$k?>" <?=$k==$cod_tipo?'selected':''?>><?=$v?></option>
 						<?}

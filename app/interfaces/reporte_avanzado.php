@@ -79,6 +79,9 @@
 	$tipos_de_dato[] ='valor_hora';
 	$tipos_de_dato[] ='diferencia_valor_estandar';
 	$tipos_de_dato[] ='valor_estandar';
+
+	$tipos_de_dato[] ='valor_trabajado_estandar';
+	$tipos_de_dato[] ='rentabilidad_base';
 	if($debug == 1)
 	{
 		$tipos_de_dato[] ='valor_pagado_parcial';
@@ -128,11 +131,12 @@
 	$glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 	$glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado");
 	$glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
-	$glosa_dato['valor_por_pagar'] = __("Valor Cobrado en Cobros Incobrables");
-	$glosa_dato['rentabilidad'] = __("Razón entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar");
-	$glosa_dato['valor_hora'] = __("Valor Cobrado por cada Hora Cobrada");
-	$glosa_dato['diferencia_valor_estandar'] = __("Diferencia entre el Valor Cobrado, y lo que se habría cobrado usando THHs Estándar");	
-	$glosa_dato['valor_estandar'] = __("Valor que se habría cobrado usando THHs Estándar");
+	$glosa_dato['rentabilidad'] = __("Valor Cobrado / Valor Estándar");
+	$glosa_dato['valor_hora'] = __("Valor Cobrado / Horas Cobradas");
+	$glosa_dato['diferencia_valor_estandar'] = __("Valor Cobrado - Valor Estándar");	
+	$glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
+	$glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
+	$glosa_dato['rentabilidad_base'] = __("Valor Cobrado / Valor Trabajado Estándar");
 
 	$glosa_boton['planilla'] = "Despliega una Planilla con deglose por cada Agrupador elegido.";
 	$glosa_boton['excel'] = "Genera la Planilla como un Documento Excel.";
@@ -141,7 +145,7 @@
 	$glosa_boton['torta'] = "Despliega un Gráfico de Torta, usando el primer Agrupador.";
 	$glosa_boton['dispersion'] = "Despliega un Gráfico de Dispersión, usando el primer Agrupador.";
 
-	$tipos_moneda = array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar');
+	$tipos_moneda = Reporte::tiposMoneda();
 
 	$hoy = date("Y-m-d");
 	if(!$fecha_anio)
@@ -171,6 +175,8 @@ TD.boton_normal { border: solid 2px #e0ffe0; background-color: #e0ffe0; }
 TD.boton_presionado { border: solid 2px red; background-color: #e0ffe0; }
 
 TD.boton_comparar { border: solid 2px blue; background-color: #e0ffe0; }
+
+TD.boton_disabled { border: solid 2px #e5e5e5; background-color: #e5e5e5; color:#444444;}
 
 TD.borde_rojo { border: solid 1px red; }
 
@@ -409,10 +415,10 @@ function RevisarMoneda()
 
 	if(
 		tipo_de_dato.value in
-			{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':''}
+			{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
 		||
 			(comparar.checked && tipo_de_dato_comparado.value in
-				{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':''}
+				{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
 			)
 		)
 		Monedas(true);
@@ -432,7 +438,7 @@ function RevisarCircular()
 	{
 		if(
 			tipo_de_dato.value in
-				{'rentabilidad':'','valor_hora':'','diferencia_valor_estandar':'','horas_castigadas':''}
+				{'rentabilidad':'','valor_hora':'','diferencia_valor_estandar':'','horas_castigadas':'','rentabilidad_base':''}
 		)
 			circular.style['display'] = 'none';
 		else
@@ -995,6 +1001,13 @@ if(!$popup)
 				echo " title= \"".__($glosa_dato[$nombre])."\"";
 				echo " > ".__($nombre)."</td>";
 			}
+			function celda_disabled($nombre)
+			{
+				echo "<td id=\"".$nombre."\"rowspan=2 align=\"center\" class= boton_disabled style=\"height:25px; font-size: 11px; vertical-align: middle;\"";
+				echo " title= \"".__($glosa_dato[$nombre])."\"";
+				echo " > ".__($nombre)."</td>";
+			
+			}
 			function borde_abajo($colspan = 1)
 			{
 				echo "<td";
@@ -1015,14 +1028,14 @@ if(!$popup)
 				global $tipo_dato;
 				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
 				echo "<div id='moneda".$select."' style =\" height:25px; font-size: 14px; ";
-				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar')))
+				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
 					echo " display:inline;\" >";
 				else
 					echo " display:none;\" >";
 				echo $s."</div>";
 
 				echo "<div id='anti_moneda".$select."' style =\" ";
-				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar')))
+				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
 					echo " display:inline;\" >";
 				else
 					echo " display:none;\" >";
@@ -1131,47 +1144,91 @@ if(!$popup)
 				<?=nada(13)?>
 			</tr>
 			<tr>
-				<?=celda("valor_cobrado")?>
+				<?=celda_disabled('valor_trabajado')?>
 				<?=borde_abajo(2)?>
-				<?=celda("valor_pagado")?>
-				<?=nada(2)?>
-				<?=moneda()?>
-				<?=nada(2)?>
-				<?=celda("valor_hora")?>
-				<?=nada(2)?>
-				<?=celda("diferencia_valor_estandar");?>
+				<?=celda_disabled('valor_cobrable')?>
+				<?=borde_abajo(2)?>
+				<?=celda_disabled('valor_visible')?>
+				<?=borde_abajo(2)?>
+				<?=celda('valor_cobrado')?>
+				<?=borde_abajo(2)?>
+				<?=celda('valor_pagado')?>
 			</tr>
 			<tr>
 				<?=borde_derecha()?>
-				<?=nada(7)?>
+				<?=nada()?>
+				<?=borde_derecha()?>
+				<?=nada()?>
+				<?=borde_derecha()?>
+				<?=nada()?>
+				<?=borde_derecha()?>
+				<?=nada()?>
+			</tr>
+			<tr>
+				<?=nada(9)?>
+			</tr>
+			<tr>
+				<?=celda('valor_trabajado_estandar')?>
+				<?=borde_abajo()?>
+				<?=celda_disabled("valor_no_cobrable")?>
+				<?=borde_abajo()?>
+				<?=celda_disabled("valor_castigado")?>
+				<?=borde_abajo()?>
+				<?=celda("valor_por_cobrar")?>
+				<?=borde_abajo()?>
+				<?=celda("valor_por_pagar")?>
+			</tr>
+			<tr>
+				<?=nada(4)?>
+				<?=borde_derecha()?>
+				<?=nada(3)?>
 			</tr>
 			<tr>
 				<?=nada(12)?>
 			</tr>
 			<tr>
-				<?=celda("valor_por_cobrar")?>
+				<?=nada(7)?>
 				<?=borde_abajo()?>
-				<?=celda("valor_por_pagar")?>
-				<?=nada(2)?>
-				<?=select_moneda()?>
-				<?=nada(2)?>
-				<?=celda("rentabilidad")?>
-				<?=nada(2)?>
-				<?=celda("valor_estandar")?>
+				<?=celda("valor_incobrable")?>
+				<?=nada(3)?>
 			</tr>
 			<tr>
-				<?=nada(8)?>
+				<?=nada(1)?>
+			</tr>
+			<tr>
+				<?=nada(13)?>
+			</tr>
+			<tr>
+				<?=nada(3)?>
+				<?=moneda()?>
+				<?=nada(2)?>
+				<?=celda("valor_estandar")?>
+				<?=nada(2)?>
+				<?=celda("diferencia_valor_estandar")?>
+				<?=nada(2)?>
+				<?=celda("valor_hora");?>
+			</tr>
+			<tr>
+				<?=nada(3)?>
+				<?=nada(6)?>
+			</tr>
+			<tr>
+				<?=nada(12)?>
+			</tr>
+			<tr>
+				<?=nada(3)?>
+				<?=select_moneda()?>
+				<?=nada(5)?>
+				<?=celda("rentabilidad_base")?>
+				<?=nada(2)?>
+				<?=celda("rentabilidad")?>
+			</tr>
+			<tr>
+				<?=nada(9)?>
 			</tr>
 			<tr>
 				<?=nada(12)?>
 				<?=tinta()?>
-			</tr>
-			<tr>
-				<?=celda("valor_incobrable")?>
-				<?=nada(11)?>
-			</tr>
-			<tr>
-				<?=nada(11)?>
 			</tr>
 		</table>
 	 </td>

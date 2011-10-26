@@ -1,4 +1,4 @@
-<?
+<?php
 require_once("lib/nusoap.php");
 require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -23,9 +23,9 @@ $server->wsdl->addComplexType(
 	'all',
 	'',
 	array(
-		'glosa_opcion' => array('name' => 'glosa_opcion', 'type' => 'xsd:varchar'),
-		'valor_opcion' => array('name' => 'valor_opcion', 'type' => 'xsd:varchar'),
-		'valores_posibles' => array('name' => 'valores_posibles', 'type' => 'xsd:varchar')
+		'glosa_opcion' => array('name' => 'glosa_opcion', 'type' => 'xsd:string'),
+		'valor_opcion' => array('name' => 'valor_opcion', 'type' => 'xsd:string'),
+		'valores_posibles' => array('name' => 'valores_posibles', 'type' => 'xsd:string')
 	)
 );
 
@@ -66,9 +66,9 @@ function EntregarDatosConfiguracion($usuario, $password)
 			while( list( $glosa_opcion, $valor_opcion, $valores_posibles ) = mysql_fetch_array($resp) )
 			{
 				$datos_configuracion = array();
-				$datos_configuracion['glosa_opcion'] = $glosa_opcion;
-				$datos_configuracion['valor_opcion'] = $valor_opcion;
-				$datos_configuracion['valores_posibles'] = $valores_posibles;
+				$datos_configuracion['glosa_opcion'] = strip_tags($glosa_opcion);
+				$datos_configuracion['valor_opcion'] = strip_tags($valor_opcion);
+				$datos_configuracion['valores_posibles'] = strip_tags($valores_posibles);                         
 				array_push($lista_datos_configuracion, $datos_configuracion); 
 			}
 		}

@@ -920,6 +920,16 @@ $_LANG['rentabilidad'] = "Rentabilidad";
 $_LANG['valor_hora'] = "Valor Hora";
 $_LANG['diferencia_valor_estandar'] = "Diferencia Valor Estándar";
 $_LANG['valor_estandar'] = "Valor Estándar";
+
+$_LANG['valor_trabajado_estandar'] = "Valor Trabajado Estándar";
+$_LANG['rentabilidad_base'] = "Rentabilidad Base";
+
+$_LANG['valor_trabajado'] = "Valor Trabajado";
+$_LANG['valor_cobrable'] = "Valor Cobrable";
+$_LANG['valor_no_cobrable'] = "Valor no Cobrable";
+$_LANG['valor_visible'] = "Valor Cobrable Corregido";
+$_LANG['valor_castigado'] = "Valor Castigado";
+
 $_LANG['mes_reporte'] = 'Trabajo (mes)';
 $_LANG['dia_reporte'] = 'Trabajo (día)';
 $_LANG['estado'] = "Estado";

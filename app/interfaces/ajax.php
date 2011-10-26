@@ -135,16 +135,53 @@
 			else
 				echo $respuesta; 
 		}
+		else if( $accion == "cargar_multiples_cuentas" )
+		{
+			if( $id ){
+				$arr_bancos = explode( '::', $id );
+				$str_bancos = "";
+				foreach( $arr_bancos as $key => $id_banco )
+				{
+					if( strlen( $str_bancos ) > 0 )
+					{
+						$str_bancos .= " OR ";
+					}
+					$str_bancos .= " id_banco = '$id_banco' ";
+				}
+				$where = " AND ( $str_bancos ) ";
+			} else {
+				$where = "";
+			}
+			$query = "SELECT id_cuenta, numero FROM cuenta_banco WHERE 1 $where";
+			
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__LIFE__,__LINE__,$sesion->dbh);
+			
+			$cont=1;
+			while( list($id_cuenta, $numero ) = mysql_fetch_array($resp) )
+			{
+				if($cont==1){
+					$respuesta = "$id_cuenta|$numero";
+				} else {
+					$respuesta .= "//$id_cuenta|$numero";
+				}
+				$cont++;
+			}
+			if(!$respuesta) {
+				echo "~noexiste";
+			} else {
+				echo $respuesta; 
+			}
+		}
 		else if( $accion == "num_abogados_sin_tarifa" )
 		{
 			$query = "SELECT DISTINCT u.id_usuario, 
-																CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre_usuario, 
-																ut.tarifa 
-													 FROM trabajo AS t 
-													 JOIN cobro AS c ON c.id_cobro=t.id_cobro 
-											 		 JOIN contrato AS co ON c.id_contrato=co.id_contrato 
-											 		 JOIN usuario AS u ON u.id_usuario=t.id_usuario 
-											LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda=c.id_moneda AND ut.id_usuario=u.id_usuario AND co.id_tarifa=ut.id_tarifa ) 
+							CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre_usuario, 
+							ut.tarifa 
+						FROM trabajo AS t 
+							 JOIN cobro AS c ON c.id_cobro=t.id_cobro 
+							 JOIN contrato AS co ON c.id_contrato=co.id_contrato 
+							 JOIN usuario AS u ON u.id_usuario=t.id_usuario 
+							 LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda=c.id_moneda AND ut.id_usuario=u.id_usuario AND co.id_tarifa=ut.id_tarifa ) 
 													WHERE c.id_cobro=".$id_cobro." AND ( ut.tarifa=0 OR ut.tarifa='' OR ut.tarifa IS NULL )";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			$num = mysql_num_rows($resp);

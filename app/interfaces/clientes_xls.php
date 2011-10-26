@@ -240,26 +240,30 @@ $col=0;
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_array($resp))
 	{
-		if ( $mostrar_codigo_secundario )
-			$ws1->write($fila_inicial, $col_codigo, $row['codigo_cliente_secundario'], $f4);
-		else
-			$ws1->write($fila_inicial, $col_codigo, $row['codigo_cliente'], $f4);
+		if ( $mostrar_codigo_secundario ){
+			$codigo_cliente = $row['codigo_cliente_secundario'];
+		} else {
+			$codigo_cliente =  str_pad($row['codigo_cliente'], 4 , '0', STR_PAD_LEFT);
+		}
+		$ws1->writeString($fila_inicial, $col_codigo, $codigo_cliente, $f4);
 		$ws1->write($fila_inicial, $col_nombre, $row['glosa_cliente'], $f4);
 		$ws1->write($fila_inicial, $col_grupo, $row['glosa_grupo_cliente'], $f4);
 		if( UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 			$ws1->write($fila_inicial, $col_encargado, $row['username'], $f4);
-			if($mostrar_encargado_secundario)
+			if($mostrar_encargado_secundario) {
 				$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
-		}
-		else{
+			}
+		} else {
 			$ws1->write($fila_inicial, $col_encargado, $row['usuario_nombre'], $f4);
-			if($mostrar_encargado_secundario)
+			if ($mostrar_encargado_secundario) {
 				$ws1->write($fila_inicial, $col_encargado_secundario, $row['usuario_secundario_nombre'], $f4);
+			}
 		}
-		if( $mostrar_codigo_secundario )
+		if ( $mostrar_codigo_secundario ) {
 			$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_cliente'], $f4);
-		else
+		} else {
 			$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_cliente_secundario'], $f4);
+		}
 		$ws1->write($fila_inicial, $col_rut, $row['rut'], $f4);            
 		$ws1->write($fila_inicial, $col_rsocial, $row['factura_razon_social'], $f4);
 		$ws1->write($fila_inicial, $col_tarifa, $row['glosa_tarifa'], $f4);

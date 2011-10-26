@@ -122,6 +122,8 @@
 						, '' as subtotal
 						, factura.iva
 						, total
+						, '' as monto_real
+						, '' as observaciones
 						, '' as saldo_pagos
 						, cta_cte_fact_mvto.saldo as saldo
 						, '' as monto_pagos_moneda_base
@@ -141,6 +143,7 @@
 					LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 					WHERE $where";
+	
 	$lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 	if($lista_suntos_liquidar->num == 0)
 		$pagina->FatalError('No existe información con este criterio');
@@ -286,6 +289,10 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'); }
 		else if(in_array($col_name[$i],array('subtotal')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Subtotal'); }
+		else if(in_array($col_name[$i],array('monto_real')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Monto Real'); }
+		else if(in_array($col_name[$i],array('observaciones')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Observaciones'); }
 		else if(in_array($col_name[$i],array('saldo_moneda_base')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Saldo'.' '.$simbolo_moneda_base); }
 		else if(in_array($col_name[$i],array('monto_pagos_moneda_base')) ) {
@@ -369,7 +376,38 @@
 				$subtotal = $proc->fields['honorarios'] + $proc->fields['subtotal_gastos'] + $proc->fields['subtotal_gastos_sin_impuesto'];
 
 				if($col_name[$i] == 'total' || $col_name[$i] == 'iva') {
-					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
+					if( strtoupper( $proc->fields['estado'] ) == 'A' ){
+						$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], '0', $formatos_moneda[$proc->fields['id_moneda']]);
+					} else {
+						$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
+					}
+				}
+				elseif($col_name[$i] == 'monto_real'){
+					$fact = new Factura($sesion);
+					$valor_real = $fact->ObtenerValorReal( $proc->fields['id_factura'] );
+					
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $valor_real, $formatos_moneda[$proc->fields['id_moneda']]);
+						
+				}
+				elseif($col_name[$i] == 'observaciones'){
+					$fact = new Factura($sesion);
+					$ids_doc = $fact->ObtenerIdsDocumentos( $proc->fields['id_factura'] );
+					$ids_doc_array = explode( '||', $ids_doc );
+					$valores = array();
+					$valor_real = $fact->ObtenerValorReal( $proc->fields['id_factura'] );
+					$comentarios = "";
+					if( $proc->fields['total'] != $valor_real ){
+						foreach ( $ids_doc_array as $key => $par_cod_num )
+						{
+							$documento = strtr( $par_cod_num, "::", " " );
+							if( strlen($documento) > 0 ) {
+								array_push( $valores, $documento);
+							}
+						}
+						$comentarios = implode(", ", $valores);
+					}
+					$ws1->write($fila, $arr_col['observaciones']['celda'], $comentarios, $formato_normal);
+						
 				}
 				else if( $col_name[$i] == 'subtotal') {
 					$subtotal = $proc->fields['honorarios'] + $proc->fields['subtotal_gastos'] + $proc->fields['subtotal_gastos_sin_impuesto'];

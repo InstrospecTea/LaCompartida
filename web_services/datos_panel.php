@@ -141,13 +141,13 @@ function EntregarDatosClientes($usuario, $password)
 			return new soap_fault('Client', '','Error SQL. --- '.$query,'');
 		while( list($numero_usuario,$numero_socios,$numero_asociado_socios,$numero_abogado_asociados,$numero_procuradores,$numero_socio_capitalistas,$numero_socio_contractuales,$horas_anio,$horas_anio_promedio,$horas_mes,$horas_mes_promedio,$horas_semana,$horas_semana_promedio) = mysql_fetch_array($resp) )
 		{
-			$datos_cliente['numero_usuario'] = $numero_usuario;
-			$datos_cliente['numero_socios'] = $numero_socios;
-			$datos_cliente['numero_asociado_socios'] = $numero_asociado_socios;
-			$datos_cliente['numero_abogado_asociados'] = $numero_abogado_asociados;
-			$datos_cliente['numero_procuradores'] = $numero_procuradores;
-			$datos_cliente['numero_socio_capitalistas'] = $numero_socio_capitalistas;
-			$datos_cliente['numero_socio_contractuales'] = $numero_socio_contractuales;
+			$datos_cliente['numero_usuario'] = strip_tags($numero_usuario);     // HTML Tags create Errors in SOAP
+			$datos_cliente['numero_socios'] = strip_tags($numero_socios);
+			$datos_cliente['numero_asociado_socios'] = strip_tags($numero_asociado_socios);
+			$datos_cliente['numero_abogado_asociados'] = strip_tags($numero_abogado_asociados);
+			$datos_cliente['numero_procuradores'] = strip_tags($numero_procuradores);
+			$datos_cliente['numero_socio_capitalistas'] = strip_tags($numero_socio_capitalistas);
+			$datos_cliente['numero_socio_contractuales'] = strip_tags($numero_socio_contractuales);
 			$datos_cliente['horas_anio'] = round($horas_anio,2);
 			$datos_cliente['horas_anio_promedio'] = round($horas_anio_promedio,2);
 			$datos_cliente['horas_mes'] = round($horas_mes,2);
@@ -181,9 +181,9 @@ function EntregarDatos($usuario, $password)
 		while( list($id_usuario,$nombre,$apellido1,$apellido2,$id_categoria_usuario) = mysql_fetch_array($resp2) )
 		{
 			$datos_cliente['id_usuario'] = $id_usuario;
-			$datos_cliente['nombre'] = $nombre;
-			$datos_cliente['apellido1'] = $apellido1;
-			$datos_cliente['apellido2'] = $apellido2;
+			$datos_cliente['nombre'] = strip_tags($nombre);          // HTML Tags create Errors in SOAP
+			$datos_cliente['apellido1'] = strip_tags($apellido1);
+			$datos_cliente['apellido2'] = strip_tags($apellido2);
 			$datos_cliente['id_categoria_usuario'] = $id_categoria_usuario;
 			array_push($lista_datos_clientes_2,$datos_cliente);
 		}

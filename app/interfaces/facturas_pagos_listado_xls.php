@@ -3,6 +3,7 @@
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
 require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
@@ -14,6 +15,7 @@ require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
 require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 
 $Sesion = new Sesion(array('ADM', 'COB'));
+$pagina = new Pagina($Sesion);
 
 set_time_limit(0);
 ini_set("memory_limit", "256M");
@@ -44,12 +46,65 @@ if ($where == '') {
 	 */
 	$lista_facturas_con_pagos = '';
 	$where = 1;
-	if ($id_concepto)
-		$where .= " AND fp.id_concepto = '" . $id_concepto . "' ";
-	if ($id_banco)
-		$where .= " AND fp.id_banco = '" . $id_banco . "' ";
-	if ($id_cuenta)
-		$where .= " AND fp.id_cuenta = '" . $id_cuenta . "' ";
+	if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
+		if ( isset($_REQUEST['id_concepto']) ) {
+			$condiciones = "";
+			foreach( $_REQUEST['id_concepto'] as $key => $value )
+			{
+				if( strlen( $condiciones ) > 0 ){
+					$condiciones .= " OR ";
+				}
+				$condiciones .= " fp.id_concepto = '$value' ";
+			}
+			$where .= " AND ( $condiciones ) ";
+		}
+		if ( isset($_REQUEST['id_banco']) ) {
+			$condiciones = "";
+			foreach( $_REQUEST['id_banco'] as $key => $value )
+			{
+				if( strlen( $condiciones ) > 0 ){
+					$condiciones .= " OR ";
+				}
+				$condiciones .= " fp.id_banco = '$value' ";
+			}
+			$where .= " AND ( $condiciones ) ";
+		}
+		if ( isset($_REQUEST['id_cuenta']) ) {
+			$condiciones = "";
+			foreach( $_REQUEST['id_cuenta'] as $key => $value )
+			{
+				if( strlen( $condiciones ) > 0 ){
+					$condiciones .= " OR ";
+				}
+				$condiciones .= " fp.id_cuenta = '$value' ";
+			}
+			$where .= " AND ( $condiciones ) ";
+		}
+		if ( isset($_REQUEST['id_estado']) ) {
+			$condiciones = "";
+			foreach( $_REQUEST['id_estado'] as $key => $value )
+			{
+				if( strlen( $condiciones ) > 0 ){
+					$condiciones .= " OR ";
+				}
+				$condiciones .= " factura.id_estado = '$value' ";
+			}
+			$where .= " AND ( $condiciones ) ";
+		}
+	} else {
+		if ($id_concepto) {
+			$where .= " AND fp.id_concepto = '$id_concepto' ";
+		}
+		if ($id_banco) {
+			$where .= " AND fp.id_banco = '$id_banco' ";
+		}
+		if ($id_cuenta) {
+			$where .= " AND fp.id_cuenta = '$id_cuenta' ";
+		}			
+		if ($id_estado) {
+			$where .= " AND factura.id_estado = '$id_estado' ";
+		}
+	}
 	if ($pago_retencion)
 		$where .= " AND fp.pago_retencion = '" . $pago_retencion . "' ";
 	if ($fecha1 && $fecha2)
@@ -66,7 +121,7 @@ if ($where == '') {
 	 */
 
 	if ($numero != '') {
-		$where .= " AND numero = '$numero'";
+		$where .= " AND factura.numero = '$numero'";
 	}
 
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
@@ -96,9 +151,6 @@ if ($where == '') {
 	}
 	if ($id_cobro) {
 		$where .= " AND factura.id_cobro=" . $id_cobro . " ";
-	}
-	if ($id_estado) {
-		$where .= " AND factura.id_estado = " . $id_estado . " ";
 	}
 	if ($id_moneda) {
 		$where .= " AND factura.id_moneda = " . $id_moneda . " ";
@@ -135,7 +187,7 @@ $query .= "			, cliente.glosa_cliente
 					, cta.numero as cuenta
 					, DATE_FORMAT(factura.fecha, '$formato_fechas') as fecha_factura
 					, factura.total
-					, ccfmn.monto AS monto_aporte
+					, fp.monto AS monto_aporte
 					, -1 * ccfm2.saldo as saldo_factura
 					, ccfm.saldo as saldo
 					, fp.id_moneda AS id_moneda_factura_pago
@@ -157,6 +209,8 @@ $query .= "			, cliente.glosa_cliente
 				LEFT JOIN prm_banco b ON fp.id_banco = b.id_banco
 				LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
 				WHERE $where";
+/*echo $query;
+exit;*/
 
 $lista_suntos_liquidar = new ListaAsuntos($Sesion, "", $query);
 if ($lista_suntos_liquidar->num == 0)
@@ -219,10 +273,19 @@ $query = 'SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio
 $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 $id_moneda_base = 0;
 while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_cambio) = mysql_fetch_array($resp)) {
+	
+	if ($moneda_base == 1) {
+		$id_moneda_base = $id_moneda;
+		$cifras_decimales_moneda_base = $cifras_decimales;
+		$tipo_cambio_moneda_base = $tipo_cambio;
+		$simbolo_moneda_base = $simbolo_moneda;
+	}
+	
 	if ($cifras_decimales > 0) {
 		$decimales = '.';
-		while ($cifras_decimales-- > 0)
+		while ($cifras_decimales-- > 0) {
 			$decimales .= '0';
+		}
 	} else {
 		$decimales = '';
 	}
@@ -231,13 +294,6 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 				'Align' => 'right',
 				'Color' => 'black',
 				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-
-	if ($moneda_base == 1) {
-		$id_moneda_base = $id_moneda;
-		$cifras_decimales_moneda_base = $cifras_decimales;
-		$tipo_cambio_moneda_base = $tipo_cambio;
-		$simbolo_moneda_base = $simbolo_moneda;
-	}
 }
 
 // Crear worksheet
@@ -259,7 +315,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 	}
 
 	// ancho celdas
-	if (in_array($col_name[$i], array('saldo', 'saldo_moneda_base'))) {
+	if (in_array($col_name[$i], array('saldo_moneda_base'))) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11);
 	} else if (in_array($col_name[$i], array('numero', 'cobro', 'saldo_pagos', 'id_cobro', 'pago_retencion', 'banco', 'cuenta'))) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 8);
@@ -267,6 +323,8 @@ for ($i = 0; $i < $col_num; ++$i) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9);
 	} else if (in_array($col_name[$i], array('tipo', 'estado_factura', 'id_pago'))) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 3);
+	} else if (in_array($col_name[$i], array('total', 'monto_aporte', 'saldo_factura', 'saldo'))) {
+		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 13);
 	} else {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10);
 	}
@@ -361,24 +419,24 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 		if ($arr_col[$col_name[$i]]['hidden'] != 'SI') {
 			if ($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'iva') {
 				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
-			} else if ($col_name[$i] == 'saldo' || $col_name[$i] == 'saldo_factura') {
+			} else if ($col_name[$i] == 'saldo' ) {
 				$saldo = $proc->fields[$col_name[$i]] * (-1);
+				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
+			} else if ( $col_name[$i] == 'saldo_factura') {
+				$saldo = $proc->fields[$col_name[$i]];
 				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
 			} else if ($col_name[$i] == 'monto_aporte') {
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['monto_aporte'], $formatos_moneda[$proc->fields['id_moneda_factura_pago']]);
-			}
-			if ($col_name[$i] == 'glosa_cliente') {
+			} else if ($col_name[$i] == 'glosa_cliente') {
 				$glosa_cliente = $proc->fields['glosa_cliente'];
 				if ($proc->fields['mostrar_diferencia_razon_social'] != 'no') {
 					$glosa_cliente .= " (" . $proc->fields['mostrar_diferencia_razon_social'] . ")";
 				}
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $glosa_clientes, $arr_col[$col_name[$i]]['css']);
-			}
-			if ($col_name[$i] == 'glosa_asunto') {
+			} else if ($col_name[$i] == 'glosa_asunto') {
 
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos_glosa, $arr_col[$col_name[$i]]['css']);
-			}
-			if ($col_name[$i] == 'codigo_asunto') {
+			} else if ($col_name[$i] == 'codigo_asunto') {
 
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 			} else {

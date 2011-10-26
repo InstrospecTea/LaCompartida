@@ -26,6 +26,7 @@
 								<? if($_SESSION['ACTIVO_JUICIO'] && method_exists('Conf','HostJuicios') ){?> 
 										| <a style="color: white;" href="<?=Conf::HostJuicios()?>" onClick="irIntranet('/fw/usuarios/index.php');">Gestión de Causas</a>
 								<?}?> 
+                                                        | <a style="color: white;" href="http://lemontech.zendesk.com/home" target="_blank" >Soporte</a>                      
 							| <a href="#" style="color: white;" onClick="irIntranet('/fw/usuarios/logout.php?salir=true');">Salir</a></span></td>
 			  </tr>
 			</table>

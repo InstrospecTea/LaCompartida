@@ -25,9 +25,9 @@ $server->wsdl->addComplexType(
 	'',
 	array(
 		'id_usuario' => array('name' => 'id_usuario', 'type' => 'xsd:int'),
-		'nombre' => array('name' => 'nombre', 'type' => 'xsd:varchar'),
-		'apellido1' => array('name' => 'apellido1', 'type' => 'xsd:varchar'),
-		'apellido2' => array('name' => 'apellido2', 'type' => 'xsd:varchar'),
+		'nombre' => array('name' => 'nombre', 'type' => 'xsd:string'),
+		'apellido1' => array('name' => 'apellido1', 'type' => 'xsd:string'),
+		'apellido2' => array('name' => 'apellido2', 'type' => 'xsd:string'),
 		'id_categoria_lemontech' => array('name' => 'id_categoria_usuario', 'type' => 'xsd:int'),
 	)
 );
@@ -64,11 +64,15 @@ function EntregarDatosClientes($usuario, $password)
 	// Busca los datos de usuarios del clientes en usuario y mandalos en el array $datos_cliente
 	if($sesion->VerificarPassword($usuario,$password))
 	{
-		$query = "SELECT id_usuario, nombre, apellido1, apellido2, id_categoria_usuario
-							FROM usuario WHERE activo=1";
+            
+                $query = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech
+                            FROM usuario u JOIN prm_categoria_usuario p 
+                            ON u.id_categoria_usuario = p.id_categoria_usuario
+                            WHERE activo =1";                                   // JOIN to Select the id_categoria_lemontech
+                
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '','Error SQL. --- '.$query,'');
-		while( list($id_usuario,$nombre,$apellido1,$apellido2,$id_categoria_usuario) = mysql_fetch_array($resp) )
+		while( list($id_usuario,$nombre,$apellido1,$apellido2,$id_categoria_usuario, $id_categoria_lemontech) = mysql_fetch_array($resp) )
 		{
 			$query2= "SELECT id_usuario FROM usuario_permiso WHERE id_usuario=".$id_usuario." AND codigo_permiso='PRO'";
 			if(!($resp2 = mysql_query($query2, $sesion->dbh) ))
@@ -79,16 +83,11 @@ function EntregarDatosClientes($usuario, $password)
 				$datos_cliente['id_usuario'] = $id_usuario+1000000;
 			else
 				$datos_cliente['id_usuario'] = $id_usuario;
-			$datos_cliente['nombre'] = $nombre;
-			$datos_cliente['apellido1'] = $apellido1;
-			$datos_cliente['apellido2'] = $apellido2;
+			$datos_cliente['nombre'] = strip_tags($nombre);
+			$datos_cliente['apellido1'] = strip_tags($apellido1);
+			$datos_cliente['apellido2'] = strip_tags($apellido2);
+                        $datos_cliente['id_categoria_lemontech'] = ($id_categoria_lemontech); 
 
-			if( !$id_categoria_usuario || ($id_categoria_usuario > 11 && $id_categoria_usuario < 100) ) $datos_cliente['id_categoria_lemontech']=6;
-			else if( ($id_categoria_usuario > 0 && $id_categoria_usuario < 4) || $id_categoria_usuario == 108 || $id_categoria_usuario == 109 ) $datos_cliente['id_categoria_lemontech']=1;
-			else if( ($id_categoria_usuario > 3 && $id_categoria_usuario < 7) || $id_categoria_usuario == 110 ) $datos_cliente['id_categoria_lemontech'] = 2;
-			else if( ($id_categoria_usuario > 6 && $id_categoria_usuario < 10) || $id_categoria_usuario == 111 || $id_categoria_usuario == 113 ) $datos_cliente['id_categoria_lemontech']=3;
-			else if( $id_categoria_usuario == 10 || $id_categoria_usuario == 112 ) $datos_cliente['id_categoria_lemontech']=4;
-			else if( $id_categoria_usuario == 11 ) $datos_cliente['id_categoria_lemontech']=5;
 			array_push($lista_datos_clientes,$datos_cliente);
 		}
 	}

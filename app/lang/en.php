@@ -700,6 +700,16 @@ $_LANG['rentabilidad'] = "Profitability";
 $_LANG['valor_hora'] = "Hour Value";
 $_LANG['diferencia_valor_estandar'] = "Standard Value Difference";
 $_LANG['valor_estandar'] = "Standard Value";
+
+$_LANG['valor_trabajado_estandar'] = "Standard Worked Value";
+$_LANG['rentabilidad_base'] = "Base Profitability";
+
+$_LANG['valor_trabajado'] = "Worked Value";
+$_LANG['valor_cobrable'] = "Chargeable Value";
+$_LANG['valor_no_cobrable'] = "Non-chargeable Value";
+$_LANG['valor_visible'] = "Revised Chargeable Value";
+$_LANG['valor_castigado'] = "Punished Value";
+
 $_LANG['mes'] = 'Month';
 $_LANG['estado'] = "Status";
 

@@ -69,10 +69,25 @@ class Reporte
 			$this->filtros[$tabla.'.'.$campo]['negativo'][] = $valor;
 	}
 
-	//Indica si el tipo de dato está basado en Moneda.
+	//Indica si el tipo de dato se calcula usando Moneda.
 	function requiereMoneda($tipo_dato)
 	{
-		if(in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','valor_hora','diferencia_valor_estandar','valor_estandar','rentabilidad','valor_pagado_parcial','valor_por_pagar_parcial')))
+		$extras = array('rentabilidad','rentabilidad_base');
+
+		if(in_array($tipo_dato,array_merge($extras,Reporte::tiposMoneda())))
+			return true;
+		return false;
+	}
+
+	//Retorna un arreglo con los tipos de datos que requieren especificar Moneda
+	function tiposMoneda()
+	{
+		return array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar','valor_trabajado_estandar');
+	}
+
+	function usaDivisor()
+	{
+		if(in_array($this->tipo_dato,array('rentabilidad','rentabilidad_base','valor_hora')))
 			return true;
 		return false;
 	}
@@ -329,11 +344,19 @@ class Reporte
 			{
 				case 'valor_cobrado': 
 				case 'valor_por_cobrar':
+				case 'valor_hora':
 				{
 					$s .=
-					' SUM( cobro.monto_trabajos
+					' 0 as valor_divisor, SUM( cobro.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	cobro_moneda.tipo_cambio)';
+					break;
+				}
+				case 'rentabilidad_base':
+				{
+					$s .= ' 0 as valor_divisor, SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_trabajos
+					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
+					/	cobro_moneda.tipo_cambio, 0 ))';
 					break;
 				}
 				case 'valor_pagado':
@@ -392,6 +415,7 @@ class Reporte
 					break;
 				}
 				case 'valor_estandar':
+				case 'valor_trabajado_estandar':
 				{
 					$s .= ' SUM( 0 )';
 					break;
@@ -504,6 +528,11 @@ class Reporte
 									* moneda_por_cobrar.tipo_cambio
 									/ (moneda_display.tipo_cambio * 3600)
 								)";
+		$monto_trabajado_estandar = "SUM( 
+										trabajo.tarifa_hh_estandar 
+										* (TIME_TO_SEC( duracion)/3600)
+										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
+									)";
 
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
 		if($this->tipo_dato != 'valor_por_cobrar')
@@ -541,7 +570,7 @@ class Reporte
 										*   ( documento.saldo_honorarios / documento.honorarios)
 										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 									)";
-
+		$datos_monedas = "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio";
 		switch($this->tipo_dato)
 		{
 			case "horas_trabajadas": case "horas_cobrables": case "horas_no_cobrables":
@@ -562,7 +591,12 @@ class Reporte
 			case 'valor_por_cobrar':
 			{
 				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando. 
-				$s .= "IF( cobro.id_cobro IS NOT NULL, $monto_honorarios ,	$monto_predicho)";
+				$s .= " $datos_monedas, IF( cobro.id_cobro IS NOT NULL, $monto_honorarios ,	$monto_predicho)";
+				break;
+			}
+			case 'valor_trabajado_estandar':
+			{
+				$s .= " $datos_monedas, $monto_trabajado_estandar";
 				break;
 			}
 			case "valor_cobrado":
@@ -570,41 +604,47 @@ class Reporte
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			{
-				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_honorarios";
+				$s .= " $datos_monedas, $monto_honorarios";
 				break;
 			}
 			case "valor_por_pagar_parcial":
 			{
-				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_por_pagar_parcial";
+				$s .= " $datos_monedas, $monto_por_pagar_parcial";
 				break;
 			}
 			case "valor_pagado_parcial":
 			{
-				$s .= "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio, $monto_honorarios - $monto_por_pagar_parcial";
+				$s .= " $datos_monedas, $monto_honorarios - $monto_por_pagar_parcial";
 				break;
 			}
 			case "valor_estandar":
 			{
-				$s .= "	$monto_estandar ";
+				$s .= " $datos_monedas,	$monto_estandar ";
 				break;
 			}
 			case "diferencia_valor_estandar":
 			{
-				$s .= "( $monto_honorarios - $monto_estandar )";
+				$s .= " $datos_monedas, ( $monto_honorarios - $monto_estandar )";
 				break;
 			}
 			case 'rentabilidad':
 				/*Se necesita resultado extra: lo que se habría cobrado*/
 				$s .= " $monto_estandar  AS valor_divisor, ";
-				$s .= " $monto_honorarios ";
+				$s .= " $datos_monedas, $monto_honorarios ";
 				break;
+			case 'rentabilidad_base':
+			{
+				$s .= " $monto_trabajado_estandar AS valor_divisor, ";
+				$s .= " $datos_monedas, IF( cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO'),$monto_honorarios, 0)";
+				break;
+			}
 			case "valor_hora":
 			{
 				/*Se necesita resultado extra: las horas cobradas*/
 				$s .= "SUM(
 						(TIME_TO_SEC( duracion_cobrada)/3600)
 					) as valor_divisor, ";
-				$s .= " $monto_honorarios ";
+				$s .= " $datos_monedas, $monto_honorarios ";
 				break;
 			}
 		}
@@ -715,9 +755,9 @@ class Reporte
 				$s.= " OR ( (".$campo_fecha." IS NULL OR ".$campo_fecha." = '00-00-0000') AND ".$campo_fecha_2." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ) ";
 			$s.=') ';
 		}
-		/* Si se filtra el periodo por cobro, los trabajos sin cobro no se ven */
+		/* Si se filtra el periodo por cobro, los trabajos sin cobro emitido (y posteriores) no se ven */
 		if( ($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo')
-			$s .= " AND trabajo.id_cobro IS NOT NULL ";
+			$s .= " AND cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') ";
 
 		return $s;
 	}
@@ -730,11 +770,7 @@ class Reporte
 
 		$agrupa = array();
 
-		if(in_array
-			(
-				$this->tipo_dato,
-				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar','valor_pagado_parcial','valor_por_pagar_parcial')
-			))
+		if($this->requiereMoneda($this->tipo_dato))
 			$agrupa[] = "id_cobro";
 
 		foreach($this->id_agrupador as $a)
@@ -775,11 +811,7 @@ class Reporte
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		if
 		(
-			in_array
-			(
-				$this->tipo_dato,
-				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar','valor_estandar','valor_pagado_parcial','valor_por_pagar_parcial')
-			) 
+			$this->requiereMoneda($this->tipo_dato)
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
@@ -840,7 +872,7 @@ class Reporte
 
 			$data['total'] += number_format($row[$this->tipo_dato],2,".","");
 
-			if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora')
+			if($this->usaDivisor())
 			{
 				$data[$nombre]['valor_divisor'] += $row['valor_divisor'];
 				$data['total_divisor'] += $row['valor_divisor'];
@@ -852,7 +884,7 @@ class Reporte
 				$data['barras']++;
 
 		/* Rentabilidad y Valor Hora son resultados de una proporcionalidad: se debe dividir por otro valor */
-		if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora' )
+		if($this->usaDivisor())
 		{
 			foreach($data as $nom => $dat)
 			{
@@ -957,7 +989,7 @@ class Reporte
 			{
 				$r['celdas'][$identificador][$identificador_col]['valor'] = 0;
 
-				if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora' )
+				if($this->usaDivisor())
 					$r['celdas'][$identificador][$identificador_col]['valor_divisor'] = 0;
 			}
 			$r['celdas'][$identificador][$identificador_col]['valor'] += number_format($row[$this->tipo_dato],2,".","");
@@ -965,7 +997,7 @@ class Reporte
 			$r['labels_col'][$identificador_col]['total'] += number_format($row[$this->tipo_dato],2,".","");
 			$r['total'] += number_format($row[$this->tipo_dato],2,".","");
 
-			if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora' )
+			if($this->usaDivisor())
 			{
 				$r['celdas'][$identificador][$identificador_col]['valor_divisor'] += $row['valor_divisor'];
 				$r['labels'][$identificador]['total_divisor'] += $row['valor_divisor'];
@@ -974,7 +1006,7 @@ class Reporte
 
 			}
 		}
-		if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora' )
+		if($this->usaDivisor())
 		{
 			foreach($r['labels'] as $ide => $nom)
 			{
@@ -1086,7 +1118,7 @@ class Reporte
 			
 
 			//Rentabilidad y Valor/Hora necesitan dividirse por otro total.
-			if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora')
+			if($this->usaDivisor())
 			{
 				$resultado = $row['valor_divisor'];
 				if(is_numeric($resultado))
@@ -1106,7 +1138,7 @@ class Reporte
 			if(is_numeric($resultado))
 			{
 				$resultado = number_format($resultado,2,".","");
-				if($this->tipo_dato == 'rentabilidad')
+				if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'rentabilidad_base')
 					$resultado *= 100;
 			}
 
@@ -1150,7 +1182,7 @@ class Reporte
 		
 
 		/* En el caso de la Rentabilidad y el Valor por Hora, debo dividir por el 'valor divisor', en cada una de las 6 profundidades (y luego en el Total)*/
-		if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora')
+		if($this->usaDivisor())
 		{
 			foreach($r as $ag1 => $a)
 			{
@@ -1304,6 +1336,7 @@ class Reporte
 			case "valor_estandar":
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
+			case "valor_trabajado_estandar":
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);
@@ -1344,6 +1377,7 @@ class Reporte
 			case "valor_estandar":
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
+			case "valor_trabajado_estandar":
 				return "$";
 			case "valor_hora":
 				return "$/Hr.";
@@ -1364,6 +1398,7 @@ class Reporte
 			case "valor_hora":
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
+			case "valor_trabajado_estandar":
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);

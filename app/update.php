@@ -6256,6 +6256,50 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
+                        
+                        case 4.90:
+				$query = array();
+				$query[] = "CREATE TABLE  `prm_tipo_pago` (
+                                             `codigo` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+                                             `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+                                            PRIMARY KEY (  `codigo` )
+                                            ) ENGINE = INNODB;";
+                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortización' );";
+                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'E', 'Efectivo' ), ( 'C', 'Cheque' );";
+                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'O',  'Otro' ), ( 'N',  'Ninguno' );";
+                                $query[] = "ALTER TABLE  `prm_tipo_pago` ADD  `orden` TINYINT( 6 ) NOT NULL ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '2' WHERE codigo = 'A' LIMIT 1 ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '1' WHERE codigo = 'T' LIMIT 1 ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '3' WHERE codigo = 'C' LIMIT 1 ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '4' WHERE codigo = 'E' LIMIT 1 ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '5' WHERE codigo = 'O' LIMIT 1 ;";
+                                $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '6' WHERE codigo = 'N' LIMIT 1 ;";
+				
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			case 4.91:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( 'SelectMultipleFacturasPago', '0', 'Cambiar los combo de banco, estado y concepto por selectores múltiples', 'boolean', '6', '-1' );";
+				foreach( $query as $q ) {
+					if( !($res = mysql_query($q, $dbh) ) ) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+			break;
+			
+			case 4.92:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					VALUES (
+					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
+					);";
+				foreach( $query as $q ) {
+					if( !($res = mysql_query($q, $dbh) ) ) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+			break;
 	}
 }
 
@@ -6514,7 +6558,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.87;
 	$VERSIONES[$num++] = 4.88;
 	$VERSIONES[$num++] = 4.89;
-	
+	$VERSIONES[$num++] = 4.90;
+	$VERSIONES[$num++] = 4.91;
+	$VERSIONES[$num++] = 4.92;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
