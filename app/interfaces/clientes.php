@@ -210,7 +210,7 @@ Calendar.setup(
 		$where = '1';
 		if($glosa_cliente != '')
 		{
-			$nombre = strtr($glosa_cliente, ' ', '%' );
+			$nombre = addslashes(strtr($glosa_cliente, ' ', '%' ));
 			$where .= " AND cliente.glosa_cliente Like '%$nombre%'";
 		}
 		if( $codigo != '')

@@ -9008,17 +9008,17 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$asunto->fields['tramites_total_valor'] = 0;
 
 			   if( $lista_tramites->num == 0 )
-           {
-               $row = $row_tmpl;
-               $row = str_replace('%iniciales%', '&nbsp;',$row);
-			   $row = str_replace('%username%', $trabajo->fields['username'], $row);
-               $row = str_replace('%fecha%', '&nbsp;',$row);
-               $row = str_replace('%descripcion%', __('No hay trámites en este asunto'),$row);
-               $row = str_replace('%valor%', '&nbsp;',$row);
-               $row = str_replace('%duracion_tramites%', '&nbsp;',$row);
-               $row = str_replace('%valor_tramites%', '&nbsp;',$row);
-               $html .= $row;
-           }
+			   {
+				   $row = $row_tmpl;
+				   $row = str_replace('%iniciales%', '&nbsp;',$row);
+				   $row = str_replace('%username%', '&nbsp;', $row);
+				   $row = str_replace('%fecha%', '&nbsp;',$row);
+				   $row = str_replace('%descripcion%', __('No hay trámites en este asunto'),$row);
+				   $row = str_replace('%valor%', '&nbsp;',$row);
+				   $row = str_replace('%duracion_tramites%', '&nbsp;',$row);
+				   $row = str_replace('%valor_tramites%', '&nbsp;',$row);
+				   $html .= $row;
+			   }
 
 
 			for($i=0;$i<$lista_tramites->num;$i++)
@@ -9035,6 +9035,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'],$idioma->fields['formato_fecha']), $row);
 				$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'].'<br>'.$tramite->fields['descripcion'])), $row);
 				$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
+				$row = str_replace('%username%', $tramite->fields['username'], $row);
 
 				//muestra las iniciales de los profesionales
 				list($nombre,$apellido_paterno,$extra,$extra2) = split(' ',$tramite->fields['nombre_usuario'],4);

@@ -892,10 +892,10 @@ function EditarTodosLosArchivos()
 			
 			$tarifa = number_format($t->GetTrabajoTarifa( $id_moneda_trabajo, $trabajo->fields['id_trabajo'] ),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		}
-		else if( $trabajo->fields['tarifa_hh'] > 0 )
+		else if( $trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0 )
 			$tarifa = number_format($trabajo->fields['tarifa_hh'],$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		else if($trabajo->fields['id_tramite_tipo'] == 0)
-			$tarifa = number_format(Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			$tarifa = number_format(Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_contrato'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		else
 			$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
 		list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);

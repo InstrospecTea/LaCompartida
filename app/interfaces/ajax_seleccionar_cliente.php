@@ -4,7 +4,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 	$sesion = new Sesion();
-	$pedazo = utf8_decode($_POST['glosa_cliente']);
+	$pedazo = utf8_decode(addslashes($_POST['glosa_cliente']));
 	
 if(!$pedazo)
 	{
