@@ -6300,6 +6300,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					}
 				}
 			break;
+			
+			case 4.93:
+				$query = array();
+				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
+					`comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `id` =264 LIMIT 1 ;";
+				foreach( $query as $q ) {
+					if( !($res = mysql_query($q, $dbh) ) ) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+				break;
 	}
 }
 
@@ -6561,6 +6572,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.90;
 	$VERSIONES[$num++] = 4.91;
 	$VERSIONES[$num++] = 4.92;
+	$VERSIONES[$num++] = 4.93;
+	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
