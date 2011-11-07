@@ -208,6 +208,16 @@
 					$cliente->Edit("alerta_monto",$cliente_alerta_monto);
 					$cliente->Edit("limite_hh",$cliente_limite_hh);
 					$cliente->Edit("limite_monto",$cliente_limite_monto);
+					
+					if ( $id_cliente == 0) {
+						$cliente->Edit("fecha_creacion", date('Y-m-d H:i:s'));
+					} elseif( $id_cliente > 0 ) { 
+						/*  TODO:
+						 *	Mejorar este proceso para que genere un log decente
+						 */
+						
+						$cliente->Edit("fecha_modificacion", date('Y-m-d H:i:s'));
+					}
 
 					if($cliente->Write())
 					{
@@ -308,6 +318,7 @@
 						$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 						$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 						$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
+						$contrato->Edit("opc_ver_concepto_gastos",$opc_ver_concepto_gastos);
 						$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 						$contrato->Edit("opc_ver_descuento",$opc_ver_descuento);
 						$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);

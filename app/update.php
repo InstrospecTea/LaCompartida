@@ -6304,13 +6304,30 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			case 4.93:
 				$query = array();
 				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
-					`comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `id` =264 LIMIT 1 ;";
-				foreach( $query as $q ) {
+                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `id` =264 LIMIT 1 ;";
+				
+                                foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
 						throw new Exception($q."---".mysql_error());
 					}
 				}
-				break;
+			break;
+                                
+                        case 4.94:
+                                $query = array();
+                                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                                                VALUES (
+                                                    NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
+                                                );";
+                                $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
+                                $query[] = "ALTER TABLE `cobro` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
+                                
+                                foreach( $query as $q ) {
+					if( !($res = mysql_query($q, $dbh) ) ) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+			break;
 	}
 }
 
@@ -6573,6 +6590,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.91;
 	$VERSIONES[$num++] = 4.92;
 	$VERSIONES[$num++] = 4.93;
+        $VERSIONES[$num++] = 4.94;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

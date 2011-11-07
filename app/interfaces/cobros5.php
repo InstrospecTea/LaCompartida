@@ -98,13 +98,13 @@
 		$cobro->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 		$cobro->Edit("opc_ver_profesional",$opc_ver_profesional);
 		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
+		$cobro->Edit("opc_ver_concepto_gastos",$opc_ver_concepto_gastos);
 		$cobro->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$cobro->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
 		$cobro->Edit("opc_ver_profesional_iniciales",$opc_ver_profesional_iniciales);
 		$cobro->Edit("opc_ver_profesional_categoria",$opc_ver_profesional_categoria);
  		$cobro->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
  		$cobro->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
-		$cobro->Edit("opc_ver_gastos",$opc_ver_gastos);
 		$cobro->Edit("opc_ver_detalles_por_hora_categoria",$opc_ver_detalles_por_hora_categoria);
 		$cobro->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
 		$cobro->Edit("opc_ver_detalles_por_hora_tarifa",$opc_ver_detalles_por_hora_tarifa);
@@ -1423,6 +1423,12 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?=$cobro->fields['opc_ver_gastos']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_gastos"><?=__('Mostrar gastos del cobro')?></label></td>
 								</tr>
+                                                                <?php if( UtilesApp::GetConf($sesion,'PrmGastos') ) { ?>
+                                                                <tr>
+									<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?=$cobro->fields['opc_ver_concepto_gastos']=='1'?'checked':''?>></td>
+									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?=__('Mostrar concepto de gastos')?></label></td>
+								</tr>
+                                                                <?php } ?>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?=$cobro->fields['opc_ver_morosidad']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2"style="font-size: 10px;"><label for="opc_ver_morosidad"><?=__('Mostrar saldo adeudado')?></label></td>

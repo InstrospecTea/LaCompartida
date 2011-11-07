@@ -173,6 +173,7 @@
 		$contrato->Edit("opc_ver_profesional_tarifa",$opc_ver_profesional_tarifa);
 		$contrato->Edit("opc_ver_profesional_importe",$opc_ver_profesional_importe);
 		$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
+		$contrato->Edit("opc_ver_concepto_gastos",$opc_ver_concepto_gastos);
 		$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 		$contrato->Edit("opc_ver_resumen_cobro",$opc_ver_resumen_cobro);
 		$contrato->Edit("opc_ver_detalles_por_hora_iniciales",$opc_ver_detalles_por_hora_iniciales);
@@ -1961,6 +1962,7 @@ else
 					$contrato->Edit('opc_ver_detalles_por_hora_iniciales', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraIniciales') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_detalles_por_hora_tarifa', Conf::GetConf($sesion, 'OpcVerDetallesPorHoraTarifa') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_gastos', Conf::GetConf($sesion, 'OpcVerGastos') == 1 ? 1 : 0);
+					$contrato->Edit('opc_ver_concepto_gastos', Conf::GetConf($sesion, 'OpcVerConceptoGastos') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_horas_trabajadas', Conf::GetConf($sesion, 'OpcVerHorasTrabajadas') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_modalidad', Conf::GetConf($sesion, 'OpcVerModalidad') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_morosidad', Conf::GetConf($sesion, 'OpcVerMorosidad') == 1 ? 1 : 0);
@@ -2034,6 +2036,12 @@ else
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_gastos" value="1" <?=$contrato->fields['opc_ver_gastos']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar gastos del cobro')?></td>
 		</tr>
+                <?php if( UtilesApp::GetConf($sesion,'PrmGastos') ) { ?>
+                <tr>
+			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_concepto_gastos" value="1" <?=$contrato->fields['opc_ver_concepto_gastos']=='1'?'checked="checked"':''?> /></td>
+			<td align="left" colspan='5'><?=__('Mostrar concepto de gastos')?></td>
+		</tr>
+                <?php } ?>
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_morosidad" value="1" <?=$contrato->fields['opc_ver_morosidad']=='1'?'checked="checked"':''?> /></td>
 			<td align="left" colspan='5'><?=__('Mostrar saldo adeudado')?></td>

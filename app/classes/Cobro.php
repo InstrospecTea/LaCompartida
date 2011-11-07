@@ -1206,6 +1206,7 @@ class Cobro extends Objeto
 				$this->Edit("opc_ver_modalidad",$contrato->fields['opc_ver_modalidad']);
 				$this->Edit("opc_ver_profesional",$contrato->fields['opc_ver_profesional']);
 				$this->Edit("opc_ver_gastos",$contrato->fields['opc_ver_gastos']);
+				$this->Edit("opc_ver_concepto_gastos",$contrato->fields['opc_ver_concepto_gastos']);
 				$this->Edit("opc_ver_morosidad",$contrato->fields['opc_ver_morosidad']);
 				$this->Edit("opc_ver_resumen_cobro",$contrato->fields['opc_ver_resumen_cobro']);
 				$this->Edit("opc_ver_descuento",$contrato->fields['opc_ver_descuento']);

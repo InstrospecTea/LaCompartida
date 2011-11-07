@@ -305,6 +305,7 @@
 									$contrato->Edit("opc_ver_modalidad",$contra_clie->fields['opc_ver_modalidad']);
 									$contrato->Edit("opc_ver_profesional",$contra_clie->fields['opc_ver_profesional']);
 									$contrato->Edit("opc_ver_gastos",$contra_clie->fields['opc_ver_gastos']);
+									$contrato->Edit("opc_ver_concepto_gastos",$contra_clie->fields['opc_ver_concepto_gastos']);
 									$contrato->Edit("opc_ver_morosidad",$contra_clie->fields['opc_ver_morosidad']);
 									$contrato->Edit("opc_ver_descuento",$contra_clie->fields['opc_ver_descuento']);
 									$contrato->Edit("opc_ver_tipo_cambio",$contra_clie->fields['opc_ver_tipo_cambio']);
@@ -458,6 +459,7 @@
 								$contrato->Edit("opc_ver_modalidad",$opc_ver_modalidad);
 								$contrato->Edit("opc_ver_profesional",$opc_ver_profesional);
 								$contrato->Edit("opc_ver_gastos",$opc_ver_gastos);
+								$contrato->Edit("opc_ver_concepto_gastos",$opc_ver_concepto_gastos);
 								$contrato->Edit("opc_ver_morosidad",$opc_ver_morosidad);
 								$contrato->Edit("opc_ver_descuento",$opc_ver_descuento);
 								$contrato->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
