@@ -11504,16 +11504,17 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		$calculos_cobro = UtilesApp::ProcesaCobroIdMoneda($this->sesion,$this->fields['id_cobro']);
 		$monto_cobrado = $calculos_cobro['monto_total_cobro'][$calculos_cobro['opc_moneda_total']];
 		$monto_facturado = $this->MontoFacturado();
+		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
+		$idioma->Load($this->fields['codigo_idioma']);
+		$monto_cobrado = number_format($monto_cobrado,$calculos_cobro['cifras_decimales_opc_moneda_total'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+		$monto_facturado = number_format($monto_facturado,$calculos_cobro['cifras_decimales_opc_moneda_total'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+			
 		$mensaje = '';
 		if($monto_cobrado != $monto_facturado)
 		{
-			$moneda = new Moneda($this->sesion);
-			$moneda->Load($this->fields['opc_moneda_total']);
+                        $moneda = new Moneda($this->sesion);
+                        $moneda->Load($this->fields['opc_moneda_total']);
 			$simbolo = $moneda->fields['simbolo'];
-			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
-			$idioma->Load($this->fields['codigo_idioma']);
-			$monto_cobrado = number_format($monto_cobrado,$calculos_cobro['cifras_decimales_opc_moneda_total'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
-			$monto_facturado = number_format($monto_facturado,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 			$mensaje = __('El monto liquidado').' ('.$simbolo.' '.$monto_cobrado.') '.__('no coincide con el monto facturado ').'('.$simbolo.' '.$monto_facturado.')';
 		}
 		return $mensaje;
