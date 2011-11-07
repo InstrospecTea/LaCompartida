@@ -56,13 +56,15 @@ class Factura extends Objeto {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm 
 						JOIN factura f USING ( id_factura )
+                                                JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado 
 						JOIN factura fp ON ( fp.id_factura = IF( f.id_factura_padre IS NULL, f.id_factura, f.id_factura_padre ) )
 						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto 
 							AND ccfm.id_moneda = ccfmm.id_moneda )
 						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto 
 							AND ccfmmbase.id_moneda = fp.id_moneda )
-					WHERE f.id_factura =  '$id_factura'
-						OR f.id_factura_padre =  '$id_factura';"; //11357
+					WHERE ( f.id_factura =  '$id_factura'
+						OR f.id_factura_padre =  '$id_factura' ) 
+                                                    AND pef.glosa NOT LIKE '%ANULADO%';"; //11357
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $valor_real ) = mysql_fetch_array($resp);
 
