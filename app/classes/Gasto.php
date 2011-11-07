@@ -72,11 +72,11 @@ class Gasto extends Objeto
 				if($this->fields['egreso'] > 0)
 					$query = "INSERT INTO gasto_historial 
 													( id_movimiento, fecha, id_usuario, accion, fecha_movimiento, fecha_movimiento_modificado, codigo_cliente, codigo_cliente_modificado, codigo_asunto, codigo_asunto_modificado, egreso, egreso_modificado, monto_cobrable, monto_cobrable_modificado, descripcion, descripcion_modificado, id_moneda, id_moneda_modificado) 
-										VALUES( ".$this->fields['id_movimiento'].", NOW(), ".$this->sesion->usuario->fields['id_usuario'].", 'MODIFICAR', '".$fecha."', '".$this->fields['fecha']."', '".$codigo_cliente."', '".$this->fields['codigo_cliente']."', '".$codigo_asunto."', '".$this->fields['codigo_asunto']."', ".$egreso.", ".$this->fields['egreso'].", ".$monto_cobrable.", ".$this->fields['monto_cobrable'].", '".addslashes($descripcion)."', '".$this->fields['descripcion']."', ".$id_moneda.", ".$this->fields['id_moneda'].")";
+										VALUES( ".$this->fields['id_movimiento'].", NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 'MODIFICAR', '".$fecha."', '".$this->fields['fecha']."', '".$codigo_cliente."', '".$this->fields['codigo_cliente']."', '".$codigo_asunto."', '".$this->fields['codigo_asunto']."', ".$egreso.", ".$this->fields['egreso'].", ".$monto_cobrable.", ".$this->fields['monto_cobrable'].", '".addslashes($descripcion)."', '".$this->fields['descripcion']."', ".$id_moneda.", ".$this->fields['id_moneda'].")";
 				else if($this->fields['ingreso'] > 0)
 					$query = "INSERT INTO gasto_historial 
 													( id_movimiento, fecha, id_usuario, accion, fecha_movimiento, fecha_movimiento_modificado, codigo_cliente, codigo_cliente_modificado, codigo_asunto, codigo_asunto_modificado, ingreso, ingreso_modificado, monto_cobrable, monto_cobrable_modificado, descripcion, descripcion_modificado, id_moneda, id_moneda_modificado) 
-										VALUES( ".$this->fields['id_movimiento'].", NOW(), ".$this->sesion->usuario->fields['id_usuario'].", 'MODIFICAR', '".$fecha."', '".$this->fields['fecha']."', '".$codigo_cliente."', '".$this->fields['codigo_cliente']."', '".$codigo_asunto."', '".$this->fields['codigo_asunto']."', ".$ingreso.", ".$this->fields['ingreso'].", ".$monto_cobrable.", ".$this->fields['monto_cobrable'].", '".addslashes($descripcion)."', '".$this->fields['descripcion']."', ".$id_moneda.", ".$this->fields['id_moneda'].")";
+										VALUES( ".$this->fields['id_movimiento'].", NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 'MODIFICAR', '".$fecha."', '".$this->fields['fecha']."', '".$codigo_cliente."', '".$this->fields['codigo_cliente']."', '".$codigo_asunto."', '".$this->fields['codigo_asunto']."', ".$ingreso.", ".$this->fields['ingreso'].", ".$monto_cobrable.", ".$this->fields['monto_cobrable'].", '".addslashes($descripcion)."', '".$this->fields['descripcion']."', ".$id_moneda.", ".$this->fields['id_moneda'].")";
 			}
 		else
 			{
@@ -88,13 +88,13 @@ class Gasto extends Objeto
 					{
 						$query = "INSERT INTO gasto_historial 
 																( id_movimiento, fecha, id_usuario, accion, fecha_movimiento_modificado, codigo_cliente_modificado, codigo_asunto_modificado, egreso_modificado, monto_cobrable_modificado, descripcion_modificado, id_moneda_modificado)
-													VALUES( ".$id_movimiento.", NOW(), ".$this->sesion->usuario->fields['id_usuario'].", 'CREAR', '".$this->fields['fecha']."', '".$this->fields['codigo_cliente']."', '".$this->fields['codigo_asunto']."',".$this->fields['egreso'].", '".$this->fields['monto_cobrable']."', '".$this->fields['descripcion']."', ".$this->fields['id_moneda'].")";
+													VALUES( ".$id_movimiento.", NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 'CREAR', '".$this->fields['fecha']."', '".$this->fields['codigo_cliente']."', '".$this->fields['codigo_asunto']."',".$this->fields['egreso'].", '".$this->fields['monto_cobrable']."', '".$this->fields['descripcion']."', ".$this->fields['id_moneda'].")";
 					}
 				else if( $this->fields['ingreso'] > 0 )
 					{
 						$query = "INSERT INTO gasto_historial 
 																( id_movimiento, fecha, id_usuario, accion, fecha_movimiento_modificado, codigo_cliente_modificado, codigo_asunto_modificado, ingreso_modificado, monto_cobrable_modificado, descripcion_modificado, id_moneda_modificado)
-													VALUES( ".$id_movimiento.", NOW(), ".$this->sesion->usuario->fields['id_usuario'].", 'CREAR', '".$this->fields['fecha']."', '".$this->fields['codigo_cliente']."', '".$this->fields['codigo_asunto']."',".$this->fields['ingreso'].", '".$this->fields['monto_cobrable']."', '".$this->fields['descripcion']."', ".$this->fields['id_moneda'].")";
+													VALUES( ".$id_movimiento.", NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 'CREAR', '".$this->fields['fecha']."', '".$this->fields['codigo_cliente']."', '".$this->fields['codigo_asunto']."',".$this->fields['ingreso'].", '".$this->fields['monto_cobrable']."', '".$this->fields['descripcion']."', ".$this->fields['id_moneda'].")";
 					}
 			}
 		if(parent::Write())

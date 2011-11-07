@@ -520,7 +520,7 @@ function Refrescar()
 			</td>
 			<td align="left" nowrap>
 				<?=__('id_cobro')?>&nbsp;
-				<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type=text size=6 name=id_cobro id=id_cobro value="<?=$id_cobro ?>">
+				<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_cobro" id="id_cobro" value="<?=$id_cobro ?>">
 			</td>
 	</tr>
 	<tr>

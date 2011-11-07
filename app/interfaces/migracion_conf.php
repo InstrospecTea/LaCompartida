@@ -127,7 +127,6 @@
 							LEFT JOIN ContactosCliente ON Cliente.CodigoCliente = ContactosCliente.CodigoCliente 
 							GROUP BY Cliente.CodigoCliente";
 		}
-		
 		function QueryAsunto() 
 		{ 
 			return "SELECT 
@@ -147,6 +146,7 @@
 								OrdenFacturacion.Asunto 																										as asunto_FFF_glosa_asunto,
 								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) ) 	as asunto_FFF_id_moneda,
 								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )		as contrato_FFF_id_moneda,
+								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )		as contrato_FFF_id_moneda_monto,
 								IF( OrdenFacturacion.Moneda = 'S', '1', IF( OrdenFacturacion.Moneda = 'E', '3', '2' ) )		as contrato_FFF_opc_moneda_total,
 								OrdenFacturacion.TarifaHora 																								as contrato_FFF_id_tarifa,
 								OrdenFacturacion.FechaModificacion 																					as asunto_FFF_fecha_modificacion,
@@ -181,10 +181,10 @@
 								,hta.FechaFacturable																																					as fecha 
 								,hta.HoraInicio 																																							as hora_inicio
 								,hta.NumeroFactura																																						as id_cobro 
-								,SEC_TO_TIME(hta.Tiempo*60)																																		as duracion
-								,SEC_TO_TIME(hta.TiempoFacturable*60) 																												as duracion_cobrada
-								,IF(hta.FlagFacturable = 'S',1,0) 																														as cobrable
-								,IF(hta.AsuntoLargoFacturable IS NOT NULL,hta.AsuntoLargoFacturable, htd.AsuntoLargo) 					as descripcion
+								,SEC_TO_TIME(htd.Tiempo*60)																																		as duracion
+								,IF(hta.Status='C','00:00:00',SEC_TO_TIME(hta.TiempoFacturable*60))														as duracion_cobrada
+								,IF(hta.FlagFacturable = 'S','1','0') 																												as cobrable
+								,IF(hta.AsuntoLargoFacturable IS NOT NULL,hta.AsuntoLargoFacturable, htd.AsuntoLargo) 				as descripcion
 								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion
 								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
 								,IF(hta.TarifaFacturable IS NOT NULL,hta.TarifaFacturable ,htd.Tarifa) 												as tarifa_hh

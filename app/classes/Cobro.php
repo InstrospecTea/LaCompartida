@@ -2521,7 +2521,16 @@ class Cobro extends Objeto
 			$html = str_replace('%nombre_socio%',$nombre_encargado,$html);
 			$html = str_replace('%fono%',__('TELÉFONO'),$html);
 			$html = str_replace('%fax%',__('TELEFAX'),$html);
+			
+			$cliente = new Cliente($this->sesion);
+			if( UtilesApp::GetConf($this->sesion,'CodigoSecundario') ) {
+				$codigo_cliente = $cliente->CodigoACodigoSecundario( $this->fields['codigo_cliente'] );
+			}
+			else {
+				$codigo_cliente = $this->fields['codigo_cliente'];
+			}
 
+			$html = str_replace('%codigo_cliente%', $codigo_cliente, $html);
 			$html = str_replace('%CLIENTE%', 				$this->GenerarDocumento($parser,'CLIENTE',			$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			$html = str_replace('%DETALLE_COBRO%', 	$this->GenerarDocumento($parser,'DETALLE_COBRO',$parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 			if( $this->fields['forma_cobro'] == 'CAP' )
@@ -2532,7 +2541,7 @@ class Cobro extends Objeto
 				{
 					if( $cont_trab || $cont_tram ) 
 						$html = str_replace('%ASUNTOS%',    $this->GenerarDocumento($parser,'ASUNTOS',      $parser_carta,$moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
-					else	
+					else
 						$html = str_replace('%ASUNTOS%','', $html);
 				}
 			else	
@@ -7135,6 +7144,15 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$fecha_mes_del_cobro = strtotime($this->fields['fecha_fin']);
 			$fecha_mes_del_cobro = strftime("%B %Y", mktime(0,0,0,date("m",$fecha_mes_del_cobro),date("d",$fecha_mes_del_cobro)-5,date("Y",$fecha_mes_del_cobro)));
 
+			$cliente = new Cliente($this->sesion);
+			if( UtilesApp::GetConf($this->sesion,'CodigoSecundario') ) {
+				$codigo_cliente = $cliente->CodigoACodigoSecundario( $this->fields['codigo_cliente'] );
+			}
+			else {
+				$codigo_cliente = $this->fields['codigo_cliente'];
+			}
+
+			$html = str_replace('%codigo_cliente%', $codigo_cliente, $html);
 			$html = str_replace('%fecha_mes_del_cobro%',ucfirst($fecha_mes_del_cobro),$html);
 			$html = str_replace('%fecha_larga%', $fecha_lang, $html);
 			$query="SELECT CONCAT(a.nombre, ' ', a.apellido1, ' ', a.apellido2) FROM usuario AS a JOIN contrato ON a.id_usuario=contrato.id_usuario_responsable JOIN cobro ON cobro.id_contrato=contrato.id_contrato WHERE cobro.id_cobro=".$this->fields['id_cobro'];

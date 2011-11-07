@@ -191,10 +191,12 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 			$g=substr($codigo,2)+1;
 		if( method_exists('Conf','GetConf') )
 		{
-			if( Conf::GetConf($this->sesion,'TipoCodigoAsunto') )
+			if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 1)
 				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
+			else if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 2)
+				$codigo_asunto=$codigo_cliente.'-'.sprintf("%03d",$f);
 			else
-				$codigo_asunto_secundario=$codigo_cliente_secundario.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
+				$codigo_asunto=$codigo_cliente.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
 		}
 		else if (method_exists('Conf','TipoCodigoAsunto'))
 		{

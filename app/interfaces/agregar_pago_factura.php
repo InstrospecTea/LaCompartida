@@ -423,7 +423,13 @@
 		$('boton_guardar').disabled = true;
 		continuar = 1;
 		ValidaMontoSaldoPago(form);
-
+		
+		if( $('codigo_cliente').value == '' ) {
+			alert( 'Debe ingresar un cliente.' );
+			$('codigo_cliente').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		}
 		// Validaciones de montos
 		if( !isNumber( $('monto').value ) ) {
 			alert( 'El formato del monto ingresado no es valido.' );
