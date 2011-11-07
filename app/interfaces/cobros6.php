@@ -101,6 +101,10 @@
 		$moneda_documento = new Moneda($sesion);
 		$moneda_documento->Load($documento_cobro->fields['id_moneda']);
 	}
+        else {
+                $moneda_documento = new Moneda($sesion);
+		$moneda_documento->Load($cobro->fields['opc_moneda_total']);
+        }
 	$moneda = new Moneda($sesion);
 
 	if(!$fecha_pago && $opc != 'guardar')
@@ -1573,16 +1577,19 @@ function Numero(texto){
 										}
 										$factura = new Factura($sesion);
 										$factura->Load($id_factura);
+                                                                                
+                                                                                $moneda_factura = new Moneda($sesion);
+                                                                                $moneda_factura->Load($id_moneda_factura);
 										?>
 									<tr bgcolor="<?=$fila++%2 ? '#f2f2ff' : '#ffffff'?>">
 										<td><?php echo $tipo ?></td>
 										<td><?php echo $numero ?></td>
-										<td><?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-										<td><?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-										<td><?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos_sin_impuesto, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
-										<td><?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($impuesto, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
+										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
+										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
+										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
+										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
 										<td>
-											<b><?= $moneda_documento->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios + $subtotal_gastos + $subtotal_gastos_sin_impuesto + $impuesto, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></b>
+											<b><?= $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios + $subtotal_gastos + $subtotal_gastos_sin_impuesto + $impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></b>
 										</td>
 										<td><?php echo $estado ?></td>
 										<td nowrap>
@@ -1595,7 +1602,7 @@ function Numero(texto){
 										<?php } ?>
 										</td>
 										<td align="right">
-											<?php echo $moneda_documento->fields['simbolo'].'&nbsp;'.number_format(-$saldo, $moneda_documento->fields['cifras_decimales'], $idioma->fieldls['separador_decimales'], $idioma->fields['separador_miles']) ?>
+											<?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format(-$saldo, $moneda_factura->fields['cifras_decimales'], $idioma->fieldls['separador_decimales'], $idioma->fields['separador_miles']) ?>
 											<?php $saldo_tmp = -$saldo;?>
 											<input type="hidden" name="saldo_<?=$id_factura?>" id="saldo_<?=$id_factura?>" value="<?= str_replace(',','.',$saldo_tmp); ?>" />
 											<input type="hidden" name="id_moneda_factura_<?=$id_factura?>" id="id_moneda_factura_<?=$id_factura?>" value="<?=$id_moneda_factura ?>" />
