@@ -668,7 +668,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecund
 				<td align=left>
 					<?php 
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
-							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="4" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta\', true);"', 'Cualquiera', "190"); 
+							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="4" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', 'Cualquiera', "190"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, ' onchange="CargarCuenta(\'id_banco\',\'id_cuenta\', false);"', 'Cualquiera', "190"); 
 						}
