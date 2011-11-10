@@ -1296,9 +1296,9 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorG
 	</tr>
 <?
 }
-	if( $contrato->loaded && $contrato->fields['separar_liquidaciones'] ) {
-		$separar_liquidaciones = '1';
-	}
+	if( $contrato->Loaded()) {
+		$separar_liquidaciones = $contrato->fields['separar_liquidaciones'];
+        }
 	else if( UtilesApp::GetConf($sesion,'SepararLiquidacionesPorDefecto') ) {
 		$separar_liquidaciones = '1';
 	}

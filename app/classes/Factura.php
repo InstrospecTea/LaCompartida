@@ -421,7 +421,7 @@ class Factura extends Objeto {
 									$select_col
 									FROM factura
 									LEFT JOIN cobro ON factura.id_cobro=cobro.id_cobro
-									LEFT JOIN prm_moneda ON cobro.id_moneda=prm_moneda.id_moneda
+									LEFT JOIN prm_moneda ON factura.id_moneda=prm_moneda.id_moneda
 									WHERE id_factura=" . $this->fields['id_factura'];
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
