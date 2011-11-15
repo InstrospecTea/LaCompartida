@@ -41,6 +41,7 @@
 		if(empty($username) and !$validaciones_segun_config)
 			$username = $nombre.' '.$apellido1.' '.$apellido2;
 		$usuario->Edit('username', $username);
+		$usuario->Edit('centro_de_costo',$centro_de_costo);
 			
 		$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
 		$usuario->Edit('id_area_usuario', $id_area_usuario);
@@ -343,6 +344,16 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 		</td>
 		<td valign="top" class="texto" align="left">
 			<input type="text" name="username" id="username" value="<?=$usuario->fields['username'] ? $usuario->fields['username'] : $username ?>" size="20" style=""/>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top" class="texto" align="right">
+			<?=__('Centro de Costo')?>
+		</td>
+		<td valign="top" class="texto" align="left">
+			<input type="text" name="centro_de_costo" id="centro_de_costo" value="<?=$usuario->fields['centro_de_costo'] ? $usuario->fields['centro_de_costo'] : $centro_de_costo ?>" size="20" style=""/>
+			&nbsp;
+			<i>(<?=__('para integración contable')?>)</i>
 		</td>
 	</tr>
 	<tr>

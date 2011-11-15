@@ -24,7 +24,7 @@
 	$documento_cobro = new Documento($sesion);
 	$factura = new Factura($sesion);
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
-	
+
 	if( $refrescar ) {
 		?>
 			<script type="text/javascript">
@@ -325,6 +325,11 @@
 
 		$cobro->Edit('se_esta_cobrando',$se_esta_cobrando);
 
+		if($opc_informar_contabilidad == 'informar')
+			$cobro->Edit('estado_contabilidad','PARA INFORMAR');
+		else if($opc_informar_contabilidad == 'informar y facturar')
+			$cobro->Edit('estado_contabilidad','PARA INFORMAR Y FACTURAR');
+		
 		$cobro->Write();
 	}
 
@@ -636,6 +641,12 @@ function MontoFacturaMoneda( id )
 	return resultado;
 }
 	
+function Informar(form,valor)
+{
+	form.opc_informar_contabilidad.value = valor;
+	ValidarTodo(form);
+}
+
 function ValidarTodo(form)
 {
 	if(form.estado.value == 'CREADO') //Significa que estoy anulando la emisión
@@ -1018,6 +1029,7 @@ function Numero(texto){
 <input type="hidden" name="gastos_pagados_original" value="<?=$cobro->fields['gastos_pagados']?>" />
 <input type="hidden" name="eliminar_pago" id="eliminar_pago" value="" />
 <input type=hidden name=opc id=opc>
+<input type=hidden name=opc_informar_contabilidad id=opc_informar_contabilidad>
 
 <table width="100%">
 	<tr>
@@ -1413,23 +1425,49 @@ function Numero(texto){
 
 						<? if( UtilesApp::GetConf($sesion,'InformarContabilidad') ){?>
 							<div align=left>
-								<input type=button value="<?=__('Informar a Contabilidad')?>" />
+								<input type=button value="<?=__('Informar a Contabilidad')?>" onclick="Informar(this.form,'informar')" />
 								&nbsp;
-								<input type=button value="<?=__('Informar y Facturar')?>" />
-								
-								<span id="estado_contabilidad">
-								<? if($cobro->fields['estado_contabilidad']=='POR INFORMAR') 
+								<input type=button value="<?=__('Informar y Facturar')?>" onclick="Informar(this.form,'informar y facturar')" />&nbsp;&nbsp;
+								<? if($cobro->fields['estado_contabilidad']=='NO INFORMADO') 
 								{
 								?>
-									<?=__('Por informar')?>
+									<? $estado_c = __('Sin informar');
+									   $titulo_c = __('El Cobro no ha sido informado.');
+									?>
 								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR') {?>
-									<?=__('Para informar')?>
+									<? $estado_c = __('Para informar');
+									   $titulo_c = __('El Cobro se ha informado a Contabilidad');
+									?>
 								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR Y FACTURAR') {?>
-									<?=__('Para informar y facturar')?>
+									<? $estado_c = __('Para informar y facturar');
+									   $titulo_c = __('El Cobro se ha informado a Contabilidad con la instrucción de facturar.');
+									?>
+								<?} else if($cobro->fields['estado_contabilidad']=='INFORMADO'){?>
+									<? $estado_c = __('Informado');
+									   $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
+									?>
 								<?} else {?>
-									<?=__('Informado')?>
+									<? $estado_c = __('Informado para Facturar');
+									   $titulo_c = __('El Cobro ha sido requerido por Contabilidad, se ha indicado que debe facturarse');
+									?>
 								<?}?>
-								</span>
+
+								<div id="estado_contabilidad" style="display:inline-block; padding:3px; border:1px solid grey; background-color:#EFEFEF;" title="<?=$titulo_c?>">
+								<?=$estado_c?>
+								</div>
+
+								
+								<? if($cobro->fields['nota_venta_contabilidad']) 
+								{
+								?>
+									&nbsp;&nbsp;
+									<div id="nota_venta_contabilidad" style="display:inline-block; padding:3px; border:1px solid grey; background-color:#EFEFEF;">
+									<?=__('Nota de Venta')?>: <?=$cobro->fields['nota_venta_contabilidad']?>
+									</div>
+
+								<?
+								}
+								?>
 							</div>
 						<?} else {?> &nbsp; <?} ?>
 					</td>

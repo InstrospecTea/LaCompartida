@@ -21,6 +21,17 @@ class FacturaPago extends Objeto
 		$this->fields = $fields;
 	}
 
+	function LoadByIdContabilidad($id_contabilidad)
+	{
+		$query = "SELECT id_factura_pago FROM factura_pago WHERE id_contabilidad = '$id_contabilidad';";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id) = mysql_fetch_array($resp);
+
+		if($id)
+			return $this->Load($id);
+		return false;
+	}
+
 	function Id($id=null){
 		if($id) $this->fields[$this->campo_id] = $id;
 		if(empty($this->fields[$this->campo_id])) return false;

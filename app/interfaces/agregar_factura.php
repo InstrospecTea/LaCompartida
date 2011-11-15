@@ -15,108 +15,128 @@
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 	require_once Conf::ServerDir().'/classes/CtaCteFact.php';
 
-	$sesion = new Sesion(array('COB'));
-	$pagina = new Pagina($sesion);
-
-	$factura = new Factura($sesion);
-
-	if($id_factura != "")
+	//La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
+	//(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
+	//se repliquen en el ingreso de datos via webservice.
+	if($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario,$password))
 	{
-		$factura->Load($id_factura);
-		if( empty($codigo_cliente) )
-			$codigo_cliente=$factura->fields['codigo_cliente'];
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-	  	{
-	  		$cliente_factura = new Cliente($sesion);
-	  		$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
-	  	}
+		$sesion = new Sesion();
+		$factura = new Factura($sesion);
 	}
-	
-	if($factura->loaded() && !$id_cobro)
+	else //ELSE (no es WEBSERVICE)
 	{
-		$id_cobro = $factura->fields['id_cobro'];
-	}
-	
-	/*Si se cambió de cliente, el cobro se reemplazó por 'nulo'*/
-	/*if($id_cobro == 'nulo')
-	{
-		$id_cobro = null;
-	}*/
-	
-	if($factura->loaded() && !$codigo_cliente)
-		$codigo_cliente = $factura->fields['codigo_cliente'];
-	
-	if($factura->loaded())
-	{
-		$id_documento_legal = $factura->fields['id_documento_legal'];
-	}
-	$query = "SELECT id_documento_legal, glosa, codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
-	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	list($id_documento_legal, $tipo_documento_legal, $codigo_tipo_doc) = mysql_fetch_array($resp);
-	
-	if(!$tipo_documento_legal)
-		$pagina->FatalError('Error al cargar el tipo de Documento Legal');
+			$sesion = new Sesion(array('COB'));
+			$pagina = new Pagina($sesion);
+			$factura = new Factura($sesion);
+		
 
-   if($opc == 'generar_factura')
-   {
-       // POR HACER
-       // mejorar
-       if($id_factura)
-           UtilesApp::generarFacturaPDF($id_factura, $sesion);
-       else
-           echo "Error";
-       exit;
-   }
-
-		if($opcion == "restaurar")
+		if($id_factura != "")
 		{
-			$factura->Edit('estado','ABIERTA');
-			$factura->Edit('anulado',0);
-			$factura->Edit("id_estado", "1");
-			if($factura->Escribir())
+			$factura->Load($id_factura);
+			if( empty($codigo_cliente) )
+				$codigo_cliente=$factura->fields['codigo_cliente'];
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
-				$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
-				$requiere_refrescar = "window.opener.Refrescar();";
-				if( $id_cobro )
+				$cliente_factura = new Cliente($sesion);
+				$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
+			}
+		}
+		
+		if($factura->loaded() && !$id_cobro)
+		{
+			$id_cobro = $factura->fields['id_cobro'];
+		}
+		
+		/*Si se cambió de cliente, el cobro se reemplazó por 'nulo'*/
+		/*if($id_cobro == 'nulo')
+		{
+			$id_cobro = null;
+		}*/
+		
+		if($factura->loaded() && !$codigo_cliente)
+			$codigo_cliente = $factura->fields['codigo_cliente'];
+		
+		if($factura->loaded())
+		{
+			$id_documento_legal = $factura->fields['id_documento_legal'];
+		}
+		$query = "SELECT id_documento_legal, glosa, codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		list($id_documento_legal, $tipo_documento_legal, $codigo_tipo_doc) = mysql_fetch_array($resp);
+		
+		if(!$tipo_documento_legal)
+			$pagina->FatalError('Error al cargar el tipo de Documento Legal');
+
+	   if($opc == 'generar_factura')
+	   {
+		   // POR HACER
+		   // mejorar
+		   if($id_factura)
+			   UtilesApp::generarFacturaPDF($id_factura, $sesion);
+		   else
+			   echo "Error";
+		   exit;
+	   }
+
+			if($opcion == "restaurar")
+			{
+				$factura->Edit('estado','ABIERTA');
+				$factura->Edit('anulado',0);
+				$factura->Edit("id_estado", "1");
+				if($factura->Escribir())
 				{
-					$cobror = new Cobro( $sesion ); #cobro restaurar
-					$cobror->Load($id_cobro);
-					if( $cobror->Loaded() )
+					$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
+					$requiere_refrescar = "window.opener.Refrescar();";
+					if( $id_cobro )
 					{
-						$fsa = $cobror->CantidadFacturasSinAnular(); #fsa = facturas sin anular
-						if ( $fsa == 1 )
+						$cobror = new Cobro( $sesion ); #cobro restaurar
+						$cobror->Load($id_cobro);
+						if( $cobror->Loaded() )
 						{
-							$cobror->Edit('estado', 'FACTURADO');
+							$fsa = $cobror->CantidadFacturasSinAnular(); #fsa = facturas sin anular
+							if ( $fsa == 1 )
+							{
+								$cobror->Edit('estado', 'FACTURADO');
+							}
 						}
+						$cobror->Write();
 					}
-					$cobror->Write();
 				}
 			}
-		}
-		if($opcion == "anular")
-		{
-			$factura->Edit('estado','ANULADA');
-			$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
-			$factura->Edit('anulado',1);
-			if($factura->Escribir())
+			if($opcion == "anular")
 			{
-				$pagina->AddInfo(__('Documento Tributario').' '.__('anulado con éxito'));
-				$requiere_refrescar = "window.opener.Refrescar();";
+				$factura->Edit('estado','ANULADA');
+				$factura->Edit("id_estado", $id_estado ? $id_estado : "1");
+				$factura->Edit('anulado',1);
+				if($factura->Escribir())
+				{
+					$pagina->AddInfo(__('Documento Tributario').' '.__('anulado con éxito'));
+					$requiere_refrescar = "window.opener.Refrescar();";
+				}
 			}
-		}
+		}//FIN DE ELSE (No es WEBSERVICE)
+
 		if($opcion == "guardar")
 		{
-			if( empty($cliente) )													$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
-			if( !is_numeric($monto_honorarios_legales) )	$pagina->AddError(__('Debe ingresar un monto válido para los honorarios.'));
-			if( !is_numeric($monto_gastos_con_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA.'));
-			if( !is_numeric($monto_gastos_sin_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA.'));
-			
-			$errores = $pagina->GetErrors();
 			$guardar_datos = true;
-			if (!empty($errores))
+			if($desde_webservice) //El webservice ignora todo llamado a $pagina
 			{
-				$guardar_datos = false;
+				$errores = array();
+				if(!is_numeric($monto_honorarios_legales)||!is_numeric($monto_gastos_con_iva)||!is_numeric($monto_gastos_sin_iva))
+					$errores[] = 'error';	
 			}
+			else
+			{
+				if( empty($cliente) )													$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
+				if( !is_numeric($monto_honorarios_legales) )	$pagina->AddError(__('Debe ingresar un monto válido para los honorarios. ('.$monto_honorarios_legales.')'));
+				if( !is_numeric($monto_gastos_con_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA. ('.$monto_gastos_con_iva.')'));
+				if( !is_numeric($monto_gastos_sin_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. ('.$monto_gastos_sin_iva.')'));
+				
+				$errores = $pagina->GetErrors();
+			}
+
+			if (!empty($errores))
+				$guardar_datos = false;
 			
 			if( $guardar_datos )
 			{ 
@@ -184,8 +204,13 @@
 	
 				if (!$factura->ValidarDocLegal())
 				{
-					$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
-					$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal));
+					if(!$desde_webservice)
+					{
+						$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
+						$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal));
+					}
+					else
+						$resultado = array('error'=>'El número ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, vuelva a intentar con número: '.$factura->ObtenerNumeroDocLegal($id_documento_legal));
 				}
 				else if($factura->Escribir())
 				{
@@ -253,7 +278,8 @@
 					$factura->Edit('id_estado',$id_estado_cobrado);
 				}
 				
-				$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
+				if(!$desde_webservice) //El webservice ignora todo llamado a $pagina
+					$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
 				$requiere_refrescar = "window.opener.Refrescar();";
 				
 				
@@ -300,7 +326,13 @@
 			$observacion->Edit('id_factura', $factura->fields['id_factura']);
 			$observacion->Write();			
 		}
-	}
+	} //Fin opcion guardar
+	if($desde_webservice)
+	{
+		if($factura->fields['id_factura'])
+		$resultado =  array('id_factura'=>$factura->fields['id_factura'],'descripción'=>'El '.__('documento tributario').' se ha guardado exitosamente.');
+		return 'EXITO';
+	}//Si vengo del webservice, no continua.
 		
 		#Se ingresa la anotación de modificación de factura en el historial	
 		if(!$id_factura && $factura->loaded())

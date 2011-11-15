@@ -132,6 +132,18 @@ class Cobro extends Objeto
 		}
 		return true;
 	}
+        
+        function LoadGlosaAsuntos()
+	{
+		$query = "SELECT glosa_asunto FROM cobro_asunto JOIN asunto USING( codigo_asunto ) WHERE id_cobro='".$this->fields['id_cobro']."'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$this->glosa_asuntos = array();
+		while( list($glosa) = mysql_fetch_array($resp) )
+		{
+			array_push($this->glosa_asuntos,$glosa);
+		}
+		return true;
+	}
 	
 	#revisa si tiene pagos asociados
 	function TienePago()
@@ -1577,7 +1589,7 @@ class Cobro extends Objeto
 				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCarta($parser_carta,'DATOS_CLIENTE',$lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 			break;
 			
-			case 'FECHA':
+			case 'FECHA': 
 				/* DICTIONARIO
 				 * %fecha_especial%  			---  CIUDAD, DIA de MES de AÑO
 				 * %fecha%					 			---  MES DIA, AÑO
@@ -1798,6 +1810,15 @@ class Cobro extends Objeto
 					$html2 = str_replace('%detalle_mb_ny%', __('%detalle_mb_ny%'), $html2);
 					$html2 = str_replace('%detalle_mb_boleta%', __('%detalle_mb_boleta%'), $html2);
 				}
+                                
+                                $this->LoadGlosaAsuntos();
+                                $lista_asuntos = "<ul>";
+                                foreach($this->glosa_asuntos as $key => $asunto) {
+                                    $lista_asuntos .= "<li>".$asunto."</li>";
+                                }
+                                $lista_asuntos .= "</ul>";
+                                $html2 = str_replace('%lista_asuntos%', $lista_asuntos, $html2);
+                                
 				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
 				$html2 = str_replace('%cuenta_mb_ny%', __('%cuenta_mb_ny%'), $html2);
@@ -6230,14 +6251,16 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCarta2($parser_carta,'DATOS_CLIENTE',$lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 			break;
 
-			case 'FECHA':
+			case 'FECHA': 
 				#formato especial
 				if( method_exists('Conf','GetConf') )
-				{
-					if( $lang == 'es' )
-						$fecha_lang = Conf::GetConf($this->sesion,'CiudadEstudio').', '.ucfirst(Utiles::sql3fecha(date('Y-m-d'),'%e de %B de %Y'));
-					else
-						$fecha_lang = Conf::GetConf($this->sesion,'CiudadEstudio').' ('.Conf::GetConf($this->sesion,'PaisEstudio').'), '.ucfirst(Utiles::sql3fecha(date('Y-m-d'),'%e de %B de %Y'));
+				{ 
+					if( $lang == 'es' ) {
+                                            $fecha_lang = Conf::GetConf($this->sesion,'CiudadEstudio').', '.ucfirst(Utiles::sql3fecha(date('Y-m-d'),'%e de %B de %Y')); 
+                                        }
+					else { 
+                                            $fecha_lang = Conf::GetConf($this->sesion,'CiudadEstudio').' ('.Conf::GetConf($this->sesion,'PaisEstudio').'), '.ucfirst(Utiles::sql3fecha(date('Y-m-d'),'%e de %B de %Y'));
+                                        }
 				}
 				else
 				{
@@ -6246,7 +6269,6 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					else
 						$fecha_lang = 'Santiago (Chile), '.date('F d, Y');
 				}
-				
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 
 				#formato normal
@@ -6411,6 +6433,15 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$html2 = str_replace('%detalle_mb_ny%', __('%detalle_mb_ny%'), $html2);
 					$html2 = str_replace('%detalle_mb_boleta%', __('%detalle_mb_boleta%'), $html2);
 				}
+                                
+                                $this->LoadGlosaAsuntos();
+                                $lista_asuntos = "<ul>";
+                                foreach($this->glosa_asuntos as $key => $asunto) {
+                                    $lista_asuntos .= "<li>".$asunto."</li>";
+                                }
+                                $lista_asuntos .= "</ul>";
+                                $html2 = str_replace('%lista_asuntos%', $lista_asuntos, $html2);
+                                
 				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
 				$html2 = str_replace('%cuenta_mb_ny%', __('%cuenta_mb_ny%'), $html2);
@@ -6497,7 +6528,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				//$total_gastos += $saldo_moneda_total;
 			 	$total_gastos=$this->fields['monto_gastos'];
 			}
-			
+		
 			/*
 			 * INICIO - CARTA GASTOS DE VFCabogados, 2011-03-04 
 			 */
@@ -6506,13 +6537,19 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo']. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo']. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-			}
+                                $html2 = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'].number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).',-', $html2);
+                                $html2 = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'].number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).',-', $html2);
+                        }
 			else
 			{	
 				$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'].' '. number_format(abs($x_cobro_gastos['subtotal_gastos_solo_provision']),$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['subtotal_gastos_sin_provision'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
 				$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'].' '. number_format($x_cobro_gastos['gasto_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).'.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-			}/*
+                                $html2 = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'].' '.number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).',-', $html2);
+                                $html2 = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'].' '.number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'],$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).',-', $html2);
+                    	}
+                        
+                        /*
 			 * FIN - CARTA GASTOS DE VFCabogados, 2011-03-04 
 			 */	
 

@@ -21,10 +21,20 @@
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 
-	$sesion = new Sesion(array('COB'));
-	$pagina = new Pagina($sesion);
-	$id_usuario = $sesion->usuario->fields['id_usuario'];
-	
+	//La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
+	//(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
+	//se repliquen en el ingreso de datos via webservice.
+	if($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario,$password))
+	{
+		$sesion = new Sesion();
+		$factura = new Factura($sesion);
+	}
+	else //ELSE (no es WEBSERVICE)
+	{
+		$sesion = new Sesion(array('COB'));
+		$pagina = new Pagina($sesion);
+		$id_usuario = $sesion->usuario->fields['id_usuario'];
+	}
 	$documento = new Documento($sesion);
 	$cobro = new Cobro($sesion);
 	if($id_cobro){
@@ -33,16 +43,23 @@
 	}
 
 	$pago = new FacturaPago($sesion);
-	if(isset($_GET['id_factura_pago'])) { $id_factura_pago = $_GET['id_factura_pago'];}
-	if(!empty($id_factura_pago) && $opcion != "guardar")
+	//Desde el webservice viene un id_pago (id_contabilidad).
+	if($desde_webservice)
 	{
-		$pago->Load($id_factura_pago);
-		$id_moneda = $pago->fields['id_moneda'];
-		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
-		$codigo_cliente = $pago->fields['codigo_cliente'];
+		$pago->LoadByIdContabilidad($id_contabilidad);
 	}
-        
+	else
+	{
+		if(isset($_GET['id_factura_pago'])) { $id_factura_pago = $_GET['id_factura_pago'];}
+		if(!empty($id_factura_pago))
+		{
+			$pago->Load($id_factura_pago);
+			$id_moneda = $pago->fields['id_moneda'];
+			$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
+			$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
+			$codigo_cliente = $pago->fields['codigo_cliente'];
+		}
+	}
 	$moneda_pago = new Moneda($sesion);
 	$moneda_pago->Load($id_moneda);
 	
@@ -57,11 +74,24 @@
 
 	if( $opcion == 'guardar' )
 	{
-		if( !is_numeric($monto) )								$pagina->AddError(__('El monto ingresado en el campo "Monto" no es válido.'));
-		if( !is_numeric($monto_moneda_cobro) && $monto_moneda_cobro != '' )	
-			$pagina->AddError(__('El monto ingresado en el campo "Equivalente a" no es válido.'));
+		if($desde_webservice)
+		{
+			$errores = array();
+			if( !is_numeric($monto) )
+				$errores[] = __('El monto ingresado en el campo "Monto" no es válido, debe ingresar el monto del documento.');
+			if( !is_numeric($monto_moneda_cobro) )	
+				$errores[] = __('El monto ingresado en el campo "Monto pagado" no es válido, debe ingresar el monto descontado del saldo.');		
+		}
+		else
+		{
+				if( !is_numeric($monto) )
+					$pagina->AddError(__('El monto ingresado en el campo "Monto" no es válido.'));
+				if( !is_numeric($monto_moneda_cobro) && $monto_moneda_cobro != '' )	
+					$pagina->AddError(__('El monto ingresado en el campo "Equivalente a" no es válido.'));
 
-		$errores = $pagina->GetErrors();
+				$errores = $pagina->GetErrors();
+		}
+
 		$guardar_datos = true;
 		if (!empty($errores))
 		{
@@ -73,6 +103,10 @@
 			if(!empty($id_factura_pago))
 			{
 				$pago->Edit('id_factura_pago',$id_factura_pago);
+			}
+			if($desde_webservice)
+			{
+				$pago->Edit('id_contabilidad',$id_contabilidad);
 			}
 			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
 			//$pago->Edit('codigo_cliente', $codigo_cliente);
@@ -90,29 +124,52 @@
 			$pago->Edit('pago_retencion', $pago_retencion);
 			$pago->Edit('id_concepto', $id_concepto);
 
-			if($pago->Write()){
+			if($pago->Write())
+			{
 				$cta_cte_fact = new CtaCteFact($sesion);
 				$neteos = array();
-				foreach($_POST as $nombre_variable => $valor){
-					if(strpos($nombre_variable, 'saldo_') === 0){
-						$saldo_fact = explode('_', $nombre_variable);
-						$factura = $saldo_fact[1];
-						$saldo = $valor;
-						$neteos[] = array($factura, $saldo);
-					}
+
+				if($desde_webservice)
+				{
+					$neteos[] = array($id_factura,$monto_moneda_cobro);
 				}
-			$documento->LoadByCobro($id_cobro);
-			$id_factura_pago = $pago->fields['id_factura_pago'];
-			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
-			$monto_pago -= $monto;
+				else foreach($_POST as $nombre_variable => $valor)
+					{
+						if(strpos($nombre_variable, 'saldo_') === 0)
+						{
+							$saldo_fact = explode('_', $nombre_variable);
+							$factura = $saldo_fact[1];
+							$saldo = $valor;
+							$neteos[] = array($factura, $saldo);
+						}
+					}
+				$documento->LoadByCobro($id_cobro);
+				$id_factura_pago = $pago->fields['id_factura_pago'];
+				$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
+				$monto_pago -= $monto;
 
-			?>
-			<script type="text/javascript">
-				window.opener.Refrescar();
-			</script>
-			<?
+				//Al llamar desde Webservice, IngresarPago utilizó una $pagina falsa. Se puede ver el contenido mediante: 
+				//echo $pagina->Output();
+				if($desde_webservice)
+				{
+					if($pago->fields['id_factura_pago'])
+						$resultado =  array('id_pago'=>$pago->fields['id_factura_pago'],'resultado_pago'=>'El '.__('pago').' se ha guardado exitosamente.');
+					else
+						$resultado =  array('id_pago'=>$pago->fields['id_factura_pago'],'resultado_pago'=>'Error al guardar el documento de '.__('pago').': '.$pagina->Output());
+					return 'DONE';
+				}//Si vengo del webservice, no continua.
 
+				?>
+				<script type="text/javascript">
+					window.opener.Refrescar();
+				</script>
+				<?
 			}
+		}
+		else
+		{	
+			$resultado =  array('id_pago'=>'-','resultado_pago'=>'Error al guardar el '.__('pago').'.');
+			return 'ERROR';
 		}
 	}
 

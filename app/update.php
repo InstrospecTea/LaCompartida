@@ -6257,7 +6257,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
                         
-                        case 4.90:
+            case 4.90:
 				$query = array();
 				$query[] = "CREATE TABLE  `prm_tipo_pago` (
                                              `codigo` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
@@ -6304,7 +6304,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			case 4.93:
 				$query = array();
 				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
-                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `id` =264 LIMIT 1 ;";
+                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
 				
                                 foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
@@ -6328,6 +6328,38 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					}
 				}
 			break;
+
+			case 4.95:
+				$query = array();
+				$query[] = "CREATE TABLE  `log_contabilidad` (
+	 `id_log_contabilidad` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	 `id_cobro` INT( 11 ) NOT NULL ,
+	 `timestamp` INT( 11 ) NOT NULL ,
+	INDEX (  `timestamp` )
+	) ENGINE = INNODB COMMENT =  'log de envio de cobros a contabilidad';";
+				$query[] = "ALTER TABLE  `cobro` ADD  `nota_venta_contabilidad` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `fecha_contabilidad` ;";
+
+				$query[] = "ALTER TABLE  `usuario` ADD  `centro_de_costo` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `username` ;";
+
+				$query[] = "UPDATE usuario SET centro_de_costo = username;";
+
+				$query[] = "ALTER TABLE  `factura_pago` ADD  `id_contabilidad` INT( 11 ) NULL DEFAULT NULL AFTER  `id_factura_pago` ;";
+
+				foreach($query as $q)
+					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
+			break;
+			
+		
+			case 4.96:
+				$query = array();
+				$query[] = "";
+				
+				foreach($query as $q) {
+					if(!($res = mysql_query($q,$dbh))) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+				break;
 	}
 }
 
@@ -6590,7 +6622,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.91;
 	$VERSIONES[$num++] = 4.92;
 	$VERSIONES[$num++] = 4.93;
-        $VERSIONES[$num++] = 4.94;
+    $VERSIONES[$num++] = 4.94;
+	$VERSIONES[$num++] = 4.95;
+	$VERSIONES[$num++] = 4.96;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

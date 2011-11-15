@@ -36,7 +36,9 @@
 	$configuracion = array();
 	$configuracion['desactivar_clave_rtf']=$desactivar_clave_rtf;
 	
-	$doc = new DocGenerator($html,$cssData,'LETTER',false,'PORTRAIT','1.5','1.5','2.0','1.5','EMITIDO','', $configuracion);
+	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesFactura( $sesion, $factura->fields['id_documento_legal']);
+	
+	$doc = new DocGenerator($html,$cssData,'LETTER',false,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,'EMITIDO','', $configuracion,$docm_header, $docm_footer);
 	$valor_unico=substr(time(),-3);
 	$doc->output('doc_tributario_'.$id_factura_grabada.'_'.$valor_unico.'.doc', '', 'factura');
 	exit;
