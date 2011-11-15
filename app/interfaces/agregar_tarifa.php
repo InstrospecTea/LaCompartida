@@ -312,7 +312,7 @@ function CrearTarifa( from, id )
 	list($id_categoria_usuario_tarifa,$id_tarifa,$tarifa,$id_moneda) = mysql_fetch_array($resp_categoria);
 
 	########## CATEGORIA TARIFA #########
-	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria
+	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido 
 												FROM prm_categoria_usuario
 												ORDER BY glosa_categoria,id_categoria_usuario";
 	$resp_categoria2 = mysql_query($query_categoria, $sesion->dbh) or Utiles::errorSQL($query_categoria,__FILE__,__LINE__,$sesion->dbh);
