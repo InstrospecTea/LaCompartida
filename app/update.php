@@ -6352,7 +6352,12 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		
 			case 4.96:
 				$query = array();
-				$query[] = "";
+				$query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
+								ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2.0',
+								ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2.0',
+								ADD  `margen_derecho` DOUBLE NOT NULL DEFAULT  '2.0',
+								ADD  `margen_encabezado` DOUBLE NOT NULL DEFAULT  '1.25',
+								ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '1.25';";
 				
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
