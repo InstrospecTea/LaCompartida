@@ -1784,6 +1784,7 @@ class Cobro extends Objeto
 				 * %monto_con_gasto%'        --- Monto total
 				 * %monto_original%'         --- Monto honorarios en la moneda del tarifa
 			   * %monto_total_sin_iva%     --- Monto subtotal
+			   * %porcentaje_impuesto%     --- Numero de Porcentaje (incluye simbolo %)
 			   * %equivalente_a_baz%       --- extensión frase de carte en el caso de que se hace una transfería
 			   * %simbolo_moneda%          --- simbolo de id_moneda del cobro 
 			   * %simbolo_moneda_total%    --- simbolo de opc_moneda_total del cobro 
@@ -1833,6 +1834,10 @@ class Cobro extends Objeto
 				else
 					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo%'), $html2);
 
+				
+				/* valor porcentaje de impuesto */
+				$html2 = str_replace('%porcentaje_impuesto%', (int)($this->fields['porcentaje_impuesto']) . '%', $html2 );
+						
 				/* Datos detalle */
 				if( method_exists('Conf','GetConf') ) 
 				{
@@ -6501,6 +6506,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$html2 = str_replace('%estimado%',__('Estimada'),$html2);
 				else
 					$html2 = str_replace('%estimado%',__('Estimado'),$html2);
+				
+				
+				/* valor porcentaje de impuesto */
+				$html2 = str_replace('%porcentaje_impuesto%', (int)($this->fields['porcentaje_impuesto']) . '%', $html2 );
 
 				/*
 					Total Gastos
