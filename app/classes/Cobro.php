@@ -3647,6 +3647,14 @@ class Cobro extends Objeto
 				
 				/* Lo anchores con la extension _bmahj usa Bofill Mir y lo que hace es que llama a las columnas 
 					 en la lista de trabajos igual como a las columnas en el resumen profesional */
+			
+			if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+			{
+				$html = str_replace( '%td_retainer%', '<td width="80" align="center">%duracion_retainer%</td>', $html);
+				$html = str_replace( '%duracion_retainer%', __('Duración Retainer'),$html);
+			} else {
+				$html = str_replace('%td_retainer%', '', $html);
+			}
 
 			if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 			{
@@ -3854,6 +3862,7 @@ class Cobro extends Objeto
 
 			$asunto->fields['trabajos_total_duracion'] = 0;
 			$asunto->fields['trabajos_total_valor'] = 0;
+			$asunto->fields['trabajos_total_duracion_retainer'] = 0;
 
 			for($i=0;$i<$lista_trabajos->num;$i++)
 			{
@@ -3863,6 +3872,7 @@ class Cobro extends Objeto
 				list($h_retainer,$m_retainer,$s_retainer) = split(":",$trabajo->fields['duracion_retainer']);
 				$asunto->fields['trabajos_total_duracion'] += $h*60 + $m + $s/60;
 				$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
+				$asunto->fields['trabajos_total_duracion_retainer'] += $h_retainer*60 + $m_retainer + $s_retainer/60;
 				$categoria_duracion_horas+=round($h);
 				$categoria_duracion_minutos+=round($m);
 				$categoria_valor+=$trabajo->fields['monto_cobrado'];
@@ -3966,6 +3976,14 @@ class Cobro extends Objeto
 					$ImprimirDuracionTrabajada = Conf::ImprimirDuracionTrabajada();
 				else
 					$ImprimirDuracionTrabajada = false;
+				
+				if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+				{
+					$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
+					$row = str_replace('%duracion_retainer%', $h_retainer.':'.sprintf("%02d", $m_retainer), $row);
+				} else {
+					$row = str_replace('%td_retainer%', '', $row);
+				}
 
 				if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 				{
@@ -4472,6 +4490,7 @@ class Cobro extends Objeto
 				
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion'])/60);
 				$minutos_cobrables = sprintf("%02d",$asunto->fields['trabajos_total_duracion']%60);
+				$duracion_retainer_total = ($asunto->fields['trabajos_total_duracion_retainer'])/60;
 				$minutos_decimal=$minutos_cobrables/60;
 				$duracion_decimal=$horas_cobrables+$minutos_decimal;
 
@@ -4493,6 +4512,14 @@ class Cobro extends Objeto
 					
 				$minutos_decimal_descontadas = $minutos_descontadas/60;
 				$duracion_decimal_descontada = $horas_descontadas + $minutos_decimal_descontadas;
+			
+			if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+			{
+				$html = str_replace( '%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
+				$html = str_replace( '%duracion_retainer%', Utiles::Decimal2GlosaHora($duracion_retainer_total), $html);
+			} else {
+				$html = str_replace( '%td_retainer%', '', $html);
+			}
 
 			if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 			{
@@ -8455,6 +8482,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 				/* Lo anchores con la extension _bmahj usa Bofill Mir y lo que hace es que llama a las columnas
 					 en la lista de trabajos igual como a las columnas en el resumen profesional */
+			
+			if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+			{
+				$html = str_replace( '%td_retainer%', '<td width="80" align="center">%duracion_retainer%</td>', $html);
+				$html = str_replace( '%duracion_retainer%', __('Duración Retainer'),$html);
+			} else {
+				$html = str_replace('%td_retainer%', '', $html);
+			}
 
 			if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 			{
@@ -8665,6 +8700,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 			$asunto->fields['trabajos_total_duracion'] = 0;
 			$asunto->fields['trabajos_total_valor'] = 0;
+			$asunto->fields['trabajos_total_duracion_retainer'] = 0;
 
 			for($i=0;$i<$lista_trabajos->num;$i++)
 			{
@@ -8674,6 +8710,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				list($h_retainer,$m_retainer,$s_retainer) = split(":",$trabajo->fields['duracion_retainer']);
 				$asunto->fields['trabajos_total_duracion'] += $h*60 + $m + $s/60;
 				$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
+				$asunto->fields['trabajos_total_duracion_retainer'] += $h_retainer*60 + $m_retainer + $s_retainer/60;
 				$categoria_duracion_horas+=round($h);
 				$categoria_duracion_minutos+=round($m);
 				$categoria_valor+=$trabajo->fields['monto_cobrado'];
@@ -8740,6 +8777,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$ImprimirDuracionTrabajada = Conf::ImprimirDuracionTrabajada();
 				else
 					$ImprimirDuracionTrabajada = false;
+				
+				if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+				{
+					$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
+					$row = str_replace('%duracion_retainer%', $h_retainer.':'.sprintf("%02d", $m_retainer), $row);
+				} else {
+					$row = str_replace('%td_retainer%', '', $row);
+				}
 
 				if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 				{
@@ -9235,6 +9280,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				
 				$duracion_trabajada_total = ($asunto->fields['trabajos_total_duracion_trabajada'])/60;
 				$duracion_cobrada_total = ($asunto->fields['trabajos_total_duracion'])/60;
+				$duracion_retainer_total = ($asunto->fields['trabajos_total_duracion_retainer'])/60;
 				$duracion_descontada_total = $duracion_trabajada_total - $duracion_cobrada_total;
 				
 				if( $this->fields['opc_ver_detalles_por_hora_categoria'] == 1 )
@@ -9252,6 +9298,15 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else
 					$html = str_replace('%td_importe%', '', $html);
 				$html = str_replace('%importe%',number_format($asunto->fields['trabajos_total_valor'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+				
+			if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
+			{
+				$html = str_replace( '%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
+				$html = str_replace( '%duracion_retainer%', Utiles::Decimal2GlosaHora($duracion_retainer_total), $html);
+			} else {
+				$html = str_replace( '%td_retainer%', '', $html);
+			}
+			
 			if( $this->fields['forma_cobro'] == 'FLAT FEE' )
 			{
 				$html = str_replace('%duracion_decimal_trabajada%','',$html);
