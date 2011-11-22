@@ -6365,6 +6365,17 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					}
 				}
 				break;
+			case 4.97:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+					VALUES ( 'FacturaPagoSubtotalIva', '1', 'Monto Factura se divide en 3 (valor de venta, igv, monto de la factura)', 'boolean', '6', '-1');";
+				
+				foreach($query as $q) {
+					if(!($res = mysql_query($q,$dbh))) {
+						throw new Exception($q."---".mysql_error());
+					}
+				}
+				break;
 	}
 }
 
@@ -6630,6 +6641,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
     $VERSIONES[$num++] = 4.94;
 	$VERSIONES[$num++] = 4.95;
 	$VERSIONES[$num++] = 4.96;
+	$VERSIONES[$num++] = 4.97;
 	
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

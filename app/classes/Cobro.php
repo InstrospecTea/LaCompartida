@@ -8278,7 +8278,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$row = str_replace('%valor_telefono%',empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 
 				if( $cont_trabajos > 0 )
-					{
+					{ 
 						if ($this->fields["opc_ver_detalles_por_hora"] == 1)
 						{
 							$row = str_replace('%espacio_trabajo%','<br>',$row);
@@ -8296,7 +8296,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							$row = str_replace('%TRABAJOS_TOTAL%','',$row);
 						}
 						$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser,'DETALLE_PROFESIONAL',$parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto),$row);
-					}
+				        }
 				else
 					{
 						$row = str_replace('%espacio_trabajo%','',$row);
@@ -8322,7 +8322,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						$row = str_replace('%TRAMITES_ENCABEZADO%','',$row);
 						$row = str_replace('%TRAMITES_FILAS%','',$row);
 						$row = str_replace('%TRAMITES_TOTAL%','',$row);
-					}
+					} 
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'ParafoGastosSoloSiHayGastos') ) || ( method_exists('Conf','ParafoGastosSoloSiHayGastos') && Conf::ParafoGastosSoloSiHayGastos() ) )
 					{
 						if( $cont_gastos > 0 )
@@ -8336,8 +8336,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				#especial mb
 				$row = str_replace('%codigo_asunto_mb%',__('Código M&B'),$row);
 
-				if( $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 )
-					$html .= $row;
+				if( $cont_trabajos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 ) {
+                                    $html .= $row;
+                                }
 			}
 			break;
 
@@ -9455,7 +9456,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%hrs_mins_descontadas%',$columna_hrs_descontadas_categoria ? __('Hrs.:Mins. Descontadas') : '', $html);
 			// El resto se llena igual que PROFESIONAL_ENCABEZADO, pero tiene otra estructura, no debe tener 'break;'.
 		
-		case 'PROFESIONAL_ENCABEZADO':
+		case 'PROFESIONAL_ENCABEZADO': 
 			global $columna_hrs_trabajadas;
 			global $columna_hrs_retainer;
 			global $columna_hrs_descontadas;
@@ -9777,8 +9778,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 		case 'PROFESIONAL_FILAS':
 			$row_tmpl = $html;
-			$html = '';
-			
+			$html = ''; 
 			if( is_array($x_detalle_profesional[$asunto->fields['codigo_asunto']]) )
 			{
 				$retainer = false;
@@ -9814,9 +9814,10 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$totales['valor_total']						= 0;
 				
 				foreach($x_detalle_profesional[$asunto->fields['codigo_asunto']] as $prof => $data)
-				{
+				{ 
 					// Para mostrar un resumen de horas de cada profesional al principio del documento.
-					$totales['valor'] += $data['valor_tarificada'];
+					$row = $row_tmpl;
+                                        $totales['valor'] += $data['valor_tarificada'];
 					//se pasan los minutos a horas:minutosecho '<h1>'.$data['duracion_descontada'].'</h1>';
 						$totales['tiempo_retainer'] 				+= 60*$data['duracion_retainer'];
 						$totales['tiempo_trabajado'] 				+= 60*$data['duracion_cobrada'];
@@ -10137,6 +10138,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%hh_retainer%', '', $html);
 			}
 			$html = str_replace('%hh_demo%', $horas_cobrables.':'.$minutos_cobrables, $html);
+                        $html = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $html);
 			if( $this->fields['opc_ver_profesional_importe'] == 1 ) {
 				$html = str_replace('%td_importe%','<td align="right">%total_horas_demo%</td>', $html);
 				$html = str_replace('%total_horas_demo%', number_format($totales['valor_total'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);

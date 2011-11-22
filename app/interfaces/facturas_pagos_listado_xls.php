@@ -186,6 +186,8 @@ $query .= "			, cliente.glosa_cliente
 					, b.nombre as banco
 					, cta.numero as cuenta
 					, DATE_FORMAT(factura.fecha, '$formato_fechas') as fecha_factura
+					, ( factura.honorarios + factura.subtotal_gastos + factura.subtotal_gastos_sin_impuesto ) as subtotal_factura
+					, factura.iva
 					, factura.total
 					, fp.monto AS monto_aporte
 					, -1 * ccfm2.saldo as saldo_factura
@@ -307,8 +309,15 @@ $col_num = count($lista_suntos_liquidar->Get()->fields);
 $arr_col = array();
 $col = 0;
 for ($i = 0; $i < $col_num; ++$i) {
-	// ocultar celdas con PHP
-	if (in_array($col_name[$i], array('simbolo', 'cifras_decimales', 'id_moneda', 'id_factura', 'id_moneda_factura_pago', 'mostrar_diferencia_razon_social'))) {
+	// ocultar celdas con PHP	
+	$cols_para_ocultar = array('simbolo', 'cifras_decimales', 'id_moneda', 'id_factura', 'id_moneda_factura_pago', 'mostrar_diferencia_razon_social');
+	if( !UtilesApp::GetConf($Sesion, 'FacturaPagoSubtotalIva') )
+	{
+		$cols_para_ocultar[] = "subtotal_factura";
+		$cols_para_ocultar[] = "iva";
+	}
+	
+	if (in_array($col_name[$i], $cols_para_ocultar )) {
 		$arr_col[$col_name[$i]]['hidden'] = 'SI';
 	} else {
 		$arr_col[$col_name[$i]]['celda'] = $col++;
@@ -330,7 +339,16 @@ for ($i = 0; $i < $col_num; ++$i) {
 	}
 
 	// ancho celdas ocultos
-	if (in_array($col_name[$i], array('id_moneda_factura_pago', 'descripcion', 'encargado_comercial', 'id_cobro', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'iva', 'honorarios'))) {
+	$para_ocultar = array('id_moneda_factura_pago', 'descripcion', 'encargado_comercial', 'id_cobro', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'honorarios');
+	
+	//FacturaPagoSubtotalIva
+	if( !UtilesApp::GetConf($Sesion, 'FacturaPagoSubtotalIva') )
+	{
+		$para_ocultar[] = "subtotal_factura";
+		$para_ocultar[] = "iva";
+	}
+	
+	if (in_array($col_name[$i], $para_ocultar)) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0, 0, 1);
 	}
 
@@ -362,6 +380,8 @@ for ($i = 0; $i < $col_num; ++$i) {
 		case 'id_cobro':				$titulo_columna = __('Cobro'); break;
 		case 'concepto':				$titulo_columna = __('Concepto Pago'); break;
 		case 'descripcion_pago':		$titulo_columna = __('Descripción Pago'); break;
+		case 'subtotal_factura':		$titulo_columna = __('Valor de Venta'); break;
+		case 'iva':						$titulo_columna = __('IVA'); break;
 		case 'total':					$titulo_columna = __('Monto Factura'); break;
 		case 'monto_aporte':			$titulo_columna = __('Monto Pago'); break;
 		case 'saldo_factura':			$titulo_columna = __('Saldo Factura'); break;
@@ -417,7 +437,7 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 
 	for ($i = 0; $i < $col_num; $i++) {
 		if ($arr_col[$col_name[$i]]['hidden'] != 'SI') {
-			if ($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'iva') {
+			if ($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'subtotal_factura' || $col_name[$i] == 'iva') {
 				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
 			} else if ($col_name[$i] == 'saldo' ) {
 				$saldo = $proc->fields[$col_name[$i]] * (-1);
