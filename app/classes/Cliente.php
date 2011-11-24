@@ -215,6 +215,15 @@ class Cliente extends Objeto
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		
+                $query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+		if($count > 0)
+		{
+			$this->error = __('No se puede eliminar un').' '.__('cliente').' '.__('que tiene gastos asociados');
+			return false;
+		}
+                
 		$query = "SELECT COUNT(*) FROM documento WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($count_doc) = mysql_fetch_array($resp);
