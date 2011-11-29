@@ -7329,6 +7329,12 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$asuntos .= ', '.$asunto_extra->fields['glosa_asunto'];
 					$i++;
 				}
+                                
+                        $query = "SELECT glosa_cliente FROM cliente 
++									WHERE codigo_cliente=".$contrato->fields['codigo_cliente'];
++			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
++			list($glosa_cliente) = mysql_fetch_array($resp);
+
 			$html = str_replace('%materia%', __('Materia'),$html);
 			$html = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'],$html);
 			$html = str_replace('%glosa_asuntos_sin_codigo%', $asuntos, $html);
@@ -7339,6 +7345,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%a_min%',empty($contrato->fields['contacto']) ? '' : __('a'),$html);
 			$html = str_replace('%cliente%', __('Cliente'), $html);
 			$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
+                        $html = str_replace('%nombre_cliente%', $glosa_cliente, $html); #nombre real del cliente$html = str_replace('%nombre_cliente%', $glosa_cliente, $html); #nombre real del cliente
 			$html = str_replace('%direccion%', __('Dirección'), $html);
 			$html = str_replace('%valor_direccion%', $contrato->fields['factura_direccion'], $html);
 			$html = str_replace('%direccion_carta%',nl2br($contrato->fields['direccion_contacto']),$html);
