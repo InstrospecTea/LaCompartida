@@ -7330,10 +7330,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$i++;
 				}
                                 
-                        $query = "SELECT glosa_cliente FROM cliente 
-+									WHERE codigo_cliente=".$contrato->fields['codigo_cliente'];
-+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-+			list($glosa_cliente) = mysql_fetch_array($resp);
+            $query = "SELECT glosa_cliente FROM cliente WHERE codigo_cliente='".$contrato->fields['codigo_cliente']."'";
+			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			list($glosa_cliente) = mysql_fetch_array($resp);
 
 			$html = str_replace('%materia%', __('Materia'),$html);
 			$html = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'],$html);
