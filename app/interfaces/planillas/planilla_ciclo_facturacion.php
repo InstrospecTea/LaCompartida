@@ -87,9 +87,10 @@ if ($xls) {
 	$ws1->setZoom(75);
 
 	$filas += 1;
-	$ws1->mergeCells($filas, 1, $filas, 2);
-	$ws1->write($filas, 1, __('Reporte ciclo de cobranza'), $formato_encabezado);
+	$ws1->mergeCells($filas, 1, $filas, 3);
+	$ws1->write($filas, 1, __('Reporte ciclo de cobranza').' '.UtilesApp::GetConf($sesion,'PdfLinea1'), $formato_encabezado);
 	$ws1->write($filas, 2, '', $formato_encabezado);
+        $ws1->write($filas, 3, '', $formato_encabezado);
 
 	$filas +=2;
 	$ws1->mergeCells($filas, 1, $filas, 4);
@@ -103,6 +104,8 @@ if ($xls) {
 
 		$ws1->write($filas, 1, __('Periodo desde:'), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_desde . " hasta " . $fecha_hasta, $formato_encabezado2);
+                $ws1->write($filas, 3, '', $formato_encabezado2);
+                $ws1->write($filas, 4, '', $formato_encabezado2);
 	} elseif (isset($_POST['fecha1'])) {
 		$where .= " AND f.fecha >= '{$_POST['fecha1']}' ";
 
@@ -111,6 +114,8 @@ if ($xls) {
 
 		$ws1->write($filas, 1, __('Periodo desde:'), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_desde, $formato_encabezado2);
+                $ws1->write($filas, 3, '', $formato_encabezado2);
+                $ws1->write($filas, 4, '', $formato_encabezado2);
 	} elseif (isset($_POST['fecha2'])) {
 
 		$where .= " AND f.fecha <= '{$_POST['fecha2']}' ";
@@ -120,6 +125,8 @@ if ($xls) {
 
 		$ws1->write($filas, 1, __('Periodo hasta:'), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_hasta, $formato_encabezado2);
+                $ws1->write($filas, 3, '', $formato_encabezado2);
+                $ws1->write($filas, 4, '', $formato_encabezado2);
 	}
 
 

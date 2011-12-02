@@ -708,7 +708,7 @@ class Factura extends Objeto {
 
 				if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($this->sesion, 'DesgloseFactura') == 'con_desglose'))) {
 					if ($mostrar_honorarios) {
-						$html2 = str_replace('%honorarios%', number_format($honorarios_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+						$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
 						$html2 = str_replace('%honorarios%', '', $html2);
 					}

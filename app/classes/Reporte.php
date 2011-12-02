@@ -777,9 +777,9 @@ class Reporte
 		}
 		if(!empty($this->rango))
 		{
-			$s .= " AND ( ".$campo_fecha." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ";
+			$s .= " AND ( ".$campo_fecha." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])." 23:59:59' ";
 			if($campo_fecha_2)
-				$s.= " OR ( (".$campo_fecha." IS NULL OR ".$campo_fecha." = '00-00-0000') AND ".$campo_fecha_2." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])."' ) ";
+				$s.= " OR ( (".$campo_fecha." IS NULL OR ".$campo_fecha." = '00-00-0000') AND ".$campo_fecha_2." BETWEEN '".Utiles::fecha2sql($this->rango['fecha_ini'])."' AND '".Utiles::fecha2sql($this->rango['fecha_fin'])." 23:59:59' ) ";
 			$s.=') ';
 		}
 		/* Si se filtra el periodo por cobro, los trabajos sin cobro emitido (y posteriores) no se ven */

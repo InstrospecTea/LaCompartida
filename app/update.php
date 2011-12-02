@@ -6386,7 +6386,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
-
+					}
+				}
 
 		case 5:
 			$query = array();
@@ -6752,11 +6753,62 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 			break;
 
-		case 5.20:
+		case 5.20 :
 			$query = array();
 			$query[] = "UPDATE  `configuracion` SET  `valor_opcion` =  '0',
 								`comentario` =  'No mostrar honorarios en documento de la factura si la cantidad es cero, usar id de tipo de documento legal separados por ;;',
 								`valores_posibles` =  'string' WHERE  `glosa_opcion` = 'EsconderValoresFacturaEnCero';";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
+			
+		case 5.21 :
+			$query = array();
+			$query[] = "ALTER TABLE  `cobro` ADD  `esc1_tiempo` DOUBLE NULL ,
+							ADD  `esc1_id_tarifa` INT NULL ,
+							ADD  `esc1_monto` DOUBLE NULL ,
+							ADD  `esc1_id_moneda` INT NULL ,
+							ADD  `esc1_descuento` DOUBLE NULL ,
+							ADD  `esc2_tiempo` DOUBLE NULL ,
+							ADD  `esc2_id_tarifa` INT NULL ,
+							ADD  `esc2_monto` DOUBLE NULL ,
+							ADD  `esc2_id_moneda` INT NULL ,
+							ADD  `esc2_descuento` DOUBLE NULL ,
+							ADD  `esc3_tiempo` DOUBLE NULL ,
+							ADD  `esc3_id_tarifa` INT NULL ,
+							ADD  `esc3_monto` DOUBLE NULL ,
+							ADD  `esc3_id_moneda` INT NULL ,
+							ADD  `esc3_descuento` DOUBLE NULL ,
+							ADD  `esc4_tiempo` DOUBLE NULL ,
+							ADD  `esc4_id_tarifa` INT NULL ,
+							ADD  `esc4_monto` DOUBLE NULL ,
+							ADD  `esc4_id_moneda` INT NULL ,
+							ADD  `esc4_descuento` DOUBLE NULL ;";
+			$query[] = "ALTER TABLE  `contrato` ADD  `esc1_tiempo` DOUBLE NULL ,
+							ADD  `esc1_id_tarifa` INT NULL ,
+							ADD  `esc1_monto` DOUBLE NULL ,
+							ADD  `esc1_id_moneda` INT NULL ,
+							ADD  `esc1_descuento` DOUBLE NULL ,
+							ADD  `esc2_tiempo` DOUBLE NULL ,
+							ADD  `esc2_id_tarifa` INT NULL ,
+							ADD  `esc2_monto` DOUBLE NULL ,
+							ADD  `esc2_id_moneda` INT NULL ,
+							ADD  `esc2_descuento` DOUBLE NULL ,
+							ADD  `esc3_tiempo` DOUBLE NULL ,
+							ADD  `esc3_id_tarifa` INT NULL ,
+							ADD  `esc3_monto` DOUBLE NULL ,
+							ADD  `esc3_id_moneda` INT NULL ,
+							ADD  `esc3_descuento` DOUBLE NULL ,
+							ADD  `esc4_tiempo` DOUBLE NULL ,
+							ADD  `esc4_id_tarifa` INT NULL ,
+							ADD  `esc4_monto` DOUBLE NULL ,
+							ADD  `esc4_id_moneda` INT NULL ,
+							ADD  `esc4_descuento` DOUBLE NULL ;";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
