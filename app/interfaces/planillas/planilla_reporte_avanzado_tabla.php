@@ -71,6 +71,7 @@
 		$reporte->setCampoFecha($campo_fecha);
 
 	$reporte->setVista($vista);
+	$reporte->setProporcionalidad($prop);
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->id_moneda = $id_moneda;
 

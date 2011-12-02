@@ -3,6 +3,9 @@ require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+require_once Conf::ServerDir().'/../app/classes/FacturaPago.php';
+require_once Conf::ServerDir().'/../app/classes/CtaCteFact.php';
 
 class NeteoDocumento extends Objeto
 {
@@ -135,7 +138,7 @@ class NeteoDocumento extends Objeto
 		return $out;
 	}
 
-	function Escribir($pago_honorarios, $pago_gastos, $cambio_pago, $cambio_cobro, $decimales_pago, $decimales_cobro, $id_cobro)
+	function Escribir($pago_honorarios, $pago_gastos, $cambio_pago, $cambio_cobro, $decimales_pago, $decimales_cobro, $id_cobro, $pagar_facturas=false)
 	{
 		$out = "";
 		$valor_pago_original = number_format($pago_honorarios + $pago_gastos,$decimales_pago,'.','');
@@ -245,6 +248,60 @@ class NeteoDocumento extends Objeto
 						$provision->Edit('incluir_en_cobro','NO');
 						$provision->Edit('fecha',date('Y-m-d H:i:s'));
 						$provision->Write();
+				}
+				
+				if(UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura') && !empty($documento_pago->fields['es_adelanto'])){
+					$factura_pago = new FacturaPago($this->sesion);
+					$factura_pago->LoadByNeteoAdelanto($this->fields[$this->campo_id]);
+					
+					if(!$factura_pago->Id()){
+						$query = "SELECT id_concepto FROM prm_factura_pago_concepto WHERE glosa = 'Adelanto'";
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+						list($id_concepto) = mysql_fetch_array($resp);
+						
+						$factura_pago->Edit('id_concepto', $id_concepto);
+						$factura_pago->Edit('fecha', date('Y-m-d H:i:s'));
+						$factura_pago->Edit('id_neteo_documento_adelanto', $this->fields['id_neteo_documento']);
+						
+						//copiar del adelanto
+						$factura_pago->Edit('codigo_cliente', $documento_pago->fields['codigo_cliente']);
+						$factura_pago->Edit('tipo_doc', $documento_pago->fields['tipo_doc']);
+						$factura_pago->Edit('nro_documento', $documento_pago->fields['numero_doc']);
+						$factura_pago->Edit('nro_cheque', $documento_pago->fields['numero_cheque']);
+						$factura_pago->Edit('descripcion', 'Adelanto #'.$documento_pago->fields['id_documento'].' - '. $documento_pago->fields['glosa_documento']);
+						$factura_pago->Edit('id_banco', $documento_pago->fields['id_banco']);
+						$factura_pago->Edit('id_cuenta', $documento_pago->fields['id_cuenta']);
+						$factura_pago->Edit('pago_retencion', $documento_pago->fields['pago_retencion']);
+					}
+					$factura_pago->Edit('id_moneda', $documento_pago->fields['id_moneda']);
+					$factura_pago->Edit('monto', (float)$this->fields['valor_pago_gastos']+(float)$this->fields['valor_pago_honorarios']);
+					$factura_pago->Edit('id_moneda_cobro', $documento_cobro->fields['id_moneda']);
+					$factura_pago->Edit('monto_moneda_cobro', (float)$this->fields['valor_cobro_gastos']+(float)$this->fields['valor_cobro_honorarios']);
+					
+					//agregarle columnas saldo_gastos y saldo_honorarios al factura_pago?
+					$nueva = !$factura_pago->Id();
+					
+					if($factura_pago->Write()){
+						$ccf = new CtaCteFact($this->sesion);
+						$neteos = array();
+						if($pagar_facturas && $nueva){
+							$query = "SELECT f.id_factura, ccfm.saldo
+								FROM cta_cte_fact_mvto AS ccfm
+								JOIN factura AS f ON f.id_factura = ccfm.id_factura
+								WHERE ccfm.saldo < 0 AND f.id_cobro = '$id_cobro' AND f.id_moneda = '".$documento_pago->fields['id_moneda']."'";
+							$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+							
+							$saldo_pago = (float)$this->fields['valor_pago_gastos']+(float)$this->fields['valor_pago_honorarios'];
+							while(list($id_factura, $saldo_factura) = mysql_fetch_array($resp)){
+								$monto = min($saldo_pago, -$saldo_factura);
+								$saldo_pago -= $monto;
+								$neteos[] = array($id_factura, $monto);
+								if($saldo_pago<=0) break;
+							}
+						}
+						$pagina_fake = ''; //la belleza del TT
+						$ccf->IngresarPago($factura_pago, $neteos, $id_cobro, $pagina_fake, '', '', empty($neteos));
+					}
 				}
 			}
 		}	

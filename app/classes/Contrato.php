@@ -412,7 +412,7 @@ class Contrato extends Objeto
 	}
 
 	function TotalMonto($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '' )
-	{
+	{ 
 		$where = '';
 		if( $this->fields['forma_cobro'] == 'RETAINER')
 		{
@@ -433,6 +433,21 @@ class Contrato extends Objeto
 				$where .= " AND t1.fecha <= '$fecha_fin' ";
 				$where_subquery .= " AND t1.fecha <= '$fecha_fin' ";
 			}
+                        
+                        if( !empty($codigo_asunto) ) {
+                            $cantidad_asuntos = $this->CantidadAsuntosPorFacturar( $fecha_ini, $fecha_fin );
+                            list($monto_hh_asunto,$x,$y) = $this->MontoHHTarifaSTD( false, $codigo_asunto, $fecha_ini, $fecha_fin );
+                            list($monto_hh_contrato,$X,$Y) = $this->MontoHHTarifaSTD( false, '', $fecha_ini, $fecha_fin );
+                            
+                            if( $monto_hh_contrato > 0 ) {
+                                $factor = number_format($monto_hh_asunto/$monto_hh_contrato,6,'.','');
+                            } else {
+                                $factor = number_format(1/$cantidad_asuntos,6,'.','');
+                            }
+                        }
+                        else {
+                            $factor = 1;
+                        } 
 
 			//subquery que se repite como mil veces
 			$subquery = " ( ( SELECT SUM( TIME_TO_SEC( t2.duracion_cobrada ) / 3600 )
@@ -450,9 +465,9 @@ class Contrato extends Objeto
 								AND ( t2.fecha < t1.fecha OR ( t2.fecha = t1.fecha AND t2.id_trabajo <= t1.id_trabajo ) )
 								AND t2.cobrable = 1 
 								AND t2.id_tramite = 0 
-							GROUP BY a2.id_contrato ) - c1.retainer_horas ) ";
+							GROUP BY a2.id_contrato ) - c1.retainer_horas * $factor ) ";
 
-			$query = "SELECT c1.monto * ( pm2.tipo_cambio / pm1.tipo_cambio ) + SUM( ut1.tarifa *
+			$query = "SELECT c1.monto * $factor * ( pm2.tipo_cambio / pm1.tipo_cambio ) + SUM( ut1.tarifa *
 					( IF ( $subquery < 0 , '0', IF ( $subquery > ( TIME_TO_SEC(t1.duracion_cobrada)/3600 ), TIME_TO_SEC(t1.duracion_cobrada)/3600 , $subquery ) ) )
 					) as total_monto_trabajado , pm1.simbolo, pm1.id_moneda 
 					FROM trabajo t1
@@ -486,6 +501,22 @@ class Contrato extends Objeto
 				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
 			}
 			
+                        if( !empty($codigo_asunto) ) {
+                            $cantidad_asuntos = $this->CantidadAsuntosPorFacturar( $fecha_ini, $fecha_fin );
+                            list($monto_hh_asunto,$x,$y) = $this->MontoHHTarifaSTD( false, $codigo_asunto, $fecha_ini, $fecha_fin );
+                            list($monto_hh_contrato,$X,$Y) = $this->MontoHHTarifaSTD( false, '', $fecha_ini, $fecha_fin );
+                            unset($x,$y,$X,$Y);
+                            
+                            if( $monto_hh_contrato > 0 ) {
+                                $factor = number_format($monto_hh_asunto/$monto_hh_contrato,6,'.','');
+                            } else {
+                                $factor = number_format(1/$cantidad_asuntos,6,'.','');
+                            }
+                        }
+                        else {
+                            $factor = 1;
+                        } 
+                        
 			$subquery = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600))   
 						FROM trabajo 
 						JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
@@ -507,12 +538,12 @@ class Contrato extends Objeto
 				$aporte_proporcional = 1;
 			}
 			else {
-				$aporte_proporcional = number_format($this->fields['retainer_horas'] / $duracion_total, 6,'.','');
+				$aporte_proporcional = number_format( $factor * $this->fields['retainer_horas'] / $duracion_total, 6,'.','');
 			}
 			
 
 			$query = "SELECT 
-										contrato.monto * ( pm2.tipo_cambio / pm1.tipo_cambio ) + 
+										contrato.monto * $factor * ( pm2.tipo_cambio / pm1.tipo_cambio ) + 
 										SUM(((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa)*(1 - $aporte_proporcional)), 
 										pm1.simbolo, 
 										pm1.id_moneda 
@@ -532,15 +563,74 @@ class Contrato extends Objeto
 		}
 		else if( $this->fields['forma_cobro'] == 'FLAT FEE' ) 
 		{
-			$query = "SELECT 
-									contrato.monto,
-									prm_moneda.simbolo,
-									prm_moneda.id_moneda
-								FROM contrato 
-								JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
-								WHERE contrato.id_contrato = '".$this->fields['id_contrato']."' ";
+                        if(!$emitido) {
+				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
+			}
+			if( !empty($fecha_ini) ) {
+				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
+			}
+			if( !empty($fecha_ini) ) {
+				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
+			}
+                        
+                        if( !empty($codigo_asunto) ) {
+                            $cantidad_asuntos = $this->CantidadAsuntosPorFacturar( $fecha_ini, $fecha_fin );
+                            list($monto_hh_asunto,$x,$y) = $this->MontoHHTarifaSTD( false, $codigo_asunto, $fecha_ini, $fecha_fin );
+                            list($monto_hh_contrato,$X,$Y) = $this->MontoHHTarifaSTD( false, '', $fecha_ini, $fecha_fin );
+                            
+                            if( $monto_hh_contrato > 0 ) {
+                                $factor = number_format($monto_hh_asunto/$monto_hh_contrato,6,'.','');
+                            } else {
+                                $factor = number_format(1/$cantidad_asuntos,6,'.','');
+                            }
+                        }
+                        else {
+                            $factor = 1;
+                        } 
+                        
+			$query = " SELECT 
+					contrato.monto * ( moneda_monto.tipo_cambio / moneda_contrato.tipo_cambio ) * $factor, 
+					moneda_contrato.simbolo, 
+					moneda_contrato.id_moneda 
+                                    FROM contrato 
+                                    JOIN prm_moneda as moneda_contrato ON contrato.opc_moneda_total = moneda_contrato.id_moneda 
+                                    JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda 
+                                    WHERE contrato.id_contrato = '".$this->fields['id_contrato']."' ";
 		}
-		else
+		else if( $this->fields['forma_cobro'] == 'CAP' )
+                {
+                        if(!$emitido) {
+                            $where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
+			}
+			if( !empty($codigo_asunto) ) {
+                            $where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
+			}
+			if( !empty($fecha_ini) ) {
+                            $where .= " AND trabajo.fecha >= '$fecha_ini' ";
+			}
+			if( !empty($fecha_fin) ) {
+                            $where .= " AND trabajo.fecha <= '$fecha_fin' ";
+			}
+
+			$query = " SELECT 
+					SUM(TIME_TO_SEC(duracion_cobrada)*usuario_tarifa.tarifa*(moneda_tarifa.tipo_cambio/moneda_monto.tipo_cambio)/3600), 
+					moneda_monto.simbolo, 
+                                        moneda_monto.id_moneda 
+                                    FROM trabajo 
+                                    JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
+                                    JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+                                    JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto=moneda_monto.id_moneda 
+                                    JOIN prm_moneda as moneda_tarifa ON contrato.id_moneda=moneda_tarifa.id_moneda 
+                                    LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario 
+                                    	AND contrato.id_moneda=usuario_tarifa.id_moneda 
+					AND contrato.id_tarifa = usuario_tarifa.id_tarifa) 
+                                    LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
+                                        WHERE 1 $where 
+					AND trabajo.cobrable = 1 
+					AND trabajo.id_tramite = 0 
+					AND asunto.id_contrato='".$this->fields['id_contrato']."' GROUP BY asunto.id_contrato "; 
+                }
+                else 
 		{
 			if(!$emitido) {
 				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
@@ -589,6 +679,38 @@ class Contrato extends Objeto
 		list($moneda,$id_moneda) = mysql_fetch_array($resp);
 		return array(0,$moneda,$id_moneda);
 	}
+        
+        function CantidadAsuntosPorFacturar( $fecha1, $fecha2 )
+        {
+                $where_trabajo = " ( trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		$where_gasto   = " ( cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		if( $fecha1 != '' && $fecha2 != '' ) {
+			$where_trabajo .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
+			$where_gasto .= " AND cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' ";
+		}
+                $where_gasto .= " AND cta_corriente.incluir_en_cobro = 'SI' ";
+
+		$query = "SELECT count(*) 
+				FROM asunto
+				WHERE asunto.id_contrato = '".$this->fields['id_contrato']."' 
+                                        AND ( ( SELECT count(*) FROM trabajo
+                                        	 LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
+						 WHERE trabajo.codigo_asunto = asunto.codigo_asunto
+					 	 AND trabajo.cobrable = 1
+					 	 AND trabajo.id_tramite = 0
+					 	 AND trabajo.duracion_cobrada != '00:00:00'
+					 	 AND $where_trabajo ) > 0
+					OR ( SELECT count(*) FROM cta_corriente
+						LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
+						WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
+						AND cta_corriente.cobrable = 1
+                                                AND cta_corriente.monto_cobrable > 0 
+						AND $where_gasto ) > 0 )
+					GROUP BY asunto.id_contrato ";
+                $resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+                list($cantidad_asuntos) = mysql_fetch_array($resp);
+                return $cantidad_asuntos;
+        }
 	
 	function MontoHHTarifaSTD($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '')
 	{
@@ -642,7 +764,7 @@ class Contrato extends Objeto
 	
 	function MontoGastos($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '')
 	{
-		$where = " 1 ";
+		$where = " 1 AND cta_corriente.cobrable=1";
 		if( !$emitido ) {
 			$where .= " AND ( cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
 		}
@@ -655,6 +777,7 @@ class Contrato extends Objeto
 		if( !empty($fecha_fin) ) {
 			$where .= " AND cta_corriente.fecha <= '$fecha_fin' ";
 		}
+                $where .= " AND cta_corriente.incluir_en_cobro = 'SI' ";
 		
 		$query = "SELECT
 									SUM( IF( egreso IS NOT NULL, monto_cobrable, -1 * monto_cobrable ) * ( moneda_gasto.tipo_cambio / moneda_contrato.tipo_cambio ) ) as monto_gastos,
@@ -814,6 +937,7 @@ class Contrato extends Objeto
 			JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			JOIN asunto ON asunto.id_contrato = contrato.id_contrato
 			WHERE cliente.codigo_cliente = '$codigo_cliente'
+				AND asunto.activo = 1 AND contrato.activo = 'SI'
 			GROUP BY contrato.id_contrato";
 		return Html::SelectQuery($this->sesion, $query, 'id_contrato', $selected, empty($onchange) ? null : 'onchange='.$onchange, __("Cualquiera"), $width);
 	}

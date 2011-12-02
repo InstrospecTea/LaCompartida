@@ -7,6 +7,7 @@ require_once Conf::ServerDir().'/../app/classes/Debug.php';
 require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 require_once Conf::ServerDir().'/../app/classes/CobroMoneda.php';
 require_once Conf::ServerDir().'/../app/classes/Moneda.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class Documento extends Objeto
 {
@@ -89,7 +90,7 @@ class Documento extends Objeto
 		return $tc;
 	}
 	
-	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha = '', $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null)
+	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha = '', $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null, $pagar_facturas=false)
 	{
 		list($dtemp,$mtemp,$atemp) = split("-",$fecha);
 		if( strlen( $dtemp ) == 2 )
@@ -137,7 +138,7 @@ class Documento extends Objeto
 				//resetea el saldo y aplica los neteos q lo recalculan
 				$this->Edit("saldo_pago",$this->fields['monto']);
 				if($this->Write()){
-					$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
+					$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos, $pagar_facturas);
 				}
 			}
 			else{
@@ -160,7 +161,7 @@ class Documento extends Objeto
 				$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 				$this->Edit("pago_honorarios",empty($pago_honorarios) ? '0' : '1');
 				$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
-				$this->Edit("id_contrato",empty($id_contrato) ? 0 : $id_contrato); //'0' guarda 0, 0 guarda NULL, null guarda ''
+				$this->Edit("id_contrato",empty($id_contrato) ? 'NULL' : $id_contrato);
 
 				if($this->Write())
 				{
@@ -179,13 +180,13 @@ class Documento extends Objeto
 						$this->ActualizarDocumentoMoneda($tipo_cambio);
 					}
 					$msg = empty($adelanto) ? __('Pago ingresado con éxito') : __('Adelanto ingresado con éxito');
-					$pagina->addInfo($msg);
+					if(!empty($pagina)) $pagina->addInfo($msg);
 					
 					$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
 					
 				}
 				else
-					$pagina->AddError($documento->error);
+					if(!empty($pagina)) $pagina->AddError($documento->error);
 /*			}
 		else
 		{ ?>
@@ -199,7 +200,7 @@ class Documento extends Objeto
 		return $id_documento;
 	}
 	
-	function AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, &$out_neteos)
+	function AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, &$out_neteos, $pagar_facturas=false)
 	{
 		//Si se ingresa el documento, se ingresan los pagos
 		foreach($arreglo_pagos_detalle as $key => $data)
@@ -236,7 +237,7 @@ class Documento extends Objeto
 
 			//Luego se modifica
 			if($pago_honorarios != 0 || $pago_gastos != 0)
-				$out_neteos .= $neteo_documento->Escribir($pago_honorarios,$pago_gastos,$cambio_pago,$cambio_cobro,$decimales_pago,$decimales_cobro,$id_cobro_neteado);
+				$out_neteos .= $neteo_documento->Escribir($pago_honorarios,$pago_gastos,$cambio_pago,$cambio_cobro,$decimales_pago,$decimales_cobro,$id_cobro_neteado, $pagar_facturas);
 
 			/*Compruebo cambios en saldos para mostrar mensajes de actualizacion*/
 			$documento_cobro_aux = new Documento($this->sesion);
@@ -313,6 +314,38 @@ class Documento extends Objeto
 		}
 	}
 	
+	function ObtenerIdNeteo($id_cobro){
+		$query = "
+						SELECT neteo_documento.id_neteo_documento AS id
+							FROM neteo_documento
+							JOIN documento ON neteo_documento.id_documento_cobro = documento.id_documento
+							WHERE neteo_documento.id_documento_pago = '".$this->fields['id_documento']."'
+							AND documento.id_cobro = '".$id_cobro."';
+				 ";
+
+		$resp = mysql_query ($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
+		list($id) = mysql_fetch_array($resp);
+		return $id;
+	}
+	
+	function MontoUsadoAdelanto($id_cobro){
+		$query = "
+						SELECT ccfm.monto_bruto - ccfm.saldo
+							FROM cta_cte_fact_mvto ccfm
+							JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
+							JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+							JOIN documento dc ON nd.id_documento_cobro = dc.id_documento
+							WHERE nd.id_documento_pago = '".$this->fields['id_documento']."'
+							AND dc.id_cobro = '".$id_cobro."';
+				 ";
+
+		$resp = mysql_query ($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
+		list($monto) = mysql_fetch_array($resp);
+		return $monto;
+	}
+	
 	function EliminarDocumentoMoneda()
 	{
 		$query = "
@@ -362,10 +395,7 @@ class Documento extends Objeto
 
 	function ListaPagos()
 	{
-		if( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'NuevoModuloFactura') )
-			$nuevo_modulo = true;
-		else
-			$nuevo_modulo = false;
+		$modulo_fact = UtilesApp::GetConf($this->sesion,'NuevoModuloFactura');
 			
 		$out = '';
 		$query = "
@@ -392,7 +422,7 @@ class Documento extends Objeto
 				
 				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')).$id;
 				
-				if( $nuevo_modulo )
+				if( $modulo_fact && !$es_adelanto )
 					$out .= "<tr><td align=left>".$nombre."</td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td><td>&nbsp;</td></tr>";
 				else
 					$out .= "<tr><td align=left><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(".$id.")\" title=\"Editar Pago\">".$nombre."</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
@@ -786,6 +816,7 @@ class Documento extends Objeto
 		$documento_cobro->Load($id_documento_cobro);
 		
 		$codigo_cliente = $documento_cobro->fields['codigo_cliente'];
+		$id_contrato = $documento_cobro->fields['id_contrato'];
 		$honorarios = $documento_cobro->fields['honorarios'];
 		$gastos = $documento_cobro->fields['gastos'];
 		
@@ -801,7 +832,7 @@ class Documento extends Objeto
 		
 		$query = "SELECT id_documento, -saldo_pago, pago_honorarios, pago_gastos, documento.id_moneda
 			FROM documento
-			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND saldo_pago < 0";
+			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente' AND (id_contrato = '$id_contrato' OR id_contrato IS NULL) AND saldo_pago < 0";
 		if($honorarios == 0) $query .= " AND pago_gastos = 1";
 		else if($gastos == 0) $query .= " AND pago_honorarios = 1";
 		$query .= " ORDER BY pago_honorarios ASC, pago_gastos ASC, fecha_creacion ASC";
@@ -843,14 +874,14 @@ class Documento extends Objeto
 			if($gastos == 0 && $honorarios == 0){
 				$estado = 'PAGADO';
 				break;
-			}
 		}
+	}
 		if($estado){
 			$cobro = new Cobro($this->sesion);
 			$cobro->Load($id_cobro);
 			$cobro->Edit('estado', $estado);
 			$cobro->Write();
-		}
+}
 	}
 }
 

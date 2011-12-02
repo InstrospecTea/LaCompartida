@@ -36,6 +36,7 @@ if (isset($codigo_cliente)) $filtros['codigo_cliente'] = $codigo_cliente;
 if (isset($pago_honorarios)) $filtros['pago_honorarios'] = $pago_honorarios;
 if (isset($pago_gastos)) $filtros['pago_gastos'] = $pago_gastos;
 if (isset($id_contrato)) $filtros['id_contrato'] = $id_contrato;
+if (isset($moneda)) $filtros['moneda'] = $moneda;
 
 if (isset($filtros['id_documento']) and !empty($filtros['id_documento']))
 {
@@ -130,8 +131,12 @@ function OpcionesListaAdelanto(&$fila)
 	<?php if ($elegir_para_pago) { ?>
 	function ElegirParaPago(url)
 	{
+		<?php if($mantener_ventana){ ?>
+		document.location.href = url + '&ocultar_boton_adelantos=1';
+		<?php } else { ?>
 		window.opener.location.href = url;
 		window.close();
+		<?php } ?>
 		return false;
 	}
 	<?php } ?>

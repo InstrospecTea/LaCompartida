@@ -14,7 +14,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/Archivo.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	
+
 	$sesion = new Sesion(array('DAT'));
 	$pagina = new Pagina($sesion);
 	$archivo = new Archivo($sesion);
@@ -31,19 +31,19 @@
 		{
 			if(!$contrato->Load($id_contrato))
 				$pagina->FatalError(__('Código inválido'));
-				
+
 			$cobro = new Cobro($sesion);
 		}
-	
+
 		if($contrato->fields['codigo_cliente'] != '')
 		{
 			$cliente = new Cliente($sesion);
 			$cliente->LoadByCodigo($contrato->fields['codigo_cliente']);
 		}
-	
+
 		if($contrato->fields['id_moneda'] == '')
 			$contrato->fields['id_moneda'] = $cliente->fields['id_moneda'];
-		
+
 		if($id_contrato)
 			$pagina->titulo = __('Editar Contrato');
 		else
@@ -51,8 +51,8 @@
 	}
 	else
 		$show = 'none';
-	
-		
+
+
 	#CONTRATO GUARDA
 	if($opcion_contrato == "guardar_contrato" && $popup && !$motivo)
 	{
@@ -77,19 +77,19 @@
 		$contrato->Edit("direccion_contacto",$direccion_contacto_contrato);
 		$contrato->Edit("es_periodico",$es_periodico);
 		$contrato->Edit("activo",$activo_contrato ? 'SI' : 'NO');
-		
+
 		if($es_periodico == 'SI')
 			$contrato->Edit("periodo_fecha_inicio", $periodo_fecha_inicio);
 		else
 			$contrato->Edit("periodo_fecha_inicio", $fecha_estimada_cobro);
-			
+
 		$contrato->Edit("periodo_repeticiones", $periodo_repeticiones);
 		$contrato->Edit("periodo_intervalo", $periodo_intervalo);
 		$contrato->Edit("periodo_unidad", $codigo_unidad);
 		$monto=str_replace(',','.',$monto);//en caso de usar comas en vez de puntos
 		$contrato->Edit("monto", $monto);
 		$contrato->Edit("id_moneda", $id_moneda);
-		$contrato->Edit("forma_cobro", $forma_cobro);		
+		$contrato->Edit("forma_cobro", $forma_cobro);
 		$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 		$retainer_horas=str_replace(',','.',$retainer_horas);//en caso de usar comas en vez de puntos
 		$contrato->Edit("retainer_horas", $retainer_horas);
@@ -128,38 +128,38 @@
 			$contrato->Edit("descuento",$descuento > 0 ? $descuento : '0');
 			$contrato->Edit("porcentaje_descuento",'0');
 		}
-		
+
 		$contrato->Edit("id_moneda_monto",$id_moneda_monto);
-		
+
 		if($contrato->Write())
 		{
-			
+
 			$pagina->AddInfo(__('Contrato guardado con éxito'));
 ?>
 			<script language="javascript">
 				window.opener.Refrescar();
 					/*{
-						
+
 						//window.close();
 					}*/
-			</script>	
+			</script>
 <?		}
 		else
 			$pagina->AddError($contrato->error);
 	}
-	
+
 	$tarifa = new Tarifa($sesion);
 	$tarifa_default = $tarifa->SetTarifaDefecto();
-	
+
 	if($popup && !$motivo)
-		
+
 		$pagina->PrintTop($popup);
-	
+
 	if($popup && !$motivo)
 		$div_show = true;	#aqui es popup de contrato directo agregar.
 	else
 		$div_show = false;
-	
+
 	$query_count = "SELECT COUNT(usuario.id_usuario)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
 				WHERE codigo_permiso='SOC'";
@@ -180,13 +180,13 @@ function ValidarContrato(form)
 			seleccionado = true;
 			break;
 		}
-	}  
+	}
 	if(!seleccionado)
 	{
 		alert('<?=__("Debe seleccionar una Moneda")?>');
 		return false;
 	}
-		
+
 	seleccionado = false;
 	for( var i=0; actual = form.elements.forma_cobro[i]; i++ )
 	{
@@ -208,24 +208,24 @@ function ValidarContrato(form)
 
 function MuestraOculta(divID)
 {
-	var divArea = $(divID); 
-	var divAreaImg = $(divID+"_img"); 
-	var divAreaVisible = divArea.style['display'] != "none"; 
-	if(divAreaVisible) 
-	{ 
-		divArea.style['display'] = "none"; 
-		divAreaImg.innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'>"; 
-	} 
-	else 
-	{ 
-		divArea.style['display'] = "inline"; 
-		divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>"; 
-	} 
+	var divArea = $(divID);
+	var divAreaImg = $(divID+"_img");
+	var divAreaVisible = divArea.style['display'] != "none";
+	if(divAreaVisible)
+	{
+		divArea.style['display'] = "none";
+		divAreaImg.innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'>";
+	}
+	else
+	{
+		divArea.style['display'] = "inline";
+		divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
+	}
 }
 
 function TogglePeriodico(chk)
 {
-	
+
 	if(chk)
   {
   		document.getElementById("tr_fecha_estimada_cobro").style.display = "none";
@@ -290,7 +290,7 @@ function ActualizarFormaCobro()
 	fc2 = $("fc2");
 	fc3 = $("fc3");
 	fc5 = $("fc5");
-	
+
 	if(fc1.checked)
 		ShowTHH();
 	else if(fc2.checked)
@@ -329,10 +329,10 @@ function InactivaContrato(alerta, opcion)
 		Dialog.confirm(text_window,
 		{
 			top:150, left:290, width:400, okLabel: "<?=__('Aceptar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
-			id: "myDialogId", 
+			id: "myDialogId",
 			cancel:function(win){ activo_contrato.checked = true; return false; },
 			ok:function(win){ ValidarContrato(this.form); return true; }
-		});		
+		});
 	}
 	else
 		return false;
@@ -345,7 +345,7 @@ function InactivaContrato(alerta, opcion)
 <input type=hidden name='id_contrato' value="<?=$contrato->fields['id_contrato'] ?>" />
 <? } ?>
 <br>
-<!-- Calendario DIV -->	
+<!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
@@ -353,7 +353,7 @@ function InactivaContrato(alerta, opcion)
 <!-- Fin calendario DIV -->
 <fieldset style="width: 97%;">
 	<legend>&nbsp;<?=__('Información Comercial')?></legend>
-	
+
 <!-- RESPONSABLE -->
 <table id='responsable' style='display:inline'>
 	<tr>
@@ -371,7 +371,7 @@ function InactivaContrato(alerta, opcion)
 		</td>
 	</tr>
 <?
-	$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre) 
+	$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
 				WHERE codigo_permiso='SOC' ORDER BY apellido1";
 ?>
@@ -489,7 +489,7 @@ function InactivaContrato(alerta, opcion)
 			<textarea name='direccion_contacto_contrato' rows=4 cols="55" ><?= $contrato->fields['direccion_contacto'] ?></textarea>
 		</td>
 	</tr>
-    
+
     </table>
 </fieldset>
 <!-- FIN SOLICITANTE -->
@@ -497,7 +497,7 @@ function InactivaContrato(alerta, opcion)
 <br>
 <?
 	$fecha_ini = date('d-m-Y');
-	
+
 	if($popup && !$motivo)
 	{
 			if($contrato->loaded())
@@ -508,8 +508,8 @@ function InactivaContrato(alerta, opcion)
 	}
 	else
 		$fecha_ini = Utiles::sql2date($contrato->fields['periodo_fecha_inicio']);
-		
-	if(!$id_moneda) 
+
+	if(!$id_moneda)
 		$id_moneda = Moneda::GetMonedaTarifaPorDefecto($sesion);
 	if(!$id_moneda)
 		$id_moneda = Moneda::GetMonedaBase($sesion);
@@ -557,7 +557,7 @@ function InactivaContrato(alerta, opcion)
 								<?=__('Cobrar')?>
 							</td>
 							<td align=left>
-								<?= Funciones::PrintRadioUnidad($sesion,"codigo_unidad",$contrato->fields[periodo_unidad] ? $contrato->fields[periodo_unidad] : '1') ?>							
+								<?= Funciones::PrintRadioUnidad($sesion,"codigo_unidad",$contrato->fields[periodo_unidad] ? $contrato->fields[periodo_unidad] : '1') ?>
 								<input type='hidden' name='periodo_intervalo' size='5' value="<?= $contrato->fields['periodo_intervalo'] ?>" />
 							</td>
 						</tr>
@@ -575,7 +575,7 @@ function InactivaContrato(alerta, opcion)
 			</td>
 		</tr>
 	  </table>
-	
+
 		<table id='tr_fecha_estimada_cobro' width="100%">
 			<tr>
 				<td align=right width="25%">
@@ -587,7 +587,7 @@ function InactivaContrato(alerta, opcion)
 				</td>
 			</tr>
 		</table>
-	
+
 		<table width="100%">
 			<tr>
 				<td colspan=2><hr size=1></td>
@@ -604,7 +604,7 @@ function InactivaContrato(alerta, opcion)
 					<span style='cursor:pointer' <?=TTip(__('Editar tarifa seleccionada'))?> onclick='CreaTarifa(this.form,false)'><img src="<?=Conf::ImgDir()?>/editar_on.gif" border="0"></span>
 				</td>
 			</tr>
-		
+
 		  <tr>
 				<td align=right>
 					<?=__('Forma de cobro')?>
@@ -617,15 +617,15 @@ function InactivaContrato(alerta, opcion)
 	?>
 				<td align=left>
 					<div id="div_cobro" align=left>
-						<input <?= TTip($tip_tasa) ?> onclick="ActualizarFormaCobro()" id=fc1 type=radio name=forma_cobro value=TASA <?= $contrato_forma_cobro == "TASA" ? "checked" : "" ?> /> 
+						<input <?= TTip($tip_tasa) ?> onclick="ActualizarFormaCobro()" id=fc1 type=radio name=forma_cobro value=TASA <?= $contrato_forma_cobro == "TASA" ? "checked" : "" ?> />
 						<label for="fc1">Tasas/HH</label>&nbsp; &nbsp;
-						<input <?= TTip($tip_retainer) ?> onclick="ActualizarFormaCobro();" id=fc2 type=radio name=forma_cobro value=RETAINER <?= $contrato_forma_cobro == "RETAINER" ? "checked" : "" ?> /> 
+						<input <?= TTip($tip_retainer) ?> onclick="ActualizarFormaCobro();" id=fc2 type=radio name=forma_cobro value=RETAINER <?= $contrato_forma_cobro == "RETAINER" ? "checked" : "" ?> />
 						<label for="fc3">Retainer</label> &nbsp; &nbsp;
 						<input <?= TTip($tip_flat) ?> id=fc3 onclick="ActualizarFormaCobro();" type=radio name=forma_cobro value="FLAT FEE" <?= $contrato_forma_cobro == "FLAT FEE" ? "checked" : "" ?> />
 						<label for="fc4"><?=__('Flat fee')?></label>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 						<input <?= TTip($tip_cap) ?> id=fc5 onclick="ActualizarFormaCobro();" type=radio name=forma_cobro value="CAP" <?= $contrato_forma_cobro == "CAP" ? "checked" : "" ?> />
 						<label for="fc5"><?=__('Cap')?></label>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-					</div>	
+					</div>
 					<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id=div_forma_cobro>
 						<div id=div_monto align=left style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 							&nbsp;<?=__('Monto')?>&nbsp;<input name=monto size="7" value="<?= $contrato->fields['monto'] ?>" />&nbsp;&nbsp;
@@ -634,8 +634,8 @@ function InactivaContrato(alerta, opcion)
 						<div id=div_horas align=left style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							&nbsp;<?=__('Horas')?>
 							&nbsp;<input name=retainer_horas size="7" value="<?= $contrato->fields['retainer_horas'] ?>" />
-						</div>				
-						<div id=div_fecha_cap align=left style="display:none; background-color:#C6DEAD;padding-left:2px;">					
+						</div>
+						<div id=div_fecha_cap align=left style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							<table style='border: 0px solid' bgcolor='#C6DEAD'>
 							<? if($cobro){ ?>
 							<tr>
@@ -651,7 +651,7 @@ function InactivaContrato(alerta, opcion)
 					</div>
 				</td>
 			</tr>
-		
+
 			<tr>
 				<td align=right><?=__('Descuento')?></td>
 				<td align=left>
@@ -660,12 +660,12 @@ function InactivaContrato(alerta, opcion)
 					<input type=text name=porcentaje_descuento id=porcentaje_descuento size=6 value=<?=$contrato->fields['porcentaje_descuento']?>> <input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?=$contrato->fields['tipo_descuento'] == 'PORCENTAJE' ? 'checked' : '' ?>><?=__('%')?>
 				</td>
 			</tr>
-		</table>	
-		
+		</table>
+
 	<!--Samuel-->
 		<table width="100%">
 <?
-		if($id_cliente||$id_asunto) 
+		if($id_cliente||$id_asunto)
 		{
 ?>
 			<tr>
@@ -679,7 +679,7 @@ function InactivaContrato(alerta, opcion)
 <?
 		} #fin id_cliente OR id_asunto
 ?>
-<? 
+<?
 		//Samuel: no sé para que se usa esto.
 		/*if(!$motivo)
 		{
@@ -706,8 +706,8 @@ function InactivaContrato(alerta, opcion)
 					echo "</select>";
 ?>
 				</td>
-			</tr> 
-<? 
+			</tr>
+<?
 		}*/ #Fin if Motivo
 ?>
 	 	</table>
@@ -740,18 +740,23 @@ function InactivaContrato(alerta, opcion)
 		</tr>
 		<tr>
 			<td align="right" colspan='1'><?=__('Tamaño del papel')?>:</td>
-			<td align="left" colspan='5'>				
+			<td align="left" colspan='5'>
+<?php
+if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDefecto')) {
+	$contrato->fields['opc_papel'] = UtilesApp::GetConf($sesion, 'PapelPorDefecto');
+}
+?>
 				<select name="opc_papel">
-					<option value="LETTER" <?=$contrato->fields['opc_papel']=='LETTER'?'selected':''?>><?=__('Carta')?></option>
-					<option value="OFFICE" <?=$contrato->fields['opc_papel']=='OFFICE'?'selected':''?>><?=__('Oficio')?></option>
-					<option value="A4" <?=$contrato->fields['opc_papel']=='A4'?'selected':''?>><?=__('A4')?></option>
-					<option value="A5" <?=$contrato->fields['opc_papel']=='A5'?'selected':''?>><?=__('A5')?></option>
+					<option value="LETTER" <?php echo $contrato->fields['opc_papel'] == 'LETTER' ? 'selected="selected"' : '' ?>><?php echo __('Carta'); ?></option>
+					<option value="LEGAL" <?php echo $contrato->fields['opc_papel'] == 'LEGAL' ? 'selected="selected"' : '' ?>><?php echo __('Oficio'); ?></option>
+					<option value="A4" <?php echo $contrato->fields['opc_papel'] == 'A4' ? 'selected="selected"' : '' ?>><?php echo __('A4'); ?></option>
+					<option value="A5" <?php echo $contrato->fields['opc_papel'] == 'A5' ? 'selected="selected"' : '' ?>><?php echo __('A5'); ?></option>
 				</select>
 			</td>
 		</tr>
 		<tr>
 			<td align="right" colspan='1'><?=__('Mostrar total en')?>:</td>
-			<td align="left" colspan='5'>				
+			<td align="left" colspan='5'>
 				<?=Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$contrato->fields['opc_moneda_total'],'onchange="ActualizarTipoCambioOpcion(this.form, this.value);"','','60')?>
 			</td>
 		</tr>
@@ -784,8 +789,8 @@ function InactivaContrato(alerta, opcion)
 		<tr>
 			<td align="right" colspan='1'><input type="checkbox" name="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?=$contrato->fields['opc_ver_carta']=='1'?'checked':''?> <?=$checked ?>></td>
 			<td align="left" colspan='5'><?=__('Mostrar Carta')?></td>
-		</tr>		
-	</table>	
+		</tr>
+	</table>
 </fieldset>
 <br><br>
 <!-- FIN CARTAS -->
@@ -839,5 +844,5 @@ Calendar.setup(
 	}
 );
 </script>
-<? #} 
+<? #}
 ?>

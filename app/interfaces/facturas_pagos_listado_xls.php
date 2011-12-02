@@ -17,35 +17,35 @@ require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 $Sesion = new Sesion(array('ADM', 'COB'));
 $pagina = new Pagina($Sesion);
 
-set_time_limit(0);
+	set_time_limit(0);
 ini_set("memory_limit", "256M");
-$where_cobro = ' 1 ';
+	$where_cobro = ' 1 ';
 
 //void Worksheet::setLandscape();
-$contrato = new Contrato($Sesion);
-
-$formato_fechas = UtilesApp::ObtenerFormatoFecha($Sesion);
-$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
+	$contrato = new Contrato($sesion);
+	
+	$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
+	$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
 $formato_fechas_php = strtr($formato_fechas, $cambios);
 
-// Esta variable se usa para que cada página tenga un nombre único.
-$numero_pagina = 0;
+	// Esta variable se usa para que cada página tenga un nombre único.
+	$numero_pagina = 0;
+		
+	// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 
-// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
-
-$id_moneda_filtro = $id_moneda;
+	$id_moneda_filtro = $id_moneda;
 
 if ($orden == "")
-	$orden = "fecha DESC";
+			$orden = "fecha DESC";
 
 if ($where == '') {
-	$join = "";
-	$where = 1;
-	/*
-	 * INICIO - obtener listado facturas con pago parcial o total
-	 */
-	$lista_facturas_con_pagos = '';
-	$where = 1;
+		$join = "";
+		$where = 1;
+		/*
+			 * INICIO - obtener listado facturas con pago parcial o total
+			 */
+			$lista_facturas_con_pagos = '';
+			$where = 1;
 	if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
 		if ( isset($_REQUEST['id_concepto']) ) {
 			$condiciones = "";
@@ -115,14 +115,16 @@ if ($where == '') {
 		$where .= " AND fp.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 
 
-
-	/*
-	 * INICIO - obtener listado facturas con pago parcial o total
-	 */
+			
+			/*
+			 * INICIO - obtener listado facturas con pago parcial o total
+			 */
 
 	if ($numero != '') {
 		$where .= " AND factura.numero = '$numero'";
 	}
+			if($serie != '' and $serie != -1)
+				$where .= " AND serie_documento_legal = '$serie'";
 
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
 		$cliente = new Cliente($Sesion);
@@ -130,12 +132,12 @@ if ($where == '') {
 		$codigo_cliente = $cliente->fields['codigo_cliente'];
 	}
 	if ($tipo_documento_legal_buscado) {
-		$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
 	}
 
 	if ($codigo_cliente) {
 		$where .= " AND factura.codigo_cliente='" . $codigo_cliente . "' ";
-	}
+				}
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
 		$asunto = new Asunto($Sesion);
 		$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
@@ -145,13 +147,16 @@ if ($where == '') {
 		$asunto = new Asunto($Sesion);
 		$asunto->LoadByCodigo($codigo_asunto);
 		$id_contrato = $asunto->fields['id_contrato'];
-	}
+				}
 	if ($id_contrato) {
 		$where .= " AND cobro.id_contrato=" . $id_contrato . " ";
 	}
 	if ($id_cobro) {
 		$where .= " AND factura.id_cobro=" . $id_cobro . " ";
 	}
+	if ($id_estado) {
+		$where .= " AND factura.id_estado = " . $id_estado . " ";
+				}
 	if ($id_moneda) {
 		$where .= " AND factura.id_moneda = " . $id_moneda . " ";
 	}
@@ -169,14 +174,25 @@ if ($where == '') {
 	$where = base64_decode($where);
 }
 
-$query = "SELECT
+	$numero_factura = "";
+	if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie'))
+	{
+		$numero_factura = "CONCAT(LPAD(factura.serie_documento_legal, 3, '0'), '-', factura.numero) as numero";
+	}
+	else
+	{
+		$numero_factura = "factura.numero";
+	}
+
+	$query = "SELECT
 					 factura.id_factura
 					, DATE_FORMAT(fp.fecha, '$formato_fechas') as fecha_pago
 					, prm_documento_legal.codigo as tipo
-					, factura.numero";
+					, $numero_factura";
+        
 if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'NuevoModuloFactura')) {
-	$query .= "			, cliente as cliente_facturable";
-}
+		$query .= "			, cliente as cliente_facturable";
+	}
 $query .= "			, cliente.glosa_cliente
 					, usuario.username AS encargado_comercial
 					, prm_estado_factura.glosa as estado_factura
@@ -267,9 +283,9 @@ $formato_total = & $wb->addFormat(array('Size' => 10,
 			'Bold' => 1,
 			'Top' => 1,
 			'Color' => 'black'));
-// Generar formatos para los distintos tipos de moneda
-$formatos_moneda = array();
-$query = 'SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio
+	// Generar formatos para los distintos tipos de moneda
+	$formatos_moneda = array();
+	$query = 'SELECT id_moneda, simbolo, cifras_decimales, moneda_base, tipo_cambio
 			FROM prm_moneda
 			ORDER BY id_moneda';
 $resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
@@ -284,13 +300,13 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 	}
 	
 	if ($cifras_decimales > 0) {
-		$decimales = '.';
+			$decimales = '.';
 		while ($cifras_decimales-- > 0) {
-			$decimales .= '0';
+				$decimales .= '0';
 		}
 	} else {
-		$decimales = '';
-	}
+			$decimales = '';
+		}
 	$formatos_moneda[$id_moneda] = & $wb->addFormat(array('Size' => 10,
 				'VAlign' => 'top',
 				'Align' => 'right',
@@ -298,16 +314,19 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 }
 
-// Crear worksheet
+	// Crear worksheet
 $ws1 = & $wb->addWorksheet(__('Pago de Documentos tributarios'));
-$ws1->setLandscape();
+	$ws1->setLandscape();
 
-$col_name = array_keys($lista_suntos_liquidar->Get()->fields);
-$col_num = count($lista_suntos_liquidar->Get()->fields);
+	$col_name = array_keys($lista_suntos_liquidar->Get()->fields);
+	$col_num = count($lista_suntos_liquidar->Get()->fields);
 
-// Definimos visible, css, ancho y titulo de cada celda
-$arr_col = array();
-$col = 0;
+	
+	$col_name['numero'] = $factura->ObtenerNumero(null, $col_name['serie_documento_legal'], $col_name['numero']);
+
+	// Definimos visible, css, ancho y titulo de cada celda
+	$arr_col = array();
+	$col = 0;
 for ($i = 0; $i < $col_num; ++$i) {
 	// ocultar celdas con PHP	
 	$cols_para_ocultar = array('simbolo', 'cifras_decimales', 'id_moneda', 'id_factura', 'id_moneda_factura_pago', 'mostrar_diferencia_razon_social');
@@ -323,7 +342,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 		$arr_col[$col_name[$i]]['celda'] = $col++;
 	}
 
-	// ancho celdas
+		// ancho celdas
 	if (in_array($col_name[$i], array('saldo_moneda_base'))) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11);
 	} else if (in_array($col_name[$i], array('numero', 'cobro', 'saldo_pagos', 'id_cobro', 'pago_retencion', 'banco', 'cuenta'))) {
@@ -338,7 +357,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10);
 	}
 
-	// ancho celdas ocultos
+		// ancho celdas ocultos
 	$para_ocultar = array('id_moneda_factura_pago', 'descripcion', 'encargado_comercial', 'id_cobro', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'honorarios');
 	
 	//FacturaPagoSubtotalIva
@@ -352,7 +371,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 		$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0, 0, 1);
 	}
 
-	// css celdas
+		// css celdas
 	if (in_array($col_name[$i], array('fecha', 'fecha_ultimo_pago'))) {
 		$arr_col[$col_name[$i]]['css'] = $formato_fecha_tiempo;
 	} else if (in_array($col_name[$i], array('glosa_cliente', 'descripcion', 'glosa_asunto', 'concepto', 'descripcion_pago'))) {
@@ -361,10 +380,10 @@ for ($i = 0; $i < $col_num; ++$i) {
 		$arr_col[$col_name[$i]]['css'] = $formato_normal;
 	}
 
-	// titulos celdas
+		// titulos celdas
 	if (in_array($col_name[$i], array('glosa_cliente'))) {
 		$arr_col[$col_name[$i]]['titulo'] = __('Cliente');
-	}
+		}
 	if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'NuevoModuloFactura')) {
 		if (in_array($col_name[$i], array('cliente_facturable'))) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Cliente Facturable');
@@ -392,80 +411,83 @@ for ($i = 0; $i < $col_num; ++$i) {
 
 	$arr_col[$col_name[$i]]['titulo'] = $titulo_columna;
 
-	//formato columna excel para formulas
-	$arr_col[$col_name[$i]]['celda_excel'] = Utiles::NumToColumnaExcel($arr_col[$col_name[$i]]['celda']);
-}
-unset($col);
-$fila = 0; //fila inicial
+		//formato columna excel para formulas
+		$arr_col[$col_name[$i]]['celda_excel'] = Utiles::NumToColumnaExcel($arr_col[$col_name[$i]]['celda']);
+	}
+	unset($col);
+	$fila = 0; //fila inicial
 
-// Escribir encabezado reporte
-$ws1->write($fila, 0, __('Pago de documentos tributarios'), $formato_encabezado);
-$fila++;
+	// Escribir encabezado reporte
+	$ws1->write($fila, 0, __('Pago de documentos tributarios'), $formato_encabezado);
+	$fila++;
 
-$ws1->write($fila, 0, $fecha_actual, $formato_encabezado);
-$fila++;
-$fila++;
-
-// Escribir titulos
+	$ws1->write($fila, 0, $fecha_actual, $formato_encabezado);
+	$fila++;
+	$fila++;
+	
+	// Escribir titulos
 for ($i = 0; $i < $col_num; ++$i) {
 	if ($arr_col[$col_name[$i]]['hidden'] != 'SI') {
-		$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], ucfirst($arr_col[$col_name[$i]]['titulo']), $formato_titulo);
+			$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], ucfirst($arr_col[$col_name[$i]]['titulo']), $formato_titulo);
+		}
 	}
-}
-//$ws1->writeNote($fila, $arr_col['hh_val_cobrado']['celda'], 'Work in Progress');
-$fila++;
-$ws1->freezePanes(array($fila));
+	//$ws1->writeNote($fila, $arr_col['hh_val_cobrado']['celda'], 'Work in Progress');
+	$fila++;
+	$ws1->freezePanes(array($fila));
 
-$fila_inicial = $fila;
-// Escribir filas
+	$fila_inicial = $fila;
+	// Escribir filas
 for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 	$fila_actual = $fila + 1;
-	$proc = $lista_suntos_liquidar->Get($j);
-	$ws1->write($fila, $col_glosa_cliente, $proc->fields[$col_name[$i]], $formato_normal);
+		$proc = $lista_suntos_liquidar->Get($j);
+		$ws1->write($fila, $col_glosa_cliente, $proc->fields[$col_name[$i]], $formato_normal);
 
-	$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
+		$query = "SELECT GROUP_CONCAT(ca.codigo_asunto SEPARATOR ', ') , GROUP_CONCAT(a.glosa_asunto SEPARATOR ', ')
 					FROM cobro_asunto ca
 					LEFT JOIN asunto a ON ca.codigo_asunto = a.codigo_asunto
 					WHERE ca.id_cobro='" . $proc->fields['id_cobro'] . "' GROUP BY ca.id_cobro";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	$lista_asuntos = '';
-	$lista_asuntos_glosa = '';
+		$lista_asuntos = '';
+		$lista_asuntos_glosa = '';
 	while (list($lista_codigo_asunto, $lista_glosa_asunto) = mysql_fetch_array($resp)) {
 		$lista_asuntos = '(' . $lista_codigo_asunto . ')';
-		$lista_asuntos_glosa = $lista_glosa_asunto;
-	}
+			$lista_asuntos_glosa = $lista_glosa_asunto;
+		}
 
 	for ($i = 0; $i < $col_num; $i++) {
 		if ($arr_col[$col_name[$i]]['hidden'] != 'SI') {
 			if ($col_name[$i] == 'total' || $col_name[$i] == 'honorarios' || $col_name[$i] == 'subtotal_factura' || $col_name[$i] == 'iva') {
-				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
 			} else if ($col_name[$i] == 'saldo' ) {
 				$saldo = $proc->fields[$col_name[$i]] * (-1);
-				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
 			} else if ( $col_name[$i] == 'saldo_factura') {
 				$saldo = $proc->fields[$col_name[$i]];
 				$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
 			} else if ($col_name[$i] == 'monto_aporte') {
-				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['monto_aporte'], $formatos_moneda[$proc->fields['id_moneda_factura_pago']]);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['monto_aporte'], $formatos_moneda[$proc->fields['id_moneda_factura_pago']]);
 			} else if ($col_name[$i] == 'glosa_cliente') {
-				$glosa_cliente = $proc->fields['glosa_cliente'];
+					$glosa_cliente = $proc->fields['glosa_cliente'];
 				if ($proc->fields['mostrar_diferencia_razon_social'] != 'no') {
 					$glosa_cliente .= " (" . $proc->fields['mostrar_diferencia_razon_social'] . ")";
-				}
-				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $glosa_clientes, $arr_col[$col_name[$i]]['css']);
+					}
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $glosa_clientes, $arr_col[$col_name[$i]]['css']);
 			} else if ($col_name[$i] == 'glosa_asunto') {
 
-				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos_glosa, $arr_col[$col_name[$i]]['css']);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos_glosa, $arr_col[$col_name[$i]]['css']);
 			} else if ($col_name[$i] == 'codigo_asunto') {
 
-				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
+                        } else if ($col_name[$i] == 'serie') {
+
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]] . " ", $arr_col[$col_name[$i]]['css']);
 			} else {
-				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
+				}
 			}
 		}
 	}
-}
 
-$wb->close();
-exit;
+	$wb->close();
+	exit;
 ?>

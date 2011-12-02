@@ -12,14 +12,17 @@ require_once Conf::ServerDir() . '/classes/Moneda.php';
 require_once Conf::ServerDir() . '/classes/Factura.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/Autocompletador.php';
+require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $Sesion = new Sesion(array('COB'));
-$Pagina = new Pagina($Sesion);
+$pagina = new Pagina($Sesion);
 
-$Factura = new Factura($Sesion);
+$factura = new Factura($Sesion);
+
+$series_documento = new DocumentoLegalNumero($sesion);
 
 if ($id_factura != "") {
-	$Factura->Load($id_factura);
+	$factura->Load($id_factura);
 }
 
 if ($opc == 'generar_factura') {
@@ -43,8 +46,8 @@ if ($exportar_excel) {
 $idioma_default = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($Sesion, 'Idioma')));
 
-$Pagina->titulo = __('Revisar Pago de Documentos Tributarios');
-$Pagina->PrintTop();
+$pagina->titulo = __('Revisar Pago de Documentos Tributarios');
+$pagina->PrintTop();
 
 
 
@@ -128,19 +131,19 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		}
 		if ($fecha1 && $fecha2) {
 			$where .= " AND fp.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
+		}
+		else if ($fecha1) {
 			$where .= " AND fp.fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
-		} else if ($fecha2) {
+		}
+		else if ($fecha2) {
 			$where .= " AND fp.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 		}
 
-		/*
-		 * INICIO - obtener listado facturas con pago parcial o total
-		 */
-
-		if ($numero != '') {
-			$where .= " AND factura.numero = '$numero'";
+		if( !empty($serie) && $serie != -1 ){
+			$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
 		}
+		if($numero != '')
+				$where .= " AND factura.numero*1 = $numero*1 ";
 
 		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
 			$cliente = new Cliente($Sesion);
@@ -169,6 +172,9 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		if ($id_cobro) {
 			$where .= " AND factura.id_cobro='$id_cobro' ";
 		}
+		if ($id_estado) {
+			$where .= " AND factura.id_estado = '$id_estado' ";
+		}
 		if ($id_moneda) {
 			$where .= " AND fp.id_moneda = '$id_moneda' ";
 		}
@@ -183,7 +189,6 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			$where .= " OR factura.descripcion_subtotal_gastos LIKE '%$descripcion_factura%' ";
 			$where .= " OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%$descripcion_factura%')";
 		}
-
 	} else {
 		$where = base64_decode($where);
 	}
@@ -198,6 +203,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 				, factura.id_factura
 				, factura.id_cobro
 				, factura.numero
+				, factura.serie_documento_legal
 				, factura.cliente as factura_razon_social
 				, fp.fecha as fecha_pago
 				, fp.descripcion as descripcion_pago
@@ -205,6 +211,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 				, fp.codigo_cliente as cliente_pago
 				, fp.id_factura_pago
 				, prm_documento_legal.codigo as tipo
+				, factura.serie_documento_legal
 				, cliente.glosa_cliente
                                 , prm_banco.nombre as nombre_banco 
                                 , cuenta_banco.numero as numero_cuenta 
@@ -266,7 +273,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$b->titulo = "Pago de Documentos Tributarios <br />" . $glosa_monto_saldo_total;
 	$b->AgregarEncabezado("fecha_factura", __('Fecha factura'), "align=right nowrap");
 	$b->AgregarEncabezado("tipo", __('Tipo'), "align=center width=40px");
-	$b->AgregarEncabezado("numero", __('N°'), "align=right width=30px");
+	$b->AgregarFuncion(__('N°'), "NumeroFactura", "align='right' width='30px'");
 	$b->AgregarEncabezado("factura_razon_social", __('Cliente'), "align=left width=40px");
 	$b->AgregarEncabezado("encargado_comercial", __('Abogado'), "align=left width=20px");
 	$b->AgregarEncabezado("estado", __('Estado'), "align=center");
@@ -301,6 +308,18 @@ function MontoTotalPago(& $fila) {
 	$idioma->Load($fila->fields['codigo_idioma']);
 
 	return $fila->fields['simbolo_pago'] . ' ' . number_format($fila->fields['monto_pago'], $fila->fields['cifras_decimales_pago'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+}
+
+function NumeroFactura(& $fila) {
+	global $Sesion;
+
+	$factura_ = new Factura($Sesion);
+	return $factura_->ObtenerNumero(null, $fila->fields['serie_documento_legal'], $fila->fields['numero']);
+}
+
+function SubTotal(& $fila) {
+	global $idioma;
+	return $fila->fields['honorarios'] > 0 ? $fila->fields['simbolo'] . ' ' . number_format($fila->fields['honorarios'], $fila->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '';
 }
 
 function SaldoFactura(& $fila) {
@@ -370,7 +389,8 @@ function funcionTR(& $fila) {
 	$glosa_tramite = $tramite->fields['glosa_tramite'];
 	$html .= "<td align=left>" . Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas, '-') . "</td>";
 	$html .= "<td align=left>" . $fila->fields['tipo'] . "</td>";
-	$html .= "<td align=right>#" . $fila->fields['numero'] . "&nbsp;</td>";
+	$factura_ = new Factura($Sesion);
+	$html .= "<td align=right>#" . NumeroFactura(& $fila, $Sesion) . "&nbsp;</td>";
 	$html .= "<td align=left>" . GlosaCliente(& $fila) . "</td>";
 	$html .= "<td align=right>" . Glosa_asuntos(& $fila, $Sesion) . "</td>";
 	$html .= "<td align=left>" . $fila->fields['encargado_comercial'] . "</td>";
@@ -390,7 +410,7 @@ function funcionTR(& $fila) {
 	//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
 	//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
 	$html .= "<td align=right nowrap>" . MontoTotal(& $fila) . "</td>";
-	//$html .= "<td align=right nowrap>".Pago(& $fila, $sesion)."</td>";
+	//$html .= "<td align=right nowrap>".Pago(& $fila, $Sesion)."</td>";
 	$html .= "<td align=right nowrap>" . MontoPago(& $fila) . "</td>";
 	$html .= "<td align=right nowrap>" . SaldoPago(& $fila) . "</td>";
 	$html .= "<td align=right nowrap>" . Saldo(& $fila) . "</td>";
@@ -451,7 +471,7 @@ function funcionTR(& $fila) {
 			}
 			var url = 'ajax.php?accion=cargar_multiples_cuentas&id=' + seleccionados;
 		} else {
-			var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
+		var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
 		}	
 
 		loading("Actualizando campo");
@@ -521,14 +541,14 @@ function funcionTR(& $fila) {
 		<div class="floating" id="calendar"></div>
 	</div>
 	<!-- Fin calendario DIV -->
-<?
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
-	echo "<table width=\"90%\"><tr><td>";
-	$class_diseno = 'class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;"';
-}
-else
-	$class_diseno = '';
-?>
+	<?
+	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
+		echo "<table width=\"90%\"><tr><td>";
+		$class_diseno = 'class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;"';
+	}
+	else
+		$class_diseno = '';
+	?>
 	<fieldset class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;">
 		<legend><?php echo  __('Filtros') ?></legend>
 		<table style="border: 0px solid black" width='720px'>
@@ -537,21 +557,22 @@ else
 <?php echo  __('Cliente') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-<?
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
-		echo Autocompletador::ImprimirSelector($Sesion, '', $codigo_cliente_secundario);
-	else
-		echo Autocompletador::ImprimirSelector($Sesion, $codigo_cliente);
-}
-else {
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-		echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
-	} else {
-		echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-	}
-}
-?>
+					<?
+					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
+						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
+							echo Autocompletador::ImprimirSelector($Sesion, '', $codigo_cliente_secundario);
+						else
+							echo Autocompletador::ImprimirSelector($Sesion, $codigo_cliente);
+					}
+					else {
+						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
+							echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
+						}
+						else {
+							echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+						}
+					}
+					?>
 				</td>
 			</tr>
 			<tr>
@@ -559,13 +580,14 @@ else {
 	<?php echo  __('Asunto') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-<?
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
-} else {
-	echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
-}
-?>
+					<?
+					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+						echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
+					}
+					else {
+						echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
+					}
+					?>
 				</td>
 			</tr>
 			<tr>
@@ -625,7 +647,11 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecund
 <?php echo  __('N° Factura') ?>
 				</td>
 				<td align=left width="18%">
-					<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?php echo  $numero ?>" onchange="this.value=this.value.toUpperCase();">
+					<?php if (UtilesApp::GetConf($Sesion, 'NumeroFacturaConSerie')) { ?>
+					<?php echo Html::SelectQuery($Sesion, $series_documento->SeriesQuery(), "serie", $serie, '', "Vacio", 60); ?>
+					<span style="vertical-align: center;">-</span>
+					<?php } ?>
+					<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?= $numero ?>" onchange="this.value=this.value.toUpperCase();">
 				</td>
 				<td alignelement=right width="18%">
 <?php echo  __('N° Cobro') ?>
@@ -647,7 +673,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecund
 						}
 					?>
 				</td>
-<?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'PagoRetencionImpuesto')) { ?>
+					<?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'PagoRetencionImpuesto')) { ?>
 					<td align=right>
 	<?php echo  __('Pago retención impuestos') ?>
 					</td>
@@ -681,9 +707,9 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecund
 					<?php 
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
 							echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
-									, CONCAT( cuenta_banco.numero,
-										 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
-									FROM cuenta_banco
+				, CONCAT( cuenta_banco.numero,
+					 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
+				FROM cuenta_banco
 									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta[]", $id_cuenta, ' multiple size="4" ', "Cualquiera", "150"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
@@ -721,9 +747,9 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecund
 			</tr>
 		</table>
 	</fieldset><?
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-						echo "</td></tr></table>";
-					?>
+if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
+	echo "</td></tr></table>";
+?>
 </form>
 <!--table style="border: 0px solid black" width='94%'>
 	<tr>
@@ -778,5 +804,5 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TipoSelectClie
 	echo(Autocompletador::Javascript($Sesion));
 }
 echo(InputId::Javascript($Sesion));
-$Pagina->PrintBottom();
+$pagina->PrintBottom();
 ?>

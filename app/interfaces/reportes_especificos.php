@@ -103,6 +103,7 @@
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?=__('Resumen Cobranzas')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_morosidad.php' style="color:#000;text-decoration: none;"><?=__('Reporte Morosidad')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/tipo_cambio_historico.php' style="color:#000;text-decoration: none;"><?=__('Histórico de Tipo de Cambio')?></a></li>
+			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_ciclo_facturacion.php' style="color:#000;text-decoration: none;"><?=__('Ciclo de Facturación')?></a></li>
 		</ul>
 		</td>
 	</tr>

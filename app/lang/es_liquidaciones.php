@@ -31,6 +31,13 @@
 	$_LANG['el &uacute;ltimo cobro'] = 'la &uacute;ltima liquidaci&oacute;n';
 	$_LANG['N° del Cobro'] = "N° de la Liquidación";
 	
+	$_LANG['Cobro inválido'] = "Liquidación inválida";
+	
+	$_LANG['Hrs cobro/trab.'] = "Hrs liq./trab."; 
+	$_LANG['Hrs Trab./Cobro.'] = "Hrs Trab./Liq."; 
+	
+	$_LANG['Fecha Cobro'] = "Fecha Liquidación";  // revisar si está correcto
+	
 	$_LANG['Fecha último cobro emitido:']  = 'Fecha última liquidación emitida:';
 	$_LANG['Eliminar cobro'] = "Eliminar pre-liquidación";
 	$_LANG['Editar cobro'] = "Editar liquidación";

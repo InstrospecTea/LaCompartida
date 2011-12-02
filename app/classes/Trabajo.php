@@ -437,9 +437,7 @@ class Trabajo extends Objeto
 					$dia = '0'.$dia;
 
 				$fecha = $hoja['cells'][$fila][$col_fecha_anyo].'-'.$mes.'-'.$dia;
-				$mensajes .= "Trabajo $id_trabajo - Fecha: ".$fecha.'<br />';
-					
-
+									
 				if($col_solicitante != 23)
 					$solicitante = $hoja['cells'][$fila][$col_solicitante];
 					
@@ -476,7 +474,7 @@ class Trabajo extends Objeto
 			 		else	
 			 			{
 			 				// Por defecto seleccionamos el primer asunto del cobro, si es que el usuario ha indica un codigo,
-							// veremos si esta coincide con codigo_asunto o codigo_asunto_secundario de uno de lo asunto dentro
+							// veremos si esta coincide con codigo_asunto o codigo_asunto_secundario de uno de lo asuntos dentro
 							// del cobro, y selecionamos el asunto correspondiente. Si no corresponde con nada avisamos al cliente 
 							// que el codigo ingresado no existe.
 							$asunto_data = $hoja['cells'][$fila][$col_asunto];
@@ -485,16 +483,16 @@ class Trabajo extends Objeto
 							{
 							$codigo_existe = false;
 							foreach($cobro->asuntos as $asunto => $data )
-								{
+								{ 
 									$asunto = new Asunto($sesion);
 									$asunto->LoadByCodigo($data);
-									if( substr($asunto->fields['codigo_asunto'],-4)==$asunto_data ) 
+									if( substr($asunto->fields['codigo_asunto'],-4)==$asunto_data || $asunto->fields['codigo_asunto'] == $asunto_data ) 
 										{
 											$codigo_asunto = $data;
 											$codigo_existe = true;
 											break;
 										}
-									else if( substr($asunto->fields['codigo_asunto_secundario'],-4)==$asunto_data )
+									else if( substr($asunto->fields['codigo_asunto_secundario'],-4)==$asunto_data || $asunto->fields['codigo_asunto_secundario'] == $asunto_data )
 										{
 											$codigo_asunto = $data;
 											$codigo_existe = true;

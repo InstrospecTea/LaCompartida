@@ -13,7 +13,24 @@
     $sesion = new Sesion('');
     #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
 		
-		if( $accion == "cargar_tarifa_trabajo" )
+                if( $accion == "actualizar_tarifas" )
+                {
+                    $query = "UPDATE trabajo 
+                                JOIN trabajo_tarifa ON trabajo.id_trabajo = trabajo_tarifa.id_trabajo 
+                                JOIN cobro ON cobro.id_cobro = trabajo.id_cobro  
+                                JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
+                                JOIN usuario_tarifa ON ( usuario_tarifa.id_usuario = trabajo.id_usuario AND 
+                                                         cobro.id_moneda = usuario_tarifa.id_moneda AND 
+                                                         usuario_tarifa.id_tarifa = contrato.id_tarifa ) 
+                                SET 
+                                    trabajo.tarifa_hh = usuario_tarifa.tarifa, 
+                                    trabajo_tarifa.valor = usuario_tarifa.tarifa 
+                                WHERE trabajo.id_cobro = '$id_cobro' 
+                                ";
+                    $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                    echo utf8_encode("OK");
+                }
+		else if( $accion == "cargar_tarifa_trabajo" )
 		{
 			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 			{

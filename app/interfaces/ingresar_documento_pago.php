@@ -40,8 +40,15 @@
 	if($id_documento)
 	{
 		$documento->Load($id_documento);
+		if($id_cobro) $monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
 	}
 	
+	if( UtilesApp::GetConf($sesion,'CodigoSecundario') && $codigo_cliente_secundario != '' )
+	{
+		$cliente = new Cliente($sesion);
+		$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario ) ;
+	}
+		
 	if($opcion == "guardar")
 	{
 		// Construir arreglo_pagos_detalle
@@ -75,13 +82,8 @@
 			}
 		}
 
-		if( UtilesApp::GetConf($sesion,'CodigoSecundario') && $codigo_cliente_secundario != '' )
-		{
-			$cliente = new Cliente($sesion);
-			$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario ) ;
-		}
 		$nuevo = empty($id_documento);
-		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato);
+		$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $id_documento && !$adelanto && $documento->fields['es_adelanto'], $id_contrato, !empty($pagar_facturas));
 		?>
 			<script type="text/javascript">
 				if( window.opener.Refrescar )
@@ -225,18 +227,26 @@ function Validar(form)
 		form.glosa_documento.focus();
 		return false;
 	}
-	if(monto > monto_pagos.value && $('es_adelanto') && $F('es_adelanto')!='1')
+	if(monto > monto_pagos && $('es_adelanto') && $F('es_adelanto')!='1')
 	{
-		alert("El Monto del documento ("+monto+") es superior a la suma de los Pagos ("+monto_pagos.value+").");
+		alert("El Monto del documento ("+monto+") es superior a la suma de los Pagos ("+monto_pagos+").");
 		return false;
 	}
-	else if(monto < monto_pagos.value)
+	else if(monto < monto_pagos)
 	{
-		alert("La suma de los Pagos ("+monto_pagos.value+") es superior al Monto del documento ("+monto+").");
+		alert("La suma de los Pagos ("+monto_pagos+") es superior al Monto del documento ("+monto+").");
 		return false;
 	}
 	
-	<?php if (!empty($adelanto)) { ?>
+	<?php if($monto_usado !== null){ ?>
+	var monto_neteo = $$('input[type="text"][id^="pago_"]').inject(0, function(suma, elem) { return suma + Number($F(elem)); });
+	var monto_usado = <?php echo $monto_usado; ?>;
+	if(monto_neteo < monto_usado){
+		alert('No puede ingresar un monto menor al monto que ya ha sido usado para pagar otras facturas ('+monto_usado+')');
+		return false;
+	}
+	<?php }
+	if (!empty($adelanto)) { ?>
 	if($$('input[id^="pago_honorarios_"]:not([value="0"])').length && !$('pago_honorarios').checked){
 		alert('El adelanto se ha usado para pagar honorarios. No puede deshabilitar esta opción.');
 		return false;
@@ -244,6 +254,13 @@ function Validar(form)
 	if($$('input[id^="pago_gastos_"]:not([value="0"])').length && !$('pago_gastos').checked){
 		alert('El adelanto se ha usado para pagar gastos. No puede deshabilitar esta opción.');
 		return false;
+	}
+	<?php } else if(UtilesApp::GetConf($sesion, 'NuevoModuloFactura') && $monto_usado === null){ ?>
+	var hayFacturas = $(window.opener.document.documentElement).select('[id^="saldo"]').any(function(e){
+		return $(e).next('[id^="id_moneda"][value="'+$F('id_moneda')+'"]');
+	});
+	if(hayFacturas && confirm('¿Desea usar este adelanto para pagar automáticamente las facturas con saldo pendiente?')){
+		$('pagar_facturas').value = '1';
 	}
 	<?php } ?>
 
@@ -486,7 +503,6 @@ function CargarContratos(){
 		}
 	}	
 	http.send(null);
-	
 }
 </script>
 <? echo Autocompletador::CSS(); ?>
@@ -509,6 +525,7 @@ function CargarContratos(){
 <input type=hidden name='monto' value='<?=$documento->fields['monto']?>'/>
 <input type=hidden name='id_moneda' value='<?=$documento->fields['id_moneda']?>'/>
 <?php } ?>
+<input type=hidden name='pagar_facturas' id="pagar_facturas" value='0'/>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -542,7 +559,7 @@ if($id_cobro){
 	$hay_adelantos = $documento->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
 }
 else $hay_adelantos = false;
-if(!$adelanto && $hay_adelantos){
+if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 		$saldo_gastos = $documento_cobro->fields['saldo_gastos'] > 0 ? '&pago_gastos=1' : '';
 		$saldo_honorarios = $documento_cobro->fields['saldo_honorarios'] > 0 ? '&pago_honorarios=1' : '';  ?>
 		<button type="button" onclick="nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
@@ -565,11 +582,11 @@ if(!$adelanto && $hay_adelantos){
 		<td colspan="3" align="left">
 			<?
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-				{
+				{ 
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarContratos(); CargarTabla(1);");
 					else
-						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', 280, "CargarContratos(); CargarTabla(1);");
+						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', 280, " CargarContratos(); CargarTabla(1);");
 				}
 			else
 				{
@@ -591,7 +608,7 @@ if(!$adelanto && $hay_adelantos){
 		</td>
 		<td id="td_selector_contrato">
 			<?php $contrato = new Contrato($sesion);
-			echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);', $id_contrato); ?>
+			echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);', $documento->fields['id_contrato']); ?>
 		</td>
 	</tr>
 	<?php } ?>
@@ -816,6 +833,9 @@ if(!$adelanto && $hay_adelantos){
 		</td>
 	</tr>
 </table>
+<?php if(!empty($adelanto) && empty($id_documento)){?>
+<input type="hidden" id="monto_pagos" />
+<?php } ?>
 
 <div id = "tabla_pagos"> </div>
 <script>
@@ -843,7 +863,7 @@ Calendar.setup(
 <?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
-		echo Autocompletador::Javascript($sesion,false);
+		echo Autocompletador::Javascript($sesion,false,'CargarContratos(); CargarTabla(1);');
 	}
 	echo InputId::Javascript($sesion,"","No existen N° de cuenta asociadas a este banco.");
 	$pagina->PrintBottom($popup);

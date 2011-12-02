@@ -48,7 +48,7 @@ class CtaCteFact extends Objeto
 
 	//Permite Ingresar o editar un Movimiento. Este puede ser positivo o negativo. Facturas o pagos.
 	function RegistrarMvto($id_moneda, $monto_neto, $monto_iva, $monto_bruto,
-		$fecha_movimiento, $neteos, $id_factura=null, $id_pago=null, $tipo_mvto='F', $ids_monedas_documento='', $tipo_cambios_documento='', $anulando = false)
+		$fecha_movimiento, $neteos, $id_factura=null, $id_pago=null, $tipo_mvto='F', $ids_monedas_documento='', $tipo_cambios_documento='', $anulando = false, $rehacer_neteos=true)
 	{
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$moneda = new Moneda($this->sesion);
@@ -96,14 +96,17 @@ class CtaCteFact extends Objeto
 		else{
 			$lista_ids_monedas = explode(',', $ids_monedas_documento);
 			$lista_tipos_cambios = explode(',', $tipo_cambios_documento);
-			foreach($lista_ids_monedas as $k => $mon){
+			foreach($lista_ids_monedas as $k => $v){
 				$tipos_cambio[] = array(
-					'id_moneda' => $mon,
+					'id_moneda' => $v,
 					'tipo_cambio' => $lista_tipos_cambios[$k]);
 			}
 		}
 		$monedas_mvto->ActualizarTipoCambioMvto($mvto->Id(), $tipos_cambio, $id_cobro);
 
+		if(!$rehacer_neteos){
+			return $mvto;
+		}
 		//agarrar todos los neteos donde mvto es el ingreso
 		//borrarlos de la bd, reajustando los saldos del mvto de egreso
 		$saldo += $this->EliminarNeteos($mvto, true, false);
@@ -121,7 +124,22 @@ class CtaCteFact extends Objeto
 		}
 
 		//a todos los neteos q apunto yo ($neteos=array(array(id_fact, monto), ...)), restarles el saldo
+		return $this->AgregarNeteos($mvto, $neteos, $moneda, $fecha_movimiento, $saldo, $id_factura_nc, $anulando);
+	}
 
+	function AgregarNeteos($mvto_pago, $neteos=array(), $moneda=null, $fecha_movimiento=null, $saldo=null, $id_factura_nc=null, $anulando=false){
+		if($saldo === null){
+			$saldo = $mvto_pago->fields['saldo'];
+		}
+		if(empty($fecha_movimiento)){
+			$fecha_movimiento = date('Y-m-d H:i:s');
+		}
+		if(!$moneda){
+			$moneda = new Moneda($this->sesion);
+			$moneda->Load($mvto_pago->fields['id_moneda']);
+		}
+		
+		//a todos los neteos q apunto yo ($neteos=array(array(id_fact, monto, [monto_pago]), ...)), restarles el saldo
 		if(!empty($neteos) && !$anulando){
 			$fact = new Factura($this->sesion);
 			foreach($neteos as $detalles_neteo){
@@ -139,7 +157,7 @@ class CtaCteFact extends Objeto
 
 					$neteo = new CtaCteFactMvtoNeteo($this->sesion);
 					$neteo->Edit('id_mvto_deuda', $mvto_neteado->Id());
-					$neteo->Edit('id_mvto_pago', $mvto->Id());
+					$neteo->Edit('id_mvto_pago', $mvto_pago->Id());
 					$neteo->Edit('monto', number_format($monto_deuda, $moneda_neteado->fields['cifras_decimales'],'.',''));
 					$neteo->Edit('monto_pago', number_format($monto_pago, $moneda->fields['cifras_decimales'],'.',''));
 					$neteo->Edit('fecha_movimiento', $fecha_movimiento);
@@ -170,13 +188,13 @@ class CtaCteFact extends Objeto
 				}
 			}
 		}
-		$mvto->Edit('saldo',$saldo ? number_format($saldo,$moneda->fields['cifras_decimales'],'.','') : '0');
-		if(!$mvto->Write()) return false;
-
-		return $mvto;
+		$mvto_pago->Edit('saldo',$saldo ? number_format($saldo,$moneda->fields['cifras_decimales'],'.','') : '0');
+		if(!$mvto_pago->Write()) return false;
+		
+		return $mvto_pago;
 	}
-
-	function IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_documento='', $tipo_cambios_documento=''){
+	
+	function IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_documento='', $tipo_cambios_documento='', $usando_adelanto=false){
 
 		$fecha = $pago->fields['fecha'];
 		$codigo_cliente = $pago->fields['codigo_cliente'];
@@ -205,7 +223,11 @@ class CtaCteFact extends Objeto
 		}
 
 		//ingresar un pago a los movimientos de ctacte (con sus neteos)
-		$mvto = $this->RegistrarMvto($id_moneda, $monto, '0', $monto, $fecha, $neteos, null, $id_pago, 'P', $ids_monedas_documento, $tipo_cambios_documento);
+		$mvto = $this->RegistrarMvto($id_moneda, $monto, '0', $monto, $fecha, $neteos, null, $id_pago, 'P', $ids_monedas_documento, $tipo_cambios_documento, false, !$usando_adelanto);
+		
+		if($usando_adelanto){
+			return true;
+		}
 		
 		$arreglo_monedas = ArregloMonedas($this->sesion);
 		
@@ -250,12 +272,13 @@ class CtaCteFact extends Objeto
 			$arreglo_pagos_detalle[$fac_cobro]['monto_gastos'] += $monto_gastos;
 		}
 		
-		$documento = new Documento($this->sesion);
-		$id_documento = $mvto->GetIdDocumentoLiquidacionSoyMvto();
-		if( $id_documento )
-			$documento->Load( $id_documento );
-		$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
-		
+		if(empty($pago->fields['id_neteo_documento_adelanto'])){
+			$documento = new Documento($this->sesion);
+			$id_documento = $mvto->GetIdDocumentoLiquidacionSoyMvto();
+			if( $id_documento )
+				$documento->Load( $id_documento );
+			$documento->IngresoDocumentoPago(&$pagina, $id_cobro, $codigo_cliente, $monto_moneda_cobro, $id_moneda_cobro, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, $id_pago);
+		}
 		return true;
 	}
 	

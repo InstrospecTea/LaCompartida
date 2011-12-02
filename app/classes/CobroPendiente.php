@@ -3,6 +3,7 @@ require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 #Fechas de los cobros estimados de los contratos
 class CobroPendiente extends Objeto
@@ -65,6 +66,119 @@ class CobroPendiente extends Objeto
 			}
 		}
 		return true;
+	}
+
+	function MontoHitosPorLiquidar($contrato)
+	{
+		$sql = "SELECT SUM(monto_estimado) AS monto FROM cobro_pendiente WHERE id_cobro IS NULL AND hito = 1 AND id_contrato = " . $contrato;
+		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		list($monto) = mysql_fetch_array($query);
+		return empty($monto) ? 0 : $monto;
+	}
+
+	function MontoHitosLiquidados($contrato)
+	{
+		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto 
+		FROM cobro_pendiente
+			JOIN cobro ON cobro_pendiente.id_cobro = cobro.id_cobro
+		WHERE cobro_pendiente.id_cobro IS NOT NULL AND 
+		cobro_pendiente.hito = 1 AND 
+		cobro_pendiente.id_contrato = " . $contrato . " AND
+		cobro.estado NOT IN ('PAGADO')";
+		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		list($monto) = mysql_fetch_array($query);
+		return empty($monto) ? 0 : $monto;
+	}
+
+	function MontoHitosPagados($contrato)
+	{
+		$sql = "SELECT SUM(cobro_pendiente.monto_estimado) AS monto 
+		FROM cobro_pendiente
+			JOIN cobro ON cobro_pendiente.id_cobro = cobro.id_cobro
+		WHERE cobro_pendiente.id_cobro IS NOT NULL AND 
+		cobro_pendiente.hito = 1 AND 
+		cobro_pendiente.id_contrato = " . $contrato . " AND
+		cobro.estado IN ('PAGADO')";
+		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		list($monto) = mysql_fetch_array($query);
+		return empty($monto) ? 0 : $monto;
+	}
+	
+	function ObtenerHitosCumplidosParaCorreos() {
+		$sql = "SELECT
+			cobro_pendiente.id_cobro_pendiente,
+			cobro_pendiente.descripcion,
+			cobro_pendiente.monto_estimado,
+			cobro_pendiente.id_contrato,
+			contrato.id_usuario_responsable,
+			contrato.id_usuario_secundario,
+			prm_moneda.simbolo,
+			prm_moneda.cifras_decimales,
+			cliente.glosa_cliente,
+			cliente.codigo_cliente,
+			cobro_pendiente.fecha_cobro,
+			GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ', ') as asuntos
+		FROM 
+			cobro_pendiente 
+			LEFT JOIN contrato ON cobro_pendiente.id_contrato = contrato.id_contrato
+			LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+			LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
+		WHERE 
+			cobro_pendiente.hito = 1 AND
+			cobro_pendiente.fecha_cobro IS NOT NULL AND
+			cobro_pendiente.fecha_cobro <= NOW() AND
+			cobro_pendiente.id_cobro IS NULL AND
+			(contrato.id_usuario_responsable IS NOT NULL OR contrato.id_usuario_secundario IS NOT NULL)
+		GROUP BY cobro_pendiente.id_cobro_pendiente
+		";
+
+		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+
+		$cliente_hitos = array(); //la estructura es usuario->cliente->contrato->(asunto,detalles,lista_hitos)
+		while ($hito = mysql_fetch_array($query)) {
+			//Monto con simbolo
+			$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
+			$idioma->Load(strtolower(UtilesApp::GetConf($this->sesion, 'Idioma')));
+			$monto_hito_simbolo = $hito['simbolo'] . " " . number_format($hito['monto_estimado'], $hito['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
+			//Responsables
+			$usuarios_responsable = array();
+			if (!empty($hito['id_usuario_responsable'])) {
+				$usuarios_responsable[$hito['id_usuario_responsable']] = $hito['id_usuario_responsable'];
+			}
+			if (!empty($hito['id_usuario_secundario'])) {
+				$usuarios_responsable[$hito['id_usuario_secundario']] = $hito['id_usuario_secundario'];
+			}
+			if (empty($usuarios_responsable)) {
+				continue;
+			}
+
+			foreach ($usuarios_responsable as $usuario_responsable) {
+				if (!isset($cliente_hitos[$usuario_responsable][$hito['codigo_cliente']]['cliente'])) {
+					$cliente_hitos[$usuario_responsable][$hito['codigo_cliente']]['cliente'] = array("glosa_cliente" => $hito['glosa_cliente']);
+				}
+				if (!isset($cliente_hitos[$usuario_responsable][$hito['codigo_cliente']]['contratos'][$hito['id_contrato']])) {
+					$cliente_hitos[$usuario_responsable][$hito['codigo_cliente']]['contratos'][$hito['id_contrato']] = array(
+						"asuntos" => $hito['asuntos'],
+						"monto_por_liquidar" => $this->MontoHitosPorLiquidar($hito['id_contrato']),
+						"monto_liquidado" => $this->MontoHitosLiquidados($hito['id_contrato']),
+						"pagado" => $this->MontoHitosPagados($hito['id_contrato'])
+					);
+				}
+				$cliente_hitos[$usuario_responsable][$hito['codigo_cliente']]['contratos'][$hito['id_contrato']]['hitos'][] = array(
+					'descripcion' => $hito['descripcion'],
+					'monto_estimado' => $monto_hito_simbolo,
+					'fecha_cobro' => $hito['fecha_cobro']
+				);
+			}
+			
+			$sql = "UPDATE cobro_pendiente SET fecha_cobro = NULL WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
+			mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		}
+
+		return $cliente_hitos;
 	}
 }
 

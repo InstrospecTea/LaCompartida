@@ -41,6 +41,9 @@ class Reporte
 	var $campo_fecha_3 = '';
 	var $campo_fecha_cobro = 'cobro.fecha_fin';
 	var $campo_fecha_cobro_2 = 'cobro.fecha_emision';
+
+	//Determina como se calcula la proporcionalidad de los montos en Flat Fee
+	var $proporcionalidad = 'estandar';
 	
 	var $conf = array();
 
@@ -73,7 +76,6 @@ class Reporte
 	function requiereMoneda($tipo_dato)
 	{
 		$extras = array('rentabilidad','rentabilidad_base');
-
 		if(in_array($tipo_dato,array_merge($extras,Reporte::tiposMoneda())))
 			return true;
 		return false;
@@ -173,6 +175,11 @@ class Reporte
 		$this->rango['fecha_fin'] = $valor2;
 	}
 
+	function setProporcionalidad($valor = 'estandar')
+	{
+		$this->proporcionalidad = $valor;
+	}
+
 	//Establece el Campo de la fecha
 	function setCampoFecha($campo_fecha)
 	{
@@ -238,8 +245,7 @@ class Reporte
 		switch($s)
 		{
 			//Agrupadores que no existen para Cobro sin trabajos:
-			case "profesional":
-			case "username":
+			
 			case "glosa_asunto":
 			case "glosa_asunto_con_codigo":
 			case "area_asunto":
@@ -247,7 +253,8 @@ class Reporte
 			case "id_trabajo":
 				break;
 
-			case "prm_area_proyecto.glosa":
+			case "prm_area_proyecto.glosa": case "profesional":
+			case "username":
 				$this->id_agrupador_cobro[] = "profesional";
 				break;
 			case "glosa_grupo_cliente":
@@ -326,7 +333,7 @@ class Reporte
 				\' - \' as glosa_asunto_con_codigo,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
-				CONCAT(cliente.codigo_cliente,\'-0000\') as codigo_asunto,
+				\' - \' as codigo_asunto,
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
@@ -335,7 +342,8 @@ class Reporte
 				DATE_FORMAT( '.$campo_fecha.' , \'%m-%Y\') as mes_reporte,
 				DATE_FORMAT( '.$campo_fecha.' , \'%d-%m-%Y\') as dia_reporte,
 				'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
-				'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
+				'.(in_array('dia_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,':'').'
+				'.(in_array('mes_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,':'').'
 				cobro.estado AS estado,
 				cobro.forma_cobro AS forma_cobro,
 			';
@@ -349,14 +357,14 @@ class Reporte
 					$s .=
 					' 0 as valor_divisor, SUM( cobro.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio)';
+					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				}
 				case 'rentabilidad_base':
 				{
 					$s .= ' 0 as valor_divisor, SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio, 0 ))';
+					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio), 0 ))';
 					break;
 				}
 				case 'valor_pagado':
@@ -364,7 +372,7 @@ class Reporte
 					$s .= ' SUM( IF(cobro.estado = \'PAGADO\',
 									(cobro.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-									/	cobro_moneda.tipo_cambio
+									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									),
 									0) )';
 					break;
@@ -374,7 +382,7 @@ class Reporte
 					$s .= ' SUM( (cobro.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( 1 - documento.saldo_honorarios / documento.honorarios)
-									/	cobro_moneda.tipo_cambio) )';
+									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
 					break;
 				}
 				case 'valor_por_pagar_parcial':
@@ -382,7 +390,7 @@ class Reporte
 					$s .= ' SUM( (cobro.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( documento.saldo_honorarios / documento.honorarios)
-									/	cobro_moneda.tipo_cambio) )';
+									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
 					break;
 				}
 				case 'valor_por_pagar':
@@ -390,7 +398,7 @@ class Reporte
 					$s .= 'SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
 									(cobro.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-									/	cobro_moneda.tipo_cambio
+									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) 
 									)) )';
 					break;
 				}
@@ -399,19 +407,19 @@ class Reporte
 					$s .= 'SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
 									(cobro.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-									/	cobro_moneda.tipo_cambio
+									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									)) )';
 					break;
 				}
 				case 'rentabilidad':
 					$s .= ' 0 AS valor_divisor,
-						SUM(cobro.monto_trabajos * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / cobro_moneda.tipo_cambio)';
+						SUM(cobro.monto_trabajos * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				case 'diferencia_valor_estandar':
 				{
 					$s .= ' SUM( cobro.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
-					/	cobro_moneda.tipo_cambio)';
+					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				}
 				case 'valor_estandar':
@@ -502,7 +510,8 @@ class Reporte
 						'.(in_array('mes_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%m-%Y\') as mes_reporte,':'').'
 						'.(in_array('dia_reporte',$this->agrupador)?'DATE_FORMAT(trabajo.fecha, \'%d-%m-%Y\') as dia_reporte,':'').'
 						'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
-						'.(in_array('dia_emision',$this->agrupador)?'DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\') as dia_emision,':'').'
+						'.(in_array('dia_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,':'').'
+						'.(in_array('mes_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,':'').'
 						IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
@@ -510,12 +519,30 @@ class Reporte
 		if(in_array('id_trabajo',$this->agrupador))
 			$s.= ' trabajo.id_trabajo, ';				
 
+
+
 		//Datos que se repiten
-		$s_tarifa = "IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh)";
 		$s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
-		$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE',".$s_monto_thh_estandar.",".$s_monto_thh_simple.")";
 
+		//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
+		// A : monto estandar de este trabajo
+		// B : monto total de los trabajos en tarifa estandar
+		// C : monto de este trabajo (tarifa de cliente)
+		// D : monto total de trabajos (tarifa del cliente)
+
+		if($this->proporcionalidad == 'estandar')
+		{
+			$s_tarifa = "IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh)";
+			$s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE',".$s_monto_thh_estandar.",".$s_monto_thh_simple.")";
+		}
+		else
+		{
+			$s_tarifa = "tarifa_hh";
+			$s_monto_thh = $s_monto_thh_simple;	
+		}
+
+		
 		
 		$monto_estandar = "SUM(
 									trabajo.tarifa_hh_estandar 
@@ -775,7 +802,8 @@ class Reporte
 
 		foreach($this->id_agrupador as $a)
 					$agrupa[] = $a;
-		return ' GROUP BY '.implode(', ',$agrupa);
+		$group_by = ' GROUP BY '.implode(', ',$agrupa);
+		return $group_by;
 	}
 
 	//ORDER BY en string de Query.
@@ -815,9 +843,10 @@ class Reporte
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
-			&& !$this->ignorar_cobros_sin_horas
+			&& !$this->ignorar_cobros_sin_horas 
 		)
 		{
+			$this->cobroQuery(); 
 			$resp = mysql_query($this->cobroQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->cobroQuery(),__FILE__,__LINE__,$this->sesion->dbh);
 			while($row = mysql_fetch_array($resp))
 				$this->row[] = $row;

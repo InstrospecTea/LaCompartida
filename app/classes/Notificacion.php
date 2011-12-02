@@ -301,6 +301,67 @@ class Notificacion
 							</td>
 						</tr>
 					";
+					
+					$mail['tr_modificacion_contrato'] =
+					"
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan=7>
+								<fieldset>
+								<legend>Modificaciones de Contrato</legend>
+									<table width=100% style='border-collapse:collapse;'>
+										<tr style='background-color:#B3E58C;'>
+											<th> Cliente </th>
+											<th> Asuntos </th>
+											<th> Usuario </th>
+											<th> Fecha </th>
+										</tr>
+										%FILAS
+									</table>
+								</fieldset>
+							</td>
+						</tr>
+					";
+					
+					$mail['tr_cliente_hitos_cumplidos'] = 
+					"
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan='7'>
+							<fieldset>
+								<legend>" . __('Hitos') . " por cobrar</legend>
+								<table width='100%' style='border-collapse:collapse;'>
+									<tr style='background-color:#B3E58C;'>
+										<th width='200px'>Cliente</th>
+										<th>". __('Hitos') . "</th>
+									</tr>
+									%FILAS_CLIENTE
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+					";
+					
+					$mail['sub_tr_cliente_hitos_cumplidos'] =
+					"
+						<tr>
+							<td>%NOMBRE_CLIENTE</td>
+							<td>" . __('Asuntos') . ": %ASUNTOS</td>
+						</tr>
+						<tr style='border-bottom:1px solid #000000;'>
+							<td>
+								<small>Por liquidar: %POR_LIQUIDAR<br/></small>
+								<small>Liquidado: %LIQUIDADO<br/></small>
+								<small>Pagado: %PAGADO<br/></small>
+							</td>
+							<td>
+								%FILAS_HITO
+							</td>
+						</tr>
+					";
+					
+					$mail['lista_hitos'] = "<p>" . __('Hito') . ": %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
+					
 						
 					$mail['bottom'] =
 						"</table>";
@@ -548,7 +609,34 @@ class Notificacion
 						$enviar = true;
 					}
 						
-				$mensaje .= $estructura['bottom'];
+				if (isset($alertas['hitos_cumplidos']) && is_array($alertas['hitos_cumplidos'])) {
+					$tabla = "";
+
+					foreach ($alertas['hitos_cumplidos'] as $clientes) {
+						foreach ($clientes as $indice_cliente => $cliente) {
+							$filas_cliente = "";
+							foreach ($cliente['contratos'] as $contrato) {
+								$fila_cliente = str_replace('%NOMBRE_CLIENTE', $clientes[$indice_cliente]['cliente']['glosa_cliente'], $estructura['sub_tr_cliente_hitos_cumplidos']);
+								$fila_cliente = str_replace('%ASUNTOS', empty($contrato['asuntos']) ? __("Sin asuntos") : $contrato['asuntos'], $fila_cliente);
+								$fila_cliente = str_replace('%POR_LIQUIDAR', $contrato['monto_por_liquidar'], $fila_cliente);
+								$fila_cliente = str_replace('%LIQUIDADO', $contrato['monto_liquidado'], $fila_cliente);
+								$fila_cliente = str_replace('%PAGADO', $contrato['pagado'], $fila_cliente);
+								$filas_hitos = "";
+								foreach ($contrato['hitos'] as $hitos) {
+									$fila_hito = str_replace('%DESCRIPCION', $hitos['descripcion'], $estructura['lista_hitos']);
+									$fila_hito = str_replace('%MONTO', $hitos['monto_estimado'], $fila_hito);
+									$fila_hito = str_replace('%FECHA', date("d-m-Y", strtotime($hitos['fecha_cobro'])), $fila_hito);
+									$filas_hitos .= $fila_hito;
+								}
+								$filas_cliente .= str_replace('%FILAS_HITO', $filas_hitos, $fila_cliente);
+							}
+							$tabla .= str_replace('%FILAS_CLIENTE', $filas_cliente, $estructura['tr_cliente_hitos_cumplidos']);
+						}
+					}
+					$mensaje .= $tabla;
+					$enviar = true;
+				}
+
 				if($enviar)
 					$mensajes[$id_usuario_mail] = $mensaje;
 			}

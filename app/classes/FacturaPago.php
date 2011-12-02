@@ -38,23 +38,46 @@ class FacturaPago extends Objeto
 		return $this->fields[$this->campo_id];
 	}
 	
+	function LoadByNeteoAdelanto($id_neteo){
+		$query = "SELECT id_factura_pago FROM factura_pago WHERE id_neteo_documento_adelanto = '$id_neteo'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($id) = mysql_fetch_array($resp);
+
+		if($id)
+			return $this->Load($id);
+		return false;
+	}
+	
 	function Eliminar()
 	{
 		$cta_cte_fact = new CtaCteFact($this->sesion);
 		if( $cta_cte_fact->EliminarMvtoPago($this->fields['id_factura_pago']) )
 		{ 
+			if(!empty($this->fields['id_neteo_documento_adelanto'])){
+				$neteo_documento = new NeteoDocumento($this->sesion);
+				$neteo_documento->Load($this->fields['id_neteo_documento_adelanto']);
+				$neteo_documento->Reestablecer(2);
+				$neteo_documento->Delete();
+			}
 			return $this->Delete();
 		}
 		else
 			return false;
 	}
 	
-	function HtmlListaPagos($sesion,& $factura)
+	function HtmlListaPagos($sesion,& $factura, $id_documento)
 	{ 
 		$moneda = new Moneda($sesion);
 		$moneda->Load($factura->fields['id_moneda']);
-		$lista_pagos = $factura->GetPagosSoyFactura();
-		$html = "<table width=\"500\"><tr bgcolor=\"#aaffaa\" style=\"font-size: 10pt;\"><th width=\"50\" align=center>N°</th><th width=\"100\" align=center>".__('Fecha')."</th><th width=200>&nbsp;</th><th width=100>".__('Monto Pago')."</th><th width=50>Opc.</th>";
+		$lista_pagos = $factura->GetPagosSoyFactura(null, $id_documento);
+		$html = "<table width=\"500\">
+					<tr bgcolor=\"#aaffaa\" style=\"font-size: 10pt;\">
+						<th width=\"50\" align=center>N°</th>
+						<th width=\"100\" align=center>".__('Fecha')."</th>
+						<th width=200>".__('Descripción')."</th>
+						<th width=100>".__('Monto Pago')."</th>
+						<th width=50>Opc.</th>
+					</tr>";
 		for($i=0;$i<$lista_pagos->num;$i++)
 		{ 
 			$pago = $lista_pagos->Get($i);
@@ -62,10 +85,10 @@ class FacturaPago extends Objeto
 			$html .= "<tr heigth=\"16\">";
 			$html .= "<td align=center>".$pago->fields['id_factura_pago']."</td>";
 			$html .= "<td align=center>".Utiles::sql2fecha("d-m-Y",$pago->fields['fecha'])."</td>";
-			$html .= "<td align=center>&nbsp;</td>";
+			$html .= "<td align=center>".$pago->fields['descripcion']."</td>";
 			$html .= "<td align=center>".$moneda->fields['simbolo']." ".number_format($pago->fields['monto_aporte'],$moneda->fields['cifras_decimales'])."</td>";
 			$html .= "<td align=center>
-									<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
+									<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&id_factura=".$factura->fields['id_factura']."&id_cobro=".$factura->fields['id_cobro']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
 									<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' onclick=\"if( confirm('Está eliminando un pago. Se reajustarán los saldos de los documentos asociados. ¿Desea continuar?') )EliminarPago('".$pago->fields['id_factura_pago']."');\" />
 								</td>";
 			$html .= "</tr>";
@@ -237,6 +260,7 @@ class FacturaPago extends Objeto
 				$query_factura = "SELECT
 								prm_documento_legal.codigo
 								,prm_documento_legal.glosa
+								,factura.serie_documento_legal
 								,factura.numero
 								,factura.descripcion
 								,cta_cte_fact_mvto.monto_bruto as monto_bruto
@@ -247,7 +271,7 @@ class FacturaPago extends Objeto
 								WHERE factura.id_factura = '".$arr_fila_tmp->fields['id_factura']."'";
 				
 				$resp_factura =mysql_query($query_factura,$this->sesion->dbh) or Utiles::errorSQL($query_factura,__FILE__,__LINE__, $this->sesion->dbh);
-				list($fac_codigo,$fac_glosa,$fac_numero,$fac_descripcion,$monto_bruto,$saldo) = mysql_fetch_array($resp_factura);
+				list($fac_codigo,$fac_glosa,$fac_serie,$fac_numero,$fac_descripcion,$monto_bruto,$saldo) = mysql_fetch_array($resp_factura);
 				if($monto_bruto!='0') {$monto_bruto=$monto_bruto*(-1);}
 				if($saldo!='0') {$saldo=$saldo*(-1);}
 				if($pago_retencion==1) {$retencion = $this->fields['monto'];}
@@ -257,8 +281,10 @@ class FacturaPago extends Objeto
 
 				$fac_concepto = $this->glosaFacturaVoucher($monto_bruto,$this->fields['monto'],$pago_retencion,$id_concepto);
 				
+				$factura_ = new Factura($this->sesion);
+				
 				$html = str_replace('%factura_codigo%', $fac_codigo, $html);
-				$html = str_replace('%factura_numero%', $fac_numero, $html);
+				$html = str_replace('%factura_numero%', $factura_->ObtenerNumero(null, $fac_serie, $fac_numero), $html);
 				$html = str_replace('%factura_descripcion%', $fac_descripcion, $html);
 				$html = str_replace('%factura_concepto%', $fac_concepto, $html);
 				$html = str_replace('%factura_total%', $total, $html);
@@ -359,6 +385,7 @@ class FacturaPago extends Objeto
 			}
 		return $lista_ids;
 	}
+	
 }
 	
 class ListaFacturaPago extends Lista

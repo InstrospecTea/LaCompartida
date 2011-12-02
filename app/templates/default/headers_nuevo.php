@@ -40,4 +40,21 @@
 	background: url(<?=Conf::ImgDir()?>/fondo_degradado2.gif) repeat-x;
 }
 </style>
+
+<!--[if lt IE 9]>
+<script>
+document.observe("dom:loaded", function() {
+	$$('select.wide').each(function(item) {
+		var widthStyle = null;
+		$(item).observe('focus', function() { widthStyle == null ? widthStyle = $(this).getWidth() : null; $(this).setStyle({ width: 'auto' }).removeClassName('clicked'); })
+			.observe('mouseover', function() { widthStyle == null ? widthStyle = $(this).getWidth() : null; $(this).setStyle({ width: 'auto' }).removeClassName('clicked'); })
+			.observe('click', function() { widthStyle == null ? widthStyle = $(this).getWidth() : null; $(this).toggleClassName('clicked'); })
+			.observe('mouseout', function() { widthStyle == null ? widthStyle = $(this).getWidth() : null; if (!$(this).hasClassName('clicked')) { $(this).setStyle({ width: widthStyle }) }})
+			.observe('blur', function() { widthStyle == null ? widthStyle = $(this).getWidth() : null; $(this).removeClassName('clicked'); $(this).setStyle({ width: widthStyle }); });
+	});
+});
+</script>
+<![endif]-->
+
+
 </head>

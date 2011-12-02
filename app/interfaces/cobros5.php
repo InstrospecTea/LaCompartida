@@ -19,41 +19,41 @@
 	require_once Conf::ServerDir().'/../app/classes/CobroMoneda.php';
 	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-	
+
 	$sesion = new Sesion(array('COB'));
 	$pagina = new PaginaCobro($sesion);
-	
+
 	$cobro = new Cobro($sesion);
 	if(!$cobro->Load($id_cobro))
 		$pagina->FatalError(__('Cobro inválido'));
-	
+
 	$enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
-	
+
 	$cliente = new Cliente($sesion);
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 	$nombre_cliente = $cliente->fields['glosa_cliente'];
 	$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Detalle #').$id_cobro.__(' ').$nombre_cliente;
-	
+
 	//Contrato
 	$contrato = new Contrato($sesion);
 	$contrato->Load($cobro->fields['id_contrato']);
-	
+
 	// Idioma
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	if( method_exists('Conf','GetConf') )
 		$idioma->Load(Conf::GetConf($sesion,'Idioma'));
 	else
 		$idioma->Load(Conf::Idioma());
-	
+
 	// Moneda
 	$moneda_base = new Objeto($sesion,'','','prm_moneda','id_moneda');
 	$moneda_base->Load($cobro->fields['id_moneda_base']);
-	
+
 	$retainer = "";
-	
+
 	if($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION' && $opc != 'anular_emision')
 		$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
-	
+
 	if($opc == 'anular_emision')
 	{
 		if($estado=='EN REVISION')
@@ -71,12 +71,12 @@
 	}
 	elseif($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') #Guardamos todos los datos del cobro
 	{
-		// Si se ajustar el valor del cobro por monto, 
+		// Si se ajustar el valor del cobro por monto,
 		// llamar a la function AjustarPorMonto de la clase Cobro
-		
+
 		if( !is_numeric($cobro_monto_honorarios) )
 			$cobro_monto_honorarios = 0;
-		
+
 		if( $ajustar_monto_hide && $ajustar_monto_hide != "false" )
 			{
 			$cobro->Edit('monto_ajustado',$cobro_monto_honorarios);
@@ -165,6 +165,7 @@
 					$documento->LoadByCobro($id_cobro);
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
 				}
+				$cobro->CambiarEstadoSegunFacturas();
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1");
 			}
@@ -239,14 +240,14 @@
 	if($cobro->Write())
 	{
 		$refrescar = "<script language='javascript' type='text/javascript'>if( window.opener.Refrescar ) window.opener.Refrescar(".$id_foco.");</script>";
-	} 
-	
+	}
+
 	$moneda_cobro = new Objeto($sesion,'','','prm_moneda','id_moneda');
 	$moneda_cobro->Load($cobro->fields['id_moneda']);
 
 	if($popup)
 	{
-?> 
+?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td valign="top" align="left" class="titulo" bgcolor="<?=(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ColorTituloPagina'):Conf::ColorTituloPagina())?>">
@@ -254,9 +255,9 @@
 				</td>
 			</tr>
 		</table>
-		<br> 
-<? 
-	} 
+		<br>
+<?
+	}
 	$pagina->PrintTop($popup);
 
 	$pagina->PrintPasos($sesion,4,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
@@ -290,7 +291,7 @@ function SubirExcel()
 	nuevaVentana('SubirExcel',500,300,"subir_excel.php");
 }
 
-function Refrescar() 
+function Refrescar()
 {
 	var id_cobro = $('id_cobro').value;
 	var vurl = "cobros5.php?popup=1&id_cobro="+id_cobro+"&id_foco=2";
@@ -306,6 +307,29 @@ function Anterior( form )
 	return true;
 }
 
+function ActualizarTarifas( form )
+{
+    var http = getXMLHTTP();
+    http.open('get', 'ajax.php?accion=actualizar_tarifas&id_cobro='+document.getElementById('id_cobro').value);
+    http.onreadystatechange = function()
+    {
+       if(http.readyState == 4)
+       {
+           response = http.responseText;
+           if( response == "OK" ) {
+               alert('Tarifas actualizados con exitó.');
+               $('form_cobro5').submit();
+               return true;
+           }
+           else {
+               alert('No se pudieron actualizar las tarifas.')
+               return false;
+           }
+       }
+    }
+    http.send(null);
+}
+
 function showOpcionDetalle( id, bloqueDetalle )
 {
 	if( $(id).checked )
@@ -317,7 +341,7 @@ function showOpcionDetalle( id, bloqueDetalle )
 function AjustarMonto( accion )
 {
 	form = document.getElementById('form_cobro5');
-	
+
 	if( accion == 'ajustar' )
 	{
 		document.getElementById('cobro_monto_honorarios').value = "";
@@ -334,7 +358,7 @@ function AjustarMonto( accion )
 		document.getElementById('ajustar_monto_hide').value = false;
 		document.getElementById('cancelar_ajustacion').style.display = 'none';
 		document.getElementById('tr_monto_original').style.display = 'none';
-		
+
 		form.submit();
 		return true;
 	}
@@ -349,7 +373,7 @@ function MontoValido( id_campo )
 		monto += arr_monto[$i];
 	if( arr_monto.length > 1 )
 		monto += '.' + arr_monto[arr_monto.length-1];
-	
+
 	document.getElementById( id_campo ).value = monto;
 }
 
@@ -369,7 +393,7 @@ function AgregarParametros( form )
 		if( form.cobro_forma_cobro[i].checked )
 			form.cobro_forma_cobro.value = form.cobro_forma_cobro[i].value;
 	}
-	
+
   if(form.cobro_id_moneda.value)
   {
   	var valor_cobro_id_moneda=form.cobro_id_moneda.value;
@@ -381,14 +405,14 @@ function AgregarParametros( form )
 		{
 			if( form.cobro_id_moneda[i].checked == true )
 				var valor_cobro_id_moneda = form.cobro_id_moneda[i].value;
-			
+
 			i++;
 		}
 	}
 	var cobro_tipo_cambio = document.getElementById('cobro_tipo_cambio_'+parseInt(valor_cobro_id_moneda)).value;
 
 	form.cobro_tipo_cambio.value = parseFloat(cobro_tipo_cambio);
-	
+
 	if( form.cobro_id_moneda.value == '' )
 	{
 		alert("<?=__('Tienes que ingresar el tipo de moneda.')?>");
@@ -414,7 +438,7 @@ function EnRevision( form )
 {
 	form.opc.value = 'en_revision';
 	form.submit();
-	return true; 
+	return true;
 }
 
 function VolverACreado( form )
@@ -424,7 +448,7 @@ function VolverACreado( form )
 			alert("<?=__('No se puede regresar a estado CREADO. Existen Documentos Tributarios creados para') . " " . __('este cobro')?>");
 			return false;
 	}
-	
+
 	form.opc.value = 'volver_a_creado';
 	form.submit();
 	return true;
@@ -440,13 +464,13 @@ function Emitir(form)
       {
 				var response = http.responseText;
 				response = response.split('//');
-				
+
 				var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-				if( response[0] != 0 ) 
+				if( response[0] != 0 )
 					{
 						if( response[0] < 2 )
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("La tarifa del abogado ")?></span>';
-						else	
+						else
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Las tarifas de los abogados ")?></span><br><br>';
 						for(i=1;i<response.length;i++)
 							{
@@ -458,7 +482,7 @@ function Emitir(form)
 							}
 						if( response[0] < 2 )
 							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__(" no esta definido.")?></span><br>';
-						else	
+						else
 							text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?=__(" no estan definidos.")?></span><br>';
 						text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';
 					}
@@ -476,7 +500,9 @@ function Emitir(form)
 								else
 								{
 									var adelantos = $F('saldo_adelantos');
-									if(adelantos && confirm('Tiene disponibles '+adelantos+' en adelantos.\n¿Desea utilizarlos automáticamente para pagar este cobro?')){
+									var total = Number($F('total_honorarios'))+Number($F('total_gastos'));
+									if(adelantos && confirm('Tiene disponibles '+adelantos+' en adelantos.\n¿Desea utilizarlos automáticamente para '+
+										(Number(adelantos.replace(/[^\d\.]/g,'')) < total ? 'abonar' : 'pagar')+' este cobro?')){
 										$('usar_adelantos').value = '1';
 									}
 									form.accion.value = 'emitir';
@@ -541,10 +567,10 @@ function GuardaCobro( form )
 {
 	if(!form)
 		var form = $('form_cobro5');
-	
+
 	if( !AgregarParametros( form ) )
 		return false;
-	
+
 	form.accion.value = '';
 	form.opc.value = 'guardar_cobro';
 	form.submit();
@@ -607,7 +633,7 @@ function HideMonto()
 
     div = document.getElementById("div_horas");
     div.style.display = "none";
-    
+
     document.getElementById('ajustar_monto').style.display = 'inline';
 }
 
@@ -829,14 +855,14 @@ function UpdateCap(monto_update, guardar)
 // -->
 </script>
 
-<? 
+<?
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
-	
+
 	#Para revisar si existen facturas (No puede volver a creado).
 	$query = "SELECT count(*) FROM factura_cobro WHERE id_cobro = '".$cobro->fields['id_cobro']."'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($numero_facturas_asociados) = mysql_fetch_array($resp);
-	if( $numero_facturas_asociados > 0 ) 
+	if( $numero_facturas_asociados > 0 )
 		$existe_factura = 1;
 	else
 		$existe_factura = 0;
@@ -855,8 +881,8 @@ function UpdateCap(monto_update, guardar)
 <input type="hidden" name="accion" value="" id="accion">
 <input type="hidden" name="saldo_adelantos" value="<?php
 $documento = new Documento($sesion);
-$pago_honorarios = empty($cobro->fields['monto_subtotal']) ? 0 : 1;
-$pago_gastos = empty($cobro->fields['subtotal_gastos']) ? 0 : 1;
+$pago_honorarios = (float)($cobro->fields['monto_subtotal']) ? 1 : 0;
+$pago_gastos = (float)($cobro->fields['subtotal_gastos']) ? 1 : 0;
 $cobro_moneda = new ListaMonedas($sesion, '','SELECT * FROM cobro_moneda WHERE id_cobro = '.$id_cobro);
 $tipo_cambio_cobro = Array();
 for( $i=0; $i<$monedas->num; $i++ )
@@ -885,7 +911,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				{ ?>
 					En revisión. &nbsp;&nbsp;
 					<input type="button" class=btn value="<?=__('Volver al estado CREADO')?>" onclick="VolverACreado(this.form);">
-		<?	} 
+		<?	}
 ?>
 			<input type="button" class=btn value="<?=__('Emitir Cobro')?>" onclick="Emitir(this.form);">
 		</td>
@@ -1045,6 +1071,9 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 
     </td>
  </tr>
+ <tr>
+    <td align="center" colspan="2"><a href="#" onclick="ActualizarTarifas();" title="Actualizar las tarifas de todos los trabajos de este cobro">Actualizar tarifas</a></td>
+ </tr>
 </table>
 </fieldset>
 <!-- fin Modalidad -->
@@ -1058,7 +1087,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
   </tr>
 </table>
 
-<? 
+<?
 	if( $cobro->fields['forma_cobro'] == 'TASA' )
 	{
 		if( $cobro->fields['monto_ajustado'] > 0 )
@@ -1089,8 +1118,13 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
   <tr>
     <td align="left">
 			<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
+				<tr>
+					<td colspan="2" bgcolor="#dfdfdf">
+						<span style="font-weight: bold; font-size: 11px;"><?=__('Honorarios')?></span>
+					</td>
+				</tr>
 			  <tr>
-			    <td align="right" width="45%" nowrap> 
+			    <td align="right" width="45%" nowrap>
 			    		<?=__('Trabajos')?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
 			    </td>
 			    <td align="left" width="55%" nowrap>
@@ -1165,7 +1199,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 			  </table>
 			</td>
 			<td align=center>
-				
+
 				<?
 				$moneda_total = new Moneda($sesion);
 				$moneda_total->Load($cobro->fields['opc_moneda_total']);
@@ -1176,60 +1210,81 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				$cifras_decimales_moneda_cobro = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['cifras_decimales'];
 				$cifras_decimales_moneda_total = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales'];
 				?>
-			<!--
-			<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
-	<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos'])
+
+			<? if( UtilesApp::GetConf($sesion,'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos']))
 			{ ?>
+			<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
 				<tr>
-			    <td align="right" width="45%" nowrap>
-			    		<?=__('Subtotal Gastos')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
-			    </td>
-			    <td align="left" width="55%" nowrap>
-			    	<input type="text" id="subtotal_gastos" value="<?=number_format($cobro->fields['subtotal_gastos'] * ($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']/$cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['tipo_cambio']),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
-			    	</td>
-			  </tr>
-			  <tr>
-			    <td align="right" width="45%" nowrap>
-			    		<?=__('Impuestos Gastos')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$cobro->fields['porcentaje_impuesto_gastos'].'%'?></span>):
-			    </td>
-			    <td align="left" width="55%" nowrap>
-			    	<input type="text" id="impuestos_gastos" value="<?=number_format($cobro->fields['impuesto_gastos'] * ($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']/$cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['tipo_cambio']),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
-			    	</td>
-			  </tr>
-			<? } ?>
-			  <tr>
-			    <td align="right" width="45%" nowrap>
-			    		<?=__('Total Gastos')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
-			    </td>
-			    <td align="left" width="55%" nowrap >
-			    	<input type="text" id="total_gastos" value="<?=number_format($cobro->fields['monto_gastos'] * ($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']/$cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['tipo_cambio']),$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
-			    	</td>
-			  </tr>
+					<td colspan="2" bgcolor="#dfdfdf">
+						<span style="font-weight: bold; font-size: 11px;"><?=__('Gastos')?></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="45%" nowrap>
+							<?=__('Subtotal Gastos c/IVA')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
+					</td>
+					<td align="left" width="55%" nowrap>
+						<input type="text" id="subtotal_gastos_con" value="<?=$x_resultados['gastos']['subtotal_gastos_con_impuestos'][$moneda_cobro->fields['id_moneda']]?>" size="12" readonly="readonly" style="text-align: right;" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="45%" nowrap>
+							<?=__('Subtotal Gastos s/IVA')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
+					</td>
+					<td align="left" width="55%" nowrap>
+						<input type="text" id="subtotal_gastos_sin" value="<?=$x_resultados['gastos']['subtotal_gastos_sin_impuestos'][$moneda_cobro->fields['id_moneda']]?>" size="12" readonly="readonly" style="text-align: right;" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="45%" nowrap>
+							<?=__('Impuestos Gastos')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
+					</td>
+					<td align="left" width="55%" nowrap>
+						<input type="text" id="impuestos_gastos" value="<?=$x_resultados['gastos']['gasto_impuesto'][$moneda_cobro->fields['id_moneda']]?>" size="12" readonly="readonly" style="text-align: right;" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="45%" nowrap>
+							<?=__('Total Gastos')?> (<span id="divCobroUnidadGastos" style='font-size:10px'><?=$moneda_cobro->fields['simbolo']?></span>):
+					</td>
+					<td align="left" width="55%" nowrap>
+						<input type="text" id="total_gastos" value="<?=$x_resultados['gastos']['gasto_total_con_impuesto'][$moneda_cobro->fields['id_moneda']]?>" size="12" readonly="readonly" style="text-align: right;" />
+					</td>
+				</tr>
 			</table>
 			<br />
-			-->
+			<? } ?>
+
 			<!--Agregar un resumen en moneda total para mejor indicacion de esta,
 					Versiones anteriores quedan comentado por sia caso que volvemos a estas mas tarde-->
 			<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf'>
 				<tr>
 					<td colspan="2" bgcolor="#dfdfdf">
-						<span style="font-weight: bold; font-size: 11px;"><?=__('Resumen moneda total')?></span>
+						<span style="font-weight: bold; font-size: 11px;"><?=__('Resumen total')?></span>
 					</td>
 				</tr>
 				<tr>
 					<td align="right" width="45%" nowrap>
-						 <span style='font-size:10px'><?=__('Total Honorarios')?></span> (<span id="divCobroUnidadHonorariosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
+						 <span style='font-size:10px;float:left'><?=__('Total Honorarios ').(UtilesApp::GetConf($sesion,'UsarImpuestoSeparado')?'<br/>('.__('con impuestos').')':'')?></span> (<span id="divCobroUnidadHonorariosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
 					</td>
 					<td align="left" width="55%" nowrap>
-						<input type="text" id="total_honorarios" value="<?=$x_resultados['monto_subtotal'][$cobro->fields['opc_moneda_total']]-$x_resultados['descuento'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
+						<input type="text" id="total_honorarios" value="<?=$x_resultados['monto'][$cobro->fields['opc_moneda_total']]-$x_resultados['descuento'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
 					</td>
 				</tr>
 				<tr>
 					<td align="right" width="45%" nowrap>
-						<span style='font-size:10px'><?=__('Total Gastos')?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
+						<span style='font-size:10px;float:left'><?=__('Total Gastos ').(UtilesApp::GetConf($sesion,'UsarImpuestoPorGastos')?'<br/>('.__('con impuestos').')':'')?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
 					</td>
 					<td align="left" width="55%" nowrap>
-						<input type="text" id="total_gastos" value="<?=$x_resultados['subtotal_gastos'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
+						<input type="text" id="total_gastos" value="<?=$x_resultados['monto_gastos'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="45%" nowrap>
+						<span style='font-size:10px'><?=__('Total')?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
+					</td>
+					<td align="left" width="55%" nowrap>
+						<input type="text" id="total" value="<?= number_format($x_resultados['monto_gastos'][$cobro->fields['opc_moneda_total']]+$x_resultados['monto'][$cobro->fields['opc_moneda_total']]-$x_resultados['descuento'][$cobro->fields['opc_moneda_total']],$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
 					</td>
 				</tr>
 			</table>
@@ -1263,7 +1318,8 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 					</td>
 				</tr>
 			</table>
-    </td> <? /*
+    </td>
+ <? /*
     <td align="center">
     	<table width="270" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=center>
 				<?
@@ -1271,7 +1327,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 		$moneda_total->Load($cobro->fields['opc_moneda_total']);
 		$cobro_moneda_tipo_cambio = new CobroMoneda($sesion);
 		$cobro_moneda_tipo_cambio->Load($id_cobro);
-		
+
 		$monto_honorario=(round($cobro->CalculaMontoTrabajos( $cobro->fields['id_cobro'] ),2)*round($cobro_moneda_tipo_cambio->moneda[$moneda_cobro->fields['id_moneda']]['tipo_cambio'],2))/round($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio'],2);
 
 			if( $cobro->fields['solo_gastos'] == 0 )
@@ -1347,7 +1403,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 										$display_detalle_profesional = "style='display: table-row;'";
 									else
 										$display_detalle_profesional = "style='display: none;'";
-										
+
 									if( $cobro->fields['opc_ver_detalles_por_hora'] )
 										$display_detalle_por_hora = "style='display: table-row;'";
 									else
@@ -1458,7 +1514,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 ?>
 					<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
 <?
-				}				
+				}
 				elseif($solicitante == 1)	// obligatorio
 				{
 ?>
@@ -1500,45 +1556,53 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 					<?		}  ?>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" id="opc_ver_valor_hh_flat_fee" value="1" <?=$cobro->fields['opc_ver_valor_hh_flat_fee']=='1'?'checked':''?>></td>
-									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?=__('Mostrar valor HH en caso de Flat Fee')?></label></td>
+									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?=__('Mostrar tarifa proporcional en base a HH')?></label></td>
 								</tr>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?=$cobro->fields['opc_ver_carta']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_carta"><?=__('Mostrar Carta')?></label></td>
 								</tr>
 								<tr>
-									<td align="right">&nbsp;</td>
-									<td align="left" style="font-size: 10px;">
+									<td style="font-size: 10px;" colspan="3">
 										<?=__('Formato de carta')?>:
 									</td>
-									<td align="left">
+								</tr>
+								<tr>
+									<td align="left" colspan="3">
 										<?= Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion
 																				FROM carta ORDER BY id_carta","id_carta",
-																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], $cobro->fields['opc_ver_carta']=='1'?'':'disabled','',130); ?>
+																$cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta']=='1'?'':'disabled') . ' class="wide"','',150); ?>
 									</td>
 								</tr>
 								<tr>
-									<td align="right">&nbsp;</td>
-									<td align="left" style="font-size: 10px;">
+									<td style="font-size: 10px;"  colspan="3">
 										<?=__('Formato Detalle Carta Cobro')?>:
 									</td>
-									<td align="left">
+								</tr>
+								<tr>
+									<td align="left" colspan="3">
 										<?= Html::SelectQuery($sesion, "SELECT cobro_rtf.id_formato, cobro_rtf.descripcion
 																FROM cobro_rtf ORDER BY cobro_rtf.id_formato","id_formato",
-												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], '','Seleccione'); ?>
+												$cobro->fields['id_formato'] ? $cobro->fields['id_formato'] : $contrato->fields['id_formato'], 'class="wide"','Seleccione',150); ?>
 									</td>
 								</tr>
 								<tr>
-									<td align="right">&nbsp;</td>
-									<td align="left" style="font-size: 10px;">
+									<td align="left" style="font-size: 10px;" colspan="3">
 										<?=__('Tamaño del papel')?>:
 									</td>
-									<td align="left">
+								</tr>
+								<tr>
+									<td align="left" colspan="3">
+<?php
+if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDefecto')) {
+	$cobro->fields['opc_papel'] = UtilesApp::GetConf($sesion, 'PapelPorDefecto');
+}
+?>
 										<select name="opc_papel">
-											<option value="LETTER" <?=$cobro->fields['opc_papel']=='LETTER'?'selected':''?>><?=__('Carta')?></option>
-											<option value="OFFICE" <?=$cobro->fields['opc_papel']=='OFFICE'?'selected':''?>><?=__('Oficio')?></option>
-											<option value="A4" <?=$cobro->fields['opc_papel']=='A4'?'selected':''?>><?=__('A4')?></option>
-											<option value="A5" <?=$cobro->fields['opc_papel']=='A5'?'selected':''?>><?=__('A5')?></option>
+											<option value="LETTER" <?php echo $cobro->fields['opc_papel'] == 'LETTER' ? 'selected="selected"' : '' ?>><?php echo __('Carta'); ?></option>
+											<option value="LEGAL" <?php echo $cobro->fields['opc_papel'] == 'LEGAL' ? 'selected="selected"' : '' ?>><?php echo __('Oficio'); ?></option>
+											<option value="A4" <?php echo $cobro->fields['opc_papel'] == 'A4' ? 'selected="selected"' : '' ?>><?php echo __('A4'); ?></option>
+											<option value="A5" <?php echo $cobro->fields['opc_papel'] == 'A5' ? 'selected="selected"' : '' ?>><?php echo __('A5'); ?></option>
 										</select>
 									</td>
 								</tr>
@@ -1554,7 +1618,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 						<table width="180">
 							<tr>
 								<td width="50%" style="font-size: 10px;" nowrap>
-									<?=__('Mostrar total en')?>: 
+									<?=__('Mostrar total en')?>:
 								</td>
 								<td width="50%">
 									<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$cobro->fields['opc_moneda_total'],'onchange="ActualizarSaldoAdelantos();"','','70');?>
@@ -1562,7 +1626,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 							</tr>
 							<tr>
 								<td style="font-size: 10px;" nowrap>
-									<?=__('Idioma')?>: 
+									<?=__('Idioma')?>:
 								</td>
 								<td>
 									<?=Html::SelectQuery($sesion,"SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma","lang",$cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'] ,'','',70);?>
@@ -1584,7 +1648,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 							<?php
 								if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
 								{
-							?>							
+							?>
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Archivo')?> PDF" onclick="return ImprimirCobroPDF(this.form);" />

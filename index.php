@@ -48,7 +48,8 @@
 		</td>
 		<td align="left" nowrap>
 			<? if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='Cédula' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='Cédula' ) )
-			        || ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='CNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='CNI' ) ) ) { ?>
+			        || ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='CNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='CNI' ) ) 
+					|| ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='DNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='DNI' ) )) { ?>
 				<input type="text" name="rut" value="" size="17">
 			<? } else { ?>
 				<input type="text" name="rut" value="" size="10">-<input type="text"  name="dvrut" value="" size="1">

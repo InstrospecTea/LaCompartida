@@ -136,6 +136,11 @@
 
 	// Asumiendo que todos los trabajos del cobro están en la misma moneda.
 	$simbolo_moneda = Utiles::glosa($sesion, $lista->Get(0)->fields['id_moneda_asunto']?$lista->Get(0)->fields['id_moneda_asunto']:$cobro->fields['id_moneda'],'simbolo','prm_moneda','id_moneda');
+	$glosa_moneda = Utiles::glosa($sesion, $lista->Get(0)->fields['id_moneda_asunto']?$lista->Get(0)->fields['id_moneda_asunto']:$cobro->fields['id_moneda'],'glosa_moneda','prm_moneda','id_moneda');
+	if ($glosa_moneda == "Euro") {
+	    $simbolo_moneda = "EUR";
+	}
+	
 	$cifras_decimales = Utiles::glosa($sesion, $lista->Get(0)->fields['id_moneda_asunto']?$lista->Get(0)->fields['id_moneda_asunto']:$cobro->fields['id_moneda'],'cifras_decimales','prm_moneda','id_moneda');
 	if($cifras_decimales > 0)
 	{
@@ -504,6 +509,10 @@
 
 		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
 		$simbolo_moneda = $moneda_total->fields['simbolo'];
+		$glosa_moneda = $moneda_total->fields['glosa_moneda'];
+		if ($glosa_moneda == "Euro") {
+			$simbolo_moneda = "EUR";
+		}
 		$cifras_decimales = $moneda_total->fields['cifras_decimales'];
 		if($cifras_decimales > 0)
 		{

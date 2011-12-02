@@ -46,7 +46,7 @@ class Excel
 	}
 
 	function CargarEncabezados()
-	{
+		{
 		for($i=1;$i<=$this->libro->sheets[0]['numCols'];$i++) {
 			$this->encabezado[$i] = $this->LeerEncabezado($i);
 		}
@@ -58,7 +58,7 @@ class Excel
 		$encabezado = str_replace('\'','',$encabezado);
 		return trim($encabezado);
 	}
-	
+
 	function C($columna)
 	{
 			$out = $this->libro->sheets[0]['cells'][$this->fila][$columna];
@@ -83,7 +83,7 @@ class Excel
 			$this->datos[$this->fila] = array();
 			$this->parsearGeneral();
 		}
-		
+
 		//$this->comprobar();
 		//$this->ImprimirTablas();
 		if($this->insertar == 1)
@@ -101,7 +101,7 @@ class Excel
 		if(!isset($this->campos[$campo][$instancia]))
 			$this->campos[$campo][$instancia] = 1;
 		else
-			$this->campos[$campo][$instancia]++;
+		   $this->campos[$campo][$instancia]++;
 	}
 
 	function parsearGeneral()
@@ -144,8 +144,8 @@ class Excel
 
 		$cliente['fono_contacto'] = $fono;
 		$cliente['email_contacto'] = $mail;
-		
-		$this->clientes[$nombre] = $cliente;	
+
+		$this->clientes[$nombre] = $cliente;
 	}
 
 	function parsearAsunto()
@@ -184,7 +184,7 @@ class Excel
 			$cliente_nuevo['apellido_contacto'] = $contacto;
 			$cliente_nuevo['fono_contacto'] = $fono;
 			$cliente_nuevo['email_contacto'] = $mail;
-			
+
 
 			$this->clientes[$cliente] = $cliente_nuevo;
 		}
@@ -227,10 +227,10 @@ class Excel
 				$cliente->Edit('glosa_cliente',$cli['nombre']);
 				$cliente->Edit('id_moneda',1);
 				$cliente->Edit('id_usuario_encargado',$this->id_usuario);
-				
+
 				if($cliente->Write())
 				{
-					
+
 					echo 'Ingresado Cliente: "'.$cli['nombre'].'"<br>';
 					$contrato = new Contrato($this->sesion);
 
@@ -269,7 +269,11 @@ class Excel
 					$contrato->Edit('opc_ver_numpag',1);
 					$contrato->Edit('opc_ver_resumen_cobro',1);
 					$contrato->Edit('opc_ver_carta',1);
-					$contrato->Edit('opc_papel','LETTER');
+					if (UtilesApp::GetConf($this->sesion, 'PapelPorDefecto')) {
+						$contrato->Edit('opc_papel', UtilesApp::GetConf($this->sesion, 'PapelPorDefecto'));
+					} else {
+						$contrato->Edit('opc_papel','LETTER');
+					}
 					$contrato->Edit('opc_moneda_total',1);
 					$contrato->Edit('opc_ver_solicitante','0');
 					$contrato->Edit('codigo_idioma','es');
@@ -282,7 +286,7 @@ class Excel
 						echo 'Ingresado Contrato<br>';
 						$cliente->Edit('id_contrato',$contrato->fields['id_contrato']);
 						$cliente->Write();
-						
+
 						foreach($cli['asuntos'] as $num => $as)
 						{
 							$asunto = new Asunto($this->sesion);
@@ -293,7 +297,7 @@ class Excel
 							$asunto->Edit('glosa_asunto',$as['nombre']);
 							$asunto->Edit('codigo_cliente',$cliente->fields['codigo_cliente']);
 							$asunto->Edit('id_contrato',$contrato->fields['id_contrato']);
-							
+
 							$asunto->Edit('id_usuario',$this->id_usuario);
 							$asunto->Edit('contacto',$as['contacto']);
 							$asunto->Edit('fono_contacto',$as['fono_contacto']);

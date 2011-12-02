@@ -137,6 +137,7 @@
 		{
 			$col_cliente_facturable = ++$col;
 		}
+                $col_codigos_asuntos = ++$col;
 		$col_asuntos = ++$col;
 		$col_encargado = ++$col;
 		if($mostrar_encargado_secundario)
@@ -187,6 +188,7 @@
 		{
 			$ws1->setColumn($col_cliente_facturable, $col_cliente_facturable, 40);
 		}
+                $ws1->setColumn($col_codigos_asuntos, $col_codigos_asuntos, 30);
 		$ws1->setColumn($col_asuntos, $col_asuntos, 40);
 		$ws1->setColumn($col_encargado, $col_encargado, 20);
 		if($mostrar_encargado_secundario)
@@ -362,7 +364,7 @@
 								documento.honorarios,
 								documento.gastos,
 								documento.saldo_honorarios,
-								documento.saldo_gastos 
+								documento.saldo_gastos
 							FROM cobro
 								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'
 								LEFT JOIN documento as documento_pago ON documento_pago.id_cobro = cobro.id_cobro AND documento_pago.tipo_doc != 'N' 
@@ -385,7 +387,8 @@
 								cobro.fecha_creacion";
 		// Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
-							GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos
+							GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos,
+                                                        GROUP_CONCAT(distinct asunto.codigo_asunto SEPARATOR '\n') as codigos_asuntos
 						FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
@@ -395,8 +398,10 @@
 						GROUP BY cobro.id_cobro";
 		$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
 		$glosa_asuntos = array();
-		while(list($id_cobro, $asuntos) = mysql_fetch_array($resp)){
+                $codigo_asuntos = array();
+		while(list($id_cobro, $asuntos, $codigos) = mysql_fetch_array($resp)){
 			$glosa_asuntos[$id_cobro] = $asuntos;
+                        $codigo_asuntos[$id_cobro] = $codigos;
 		}
 
 		#Clientes
@@ -404,7 +409,7 @@
 		//echo $query;
 		$fila_inicial = $filas + 2;
 		while($cobro = mysql_fetch_array($resp))
-		{			
+                {			
 			if(!$tabla_creada)
 			{
 				$ws1->write($filas, $col_numero_cobro, __('N° del Cobro'), $titulo_filas);
@@ -417,6 +422,7 @@
 				{
 					$ws1->write($filas, $col_cliente_facturable, __('Cliente Facturable'), $titulo_filas);
 				}
+                                $ws1->write($filas, $col_codigos_asuntos, __('Codigos') . ' ' . __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_encargado, __('Encargado Comercial'), $titulo_filas);
 				if($mostrar_encargado_secundario)
@@ -640,16 +646,20 @@
 			{
 				$facturas = "";
 				$clientes_factura = "";
-				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo FROM factura f JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  WHERE f.id_cobro = '" . $cobro['id_cobro'] . "'";
+				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo, f.serie_documento_legal 
+                                                             FROM factura f 
+                                                             JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  
+                                                             JOIN prm_estado_factura pef ON pef.id_estado = f.id_estado 
+                                                             WHERE f.id_cobro = '" . $cobro['id_cobro'] . "' AND pef.codigo != 'A'";
 				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
-				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura )  = mysql_fetch_array($resp3))
+				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura, $serie )  = mysql_fetch_array($resp3))
 				{
 					if( strlen( $facturas ) > 0 )
 					{
 						$facturas .= "\n";
 						$clientes_factura .= "\n";
 					}
-					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " . $numero_factura : " "  );
+					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " .  str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero_factura : " "  );
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
 				}
 			}
@@ -673,6 +683,8 @@
 			{
 				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
 			}
+
+                        $ws1->write($filas, $col_codigos_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_opcion);                        
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_opcion);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 				$ws1->write($filas, $col_encargado, $cobro['username'], $txt_opcion);

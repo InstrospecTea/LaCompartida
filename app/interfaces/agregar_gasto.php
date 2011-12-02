@@ -57,24 +57,24 @@
 		else
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
-			{	
+			{
 				$gasto->Edit("cobrable","0");
 			}
 			else
-			{	
+			{
 				$gasto->Edit("cobrable","1");
 			}
 		}
-		
+
 		/*
-		 *  Si el gasto se considera con IVA, 
+		 *  Si el gasto se considera con IVA,
 		 *  se calcula en base al porcentaje impuesto gasto
 		 *  del cobro
 		 */
 		if( !UtilesApp::GetConf($sesion,'UsarGastosConSinImpuesto') )
 			$con_impuesto = 1;
 		$gasto->Edit("con_impuesto",$con_impuesto==1 ? "SI" : "NO");
-		
+
 		if(!$codigo_cliente && $codigo_cliente_secundario)
 		{
 			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
@@ -130,18 +130,18 @@
 		$gasto->Edit("id_usuario_orden",(!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
-		
+
 		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
 		if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
-		{ 
-			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada; 
+		{
+			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada;
 		}
 		$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
 		$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
 		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
-		
-		
-	
+
+
+
 		if($pagado && $prov == 'false')
 		{
 			$ingreso->Edit('fecha',$fecha_pago ? Utiles::fecha2sql($fecha_pago) : "NULL");
@@ -344,7 +344,7 @@ function Validar(form)
 		form.monto.focus();
 		return false;
 	}
-<? } ?> 
+<? } ?>
 	if(form.descripcion.value == "")
 	{
 		alert('<?=__('Debe ingresar una descripción')?>');
@@ -352,7 +352,7 @@ function Validar(form)
 		return false;
 	}
 <?php
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
+	if (UtilesApp::GetConf($sesion, 'TodoMayuscula'))
 	{
 ?>
 	if(form.descripcion.value != "")
@@ -450,7 +450,7 @@ function CargaIdioma( codigo )
 }
 function AgregarNuevo(tipo, prov)
 {
-	<? 
+	<?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	 { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
@@ -507,17 +507,17 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundar
 		{
 			if( $gasto->fields['codigo_cliente'] )
 			 	$codigo_cliente=$gasto->fields['codigo_cliente'];
-			 	
+
 			$query = "SELECT codigo_cliente_secundario FROM cliente WHERE codigo_cliente='$codigo_cliente'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($codigo_cliente_secundario)=mysql_fetch_array($resp);
 		}
-		
+
 	if( !$codigo_asunto_secundario )
 		{
 			if($gasto->fields['codigo_asunto'])
 				$codigo_asunto=$gasto->fields['codigo_asunto'];
-				
+
 			$query = "SELECT codigo_asunto_secundario FROM asunto WHERE codigo_asunto='$codigo_asunto'";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($codigo_asunto_secundario)=mysql_fetch_array($resp);
@@ -527,7 +527,7 @@ else
 {
 	if( !$codigo_cliente )
 			$codigo_cliente = $gasto->fields['codigo_cliente'];
-			
+
 	if( !$codigo_asunto )
 			$codigo_asunto = $gasto->fields['codigo_asunto'];
 }
@@ -559,7 +559,7 @@ else
 		</td>
 		<td align=left>
 			<?
-			
+
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -576,7 +576,7 @@ else
 				else
 				{
 					echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $gasto->fields['codigo_cliente'] ? $gasto->fields['codigo_cliente'] : $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos');", 320);
-				} 
+				}
 			}	?>
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
@@ -585,11 +585,11 @@ else
 		<td align=right>
 			<?=__('Asunto')?>
 		</td>
-		<td align=left> 
+		<td align=left>
 				<?
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) )
 				{
-					echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto","codigo_asunto_secundario", $codigo_asunto_secundario,"", "CargaIdioma(this.value);CargarSelectCliente(this.value, 'gastos');", 320, $codigo_cliente_secundario); 
+					echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto","codigo_asunto_secundario", $codigo_asunto_secundario,"", "CargaIdioma(this.value);CargarSelectCliente(this.value, 'gastos');", 320, $codigo_cliente_secundario);
 				}
 				else
 				{
@@ -740,17 +740,17 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 				<input name="pre_numero_factura_asociada" size=3 maxlength=3 value="<?=$pre_numero_factura_asociada? $pre_numero_factura_asociada:''?>" />
 				<span>-</span>
 				<input name="post_numero_factura_asociada" size=10 maxlength=10 value="<?=$post_numero_factura_asociada? $post_numero_factura_asociada:''?>" />
-				
+
 			<?} else {?>
 				<input name="numero_factura_asociada" size=10 value="<?=($gasto->fields['codigo_factura_gasto'] && $gasto->fields['codigo_factura_gasto'] != 'NULL') ? $gasto->fields['codigo_factura_gasto'] : '' ?>" />
 			<?}?>
-			
+
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
 	</tr>
 	<tr>
 		<td align="right">
-			<?=__('Fecha Documento')?> 
+			<?=__('Fecha Documento')?>
 		</td>
 		<td>
 			<input type="text" name="fecha_factura_asociada" value="<?=($gasto->fields['fecha_factura'] && $gasto->fields['fecha_factura']!='NULL') ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
@@ -808,7 +808,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 		<td align=left>
 			<textarea id='descripcion' name=descripcion cols="45" rows="3"><?=$checked_general == '' ? $gasto->fields['descripcion'] : $gastoGeneral->fields['descripcion'];?></textarea>
-		
+
 			<script type="text/javascript">
 				var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
 				googie2.setLanguages({'es': 'Español', 'en': 'English'});
@@ -818,12 +818,12 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			</script>
 		</td>
 	</tr>
-	<? 
+	<?
 		// Por definicion las provisiones no deben tener Impuestos
 		if ($prov == 'false')
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) )
-			{ 
+			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosConSinImpuesto') ) || ( method_exists('Conf','UsarGastosConSinImpuesto') && Conf::UsarGastosConSinImpuesto() ) )
 				{ ?>
 	<tr>
@@ -842,11 +842,11 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="1" <?php echo $con_impuesto_check; ?>>
  		</td>
 	</tr>
-			<?	} 
+			<?	}
 			}
 		} ?>
 	<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
-			{ 
+			{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 				{ ?>
 	<tr>
@@ -854,7 +854,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Cobrable')?>
 			<?php
 			$cobrable_checked = 'checked';
-			
+
 			if($id_gasto>0)
 			{
 				if($gasto->fields['cobrable'] == 1) {
@@ -870,8 +870,8 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<input type="checkbox" id="cobrable" name="cobrable" value="1" <?php echo $cobrable_checked; ?>>
  		</td>
 	</tr>
-			<?	} 
-			} ?>		
+			<?	}
+			} ?>
 	<tr>
 		<td align=right colspan="2">&nbsp;</td>
 	</tr>
@@ -966,13 +966,13 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<input type="checkbox" id="con_impuesto" name="con_impuesto" value="1" <?php echo $con_impuesto_check; ?>>
 		</td>
 	</tr>
-	<?	 }	
+	<?	 }
 		}
 	} ?>
-	
-	
-	
-	
+
+
+
+
 </table>
 </div>
 <?

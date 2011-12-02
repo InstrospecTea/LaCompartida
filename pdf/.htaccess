@@ -1,0 +1,51 @@
+#Options none
+# Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	
+	# descomentar la linea si hay problemas haciendo trabajar scripts
+	# RewriteBase /
+	# RewriteCond %{HTTP_HOST} ^www.casalapostolle.com.com$[OR]
+	# RewriteCond %{HTTP_HOST} ^casalapostolle.com$[OR]
+	# RewriteCond %{HTTP_HOST} ^www.closapalta.com.com$[OR]
+	# RewriteCond %{HTTP_HOST} ^closapalata.com$
+	# RewriteRule ^(.*)$ http://www.lapostolle.com/ [R=301,L]
+	
+	# saltear todos los archivos .algo  (ej .htaccess .readme  etc)
+	#RewriteCond %{REQUEST_URI} \..+$
+	#RewriteCond %{REQUEST_URI} !\.html$
+	#RewriteRule .* - [L]
+	
+	#prevenir en parte los remote file inclusion
+	#RewriteCond %{QUERY_STRING} ^.*=(ht|f)tp\://.*$ [NC]
+	
+	#bloquear algunos query strings maliciosos conocidos
+	#RewriteCond %{QUERY_STRING} tool25 [OR]
+	#RewriteCond %{QUERY_STRING} cmd [OR]
+	#RewriteCond %{QUERY_STRING} r57shell [OR]
+	#RewriteCond %{QUERY_STRING} c99
+	#RewriteRule ^.* - [F,L]
+	
+	#revisamos si la solicitud es feed o la especiald e paypal
+	#Rewriterule ^ms/(.*)$  ms.php?pagina=$1
+	#Rewriterule ^es_CL/blog/(.*)$  blog/index.php?nl=es_CL
+	#Rewriterule ^en_US/blog/(.*)$  blog/index.php?nl=en_US
+	
+	# revisamos si existe una version del archivo con extension .html (caching)
+	RewriteRule ^$ index.html [QSA]	
+	
+	# revisamos si es un archivo, y lo abrimos, o si es un directorio lo mismo.
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	
+	# si no existe, lo redireccionamos a la pagina que gestionará los contenidos
+	RewriteRule ^(.*)factura(.*).pdf(.*)$ factura.pdf [QSA,L]
+	
+	#uncomment this lines for not alowing hotlinking images //change url too
+	#RewriteCond %{HTTP_REFERER} !^$
+	#RewriteCond %{HTTP_REFERER} !^http://(www\.)?lapostolle.cl/.*$ [NC]
+	#RewriteRule \.(gif|jpg|png)$ http://www.lapostolle.cl/imagenes/nohotlink.gif [R,L]
+</IfModule>
+
+

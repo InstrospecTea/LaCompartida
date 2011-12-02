@@ -6386,268 +6386,643 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
-					}
+
+
+		case 5:
+			$query = array();
+			$query[] = "ALTER TABLE `cliente` ADD `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.01:
+			$query = array();
+
+			$query[] = "
+				INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'NumeroFacturaConSerie', '0', 'Agregar numero de serie al numero correlativo de los documentos legales', 'boolean', '6', '-1');
+				";
+
+			$query[] = "
+				--
+				-- Estructura de tabla para la tabla `prm_doc_legal_numero`
+				--
+
+				CREATE TABLE `prm_doc_legal_numero` (
+				  `id_doc_legal_numero` int(11) NOT NULL auto_increment,
+				  `id_documento_legal` int(11) NOT NULL default '0',
+				  `numero_inicial` varchar(11) NOT NULL default '0',
+				  `serie` varchar(11) NOT NULL default '0',
+				  PRIMARY KEY  (`id_doc_legal_numero`),
+				  UNIQUE KEY `id_documento_legal_2` (`id_documento_legal`,`serie`),
+				  KEY `id_documento_legal` (`id_documento_legal`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
+				";
+
+			$query[] = "
+				ALTER TABLE `prm_doc_legal_numero`
+				  ADD CONSTRAINT `prm_doc_legal_numero_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`);
+				";
+
+			$query[] = "INSERT INTO `prm_doc_legal_numero` (`id_documento_legal`, `numero_inicial`, `serie`) SELECT `id_documento_legal`, `numero_inicial`, '001' AS serie FROM prm_documento_legal;";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.02:
+			$query = array();
+			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'CantidadCerosFormatoDNI', '0', 'Completa N ceros al inicio del DNI', 'string', '6', '-1');";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.03:
+			$query = array();
+
+			$query[] = "INSERT INTO `prm_forma_cobro` ( `forma_cobro` , `descripcion` ) VALUES ('HITOS', 'Hitos');";
+			$query[] = "ALTER TABLE `cobro_pendiente` CHANGE `fecha_cobro` `fecha_cobro` DATE NULL;";
+			$query[] = "ALTER TABLE `cobro_pendiente` ADD `hito` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT '1 si es un hito, 0 si no (cobro programado)';";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.04:
+			$query = array();
+			$query[] = "ALTER TABLE `cobro_pendiente` ADD `observaciones` TEXT NULL COMMENT 'para los hitos';";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.05:
+			$query = array();
+			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'PapelPorDefecto',  'LETTER',  'Tamaño de papel por defecto',  'select;LETTER;LEGAL;A4;A5',  '6',  '-1');";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.06:
+			$query = array();
+			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
+
+			$query[] = "ALTER TABLE  `contrato`
+					ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ,
+					ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ,
+					ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.07:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+											VALUES (
+												NULL ,  'SepararLiquidacionesPorDefecto',  '0', NULL ,  'boolean',  '6',  '-1'
+											);";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.08:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+											VALUES (
+												NULL ,  'DescargarArchivoContabilidad',  '0', 'Permite descargar el archivo de las facturas con el formato de contabilidad para PRC' ,  'boolean',  '6',  '-1'
+											);";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.09:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+                                                VALUES (
+                                                    NULL ,  'EsPRC',  '0', NULL ,  'boolean',  '6',  '-1'
+                                                );";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.10:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+					VALUES (
+					NULL ,  'AnchoMaximoGlosaCliente',  '0', NULL ,  'numero',  '7',  '-1'
+				);";
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+					VALUES (
+					NULL ,  'AnchoMaximoDireccionCliente',  '0', NULL ,  'numero',  '7',  '-1'
+				);";
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+					VALUES (
+					NULL ,  'MaximoCaracterPorLineaDescripcion',  '0', NULL ,  'numero',  '7',  '-1'
+				);";
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+					VALUES (
+					NULL ,  'MaximoLineasDescripcion',  '0', NULL ,  'numero',  '7',  '-1'
+				);";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.11:
+			$query = array();
+			$query[] = "INSERT INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` )
+                                                VALUES (
+                                                    'SEC',  'Secretaría'
+                                                );";
+			$query[] = "INSERT INTO menu_permiso ( codigo_menu, codigo_permiso )
+                                            VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+                                                VALUES (
+                                                NULL ,  'MostrarColumnaCodigoAsuntoHorasPorFacturar',  '1', NULL ,  'boolean',  '6',  '-1'
+                                                ), (
+                                                NULL ,  'MostrarColumnaAsuntoCobrableHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
+                                                );";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.12:
+			$query = array();
+			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoComercial', '0', 'Obligatorio Encargado Comercial', 'boolean', '6', '-1');";
+			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioAsunto', '0', 'Obligatorio Encargado Secundario Asunto', 'boolean', '6', '-1');";
+			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioCliente', '0', 'Obligatorio Encargado Secundario Cliente', 'boolean', '6', '-1');";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.13:
+			$query = array();
+			//$query[] = "ALTER TABLE `factura_pago` ADD `id_neteo_documento_adelanto` INT NULL COMMENT 'neteo correspondiente al uso de un adelanto para pagar un cobro' AFTER `id_concepto` ;";
+			$query[] = "ALTER TABLE `factura_pago` ADD INDEX ( `id_neteo_documento_adelanto` ) ;";
+			$query[] = "ALTER TABLE `factura_pago`  ADD CONSTRAINT `factura_pago_ibfk_1` FOREIGN KEY (`id_neteo_documento_adelanto`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+
+			$query[] = "INSERT INTO `prm_factura_pago_concepto` ( `id_concepto` , `glosa` , `pje_variable` , `orden` )
+								VALUES (NULL , 'Adelanto', '0', '999');";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+			break;
+
+		case 5.14:
+			$query = array();
+			$query[] = "ALTER TABLE `factura` ADD `asiento_contable` INT NULL COMMENT 'correlativo mensual (para PRC)',
+									ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
+			$query[] = "ALTER TABLE `factura` ADD UNIQUE (`asiento_contable` ,`mes_contable`);";
+
+			$query[] = "UPDATE factura SET mes_contable = YEAR( fecha ) *100 + MONTH( fecha ) ;";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+
+			//rellenar los correlativos para cada mes
+			$query = "SELECT DISTINCT mes_contable FROM `factura`;";
+			if (!($res = mysql_query($query, $dbh)))
+				throw new Exception($query . "---" . mysql_error());
+			$meses = array();
+			while (list($mes) = mysql_fetch_array($res))
+				$meses[] = $mes;
+
+			foreach ($meses as $mes) {
+				$query = "SELECT id_factura FROM factura WHERE mes_contable = '$mes' ORDER BY fecha ASC, factura.numero ASC;";
+				if (!($res = mysql_query($query, $dbh)))
+					throw new Exception($query . "---" . mysql_error());
+				$ids = array();
+				while (list($id) = mysql_fetch_array($res))
+					$ids[] = $id;
+
+				foreach ($ids as $numero => $id) {
+					$query = "UPDATE factura SET asiento_contable = '" . ($numero + 1) . "' WHERE id_factura = '$id';";
+					if (!($res = mysql_query($query, $dbh)))
+						throw new Exception($query . "---" . mysql_error());
 				}
-				
-				break;
+			}
+			break;
+
+		case 5.15:
+			$query = array();
+			$query[] = "CREATE TABLE  `prm_tipo_documento_identidad` (
+					 `id_tipo_documento_identidad` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					 `glosa` VARCHAR( 255 ) NOT NULL
+					) ENGINE = MYISAM ;";
+			$query[] = "INSERT INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` )
+					VALUES (NULL ,  'RUC'), (NULL ,  'Documento de Extranjería'), (NULL ,  'Libreta Electoral'), (NULL ,  'DNI');";
+
+			$query[] = "ALTER TABLE  `factura` ADD  `id_tipo_documento_identidad` INT NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC';";
+
+			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'TipoDocumentoIdentidadFacturacion', '0', 'Permite seleccionar el tipo de documento de identidad que se utilizó para facturar al cliente', 'boolean', '6', '-1');";
+
+			foreach ($query as $q)
+				if (!($res = mysql_query($q, $dbh)))
+					throw new Exception($q . "---" . mysql_error());
+
+			break;
+
+		case 5.16:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					VALUES (
+					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
+					);";
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+			break;
+
+		case 5.17:
+			$query = array();
+			$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
+                                            `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+			break;
+
+		case 5.18:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					VALUES (
+					NULL ,  'UsarGlosaFacturaMayusculas',  '1',  'Transformar a mayusculas todas las glosas honorarios gastos con y sin impuesto a mayuscula',  'boolean',  '6',  '-1'
+					);";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
+
+		case 5.19:
+			$query = array();
+			$query[] = "CREATE TABLE  `factura_pdf_tipo_datos` (
+                                         `id_tipo_dato` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                                         `codigo_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+                                         `glosa_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+                                        ) ENGINE = INNODB;";
+			$query[] = "INSERT INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato ) 
+                                            SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` CHANGE  `id_tipo_dato`  `id_dato` INT( 11 ) NOT NULL AUTO_INCREMENT";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_tipo_dato` INT( 11 ) NOT NULL AFTER  `id_dato` ;";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX ( `id_tipo_dato` ) ;";
+			$query[] = "UPDATE factura_pdf_datos SET factura_pdf_datos.id_tipo_dato = (
+                                                SELECT factura_pdf_tipo_datos.id_tipo_dato
+                                                FROM factura_pdf_tipo_datos
+                                                WHERE factura_pdf_tipo_datos.codigo_tipo_dato = factura_pdf_datos.tipo_dato
+                                            )";
+			$query[] = "ALTER TABLE `factura_pdf_datos`
+                                        ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`) 
+                                        REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` 
+                                            DROP  `tipo_dato` ,
+                                            DROP  `glosa_dato` ;";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
+			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
+			$query[] = "UPDATE factura_pdf_datos SET id_documento_legal =1;";
+			$query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano ) 
+                                            SELECT 
+                                                prm_documento_legal.id_documento_legal, 
+                                                id_tipo_dato, 
+                                                activo, 
+                                                coordinateX, 
+                                                coordinateY, 
+                                                font, 
+                                                style, 
+                                                mayuscula, 
+                                                tamano 
+                                            FROM factura_pdf_datos 
+                                            JOIN prm_documento_legal ON 1=1
+                                            WHERE prm_documento_legal.id_documento_legal > 1";
+			$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellW` INT( 11 ) NOT NULL DEFAULT '0' AFTER `coordinateY` ;";
+			$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellH` INT( 11 ) NOT NULL DEFAULT '0' AFTER `cellW` ;";
+			$query[] = "CREATE TABLE  `factura_pdf_datos_categoria` (
+                                         `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                                         `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+                                        ) ENGINE = MYISAM ;";
+			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+                                            VALUES ( '1', 'Fecha' ), ( '2', 'Datos cliente' );";
+			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+                                            VALUES ( '3', 'Detalle factura' ), ( '4', 'Totales factura' );";
+			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD  `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AFTER  `id_tipo_dato`;";
+			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD INDEX ( `id_factura_pdf_datos_categoria` );";
+			$query[] = "ALTER TABLE  `factura_pdf_datos_categoria` ENGINE = INNODB";
+			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 1 WHERE id_tipo_dato IN(2,3,4,24);";
+			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 2 WHERE id_tipo_dato IN(1,5,6);";
+			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 3 WHERE id_tipo_dato > 6 AND id_tipo_dato < 16;";
+			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 4 WHERE id_tipo_dato > 15 AND id_tipo_dato < 24;";
+			$query[] = "ALTER TABLE `factura_pdf_tipo_datos`
+                                                ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+			break;
+
+		case 5.20:
+			$query = array();
+			$query[] = "UPDATE  `configuracion` SET  `valor_opcion` =  '0',
+								`comentario` =  'No mostrar honorarios en documento de la factura si la cantidad es cero, usar id de tipo de documento legal separados por ;;',
+								`valores_posibles` =  'string' WHERE  `glosa_opcion` = 'EsconderValoresFacturaEnCero';";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
 	}
 }
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
-	(No olvidar agregar la notificacion de los cambios)*/
+  (No olvidar agregar la notificacion de los cambios) */
 
-	$num = 0;
-	$VERSIONES[$num++] = 1.0;
-	$VERSIONES[$num++] = 1.1;
-	$VERSIONES[$num++] = 1.2;
-	$VERSIONES[$num++] = 1.3;
-	$VERSIONES[$num++] = 1.4;
-	$VERSIONES[$num++] = 1.5;
-	$VERSIONES[$num++] = 1.6;
-	$VERSIONES[$num++] = 1.7;
-	$VERSIONES[$num++] = 1.8;
-	$VERSIONES[$num++] = 1.9;
-	$VERSIONES[$num++] = 2;
-	$VERSIONES[$num++] = 2.1;
-	$VERSIONES[$num++] = 2.2;
-	$VERSIONES[$num++] = 2.21;
-	$VERSIONES[$num++] = 2.22;
-	$VERSIONES[$num++] = 2.23;
-	$VERSIONES[$num++] = 2.24;
-	$VERSIONES[$num++] = 2.25;
-	$VERSIONES[$num++] = 2.26;
-	$VERSIONES[$num++] = 2.27;
-	$VERSIONES[$num++] = 2.28;
-	$VERSIONES[$num++] = 2.29;
-	$VERSIONES[$num++] = 2.3;
-	$VERSIONES[$num++] = 2.31;
-	$VERSIONES[$num++] = 2.32;
-	$VERSIONES[$num++] = 2.33;
-	$VERSIONES[$num++] = 2.34;
-	$VERSIONES[$num++] = 2.35;
-	$VERSIONES[$num++] = 2.36;
-	$VERSIONES[$num++] = 2.4;
-	$VERSIONES[$num++] = 2.41;
-	$VERSIONES[$num++] = 2.42;
-	$VERSIONES[$num++] = 2.43;
-	$VERSIONES[$num++] = 2.44;
-	$VERSIONES[$num++] = 2.45;
-	$VERSIONES[$num++] = 2.46;
-	$VERSIONES[$num++] = 2.47;
-	$VERSIONES[$num++] = 2.48;
-	$VERSIONES[$num++] = 2.49;
-	$VERSIONES[$num++] = 2.5;
-	$VERSIONES[$num++] = 2.51;
-	$VERSIONES[$num++] = 2.52;
-	$VERSIONES[$num++] = 2.53;
-	$VERSIONES[$num++] = 2.54;
-	$VERSIONES[$num++] = 2.55;
-	$VERSIONES[$num++] = 2.56;
-	$VERSIONES[$num++] = 2.57;
-	$VERSIONES[$num++] = 2.59;
-	$VERSIONES[$num++] = 2.6;
-	$VERSIONES[$num++] = 2.61;
-	$VERSIONES[$num++] = 2.62;
-	$VERSIONES[$num++] = 2.63;
-	$VERSIONES[$num++] = 2.64;
-	$VERSIONES[$num++] = 2.65;
-	$VERSIONES[$num++] = 2.66;
-	$VERSIONES[$num++] = 2.67;
-	$VERSIONES[$num++] = 2.68;
-	$VERSIONES[$num++] = 2.69;
-	$VERSIONES[$num++] = 2.70;
-	$VERSIONES[$num++] = 2.71;
-	$VERSIONES[$num++] = 2.72;
-	$VERSIONES[$num++] = 2.73;
-	$VERSIONES[$num++] = 2.74;
-	$VERSIONES[$num++] = 2.75;
-	$VERSIONES[$num++] = 2.76;
-	$VERSIONES[$num++] = 2.8;
-	$VERSIONES[$num++] = 2.81;
-	$VERSIONES[$num++] = 2.82;
-	$VERSIONES[$num++] = 2.83;
-	$VERSIONES[$num++] = 2.84;
-	$VERSIONES[$num++] = 2.85;
-	$VERSIONES[$num++] = 2.86;
-	$VERSIONES[$num++] = 2.87;
-	$VERSIONES[$num++] = 2.88;
-	$VERSIONES[$num++] = 2.89;
-	$VERSIONES[$num++] = 2.90;
-	$VERSIONES[$num++] = 2.91;
-	$VERSIONES[$num++] = 2.92;
-	$VERSIONES[$num++] = 2.93;
-	$VERSIONES[$num++] = 2.94;
-	$VERSIONES[$num++] = 2.95;
-	$VERSIONES[$num++] = 2.96;
-	$VERSIONES[$num++] = 2.97;
-	$VERSIONES[$num++] = 2.98;
-	$VERSIONES[$num++] = 2.99;
-	$VERSIONES[$num++] = 3.00;
-	$VERSIONES[$num++] = 3.01;
-	$VERSIONES[$num++] = 3.02;
-	$VERSIONES[$num++] = 3.03;
-	$VERSIONES[$num++] = 3.04;
-	$VERSIONES[$num++] = 3.05;
-	$VERSIONES[$num++] = 3.06;
-	$VERSIONES[$num++] = 3.07;
-	$VERSIONES[$num++] = 3.08;
-	$VERSIONES[$num++] = 3.09;
-	$VERSIONES[$num++] = 3.10;
-	$VERSIONES[$num++] = 3.11;
-	$VERSIONES[$num++] = 3.12;
-	$VERSIONES[$num++] = 3.13;
-	$VERSIONES[$num++] = 3.14;
-	$VERSIONES[$num++] = 3.15;
-	$VERSIONES[$num++] = 3.16;
-	$VERSIONES[$num++] = 3.17;
-	$VERSIONES[$num++] = 3.18;
-	$VERSIONES[$num++] = 3.19;
-	$VERSIONES[$num++] = 3.20;
-	$VERSIONES[$num++] = 3.21;
-	$VERSIONES[$num++] = 3.22;
-	$VERSIONES[$num++] = 3.23;
-	$VERSIONES[$num++] = 3.24;
-	$VERSIONES[$num++] = 3.25;
-	$VERSIONES[$num++] = 3.26;
-	$VERSIONES[$num++] = 3.27;
-	$VERSIONES[$num++] = 3.28;
-	$VERSIONES[$num++] = 3.29;
-	$VERSIONES[$num++] = 3.30;
-	$VERSIONES[$num++] = 3.31;
-	$VERSIONES[$num++] = 3.32;
-	$VERSIONES[$num++] = 3.33;
-	$VERSIONES[$num++] = 3.34;
-	$VERSIONES[$num++] = 3.35;
-	$VERSIONES[$num++] = 3.36;
-	$VERSIONES[$num++] = 3.37;
-	$VERSIONES[$num++] = 3.38;
-	$VERSIONES[$num++] = 3.39;
-	$VERSIONES[$num++] = 3.40;
-	$VERSIONES[$num++] = 3.41;
-	$VERSIONES[$num++] = 3.42;
-	$VERSIONES[$num++] = 3.43;
-	$VERSIONES[$num++] = 3.44;
-	$VERSIONES[$num++] = 3.45;
-	$VERSIONES[$num++] = 3.46;
-	$VERSIONES[$num++] = 3.47;
-	$VERSIONES[$num++] = 3.48;
-	$VERSIONES[$num++] = 3.49;
-	$VERSIONES[$num++] = 3.50;
-	$VERSIONES[$num++] = 3.51;
-	$VERSIONES[$num++] = 3.52;
-	$VERSIONES[$num++] = 3.53;
-	$VERSIONES[$num++] = 3.54;
-	$VERSIONES[$num++] = 3.55;
-	$VERSIONES[$num++] = 3.56;
-	$VERSIONES[$num++] = 3.57;
-	$VERSIONES[$num++] = 3.58;
-	$VERSIONES[$num++] = 3.59;
-	$VERSIONES[$num++] = 3.60;
-	$VERSIONES[$num++] = 3.61;
-	$VERSIONES[$num++] = 3.62;
-	$VERSIONES[$num++] = 3.63;
-	$VERSIONES[$num++] = 3.64;
-	$VERSIONES[$num++] = 3.65;
-	$VERSIONES[$num++] = 3.66;
-	$VERSIONES[$num++] = 3.67;
-	$VERSIONES[$num++] = 3.68;
-	$VERSIONES[$num++] = 3.69;
-	$VERSIONES[$num++] = 3.70;
-	$VERSIONES[$num++] = 3.71;
-	$VERSIONES[$num++] = 3.72;
-	$VERSIONES[$num++] = 3.73;
-	$VERSIONES[$num++] = 3.74;
-	$VERSIONES[$num++] = 3.75;
-	$VERSIONES[$num++] = 4;
-	$VERSIONES[$num++] = 4.01;
-	$VERSIONES[$num++] = 4.02;
-	$VERSIONES[$num++] = 4.03;
-	$VERSIONES[$num++] = 4.04;
-	$VERSIONES[$num++] = 4.05;
-	$VERSIONES[$num++] = 4.06;
-	$VERSIONES[$num++] = 4.07;
-	$VERSIONES[$num++] = 4.08;
-	$VERSIONES[$num++] = 4.09;
-	$VERSIONES[$num++] = 4.10;
-	$VERSIONES[$num++] = 4.11;
-	$VERSIONES[$num++] = 4.12;
-	$VERSIONES[$num++] = 4.13;
-	$VERSIONES[$num++] = 4.14;
-	$VERSIONES[$num++] = 4.15;
-	$VERSIONES[$num++] = 4.16;
-	$VERSIONES[$num++] = 4.17;
-	$VERSIONES[$num++] = 4.18;
-	$VERSIONES[$num++] = 4.19;
-	$VERSIONES[$num++] = 4.20;
-	$VERSIONES[$num++] = 4.21;
-	$VERSIONES[$num++] = 4.22;
-	$VERSIONES[$num++] = 4.23;
-	$VERSIONES[$num++] = 4.24;
-	$VERSIONES[$num++] = 4.25;
-	$VERSIONES[$num++] = 4.26;
-	$VERSIONES[$num++] = 4.27;
-	$VERSIONES[$num++] = 4.28;
-	$VERSIONES[$num++] = 4.29;
-	$VERSIONES[$num++] = 4.30;
-	$VERSIONES[$num++] = 4.31;
-	$VERSIONES[$num++] = 4.32;
-	$VERSIONES[$num++] = 4.33;
-	$VERSIONES[$num++] = 4.34;
-	$VERSIONES[$num++] = 4.35;
-	$VERSIONES[$num++] = 4.36;
-	$VERSIONES[$num++] = 4.37;
-	$VERSIONES[$num++] = 4.38;
-	$VERSIONES[$num++] = 4.39;
-	$VERSIONES[$num++] = 4.40;
-	$VERSIONES[$num++] = 4.41;
-	$VERSIONES[$num++] = 4.42;
-	$VERSIONES[$num++] = 4.43;
-	$VERSIONES[$num++] = 4.44;
-	$VERSIONES[$num++] = 4.45;
-	$VERSIONES[$num++] = 4.46;
-	$VERSIONES[$num++] = 4.47;
-	$VERSIONES[$num++] = 4.48;
-	$VERSIONES[$num++] = 4.49;
-	$VERSIONES[$num++] = 4.50;
-	$VERSIONES[$num++] = 4.51;
-	$VERSIONES[$num++] = 4.52;
-	$VERSIONES[$num++] = 4.53;
-	$VERSIONES[$num++] = 4.54;
-	$VERSIONES[$num++] = 4.55;
-	$VERSIONES[$num++] = 4.56;
-	$VERSIONES[$num++] = 4.57;
-	$VERSIONES[$num++] = 4.58;
-	$VERSIONES[$num++] = 4.59;
-	$VERSIONES[$num++] = 4.60;
-	$VERSIONES[$num++] = 4.61;
-	$VERSIONES[$num++] = 4.62;
-	$VERSIONES[$num++] = 4.63;
-	$VERSIONES[$num++] = 4.64;
-	$VERSIONES[$num++] = 4.65;
-	$VERSIONES[$num++] = 4.66;
-	$VERSIONES[$num++] = 4.67;
-	$VERSIONES[$num++] = 4.68;
-	$VERSIONES[$num++] = 4.69;
-	$VERSIONES[$num++] = 4.70;
-	$VERSIONES[$num++] = 4.71;
-	$VERSIONES[$num++] = 4.72;
-	$VERSIONES[$num++] = 4.73;
-	$VERSIONES[$num++] = 4.74;
-	$VERSIONES[$num++] = 4.75;
-	$VERSIONES[$num++] = 4.76;
-	$VERSIONES[$num++] = 4.77;
-	$VERSIONES[$num++] = 4.78;
-	$VERSIONES[$num++] = 4.79;
-	$VERSIONES[$num++] = 4.80;
-	$VERSIONES[$num++] = 4.81;
-	$VERSIONES[$num++] = 4.82;
-	$VERSIONES[$num++] = 4.83;
-	$VERSIONES[$num++] = 4.84;
-	$VERSIONES[$num++] = 4.85;
-	$VERSIONES[$num++] = 4.86;
-	$VERSIONES[$num++] = 4.87;
-	$VERSIONES[$num++] = 4.88;
-	$VERSIONES[$num++] = 4.89;
+$num = 0;
+$VERSIONES[$num++] = 1.0;
+$VERSIONES[$num++] = 1.1;
+$VERSIONES[$num++] = 1.2;
+$VERSIONES[$num++] = 1.3;
+$VERSIONES[$num++] = 1.4;
+$VERSIONES[$num++] = 1.5;
+$VERSIONES[$num++] = 1.6;
+$VERSIONES[$num++] = 1.7;
+$VERSIONES[$num++] = 1.8;
+$VERSIONES[$num++] = 1.9;
+$VERSIONES[$num++] = 2;
+$VERSIONES[$num++] = 2.1;
+$VERSIONES[$num++] = 2.2;
+$VERSIONES[$num++] = 2.21;
+$VERSIONES[$num++] = 2.22;
+$VERSIONES[$num++] = 2.23;
+$VERSIONES[$num++] = 2.24;
+$VERSIONES[$num++] = 2.25;
+$VERSIONES[$num++] = 2.26;
+$VERSIONES[$num++] = 2.27;
+$VERSIONES[$num++] = 2.28;
+$VERSIONES[$num++] = 2.29;
+$VERSIONES[$num++] = 2.3;
+$VERSIONES[$num++] = 2.31;
+$VERSIONES[$num++] = 2.32;
+$VERSIONES[$num++] = 2.33;
+$VERSIONES[$num++] = 2.34;
+$VERSIONES[$num++] = 2.35;
+$VERSIONES[$num++] = 2.36;
+$VERSIONES[$num++] = 2.4;
+$VERSIONES[$num++] = 2.41;
+$VERSIONES[$num++] = 2.42;
+$VERSIONES[$num++] = 2.43;
+$VERSIONES[$num++] = 2.44;
+$VERSIONES[$num++] = 2.45;
+$VERSIONES[$num++] = 2.46;
+$VERSIONES[$num++] = 2.47;
+$VERSIONES[$num++] = 2.48;
+$VERSIONES[$num++] = 2.49;
+$VERSIONES[$num++] = 2.5;
+$VERSIONES[$num++] = 2.51;
+$VERSIONES[$num++] = 2.52;
+$VERSIONES[$num++] = 2.53;
+$VERSIONES[$num++] = 2.54;
+$VERSIONES[$num++] = 2.55;
+$VERSIONES[$num++] = 2.56;
+$VERSIONES[$num++] = 2.57;
+$VERSIONES[$num++] = 2.59;
+$VERSIONES[$num++] = 2.6;
+$VERSIONES[$num++] = 2.61;
+$VERSIONES[$num++] = 2.62;
+$VERSIONES[$num++] = 2.63;
+$VERSIONES[$num++] = 2.64;
+$VERSIONES[$num++] = 2.65;
+$VERSIONES[$num++] = 2.66;
+$VERSIONES[$num++] = 2.67;
+$VERSIONES[$num++] = 2.68;
+$VERSIONES[$num++] = 2.69;
+$VERSIONES[$num++] = 2.70;
+$VERSIONES[$num++] = 2.71;
+$VERSIONES[$num++] = 2.72;
+$VERSIONES[$num++] = 2.73;
+$VERSIONES[$num++] = 2.74;
+$VERSIONES[$num++] = 2.75;
+$VERSIONES[$num++] = 2.76;
+$VERSIONES[$num++] = 2.8;
+$VERSIONES[$num++] = 2.81;
+$VERSIONES[$num++] = 2.82;
+$VERSIONES[$num++] = 2.83;
+$VERSIONES[$num++] = 2.84;
+$VERSIONES[$num++] = 2.85;
+$VERSIONES[$num++] = 2.86;
+$VERSIONES[$num++] = 2.87;
+$VERSIONES[$num++] = 2.88;
+$VERSIONES[$num++] = 2.89;
+$VERSIONES[$num++] = 2.90;
+$VERSIONES[$num++] = 2.91;
+$VERSIONES[$num++] = 2.92;
+$VERSIONES[$num++] = 2.93;
+$VERSIONES[$num++] = 2.94;
+$VERSIONES[$num++] = 2.95;
+$VERSIONES[$num++] = 2.96;
+$VERSIONES[$num++] = 2.97;
+$VERSIONES[$num++] = 2.98;
+$VERSIONES[$num++] = 2.99;
+$VERSIONES[$num++] = 3.00;
+$VERSIONES[$num++] = 3.01;
+$VERSIONES[$num++] = 3.02;
+$VERSIONES[$num++] = 3.03;
+$VERSIONES[$num++] = 3.04;
+$VERSIONES[$num++] = 3.05;
+$VERSIONES[$num++] = 3.06;
+$VERSIONES[$num++] = 3.07;
+$VERSIONES[$num++] = 3.08;
+$VERSIONES[$num++] = 3.09;
+$VERSIONES[$num++] = 3.10;
+$VERSIONES[$num++] = 3.11;
+$VERSIONES[$num++] = 3.12;
+$VERSIONES[$num++] = 3.13;
+$VERSIONES[$num++] = 3.14;
+$VERSIONES[$num++] = 3.15;
+$VERSIONES[$num++] = 3.16;
+$VERSIONES[$num++] = 3.17;
+$VERSIONES[$num++] = 3.18;
+$VERSIONES[$num++] = 3.19;
+$VERSIONES[$num++] = 3.20;
+$VERSIONES[$num++] = 3.21;
+$VERSIONES[$num++] = 3.22;
+$VERSIONES[$num++] = 3.23;
+$VERSIONES[$num++] = 3.24;
+$VERSIONES[$num++] = 3.25;
+$VERSIONES[$num++] = 3.26;
+$VERSIONES[$num++] = 3.27;
+$VERSIONES[$num++] = 3.28;
+$VERSIONES[$num++] = 3.29;
+$VERSIONES[$num++] = 3.30;
+$VERSIONES[$num++] = 3.31;
+$VERSIONES[$num++] = 3.32;
+$VERSIONES[$num++] = 3.33;
+$VERSIONES[$num++] = 3.34;
+$VERSIONES[$num++] = 3.35;
+$VERSIONES[$num++] = 3.36;
+$VERSIONES[$num++] = 3.37;
+$VERSIONES[$num++] = 3.38;
+$VERSIONES[$num++] = 3.39;
+$VERSIONES[$num++] = 3.40;
+$VERSIONES[$num++] = 3.41;
+$VERSIONES[$num++] = 3.42;
+$VERSIONES[$num++] = 3.43;
+$VERSIONES[$num++] = 3.44;
+$VERSIONES[$num++] = 3.45;
+$VERSIONES[$num++] = 3.46;
+$VERSIONES[$num++] = 3.47;
+$VERSIONES[$num++] = 3.48;
+$VERSIONES[$num++] = 3.49;
+$VERSIONES[$num++] = 3.50;
+$VERSIONES[$num++] = 3.51;
+$VERSIONES[$num++] = 3.52;
+$VERSIONES[$num++] = 3.53;
+$VERSIONES[$num++] = 3.54;
+$VERSIONES[$num++] = 3.55;
+$VERSIONES[$num++] = 3.56;
+$VERSIONES[$num++] = 3.57;
+$VERSIONES[$num++] = 3.58;
+$VERSIONES[$num++] = 3.59;
+$VERSIONES[$num++] = 3.60;
+$VERSIONES[$num++] = 3.61;
+$VERSIONES[$num++] = 3.62;
+$VERSIONES[$num++] = 3.63;
+$VERSIONES[$num++] = 3.64;
+$VERSIONES[$num++] = 3.65;
+$VERSIONES[$num++] = 3.66;
+$VERSIONES[$num++] = 3.67;
+$VERSIONES[$num++] = 3.68;
+$VERSIONES[$num++] = 3.69;
+$VERSIONES[$num++] = 3.70;
+$VERSIONES[$num++] = 3.71;
+$VERSIONES[$num++] = 3.72;
+$VERSIONES[$num++] = 3.73;
+$VERSIONES[$num++] = 3.74;
+$VERSIONES[$num++] = 3.75;
+$VERSIONES[$num++] = 4;
+$VERSIONES[$num++] = 4.01;
+$VERSIONES[$num++] = 4.02;
+$VERSIONES[$num++] = 4.03;
+$VERSIONES[$num++] = 4.04;
+$VERSIONES[$num++] = 4.05;
+$VERSIONES[$num++] = 4.06;
+$VERSIONES[$num++] = 4.07;
+$VERSIONES[$num++] = 4.08;
+$VERSIONES[$num++] = 4.09;
+$VERSIONES[$num++] = 4.10;
+$VERSIONES[$num++] = 4.11;
+$VERSIONES[$num++] = 4.12;
+$VERSIONES[$num++] = 4.13;
+$VERSIONES[$num++] = 4.14;
+$VERSIONES[$num++] = 4.15;
+$VERSIONES[$num++] = 4.16;
+$VERSIONES[$num++] = 4.17;
+$VERSIONES[$num++] = 4.18;
+$VERSIONES[$num++] = 4.19;
+$VERSIONES[$num++] = 4.20;
+$VERSIONES[$num++] = 4.21;
+$VERSIONES[$num++] = 4.22;
+$VERSIONES[$num++] = 4.23;
+$VERSIONES[$num++] = 4.24;
+$VERSIONES[$num++] = 4.25;
+$VERSIONES[$num++] = 4.26;
+$VERSIONES[$num++] = 4.27;
+$VERSIONES[$num++] = 4.28;
+$VERSIONES[$num++] = 4.29;
+$VERSIONES[$num++] = 4.30;
+$VERSIONES[$num++] = 4.31;
+$VERSIONES[$num++] = 4.32;
+$VERSIONES[$num++] = 4.33;
+$VERSIONES[$num++] = 4.34;
+$VERSIONES[$num++] = 4.35;
+$VERSIONES[$num++] = 4.36;
+$VERSIONES[$num++] = 4.37;
+$VERSIONES[$num++] = 4.38;
+$VERSIONES[$num++] = 4.39;
+$VERSIONES[$num++] = 4.40;
+$VERSIONES[$num++] = 4.41;
+$VERSIONES[$num++] = 4.42;
+$VERSIONES[$num++] = 4.43;
+$VERSIONES[$num++] = 4.44;
+$VERSIONES[$num++] = 4.45;
+$VERSIONES[$num++] = 4.46;
+$VERSIONES[$num++] = 4.47;
+$VERSIONES[$num++] = 4.48;
+$VERSIONES[$num++] = 4.49;
+$VERSIONES[$num++] = 4.50;
+$VERSIONES[$num++] = 4.51;
+$VERSIONES[$num++] = 4.52;
+$VERSIONES[$num++] = 4.53;
+$VERSIONES[$num++] = 4.54;
+$VERSIONES[$num++] = 4.55;
+$VERSIONES[$num++] = 4.56;
+$VERSIONES[$num++] = 4.57;
+$VERSIONES[$num++] = 4.58;
+$VERSIONES[$num++] = 4.59;
+$VERSIONES[$num++] = 4.60;
+$VERSIONES[$num++] = 4.61;
+$VERSIONES[$num++] = 4.62;
+$VERSIONES[$num++] = 4.63;
+$VERSIONES[$num++] = 4.64;
+$VERSIONES[$num++] = 4.65;
+$VERSIONES[$num++] = 4.66;
+$VERSIONES[$num++] = 4.67;
+$VERSIONES[$num++] = 4.68;
+$VERSIONES[$num++] = 4.69;
+$VERSIONES[$num++] = 4.70;
+$VERSIONES[$num++] = 4.71;
+$VERSIONES[$num++] = 4.72;
+$VERSIONES[$num++] = 4.73;
+$VERSIONES[$num++] = 4.74;
+$VERSIONES[$num++] = 4.75;
+$VERSIONES[$num++] = 4.76;
+$VERSIONES[$num++] = 4.77;
+$VERSIONES[$num++] = 4.78;
+$VERSIONES[$num++] = 4.79;
+$VERSIONES[$num++] = 4.80;
+$VERSIONES[$num++] = 4.81;
+$VERSIONES[$num++] = 4.82;
+$VERSIONES[$num++] = 4.83;
+$VERSIONES[$num++] = 4.84;
+$VERSIONES[$num++] = 4.85;
+$VERSIONES[$num++] = 4.86;
+$VERSIONES[$num++] = 4.87;
+$VERSIONES[$num++] = 4.88;
+$VERSIONES[$num++] = 4.89;
 	$VERSIONES[$num++] = 4.90;
 	$VERSIONES[$num++] = 4.91;
 	$VERSIONES[$num++] = 4.92;
@@ -6657,7 +7032,28 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 	$VERSIONES[$num++] = 4.96;
 	$VERSIONES[$num++] = 4.97;
 	$VERSIONES[$num++] = 4.98;
-	
+$VERSIONES[$num++] = 5;
+$VERSIONES[$num++] = 5.01;
+$VERSIONES[$num++] = 5.02;
+$VERSIONES[$num++] = 5.03;
+$VERSIONES[$num++] = 5.04;
+$VERSIONES[$num++] = 5.05;
+$VERSIONES[$num++] = 5.06;
+$VERSIONES[$num++] = 5.07;
+$VERSIONES[$num++] = 5.08;
+$VERSIONES[$num++] = 5.09;
+$VERSIONES[$num++] = 5.10;
+$VERSIONES[$num++] = 5.11;
+$VERSIONES[$num++] = 5.12;
+$VERSIONES[$num++] = 5.13;
+$VERSIONES[$num++] = 5.14;
+$VERSIONES[$num++] = 5.15;
+$VERSIONES[$num++] = 5.16;
+$VERSIONES[$num++] = 5.17;
+$VERSIONES[$num++] = 5.18;
+$VERSIONES[$num++] = 5.19;
+$VERSIONES[$num++] = 5.20;
+
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

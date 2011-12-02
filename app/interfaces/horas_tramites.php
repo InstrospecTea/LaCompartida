@@ -11,7 +11,7 @@
     require_once Conf::ServerDir().'/classes/Tramite.php';
     require_once Conf::ServerDir().'/classes/Funciones.php';
 
-    $sesion = new Sesion(array('PRO', 'REV', 'COB'));
+    $sesion = new Sesion(array('PRO', 'REV', 'COB','SEC'));
     $pagina = new Pagina($sesion);
 
     $t = new Tramite($sesion);

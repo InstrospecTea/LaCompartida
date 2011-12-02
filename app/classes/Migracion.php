@@ -951,7 +951,7 @@ class Migracion
                                 cobro.opc_papel,contrato.id_carta, cobro.fecha_creacion 
                                 FROM cobro
                                 LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-                                WHERE cobro.estado IN ( 'CREADO', 'EN REVISION' )";
+                                WHERE cobro.estado IN ( 'CREADO', 'EN REVISION' ) AND id_cobro > 19980003";
             $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
             while($cob = mysql_fetch_assoc($resp))
@@ -2916,28 +2916,7 @@ class Migracion
 		$cobro = new Cobro($this->sesion);
 		if($cobro->Load($objeto->fields['id_cobro']))
 		{
-			if( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
-			{
-				$query = "SELECT
-					group_concat(idDocLegal) as listaDocLegal
-					FROM (
-					SELECT
-					 CONCAT(if(f.id_documento_legal != 0, if(f.letra is not null, if(f.letra != '',concat('LETRA ',f.letra), CONCAT(p.codigo,' ',f.numero)), CONCAT(p.codigo,' ',f.numero)), ''),IF(f.anulado=1,' (ANULADO)',''),' ') as idDocLegal
-					,f.id_cobro
-					FROM factura f, prm_documento_legal p
-					WHERE f.id_documento_legal = p.id_documento_legal
-					AND id_cobro = '" . $objeto->fields['id_cobro'] . "'
-					)zz
-					GROUP BY id_cobro";
-				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				list($lista) = mysql_fetch_array($resp);
-				$cobro->Edit('documento', $lista);
-			}
-			else
-			{
-				$cobro->Edit('documento', $this->fields['numero']);
-			}
-
+			$cobro->Edit('documento', $objeto->ListaDocumentosLegales($cobro));
 			if (!$this->Write($cobro))
 			{
 				return false;
@@ -3252,7 +3231,7 @@ $areas = array(
 
 		foreach($asuntos as $key => $val)
 		{
-			$codigo_asunto = substr($val, 0, 4).'-0'.substr($val, 4, 3);
+			$codigo_asunto = substr($val, 0, 4).'-'.substr($val, 4, 3);
 			
 			$query_area = "SELECT id_area_proyecto FROM prm_area_proyecto WHERE glosa LIKE '%".$areas[$key]."%' ";
 			$resp = mysql_query($query_area,$this->sesion->dbh) or Utiles::errorSQL($query_area,__FILE__,__LINE__,$this->sesion->dbh);
@@ -3341,7 +3320,7 @@ $areas = array(
 		
 		foreach($asuntos as $key => $val)
 		{
-			$codigo_asunto = substr($val, 0, 4).'-0'.substr($val, 4, 3);
+			$codigo_asunto = substr($val, 0, 4).'-'.substr($val, 4, 3);
 			
 			$query_cuenta = "SELECT id_cuenta FROM cuenta_banco WHERE numero LIKE '%".$cuentas[$key]."%' ";
 			$resp = mysql_query($query_cuenta,$this->sesion->dbh) or Utiles::errorSQL($query_cuenta,__FILE__,__LINE__,$this->sesion->dbh);

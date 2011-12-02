@@ -13,7 +13,7 @@
 	require_once Conf::ServerDir().'/classes/Funciones.php';
 
 
-	$sesion = new Sesion(array('DAT','PRO'));
+	$sesion = new Sesion(array('DAT','PRO','SEC'));
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 

@@ -13,7 +13,7 @@
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
+	$sesion = new Sesion(array('PRO','REV','ADM','COB','SEC'));
 	$pagina = new Pagina($sesion);
 
 	$params_array['codigo_permiso'] = 'REV';

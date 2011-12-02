@@ -87,6 +87,7 @@
    $col_glosa_cliente = $col++;
    $col_codigo_secundario = $col++;
    $col_descripcion = $col++;
+   $col_activo = $col++;
    $col_horas_trabajadas = $col++;
    $col_horas_a_cobrar = $col++;
    $col_encargado = $col++;
@@ -114,6 +115,7 @@
 	$ws1->setColumn( $col_glosa_cliente, $col_glosa_cliente,  45.00);
 	$ws1->setColumn( $col_codigo_secundario, $col_codigo_secundario,  15.00);
 	$ws1->setColumn( $col_descripcion, $col_descripcion,  45.00);
+        $ws1->setColumn( $col_activo, $col_activo, 10.00);
 	$ws1->setColumn( $col_horas_trabajadas, $col_horas_trabajadas,  19.80);
 	$ws1->setColumn( $col_horas_a_cobrar, $col_horas_a_cobrar,  19.80);
 	$ws1->setColumn( $col_encargado, $col_encargado,  28.50);
@@ -153,6 +155,7 @@
     $ws1->write($fila_inicial, $col_glosa_cliente, __('Cliente'), $tit);
     $ws1->write($fila_inicial, $col_codigo_secundario, __('Código Secundario'), $tit);
     $ws1->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
+    $ws1->write($fila_inicial, $col_activo, __('Activo'), $tit);
     $ws1->write($fila_inicial, $col_horas_trabajadas, __('Horas Trabajadas'), $tit);
     $ws1->write($fila_inicial, $col_horas_a_cobrar, __('Horas a cobrar'), $tit);
 		if($mostrar_encargado_secundario) {
@@ -234,7 +237,7 @@
 					*,
 			    							a1.codigo_asunto,
 			    							a1.id_moneda, 
-			    							a1.activo,
+			    							IF(a1.activo=1,'SI','NO') as activo,
 											a1.fecha_inactivo,
 			            			a1.fecha_creacion, 
 			            			(
@@ -309,6 +312,7 @@
 							$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_secundario'], $f4);
 						}
 						$ws1->write($fila_inicial, $col_descripcion, $row['descripcion_asunto'], $f4);
+                                                $ws1->write($fila_inicial, $col_activo, $row['activo'], $f4);
 						$ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
 						$ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
 						if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){

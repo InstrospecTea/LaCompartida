@@ -442,6 +442,7 @@ function Refrescar()
 	{ ?>
 	var codigo_cliente = $('codigo_cliente').value;
 <?} ?>
+	var codigo_asunto = $('codigo_asunto').value;
 	var id_usuario = $('id_usuario').value;
 	var id_usuario_secundario = $('id_usuario_secundario') ? $('id_usuario_secundario').value : '';
 	var id_proceso = $('id_proceso').value;
@@ -458,9 +459,9 @@ function Refrescar()
 		echo "var pagina_desde = '';";
 ?> 
 	if( $('codigo_cliente') )
-		var url = "genera_cobros.php?codigo_cliente="+codigo_cliente+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
+		var url = "genera_cobros.php?codigo_cliente="+codigo_cliente+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo+"&codigo_asunto="+codigo_asunto;
 	else if( $('codigo_cliente_secundario') ) 
-		var url = "genera_cobros.php?codigo_cliente_secundario="+codigo_cliente_secundario+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo;
+		var url = "genera_cobros.php?codigo_cliente_secundario="+codigo_cliente_secundario+"&popup=1&opc="+opc+pagina_desde+"&id_usuario="+id_usuario+"&id_usuario_secundario="+id_usuario_secundario+"&id_proceso="+id_proceso+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&activo="+activo+"&codigo_asunto="+codigo_asunto;
 		
 	self.location.href= url;
 }//fin refrescar para popup
@@ -809,8 +810,31 @@ if($opc == 'buscar')
 														JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
 														JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
 														WHERE cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.id_contrato = '".$contrato->fields['id_contrato']."'
-														AND cobro_pendiente.fecha_cobro <= '".Utiles::fecha2sql($fecha_fin)."' ORDER BY cobro_pendiente.fecha_cobro ASC";
+														AND cobro_pendiente.fecha_cobro <= '".Utiles::fecha2sql($fecha_fin)."' AND cobro_pendiente.hito = 0 ORDER BY cobro_pendiente.fecha_cobro ASC";
 			$lista_pendientes = new ListaCobrosPendientes($sesion,'',$query_pendientes);
+			
+			//Hitos
+			$query_hitos = "SELECT 
+					cobro_pendiente.id_cobro_pendiente,
+					cobro_pendiente.monto_estimado,
+					cobro_pendiente.descripcion,
+					cobro_pendiente.fecha_cobro,
+					cobro_pendiente.id_cobro,
+					cobro.estado,
+					prm_moneda.simbolo,
+					prm_moneda.cifras_decimales
+				FROM cobro_pendiente
+					JOIN contrato ON contrato.id_contrato=cobro_pendiente.id_contrato
+					JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
+					LEFT JOIN cobro ON cobro.id_cobro = cobro_pendiente.id_cobro
+				WHERE
+					cobro_pendiente.id_contrato = '".$contrato->fields['id_contrato']."' AND 
+					cobro_pendiente.hito = 1
+				ORDER BY cobro_pendiente.id_cobro_pendiente ASC";
+			$lista_hitos = new ListaCobrosPendientes($sesion,'',$query_hitos);
+			
+			
+			
 			#se dejó igual hasta que todos los clientes esten ordenados... 08-03-09
 			$query_cobros = "SELECT 
 													id_cobro, 
@@ -841,8 +865,11 @@ if($opc == 'buscar')
 
 		if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
 			$texto_acuerdo = $contrato->fields['forma_cobro']." de ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ".$contrato->fields['retainer_horas']." Hrs.";
-		} else {
-			$texto_acuerdo = $contrato->fields['forma_cobro'] != 'TASA' ? $contrato->fields['forma_cobro']." por ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : $contrato->fields['forma_cobro'];
+		} else if($contrato->fields['forma_cobro'] == 'TASA' || $contrato->fields['forma_cobro'] == 'HITOS') {
+			$texto_acuerdo = $contrato->fields['forma_cobro'];
+		}
+		else{
+			$texto_acuerdo = $contrato->fields['forma_cobro']." por ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		}
 
 		$html .= "<td style='font-size:10px' align=left valign=top colspan=2>";
@@ -945,8 +972,72 @@ if($opc == 'buscar')
 			$html .= "</td></tr>\n";
 			#FIN DIV cobros pendientes.
 		}
+		
+		//HITOS
+		if ($lista_hitos->num > 0 && $contrato->fields['id_contrato'] > 0)
+		{
+			$check = $contrato->fields['incluir_en_cierre'] == 1 ? 'checked':'';
+			$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
+			$html .= "<td></td><td align=left colspan=4></td>";
+			$html .= "</tr>\n";
+			$cobro_pendiente = new CobroPendiente($sesion);
+			$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
+			$html .= "<td style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999; font-size:10px'>" . __('Hitos') . "<br/>" . 
+			__("Por liquidar") . ": " . $contrato->fields['simbolo_moneda_monto'] . " " . number_format($cobro_pendiente->MontoHitosPorLiquidar($contrato->fields['id_contrato']),$contrato->fields['cifras_decimales_moneda_monto'], '.', '') . "<br/>" .
+			__("Liquidado") . ": " .  $contrato->fields['simbolo_moneda_monto'] . " " . number_format($cobro_pendiente->MontoHitosLiquidados($contrato->fields['id_contrato']), $contrato->fields['cifras_decimales_moneda_monto'], '.', '') . "<br/>" .
+			__("Pagado") . ": " .  $contrato->fields['simbolo_moneda_monto'] . " " . number_format($cobro_pendiente->MontoHitosPagados($contrato->fields['id_contrato']), $contrato->fields['cifras_decimales_moneda_monto'], '.', '') . "<br/>" .
+			"</td>";
+			$html .= "<td colspan=4 style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999;'>";
+			$html .= "<div id='pendiente_$i'>";
+			$html .= "<table width=100%>";
+
+			for ($z = 0;$z < $lista_hitos->num; $z++) {
+				$pendiente = $lista_hitos->Get($z);
+				$color_pendiente = 'verde';
+				if(!empty($pendiente->fields['id_cobro'])) $color_pendiente = $pendiente->fields['estado'] == 'CREADO' || $pendiente->fields['estado'] == 'EN REVISION' ? 'amarillo' : 'blanco';
+				$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'>".
+						"<td width=2% align=center>&nbsp;<img src='".Conf::ImgDir()."/color_$color_pendiente.gif' style='vertical-align:middle;' border=0></td>";
+				
+				if(!empty($pendiente->fields['id_cobro'])){
+					$html .= "<td align='center' width='5%' style='font-size:10px; vertical-align:middle;'>#".$pendiente->fields['id_cobro']."</td>";
+					$html .= "<td align=left width=84% style='font-size:10px; vertical-align:middle;' id='glosa_hito_".$i."_".$z."'>"
+							.__('Hito') . ': ' . $pendiente->fields['descripcion'] . ' por un monto de ' . $pendiente->fields['simbolo'] . " " .
+							number_format($pendiente->fields['monto_estimado'], $pendiente->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .
+							", ".__("cobro")." en estado " . __($pendiente->fields['estado']) . "</td>"
+							."<script> new Tip('glosa_hito_".$i."_".$z."', '".__('Para editar o eliminar el hito debe hacerlo desde la edición del contrato')."', {title : '', effect: '', offset: {x:-2, y:19}}); </script>";
+
+					$html .= "<td align=center width=8%/></tr>";
+						continue;
+				}
+				
+				$html .= "<td align=left width=90% style='font-size:10px; vertical-align:middle;' colspan='2' id='glosa_hito_".$i."_".$z."'>".__('Hito') . ': ' . $pendiente->fields['descripcion'] . ' por un monto de ' . $pendiente->fields['simbolo'] . " " .
+						number_format($pendiente->fields['monto_estimado'], $pendiente->fields['cifras_decimales'], '.', '') .
+						(empty($pendiente->fields['fecha_cobro']) ? "" : " (Se recordará el " . Utiles::sql2date($pendiente->fields['fecha_cobro']) . ")") . "</td>"
+						."<script> new Tip('glosa_hito_".$i."_".$z."', '".__('Para editar o eliminar el hito debe hacerlo desde la edición del contrato')."', {title : '', effect: '', offset: {x:-2, y:19}}); </script>";
+						
+				$html .= "<td align=center width=8%>";
+				
+				// Mostrar dos botones de monedas para crear liquidaciones por separado
+				if ($contrato->fields['separar_liquidaciones']) {
+					$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-")."',"
+						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 0)\" >";
+				} else {
+					// Flujo Actual, solo uno que hace ambas cosas
+					$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('"
+						.$contrato->fields['forma_cobro']."',".$contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','','".Utiles::sql2fecha($pendiente->fields['fecha_cobro'], $formato_fecha, "-")."',"
+						.($pendiente->fields['monto_estimado'] ? $pendiente->fields['monto_estimado'] : 0).",".$contrato->fields['monto'].",'".$contrato->fields['simbolo']."',".$pendiente->fields['id_cobro_pendiente'].", 1, 1)\" >";
+				}
+
+				$html .= "</td>";
+			}
+			
+			$html .= "</tr></table></div>";
+			$html .= "</td></tr>\n";
+		}
+		
 		#WIP
-		$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : $contrato->fields['fecha_ultimo_cobro'],Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
+		$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : '',Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 		$html .= "<td style='border:1px dashed #999999; font-size:10px'>".__('WIP (Work in progress)')."</td><td colspan=4 style='border:1px dashed #999999'>";
 		$html .= "<div id='wip_$i'>";
@@ -962,18 +1053,21 @@ if($opc == 'buscar')
 			case 2: $txt_wip = $wip_gastos; break;
 			default: $txt_wip = $wip_honorarios.' y '.$wip_gastos; break;
 		}
-
+		if($contrato->fields['forma_cobro'] == 'HITOS'){
+			$txt_wip = $wip_gastos;
+		}
+		
 		$html .= "<td align=left style='font-size:10px'>$txt_wip</td>";
 		$html .= "<td width='8%' align='center' nowrap>";
-		
+
 		// Mostrar dos botones de monedas para crear liquidaciones por separado
-		if ($contrato->fields['separar_liquidaciones']) {
-			if(!($tipo_liquidacion & 2)){ //1-2 = honorarios-gastos, 3 = mixtas
+		if ($contrato->fields['separar_liquidaciones'] || $contrato->fields['forma_cobro'] == 'HITOS') {
+			if(!($tipo_liquidacion & 2) && $contrato->fields['forma_cobro'] != 'HITOS'){ //1-2 = honorarios-gastos, 3 = mixtas
 				$html .= "<img src='".Conf::ImgDir()."/coins_16_honorarios.png' title='".__('Generar cobro individual para honorarios')."' border=0 onclick=\"GenerarIndividual('',";
 				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 1, 0);\" />";
 			}
 			if(!$tipo_liquidacion) $html .= "&nbsp;&nbsp;";
-			if(!($tipo_liquidacion & 1)){ //1-2 = honorarios-gastos, 3 = mixtas
+			if(!($tipo_liquidacion & 1) || $contrato->fields['forma_cobro'] == 'HITOS'){ //1-2 = honorarios-gastos, 3 = mixtas
 				$html .= "<img src='".Conf::ImgDir()."/coins_16_gastos.png' title='".__('Generar cobro individual para gastos')."' border=0 onclick=\"GenerarIndividual('',";
 				$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 0, 1);\" />";
 			}
@@ -982,7 +1076,7 @@ if($opc == 'buscar')
 			$html .= "<img src='".Conf::ImgDir()."/coins_16.png' title='".__('Generar cobro individual')."' border=0 onclick=\"GenerarIndividual('',";
 			$html .= $contrato->fields['id_contrato'].",'".$contrato->fields['fecha_ultimo_cobro']."','".$fecha_ini."','".$fecha_fin."',0,0,'',0, 1, 1);\" >";
 		}
-		
+
 		$html .= "</tr></table></div>";
 		$html .= "</td></tr>\n";
 		#FIN WIP

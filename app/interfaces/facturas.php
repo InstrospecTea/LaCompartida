@@ -13,9 +13,12 @@
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 	require_once Conf::ServerDir().'/../app/classes/FacturaPdfDatos.php';
+	require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+
+	$serienumero_documento = new DocumentoLegalNumero($sesion);
 
 	$factura = new Factura($sesion);
 
@@ -53,6 +56,11 @@
 		exit;
 	}
 
+	if ($archivo_contabilidad) {
+		require_once Conf::ServerDir() . '/interfaces/facturas_contabilidad_txt.php';
+		exit;
+	}
+
 
 	$pagina->titulo = __('Revisar Documentos Tributarios');
 	$pagina->PrintTop();
@@ -70,7 +78,7 @@
 			$join = "";
 			$where = 1;
 			if($numero != '')
-				$where .= " AND numero = '$numero'";
+				$where .= " AND numero*1 = $numero*1 ";
 			if($fecha1 && $fecha2)
 				$where .= " AND fecha BETWEEN '".Utiles::fecha2sql($fecha1)." 00:00:00' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 			else if( $fecha1 )
@@ -137,13 +145,17 @@
 			if($descripcion_factura){
 				$where .= " AND (factura.descripcion LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos LIKE '%".$descripcion_factura."%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%".$descripcion_factura."%')";
 			}
+			if( !empty($serie) && $serie != -1 ){
+				$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
+			}
 		}
 		else
 			$where = base64_decode($where);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS *
-								, prm_documento_legal.codigo as tipo
+		$query = "SELECT SQL_CALC_FOUND_ROWS
+									 prm_documento_legal.codigo as tipo
 								, numero
+								, factura.serie_documento_legal
 								, cliente.glosa_cliente
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
 											factura.cliente,
@@ -213,7 +225,7 @@
 		$b->titulo = "Documentos Tributarios <br />".$glosa_monto_saldo_total;
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
-		$b->AgregarEncabezado("numero",__('N° Factura'),"align=right width=30px");
+		$b->AgregarFuncion(__('N° Factura'), "NumeroFactura", "align='right' width='30px'");
 		$b->AgregarEncabezado("factura_rsocial",__('Cliente'),"align=left width=40px");
 		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
@@ -221,7 +233,7 @@
 		$b->AgregarEncabezado("estado",__('Estado'),"align=center");
 		$b->AgregarEncabezado("id_cobro",__('Cobro'),"align=center");
 		$b->AgregarFuncion("SubTotal","SubTotal","align=right nowrap");
-		$b->AgregarFuncion("iva","Iva","align=right nowrap");
+		$b->AgregarFuncion(__("IVA"),"Iva","align=right nowrap");
 		$b->AgregarFuncion("Monto Total","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Pagos","MontoTotal","align=right nowrap");
 		$b->AgregarFuncion("Saldo","MontoTotal","align=right nowrap");
@@ -247,6 +259,12 @@
 			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirPDF(".$id_factura.");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=\"Imprimir Pdf\"></a>";
 		}
 		return $html_opcion;
+	}
+
+	function NumeroFactura(& $fila, $sesion)
+	{
+		$factura_ = new Factura($sesion);
+		return $factura_->ObtenerNumero(null, $fila->fields['serie_documento_legal'], $fila->fields['numero']);
 	}
 
 	function SubTotal(& $fila)
@@ -359,7 +377,7 @@
 		$glosa_tramite = $tramite->fields['glosa_tramite'];
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas)."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
-		$html .= "<td align=right>#".$fila->fields['numero']."&nbsp;</td>";
+		$html .= "<td align=right>#" . NumeroFactura(& $fila, $sesion) . "&nbsp;</td>";
 		if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
 			$html .= "<td align=left>".$fila->fields['factura_rsocial']."</td>";
 		else
@@ -409,16 +427,28 @@ function Refrescar()
 
 function BuscarFacturas( form, from )
 {
-	if(!form)
+	if (!form) {
 		var form = $('form_facturas');
-	if(from == 'buscar') {
-		form.action = 'facturas.php?buscar=1';
 	}
-	else if(from == 'exportar_excel'){
-		form.action = 'facturas.php?exportar_excel=1';
+	switch (from) {
+		case 'buscar':
+			form.action = 'facturas.php?buscar=1';
+			break;
+
+		case 'exportar_excel':
+			form.action = 'facturas.php?exportar_excel=1';
+			break;
+
+<?php if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
+		case 'archivo_contabilidad':
+			form.action = 'facturas.php?archivo_contabilidad=1';
+			break;
+
+<?php } ?>
+		default:
+			return false;
 	}
-	else
-		return false;
+
 	form.submit();
 	return true;
 }
@@ -542,7 +572,11 @@ $class_diseno = '';
 		<td align=right>
 			<?=__('N° Factura')?>
 		</td>
-		<td align=left width="18%">
+		<td align=left width="18%" nowrap>
+			<?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) { ?>
+				<?php echo Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery(), "serie", $serie, 'onchange="NumeroDocumentoLegal()"', "Vacio", 60); ?>
+				<span style="vertical-align: center;">-</span>
+			<?php } ?>
 			<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?=$numero?>" onchange="this.value=this.value.toUpperCase();">
 		</td>
 		<td align=right width="18%">
@@ -587,11 +621,16 @@ $class_diseno = '';
 		</td>
 	</tr>
 	<tr>
-		<td colspan=3 align=right>
+		<td colspan="2" align=right>
 			<input name=boton_buscar id='boton_buscar' type=button value="<?=__('Buscar')?>" onclick="BuscarFacturas(this.form,'buscar')" class=btn>
 		</td>
 		<td align="right">
 			<input type="button" value="<?php echo  __('Descargar Excel');?>" class="btn" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
+		</td>
+		<td align="right">
+<?php if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
+			<input type="button" value="<?php echo  __('Descargar Archivo Contabilidad');?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')">
+<?php } ?>
 		</td>
 	</tr>
 </table>

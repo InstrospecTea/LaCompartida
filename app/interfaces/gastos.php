@@ -140,17 +140,26 @@
 			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 		}
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS *, 
+		$query = "SELECT SQL_CALC_FOUND_ROWS 
+									cta_corriente.id_movimiento,
+									cta_corriente.fecha,
 									cta_corriente.egreso, 
 									cta_corriente.ingreso, 
 									cta_corriente.monto_cobrable, 
 									cta_corriente.codigo_cliente, 
+									cta_corriente.numero_documento,
+									cta_corriente.numero_ot,
+									cta_corriente.descripcion,
+									cta_corriente.id_cobro,
+									asunto.glosa_asunto,
 									cliente.glosa_cliente, 
+									prm_moneda.simbolo,
 									prm_moneda.cifras_decimales,
 									prm_cta_corriente_tipo.glosa as tipo, 
 									cobro.estado, 
 									cta_corriente.con_impuesto,
-									prm_idioma.codigo_idioma
+									prm_idioma.codigo_idioma,
+                                                                        contrato.activo AS contrato_activo
 									$col_select
 								FROM cta_corriente
 								LEFT JOIN asunto USING(codigo_asunto)
@@ -191,7 +200,7 @@
 				$b->AgregarEncabezado("con_impuesto","Impuesto","align=center");
 			}
 		$b->AgregarFuncion(__('Cobro'),"CobroFila","align=left nowrap");
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'FacturaAsociada') && !(Conf::GetConf($sesion,'FacturaAsociadaEsconderListado')) )
+		if( UtilesApp::GetConf($sesion,'FacturaAsociada') && !(UtilesApp::GetConf($sesion,'FacturaAsociadaEsconderListado')) )
 		{
 			$b->AgregarEncabezado("codigo_factura_gasto","Factura","align=left nowrap");
 			$b->AgregarFuncion(__('Fecha Factura'),"FechaFactura","align=center nowrap");
@@ -201,8 +210,9 @@
 		{
 			$b->AgregarEncabezado("esCobrable","Cobrable","align=center");
 		}
+                $b->AgregarEncabezado("contrato_activo", __('Contrato') . ' ' . __('Activo'), "align='right nowrap'");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
-		
+
 		$b->color_mouse_over = "#bcff5c";
 
 		function FechaFactura(& $fila)
@@ -264,7 +274,7 @@
 				$idioma->Load($fila->fields['codigo_idioma']);
 			else
 				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
-			return $fila->fields['ingreso'] > 0 ? $fila->fields[simbolo] . " " .number_format($fila->fields['monto_cobrable'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
+			return $fila->fields['ingreso'] > 0 ? $fila->fields['simbolo'] . " " .number_format($fila->fields['monto_cobrable'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 		}
 	}
 	elseif($opc == 'xls')
@@ -679,7 +689,7 @@ Calendar.setup(
 <?
 	if($opc == 'buscar')
 	{
-		echo($total_cta ? "<table width=90%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta gastos: $')." ".$total_cta."</b></span></td></tr></table>":"");
+		echo($total_cta ? "<table width=90%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta gastos: '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion)))." ".$total_cta."</b></span></td></tr></table>":"");
 		$b->Imprimir();
 	}
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )

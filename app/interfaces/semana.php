@@ -12,7 +12,7 @@
     require_once Conf::ServerDir().'/classes/Asunto.php';
 		require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
-    $sesion = new Sesion(array('PRO','REV'));
+    $sesion = new Sesion(array('PRO','REV','SEC'));
     $pagina = new Pagina($sesion);
     $pagina->titulo = __('Modificación de').' '.__('Trabajo');
     $pagina->PrintTop($popup);
@@ -23,11 +23,30 @@
 	
 	$params_array['codigo_permiso'] = 'REV';// permisos de consultor jefe
 	$p_revisor = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+        
+        $params_array['codigo_permiso'] = 'SEC';
+	$p_secretaria = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	
 	if(!$id_usuario)
 	{
 		if($p_profesional->fields['permitido'])
 			$id_usuario = $sesion->usuario->fields['id_usuario'];
+                else if($p_secretaria->fields['permitido'])
+                {
+                        $query = "SELECT usuario.id_usuario,
+								CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+								as nombre
+								FROM usuario
+                                                                JOIN usuario_permiso USING(id_usuario)
+                                                                JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario 
+                                                                WHERE usuario.visible = 1 AND 
+                                                                      usuario_permiso.codigo_permiso='PRO' AND 
+                                                                      usuario_secretario.id_secretario='".$sesion->usuario->fields['id_usuario']."'
+                                                                GROUP BY usuario.id_usuario ORDER BY nombre LIMIT 1";
+                        $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$temp=mysql_fetch_array($resp);
+			$id_usuario=$temp['id_usuario'];
+                }
 		else
 		{
 			$query = "SELECT usuario.id_usuario,
@@ -78,7 +97,7 @@
 				 FROM trabajo 
 				 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 					WHERE
-					trabajo.id_usuario = $id_usuario
+					trabajo.id_usuario = '$id_usuario' 
 					AND YEARWEEK(fecha,1) = YEARWEEK($semana2,1)
 					ORDER BY fecha,id_trabajo";
 	$lista = new ListaTrabajos($sesion, "", $query);

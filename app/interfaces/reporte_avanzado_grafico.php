@@ -75,6 +75,7 @@
 	$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->setVista($vista);
+	$reporte->setProporcionalidad($prop);
 
 	if($campo_fecha)
 		$reporte->setCampoFecha($campo_fecha);
@@ -111,6 +112,7 @@
 		$reporte->id_moneda = $id_moneda;
 		$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 		$reporte->setVista($vista);
+		$reporte->setProporcionalidad($prop);
 
 		if($campo_fecha)
 		$reporte->setCampoFecha($campo_fecha);

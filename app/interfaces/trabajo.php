@@ -10,7 +10,7 @@
     require_once Conf::ServerDir().'/classes/Trabajo.php';
     require_once Conf::ServerDir().'/classes/Asunto.php';
 
-    $sesion = new Sesion(array('PRO','REV'));
+    $sesion = new Sesion(array('PRO','REV','SEC'));
     $pagina = new Pagina($sesion);
     $pagina->titulo = __('Ingreso/Modificación de').' '.__('Trabajos');
     $pagina->PrintTop($popup);

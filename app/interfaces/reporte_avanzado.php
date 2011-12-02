@@ -102,11 +102,14 @@
 	'prm_area_proyecto.glosa',
 	'categoria_usuario',
 	'area_usuario',
+        'fecha_emision',
 	'glosa_grupo_cliente',
 	'id_usuario_responsable',
 	'id_usuario_secundario',
 	'mes_reporte',
-	'dia_reporte');
+	'dia_reporte',
+	'mes_emision'
+	);
 	if($debug==1)
 	{
 		$agrupadores[] = 'id_trabajo';
@@ -1023,6 +1026,30 @@ if(!$popup)
 				for($i=0; $i< $numero; $i++)
 				echo "<td style=\"font-size: 3px; width:10px; height:7px; \"> &nbsp; </td>";
 			}
+			function titulo_proporcionalidad()
+			{
+				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
+				echo "<div id='titulo_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
+				echo "&nbsp;&nbsp;".__('Proporcionalidad').":</div>";
+				echo "</td>";
+			}
+			function select_proporcionalidad()
+			{
+				global $proporcionalidad;
+				$o1 = 'selected';
+				$o2 = '';
+				if($proporcionalidad == 'cliente')
+				{
+					$o1 = '';
+					$o2 = 'selected';
+				}
+				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
+				echo "<div id='select_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
+				echo "&nbsp;&nbsp;<select name='proporcionalidad'>";
+					echo "<option value='estandar' ".$o1.">".__('Estándar')."</option>";
+					echo "<option value='cliente' ".$o2.">".__('Cliente')."</option>";
+				echo "</select></td>";
+			}
 			function visible_moneda($s,$select = '')
 			{
 				global $tipo_dato;
@@ -1199,7 +1226,8 @@ if(!$popup)
 				<?=nada(13)?>
 			</tr>
 			<tr>
-				<?=nada(3)?>
+				<?=titulo_proporcionalidad()?>
+				<?=nada(2)?>
 				<?=moneda()?>
 				<?=nada(2)?>
 				<?=celda("valor_estandar")?>
@@ -1209,14 +1237,15 @@ if(!$popup)
 				<?=celda("valor_hora");?>
 			</tr>
 			<tr>
-				<?=nada(3)?>
+				<?=nada(2)?>
 				<?=nada(6)?>
 			</tr>
 			<tr>
 				<?=nada(12)?>
 			</tr>
 			<tr>
-				<?=nada(3)?>
+				<?=select_proporcionalidad()?>
+				<?=nada(2)?>
 				<?=select_moneda()?>
 				<?=nada(5)?>
 				<?=celda("rentabilidad_base")?>
@@ -1224,7 +1253,7 @@ if(!$popup)
 				<?=celda("rentabilidad")?>
 			</tr>
 			<tr>
-				<?=nada(9)?>
+				<?=nada(8)?>
 			</tr>
 			<tr>
 				<?=nada(12)?>
@@ -1410,6 +1439,7 @@ if(!$popup)
 	$url_iframe .= "&tipo_dato=".$tipo_dato;
 	$url_iframe .= "&vista=".$vista;
 	$url_iframe .= "&id_moneda=".$id_moneda;
+	$url_iframe .= "&prop=".$proporcionalidad;
 
 	if($limitar)
 		$url_iframe .= "&limite=".$limite;

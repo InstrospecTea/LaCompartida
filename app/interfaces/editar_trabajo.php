@@ -16,7 +16,7 @@
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
 
-	$sesion = new Sesion(array('PRO','REV'));
+	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
 
 	$t = new Trabajo($sesion);
@@ -26,6 +26,8 @@
 	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	$params_array['codigo_permiso'] = 'PRO';
 	$permiso_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+        $params_array['codigo_permiso'] = 'SEC';
+        $permiso_secretaria = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
 	$tipo_ingreso = UtilesApp::GetConf($sesion,'TipoIngresoHoras');
 	$actualizar_trabajo_tarifa = true;
@@ -109,7 +111,7 @@
 		{
 			$valida = true;
 			$asunto = new Asunto($sesion);
-			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
 				$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
 				$codigo_asunto=$asunto->fields['codigo_asunto'];
@@ -321,7 +323,7 @@
 		$txt_opcion = '';
 
 	$codigo_cliente = $t->get_codigo_cliente();
-	if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+	if ( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 	{
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($codigo_cliente);
@@ -342,7 +344,7 @@ if(str_url.search('/trabajo.php') > 0)//Si la página está siendo llamada desde t
 	}
 ?>
 
-<script type=text/javascript>
+<script type="text/javascript">
 
 function MostrarTrabajoTarifas()
 {
@@ -376,7 +378,7 @@ function Confirmar(form)
 function Validar(form)
 {
 <?
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+			if(UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
 				echo "if(!form.codigo_asunto_secundario.value){";
 			}
@@ -387,7 +389,7 @@ function Validar(form)
 ?>
 			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
 <?
-			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
 				echo "form.codigo_asunto_secundario.focus();";
 			}
@@ -446,7 +448,7 @@ function Validar(form)
 	if(form.id_cobro.value != '' && $('id_trabajo').value != '')
 	{
 	<?
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) ) 
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) 
 			{ ?>
 				if(ActualizaCobro(form.codigo_asunto_secundario.value))
 					return true;
@@ -487,7 +489,7 @@ function Validar(form)
 <?
 	}
 	//Se pasa todo a mayúscula por conf
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
+	if( UtilesApp::GetConf($sesion,'TodoMayuscula') )
 	{
 		echo "form.descripcion.value=form.descripcion.value.toUpperCase();";
 		if (method_exists('Conf','GetConf'))
@@ -642,13 +644,19 @@ function ShowDiv(div, valor, dvimg)
 	var div_id = document.getElementById(div);
 	var img = document.getElementById(dvimg);
 	var form = document.getElementById('form_editar_trabajo');
-	var codigo = document.getElementById('campo_codigo_cliente').value;
+	<?php if (UtilesApp::GetConf($sesion, "TipoSelectCliente") == "autocompletador") { ?>
+	var codigo = document.getElementById('codigo_cliente');
+	<?php } else { ?>
+	var codigo = document.getElementById('campo_codigo_cliente');
+	<?php } ?>
 	var tr = document.getElementById('tr_cliente');
 	var tr2 = document.getElementById('tr_asunto');
 	var al = document.getElementById('al');
 	//var tbl_trabajo = document.getElementById('tbl_trabajo');
 
 	DivClear(div, dvimg);
+
+	codigo = (codigo == null) ? "" : codigo.value;
 
 	if( div == 'tr_asunto' && codigo == '')
 	{
@@ -708,10 +716,15 @@ function Lista(accion, div, codigo, div_post)
 	hideddrivetip();
 	if(accion == 'lista_asuntos')
 	{
+		<?php if (UtilesApp::GetConf($sesion, "TipoSelectCliente") == "autocompletador") { ?>
+		//form.codigo_cliente.value = codigo;
+		SetSelectInputId('codigo_cliente','glosa_cliente');
+		<?php } else { ?>
 		form.campo_codigo_cliente.value = codigo;
-		SetSelectInputId('campo_codigo_cliente','codigo_cliente');
-<? 
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		SetSelectInputId('campo_codigo_cliente','codigo_cliente');	
+		<?php } ?>
+<?
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 		{
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
 		}
@@ -725,7 +738,7 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_asunto.value = codigo;
 		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+<? if( UtilesApp::GetConf($sesion,'UsoActividades') )
 	 { ?>
 		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
 <? }?>
@@ -739,8 +752,8 @@ function Lista(accion, div, codigo, div_post)
 		right_data.innerHTML = '';
 	}
 
-		var vurl = 'ajax_historial.php?accion='+accion+'&codigo='+codigo+'&div_post='+div_post+'&div='+div;
-    http.open('get', vurl, true);
+	var vurl = 'ajax_historial.php?accion='+accion+'&codigo='+codigo+'&div_post='+div_post+'&div='+div;
+    http.open('get', vurl, false);
     http.onreadystatechange = function()
     {
         if(http.readyState == 4)
@@ -764,7 +777,10 @@ function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, dura
 	form.cobrable.checked = cobrable > 0 ? true : false;
 	form.visible.checked = visible > 0 ? true : false;
 	form.descripcion.value = descripcion;
+
+	/*
 	var fecha_arr = fecha.split('-',3);
+	
 	var m = document.getElementById('fecha_Month_ID');
 	var d = document.getElementById('fecha_Day_ID');
 	var a = document.getElementById('fecha_Year_ID');
@@ -789,7 +805,7 @@ function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, dura
 		a.value = fecha_arr[0];
 		fecha_Object.fixYear(a);
 		fecha_Object.checkYear(a);
-	}
+	}*/
 
 	form.fecha.value = fecha;
 	var tr = document.getElementById('tr_cliente');
@@ -932,7 +948,7 @@ function CheckVisible()
 
 function AgregarNuevo(tipo)
 {
-<? if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )){?>
+<? if(UtilesApp::GetConf($sesion,'CodigoSecundario')){?>
 	var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 	var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
 <? } else { ?>
@@ -962,7 +978,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type="hidden" id="opcion" name="opcion" value="guardar" />
 <input type="hidden" name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
-<input type="hidden" name="max_hora" id="max_hora" value=<?=Conf::GetConf($sesion,'MaxDuracionTrabajo')?> />
+<input type="hidden" name="max_hora" id="max_hora" value=<?=UtilesApp::GetConf($sesion,'MaxDuracionTrabajo')?> />
 <input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?=$t->fields['codigo_asunto']?>" />
 <?
 	if( $opcion != 'nuevo' )
@@ -984,7 +1000,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type="hidden" name=popup value='<?=$popup?>' id="popup">
 
 <!-- TABLA HISTORIAL -->
-<?  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo' ) && Conf::UsaDisenoNuevo() ) )
+<?  if( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') )
 	          $display_none = 'style="display: none;"';
 		else
 		  $display_none = ''; ?>
@@ -1084,23 +1100,23 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <table class="border_plomo" id="tbl_trabajo">
     <tr>
         <td align=center>
-        	<span id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        	<span <?=UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
         </td>
         <td align=right>
 			<?=__('Cliente')?>
         </td>
         <td align=left width="440" nowrap>
 <?
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+	if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )
 	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 			echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario, true, '', "CargarTarifa();");
 		else
 			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'', true, '', "CargarTarifa();");
 	}
 	else
 	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "","CargarTarifa();CargarSelect('campo_codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
 		else
 			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarTarifa();CargarSelect('campo_codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
@@ -1110,7 +1126,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
      </tr>
      <tr>
         <td align='center'>
-        	<span id="img_asunto"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        	<span <?=UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_asunto"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
         <td align='right'>
              <?=__('Asunto')?>
@@ -1130,7 +1146,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 ?>
        </td>
     </tr>
-    <? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) ){ ?>
+    <? if( UtilesApp::GetConf($sesion,'UsoActividades') ){ ?>
     <tr>
         <td colspan="2" align=right>
             <?=__('Actividad')?>
@@ -1226,11 +1242,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?
 
 	if($permisos->fields['permitido'])
-		$where = " usuario_permiso.codigo_permiso='PRO' ";
+		$where = " ( usuario_permiso.codigo_permiso='PRO' ";
 	else
-		$where = " (usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
-							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
-	$where .= " AND usuario.visible=1 OR usuario.id_usuario = '$id_usuario'";
+		$where = " usuario_permiso.codigo_permiso='PRO' AND ( (usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
+							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].")  ";
+	$where .= " AND usuario.visible=1 OR usuario.id_usuario = '$id_usuario' ) ";
 	
 	$query = "SELECT SQL_CALC_FOUND_ROWS usuario.id_usuario,
 							CONCAT_WS(' ', apellido1, apellido2,',',nombre)
@@ -1357,7 +1373,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					</div>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 <? 
-	if( $cantidad_usuarios > 1 ) // Depende de que no cambie la función Html::SelectQuery(...)
+	if( $cantidad_usuarios > 1 || $permiso_secretaria->fields['permitido'] ) // Depende de que no cambie la función Html::SelectQuery(...)
 	{
 		echo(__('Usuario'));
 		echo($select_usuario);

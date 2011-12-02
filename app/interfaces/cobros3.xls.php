@@ -179,7 +179,7 @@
 
 		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($trabajo->fields[fecha], "%d-%m-%Y"), $tex);
 		$ws->write($fila_inicial + $i, $col_cliente, $trabajo->fields[glosa_cliente], $tex);
-		$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields[glosa_asunto], $tex);
+		$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['codigo_asunto'] . ' ' . $trabajo->fields['glosa_asunto'], $tex);
 		$ws->write($fila_inicial + $i, $col_id_cobro, $trabajo->fields['id_cobro']?$trabajo->fields['id_cobro']:'', $tex);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 			$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields[glosa_actividad], $tex);

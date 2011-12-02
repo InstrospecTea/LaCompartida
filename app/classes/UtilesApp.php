@@ -322,13 +322,19 @@ class UtilesApp extends Utiles
 		$total_ingresos=0;
 		$total_egresos=0;
 
-		$query = "SELECT ingreso*tipo_cambio, egreso*tipo_cambio, monto_cobrable*tipo_cambio
+		$query = "SELECT 
+								IF( cta_corriente.id_cobro IS NOT NULL, ingreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), ingreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
+								IF( cta_corriente.id_cobro IS NOT NULL, egreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), egreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
+								IF( cta_corriente.id_cobro IS NOT NULL, monto_cobrable*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), monto_cobrable*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )
 							FROM cta_corriente 
-							LEFT JOIN asunto USING(codigo_asunto)
+							JOIN prm_moneda as moneda_gasto ON cta_corriente.id_moneda=moneda_gasto.id_moneda
+							JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
+								LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto 
 								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
 								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
-								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+								LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
+								LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
@@ -1299,6 +1305,7 @@ HTML;
 		* Calculos comunos que no dependen a la forma de cobro.
 		* Principalmente se trata de totales y impuestos.
 		*/
+		$arr_resultado['gastos'] = array();
 		for($e=0;$e<$lista_monedas->num;$e++)
 		{
 			$id_moneda_obj = $lista_monedas->Get($e);
@@ -1311,6 +1318,16 @@ HTML;
 																	 ,$cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 																	 ,$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 																	);
+			
+			foreach($arr_datos_gastos as $campo => $valor){
+				if(is_array($valor)) continue;
+				$arr_resultado['gastos'][$campo][$id_moneda_actual]= UtilesApp::CambiarMoneda($valor//monto_moneda_l
+																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio']//tipo de cambio ini
+																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales']//decimales ini
+																	 ,$cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+																	 ,$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+																	);
+			}
 			
 			if( $xtabla == 'cobro' ) 
 				{
@@ -1343,7 +1360,7 @@ HTML;
 			$arr_resultado['monto_cobro_original'][$id_moneda_actual] 				= UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
 			$arr_resultado['monto_cobro_original_con_iva'][$id_moneda_actual]	= UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['monto_iva'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
 			
-		}		
+		}
 		return	$arr_resultado;
 	}
 	

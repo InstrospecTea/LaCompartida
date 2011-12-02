@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -153,9 +153,9 @@
 		else
 			$dato_profesional = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
 		// Lista de abogados sobre los que se calculan valores.
-		$query = "SELECT 
-									".$dato_profesional." AS nombre_usuario, 
-									id_usuario 
+		$query = "SELECT
+									".$dato_profesional." AS nombre_usuario,
+									id_usuario
 								FROM usuario
 								WHERE visible=1
 								ORDER BY apellido1, apellido2, nombre, id_usuario";
@@ -174,8 +174,8 @@
 	elseif($vista == 'glosa_cliente')
 	{
 		// Lista de clientes sobre los que se calculan valores. Aparece el encargado comercial
-		$query = "SELECT 
-									glosa_cliente, 
+		$query = "SELECT
+									glosa_cliente,
 									codigo_cliente
 								FROM cliente
 								ORDER BY glosa_cliente, id_cliente";
@@ -207,9 +207,9 @@
 	}
 	elseif($vista == 'glosa_asunto')
 	{
-		$query = "SELECT DISTINCT 
-									trabajo.codigo_asunto, 
-									cliente.glosa_cliente, 
+		$query = "SELECT DISTINCT
+									trabajo.codigo_asunto,
+									cliente.glosa_cliente,
 									asunto.glosa_asunto
 								FROM trabajo
 									LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
@@ -297,8 +297,8 @@
 					$f1 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-01";
 					$f2 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-".$duracion_mes[$m];
 					// ids de los profesionales que trabajaron para el cliente $ids[$t] en cada mes
-					$query_cliente_1 = "SELECT DISTINCT 
-																	trabajo.id_usuario, 
+					$query_cliente_1 = "SELECT DISTINCT
+																	trabajo.id_usuario,
 																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
 																FROM trabajo
 																	LEFT JOIN cobro ON trabajo.id_cobro=cobro.id_cobro
@@ -310,8 +310,8 @@
 					$resp_cliente_1 = mysql_query($query_cliente_1, $sesion->dbh) or Utiles::errorSQL($query_cliente_1, __FILE__, __LINE__, $sesion->dbh);
 
 					// duración total trabajada por cada profesional en cada mes
-					$query_cliente_2 = "SELECT DISTINCT 
-																	id_usuario, 
+					$query_cliente_2 = "SELECT DISTINCT
+																	id_usuario,
 																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
 																FROM trabajo
 																WHERE '$f1'<=fecha AND fecha<='$f2'
@@ -319,8 +319,8 @@
 																ORDER BY id_usuario";
 					$resp_cliente_2 = mysql_query($query_cliente_2, $sesion->dbh) or Utiles::errorSQL($query_cliente_2, __FILE__, __LINE__, $sesion->dbh);
 
-					$query_cliente_3 = "SELECT 
-																	id_usuario, 
+					$query_cliente_3 = "SELECT
+																	id_usuario,
 																	costo
 																FROM usuario_costo
 																WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "
@@ -355,7 +355,7 @@
 		elseif($vista=='mes')
 		{
 			list($m, $a) = split('-', $ids[$t]);
-			$query3 = "SELECT 
+			$query3 = "SELECT
 										SUM(costo)
 									FROM usuario_costo
 									WHERE MONTH(fecha)=$m AND YEAR(fecha)=$a";
@@ -372,8 +372,8 @@
 					$f1 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-01";
 					$f2 = ($fecha1_a+$a)."-".sprintf("%02d", $m+1)."-".$duracion_mes[$m];
 					// ids de los profesionales que trabajaron para el asunto $ids[$t] en cada mes
-					$query_cliente_1 = "SELECT DISTINCT 
-																	trabajo.id_usuario, 
+					$query_cliente_1 = "SELECT DISTINCT
+																	trabajo.id_usuario,
 																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
 																FROM trabajo
 																WHERE trabajo.codigo_asunto='$ids[$t]'
@@ -383,8 +383,8 @@
 					$resp_cliente_1 = mysql_query($query_cliente_1, $sesion->dbh) or Utiles::errorSQL($query_cliente_1, __FILE__, __LINE__, $sesion->dbh);
 
 					// duración total trabajada por cada profesional en cada mes
-					$query_cliente_2 = "SELECT DISTINCT 
-																	id_usuario, 
+					$query_cliente_2 = "SELECT DISTINCT
+																	id_usuario,
 																	SUM(TIME_TO_SEC(trabajo.duracion)) AS duracion
 																FROM trabajo
 																WHERE '$f1'<=fecha AND fecha<='$f2'
@@ -392,8 +392,8 @@
 																ORDER BY id_usuario";
 					$resp_cliente_2 = mysql_query($query_cliente_2, $sesion->dbh) or Utiles::errorSQL($query_cliente_2, __FILE__, __LINE__, $sesion->dbh);
 
-					$query_cliente_3 = "SELECT 
-																id_usuario, 
+					$query_cliente_3 = "SELECT
+																id_usuario,
 																costo
 															FROM usuario_costo
 															WHERE MONTH(fecha)=" . ($m+1) . " AND YEAR(fecha)=" . ($a+$fecha1_a) . "

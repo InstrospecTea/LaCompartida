@@ -15,7 +15,7 @@
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
 
-	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
+	$sesion = new Sesion(array('PRO','REV','ADM','COB','SEC'));
 	$pagina = new Pagina($sesion);
 
 	$params_array['codigo_permiso'] = 'REV';
@@ -109,6 +109,8 @@
 	if(isset($cobro) || $opc == 'buscar' || $excel)
 	{
 		$where = base64_decode($where);
+                $where_gastos = " 1 ";
+                $where_gastos .= " AND cta_corriente.incluir_en_cobro = 'SI' AND cta_corriente.cobrable = 1 ";
 		if( $where == '')
 			$where .= 1;
 		if($id_usuario != '')
@@ -184,22 +186,31 @@
 			}
 		}
 		#SQL FECHAS
-		if($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00')
+		if($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00') {
 			$where .= " AND trabajo.fecha >= '".$fecha_ini."' ";
+                        $where_gastos .= " AND cta_corriente.fecha >= '".$fecha_ini."' ";
+                }
 	
-		if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00')
+		if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00') {
 			$where .= " AND trabajo.fecha <= '".$fecha_fin."' ";
+                        $where_gastos .= " AND cta_corriente.fecha <= '".$fecha_fin."' ";
+                }
 	
 		if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
 		{
 			$cobro->LoadAsuntos();
 			$query_asuntos = implode("','", $cobro->asuntos);
 			$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
+                        $where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
 			//$where .= " AND trabajo.cobrable = 1";
-			if($opc == 'buscar')
+			if($opc == 'buscar') {
 				$where .= " AND (cobro.estado IS NULL OR trabajo.id_cobro = '$id_cobro')";
-			else
+                                $where_gastos.= " AND (cobro.estado IS NULL OR cta_corriente.id_cobro = '$id_cobro')";
+                        }
+			else {
 				$where .= " AND trabajo.id_cobro = '$id_cobro'";
+                                $where_gastos .= " AND cta_corriente.id_cobro = '$id_cobro'";
+                        }
 		}
 	
 		if($cobrable == 'SI')
@@ -243,7 +254,7 @@
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
 	
 		#BUSCAR
-		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
+		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
 												trabajo.id_cobro,
 												trabajo.revisado, 
 												trabajo.id_trabajo, 
@@ -253,6 +264,7 @@
 												asunto.codigo_cliente as codigo_cliente, 
 												contrato.id_moneda as id_moneda_asunto, 
 												asunto.id_asunto AS id,
+												cliente.glosa_cliente,
 												trabajo.fecha_cobro as fecha_cobro_orden, 
 												trabajo.descripcion, 
 												IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
@@ -268,14 +280,14 @@
 												TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas, 
 												trabajo.tarifa_hh, 
 												tramite_tipo.id_tramite_tipo,
-		              			DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
-		              			cobro.estado, 
-		              			asunto.forma_cobro, 
-		              			asunto.monto, 
-		              			asunto.glosa_asunto,
-		              			contrato.descuento, 
-		              			tramite_tipo.glosa_tramite, 
-		              			trabajo.fecha, 
+												DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
+												cobro.estado, 
+												asunto.forma_cobro, 
+												asunto.monto, 
+												asunto.glosa_asunto,
+												contrato.descuento, 
+												tramite_tipo.glosa_tramite, 
+												trabajo.fecha, 
 		              			prm_idioma.codigo_idioma as codigo_idioma,
 		              			contrato.id_tarifa  
 		              FROM trabajo
@@ -303,6 +315,22 @@
 				$emitir_trabajo->Edit('id_cobro',$id_cobro);
 				$emitir_trabajo->Write();
 			}
+                        
+                        if( $cobro->fields['incluye_gastos'] ) {
+                            $query3 = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
+                            $resp = mysql_query($query3, $sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
+                            $query_gastos = "SELECT id_movimiento FROM cta_corriente LEFT JOIN cobro USING( id_cobro ) WHERE $where_gastos ";
+                            $lista_gastos = new ListaGastos($sesion,'',$query_gastos);
+                            for($x=0;$x<$lista_gastos->num;$x++)
+                            {
+                                    $gasto = $lista_gastos->Get($x);
+                                    $emitir_gasto = new Gasto($sesion);
+                                    $emitir_gasto->Load($gasto->fields['id_movimiento']);
+                                    $emitir_gasto->Edit('id_cobro',$id_cobro);
+                                    $emitir_gasto->Write();
+                            }
+                        }
+                        $cobro->GuardarCobro();
 		}
 		//Se hace la lista para la edición de TODOS los trabajos del query
 		//A la página de editar multiples trabajos se le pasa encriptado el where

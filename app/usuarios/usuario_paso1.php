@@ -28,12 +28,12 @@
 	//Opción editar
 	else if($opc == 'edit')
 	{
-		if($cambiar_alerta_diaria=='on') 
-		{ 
-			if($alerta_diaria=='on') $alerta_diaria=1; else $alerta_diaria=0; 
+		if($cambiar_alerta_diaria=='on')
+		{
+			if($alerta_diaria=='on') $alerta_diaria=1; else $alerta_diaria=0;
 			if($retraso_max=='') $retraso_max=0;
-		} 
-		else 
+		}
+		else
 		{
 			$alerta_diaria='alerta_diaria';
 			$retraso_max='retraso_max';
@@ -47,18 +47,18 @@
 		{
 			$restriccion_diario='restriccion_diario';
 		}
-		if($cambiar_alerta_semanal=='on') 
+		if($cambiar_alerta_semanal=='on')
 		{
-			if($alerta_semanal=='on') 
-				$alerta_semanal=1; 
+			if($alerta_semanal=='on')
+				$alerta_semanal=1;
 			else
-				$alerta_semanal=0; 
+				$alerta_semanal=0;
 			if($restriccion_max=='')
 				$restriccion_max=0;
 			if($restriccion_min=='')
 				$restriccion_min=0;
-		} 
-		else 
+		}
+		else
 		{
 			$alerta_semanal='alerta_semanal';
 			$restriccion_max='restriccion_max';
@@ -66,7 +66,7 @@
 		}
 		if($cambiar_restriccion_mensual=='on')
 		{
-			if($restriccion_mensual=='') 
+			if($restriccion_mensual=='')
 				$restriccion_mensual=120;
 		}
 		else
@@ -75,39 +75,39 @@
 		}
 		if($cambiar_dias_ingreso_trabajo=='on')
 		{
-			if($dias_ingreso_trabajo=='') 
+			if($dias_ingreso_trabajo=='')
 				$dias_ingreso_trabajo=7;
 		}
 		else
 		{
 			$dias_ingreso_trabajo='dias_ingreso_trabajo';
 		}
-	
+
 		//Actualizar alerta de Usuario
 		$query3 = "UPDATE usuario SET alerta_diaria=".$alerta_diaria.", alerta_semanal=".$alerta_semanal.", retraso_max=".$retraso_max.",
 					restriccion_max=".$restriccion_max.", restriccion_min=".$restriccion_min.", restriccion_mensual=".$restriccion_mensual.",
 					dias_ingreso_trabajo=".$dias_ingreso_trabajo.", restriccion_diario=".$restriccion_diario;
 		$resp3 = mysql_query($query3,$sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		//Insert para el registro de cambios Restricciones y alertas generales
 		$nuevos = 'Alerta diaria: '.$alerta_diaria.',';
 		$nuevos .= 'Retraso max. diaria (HH): '.$retraso_max.',';
 		$nuevos .= 'Restricción min. diaria (HH): '.$restriccion_diario.',';
 		$nuevos .= 'Alerta semanal: '.$alerta_semanal.',';
 		$nuevos .= 'Restricción min. semanal (HH): '.$restriccion_min.',';
-		$nuevos .= 'Restricción max. semanal (HH): '.$restriccion_max.',';		
+		$nuevos .= 'Restricción max. semanal (HH): '.$restriccion_max.',';
 		$nuevos .= 'Restricción min. mensual (Hrs): '.$restriccion_mensual.',';
 		$nuevos .= 'Plazo max. (días) para ingreso de trabajos: '.$dias_ingreso_trabajo;
 		$query4 = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
 		$query4 .= " VALUES(NULL,'".$sesion->usuario->fields['id_usuario']."','Restricciones y alertas generales',NULL,'".$nuevos."',NOW())";
 		$resp = mysql_query($query4, $sesion->dbh) or Utiles::errorSQL($query4,__FILE__,__LINE__,$sesion->dbh);
-		
-		if($alerta_diaria==0) 
+
+		if($alerta_diaria==0)
 			$alerta_diaria='';
 		if($alerta_semanal==0)
 			$alerta_semanal='';
 	}
-	
+
 	$pagina->PrintTop();
 	$tooltip_text = __('Para agregar un nuevo usuario ingresa su RUT aquí.');
 ?>
@@ -154,7 +154,7 @@ function Listar( form, from )
 		{
 			if( from.cambiar_alerta_diaria.checked==true)
 				{
-				var alerta_diaria = from.alerta_diaria.checked; 
+				var alerta_diaria = from.alerta_diaria.checked;
 				if( alerta_diaria == true ) alerta_diaria='\n Alerta diaria:          SI'; else alerta_diaria='\n Alerta diaria:          NO';
 				var retraso_max = '\n Restraso Max:        '
 				}
@@ -165,7 +165,7 @@ function Listar( form, from )
 				}
 			if( from.cambiar_alerta_semanal.checked==true)
 				{
-				var alerta_semanal = from.alerta_semanal.checked; 
+				var alerta_semanal = from.alerta_semanal.checked;
 				if( alerta_semanal == true ) alerta_semanal='\n Alerta semanal:     SI'; else alerta_semanal='\n Alerta semanal:     NO';
 				var restriccion_min = '\n Min HH:                 '
 				var restriccion_max = '\n Max HH:                 '
@@ -192,7 +192,7 @@ function Listar( form, from )
 				{
 				var dias_ingreso_trabajo = '';
 				}
-			
+
 		if(confirm( alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?' ))
 			{
 			from.action="usuario_paso1.php";
@@ -204,7 +204,7 @@ function Listar( form, from )
 				form.opc.value = 'cancelar';
 				form.submit();
 			}
-			
+
 			function DisableColumna( from, valor, text)
 			{
 				if(text == 'alerta_diaria')
@@ -212,7 +212,7 @@ function Listar( form, from )
 					var Input1 = $('alerta_diaria');
 					var Input2 = $('retraso_max');
  					var check = $(valor);
-				
+
 					if(check.checked)
 					{
 						Input1.disabled= false;
@@ -234,7 +234,7 @@ function Listar( form, from )
 					var Input2 = $('restriccion_min');
 					var Input3 = $('restriccion_max');
  					var check = $(valor);
-				
+
 					if(check.checked)
 					{
 						Input1.disabled= false;
@@ -259,7 +259,7 @@ function Listar( form, from )
 				{
 					var Input1 = $('restriccion_mensual');
  					var check = $(valor);
-				
+
 					if(check.checked)
 					{
 						Input1.disabled= false;
@@ -276,7 +276,7 @@ function Listar( form, from )
 				{
 					var Input1 = $('dias_ingreso_trabajo');
  					var check = $(valor);
-				
+
 					if(check.checked)
 					{
 						Input1.disabled= false;
@@ -293,7 +293,7 @@ function Listar( form, from )
 				{
 					var Input1 = $('restriccion_diario');
 					var check = $(valor);
-					
+
 					if(check.checked)
 					{
 						Input1.disabled= false;
@@ -307,7 +307,7 @@ function Listar( form, from )
 					}
 				}
 			}
-		
+
 </script>
 <table width="96%" align="left">
 	<tr>
@@ -315,11 +315,11 @@ function Listar( form, from )
 		<td valign="top">
 
 <?
-  if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador()) == 'rut' ) ) 
+  if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador()) == 'rut' ) )
 		{ ?>
 			<form action="usuario_paso2.php" method="post" onsubmit="return RevisarRut(this);">
-<?  } 
-	else 
+<?  }
+	else
 		{ ?>
 			<form action="usuario_paso2.php" method="post">
 <?  } ?>
@@ -336,15 +336,14 @@ function Listar( form, from )
 			<strong><?=( method_exists('Conf','GetConf')?Conf::GetConf($sesion,'NombreIdentificador'):Conf::NombreIdentificador() )?></strong>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='Cédula' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='Cédula' ) ) 
-						|| ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='CNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='CNI' ) ) ) { ?>
-				<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?=$tooltip_text?>')" onMouseout="hideddrivetip()" />
-			<? } else { ?>
+			<? if( method_exists('Conf','GetConf') && strtoupper(Conf::GetConf($sesion,'NombreIdentificador'))=='RUT' ) { ?>
 				<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?=$tooltip_text?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
+			<? } else { ?>
+				<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?=$tooltip_text?>')" onMouseout="hideddrivetip()" />
 			<? } ?>
 				<br />
-			<? 
-			if( $sesion->usuario->fields['id_visitante'] == 0 ) 
+			<?
+			if( $sesion->usuario->fields['id_visitante'] == 0 )
 				echo "<br><input type=\"submit\" class=btn name=\"boton\" value=\"".__('Aceptar')."\" />";
 			else
 				echo "<br><input type=\"button\" class=btn name=\"boton\" value=\"".__('Aceptar')."\" onclick=\"alert('Ústed no tiene derecho para agegar un usuario nuevo');\" />";
@@ -359,14 +358,14 @@ function Listar( form, from )
 </form>
 				</td>
 		</tr>
-		
+
 	<tr><td></td>
 		<td>
 			<table width=100% class="tb_base">
 				<tr>
 					<td>
 				<table width=100%>
-					<tr>	
+					<tr>
 							<td valign="top" class="subtitulo" align="left" colspan="2">
 							<?=__('Modificacion de Datos para todos los usuarios ')?>:
 							<hr class="subtitulo_linea_plomo"/>
@@ -375,7 +374,7 @@ function Listar( form, from )
 				</table>
 		</td>
 	</tr>
-	
+
 	<tr><td>
 		<form name="form_usuario" method="post" enctype="multipart/form-data">
 			 <input type="hidden" name="opc" value="edit" />
@@ -389,14 +388,14 @@ function Listar( form, from )
 			<td width=20% align="right"></td>
 			<td width=17% align="center">
 				Cambiar valores
-			</td>	
+			</td>
 		</tr>
 		<tr>
 			<td align="right">
 				<label for="alerta_diaria"><?=__('Alerta Diaria')?></label> <input type="checkbox" id="alerta_diaria" name="alerta_diaria" <?=$cambiar_alerta_diaria=='on' ? '' : disabled ?> <?=$alerta_diaria!='' ? "checked" : "" ?> />
 			</td>
 			<td align="right">
-				<?=__('Retraso max.')?> 
+				<?=__('Retraso max.')?>
 			</td>
 			<td align="left">
 				<input type="text" style="background-color: #EEEEEE;" size=10 value="<?=$retraso_max > 0 ? $retraso_max : '' ?>" id="retraso_max" name="retraso_max" <?=$cambiar_alerta_diaria=='on' ? '' : disabled ?> />
@@ -411,7 +410,7 @@ function Listar( form, from )
 				&nbsp;
 			</td>
 			<td align="right">
-				<?=__('Min HH.')?> 
+				<?=__('Min HH.')?>
 			</td>
 			<td align="left">
 				<input type="text" style="background-color: #EEEEEE;" size=10 value="<?=$restriccion_diario > 0 ? $restriccion_diario : '' ?>" id="restriccion_diario" name="restriccion_diario" <?=$cambiar_restriccion_diario =='on' ? '' : disabled ?> />
@@ -426,7 +425,7 @@ function Listar( form, from )
 				<label for="alerta_semanal"><?=__('Alerta Semanal')?></label> <input type="checkbox" id="alerta_semanal" name="alerta_semanal" <?=$cambiar_alerta_semanal=='on' ? '' : disabled ?> <?=$alerta_semanal!='' ? "checked" : "" ?> />
 			</td>
 			<td align="right">
-				<?=__('Mín. HH')?> 
+				<?=__('Mín. HH')?>
 			</td>
 			<td align="left">
 				<input type="text" style="background-color: #EEEEEE;" size=10 value="<?=$restriccion_min > 0 ? $restriccion_min : '' ?>" id="restriccion_min" name="restriccion_min" <?=$cambiar_alerta_semanal=='on' ? '' : disabled ?> />
@@ -471,7 +470,7 @@ function Listar( form, from )
 			<legend><?=__('Guardar datos')?></legend>
 			<table width=100%>
 			<tr><td align="center">
-			<? if( $sesion->usuario->fields['id_visitante'] == 0 ) 
+			<? if( $sesion->usuario->fields['id_visitante'] == 0 )
 						echo "<input type=\"button\" value=\"".__('Guardar')."\" class=btn onclick=\"ModificaTodos(this.form);\"  /> &nbsp;&nbsp;";
 				 else
 				 		echo "<input type=\"button\" value=\"".__('Guardar')."\" class=btn onclick=\"alert('Ústed no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
@@ -487,7 +486,7 @@ function Listar( form, from )
 <br/>
 </td>
 </tr>
-		
+
 		<tr><td></td><td>
 		<table width=100% class="tb_base">
 		<tr>
@@ -509,7 +508,7 @@ function Listar( form, from )
 			<form name="act"  method="post">
 					  <input type="checkbox" name="activo" value="1" id="activo" checked />solo activos &nbsp;&nbsp;&nbsp;
 						<strong>Nombre</strong>
-						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" value="<?=$nombre?>" size="20" /> 
+						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" value="<?=$nombre?>" size="20" />
 						&nbsp;&nbsp; <input type="submit" class=btn value="Buscar" onclick="Listar(this.form,'buscar')" />
 						&nbsp;&nbsp; <input type="button" class=btn value="<?=__('Descargar listado a Excel')?>" onclick="Listar(this.form,'xls')" />
 						&nbsp; <input type="button" class=btn value="<?=__('Descargar vacaciones a Excel')?>" onclick="Listar(this.form,'xls_vacacion')" />
@@ -552,7 +551,7 @@ function Listar( form, from )
 
 		<tr><td colspan="2">&nbsp;</td></tr>
 
-<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanzados') ) || ( method_exists('Conf','ReportesAvanzados') && Conf::ReportesAvanzados() ) ) 
+<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanzados') ) || ( method_exists('Conf','ReportesAvanzados') && Conf::ReportesAvanzados() ) )
 		{ ?>
 		<tr><td></td><td>
 		<table width=100%>

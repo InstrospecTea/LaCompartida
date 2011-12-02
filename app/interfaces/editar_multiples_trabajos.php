@@ -17,6 +17,8 @@
 
 	$params_array['codigo_permiso'] = 'REV';
 	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	$params_array['codigo_permiso'] = 'PRO';
+	$permiso_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
 $where_query_listado_completo = mysql_real_escape_string(base64_decode($listado));
 $where_query_listado_completo = str_replace("\'","'",$where_query_listado_completo);
@@ -171,15 +173,18 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 		{
 			$cont++;
 			$t[$i]->Edit('codigo_asunto', $codigo_asunto);
-			if(!$cobrable)
-			{
-				$t[$i]->Edit('cobrable', '0');
-				$t[$i]->Edit('visible', $visible?'1':'0');
-			}
-			else
-			{
-				$t[$i]->Edit('cobrable','1');
-				$t[$i]->Edit('visible','1');
+			
+			if(!$permiso_profesional->fields['permitido'] || $permisos->fields['permitido']) {
+				if(!$cobrable)
+				{
+					$t[$i]->Edit('cobrable', '0');
+					$t[$i]->Edit('visible', $visible?'1':'0');
+				}
+				else
+				{
+					$t[$i]->Edit('cobrable','1');
+					$t[$i]->Edit('visible','1');
+				}
 			}
 			if($asunto->fields['cobrable']==0)//Si el asunto no es cobrable
 			{
@@ -843,6 +848,10 @@ if($txt_opcion)
 	<input type="hidden" name="codigo_actividad" id="codigo_actividad">
 	<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
 	<? }?>
+<?
+	if($permisos->fields['permitido'])
+	{
+?>
 	<tr>
 		<td colspan="2" align=right>
 			<?=__('Total Horas') ?>
@@ -855,6 +864,7 @@ if($txt_opcion)
 		</td>
 	</tr>
 
+<? } ?>
 <?
 	if($permisos->fields['permitido'])
 		$where = "usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'";
@@ -864,6 +874,7 @@ if($txt_opcion)
 	$where .= " AND usuario.visible=1";
 ?>
 
+<?php if(!$permiso_profesional->fields['permitido'] || $permisos->fields['permitido']) { ?>
 	<tr>
 		<td colspan="2" align=right>
 			<?=__('Cobrable')?><br/>
@@ -907,6 +918,7 @@ if($txt_opcion)
 			</div>
 		</td>
 	</tr>
+<?php } ?>
 <?
 	if(isset($t[0]) && $t[0]->Loaded() && $opcion != 'nuevo')
 	{

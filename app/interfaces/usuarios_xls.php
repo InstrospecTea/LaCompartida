@@ -94,7 +94,7 @@
 		if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador())=='rut' ) )
 			$glosa_rut = 'Rut';
 		else
-			$glosa_rut = 'CNI';
+			$glosa_rut = 'DNI';
 		
 		$ws1->write($fila_inicial, 1, __('Nombre'), $tit);
 	  $ws1->write($fila_inicial, 2, __('Iniciales'), $tit);
@@ -170,7 +170,7 @@
 		if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador())=='rut' ) )
 			$glosa_rut = 'Rut';
 		else
-			$glosa_rut = 'CNI';
+			$glosa_rut = 'DNI';
 		
 		$ws1->write($fila_inicial, 1, __('Usuario'), $tit);
 		$ws1->write($fila_inicial, 2, __('Fecha creación'), $tit);
@@ -317,7 +317,7 @@
 		if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador())=='rut' ) )
 			$glosa_rut = 'Rut';
 		else
-			$glosa_rut = 'CNI';
+			$glosa_rut = 'DNI';
 		
 		$ws1->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
 		$ws1->write($fila_inicial, $col_username, __('Código Usuario'), $tit);
@@ -362,7 +362,12 @@
 			$ws1->write($fila_inicial, $col_username, $row['username'], $f4);
 			$ws1->write($fila_inicial, $col_categoria, $row['glosa_categoria'], $f4);
 			$ws1->write($fila_inicial, $col_email, $row['email'], $f4);
-			$ws1->write($fila_inicial, $col_rut, $row['rut'].($row['dv_rut']?'-'.$row['dv_rut']:''), $f4);
+			$rut = $row['rut'] . ($row['dv_rut'] ? '-' . $row['dv_rut'] : '');
+			$ceros_dni = UtilesApp::GetConf($sesion, 'CantidadCerosFormatoDNI');
+			if ($ceros_dni) {
+				$rut = str_pad($rut, $ceros_dni , '0', STR_PAD_LEFT);
+			}
+			$ws1->writeString($fila_inicial, $col_rut, $rut, $f4);
 			$ws1->write($fila_inicial, $col_dias_ingreso_trabajo, $row['dias_ingreso_trabajo'], $f4);
 			$ws1->write($fila_inicial, $col_area, $row['glosa'], $f4);
 			if($row[activo]==0) {

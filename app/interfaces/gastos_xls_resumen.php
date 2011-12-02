@@ -278,7 +278,7 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 	$gasto = $lista_gastos->Get($v);
 	$tipo_cambio = Moneda::GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
 	$columna_actual = 0;
-	//echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto->fields);echo '</pre>';
+	//echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto->fields);echo '</pre>'; 
 
 
 	$tipo_cambio_segun_cobro = $gasto->fields['tipo_cambio_segun_cobro'] != '' ? $gasto->fields['tipo_cambio_segun_cobro'] : $tipo_cambio;
@@ -311,7 +311,7 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 						|| $gasto->fields['estado_cobro'] == 'CREADO'
 						|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
 					$total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
-					$total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);				
+					$total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
 				} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
 						|| $gasto->fields['estado_cobro'] == 'FACTURADO'
 						|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
@@ -389,7 +389,7 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 		}
 
 		if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-
+			
 			$ws1->writeNumber($filas, $columna_gastos_por_cobrar, max($total_gastos_por_cobrar_cliente, 0), $formato_moneda);
 			$total_gastos_por_cobrar -= min($total_gastos_por_cobrar_cliente, 0);
 		}
@@ -413,7 +413,7 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 						|| $gasto->fields['estado_cobro'] == 'CREADO'
 						|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
 					$total_gastos_por_cobrar_cliente = (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
-					$total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);				
+					$total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
 				} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
 						|| $gasto->fields['estado_cobro'] == 'FACTURADO'
 						|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
@@ -472,7 +472,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 }
 $ws1->write($filas, $columna_es_cobrable, '', $formato_moneda);
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-	$ws1->writeNumber($filas, $columna_gastos_por_cobrar, $total_gastos_por_cobrar, $formato_moneda_total);
+	$ws1->writeNumber($filas, $columna_gastos_por_cobrar, $total_gastos_por_cobrar, $formato_moneda_total);	
 }
 
 if ($total_balance_egreso_cobrable > 0 && $total_balance_ingreso_cobrable > 0) {

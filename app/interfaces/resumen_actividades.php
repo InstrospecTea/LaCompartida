@@ -12,6 +12,9 @@
 	$sesion = new Sesion(array('REP'));
 
 	$pagina = new Pagina($sesion);
+	
+	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+	$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
 	$pagina->titulo = __('Resumen actividades profesionales');
 
@@ -939,7 +942,7 @@ else
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) )
 						$glosa_show = Utiles::Formato($dato_minutos,'%s').'<br>'.Utiles::Formato($dato_minutos2,'%s');
 					else
-						$glosa_show = Utiles::Formato($dato,'%f').'<br>'.Utiles::Formato($dato2,'%f');
+						$glosa_show = Utiles::Formato($dato,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato2,'%f', $idioma, 2);
 				}
 				else if( $horas_sql == 'hr_asunto_cobrable' or $horas_sql == 'hr_asunto_no_cobrable')
 				{
@@ -949,7 +952,7 @@ else
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos')&& Conf::MostrarSoloMinutos() ) )
 						$glosa_show = Utiles::Formato($dato_minutos,'%s');
 					else
-						$glosa_show = Utiles::Formato($dato,'%f');
+						$glosa_show = Utiles::Formato($dato,'%f', $idioma, 2);
 				}
 				else
 				{
@@ -959,7 +962,7 @@ else
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) )
 						$glosa_show = Utiles::Formato($dato_minutos,'%s');
 					else
-						$glosa_show = Utiles::Formato($dato,'%f');
+						$glosa_show = Utiles::Formato($dato,'%f', $idioma, 2);
 				}
 
 
@@ -1007,9 +1010,9 @@ else
 					}
 					else
 					{
-						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f').'<br>'.Utiles::Formato($dato_cliente2,'%f');
-						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f').'<br>'.Utiles::Formato($dato_grupo2,'%f');
-						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f').'<br>'.Utiles::Formato($dato_usuario2,'%f');
+						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_cliente2,'%f', $idioma, 2);
+						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_grupo2,'%f', $idioma, 2);
+						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_usuario2,'%f', $idioma, 2);
 					}
 				}
 				else
@@ -1022,9 +1025,9 @@ else
 					}
 					else
 					{
-						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f');
-						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f');
-						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f');
+						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f', $idioma, 2);
+						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f', $idioma, 2);
+						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f', $idioma, 2);
 					}
 				}
 				$total_hr += $dato;
@@ -1091,7 +1094,7 @@ else
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos')&& Conf::MostrarSoloMinutos() ) )
 				$html_info .= Utiles::Formato($total_hr_minutos,'%s');
 			else
-				$html_info .= Utiles::Formato($total_hr,'%f');
+				$html_info .= Utiles::Formato($total_hr,'%f', $idioma, 2);
 			$html_info .= "</td></tr>";
 			$html_info .= "<tr><td colspan=2 align=left><u>".__('Periodo consultado').": ".$periodo_txt."</u></td></table>";
 			$html_info .= "</td></tr><tr><td>&nbsp;</td></tr>";
@@ -1291,12 +1294,12 @@ else
 				{
 					$dato = $row['hr_trabajadas'];
 					$dato2 = $row['hr_cobrable'];
-					$glosa_show = Utiles::Formato($dato,'%f').'<br>'.Utiles::Formato($dato2,'%f');
+					$glosa_show = Utiles::Formato($dato,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato2,'%f', $idioma, 2);
 				}
 				else
 				{
 					$dato = $row[$horas_sql];
-					$glosa_show = Utiles::Formato($dato,'%f');
+					$glosa_show = Utiles::Formato($dato,'%f', $idioma, 2);
 				}
 
 				$tr_usuario = "<tr><td class=usuario_nombre style='width:150px'><a href='javascript:void(0)' onclick=\"DetalleUsuario(this.form,".$row[id_usuario].")\">".$row[$letra_profesional]."</a></td>
@@ -1338,10 +1341,10 @@ else
 					}
 					else
 					{
-						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f').'<br>'.Utiles::Formato($dato_cliente2,'%f');
-						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f').'<br>'.Utiles::Formato($dato_grupo2,'%f');
-						$glosa_show_asunto = Utiles::Formato($dato_asunto,'%f').'<br>'.Utiles::Formato($dato_asunto2,'%f');
-						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f').'<br>'.Utiles::Formato($dato_usuario2,'%f');
+						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_cliente2,'%f', $idioma, 2);
+						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_grupo2,'%f', $idioma, 2);
+						$glosa_show_asunto = Utiles::Formato($dato_asunto,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_asunto2,'%f', $idioma, 2);
+						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f', $idioma, 2).'<br>'.Utiles::Formato($dato_usuario2,'%f', $idioma, 2);
 					}
 				}
 				else
@@ -1355,10 +1358,10 @@ else
 					}
 					else
 					{
-						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f');
-						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f');
-						$glosa_show_asunto = Utiles::Formato($dato_asunto,'%f');
-						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f');
+						$glosa_show_cliente = Utiles::Formato($dato_cliente,'%f', $idioma, 2);
+						$glosa_show_grupo = Utiles::Formato($dato_grupo,'%f', $idioma, 2);
+						$glosa_show_asunto = Utiles::Formato($dato_asunto,'%f', $idioma, 2);
+						$glosa_show_usuario = Utiles::Formato($dato_usuario,'%f', $idioma, 2);
 					}
 				}
 				$total_hr += $dato;
@@ -1429,7 +1432,7 @@ else
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) )
 				$html_info .= Utiles::Formato($total_hr_minutos,'%s');
 			else
-				$html_info .= Utiles::Formato($total_hr,'%f');
+				$html_info .= Utiles::Formato($total_hr,'%f', $idioma, 2);
 			$html_info .= "</td></tr></table>";
 			$html_info .= "</td></tr><tr><td>&nbsp;</td></tr>";
 			$html_info .= "<tr><td>";

@@ -39,10 +39,14 @@ class Cliente extends Objeto
   
 	//funcion que asigna el nuevo codigo automatico para un cliente
 	function AsignarCodigoCliente()
-	{
-		$query = "SELECT codigo_cliente AS x FROM cliente ORDER BY x DESC LIMIT 1";
+	{  
+		if( UtilesApp::GetConf($this->sesion,'EsPRC') ) {
+			$query = "SELECT codigo_cliente AS x FROM cliente WHERE codigo_cliente NOT IN ('2000','2001','2002','2003') ORDER BY x DESC LIMIT 1";
+		} else {
+			$query = "SELECT codigo_cliente AS x FROM cliente ORDER BY x DESC LIMIT 1";
+		}
 	  $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-    list($codigo) = mysql_fetch_array($resp);
+      list($codigo) = mysql_fetch_array($resp);
 		$f=$codigo+1;
 	  $codigo_cliente=sprintf("%04d",$f);
 	  return $codigo_cliente;

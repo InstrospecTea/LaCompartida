@@ -121,6 +121,8 @@ $col=0;
 	$col_fono_contacto = $col++;
 	$col_mail_contacto = $col++;
 	$col_dir_contacto = $col++;
+	$col_fecha_creacion = $col++;
+	$col_fecha_inactivo = $col++;
 	
 	// Nueva columna estado del cliente
 	$col_estado = $col++;
@@ -146,6 +148,8 @@ $col=0;
 	$ws1->setColumn( $col_fono_contacto, $col_fono_contacto,  20.00);
 	$ws1->setColumn( $col_mail_contacto, $col_mail_contacto,  30.00);
 	$ws1->setColumn( $col_dir_contacto, $col_dir_contacto, 40.00);
+	$ws1->setColumn( $col_fecha_creacion, $col_fecha_creacion,  20.00);
+	$ws1->setColumn( $col_fecha_inactivo, $col_fecha_inactivo,  20.00);
 
 	// Nueva columna estado del cliente
 	$ws1->setColumn( $col_estado, $col_estado, 10.00);
@@ -182,6 +186,8 @@ $col=0;
 	$ws1->write($fila_inicial, $col_fono_contacto, __('Teléfono Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_mail_contacto, __('E-mail Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_dir_contacto, __('Dirección contacto'), $tit);
+	$ws1->write($fila_inicial, $col_fecha_creacion, __('Fecha Creación'), $tit);
+	$ws1->write($fila_inicial, $col_fecha_inactivo, __('Fecha Inactivo'), $tit);
 	
 	// Nueva columna estado del cliente
 	$ws1->write($fila_inicial, $col_estado, __('Activo'), $tit);
@@ -228,6 +234,8 @@ $col=0;
 								contrato.monto,
 								tarifa.glosa_tarifa,
 								contrato.id_moneda_monto,
+								cliente.fecha_creacion,
+								cliente.fecha_inactivo,
 								cliente.activo
 						FROM cliente 
 						LEFT JOIN grupo_cliente USING (id_grupo_cliente)

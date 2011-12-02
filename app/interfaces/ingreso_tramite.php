@@ -15,7 +15,7 @@
 	require_once Conf::ServerDir().'/classes/Funciones.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
-	$sesion = new Sesion(array('PRO','REV'));
+	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
 	
 	$tramite = new Tramite($sesion);
@@ -1308,12 +1308,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		if( Conf::GetConf( $sesion,'TipoIngresoHoras')=='selector' )
 		{
 			if(!$duracion) $duracion='00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario || $permisos->fields['permitido'] );
 		}
 		else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' )
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
+					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
 <?
 		}
 		else if( Conf::GetConf( $sesion,'TipoIngresoHoras')=='java' )
@@ -1326,22 +1326,22 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		if(Conf::TipoIngresoHoras()=='selector')
 		{
 			if(!$duracion) $duracion='00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario );
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario || $permisos->fields['permitido'] );
 		}
 		else if(Conf::TipoIngresoHoras()=='decimal')
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
+					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
 <?
 		}
 		else if(Conf::TipoIngresoHoras()=='java')
 		{
-			echo Html::PrintTime("duracion",$duracion,"$como_trabajo==1 || $tramite->fields['trabajo_si_no']==1 ? '' : 'readonly' onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario);
+			echo Html::PrintTime("duracion",$duracion,"$como_trabajo==1 || $tramite->fields['trabajo_si_no']==1 ? '' : 'readonly' onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario || $permisos->fields['permitido']);
 		}
 	}
 	else
 	{
-		echo Html::PrintTime('duracion',$tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion,"$como_trabajo==1 ? '' : 'readonly' onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario);
+		echo Html::PrintTime('duracion',$tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion,"$como_trabajo==1 ? '' : 'readonly' onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario || $permisos->fields['permitido']);
 	}
 
 ?>		

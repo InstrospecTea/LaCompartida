@@ -9,18 +9,20 @@
 	$sesion = new Sesion (null, true);
 	$alerta = new Alerta ($sesion);
 
-	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre FROM log_correo WHERE enviado=0";
+	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-	while(list($id, $subject, $mensaje, $mail, $nombre)=mysql_fetch_array($resp))
+	while(list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo )=mysql_fetch_array($resp))
 	{
 		$correos=array();
 		$correo=array( 'nombre' => $nombre, 'mail' => $mail );
 		array_push($correos,$correo);
-		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje))
+		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,false,$id_archivo_anexo))
 		{
+                    
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=".$id;
 			$resp2 = mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 		}
 	}
+
 ?>

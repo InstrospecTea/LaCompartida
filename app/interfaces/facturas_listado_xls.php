@@ -99,10 +99,20 @@
 	else
 		$where = base64_decode($where);
 
+        $numero_factura = "";
+	if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie'))
+	{
+		$numero_factura = "CONCAT(LPAD(factura.serie_documento_legal, 3, '0'), '-', factura.numero) as numero";
+	}
+	else
+	{
+		$numero_factura = "factura.numero";
+	}
+
 	$query = "SELECT cliente.glosa_cliente
 						, DATE_FORMAT(fecha, '" . $formato_fechas . "') as fecha
 						, prm_documento_legal.codigo as tipo
-						, numero";
+						, $numero_factura";
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 	{
 		$query .= "			, cliente as cliente_facturable";
@@ -152,9 +162,10 @@
 
 	// Crear y preparar planilla
 	$wb = new Spreadsheet_Excel_Writer();
-	// Enviar headers a la pagina
-	$wb->send( __('Documentos tributarios') .' '. $fecha_actual.'.xls');
 
+        // Enviar headers a la pagina
+	$wb->send( __('Documentos tributarios') .' '. $fecha_actual.'.xls');
+        
 	// Definir colores
 	$wb->setCustomColor ( 35, 220, 255, 220 );
 	$wb->setCustomColor ( 36, 255, 255, 220 );
@@ -266,9 +277,9 @@
 		if(in_array($col_name[$i],array('fecha','fecha_ultimo_pago')) ) {
 			$arr_col[$col_name[$i]]['css'] = $formato_fecha_tiempo; }
 		else if(in_array($col_name[$i],array('glosa_cliente','descripcion','glosa_asunto')) ) {
-			$arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+			$arr_col[$col_name[$i]]['css'] = $formato_descripcion; }                 
 		else { $arr_col[$col_name[$i]]['css'] = $formato_normal; }
-
+                
 		// titulos celdas
 		if(in_array($col_name[$i],array('glosa_cliente')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Cliente'); }
@@ -302,6 +313,7 @@
 		else if(in_array($col_name[$i],array('numeracion_excel')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __(''); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
+                
 
 		//formato columna excel para formulas
 		$arr_col[$col_name[$i]]['celda_excel'] = Utiles::NumToColumnaExcel($arr_col[$col_name[$i]]['celda']);
@@ -369,6 +381,8 @@
 		if($monto_pago<=0)
 			$monto_pago = 0;
 
+		$proc->fields['tipo_cambio'] /= $tipo_cambio_moneda_base;
+		
 		for($i=0; $i<$col_num; $i++) {
 	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
 
@@ -379,8 +393,8 @@
 					if( strtoupper( $proc->fields['estado'] ) == 'A' ){
 						$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], '0', $formatos_moneda[$proc->fields['id_moneda']]);
 					} else {
-						$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
-					}
+					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $formatos_moneda[$proc->fields['id_moneda']]);
+				}
 				}
 				elseif($col_name[$i] == 'monto_real'){
 					$fact = new Factura($sesion);
@@ -413,10 +427,22 @@
 					$subtotal = $proc->fields['honorarios'] + $proc->fields['subtotal_gastos'] + $proc->fields['subtotal_gastos_sin_impuesto'];
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $subtotal, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
+                                else if( $col_name[$i] == 'honorarios' ) {
+                                        $ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['honorarios'], $formatos_moneda[$proc->fields['id_moneda']]);
+                                }
+                                else if( $col_name[$i] == 'subtotal_gastos' ) {
+                                        $ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['subtotal_gastos'], $formatos_moneda[$proc->fields['id_moneda']]);
+                                }
+                                else if( $col_name[$i] == 'subtotal_gastos_sin_impuesto' ) {
+                                        $ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['subtotal_gastos_sin_impuesto'], $formatos_moneda[$proc->fields['id_moneda']]);
+                                }
 				else if($col_name[$i] == 'saldo') {
 					$saldo = $proc->fields[$col_name[$i]]*(-1);
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
+                                else if($col_name[$i] == 'tipo_cambio') {
+                                        $ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields['tipo_cambio'], $formatos_moneda[$proc->fields['id_moneda']]);
+                                }
 				else if($col_name[$i] == 'saldo_pagos') {
 					//$factura = new Factura($sesion);
 					//$lista_pagos_fact = $factura->GetPagosSoyFactura($proc->fields['id_factura']);
@@ -424,16 +450,16 @@
 					$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 				}
 				else if($col_name[$i] == 'saldo_moneda_base') {
-					$saldo_moneda_base = UtilesApp::CambiarMoneda($saldo, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
+					//$saldo_moneda_base = UtilesApp::CambiarMoneda($saldo, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
 					$ws1->writeFormula($fila, $arr_col['saldo_moneda_base']['celda'], "=".$arr_col['saldo']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
 					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $saldo_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
 				else if($col_name[$i] == 'monto_pagos_moneda_base') {
-					$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
+					//$monto_pago_moneda_base = UtilesApp::CambiarMoneda($monto_pago, $proc->fields['tipo_cambio'], $proc->fields['cifras_decimales'], $tipo_cambio_moneda_base,$cifras_decimales_moneda_base,false);
 					$ws1->writeFormula($fila, $arr_col['monto_pagos_moneda_base']['celda'], "=".$arr_col['saldo_pagos']['celda_excel']."$fila_actual*".$arr_col['tipo_cambio']['celda_excel']."$fila_actual", $formatos_moneda[$id_moneda_base]);
 					//$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], $monto_pago_moneda_base, $formatos_moneda[$id_moneda_base]);
 				}
-				if($col_name[$i] == 'glosa_cliente') {
+				else if($col_name[$i] == 'glosa_cliente') {
 					$glosa_cliente = $proc->fields['glosa_cliente'];
 					if($proc->fields['mostrar_diferencia_razon_social']!='no')
 					{
@@ -441,33 +467,29 @@
 					}
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $glosa_cliente, $arr_col[$col_name[$i]]['css']);
 				}
-				if($col_name[$i] == 'glosa_asunto') {
+				else if($col_name[$i] == 'glosa_asunto') {
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos_glosa, $arr_col[$col_name[$i]]['css']);
 				}
-				if($col_name[$i] == 'codigo_asunto') {
+				else if($col_name[$i] == 'codigo_asunto') {
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $lista_asuntos, $arr_col[$col_name[$i]]['css']);
 				}
-				if($col_name[$i] == 'fecha_ultimo_pago') {
+				else if($col_name[$i] == 'fecha_ultimo_pago') {
 
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], Utiles::sql2fecha($ultima_fecha_pago, $formato_fechas, "-"), $arr_col[$col_name[$i]]['css']);
 				}
-				if($col_name[$i] == 'estado_glosa') {
+				else if($col_name[$i] == 'estado_glosa') {
 
 					$ws1->writeNote($fila, $arr_col['estado']['celda'], $proc->fields[$col_name[$i]]);
 				}
-				if($col_name[$i] == 'numeracion_excel') {
+				else if($col_name[$i] == 'numeracion_excel') {
 
 					$ws1->writeFormula($fila, $arr_col['numeracion_excel']['celda'], "=SUM(".$arr_col['numeracion_excel']['celda_excel']."$fila + 1)", $arr_col[$col_name[$i]]['css']);
 				}
-
 				else {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
 				}
-
-				$ws1->writeNumber($fila, $arr_col['subtotal']['celda'], $subtotal, $formatos_moneda[$proc->fields['id_moneda']]);
-				$ws1->write($fila, $arr_col['saldo_pagos']['celda'], $monto_pago, $formatos_moneda[$proc->fields['id_moneda']]);
 			}
 		}
 	}
@@ -480,24 +502,24 @@
 		// ancho celdas
 		if(in_array($col_name[$i],array('descripcion')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 12); }
-		else if(in_array($col_name[$i],array('saldo','iva','subtotal','saldo_moneda_base')) ) {
+		else if(in_array($col_name[$i],array('numero','cobro','id_cobro')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
+		else if(in_array($col_name[$i],array('fecha_ultimo_pago')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11); }
-		else if(in_array($col_name[$i],array('numero','cobro','saldo_pagos','id_cobro')) ) {
-			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 8); }
-		else if(in_array($col_name[$i],array('encargado_comercial','fecha_ultimo_pago','glosa_asunto')) ) {
-			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
 		else if(in_array($col_name[$i],array('tipo','estado')) ) {
-			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 3); }
-		else if(in_array($col_name[$i],array('glosa_cliente')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 6); }
+		else if(in_array($col_name[$i],array('glosa_cliente','glosa_asunto','cliente_facturable')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 20); }
-		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
+		else if(in_array($col_name[$i],array('encargado_comercial','codigo_asunto')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 15); }
+		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 12); }
 
 		// ancho celdas ocultos
 		if(in_array($col_name[$i],array('numeracion_excel','estado_glosa','honorarios','subtotal_gastos','subtotal_gastos_sin_impuesto','total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 	}
-
+	
 	$wb->close();
 	exit;
 ?>

@@ -211,6 +211,7 @@ span.indefinido { color: #550000; }
 
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->setVista($vista);
+	$reporte->setProporcionalidad($prop);
 
 	$reporte->Query();
 	$r = $reporte->toArray();
@@ -244,6 +245,7 @@ span.indefinido { color: #550000; }
 		$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 		$reporte->setTipoDato($tipo_dato_comparado);
 		$reporte->setVista($vista);
+		$reporte->setProporcionalidad($prop);
 
 		if($campo_fecha)
 			$reporte->setCampoFecha($campo_fecha);

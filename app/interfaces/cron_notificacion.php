@@ -15,8 +15,10 @@
 	require_once Conf::ServerDir().'/classes/Reporte.php';
 	require_once Conf::ServerDir().'/classes/Notificacion.php';
 	require_once Conf::ServerDir().'/classes/Tarea.php';
+	require_once Conf::ServerDir().'/classes/CobroPendiente.php';
+
 	//require_once Conf::ServerDir().'/interfaces/graficos/Grafico.php';
-	
+
 	//$dbh = mysql_connect(Conf::dbHost(), Conf::dbUser(), Conf::dbPass());
 	//mysql_select_db(Conf::dbName()) or mysql_error($dbh);
 	$sesion = new Sesion (null, true);
@@ -24,31 +26,31 @@
 
 
 	$notificacion = new Notificacion($sesion);
-	
+
 	//El arreglo dato_x se construirá con los datos de cada usuarios de la forma: id_usuario => datos (otro arreglo)
 	//Por ejemplo, se pueden anexar los siguientes componentes
 	// $dato_x['usuarios'][5]['alerta_propia'] => 'Estimado usuario 5: no has ingresado horas'. (5: PRO)
 	// $dato_x['usuarios'][5]['alerta_revisado'][7] => 'Estimado usuario 5: usuario 7 no ha ingresado horas'. (5:REV ó revisor(5,7)
-	// $dato_x['usuarios'][5]['reportes'][3] => 'Estimado usuario 5: <imagen_reporte_5>. (5:REP)	
+	// $dato_x['usuarios'][5]['reportes'][3] => 'Estimado usuario 5: <imagen_reporte_5>. (5:REP)
 	$dato_mensual = array();
 	$dato_semanal = array();
 	$dato_diario = array();
-	
+
 	/*Mensajes */
 	$warning = '<span style="color:#CC2233;">Alerta:</span>';
 	$msg['horas_minimas_propio'] = $warning." s&oacute;lo ha ingresado %HORAS horas de un m&iacute;nimo de %MINIMO.";
 	$msg['horas_maximas_propio'] = $warning." ha ingresado %HORAS horas, superando su m&aacute;ximo de %MAXIMO.";
 	$msg['horas_minimas_revisado'] = $warning." no alcanza su m&iacute;nimo de %MINIMO horas.";
 	$msg['horas_maximas_revisado'] = $warning." supera su m&aacute;ximo de %MAXIMO horas.";
-	
-	
+
+
 	//Queries de Notificacion Semanal
 	$DiaMailSemanal = 'Fri';
 	if( method_exists( 'Conf', 'GetConf' ) )
 		$DiaMailSemanal = Conf::GetConf( $sesion, 'DiaMailSemanal' );
 	else if( method_exists( 'Conf', 'DiaMailSemanal' ) )
 		$DiaMailSemanal = Conf::DiaMailSemanal();
-		
+
 	if( date("D") == $DiaMailSemanal || $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')
 	{
 		// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
@@ -56,8 +58,8 @@
 									alerta_semanal,
 									usuario.nombre AS nombre_pila,
 									username AS nombre_usuario
-								FROM usuario 
-								JOIN usuario_permiso USING(id_usuario) 
+								FROM usuario
+								JOIN usuario_permiso USING(id_usuario)
 								WHERE codigo_permiso = 'PRO' AND activo = 1 ";
 		$result = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while( list($id_usuario,$alerta_semanal,$nombre_pila,$nombre_usuario) = mysql_fetch_array($result))
@@ -68,12 +70,12 @@
 			$maximo = $profesional->fields['restriccion_max'];
 			$horas = $alerta->HorasUltimaSemana($id_usuario);
 			$horas_cobrables = $alerta->HorasCobrablesUltimaSemana($id_usuario);
-			
+
 			if(!$horas)
 				$horas = '0.00';
 			if(!$horas_cobrables)
 				$horas_cobrables = '0.00';
-						
+
 			if($minimo > 0 && $horas < $minimo)
 			{
 					//Alerto al usuario
@@ -95,41 +97,41 @@
 					{
 						$txt = str_replace('%HORAS',$horas,$msg['horas_maximas_propio']);
 						$txt = str_replace('%MAXIMO',$maximo,$txt);
-						$dato_semanal[$id_usuario]['alerta_propia'] = $txt;		
+						$dato_semanal[$id_usuario]['alerta_propia'] = $txt;
 					}
 					//Alerta a sus revisores
 					$txt = str_replace('%HORAS',$horas,$msg['horas_maximas_revisado']);
 					$txt = str_replace('%MAXIMO',$maximo,$txt);
-					$cache_revisados[$id_usuario]['alerta'] = $txt;	
+					$cache_revisados[$id_usuario]['alerta'] = $txt;
 			}
 			$dato_semanal[$id_usuario]['nombre_pila'] = $nombre_pila;
 			$cache_revisados[$id_usuario]['nombre'] = $nombre_usuario;
 			$cache_revisados[$id_usuario]['horas'] = number_format($horas,1);
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables,1);
 		}
-		// Mensaje para REV: horas de cada revisado, alertas. 
+		// Mensaje para REV: horas de cada revisado, alertas.
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') )
 				$having = "";
 			else
 				$having = " AND (codigo_permiso = 'REV' OR revisados IS NOT NULL)";
-			$query = 	"SELECT usuario.id_usuario, alerta_semanal, codigo_permiso, 
-													GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados 
-					    			FROM usuario 
-										LEFT JOIN usuario_permiso ON (usuario.id_usuario = usuario_permiso.id_usuario AND usuario_permiso.codigo_permiso = 'REV') 
-										LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor) 
-										WHERE activo = 1 
-											AND alerta_revisor = 1 
-										GROUP BY usuario.id_usuario 
+			$query = 	"SELECT usuario.id_usuario, alerta_semanal, codigo_permiso,
+													GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
+					    			FROM usuario
+										LEFT JOIN usuario_permiso ON (usuario.id_usuario = usuario_permiso.id_usuario AND usuario_permiso.codigo_permiso = 'REV')
+										LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
+										WHERE activo = 1
+											AND alerta_revisor = 1
+										GROUP BY usuario.id_usuario
 										HAVING 1 $having";
 			$result = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			while( list($id_usuario,$alerta_semanal,$codigo_permiso,$revisados) = mysql_fetch_array($result))
 			{
 				$profesional = new Usuario($sesion);
 				$profesional->LoadId($id_usuario);
-				
-				if( $revisados != "" ) 
+
+				if( $revisados != "" )
 					$revisados .= ','.$id_usuario;
-				
+
 				// Comentado por Stefan Moers 5.4.2011, siempre se debería hacer el intersect con el array de los revisados.
 				/*if($codigo_permiso == 'REV') //Si es revisor, informo sobre todos en cache_revisados
 					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
@@ -140,13 +142,13 @@
 					$dato_semanal[$id_usuario]['alerta_revisados'] = array_intersect_key($cache_revisados,array_flip(explode(',',$revisados)));
 			}
 		// Mensaje para REP: Imagenes de Reporte Consolidado. Genero el pdf que se anexará
-		
+
 		/* Imagenes para Encargado comercial:
 		 * Mis contratos: horas de la semana, monto de la semana, que tal el CAP.
 		 * */
 	}
 	// echo htmlentities(print_r($mail_semanal,true));
-	
+
 	// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 	$mensajes = $notificacion->mensajeSemanal($dato_semanal);
 	foreach($mensajes as $id_usuario => $mensaje)
@@ -159,54 +161,54 @@
 		var_dump($dato_semanal);
 		echo implode('<br><br><br>',$mensajes);
 	}
-	
+
 	// Mail diario, Primer componente: la modificación de datos se alerta cada día a los responsables del contrato
 	$CorreosModificacionAdminDatos = '';
 	if(method_exists('Conf','GetConf'))
 		$CorreosModificacionAdminDatos = Conf::GetConf($sesion, 'CorreosModificacionAdminDatos');
 	else if (method_exists('Conf','CorreosModificacionAdminDatos'))
 		$CorreosModificacionAdminDatos = Conf::CorreosModificacionAdminDatos();
-		
+
 	if($CorreosModificacionAdminDatos != '')
 	{
 		$query_enviado = "SELECT MAX(fecha_enviado)
 							FROM modificaciones_contrato";
 		$resp_enviado = mysql_query($query_enviado, $sesion->dbh) or Utiles::errorSQL($query_enviado,__FILE__,__LINE__,$sesion->dbh);
 		list($fecha) = mysql_fetch_array($resp_enviado);
-		
+
 		// Buscar para todas las personas responsables que necesitas informar
 		$query_responsables="
-				SELECT  
+				SELECT
 				DISTINCT u.nombre as nombre_pila_responsable,
 				u.email,
 				u.id_usuario
 				FROM usuario AS u
 				JOIN modificaciones_contrato AS mc ON u.id_usuario=mc.id_usuario_responsable
 				WHERE u.activo=1 AND mc.fecha_modificacion>'".$fecha."'";
-		$resp_responsables = mysql_query($query_responsables, $sesion->dbh) or Utiles::errorSQL($query_responsables,__FILE__,__LINE__,$sesion->dbh);	
+		$resp_responsables = mysql_query($query_responsables, $sesion->dbh) or Utiles::errorSQL($query_responsables,__FILE__,__LINE__,$sesion->dbh);
 
 		while(list($nombre_pila_responsable,$email,$id_usuario_responsable) = mysql_fetch_array($resp_responsables))
-		{							
+		{
 			//Buscar para todas las modificaciones desde ultimo Email enviado
 			$query_mod = "SELECT c.glosa_cliente,
 											username as nombre_modificador,
 											mc.fecha_modificacion,
 											GROUP_CONCAT(DISTINCT a.glosa_asunto SEPARATOR ',') as asuntos,
 											contrato.glosa_contrato
-								 		FROM modificaciones_contrato AS mc 
+								 		FROM modificaciones_contrato AS mc
 										JOIN contrato ON contrato.id_contrato=mc.id_contrato
 										JOIN usuario AS u ON mc.id_usuario=u.id_usuario
 										JOIN cliente AS c ON c.codigo_cliente=contrato.codigo_cliente
-										LEFT JOIN asunto AS a ON a.id_contrato=mc.id_contrato 
+										LEFT JOIN asunto AS a ON a.id_contrato=mc.id_contrato
 										WHERE mc.fecha_modificacion > '".$fecha."'
 										AND mc.id_usuario_responsable='$id_usuario_responsable'
 										GROUP BY contrato.id_contrato";
-			$resp_mod = mysql_query($query_mod, $sesion->dbh) or Utiles::errorSQL($query_mod,__FILE__,__LINE__,$sesion->dbh);							
+			$resp_mod = mysql_query($query_mod, $sesion->dbh) or Utiles::errorSQL($query_mod,__FILE__,__LINE__,$sesion->dbh);
 
-							
+
 			while(list($nombre_cliente,$nombre_modificador,$fecha_modificacion,$asuntos,$glosa_contrato)=mysql_fetch_array($resp_mod))
 			{
-				$date=new DateTime($fecha_modificacion);					
+				$date=new DateTime($fecha_modificacion);
 				$asuntos = explode(',',$asuntos);
 				$dato_diario[$id_usuario_responsable]['nombre_pila'] = $nombre_pila_responsable;
 				$dato_diario[$id_usuario_responsable]['modificacion_contrato'][] =
@@ -215,18 +217,18 @@
 						'asuntos'=>$asuntos,
 						'nombre_modificador'=>$nombre_modificador,
 						'fecha'=>date_format($date,'d/m/Y  H:i:s'));
-			}	
+			}
 			$query_update = " UPDATE modificaciones_contrato
-											SET fecha_enviado=NOW() 
+											SET fecha_enviado=NOW()
 											WHERE fecha_modificacion >= '".$fecha."'";
 			if($argv[1]=='correo')
 				$resp_update = mysql_query($query_update, $sesion->dbh) or Utiles::errorSQL($query_update,__FILE__,__LINE__,$sesion->dbh);
-		}	
+		}
 	}
-	
-	
-	
-	//Mail diario, Segundo Componente: Alertas de límites de Asuntos 
+
+
+
+	//Mail diario, Segundo Componente: Alertas de límites de Asuntos
 	$query_asuntos=
 		"SELECT asunto.codigo_asunto,
 				usuario.id_usuario,
@@ -236,13 +238,13 @@
 		JOIN usuario ON (asunto.id_encargado = usuario.id_usuario)
 		JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
 		WHERE asunto.activo = '1' AND cliente.activo = '1'";
-	$result_asuntos = mysql_query ($query_asuntos,$sesion->dbh) or Utiles::errorSQL($query_asuntos,__FILE__,__LINE__,$sesion->dbh); 
+	$result_asuntos = mysql_query ($query_asuntos,$sesion->dbh) or Utiles::errorSQL($query_asuntos,__FILE__,__LINE__,$sesion->dbh);
 	while( list($codigo_asunto, $id_usuario, $nombre_usuario,$glosa_cliente) = mysql_fetch_array($result_asuntos))
 	{
 		$asunto = new Asunto($sesion);
 		$cobro = new Cobro($sesion);
 		$asunto->LoadByCodigo($codigo_asunto);
-		
+
 		$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
 
 		/*Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. */
@@ -253,8 +255,8 @@
 		if($asunto->fields['alerta_hh'] > 0) //Alerta de limite de horas no emitidas
 			$total_horas_ult_cobro =  $asunto->TotalHoras(false);
 		if($asunto->fields['alerta_monto'] > 0) //Significa que se requiere alerta por monto no emitido
-			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $asunto->TotalMonto(false);	
-		
+			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $asunto->TotalMonto(false);
+
 		//Notificacion "Límite de monto"
 		$total_monto = number_format($total_monto,1);
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
@@ -274,6 +276,7 @@
 		//Notificacion "Límite de horas"
 		if(($total_horas_trabajadas > $asunto->fields['limite_hh']) && ($asunto->fields['limite_hh'] > 0 ) && ($asunto->fields['notificado_hr_excedido']==0))
 		{
+			echo "Límite de horas\n";
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_horas'] = array(
 			'cliente' => $glosa_cliente,
 			'asunto' => $asunto->fields['glosa_asunto'],
@@ -291,14 +294,14 @@
 			'asunto' => $asunto->fields['glosa_asunto'],
 			'max' => $asunto->fields['alerta_monto'],
 			'actual' => $total_monto_ult_cobro,
-			'moneda' => $moneda_desde_ult_cobro);			
+			'moneda' => $moneda_desde_ult_cobro);
 			$asunto->Edit('notificado_monto_excedido_ult_cobro','1');
             $asunto->Write();
 		}
 
 		//Notificacion "Horas desde el último cobro"
 		if(($total_horas_ult_cobro > $asunto->fields['alerta_hh']) &&  ($asunto->fields['alerta_hh'] > 0) && ($asunto->fields['notificado_hr_excedida_ult_cobro']==0)){
-			
+
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['alerta_hh'] = array(
 			'cliente' => $glosa_cliente,
 			'asunto' => $asunto->fields['glosa_asunto'],
@@ -311,25 +314,28 @@
 	// Mail diario - Tercer componente: alertas de limites de Contrato.
 		$query_contratos=
 		"SELECT contrato.id_contrato,
-				usuario.id_usuario,
-				usuario.username,
+				usuario_encargado_principal.id_usuario,
+				usuario_encargado_principal.username,
+				usuario_encargado_secundario.id_usuario,
+				usuario_encargado_secundario.username,
 				cliente.glosa_cliente,
 				GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ',') as asuntos
 		FROM contrato
-		JOIN usuario ON (contrato.id_usuario_responsable = usuario.id_usuario)
+		LEFT JOIN usuario usuario_encargado_principal ON (contrato.id_usuario_responsable = usuario_encargado_principal.id_usuario)
+		LEFT JOIN usuario usuario_encargado_secundario ON (contrato.id_usuario_secundario = usuario_encargado_secundario.id_usuario)
 		JOIN cliente ON (contrato.codigo_cliente = cliente.codigo_cliente)
 		JOIN asunto ON (asunto.id_contrato = contrato.id_contrato)
-		WHERE contrato.activo = 'SI' AND cliente.activo = '1' GROUP BY contrato.id_contrato";
-	$result_contratos = mysql_query ($query_contratos,$sesion->dbh) or Utiles::errorSQL($query_contratos,__FILE__,__LINE__,$sesion->dbh); 
-	while( list($id_contrato, $id_usuario, $nombre_usuario,$glosa_cliente,$asuntos) = mysql_fetch_array($result_contratos))
+		WHERE contrato.activo = 'SI' AND 
+		cliente.activo = '1' AND 
+		(contrato.id_usuario_responsable IS NOT NULL OR contrato.id_usuario_secundario IS NOT NULL OR (contrato.notificar_otros_correos IS NOT NULL AND contrato.notificar_otros_correos <> '')) GROUP BY contrato.id_contrato";
+	$result_contratos = mysql_query ($query_contratos,$sesion->dbh) or Utiles::errorSQL($query_contratos,__FILE__,__LINE__,$sesion->dbh);
+	while( list($id_contrato, $id_usuario, $nombre_usuario, $id_usuario_secundario, $nombre_usuario_secundario, $glosa_cliente,$asuntos) = mysql_fetch_array($result_contratos))
 	{
 		$contrato = new Contrato($sesion);
 		$cobro = new Cobro($sesion);
 		$contrato->Load($id_contrato);
-		
-		$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
 
-		// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. 
+		// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 		if($contrato->fields['limite_monto'] > 0)
 			list($total_monto,$moneda_total_monto) =  $contrato->TotalMonto();
 		if($contrato->fields['limite_hh'] > 0)
@@ -337,20 +343,43 @@
 		if($contrato->fields['alerta_hh'] > 0) //Alerta de limite de horas no emitidas
 			$total_horas_ult_cobro =  $contrato->TotalHoras(false);
 		if($contrato->fields['alerta_monto'] > 0) //Significa que se requiere alerta por monto no emitido
-			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $contrato->TotalMonto(false);	
-		
+			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $contrato->TotalMonto(false);
+
 		//Notificacion "Límite de monto"
 		$total_monto = number_format($total_monto,1);
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
 
 		if (($total_monto > $contrato->fields['limite_monto']) && ($contrato->fields['limite_monto'] > 0) && ($contrato->fields['notificado_monto_excedido']==0))
 		{
-			$dato_diario[$id_usuario]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_monto'] = array(
-			'cliente' => $glosa_cliente,
-			'asunto' => explode(',',$asuntos),
-			'max' => $contrato->fields['limite_monto'],
-			'actual' => $total_monto,
-			'moneda' => $moneda_total_monto);
+			
+			$contrato_excedido = array(
+				'cliente' => $glosa_cliente,
+				'asunto' => explode(',',$asuntos),
+				'max' => $contrato->fields['limite_monto'],
+				'actual' => $total_monto,
+				'moneda' => $moneda_total_monto
+			);
+
+			if (!empty($contrato->fields['id_usuario_responsable']) && $contrato->fields['notificar_encargado_principal'] == '1') {
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['nombre_pila'] = $nombre_usuario;
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_monto'] = $contrato_excedido;
+			}
+
+			if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
+				echo $contrato->fields['id_usuario_secundario']. "\n";
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $nombre_usuario_secundario;
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_monto'] = $contrato_excedido;
+			}
+			
+			if (!empty($contrato->fields['notificar_otros_correos'])) {
+				$otros_correos = explode(',', $contrato->fields['notificar_otros_correos']);
+				foreach ($otros_correos as $otro_correo) {
+					if (empty($otro_correo)) {
+						continue;
+					}
+					$dato_diario[$otro_correo]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_monto'] = $contrato_excedido;
+				}
+			}
 			$contrato->Edit('notificado_monto_excedido','1');
             $contrato->Write();
 		}
@@ -358,11 +387,33 @@
 		//Notificacion "Límite de horas"
 		if(($total_horas_trabajadas > $contrato->fields['limite_hh']) && ($contrato->fields['limite_hh'] > 0 ) && ($contrato->fields['notificado_hr_excedido']==0))
 		{
-			$dato_diario[$id_usuario]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_horas'] = array(
-			'cliente' => $glosa_cliente,
-			'asunto' => explode(',',$asuntos),
-			'max' => $contrato->fields['limite_hh'],
-			'actual' => $total_horas_trabajadas);
+			
+			$contrato_excedido = array(
+				'cliente' => $glosa_cliente,
+				'asunto' => explode(',',$asuntos),
+				'max' => $contrato->fields['limite_hh'],
+				'actual' => $total_horas_trabajadas
+			);
+			if (!empty($contrato->fields['id_usuario_responsable']) && $contrato->fields['notificar_encargado_principal'] == '1') {
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['nombre_pila'] = $nombre_usuario;
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_horas'] = $contrato_excedido;
+			}
+
+			if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
+				echo $contrato->fields['id_usuario_secundario']. "\n";
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $nombre_usuario_secundario;
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_horas'] = $contrato_excedido;
+			}
+			
+			if (!empty($contrato->fields['notificar_otros_correos'])) {
+				$otros_correos = explode(',', $contrato->fields['notificar_otros_correos']);
+				foreach ($otros_correos as $otro_correo) {
+					if (empty($otro_correo)) {
+						continue;
+					}
+					$dato_diario[$otro_correo]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_horas'] = $contrato_excedido;
+				}
+			}
 			$contrato->Edit('notificado_hr_excedido','1');
 			$contrato->Write();
 		}
@@ -370,28 +421,70 @@
 		//Notificacion "Monto desde el último cobro"
 		if(($total_monto_ult_cobro > $contrato->fields['alerta_monto']) && ($contrato->fields['alerta_monto'] > 0) && ($contrato->fields['notificado_monto_excedido_ult_cobro']==0))
 		{
-			$dato_diario[$id_usuario]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_ultimo_cobro'] = array(
-			'cliente' => $glosa_cliente,
-			'asunto' => explode(',',$asuntos),
-			'max' => $contrato->fields['alerta_monto'],
-			'actual' => $total_monto_ult_cobro,
-			'moneda' => $moneda_desde_ult_cobro);			
+			$contrato_excedido = array(
+				'cliente' => $glosa_cliente,
+				'asunto' => explode(',',$asuntos),
+				'max' => $contrato->fields['alerta_monto'],
+				'actual' => $total_monto_ult_cobro,
+				'moneda' => $moneda_desde_ult_cobro
+			);
+			if (!empty($contrato->fields['id_usuario_responsable']) && $contrato->fields['notificar_encargado_principal'] == '1') {
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['nombre_pila'] = $nombre_usuario;
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_ultimo_cobro'] = $contrato_excedido;
+			}
+
+			if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
+				echo $contrato->fields['id_usuario_secundario']. "\n";
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $nombre_usuario_secundario;
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_ultimo_cobro'] = $contrato_excedido;
+			}
+			
+			if (!empty($contrato->fields['notificar_otros_correos'])) {
+				$otros_correos = explode(',', $contrato->fields['notificar_otros_correos']);
+				foreach ($otros_correos as $otro_correo) {
+					if (empty($otro_correo)) {
+						continue;
+					}
+					$dato_diario[$otro_correo]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_ultimo_cobro'] = $contrato_excedido;
+				}
+			}
 			$contrato->Edit('notificado_monto_excedido_ult_cobro','1');
             $contrato->Write();
 		}
 
 		//Notificacion "Horas desde el último cobro"
 		if(($total_horas_ult_cobro > $contrato->fields['alerta_hh']) &&  ($contrato->fields['alerta_hh'] > 0) && ($contrato->fields['notificado_hr_excedida_ult_cobro']==0)){
+			$contrato_excedido = array(
+				'cliente' => $glosa_cliente,
+				'asunto' => explode(',',$asuntos),
+				'max' => $contrato->fields['alerta_hh'],
+				'actual' => $total_horas_ult_cobro
+			);
+			if (!empty($contrato->fields['id_usuario_responsable']) && $contrato->fields['notificar_encargado_principal'] == '1') {
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['nombre_pila'] = $nombre_usuario;
+				$dato_diario[$contrato->fields['id_usuario_responsable']]['contrato_excedido'][$contrato->fields['id_contrato']]['alerta_hh'] = $contrato_excedido;
+			}
+
+			if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
+				echo $contrato->fields['id_usuario_secundario']. "\n";
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $nombre_usuario_secundario;
+				$dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['alerta_hh'] = $contrato_excedido;
+			}
 			
-			$dato_diario[$id_usuario]['contrato_excedido'][$contrato->fields['id_contrato']]['alerta_hh'] = array(
-			'cliente' => $glosa_cliente,
-			'asunto' => explode(',',$asuntos),
-			'max' => $contrato->fields['alerta_hh'],
-			'actual' => $total_horas_ult_cobro);
+			if (!empty($contrato->fields['notificar_otros_correos'])) {
+				$otros_correos = explode(',', $contrato->fields['notificar_otros_correos']);
+				foreach ($otros_correos as $otro_correo) {
+					if (empty($otro_correo)) {
+						continue;
+					}
+					$dato_diario[$otro_correo]['contrato_excedido'][$contrato->fields['id_contrato']]['alerta_hh'] = $contrato_excedido;
+				}
+			}
 			$contrato->Edit('notificado_hr_excedida_ult_cobro','1');
             $contrato->Write();
 		}
 	}
+	
 	// Mail diario - Cuarto componente: alertas de limites de Cliente.
 		$query_clientes=
 		"SELECT cliente.codigo_cliente,
@@ -401,12 +494,12 @@
 		FROM cliente
 		JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
 		WHERE cliente.activo = '1'";
-	$result_clientes = mysql_query ($query_clientes,$sesion->dbh) or Utiles::errorSQL($query_clientes,__FILE__,__LINE__,$sesion->dbh); 
+	$result_clientes = mysql_query ($query_clientes,$sesion->dbh) or Utiles::errorSQL($query_clientes,__FILE__,__LINE__,$sesion->dbh);
 	while( list($codigo_cliente, $id_usuario, $nombre_usuario,$glosa_cliente) = mysql_fetch_array($result_clientes))
 	{
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($codigo_cliente);
-		
+
 		$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
 
 		//Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
@@ -417,9 +510,9 @@
 		if($cliente->fields['alerta_hh'] > 0) //Alerta de limite de horas no emitidas
 			$total_horas_ult_cobro =  $cliente->TotalHoras(false);
 		if($cliente->fields['alerta_monto'] > 0) //Significa que se requiere alerta por monto no emitido
-			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $cliente->TotalMonto(false);	
-			
-		
+			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $cliente->TotalMonto(false);
+
+
 		//Notificacion "Límite de monto"
 		$total_monto = number_format($total_monto,1);
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
@@ -460,7 +553,7 @@
 
 		//Notificacion "Horas desde el último cobro"
 		if(($total_horas_ult_cobro > $cliente->fields['alerta_hh']) &&  ($cliente->fields['alerta_hh'] > 0) && ($cliente->fields['notificado_hr_excedida_ult_cobro']==0)){
-			
+
 			$dato_diario[$id_usuario]['cliente_excedido'][$cliente->fields['codigo_cliente']]['alerta_hh'] = array(
 			'cliente' => $glosa_cliente,
 			'max' => $cliente->fields['alerta_hh'],
@@ -469,22 +562,22 @@
             $cliente->Write();
 		}
 	}
-	
+
 	// Mail diario - quinto componente: cierre de cobranza
-	$query="SELECT usuario.id_usuario, usuario.username, usuario.restriccion_mensual from usuario 
-							JOIN usuario_permiso USING( id_usuario ) 
+	$query="SELECT usuario.id_usuario, usuario.username, usuario.restriccion_mensual from usuario
+							JOIN usuario_permiso USING( id_usuario )
 						 where codigo_permiso='PRO' and activo=1";
 	$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while(list($id_usuario,$username,$restriccion_mensual) = mysql_fetch_array($result))
-	{			 
+	{
 		$dato_diario[$id_usuario]['nombre_pila'] = $username;
-		
+
 		/*Cuarto componente: Mail de alerta mensual de cierre de cobranza*/
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CorreosMensuales') ) || ( method_exists('Conf','CorreosMensuales') && Conf::CorreosMensuales() ) ) && UtilesApp::esUltimoDiaHabilDelMes())
 		{
 			$dato_diario[$id_usuario]['fin_de_mes'] = 1;
 		}
-		
+
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CorreosMensuales') ) || ( method_exists('Conf','CorreosMensuales') && Conf::CorreosMensuales() ) ) && UtilesApp::esSegundoDiaHabilDelMes() )
 		{
 			// horas ingresadas el mes anterior
@@ -495,13 +588,13 @@
 				$mes = 12;
 				--$ano;
 			}
-				
+
 			$query = "SELECT SUM(TIME_TO_SEC(duracion))/3600
 					FROM trabajo
 					WHERE id_usuario = '$id_usuario'
 						AND MONTH(fecha) = $mes
 						AND YEAR(fecha) = $ano";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($horas_mes) = mysql_fetch_array($resp);
 			if(!$horas_mes)
 				$horas_mes = '0.00';
@@ -513,26 +606,26 @@
 	}
 
 	// Mail Diario: Sexto componente: Alertas de ingreso de horas
-	if(date ("N") < 6) //Lunes a Viernes 
-	{ 
-			$opc = 'mail_retrasos'; 
-			$query="SELECT usuario.id_usuario  
-													from usuario  
-													JOIN usuario_permiso USING(id_usuario)  
-													where codigo_permiso='PRO' AND alerta_diaria = '1' AND activo=1"; 
+	if(date ("N") < 6) //Lunes a Viernes
+	{
+			$opc = 'mail_retrasos';
+			$query="SELECT usuario.id_usuario
+													from usuario
+													JOIN usuario_permiso USING(id_usuario)
+													where codigo_permiso='PRO' AND alerta_diaria = '1' AND activo=1";
 			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			while ($row = mysql_fetch_array($result)) 
-			{ 
-					$id_usuario = $row["id_usuario"]; 
+			while ($row = mysql_fetch_array($result))
+			{
+					$id_usuario = $row["id_usuario"];
 					$prof = new Usuario($sesion);
 					$prof->LoadId($id_usuario);
 
 					if($prof->fields['retraso_max'] > 0)
 					{
 						//Calcular horas de retraso excluyendo los fines de semana
-						
+
 						$query = "SELECT MAX(fecha_creacion) FROM trabajo WHERE id_usuario='$id_usuario'";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 						list($ultima_fecha_ingreso) = mysql_fetch_array($resp);
 						$start = strtotime($ultima_fecha_ingreso);
 						$end = strtotime(date("Y-m-d"));
@@ -547,7 +640,7 @@
 
 						//Calcular horas de retraso excluyendo los fines de semana como query (Deje el codigo de arriba porque es mas entendible)
 						/*$query = "
-						SELECT 
+						SELECT
 							24 * ( (floor( datediff( NOW( ) , MAX( fecha_creacion ) ) /7 ) *5 ) +
 							CASE dayofweek( MAX( fecha_creacion) )
 							WHEN 1
@@ -564,9 +657,9 @@
 						if($horas_retraso > $prof->fields['retraso_max'])
 						{
 							$dato_diario[$id_usuario]['retraso_max'] = array('actual'=>$horas_retraso,'max'=>$prof->fields['retraso_max']);
-						} 
+						}
 					}
-					
+
 					if($prof->fields['restriccion_diario'] > 0)
 					{
 						$query = "SELECT SUM( TIME_TO_SEC( duracion )/3600 ) FROM trabajo WHERE id_usuario = '$id_usuario' AND fecha = CURDATE()";
@@ -579,9 +672,9 @@
 							$dato_diario[$id_usuario]['restriccion_diario'] = array('actual'=>$cantidad_horas,'min'=>$prof->fields['restriccion_diario']);
 						}
 					}
-			} 
-	} 
-	
+			}
+	}
+
 	//Mail diario: septimo componente: Alertas de Tareas
 	//Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
 	$query="SELECT cliente.glosa_cliente,
@@ -604,7 +697,7 @@
 				alerta > 0
 				AND
 				DATE_ADD(NOW(), INTERVAL (alerta) DAY) < fecha_entrega
-				AND 
+				AND
 				DATE_ADD(NOW(), INTERVAL (alerta+1) DAY) > fecha_entrega
 				AND estado <> 'Lista'";
 	$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -614,7 +707,7 @@
 			return $alerta_previo.' '.__('d&iacute;a previo');
 			return $alerta_previo.' '.__('d&iacute;as previos');
 	}
-	
+
 	$tarea = new Tarea($sesion);
 	while(list($cliente,$asunto,$nombre_encargado,$nombre_revisor,$id_encargado,$id_revisor,$fecha_entrega,$nombre,$detalle,$estado,$alerta_previo) = mysql_fetch_array($result))
 	{
@@ -629,7 +722,7 @@
 		if($id_encargado)
 			$t['alerta'] .= '&nbsp;&nbsp;'.__('Encargado').': '.$nombre_encargado.'.<br>';
 			$t['alerta'] .= '&nbsp;&nbsp;'.__('Revisor').': '.$nombre_revisor.'.';
-		
+
 		if($estado == 'Por Asignar' || $estado == 'Por Asignar' || !$id_encargado)
 		{
 			$dato_diario[$id_revisor]['tarea_alerta'][] = $t;
@@ -638,23 +731,35 @@
 		{
 			$dato_diario[$id_encargado]['tarea_alerta'][] = $t;
 		}
-		
+
 	}
-		
+
+
+	//Correo Hitos
+	$cobro_pendiete = new CobroPendiente($sesion);
+	$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();
+
+	foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido)
+	{
+		$dato_diario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+	}
+
 	// Fin del mail diario. Envío.
 	$mensajes = $notificacion->mensajeDiario($dato_diario);
+
 	foreach($mensajes as $id_usuario => $mensaje)
 	{
 			if($argv[1]=='correo')
 				$alerta->EnviarAlertaProfesional($id_usuario,$mensaje, $sesion, false);
 	}
+
 	if($desplegar_correo == 'aefgaeddfesdg23k1h3kk1')
 	{
 			var_dump($dato_diario);
 			echo implode('<br><br><br>',$mensajes);
 	}
-	
+
 	if(date("j")==1)
-		CobroPendiente::GenerarCobrosPeriodicos($sesion); 
+		CobroPendiente::GenerarCobrosPeriodicos($sesion);
 
 ?>
