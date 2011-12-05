@@ -370,7 +370,7 @@ class Factura extends Objeto {
 				$meses_org = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 				$month_short = array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 				$mes_corto = array('JAN', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC');
-				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICICIEMBRE');
+				$mes_largo_es = array('ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
 				$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto . ' ' . $contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%direccion_cliente%', $direccion_cliente, $html2);
 				$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($direccion_cliente), $html2);

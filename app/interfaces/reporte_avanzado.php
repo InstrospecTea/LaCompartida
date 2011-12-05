@@ -7,6 +7,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
+        require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Reporte.php';
 
@@ -1078,7 +1079,11 @@ if(!$popup)
 			{
 				global $sesion;
 				global $id_moneda;
-				visible_moneda(Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$id_moneda? $id_moneda:'3', '','',"60"),'_select');
+                                if( $id_moneda ) 
+                                    $moneda = $id_moneda;
+                                else 
+                                    $moneda = Moneda::GetMonedaReportesAvanzados( $sesion );
+				visible_moneda(Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$moneda, '','',"60"),'_select');
 			}
 			function tinta2()
 			{

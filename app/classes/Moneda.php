@@ -2,6 +2,7 @@
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class Moneda extends Objeto
@@ -129,6 +130,21 @@ class Moneda extends Objeto
 		else
 			return false;
 	}
+        
+        function GetMonedaReportesAvanzados(&$sesion)
+        {
+            $query = " SELECT id_moneda FROM prm_moneda WHERE glosa_moneda LIKE '%".UtilesApp::GetConf($sesion,'MonedaTarifaPorDefecto')."%' ";
+            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            list($id_moneda) = mysql_fetch_array($resp);
+            
+            if(empty($id_moneda)) {
+                $query = " SELECT id_moneda FROM prm_moneda WHERE moneda_base = 1 ";
+                $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                list($id_moneda) = mysql_fetch_array($resp);
+            }
+            
+            return $id_moneda;
+        }
 }
 
 class ListaMonedas extends Lista
