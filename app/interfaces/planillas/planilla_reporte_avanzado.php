@@ -86,7 +86,7 @@
 
 		$reporte[$dato]->setTipoDato($dato);
 		$reporte[$dato]->setVista($vista);
-		$reporte->setProporcionalidad($prop);
+		$reporte[$dato]->setProporcionalidad($prop);
 		$reporte[$dato]->id_moneda = $id_moneda;
 	
 		$reporte[$dato]->Query();
