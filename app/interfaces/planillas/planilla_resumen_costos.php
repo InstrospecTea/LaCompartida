@@ -4,6 +4,8 @@
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+        require_once Conf::ServerDir().'/../app/classes/Reporte.php';
+        require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 
 	/*
 		Este archivo debe ser llamado mediante require_once() desde otro archivo (actualmente solo desde app/interfaces/reporte_costos.php)
@@ -132,14 +134,14 @@
 		global $formato_encabezado;
 
 		// variables para usar en las fórmulas
-		$col_nombres = 					Utiles::NumToColumnaExcel($offset_columnas+0);
-		$col_horas = 						Utiles::NumToColumnaExcel($offset_columnas+1);
-		$col_minutos = 					Utiles::NumToColumnaExcel($offset_columnas+2);
-		$col_total = 							Utiles::NumToColumnaExcel($offset_columnas+3);
-		$col_factura_promedio = 		Utiles::NumToColumnaExcel($offset_columnas+4);
-		$col_costo = 						Utiles::NumToColumnaExcel($offset_columnas+5);
+		$col_nombres = 			Utiles::NumToColumnaExcel($offset_columnas+0);
+		$col_horas = 			Utiles::NumToColumnaExcel($offset_columnas+1);
+		$col_minutos = 			Utiles::NumToColumnaExcel($offset_columnas+2);
+		$col_total = 			Utiles::NumToColumnaExcel($offset_columnas+3);
+		$col_factura_promedio = 	Utiles::NumToColumnaExcel($offset_columnas+4);
+		$col_costo = 			Utiles::NumToColumnaExcel($offset_columnas+5);
 		$col_costo_promedio = 		Utiles::NumToColumnaExcel($offset_columnas+6);
-		$col_margen = 					Utiles::NumToColumnaExcel($offset_columnas+7);
+		$col_margen =                   Utiles::NumToColumnaExcel($offset_columnas+7);
 		$col_porcentaje_costo =		Utiles::NumToColumnaExcel($offset_columnas+8);
 		$col_porcentaje_margen =	Utiles::NumToColumnaExcel($offset_columnas+9);
 
@@ -175,45 +177,42 @@
 		global $primera_llamada;
 		global $ws_facturacion;
 		global $ws_fact_abogados;
-
-		$query2 =	"SELECT IFNULL(SUM(HOUR(duracion_cobrada)), 0) AS horas,
-								IFNULL(SUM(MINUTE(duracion_cobrada)), 0) AS minutos,
-								IFNULL(SUM(monto_cobrado * tipo_cambio), 0) AS total,
-								trabajo.id_usuario
-							FROM trabajo
-								LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=trabajo.id_cobro AND cobro_moneda.id_moneda=trabajo.id_moneda
-							WHERE cobrable=1
-								AND trabajo.fecha >= '$fecha1'
-								AND trabajo.fecha <= '$fecha2'
-							GROUP BY id_usuario
-							ORDER BY apellido1, apellido2, nombre, trabajo.id_usuario";
-		$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
-		$index_resp2 = 0;
+	
 		// Imprimir contenido
 		for($i=0; $i<count($nombres); ++$i)
 		{
+                        $id_moneda_base = GetMonedaBase($sesion);
+                        
+                        $s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
+                        $s_monto_thh = $s_monto_thh_simple;	
+                        
+                        $reporte = new Reporte($sesion);
+                        $reporte->AddFiltro('usuario','id_usuario',$ids[$i]);
+                        $reporte->addRangoFecha(Utiles::sql2date($fecha1),Utiles::sql2date($fecha2));
+                        $reporte->addAgrupador('profesional');
+                        $reporte->setVista('profesional');
+                        $reporte->setTipoDato('valor_cobrado');
+                        $reporte->id_moneda = $id_moneda_base;
+                        $reporte->Query();
+                        
+                        $resultado = $reporte->toArray();
+                        $total = number_format($resultado['total'],2,'.','');
+                        
+                        $reporte = new Reporte($sesion);
+                        $reporte->AddFiltro('usuario','id_usuario',$ids[$i]);
+                        $reporte->addRangoFecha(Utiles::sql2date($fecha1),Utiles::sql2date($fecha2));
+                        $reporte->addAgrupador('profesional');
+                        $reporte->setVista('profesional');
+                        $reporte->setTipoDato('horas_visibles');
+                        $reporte->Query();
+                        
+                        $resultado = $reporte->toArray();
+                        $horas = floor($resultado['total']);
+                        $minutos = $resultado['total']%60;
+                        
 			// Nombre
 			$ws->write($fila, $offset_columnas, $nombres[$i], $formato_nombre);
 			// Horas y minutos
-			list($horas, $minutos, $total, $id_ignorar) = mysql_fetch_array($resp2);
-			if(mysql_num_rows($resp2)==0 || ($index_resp2>0 && $index_resp2>=mysql_num_rows($resp2)))
-			{
-				$horas = 0;
-				$minutos = 0;
-				$total = 0;
-			}
-			else if($id_ignorar != $ids[$i])
-			{
-				mysql_data_seek($resp2, $index_resp2);
-				$horas = 0;
-				$minutos = 0;
-				$total = 0;
-			}
-			else
-				++$index_resp2;
-			$horas += floor($minutos/60);
-			$minutos %= 60;
 			$ws->write($fila, $offset_columnas+1, $horas?$horas:0, $formato_numero);
 			$ws->write($fila, $offset_columnas+2, $minutos?$minutos:0, $formato_numero);
 			// Total facturado

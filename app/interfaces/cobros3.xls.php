@@ -215,20 +215,22 @@
 		if($p_cobranza->fields['permitido'])
 		{
 			// Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
-			$tarifa = $trabajo->fields['tarifa_hh'];
-			if(!$tarifa)
+			if( $trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0 ) {
+                            $tarifa = $trabajo->fields['tarifa_hh'];
+                        }
+			else 
 			{
-				if($trabajo->fields['id_tarifa'] && $trabajo->fields['id_moneda'] && $trabajo->fields['id_usuario'])
+				if($trabajo->fields['id_tarifa'] && $trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario'])
 				{
-				$query = "SELECT tarifa
-									FROM usuario_tarifa
-									WHERE id_tarifa=".$trabajo->fields['id_tarifa']."
-										AND id_moneda=".$trabajo->fields['id_moneda']."
-										AND id_usuario=".$trabajo->fields['id_usuario'];
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-				list($tarifa) = mysql_fetch_array($resp);
+                                    $query = "SELECT tarifa
+                                                                            FROM usuario_tarifa
+                                                                            WHERE id_tarifa=".$trabajo->fields['id_tarifa']."
+                                                                                    AND id_moneda=".$trabajo->fields['id_moneda_contrato']."
+                                                                                    AND id_usuario=".$trabajo->fields['id_usuario'];
+                                    $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                                    list($tarifa) = mysql_fetch_array($resp);
 				}
-				else if($trabajo->fields['id_moneda'] && $trabajo->fields['id_usuario'])
+				else if($trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario'])
 				{
 					$query = "SELECT id_tarifa FROM tarifa WHERE tarifa_defecto=1";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -239,7 +241,7 @@
 						$query = "SELECT tarifa
 											FROM usuario_tarifa
 											WHERE id_tarifa=".$id_tarifa."
-												AND id_moneda=".$trabajo->fields['id_moneda']."
+												AND id_moneda=".$trabajo->fields['id_moneda_contrato']."
 												AND id_usuario=".$trabajo->fields['id_usuario'];
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 						list($tarifa) = mysql_fetch_array($resp);
