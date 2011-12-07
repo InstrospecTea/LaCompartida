@@ -1,6 +1,6 @@
 <?
  require_once dirname(__FILE__).'/../app/conf.php';
- 
+
 /* PASO 1: Agregar los cambios en un case del switch de esta funcion. */
 /*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
 
@@ -2885,7 +2885,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				if(!($resp = mysql_query($q, $dbh)))
 					throw new Exception($q."---".mysql_error());
 		break;
-		
+
 		case 3.19:
 			$query=array();
 			$query[] = "CREATE TABLE `prm_titulo_persona` (
@@ -2894,16 +2894,16 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 										  `glosa_titulo` varchar(30) default NULL,
 										  PRIMARY KEY  (`id_titulo`)
 										) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;";
-			$query[] = "INSERT INTO `prm_titulo_persona` (`id_titulo`, `titulo`, `glosa_titulo`) 
+			$query[] = "INSERT INTO `prm_titulo_persona` (`id_titulo`, `titulo`, `glosa_titulo`)
 											 VALUES (1, 'Sr.', 'SeÃ±or'),
 															(2, 'Sra.', 'SeÃ±ora'),
 															(3, 'Srta.', 'SeÃ±orita');";
-															
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 3.20:
 				$query=array();
 				$query[] = "ALTER TABLE  `cobro` ADD  `nota_cobro` VARCHAR( 20 ) NULL COMMENT  'valor que se utiliza cuando tienen notas de cobros extras';";
@@ -2911,7 +2911,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 						if(!($resp = mysql_query($q, $dbh)))
 							throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 3.21:
 				$query=array();
 				$query[] = "ALTER TABLE  `factura` CHANGE  `subtotal`  `subtotal` DOUBLE NOT NULL DEFAULT  '0',
@@ -2926,12 +2926,12 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				$query[] = "ALTER TABLE  `factura` ADD  `descuento_honorarios` DOUBLE NOT NULL DEFAULT  '0' AFTER  `subtotal` ;";
 				$query[] = "ALTER TABLE  `documento` ADD  `subtotal_sin_descuento` DOUBLE NOT NULL DEFAULT  '0' AFTER  `subtotal_honorarios` ;";
 				$query[] = "ALTER TABLE  `factura` ADD  `subtotal_sin_descuento` DOUBLE NOT NULL DEFAULT  '0' AFTER  `subtotal` ;";
-				
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 			case 3.22:
 				$query=array();
 				$query[] = "ALTER TABLE  `trabajo_respaldo_excel` ADD  `id_usuario` INT( 11 ) NOT NULL AFTER  `fecha` ;";
@@ -2973,40 +2973,40 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 											  KEY `cobrable` (`cobrable`),
 											  KEY `fecha` (`fecha`)
 											) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=13142 ;";
-				
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.23:
 				$query = array();
 				$query[] = "ALTER TABLE  `cobro_rtf` ADD  `html_header` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `formato_cobro_fila_movimiento` ,
 																						 ADD  `html_pie` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `html_header` ;";
-																						 
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.24:
 				$query = array();
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `id_trabajo_historial` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `fecha_trabajo` DATETIME NULL AFTER  `fecha` ,
 																										 ADD  `descripcion` MEDIUMTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER  `fecha_trabajo` ;";
-				$query[] = "UPDATE trabajo_historial 
-											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo 
+				$query[] = "UPDATE trabajo_historial
+											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo
 											 SET trabajo_historial.descripcion = trabajo.descripcion,
 													 trabajo_historial.fecha = trabajo.fecha";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `duracion_cobrada` TIME NULL AFTER  `descripcion` ,
 																										 ADD  `id_usuario_trabajador` INT( 11 ) NULL DEFAULT  '0' AFTER  `duracion_cobrada` ,
 																										 ADD  `duracion` TIME NULL AFTER `id_usuario_trabajador` ;";
-				$query[] = "UPDATE trabajo_historial 
-											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo 
+				$query[] = "UPDATE trabajo_historial
+											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo
 											 SET trabajo_historial.duracion_cobrada = trabajo.duracion_cobrada,
 													 trabajo_historial.id_usuario_trabajador = trabajo.id_usuario";
-				$query[] = "UPDATE trabajo_historial 
-											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo 
+				$query[] = "UPDATE trabajo_historial
+											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo
 											 SET trabajo_historial.duracion = trabajo.duracion";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `fecha_trabajo_modificado` DATE NOT NULL AFTER  `fecha_trabajo` ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `descripcion_modificado` MEDIUMTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `descripcion` ;";
@@ -3015,8 +3015,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `id_usuario_trabajador_modificado` INT( 11 ) NULL AFTER  `id_usuario_trabajador` ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `codigo_asunto_modificado` VARCHAR( 10 ) NULL AFTER  `codigo_asunto` ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD  `cobrable_modificado` TINYINT( 4 ) NOT NULL AFTER  `cobrable` ;";
-				$query[] = "UPDATE trabajo_historial 
-											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo 
+				$query[] = "UPDATE trabajo_historial
+											JOIN trabajo ON trabajo_historial.id_trabajo = trabajo.id_trabajo
 											 SET fecha_trabajo_modificado = trabajo.fecha,
 													 descripcion_modificado = trabajo.descripcion,
 													 duracion_modificado = trabajo.duracion,
@@ -3024,12 +3024,12 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 													 id_usuario_trabajador_modificado = trabajo.id_usuario,
 													 codigo_asunto_modificado = trabajo.codigo_asunto,
 													 cobrable_modificado = trabajo.cobrable";
-				
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.25:
 				$query = array();
 				$query[] = "ALTER TABLE  `cobro_historial` CHANGE  `es_modificacble`  `es_modificable` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'SI'";
@@ -3057,31 +3057,31 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '15' WHERE  `id_prm_excel_cobro` =3 LIMIT 1;";
 				$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '12' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
 				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 1, -1);";
-				$query[] = "ALTER TABLE  `trabajo_respaldo_excel` 
+				$query[] = "ALTER TABLE  `trabajo_respaldo_excel`
 														ADD  `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `id_usuario` ,
 														ADD  `id_cobro` INT( 11 ) NULL AFTER  `codigo_asunto` ;";
 				$query[] = "ALTER TABLE  `gasto_historial` ADD PRIMARY KEY (  `id_gasto_historial` )";
 				$query[] = "ALTER TABLE  `gasto_historial` CHANGE  `id_gasto_historial`  `id_gasto_historial` INT( 11 ) NOT NULL AUTO_INCREMENT";
-				
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.26:
 				$query = array();
-				$query[] = "ALTER TABLE  `gasto_historial` 
+				$query[] = "ALTER TABLE  `gasto_historial`
 														ADD  `id_moneda` INT( 11 ) NULL ,
 														ADD  `id_moneda_modificado` INT( 11 ) NULL ;";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD INDEX (  `fecha` )";
 				$query[] = "ALTER TABLE  `trabajo_historial` ADD INDEX (  `accion` )";
-				$query[] = "UPDATE cliente 
-											 SET codigo_cliente_secundario = codigo_cliente 
+				$query[] = "UPDATE cliente
+											 SET codigo_cliente_secundario = codigo_cliente
 										 WHERE codigo_cliente_secundario = '' OR codigo_cliente_secundario IS NULL";
-				$query[] = "UPDATE asunto 
-											 SET codigo_asunto_secundario = codigo_asunto 
+				$query[] = "UPDATE asunto
+											 SET codigo_asunto_secundario = codigo_asunto
 										 WHERE codigo_asunto_secundario =  '' OR codigo_asunto_secundario IS NULL";
-														
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
@@ -3098,17 +3098,17 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 4 WHERE glosa_categoria = 'Procurador';";
 
 				//Busco los usuarios sin categoria
-				$query_usuarios = "	SELECT usuario.id_usuario, profesional.codigo_permiso as profesional, comercial.codigo_permiso as comercial 
+				$query_usuarios = "	SELECT usuario.id_usuario, profesional.codigo_permiso as profesional, comercial.codigo_permiso as comercial
 						FROM  `usuario`
 						LEFT JOIN usuario_permiso as profesional ON (usuario.id_usuario = profesional.id_usuario AND profesional.codigo_permiso = 'PRO')
 						LEFT JOIN usuario_permiso as comercial ON (usuario.id_usuario = comercial.id_usuario AND comercial.codigo_permiso = 'SOC')
 						WHERE id_categoria_usuario IS NULL ";
 
 				//Obtengo las categorías a las que se puede asignar.
-				$query_admin = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 5 LIMIT 1 "; 
-				$query_socio = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 1 LIMIT 1 "; 
-				$query_junior = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 3 LIMIT 1 "; 
-				$query_minimo = " SELECT id_categoria_usuario FROM prm_categoria_usuario ORDER BY id_categoria_lemontech DESC LIMIT 1 "; 
+				$query_admin = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 5 LIMIT 1 ";
+				$query_socio = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 1 LIMIT 1 ";
+				$query_junior = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 3 LIMIT 1 ";
+				$query_minimo = " SELECT id_categoria_usuario FROM prm_categoria_usuario ORDER BY id_categoria_lemontech DESC LIMIT 1 ";
 
 				if(! ($resp_admin = mysql_query($query_admin,$sesion->dbh)))
 					throw new Exception($query_admin ."---".mysql_error());
@@ -3135,7 +3135,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					//por cada usuario sin categoría, puede tener la categoría 'Admin', 'Asociado Junior', o 'Socio' dependiendo de los permisos
 					if(!$profesional)
 					{
-						$query[] = "UPDATE usuario SET id_categoria_usuario = '".$admin."' WHERE id_usuario = '".$id_usuario."'"; 
+						$query[] = "UPDATE usuario SET id_categoria_usuario = '".$admin."' WHERE id_usuario = '".$id_usuario."'";
 					}
 					else
 					{
@@ -3144,7 +3144,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 						else
 							$query[] = "UPDATE usuario SET id_categoria_usuario = '".$junior."' WHERE id_usuario = '".$id_usuario."'";
 					}
-				}				
+				}
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
@@ -3152,7 +3152,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 
 				/*Clase ayuda invocada en cada pagina por el Header, imprime ayuda para esa pagina.*/
 				/*Soporte para glosa de los reportes consolidados*/
-				case 3.28: 
+				case 3.28:
 					$query = array();
 					$query[] = "
 					CREATE TABLE  `prm_ayuda` (
@@ -3163,51 +3163,51 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					 `id_ayuda_siguiente` INT( 11 ) NULL
 					) ENGINE = INNODB COMMENT =  'tabla de paginas de ayuda';";
 					$query[] = "ALTER TABLE  `reporte_consolidado` ADD  `glosa_reporte` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `id_moneda` ;";
-					
+
 					foreach($query as $q)
 						if(!($resp = mysql_query($q, $dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				/*Achicar tamaÃ±o de las columnas fecha y abogado al tamaÃ±o que tenía antes de lo modificacion 3.25*/
 				case 3.29:
 					$query = array();
 					$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '9' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
 					$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '10' WHERE  `id_prm_excel_cobro` =3 LIMIT 1;";
-					
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.30:
 					$query = array();
 					$query[] = "ALTER TABLE  `contrato` ADD  `opc_restar_retainer` TINYINT( 4 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_solicitante` ;";
 					$query[] = "ALTER TABLE  `cobro` ADD  `opc_restar_retainer` TINYINT( 4 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_cobrable` ;";
-					
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				/*Rollback Ayuda*/
-				case 3.31: 
+				case 3.31:
 					$query = array();
 					$query[] = "DROP TABLE  `prm_ayuda`;";
 					foreach($query as $q)
 						if(!($resp = mysql_query($q, $dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.32:
 					$query = array();
 					$query[] = "ALTER TABLE  `usuario` CHANGE  `dias_ingreso_trabajo`  `dias_ingreso_trabajo` SMALLINT( 5 ) UNSIGNED NOT NULL DEFAULT  '30'";
-					
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.33:
 					$query = array();
 					$query[] = "ALTER TABLE `cta_corriente` ADD COLUMN `con_impuesto` CHAR(2) NOT NULL DEFAULT 'SI' AFTER `id_movimiento_pago`;";
@@ -3222,12 +3222,12 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
                     $query = array();
                     $query[] = "ALTER TABLE  `documento` ADD  `monto_trabajos` DOUBLE NOT NULL DEFAULT  '0' AFTER  `subtotal_honorarios` ;";
                     $query[] = "ALTER TABLE  `documento` ADD  `monto_tramites` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_trabajos` ;";
-                    $query[] = "UPDATE  documento as d 
-                                                JOIN cobro as c  ON ( c.id_cobro=d.id_cobro AND d.tipo_doc='N' ) 
-                                                JOIN cobro_moneda AS cm ON ( c.id_cobro=cm.id_cobro AND c.id_moneda=cm.id_moneda ) 
-                                                JOIN cobro_moneda AS cmt ON ( c.id_cobro=cmt.id_cobro AND c.opc_moneda_total=cmt.id_moneda ) 
-                                                JOIN prm_moneda AS mt ON c.opc_moneda_total=mt.id_moneda 
-                                                SET d.monto_trabajos=ROUND(c.monto_trabajos*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales), 
+                    $query[] = "UPDATE  documento as d
+                                                JOIN cobro as c  ON ( c.id_cobro=d.id_cobro AND d.tipo_doc='N' )
+                                                JOIN cobro_moneda AS cm ON ( c.id_cobro=cm.id_cobro AND c.id_moneda=cm.id_moneda )
+                                                JOIN cobro_moneda AS cmt ON ( c.id_cobro=cmt.id_cobro AND c.opc_moneda_total=cmt.id_moneda )
+                                                JOIN prm_moneda AS mt ON c.opc_moneda_total=mt.id_moneda
+                                                SET d.monto_trabajos=ROUND(c.monto_trabajos*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales),
                                                 d.monto_tramites=ROUND(c.monto_tramites*cm.tipo_cambio/cmt.tipo_cambio,mt.cifras_decimales);";
                     $query[] = "UPDATE contrato SET id_moneda_monto = 1 WHERE id_moneda_monto = 0;";
                     $query[] = "ALTER TABLE  `contrato` CHANGE  `id_moneda_monto`  `id_moneda_monto` INT( 11 ) NOT NULL DEFAULT  '1';";
@@ -3236,7 +3236,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
           			if(!($resp = mysql_query($q, $dbh)))
             			throw new Exception($q."---".mysql_error());
         		break;
-				
+
 				case 3.35:
 					$query = array();
 					//1:CREAR TABLA
@@ -3292,12 +3292,12 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 				FROM documento
 				JOIN cobro ON documento.id_cobro = cobro.id_cobro
 				JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
-				*/		
+				*/
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
-				break; 
-				
+				break;
+
 				case 3.37:
 					$query = array();
 					$query[] = "TRUNCATE TABLE `configuracion`;";
@@ -3332,689 +3332,689 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 													(5, 'Administracion Reportes por Lemontech'),
 													(6, 'Configuracion por Lemontech');";
 					if( method_exists('Conf','MaxLoggedTime') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(31, 'MaxLoggedTime', '".Conf::MaxLoggedTime()."', 'Tiempo en segundos que dura la sesión', 'string', 6, 10);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(31, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesión', 'string', 6, 10);";
-													
+
 					if( method_exists('Conf','MailSistema') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(32, 'MailSistema', '".Conf::MailSistema()."', NULL, 'string', 1, 20);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(32, 'MailSistema', '', NULL, 'string', 1, 20);";
-													
+
 					if( method_exists('Conf','Intervalo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(33, 'Intervalo', '".Conf::Intervalo()."', 'Intervalo del ingreso trabajo', 'numero', 1, 200);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(33, 'Intervalo', '5', 'Intervalo del ingreso trabajo', 'numero', 1, 200);";
-													
+
 					if( method_exists('Conf','Idioma') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(34, 'Idioma', '".Conf::Idioma()."', 'Idioma del sistma', 'select;ES;EN;', 6, 30);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(34, 'Idioma', 'ES', 'Idioma del sistma', 'select;ES;EN;', 6, 30);";
-													
+
 					if( method_exists('Conf','MailAdmin') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(35, 'MailAdmin', '".Conf::MailAdmin()."', 'Email al que llegan los avisos del sistema', 'string', 1, 40);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(35, 'MailAdmin', '', 'Email al que llegan los avisos del sistema', 'string', 1, 40);";
-													
+
 					if( method_exists('Conf','SitioWeb') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(36, 'SitioWeb', '".Conf::SitioWeb()."', 'Sitio Web del estudio', 'string', 1, 50);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(36, 'SitioWeb', '', 'Sitio Web del estudio', 'string', 1, 50);";
-													
+
 					if( method_exists('Conf','Email') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(37, 'Email', '".Conf::Email()."', 'Mail contacto del estudio', 'string', 1, 60);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(37, 'Email', '', 'Mail contacto del estudio', 'string', 1, 60);";
-																				
+
 					if( method_exists('Conf','TipoSelectCliente') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(40, 'TipoSelectCliente', '".(Conf::TipoSelectCliente()?'autocompletador':'selector')."', 'Tipo de selection del cliente', 'select;autocompletador;selector_cliente', 1, 90);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(40, 'TipoSelectCliente', 'selector', 'Tipo de selection del cliente', 'select;autocompletador;selector;', 1, 90);";
-													
+
 					if( method_exists('Conf','AgregarAsuntosPorDefecto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(41, 'AgregarAsuntosPorDefecto', '".implode(';',Conf::AgregarAsuntosPorDefecto())."', 'Asuntos que se crean por defecto', 'array', 1, 100);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(41, 'AgregarAsuntosPorDefecto', '', 'Asuntos que se crean por defecto', 'array', 1, 100);";
-													
+
 					if( method_exists('Conf','UsarImpuestoSeparado') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(42, 'UsarImpuestoSeparado', '1', '".Conf::UsarImpuestoSeparado()."', 'boolean', 2, 210);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(42, 'UsarImpuestoSeparado', '0', false, 'boolean', 2, 210);";
-													
+
 					if( method_exists('Conf','ValorImpuesto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(43, 'ValorImpuesto', '".Conf::ValorImpuesto()."', 'Porcentaje de los Impuestos', 'numero', 2, 220);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(43, 'ValorImpuesto', 0, 'Porcentaje de los Impuestos', 'numero', 2, 220);";
-													
+
 					if( method_exists('Conf','UsarImpuestoPorGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(44, 'UsarImpuestoPorGastos', '".Conf::UsarImpuestoPorGastos()."', 'Usar impuestos por los gastos', 'boolean', 2, 230);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(44, 'UsarImpuestoPorGastos', false, 'Usar impuestos por los gastos', 'boolean', 2, 230);";
-													
+
 					if( method_exists('Conf','ValorImpuestoGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(45, 'ValorImpuestoGastos', '".Conf::ValorImpuestoGastos()."', 'Porcentaje de impuestos que se cobra a los gastos', 'numero', 2, 240);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(45, 'ValorImpuestoGastos', 0, 'Porcentaje de impuestos que se cobra a los gastos', 'numero', 2, 240);";
-													
+
 					if( method_exists('Conf','ComisionGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(46, 'ComisionGastos', '".Conf::ComisionGastos()."', 'Porcentaje de comision que se cobra a los gastos', 'numero', 2, 250);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(46, 'ComisionGastos', 0, 'Porcentaje de comision que se cobra a los gastos', 'numero', 2, 250);";
-													
+
 					if( method_exists('Conf','Ordenado_Por') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(47, 'OrdenadoPor', '".Conf::Ordenado_Por()."', '0 no se necesita; 1 es obligatorio; 2 opcional;', 'select;0;1;2', 1, 260);";
-					else	
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+					else
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(47, 'OrdenadoPor', 0, '0 no se necesita; 1 es obligatorio; 2 opcional;', 'select;0;1;2', 1, 260);";
-													
+
 					if( method_exists('Conf','TipoIngresoHoras') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(48, 'TipoIngresoHoras', '".Conf::TipoIngresoHoras()."', 'Tipo de ingreso de horas', 'select;java;decimal;selector', 1, 270);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(48, 'TipoIngresoHoras', 'java', 'Tipo de ingreso de horas', 'select;java;decimal;selector', 1, 270);";
-													
+
 					if( method_exists('Conf','PermitirFactura') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(49, 'PermitirFactura', '".Conf::PermitirFactura()."', 'Permitir factura por el sistema', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(49, 'PermitirFactura', false, 'Permitir factura por el sistema', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsaNumeracionAutomatica') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(50, 'UsaNumeracionAutomatica', '".Conf::UsaNumeracionAutomatica()."', 'Hacer numeracion de las facturas automaticamente', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(50, 'UsaNumeracionAutomatica', false, 'Hacer numeracion de las facturas automaticamente', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NumeracionDesde') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(51, 'NumeracionDesde', '".Conf::NumeracionDesde()."', 'Numeracion minima de factura', 'numero', 2, 300);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(51, 'NumeracionDesde', '', 'Numeracion minima de factura', 'numero', 2, 300);";
-													
+
 					if( method_exists('Conf','NumeracionHasta') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(52, 'NumeracionHasta', '".Conf::NumeracionHasta()."', 'Numeracion maxima de factura', 'numero', 2, 310);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(52, 'NumeracionHasta', '', 'Numeracion maxima de factura', 'numero', 2, 310);";
-													
+
 					if( method_exists('Conf','MailAsuntoNuevo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(53, 'MailAsuntoNuevo', '".Conf::MailAsuntoNuevo()."', 'Enviar mail cuando se crea un asunto nuevo', 'boolean', 3, 400);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(53, 'MailAsuntoNuevo', false, 'Enviar mail cuando se crea un asunto nuevo', 'boolean', 3, 400);";
-													
+
 					if( method_exists('Conf','DiaMailSemanal') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(54, 'DiaMailSemanal', '".Conf::DiaMailSemanal()."', '', 'select;Mon;Tue;Wed;Thu;Fri;Sat;Sun', 3, 410);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(54, 'DiaMailSemanal', 'Fri', '', 'select;Mon;Tue;Wed;Thu;Fri;Sat;Sun', 3, 410);";
-													
+
 					if( method_exists('Conf','CorreosModificacionAdminDatos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(55, 'CorreosModificacionAdminDatos', '".Conf::CorreosModificacionAdminDatos()."', '', 'string', 3, 420);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(55, 'CorreosModificacionAdminDatos', '', '', 'string', 3, 420);";
-													
+
 					if( method_exists('Conf','MensajeRestriccionSemanal') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(56, 'MensajeRestriccionSemanal', '".Conf::MensajeRestriccionSemanal()."', '', 'text', 3, 430);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(56, 'MensajeRestriccionSemanal', '', '', 'text', 3, 430);";
-													
+
 					if( method_exists('Conf','CorreosMensuales') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(57, 'CorreosMensuales', '".Conf::CorreosMensuales()."', '', 'boolean', 3, 440);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(57, 'CorreosMensuales', false, '', 'boolean', 3, 440);";
-													
+
 					if( method_exists('Conf','PdfLinea1') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(58, 'PdfLinea1', '".Conf::PdfLinea1()."', '', 'string', 4, 600);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(58, 'PdfLinea1', '', '', 'string', 4, 600);";
-													
+
 					if( method_exists('Conf','PdfLinea2') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(59, 'PdfLinea2', '".Conf::PdfLinea2()."', '', 'string', 4, 610);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(59, 'PdfLinea2', '', '', 'string', 4, 610);";
-													
+
 					if( method_exists('Conf','PdfLinea3') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(60, 'PdfLinea3', '".Conf::PdfLinea3()."', '', 'string', 4, 620);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(60, 'PdfLinea3', '', '', 'string', 4, 620);";
-													
+
 					if( method_exists('Conf','DireccionPdf') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(61, 'DireccionPdf', '".Conf::DireccionPdf()."', '', 'string', 4, 630);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(61, 'DireccionPdf', '', '', 'string', 4, 630);";
-													
+
 					if( method_exists('Conf','TituloContacto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(62, 'TituloContacto', '".Conf::TituloContacto()."', 'Indicar titulo antes de nombre', 'boolean', 4, 640);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(62, 'TituloContacto', false, 'Indicar titulo antes de nombre', 'boolean', 4, 640);";
-													
+
 					if( method_exists('Conf','OrdenarPorFechaCategoria') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(63, 'OrdenarPorFechaCategoria', '".Conf::OrdenarPorFechaCategoria()."', 'Ordenar detalle profesional por fecha', 'radio;ordenar', 4, 650);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(63, 'OrdenarPorFechaCategoria', false, 'Ordenar detalle profesional por fecha', 'radio;ordenar', 4, 650);";
-													
+
 					if( method_exists('Conf','OrdenarPorTarifa') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(64, 'OrdenarPorTarifa', '".Conf::OrdenarPorTarifa()."', 'Ordenar detalle profesional por tarifa', 'radio;ordenar', 4, 660);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(64, 'OrdenarPorTarifa', false, 'Ordenar detalle profesional por tarifa', 'radio;ordenar', 4, 660);";
-													
+
 					if( method_exists('Conf','OrdenarPorCategoriaUsuario') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(65, 'OrdenarPorCategoriaUsuario', '".Conf::OrdenarPorCategoriaUsuario()."', 'Ordenar detalle profesional por categoria', 'radio;ordenar', 4, 670);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(65, 'OrdenarPorCategoriaUsuario', false, 'Ordenar detalle profesional por categoria', 'radio;ordenar', 4, 670);";
-													
+
 					if( method_exists('Conf','ImprimirDuracionTrabajada') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(66, 'ImprimirDuracionTrabajada', '".Conf::ImprimirDuracionTrabajada()."', '', 'boolean', 4, 680);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(66, 'ImprimirDuracionTrabajada', false, '', 'boolean', 4, 680);";
-													
+
 					if( method_exists('Conf','TodoMayuscula') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(67, 'TodoMayuscula', '".Conf::TodoMayuscula()."', 'Descripciones y nombres en mayuscula', 'boolean', 4, 690);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(67, 'TodoMayuscula', false, 'Descripciones y nombres en mayuscula', 'boolean', 4, 690);";
-													
+
 					if( method_exists('Conf','SepararGastosPorAsunto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(68, 'SepararGastosPorAsunto', '".Conf::SepararGastosPorAsunto()."', 'En la carta de cobro separar los gastos por asunto', 'boolean', 4, 700);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(68, 'SepararGastosPorAsunto', false, 'En la carta de cobro separar los gastos por asunto', 'boolean', 4, 700);";
 					if( method_exists('Conf','ValorSinEspacio') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(69, 'ValorSinEspacio', '".Conf::ValorSinEspacio()."', 'En carta de cobro mostra los valores sin espacio entre simbolos y montos', 'boolean', 4, 710);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(69, 'ValorSinEspacio', false, 'En carta de cobro mostra los valores sin espacio entre simbolos y montos', 'boolean', 4, 710);";
 					if( method_exists('Conf','ParafoGastosSoloSiHayGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(70, 'ParafoGastosSoloSiHayGastos', '".Conf::ParafoGastosSoloSiHayGastos()."', '', 'boolean', 4, 720);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(70, 'ParafoGastosSoloSiHayGastos', false, '', 'boolean', 4, 720);";
 					if( method_exists('Conf','ParafoAsuntosSoloSiHayTrabajos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(71, 'ParafoAsuntosSoloSiHayTrabajos', '".Conf::ParafoAsuntosSoloSiHayTrabajos()."', '', 'boolean', 4, 730);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(71, 'ParafoAsuntosSoloSiHayTrabajos', false, '', 'boolean', 4, 730);";
 					if( method_exists('Conf','ColorTituloPagina') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(72, 'ColorTituloPagina', '".Conf::ColorTituloPagina()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(72, 'ColorTituloPagina', '', '', 'string', 6, -1);";
 					if( method_exists('Conf','ColorLineaSuperior') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(73, 'ColorLineaSuperior', '".Conf::ColorLineaSuperior()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(73, 'ColorLineaSuperior', '', '', 'string', 6, -1);";
 					if( method_exists('Conf','Telefono') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(75, 'Telefono', '".Conf::Telefono()."', '', 'numero', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(75, 'Telefono', '', '', 'numero', 6, -1);";
-													
-					if( method_exists('Conf','UsoActividades') )  
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+
+					if( method_exists('Conf','UsoActividades') )
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(78, 'UsoActividades', '".Conf::UsoActividades()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(78, 'UsoActividades', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','RecordarSesion') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(82, 'RecordarSesion', '".Conf::RecordarSesion()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(82, 'RecordarSesion', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','IdiomaGrande') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(83, 'IdiomaGrande', '".Conf::IdiomaGrande()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(83, 'IdiomaGrande', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsernameMail') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(84, 'UsernameMail', '".Conf::UsernameMail()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(84, 'UsernameMail', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','PasswordMail') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(85, 'PasswordMail', '".Conf::PasswordMail()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(85, 'PasswordMail', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','SoloGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(86, 'SoloGastos', '".Conf::SoloGastos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(86, 'SoloGastos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','TipoCodigoAsunto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(87, 'TipoCodigoAsunto', '".Conf::TipoCodigoAsunto()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(87, 'TipoCodigoAsunto', '1', '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','FacturaSeguimientoCobros') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(88, 'FacturaSeguimientoCobros', '".Conf::FacturaSeguimientoCobros()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(88, 'FacturaSeguimientoCobros', false, '', 'boolean', 6, -1);";
-														
+
 					if( method_exists('Conf','ReportesAvanzados') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(92, 'ReportesAvanzados', '".Conf::ReportesAvanzados()."', '', 'boolean', 5, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(92, 'ReportesAvanzados', false, '', 'boolean', 5, -1);";
-													
+
 					if( method_exists('Conf','TipoGasto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(93, 'TipoGasto', '".Conf::TipoGasto()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(93, 'TipoGasto', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','SinAproximacion') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(94, 'SinAproximacion', '".Conf::SinAproximacion()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(94, 'SinAproximacion', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CodigoObligatorio') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(95, 'CodigoObligatorio', '".Conf::CodigoObligatorio()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(95, 'CodigoObligatorio', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CatidadHorasDia') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(96, 'CatidadHorasDia', '".Conf::CatidadHorasDia()."', '', 'numero', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(96, 'CatidadHorasDia', '1439', '', 'numero', 6, -1);";
-													
-					if( method_exists('Conf','MostrarHorasCero') ) 
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+
+					if( method_exists('Conf','MostrarHorasCero') )
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(97, 'MostrarHorasCero', '".Conf::MostrarHorasCero()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(97, 'MostrarHorasCero', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NumeroGasto') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(98, 'NumeroGasto', '".Conf::Idioma()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(98, 'NumeroGasto', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NumeroOT') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(99, 'NumeroOT', '".Conf::NumeroOT()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(99, 'NumeroOT', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CodigoEspecialGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(100, 'CodigoEspecialGastos', '".Conf::CodigoEspecialGastos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(100, 'CodigoEspecialGastos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NotaCobroExtra') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(101, 'NotaCobroExtra', '".Conf::NotaCobroExtra()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(101, 'NotaCobroExtra', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CalculacionCyC') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(102, 'CalculacionCyC', '".Conf::CalculacionCyC()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(102, 'CalculacionCyC', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsaFechaDesdeCobranza') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(103, 'UsaFechaDesdeCobranza', '".Conf::UsaFechaDesdeCobranza()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(103, 'UsaFechaDesdeCobranza', false, '', 'boolean', 6, -1);";
-													
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(104, 'UsaDisenoNuevo', true, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','XLSFormatoEspecial') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(105, 'XLSFormatoEspecial', '".Conf::XLSFormatoEspecial()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(105, 'XLSFormatoEspecial', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CodigoUsuario') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(106, 'CodigoUsuario', '".Conf::CodigoUsuario()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(106, 'CodigoUsuario', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','InfoBancariaCYC') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(107, 'InfoBancariaCYC', '".Conf::InfoBancariaCYC()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(107, 'InfoBancariaCYC', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsaMontoCobrable') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(108, 'UsaMontoCobrable', '".Conf::UsaMontoCobrable()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(108, 'UsaMontoCobrable', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NuevaLibreriaNusoap') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(111, 'NuevaLibreriaNusoap', '".Conf::NuevaLibreriaNusoap()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(111, 'NuevaLibreriaNusoap', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','LoginDesdeSitio') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(112, 'LoginDesdeSitio', '".Conf::LoginDesdeSitio()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(112, 'LoginDesdeSitio', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CreacionYEmisionDeLosCobrosAutomatico') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(113, 'CreacionYEmisionDeLosCobrosAutomatico', '".Conf::CreacionYEmisionDeLosCobrosAutomatico()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(113, 'CreacionYEmisionDeLosCobrosAutomatico', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','FicheroLogoDoc') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(114, 'FicheroLogoDoc', '".Conf::FicheroLogoDoc()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(114, 'FicheroLogoDoc', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','PrmGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(115, 'PrmGastos', '".Conf::PrmGastos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(115, 'PrmGastos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CSSSoloGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(116, 'CSSSoloGastos', '".Conf::CSSSoloGastos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(116, 'CSSSoloGastos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ImprimirResumenAsuntosEnCarta') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(118, 'ImprimirResumenAsuntosEnCarta', '".Conf::ImprimirResumenAsuntosEnCarta()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(118, 'ImprimirResumenAsuntosEnCarta', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NoImprimirValorTrabajo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(119, 'NoImprimirValorTrabajo', '".Conf::NoImprimirValorTrabajo()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(119, 'NoImprimirValorTrabajo', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ImprimirValorTrabajo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(120, 'ImprimirValorTrabajo', '".Conf::ImprimirValorTrabajo()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(120, 'ImprimirValorTrabajo', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','MostrarSoloMinutos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(121, 'MostrarSoloMinutos', '".Conf::MostrarSoloMinutos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(121, 'MostrarSoloMinutos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ImprimirFacturaPdf') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(122, 'ImprimirFacturaPdf', '".Conf::ImprimirFacturaPdf()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(122, 'ImprimirFacturaPdf', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','CobranzaExcel') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(123, 'CobranzaExcel', '".Conf::CobranzaExcel()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(123, 'CobranzaExcel', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsarEgresoPositivo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(124, 'UsarEgresoPositivo', '".Conf::UsarEgresoPositivo()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(124, 'UsarEgresoPositivo', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ColumnaNotificacion') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(125, 'ColumnaNotificacion', '".Conf::ColumnaNotificacion()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(125, 'ColumnaNotificacion', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','TieneTablaVisitante') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(126, 'TieneTablaVisitante', '".Conf::TieneTablaVisitante()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(126, 'TieneTablaVisitante', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','UsarSoloGastos') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(127, 'UsarSoloGastos', '".Conf::UsarSoloGastos()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(127, 'UsarSoloGastos', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ReporteMorosidadEnviados') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(128, 'ReporteMorosidadEnviados', false, '', 'boolean', 5, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(128, 'ReporteMorosidadEnviados', false, '', 'boolean', 5, -1);";
-													
+
 					if( method_exists('Conf','CodigoSecundario') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(129, 'CodigoSecundario', '".Conf::CodigoSecundario()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(129, 'CodigoSecundario', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','SistemaCarpetasEspecial') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(130, 'SistemaCarpetasEspecial', '".Conf::SistemaCarpetasEspecial()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(130, 'SistemaCarpetasEspecial', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NumeroCuentaCorriente') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(131, 'NumeroCuentaCorriente', '".Conf::NumeroCuentaCorriente()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(131, 'NumeroCuentaCorriente', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','BancoCuentaCorriente') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(132, 'BancoCuentaCorriente', '".Conf::BancoCuentaCorriente()."', '', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(132, 'BancoCuentaCorriente', '', '', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','UsarResumenExcel') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(134, 'UsarResumenExcel', '".Conf::UsarResumenExcel()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(134, 'UsarResumenExcel', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','GlosaAsuntoSinCodigo') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(135, 'GlosaAsuntoSinCodigo', '".Conf::GlosaAsuntoSinCodigo()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(135, 'GlosaAsuntoSinCodigo', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','NotaDeCobroVFC') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(136, 'NotaDeCobroVFC', '".Conf::NotaDeCobroVFC()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(136, 'NotaDeCobroVFC', false, '', 'boolean', 6, -1);";
-													
+
 					if( method_exists('Conf','ResumenProfesionalVial') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(137, 'ResumenProfesionalVial', '".Conf::ResumenProfesionalVial()."', '', 'boolean', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(137, 'ResumenProfesionalVial', false, '', 'boolean', 6, -1);";
-					
+
 					if( method_exists('Conf','ZonaHoraria') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(138, 'ZonaHoraria', '".Conf::ZonaHoraria()."', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 6, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(138, 'ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 6, -1);";
-													
+
 					if( method_exists('Conf','CiudadSignatura') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(139, 'CiudadSignatura', '".Conf::CiudadSignatura()."', 'La ciudad ingresada aquí va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(139, 'CiudadSignatura', '', 'La ciudad ingresada aquí va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
-													
+
 					if( method_exists('Conf','NombreEmpresa') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(140, 'NombreEmpresa', '".Conf::NombreEmpresa()."', NULL, 'string', 1, 160);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(140, 'NombreEmpresa', '', NULL, 'string', 1, 160);";
-													
+
 					if( method_exists('Conf','SubtituloEmpresa') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(141, 'SubtituloEmpresa', '".Conf::SubtituloEmpresa()."', NULL, 'string', 1, 161);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(141, 'SubtituloEmpresa', '', NULL, 'string', 1, 161);";
-													
+
 					if( method_exists('Conf','ReportesAvanzados_FiltrosExtra') )
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(142, 'ReportesAvanzados_FiltrosExtra', '".Conf::ReportesAvanzados_FiltrosExtra()."', NULL, 'boolean', 5, -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(142, 'ReportesAvanzados_FiltrosExtra', false, NULL, 'boolean', 5, -1);";
-					
+
 					if( method_exists('Conf','NombreIdentificador') )
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES 
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES
 													(143 ,  'NombreIdentificador',  '".Conf::NombreIdentificador()."', NULL ,  'string',  '6',  -1);";
 					else
-						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(143, 'NombreIdentificador', 'RUT', NULL, 'boolean', 5, -1);";
-					
-					$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
+
+					$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
 													(144, 'EsAmbientePrueba', '0', 'Se aplica a lab y las sistemas demo para hacer testing', 'boolean', '6', '-1');";
-													
+
 				foreach($query as $q)
 					if(!($resp = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.38:
           $query = array();
           $query[] = "ALTER TABLE `cobro` ADD COLUMN `modalidad_calculo` TINYINT(4) NOT NULL DEFAULT 1 COMMENT '1 calculacion nueva, 0 calculacon vieja' AFTER `nota_cobro`;";
@@ -4026,16 +4026,16 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
         break;
 
         case 3.39:
-		
+
 					$query = array();
-										
-					$query[] = "UPDATE usuario SET username = CONCAT_WS(' ',nombre, apellido1, apellido2) WHERE username = ''"; 
-					
-					$query_malos = 
-					"SELECT cobro.id_cobro, cobro.estado, COUNT(documento.id_documento) as num_documentos 
+
+					$query[] = "UPDATE usuario SET username = CONCAT_WS(' ',nombre, apellido1, apellido2) WHERE username = ''";
+
+					$query_malos =
+					"SELECT cobro.id_cobro, cobro.estado, COUNT(documento.id_documento) as num_documentos
 					FROM cobro
-					JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N') 
-					GROUP BY cobro.id_cobro 
+					JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N')
+					GROUP BY cobro.id_cobro
 					HAVING ( ( cobro.estado IN ('CREADO','EN REVISION') AND num_documentos > 0 ) OR ( cobro.estado NOT IN ('CREADO','EN REVISION') AND num_documentos > 1 ) ) ";
 					$resp = mysql_query($query_malos,$dbh) or Utiles::errorSQL($query_malos,__FILE__,__LINE__,$dbh);
 					while( list($id_cobro,$estado,$num_documentos) = mysql_fetch_array($resp))
@@ -4045,7 +4045,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 						$cobro->AnularDocumento();
 						echo "<br>Revisar cobro: ".$id_cobro."<br>";
 					}
-	
+
 					$query[] = "ALTER TABLE  `asunto` CHANGE  `alerta_hh`  `alerta_hh` DOUBLE NOT NULL DEFAULT  '0',
 CHANGE  `alerta_monto`  `alerta_monto` DOUBLE NOT NULL DEFAULT  '0',
 CHANGE  `alerta_porctje_lim_hh`  `alerta_porctje_lim_hh` DOUBLE NOT NULL DEFAULT  '0',
@@ -4062,7 +4062,7 @@ ADD  `limite_monto` DOUBLE NOT NULL DEFAULT  '0' AFTER  `limite_hh` ;";
  ADD  `alerta_monto` DOUBLE NOT NULL DEFAULT  '0' AFTER  `alerta_hh` ,
  ADD  `limite_hh` DOUBLE NOT NULL DEFAULT  '0' AFTER  `alerta_monto` ,
 ADD  `limite_monto` DOUBLE NOT NULL DEFAULT  '0' AFTER  `limite_hh` ;";
-							 
+
 			$query[] = "ALTER table contrato ADD `notificado_hr_excedido` tinyint(4) NOT NULL default '0' AFTER `usa_impuesto_gastos`,
 ADD `notificado_monto_excedido_ult_cobro` tinyint(4) NOT NULL default '0' AFTER `notificado_hr_excedido`,
 ADD `notificado_hr_excedida_ult_cobro` tinyint(4) NOT NULL default '0' AFTER `notificado_monto_excedido_ult_cobro`,
@@ -4077,8 +4077,8 @@ ADD `notificado_monto_excedido` tinyint(4) NOT NULL default '0' AFTER `notificad
 			$query[] = "ALTER TABLE  `documento` CHANGE  `glosa_documento`  `glosa_documento` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
 			$query[] = "ALTER TABLE  `log_correo` ADD  `id_archivo_anexo` INT( 11 ) NULL DEFAULT NULL AFTER  `nombre` ;";
-			
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 VALUES (
 NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Alerta.',  'boolean',  '6',  '20'
 );";
@@ -4091,7 +4091,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 		case 3.40:
 					$query = array();
 					$query[] = "ALTER TABLE  `contrato` ADD  `id_documento_legal` INT( 11 ) NULL AFTER  `centro_costo` ;";
-					
+
 				foreach($query as $q)
           if(!($resp = mysql_query($q, $dbh)))
             throw new Exception($q."---".mysql_error());
@@ -4099,18 +4099,18 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 		case 3.41:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` , `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` , `orden` )
 								VALUES ( NULL ,  'UsarGastosConSinImpuesto',  '0', NULL ,  'boolean',  '2',  '245');";
 
 		foreach($query as $q)
 			if(!($res = mysql_query($q, $dbh)))
 				throw new Exception($q."---".mysql_error());
 		break;
-		
+
 		case 3.42:
 					$query = array();
 					$query[] = "UPDATE cta_corriente SET monto_cobrable = ingreso WHERE (ingreso > 0) AND (monto_cobrable = 0 OR monto_cobrable IS NULL)";
-					
+
 					$query[] = "CREATE TABLE `factura_cobro` (
 								`id_factura` INT( 11 ) NOT NULL ,
 								`id_cobro` INT( 11 ) NOT NULL ,
@@ -4120,7 +4120,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 								`monto_documento_honorarios` DOUBLE NOT NULL ,
 								`monto_documento_gastos` DOUBLE NOT NULL ,
 								`id_moneda_documento` INT( 11 ) NOT NULL ,
-								PRIMARY KEY ( `id_factura` , `id_cobro` ) 
+								PRIMARY KEY ( `id_factura` , `id_cobro` )
 								) ENGINE = INNODB COMMENT = 'Relación de facturas que incluyen cobros';";
 
 					$query[] = "ALTER TABLE `factura_cobro` ADD `impuesto_factura` DOUBLE NOT NULL DEFAULT '0' AFTER `monto_factura` ;";
@@ -4187,36 +4187,36 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.43:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES ( NULL ,  'NuevoModuloFactura',  '0', NULL ,  'boolean',  '6',  '-1' );";
-												
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.44:
 					$query = array();
 					$query[] = "ALTER TABLE `cobro` ADD COLUMN `id_formato` INTEGER  NOT NULL AFTER `id_carta`;";
 					$query[] = "ALTER TABLE `contrato` ADD COLUMN `id_formato` INTEGER  NOT NULL AFTER `id_carta`;";
-												
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.45:
 					$query = array();
 					$query[] = "ALTER TABLE `cobro_rtf` ADD COLUMN `descripcion` varchar(60)  AFTER `id_formato`;";
-												
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.46:
 					$query = array();
 					$query[] = "ALTER TABLE `factura` ADD `subtotal_gastos_sin_impuesto` DOUBLE NOT NULL DEFAULT '0' AFTER `subtotal_gastos` ;";
@@ -4224,24 +4224,24 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 					$query[] = "UPDATE prm_tipo_proyecto SET orden = id_tipo_proyecto + 10";
 					$query[] = "ALTER TABLE  `prm_area_proyecto` ADD  `orden` INT( 11 ) NOT NULL DEFAULT  '0';";
 					$query[] = "UPDATE `prm_area_proyecto` SET orden = id_area_proyecto + 10";
-					
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.47:
 					$query = array();
 					$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 											VALUES (
 											NULL , 'LibreriaMenu', 'jquery', NULL , 'select; jquery; prototype', '6', '-1'
 											);";
-					
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.48:
 					$query = array();
 					$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
@@ -4251,77 +4251,77 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 					//$query[] = "ALTER TABLE `factura` ADD `descripcion_honorarios` VARCHAR( 255 ) NOT NULL AFTER `subtotal_gastos_sin_impuesto` ;";
 					$query[] = "ALTER TABLE `factura` ADD `descripcion_subtotal_gastos` VARCHAR( 255 ) NOT NULL AFTER `subtotal_gastos_sin_impuesto` ;";
 					$query[] = "ALTER TABLE `factura` ADD `descripcion_subtotal_gastos_sin_impuesto` VARCHAR( 255 ) NOT NULL AFTER `descripcion_subtotal_gastos` ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q, $dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.49:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES ( NULL ,  'CiudadEstudio',  'Santiago', NULL ,  'string',  '6',  '-1' );";
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 													 VALUES ( NULL ,  'PaisEstudio',  'Chile', NULL ,  'string',  '6',  '-1' );";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.50:
 					$query = array();
 					$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('UsarGastosCobrable', '0', 'seleccionar si gastos es cobrable o no,siendo cobrable 1 y no cobrable 0', 'boolean', 2, 210);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.51:
 					$query = array();
 					$query[] = "ALTER TABLE `usuario` ADD `alerta_revisor` INT( 11 ) NOT NULL DEFAULT '0' AFTER `alerta_semanal` ;";
 					$query[] = "ALTER TABLE `usuario` CHANGE `alerta_revisor` `alerta_revisor` TINYINT( 1 ) NOT NULL DEFAULT '0';";
 					$query[] = "ALTER TABLE `usuario` ADD `restriccion_diario` SMALLINT( 6 ) NOT NULL DEFAULT '0' AFTER `retraso_max` ;";
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 													VALUES (
 													NULL ,  'UsernameEnListaDeTrabajos',  '0',  'para que en la lista de trabajos sale el username como nombre y asi sea modificable por el administrador del estudio',  'boolean',  '6',  '-1'
 													);";
-					
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
-				
+
+
 				case 3.52:
 					$query = array();
 					$query[] = "ALTER TABLE `cobro` CHANGE `documento` `documento` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Se refiere a la boleta o factura asociada'";
-					
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.53:
 					$query = array();
 					$query[] = "ALTER TABLE  `usuario_revisor` DROP INDEX  `id_revisado` ,
 												ADD INDEX  `id_revisado` (  `id_revisado` );";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.54:
 					$query = array();
 					$query[] = "ALTER TABLE `prm_documento_legal` ADD `numero_inicial` INT NOT NULL COMMENT 'ultimo numero usado como instalación del documento legal para usar correlativo';";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.55:
 					$query = array();
 					$query[] = "CREATE TABLE `prm_banco` (
@@ -4338,17 +4338,17 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 								  KEY `id_cuenta` (`id_cuenta`),
 								  KEY `id_banco` (`id_banco`),
 								  CONSTRAINT `id_banco_fk` FOREIGN KEY (`id_banco`) REFERENCES `prm_banco` (`id_banco`) ON DELETE NO ACTION ON UPDATE CASCADE
-								) ENGINE=InnoDB DEFAULT CHARSET=latin1";	
+								) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 					$query[] = "ALTER TABLE `documento` ADD `id_banco` INT NOT NULL ,
 								ADD `id_cuenta` INT NOT NULL ,
 								ADD `numero_operacion` VARCHAR( 40 ) NOT NULL ,
-								ADD `numero_cheque` VARCHAR( 40 ) NOT NULL ;";					
-				
+								ADD `numero_cheque` VARCHAR( 40 ) NOT NULL ;";
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.56:
 					$query = array();
 					$query_fact = "SELECT count(*) FROM menu WHERE codigo = 'FACT'";
@@ -4360,24 +4360,24 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 							$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` )
 															VALUES (
 															'ADM', 'FACT'
-															);";					
+															);";
 						}
-						
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.57:
 					$query = array();
 					$query[] = "ALTER TABLE `documento` ADD  `pago_retencion` VARCHAR( 1 ) NOT NULL DEFAULT  '0';";
 					$query[] = "UPDATE usuario SET username = CONCAT_WS(' ', nombre, apellido1, apellido2) WHERE username = '' OR username IS NULL;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 						throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.58:
 					$query = array();
 					$query[] = "ALTER TABLE  `factura_cobro` CHANGE  `id_documento`  `id_documento` INT( 11 ) NULL DEFAULT  '0'";
@@ -4387,17 +4387,17 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.59:
 					$query = array();
 					$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACTURA', 'Facturación', '/app/interfaces/mantencion_facturacion.php', '', '', 0, 300, 'ADMIN_SIS');";
 					$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACTURA');";
-				
+
 					foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.60:
 					$query = array();
 					$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('LimpiarTrabajo', '0', 'Limpiar todos los campos luego de ingresar un trabajo', 'boolean', 2, 275)";
@@ -4406,7 +4406,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.61:
 					$query = array();
 					$query[] = "CREATE TABLE `usuario_reporte` (
@@ -4424,7 +4424,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.62:
 					$query = array();
 					$query[] = "ALTER TABLE `factura_rtf` ADD `id_tipo` INT( 11 ) NOT NULL ,
@@ -4433,67 +4433,67 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.63:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
 												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retención',  'boolean',  '6',  '-1'
 												);";
-												
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.64:
 					$query = array();
 					$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OcultarHorasTarificadasExcel', '0', 'Oculta columna horas tarificadas en generar excel, pero es usado para los calculos', 'boolean', 6, -1);";
-												
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.65:
 					$query_moneda_base = "SELECT glosa_moneda FROM prm_moneda WHERE moneda_base = 1";
 					if(!($resp_moneda_base = mysql_query($query_moneda_base, $dbh)))
 						throw new Exception($query_moneda_base."---".mysql_error());
 					list($glosa_moneda_base) = mysql_fetch_array($resp_moneda_base);
-				
+
 					$query = array();
-					$query[] = " INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = " INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 													VALUES (
 													NULL ,  'MonedaTarifaPorDefecto',  '".$glosa_moneda_base."',  '',  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299'
 													);";
-													
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.66:
 					$query = array();
 					$query[] = "ALTER TABLE  `contrato` ADD  `opc_ver_detalle_retainer` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_restar_retainer` ;";
 					$query[] = "ALTER TABLE  `cobro` ADD  `opc_ver_detalle_retainer` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_restar_retainer` ;";
-					
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.67:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
 												NULL ,  'UsaUsernameEnTodoElSistema',  '1', NULL ,  'boolean',  '6',  '-1'
 												);";
-												
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.68:
 					$query = array();
 					$query[] = "CREATE TABLE `prm_color` (
@@ -4512,67 +4512,67 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 																	(64, '#FFCCF2'),(65, '#92CB45'),(66, '#8D8E82'),(67, '#BDEE73'),(68, '#CCC'),(69, '#996'),(70, '#CC6'),(71, '#699'),(72, '#F2F2F2'),
 																	(73, '#E9BBBA'),(74, '#8C4646'),(75, '#C8EEFD'),(76, '#C5DEFA'),(77, '#D1D8D7'),(78, '#FF99FF'),(79, '#FC9'),(80, '#3C7B91'),
 																	(81, '#5EA6BD'),(82, '#FEEEBC'),(83, '#CAC793'),(84, '#FEB1B4'),(85, '#CC6633'),(86, '#CCC'),(87, '#66CC66'),(88, '#66FF66');";
-																	
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.69:
 					$query = array();
 					$query[] = "ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad` ;";
-					
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.70:
 					$query = array();
 					$query[] = "INSERT INTO documento_moneda ( id_documento, id_moneda, tipo_cambio )
-											SELECT dp.id_documento, dm.id_moneda, dm.tipo_cambio  
-											FROM documento_moneda AS dm 
-											LEFT JOIN neteo_documento AS nd ON nd.id_documento_cobro = dm.id_documento 
-											JOIN documento AS dp ON dp.id_documento = nd.id_documento_pago 
+											SELECT dp.id_documento, dm.id_moneda, dm.tipo_cambio
+											FROM documento_moneda AS dm
+											LEFT JOIN neteo_documento AS nd ON nd.id_documento_cobro = dm.id_documento
+											JOIN documento AS dp ON dp.id_documento = nd.id_documento_pago
 											ON DUPLICATE KEY UPDATE tipo_cambio = dm.tipo_cambio ";
-											
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.71:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
 												NULL ,  'ReporteRevisadosATodosLosAbogados',  '0', NULL ,  'boolean',  '3',  '460'
 												);";
-												
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.72:
 					$query = array();
 					if( !(method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura')) )
 						$query[] = "DELETE FROM factura WHERE total = 0 AND id_cobro IS NULL AND cliente IS NULL";
-					
+
 				foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.73:
 					$query = array();
-					$query[] = "INSERT INTO `configuracion` SET 
+					$query[] = "INSERT INTO `configuracion` SET
 						`glosa_opcion` =  'PrellenarTrabajoConActividad',
 						`valor_opcion` = '0',
 						`comentario` = 'Permite prellenar el detalle del trabajo con la glosa de la actividad',
 						`valores_posibles` = 'boolean',
 						`id_configuracion_categoria` = '6',
 						`orden` = '-1';";
-						
+
 					foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
@@ -4580,19 +4580,19 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 
 				case 3.74:
 					$query = array();
-					$query[] = "INSERT INTO `configuracion` SET 
+					$query[] = "INSERT INTO `configuracion` SET
 						`glosa_opcion` =  'CantidadDecimalesTotalFactura',
 						`valor_opcion` = '-1',
 						`comentario` = '',
 						`valores_posibles` = 'numero',
 						`id_configuracion_categoria` = '6',
 						`orden` = '-1';";
-						
+
 					foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh)))
 							throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 3.75:
 					$query = array();
 
@@ -4615,9 +4615,9 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
-				
+
 				case 4:
-					$query = array(); 
+					$query = array();
 					$query[] = "CREATE TABLE factura_documento_cobro (
   id int(11) NOT NULL auto_increment,
   id_factura int(11) NOT NULL default '0',
@@ -4697,7 +4697,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-				
+
 				case 4.01:
 					$query = array();
 
@@ -4719,10 +4719,10 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.03:
 						$query = array();
-						
+
 						$query[] = "CREATE TABLE `cta_cte_fact_mvto` (
 												  `id_cta_cte_mvto` int(11) NOT NULL auto_increment,
 												  `tipo_mvto` varchar(10) NOT NULL default '',
@@ -4757,7 +4757,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 												  KEY `id_mvto_ingreso` (`id_mvto_deuda`),
 												  KEY `id_mvto_egreso` (`id_mvto_pago`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Neteo de cuenta corriente facturas';";
-						
+
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -4765,7 +4765,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 
 					case 4.04:
 					$query = array();
-					
+
 					$query[] = "CREATE TABLE  `factura_pago` (
 											 `id_factura_pago` INT( 11 ) NOT NULL AUTO_INCREMENT ,
 											 `fecha` DATE NOT NULL DEFAULT  '0000-00-00',
@@ -4787,8 +4787,8 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_4` FOREIGN KEY (`id_mvto_pago`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE,
 												  ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_3` FOREIGN KEY (`id_mvto_deuda`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE;";
 					$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'Razón Social Cliente'";
-					
-					
+
+
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -4803,7 +4803,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.06:
 					$query = array();
 
@@ -4819,7 +4819,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 									id_cta_banco,
 									fecha_movimiento,
 									fecha_creacion,
-									fecha_modificacion) 
+									fecha_modificacion)
 
 									SELECT
 										tipo.codigo,
@@ -4865,7 +4865,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.08:
 					$query = array();
 
-					$query[] = "INSERT INTO cta_cte_fact_mvto_moneda (id_cta_cte_fact_mvto, id_moneda, tipo_cambio) 
+					$query[] = "INSERT INTO cta_cte_fact_mvto_moneda (id_cta_cte_fact_mvto, id_moneda, tipo_cambio)
 								SELECT mvto.id_cta_cte_mvto, cm.id_moneda, cm.tipo_cambio
 								FROM cta_cte_fact_mvto mvto
 								INNER JOIN factura fac ON fac.id_factura = mvto.id_factura
@@ -4958,7 +4958,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					$query = array();
 
 					$query[] = 	"ALTER TABLE  `prm_factura_pago_concepto` ADD  `pje_variable` INT NOT NULL COMMENT  'si es 1, se hace un replace de % por el % que corresponda' AFTER  `glosa` ;";
-				
+
 					$query[] = "INSERT INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
 (1, 'Cobranza al 100%', 0, 2),
 (2, 'Cobranza de detracción 12%', 0, 6),
@@ -4986,7 +4986,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					$query = array();
 
 					$query[] = 	"ALTER TABLE `cta_cte_fact_mvto` ADD `anulado` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `saldo` ;";
-				
+
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5033,7 +5033,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					/*Crea tbl usuario_vacacion*/
 					case 4.19:
 						$query = array();
@@ -5054,7 +5054,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.20:
 						$query = array();
 						$query[] = "ALTER TABLE `factura_pago` ADD `monto_moneda_cobro` DOUBLE NOT NULL COMMENT 'monto en la moneda del cobro' AFTER `id_moneda` ;";
@@ -5062,13 +5062,13 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` ADD `monto_pago` DOUBLE NOT NULL COMMENT 'monto en la moneda del pago' AFTER `monto` ;";
 						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` CHANGE `monto` `monto` DOUBLE NOT NULL DEFAULT '0' COMMENT 'monto en la moneda de la deuda'";
 						$query[] = "UPDATE `factura_pago` SET `monto_moneda_cobro` = `monto`, `id_moneda_cobro` = `id_moneda` WHERE 1";
-						$query[] = "UPDATE `cta_cte_fact_mvto_neteo` SET `monto_pago` = `monto` WHERE 1"; 
-						
+						$query[] = "UPDATE `cta_cte_fact_mvto_neteo` SET `monto_pago` = `monto` WHERE 1";
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.21:
 						$query = array();
 						$query[] = "ALTER TABLE  `factura` ADD  `porcentaje_impuesto` DOUBLE NOT NULL COMMENT  'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos';";
@@ -5077,7 +5077,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.22:
 						$query = array();
 						$query[] = "CREATE TABLE `usuario_cambio_historial` (
@@ -5094,23 +5094,23 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.23:
 						$query_consulta = "SELECT glosa_moneda FROM prm_moneda";
 						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
-						
+
 						$query_moneda_base = "SELECT glosa_moneda FROM prm_moneda WHERE moneda_base = 1";
 						if(!($resp_moneda_base = mysql_query($query_moneda_base, $dbh)))
 							throw new Exception($query_moneda_base."---".mysql_error());
 						list($glosa_moneda_base) = mysql_fetch_array($resp_moneda_base);
-					
+
 						$valores_posibles = "select";
 						while(list($glosa)=mysql_fetch_array($resp_consulta))
 							$valores_posibles .= ";$glosa";
-							
+
 						$query = array();
 						$query[] = "ALTER TABLE  `contrato` CHANGE  `centro_costo`  `centro_costo` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT  'Depricated, no se usa'";
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 													VALUES (
 														NULL ,  'MonedaTotalPorDefecto',  '".$glosa_moneda_base."',  '',  '".$valores_posibles."', 2, 299
 													);";
@@ -5126,24 +5126,24 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "ALTER TABLE `factura` ADD FOREIGN KEY ( `id_moneda` ) REFERENCES `prm_moneda` (
 												`id_moneda`
 												) ON DELETE RESTRICT ON UPDATE CASCADE ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.24:
 						$query = array();
-						$query[] = "INSERT INTO  `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) 
+						$query[] = "INSERT INTO  `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 													VALUES (
 													NULL ,  'ExcelGastosDesglosado', '0', NULL ,  'boolean',  '6',  '-1'
 													);";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
 					break;
-			
+
 					case 4.25:
 						$query = array();
 						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ValidacionesCliente', '0', NULL , 'boolean', '6', '-1');";
@@ -5157,7 +5157,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Factura N°', `glosa_en` =  'Invoice N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =48 LIMIT 1 ;";
 						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Minuta de cobro N°', `glosa_en` =  'Bill of charge N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =49 LIMIT 1 ;";
 						$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'N°', `glosa_en` =  'N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =52 LIMIT 1 ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5189,17 +5189,17 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query_consulta = "SELECT count(*) FROM tramite_tarifa";
 						$resp_consulta = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
 						list($cantidad) = mysql_fetch_array($resp_consulta);
-						
+
 						$query = array();
 						if( $cantidad == 0 )
 							$query[] = "INSERT INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
 															 VALUES ( '1',  'TARIFA BASE',  '0000-00-00 00:00:00', NULL ,  '1',  '1' );";
-						
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 														VALUES (
 														NULL ,  'MaxDuracionTrabajo',  '14',  'duración maxima que puede tener un trabajo',  'numero',  '2',  '240'
 														);";
-							
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5510,7 +5510,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.34:
 						$query = array();
 						$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_proveedor`  `id_proveedor` INT( 11 ) NULL DEFAULT  '0'";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5518,7 +5518,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.35:
 						$query = array();
 						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `CCI` VARCHAR( 50 ) NOT NULL ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5526,7 +5526,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.36:
 						$query = array();
 						$query[] = "DROP TABLE  `usuario_tarifa_cliente`;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5534,7 +5534,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.37:
 						$query = array();
 						$query[] = "ALTER TABLE  `cobro_historial` ADD  `id_factura` INT( 11 ) NOT NULL DEFAULT  '0' AFTER  `id_cobro` ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5542,11 +5542,11 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.38:
 						$query = array();
 						$query[] = "DELETE FROM `menu` WHERE CONVERT(`codigo` USING utf8) = 'CONF' LIMIT 1 ";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.39:
 						$query = array();
 						$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACT_PAGO', 'Factura Pago', '/app/interfaces/facturas_pagos.php', '', '', 0, 53, 'COBRANZA');";
@@ -5559,7 +5559,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					case 4.40:
 						$query = array();
 						$query[] = "ALTER TABLE  `cobro` ADD  `monto_ajustado` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_subtotal`;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5576,7 +5576,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						$query[] = "ALTER TABLE  `cobro` ADD  `informado` VARCHAR( 2 ) NOT NULL DEFAULT  'NO' AFTER  `facturado` ,
 												ADD  `fecha_informado` DATETIME NULL DEFAULT NULL AFTER  `informado` ;";
 
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` ) 
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` )
 								VALUES (
 								NULL ,  'InformarContabilidad',  '0',  'Permite que los cobros se informen a la area de contabilidad mediante Webservice 3',  'boolean',  '6',  '-1'
 								);";
@@ -5585,36 +5585,36 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.42:
 						$query = array();
 						$query[] = "ALTER TABLE `cobro_historial` CHANGE  `id_cobro` `id_cobro` INT( 11 ) NULL DEFAULT NULL";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.43:
 						$query = array();
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  
-							`comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
-							VALUES ( NULL ,  'RevisarTarifas',  '0',  
+						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,
+							`comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+							VALUES ( NULL ,  'RevisarTarifas',  '0',
 							'Revisa si los abogados tienen fijados los precios para la tarifa y moneda seleccionada',  'boolean',  '6',  '-1');";
-						
+
 						foreach( $query as $q)
 						{
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 						}
 						break;
-						
+
 					case 4.44:
 						$query = array();
 						$query[] = "ALTER TABLE `cobro` ADD  `monto_original` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_ajustado` ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
-					
+
 					case 4.45:
 						$query = array();
 						$query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ,
@@ -5629,7 +5629,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 																	ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ,
 																	ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ,
 																	ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
-						
+
 						foreach( $query as $q)
 						{
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5638,7 +5638,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 			case 4.46:
 						$query = array();
 						$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_factura` INT( 11 ) NULL , ADD  `fecha_factura` DATE NULL ;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5652,14 +5652,14 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 							 `valor` DOUBLE NOT NULL DEFAULT  '0',
 							 `moneda_base` TINYINT( 1 ) NOT NULL DEFAULT  '0'
 							) ENGINE = INNODB;";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 			case 4.48:
 						$query = array();
 						$query[] = "ALTER TABLE  `moneda_historial` ADD  `id_usuario` INT( 11 ) NOT NULL DEFAULT  '0';";
-						
+
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5678,7 +5678,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.50:
 						$query = array();
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trabajos'
 						), (
@@ -5686,7 +5686,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 						);";
 						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trámites'
 						), (
@@ -5733,7 +5733,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.54:
 				$query = array();
 				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (182, 'SelectClienteAsuntoEspecial', '1', 'Usar Select para Clientes y Autocompletador para Asuntos en  pantalla Asunto', 'boolean', 6, -1);";
-				
+
 				foreach( $query as $q )
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5742,40 +5742,40 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.55:
 				$query = array();
 				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'MostrarDetalleProfesionalCartaCobro', '1', 'Mostrar el detalle de los profesionales en la carta de cobro', 'boolean', '4', '-1');";
-				
+
 				foreach( $query as $q )
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 				break;
-				
+
 			case 4.56:
 				$query = array();
-					
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
 												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
 												);";
 					$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_factura` `codigo_factura_gasto` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
-					
+
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				break;
-				
+
 				case 4.57:
            $query = array();
            $query[] = "ALTER TABLE `cobro` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
            $query[] = "ALTER TABLE `contrato` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
-                               
+
            foreach( $query as $q )
            {
              if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
            }
            break;
-           
+
          case 4.58:
          		$query = array();
-         		$query[] = "ALTER TABLE `contrato` 
+         		$query[] = "ALTER TABLE `contrato`
          									CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
 													CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
 													CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
@@ -5786,13 +5786,13 @@ WHERE  `id` =105 LIMIT 1 ;";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
 						$query[] = "ALTER TABLE `cobro` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
-						
+
 						foreach( $query as $q )
             {
               if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
             }
          break;
-         
+
 		 case 4.59:
 				$query = array();
 				$query[] = "INSERT INTO `prm_estado_cobro` (`codigo_estado_cobro`, `orden`) VALUES ('FACTURADO', '4'), ('PAGO PARCIAL', '6');";
@@ -5804,101 +5804,101 @@ WHERE  `id` =105 LIMIT 1 ;";
 			foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.60:
 				$query = array();
 				$query[] = "ALTER TABLE  `cobro` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
 				$query[] = "ALTER TABLE  `contrato` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 			case 4.61:
 				$query = array();
 				$query[] = "ALTER TABLE  `cobro_rtf` ADD  `pdf_encabezado_imagen` TEXT NULL , ADD  `pdf_encabezado_texto` TEXT NULL ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 			case 4.62:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 							VALUES (NULL ,  'MonedaTramitePorDefecto',  'Dólar', NULL ,  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299');";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.63:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
+				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` )
 											VALUES (
 											'7',  'Margenes Factura'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'EspacioEncabezado',  '88', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'EspacioCuerpo',  '117', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'MargenIzquierdaRsocial',  '21', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'EspacioMontoPalabra',  '7', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'MargenDerechaCuerpo',  '105', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoColumnaMes',  '33', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaAnyo',  '49', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoColumnaDia',  '35', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoColumnaBaseCuerpo',  '505', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaBaseEncabezado',  '200', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'MargenIzquierdaCuerpo',  '7', NULL ,  'string',  '7',  '-1'
 											);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.64:
 				$query = array();
-				
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoColumnaMontoSubtotal',  '90', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaMontoIVA',  '32', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoColumnaMontoTotal',  '40', NULL ,  'string',  '7',  '-1'
 											);";
-			
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.65:
 				$query = array();
-				
+
 				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresión Carta');";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHora',  '1', NULL ,  'boolean',  '8',  '-1');";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerModalidad',  '0', NULL ,  'boolean',  '8',  '-1');";
@@ -5925,7 +5925,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcRestarRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetalleRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerValorHHFlatFee',  '0', NULL ,  'boolean',  '8',  '-1');";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
@@ -5933,7 +5933,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.66:
 				$query = array();
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'MostrarBotonCobroPDF',  '0',  'Dar la opción de bajar Pre-liquidación (Word de cobros) en formato PDF',  'boolean',  '6',  '-1');";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
@@ -5949,45 +5949,45 @@ WHERE  `id` =105 LIMIT 1 ;";
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.68:
 				$query = array();
 				$query[] = "ALTER TABLE  `tramite` ADD  `id_moneda_tramite_individual` INT( 11 ) NULL ,
 											ADD  `tarifa_tramite_individual` DOUBLE NULL ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.69:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'MailAsuntoNuevoATodosLosAdministradores',  '1', NULL ,  'boolean',  '3',  '-1'
 											);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.70:
 				$query = array();
 				$query[] = "ALTER TABLE `prm_moneda` ADD `tipo_cambio_referencia` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
 				$query[] = "UPDATE prm_moneda SET tipo_cambio_referencia = 1 WHERE moneda_base = 1;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.71:
 				$query = array();
 				$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES ( NULL, 'senores', 'Señores', 'Dear', 0, 'Encabezado');";
 				$query[] = "UPDATE `menu_permiso` SET  `codigo_permiso` =  'COB' WHERE CONVERT(  `menu_permiso`.`codigo_permiso` USING utf8 ) =  'ADM' AND CONVERT(  `menu_permiso`.`codigo_menu` USING utf8 ) =  'FACT_PAGO' LIMIT 1 ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.72:
 				$query = array();
 				$query[] = "INSERT INTO `prm_permisos` ( `codigo_permiso` , `glosa` ) VALUES ( 'TAR', 'Tarifa' );";
@@ -5996,11 +5996,11 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'TARIFA' );";
 				$query[] = "DELETE FROM menu_permiso WHERE codigo_permiso = 'COB' AND codigo_menu = 'TARIFA'";
 				$query[] = "UPDATE `menu_permiso` SET `codigo_permiso` = 'TAR' WHERE CONVERT( `codigo_permiso` USING utf8 ) = 'COB' AND CONVERT( `codigo_menu` USING utf8 ) = 'TAR_TRA' LIMIT 1;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.73:
 				$query = array();
 				$query[] = "ALTER TABLE  `carta` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
@@ -6014,7 +6014,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
-			
+
 			case 4.74:
 				$query = array();
 				$query[] = "ALTER TABLE  `asunto` ADD  `fecha_inactivo` DATETIME NOT NULL AFTER  `activo` ;";
@@ -6033,7 +6033,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
-			
+
 			case 4.76:
 				$query = array();
 				$query[] = "CREATE TABLE `prm_tipo_documento_asociado` (
@@ -6041,18 +6041,18 @@ WHERE  `id` =105 LIMIT 1 ;";
 						  `glosa` varchar(250) NOT NULL default '',
 						  PRIMARY KEY  (`id_tipo_documento_asociado`)
 						) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
-				
+
 				$query[] = "INSERT INTO `prm_tipo_documento_asociado` (`id_tipo_documento_asociado`, `glosa`) VALUES (NULL, 'Factura Asociada'),
 					(NULL, 'Boleta Asociada'),
 					(NULL, 'Recibo por honorarios');";
-				
+
 				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_tipo_documento_asociado` INT(11) NULL AFTER  `id_proveedor` ;";
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
-				
+
 			case 4.77:
 				$query = array();
 				$query[] = "CREATE TABLE `trabajo_tarifa` (
@@ -6066,32 +6066,32 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "ALTER TABLE `trabajo_tarifa`
 										  ADD CONSTRAINT `trabajo_tarifa_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
 										  ADD CONSTRAINT `trabajo_tarifa_ibfk_1` FOREIGN KEY (`id_trabajo`) REFERENCES `trabajo` (`id_trabajo`) ON DELETE CASCADE ON UPDATE CASCADE;";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL , 'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
-				
+
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
-			
+
 			case 4.78:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 							VALUES (
 							NULL ,  'AnchoGraficoReporteGeneral',  '730',  'ancho que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
 							), (
 							NULL ,  'AltoGraficoReporteGeneral',  '500',  'alto que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
 							);";
-				
+
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				}
 			break;
-			
+
 			case 4.79:
 				$query = array();
 				$query[] = "ALTER TABLE `documento` ADD `id_contrato` INT NULL AFTER `codigo_cliente` ;";
@@ -6100,22 +6100,22 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "ALTER TABLE `documento` ADD `pago_honorarios` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar honorarios',
 ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar gastos';";
 				$query[] = "ALTER TABLE `documento` ADD `es_adelanto` TINYINT( 1 ) NOT NULL DEFAULT '0';";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.80:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'SetFormatoRut',  '0',  'Decide si al campo Rut del contrato se agrega el formato de manera automatica',  'boolean',  '6',  '-1'
 											);";
-											
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.81:
 				$query = array();
 				$query[] = "ALTER TABLE  `prm_excel_cobro` CHANGE  `nombre_interno`  `nombre_interno` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
@@ -6124,26 +6124,26 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 												CHANGE  `grupo`  `grupo` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 				$query[] = "UPDATE	`prm_excel_cobro` SET  `glosa_es` =  'N°',
 														`glosa_en` =  'N°' WHERE  `id_prm_excel_cobro` =1 LIMIT 1 ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.82:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
 													NULL ,  'MostrarColumnasGastosEnHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
 												);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.83:
 				$query = array();
 				$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'
 											), (
@@ -6185,78 +6185,77 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 											(21, 'monto_iva', 'Monto IVA', 1, 170, 160, 'Times', '', '', 8),
 											(22, 'moneda_total', 'Moneda total', 1, 160, 170, 'Times', '', '', 8),
 											(23, 'monto_total', 'Monto total', 1, 170, 170, 'Times', '', '', 8);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 
-			
 			case 4.84:
 				$query = array();
 				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_glosa_gasto` TINYINT( 4 ) NULL AFTER  `codigo_asunto` ;
 ";
 				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualización del campo descripción al agregar gastos.', 'boolean', 6, -1);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.85:
 				$query = array();
 				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaAsociadaEsconderListado', '0', 'Esconder las columnas factura y fecha factura (de las asociadas al gasto), en gastos.php', 'boolean', '6', '-1');";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.86:
 				$query = array();
 				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (NULL , 'ModuloAdelantos', '0', NULL , 'boolean', '6', '-1');";
 				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (NULL , 'UsarHorasMesConsulta', '0', NULL , 'boolean', '6', '-1');";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.87:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 				VALUES (
 				NULL ,  'ImprimirExcelCobrosUnaPagina',  '0',  'Imprimir excel cobros una página (fit to pages)',  'boolean',  '6',  '-1'
 				);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.88:
 				$query = array();
-				$query[] = "INSERT INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` ) 
+				$query[] = "INSERT INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` )
 											VALUES (
 												NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'ImprimirFacturaDoc',  '1', NULL ,  'boolean',  '6',  '-1'
 											);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
+
 			case 4.89:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'SepararLiquidacionesPorDefecto',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-                        
+
             case 4.90:
 				$query = array();
 				$query[] = "CREATE TABLE  `prm_tipo_pago` (
@@ -6274,7 +6273,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '4' WHERE codigo = 'E' LIMIT 1 ;";
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '5' WHERE codigo = 'O' LIMIT 1 ;";
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '6' WHERE codigo = 'N' LIMIT 1 ;";
-				
+
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
@@ -6287,10 +6286,10 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					}
 				}
 			break;
-			
+
 			case 4.92:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
 					);";
@@ -6300,28 +6299,28 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					}
 				}
 			break;
-			
+
 			case 4.93:
 				$query = array();
-				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
+				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero',
                                             `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
-				
+
                                 foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
 						throw new Exception($q."---".mysql_error());
 					}
 				}
 			break;
-                                
+
                         case 4.94:
                                 $query = array();
-                                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
                                                 VALUES (
                                                     NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
                                                 );";
                                 $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
                                 $query[] = "ALTER TABLE `cobro` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
-                                
+
                                 foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
 						throw new Exception($q."---".mysql_error());
@@ -6348,8 +6347,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
-			
-		
+
+
 			case 4.96:
 				$query = array();
 				$query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
@@ -6358,7 +6357,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 								ADD  `margen_derecho` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_encabezado` DOUBLE NOT NULL DEFAULT  '1.25',
 								ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '1.25';";
-				
+
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
@@ -6367,9 +6366,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				break;
 			case 4.97:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
 					VALUES ( 'FacturaPagoSubtotalIva', '1', 'Monto Factura se divide en 3 (valor de venta, igv, monto de la factura)', 'boolean', '6', '-1');";
-				
+
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
@@ -6378,11 +6377,11 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				break;
 			case 4.98:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'MostrarMontosPorCobrar',  '0',  'En resumen de gastos mostrar el monto que falta por facturar(cobrar) de los gastos.',  'boolean',  '6',  '-1'
 					);";
-				
+
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
@@ -6579,7 +6578,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.13:
 			$query = array();
-			//$query[] = "ALTER TABLE `factura_pago` ADD `id_neteo_documento_adelanto` INT NULL COMMENT 'neteo correspondiente al uso de un adelanto para pagar un cobro' AFTER `id_concepto` ;";
+			$query[] = "ALTER TABLE `factura_pago` ADD `id_neteo_documento_adelanto` INT NULL COMMENT 'neteo correspondiente al uso de un adelanto para pagar un cobro' AFTER `id_concepto` ;";
 			$query[] = "ALTER TABLE `factura_pago` ADD INDEX ( `id_neteo_documento_adelanto` ) ;";
 			$query[] = "ALTER TABLE `factura_pago`  ADD CONSTRAINT `factura_pago_ibfk_1` FOREIGN KEY (`id_neteo_documento_adelanto`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
@@ -6648,7 +6647,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.16:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
 					);";
@@ -6661,7 +6660,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.17:
 			$query = array();
-			$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
+			$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero',
                                             `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
 
 			foreach ($query as $q) {
@@ -6673,7 +6672,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.18:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'UsarGlosaFacturaMayusculas',  '1',  'Transformar a mayusculas todas las glosas honorarios gastos con y sin impuesto a mayuscula',  'boolean',  '6',  '-1'
 					);";
@@ -6693,7 +6692,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                          `codigo_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
                                          `glosa_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
                                         ) ENGINE = INNODB;";
-			$query[] = "INSERT INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato ) 
+			$query[] = "INSERT INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato )
                                             SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
 			$query[] = "ALTER TABLE  `factura_pdf_datos` CHANGE  `id_tipo_dato`  `id_dato` INT( 11 ) NOT NULL AUTO_INCREMENT";
 			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_tipo_dato` INT( 11 ) NOT NULL AFTER  `id_dato` ;";
@@ -6704,26 +6703,26 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                                 WHERE factura_pdf_tipo_datos.codigo_tipo_dato = factura_pdf_datos.tipo_dato
                                             )";
 			$query[] = "ALTER TABLE `factura_pdf_datos`
-                                        ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`) 
+                                        ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`)
                                         REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` 
+			$query[] = "ALTER TABLE  `factura_pdf_datos`
                                             DROP  `tipo_dato` ,
                                             DROP  `glosa_dato` ;";
 			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
 			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
 			$query[] = "UPDATE factura_pdf_datos SET id_documento_legal =1;";
-			$query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano ) 
-                                            SELECT 
-                                                prm_documento_legal.id_documento_legal, 
-                                                id_tipo_dato, 
-                                                activo, 
-                                                coordinateX, 
-                                                coordinateY, 
-                                                font, 
-                                                style, 
-                                                mayuscula, 
-                                                tamano 
-                                            FROM factura_pdf_datos 
+			$query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano )
+                                            SELECT
+                                                prm_documento_legal.id_documento_legal,
+                                                id_tipo_dato,
+                                                activo,
+                                                coordinateX,
+                                                coordinateY,
+                                                font,
+                                                style,
+                                                mayuscula,
+                                                tamano
+                                            FROM factura_pdf_datos
                                             JOIN prm_documento_legal ON 1=1
                                             WHERE prm_documento_legal.id_documento_legal > 1";
 			$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellW` INT( 11 ) NOT NULL DEFAULT '0' AFTER `coordinateY` ;";
@@ -6732,9 +6731,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                          `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
                                          `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
                                         ) ENGINE = MYISAM ;";
-			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` )
                                             VALUES ( '1', 'Fecha' ), ( '2', 'Datos cliente' );";
-			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` )
                                             VALUES ( '3', 'Detalle factura' ), ( '4', 'Totales factura' );";
 			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD  `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AFTER  `id_tipo_dato`;";
 			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD INDEX ( `id_factura_pdf_datos_categoria` );";
@@ -6766,7 +6765,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 
 			break;
-			
+
 		case 5.21 :
 			$query = array();
 			$query[] = "ALTER TABLE  `cobro` ADD  `esc1_tiempo` DOUBLE NULL ,
@@ -6817,6 +6816,22 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 
 			break;
+
+		case 5.22:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+					VALUES (
+					NULL ,  'MostrarCodigoAsuntoEnListados',  '0',  'Muestra el codigo de asunto en listados y los asuntos de cada cobro',  'boolean',  '6',  '-1'
+					);";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
+
 	}
 }
 
@@ -7075,15 +7090,15 @@ $VERSIONES[$num++] = 4.86;
 $VERSIONES[$num++] = 4.87;
 $VERSIONES[$num++] = 4.88;
 $VERSIONES[$num++] = 4.89;
-	$VERSIONES[$num++] = 4.90;
-	$VERSIONES[$num++] = 4.91;
-	$VERSIONES[$num++] = 4.92;
-	$VERSIONES[$num++] = 4.93;
-    $VERSIONES[$num++] = 4.94;
-	$VERSIONES[$num++] = 4.95;
-	$VERSIONES[$num++] = 4.96;
-	$VERSIONES[$num++] = 4.97;
-	$VERSIONES[$num++] = 4.98;
+$VERSIONES[$num++] = 4.90;
+$VERSIONES[$num++] = 4.91;
+$VERSIONES[$num++] = 4.92;
+$VERSIONES[$num++] = 4.93;
+$VERSIONES[$num++] = 4.94;
+$VERSIONES[$num++] = 4.95;
+$VERSIONES[$num++] = 4.96;
+$VERSIONES[$num++] = 4.97;
+$VERSIONES[$num++] = 4.98;
 $VERSIONES[$num++] = 5;
 $VERSIONES[$num++] = 5.01;
 $VERSIONES[$num++] = 5.02;
@@ -7105,6 +7120,8 @@ $VERSIONES[$num++] = 5.17;
 $VERSIONES[$num++] = 5.18;
 $VERSIONES[$num++] = 5.19;
 $VERSIONES[$num++] = 5.20;
+$VERSIONES[$num++] = 5.21;
+$VERSIONES[$num++] = 5.22;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

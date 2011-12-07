@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -139,6 +139,15 @@
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ".
 				" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
 
+		$mostrar_codigo_asuntos = "";
+		if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+			$mostrar_codigo_asuntos = "asunto.codigo_asunto";
+			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+				$mostrar_codigo_asuntos .= "_secundario";
+			}
+			$mostrar_codigo_asuntos .= ", ' ', ";
+		}
+
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 								cobro.id_cobro,
 								cobro.monto as cobro_monto,
@@ -162,17 +171,20 @@
 								moneda.cifras_decimales,
 								cobro.incluye_honorarios as incluye_honorarios,
 								cobro.incluye_gastos as incluye_gastos,
-								GROUP_CONCAT('<li>', asunto.glosa_asunto SEPARATOR '</li>') as asuntos,
+								CONCAT(GROUP_CONCAT(DISTINCT '<li>', ${mostrar_codigo_asuntos} asunto.glosa_asunto SEPARATOR '</li>'), '</li>') as asuntos,
 								asunto.glosa_asunto as asunto_lista,
+								GROUP_CONCAT(DISTINCT " . str_replace('asunto.', 'a2.', $mostrar_codigo_asuntos) . " a2.glosa_asunto SEPARATOR ', ') as asuntos_cobro,
 								CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
 								tarifa.glosa_tarifa
 							FROM cobro
 							LEFT JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 							LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
 							LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
 							LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
-							LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
+							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
+							LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto
 							WHERE $where
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 		$x_pag = 20;
@@ -223,7 +235,7 @@
 
 				$html .= "<tr id=foco".$j." bgcolor=$color style='border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;'>";
 				$html .= "<td style='font-size:10px' align=center valing=top><b>".$cobro->fields['glosa_cliente']."</b></td>";
-				$html .= "<td style='font-size:10px' id=tip_$j align=left valing=top><b>".$cobro->fields['asuntos']."..</b></td>";
+				$html .= "<td style='font-size:10px' id=tip_$j align=left valing=top><b>".$cobro->fields['asuntos']."</b></td>";
 				if($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL')
 					$texto_acuerdo = $cobro->fields['forma_cobro']." de ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ". number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
 				else
@@ -301,7 +313,16 @@
 				$fecha_cobro .= ' '.__('hasta').' '.Utiles::sql2date($cobro->fields['fecha_fin']).' ';
 			$html .= $fecha_cobro ? __('durante').' '.$fecha_cobro : '';
 			#$html .= ' -  [Proc. '.$cobro->fields['id_proceso'].'] ';
-			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span></td>";
+			$html .= "<span style='font-size:8px'>- (".$cobro->fields['estado'].")</span>";
+
+			if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
+				$asuntos_separados = explode(', ',$cobro->fields['asuntos_cobro']);
+				$cantidad_asuntos = count($asuntos_separados);
+				$html .= " <strong id=\"tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "\">" . $cantidad_asuntos . "&nbsp;asunto" . ($cantidad_asuntos > 1 ? "s" : "") . "</strong>";
+				$html .="<script> new Tip('tip_asuntos_cobro_" . $cobro->fields['id_cobro'] . "', '" . '<li>' . implode('</li><li>', $asuntos_separados) . '</li>' . "', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";
+			}
+
+			$html .= "</td>";
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
 					$html .= "<td align=left style='font-size:10px; width: 200px;'>&nbsp;";
