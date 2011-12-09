@@ -450,7 +450,7 @@ class Cobro extends Objeto
                 $this->escalonadas[$i] = array();
                 
                 $this->escalonadas[$i]['tiempo_inicial'] = $tiempo_inicial;
-                $this->escalonadas[$i]['tiempo_final'] = $salir_en_proximo_paso ? '' : $this->fields['esc'.$i.'_tiempo']+$tiempo_inicial;
+                $this->escalonadas[$i]['tiempo_final'] = $this->fields['esc'.$i.'_tiempo']+$tiempo_inicial;
                 $this->escalonadas[$i]['id_tarifa'] = $this->fields['esc'.$i.'_id_tarifa'];
                 $this->escalonadas[$i]['id_moneda'] = $this->fields['esc'.$i.'_id_moneda'];
 				$this->escalonadas[$i]['monto'] = UtilesApp::CambiarMoneda(
@@ -459,7 +459,7 @@ class Cobro extends Objeto
                                         $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'],
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
-                                     );
+                                     ) * ( 1 - $this->fields['esc'.$i.'_descuento'] / 100 );
 				
                 $this->escalonadas[$i]['descuento'] = $this->fields['esc'.$i.'_descuento'];
                 
@@ -489,7 +489,7 @@ class Cobro extends Objeto
                                         $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'],
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
-                                     );
+                                     ) * ( 1 - $this->fields['esc'.$i.'_descuento'] / 100 );
 			$this->escalonadas[$i2]['descuento'] = $this->fields['esc'.$i.'_descuento'];
 
 			if( !empty($this->escalonadas[$i2]['monto']) ) {
@@ -570,8 +570,8 @@ class Cobro extends Objeto
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
                                      );
 
-                           $valor_trabajo += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
-                           $valor_trabajo_estandar += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa_estandar;
+                           $valor_trabajo += ( 1 - $this->escalonadas[$x_escalonada]['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
+                           $valor_trabajo_estandar += ( 1 - $this->escalonadas[$x_escalonada]['descuento']/100 ) * $duracion_escalonada_actual * $tarifa_estandar;
                        } else {
                            $duracion_retainer_trabajo += $duracion_escalonada_actual;
                            $valor_trabajo += 0;
@@ -1464,6 +1464,31 @@ class Cobro extends Objeto
 				$this->Edit('tipo_cambio_moneda',$moneda->fields['tipo_cambio']);
 				$this->Edit('forma_cobro', $hito ? 'FLAT FEE' : $contrato->fields['forma_cobro']);
 
+                                // Pasar configuración de escalonadas ... 
+                                $this->Edit('esc1_tiempo',$contrato->fields['esc1_tiempo']);
+                                $this->Edit('esc1_id_tarifa',$contrato->fields['esc1_id_tarifa']);
+                                $this->Edit('esc1_monto',$contrato->fields['esc1_monto']);
+                                $this->Edit('esc1_id_moneda',$contrato->fields['esc1_id_moneda']);
+                                $this->Edit('esc1_descuento',$contrato->fields['esc1_descuento']);
+                                
+                                $this->Edit('esc2_tiempo',$contrato->fields['esc2_tiempo']);
+                                $this->Edit('esc2_id_tarifa',$contrato->fields['esc2_id_tarifa']);
+                                $this->Edit('esc2_monto',$contrato->fields['esc2_monto']);
+                                $this->Edit('esc2_id_moneda',$contrato->fields['esc2_id_moneda']);
+                                $this->Edit('esc2_descuento',$contrato->fields['esc2_descuento']);
+                                
+                                $this->Edit('esc3_tiempo',$contrato->fields['esc3_tiempo']);
+                                $this->Edit('esc3_id_tarifa',$contrato->fields['esc3_id_tarifa']);
+                                $this->Edit('esc3_monto',$contrato->fields['esc3_monto']);
+                                $this->Edit('esc3_id_moneda',$contrato->fields['esc3_id_moneda']);
+                                $this->Edit('esc3_descuento',$contrato->fields['esc3_descuento']);
+                                
+                                $this->Edit('esc4_tiempo',$contrato->fields['esc4_tiempo']);
+                                $this->Edit('esc4_id_tarifa',$contrato->fields['esc4_id_tarifa']);
+                                $this->Edit('esc4_monto',$contrato->fields['esc4_monto']);
+                                $this->Edit('esc4_id_moneda',$contrato->fields['esc4_id_moneda']);
+                                $this->Edit('esc4_descuento',$contrato->fields['esc4_descuento']);
+                                    
 				//este es el monto fijo, pero si no se inclyen honorarios no va
 				$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
 				if(empty($incluye_honorarios)) $monto = '0';

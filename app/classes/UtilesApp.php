@@ -35,7 +35,7 @@ class UtilesApp extends Utiles
 		else //si no buscamos el idioma por defecto.
 		{
 			$query_idioma_defecto = "SELECT pi.formato_fecha FROM prm_idioma pi WHERE pi.codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma' )  ";
-			$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query_idioma_defecto,__FILE__,__LINE__,$sesion->dbh);
 			list($formato) = mysql_fetch_array($resp);
 		}
 		return ($formato);

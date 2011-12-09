@@ -54,6 +54,7 @@
 	if( date("D") == $DiaMailSemanal || $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')
 	{
 		// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
+		$ids_usuarios_profesionales = '';
 		$query = 	"SELECT usuario.id_usuario,
 									alerta_semanal,
 									usuario.nombre AS nombre_pila,
@@ -75,6 +76,10 @@
 				$horas = '0.00';
 			if(!$horas_cobrables)
 				$horas_cobrables = '0.00';
+			
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AlertaSemanalTodosAbogadosaAdministradores') ) {
+				$ids_usuarios_profesionales .= ',' . $id_usuario;
+			}
 
 			if($minimo > 0 && $horas < $minimo)
 			{
@@ -110,14 +115,16 @@
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables,1);
 		}
 		// Mensaje para REV: horas de cada revisado, alertas.
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') )
+			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') 
+					|| ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AlertaSemanalTodosAbogadosaAdministradores') ))
 				$having = "";
 			else
 				$having = " AND (codigo_permiso = 'REV' OR revisados IS NOT NULL)";
 			$query = 	"SELECT usuario.id_usuario, alerta_semanal, codigo_permiso,
 													GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
 					    			FROM usuario
-										LEFT JOIN usuario_permiso ON (usuario.id_usuario = usuario_permiso.id_usuario AND usuario_permiso.codigo_permiso = 'REV')
+										LEFT JOIN usuario_permiso ON (usuario.id_usuario = usuario_permiso.id_usuario 
+											AND ( usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM' ))
 										LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
 										WHERE activo = 1
 											AND alerta_revisor = 1
@@ -129,7 +136,14 @@
 				$profesional = new Usuario($sesion);
 				$profesional->LoadId($id_usuario);
 
-				if( $revisados != "" )
+				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AlertaSemanalTodosAbogadosaAdministradores') ) {
+					if( $codigo_permiso == 'ADM') {
+						$revisados = $ids_usuarios_profesionales;
+					} else {
+						$revisados = $id_usuario;
+					}
+				}
+				else if( $revisados != "" )
 					$revisados .= ','.$id_usuario;
 
 				// Comentado por Stefan Moers 5.4.2011, siempre se debería hacer el intersect con el array de los revisados.

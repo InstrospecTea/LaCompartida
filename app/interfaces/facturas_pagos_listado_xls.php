@@ -22,9 +22,9 @@ ini_set("memory_limit", "256M");
 	$where_cobro = ' 1 ';
 
 //void Worksheet::setLandscape();
-	$contrato = new Contrato($sesion);
+	$contrato = new Contrato($Sesion);
 	
-	$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
+	$formato_fechas = UtilesApp::ObtenerFormatoFecha($Sesion);
 	$cambios = array("%d" => "d", "%m" => "m", "%y" => "Y", "%Y" => "Y");
 $formato_fechas_php = strtr($formato_fechas, $cambios);
 
@@ -175,7 +175,7 @@ if ($where == '') {
 }
 
 	$numero_factura = "";
-	if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie'))
+	if (UtilesApp::GetConf($Sesion, 'NumeroFacturaConSerie'))
 	{
 		$numero_factura = "CONCAT(LPAD(factura.serie_documento_legal, 3, '0'), '-', factura.numero) as numero";
 	}

@@ -27,6 +27,7 @@
 	if(!$cobro->Load($id_cobro))
 		$pagina->FatalError(__('Cobro inválido'));
 
+        $cobro->CargarEscalonadas();
 	$enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
 
 	$cliente = new Cliente($sesion);
@@ -115,7 +116,7 @@
 		$cobro->Edit("opc_ver_detalles_por_hora",$opc_ver_detalles_por_hora);
 		$cobro->Edit('id_moneda',$cobro_id_moneda);
 		$cobro->Edit('tipo_cambio_moneda',$cobro_tipo_cambio);
-		//$cobro->Edit('forma_cobro',$cobro_forma_cobro);
+		$cobro->Edit('forma_cobro',$cobro_forma_cobro);
 		$cobro->Edit('id_moneda_monto', $id_moneda_monto);
 		$cobro->Edit('monto_contrato',$cobro_monto_contrato);
 		$cobro->Edit('retainer_horas',$cobro_retainer_horas);
@@ -1237,6 +1238,20 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 					</tr>
 				</table>
             </div>
+<?php
+    $rango1 = ( $cobro->escalonadas[1]['tiempo_inicial'] ? 
+                        $cobro->escalonadas[1]['tiempo_inicial'] : '0' ).' - '.( $cobro->escalonadas[1]['tiempo_final'] ? 
+                                                                                        $cobro->escalonadas[1]['tiempo_final'] : '' );
+    $rango2 = ( $cobro->escalonadas[2]['tiempo_inicial'] ? 
+                        $cobro->escalonadas[2]['tiempo_inicial'] : '0' ).' - '.( $cobro->escalonadas[2]['tiempo_final'] ? 
+                                                                                        $cobro->escalonadas[2]['tiempo_final'] : '' );
+    $rango3 = ( $cobro->escalonadas[3]['tiempo_inicial'] ? 
+                        $cobro->escalonadas[3]['tiempo_inicial'] : '0' ).' - '.( $cobro->escalonadas[3]['tiempo_final'] ? 
+                                                                                        $cobro->escalonadas[3]['tiempo_final'] : '' );
+    $ultimo_rango = ( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicial'] ? 
+                        $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_inicial'] : '0' ).' - '.( $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_final'] ? 
+                                                                                                                $cobro->escalonadas[$cobro->escalonadas['num']]['tiempo_final'] : '' );
+?>
 			<div id="div_escalonada" align="left" style="display:none; background-color:#F8FBBD; padding-left:20px">
 				<div class="template_escalon" id="escalon_1">
 					<table style='padding: 5px; border: 0px solid' bgcolor='#F8FBBD'>
@@ -1244,17 +1259,17 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 							<td valign="bottom">
 								<div style="display:inline-block; width: 75px;"><?php echo __('Las primeras'); ?> </div>
 								<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php echo $cobro->fields['esc1_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango1; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 								<select name="esc_selector[]" id="esc_selector_1" onchange="cambia_tipo_forma(this.value, this.id);">
 									<option value="1" <?php echo !isset($cobro->fields['esc1_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 									<option value="2" <?php echo $cobro->fields['esc1_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 								</select>
 								<span>
-									<span id="tipo_forma_1_1" style="display: inline-block;">
+									<span id="tipo_forma_1_1" <?php echo !isset($cobro->fields['esc1_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 										<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_1" , $cobro->fields['esc1_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
 									</span>
-									<span id="tipo_forma_1_2" style="display: none;">
-										<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_1" value="<?php echo $cobro->fields['esc1_monto']; ?>" name="esc_monto[]" />
+									<span id="tipo_forma_1_2" <?php echo $cobro->fields['esc1_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
+										<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_1" value="<?php if( !empty($cobro->fields['esc1_monto']) ) echo $cobro->fields['esc1_monto']; else echo ''; ?>" name="esc_monto[]" />
 									</span>
 								</span>
 								<span><?php echo __('en'); ?></span> 
@@ -1275,16 +1290,16 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 							<td valign="bottom">
 								<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
 								<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php echo $cobro->fields['esc2_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 								<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
 									<option value="1" <?php echo !isset($cobro->fields['esc2_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 									<option value="2" <?php echo $cobro->fields['esc2_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 								</select>
 								<span>
-									<span id="tipo_forma_2_1" style="display: inline-block;">
+									<span id="tipo_forma_2_1" <?php echo !isset($cobro->fields['esc2_monto']) || $cobro->fields['esc2_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 										<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2" , $cobro->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
 									</span>
-									<span id="tipo_forma_2_2" style="display: none;">
+									<span id="tipo_forma_2_2" <?php echo $cobro->fields['esc2_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?>>
 										<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_2" name="esc_monto[]" value="<?php echo $cobro->fields['esc2_monto']; ?>" />
 									</span>
 								</span>
@@ -1306,16 +1321,16 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 							<td valign="bottom">
 								<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
 								<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php echo $cobro->fields['esc3_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+								<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 								<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
 									<option value="1" <?php echo !isset($cobro->fields['esc3_monto']) || $cobro->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 									<option value="2" <?php echo $cobro->fields['esc3_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 								</select>
 								<span>
-									<span id="tipo_forma_3_1" style="display: inline-block;">
+									<span id="tipo_forma_3_1" <?php echo !isset($cobro->fields['esc3_monto']) || $cobro->fields['esc3_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 										<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3" , $cobro->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
 									</span>
-									<span id="tipo_forma_3_2" style="display: none;">
+									<span id="tipo_forma_3_2" <?php echo $cobro->fields['esc3_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
 										<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_3" name="esc_monto[]" value="<?php echo $cobro->fields['esc3_monto']; ?>" />
 									</span>
 								</span>
@@ -1340,11 +1355,11 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									<option value="2" <?php echo $cobro->fields['esc4_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 								</select>
 								<span>
-									<span id="tipo_forma_4_1" style="display: inline-block;">
+									<span id="tipo_forma_4_1" <?php echo !isset($cobro->fields['esc4_monto']) || $cobro->fields['esc4_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"' ?> >
 										<!-- function SelectQuery( $sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150') -->
 										<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_4" , $cobro->fields['esc4_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
 									</span>
-									<span id="tipo_forma_4_2" style="display: none;">
+									<span id="tipo_forma_4_2" <?php echo $cobro->fields['esc4_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
 										<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_4" value="<?php echo $cobro->fields['esc4_monto']; ?>" name="esc_monto[]" />
 									</span>
 								</span>
