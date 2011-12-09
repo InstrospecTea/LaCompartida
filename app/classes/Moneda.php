@@ -16,7 +16,7 @@ class Moneda extends Objeto
 		$this->guardar_fecha = false;
 	}
 	
-	 function GuardaHistorial($sesion,$fecha)
+	function GuardaHistorial($sesion,$fecha)
 	{
 		$query = "INSERT INTO moneda_historial (id_moneda, fecha, valor, moneda_base, id_usuario) 
 					VALUES('" . $this->fields["id_moneda"] . "', '" . $fecha . "', '" . $this->fields["tipo_cambio"] . "', '" . 

@@ -199,6 +199,11 @@ if ($opcion == "guardar") {
 						$pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificación"));
 					}
 					break;
+				case "ESCALONADA":
+					if( empty($_POST['esc_tiempo'][0])){
+						$pagina->AddError(__("Por favor ingrese el tiempo para la primera escala"));
+					}
+					break;
 				case "TASA":
 				case "HITOS":
 					break;
@@ -374,6 +379,32 @@ if ($opcion == "guardar") {
 						$contrato->Edit("porcentaje_descuento", '0');
 					}
 					$contrato->Edit("id_moneda_monto", $id_moneda_monto);
+					
+					/* tarifa escalonada */
+					if( isset( $_POST['esc_tiempo'] ) ) {
+						for( $i = 1; $i <= sizeof($_POST['esc_tiempo']) ; $i++){		
+							if( $_POST['esc_tiempo'][$i-1] != '' ){
+								$contrato->Edit('esc'.$i.'_tiempo', $_POST['esc_tiempo'][$i-1] );
+								if( $_POST['esc_selector'][$i-1] != 1 ){
+									//caso monto
+									$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+									$contrato->Edit('esc'.$i.'_monto', $_POST['esc_monto'][$i-1]);
+								} else {
+									//caso tarifa
+									$contrato->Edit('esc'.$i.'_id_tarifa', $_POST['esc_id_tarifa_'.$i]);
+									$contrato->Edit('esc'.$i.'_monto', "NULL");
+								}
+								$contrato->Edit('esc'.$i.'_id_moneda', $_POST['esc_id_moneda_'.$i]);
+								$contrato->Edit('esc'.$i.'_descuento', $_POST['esc_descuento'][$i-1]);
+							} else {
+								$contrato->Edit('esc'.$i.'_tiempo', "NULL");
+								$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+								$contrato->Edit('esc'.$i.'_monto', "NULL");
+								$contrato->Edit('esc'.$i.'_id_moneda', "NULL");
+								$contrato->Edit('esc'.$i.'_descuento', "NULL");
+							}
+						}		
+					}
 
 					$contrato->Edit("alerta_hh", $contra_clie->fields['alerta_hh']);
 					$contrato->Edit("alerta_monto", $contra_clie->fields['alerta_monto']);
@@ -453,7 +484,7 @@ if ($opcion == "guardar") {
 				else
 					$contrato = new Contrato($sesion);
 
-				if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $monto == 0) {
+				if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 					$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 					$val = true;
 				} elseif ($forma_cobro == 'TASA')

@@ -27,6 +27,7 @@ $tip_proporcional = __("El cliente compra un número de horas, el exceso de horas
 $tip_flat = __("El cliente acuerda cancelar un <strong>monto fijo</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
 $tip_cap = __("Cap");
 $tip_hitos = __("Hitos");
+$tip_escalonada = __("Escalonada");
 $tip_honorarios = __("Solamente lleva la cuenta de las HH profesionales. Al terminar el proyecto se puede cobrar eventualmente.");
 $tip_mensual = __("El cobro se hará de forma mensual.");
 $tip_tarifa_especial = __("Al ingresar una nueva tarifa, esta se actualizará automáticamente.");
@@ -95,7 +96,7 @@ $obligatorio = '<span class="req">*</span>';
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
-	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $monto == 0) {
+	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 		$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 		$val = true;
 	} else if ($forma_cobro == 'TASA') {
@@ -205,6 +206,34 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	}
 	$contrato->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
 	$contrato->Edit("codigo_idioma", $codigo_idioma != '' ? $codigo_idioma : 'es');
+	
+	/* tarifa escalonada */
+	if( isset( $_POST['esc_tiempo'] ) ) {
+		for( $i = 1; $i <= sizeof($_POST['esc_tiempo']) ; $i++){		
+			if( $_POST['esc_tiempo'][$i-1] != '' ){
+				$contrato->Edit('esc'.$i.'_tiempo', $_POST['esc_tiempo'][$i-1] );
+				if( $_POST['esc_selector'][$i-1] != 1 ){
+					//caso monto
+					$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+					$contrato->Edit('esc'.$i.'_monto', $_POST['esc_monto'][$i-1]);
+				} else {
+					//caso tarifa
+					$contrato->Edit('esc'.$i.'_id_tarifa', $_POST['esc_id_tarifa_'.$i]);
+					$contrato->Edit('esc'.$i.'_monto', "NULL");
+				}
+				$contrato->Edit('esc'.$i.'_id_moneda', $_POST['esc_id_moneda_'.$i]);
+				$contrato->Edit('esc'.$i.'_descuento', $_POST['esc_descuento'][$i-1]);
+			} else {
+				$contrato->Edit('esc'.$i.'_tiempo', "NULL");
+				$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+				$contrato->Edit('esc'.$i.'_monto', "NULL");
+				$contrato->Edit('esc'.$i.'_id_moneda', "NULL");
+				$contrato->Edit('esc'.$i.'_descuento', "NULL");
+			}
+		}		
+	}
+	
+	
 	// descuento
 	$contrato->Edit("tipo_descuento", $tipo_descuento);
 	if ($tipo_descuento == 'PORCENTAJE') {
@@ -615,12 +644,15 @@ list($cant_encargados) = mysql_fetch_array($resp);
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "none";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "none";
 		$('span_monto').show();
 		div = $("div_horas");
 		div.style.display = "none";
 		div = $("div_fecha_cap");
+		div.style.display = "none";
+		div = $("div_escalonada");
 		div.style.display = "none";
 		$('tabla_hitos').hide();
 	}
@@ -628,12 +660,15 @@ list($cant_encargados) = mysql_fetch_array($resp);
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "block";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "block";
 		$('span_monto').show();
 		div = $("div_horas");
 		div.style.display = "none";
 		div = $("div_fecha_cap");
+		div.style.display = "none";
+		div = $("div_escalonada");
 		div.style.display = "none";
 		$('tabla_hitos').hide();
 	}
@@ -641,12 +676,15 @@ list($cant_encargados) = mysql_fetch_array($resp);
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "block";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "block";
 		$('span_monto').show();
 		div = $("div_horas");
 		div.style.display = "block";
 		div = $("div_fecha_cap");
+		div.style.display = "none";
+		div = $("div_escalonada");
 		div.style.display = "none";
 		$('tabla_hitos').hide();
 	}
@@ -654,12 +692,15 @@ list($cant_encargados) = mysql_fetch_array($resp);
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "block";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "block";
 		$('span_monto').show();
 		div = $("div_horas");
 		div.style.display = "block";
 		div = $("div_fecha_cap");
+		div.style.display = "none";
+		div = $("div_escalonada");
 		div.style.display = "none";
 		$('tabla_hitos').hide();
 	}
@@ -667,6 +708,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "block";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "block";
 		$('span_monto').show();
@@ -674,12 +716,15 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		div.style.display = "none";
 		div = $("div_fecha_cap");
 		div.style.display = "block";
+		div = $("div_escalonada");
+		div.style.display = "none";
 		$('tabla_hitos').hide();
 	}
 	function ShowHitos()
 	{
 		div = $("div_forma_cobro");
 		div.style.display = "block";
+		div.style.width = '400px';
 		div = $("div_monto");
 		div.style.display = "block";
 		$('span_monto').hide();
@@ -687,8 +732,156 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		div.style.display = "none";
 		div = $("div_fecha_cap");
 		div.style.display = "none";
+		div = $("div_escalonada");
+		div.style.display = "none";
 		$('tabla_hitos').show();
 	}
+	function ShowEscalonada()
+	{
+		div = $("div_forma_cobro");
+		div.style.display = "block";
+		div.style.width = '730px';
+		div = $("div_monto");
+		div.style.display = "none";
+		$('span_monto').hide();
+		div = $("div_horas");
+		div.style.display = "none";
+		div = $("div_fecha_cap");
+		div.style.display = "none";
+		$('tabla_hitos').hide();
+		div = $("div_escalonada");
+		div.style.display = "block";
+	}
+	function ActualizaRango(desde, cant){
+		var aplicar = parseInt(desde.substr(-1,1));
+		var ini = 0;
+		num_escalas = (document.getElementsByName('esc_tiempo[]')).length;
+		for( var i = aplicar; i< num_escalas; i++){
+			
+			if( i > 1){
+				ini = 0;
+				for( var j = i; j > 1; j-- ){
+					ini += parseFloat(document.getElementById('esc_tiempo_'+(j-1)).value);
+					if( ini.length == 0 || isNaN(ini)){
+						ini = 0;
+					}
+				}				
+			}
+			
+			valor_actual = document.getElementById('esc_tiempo_'+(i)).value;
+			if( i == aplicar ){
+				if( cant.length > 0 && !isNaN(cant)){
+					tiempo_final = parseFloat(ini,10) + parseFloat(cant,10);
+				} else {
+					tiempo_final = parseFloat(ini, 10);
+				}
+			} else {				
+				if( valor_actual.length > 0 && !isNaN(valor_actual)){
+					tiempo_final = parseFloat(ini,10) + parseFloat(valor_actual,10);
+				} else {
+					tiempo_final = parseFloat(ini, 10);
+				}
+			}
+			revisor = document.getElementById('esc_tiempo_'+(i)).value;
+			if( valor_actual.length == 0 || isNaN(valor_actual)){
+				ini = 0;
+				tiempo_final = 0;
+			}
+			donde = document.getElementById('esc_rango_'+i);
+			donde.innerHTML = ini + ' - ' + tiempo_final;
+		}
+		
+	}
+	
+	function cambia_tipo_forma(valor, desde){
+		var aplicar = parseInt(desde.substr(-1,1));
+		var donde = 'tipo_forma_' + aplicar + '_';
+		var selector = document.getElementById(desde);
+		
+		for( var i = 1; i <= selector.length; i++ ){
+			if( i == valor ) {
+				document.getElementById(donde+i).style.display = 'inline-block';
+			} else {
+				document.getElementById(donde+i).style.display = 'none';
+			}
+		}
+	}
+	
+	function setear_valores_escalon( donde, desde, tiempo, tipo, id_tarifa, monto, id_moneda, descuento ){
+		if( desde != '' ) {
+			/* si le paso desde donde copiar, los utilizo */
+			document.getElementById('esc_tiempo_' + donde).value = document.getElementById('esc_tiempo_' + desde).value;
+			document.getElementById('esc_selector_' + donde).value = document.getElementById('esc_selector_' + desde).value;
+			cambia_tipo_forma(document.getElementById('esc_selector_' + desde).value, 'esc_selector_' + donde);
+			document.getElementById('esc_id_tarifa_' + donde).value = document.getElementById('esc_id_tarifa_' + desde).value;			
+			document.getElementById('esc_monto_' + donde).value = document.getElementById('esc_monto_' + desde).value;
+			document.getElementById('esc_id_moneda_' + donde).value = document.getElementById('esc_id_moneda_' + desde).value;
+			document.getElementById('esc_descuento_' + donde).value = document.getElementById('esc_descuento_' + desde).value;
+		} else {
+			/* sino utilizo los valores entregados individualmente */
+			document.getElementById('esc_tiempo_' + donde).value = tiempo;
+			document.getElementById('esc_selector_' + donde).value = tipo;
+			cambia_tipo_forma(1,'esc_selector_' + donde);
+			document.getElementById('esc_id_tarifa_' + donde).value = id_tarifa;
+			document.getElementById('esc_monto_' + donde).value = monto;
+			document.getElementById('esc_id_moneda_' + donde).value = id_moneda;
+			document.getElementById('esc_descuento_' + donde).value = descuento;
+			
+		}
+	}
+	
+	function agregar_eliminar_escala(divID){
+		var numescala = parseInt(divID.substr(-1,1));
+		var divArea = document.getElementById(divID);
+		var divAreaImg = document.getElementById(divID+"_img");
+		var divAreaVisible = divArea.style['display'] != "none";
+		var esconder = "";
+		
+		if( !divAreaVisible ){
+			for( var i = numescala; i> 1; i--){
+				var valor_anterior = document.getElementById('esc_tiempo_'+(i-1)).value;
+				if( valor_anterior != '' && valor_anterior > 0 ){
+					divArea.style['display'] = "inline-block";
+					divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'> Eliminar";
+				} else {
+					alert('No puede agregar un escalón nuevo, si no ha llenado los datos del escalon actual');
+					return 0;
+				}
+			}
+		} else {
+			num_escalas = (document.getElementsByName('esc_tiempo[]')).length;
+			esconder = divID;
+			for( var i = numescala; i <= (num_escalas-2) ; i++ ){
+				var siguiente = document.getElementById('esc_tiempo_'+(parseInt(i)+1));
+				if( siguiente.style.display != "none"){
+					valor_siguiente = document.getElementById('esc_tiempo_'+(parseInt(i)+1)).value;
+					if( valor_siguiente > 0 ){
+						setear_valores_escalon(i, (i+1),0,1,1,0,1,0);
+						ActualizaRango('esc_tiempo_'+i, document.getElementById('esc_tiempo_'+(i+1)).value);
+						setear_valores_escalon((i+1), '','',1,1,'',1,'');
+						ActualizaRango('esc_tiempo_'+(parseInt(i)+1), '');
+						esconder = "escalon_" + (parseInt(numescala)+1);
+						
+					} else {
+						id_sgte = "escalon_" +(parseInt(i)+1);
+						document.getElementById(id_sgte).style.display = "none";
+						document.getElementById(id_sgte+"_img").innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'> Agregar";
+					}
+				} else {
+					setear_valores_escalon(i, '','',1,1,'',1,'');
+					ActualizaRango('esc_tiempo_'+i, '');
+					esconder = "escalon_" + i;
+					/*i = num_escalas;*/
+				}
+			}
+			setear_valores_escalon(parseInt(esconder.substr(-1,1)), '','',1,1,'',1,'');
+			ActualizaRango('esc_tiempo_'+esconder.substr(-1,1), '');
+			document.getElementById(esconder).style.display = 'none';
+			divAreaImg = document.getElementById(esconder+"_img");
+			divAreaImg.innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'> Agregar";
+		}
+	}
+	
 	function ActualizarFormaCobro()
 	{
 		fc1 = $("fc1");
@@ -697,6 +890,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		fc5 = $("fc5");
 		fc6 = $("fc6");
 		fc7 = $("fc7");
+		fc8 = $("fc8");
 
 		if(fc1.checked)
 			ShowTHH();
@@ -710,6 +904,8 @@ list($cant_encargados) = mysql_fetch_array($resp);
 			ShowProporcional();
 		else if(fc7.checked)
 			ShowHitos();
+		else if(fc8.checked)
+			ShowEscalonada();
 	}
 	function CreaTarifa(form, opcion)
 	{
@@ -1445,7 +1641,7 @@ if (!$contrato->loaded()) {
                                 <?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
 				</td>
 				<td align="left" width = '70%'>
-<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', 'onchange="CambioEncargado()"', "Vacio", "200"); ?>
+                                    <?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', 'onchange="CambioEncargado()"', "Vacio", "200"); ?>
 				</td>
 			</tr>
 			<?
@@ -1773,8 +1969,10 @@ else
 								<label for="fc6">Proporcional</label> &nbsp;
 								<input <?= TTip($tip_hitos) ?> onclick="ActualizarFormaCobro();" id=fc7 type=radio name=forma_cobro value="HITOS" <?= $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
 								<label for="fc7"><?= __('Hitos') ?></label>
+								<input <?= TTip($tip_escalonada) ?> onclick="ActualizarFormaCobro();" id=fc8 type=radio name=forma_cobro value="ESCALONADA" <?= $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
+								<label for="fc8"><?= __('Escalonada') ?></label>
 							</div>
-							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id=div_forma_cobro>
+							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 								<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 									<span id="span_monto">&nbsp;<?= __('Monto') ?>
 <?php if ($validaciones_segun_config)
@@ -1817,6 +2015,125 @@ else
 										</tr>
 									</table>
 								</div>
+								<div id="div_escalonada" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
+									<div class="template_escalon" id="escalon_1">
+										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
+											<tr>
+												<td valign="bottom">
+													<div style="display:inline-block; width: 75px;"><?php echo __('Las primeras'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php echo $contrato->fields['esc1_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+													<select name="esc_selector[]" id="esc_selector_1" onchange="cambia_tipo_forma(this.value, this.id);">
+														<option value="1" <?php echo !isset($contrato->fields['esc1_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
+														<option value="2" <?php echo $contrato->fields['esc1_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
+													</select>
+													<span>
+														<span id="tipo_forma_1_1" style="display: inline-block;">
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_1" , $contrato->fields['esc1_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+														</span>
+														<span id="tipo_forma_1_2" style="display: none;">
+															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_1" value="<?php echo $contrato->fields['esc1_monto']; ?>" name="esc_monto[]" />
+														</span>
+													</span>
+													<span><?php echo __('en'); ?></span> 
+													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_1', $contrato->fields['esc1_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+													<span><?php echo __('con'); ?> </span>
+													<input type="text" name="esc_descuento[]" id="esc_descuento_1" value="<?php echo $contrato->fields['esc1_descuento']; ?>" size="4" /> 
+													<span><?php echo __('% dcto.'); ?> </span>
+												</td>
+											</tr>
+										</table>
+										<div <?= !$div_show ? 'onClick="agregar_eliminar_escala(\'escalon_2\')" style="cursor:pointer"' : '' ?> >
+											<?= !$div_show ? '<span id="escalon_2_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') . '</span>' : '' ?>											
+										</div>
+									</div>
+									<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
+										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
+											<tr>
+												<td valign="bottom">
+													<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php echo $contrato->fields['esc2_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+													<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
+														<option value="1" <?php echo !isset($contrato->fields['esc2_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
+														<option value="2" <?php echo $contrato->fields['esc2_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
+													</select>
+													<span>
+														<span id="tipo_forma_2_1" style="display: inline-block;">
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2" , $contrato->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+														</span>
+														<span id="tipo_forma_2_2" style="display: none;">
+															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_2" name="esc_monto[]" value="<?php echo $contrato->fields['esc2_monto']; ?>" />
+														</span>
+													</span>
+													<span><?php echo __('en'); ?></span> 
+													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_2', $contrato->fields['esc2_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+													<span><?php echo __('con'); ?> </span>
+													<input type="text" name="esc_descuento[]" value="<?php echo $contrato->fields['esc2_descuento']; ?>" id="esc_descuento_2" size="4" /> 
+													<span><?php echo __('% dcto.'); ?> </span>
+												</td>
+											</tr>
+										</table>
+										<div <?= !$div_show ? 'onClick="agregar_eliminar_escala(\'escalon_3\')" style="cursor:pointer"' : '' ?> >
+											<?= !$div_show ? '<span id="escalon_3_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') . '</span>' : '' ?>
+										</div>
+									</div>
+									<div class="template_escalon" id="escalon_3" style="display: <?php echo isset($contrato->fields['esc3_tiempo']) && $contrato->fields['esc3_tiempo'] > 0 ? 'block' : 'none'; ?>;">
+										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
+											<tr>
+												<td valign="bottom">
+													<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php echo $contrato->fields['esc3_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 60px; text-align: center;">0 - 0</div> <span>) <?php echo __('aplicar'); ?></span>
+													<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
+														<option value="1" <?php echo !isset($contrato->fields['esc3_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
+														<option value="2" <?php echo $contrato->fields['esc3_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
+													</select>
+													<span>
+														<span id="tipo_forma_3_1" style="display: inline-block;">
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3" , $contrato->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+														</span>
+														<span id="tipo_forma_3_2" style="display: none;">
+															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_3" name="esc_monto[]" value="<?php echo $contrato->fields['esc3_monto']; ?>" />
+														</span>
+													</span>
+													<span><?php echo __('en'); ?></span> 
+													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $contrato->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+													<span><?php echo __('con'); ?> </span>
+													<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php echo $contrato->fields['esc3_descuento']; ?>" size="4" /> 
+													<span><?php echo __('% dcto.'); ?> </span>
+												</td>
+											</tr>
+										</table>
+									</div>
+									<div class="template_escalon" id="escalon_4">
+										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
+											<tr>
+												<td valign="bottom">
+													<div style="display:inline-block; width: 170px;"><?php echo __('Para el resto de horas trabajadas, aplicar'); ?> </div> 
+													<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="4" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<select name="esc_selector[]" id="esc_selector_4" onchange="cambia_tipo_forma(this.value, this.id);">
+														<option value="1" <?php echo !isset($contrato->fields['esc4_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
+														<option value="2" <?php echo $contrato->fields['esc4_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
+													</select>
+													<span>
+														<span id="tipo_forma_4_1" style="display: inline-block;">
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_4" , $contrato->fields['esc4_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+														</span>
+														<span id="tipo_forma_4_2" style="display: none;">
+															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_4" value="<?php echo $contrato->fields['esc4_monto']; ?>" name="esc_monto[]" />
+														</span>
+													</span>
+													<span><?php echo __('en'); ?></span> 
+													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_4', $contrato->fields['esc4_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+													<span><?php echo __('con'); ?> </span>
+													<input type="text" name="esc_descuento[]" id="esc_descuento_4" value="<?php echo $contrato->fields['esc4_descuento']; ?>" size="4" /> 
+													<span><?php echo __('% dcto.'); ?> </span> 
+												</td>
+											</tr>
+										</table>
+									</div>
+								</div>								
 							</div>
 
 							<table id="tabla_hitos" width='93%' style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:1px solid #454545;' cellpadding="3" cellspacing="3" style="border-collapse:collapse;">

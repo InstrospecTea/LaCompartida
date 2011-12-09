@@ -135,7 +135,7 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese la moneda de la tarifa en la tarificación"));
 
 		if (empty($forma_cobro)) {
-			$pagina->AddError(__("Por favor ingrese la forma de") . __("cobro") . __("en la tarificación"));
+			$pagina->AddError(__("Por favor ingrese la forma de ") . __("cobro") . __(" en la tarificación"));
 		} else {
 			switch ($forma_cobro) {
 				case "RETAINER":
@@ -167,6 +167,11 @@ if ($opcion == "guardar") {
 						$pagina->AddError(__("Por favor ingrese las horas para el proporcional en la tarificación"));
 					if (empty($id_moneda_monto))
 						$pagina->AddError(__("Por favor ingrese la moneda para el proporcional en la tarificación"));
+					break;
+				case "ESCALONADA":
+					if( empty($_POST['esc_tiempo'][0])){
+						$pagina->AddError(__("Por favor ingrese el tiempo para la primera escala"));
+					}
 					break;
 				case "TASA":
 				case "HITOS":
@@ -249,7 +254,7 @@ if ($opcion == "guardar") {
 
 			#CONTRATO
 			$contrato->Load($cliente->fields['id_contrato']);
-			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $monto == 0) {
+			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 				$pagina->AddError(__('Ud. ha seleccionado forma de cobro:') . ' ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 				$val = true;
 			} elseif ($forma_cobro == 'TASA')
@@ -351,6 +356,32 @@ if ($opcion == "guardar") {
 			$contrato->Edit("opc_moneda_total", $opc_moneda_total);
 			$contrato->Edit("opc_moneda_gastos", $opc_moneda_gastos);
 
+			/* tarifa escalonada */
+			if( isset( $_POST['esc_tiempo'] ) ) {
+				for( $i = 1; $i <= sizeof($_POST['esc_tiempo']) ; $i++){		
+					if( $_POST['esc_tiempo'][$i-1] != '' ){
+						$contrato->Edit('esc'.$i.'_tiempo', $_POST['esc_tiempo'][$i-1] );
+						if( $_POST['esc_selector'][$i-1] != 1 ){
+							//caso monto
+							$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+							$contrato->Edit('esc'.$i.'_monto', $_POST['esc_monto'][$i-1]);
+						} else {
+							//caso tarifa
+							$contrato->Edit('esc'.$i.'_id_tarifa', $_POST['esc_id_tarifa_'.$i]);
+							$contrato->Edit('esc'.$i.'_monto', "NULL");
+						}
+						$contrato->Edit('esc'.$i.'_id_moneda', $_POST['esc_id_moneda_'.$i]);
+						$contrato->Edit('esc'.$i.'_descuento', $_POST['esc_descuento'][$i-1]);
+					} else {
+						$contrato->Edit('esc'.$i.'_tiempo', "NULL");
+						$contrato->Edit('esc'.$i.'_id_tarifa', "NULL");
+						$contrato->Edit('esc'.$i.'_monto', "NULL");
+						$contrato->Edit('esc'.$i.'_id_moneda', "NULL");
+						$contrato->Edit('esc'.$i.'_descuento', "NULL");
+					}
+				}		
+			}
+			
 			$contrato->Edit("opc_ver_solicitante", $opc_ver_solicitante);
 			$contrato->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 			$contrato->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);

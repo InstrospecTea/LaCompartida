@@ -431,6 +431,184 @@ class Cobro extends Objeto
 
 		return $total_monto_tramites;
 	}
+        
+        // Cargar información de escalonadas a un objeto 
+        function CargarEscalonadas()
+        {
+			$cobro_moneda = new CobroMoneda( $this->sesion );
+			$cobro_moneda->Load( $this->fields['id_cobro'] );
+		   
+            $this->escalonadas = array();
+            $this->escalonadas['num'] = 0;
+            $this->escalonadas['monto_fijo'] = 0;
+            
+            $tiempo_inicial = 0;
+            for($i=1; $i<4; $i++) {
+                if( empty($this->fields['esc'.$i.'_tiempo']) ) break;
+                
+                $this->escalonadas['num']++;
+                $this->escalonadas[$i] = array();
+                
+                $this->escalonadas[$i]['tiempo_inicial'] = $tiempo_inicial;
+                $this->escalonadas[$i]['tiempo_final'] = $salir_en_proximo_paso ? '' : $this->fields['esc'.$i.'_tiempo']+$tiempo_inicial;
+                $this->escalonadas[$i]['id_tarifa'] = $this->fields['esc'.$i.'_id_tarifa'];
+                $this->escalonadas[$i]['id_moneda'] = $this->fields['esc'.$i.'_id_moneda'];
+				$this->escalonadas[$i]['monto'] = UtilesApp::CambiarMoneda(
+                                        $this->fields['esc'.$i.'_monto'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
+                                     );
+				
+                $this->escalonadas[$i]['descuento'] = $this->fields['esc'.$i.'_descuento'];
+                
+                if( !empty($this->escalonadas[$i]['monto']) ) {
+                    $this->escalonadas[$i]['escalonada_tarificada'] = 0;
+                    $this->escalonadas['monto_fijo'] += $this->escalonadas[$i]['monto'];
+                } else {
+                    $this->escalonadas[$i]['escalonada_tarificada'] = 1;
+                }
+                
+                $tiempo_inicial += $this->fields['esc'.$i.'_tiempo'];
+            }
+			
+			$this->escalonadas['num']++;
+			$i = 4;  //ultimo campo (por la genialidad de agregar como mil campos en una tabla)
+			$i2 = $this->escalonadas['num']; //proximo "slot" en el array de escalonadas
+			
+			$this->escalonadas[$i2] = array();
+
+			$this->escalonadas[$i2]['tiempo_inicial'] = $tiempo_inicial;
+			$this->escalonadas[$i2]['tiempo_final'] = '';
+			$this->escalonadas[$i2]['id_tarifa'] = $this->fields['esc'.$i.'_id_tarifa'];
+			$this->escalonadas[$i2]['id_moneda'] = $this->fields['esc'.$i.'_id_moneda'];
+			$this->escalonadas[$i2]['monto'] = UtilesApp::CambiarMoneda(
+                                        $this->fields['esc'.$i.'_monto'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
+                                     );
+			$this->escalonadas[$i2]['descuento'] = $this->fields['esc'.$i.'_descuento'];
+
+			if( !empty($this->escalonadas[$i2]['monto']) ) {
+				$this->escalonadas[$i2]['escalonada_tarificada'] = 0;
+				$this->escalonadas['monto_fijo'] += $this->escalonadas[$i2]['monto'];
+			} else {
+				$this->escalonadas[$i2]['escalonada_tarificada'] = 1;
+			}
+        }
+        
+        // Para calcular monto honorarios en caso de forma de cobro ESCALONADA
+        function MontoHonorariosEscalonados( $lista_trabajos ) 
+        {
+           $cobro_moneda = new CobroMoneda( $this->sesion );
+           $cobro_moneda->Load( $this->fields['id_cobro'] );
+            
+           // Cargar escalonadas
+           $this->CargarEscalonadas();
+           
+           // Contador escalonadas 
+           $x_escalonada = 1;
+           
+           // Variable para sumar monto total
+           $cobro_total_honorario_cobrable = $this->escalonadas['monto_fijo'];
+           
+           // Contador de duracion
+           $cobro_total_duracion = 0;
+           
+           $duracion_hora_restante = 0;
+           
+           for($z=0;$z<$lista_trabajos->num;$z++)
+           {
+               $trabajo = $lista_trabajos->Get($z);
+               $valor_trabajo = 0;
+               $valor_estandar_trabajo = 0;
+               $duracion_retainer_trabajo = 0;
+               
+               if( $trabajo->fields['cobrable'] ) {
+                   // Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada 
+                   list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+                   $duracion = $h + ($m > 0 ? ($m / 60) :'0');
+                   $duracion_trabajo = $duracion;
+
+                   // Mantengase en el mismo trabajo hasta que no se require un cambio de escalonada...
+                   while( true ) {
+                       
+                       // Calcula tiempo del trabajo actual que corresponde a esa escalonada y tiempo que corresponde a la proxima. 
+                       if( !empty($this->escalonadas[$x_escalonada]['tiempo_final']) ) {
+                           $duracion_escalonada_actual = min( $duracion, $this->escalonadas[$x_escalonada]['tiempo_final'] - $cobro_total_duracion );
+                           $duracion_hora_restante = $duracion - $duracion_escalonada_actual;
+                       } else {
+                           $duracion_escalonada_actual = $duracion;
+                           $duracion_hora_restante = 0;
+                       }
+                       
+                       $cobro_total_duracion += $duracion_escalonada_actual;
+
+                       if( !empty($this->escalonadas[$x_escalonada]['id_tarifa']) ) {
+                           // Busca la tarifa según abogado y definición de la escalonada 
+                           $tarifa_estandar = UtilesApp::CambiarMoneda(
+                                        Funciones::TarifaDefecto( $this->sesion, 
+                                                        $trabajo->fields['id_usuario'], 
+                                                        $this->escalonadas[$x_escalonada]['id_moneda'] ),
+                                        $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
+                                     );
+                           $tarifa = UtilesApp::CambiarMoneda(
+                                        Funciones::Tarifa( $this->sesion, 
+                                                        $trabajo->fields['id_usuario'], 
+                                                        $this->escalonadas[$x_escalonada]['id_moneda'], 
+                                                        '', 
+                                                        $this->escalonadas[$x_escalonada]['id_tarifa'] ),
+                                        $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+                                        $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
+                                     );
+
+                           $valor_trabajo += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
+                           $valor_trabajo_estandar += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa_estandar;
+                       } else {
+                           $duracion_retainer_trabajo += $duracion_escalonada_actual;
+                           $valor_trabajo += 0;
+                           $valor_trabajo_estandar += 0;
+                       }
+                       
+                       if( $duracion_hora_restante > 0 || $cobro_total_duracion == $this->escalonadas[$x_escalonada]['tiempo_final'] ) {
+                           $x_escalonada++;
+                           if( $duracion_hora_restante > 0 ) {
+                               $duracion = $duracion_hora_restante;
+                           } else {
+                               break;
+                           }
+                       }
+                       else 
+                           break;
+                           
+                   }
+                   
+                   $cobro_total_honorario_cobrable += $valor_trabajo;
+                   $tarifa_hh = $valor_trabajo / $duracion_trabajo;
+                   $tarifa_hh_estandar = $valor_trabajo_estandar / $duracion_trabajo;
+
+                   $trabajo->Edit('id_moneda', $this->fields['id_moneda']);
+                   $trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
+                   $trabajo->Edit('tarifa_hh', $tarifa_hh);
+                   $trabajo->Edit('monto_cobrado', $valor_trabajo);
+                   $trabajo->Edit('costo_hh', $tarifa_hh_estandar);
+                   $trabajo->Edit('tarifa_hh_estandar', $tarifa_hh_estandar);
+                   $trabajo->Edit('duracion_retainer', $duracion_retainer_trabajo);
+                   $trabajo->Write();
+               } else {
+                   continue;
+               }
+           }
+           return $cobro_total_honorario_cobrable;
+        }
 
 	// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos
 	// actual guardado en la configuracion sino el dato traspasado
@@ -549,137 +727,141 @@ class Cobro extends Objeto
 			$lista_trabajos = new ListaTrabajos($this->sesion,'',$query);
 		else
 			$lista_trabajos->num = 0;
+                
+                if( $this->fields['forma_cobro'] == 'ESCALONADA' ) {
+                    $cobro_total_honorario_cobrable = $this->MontoHonorariosEscalonados( $lista_trabajos );
+                } else {
+                    for($z=0;$z<$lista_trabajos->num;$z++)
+                    {
+                            $trabajo = $lista_trabajos->Get($z);
+                            list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+                            $duracion = $h + ($m > 0 ? ($m / 60) :'0');
+                            $duracion_minutos = $h*60 + $m;
 
-		for($z=0;$z<$lista_trabajos->num;$z++)
-		{
-			$trabajo = $lista_trabajos->Get($z);
-			list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
-			$duracion = $h + ($m > 0 ? ($m / 60) :'0');
-			$duracion_minutos = $h*60 + $m;
+                            //se inicializa el valor del retainer del trabajo
+                            $retainer_trabajo_minutos=0;
 
-			//se inicializa el valor del retainer del trabajo
-			$retainer_trabajo_minutos=0;
+                            // Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
+                            // Si el config "GuardarTarifaAlIngresoDeHora" existe saca la tarifa del registro de tarifas
+                            // por trabajo, si no saca lo del contrato actual
+                            if( UtilesApp::GetConf($this->sesion,'GuardarTarifaAlIngresoDeHora') )
+                            {
+                                    // Según Tarifa del contrato
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::TrabajoTarifa($this->sesion,$trabajo->fields['id_trabajo'],$this->fields['id_moneda']);
+                                    // Según Tarifa estándar del sistema
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
+                                    // Según tarifa estándar de sistema y si no existe tarifa en moneda indicada buscar mejor tarifa en otra moneda
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$this->fields['id_cobro']);
+                            }
+                            else if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
+                            {
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
 
-			// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
-			// Si el config "GuardarTarifaAlIngresoDeHora" existe saca la tarifa del registro de tarifas
-			// por trabajo, si no saca lo del contrato actual
-			if( UtilesApp::GetConf($this->sesion,'GuardarTarifaAlIngresoDeHora') )
-			{
-				// Según Tarifa del contrato
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::TrabajoTarifa($this->sesion,$trabajo->fields['id_trabajo'],$this->fields['id_moneda']);
-				// Según Tarifa estándar del sistema
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
-				// Según tarifa estándar de sistema y si no existe tarifa en moneda indicada buscar mejor tarifa en otra moneda
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$this->fields['id_cobro']);
-			}
-			else if($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '')
-			{
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$trabajo->fields['codigo_asunto']);
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
 
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda']);
+                                    $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$this->fields['id_cobro']);
+                            }
 
-				$profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion,$trabajo->fields['id_usuario'],$this->fields['id_moneda'],$this->fields['id_cobro']);
-			}
+                            // Se calcula el valor del trabajo, según el tiempo trabajado y la tarifa
+                            if($trabajo->fields['cobrable'] == '1')
+                            {
+                                    $valor_trabajo = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa'];
+                                    $valor_trabajo_estandar = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'];
+                            }
+                            else
+                            {
+                                    $valor_trabajo = 0;
+                                    $valor_trabajo_estandar = 0;
+                            }
+                            // Se suman los valores del trabajo a las variables del cobro
+                            $cobro_total_honorario_hh += $valor_trabajo;
+                            $cobro_total_honorario_hh_estandar += $valor_trabajo_estandar;
 
-			// Se calcula el valor del trabajo, según el tiempo trabajado y la tarifa
-			if($trabajo->fields['cobrable'] == '1')
-			{
-				$valor_trabajo = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa'];
-				$valor_trabajo_estandar = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'];
-			}
-			else
-			{
-				$valor_trabajo = 0;
-				$valor_trabajo_estandar = 0;
-			}
-			// Se suman los valores del trabajo a las variables del cobro
-			$cobro_total_honorario_hh += $valor_trabajo;
-			$cobro_total_honorario_hh_estandar += $valor_trabajo_estandar;
+                            if ($trabajo->fields['cobrable']=='1')
+                            {
+                                    $cobro_total_minutos += $duracion_minutos;
+                                    $cobro_total_horas += $duracion;
+                            }
 
-			if ($trabajo->fields['cobrable']=='1')
-			{
-				$cobro_total_minutos += $duracion_minutos;
-				$cobro_total_horas += $duracion;
-			}
+                            // El valor a cobrar del trabajo dependerá de la forma de cobro
+                            switch($this->fields['forma_cobro'])
+                            {
+                                    case 'FLAT FEE':
+                                            $valor_a_cobrar = 0;
+                                            break;
+                                    case 'PROPORCIONAL':
+                                            // Se calculan después, pero necesitan los valores de los totales que se suman en este ciclo.
+                                            continue;
+                                            break;
+                                    case 'RETAINER':
+                                            if( $this->fields['retainer_horas'] != '')
+                                            {
+                                                    if( $cobro_total_minutos < $this->fields['retainer_horas']*60 )
+                                                    {
+                                                            $valor_a_cobrar = 0;
+                                                            //se agrega el valor del retainer en el trabajo para luego ser mostrado
+                                                            if ($trabajo->fields['cobrable']=='1')
+                                                            {
+                                                                    $retainer_trabajo_minutos = $duracion_minutos;
+                                                                    $cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo;
+                                                            }
+                                                    }
+                                                    else
+                                                    {
+                                                            $valor_a_cobrar = min( $valor_trabajo, ($cobro_total_horas - $this->fields['retainer_horas']) * $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+                                                            //se agrega el valor del retainer en el trabajo para luego ser mostrado
+                                                            if ($trabajo->fields['cobrable']=='1')
+                                                            {
+                                                                    if ($cobro_total_minutos - ($this->fields['retainer_horas']*60) < $duracion_minutos)
+                                                                    {
+                                                                            $retainer_trabajo_minutos=$duracion_minutos - ($cobro_total_minutos - ($this->fields['retainer_horas']*60));
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                            $retainer_trabajo_minutos = 0;
+                                                                    }
+                                                                    $cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo - $valor_a_cobrar;
+                                                            }
+                                                    }
+                                            }
+                                            else
+                                            {
+                                                    if($cobro_total_honorario_hh < $this->fields['monto_contrato'])
+                                                    {
+                                                            $valor_a_cobrar = 0;
+                                                            $cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo;
+                                                    }
+                                                    else
+                                                    {
+                                                            $valor_a_cobrar = min($valor_trabajo, $cobro_total_honorario_hh - $this->fields['monto_contrato']);
+                                                            $cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo - $valor_a_cobrar;
+                                                    }
+                                            }
+                                    break;
+                                    default:
+                                            $valor_a_cobrar = $valor_trabajo;
+                                    break;
+                            }
 
-			// El valor a cobrar del trabajo dependerá de la forma de cobro
-			switch($this->fields['forma_cobro'])
-			{
-				case 'FLAT FEE':
-					$valor_a_cobrar = 0;
-					break;
-				case 'PROPORCIONAL':
-					// Se calculan después, pero necesitan los valores de los totales que se suman en este ciclo.
-					continue;
-					break;
-				case 'RETAINER':
-					if( $this->fields['retainer_horas'] != '')
-					{
-						if( $cobro_total_minutos < $this->fields['retainer_horas']*60 )
-						{
-							$valor_a_cobrar = 0;
-							//se agrega el valor del retainer en el trabajo para luego ser mostrado
-							if ($trabajo->fields['cobrable']=='1')
-							{
-								$retainer_trabajo_minutos = $duracion_minutos;
-								$cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo;
-							}
-						}
-						else
-						{
-							$valor_a_cobrar = min( $valor_trabajo, ($cobro_total_horas - $this->fields['retainer_horas']) * $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-							//se agrega el valor del retainer en el trabajo para luego ser mostrado
-							if ($trabajo->fields['cobrable']=='1')
-							{
-								if ($cobro_total_minutos - ($this->fields['retainer_horas']*60) < $duracion_minutos)
-								{
-									$retainer_trabajo_minutos=$duracion_minutos - ($cobro_total_minutos - ($this->fields['retainer_horas']*60));
-								}
-								else
-								{
-									$retainer_trabajo_minutos = 0;
-								}
-								$cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo - $valor_a_cobrar;
-							}
-						}
-					}
-					else
-					{
-						if($cobro_total_honorario_hh < $this->fields['monto_contrato'])
-						{
-							$valor_a_cobrar = 0;
-							$cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo;
-						}
-						else
-						{
-							$valor_a_cobrar = min($valor_trabajo, $cobro_total_honorario_hh - $this->fields['monto_contrato']);
-							$cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo - $valor_a_cobrar;
-						}
-					}
-				break;
-				default:
-					$valor_a_cobrar = $valor_trabajo;
-				break;
-			}
+                            // Se suma el monto a cobrar
+                            $cobro_total_honorario_cobrable += $valor_a_cobrar;
+                            // Se guarda la información del cobro para este trabajo. se incluye minutos retainer en el trabajo
+                            $horas_retainer = floor(($retainer_trabajo_minutos)/60);
+                            $minutos_retainer = sprintf("%02d",$retainer_trabajo_minutos%60);
+                            $trabajo->Edit('id_moneda',$this->fields['id_moneda']);
+                            $trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
+                            $trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
+                            $trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+                            $trabajo->ActualizarTrabajoTarifa( $this->fields['id_moneda'], $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+                            $trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
+                            $trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
+                            $trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
 
-			// Se suma el monto a cobrar
-			$cobro_total_honorario_cobrable += $valor_a_cobrar;
-			// Se guarda la información del cobro para este trabajo. se incluye minutos retainer en el trabajo
-			$horas_retainer = floor(($retainer_trabajo_minutos)/60);
-			$minutos_retainer = sprintf("%02d",$retainer_trabajo_minutos%60);
-			$trabajo->Edit('id_moneda',$this->fields['id_moneda']);
-			$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
-			$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-			$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-			$trabajo->ActualizarTrabajoTarifa( $this->fields['id_moneda'], $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-			$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar,6,'.',''));
-			$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
-			$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'],$decimales,'.',''));
+                            if( !$trabajo->Write(false) )
+                                    return 'Error, trabajo #'.$trabajo->fields['id_trabajo'].' no se pudo guardar';
 
-			if( !$trabajo->Write(false) )
-				return 'Error, trabajo #'.$trabajo->fields['id_trabajo'].' no se pudo guardar';
-
-		} #End for cobros
+                    } #End for cobros
+                }
 
 		if($this->fields['forma_cobro']=='PROPORCIONAL')
 		{
@@ -1053,7 +1235,7 @@ class Cobro extends Objeto
 	function ReiniciarDocumento()
 	{
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'],array(),0,false);
-			$x_gastos 		= UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+			$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
 			//PENDIENTE: al final hay $documento->Edit('monto_base',number_format(($cobro_base_honorarios+$cobro_base_gastos),$decimales_base,".",""));
 			//cobro_base_honorarios y cobro_base_gastos se fue calculando 1 a 1 transformando a base.
 
@@ -1099,8 +1281,8 @@ class Cobro extends Objeto
 			}
 			$documento->Edit('impuesto', $x_resultados['monto_iva'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('subtotal_honorarios', $x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']]);
-			$documento->Edit('subtotal_gastos',$x_gastos['subtotal_gastos_con_impuestos']? $x_gastos['subtotal_gastos_con_impuestos']:'0');
-			$documento->Edit('subtotal_gastos_sin_impuesto',$x_gastos['subtotal_gastos_sin_impuestos']? $x_gastos['subtotal_gastos_sin_impuestos']:'0');
+			$documento->Edit('subtotal_gastos',$x_gastos['subtotal_gastos_con_impuestos']? number_format($x_gastos['subtotal_gastos_con_impuestos'],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.',''):'0');
+			$documento->Edit('subtotal_gastos_sin_impuesto',$x_gastos['subtotal_gastos_sin_impuestos']? number_format($x_gastos['subtotal_gastos_sin_impuestos'],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.',''):'0');
 			$documento->Edit('descuento_honorarios',$x_resultados['descuento'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('subtotal_sin_descuento',(string)number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']]-$x_resultados['descuento'][$this->fields['opc_moneda_total']],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.',''));
 			$documento->Edit('honorarios',$x_resultados['monto'][$this->fields['opc_moneda_total']]);

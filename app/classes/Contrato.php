@@ -630,6 +630,44 @@ class Contrato extends Objeto
 					AND trabajo.id_tramite = 0 
 					AND asunto.id_contrato='".$this->fields['id_contrato']."' GROUP BY asunto.id_contrato "; 
                 }
+                else if( $this->fields['forma_cobro'] == 'ESCALONADA' )
+                {
+                        if(!$emitido) {
+				$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
+			}
+			if( !empty($codigo_asunto) ) {
+				$where .= " AND trabajo.codigo_asunto = '$codigo_asunto' ";
+			}
+			if( !empty($fecha_ini) ) {
+				$where .= " AND trabajo.fecha >= '$fecha_ini' ";
+			}
+			if( !empty($fecha_fin) ) {
+				$where .= " AND trabajo.fecha <= '$fecha_fin' ";
+			}
+
+			$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
+					trabajo.descripcion,
+					trabajo.fecha,
+					trabajo.id_usuario,
+					trabajo.monto_cobrado,
+					trabajo.id_moneda as id_moneda_trabajo,
+					trabajo.id_trabajo,
+					trabajo.tarifa_hh,
+					trabajo.cobrable,
+					trabajo.visible,
+					trabajo.codigo_asunto,
+					CONCAT_WS(' ', nombre, apellido1) as nombre_usuario
+                                    FROM trabajo 
+                                    JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
+                                    JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+                                    JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+                                    LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
+                                    WHERE 1 $where  
+                                        AND trabajo.cobrable = 1 
+                                        AND trabajo.id_tramite = 0 
+					AND asunto.id_contrato='".$this->fields['id_contrato']."'"; 
+                        $lista_trabajos = new ListaTrabajos($this->sesion,'',$query);
+                }
                 else 
 		{
 			if(!$emitido) {
@@ -679,6 +717,183 @@ class Contrato extends Objeto
 		list($moneda,$id_moneda) = mysql_fetch_array($resp);
 		return array(0,$moneda,$id_moneda);
 	}
+        
+        // Cargar información de escalonadas a un objeto 
+        function CargarEscalonadas()
+        {
+            $this->escalonadas = array();
+            $this->escalonadas['num'] = 0;
+            $this->escalonadas['monto_fijo'] = 0;
+			
+			
+			$moneda_contrato = new Moneda( $this->sesion );
+			$moneda_contrato->Load( $this->fields['id_moneda'] );
+
+			// Contador escalonadas $moneda_escalonada->Load( $this->escalondas[$x_escalonada]['id_moneda'] );
+			$moneda_escalonada = new Moneda( $this->sesion );
+			
+            
+            $tiempo_inicial = 0;
+            for($i=1; $i<5; $i++) {
+                if( empty($this->fields['esc'.$i.'_tiempo']) ) break;
+                
+				$this->escalonadas['num']++;
+                $this->escalonadas[$i] = array();
+                
+                $this->escalonadas[$i]['tiempo_inicial'] = $tiempo_inicial;
+                $this->escalonadas[$i]['tiempo_final'] = $salir_en_proximo_paso ? '' : $this->fields['esc'.$i.'_tiempo']+$tiempo_inicial;
+                $this->escalonadas[$i]['id_tarifa'] = $this->fields['esc'.$i.'_id_tarifa'];
+                $this->escalonadas[$i]['id_moneda'] = $this->fields['esc'.$i.'_id_moneda'];
+				
+				$moneda_escalonada->Load( $this->escalondas[$i]['id_moneda'] );
+				
+                $this->escalonadas[$i]['monto'] = UtilesApp::CambiarMoneda(
+                                        $this->fields['esc'.$i.'_monto'],
+                                        $moneda_escalonada->fields['tipo_cambio'],
+                                        $moneda_escalonada->fields['cifras_decimales'],
+                                        $moneda_contrato->fields['tipo_cambio'],
+                                        $moneda_contrato->fields['cifras_decimales'] 
+                                     );
+                $this->escalonadas[$i]['descuento'] = $this->fields['esc'.$i.'_descuento'];
+                
+                if( !empty($this->escalonadas[$i]['monto']) ) {
+                    $this->escalonadas[$i]['escalonada_tarificada'] = 0;
+                    $this->escalonadas['monto_fijo'] += $this->escalonadas[$i]['monto'];
+                } else {
+                    $this->escalonadas[$i]['escalonada_tarificada'] = 1;
+                }
+                
+                $tiempo_inicial += $this->fields['esc'.$i.'_tiempo'];
+            }
+			
+			$this->escalonadas['num']++;
+			$i = 4;  //ultimo campo (por la genialidad de agregar como mil campos en una tabla)
+			$i2 = $this->escalonadas['num']; //proximo "slot" en el array de escalonadas
+			
+			$this->escalonadas[$i2] = array();
+
+			$this->escalonadas[$i2]['tiempo_inicial'] = $tiempo_inicial;
+			$this->escalonadas[$i2]['tiempo_final'] = '';
+			$this->escalonadas[$i2]['id_tarifa'] = $this->fields['esc'.$i.'_id_tarifa'];
+			$this->escalonadas[$i2]['id_moneda'] = $this->fields['esc'.$i.'_id_moneda'];
+			
+			$moneda_escalonada->Load( $this->escalondas[$i2]['id_moneda'] );
+			
+			$this->escalonadas[$i2]['monto'] = UtilesApp::CambiarMoneda(
+                                        $this->fields['esc'.$i.'_monto'],
+                                        $moneda_escalonada->fields['tipo_cambio'],
+                                        $moneda_escalonada->fields['cifras_decimales'],
+                                        $moneda_contrato->fields['tipo_cambio'],
+                                        $moneda_contrato->fields['cifras_decimales'] 
+                                     );
+			$this->escalonadas[$i2]['descuento'] = $this->fields['esc'.$i.'_descuento'];
+
+			if( !empty($this->escalonadas[$i2]['monto']) ) {
+				$this->escalonadas[$i2]['escalonada_tarificada'] = 0;
+				$this->escalonadas['monto_fijo'] += $this->escalonadas[$i2]['monto'];
+			} else {
+				$this->escalonadas[$i2]['escalonada_tarificada'] = 1;
+			}
+        }
+        
+        function MontoHonorariosEscalonados( $lista_trabajos ) 
+        {
+           // Cargar escalonadas
+           $this->CargarEscalonadas();
+           $moneda_contrato = new Moneda( $this->sesion );
+           $moneda_contrato->Load( $this->fields['id_moneda'] );
+           
+           // Contador escalonadas 
+           $x_escalonada = 1;
+           $moneda_escalonada = new Moneda( $this->sesion );
+           $moneda_escalonada->Load( $this->escalondas[$x_escalonada]['id_moneda'] );
+           
+           // Variable para sumar monto total
+           $cobro_total_honorario_cobrable = $this->escalonadas['monto_fijo'];
+           
+           // Contador de duracion
+           $cobro_total_duracion = 0;
+           
+           $duracion_hora_restante = 0;
+           
+           for($z=0;$z<$lista_trabajos->num;$z++)
+           {
+               $trabajo = $lista_trabajos->Get($z);
+               $valor_trabajo = 0;
+               $valor_estandar_trabajo = 0;
+               $duracion_retainer_trabajo = 0;
+               
+               if( $trabajo->fields['cobrable'] ) {
+                   // Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada 
+                   list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+                   $duracion = $h + ($m > 0 ? ($m / 60) :'0');
+                   $duracion_trabajo = $duracion;
+
+                   // Mantengase en el mismo trabajo hasta que no se require un cambio de escalonada...
+                   while( true ) {
+                       
+                       // Calcula tiempo del trabajo actual que corresponde a esa escalonada y tiempo que corresponde a la proxima. 
+                       if( !empty($this->escalonadas[$x_escalonada]['tiempo_final']) ) {
+                           $duracion_escalonada_actual = min( $duracion, $this->escalonadas[$x_escalonada]['tiempo_final'] - $cobro_total_duracion );
+                           $duracion_hora_restante = $duracion - $duracion_escalonada_actual;
+                       } else {
+                           $duracion_escalonada_actual = $duracion;
+                           $duracion_hora_restante = 0;
+                       }
+                       
+                       $cobro_total_duracion += $duracion_escalonada_actual;
+
+                       if( !empty($this->escalonadas[$x_escalonada]['id_tarifa']) ) {
+                           // Busca la tarifa según abogado y definición de la escalonada 
+                           $tarifa_estandar = UtilesApp::CambiarMoneda(
+                                        Funciones::TarifaDefecto( $this->sesion, 
+                                                        $trabajo->fields['id_usuario'], 
+                                                        $this->escalonadas[$x_escalonada]['id_moneda'] ),
+                                        $moneda_escalonada->fields['tipo_cambio'],
+                                        $moneda_escalonada->fields['cifras_decimales'],
+                                        $moneda_contrato->fields['tipo_cambio'],
+                                        $moneda_contrato->fields['cifras_decimales'] 
+                                     );
+                           $tarifa = UtilesApp::CambiarMoneda(
+                                        Funciones::Tarifa( $this->sesion, 
+                                                        $trabajo->fields['id_usuario'], 
+                                                        $this->escalonadas[$x_escalonada]['id_moneda'], 
+                                                        '', 
+                                                        $this->escalonadas[$x_escalonada]['id_tarifa'] ),
+                                        $moneda_escalonada->fields['tipo_cambio'],
+                                        $moneda_escalonada->fields['cifras_decimales'],
+                                        $moneda_contrato->fields['tipo_cambio'],
+                                        $moneda_contrato->fields['cifras_decimales'] 
+                                     );
+
+                           $valor_trabajo += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
+                           $valor_trabajo_estandar += ( 1 - $this->escalonadas['descuento']/100 ) * $duracion_escalonada_actual * $tarifa_estandar;
+                       } else {
+                           $duracion_retainer_trabajo += $duracion_escalonada_actual;
+                           $valor_trabajo += 0;
+                           $valor_trabajo_estandar += 0;
+                       }
+                       
+                       if( $duracion_hora_restante > 0 || $cobro_total_duracion == $this->escalonadas[$x_escalonada]['tiempo_final'] ) {
+                           $x_escalonada++;
+                           $moneda_escalonada = new Moneda( $this->sesion );
+                           $moneda_escalonada->Load( $this->escalondas[$x_escalonada]['id_moneda'] );
+                           if( $duracion_hora_restante > 0 ) {
+                               $duracion = $duracion_hora_restante;
+                           } else {
+                               break;
+                           }
+                       }
+                       else 
+                           break;
+                   }
+                   $cobro_total_honorario_cobrable += $valor_trabajo;
+               } else {
+                   continue;
+               }
+           }
+           return $cobro_total_honorario_cobrable;
+        }
         
         function CantidadAsuntosPorFacturar( $fecha1, $fecha2 )
         {
