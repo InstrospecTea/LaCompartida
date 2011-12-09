@@ -144,8 +144,13 @@
 
 			$t->Edit("duracion_cobrada", $tipo_ingreso == 'decimal' ?
 				UtilesApp::Decimal2Time($duracion_cobrada) : $duracion_cobrada);
-
+                        
+                        $query = "SELECT id_categoria_usuario FROM usuario WHERE id_usuario = '$id_usuario' ";
+                        $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                        list( $id_categoria_usuario ) = mysql_fetch_array($resp);
+                        
 			$t->Edit('id_usuario', $id_usuario);
+                        $t->Edit('id_categoria_usuario', $id_categoria_usuario );
 			$t->Edit('codigo_asunto', $codigo_asunto);
 
 			if (method_exists('Conf','GetConf'))
@@ -210,7 +215,7 @@
 			{
 				if( $actualizar_trabajo_tarifa )
 					$t->InsertarTrabajoTarifa();
-				$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con exito'):__('editado con éxito')));
+				$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con éxito'):__('editado con éxito')));
 #refresca el listado de horas.php cuando se graba la informacion desde el popup
 ?>
 				<script>

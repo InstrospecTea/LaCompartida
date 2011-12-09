@@ -411,10 +411,10 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$min = $min < 10 ? "0$min" : $min; 
 		$hora = $hora < 10 ? "0$hora" : $hora; 
 
-		$query = "SELECT id_usuario,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
+		$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
 			return new soap_fault('Client', '',mysql_error(),'');
-		list($id_usuario,$dias_ingreso_trabajo) = mysql_fetch_array($resp);
+		list($id_usuario, $id_categoria_usuario, $dias_ingreso_trabajo) = mysql_fetch_array($resp);
 
 		if($codigo_actividad == "")
 			$codigo_actividad = "NULL";
@@ -440,6 +440,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$ordenado_por=addslashes($ordenado_por);
 		$query = "INSERT INTO trabajo SET 
 								id_usuario='$id_usuario',
+                                                                id_categoria_usuario='$id_categoria_usuario',
 								id_trabajo_local='$id_trabajo_local',
 								codigo_asunto='$codigo_asunto',
 								codigo_actividad=$codigo_actividad,

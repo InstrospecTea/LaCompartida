@@ -6831,6 +6831,35 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 
 			break;
+                        
+		case 5.23:
+			$query = array();
+			$query[] = "ALTER TABLE  `trabajo` ADD  `id_categoria_usuario` INT( 11 ) NULL DEFAULT NULL AFTER  `id_usuario` ;";
+                        $query[] = "ALTER TABLE  `trabajo` ADD INDEX (  `id_categoria_usuario` )";
+                        $query[] = "ALTER TABLE `trabajo`
+                                        ADD CONSTRAINT `trabajo_ibfk_31` FOREIGN KEY (`id_categoria_usuario`) 
+                                        REFERENCES `prm_categoria_usuario` (`id_categoria_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
+			
+		case 5.24:
+			$query = array();
+			$query[] = "INSERT INTO  `configuracion` ( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'AlertaSemanalTodosAbogadosaAdministradores',  '0',  'enviar alertas de las horas ingresadas, semanalmente a los usuarios administradores',  'boolean',  '3',  '500' );";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
 
 	}
 }
@@ -7122,6 +7151,8 @@ $VERSIONES[$num++] = 5.19;
 $VERSIONES[$num++] = 5.20;
 $VERSIONES[$num++] = 5.21;
 $VERSIONES[$num++] = 5.22;
+$VERSIONES[$num++] = 5.23;
+$VERSIONES[$num++] = 5.24;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
