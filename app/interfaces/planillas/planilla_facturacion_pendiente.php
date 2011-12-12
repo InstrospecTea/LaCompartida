@@ -309,7 +309,6 @@
 							GROUP BY $group_by ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		$fila_inicial = $filas+2;
 		while($cobro = mysql_fetch_array($resp))
 		{
@@ -333,7 +332,7 @@
 				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, '', $fecha1, $fecha2 );
 				list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, '', $fecha1, $fecha2 );
 				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, '', $fecha1, $fecha2 );
-			}
+			} 
 			$id_ultimo_cobro = $contrato->UltimoCobro();
 			$ultimo_cobro = new Cobro($sesion);
 			$ultimo_cobro->Load($id_ultimo_cobro);

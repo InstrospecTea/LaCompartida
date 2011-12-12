@@ -658,6 +658,7 @@ class Contrato extends Objeto
 					trabajo.codigo_asunto,
 					CONCAT_WS(' ', nombre, apellido1) as nombre_usuario
                                     FROM trabajo 
+                                    JOIN usuario ON trabajo.id_usuario = usuario.id_usuario 
                                     JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
                                     JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
                                     JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 

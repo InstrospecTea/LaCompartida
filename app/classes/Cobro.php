@@ -524,8 +524,10 @@ class Cobro extends Objeto
            {
                $trabajo = $lista_trabajos->Get($z);
                $valor_trabajo = 0;
+               $valor_trabajo_hh = 0;
                $valor_estandar_trabajo = 0;
                $duracion_retainer_trabajo = 0;
+               $aporte_monto_trabajo = 0;
                
                if( $trabajo->fields['cobrable'] ) {
                    // Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada 
@@ -547,8 +549,7 @@ class Cobro extends Objeto
                        
                        $cobro_total_duracion += $duracion_escalonada_actual;
 
-                       if( !empty($this->escalonadas[$x_escalonada]['id_tarifa']) ) {
-                           // Busca la tarifa según abogado y definición de la escalonada 
+                       // Busca la tarifa según abogado y definición de la escalonada 
                            $tarifa_estandar = UtilesApp::CambiarMoneda(
                                         Funciones::TarifaDefecto( $this->sesion, 
                                                         $trabajo->fields['id_usuario'], 
@@ -558,6 +559,7 @@ class Cobro extends Objeto
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
                                         $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] 
                                      );
+                       if( !empty($this->escalonadas[$x_escalonada]['id_tarifa']) && $this->escalonadas[$x_escalonada]['id_tarifa']  != "NULL" ) {
                            $tarifa = UtilesApp::CambiarMoneda(
                                         Funciones::Tarifa( $this->sesion, 
                                                         $trabajo->fields['id_usuario'], 
@@ -571,11 +573,16 @@ class Cobro extends Objeto
                                      );
 
                            $valor_trabajo += ( 1 - $this->escalonadas[$x_escalonada]['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
+                           $valor_trabajo_hh += ( 1 - $this->escalonadas[$x_escalonada]['descuento']/100 ) * $duracion_escalonada_actual * $tarifa;
                            $valor_trabajo_estandar += ( 1 - $this->escalonadas[$x_escalonada]['descuento']/100 ) * $duracion_escalonada_actual * $tarifa_estandar;
                        } else {
                            $duracion_retainer_trabajo += $duracion_escalonada_actual;
                            $valor_trabajo += 0;
-                           $valor_trabajo_estandar += 0;
+                           $valor_trabajo_hh += $duracion_escalonada_actual * $tarifa_estandar;
+                           $valor_trabajo_estandar += $duracion_escalonada_actual * $tarifa_estandar;
+                           
+                           // Esa variable hay que sumar al valor cobrado de ese trabajo ...
+                           $aporte_monto_trabajo += $duracion_escalonada_actual * ( $this->escalonadas[$x_escalonada]['monto'] / ( $this->escalonadas[$x_escalonada]['tiempo_final'] - $this->escalonadas[$x_escalonada]['tiempo_inicial'] ) );
                        }
                        
                        if( $duracion_hora_restante > 0 || $cobro_total_duracion == $this->escalonadas[$x_escalonada]['tiempo_final'] ) {
@@ -592,13 +599,13 @@ class Cobro extends Objeto
                    }
                    
                    $cobro_total_honorario_cobrable += $valor_trabajo;
-                   $tarifa_hh = $valor_trabajo / $duracion_trabajo;
+                   $tarifa_hh = $valor_trabajo_hh / $duracion_trabajo;
                    $tarifa_hh_estandar = $valor_trabajo_estandar / $duracion_trabajo;
 
                    $trabajo->Edit('id_moneda', $this->fields['id_moneda']);
                    $trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
                    $trabajo->Edit('tarifa_hh', $tarifa_hh);
-                   $trabajo->Edit('monto_cobrado', $valor_trabajo);
+                   $trabajo->Edit('monto_cobrado', $valor_trabajo + $aporte_monto_trabajo );
                    $trabajo->Edit('costo_hh', $tarifa_hh_estandar);
                    $trabajo->Edit('tarifa_hh_estandar', $tarifa_hh_estandar);
                    $trabajo->Edit('duracion_retainer', $duracion_retainer_trabajo);
