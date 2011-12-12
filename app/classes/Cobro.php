@@ -240,6 +240,8 @@ class Cobro extends Objeto
 			if($num_facturas == 1 && empty($this->fields['fecha_facturacion'])){
 				//dejar la fecha de facturacion como la fecha de la primera factura
 				$this->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
+			} else if( $num_facturas == 0 ) {
+				$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
 			}
 			
 			//tomar suma de todos los pagos aplicados a facturas
@@ -249,7 +251,7 @@ class Cobro extends Objeto
 				JOIN factura f ON f.id_factura = ccfm.id_factura
 				WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			$monto_pagado = mysql_fetch_array( $resp );
+			$monto_pagado = mysql_result( $resp, 0, 0 );
 			
 			if( empty($monto_pagado) ){
 				$estado = "FACTURADO";

@@ -148,6 +148,9 @@
 			if( !empty($serie) && $serie != -1 ){
 				$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
 			}
+			if (isset($desde_asiento_contable) && is_numeric($desde_asiento_contable)) {
+				$where .= " AND factura.asiento_contable >= $desde_asiento_contable";
+			}
 		}
 		else
 			$where = base64_decode($where);
@@ -629,7 +632,10 @@ $class_diseno = '';
 		</td>
 		<td align="right">
 <?php if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
-			<input type="button" value="<?php echo  __('Descargar Archivo Contabilidad');?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')">
+			<input type="button" value="<?php echo  __('Descargar Archivo Contabilidad');?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')" />
+			<br />
+			<label>desde el asiento contable
+			<input type="text" size="4" name="desde_asiento_contable" value="<?php echo $desde_asiento_contable; ?>" /></label>
 <?php } ?>
 		</td>
 	</tr>

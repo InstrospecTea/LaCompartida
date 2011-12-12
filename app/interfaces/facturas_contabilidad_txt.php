@@ -98,6 +98,9 @@ if ($where == '') {
 	if ($descripcion_factura) {
 		$where .= " AND (factura.descripcion LIKE '%$descripcion_factura%' OR factura.descripcion_subtotal_gastos LIKE '%$descripcion_factura%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%$descripcion_factura%')";
 	}
+	if (isset($desde_asiento_contable) && is_numeric($desde_asiento_contable)) {
+		$where .= " AND factura.asiento_contable >= $desde_asiento_contable";
+	}
 } else {
 	$where = base64_decode($where);
 }
