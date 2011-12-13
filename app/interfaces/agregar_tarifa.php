@@ -323,6 +323,7 @@ function CrearTarifa( from, id )
 	{
 		$cont++;
 		$glosa_categoria_2=preg_replace("/_/"," ",$glosa_categoria);
+                $glosa_categoria = str_replace('/','',$glosa_categoria);
 		$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">'.$glosa_categoria_2.'</td>';
 		$tab = $cont;
 		for($j=0;$j<$lista_monedas->num;$j++)
@@ -400,6 +401,7 @@ function CrearTarifa( from, id )
 	while(list($id_usuario,$nombre_usuario,$glosa_categoria) = mysql_fetch_array($resp2))
 	{
 		$cont++;
+                $glosa_categoria = str_replace('/','',$glosa_categoria);
 		$td_tarifas .= '<tr><td align=left class="border_plomo">'.$nombre_usuario.'</td>';
 		$tab = $cont;
 		for($j=0;$j<$lista_monedas->num;$j++)
