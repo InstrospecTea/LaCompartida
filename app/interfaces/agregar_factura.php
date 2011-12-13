@@ -97,9 +97,10 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 						if( $cobror->Loaded() )
 						{
 							$fsa = $cobror->CantidadFacturasSinAnular(); #fsa = facturas sin anular
-							if ( $fsa == 1 )
+							if ( $fsa > 0 )
 							{
 								$cobror->Edit('estado', 'FACTURADO');
+								$cobror->CambiarEstadoSegunFacturas();
 							}
 						}
 						$cobror->Write();
@@ -236,7 +237,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 				$factura->PagarUsandoAdelantos();
 			}
 
-			if ($mvto_guardado->fields['tipo_mvto'] != 'NC' && $mvto_guardado->fields['saldo'] == 0) {
+			if ($mvto_guardado->fields['tipo_mvto'] != 'NC' && $mvto_guardado->fields['saldo'] == 0 && $mvto_guardado->fields['anulado'] != 1) {
 				$query = "SELECT id_estado FROM prm_estado_factura WHERE codigo = 'C'";
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				list($id_estado_cobrado) = mysql_fetch_array($resp);

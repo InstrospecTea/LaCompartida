@@ -199,7 +199,14 @@ class Cobro extends Objeto
 
 	function CantidadFacturasSinAnular()
 	{
-		$query = "SELECT COUNT(*) FROM factura WHERE id_cobro = '".$this->fields['id_cobro']."' AND id_estado != 5 AND estado != 'ANULADA' AND anulado = 0";
+		$query = "SELECT COUNT(*) 
+					FROM factura f 
+						JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )
+					WHERE id_cobro = '".$this->fields['id_cobro']."' 
+						AND f.id_estado != 5 
+						AND f.estado != 'ANULADA' 
+						AND f.anulado = 0
+						AND pdl.codigo != 'NC'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($cantidad_facturas) = mysql_fetch_array( $resp );
 		return $cantidad_facturas;
@@ -235,37 +242,68 @@ class Cobro extends Objeto
 			if($actual != "ENVIADO AL CLIENTE"){
 				$estado = "EMITIDO";
 			}
+			$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
 		}
 		else{
-			if($num_facturas == 1 && empty($this->fields['fecha_facturacion'])){
+			if($num_facturas == 1 && ( empty($this->fields['fecha_facturacion']) || $this->fields['fecha_facturacion'] == '0000-00-00 00:00:00' ) ){
 				//dejar la fecha de facturacion como la fecha de la primera factura
-				$this->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
-			} else if( $num_facturas == 0 ) {
-				$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
+				$query = "SELECT f.fecha FROM factura f							
+							JOIN prm_documento_legal pdl ON f.id_documento_legal = pdl.id_documento_legal
+							WHERE f.id_cobro = '{$this->fields['id_cobro']}' 
+								AND ( f.id_estado != 5 AND f.estado != 'ANULADA' AND f.anulado = 0 )
+								AND pdl.codigo != 'NC'							
+							ORDER BY f.fecha ASC LIMIT 1";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				$fecha_facturacion = mysql_result( $resp, 0, 0 );
+			
+				if( !empty($fecha_facturacion) && $fecha_facturacion != 'NULL' ){
+					$this->Edit('fecha_facturacion', $fecha_facturacion);
+				} else {
+					$this->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
+				}
+			} else if( $num_facturas > 1 ){
+				$query = "SELECT f.fecha FROM factura f							
+							JOIN prm_documento_legal pdl ON f.id_documento_legal = pdl.id_documento_legal
+							WHERE f.id_cobro = '{$this->fields['id_cobro']}' 
+								AND ( f.id_estado != 5 AND f.estado != 'ANULADA' AND f.anulado = 0 )
+								AND pdl.codigo != 'NC'							
+							ORDER BY f.fecha ASC LIMIT 1";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				$fecha_facturacion = mysql_result( $resp, 0, 0 );
+			
+				if( !empty($fecha_facturacion) && $fecha_facturacion != 'NULL' ){
+					$this->Edit('fecha_facturacion', $fecha_facturacion);
+				}
 			}
 			
 			//tomar suma de todos los pagos aplicados a facturas
 			$query = "SELECT SUM(ccfmn.monto)
 				FROM cta_cte_fact_mvto_neteo ccfmn
-				JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-				JOIN factura f ON f.id_factura = ccfm.id_factura
-				WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
+					JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
+					JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto )
+					JOIN factura f ON f.id_factura = ccfm.id_factura
+				WHERE f.id_cobro = '".$this->fields['id_cobro']."'
+					AND ccfmp.id_factura IS NULL";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			$monto_pagado = mysql_result( $resp, 0, 0 );
 			
-			if( empty($monto_pagado) ){
-				$estado = "FACTURADO";
-			}
-			else{
+			if( empty($monto_pagado) || $monto_pagado == 'NULL' ){
+				if( $num_facturas > 0 ) {
+					$estado = "FACTURADO";
+				} else {
+					$estado = 'EMITIDO';
+					$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
+				}
+			} else if( !empty($monto_pagado) && $monto_pagado > 0 ) {
 				//ver si los pagos son por el monto total del cobro
 				$query = "SELECT monto
 					FROM documento
 					WHERE id_tipo_documento = 2 AND id_cobro = '".$this->fields['id_cobro']."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				$monto_total = mysql_fetch_array( $resp );
+				$monto_total = mysql_result( $resp, 0, 0 );
 				
 				$estado = $monto_pagado < $monto_total ? "PAGO PARCIAL" : "PAGADO";
-			}
+			} 
 		}
 		
 		$this->Edit('estado', $estado);
