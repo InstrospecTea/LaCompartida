@@ -76,9 +76,9 @@
 		<br/>
 		</td>
 	</tr>
-    
-        
-		
+
+
+
 
     <tr style='font-weight:bold'>
     	<td>
@@ -97,10 +97,10 @@
 	<tr><td></td>
 		<td>
 		<ul style="list-style-position: outside; text-align: left;">
-			<li><a href='resumen_cliente.php' style="color:#000;text-decoration: none;"><?=__('Facturaci&oacute;n cliente')?></a></li>
+			<li><a href='resumen_cliente.php' style="color:#000;text-decoration: none;"><?=__('Reporte de Ventas')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_facturacion_pendiente.php' style="color:#000;text-decoration: none;"><?=__('Horas por facturar')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_cobros_por_area.php' style="color:#000;text-decoration: none;"><?=__('Cobros por Area')?></a></li>
-			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?=__('Resumen Cobranzas')?></a></li>
+			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?=__('Resumen de Liquidaciones')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_morosidad.php' style="color:#000;text-decoration: none;"><?=__('Reporte Morosidad')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/tipo_cambio_historico.php' style="color:#000;text-decoration: none;"><?=__('Histórico de Tipo de Cambio')?></a></li>
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_ciclo_facturacion.php' style="color:#000;text-decoration: none;"><?=__('Ciclo de Facturación')?></a></li>
@@ -162,7 +162,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 			<li><a href='<?=Conf::RootDir()?>/app/interfaces/planillas/planilla_participacion_abogado.php' style="color:#000;text-decoration: none;"><?=__('Participacion Abogado')?></a></li>
 			<li><a href='reporte_consolidado.php' style="color:#000;text-decoration: none;"><?=__('Reporte consolidado')?></a></li>
 			<li><a href='reporte_anual.php' style="color:#000;text-decoration: none;"><?=__('Reporte anual')?></a></li>
-			
+
 			</ul>
 			</td>
 
@@ -170,7 +170,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 </table>
 		<br/>
     	</td>
-		
+
 			<td>
     		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 		<tr>

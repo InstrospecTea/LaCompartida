@@ -13,10 +13,10 @@
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
 	if($fecha1 != '')
-		$pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");	
-	$pagina->titulo = __('Reporte Facturación clientes');
+		$pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");
+	$pagina->titulo = __('Reporte de Ventas');
 	$pagina->PrintTop();
-	
+
 	$query = "SELECT id_moneda FROM prm_moneda WHERE moneda_base = 1";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($id_moneda_base) = mysql_fetch_array($resp);
@@ -99,7 +99,7 @@
 	</tr>
 
 </table>
-	
+
 </form>
 
 <script type="text/javascript">

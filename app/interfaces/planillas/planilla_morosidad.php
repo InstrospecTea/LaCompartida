@@ -10,9 +10,9 @@
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
-	
+
 	set_time_limit(300);
-	
+
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	if($xls)
@@ -21,7 +21,7 @@
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
-		
+
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);
 
@@ -81,7 +81,7 @@
 									'Color' => 'black',
 									'NumFormat' => "#,##0.00"));
 
-		$ws1 =& $wb->addWorksheet(__('Morosidad'));
+		$ws1 =& $wb->addWorksheet(__('Deuda Cliente'));
 		$ws1->setInputEncoding('utf-8');
 		$ws1->fitToPages(1, 5);
 		$ws1->setZoom(75);
@@ -141,7 +141,7 @@
 
 		++$filas;
 		$ws1->mergeCells($filas, $col_cliente, $filas, $col_factura);
-		$ws1->write($filas, $col_cliente, __('REPORTE MOROSIDAD'), $encabezado);
+		$ws1->write($filas, $col_cliente, __('REPORTE DEUDA CLIENTE'), $encabezado);
 		$filas += 2;
 		$ws1->write($filas, $col_cliente, __('GENERADO EL:'), $txt_opcion);
 		$ws1->write($filas, $col_total_pesos, date("d/m/Y H:i:s"), $txt_opcion);
@@ -167,10 +167,10 @@
 			$lista_grupos = join("','", $grupos);
 			$where .= " AND cliente.id_grupo_cliente IN ('$lista_grupos')";
 		}
-		
+
 		if($periodo && $fecha_ini)
 				$where .= " AND cobro.fecha_emision >=  '".Utiles::fecha2sql($fecha_ini)."' ";
-		
+
 		if( method_exists('Conf','ReporteMorosidadEnviados') && Conf::ReporteMorosidadEnviados() )
 			$where .= " AND cobro.estado = 'ENVIADO AL CLIENTE' ";
 		else
@@ -205,7 +205,7 @@
 		$cont_filas_cliente = 0;
 		$total_cliente = 0;
 		$total_moneda = 0;
-		$query = "SELECT 
+		$query = "SELECT
 					cobro.fecha_enviado_cliente,
 					cobro.fecha_emision,
 					cliente.glosa_cliente,
@@ -224,16 +224,16 @@
 					moneda_base.id_moneda as id_moneda_base,
 					cobro.modalidad_calculo
 				FROM cobro
-					LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro $where_documento 
+					LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro $where_documento
 					LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 					LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 					LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
 					LEFT JOIN prm_moneda as documento_moneda ON documento_moneda.id_moneda = documento.id_moneda
-					LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1 
+					LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
 					LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = documento.id_moneda
-					LEFT JOIN cobro_moneda as cobro_moneda_base ON cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = moneda_base.id_moneda 
-				WHERE $where 
+					LEFT JOIN cobro_moneda as cobro_moneda_base ON cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = moneda_base.id_moneda
+				WHERE $where
 				ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
 
@@ -252,7 +252,7 @@
 		while(list($id_cobro, $asuntos) = mysql_fetch_array($resp)){
 			$glosa_asuntos[$id_cobro] = $asuntos;
 		}
-		
+
 		#Clientes
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while($cobro = mysql_fetch_array($resp))
@@ -646,11 +646,11 @@
 			$ws1->mergeCells($filas, $col_cliente, $filas, $col_moneda);
 			$ws1->write($filas, $col_cliente, __('No se encontraron resultados'), $encabezado);
 		}
-		$wb->send("planilla_morosidad.xls");
+		$wb->send("planilla_deuda_cliente.xls");
 		$wb->close();
 		exit;
 	}
-	$pagina->titulo = __('Reporte Morosidad');
+	$pagina->titulo = __('Reporte Deuda Cliente');
 	$pagina->PrintTop();
 ?>
 <form method=post name=formulario action="planilla_morosidad.php?xls=1">
@@ -714,7 +714,7 @@
 	</tr>
 	<tr>
 		<td align=left>
-			<input type="checkbox" name="periodo" value="1" <?=$periodo ? 'checked' : '' ?> onclick='' title='<?=__('Periodo del Cobro')?>' />&nbsp;	
+			<input type="checkbox" name="periodo" value="1" <?=$periodo ? 'checked' : '' ?> onclick='' title='<?=__('Periodo del Cobro')?>' />&nbsp;
 			<b><?=__('Periodo') ?>:</b>
 			<div id=periodo_rango style='align:center'>
 				&nbsp;&nbsp;&nbsp;

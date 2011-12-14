@@ -2,19 +2,19 @@
 class Conf
 {
 	function AppName() { return 'Lemontech - The Time Billing'; }
-	function ServerIP() { return 'lab.lemontech.cl'; }
+	function ServerIP() { return 'xxxdomain_namexxx'; }
 	function ServerDir() { return dirname(__FILE__); }
-	function RootDir() { return '/smoers/time_tracking'; }
+	function RootDir() { return '/time_tracking'; }
 	function ImgDir() { return Conf::RootDir().'/app/templates/'.Conf::Templates().'/img'; }
-	function dbHost() { return 'localhost'; }
-	function dbName() { return 'time_tracking'; }
-	function dbUser() { return 'time_tracking'; }
-	function dbPass() { return '.tt.'; }
+	function dbHost() { return 'xxxdb_hostxxx'; }
+	function dbName() { return 'xxxdb_namexxx'; }
+	function dbUser() { return 'xxxdb_userxxx'; }
+	function dbPass() { return 'xxxdb_passxxx'; }
 	function logoutRedirect() { return Conf::RootDir().'/index.php?logout'; }
 	function Hash() { return 'c85ef9997e6a30032a765a20ee69630b'; }
 	function TimestampDeployJS(){ return '1234370043'; }
 	function TimestampDeployCSS(){ return '1226330411'; }
-	function HostJuicios() { return Conf::Server()."/smoers/juicios/fw/usuarios/index.php"; }
+	function HostJuicios() { return Conf::Server()."/juicios/fw/usuarios/index.php"; }
 	function UsuarioWS() { return 'Lemontech_SAP'; }
 	function PasswordWS() { return 'U72N4Y69l073u4641R6B'; }
 	function LangDefecto() { return "abogado_materia"; }
@@ -27,7 +27,7 @@ class Conf
 	function LogoPdf($fullPath=true) { return ($fullPath?Conf::Server():'').Conf::ImgDir().'/logo_pdf.jpg'; }
 	function Templates() { return "default"; }
 	function MantencionTablas() { return array('grupo_cliente','prm_comuna','prm_tipo_proyecto','prm_moneda'); }
-	function Host() { return Conf::Server()."/smoers/time_tracking/"; }
+	function Host() { return Conf::Server()."/time_tracking/"; }
 	function GlosaTablas()
 	{
 		$glosa['prm_comuna'] = "glosa_comuna";
@@ -37,7 +37,7 @@ class Conf
 	}
 	function Locale() { return array('es_CL','es_ES'); }
 	function NombreIdentificador() {return 'RUT'; }
-	function Server() { return "http://lab.lemontech.cl"; }
+	function Server() { return "http://xxxdomain_namexxx"; }
 	function GetConf($sesion, $glosa_opcion)
 	{
 				$query_conf = "SELECT valor_opcion FROM configuracion WHERE glosa_opcion='$glosa_opcion'";
@@ -50,4 +50,3 @@ class Conf
 require_once Conf::ServerDir().'/../app/lang/es.php';		//Para que cargue el idioma por defecto
 require_once Conf::ServerDir().'/../app/lang/abogado.php';	//Por si hay palabras especificas relacionadas con el rubro
 ?>
-
