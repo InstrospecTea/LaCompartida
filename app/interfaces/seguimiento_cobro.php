@@ -238,8 +238,10 @@
 				$html .= "<td style='font-size:10px' id=tip_$j align=left valing=top><b>".$cobro->fields['asuntos']."</b></td>";
 				if($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL')
 					$texto_acuerdo = $cobro->fields['forma_cobro']." de ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ". number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
-				else
-					$texto_acuerdo = $cobro->fields['forma_cobro'] != 'TASA' ? $cobro->fields['forma_cobro']." por ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : $cobro->fields['forma_cobro'];
+				else if( $cobro->fields['forma_cobro'] == 'TASA' || $cobro->fields['forma_cobro'] == 'HITOS' || $cobro->fields['forma_cobro'] == 'ESCALONADA' )
+					$texto_acuerdo = $cobro->fields['forma_cobro'];
+                                else
+                                        $texto_acuerdo = $cobro->fields['forma_cobro']." por ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		    	$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>".$texto_acuerdo.', Tarifa: '.$cobro->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuevaVentana('Editar_Contrato',730,600,'agregar_contrato.php?popup=1&id_contrato=".$cobro->fields['id_contrato']."');\" title='".__('Editar Información Comercial')."'>Editar</a></td>";
 		    	$html .= "</tr>";
 		    	$html .="<script> new Tip('tip_".$j."', '".$cobro->fields['asuntos']."', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";

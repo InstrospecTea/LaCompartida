@@ -97,25 +97,6 @@ class Documento extends Objeto
 		{
 			$fecha = Utiles::fecha2sql($fecha);
 		}
-		if($id_cobro)
-		{
-			/*$query="UPDATE cobro SET fecha_cobro='".$fecha." 00:00:00' WHERE id_cobro=".$id_cobro;
-			$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);*/
-			
-			//revisar si el monto pagado es igual al total, en caso contrario cambiar estado a pago parcial
-			$cobrox = new Cobro($this->sesion);
-			$cobrox->Load($id_cobro);
-			if( $cobrox->Loaded() )
-			{
-				$cobrox->Edit('fecha_cobro', "$fecha 00:00:00");
-				if( !$cobrox->TienePago() )
-				{
-					$cobrox->Edit('estado', 'PAGO PARCIAL');
-					$cobrox->Edit('fecha_pago_parcial', "$fecha 00:00:00");
-				}
-				$cobrox->Write();
-			}
-		}
 				
 		$query = "SELECT activo FROM cliente WHERE codigo_cliente='".$codigo_cliente."'";
 		$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -163,8 +144,7 @@ class Documento extends Objeto
 				$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
 				$this->Edit("id_contrato",empty($id_contrato) ? 'NULL' : $id_contrato);
 
-				if($this->Write())
-				{
+				if($this->Write()) {
 					$id_documento = $this->fields['id_documento'];
 					$ids_monedas = explode(',',$ids_monedas_documento);
 					$tipo_cambios = explode(',',$tipo_cambios_documento);
@@ -184,9 +164,9 @@ class Documento extends Objeto
 					
 					$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
 					
-				}
-				else
+				} else {
 					if(!empty($pagina)) $pagina->AddError($documento->error);
+				}
 /*			}
 		else
 		{ ?>
@@ -194,6 +174,33 @@ class Documento extends Objeto
 <?	}
 */			}
 		
+		/* 
+		 * esto lo movi por que necesito que el pago este creado para que actualice bien los estados y fechas respectivas 
+		 */
+		if($id_cobro)
+		{
+			/*$query="UPDATE cobro SET fecha_cobro='".$fecha." 00:00:00' WHERE id_cobro=".$id_cobro;
+			$resp=mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);*/
+			
+			//revisar si el monto pagado es igual al total, en caso contrario cambiar estado a pago parcial
+			$cobrox = new Cobro($this->sesion);
+			$cobrox->Load($id_cobro);
+			
+			if( $cobrox->Loaded() )
+			{
+				$cobrox->CambiarEstadoSegunFacturas();
+				
+				if( $cobrox->fields['estado'] == 'PAGADO'){
+					$cobrox->Edit('fecha_cobro', "$fecha 00:00:00" );
+				} else if( $cobrox->fields['estado'] == 'PAGO PARCIAL'){					
+					if( empty($cobrox->fields['fecha_pago_parcial']) || $cobrox->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' ) {
+						$cobrox->Edit('fecha_pago_parcial', "$fecha 00:00:00" );
+					}
+				}
+				$cobrox->Write();
+				
+			}
+		}
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";
 		//echo $out_neteos;
 		

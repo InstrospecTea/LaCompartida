@@ -171,29 +171,78 @@ class Cobro extends Objeto
 		return false;
 	}
 
-	function CalcularEstadoAlBorrarPago()
+	function CalcularEstadoAnterior()
 	{
-		$query = "SELECT * FROM prm_estado_cobro WHERE ( codigo_estado_cobro != 'CREADO' AND codigo_estado_cobro != 'EN REVISION' ) ORDER BY orden ASC";
+		/*
+		 * este estado anterior es sólo cuando no tiene pagos. 
+		 * cuando si tiene pagos lo calcula en la funcion CambiarEstadoSegunFactura() esta misma clase
+		 */
+		/*$query = "SELECT * FROM prm_estado_cobro WHERE ( codigo_estado_cobro != 'CREADO' AND codigo_estado_cobro != 'EN REVISION' ) ORDER BY orden ASC";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		$estado_anterior_temp = "";
 		while( list( $codigo_estado_cobro, $orden ) = mysql_fetch_array($resp) )
 		{
-			if( $codigo_estado_cobro == 'EMITIDO' || $codigo_estado_cobro == 'ENVIADO AL CLIENTE' )
+			if( $codigo_estado_cobro == 'EMITIDO' || $codigo_estado_cobro == 'FACTURADO' || $codigo_estado_cobro == 'ENVIADO AL CLIENTE' )
 			{
 				$estado_anterior_temp = ( $this->TieneFacturasSinAnular() ? "ENVIADO AL CLIENTE" : "EMITIDO" );
 			}
+			
+			
+		}*/
+		$estado_anterior_temp = 'EMITIDO'; /* estado más atrás que puede llegar al borrar pago */
+		$codigo_estado_cobro = $this->fields['estado'];
+		if( $this->TienePago() ) {
+			$estado_anterior_temp = 'PAGO PARCIAL';
+		} else {			
+			if( $codigo_estado_cobro == 'PAGADO' || $codigo_estado_cobro == 'PAGO PARCIAL' ) {
+				if( !empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' ) {
+					$estado_anterior_temp == 'ENVIADO AL CLIENTE';
+				} else {
+					if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+						if( $this->TieneFacturasSinAnular() ) {
+							$estado_anterior_temp = 'FACTURADO';
+						} 
+					}
+				}
+			} else if( $codigo_estado_cobro == 'ENVIADO AL CLIENTE' ) {
+				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+					if( $this->TieneFacturasSinAnular() ) {
+						$estado_anterior_temp = 'FACTURADO';
+					} 
+				}
+			} else if( $codigo_estado_cobro == 'FACTURADO' ) {
+				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+					if( $this->TieneFacturasSinAnular() ) {
+						$estado_anterior_temp = 'FACTURADO';
+					} 
+				}
+			}
 		}
+		
 		return $estado_anterior_temp;
 	}
 
 	function CambiarEstadoAnterior()
 	{
-		$nuevo_estado = $this->CalcularEstadoAlBorrarPago();
-		if( !$this->TienePago() )
-		{
-			$query_update_cobro = "UPDATE cobro SET estado='$nuevo_estado', fecha_pago_parcial=NULL WHERE id_cobro='".$this->fields['id_cobro']."'";
-			//echo $query_update_cobro . "<br />";
-			mysql_query($query_update_cobro, $this->sesion->dbh) or Utiles::errorSQL($query_update_cobro,__FILE__,__LINE__,$this->sesion->dbh);
+		if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+			$this->CambiarEstadoSegunFacturas();
+		} else {
+			$nuevo_estado = $this->CalcularEstadoAnterior();
+
+			if( !$this->TienePago() ) {
+				$query_update_cobro = "UPDATE cobro SET estado='$nuevo_estado', fecha_pago_parcial=NULL, fecha_cobro=NULL WHERE id_cobro='".$this->fields['id_cobro']."'";
+				mysql_query($query_update_cobro, $this->sesion->dbh) or Utiles::errorSQL($query_update_cobro,__FILE__,__LINE__,$this->sesion->dbh);
+			} else {
+				$otros = "";
+				if( $nuevo_estado != 'PAGADO') {
+					$otros = ", fecha_cobro=NULL";
+					if( $nuevo_estado != 'PAGO PARCIAL'){
+						$otros .= ", fecja_pago_parcial = NULL";
+					}
+				}
+				$query_update_cobro = "UPDATE cobro SET estado='$nuevo_estado' $otros WHERE id_cobro='".$this->fields['id_cobro']."'";
+				mysql_query($query_update_cobro, $this->sesion->dbh) or Utiles::errorSQL($query_update_cobro,__FILE__,__LINE__,$this->sesion->dbh);
+			}
 		}
 	}
 
@@ -225,8 +274,8 @@ class Cobro extends Objeto
 	function CambiarEstadoSegunFacturas(){
 		/*
 			INCOBRABLE			si estaba en incobrable no se toca
-			ENVIADO AL CLIENTE	si no hay facturas, dejarlo asi
-			EMITIDO				sin facturas (no-anuladas)
+			ENVIADO AL CLIENTE	si no hay facturas y pasó por el estado enviado al cliente, dejarlo asi
+			EMITIDO				sin facturas (no-anuladas) y sin fecha de enviado al cliente
 			FACTURADO			con facturas && monto pagado == 0
 			PAGADO				con facturas && monto_pagado == monto_total
 			PAGO PARCIAL		con facturas && 0 < monto_pagado < monto_total
@@ -277,35 +326,43 @@ class Cobro extends Objeto
 			}
 			
 			//tomar suma de todos los pagos aplicados a facturas
-			$query = "SELECT SUM(ccfmn.monto)
+			$query = "SELECT SUM(ccfmn.monto), SUM(IF(ccfmp.id_factura IS NULL,ccfmn.monto,0))
 				FROM cta_cte_fact_mvto_neteo ccfmn
 					JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-					JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto )
+					JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
 					JOIN factura f ON f.id_factura = ccfm.id_factura
-				WHERE f.id_cobro = '".$this->fields['id_cobro']."'
-					AND ccfmp.id_factura IS NULL";
+				WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			$monto_pagado = mysql_result( $resp, 0, 0 );
+			list($monto_pagado,$monto_pago_menos_ncs) = mysql_fetch_array( $resp );
 			
-			if( empty($monto_pagado) || $monto_pagado == 'NULL' ){
-				if( $num_facturas > 0 ) {
-					$estado = "FACTURADO";
+			if( empty($monto_pago_menos_ncs) || $monto_pago_menos_ncs == 'NULL' ){
+				if( $num_facturas > 0 ) {					
+					if( !empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' ) {
+						$estado = "ENVIADO AL CLIENTE";
+					} else {
+						$estado = "FACTURADO";
+					}
 				} else {
 					$estado = 'EMITIDO';
 					$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
 				}
-			} else if( !empty($monto_pagado) && $monto_pagado > 0 ) {
+			} else if( !empty($monto_pago_menos_ncs) && $monto_pago_menos_ncs > 0 ) {
 				//ver si los pagos son por el monto total del cobro
 				$query = "SELECT monto
 					FROM documento
 					WHERE id_tipo_documento = 2 AND id_cobro = '".$this->fields['id_cobro']."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				$monto_total = mysql_result( $resp, 0, 0 );
-				
-				$estado = $monto_pagado < $monto_total ? "PAGO PARCIAL" : "PAGADO";
+				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
+				$estado = round($monto_pagado) < round($monto_total) ? "PAGO PARCIAL" : "PAGADO";
 			} 
 		}
-		
+		if( $estado != 'PAGADO') {
+			$this->Edit('fecha_cobro', "0000-00-00 00:00:00" ); /* esta fecha debiese llenarse cuando tiene pago completo */
+			if( $estado != 'PAGO PARCIAL') {
+				$this->Edit('fecha_pago_parcial', "0000-00-00 00:00:00" ); /* esta fecha debiese existir solo con pagos*/
+			}
+		} 
 		$this->Edit('estado', $estado);
 		if($this->Write()){
 			return $estado;

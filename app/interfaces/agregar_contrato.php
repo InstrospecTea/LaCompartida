@@ -2034,88 +2034,88 @@ else
 									<div class="template_escalon" id="escalon_1">
 										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
 											<tr>
-												<td valign="bottom">
-													<div style="display:inline-block; width: 75px;"><?php echo __('Las primeras'); ?> </div>
-													<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="4" value="<?php echo $contrato->fields['esc1_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango1; ?></div> <span>) <?php echo __('aplicar'); ?></span>
+												<td valign="bottom" nowrap>
+													<div style="display:inline-block; width: 65px;"><?php echo __('Las primeras'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_1" size="3" value="<?php if( !empty( $contrato->fields['esc1_tiempo'] ) ) echo $contrato->fields['esc1_tiempo']; else echo ''; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_1" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango1; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 													<select name="esc_selector[]" id="esc_selector_1" onchange="cambia_tipo_forma(this.value, this.id);">
 														<option value="1" <?php echo !isset($contrato->fields['esc1_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 														<option value="2" <?php echo $contrato->fields['esc1_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 													</select>
 													<span>
 														<span id="tipo_forma_1_1" <?php echo !isset($contrato->fields['esc1_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_1" , $contrato->fields['esc1_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_1" , $contrato->fields['esc1_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
 														</span>
 														<span id="tipo_forma_1_2" <?php echo $contrato->fields['esc1_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_1" value="<?php echo $contrato->fields['esc1_monto']; ?>" name="esc_monto[]" />
+															<input type="text" size="7" style="font-size:9pt; width:116px;" id="esc_monto_1" value="<?php if( !empty($contrato->fields['esc1_monto']) ) echo $contrato->fields['esc1_monto']; else echo ''; ?>" name="esc_monto[]" />
 														</span>
 													</span>
 													<span><?php echo __('en'); ?></span> 
 													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_1', $contrato->fields['esc1_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
 													<span><?php echo __('con'); ?> </span>
-													<input type="text" name="esc_descuento[]" id="esc_descuento_1" value="<?php echo $contrato->fields['esc1_descuento']; ?>" size="4" /> 
+													<input type="text" name="esc_descuento[]" id="esc_descuento_1" value="<?php if( !empty($contrato->fields['esc1_descuento']) ) echo $contrato->fields['esc1_descuento']; else echo ''; ?>" size="4" /> 
 													<span><?php echo __('% dcto.'); ?> </span>
 												</td>
 											</tr>
 										</table>
-										<div <?= !$div_show ? 'onClick="agregar_eliminar_escala(\'escalon_2\')" style="cursor:pointer"' : '' ?> >
-											<?= !$div_show ? '<span id="escalon_2_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') . '</span>' : '' ?>											
+										<div onclick="agregar_eliminar_escala('escalon_2')" style="cursor:pointer;" >
+											<span id="escalon_2_img"><?php echo !isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] <= 0 ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar')  : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>	
 										</div>
 									</div>
 									<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
 										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
 											<tr>
-												<td valign="bottom">
-													<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
-													<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="4" value="<?php echo $contrato->fields['esc2_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
+												<td valign="bottom" nowrap>
+													<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_2" size="3" value="<?php if( !empty($contrato->fields['esc2_tiempo']) ) echo $contrato->fields['esc2_tiempo']; else echo ''; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_2" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango2; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 													<select name="esc_selector[]" id="esc_selector_2" onchange="cambia_tipo_forma(this.value, this.id);">
 														<option value="1" <?php echo !isset($contrato->fields['esc2_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 														<option value="2" <?php echo $contrato->fields['esc2_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 													</select>
 													<span>
 														<span id="tipo_forma_2_1" <?php echo !isset($contrato->fields['esc2_monto']) || $contrato->fields['esc2_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2" , $contrato->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_2" , $contrato->fields['esc2_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
 														</span>
 														<span id="tipo_forma_2_2" <?php echo $contrato->fields['esc2_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_2" name="esc_monto[]" value="<?php echo $contrato->fields['esc2_monto']; ?>" />
+															<input type="text" size="7" style="font-size:9pt; width:116px;" id="esc_monto_2" name="esc_monto[]" value="<?php if( !empty($contrato->fields['esc2_monto']) ) echo $contrato->fields['esc2_monto']; else echo ''; ?>" />
 														</span>
 													</span>
 													<span><?php echo __('en'); ?></span> 
 													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_2', $contrato->fields['esc2_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
 													<span><?php echo __('con'); ?> </span>
-													<input type="text" name="esc_descuento[]" value="<?php echo $contrato->fields['esc2_descuento']; ?>" id="esc_descuento_2" size="4" /> 
+													<input type="text" name="esc_descuento[]" value="<?php if( !empty($contrato->fields['esc2_descuento']) ) echo $contrato->fields['esc2_descuento']; else echo ''; ?>" id="esc_descuento_2" size="4" /> 
 													<span><?php echo __('% dcto.'); ?> </span>
 												</td>
 											</tr>
 										</table>
-										<div <?= !$div_show ? 'onClick="agregar_eliminar_escala(\'escalon_3\')" style="cursor:pointer"' : '' ?> >
-											<?= !$div_show ? '<span id="escalon_3_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar') . '</span>' : '' ?>
+										<div onclick="agregar_eliminar_escala('escalon_3')" style="cursor:pointer;" >
+											<span id="escalon_3_img"><?php echo !isset($contrato->fields['esc3_tiempo']) && $contrato->fields['esc3_tiempo'] <= 0 ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar')  : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>	
 										</div>
 									</div>
 									<div class="template_escalon" id="escalon_3" style="display: <?php echo isset($contrato->fields['esc3_tiempo']) && $contrato->fields['esc3_tiempo'] > 0 ? 'block' : 'none'; ?>;">
 										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
 											<tr>
-												<td valign="bottom">
-													<div style="display:inline-block; width: 75px;"><?php echo __('Las siguientes'); ?> </div>
-													<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="4" value="<?php echo $contrato->fields['esc3_tiempo']; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
-													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 60px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
+												<td valign="bottom" nowrap>
+													<div style="display:inline-block; width: 65px;"><?php echo __('Las siguientes'); ?> </div>
+													<input type="text" name="esc_tiempo[]" id="esc_tiempo_3" size="3" value="<?php if( !empty($contrato->fields['esc3_tiempo']) ) echo $contrato->fields['esc3_tiempo']; else echo ''; ?>" onkeyup="ActualizaRango(this.id , this.value);" /> 
+													<span><?php echo __('horas trabajadas'); ?> (</span> <div id="esc_rango_3" style="display:inline-block; width: 50px; text-align: center;"><?php echo $rango3; ?></div> <span>) <?php echo __('aplicar'); ?></span>
 													<select name="esc_selector[]" id="esc_selector_3" onchange="cambia_tipo_forma(this.value, this.id);">
 														<option value="1" <?php echo !isset($contrato->fields['esc3_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 														<option value="2" <?php echo $contrato->fields['esc3_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 													</select>
 													<span>
 														<span id="tipo_forma_3_1" <?php echo !isset($contrato->fields['esc3_monto']) || $contrato->fields['esc3_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3" , $contrato->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_3" , $contrato->fields['esc3_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
 														</span>
 														<span id="tipo_forma_3_2" <?php echo $contrato->fields['esc3_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_3" name="esc_monto[]" value="<?php echo $contrato->fields['esc3_monto']; ?>" />
+															<input type="text" size="7" style="font-size:9pt; width:116px;" id="esc_monto_3" name="esc_monto[]" value="<?php if( !empty($contrato->fields['esc3_monto']) ) echo $contrato->fields['esc3_monto']; else echo ''; ?>" />
 														</span>
 													</span>
 													<span><?php echo __('en'); ?></span> 
 													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_3', $contrato->fields['esc3_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
 													<span><?php echo __('con'); ?> </span>
-													<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php echo $contrato->fields['esc3_descuento']; ?>" size="4" /> 
+													<input type="text" name="esc_descuento[]" id="esc_descuento_3" value="<?php if( !empty($contrato->fields['esc3_descuento']) ) echo $contrato->fields['esc3_descuento']; else echo ''; ?>" size="4" /> 
 													<span><?php echo __('% dcto.'); ?> </span>
 												</td>
 											</tr>
@@ -2124,23 +2124,23 @@ else
 									<div class="template_escalon" id="escalon_4">
 										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
 											<tr>
-												<td valign="bottom">
-													<div style="display:inline-block; width: 170px;"><?php echo __('Para el resto de horas trabajadas, aplicar'); ?> </div> 
-													<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="4" onkeyup="ActualizaRango(this.id , this.value);" /> 
+												<td valign="bottom" nowrap>
+													<div style="display:inline-block; width: 200px;"><?php echo __('Para el resto de horas trabajadas, aplicar'); ?> </div> 
+													<input type="hidden" name="esc_tiempo[]" id="esc_tiempo_4" value="-1" size="3" onkeyup="ActualizaRango(this.id , this.value);" /> 
 													<select name="esc_selector[]" id="esc_selector_4" onchange="cambia_tipo_forma(this.value, this.id);">
 														<option value="1" <?php echo !isset($contrato->fields['esc4_monto']) || $contrato->fields['esc1_monto'] == 0 ? 'selected="selected"' : ''; ?>>tarifa</option>
 														<option value="2" <?php echo $contrato->fields['esc4_monto'] > 0 ? 'selected="selected"' : ''; ?> >monto</option>
 													</select>
 													<span>
 														<span id="tipo_forma_4_1" <?php echo !isset($contrato->fields['esc4_monto']) || $contrato->fields['esc4_monto'] == 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?> >
-															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_4" , $contrato->fields['esc4_id_tarifa'], 'style="font-size:9pt; width:130px;"'); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_tarifa, glosa_tarifa FROM tarifa", "esc_id_tarifa_4" , $contrato->fields['esc4_id_tarifa'], 'style="font-size:9pt; width:120px;"'); ?>
 														</span>
 														<span id="tipo_forma_4_2" <?php echo $contrato->fields['esc4_monto'] > 0 ? 'style="display: inline-block;"' : 'style="display: none;"'; ?>>
-															<input type="text" size="8" style="font-size:9pt; width:130px;" id="esc_monto_4" value="<?php echo $contrato->fields['esc4_monto']; ?>" name="esc_monto[]" />
+															<input type="text" size="7" style="font-size:9pt; width:116px;" id="esc_monto_4" value="<?php if( !empty($contrato->fields['esc4_monto']) ) echo $contrato->fields['esc4_monto']; else echo ''; ?>" name="esc_monto[]" />
 														</span>
 													</span>
 													<span><?php echo __('en'); ?></span> 
-													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_4', $contrato->fields['esc4_id_moneda'], 'style="font-size:9pt; width:70px;"'); ?> 
+													<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'esc_id_moneda_4', $contrato->fields['esc4_id_moneda'], 'style="font-size:9pt; width:60px;"'); ?> 
 													<span><?php echo __('con'); ?> </span>
 													<input type="text" name="esc_descuento[]" id="esc_descuento_4" value="<?php echo $contrato->fields['esc4_descuento']; ?>" size="4" /> 
 													<span><?php echo __('% dcto.'); ?> </span> 

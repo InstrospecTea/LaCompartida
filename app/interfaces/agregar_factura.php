@@ -80,32 +80,34 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 			   echo "Error";
 		   exit;
 	   }
-
-			if($opcion == "restaurar")
+		
+	   $opc_inicial = $opcion;
+			if($opcion == "restaurar")	
 			{
-				$factura->Edit('estado','ABIERTA');
+				/*
+				 * comentado por Erwin, ya que el botón restaurar ahora hará cambio de estado por javascript
+				 * ya que tiene que actualizar valores de saldos e impuesto.
+				 */
+				
+				/*$factura->Edit('estado','ABIERTA');
 				$factura->Edit('anulado',0);
 				$factura->Edit("id_estado", "1");
 				if($factura->Escribir())
 				{
 					$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
-					$requiere_refrescar = "window.opener.Refrescar();";
 					if( $id_cobro )
 					{
 						$cobror = new Cobro( $sesion ); #cobro restaurar
 						$cobror->Load($id_cobro);
 						if( $cobror->Loaded() )
 						{
-							$fsa = $cobror->CantidadFacturasSinAnular(); #fsa = facturas sin anular
-							if ( $fsa > 0 )
-							{
-								$cobror->Edit('estado', 'FACTURADO');
-								$cobror->CambiarEstadoSegunFacturas();
-							}
+							$cobror->CambiarEstadoSegunFacturas();							
 						}
-						$cobror->Write();
 					}
-				}
+					$requiere_refrescar = "window.opener.Refrescar();";
+				}*/
+				$opc_inicial = $opcion;
+				$opcion = "guardar";
 			}
 			if($opcion == "anular")
 			{
@@ -245,8 +247,11 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 				$factura->Edit('id_estado', $id_estado_cobrado);
 			}
 
-				if(!$desde_webservice) //El webservice ignora todo llamado a $pagina
-					$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
+				if(!$desde_webservice){ //El webservice ignora todo llamado a $pagina
+					if( $opc_inicial != 'restaurar') {
+						$pagina->AddInfo(__('Documento Tributario').' '.$mensaje_accion.' '.__(' con éxito'));
+					}
+				}
 			$requiere_refrescar = "window.opener.Refrescar();";
 
 
@@ -667,8 +672,10 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactu
 
 			function Cambiar(form,opc)
 			{
-				form.opcion.value = opc;
-				form.submit();
+				form.opcion.value = 'guardar';
+				document.getElementById('id_estado').value=1;
+				//form.submit();
+				Validar(form);
 			}
 			var saltar_validacion_saldo = 0;
 			var mostrar_alert_saldo =0;

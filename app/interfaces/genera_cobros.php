@@ -874,10 +874,9 @@ if($opc == 'buscar')
 
 		if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
 			$texto_acuerdo = $contrato->fields['forma_cobro']." de ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])." por ".$contrato->fields['retainer_horas']." Hrs.";
-		} else if($contrato->fields['forma_cobro'] == 'TASA' || $contrato->fields['forma_cobro'] == 'HITOS') {
+		} else if($contrato->fields['forma_cobro'] == 'TASA' || $contrato->fields['forma_cobro'] == 'HITOS' || $contrato->fields['forma_cobro'] == 'ESCALONADA' ) {
 			$texto_acuerdo = $contrato->fields['forma_cobro'];
-		}
-		else{
+		} else {
 			$texto_acuerdo = $contrato->fields['forma_cobro']." por ".$contrato->fields['simbolo_moneda_monto']." ".number_format($contrato->fields['monto'],$contrato->fields['cifras_decimales_moneda_monto'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		}
 

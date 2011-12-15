@@ -1,4 +1,4 @@
-<?
+<?php
  require_once dirname(__FILE__).'/../app/conf.php';
 
 /* PASO 1: Agregar los cambios en un case del switch de esta funcion. */
@@ -6860,6 +6860,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			}
 
 			break;
+		
+		case 5.25:
+			$query = array();
+			$query[] = "INSERT INTO  `prm_forma_cobro` (  `forma_cobro` ,  `descripcion` ) 
+						VALUES (
+						'ESCALONADA',  'Escalonada'
+						);";
+				
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
 
 	}
 }
@@ -7153,6 +7166,7 @@ $VERSIONES[$num++] = 5.21;
 $VERSIONES[$num++] = 5.22;
 $VERSIONES[$num++] = 5.23;
 $VERSIONES[$num++] = 5.24;
+$VERSIONES[$num++] = 5.25;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

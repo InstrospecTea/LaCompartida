@@ -106,7 +106,7 @@ if ($where == '') {
 }
 
 $where .= " GROUP BY factura.id_factura";
-$where .= " ORDER BY factura.fecha ASC, factura.numero ASC";
+$where .= " ORDER BY factura.mes_contable ASC, factura.asiento_contable ASC";
 
 $query = "SELECT cliente.glosa_cliente
 						, DATE_FORMAT(fecha, '$formato_fechas') as fecha
@@ -313,7 +313,10 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; $j++) {
 	$id_cliente_factura = $documento->fields['id_tipo_documento_identidad'];
 	$impuesto_factura = $documento->fields['iva'];
 	$codigo_asunto = $documento->fields['codigo_asunto'];
-	$descripcion_factura = preg_replace('/^(.+?)(\r\n|\n|\r|$)/s', '${1}', strip_tags($documento->fields['descripcion'])) . ' ' . $codigo_asunto;
+	$descripcion_factura = trim($documento->fields['descripcion']);
+	$descripcion_factura = strip_tags($descripcion_factura);
+	$descripcion_factura = str_replace(array("\r\n", "\n\r", "\n", "\r"), " ", $descripcion_factura);
+	$descripcion_factura = $descripcion_factura . ' ' . $codigo_asunto;
 
 	$codigo_asunto = explode('-', $codigo_asunto);
 	$codigo_asunto = $codigo_asunto[0] . $codigo_asunto[1];

@@ -353,12 +353,18 @@ class CtaCteFact extends Objeto
 	
 	function EliminarMvtoPago($id_pago){
 		$documento = new Documento($this->sesion);
-		$documento->EliminarDesdeFacturaPago($id_pago);
+		//$documento->EliminarDesdeFacturaPago($id_pago);
 
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$mvto->LoadByPago($id_pago);
 		$this->EliminarNeteos($mvto);
-		return $mvto->Delete();
+		if( $mvto->Delete() ){
+			$documento->EliminarDesdeFacturaPago($id_pago);
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 	
 	function EliminarMvtoFactura($id_factura){

@@ -75,7 +75,7 @@ class Factura extends Objeto {
 	}
 
 	function ObtenerIdsDocumentos($id_factura) {
-		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', ccfm.id_factura ) as bloque
+		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', ccfm.id_factura ) as bloque 
 					FROM cta_cte_fact_mvto ccfm 
 						JOIN factura f USING ( id_factura ) 
 					WHERE f.id_factura_padre =  '$id_factura';";

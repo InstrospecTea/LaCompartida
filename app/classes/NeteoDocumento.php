@@ -323,14 +323,16 @@ class NeteoDocumento extends Objeto
 				}
 				elseif( $cobro->TieneFacturasSinAnular() )
 				{
-					if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
-					{
-						$cobro->Edit('estado','FACTURADO');
-					}
-					else
-					{
+					if( !empty($cobro->fields['fecha_enviado_cliente']) && $cobro->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' ) {
 						$cobro->Edit('estado','ENVIADO AL CLIENTE');
-					}					
+					} else {
+						if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura'))
+						{
+							$cobro->Edit('estado','FACTURADO');
+						} else {
+							$cobro->Edit('estado','EMITIDO');
+						}
+					}
 				}
 				else {
 					$cobro->Edit('estado','EMITIDO');					
