@@ -7893,7 +7893,12 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			$html = str_replace('%valor_fecha_fin%', ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_fin'],$idioma->fields['formato_fecha']), $html);
 
 			$html = str_replace('%horas%', __('Total Horas'), $html);
-			$html = str_replace('%valor_horas%', $horas_cobrables.':'.$minutos_cobrables, $html);
+                        if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
+                            $duracion_decimal_cobrable = number_format( $horas_cobrables + $minutos_cobrables/60, 1,',','');
+                            $html = str_replace('%valor_horas%', $duracion_decimal_cobrable, $html );
+                        } else {
+                            $html = str_replace('%valor_horas%', $horas_cobrables.':'.$minutos_cobrables, $html);
+                        }
 			if( $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL' )
 				{
 					$html = str_replace('%DETALLE_COBRO_RETAINER%', $this->GenerarDocumento($parser, 'DETALLE_COBRO_RETAINER', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -8383,8 +8388,13 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 		case 'DETALLE_HONORARIOS':
 			$horas_cobrables = floor(($this->fields['total_minutos'])/60);
 			$minutos_cobrables = sprintf("%02d",$this->fields['total_minutos']%60);
-			$html = str_replace('%horas%', __('Total Horas'), $html);
-			$html = str_replace('%valor_horas%', $horas_cobrables.':'.$minutos_cobrables, $html);
+			$duracion_cobrable_decimal = number_format( $horas_cobrables + $minutos_cobrables/60, 1, ',', '');
+                        $html = str_replace('%horas%', __('Total Horas'), $html);
+			if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
+                            $html = str_replace('%valor_horas%', $duracion_cobrable_decimal, $html);
+                        } else {
+                            $html = str_replace('%valor_horas%', $horas_cobrables.':'.$minutos_cobrables, $html);
+                        }
 			$html = str_replace('%honorarios%', __('Honorarios'), $html);
 			if(( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) ) && $contrato->fields['usa_impuesto_separado'])
 				$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'].' '.number_format($this->fields['monto']-$this->fields['impuesto'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
