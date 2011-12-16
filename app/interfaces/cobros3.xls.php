@@ -3,6 +3,7 @@
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+        require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 	$pagina = new Pagina($sesion);
@@ -42,6 +43,12 @@
 								'Border' => 1,
 								'Color' => 'black',
 								'NumFormat' => 0));
+        $fdd =& $wb->addFormat(array('Size' => 11,
+								'VAlign' => 'top',
+								'Align' => 'justify',
+								'Border' => 1,
+								'Color' => 'black'));
+        $fdd->setNumFormat(0.0);
 	$tex =& $wb->addFormat(array('Size' => 11,
 								'valign' => 'top',
 								'Align' => 'justify',
@@ -194,8 +201,13 @@
 		
 		list($duracion, $duracion_cobrada)= split('<br>', $trabajo->fields[duracion]);
 		list($h, $m)= split(':', $duracion);
+                $duracion_decimal = number_format($h+$m/60,1,'.','');
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
-		$ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+                if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                        $ws->writeNumber($fila_inicial + $i, $col_duracion, $duracion_decimal, $fdd );
+                } else {
+                        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+                }
 
 		$params_array['codigo_permiso'] = 'REV';
 		$p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
@@ -204,9 +216,14 @@
 			if($trabajo->fields['cobrable'] == 0)
 				$duracion_cobrada = '0:00';
 			list($h, $m)= split(':', $duracion_cobrada);
-
+                        
+                        $duracion_cobrada_decimal = number_format($h+$m/60, 1,'.','');
 			$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
-			$ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
+                        if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                                $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $duracion_cobrada_decimal, $fdd );
+                        } else {
+                                $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
+                        }
 		}
 		else
 			 $ws->write($fila_inicial + $i, $col_duracion_cobrada, '', $time_format);
@@ -251,12 +268,21 @@
 					$tarifa=0;
 			}
 			$ws->writeNumber($fila_inicial + $i, $col_tarifa_hh, $tarifa, $money_format);
-			$ws->writeFormula($fila_inicial + $i, $col_valor_trabajo, "=$col_formula_tarifa_hh".($fila_inicial+$i+1)."*(24*($col_formula_duracion_cobrada".($fila_inicial+$i+1)."))", $money_format);
+                        if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                            $formula_monto = "=$col_formula_tarifa_hh".($fila_inicial+$i+1)."*($col_formula_duracion_cobrada".($fila_inicial+$i+1).")";
+                        } else {
+                            $formula_monto = "=$col_formula_tarifa_hh".($fila_inicial+$i+1)."*(24*($col_formula_duracion_cobrada".($fila_inicial+$i+1)."))";
+                        }
+			$ws->writeFormula($fila_inicial + $i, $col_valor_trabajo, $formula_monto , $money_format);
 		}
 	}
-
-	$ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
-	$ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $time_format);
+        if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+            $ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $fdd);
+            $ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $fdd);
+        } else {
+            $ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
+            $ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $time_format);
+        }
 	// No tiene sentido sumar los totales porque pueden estar en monedas distintas.
 	
 	$wb->close();
