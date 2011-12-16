@@ -894,7 +894,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									AND trabajo.id_tramite=0
 									AND trabajo.id_cobro='" . $Cobro->fields['id_cobro'] . "'";
 
-			$orden = "trabajo.codigo_asunto, usuario.id_categoria_usuario, trabajo.fecha, trabajo.descripcion";
+			$orden = "trabajo.codigo_asunto, trabajo.fecha, usuario.id_categoria_usuario, trabajo.descripcion";
 			$b1 = new Buscador($Sesion, $query_trabajos, "Trabajo", $desde, '', $orden);
 			$lista_trabajos = $b1->lista;
 			$fila_inicial = $filas;
