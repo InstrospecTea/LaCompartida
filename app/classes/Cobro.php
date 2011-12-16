@@ -2191,6 +2191,9 @@ class Cobro extends Objeto
 			   * %monto_gasto_separado%    --- Frase que indica valor de gastos
 			   * %frase_gastos_ingreso%    --- Frase especial para baz
 			   * %frase_gastos_egreso%     --- Frase especial para baz
+			   * 
+			   * %cta_cte_gbp_segun_moneda% --- Numero de cuenta que va a cambiar segun moneda (si es dolar una cuenta, en caso contrario otra, para gbplegal
+               * %tipo_gbp_segun_moneda% --- Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (si es dolar Extranjera, en caso contrario Nacional para gbplegal
 			   */
 				/* Primero se hacen las cartas particulares ya que lee los datos que siguen */
 				#carta mb
@@ -2232,6 +2235,14 @@ class Cobro extends Objeto
 				else
 					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo%'), $html2);
 
+				#carta gallo barrios pickman (gbplegal)
+				if( $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['codigo'] == 'USD' ){
+					$html2 = str_replace('%cta_cte_gbp_segun_moneda%', __('194-1861108179'), $html2);
+					$html2 = str_replace('%tipo_gbp_segun_moneda%', __('Extranjera'), $html2);
+				} else {
+					$html2 = str_replace('%cta_cte_gbp_segun_moneda%', __('194-1847085-0-23'), $html2);
+					$html2 = str_replace('%tipo_gbp_segun_moneda%', __('Nacional'), $html2);
+				}
 				
 				/* valor porcentaje de impuesto */
 				$html2 = str_replace('%porcentaje_impuesto%', (int)($this->fields['porcentaje_impuesto']) . '%', $html2 );
@@ -6935,6 +6946,14 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				else
 					$html2 = str_replace('%estimado%',__('Estimado'),$html2);
 
+				#carta gallo barrios pickman (gbplegal)
+				if( $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['codigo'] == 'USD' ){
+					$html2 = str_replace('%cta_cte_gbp_segun_moneda%', __('194-1861108179'), $html2);
+					$html2 = str_replace('%tipo_gbp_segun_moneda%', __('Extranjera'), $html2);
+				} else {
+					$html2 = str_replace('%cta_cte_gbp_segun_moneda%', __('194-1847085-0-23'), $html2);
+					$html2 = str_replace('%tipo_gbp_segun_moneda%', __('Nacional'), $html2);
+				}
 				
 				/* valor porcentaje de impuesto */
 				$html2 = str_replace('%porcentaje_impuesto%', (int)($this->fields['porcentaje_impuesto']) . '%', $html2 );
