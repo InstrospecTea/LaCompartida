@@ -1617,6 +1617,15 @@ class Cobro extends Objeto
 				$this->Edit("opc_restar_retainer",$contrato->fields['opc_restar_retainer']);
 				$this->Edit("opc_ver_detalle_retainer",$contrato->fields['opc_ver_detalle_retainer']);
 				$this->Edit("opc_ver_valor_hh_flat_fee",$contrato->fields['opc_ver_valor_hh_flat_fee']);
+                                $this->Edit("opc_ver_detalles_por_hora_iniciales",$contrato->fields['opc_ver_detalles_por_hora_iniciales']);
+                                $this->Edit("opc_ver_detalles_por_hora_categoria",$contrato->fields['opc_ver_detalles_por_hora_categoria']);
+                                $this->Edit("opc_ver_detalles_por_hora_tarifa",$contrato->fields['opc_ver_detalles_por_hora_tarifa']);
+                                $this->Edit("opc_ver_detalles_por_hora_importe",$contrato->fields['opc_ver_detalles_por_hora_importe']);
+                                $this->Edit("opc_ver_detalles_por_hora",$contrato->fields['opc_ver_detalles_por_hora']);
+                                $this->Edit("opc_ver_profesional_iniciales",$contrato->fields['opc_ver_profesional_iniciales']);
+                                $this->Edit("opc_ver_profesional_categoria",$contrato->fields['opc_ver_profesional_categoria']);
+                                $this->Edit("opc_ver_profesional_tarifa",$contrato->fields['opc_ver_profesional_tarifa']);
+                                $this->Edit("opc_ver_profesional_importe",$contrato->fields['opc_ver_profesional_importe']);
 				/**
 				 * Configuración moneda del cobro
 				 */
