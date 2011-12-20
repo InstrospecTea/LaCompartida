@@ -18,6 +18,8 @@ class Documento extends Objeto
 		#$this->guardar_fecha = false;
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->logear = true;
+		$this->tabla_log = "documento_log";
 	}
 
 	function LoadByCobro($id_cobro)

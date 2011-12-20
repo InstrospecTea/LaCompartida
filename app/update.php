@@ -6886,6 +6886,141 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				}
 			}
 			break;
+		
+		case 5.27:
+			$query = array();
+			/* este debe ser el update más feo de mi vida */
+			$query[] = "CREATE TABLE `cobro_log` ( `id_cobro` int( 11 ) NOT NULL default '0', `incluye_honorarios` tinyint( 1 ) NOT NULL default '1', 
+				`incluye_gastos` tinyint( 1 ) NOT NULL default '1', `id_usuario` int( 11 ) default NULL , `codigo_cliente` varchar( 10 ) NOT NULL default '', 
+				`monto_subtotal` double NOT NULL default '0', `monto_ajustado` double NOT NULL default '0', `monto_original` double NOT NULL default '0', 
+				`impuesto` double NOT NULL default '0', 
+				`porcentaje_impuesto` tinyint( 3 ) unsigned NOT NULL default '0' COMMENT 'Para agregar el impuesto al final cuando no está incluido en el valor del cobro.', 
+				`porcentaje_impuesto_gastos` tinyint( 3 ) unsigned NOT NULL default '0', `descuento` double NOT NULL default '0', 
+				`porcentaje_descuento` int( 3 ) NOT NULL default '0', `tipo_descuento` varchar( 20 ) NOT NULL default 'VALOR', 
+				`monto_contrato` double NOT NULL default '0', `id_moneda_monto` int( 11 ) NOT NULL default '1', `monto_trabajos` double default NULL , 
+				`monto_tramites` double default NULL , `monto` double default NULL COMMENT 'monto honorarios, ya incluye los trámites', 
+				`monto_thh` double NOT NULL default '0', `monto_thh_estandar` double NOT NULL default '0', `retainer_horas` decimal( 10, 2 ) default NULL , 
+				`retainer_usuarios` varchar( 100 ) default NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer', 
+				`total_minutos` int( 11 ) default NULL , `subtotal_gastos` double NOT NULL default '0', `impuesto_gastos` double NOT NULL default '0', 
+				`monto_gastos` double NOT NULL default '0' COMMENT 'Actualmente sin valor', `id_gasto_generado` int( 11 ) default NULL , 
+				`id_provision_generada` int( 11 ) default NULL , `honorarios_pagados` char( 2 ) NOT NULL default 'NO', 
+				`gastos_pagados` char( 2 ) NOT NULL default 'NO', `id_doc_pago_honorarios` int( 11 ) default NULL , `id_doc_pago_gastos` int( 11 ) default NULL , 
+				`saldo_cta_corriente` double default NULL COMMENT 'Saldo de la cuenta corriente del cliente', `fecha_cobro` datetime default NULL , 
+				`estado` varchar( 20 ) NOT NULL default 'CREADO', `observaciones` tinytext, `fecha_ini` date NOT NULL default '0000-00-00', 
+				`fecha_fin` date NOT NULL default '0000-00-00', `id_moneda` int( 11 ) NOT NULL default '1', 
+				`tipo_cambio_moneda` double NOT NULL default '0' COMMENT 'Tipo de cambio de la moneda con que se hizo el cobro', 
+				`id_moneda_base` int( 11 ) NOT NULL default '0' COMMENT 'Id de la moneda base actual', 
+				`tipo_cambio_moneda_base` double NOT NULL default '0' COMMENT 'Tipo de cambio de la moneda base actual.', 
+				`forma_cobro` varchar( 20 ) default NULL , `costo_hh` double default NULL , `fecha_creacion` datetime default NULL , 
+				`fecha_en_revision` datetime default NULL , `fecha_modificacion` datetime default NULL , `fecha_emision` datetime default NULL , 
+				`fecha_facturacion` datetime default NULL , `fecha_enviado_cliente` datetime default NULL , `fecha_pago_parcial` datetime default NULL , 
+				`forma_envio` varchar( 20 ) NOT NULL default 'CARTA', `etapa_cobro` tinyint( 4 ) NOT NULL default '1', 
+				`documento` varchar( 255 ) default NULL COMMENT 'Se refiere a la boleta o factura asociada', `id_contrato` int( 11 ) default NULL , 
+				`opc_ver_modalidad` tinyint( 4 ) NOT NULL default '1', `opc_ver_profesional` tinyint( 4 ) NOT NULL default '1', 
+				`opc_ver_profesional_iniciales` tinyint( 1 ) NOT NULL default '1', `opc_ver_profesional_categoria` tinyint( 1 ) NOT NULL default '1', 
+				`opc_ver_profesional_tarifa` tinyint( 1 ) NOT NULL default '1', `opc_ver_profesional_importe` tinyint( 1 ) NOT NULL default '1', 
+				`opc_ver_gastos` tinyint( 4 ) NOT NULL default '1', `opc_ver_concepto_gastos` tinyint( 1 ) NOT NULL default '1', 
+				`opc_ver_descuento` tinyint( 4 ) NOT NULL default '1', `opc_papel` varchar( 16 ) NOT NULL default 'LETTER', 
+				`opc_ver_numpag` tinyint( 4 ) NOT NULL default '1', `opc_ver_solicitante` tinyint( 1 ) NOT NULL default '0', 
+				`opc_moneda_total` int( 11 ) NOT NULL default '1' COMMENT 'Moneda total de impresión del DOC', 
+				`opc_ver_carta` tinyint( 1 ) NOT NULL default '1', `opc_ver_morosidad` tinyint( 4 ) NOT NULL default '1' COMMENT 'Ver saldo adeudado', 
+				`opc_ver_tipo_cambio` tinyint( 4 ) NOT NULL default '0', `opc_ver_resumen_cobro` tinyint( 4 ) NOT NULL default '1', 
+				`opc_ver_detalles_por_hora_iniciales` tinyint( 1 ) NOT NULL default '1', `opc_ver_detalles_por_hora_categoria` tinyint( 1 ) NOT NULL default '1', 
+				`opc_ver_detalles_por_hora_tarifa` tinyint( 1 ) NOT NULL default '1', `opc_ver_detalles_por_hora_importe` tinyint( 1 ) NOT NULL default '1', 
+				`opc_ver_asuntos_separados` tinyint( 4 ) NOT NULL default '0', `opc_ver_horas_trabajadas` tinyint( 4 ) NOT NULL default '0', 
+				`opc_ver_cobrable` tinyint( 4 ) NOT NULL default '0', `opc_restar_retainer` tinyint( 4 ) NOT NULL default '1', 
+				`opc_ver_detalle_retainer` tinyint( 1 ) NOT NULL default '1', `opc_ver_valor_hh_flat_fee` tinyint( 4 ) NOT NULL default '0', 
+				`opc_ver_detalles_por_hora` tinyint( 1 ) NOT NULL default '1', `opc_ver_columna_cobrable` tinyint( 1 ) NOT NULL default '0', 
+				`id_carta` int( 11 ) default NULL , `id_formato` int( 11 ) NOT NULL default '0', `id_cobro_rtf` tinyint( 4 ) NOT NULL default '1', 
+				`codigo_idioma` varchar( 5 ) NOT NULL default 'es', `id_proceso` int( 11 ) default NULL , 
+				`facturado` tinyint( 4 ) NOT NULL default '0' COMMENT '0 NO FACTURADO; 1 FACURADO', 
+				`estado_contabilidad` varchar( 25 ) NOT NULL default 'NO INFORMADO' COMMENT 'webservice contabilidad', 
+				`fecha_contabilidad` datetime default NULL COMMENT 'webservice contabilidad', `nota_venta_contabilidad` varchar( 20 ) default NULL , 
+				`fecha_pago_gastos` date default NULL , `documento_pago_gastos` varchar( 50 ) default NULL , `id_movimiento_pago` int( 11 ) default NULL , 
+				`saldo_final_gastos` double NOT NULL default '0' COMMENT 'Saldo de la cuenta corriente del periodo', `temp` char( 2 ) NOT NULL default '', 
+				`solo_gastos` int( 1 ) NOT NULL default '0', `nota_cobro` varchar( 20 ) default NULL COMMENT 'valor que se utiliza cuando tienen notas de cobros extras', 
+				`modalidad_calculo` tinyint( 4 ) NOT NULL default '1' COMMENT '1 calculacion nueva, 0 calculacon vieja', 
+				`se_esta_cobrando` varchar( 254 ) default NULL COMMENT 'glosa resumen de lo que se esta cobrando', 
+				`descuento_incobrable` double NOT NULL default '0', `descuento_obsequio` double NOT NULL default '0', 
+				`esc1_tiempo` double default NULL , `esc1_id_tarifa` int( 11 ) default NULL , `esc1_monto` double default NULL , 
+				`esc1_id_moneda` int( 11 ) default NULL , `esc1_descuento` double default NULL , `esc2_tiempo` double default NULL , 
+				`esc2_id_tarifa` int( 11 ) default NULL , `esc2_monto` double default NULL , `esc2_id_moneda` int( 11 ) default NULL , 
+				`esc2_descuento` double default NULL , `esc3_tiempo` double default NULL , `esc3_id_tarifa` int( 11 ) default NULL , 
+				`esc3_monto` double default NULL , `esc3_id_moneda` int( 11 ) default NULL , `esc3_descuento` double default NULL , 
+				`esc4_tiempo` double default NULL , `esc4_id_tarifa` int( 11 ) default NULL , `esc4_monto` double default NULL , 
+				`esc4_id_moneda` int( 11 ) default NULL , `esc4_descuento` double default NULL , 
+				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00'
+				, `usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1;";
+			
+			$query[] = "CREATE TABLE `factura_log` ( `id_factura` int( 11 ) NOT NULL default '0', `id_factura_padre` int( 11 ) default NULL , 
+				`id_documento_legal` int( 11 ) NOT NULL default '1' COMMENT 'tipo de documento legal', `id_documento_legal_motivo` int( 11 ) default NULL , 
+				`numero` int( 11 ) NOT NULL default '0', `comprobante_erp` varchar( 20 ) default NULL , `condicion_pago` tinyint( 2 ) NOT NULL default '0', 
+				`serie_documento_legal` tinyint( 4 ) NOT NULL default '1', `fecha` date NOT NULL default '0000-00-00', 
+				`cliente` varchar( 100 ) default NULL COMMENT 'Razón Social Cliente', 
+				`RUT_cliente` varchar( 20 ) default NULL COMMENT 'En Colombia se usa NIT en vez de RUT', `direccion_cliente` varchar( 255 ) default NULL , 
+				`codigo_cliente` varchar( 10 ) NOT NULL default '' COMMENT 'daro secundario, ocupar el codigo_cliente del COBRO', `subtotal` double NOT NULL default '0', 
+				`subtotal_sin_descuento` double NOT NULL default '0', `descuento_honorarios` double NOT NULL default '0', `honorarios` double NOT NULL default '0', 
+				`subtotal_gastos` double NOT NULL default '0', `subtotal_gastos_sin_impuesto` double NOT NULL default '0', 
+				`descripcion_subtotal_gastos` varchar( 255 ) NOT NULL default '', `descripcion_subtotal_gastos_sin_impuesto` varchar( 255 ) NOT NULL default '', 
+				`gastos` double NOT NULL default '0', `iva` double NOT NULL default '0', `total` double NOT NULL default '0', 
+				`descripcion` varchar( 255 ) NOT NULL default '', `numeracion_papel_desde` int( 11 ) NOT NULL default '0', 
+				`numeracion_papel_hasta` int( 11 ) NOT NULL default '0', `numeracion_computador_desde` int( 11 ) NOT NULL default '0', 
+				`numeracion_computador_hasta` int( 11 ) NOT NULL default '0', `id_cobro` int( 11 ) default NULL , 
+				`estado` varchar( 12 ) NOT NULL default 'ABIERTA', `anulado` tinyint( 4 ) NOT NULL default '0', `id_estado` int( 11 ) default NULL , 
+				`letra` varchar( 50 ) default NULL , `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00', 
+				`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00', `id_moneda` int( 11 ) NOT NULL default '1', 
+				`porcentaje_impuesto` double NOT NULL default '0' COMMENT 'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos', 
+				`id_contrato` int( 11 ) NOT NULL default '0', `asiento_contable` int( 11 ) default NULL COMMENT 'correlativo mensual (para PRC)', 
+				`mes_contable` int( 11 ) default NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)', 
+				`id_tipo_documento_identidad` int( 11 ) default NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC', 
+				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00', 
+				`usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1;";
+			
+			$query[] = "CREATE TABLE `documento_log` ( `id_documento` int( 11 ) NOT NULL default '0', 
+				`id_tipo_documento` int( 11 ) NOT NULL default '0' COMMENT 'tipo documento', `codigo_cliente` varchar( 10 ) NOT NULL default '', 
+				`id_contrato` int( 11 ) default NULL , `id_cobro` int( 11 ) default NULL , `glosa_documento` text NOT NULL , 
+				`monto` double NOT NULL default '0' COMMENT 'monto que paga el documento', `subtotal_honorarios` double NOT NULL default '0', 
+				`monto_trabajos` double NOT NULL default '0', `monto_tramites` double NOT NULL default '0', 
+				`subtotal_sin_descuento` double NOT NULL default '0', `descuento_honorarios` double NOT NULL default '0', 
+				`honorarios` double default '0', `impuesto` double NOT NULL default '0', `subtotal_gastos` double NOT NULL default '0', 
+				`gastos` double default '0', `saldo_honorarios` double NOT NULL default '0', `saldo_gastos` double NOT NULL default '0', 
+				`saldo_pago` double NOT NULL default '0', `honorarios_pagados` char( 2 ) NOT NULL default 'NO', 
+				`gastos_pagados` char( 2 ) NOT NULL default 'NO', `id_moneda` int( 11 ) NOT NULL default '0', 
+				`monto_base` double NOT NULL default '0' COMMENT 'monto en moneda base', `id_moneda_base` int( 11 ) NOT NULL default '1', 
+				`numero_doc` varchar( 20 ) NOT NULL default '0000' COMMENT 'numero de documento en papel', 
+				`tipo_doc` char( 1 ) NOT NULL default 'N' COMMENT 'C:Cheque T:Transferencia E:Efectivo F: Factura O:Otro N:NoAplica', 
+				`fecha` date NOT NULL default '0000-00-00' COMMENT 'fecha del documento', 
+				`fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00', 
+				`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00', 
+				`subtotal_gastos_sin_impuesto` double NOT NULL default '0' COMMENT 'subtotal de los gastos terceros a cuales no se agregan impuestos', 
+				`id_banco` int( 11 ) NOT NULL default '0', `id_cuenta` int( 11 ) NOT NULL default '0', 
+				`numero_operacion` varchar( 40 ) NOT NULL default '', `numero_cheque` varchar( 40 ) NOT NULL default '', 
+				`pago_retencion` tinyint( 1 ) NOT NULL default '0', 
+				`id_factura_pago` int( 11 ) default NULL COMMENT 'si es un pago generado desde un pago a facturas, apunta al factura_pago q lo creo', 
+				`pago_honorarios` tinyint( 1 ) default NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar honorarios', 
+				`pago_gastos` tinyint( 1 ) default NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar gastos', 
+				`es_adelanto` tinyint( 1 ) NOT NULL default '0', 
+				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00', 
+				`usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1 COMMENT = 'Tabla de los documentos contables';";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+			break;
+                        
+                        case 5.28:
+                            $query = array();
+                            $query[] = "ALTER TABLE `prm_categoria_usuario` ADD `orden` INT( 11 ) NOT NULL DEFAULT  '0';";
+                            $query[] = "UPDATE prm_categoria_usuario SET orden = id_categoria_usuario";
+                            
+                            foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+                            }
+			break;
 
 	}
 }
@@ -7181,6 +7316,8 @@ $VERSIONES[$num++] = 5.23;
 $VERSIONES[$num++] = 5.24;
 $VERSIONES[$num++] = 5.25;
 $VERSIONES[$num++] = 5.26;
+$VERSIONES[$num++] = 5.27;
+$VERSIONES[$num++] = 5.28;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

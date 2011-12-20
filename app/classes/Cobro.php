@@ -31,6 +31,8 @@ class Cobro extends Objeto
 		$this->campo_id = "id_cobro";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->logear = true;
+		$this->tabla_log = "cobro_log";
 		$this->guardar_fecha = true;
 	}
 
@@ -4058,7 +4060,7 @@ class Cobro extends Objeto
 									WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "'
 									AND trabajo.codigo_asunto = '".$asunto->fields['codigo_asunto']."'
 									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 									LIMIT 1";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($categoria)=mysql_fetch_array($resp);
@@ -4195,7 +4197,7 @@ class Cobro extends Objeto
 									WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "'
 									AND trabajo.codigo_asunto = '".$asunto->fields['codigo_asunto']."'
 									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 									LIMIT 1";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($categoria)=mysql_fetch_array($resp);
@@ -4240,7 +4242,7 @@ class Cobro extends Objeto
 			{
 				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
-				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
+				$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 			}
 			elseif ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'SepararPorUsuario') ) || ( method_exists('Conf','SepararPorUsuario') && Conf::SepararPorUsuario() ) ) )
 			{
@@ -4733,7 +4735,7 @@ class Cobro extends Objeto
 			{
 				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
-				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
+				$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 			}
 			elseif ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf','OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ) ) )
 			{
@@ -8930,7 +8932,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 									WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "'
 									AND trabajo.codigo_asunto = '".$asunto->fields['codigo_asunto']."'
 									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 									LIMIT 1";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($categoria)=mysql_fetch_array($resp);
@@ -9090,7 +9092,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 									WHERE trabajo.id_cobro = '". $this->fields['id_cobro'] . "'
 									AND trabajo.codigo_asunto = '".$asunto->fields['codigo_asunto']."'
 									AND trabajo.visible=1
-									ORDER BY usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha ASC
+									ORDER BY cat.orden, usuario.id_usuario, trabajo.fecha ASC
 									LIMIT 1";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				list($categoria)=mysql_fetch_array($resp);
@@ -9123,7 +9125,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) )
 			{
 				$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
+				$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 			}
 			elseif ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'SepararPorUsuario') ) || ( method_exists('Conf','SepararPorUsuario') && Conf::SepararPorUsuario() ) )
 			{
@@ -9605,7 +9607,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			{
 				$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
-				$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
+				$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
 			}
 			elseif ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf','OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ) )
 			{
@@ -11957,7 +11959,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorTarifa') ) || ( method_exists('Conf','OrdenarPorTarifa') && Conf::OrdenarPorTarifa() ) ) )
 				$order_categoria = "t.tarifa_hh DESC, ";
 			else if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf','OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ) ) )
-				$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
+				$order_categoria = "cu.orden, u.id_usuario, ";
 			else if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'SepararPorUsuario') ) || ( method_exists('Conf','SepararPorUsuario') && Conf::SepararPorUsuario() ) ) )
 				$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
 			else if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf','OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ) ) )

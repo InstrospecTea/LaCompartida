@@ -19,6 +19,8 @@ class Factura extends Objeto {
 		$this->campo_id = "id_factura";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->logear = true;
+		$this->tabla_log = "factura_log";
 	}
 
 	function Id($id=null) {
