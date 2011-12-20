@@ -838,16 +838,22 @@ class Factura extends Objeto {
 		return $html2;
 	}
 
-	function ObtenerNumero($id_factura = null, $serie = null, $numero = null)
+	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false)
 	{
 		if ($this->Loaded())
 		{
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie'))
 			{
 				$serie = empty($this->fields['serie_documento_legal']) ? '001' : $this->fields['serie_documento_legal'];
-				return str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
+				$n = str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
 			}
-			return $this->fields['numero'];
+			else
+				$n = $this->fields['numero'];
+
+			if($mostrar_comprobante && $this->fields['comprobante_erp'])
+				$n =  '<span title="'.__('Comprobante').': '.$this->fields['comprobante_erp'].'"><b>'.$n.'</b></span>';
+			
+			return $n;
 		}
 		elseif (!empty($id_factura))
 		{

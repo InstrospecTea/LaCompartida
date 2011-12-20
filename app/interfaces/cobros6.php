@@ -851,7 +851,7 @@ else {
 				AgregarPago();
 			}
 		}
-		if( estado != 'PAGADO' && $('estado_original').value == 'PAGADO' && $('hay_pagos').value == 'si')
+		if( estado != 'PAGADO' && estado != 'EN REVISION' && $('estado_original').value == 'PAGADO' && $('hay_pagos').value == 'si')
 		{
 			$("estado").selectedIndex = 4;
 			alert('<?= __("No se puede salir de estado PAGADO. Debe eliminar los Documentos de Pago del listado.") ?>');
@@ -1394,10 +1394,10 @@ if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetCon
 					</tr>
 					<tr>
 						<td align=right style="vertical-align: top;" nowrap>
-<?= __('Cambiar a') ?>:&nbsp;&nbsp;
+                                                        <?= __('Cambiar a') ?>:&nbsp;&nbsp;
 						</td>
 						<td align=left style="vertical-align: top;" width="170px">
-														<?= Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', $cobro->fields['estado'], 'onchange="RevisarPagado(this.value);"', '', 150); ?>
+							<?= Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', $cobro->fields['estado'], 'onchange="RevisarPagado(this.value);"', '', 150); ?>
 						</td>
 						<td align=left style="vertical-align: top;">
 
@@ -1600,7 +1600,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 									?>
 											<tr bgcolor="<?= $fila++ % 2 ? '#f2f2ff' : '#ffffff' ?>">
 												<td><?php echo $tipo ?></td>
-												<td><?php echo $factura->ObtenerNumero() ?></td>
+												<td><?php echo $factura->ObtenerNumero(null,null,null,true) ?></td>
 										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
 										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
 										<td><?php echo $moneda_factura->fields['simbolo'].'&nbsp;'.number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>

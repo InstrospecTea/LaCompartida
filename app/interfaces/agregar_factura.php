@@ -150,6 +150,9 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 		$mensaje_accion = 'guardar';
 		$factura->Edit('subtotal', $monto_neto);
 		$factura->Edit('porcentaje_impuesto', $porcentaje_impuesto);
+		if($comprobante_erp)
+			$factura->Edit('comprobante_erp',$comprobante_erp);
+		$factura->Edit('condicion_pago',''.$condicion_pago);
 		$factura->Edit('iva', $iva);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
 		$factura->Edit("id_factura_padre", $id_factura_padre ? $id_factura_padre : "NULL");
@@ -1146,6 +1149,24 @@ if ($buscar_padre) {
 		<tr>
 			<td align=right><?= __('Dirección Cliente') ?></td>
 			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?= $factura->fields['direccion_cliente'] ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
+		</tr>
+		<tr>
+			<td align=right><?= __('Condición de Pago') ?></td>
+			<td align=left colspan=3>
+				<select type="text" name="condicion_pago" value="<?= $factura->fields['condicion_pago'] ?>" id="condicion_pago" >
+					<?php
+						$valores_condicion = array(0,15,30,60,90);
+						foreach($valores_condicion as $vc)
+						{
+							echo "<option ";
+							if( $factura->fields['condicion_pago'] == $vc )
+								echo "selected";
+							echo " value=".$vc.">".$vc."</option>";
+					
+						}
+					?>
+				</select>&nbsp;<?=__('días')?>.
+			</td>
 		</tr>
 		<?php
 		if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {

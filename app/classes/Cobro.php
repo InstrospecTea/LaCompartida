@@ -287,7 +287,7 @@ class Cobro extends Objeto
 		$estado = $actual;
 		
 		$num_facturas = $this->CantidadFacturasSinAnular();
-		if($num_facturas == 0){
+                if($num_facturas == 0){
 			if($actual != "ENVIADO AL CLIENTE"){
 				$estado = "EMITIDO";
 			}
@@ -326,11 +326,15 @@ class Cobro extends Objeto
 			}
 			
 			//tomar suma de todos los pagos aplicados a facturas
-			$query = "SELECT SUM(ccfmn.monto), SUM(IF(ccfmp.id_factura IS NULL,ccfmn.monto,0))
+			$query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
 				FROM cta_cte_fact_mvto_neteo ccfmn
 					JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
 					JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
-					JOIN factura f ON f.id_factura = ccfm.id_factura
+					JOIN factura f ON f.id_factura = ccfm.id_factura 
+                                        JOIN cobro c ON c.id_cobro = f.id_cobro 
+                                        JOIN prm_moneda as m_cobro ON m_cobro.id_moneda = c.opc_moneda_total 
+                                        JOIN cobro_moneda as mf ON mf.id_cobro = f.id_cobro AND mf.id_moneda = f.id_moneda 
+                                        JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total 
 				WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($monto_pagado,$monto_pago_menos_ncs) = mysql_fetch_array( $resp );
@@ -341,7 +345,7 @@ class Cobro extends Objeto
 						$estado = "ENVIADO AL CLIENTE";
 					} else {
 						$estado = "FACTURADO";
-					}
+					} 
 				} else {
 					$estado = 'EMITIDO';
 					$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
@@ -350,7 +354,7 @@ class Cobro extends Objeto
 				//ver si los pagos son por el monto total del cobro
 				$query = "SELECT monto
 					FROM documento
-					WHERE id_tipo_documento = 2 AND id_cobro = '".$this->fields['id_cobro']."'";
+					WHERE tipo_doc = 'N' AND id_cobro = '".$this->fields['id_cobro']."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 				$monto_total = mysql_result( $resp, 0, 0 );
 				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
@@ -366,7 +370,7 @@ class Cobro extends Objeto
 		$this->Edit('estado', $estado);
 		if($this->Write()){
 			return $estado;
-		}
+		} 
 		return null;
 	}
 	
@@ -435,6 +439,10 @@ class Cobro extends Objeto
 	{
 		$id_cobro = $this->fields['id_cobro'];
 
+                $query = "SELECT count(*) FROM documento WHERE id_cobro = '$id_cobro' AND tipo_doc != 'N' ";
+                $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+                list($cantidad_pagos) = mysql_fetch_array($resp);
+                
 		#No se puede anular si tiene facturas.
 		if($estado == 'CREADO')
 		{
@@ -444,6 +452,9 @@ class Cobro extends Objeto
 			{
 					return false;
 			}
+                        
+                        if( $cantidad_pagos > 0 )
+                            return false;
 		}
 
 		$query = "UPDATE trabajo SET fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
@@ -453,21 +464,22 @@ class Cobro extends Objeto
 		$this->Edit('id_doc_pago_honorarios','NULL');
 		$this->Edit('id_doc_pago_gastos','NULL');
 		$this->Write();
-		$this->AnularDocumento($estado);
+		$this->AnularDocumento($estado,$cantidad_pagos > 0 ? true : false);
 	}
 
-	function AnularDocumento($estado = 'CREADO')
+	function AnularDocumento($estado = 'CREADO',$hay_pagos=false)
 	{
 		$documento = new Documento($this->sesion);
 		$documento->LoadByCobro($this->fields['id_cobro']);
-		$documento->EliminarNeteos();
-
+		
 		if($estado == 'INCOBRABLE')
 		{
+                        $documento->EliminarNeteos();
 			$documento->AnularMontos();
 		}
-		else
+		else if( !$hay_pagos )
 		{
+                        $documento->EliminarNeteos();
 			$query_factura = "UPDATE factura_cobro SET id_documento = NULL WHERE id_documento = '".$documento->fields['id_documento']."'";
 			mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura,__FILE__,__LINE__,$this->sesion->dbh);
 			$documento->Delete();
@@ -1343,7 +1355,6 @@ class Cobro extends Objeto
 			//PENDIENTE: al final hay $documento->Edit('monto_base',number_format(($cobro_base_honorarios+$cobro_base_gastos),$decimales_base,".",""));
 			//cobro_base_honorarios y cobro_base_gastos se fue calculando 1 a 1 transformando a base.
 
-
 			//Tipo de cambios del cobro de (cobro_moneda)
 			$cobro_moneda = new CobroMoneda($this->sesion);
 			$cobro_moneda->Load($this->fields['id_cobro']);
@@ -1401,7 +1412,34 @@ class Cobro extends Objeto
 			$documento->Edit('saldo_gastos',$x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 			$documento->Edit('monto_base',$x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
 			$documento->Edit('fecha',date('Y-m-d'));
-			if($documento->Write())
+			
+                        $query = "SELECT id_documento, id_moneda FROM documento WHERE id_cobro = '".$this->fields['id_cobro']."' AND tipo_doc != 'N' ";
+                        $resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,$this->sesion->dbh);
+                        
+                        $saldo_honorarios = $documento->fields['honorarios'];
+                        $saldo_gastos = $documento->fields['gastos'];
+                        
+                        while( list($id_documento_pago, $id_moneda) = mysql_fetch_array($resp) )
+                        {
+                            $neteo = new NeteoDocumento($this->sesion);
+                            $neteo->Ids($id_documento_pago,$documento->fields['id_documento']);
+                            
+                            $documento_moneda_pago = new DocumentoMoneda($this->sesion);
+                            $documento_moneda_pago->Load($id_documento_pago);
+                            
+                            $neteo->Edit('valor_cobro_honorarios', number_format($neteo->fields['valor_pago_honorarios']*$documento_moneda_pago->moneda[$id_moneda]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.',''));
+                            $neteo->Edit('valor_cobro_gastos', number_format($neteo->fields['valor_cobro_gastos']*$documento_moneda_pago->moneda[$id_moneda]['tipo_cambio']/$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'],$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.',''));
+                            
+                            $saldo_honorarios -= $neteo->fields['valor_cobro_honorarios'];
+                            $saldo_gastos -= $neteo->fields['valor_cobro_gastos'];
+                            
+                            $neteo->Write();
+                        }
+                        
+                        $documento->Edit('saldo_honorarios', number_format($saldo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.','') );
+                        $documento->Edit('saldo_gastos', number_format($saldo_gastos, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'],'.','') );
+                        
+                        if($documento->Write())
 			{
 				$documento->BorrarDocumentoMoneda();
 				$query_documento_moneda = "INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)

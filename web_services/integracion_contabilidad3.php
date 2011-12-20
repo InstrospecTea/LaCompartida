@@ -44,7 +44,10 @@ $server->wsdl->addComplexType(
 			'all',
 			'',
 			array(
-				'id_factura' =>  array('name' => 'id_factura', 'type' => 'xsd:integer'),
+				'codigo_factura_lemontech' =>  array('name' => 'codigo_factura_lemontech', 'type' => 'xsd:integer'),
+				'comprobante_erp'  =>  array('name' => 'comprobante_erp', 'type' => 'xsd:string'),
+				'condicion_pago' => array('name' => 'condicion_pago','type' => 'xsd:integer'),
+				'serie' => array('name' => 'serie', 'type' => 'xsd:string'),
 				'numero' => array('name' => 'numero', 'type' => 'xsd:integer'),
 				'tipo' => array('name' => 'tipo', 'type' => 'xsd:string'),
 				'honorarios' => array('name' => 'honorarios', 'type' => 'xsd:float'),
@@ -211,7 +214,7 @@ $server->wsdl->addComplexType(
 			'all',
 			'',
 			array(
-				'id_factura' => array('name' => 'id_factura', 'type' => 'xsd:integer'),
+				'codigo_factura_lemontech' => array('name' => 'codigo_factura_lemontech', 'type' => 'xsd:integer'),
 				'resultado_factura' => array('name' => 'resultado_factura', 'type' => 'xsd:string')
 			)
 );
@@ -440,6 +443,8 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 
 			$query_facturas = " SELECT
 											factura.id_factura,
+											factura.comprobante_erp,
+											factura.condicion_pago,
 											SUM(factura_cobro.monto_factura) as monto_factura,
 											factura.numero,
 											prm_documento_legal.glosa as tipo,
@@ -459,19 +464,22 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											descripcion,
 											factura.id_moneda,
 											pm.tipo_cambio,
-											pm.cifras_decimales
+											pm.cifras_decimales,
+											prm_moneda.codigo as codigo_moneda_factura,
+											factura.serie_documento_legal as serie
 										FROM factura
 										JOIN prm_moneda AS pm ON factura.id_moneda = pm.id_moneda
 										LEFT JOIN cta_cte_fact_mvto AS ccfm ON factura.id_factura = ccfm.id_factura
 										JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
 										JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
+										JOIN prm_moneda ON prm_moneda.id_moneda = factura.id_moneda
 										LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
 										WHERE factura.id_cobro = '".$id_cobro."'
 										GROUP BY factura.id_factura";
 			$respu = mysql_query($query_facturas, $sesion->dbh) or Utiles::errorSQL($query_facturas, __FILE__, __LINE__, $sesion->dbh);
 
 			$facturas_cobro = Array();
-			while( list( $id_factura, $monto, $numero, $tipo, $estado, $cod_estado, $subtotal_honorarios, $honorarios, $saldo, $subtotal_gastos, $subtotal_gastos_sin_impuesto, $impuesto, $cod_tipo, $cliente, $RUT_cliente, $direccion_cliente, $fecha, $descripcion, $id_moneda_factura, $tipo_cambio_factura, $cifras_decimales_factura ) = mysql_fetch_array($respu) )
+			while( list( $id_factura, $comprobante_erp, $condicion_pago, $monto, $numero, $tipo, $estado, $cod_estado, $subtotal_honorarios, $honorarios, $saldo, $subtotal_gastos, $subtotal_gastos_sin_impuesto, $impuesto, $cod_tipo, $cliente, $RUT_cliente, $direccion_cliente, $fecha, $descripcion, $id_moneda_factura, $tipo_cambio_factura, $cifras_decimales_factura, $codigo_moneda_factura, $serie ) = mysql_fetch_array($respu) )
 			{
 										//si el documento no esta anulado, lo cuento para el saldo disponible a facturar (notas de credito suman, los demas restan)
 										if($cod_estado != 'A'){
@@ -481,6 +489,9 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$saldo_gastos_sin_impuestos += $subtotal_gastos_sin_impuesto*$mult;
 											
 											$factura_cobro['id_factura'] = $id_factura;
+											$factura_cobro['codigo_factura_lemontech'] = $id_factura;
+											$factura_cobro['comprobante_erp'] = $comprobante_erp;
+											$factura_cobro['condicion_pago'] = $condicion_pago;
 											$factura_cobro['tipo'] = $tipo;
 											$factura_cobro['numero'] = $numero;
 											$factura_cobro['honorarios'] = number_format($subtotal_honorarios,2,'.','');
@@ -492,11 +503,20 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$factura_cobro['saldo'] = number_format($saldo,2,'.','');
 
 											$factura_cobro['cliente'] = $cliente;
-											$factura_cobro['RUT_cliente'] = $RUT_cliente;
+											$factura_cobro['rut_cliente'] = $RUT_cliente;
 											$factura_cobro['direccion_cliente'] = $direccion_cliente;
 											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha);
 											$factura_cobro['descripcion'] = $descripcion;
-											
+											$factura_cobro['moneda'] = $codigo_moneda_factura;
+
+											if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie'))
+											{
+												$serie = $serie ? $serie : '001';
+												$factura_cobro['serie'] = str_pad($serie, 3, '0', STR_PAD_LEFT);
+											}
+											else
+												$factura_cobro['serie'] = $serie;
+
 											$uc = $usuarios_cobro;
 											$factura_cobro['ListaUsuariosFactura'] = $uc;
 											foreach($factura_cobro['ListaUsuariosFactura'] as $key => $user)
@@ -616,6 +636,9 @@ function AgregarFactura($p)
 		$monto_gastos_con_iva = $p['monto_gastos_con_iva'];
 		$monto_gastos_sin_iva = $p['monto_gastos_sin_iva'];
 
+		$comprobante_erp = $p['comprobante_erp'];
+		$condicion_pago = $p['condicion_pago'];
+
 		$monto_neto = $p['monto_neto'];
 		$porcentaje_impuesto = $p['porcentaje_impuesto'];
 		$iva = $p['iva'];
@@ -628,6 +651,7 @@ function AgregarFactura($p)
 		$id_cobro = $p['id_cobro'];
 		$id_documento_legal = $p['id_documento_legal'];
 		$numero = $p['numero'];
+		$serie = $p['serie'];
 		$id_estado = $p['id_estado'];
 		$id_moneda_factura = $p['id_moneda_factura'];
 			//Para Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose'
@@ -740,31 +764,32 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 						foreach($datos_cobro['ListaFacturasCobro'] as $datos_factura)
 						{
 							$factura = new Factura($sesion);
-							if($datos_factura['id_factura'])
+							if($datos_factura['codigo_factura_lemontech'])
 							{
-								$id_factura = intval(mysql_real_escape_string($datos_factura['id_factura']));
+								$id_factura = intval(mysql_real_escape_string($datos_factura['codigo_factura_lemontech']));
 								if($factura->Load($id_factura))
 								{
 									if($factura->fields['id_cobro'] != $id_cobro)
 									{
-										$resultado_facturas[] = array('id_factura'=>$id_factura,'resultado_factura'=>'Error: la factura indicada no pertenece al cobro');
+										$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>'Error: la factura indicada no pertenece al cobro');
 									}
 									else
 									{
 										$factura->Edit('numero',$datos_factura['numero']);
+										$factura->Edit('comprobante_erp',$datos_factura['comprobante_erp']);
 										if($factura->Write())
 										{
-											$resultado_facturas[] = array('id_factura'=>$id_factura,'resultado_factura'=>'Numero ingresado');
+											$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>'Numero ingresado');
 										}
 										else
 										{
-											$resultado_facturas[] = array('id_factura'=>$id_factura,'resultado_factura'=>'Error de ingreso');
+											$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>'Error de ingreso');
 										}
 									}
  								}
 								else
 								{
-									$resultado_facturas[] = array('id_factura'=>$id_factura,'resultado_factura'=>'Error: no existe factura');
+									$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>'Error: no existe factura');
 									$id_factura = '';
 								}
 							}
@@ -788,7 +813,7 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 								}
 								if(!$tipo)
 								{
-									$resultado_facturas[] = array('id_factura'=>'','resultado_factura'=>"Error en nueva factura: tipo no reconocido. Los tipos de documento legal son: $helper_tipo_documento_legal");
+									$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>"Error en nueva factura: tipo no reconocido. Los tipos de documento legal son: $helper_tipo_documento_legal");
 								}
 								else
 								{
@@ -797,6 +822,9 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 									
 									$p['usuario'] = $usuario;
 									$p['password'] = $password;
+
+									$p['comprobante_erp'] = mysql_real_escape_string($datos_factura['comprobante_erp']);
+									$p['condicion_pago'] = intval($datos_factura['condicion_pago']);
 
 									$p['cliente'] = mysql_real_escape_string($datos_factura['cliente']);
 									$p['monto_honorarios_legales'] = round(floatval($datos_factura['honorarios']),$decimales);
@@ -814,14 +842,15 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 									$p['iva'] = $datos_factura['impuestos'];
 
 									$p['id_factura_padre'] = null;
-									$p['fecha'] = $datos_factura['fecha'];
-									$p['RUT_cliente'] = $datos_factura['rut_cliente'];
-									$p['direccion_cliente'] = $datos_factura['direccion_cliente']; ;
-									$p['codigo_cliente'] = $cobro->fields['codigo_cliente'];
+									$p['fecha'] = mysql_real_escape_string($datos_factura['fecha']);
+									$p['RUT_cliente'] = mysql_real_escape_string($datos_factura['rut_cliente']);
+									$p['direccion_cliente'] = mysql_real_escape_string($datos_factura['direccion_cliente']);
+									$p['codigo_cliente'] = mysql_real_escape_string($cobro->fields['codigo_cliente']);
 									$p['id_cobro'] = $id_cobro;
 									$p['id_documento_legal'] = $id_tipo;
 									$p['codigo_tipo_doc'] = $tipo;
-									$p['numero'] = $datos_factura['numero'];
+									$p['serie'] = intval($datos_factura['serie']);
+									$p['numero'] = mysql_real_escape_string($datos_factura['numero']);
 									$p['id_estado'] = 1;
 									$p['id_moneda_factura'] = $cobro->fields['opc_moneda_total'];
 										//Para Conf::GetConf($sesion,'DesgloseFactura')=='con_desglose'
@@ -843,11 +872,11 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 
 									if($resultado['id_factura'])
 									{
-										$resultado_facturas[] = array('id_factura'=>$resultado['id_factura'],'resultado_factura'=>'Factura guardada con éxito');
 										$id_factura = $resultado['id_factura'];
+										$resultado_facturas[] = array('codigo_factura_lemontech'=>$id_factura,'resultado_factura'=>'Factura guardada con éxito');
 									}
 									else
-										$resultado_facturas[] = array('id_factura'=>'-','resultado_factura'=>$resultado['error']);
+										$resultado_facturas[] = array('codigo_factura_lemontech'=>'-','resultado_factura'=>$resultado['error']);
 								}
 								//Ingresar nueva factura?
 							}

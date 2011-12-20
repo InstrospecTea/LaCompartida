@@ -172,9 +172,16 @@
 
 		$ret = $cobro->GuardarCobro();
 		if($accion == 'emitir' && $ret == '') 				##################### EMISION ######################
-		{
+		{ 
 			/*Guardo el cobro generando los movimientos de cuenta corriente*/
-			$cobro->GuardarCobro(true);
+			$query_pagos = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobro->fields['id_cobro']."' AND tipo_doc != 'N' ";
+                        $resp_pagos = mysql_query($query_pagos,$sesion->dbh) or Utiles::errorSQL($query_pagos,__FILE__,__LINE__,$sesion->dbh);
+                        list($cantidad_pagos) = mysql_fetch_array($resp_pagos);
+                        if( $cantidad_pagos > 0 ) {
+                            $cobro->ReiniciarDocumento();
+                        } else {
+                            $cobro->GuardarCobro(true);
+                        }
 			$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado','EMITIDO');
 			$historial_comentario = __('COBRO EMITIDO');
@@ -191,7 +198,7 @@
 					$documento = new Documento($sesion);
 					$documento->LoadByCobro($id_cobro);
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
-				}
+				} 
 				$cobro->CambiarEstadoSegunFacturas();
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1");
@@ -250,17 +257,31 @@
 	}
 	elseif($opc == 'volver_a_creado')
 	{
-		$cobro->Edit('estado','CREADO');
-		if($cobro->Write())
-			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
-		$historial_comentario = __('REVISION ANULADO');
-		##Historial##
-		$his = new Observacion($sesion);
-		$his->Edit('fecha',date('Y-m-d H:i:s'));
-		$his->Edit('comentario',$historial_comentario);
-		$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
-		$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-		$his->Write();
+                $query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobro->fields['id_cobro']."' ";
+                $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                list($cantidad_pagos) = mysql_fetch_array($resp);
+                
+                $query = "SELECT count(*) FROM factura WHERE id_cobro = '".$cobro->fields['id_cobro']."' ";
+                $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                list($cantidad_facturas) = mysql_fetch_array($resp);
+                
+                if( $cantidad_pagos > 0 ) {
+                    $pagina->AddError("Este cobro no se puede volver al estado CREADO, ya que tiene un pago asociado.");
+                } else if( $cantidad_facturas > 0 ) {
+                    $pagina->AddError("Este cobro no se puede volver al estado CREADO, ya que tiene facturas asociados.");
+                } else {
+                    $cobro->Edit('estado','CREADO');
+                    if($cobro->Write())
+                            $pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
+                    $historial_comentario = __('REVISION ANULADO');
+                    ##Historial##
+                    $his = new Observacion($sesion);
+                    $his->Edit('fecha',date('Y-m-d H:i:s'));
+                    $his->Edit('comentario',$historial_comentario);
+                    $his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
+                    $his->Edit('id_cobro',$cobro->fields['id_cobro']);
+                    $his->Write();
+                }
 	}
 
 	$cobro->Edit('etapa_cobro','4');

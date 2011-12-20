@@ -225,17 +225,17 @@ function Write()
 		}
 		if( $this->fields['orden_estado']==2 || $this->fields['estado'] == 'Asignada')
 		{
-			$estado = " Se le ha sido asignado la siguiente tarea:";
+			$estado = " Se le ha asignado la siguiente tarea:";
 			$where = "id_usuario=".$this->fields['usuario_encargado'];
 		}
 		else if( $this->fields['orden_estado'] == 4)
 		{
-			$estado = " Se le ha desarrollado la siguiente tarea y está a la espera de su revisión:";
+			$estado = " La siguiente tarea ha sido desarrollada y está a la espera de su revisión:";
 			$where = "id_usuario=".$this->fields['usuario_revisor'];
 		}
 		else if( $this->fields['orden_estado'] == 5)
 		{
-			$estado = " Se le ha revisado la siguiente tarea:";
+			$estado = " Se ha revisado la siguiente tarea:";
 			$where = "id_usuario=".$this->fields['usuario_encargado']." OR id_usuario=".$this->fields['usuario_revisor']." OR id_usuario=".$this->fields['usuario_generador'];
 		}
 		else
@@ -262,7 +262,7 @@ function Write()
 			list($rut,$dv_rut,$password)=mysql_fetch_array($resp2);
 			
 			$subject = "[Tarea] ".$this->fields['nombre'];
-			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=http://lab.lemontech.cl".Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";
+			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";
 			
 			Utiles::Insertar($this->sesion,$subject,$mensaje,$email,$nombre,false);
 		}

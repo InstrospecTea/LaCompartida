@@ -94,7 +94,6 @@
 		$resultado[$dato] = $reporte[$dato]->toArray();
 	}	
 
-
     $wb = new Spreadsheet_Excel_Writer();
 
     $wb->send("Planilla Horas por Cliente.xls");
@@ -207,14 +206,11 @@
    $ws1->fitToPages(1,0);
    $ws1->setZoom(75);
 
-    $ws1->setColumn( $fila_inicial, $fila_inicial,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+1,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+2,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+3,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+4,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+5,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+6,  25.00);
-	$ws1->setColumn( $fila_inicial, $fila_inicial+7,  25.00);
+   $cantidad_columnas = sizeof($agrupadores) * ( $comparar ? 3 : 2 );
+   
+   for($i=0;$i<$cantidad_columnas;$i++) {
+       $ws1->setColumn( $fila_inicial+$i, $fila_inicial+$i, 25.00);
+   }
 
 	$fila = 1;
 
@@ -324,44 +320,20 @@
 	//ENCABEZADOS
 
 	$col = $columna;
-
-	if(sizeof($agrupadores)>5)
-	{
-		$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[0]),$encabezado);
+        
+        for($i=0;$i<sizeof($agrupadores);$i++) {
+                $indice_agrupador = 6-sizeof($agrupadores)+$i;
+                $ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[$indice_agrupador]),$encabezado);
 		$col++;
-	}
-	if(sizeof($agrupadores)>4)	
-	{
-		$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[1]),$encabezado);
-		$col++;
-	}
-	if(sizeof($agrupadores)>3)
-	{
-		$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[2]),$encabezado);
-		$col++;
-	}
-	if(sizeof($agrupadores)>2)
-	{
-		$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[3]),$encabezado);
-		$col++;
-	}
-	if(sizeof($agrupadores)>1)
-	{
-		$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[4]),$encabezado);
-		$col++;
-	}
-	$ws1->write($fila,$col,__($reporte[$tipo_dato]->agrupador[5]),$encabezado);
-	$col++;
-	
-
-	$ws1->write($fila,$col,__($tipo_dato),$encabezado);
-	$col++;
-	if($comparar)
-	{
-		$ws1->write($fila,$col,__($tipo_dato_comparado),$encabezado);
-	}
-
-	
+                $ws1->write($fila,$col,__($tipo_dato),$encabezado);
+                $col++;
+                if($comparar)
+                {
+                        $ws1->write($fila,$col,__($tipo_dato_comparado),$encabezado);
+                        $col++;
+                }
+        }
+       
 	$fila++;
 
 	/*	CELDAS Y VALORES. Se indica Total después del agrupador principal (nombre de la vista) y el agrupador más pequeño.
@@ -379,6 +351,16 @@
 				texto($fila_a, $col_a, $k_a);
 				extender($fila_a, $col_a, $a['filas']);
 				$col_a++;
+                                
+                                dato($fila_a, $col_a, $resultado[$tipo_dato][$k_a]['valor']);
+                                extender($fila_a, $col_a, $a['filas']);
+				$col_a++;
+
+				if($comparar) {
+					dato($fila_a, $col_a, $resultado[$tipo_dato_comparado][$k_a]['valor']);
+                                        extender($fila_a, $col_a, $a['filas']);
+                                        $col_a++;
+                                }
 			}
 
 			$fila_b = $fila_a;
@@ -393,6 +375,16 @@
 						texto($fila_b, $col_b, $k_b);
 						extender($fila_b, $col_b, $b['filas']);
 						$col_b++;
+                                                
+                                                dato($fila_b, $col_b, $resultado[$tipo_dato][$k_a][$k_b]['valor']);
+                                                extender($fila_b, $col_b, $b['filas']);
+						$col_b++;
+
+						if($comparar) {
+							dato($fila_b, $col_b, $resultado[$tipo_dato_comparado][$k_a][$k_b]['valor']);
+                                                        extender($fila_b, $col_b, $b['filas']);
+                                                        $col_b++;
+                                                }
 					}	
 
 					$fila_c = $fila_b;
@@ -407,6 +399,16 @@
 								texto($fila_c, $col_c, $k_c);
 								extender($fila_c, $col_c, $c['filas']);
 								$col_c++;
+                                                                
+                                                                dato($fila_c, $col_c, $resultado[$tipo_dato][$k_a][$k_b][$k_c]['valor']);
+                                                                extender($fila_c, $col_c, $c['filas']);
+								$col_c++;
+
+								if($comparar) {
+									dato($fila_c, $col_c, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c]['valor']);
+                                                                        extender($fila_c, $col_c, $c['filas']);
+                                                                        $col_c++;
+                                                                }
 							}
 
 							$fila_d = $fila_c;
@@ -420,6 +422,16 @@
 										texto($fila_d, $col_d, $k_d);
 										extender($fila_d, $col_d, $d['filas']);
 										$col_d++;
+                                                                                
+                                                                                dato($fila_d, $col_d, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d]['valor']);
+                                                                                extender($fila_d, $col_d, $d['filas']);
+										$col_d++;
+
+										if($comparar) {
+											dato($fila_d, $col_d, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d]['valor']);
+                                                                                        extender($fila_d, $col_d, $d['filas']);
+                                                                                        $col_d++;
+                                                                                }
 									}
 
 									$fila_e = $fila_d;
@@ -433,6 +445,17 @@
 												texto($fila_e, $col_e, $k_e);
 												extender($fila_e, $col_e, $e['filas']);
 												$col_e++;
+                                                                                                
+                                                                                                dato($fila_e, $col_e, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
+                                                                                                extender($fila_e, $col_e, $e['filas']);
+												$col_e++;
+
+												if($comparar) {
+													dato($fila_e, $col_e, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
+                                                                                                        extender($fila_e, $col_e, $e['filas']);
+                                                                                                        $col_e++;
+                                                                                                }
+
 											}
 
 											$fila_f = $fila_e;
@@ -472,7 +495,7 @@
 		
 		
 	}
-		$col_c = sizeof($agrupadores)-1;
+		$col_c = $cantidad_columnas-($comparar ? 3: 2);
 		//TOTALES
 		$ws1->write($fila_a,$columna+$col_c,"TOTAL",$txt_derecha_bold);
 				

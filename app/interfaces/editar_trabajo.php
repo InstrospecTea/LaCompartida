@@ -169,7 +169,11 @@
 			if($Ordenado_por==1 || $Ordenado_por==2)
 				$t->Edit('solicitante',$solicitante);
 
-			$t->Edit('descripcion',$descripcion);
+			if( UtilesApp::GetConf($sesion,'TodoMayuscula') ) {
+                            $t->Edit('descripcion',strtoupper($descripcion));
+                        } else {
+                            $t->Edit('descripcion',$descripcion);
+                        }
 			$t->Edit('fecha',Utiles::fecha2sql($fecha));
 			#$t->Edit('fecha',$fecha);
 			if($codigo_actividad)

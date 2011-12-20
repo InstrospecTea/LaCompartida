@@ -6873,6 +6873,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					throw new Exception($q . "---" . mysql_error());
 				}
 			}
+			break;
+
+		case 5.26:
+			$query = array();
+			$query[] = "ALTER TABLE  `factura` ADD  `comprobante_erp` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `numero` ,
+ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp` ;";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+			break;
 
 	}
 }
@@ -7167,6 +7180,7 @@ $VERSIONES[$num++] = 5.22;
 $VERSIONES[$num++] = 5.23;
 $VERSIONES[$num++] = 5.24;
 $VERSIONES[$num++] = 5.25;
+$VERSIONES[$num++] = 5.26;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
