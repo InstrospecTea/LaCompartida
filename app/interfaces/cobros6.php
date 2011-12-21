@@ -45,6 +45,10 @@ if ($opc == 'eliminar_pago') {
 			$pagina->addInfo(__('Pago borrado con éxito'));
 	}
 }
+
+if (!$cobro->Load($id_cobro))
+	$pagina->FatalError(__('Cobro inválido'));
+
 if ($opc == "eliminar_documento") {
 	$documento_eliminado = new Documento($sesion);
 	$documento_eliminado->Load($id_documento_eliminado);
@@ -68,9 +72,8 @@ if ($opc == "eliminar_documento") {
 		}
 		$pagina->AddInfo(__('El pago ha sido eliminado satisfactoriamente'));
 	}
+        $cobro->CambiarEstadoSegunFacturas();
 }
-if (!$cobro->Load($id_cobro))
-	$pagina->FatalError(__('Cobro inválido'));
 
 $moneda_total = new Moneda($sesion);
 $moneda_total->Load($cobro->fields['opc_moneda_total']);
@@ -331,7 +334,7 @@ if ($cambiar_estado) {
 		$cobro->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 	$cobro->Edit('estado', $estado);
 	$cobro->Write();
-
+        
 	#Se ingresa la anotación en el historial
 	$his = new Observacion($sesion);
 	$his->Edit('fecha', date('Y-m-d H:i:s'));

@@ -288,8 +288,12 @@ class Cobro extends Objeto
 		}
 		$estado = $actual;
 		
-		$num_facturas = $this->CantidadFacturasSinAnular();
-                if($num_facturas == 0){
+                if( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura') ) {
+                    $num_facturas = $this->CantidadFacturasSinAnular();
+                } else {
+                    $num_factura = $this->fields['facturado'];
+                }
+                if($num_facturas == 0 && UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')){
 			if($actual != "ENVIADO AL CLIENTE"){
 				$estado = "EMITIDO";
 			}
@@ -328,16 +332,24 @@ class Cobro extends Objeto
 			}
 			
 			//tomar suma de todos los pagos aplicados a facturas
-			$query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
-				FROM cta_cte_fact_mvto_neteo ccfmn
-					JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-					JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
-					JOIN factura f ON f.id_factura = ccfm.id_factura 
-                                        JOIN cobro c ON c.id_cobro = f.id_cobro 
-                                        JOIN prm_moneda as m_cobro ON m_cobro.id_moneda = c.opc_moneda_total 
-                                        JOIN cobro_moneda as mf ON mf.id_cobro = f.id_cobro AND mf.id_moneda = f.id_moneda 
-                                        JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total 
-				WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
+			if( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura') ) {
+                            $query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
+                                    FROM cta_cte_fact_mvto_neteo ccfmn
+                                            JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
+                                            JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
+                                            JOIN factura f ON f.id_factura = ccfm.id_factura 
+                                            JOIN cobro c ON c.id_cobro = f.id_cobro 
+                                            JOIN prm_moneda as m_cobro ON m_cobro.id_moneda = c.opc_moneda_total 
+                                            JOIN cobro_moneda as mf ON mf.id_cobro = f.id_cobro AND mf.id_moneda = f.id_moneda 
+                                            JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total 
+                                    WHERE f.id_cobro = '".$this->fields['id_cobro']."'";
+                        } else {
+                            $query = "SELECT ROUND( SUM(-1*documento.monto) ), ROUND( SUM(-1*documento.monto) ) 
+                                        FROM documento
+                                        JOIN cobro_moneda as md ON md.id_cobro = documento.id_cobro AND md.id_moneda = documento.id_moneda 
+                                        JOIN cobro_moneda as mc ON mc.id_cobro = '".$this->fields['id_cobro']."' AND mc.id_moneda = '".$this->fields['opc_moneda_total']."' 
+                                       WHERE documento.id_cobro = '".$this->fields['id_cobro']."' AND tipo_doc != 'N' ";
+                        }
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($monto_pagado,$monto_pago_menos_ncs) = mysql_fetch_array( $resp );
 			
@@ -349,7 +361,11 @@ class Cobro extends Objeto
 						$estado = "FACTURADO";
 					} 
 				} else {
-					$estado = 'EMITIDO';
+                                        if( !empty($this->fields['fecha_enviado_cliente']) && $this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' && !UtilesApp::GetConf($this->sesion,'NuevoModuloFactura') ) {
+                                            $estado = "ENVIADO AL CLIENTE";
+                                        } else {
+                                            $estado = 'EMITIDO';
+                                        }
 					$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
 				}
 			} else if( !empty($monto_pago_menos_ncs) && $monto_pago_menos_ncs > 0 ) {
@@ -361,6 +377,15 @@ class Cobro extends Objeto
 				$monto_total = mysql_result( $resp, 0, 0 );
 				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
 				$estado = round($monto_pagado) < round($monto_total) ? "PAGO PARCIAL" : "PAGADO";
+				if( $estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' ) ){
+					$fecha_primer_pago = $this->FechaPrimerPago();
+					$this->Edit('fecha_pago_parcial', $fecha_primer_pago);
+				}
+				
+				if( $estado == 'PAGADO' && ( empty($this->fields['fecha_cobro']) || $this->fields['fecha_cobro'] == '0000-00-00 00:00:00' ) ){
+					$fecha_ultimo_pago = $this->FechaUltimoPago();
+					$this->Edit('fecha_cobro', $fecha_ultimo_pago);
+				}
 			} 
 		}
 		if( $estado != 'PAGADO') {
@@ -371,9 +396,45 @@ class Cobro extends Objeto
 		} 
 		$this->Edit('estado', $estado);
 		if($this->Write()){
+                        $his = new Observacion($this->sesion);
+                        $his->Edit('fecha',date('Y-m-d H:i:s'));
+                        $his->Edit('comentario',__('COBRO '.$estado));
+                        $his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
+                        $his->Edit('id_cobro',$this->fields['id_cobro']);
+                        $his->Write();
 			return $estado;
 		} 
 		return null;
+	}
+	
+	function FechaPrimerPago(){
+		$query = "SELECT MIN(fp.fecha)
+					FROM cta_cte_fact_mvto_neteo ccfmn
+						JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
+						JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
+						JOIN factura_pago fp ON fp.id_factura_pago = ccfmp.id_factura_pago
+						JOIN factura f ON f.id_factura = ccfm.id_factura
+					WHERE f.id_cobro = '".$this->fields['id_cobro']."' ";
+		
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($fecha_ini) = mysql_fetch_array($resp);
+
+		return $fecha_ini;
+	}
+	
+	function FechaUltimoPago(){
+		$query = "SELECT MAX(fp.fecha)
+					FROM cta_cte_fact_mvto_neteo ccfmn
+						JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
+						JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
+						JOIN factura_pago fp ON fp.id_factura_pago = ccfmp.id_factura_pago
+						JOIN factura f ON f.id_factura = ccfm.id_factura
+					WHERE f.id_cobro = '".$this->fields['id_cobro']."' ";
+		
+		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		list($fecha_ini) = mysql_fetch_array($resp);
+
+		return $fecha_ini;
 	}
 	
 	function FechaPrimerTrabajo()
@@ -780,7 +841,7 @@ class Cobro extends Objeto
 			else
 				$this->Edit('porcentaje_impuesto_gastos', '0');
 		}
-      $query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
+                $query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
                                    tramite.tarifa_tramite,
                                    tramite.id_moneda_tramite,
                                    tramite.fecha,

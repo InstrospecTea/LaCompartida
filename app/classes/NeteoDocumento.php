@@ -206,7 +206,7 @@ class NeteoDocumento extends Objeto
 					$cobro = new Cobro($this->sesion);
 					$cobro->Load($id_cobro);
 					if($cobro->Loaded())
-					{
+					{ /*
 						if($cobro->fields['estado'] != 'PAGADO')
 						{
 							#Se ingresa la anotación en el historial
@@ -216,7 +216,7 @@ class NeteoDocumento extends Objeto
 							$his->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
 							$his->Edit('id_cobro',$id_cobro);
 							$his->Write();
-						}
+						}*/
 						$cobro->Edit('estado','PAGADO');
 						$cobro->Write();
 					}
