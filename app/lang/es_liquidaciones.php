@@ -22,6 +22,7 @@
 	$_LANG['Guardar cobro'] = "Guardar liquidación";
 	$_LANG['un cobro'] = "una liquidación";
 	$_LANG['Nota Cobro'] = "Nota Liquidación";
+        $_LANG['ultimo cobro'] = "ultima liquidación";
 	$_LANG['Total Cobro Original'] = "Total Liquidación Original";
 	$_LANG['al cobro'] = "a la liquidación";
 	$_LANG['un Cobro'] = "una Liquidación";

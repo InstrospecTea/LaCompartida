@@ -44,6 +44,7 @@ $_LANG['Encargado Comercial'] = 'Attache Primario';
 $_LANG['Encargado comercial'] = 'Attache principal';
 $_LANG['Usuario encargado'] = 'Attache Secundario';
 $_LANG['Encargado'] = 'Attache';
+$_LANG['encargado'] = 'attache';
 $_LANG['Encargado Secundario'] = 'Attache Secundario';
 
 $_LANG['id_usuario_responsable'] = 'Attache Primario';

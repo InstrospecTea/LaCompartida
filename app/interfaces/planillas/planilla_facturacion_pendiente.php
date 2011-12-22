@@ -643,10 +643,10 @@
                             $ocultar_estado_ultimo_cobro = UtilesApp::GetConf($sesion,'OcultarColumnasHorasPorFacturar');
                         }
                         ?>
-                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?=$ocultar_encargado ? 'checked' : ''?> /><?=__('Ocultar columna encargado')?><br/>
-                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?=$ocultar_ultimo_trabajo ? 'checked' : ''?> /><?=__('Ocultar columna ultimo trabajo')?><br/>
-                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?=$ocultar_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna ultimo cobro')?><br/>
-                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?=$ocultar_estado_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna estado ultimo cobro')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?=$ocultar_encargado ? 'checked' : ''?> /><?=__('Ocultar columna').' '.__('encargado')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?=$ocultar_ultimo_trabajo ? 'checked' : ''?> /><?=__('Ocultar columna').' '.__('ultimo trabajo')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?=$ocultar_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna').' '.__('ultimo cobro')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?=$ocultar_estado_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna estado').' '.__('ultimo cobro')?><br/>
                     </td>
                 </tr>
 		<tr>
