@@ -8082,7 +8082,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 			$html = str_replace('%horas%', __('Total Horas'), $html);
                         if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                            $duracion_decimal_cobrable = number_format( $horas_cobrables + $minutos_cobrables/60, 1,',','');
+                            $duracion_decimal_cobrable = number_format( $horas_cobrables + $minutos_cobrables/60, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',','');
                             $html = str_replace('%valor_horas%', $duracion_decimal_cobrable, $html );
                         } else {
                             $html = str_replace('%valor_horas%', $horas_cobrables.':'.$minutos_cobrables, $html);
