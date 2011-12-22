@@ -875,7 +875,8 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 	<tr>
 		<td align=right colspan="2">&nbsp;</td>
 	</tr>
-<?
+<?php
+        $usuario_defecto = empty($gasto->fields['id_movimiento']) ? $sesion->usuario->fields['id_usuario'] : '';
 	if($prov == 'false')
 	{
 ?>
@@ -884,10 +885,10 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Ordenado por')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $sesion->usuario->fields['id_usuario'], "", "Vacio",'170'); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, "", "Vacio",'170'); ?>
 		</td>
 	</tr>
-<?
+<?php
 	}
 ?>
 	<tr>
@@ -896,7 +897,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 		</td>
 		<td align=left>
 			<!-- $sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150' -->
-			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $sesion->usuario->fields['id_usuario'], "", "Vacio",'170'); ?>
+			<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario ORDER BY apellido1", "id_usuario", isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, "", "Vacio",'170'); ?>
 		</td>
 	</tr>
 </table>
