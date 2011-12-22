@@ -64,6 +64,12 @@
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
+                $fdd =& $wb->addFormat(array('Size' => 11,
+								'VAlign' => 'top',
+								'Align' => 'justify',
+								'Border' => 1,
+								'Color' => 'black'));
+                $fdd->setNumFormat(0.0);
 
 		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
 
@@ -418,7 +424,11 @@
                             $ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
 			if( !$ocultar_estado_ultimo_cobro )
                             $ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
-			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas/24,6,'.',''), $formato_tiempo);
+			if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                            $ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas,1,'.',''), $fdd);
+                        } else {
+                            $ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas/24,6,'.',''), $formato_tiempo);
+                        }
 			$ws1->write($filas, $col_forma_cobro, $cobro['forma_cobro'], $formato_texto);
 
 			// En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
@@ -554,8 +564,12 @@
 			$ws1->writeFormula($filas, $col_valor_en_moneda_base_segun_THH, "=SUM($col_formula_valor_en_moneda_base_segun_THH$fila_inicial:$col_formula_valor_en_moneda_base_segun_THH$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
 
 			$col_formula_horas_trabajadas = Utiles::NumToColumnaExcel($col_horas_trabajadas);
-
-			$ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $formato_tiempo);
+                        
+                        if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                            $ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $fdd);
+                        } else {
+                            $ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $formato_tiempo);
+                        }
 		}
 
 		$wb->send("Planilla horas por facturar.xls");
