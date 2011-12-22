@@ -229,6 +229,8 @@ class NeteoDocumento extends Objeto
 						$provision->Edit('ingreso',$pago_gastos);
 						$provision->Edit('monto_cobrable',$pago_gastos);
 						$provision->Edit('id_cobro','NULL');
+                                                $provision->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
+                                                $provision->Edit('id_usuario_orden',$this->sesion->usuario->fields['id_usuario']);
 						$provision->Edit('codigo_cliente', $documento_pago->fields['codigo_cliente']);
 
 						$query_gastos = "SELECT cta_corriente.codigo_asunto FROM cta_corriente 

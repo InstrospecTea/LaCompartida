@@ -134,8 +134,9 @@
 		$col = 0;
 
 		$col_cliente = ++$col;
-		$col_usuario_encargado = ++$col;
-		if ($mostrar_encargado_secundario) {
+		if( !$ocultar_encargado )
+                    $col_usuario_encargado = ++$col;
+		if ($mostrar_encargado_secundario && !$ocultar_encargado) {
 			$col_usuario_encargado_secundario = ++$col;
 		}
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaCodigoAsuntoHorasPorFacturar') ) {
@@ -145,18 +146,27 @@
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaAsuntoCobrableHorasPorFacturar') ) {
                     $col_asunto_cobrable = ++$col;
                 }
-		$col_ultimo_trabajo = ++$col;
+                if( !$ocultar_ultimo_trabajo )
+                    $col_ultimo_trabajo = ++$col;
 
 		if (UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar')) {
 			$col_ultimo_gasto = ++$col;
 			$col_monto_gastos = ++$col;
                         $col_monto_gastos_mb = ++$col;
 		}
-		$col_ultimo_cobro = ++$col;
-		$col_estado_ultimo_cobro = ++$col;
+                if( !$ocultar_ultimo_cobro )
+                    $col_ultimo_cobro = ++$col;
+		if( !$ocultar_estado_ultimo_cobro )
+                    $col_estado_ultimo_cobro = ++$col;
 		$col_horas_trabajadas = ++$col;
 		$col_forma_cobro = ++$col;
-		$col_valor_estimado = ++$col;
+                if( $desglosar_moneda ) {
+                    foreach( $arreglo_monedas as $id_moneda => $moneda ) {
+                        $col_valor_estimado_{$id_moneda} = ++$col;
+                    }
+                } else {
+                    $col_valor_estimado = ++$col;
+                }
 		$col_tipo_cambio = ++$col;
 		if( $id_moneda_base != $id_moneda_referencia ) {
 			$col_tipo_cambio_moneda_base = ++$col;
@@ -174,9 +184,11 @@
 		unset($col);
 
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
-		$ws1->setColumn($col_usuario_encargado, $col_usuario_encargado, 40);
-		if($mostrar_encargado_secundario)
+                if( !$ocultar_encargado ) {
+                    $ws1->setColumn($col_usuario_encargado, $col_usuario_encargado, 40);
+                    if($mostrar_encargado_secundario)
 			$ws1->setColumn($col_usuario_encargado_secundario, $col_usuario_encargado_secundario, 40);
+                }
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaCodigoAsuntoHorasPorFacturar') ) {
         		$ws1->setColumn($col_codigo_asunto, $col_codigo_asunto, 16);
                 }
@@ -184,17 +196,28 @@
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaAsuntoCobrableHorasPorFacturar') ) {
                     $ws1->setColumn($col_asunto_cobrable, $col_asunto_cobrable, 13);
                 }
-
-		$ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
+                if( !$ocultar_ultimo_trabajo ) {
+                    $ws1->setColumn($col_ultimo_trabajo, $col_ultimo_trabajo, 15);
+                }
 		if( UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar') ) {
 			$ws1->setColumn($col_ultimo_gasto, $col_ultimo_gasto, 15);
 			$ws1->setColumn($col_monto_gastos, $col_monto_gastos, 18);
 			$ws1->setColumn($col_monto_gastos_mb, $col_monto_gastos_mb, 18);
 		}
-		$ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
-		$ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
+                if( !$ocultar_ultimo_cobro ) {
+                    $ws1->setColumn($col_ultimo_cobro, $col_ultimo_cobro, 14);
+                }
+                if( !$ocultar_estado_ultimo_cobro ) {
+                    $ws1->setColumn($col_estado_ultimo_cobro, $col_estado_ultimo_cobro, 22);
+                }
 		$ws1->setColumn($col_forma_cobro, $col_forma_cobro, 14);
-		$ws1->setColumn($col_valor_estimado, $col_valor_estimado, 18);
+                if( $desglosar_moneda ) {
+                    foreach( $arreglo_monedas as $id_moneda => $moneda ) {
+                        $ws1->setColumn($col_valor_estimado_{$id_moneda},$col_valor_estimado_{$id_moneda}, 22);
+                    }
+                } else {
+                    $ws1->setColumn($col_valor_estimado, $col_valor_estimado, 18);
+                }
 		$ws1->setColumn($col_tipo_cambio, $col_tipo_cambio, 14);
 		if( $id_moneda_base != $id_moneda_referencia ) {
 			$ws1->setColumn($col_tipo_cambio_moneda_base, $col_tipo_cambio_moneda_base, 14);
@@ -212,10 +235,12 @@
 		}
 
 		$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
-		$ws1->write($filas, $col_usuario_encargado, __('Encargado Comercial'), $formato_titulo);
-		if ($mostrar_encargado_secundario) {
-			$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
-		}
+                if( !$ocultar_encargado ) {
+                    $ws1->write($filas, $col_usuario_encargado, __('Encargado Comercial'), $formato_titulo);
+                    if ($mostrar_encargado_secundario) {
+                            $ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
+                    }
+                }
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaCodigoAsuntoHorasPorFacturar') ) {
         		$ws1->write($filas, $col_codigo_asunto, __('Código Asunto'), $formato_titulo);
                 }
@@ -223,16 +248,25 @@
                 if( UtilesApp::GetConf($sesion,'MostrarColumnaAsuntoCobrableHorasPorFacturar') ) {
                     $ws1->write($filas, $col_asunto_cobrable, __('Cobrable'), $formato_titulo);
                 }
-		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
+                if( !$ocultar_ultimo_trabajo )
+        		$ws1->write($filas, $col_ultimo_trabajo, __('Último trabajo'), $formato_titulo);
 		if (UtilesApp::GetConf($sesion,'MostrarColumnasGastosEnHorasPorFacturar')) {
 			$ws1->write($filas, $col_ultimo_gasto, __('Último gasto'), $formato_titulo);
 			$ws1->write($filas, $col_monto_gastos, __('Monto gastos'), $formato_titulo);
                         $ws1->write($filas, $col_monto_gastos_mb, __('Monto gastos '.$moneda_base['simbolo']), $formato_titulo);
 		}
-		$ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
-		$ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
+                if( !$ocultar_ultimo_cobro )    
+                    $ws1->write($filas, $col_ultimo_cobro, __('Último cobro'), $formato_titulo);
+                if( !$ocultar_estado_ultimo_cobro )
+                    $ws1->write($filas, $col_estado_ultimo_cobro, __('Estado último cobro'), $formato_titulo);
 		$ws1->write($filas, $col_forma_cobro, __('Forma cobro'), $formato_titulo);
-		$ws1->write($filas, $col_valor_estimado, __('Valor estimado'), $formato_titulo);
+		if( $desglosar_moneda ) {
+                    foreach( $arreglo_monedas as $id_moneda => $moneda ) {
+                        $ws1->write($filas, $col_valor_estimado_{$id_moneda}, __('Valor estimado').' '.__($moneda['glosa_moneda']), $formato_titulo);
+                    }
+                } else {
+                    $ws1->write($filas, $col_valor_estimado, __('Valor estimado'), $formato_titulo);
+                }
 		$ws1->write($filas, $col_tipo_cambio, __('Tipo Cambio'), $formato_titulo);
 		if( $id_moneda_base != $id_moneda_referencia ) {
 			$ws1->write($filas, $col_tipo_cambio_moneda_base, __('Tipo Cambio '.$arreglo_monedas[$id_moneda_base]['simbolo']), $formato_titulo);
@@ -347,16 +381,18 @@
 			++$filas;
 
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
-				$ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
-				if($mostrar_encargado_secundario)
-					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['username_encargado_secundario'], $formato_texto);
-			}
-			else{
-				$ws1->write($filas, $col_usuario_encargado, $cobro['nombre_encargado_comercial'], $formato_texto);
-				if($mostrar_encargado_secundario)
-					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_encargado_secundario'], $formato_texto);
-			}
+			if( !$ocultar_encargado ) {
+                            if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
+                                    $ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
+                                    if($mostrar_encargado_secundario)
+                                            $ws1->write($filas, $col_usuario_encargado_secundario, $cobro['username_encargado_secundario'], $formato_texto);
+                            }
+                            else{
+                                    $ws1->write($filas, $col_usuario_encargado, $cobro['nombre_encargado_comercial'], $formato_texto);
+                                    if($mostrar_encargado_secundario)
+                                            $ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_encargado_secundario'], $formato_texto);
+                            }
+                        }
                         if( UtilesApp::GetConf($sesion,'MostrarColumnaCodigoAsuntoHorasPorFacturar') ) {
                             $ws1->write($filas, $col_codigo_asunto, $codigos_asuntos, $formato_texto);
                         }
@@ -364,6 +400,7 @@
                         if( UtilesApp::GetConf($sesion,'MostrarColumnaAsuntoCobrableHorasPorFacturar') ) {
                             $ws1->write($filas, $col_asunto_cobrable, $asuntos_cobrables, $formato_texto);
                         }
+                        if( !$ocultar_ultimo_trabajo )
                             $ws1->write($filas, $col_ultimo_trabajo, empty($fecha_ultimo_trabajo) ? "" : Utiles::sql2fecha($fecha_ultimo_trabajo, $formato_fecha, "-" ), $formato_texto);
 			
                         $monto_estimado_gastos_monedabase = UtilesApp::CambiarMoneda( $monto_estimado_gastos,
@@ -377,8 +414,10 @@
 				$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
                                 $ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
                         }
-			$ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
-			$ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
+                        if( !$ocultar_ultimo_cobro )
+                            $ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
+			if( !$ocultar_estado_ultimo_cobro )
+                            $ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
 			$ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas/24,6,'.',''), $formato_tiempo);
 			$ws1->write($filas, $col_forma_cobro, $cobro['forma_cobro'], $formato_texto);
 
@@ -460,8 +499,18 @@
 									number_format($moneda_base['tipo_cambio'],$moneda_base['cifras_decimales'],'.',''),
 									$moneda_base['cifras_decimales']);
 
-			$ws1->writeNumber($filas, $col_valor_estimado, $valor_estimado, $formatos_moneda[$cobro['id_moneda_total']]);
-			$ws1->writeNumber($filas, $col_tipo_cambio,number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'],$arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'],'.',''), $formatos_moneda_tc[$id_moneda_referencia]);
+			if( $desglosar_moneda ) {
+                            foreach($arreglo_monedas as $id_moneda => $moneda) {
+                                if( $id_moneda == $cobro['id_moneda_total'] ) {
+                                    $ws1->writeNumber($filas, $col_valor_estimado_{$id_moneda}, $valor_estimado, $formatos_moneda[$cobro['id_moneda_total']] );
+                                } else { 
+                                    $ws1->write($filas, $col_valor_estimado_{$id_moneda}, '', $formato_texto);
+                                }
+                            }
+                        } else {
+                            $ws1->writeNumber($filas, $col_valor_estimado, $valor_estimado, $formatos_moneda[$cobro['id_moneda_total']]);
+                        }
+			$ws1->writeNumber($filas, $col_tipo_cambio,number_format($arreglo_monedas[$cobro['id_moneda_total']]['tipo_cambio'],$arreglo_monedas[$cobro['id_moneda_total']]['cifras_decimales'],'.',''), $formatos_moneda_tc[$id_moneda_referencia]);
 			if( $id_moneda_base != $id_moneda_referencia ) {
 				$ws1->writeNumber($filas, $col_tipo_cambio_moneda_base, number_format($arreglo_monedas[$id_moneda_base]['tipo_cambio'],$arreglo_monedas[$id_moneda_base]['cifras_decimales'],'.',''), $formatos_moneda_tc[$id_moneda_referencia]);
 			}
@@ -517,7 +566,23 @@
 	$pagina->titulo = __('Reporte Facturación pendiente');
 	$pagina->PrintTop();
 ?>
+<script type="text/javascript">
+    function MostrarOpcionesParaOcultar()
+    {
+        $('tr_opciones_ocultar').style.display = 'table-row';
+        $('abrir_opciones_ocultar').style.display = 'none';
+        $('cerrar_opciones_ocultar').style.display = 'block';
+    }
+    function OcultarOpcionesParaOcultar()
+    {
+        $('tr_opciones_ocultar').style.display = 'none';
+        $('abrir_opciones_ocultar').style.display = 'block';
+        $('cerrar_opciones_ocultar').style.display = 'none';
+    }
+    
+</script>
 <form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
+    <input type="hidden" name="reporte" value="generar" />
 	<table class="border_plomo tb_base">
 		<tr>
 			<td align=right>
@@ -543,10 +608,33 @@
 			</td>
 		</tr>
 		<tr>
-			<td align=center colspan="2">
-				<input type="checkbox" value=1 name="separar_asuntos" <?=$separar_asuntos ? 'checked' : ''?>><?=__('Separar Asuntos')?>
+			<td align=left colspan="2">
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?=$separar_asuntos ? 'checked' : ''?> /><?=__('Separar Asuntos')?><br/>
+                                &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?=$desglosar_moneda ? 'checked' : ''?> /><?=__('Desglosar monto por monedas')?><br/>
 			</td>
 		</tr>
+                <tr>
+                    <td align="left" colspan="2">
+                        <div id="abrir_opciones_ocultar" onclick="MostrarOpcionesParaOcultar();" style="display:block;"><img src=<?=Conf::ImgDir().'/mas.gif'?>  />&nbsp;<b><?php echo __('Ocultar columnas:') ?></b></div>
+                        <div id="cerrar_opciones_ocultar" onclick="OcultarOpcionesParaOcultar();" style="display:none;"><img src=<?=Conf::ImgDir().'/menos.gif'?>  />&nbsp;<b><?php echo __('Ocultar columnas:') ?></b></div>
+                    </td>
+                </tr>
+                <tr id="tr_opciones_ocultar" style="display:none;">
+                    <td align="left" colspan="2">
+                        <?php
+                        if( $_POST['reporte'] != 'generar' ) {
+                            $ocultar_encargado = UtilesApp::GetConf($sesion,'OcultarColumnasHorasPorFacturar');
+                            $ocultar_ultimo_trabajo = UtilesApp::GetConf($sesion,'OcultarColumnasHorasPorFacturar');
+                            $ocultar_ultimo_cobro = UtilesApp::GetConf($sesion,'OcultarColumnasHorasPorFacturar');
+                            $ocultar_estado_ultimo_cobro = UtilesApp::GetConf($sesion,'OcultarColumnasHorasPorFacturar');
+                        }
+                        ?>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?=$ocultar_encargado ? 'checked' : ''?> /><?=__('Ocultar columna encargado')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?=$ocultar_ultimo_trabajo ? 'checked' : ''?> /><?=__('Ocultar columna ultimo trabajo')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?=$ocultar_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna ultimo cobro')?><br/>
+                        &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?=$ocultar_estado_ultimo_cobro ? 'checked' : ''?> /><?=__('Ocultar columna estado ultimo cobro')?><br/>
+                    </td>
+                </tr>
 		<tr>
 			<td align=right colspan=2>
 				<input type="hidden" name="debug" value="<?=$debug?>" />

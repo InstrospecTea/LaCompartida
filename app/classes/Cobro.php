@@ -73,6 +73,8 @@ class Cobro extends Objeto
 					$provision = new Gasto($this->sesion);
 					$provision->Edit('id_moneda',$this->fields['id_moneda']);
 					$provision->Edit('ingreso',$this->fields['monto_gastos']);
+                                        $provision->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
+                                        $provision->Edit('id_usuario_orden',$this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_cobro','NULL');
 					$provision->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 					$provision->Edit('codigo_asunto','NULL');

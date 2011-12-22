@@ -184,14 +184,6 @@
                         }
 			$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado','EMITIDO');
-			$historial_comentario = __('COBRO EMITIDO');
-			##Historial##
-			$his = new Observacion($sesion);
-			$his->Edit('fecha',date('Y-m-d H:i:s'));
-			$his->Edit('comentario',$historial_comentario);
-			$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
-			$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-			$his->Write();
 			if($cobro->Write())
 			{
 				if(!empty($usar_adelantos)){

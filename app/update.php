@@ -7021,6 +7021,20 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				}
                             }
 			break;
+                        
+                        case 5.29:
+                            $query = array();
+                            $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                                            VALUES (
+                                            NULL ,  'OcultarColumnasHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
+                                            );";
+                            
+                            foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+                            }
+			break;
 
 	}
 }
@@ -7318,6 +7332,7 @@ $VERSIONES[$num++] = 5.25;
 $VERSIONES[$num++] = 5.26;
 $VERSIONES[$num++] = 5.27;
 $VERSIONES[$num++] = 5.28;
+$VERSIONES[$num++] = 5.29;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
