@@ -107,8 +107,18 @@
 	/* OPCION -> Guardar else Eliminar */
 	if($opcion == "guardar")
 	{
-		if(Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
-		{
+                if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+                    if( round(10*number_format(str_replace(',','.',$duracion),6,'.','')) != 10*number_format(str_replace(',','.',$duracion),6,'.','') ) 
+                        $pagina->AddError(__("Solo se permite ingresar un decimal en el campo ").' <b>'.__('Duración').'</b>');
+                    if( round(10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','')) != 10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','') ) 
+                        $pagina->AddError(__("Solo se permite ingresar un decimal en el campo ").' <b>'.__('Duración Cobrable').'</b>');
+                }
+                $errores = $pagina->GetErrors();
+            
+                if( empty($errores) )
+                {
+                    if( Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
+                    {
 			$valida = true;
 			$asunto = new Asunto($sesion);
 			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
@@ -232,11 +242,12 @@
 				</script>
 <?
 			}
-		}
-		else
-		{
-			$pagina->AddError("No se pueden ingresar mas de 23:59 horas por día.");
-		}
+                    }
+                    else
+                    {
+                            $pagina->AddError("No se pueden ingresar mas de 23:59 horas por día.");
+                    }
+                }
 
 		unset($id_trab);
 		if($es_trabajo_nuevo)//Significa que estoy agregando más que editando, así que debo dejar en limpio el formulario

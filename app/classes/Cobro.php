@@ -9353,7 +9353,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				{
 					$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $row = str_replace('%duracion_retainer%', number_format($duracion_decimal_retainer,1,',',''), $row);
+                                            $row = str_replace('%duracion_retainer%', number_format( $duracion_decimal_retainer, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                         } else {
                                             $row = str_replace('%duracion_retainer%', $h_retainer.':'.sprintf("%02d", $m_retainer), $row);
                                         }
@@ -9370,18 +9370,18 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 
 					if( !$this->fields['opc_ver_horas_trabajadas'] )
 						{
-                                                    $row = str_replace('%duracion_decimal%',number_format($duracion_decimal,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+                                                    $row = str_replace('%duracion_decimal%',number_format($duracion_decimal,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
                                                     if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {    
-                                                        $row = str_replace('%duracion%', number_format( $duracion_decimal,1,',',''), $row);
+                                                        $row = str_replace('%duracion%', number_format( $duracion_decimal, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                                     } else {
                                                         $row = str_replace('%duracion%', $h.':'.sprintf("%02d", $m), $row);
                                                     }
 						}
 					else
 						{
-                                                    $row = str_replace('%duracion_decimal%',number_format($duracion_decimal_trabajada,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+                                                    $row = str_replace('%duracion_decimal%',number_format($duracion_decimal_trabajada,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
                                                     if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                        $row = str_replace('%duracion%', number_format( $duracion_decimal_trabajada,1,',',''), $row);
+                                                        $row = str_replace('%duracion%', number_format( $duracion_decimal_trabajada, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                                     } else {
                                                         $row = str_replace('%duracion%', $ht.':'.sprintf("%02d", $mt), $row);
                                                     }
@@ -9389,22 +9389,22 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				}
 				if ($ImprimirDuracionTrabajada && ( $this->fields['estado']=='CREADO' || $this->fields['estado']=='EN REVISION' ) )
 				{
-					$row = str_replace('%duracion_decimal_trabajada%', number_format($duracion_decimal_trabajada,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+					$row = str_replace('%duracion_decimal_trabajada%', number_format($duracion_decimal_trabajada,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $row = str_replace('%duracion_trabajada%', number_format( $duracion_decimal_trabajada,1,',',''), $row);
-                                            $row = str_replace('%duracion_descontada%', number_format( $duracion_decimal_descontada,1,',',''), $row);
+                                            $row = str_replace('%duracion_trabajada%', number_format( $duracion_decimal_trabajada, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
+                                            $row = str_replace('%duracion_descontada%', number_format( $duracion_decimal_descontada, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                         } else {
                                             $row = str_replace('%duracion_trabajada%', $ht.':'.sprintf("%02d", $mt), $row);
                                             $row = str_replace('%duracion_descontada%', $horas_descontadas.':'.sprintf("%02d",$minutos_descontadas), $row);
                                         }
-                                        $row = str_replace('%duracion_decimal_descontada%', number_format($duracion_decimal_descontada,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+                                        $row = str_replace('%duracion_decimal_descontada%', number_format($duracion_decimal_descontada,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
 				}
 				else if( $this->fields['opc_ver_horas_trabajadas'] )
 				{
-					$row = str_replace('%duracion_decimal_trabajada%', number_format($duracion_decimal_trabajada,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+					$row = str_replace('%duracion_decimal_trabajada%', number_format($duracion_decimal_trabajada,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $row = str_replace('%duracion_trabajada%', number_format( $duracion_decimal_trabajada,1,',',''), $row);
-                                            $row = str_replace('%duracion_descontada%', number_format( $duracion_decimal_descontada,1,',',''), $row);
+                                            $row = str_replace('%duracion_trabajada%', number_format( $duracion_decimal_trabajada, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
+                                            $row = str_replace('%duracion_descontada%', number_format( $duracion_decimal_descontada, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                         } else {
                                             $row = str_replace('%duracion_trabajada%', $ht.':'.sprintf("%02d", $mt), $row);
                                             $row = str_replace('%duracion_descontada%', $horas_descontadas.':'.sprintf("%02d",$minutos_descontadas), $row);
@@ -9419,9 +9419,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					$row = str_replace('%duracion_trabajada%', '', $row);
 				}
 
-				$row = str_replace('%duracion_decimal%', number_format($duracion_decimal,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+				$row = str_replace('%duracion_decimal%', number_format($duracion_decimal, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
 				if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                    $row = str_replace('%duracion%', number_format( $duracion_decimal,1,',',''), $row);
+                                    $row = str_replace('%duracion%', number_format( $duracion_decimal, UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $row);
                                 } else {
                                     $row = str_replace('%duracion%', $h.':'.$m, $row);
                                 }
@@ -9909,7 +9909,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			{
 				$html = str_replace( '%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
 				if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                    $html = str_replace( '%duracion_retainer%', number_format($duracion_retainer_total,1,',',''), $html);
+                                    $html = str_replace( '%duracion_retainer%', number_format($duracion_retainer_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                                 } else {
                                     $html = str_replace( '%duracion_retainer%', Utiles::Decimal2GlosaHora($duracion_retainer_total), $html);
                                 }
@@ -9925,18 +9925,18 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				$html = str_replace('%duracion_decimal_descontada%','',$html);
 				if( $this->fields['opc_ver_horas_trabajadas'] )
 				{
-					$html = str_replace('%duracion_decimal%', number_format($duracion_trabajada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+					$html = str_replace('%duracion_decimal%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $html = str_replace('%duracion%', number_format($duracion_trabajada_total,1,',',''), $html);
+                                            $html = str_replace('%duracion%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                                         } else {
                                             $html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_trabajada_total), $html);
                                         }
 				}
 				else
 				{
-					$html = str_replace('%duracion_decimal%', number_format($duracion_cobrada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+					$html = str_replace('%duracion_decimal%', number_format($duracion_cobrada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $html = str_replace('%duracion%', number_format($duracion_cobrada_total,1,',',''), $html);
+                                            $html = str_replace('%duracion%', number_format($duracion_cobrada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                                         } else {
                                             $html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_cobrada_total), $html);
                                         }
@@ -9944,11 +9944,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			}
 			if ($ImprimirDuracionTrabajada && ( $this->fields['estado']=='CREADO' || $this->fields['estado']=='EN REVISION' ) )
 			{
-				$html = str_replace('%duracion_decimal_trabajada%', number_format($duracion_trabajada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
-				$html = str_replace('%duracion_decimal_descontada%', number_format($duracion_descontada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+				$html = str_replace('%duracion_decimal_trabajada%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+				$html = str_replace('%duracion_decimal_descontada%', number_format($duracion_descontada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 				if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                    $html = str_replace('%duracion_trabajada%', number_format($duracion_trabajada_total,1,',',''), $html);
-                                    $html = str_replace('%duracion_descontada%', number_format($duracion_descontada_total,1,',',''), $html);
+                                    $html = str_replace('%duracion_trabajada%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
+                                    $html = str_replace('%duracion_descontada%', number_format($duracion_descontada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                                 } else {
                                     $html = str_replace('%duracion_trabajada%', Utiles::Decimal2GlosaHora($duracion_trabajada_total), $html);
                                     $html = str_replace('%duracion_descontada%', Utiles::Decimal2GlosaHora($duracion_descontada_total), $html);
@@ -9956,11 +9956,11 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			}
 			else if( $this->fields['opc_ver_horas_trabajadas'] )
 			{
-				$html = str_replace('%duracion_decimal_trabajada%', number_format($duracion_trabajada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
-				$html = str_replace('%duracion_decimal_descontada%', number_format($duracion_descontada_total,1, $idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+				$html = str_replace('%duracion_decimal_trabajada%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+				$html = str_replace('%duracion_decimal_descontada%', number_format($duracion_descontada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'), $idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 				if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                    $html = str_replace('%duracion_trabajada%', number_format($duracion_trabajada_total,1,',',''), $html);
-                                    $html = str_replace('%duracion_descontada%', number_format($duracion_descontada_total,1,',',''), $html);
+                                    $html = str_replace('%duracion_trabajada%', number_format($duracion_trabajada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
+                                    $html = str_replace('%duracion_descontada%', number_format($duracion_descontada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                                 } else {
                                     $html = str_replace('%duracion_trabajada%', Utiles::Decimal2GlosaHora($duracion_trabajada_total), $html);
                                     $html = str_replace('%duracion_descontada%', Utiles::Decimal2GlosaHora($duracion_descontada_total), $html);
@@ -9975,9 +9975,9 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			}
 
 			$html = str_replace('%glosa%',__('Total Trabajos'), $html);
-			$html = str_replace('%duracion_decimal%', number_format($duracion_cobrada_total,1,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
+			$html = str_replace('%duracion_decimal%', number_format($duracion_cobrada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$html);
 			if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                            $html = str_replace('%duracion%', number_format($duracion_cobrada_total,1,',',''), $html);
+                            $html = str_replace('%duracion%', number_format($duracion_cobrada_total,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html);
                         } else {
                             $html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_cobrada_total), $html);
                         }
@@ -11033,7 +11033,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				if( $this->fields['opc_ver_horas_trabajadas'] )
 					{
                                                 if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                    $html3 = str_replace('%hh_trabajada%', number_format($data['duracion_trabajada'],1,',',''), $html3);
+                                                    $html3 = str_replace('%hh_trabajada%', number_format($data['duracion_trabajada'],UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                 } else {
                                                     $html3 = str_replace('%hh_trabajada%', $data['glosa_duracion_trabajada'], $html3);
                                                 }
@@ -11041,7 +11041,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							{
 								$html3 = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $html3);
 								if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                                    $html3 = str_replace('%hh_descontada%', number_format($data['duracion_descontada'],1,',',''), $html3);
+                                                                    $html3 = str_replace('%hh_descontada%', number_format($data['duracion_descontada'],UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                                 } else {
                                                                     $html3 = str_replace('%hh_descontada%', $data['glosa_duracion_descontada'], $html3);
                                                                 }
@@ -11062,7 +11062,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 					{
 						$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
 						if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                    $html3 = str_replace('%hh_cobrable%', number_format( $data['duracion_cobrada'], 1,',',''), $html3);
+                                                    $html3 = str_replace('%hh_cobrable%', number_format( $data['duracion_cobrada'], UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                 } else {
                                                     $html3 = str_replace('%hh_cobrable%', $data['glosa_duracion_cobrada'], $html3);
                                                 }
@@ -11070,7 +11070,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 							{
 								$html3 = str_replace('%td_retainer%', '<td align=\'center\'>%hh_retainer%</td>', $html3);
 								if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                                    $html3 = str_replace('%hh_retainer%', number_format($data['duracion_retainer'],1,',',''), $html3);
+                                                                    $html3 = str_replace('%hh_retainer%', number_format($data['duracion_retainer'],UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                                 } else {
                                                                     $html3 = str_replace('%hh_retainer%', $data['glosa_duracion_retainer'], $html3);
                                                                 }
@@ -11089,7 +11089,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						$html3 = str_replace('%hh_retainer%', '', $html3);
 					}
                                 if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                    $html3 = str_replace('%hh_demo%', number_format($data['duracion_tarificada'],1,',',''), $html3);
+                                    $html3 = str_replace('%hh_demo%', number_format($data['duracion_tarificada'],UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                 } else {
                                     $html3 = str_replace('%hh_demo%', $data['glosa_duracion_tarificada'], $html3);
                                 }
@@ -11200,7 +11200,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			if( $this->fields['opc_ver_horas_trabajadas'] )
 				{
                                         if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $html3 = str_replace('%hh_trabajada%',number_format($resumen_hrs_trabajadas,1,',',''), $html3);
+                                            $html3 = str_replace('%hh_trabajada%',number_format($resumen_hrs_trabajadas,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                         } else {
                                             $html3 = str_replace('%hh_trabajada%',UtilesApp::Hora2HoraMinuto(round($resumen_hrs_trabajadas,2)), $html3);
                                         }
@@ -11208,7 +11208,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						{
 							$html3 = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $html3);
 							if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                            $html3 = str_replace('%hh_descontada%',number_format($resumen_hrs_descontadas,1,',',''), $html3);
+                                                            $html3 = str_replace('%hh_descontada%',number_format($resumen_hrs_descontadas,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                         } else {
                                                             $html3 = str_replace('%hh_descontada%',Utiles::Decimal2GlosaHora(round($resumen_hrs_descontadas,2)), $html3);
                                                         }
@@ -11229,7 +11229,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 				{
 					$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
 					if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                            $html3 = str_replace('%hh_cobrable%',number_format($resumen_hrs_cobradas,1,',',''), $html3);
+                                            $html3 = str_replace('%hh_cobrable%',number_format($resumen_hrs_cobradas,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                         } else {
                                             $html3 = str_replace('%hh_cobrable%',UtilesApp::Hora2HoraMinuto(round($resumen_hrs_cobradas,2)), $html3);
                                         }
@@ -11237,7 +11237,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 						{
 							$html3 = str_replace('%td_retainer%', '<td align=\'center\'>%hh_retainer%</td>', $html3);
 							if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                                                            $html3 = str_replace('%hh_retainer%',number_format($resumen_hrs_retainer,1,',',''), $html3);
+                                                            $html3 = str_replace('%hh_retainer%',number_format($resumen_hrs_retainer,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                                                         } else {
                                                             $html3 = str_replace('%hh_retainer%',UtilesApp::Hora2HoraMinuto(round($resumen_hrs_retainer,2)), $html3);
                                                         }
@@ -11260,7 +11260,7 @@ function GenerarDocumentoCarta2( $parser_carta, $theTag='', $lang, $moneda_clien
 			else
 				$html3 = str_replace('%columna_horas_no_cobrables%','',$html3);
 			if( UtilesApp::GetConf($this->sesion,'TipoIngresoHoras') == 'decimal' ) {
-                            $html3 = str_replace('%hh_demo%',number_format($resumen_hh,1,',',''), $html3);
+                            $html3 = str_replace('%hh_demo%',number_format($resumen_hh,UtilesApp::GetConf($this->sesion,'CantidadDecimalesIngresoHoras'),',',''), $html3);
                         } else {
                             $html3 = str_replace('%hh_demo%',UtilesApp::Hora2HoraMinuto(round($resumen_hh,2)), $html3);
                         }
