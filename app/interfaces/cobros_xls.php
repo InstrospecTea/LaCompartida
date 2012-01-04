@@ -1,4 +1,5 @@
 <?php
+
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -18,13 +19,11 @@
 		$where_cobro .= " AND cobro.id_cobro=$id_cobro ";
 
 	// Procesar los filtros
-	if($codigo_cliente_secundario)
-	{
+if ($codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
 		$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
 	}
-	if($codigo_cliente)
-	{
+if ($codigo_cliente) {
 		$cliente = new Cliente($sesion);
 		$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
 	}
@@ -32,6 +31,8 @@
 		$where_cobro .= " AND contrato.activo = 'SI' ";
 	elseif($no_activo)
 		$where_cobro .= " AND contrato.activo = 'NO' ";
+if ($forma_cobro)
+	$where_cobro .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	if($id_usuario)
 		$where_cobro .= " AND contrato.id_usuario_responsable = '$id_usuario' ";
 	if($codigo_cliente)
@@ -58,13 +59,10 @@
 		}
 $mostrar_resumen_de_profesionales = 1;
 
-	if($guardar_respaldo)
-		{
+if ($guardar_respaldo) {
 			$wb = new Spreadsheet_Excel_Writer(Conf::ServerDir().'/respaldos/ResumenCobros'.date('ymdHis').'.xls');
 			$wb->setVersion(8);
-		}
-	else
-		{
+} else {
 			$wb = new Spreadsheet_Excel_Writer();
 			$wb->setVersion(8);
 			// No se hace $wb->send() todavía por si acaso no hay horas en el cobro.
@@ -94,6 +92,10 @@ $mostrar_resumen_de_profesionales = 1;
 												'Bottom' => 1,
 												'FgColor' => 35,
 												'Color' => 'black'));
+$formato_normal_centrado = & $wb->addFormat(array('Size' => 7,
+			'Align' => 'center',
+			'VAlign' => 'top',
+			'Color' => 'black'));
 		$formato_normal =& $wb->addFormat(array('Size' => 7,
 												'VAlign' => 'top',
 												'Color' => 'black'));
@@ -182,36 +184,37 @@ $mostrar_resumen_de_profesionales = 1;
 	$col = 0;
 	$col_id_trabajo = $col++;
 
-	$col_fecha_ini = $col++;
-	$col_fecha_med = $col++;
-	$col_fecha_fin = $col++;
+$col_fecha_ini = $col++;
+$col_fecha_med = $col++;
+$col_fecha_fin = $col++;
 
-	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
-	$idioma->Load($cobro->fields['codigo_idioma']);
+$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+$idioma->Load($cobro->fields['codigo_idioma']);
 
-	if( strtolower($idioma->fields['formato_fecha']) == '%d/%m/%y' )
-	{
-		$col_fecha_dia = $col_fecha_ini;
-		$col_fecha_mes = $col_fecha_med;
-		$col_fecha_anyo = $col_fecha_fin;
-	}
-	else
-	{
-		$col_fecha_mes = $col_fecha_ini;
-		$col_fecha_dia = $col_fecha_med;
-		$col_fecha_anyo = $col_fecha_fin;
-	}
+if ($idioma->fields['formato_fecha'] == '%d/%m/%y' || $borradores) {
+	$col_fecha_dia = $col_fecha_ini;
+	$col_fecha_mes = $col_fecha_med;
+	$col_fecha_anyo = $col_fecha_fin;
+} else {
+	$col_fecha_mes = $col_fecha_ini;
+	$col_fecha_dia = $col_fecha_med;
+	$col_fecha_anyo = $col_fecha_fin;
+}
 
 	$col_abogado = $col++;
-	if($opc_ver_cobrable)
+if ($opc_ver_cobrable) {
 		$col_es_cobrable = $col++;
-	if(!$opc_ver_asuntos_separados)
+}
+if (!$opc_ver_asuntos_separados) {
 		$col_asunto = $col++;
-	if($opc_ver_solicitante)
-		$col_solicitante = $col++;
-	$col_descripcion = $col++;
-	if($opc_ver_horas_trabajadas)
+}
+//if ($opc_ver_solicitante) {
+	$col_solicitante = $col++;   //esto se va a mostrar siempre, y luego se esconde la columna en caso de no querer mostrarlo.
+//}
+$col_descripcion = $col++;
+	if($opc_ver_horas_trabajadas){
 		$col_duracion_trabajada = $col++;
+}
 	$col_tarificable_hh = $col++;
 	//if(($lista->Get(0)->fields['forma_cobro']=='Retainer' || $lista->Get(0)->fields['forma_cobro']=='PROPORCIONAL')&&!$borradores)
 	//	$col_duracion_retainer = $col++;
@@ -246,8 +249,7 @@ $mostrar_resumen_de_profesionales = 1;
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
 
-	if( $borradores )
-	{
+if ($borradores) {
 		$ws =& $wb->addWorksheet('Inicio');
 				$ws->setPaper(1);
 				$ws->hideScreenGridlines();
@@ -328,13 +330,16 @@ $mostrar_resumen_de_profesionales = 1;
 		$ws->write($filas, $col_fecha_mes, Utiles::GlosaMult($sesion, 'fecha_mes', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 		$ws->write($filas, $col_fecha_anyo, Utiles::GlosaMult($sesion, 'fecha_anyo', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
         $ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-        if($opc_ver_solicitante)
-        $ws->write($filas, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-        if(!$opc_ver_asuntos_separados)
+	//if ($opc_ver_solicitante) {
+		$ws->write($filas, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);   //si no se quiere ver esto se oculta al final de cada hoja
+	//}	
+	if (!$opc_ver_asuntos_separados) {
         $ws->write($filas, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
+	}
         $ws->write($filas, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-        if($opc_ver_horas_trabajadas)
+	if ($opc_ver_horas_trabajadas) {
         $ws->write($filas, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
+	}
         $ws->write($filas, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'duracion_cobrable', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
         $ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'tarifa_hh', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
         $ws->write($filas, $col_valor_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
@@ -349,8 +354,9 @@ $mostrar_resumen_de_profesionales = 1;
 		$ws->write($filas, $col_fecha_med, '', $formato_total);
 		$ws->write($filas, $col_fecha_fin, '', $formato_total);
         $ws->write($filas, $col_descripcion, '', $formato_total);
-        if($opc_ver_solicitante)
+	//if ($opc_ver_solicitante) {
           $ws->write($filas, $col_solicitante, '', $formato_total);
+	// }
         $ws->write($filas, $col_abogado, '', $formato_total);
         if(!$opc_ver_asuntos_separados)
           $ws->write($filas, $col_asunto, '', $formato_total);
@@ -377,8 +383,7 @@ $mostrar_resumen_de_profesionales = 1;
 						 ORDER BY cliente.glosa_cliente,cobro.codigo_cliente";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-	while( list($id_cobro) = mysql_fetch_array($resp) )
-		{
+while (list($id_cobro) = mysql_fetch_array($resp)) {
 			// ---------------- Cargar los datos necesarios dentro del cobro -----------------
 			$cobro = new Cobro($sesion);
 			$cobro->Load($id_cobro);
@@ -386,8 +391,7 @@ $mostrar_resumen_de_profesionales = 1;
 			$cobro->GuardarCobro();
 
 			// Si es que el cobro es RETAINER o PROPORCIONAL modifica las columnas del excel
-			if(($cobro->fields['forma_cobro']=='RETAINER' || $cobro->fields['forma_cobro']=='PROPORCIONAL' || $cobro->fields['forma_cobro']=='FLAT FEE'))
-				{
+	if (($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' || $cobro->fields['forma_cobro'] == 'FLAT FEE')) {
 					$col_duracion_retainer = $col_tarificable_hh+1;
 					//if($opc_ver_cobrable)
 					$col_cobrable++;
@@ -451,8 +455,7 @@ $mostrar_resumen_de_profesionales = 1;
 
 			$cifras_decimales_opc_moneda_total = $cifras_decimales;
 			$simbolo_moneda_opc_moneda_total = $simbolo_moneda;
-			if($cifras_decimales>0)
-				{
+	if ($cifras_decimales > 0) {
 					$decimales = '.';
 					while($cifras_decimales-- >0)
 						$decimales .= '0';
@@ -491,8 +494,7 @@ $mostrar_resumen_de_profesionales = 1;
 			$cifras_decimales = Utiles::glosa($sesion, $contrato->fields['id_moneda_monto'], 'cifras_decimales', 'prm_moneda', 'id_moneda');
 			$cifras_decimales_moneda_monto = $cifras_decimales;
 			$simbolo_moneda_opc_moneda_monto = $simbolo_moneda;
-			if($cifras_decimales)
-				{
+	if ($cifras_decimales) {
 					$decimales = '.';
 					while($cifras_decimales-- > 0)
 						$decimales .= '0';
@@ -511,8 +513,7 @@ $mostrar_resumen_de_profesionales = 1;
 				$simbolo_moneda = "EUR";
 			}
 			$cifras_decimales = Utiles::glosa($sesion, $cobro->fields['id_moneda_monto'], 'cifras_decimales', 'prm_moneda', 'id_moneda');
-			if($cifras_decimales)
-			{
+	if ($cifras_decimales) {
 				$decimales = '.';
 				while($cifras_decimales-- > 0)
 					$decimales .= '0';
@@ -531,8 +532,7 @@ $mostrar_resumen_de_profesionales = 1;
 				$simbolo_moneda = "EUR";
 			}
 			$cifras_decimales = Utiles::glosa($sesion, $cobro->fields['id_moneda'], 'cifras_decimales', 'prm_moneda', 'id_moneda');
-			if($cifras_decimales)
-			{
+	if ($cifras_decimales) {
 				$decimales = '.';
 				while($cifras_decimales-- > 0)
 					$decimales .= '0';
@@ -560,7 +560,6 @@ $mostrar_resumen_de_profesionales = 1;
 
 
 			// **************** Imprime el encabezado de la hoja **********************
-
 				// El largo máximo para el nombre de una hoja son 31 caracteres, reservamos 4 para el número de página y un espacio.
 				// Es importante notar que los nombres se truncan automáticamente con el primer caracter con tilde o ñ.
 				$nombre_pagina = ++$numero_pagina.' ';
@@ -593,10 +592,12 @@ $mostrar_resumen_de_profesionales = 1;
 						$ws->setColumn($col_fecha_anyo, $col_fecha_anyo, Utiles::GlosaMult($sesion, 'fecha_anyo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 						$ws->setColumn($col_abogado, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 					}
-				if(!$opc_ver_asuntos_separados)
+	if (!$opc_ver_asuntos_separados){
 					$ws->setColumn($col_asunto, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-				if($opc_ver_solicitante)
+	}
+	//if ($cobro->fields['opc_ver_solicitante']){
 					$ws->setColumn($col_solicitante, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	//}
 				$ws->setColumn($col_descripcion, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 				if($opc_ver_horas_trabajadas)
 					$ws->setColumn($col_duracion_trabajada, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
@@ -609,17 +610,13 @@ $mostrar_resumen_de_profesionales = 1;
 				$ws->setColumn($col_valor_trabajo, $col_valor_trabajo, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 				$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0, 1);
 
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'OcultarHorasTarificadasExcel') ) || ( method_exists('Conf','OcultarHorasTarificadasExcel') && Conf::OcultarHorasTarificadasExcel() ) )
-				{
+	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'OcultarHorasTarificadasExcel') ) || ( method_exists('Conf', 'OcultarHorasTarificadasExcel') && Conf::OcultarHorasTarificadasExcel() )) {
 					$ws->setColumn($col_cobrable, $col_cobrable, 0, 0, 1);
-				}
-				else
-				{
+	} else {
 					$ws->setColumn($col_cobrable, $col_cobrable, Utiles::GlosaMult($sesion, 'cobrable', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 				}
 				// Agregar la imagen del logo
-				if( method_exists('Conf', 'LogoExcel') )
-				{
+	if (method_exists('Conf', 'LogoExcel')) {
 					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel());
 					$ws->insertBitmap(0, 0, Conf::LogoExcel(), 0, 0, .8, .8);
 				}
@@ -630,8 +627,17 @@ $mostrar_resumen_de_profesionales = 1;
 				$filas = 0;
 				$filas_totales_asuntos = array();
 
-				$ws->write($filas, $col_descripcion+1, Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo').' '.$cobro->fields['id_cobro'], $formato_encabezado);
-				$filas += 2;
+	$cliente = new Cliente($sesion);
+	if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario')) {
+		$codigo_cliente = $cliente->CodigoACodigoSecundario($cobro->fields['codigo_cliente']);
+	} else {
+		$codigo_cliente = $cobro->fields['codigo_cliente'];
+	}
+
+	$ws->write($filas, $col_descripcion + 1, Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . ' ' . $cobro->fields['id_cobro'], $formato_encabezado);
+	$filas++;
+	$ws->write($filas, $col_descripcion + 1, 'Código cliente: ' . $codigo_cliente, $formato_encabezado);
+	$filas++;
 
 				// Escribir el encabezado con los datos del cliente
 				$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'cliente', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
@@ -667,8 +673,7 @@ $mostrar_resumen_de_profesionales = 1;
 				$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 				$filas += 2;
 
-				if($opc_ver_resumen_cobro || $borradores)
-				{
+	if ($opc_ver_resumen_cobro || $borradores) {
 					$ws->write($filas++, $col_id_trabajo, Utiles::GlosaMult($sesion, 'titulo', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 
 					// Esto es para poder escribir la segunda columna más fácilmente.
@@ -700,8 +705,7 @@ $mostrar_resumen_de_profesionales = 1;
 						$fecha_ultimo_trabajo = $cobro->fields['fecha_fin'];
 					$fecha_inicial_primer_trabajo = date('Y-m-01', strtotime($fecha_primer_trabajo));
 					$fecha_final_ultimo_trabajo = date('Y-m-d', strtotime($fecha_ultimo_trabajo));
-					if( $fecha_primer_trabajo && $fecha_primer_trabajo != '0000-00-00' )
-						{
+		if ($fecha_primer_trabajo && $fecha_primer_trabajo != '0000-00-00') {
 							$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'fecha_desde', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 
 							$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_inicial_primer_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
@@ -711,27 +715,23 @@ $mostrar_resumen_de_profesionales = 1;
 					$ws->write($filas++, $col_abogado, Utiles::sql2fecha($fecha_final_ultimo_trabajo, $idioma->fields['formato_fecha']), $formato_encabezado);
 
 					// Si hay una factura asociada mostramos su número.
-					if( $cobro->fields['documento'])
-					{
+		if ($cobro->fields['documento']) {
 						$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'factura', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 						$ws->write($filas++, $col_abogado, $cobro->fields['documento'], $formato_encabezado);
 					}
 
-					if($opc_ver_modalidad)
-					{
+		if ($opc_ver_modalidad) {
 						$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'forma_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 						//$ws->write($filas++, $col_abogado, __($cobro->fields['forma_cobro']), $formato_encabezado);
 						if(($cobro->fields['forma_cobro'] == 'PROPORCIONAL') || ($cobro->fields['forma_cobro'] == 'RETAINER')){
 							$mje_detalle_forma_cobro = "de ".$cobro->fields['retainer_horas']." Hr. por ".$simbolo_moneda_opc_moneda_monto." ".number_format($cobro->fields['monto_contrato'],$cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales'],',','.');
-						}
-						else{
+			} else {
 							$mje_detalle_forma_cobro = "";
 						}
 						$ws->write($filas++, $col_abogado, __($cobro->fields['forma_cobro'])." ".$mje_detalle_forma_cobro, $formato_encabezado);
 					}
 
-					if($trabajo->fields['forma_cobro']=='PROPORCIONAL' || $trabajo->fields['forma_cobro']=='RETAINER')
-					{
+		if ($trabajo->fields['forma_cobro'] == 'PROPORCIONAL' || $trabajo->fields['forma_cobro'] == 'RETAINER') {
 						$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'horas_retainer', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 						$ws->write($filas++, $col_abogado, $cobro->fields['retainer_horas'], $formato_encabezado_derecha);
 						$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'monto_retainer', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
@@ -747,24 +747,19 @@ $mostrar_resumen_de_profesionales = 1;
 							$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 							$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 
-							if( $cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total'] )
-							{
+		if ($cobro->fields['id_moneda'] != $cobro->fields['opc_moneda_total']) {
 								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'equivalente', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 								$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1)."*".$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']."/".$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
 							}
-							if($cobro->fields['descuento'] > 0)
-							{
+		if ($cobro->fields['descuento'] > 0) {
 								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 								$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['descuento']*$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'], $formato_moneda_resumen);
 								$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 								$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)."-$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
 							}
-							if($cobro->fields['porcentaje_impuesto'] > 0 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValorImpuesto') > 0 ) || ( method_exists('Conf', 'ValorImpuesto') && Conf::ValorImpuesto()>0 ) ) )
-							{
-								if( $cobro->fields['porcentaje_impuesto_gastos'] > 0 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValorImpuestoGastos') > 0 ) || ( method_exists('Conf', 'ValorImpuestoGastos') && Conf::ValorImpuestoGastos()>0 ) ) )
-								{
-									if($opc_ver_gastos)
-									{
+		if ($cobro->fields['porcentaje_impuesto'] > 0 && ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValorImpuesto') > 0 ) || ( method_exists('Conf', 'ValorImpuesto') && Conf::ValorImpuesto() > 0 ) )) {
+			if ($cobro->fields['porcentaje_impuesto_gastos'] > 0 && ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValorImpuestoGastos') > 0 ) || ( method_exists('Conf', 'ValorImpuestoGastos') && Conf::ValorImpuestoGastos() > 0 ) )) {
+				if ($opc_ver_gastos) {
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['subtotal_gastos'], $formato_moneda_resumen);
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
@@ -775,9 +770,7 @@ $mostrar_resumen_de_profesionales = 1;
 										$ws->write( $filas2++, $col_valor_trabajo, $x_resultados_tmp['monto_iva'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen );
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
-									}
-									else
-									{
+				} else {
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 
 										$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
@@ -786,38 +779,28 @@ $mostrar_resumen_de_profesionales = 1;
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
 									}
-								}
-								else
-								{
+			} else {
 									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'impuesto', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 									$x_resultados_tmp = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
 										//$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1).'*0.'.(method_exists('Conf','GetConf')?Conf::GetConf($sesion,'ValorImpuesto'):Conf::ValorImpuesto()), $formato_moneda_resumen);
 										$ws->write( $filas2++, $col_valor_trabajo, $x_resultados_tmp['monto_iva'][$cobro->fields['opc_moneda_total']], $formato_moneda_resumen );
-									if($opc_ver_gastos)
-									{
+				if ($opc_ver_gastos) {
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_gastos'], $formato_moneda_resumen);
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-3).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
-									}
-									else
-									{
+				} else {
 										$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 										$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-2)." + $col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
 									}
 								}
-							}
-							else
-							{
-								if($opc_ver_gastos)
-								{
+		} else {
+			if ($opc_ver_gastos) {
 									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 									$ws->writeNumber($filas2++, $col_valor_trabajo, $cobro->fields['monto_gastos'], $formato_moneda_resumen);
 									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 									$ws->writeFormula($filas2++, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo".($filas2-2).":$col_formula_valor_trabajo".($filas2-1).")", $formato_moneda_resumen);
-								}
-								else
-								{
+			} else {
 									$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
 									$ws->writeFormula($filas2++, $col_valor_trabajo, "=$col_formula_valor_trabajo".($filas2-1), $formato_moneda_resumen);
 								}
@@ -833,8 +816,7 @@ $mostrar_resumen_de_profesionales = 1;
 				$num_usuarios = mysql_num_rows($resp_num_usuarios);
 
 				// Dejar espacio para el resumen profesional si es necesario.
-				if( ( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional'] )
-					{
+	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional']) {
 						$fila_inicio_resumen_profesional = $filas - 1;
 						if( $num_usuarios > 0 )
 							$filas += $num_usuarios + 7;
@@ -846,8 +828,7 @@ $mostrar_resumen_de_profesionales = 1;
 
 					// Bucle sobre todos los asuntos de este cobro
 					$cobro_tiene_trabajos = false;
-					while( $cobro->asuntos[$cont_asuntos] )
-					{
+	while ($cobro->asuntos[$cont_asuntos]) {
 						$asunto = new Asunto($sesion);
 						$asunto->LoadByCodigo($cobro->asuntos[$cont_asuntos]);
 						$codigo_asunto_secundario = $asunto->CodigoACodigoSecundario($cobro->asuntos[$cont_asuntos]);
@@ -873,11 +854,9 @@ $mostrar_resumen_de_profesionales = 1;
 						list($cont_tramites) = mysql_fetch_array($resp_cont_tramites);
 
 							// Si el asunto tiene trabajos y/o trámites imprime su resumen
-							if( ($cont_trabajos+$cont_tramites) > 0 )
-								{
+		if (($cont_trabajos + $cont_tramites) > 0) {
 									$cobro_tiene_trabajos = true;
-									if($opc_ver_asuntos_separados)
-										{
+			if ($opc_ver_asuntos_separados) {
 											// Indicar en una linea que los asuntos se muestran por separado y lluego
 											// esconder la columna para que no ensucia la vista.
 											$ws->write($filas, $col_fecha_ini, 'asuntos_separado', $formato_encabezado);
@@ -892,8 +871,7 @@ $mostrar_resumen_de_profesionales = 1;
 										}
 
 								// Si existen trabajos imprime la tabla
-								if( $cont_trabajos > 0 )
-									{
+			if ($cont_trabajos > 0) {
 										// Buscar todos los trabajos de este asunto/cobro
 										$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
 																				trabajo.id_cobro,
@@ -941,8 +919,9 @@ $mostrar_resumen_de_profesionales = 1;
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 									$ws->write($filas, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-									if($opc_ver_solicitante)
+				//if ($cobro->fields['opc_ver_solicitante']) {
 										$ws->write($filas, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
+				//}
 									if($opc_ver_horas_trabajadas)
 										$ws->write($filas, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 									$ws->write($filas, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'duracion_cobrable', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
@@ -963,25 +942,24 @@ $mostrar_resumen_de_profesionales = 1;
 							 		$suma_total_inexacto = 0;
 							 		$suma_total_exacto = 0;
 							 		// Contenido de la tabla de trabajos
-									for($i=0;$i<$lista_trabajos->num;$i++)
-									{
+				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 										$trabajo = $lista_trabajos->Get($i);
 
-										$f = explode('-',$trabajo->fields['fecha']);
-										$ws->write($filas,$col_fecha_dia, $f[2],$formato_normal);
-										$ws->write($filas,$col_fecha_mes, $f[1],$formato_normal);
-										$ws->write($filas,$col_fecha_anyo, $f[0],$formato_normal);
+					$f = explode('-', $trabajo->fields['fecha']);
+					$ws->write($filas, $col_fecha_dia, $f[2], $formato_normal_centrado);
+					$ws->write($filas, $col_fecha_mes, $f[1], $formato_normal_centrado);
+					$ws->write($filas, $col_fecha_anyo, $f[0], $formato_normal_centrado);
 
-										//$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
-										if (!$opc_ver_asuntos_separados) {
-											$ws->write($filas, $col_asunto, $trabajo->fields['codigo_asunto_secundario'], $formato_descripcion);
-										}
+					//$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
+					if (!$opc_ver_asuntos_separados)
+						$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $formato_descripcion);
 										$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $formato_descripcion);
 										// Se guarda el nombre en una variable porque se usa en el detalle profesional.
 										$nombre = $trabajo->fields['username'];
 										$ws->write($filas, $col_abogado, $nombre, $formato_normal);
-										if($opc_ver_solicitante)
+					//if ($cobro->fields['opc_ver_solicitante']) {
 											$ws->write($filas, $col_solicitante, $trabajo->fields['solicitante'], $formato_normal);
+					//}
 										$duracion = $trabajo->fields['duracion'];
 										list($h, $m) = split(':', $duracion);
 										$duracion = $h/24 + $m/(24*60);
@@ -998,21 +976,22 @@ $mostrar_resumen_de_profesionales = 1;
 										$query_total_cobrable = "select if(sum(TIME_TO_SEC(duracion_cobrada)/3600)<=0,1,sum(TIME_TO_SEC(duracion_cobrada)/3600)) as duracion_total from trabajo where id_cobro = '".$cobro->fields['id_cobro']."' and cobrable = 1";
 										$resp_total_cobrable = mysql_query($query_total_cobrable,$sesion->dbh) or Utiles::errorSQL($query_total_cobrable,__FILE__,__LINE__,$sesion->dbh);
 										list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
-										$xtotal_hh_cobrable  = ($xtotal_hh_cobrable > 0 ? $xtotal_hh_cobrable : 1  );   //se evita la división por cero.
-										$factor = $cobro->fields['retainer_horas']/$xtotal_hh_cobrable;
-
-										if( $cobro->fields['forma_cobro'] =='PROPORCIONAL' ) {
-											$duracion_retainer = $duracion_cobrada * $factor;
-										}
-										else{
+					if( $xtotal_hh_cobrable > 0 ) {
+						$factor = $cobro->fields['retainer_horas'] / $xtotal_hh_cobrable;
+					}
+					else {
+						$factor = 1;
+					}
+					if ($cobro->fields['forma_cobro'] == 'PROPORCIONAL') {
+						$duracion_retainer = $duracion_cobrada * $factor;
+					} else {
 											$duracion_retainer = $trabajo->fields['duracion_retainer'];
 											list($h,$m,$s) = split(':', $duracion_retainer);
 											$duracion_retainer = $h/24 + $m/(24*60) + $s/(24*60*60);
 										}
 										if( $duracion_retainer > $duracion_cobrada || $cobro->fields['forma_cobro'] == 'FLAT FEE' )
 											$duracion_retainer = $duracion_cobrada;
-										if($col_duracion_retainer)
-										{
+					if ($col_duracion_retainer) {
 											$ws->writeNumber($filas, $col_duracion_retainer, $duracion_retainer, $formato_tiempo);
 										}
 										$duracion_tarificable = max(($duracion_cobrada - $duracion_retainer),0);
@@ -1028,10 +1007,8 @@ $mostrar_resumen_de_profesionales = 1;
 										$ws->write($filas, $col_id_abogado, $trabajo->fields['id_usuario'], $formato_normal);
 
 										// Si hay que mostrar el detalle profesional guardamos una lista con los profesionales que trabajaron en este asunto.
-										if( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] )
-										{
-											if( $trabajo->fields['cobrable'] > 0 && !isset($detalle_profesional[$trabajo->fields['id_usuario']]) )
-												{
+					if ($opc_ver_profesional || $cobro->fields['opc_ver_profesional']) {
+						if ($trabajo->fields['cobrable'] > 0 && !isset($detalle_profesional[$trabajo->fields['id_usuario']])) {
 													$detalle_profesional[$trabajo->fields['id_usuario']]['tarifa'] = $trabajo->fields['tarifa_hh'];
 													$detalle_profesional[$trabajo->fields['id_usuario']]['nombre'] = $nombre;
 												}
@@ -1054,8 +1031,9 @@ $mostrar_resumen_de_profesionales = 1;
 									$ws->write($filas, $col_abogado, '', $formato_total);
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_asunto, '', $formato_total);
-									if($opc_ver_solicitante)
+				//if ($cobro->fields['opc_ver_solicitante']) {
 										$ws->write($filas, $col_solicitante, '', $formato_total);
+				//}
 									if($opc_ver_horas_trabajadas)
 										$ws->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$primera_fila_asunto:$col_formula_duracion_trabajada$filas)", $formato_tiempo_total);
 									if($col_duracion_retainer)
@@ -1071,8 +1049,7 @@ $mostrar_resumen_de_profesionales = 1;
 
 
 
-								if( $cont_tramites > 0 )
-									{
+			if ($cont_tramites > 0) {
 										// Buscar todos los trámites de este cobro/asunto
 										$where_tramites = " 1 ";
 										if($opc_ver_asuntos_separados)
@@ -1121,8 +1098,9 @@ $mostrar_resumen_de_profesionales = 1;
 												$ws->write($filas, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
 												if(!$opc_ver_asuntos_separados)
 													$ws->write($filas, $col_abogado+1, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
-												if($opc_ver_solicitante)
+				//if ($cobro->fields['opc_ver_solicitante']) {
 													$ws->write($filas, $col_solicitante,'',$formato_titulo);
+				//}
 												$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
 												if($opc_ver_horas_trabajadas)
 													$ws->write($filas, $col_duracion_trabajada, '', $formato_titulo);
@@ -1137,12 +1115,10 @@ $mostrar_resumen_de_profesionales = 1;
 												$fila_inicio_tramites = $filas + 1;
 
 												// Contenido de la tabla de trámites
-												for($i=0;$i<$lista_tramites->num;$i++)
-												{
+				for ($i = 0; $i < $lista_tramites->num; $i++) {
 													$tramite = $lista_tramites->Get($i);
 													list($h,$m,$s) = split(':',$tramite->fields['duracion']);
-													if($h+$m > 0)
-														{
+					if ($h + $m > 0) {
 														if( $h > 9 )
 															$duracion = $h.':'.$m;
 														else
@@ -1162,8 +1138,9 @@ $mostrar_resumen_de_profesionales = 1;
 
 													if(!$opc_ver_asuntos_separados)
 														$ws->write($filas, $col_abogado+1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
-													if($opc_ver_solicitante)
+					//if ($cobro->fields['opc_ver_solicitante']) {
 														$ws->write($filas, $col_solicitante,'',$formato_normal);
+					//}
 													$ws->write($filas, $col_descripcion, $tramite->fields['glosa_tramite'].' - '.$tramite->fields['descripcion'], $formato_descripcion);
 													if($opc_ver_horas_trabajadas)
 														$ws->write($filas, $col_duracion_trabajada, '', $formato_tiempo);
@@ -1189,8 +1166,9 @@ $mostrar_resumen_de_profesionales = 1;
 									$ws->write($filas, $col_abogado, '', $formato_total);
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_abogado+1, '', $formato_total);
-									if($opc_ver_solicitante)
+				//if ($cobro->fields['opc_ver_solicitante']) {
 										$ws->write($filas, $col_solicitante,'',$formato_total);
+				//}
 									$ws->write($filas, $col_descripcion, '', $formato_total);
 									if($opc_ver_horas_trabajadas && $col_duracion_trabajada != $col_descripcion+1 )
 											$ws->write($filas, $col_duracion_trabajada, '', $formato_tiempo_total);
@@ -1217,17 +1195,14 @@ $mostrar_resumen_de_profesionales = 1;
 							break;
 					}
 
-					if( count($cobro->asuntos) == 0 || !$cobro_tiene_trabajos )
-					{
+	if (count($cobro->asuntos) == 0 || !$cobro_tiene_trabajos) {
 						$ws->write($filas++,$col_descripcion,'No existen trabajos asociados a este cobro.',$formato_instrucciones10);
 						$filas += 2;
 					}
 
-				if( ( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional) )
-					{
+	if (( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) {
 						// Si el resumen va al principio cambiar el índice de las filas.
-						if($mostrar_resumen_de_profesionales)
-						{
+		if ($mostrar_resumen_de_profesionales) {
 							$filas2 = $filas;
 							$filas = $fila_inicio_resumen_profesional;
 						}
@@ -1250,8 +1225,7 @@ $mostrar_resumen_de_profesionales = 1;
 						$filas+=2;
 						$ws->write($filas++, $col_descripcion, Utiles::GlosaMult($sesion, 'titulo', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 						$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'nombre', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-						if($opc_ver_horas_trabajadas)
-						{
+		if ($opc_ver_horas_trabajadas) {
 							$ws->write($filas, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'horas_trabajadas', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 							$ws->write($filas, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'horas_cobrables', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 						}
@@ -1277,10 +1251,8 @@ $mostrar_resumen_de_profesionales = 1;
 						else
 							$inicio_datos = "$col_formula_duracion_cobrable".($primera_fila_primer_asunto+1);
 						$fin_datos = "$col_formula_id_abogado".($ultima_fila_ultimo_asunto+1);
-						if( is_array($detalle_profesional) )
-							{
-								foreach($detalle_profesional as $id => $data)
-									{
+		if (is_array($detalle_profesional)) {
+			foreach ($detalle_profesional as $id => $data) {
 										if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
 											$query_tarifa = "SELECT
 																					SUM( ( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) * tarifa_hh ) / SUM( TIME_TO_SEC( duracion_cobrada ) - TIME_TO_SEC( duracion_retainer ) ) as tarifa
@@ -1322,13 +1294,11 @@ $mostrar_resumen_de_profesionales = 1;
 						if( $cobro->fields['forma_cobro'] == 'FLAT FEE' )
 							$ws->write($filas, $col_valor_trabajo+2, '', $formato_normal);
 						//$ws->writeFormula($filas, $col_cobrable, "=SUM($col_formula_cobrable$fila_inicio_detalle_profesional:$col_formula_cobrable$filas)", $formato_moneda_total);
-
 						// Borrar el resumen para que el siguiente asunto parta de cero
 						unset($detalle_profesional);
 
 						// Si el resumen va al principio cambiar el índice de las filas.
-						if($mostrar_resumen_de_profesionales)
-						{
+		if ($mostrar_resumen_de_profesionales) {
 							$filas = $filas2;
 						}
 					}
@@ -1419,8 +1389,7 @@ $mostrar_resumen_de_profesionales = 1;
 										ORDER BY fecha ASC";
 
 							$lista_gastos = new ListaGastos($sesion, '', $query);
-							for($i=0;$i<$lista_gastos->num;$i++)
-							{
+		for ($i = 0; $i < $lista_gastos->num; $i++) {
 								$gasto = $lista_gastos->Get($i);
 
 								if( UtilesApp::GetConf($sesion, 'FacturaAsociada') ){
@@ -1523,8 +1492,7 @@ $mostrar_resumen_de_profesionales = 1;
 							}
 						}
 
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarResumenExcel') ) || ( method_exists('Conf','UsarResumenExcel') && Conf::UsarResumenExcel() ) )
-					{
+	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarResumenExcel') ) || ( method_exists('Conf', 'UsarResumenExcel') && Conf::UsarResumenExcel() )) {
 						// Resumen con información la forma de cobro y en caso de CAP una lista de los otros cobro que estan adentro de este CAP.
 						$filas += 3;
 						// Informacion general sobre el cobro:
@@ -1556,8 +1524,7 @@ $mostrar_resumen_de_profesionales = 1;
 															 WHERE cobro.id_contrato=".$cobro->fields['id_contrato']."
 															 	 AND cobro.forma_cobro='CAP'";
 								$resp_cob = mysql_query($query_cob, $sesion->dbh) or Utiles::errorSQL($query_cob,__FILE__,__LINE__,$sesion->dbh);
-								while(list($id_cobro, $id_factura, $monto_cap)=mysql_fetch_array($resp_cob))
-									{
+			while (list($id_cobro, $id_factura, $monto_cap) = mysql_fetch_array($resp_cob)) {
 										$monto_cap = number_format($monto_cap, $moneda_monto->fields['cifras_decimales'],'.','');
 										$ws->write($filas, $col_fecha_ini, __('Factura N°').' '.$id_factura, $formato_resumen_text);
 										$ws->writeNumber($filas++, $col_fecha_ini+1, $monto_cap, $formato_moneda_monto_resumen);
@@ -1569,8 +1536,7 @@ $mostrar_resumen_de_profesionales = 1;
 					}
 				// Si el cobro es RETAINER o PROPORCIONAL vuelve la definición de las columnas al
 				// estado normal para patir en cero en el siguiente cobro
-				if(($cobro->fields['forma_cobro']=='RETAINER' || $cobro->fields['forma_cobro']=='PROPORCIONAL' || $cobro->fields['forma_cobro']=='FLAT FEE'))
-					{
+	if (($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' || $cobro->fields['forma_cobro'] == 'FLAT FEE')) {
 						unset($col_duracion_retainer);
 						unset($col_formula_duracion_retainer);
 						//if($opc_ver_cobrable)
@@ -1585,10 +1551,13 @@ $mostrar_resumen_de_profesionales = 1;
 							$col_formula_cobrable = Utiles::NumToColumnaExcel($col_cobrable);
 						$col_formula_id_abogado = Utiles::NumToColumnaExcel($col_id_abogado);
 					}
+	
+	if( !$cobro->fields['opc_ver_solicitante'] ) {
+		$ws->setColumn($col_solicitante, $col_solicitante, 10 ,$formato_total, 1);
 			}
+}
 		// fin bucle cobros
-if(isset($ws))
-	{
+if (isset($ws)) {
 		// Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
 		if(!$guardar_respaldo)
 			$wb->send('Resumen de cobros.xls');

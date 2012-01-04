@@ -50,6 +50,7 @@ $server->wsdl->addComplexType(
 				'serie' => array('name' => 'serie', 'type' => 'xsd:string'),
 				'numero' => array('name' => 'numero', 'type' => 'xsd:integer'),
 				'tipo' => array('name' => 'tipo', 'type' => 'xsd:string'),
+				'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
 				'honorarios' => array('name' => 'honorarios', 'type' => 'xsd:float'),
 				'gastos_sin_iva' => array('name' => 'gastos_sin_iva', 'type' => 'xsd:float'),
 				'gastos_con_iva' => array('name' => 'gastos_con_iva', 'type' => 'xsd:float'),
@@ -443,6 +444,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 
 			$query_facturas = " SELECT
 											factura.id_factura,
+											factura.codigo_cliente,
 											factura.comprobante_erp,
 											factura.condicion_pago,
 											SUM(factura_cobro.monto_factura) as monto_factura,
@@ -479,7 +481,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 			$respu = mysql_query($query_facturas, $sesion->dbh) or Utiles::errorSQL($query_facturas, __FILE__, __LINE__, $sesion->dbh);
 
 			$facturas_cobro = Array();
-			while( list( $id_factura, $comprobante_erp, $condicion_pago, $monto, $numero, $tipo, $estado, $cod_estado, $subtotal_honorarios, $honorarios, $saldo, $subtotal_gastos, $subtotal_gastos_sin_impuesto, $impuesto, $cod_tipo, $cliente, $RUT_cliente, $direccion_cliente, $fecha, $descripcion, $id_moneda_factura, $tipo_cambio_factura, $cifras_decimales_factura, $codigo_moneda_factura, $serie ) = mysql_fetch_array($respu) )
+			while( list( $id_factura, $codigo_cliente_factura, $comprobante_erp, $condicion_pago, $monto, $numero, $tipo, $estado, $cod_estado, $subtotal_honorarios, $honorarios, $saldo, $subtotal_gastos, $subtotal_gastos_sin_impuesto, $impuesto, $cod_tipo, $cliente, $RUT_cliente, $direccion_cliente, $fecha, $descripcion, $id_moneda_factura, $tipo_cambio_factura, $cifras_decimales_factura, $codigo_moneda_factura, $serie ) = mysql_fetch_array($respu) )
 			{
 										//si el documento no esta anulado, lo cuento para el saldo disponible a facturar (notas de credito suman, los demas restan)
 										if($cod_estado != 'A'){
@@ -489,6 +491,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$saldo_gastos_sin_impuestos += $subtotal_gastos_sin_impuesto*$mult;
 											
 											$factura_cobro['id_factura'] = $id_factura;
+											$factura_cobro['codigo_cliente'] = $codigo_cliente_factura;
 											$factura_cobro['codigo_factura_lemontech'] = $id_factura;
 											$factura_cobro['comprobante_erp'] = $comprobante_erp;
 											$factura_cobro['condicion_pago'] = $condicion_pago;
@@ -776,6 +779,7 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 									else
 									{
 										$factura->Edit('numero',$datos_factura['numero']);
+										$factura->Edit('serie_documento_legal',$datos_factura['serie']);
 										$factura->Edit('comprobante_erp',$datos_factura['comprobante_erp']);
 										if($factura->Write())
 										{
@@ -845,7 +849,12 @@ function InformarNotaVenta($usuario,$password,$lista_cobros)
 									$p['fecha'] = mysql_real_escape_string($datos_factura['fecha']);
 									$p['RUT_cliente'] = mysql_real_escape_string($datos_factura['rut_cliente']);
 									$p['direccion_cliente'] = mysql_real_escape_string($datos_factura['direccion_cliente']);
-									$p['codigo_cliente'] = mysql_real_escape_string($cobro->fields['codigo_cliente']);
+
+									
+									$p['codigo_cliente'] = null;
+									if($datos_factura['codigo_cliente'])
+										$p['codigo_cliente'] = mysql_real_escape_string($datos_factura['codigo_cliente']);
+										
 									$p['id_cobro'] = $id_cobro;
 									$p['id_documento_legal'] = $id_tipo;
 									$p['codigo_tipo_doc'] = $tipo;

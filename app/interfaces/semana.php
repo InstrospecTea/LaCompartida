@@ -236,6 +236,10 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		
 		$alto = max($lista->Get($i)->fields[alto],12)."px";
 		$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
+		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+			$cod_asunto_color = $asunto->CodigoSecundarioACodigo($cod_asunto);
+		else
+			$cod_asunto_color = $cod_asunto;
 		$cliente = $lista->Get($i)->fields[codigo_cliente];
 		$dia_semana = $lista->Get($i)->fields[dia_semana];
 		
@@ -271,7 +275,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		else
 		{
 			$no_cobrable = '';
-			$color = $objeto_semana->colores[$cod_asunto];
+			$color = $objeto_semana->colores[$cod_asunto_color];
 			if($color == '')
 				$color = '#E8E7D9';
 		}
@@ -279,8 +283,9 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		$total[$dia_semana]  += $hh + $mm/60; 
 #		$total[$dia_semana] += ($alto/40);
 
+		$descripcion = nl2br(str_replace("'","`",$lista->Get($i)->fields['descripcion']));
 		$id_trabajo = $lista->Get($i)->fields[id_trabajo];
-		$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".nl2br($lista->Get($i)->fields[descripcion])."<br><b>".$no_cobrable."</b>");
+		$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
 		if($dia_anterior != $dia_semana)
 		{
 			for($q = $dia_anterior+1; $q <= $dia_semana; $q++)

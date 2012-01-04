@@ -21,7 +21,7 @@ class CobroPendiente extends Objeto
 	function AsociarCobro($sesion,$id_cobro)
 	{
 		$query = "UPDATE cobro_pendiente SET id_cobro='$id_cobro' WHERE id_cobro_pendiente='".$this->fields['id_cobro_pendiente']."'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		return true;
 	}
 	
@@ -29,7 +29,7 @@ class CobroPendiente extends Objeto
 	function EliminarPorContrato($sesion,$id_contrato)
 	{
 		$query = "DELETE FROM cobro_pendiente WHERE id_contrato = '$id_contrato' AND id_cobro IS NULL";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	}
 	
 	#funcion que se corre una vez al mes por cron para generar los nuevos

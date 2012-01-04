@@ -281,8 +281,58 @@
 			'max' => $cliente->fields['alerta_hh'],
 			'actual' => $total_horas_ult_cobro);
 			$cliente->Edit('notificado_hr_excedida_ult_cobro','1');
-            $cliente->Write();
+                        $cliente->Write();
 		}
+	}
+        
+        // Mail Diario: Sexto componente: Alertas de ingreso de horas
+	if(date ("N") < 6) // Lunes a Viernes
+	{ 
+			$opc = 'mail_retrasos';
+			$query="SELECT usuario.id_usuario
+					FROM usuario
+					JOIN usuario_permiso USING(id_usuario)
+					WHERE codigo_permiso='PRO' AND alerta_diaria = '1' AND activo=1 AND retraso_max_notificado = 0";
+			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			while ($row = mysql_fetch_array($result))
+			{ 
+					$id_usuario = $row["id_usuario"];
+					$prof = new Usuario($sesion);
+					$prof->LoadId($id_usuario);
+
+					if($prof->fields['retraso_max'] > 0)
+					{
+						//Calcular horas de retraso excluyendo los fines de semana
+                                                $diferencia_db_app = UtilesApp::DiferenciaDbAplicacionEnSegundos($sesion);
+                                                
+                                                $query = "SELECT MAX(fecha_creacion) FROM trabajo WHERE id_usuario='$id_usuario'";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						list($ultima_fecha_ingreso) = mysql_fetch_array($resp);
+                                                $start = 0;
+                                                if( !empty($ultima_fecha_ingreso) && $ultima_fecha_ingreso != "NULL" ) {
+                                                    $start = strtotime($ultima_fecha_ingreso);
+                                                }
+						$end = strtotime(date("Y-m-d H:i:s"));
+                                                if($start == 0) {
+                                                    $retraso = 0;
+                                                } else {
+                                                    $retraso = $end - $start - $diferencia_db_app;
+                                                    while ($start <= $end) {
+                                                        if (date('N', $start) > 5 ) {
+                                                               $retraso -= 86400;
+                                                        }
+                                                        $start += 86400;
+                                                    }
+                                                }
+						$horas_retraso = max(0,$retraso/3600);
+						if($horas_retraso > $prof->fields['retraso_max'])
+						{ 
+							$dato_diario[$id_usuario]['retraso_max'] = array('actual'=>$horas_retraso,'max'=>$prof->fields['retraso_max']);
+							$query = "UPDATE usuario SET retraso_max_notificado = 1 WHERE id_usuario = '$id_usuario'";
+							mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						}
+					}
+			}
 	}
 	
 	

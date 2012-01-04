@@ -234,11 +234,18 @@
 			
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
     $query = "SELECT SQL_CALC_FOUND_ROWS
-					*,
 			    							a1.codigo_asunto,
+			    							a1.glosa_asunto,
+			    							a1.descripcion_asunto,
 			    							a1.id_moneda, 
 			    							IF(a1.activo=1,'SI','NO') as activo,
 											a1.fecha_inactivo,
+			    							a1.contacto, 
+			    							a1.cobrable,
+			    							a1.fono_contacto, 
+			    							a1.email_contacto, 
+			    							a1.direccion_contacto,
+			    							a1.actividades_obligatorias, 
 			            			a1.fecha_creacion, 
 			            			(
 			            				SELECT 
@@ -259,9 +266,11 @@
 			                  ) AS horas_trabajadas,
 												ca.id_cobro AS id_cobro_asunto, 
 												tarifa.glosa_tarifa,
+												cliente.glosa_cliente,
 												prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
 												prm_area_proyecto.glosa AS area_proyecto, 
 												a1.codigo_asunto_secundario as codigo_secundario,
+												prm_idioma.glosa_idioma, 
 												contrato.monto,
 												contrato.forma_cobro,
 											prm_moneda.glosa_moneda,

@@ -58,7 +58,7 @@ class Gasto extends Objeto
 	function Load($id)
 	{
 		$this->Check();
-		Objeto::Load($id);
+		return Objeto::Load($id);
 	}
 	
 	function Write()
@@ -142,23 +142,9 @@ class Gasto extends Objeto
 		#Actualiza los egresos segun sus datos
 		$query = "UPDATE cta_corriente SET fecha_pago = '$fecha_pago', documento_pago = '$documento_pago', monto_pago = egreso, pagado = 1, id_movimiento_pago = '$id'
 				WHERE id_cobro = '$id_cobro' AND id_movimiento_pago IS NULL";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);	
+		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);	
 		return true;
 	}
-	
-	#Elimina ingreso que se haya realizado a través del ingreso o pago de gastos en un COBRO.
-	#id -> id de movimientos
-	function EliminaIngresoDeCobro($id)
-	{
-		$query = "UPDATE cta_corriente SET documento_pago = '' id_movimiento_pago = 'NULL'
-				WHERE id_cobro = '".$id_cobro."' ";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		
-		$query = "DELETE FROM cta_corriente WHERE id_movimiento = '$id' LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		return true;
-	}
-	
 	
 	/*
 	Elimina Ingreso desde un gasto asociado, verificando que no existan otros gastos asociados a el.

@@ -4,6 +4,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
+	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 	
 	$sesion = new Sesion();
 	$pagina = new Pagina($sesion);
@@ -113,20 +114,28 @@
 			$ws1->setColumn($col,$col,15);$col++;
 		}
 		$col = 2;
-		$x_fecha = $fecha1;
+		$meses = UtilesApp::ArregloMeses();
+		$x_mes  = date("n",strtotime($fecha1));
+		$x_anio = date("Y",strtotime($fecha1));
 		$ws1->write($filas+1, $col-1, 'Nombre', $formato_titulo);
 		while( $col < 4 * $cantidad_meses + 2 )
 		{
 			$ws1->mergeCells($filas, $col, $filas, $col+3);
-			$ws1->write($filas, $col, ucfirst(strftime("%B",strtotime($x_fecha))).' '.strftime("%G",strtotime($x_fecha)), $formato_titulo);
-			$ws1->write($filas, $col+1,'', $formato_titulo);
+			$ws1->write($filas, $col+1, $meses[$x_mes].' '.$x_anio, $formato_titulo);
+			$ws1->write($filas, $col,'', $formato_titulo);
 			$ws1->write($filas, $col+2,'', $formato_titulo);
 			$ws1->write($filas, $col+3,'', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'Mayor', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'Menor', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'Promedio', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'N° Trabajos', $formato_titulo);
-			$x_fecha = Utiles::add_date($x_fecha,0,1,0);
+			if( $x_mes == 12 )
+				{
+					$x_anio++;
+					$x_mes = 1;
+		}
+			else
+				$x_mes++;
 		}
 		$filas += 2;
 		$i = 1;

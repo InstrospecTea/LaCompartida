@@ -215,7 +215,6 @@ echo(Autocompletador::CSS());
 	
 	function funcionTR(& $gasto_historial)
 		{
-			global $sesion;
 			static $i = 0;
 			
 			if($i % 2 == 0)

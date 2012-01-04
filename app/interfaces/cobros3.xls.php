@@ -76,8 +76,14 @@
 
 	// Definición de columnas
 	$col = 0;
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $col_id_trabajo = $col++;
+        }
 	$col_fecha = $col++;
 	$col_cliente = $col++;
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $col_codigo_asunto = $col++;
+        }
 	$col_asunto = $col++;
 	$col_id_cobro = $col++;
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
@@ -92,7 +98,6 @@
 	$col_tarifa_hh = $col++;
 	$col_valor_trabajo = $col++;
 	
-
 	// Valores para las fórmulas
 	$col_formula_duracion = Utiles::NumToColumnaExcel($col_duracion);
 	$col_formula_duracion_cobrada = Utiles::NumToColumnaExcel($col_duracion_cobrada);
@@ -102,8 +107,14 @@
 
 	$col = 3;
 	// Setear el ancho de las columnas
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $ws->setColumn($col_id_trabajo, $col_id_trabajo, 15);
+        }
 	$ws->setColumn($col_fecha, $col_fecha, 10);
 	$ws->setColumn($col_cliente, $col_cliente, 30);
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $ws->setColumn($col_codigo_asunto, $col_codigo_asunto, 20);
+        }
 	$ws->setColumn($col_asunto, $col_asunto, 30);
 	$ws->setColumn($col_id_cobro, $col_id_cobro, 15);
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
@@ -136,8 +147,14 @@
 
 	$fila_inicial = 4;
 
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $ws->write($fila_inicial, $col_id_trabajo, __('N° Trabajo'), $tit);
+        }
 	$ws->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
 	$ws->write($fila_inicial, $col_cliente, __('Cliente'), $tit);
+        if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+            $ws->write($fila_inicial, $col_codigo_asunto, __('Código Asunto'), $tit);
+        }
 	$ws->write($fila_inicial, $col_asunto, __('Asunto'), $tit);
 	$ws->write($fila_inicial, $col_id_cobro, __('Cobro'), $tit);
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
@@ -184,9 +201,19 @@
 								'Color' => 'black',
 								'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 
-		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($trabajo->fields[fecha], "%d-%m-%Y"), $tex);
-		$ws->write($fila_inicial + $i, $col_cliente, $trabajo->fields[glosa_cliente], $tex);
-		$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['codigo_asunto'] . ' ' . $trabajo->fields['glosa_asunto'], $tex);
+                if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+                    $ws->write($fila_inicial + $i, $col_id_trabajo, $trabajo->fields['id_trabajo'], $tex);
+                }
+		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], "%d-%m-%Y"), $tex);
+		$ws->write($fila_inicial + $i, $col_cliente, $trabajo->fields['glosa_cliente'], $tex);
+                if( UtilesApp::GetConf($sesion,'ColumnaIdYCodigoAsuntoAExcelRevisarHoras') ) {
+                    if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
+                        $ws->write($fila_inicial + $i, $col_codigo_asunto, $trabajo->fields['codigo_asunto_secundario'], $tex);
+                    } else {
+                        $ws->write($fila_inicial + $i, $col_codigo_asunto, $trabajo->fields['codigo_asunto'], $tex);
+                    }
+                }
+		$ws->write($fila_inicial + $i, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
 		$ws->write($fila_inicial + $i, $col_id_cobro, $trabajo->fields['id_cobro']?$trabajo->fields['id_cobro']:'', $tex);
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 			$ws->write($fila_inicial + $i, $col_actividad, $trabajo->fields[glosa_actividad], $tex);
@@ -206,7 +233,7 @@
                 if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
                         $ws->writeNumber($fila_inicial + $i, $col_duracion, $duracion_decimal, $fdd );
                 } else {
-                        $ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+		$ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
                 }
 
 		$params_array['codigo_permiso'] = 'REV';
@@ -216,14 +243,14 @@
 			if($trabajo->fields['cobrable'] == 0)
 				$duracion_cobrada = '0:00';
 			list($h, $m)= split(':', $duracion_cobrada);
-                        
+
                         $duracion_cobrada_decimal = number_format($h+$m/60, 1,'.','');
 			$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
                         if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
                                 $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $duracion_cobrada_decimal, $fdd );
                         } else {
-                                $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
-                        }
+			$ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel, $time_format);
+		}
 		}
 		else
 			 $ws->write($fila_inicial + $i, $col_duracion_cobrada, '', $time_format);
@@ -232,20 +259,19 @@
 		if($p_cobranza->fields['permitido'])
 		{
 			// Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
-			if( $trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0 ) {
-                            $tarifa = $trabajo->fields['tarifa_hh'];
-                        }
-			else 
+			if( $trabajo->fields['tarifa_hh'] > 0 && !empty($trabajo->fields['estado_cobro']) && $trabajo->fields['estado_cobro'] != 'CREADO' && $trabajo->fields['estado_cobro'] != 'EN REVISION' )
+			$tarifa = $trabajo->fields['tarifa_hh'];
+			else
 			{
 				if($trabajo->fields['id_tarifa'] && $trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario'])
 				{
-                                    $query = "SELECT tarifa
-                                                                            FROM usuario_tarifa
-                                                                            WHERE id_tarifa=".$trabajo->fields['id_tarifa']."
+				$query = "SELECT tarifa
+									FROM usuario_tarifa
+									WHERE id_tarifa=".$trabajo->fields['id_tarifa']."
                                                                                     AND id_moneda=".$trabajo->fields['id_moneda_contrato']."
-                                                                                    AND id_usuario=".$trabajo->fields['id_usuario'];
-                                    $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-                                    list($tarifa) = mysql_fetch_array($resp);
+										AND id_usuario=".$trabajo->fields['id_usuario'];
+				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				list($tarifa) = mysql_fetch_array($resp);
 				}
 				else if($trabajo->fields['id_moneda_contrato'] && $trabajo->fields['id_usuario'])
 				{
@@ -272,16 +298,16 @@
                             $formula_monto = "=$col_formula_tarifa_hh".($fila_inicial+$i+1)."*($col_formula_duracion_cobrada".($fila_inicial+$i+1).")";
                         } else {
                             $formula_monto = "=$col_formula_tarifa_hh".($fila_inicial+$i+1)."*(24*($col_formula_duracion_cobrada".($fila_inicial+$i+1)."))";
-                        }
-			$ws->writeFormula($fila_inicial + $i, $col_valor_trabajo, $formula_monto , $money_format);
 		}
+			$ws->writeFormula($fila_inicial + $i, $col_valor_trabajo, $formula_monto , $money_format);
+	}
 	}
         if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
             $ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $fdd);
             $ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $fdd);
         } else {
-            $ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
-            $ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $time_format);
+	$ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
+	$ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $time_format);
         }
 	// No tiene sentido sumar los totales porque pueden estar en monedas distintas.
 	

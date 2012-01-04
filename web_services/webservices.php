@@ -3,6 +3,7 @@ require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
@@ -139,6 +140,7 @@ $server->register('CargarTrabajo2',
 					'ordenado_por' => 'xsd:string',
 					'fecha' => 'xsd:string',
 					'duracion' => 'xsd:string',
+					'area_trabajo' => 'xsd:string'
 					),
 			array('resultado' => 'xsd:string'),
 			$ns);
@@ -153,6 +155,10 @@ $server->register('EntregarListaClientes',
 $server->register('EntregarListaAsuntos',
 			array('usuario' => 'xsd:string', 'password' => 'xsd:string'),
 			array('lista_asuntos' => 'tns:ListaCodigoGlosa'),
+			$ns);
+$server->register('EntregarListaAreas',
+			array('usuario' => 'xsd:string', 'password' => 'xsd:string'),
+			array('lista_areas' => 'tns:ListaCodigoGlosa'),
 			$ns);
 $server->register('ActividadesObligatorias',
 			array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'codigo_asunto' => 'xsd:string'),
@@ -169,6 +175,10 @@ $server->register('Telefono',
 $server->register('Setups',
 			array(),
 			array('ordenado_por' => 'xsd:int'),
+			$ns);
+$server->register('UsarAreaTrabajos',
+			array(),
+			array('resultado' => 'xsd:int'),
 			$ns);
 $server->register('GetTimeLastWork',
 			array('usuario' => 'xsd:string', 'password' => 'xsd:string'),
@@ -214,6 +224,11 @@ function Setups()
 		return Conf::GetConf($sesion,'OrdenadoPor');
 	else
 		return Conf::Ordenado_por();
+}
+function UsarAreaTrabajos()
+{
+	global $sesion;
+	return UtilesApp::GetConf($sesion,'UsarAreaTrabajos');
 }
 function Titulo()
 {
@@ -371,16 +386,45 @@ function EntregarListaActividades($usuario, $password)
 		return new soap_fault('Client', '','Error de login.','');
 	return new soapval('lista_actividades','ListaCodigoGlosa',$lista_actividades);
 }
-function CargarTrabajo2($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion)
+function EntregarListaAreas($usuario, $password)
 {
-	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion);
+	if($usuario == "" || $password == "")
+		return new soap_fault(
+			'Client', '',
+			'Debe entregar el usuario y el password.',''
+		); 
+
+	$sesion = new Sesion();
+
+	$lista_areas = array();
+
+	if($sesion->VerificarPassword($usuario,$password))
+	{
+		$query = "SELECT id_area_trabajo, glosa FROM prm_area_trabajo ORDER BY glosa";
+		if(!($resp = mysql_query($query, $sesion->dbh) ))
+			return new soap_fault('Client', '','Error SQL.','');
+		while( list($id, $glosa) = mysql_fetch_array($resp) )
+		{
+			$lista_areas[] = array(
+				'codigo' => $id,
+				'glosa' => $glosa,
+				'codigo_padre' => '');
+}
+	}
+	else
+		return new soap_fault('Client', '','Error de login.','');
+	return new soapval('lista_areas','ListaCodigoGlosa',$lista_areas);
+}
+function CargarTrabajo2($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo = null)
+{
+	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo);
 }
 function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $fecha, $duracion)
 {
-	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion);
+	return CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, '', $fecha, $duracion, '');
 }
 
-function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por,  $fecha, $duracion)
+function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por,  $fecha, $duracion, $area_trabajo)
 {
 	if($usuario == "" || $password == "")
 		return new soap_fault(
@@ -433,9 +477,12 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		}
 
 		$fecha_antigua=$fecha;
+		if( $dias_ingreso_trabajo > 0 )
 		if(strtotime($fecha) < mktime(0,0,0,date("m"),date("d")-$dias_ingreso_trabajo,date("Y")))
 			$fecha=date("Y-m-d");
 
+		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : "NULL";
+			
 		$descripcion=addslashes($descripcion);
 		$ordenado_por=addslashes($ordenado_por);
 		$query = "INSERT INTO trabajo SET 
@@ -451,7 +498,8 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 								fecha_creacion=NOW(),
 								fecha=DATE_SUB('$fecha', INTERVAL $duracion SECOND),
 								duracion='$hora:$min:00',
-								duracion_cobrada='$hora:$min:00' 
+						duracion_cobrada='$hora:$min:00',
+						id_area_trabajo = $id_area_trabajo
 							";
 		
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
@@ -460,6 +508,8 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			$trabajo = new Trabajo( $sesion );
 			$trabajo->Load( mysql_insert_id( $sesion->dbh ) );
 			$trabajo->InsertarTrabajoTarifa();
+			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
+			mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		}
 	}
 	else

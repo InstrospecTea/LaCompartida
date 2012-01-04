@@ -287,7 +287,7 @@ class FacturaPago extends Objeto
 				$html = str_replace('%factura_numero%', $factura_->ObtenerNumero(null, $fac_serie, $fac_numero), $html);
 				$html = str_replace('%factura_descripcion%', $fac_descripcion, $html);
 				$html = str_replace('%factura_concepto%', $fac_concepto, $html);
-				$html = str_replace('%factura_total%', $total, $html);
+				$html = str_replace('%factura_total%', $monto_bruto, $html);
 				$html = str_replace('%factura_retencion%', $retencion, $html);
 				$html = str_replace('%factura_neto%', $neto, $html);
 			break;

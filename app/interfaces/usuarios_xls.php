@@ -276,7 +276,9 @@
 		$i=0;
 		$col++;
 		$col_nombre = $col++;
-		$col_username = $col++;
+	if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
+		$col_codigo_usuario =  $col++;
+	}
 		$col_categoria = $col++;
 		$col_email = $col++;
 		$col_rut = $col++;
@@ -291,7 +293,10 @@
 	 
 		// se setea el ancho de las columnas
 		$ws1->setColumn( $col_nombre, $col_nombre,  25.00);
-		$ws1->setColumn( $col_username, $col_username, 25.00);
+	
+	if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
+	   $ws1->setColumn( $col_codigo_usuario, $col_codigo_usuario,  15.00);
+	}
 		$ws1->setColumn( $col_categoria, $col_categoria,  25.00);
 		$ws1->setColumn( $col_email, $col_email,  30.00);
 		$ws1->setColumn( $col_rut, $col_rut, 20.00);
@@ -320,7 +325,9 @@
 			$glosa_rut = 'DNI';
 		
 		$ws1->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
-		$ws1->write($fila_inicial, $col_username, __('Código Usuario'), $tit);
+	if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
+	   $ws1->write( $fila_inicial, $col_codigo_usuario,  __('Código Usuario'), $tit);
+	}
 	  $ws1->write($fila_inicial, $col_categoria, __('Categoria'), $tit);
 	  $ws1->write($fila_inicial, $col_email, __('Email'), $tit);
 	  $ws1->write($fila_inicial, $col_rut, $glosa_rut, $tit);
@@ -359,7 +366,9 @@
 		{
 			$i=0;
 			$ws1->write($fila_inicial, $col_nombre, $row['nombre'], $f4);
-			$ws1->write($fila_inicial, $col_username, $row['username'], $f4);
+		if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
+		   $ws1->write( $fila_inicial, $col_codigo_usuario, $row['username'], $f4);
+		}
 			$ws1->write($fila_inicial, $col_categoria, $row['glosa_categoria'], $f4);
 			$ws1->write($fila_inicial, $col_email, $row['email'], $f4);
 			$rut = $row['rut'] . ($row['dv_rut'] ? '-' . $row['dv_rut'] : '');

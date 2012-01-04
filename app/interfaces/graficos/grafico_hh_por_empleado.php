@@ -1,7 +1,7 @@
 <?php 
 
 require_once "GraficoBarras.php";
-require_once dirnme(__FILE__).'/../../conf.php';
+require_once dirname(__FILE__).'/../../conf.php';
 require_once "../../../fw/classes/Sesion.php";
 
 $sesion = new Sesion();
@@ -16,10 +16,15 @@ $sesion = new Sesion();
 	else
 		$where_usuario = '';
 
+	if($solo_activos)
+		$where_usuario .= ' AND usuario.activo = 1 ';
+
 	if($clientes)
 		$where_cliente = ' AND cliente.codigo_cliente IN ('.$clientes.')';
 	else
 		$where_cliente = '';
+
+
 
 
 $total_tiempo = 0;
@@ -27,7 +32,9 @@ $query = "SELECT
 						CONCAT_WS(', ',apellido1,nombre) as usuario, 
 						username,
 						SUM(TIME_TO_SEC(duracion))/3600 as tiempo
-					FROM trabajo JOIN usuario ON (usuario.id_usuario = trabajo.id_usuario) JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto)
+					FROM trabajo 
+					JOIN usuario ON (usuario.id_usuario = trabajo.id_usuario) 
+					JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto)
 					JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
 					WHERE
 						(fecha BETWEEN '$fecha_ini' AND '$fecha_fin') ".$where_cliente.$where_usuario."

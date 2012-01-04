@@ -7,6 +7,7 @@
         require_once Conf::ServerDir().'/../app/classes/Reporte.php';
         require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 
+        set_time_limit(300);
 	/*
 		Este archivo debe ser llamado mediante require_once() desde otro archivo (actualmente solo desde app/interfaces/reporte_costos.php)
 		Necesita las liguientes variables para funcionar:
@@ -181,7 +182,7 @@
 		// Imprimir contenido
 		for($i=0; $i<count($nombres); ++$i)
 		{
-                        $id_moneda_base = GetMonedaBase($sesion);
+                        $id_moneda_base = Moneda::GetMonedaBase($sesion);
                         
                         $s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
                         $s_monto_thh = $s_monto_thh_simple;	

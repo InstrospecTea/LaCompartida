@@ -75,7 +75,7 @@ class Alerta
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($email,$nombre) = mysql_fetch_array($resp);
 
-		$mensaje = __('Usuario').": $nombre $apellido1\n".__('Alerta').": $mensaje";
+		$mensaje = __('Usuario').": $nombre\n".__('Alerta').": $mensaje";
 
 		$from = Conf::AppName();
 
@@ -106,7 +106,7 @@ class Alerta
 			$query = "SELECT 24*(TO_DAYS(NOW()) - TO_DAYS(MAX(fecha))) FROM trabajo WHERE id_usuario='$id_persona'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list($horas_retraso) = mysql_fetch_array($resp);
-			if($horas_retraso > $fields['retraso_max'])
+			if($horas_retraso > $prof->fields['retraso_max'])
 				//$this->EnviarAlertaProfesional($id_persona,"El usuario ha superado el tiempo máximo sin ingresar horas.",$sesion);
 				echo __("ha superado el tiempo sin ingresar horas");
 		}

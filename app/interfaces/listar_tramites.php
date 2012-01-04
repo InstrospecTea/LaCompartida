@@ -21,54 +21,54 @@
 
 	$params_array['codigo_permiso'] = 'COB';
 	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	if($p_cobranza->fields['permitido'])
+	if ($p_cobranza->fields['permitido']) {
 		$p_revisor->fields['permitido'] = true;
+	}
 
 	$params_array['codigo_permiso'] = 'PRO';
 	$p_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
-	if($p_revisor->fields['permitido'] && $accion == "eliminar")
-	{
+	if ($p_revisor->fields['permitido'] && $accion == "eliminar") {
 		$tramite = new Tramite($sesion);
 		$tramite->Load($id_tramite);
-		if($tramite->Estado() == "Abierto") 
-			{
-			if(!$tramite->Eliminar())
+		if ($tramite->Estado() == "Abierto") {
+			if(!$tramite->Eliminar()) {
 				$pagina->AddError($asunto->error);
-			else
+			} else {
 				$pagina->AddInfo(__('Trámite').' '.__('eliminado con éxito'));
 			}
-		else $pagina->AddInfo(__('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')); 
+		} else {
+			$pagina->AddInfo(__('No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')); 
+	}
 	}
 
 	##Seteando FECHAS a formato SQL
-	if($fecha_ini != '')
+	if ($fecha_ini != '') {
 		$fecha_ini	= Utiles::fecha2sql($fecha_ini);
-	else
+	} else {
 		$fecha_ini = Utiles::fecha2sql($fecha_ini,'0000-00-00');
+	}
 
-	if($fecha_fin != '')
+	if ($fecha_fin != '') {
 		$fecha_fin	= Utiles::fecha2sql($fecha_fin);
-	else
+	} else {
 		$fecha_fin = Utiles::fecha2sql($fecha_fin,'0000-00-00');
+	}
 
-	if($id_cobro == 'Indefinido')
-	{
+	if ($id_cobro == 'Indefinido') {
 		$cobro_nulo = true;
 		unset($id_cobro);
 	}
 
 	#Si estamos en un cobro
-	if($id_cobro)
-	{
+	if($id_cobro) {
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 
-		if(!$cobro->Load($id_cobro))
+		if (!$cobro->Load($id_cobro)) {
 			$pagina->FatalError(__('Cobro inválido'));
-		
-		else //En caso de que no estoy buscando debo setear fecha ini y fecha fin
-		{
+		} else {
+			//En caso de que no estoy buscando debo setear fecha ini y fecha fin
 			$fecha_ini = $cobro->fields['fecha_ini'];
 			$fecha_fin = $cobro->fields['fecha_fin'];
 		}
@@ -76,85 +76,104 @@
 	
 
 	// Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
-	if($p_revisor->fields['permitido'])
+	if($p_revisor->fields['permitido']) {
 		$where_usuario = '';
-	else
+	} else {
 		$where_usuario = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].")";
+	}
 	$select_usuario = Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ".$where_usuario." ORDER BY nombre ASC","id_usuario",$id_usuario,'','Todos','200');
 
 	$where = base64_decode($where);
-	if( $where == '')
+	if ( $where == '') {
 		$where .= 1;
-	if($id_usuario != '')
+	}
+	if ($id_usuario != '') {
 		$where .= " AND tramite.id_usuario='$id_usuario' ";
-	else if(!$p_revisor->fields['permitido']) // Se buscan trabajos de los usuarios a los que se puede revisar.
+	} else if(!$p_revisor->fields['permitido']) {
+		// Se buscan trabajos de los usuarios a los que se puede revisar.
 		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
-	if($revisado == 'NO')
+	}
+	
+	if ($revisado == 'NO') {
 		$where.= " AND tramite.revisado = 0 ";
-	if($revisado == 'SI')
+	}
+	if ($revisado == 'SI') {
 		$where.= " AND tramite.revisado = 1 ";
+	}
 
-	if($codigo_asunto != '')
+	if ($codigo_asunto != '') {
 			$where.= " AND tramite.codigo_asunto = '$codigo_asunto' ";
+	}
 			
-	if($cobrado == 'NO')
+	if ($cobrado == 'NO') {
 		$where .= " AND tramite.id_cobro is null ";
-	if($cobrado == 'SI')
+	}
+	if ($cobrado == 'SI') {
 		$where .= " AND tramite.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL') ";
+	}
 
-	if($from == 'reporte')
-	{
-		if($id_cobro)
+	if ($from == 'reporte') {
+		if ($id_cobro) {
 			$where .= " AND contrato.id_contrato = cobro.id_contrato ";
-
-		if($mes)
-			$where .= " AND CONCAT(Month(fecha),'-',Year(fecha)) = '$mes' ";
-
-		if($cobro_nulo)
-			$where .= " AND tramite.id_cobro IS NULL ";
-
-		if($estado)
-		if($estado != 'abiertos')
-		{
-			if($estado == 'Indefinido')
-				$where .= " AND cobro.id_cobro IS NULL";
-			else
-				$where .= " AND cobro.estado = '$estado' ";
 		}
 
-		if($lis_clientes)
+		if ($mes) {
+			$where .= " AND CONCAT(Month(fecha),'-',Year(fecha)) = '$mes' ";
+		}
+
+		if ($cobro_nulo) {
+			$where .= " AND tramite.id_cobro IS NULL ";
+		}
+
+		if ($estado) {
+			if ($estado != 'abiertos') {
+				if($estado == 'Indefinido') {
+				$where .= " AND cobro.id_cobro IS NULL";
+				} else {
+				$where .= " AND cobro.estado = '$estado' ";
+		}
+			}
+		}
+
+		if ($lis_clientes) {
 			$where .= " AND cliente.codigo_cliente IN (".$lis_clientes.") ";
-		if($lis_usuarios)
+		}
+		if ($lis_usuarios) {
 			$where .= " AND usuario.id_usuario IN (".$lis_usuarios.") ";
+		}
 
 	}
 
 	//Estos filtros son tambien para la pag. mis horas
 	if($activo)
 	{
-		if($activo== 'SI')
+		if ($activo== 'SI') {
 			$activo = 1;
-		else
+		} else {
 			$activo = 0;
+		}
 
     $where .= " AND a1.activo = $activo ";
 	}
 	
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) ) {
-			if( $codigo_cliente_secundario != "" )
+		if ( $codigo_cliente_secundario != "" ) {
 					$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario' ";
 	}
-	else {
-	if($codigo_cliente != "")
+	} else {
+		if ($codigo_cliente != "") {
 			$where .= " AND cliente.codigo_cliente ='$codigo_cliente' ";
+	}
 	}
 
 	#SQL FECHAS
-	if($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00')
+	if ($fecha_ini != '' and $fecha_ini != 'NULL' and $fecha_ini != '0000-00-00') {
 		$where .= " AND tramite.fecha >= '".$fecha_ini."' ";
+	}
 
-	if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00')
+	if ($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00') {
 		$where .= " AND tramite.fecha <= '".$fecha_fin."' ";
+	}
 
 	if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
 	{
@@ -162,43 +181,50 @@
 		$query_asuntos = implode("','", $cobro->asuntos);
 		$where .= " AND tramite.codigo_asunto IN ('$query_asuntos') ";
 		//$where .= " AND tramite.cobrable = 1";
-		if($opc == 'buscar')
+		if ($opc == 'buscar') {
 			$where .= " AND (cobro.estado IS NULL OR tramite.id_cobro = '$id_cobro')";
-		else
+		} else {
 			$where .= " AND tramite.id_cobro = '$id_cobro'";
+	}
 	}
 
 	//Filtros que se mandan desde el reporte Periodico
-	if($trabajo_si_no=='SI')
+	if ($trabajo_si_no=='SI') {
 		$where .= " AND trabajo_si_no=1 ";
-	else if($trabajo_si_no=='NO')
+	} else if($trabajo_si_no=='NO') {
 		$where .= " AND trabajo_si_no=0 ";
+	}	
 	
-	
-	if($clientes)
+	if ($clientes) {
 		$where .= "	AND cliente.codigo_cliente IN ('".base64_decode($clientes)."')";
+	}
 
-	if($usuarios)
+	if ($usuarios) {
 		$where .= "	AND usuario.id_usuario IN (".base64_decode($usuarios).")";
+	}	
 		
-
 
 	#TOTAL HORAS
 
 	#BUSCAR
-	$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
+	$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
 									tramite.id_cobro,
 									tramite.id_tramite, 
+						tramite.id_moneda_tramite, 
+						tramite.fecha, 
 									tramite.codigo_asunto, 
 									tramite.revisado,
 									prm_moneda.simbolo as simbolo,
 									asunto.codigo_cliente as codigo_cliente, 
 									contrato.id_moneda as id_moneda_asunto, 
-									contrato.id_moneda_tramite as id_moneda_tramite,
 									asunto.id_asunto AS id,
 									cobro.fecha_cobro as fecha_cobro_orden, 
 									IF(tramite.cobrable=1,'SI','NO') as glosa_cobrable, 
 									cobro.estado as estado_cobro, 
+						usuario.username,
+						usuario.nombre,
+						usuario.apellido1,
+						usuario.apellido2,
 									CONCAT_WS(' ',usuario.nombre,usuario.apellido1, usuario.apellido2) as usr_nombre, 
 									tramite.id_tramite_tipo, 
 									DATE_FORMAT(tramite.fecha,'%e-%c-%x') AS fecha_cobro, 
@@ -226,14 +252,13 @@
 	              LEFT JOIN usuario ON tramite.id_usuario = usuario.id_usuario
 	              LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
 	              WHERE $where ";
-	              //echo $query;
+	
 	if($check_tramite == 1 && isset($cobro) && !$excel)	//check_tramite vale 1 cuando aprietan boton buscar
 	{
 		$query2 = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
 		$resp = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 		$lista_tramites = new ListaTramites($sesion,'',$query);
-		for($x=0;$x<$lista_tramites->num;$x++)
-		{
+		for ($x=0;$x<$lista_tramites->num;$x++) {
 			$tramite = $lista_tramites->Get($x);
 			$emitir_tramite = new Tramite($sesion);
 			$emitir_tramite->Load($tramite->fields['id_tramite']);
@@ -287,20 +312,21 @@
 	$b->color_mouse_over = "#bcff5c";
 	$b->funcionTR = "funcionTR";
 
-	if($excel)
-	{
-		if($p_cobranza->fields['permitido'])
+	if ($excel)	{
+		if ($p_cobranza->fields['permitido']) {
 			$orden = "cliente.glosa_cliente,contrato.id_contrato,asunto.glosa_asunto,tramite.fecha,tramite.descripcion";
+		}
 		$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 		$lista = $b1->lista;
 
 //			require_once Conf::ServerDir().'/interfaces/cobros_generales2.php';
 //			exit;
 
-		if($p_cobranza->fields['permitido'] && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CobranzaExcel') ) || ( method_exists('Conf','CobranzaExcel') && Conf::CobranzaExcel() ) ) )
+		if ($p_cobranza->fields['permitido'] && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CobranzaExcel') ) || ( method_exists('Conf','CobranzaExcel') && Conf::CobranzaExcel() ) ) ) {
 			require_once('cobros_generales_tramites.xls.php');
-		else 
+		} else {
 			require_once('cobros3_tramites.xls.php');
+		}
 		exit;
 	}
 	
@@ -311,21 +337,19 @@
 function GrabarCampo(accion,id_tramite,cobro,valor)
 {
     var http = getXMLHTTP();
-    if(valor)
+    if(valor) {
        valor = '1';
-    else
+	} else {
       valor = '0';
+	}
 
     loading("Actualizando opciones");
     http.open('get', 'ajax_grabar_campo.php?accion=' + accion + '&id_tramite=' + id_tramite + '&id_cobro=' + cobro + '&valor=' + valor);
-    http.onreadystatechange = function()
-    {
-        if(http.readyState == 4)
-        {
+    http.onreadystatechange = function() {
+        if (http.readyState == 4) {
             var response = http.responseText;
             var update = new Array();
-            if(response.indexOf('OK') == -1)
-            {
+            if (response.indexOf('OK') == -1) {
               alert(response);
             }
             offLoading();
@@ -676,9 +700,7 @@ function editarMultiplesArchivos()
 	}
 	function Cobrable(& $fila)
 	{
-		global $sesion;
 		global $id_cobro;
-		global $motivo;
 		#$checked = "";
 		#$checked = "checked";
 		
@@ -697,8 +719,6 @@ function editarMultiplesArchivos()
 	}
 	function Revisado(& $fila)
 	{
-		global $sesion;
-		global $motivo;
 		#$checked = "";
 		#$checked = "checked";
 		if($fila->fields['revisado'] == 1)
@@ -729,7 +749,6 @@ function editarMultiplesArchivos()
 		{
 			$opc_html = Cobrable($tramite);
 		}
-		$id_asunto = $fila->fields['id_asunto'];
 
 		if($p_revisor->fields['permitido'])
 		{
@@ -787,15 +806,15 @@ function editarMultiplesArchivos()
 		global $id_cobro;
 		global $p_revisor;
 		global $p_cobranza;
-		global $p_profesional;
 		global $select_usuario;
 		static $i = 0;
 		
 		
-		if($i % 2 == 0)
+		if($i % 2 == 0) {
 			$color = "#dddddd";
-		else
+		} else {
 			$color = "#ffffff";
+		}
 		
 		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 		if( $tramite->fields['codigo_idioma'] != '' ) {
@@ -834,18 +853,17 @@ function editarMultiplesArchivos()
 		$html .= "<td>$fecha</td>";
 		$html .= "<td>".$tramite->fields['glosa_cliente']."<br>".$tramite->fields['glosa_asunto']."</td>";
 		
-		if($p_revisor->fields['permitido'])
-			{
-			if($tramite->fields['cobrable']==1)
+		if ($p_revisor->fields['permitido']) {
+			if($tramite->fields['cobrable']==1) {
 				$html .= "<td align=center>SI</td>";
-			else
+			} else {
 				$html .= "<td align=center>NO</td>";
 			}
+		}
 			
 			$duracion = $tramite->fields['duracion'];
 		//echo $duracion;
-		if(!$p_revisor->fields['permitido'])
-		{
+		if(!$p_revisor->fields['permitido'])  {
 				$duracion_trabajada = $tramite->fields['duracion'];
 			
 				$duracion = $duracion_trabajada;
@@ -873,22 +891,21 @@ function editarMultiplesArchivos()
 		}
 		
 		$moneda_tramite = new Moneda($sesion);
-		$moneda_tramite->Load($tramite->fields['id_moneda_asunto']);
+		$moneda_tramite->Load($tramite->fields['id_moneda_tramite']);
 
         $html .= "<td align=center>".$duracion."</td>";
         $html .= "<td>".$editar_cobro."</td>";
         #$html .= "<td>".$tramite->Estado()."</td>";
-        if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164)
-        	{
-        		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+        if($p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || strlen($select_usuario) > 164) {
+        	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ) {
         			$html .= "<td align=center>".$tramite->fields['username']."</td>";
-        		else
-        			$html .= "<td align=center>".substr($tramite->fields[nombre],0,1).substr($tramite->fields[apellido1],0,1).substr($tramite->fields[apellido2],0,1)."</td>";
+			} else {
+        		$html .= "<td align=center>".substr($tramite->fields['nombre'],0,1).substr($tramite->fields['apellido1'],0,1).substr($tramite->fields['apellido2'],0,1)."</td>";
         	}
-        if( $p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido'] )
-					{
+		}
+        if( $p_revisor->fields['permitido'] || $p_cobranza->fields['permitido'] || $p_adm->fields['permitido'] ) {
 					//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
-					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['decimales'], $idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])."</td>";
+					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])."</td>";
 					}
 		$html .= '<td align=center nowrap>'.Opciones(& $tramite).'</td>';
         $html .= "</tr>";

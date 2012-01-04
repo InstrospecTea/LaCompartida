@@ -148,16 +148,34 @@
 
 	if($vista == 'profesional')
 	{
+                $largo_meses = array('',31, Utiles::es_bisiesto($fecha_anio)?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+                $fecha_ini = $fecha1_a.'-'.$fecha1_m.'-01';
+                $fecha_fin = $fecha2_a.'-'.$fecha2_m.'-'.$largo_meses[$fecha2_m];
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
 			$dato_profesional = "username";
 		else
 			$dato_profesional = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
+                
+                if( $seleccion == 'profesionales' ) {
+                    $where_usuarios = " AND usuario_permiso.codigo_permiso = 'PRO' ";
+                } 
+                
+                $where_usuarios .= " AND ( ( SELECT SUM(costo) FROM usuario_costo 
+                                        WHERE usuario_costo.id_usuario = usuario.id_usuario 
+                                          AND usuario_costo.fecha >= '$fecha_ini' 
+                                          AND usuario_costo.fecha <= '$fecha_fin' ) > 0 OR 
+                                        ( SELECT SUM( TIME_TO_SEC( duracion_cobrada ) ) FROM trabajo 
+                                            WHERE trabajo.id_usuario = usuario.id_usuario 
+                                            AND trabajo.fecha >= '$fecha_ini' 
+                                            AND trabajo.fecha <= '$fecha_fin' ) > 0 ) "; 
+                
 		// Lista de abogados sobre los que se calculan valores.
 		$query = "SELECT
 									".$dato_profesional." AS nombre_usuario,
-									id_usuario
+				usuario.id_usuario 
 								FROM usuario
-								WHERE visible=1
+                              LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario AND usuario_permiso.codigo_permiso = 'PRO' 
+                              WHERE visible = 1 $where_usuarios 
 								ORDER BY apellido1, apellido2, nombre, id_usuario";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while(list($nombre_usuario, $id_usr) = mysql_fetch_array($resp))

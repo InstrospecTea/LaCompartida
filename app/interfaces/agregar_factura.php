@@ -31,7 +31,7 @@ require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 $serienumero_documento = new DocumentoLegalNumero($sesion);
 
 			$factura = new Factura($sesion);
-		
+
 
 		if($id_factura != "")
 		{
@@ -44,21 +44,21 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 				$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
 			}
 		}
-		
+
 		if($factura->loaded() && !$id_cobro)
 		{
 			$id_cobro = $factura->fields['id_cobro'];
 		}
-		
+
 		/*Si se cambió de cliente, el cobro se reemplazó por 'nulo'*/
 		/*if($id_cobro == 'nulo')
 		{
 			$id_cobro = null;
 		}*/
-		
+
 		if($factura->loaded() && !$codigo_cliente)
 			$codigo_cliente = $factura->fields['codigo_cliente'];
-		
+
 		if($factura->loaded())
 		{
 			$id_documento_legal = $factura->fields['id_documento_legal'];
@@ -66,7 +66,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 		$query = "SELECT id_documento_legal, glosa, codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_documento_legal, $tipo_documento_legal, $codigo_tipo_doc) = mysql_fetch_array($resp);
-		
+
 		if(!$tipo_documento_legal)
 			$pagina->FatalError('Error al cargar el tipo de Documento Legal');
 
@@ -80,15 +80,15 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 			   echo "Error";
 		   exit;
 	   }
-		
+
 	   $opc_inicial = $opcion;
-			if($opcion == "restaurar")	
+			if($opcion == "restaurar")
 			{
 				/*
 				 * comentado por Erwin, ya que el botón restaurar ahora hará cambio de estado por javascript
 				 * ya que tiene que actualizar valores de saldos e impuesto.
 				 */
-				
+
 				/*$factura->Edit('estado','ABIERTA');
 				$factura->Edit('anulado',0);
 				$factura->Edit("id_estado", "1");
@@ -101,7 +101,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 						$cobror->Load($id_cobro);
 						if( $cobror->Loaded() )
 						{
-							$cobror->CambiarEstadoSegunFacturas();							
+							$cobror->CambiarEstadoSegunFacturas();
 						}
 					}
 					$requiere_refrescar = "window.opener.Refrescar();";
@@ -129,23 +129,24 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 			{
 				$errores = array();
 				if(!is_numeric($monto_honorarios_legales)||!is_numeric($monto_gastos_con_iva)||!is_numeric($monto_gastos_sin_iva))
-					$errores[] = 'error';	
+					$errores[] = 'error';
 			}
 			else
 			{
-				if( empty($cliente) )													$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
-				if( !is_numeric($monto_honorarios_legales) )	$pagina->AddError(__('Debe ingresar un monto válido para los honorarios. ('.$monto_honorarios_legales.')'));
-				if( !is_numeric($monto_gastos_con_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA. ('.$monto_gastos_con_iva.')'));
-				if( !is_numeric($monto_gastos_sin_iva) ) 			$pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. ('.$monto_gastos_sin_iva.')'));
-				
+				if( empty($cliente) )	$pagina->AddError(__('Debe ingresar la razon social del cliente.'));
+                                if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
+                                    if( !is_numeric($monto_honorarios_legales) )    $pagina->AddError(__('Debe ingresar un monto válido para los honorarios. ('.$monto_honorarios_legales.')'));
+                                    if( !is_numeric($monto_gastos_con_iva) )        $pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA. ('.$monto_gastos_con_iva.')'));
+                                    if( !is_numeric($monto_gastos_sin_iva) )        $pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. ('.$monto_gastos_sin_iva.')'));
+                                }
 				$errores = $pagina->GetErrors();
 			}
 
 			if (!empty($errores))
 				$guardar_datos = false;
-			
+
 			if( $guardar_datos )
-			{ 
+			{
 		//chequear
 		$mensaje_accion = 'guardar';
 		$factura->Edit('subtotal', $monto_neto);
@@ -182,7 +183,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 					$factura->Edit('anulado','0');
 		}
 
-		if (UtilesApp::GetConf($sesion, 'DesgloseFactura') == 'con_desglose') {
+		if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 			$factura->Edit("descripcion", $descripcion_honorarios_legales);
 			$factura->Edit("honorarios", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
 			$factura->Edit("subtotal", $monto_honorarios_legales ? $monto_honorarios_legales : NULL);
@@ -193,10 +194,8 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 			$factura->Edit("subtotal_gastos_sin_impuesto", $monto_gastos_sin_iva ? $monto_gastos_sin_iva : NULL);
 			$factura->Edit("total", $total ? $total : NULL);
 			$factura->Edit("iva", $iva_hidden ? $iva_hidden : NULL);
-				}
-				else
-				{
-					$factura->Edit("descripcion",$descripcion);
+		} else {
+			$factura->Edit("descripcion",$descripcion);
 		}
 
 		if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) {
@@ -206,9 +205,9 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 		$factura->Edit('letra', $letra);
 		if ($letra_inicial)
 			$factura->Edit('letra', $letra_inicial);
-	
+
 				if (empty($factura->fields['id_factura'])) $generar_nuevo_numero = true;
-	
+
                 if ($id_cobro && empty($factura->fields['id_factura'])) {
 					$cobro = new Cobro($sesion);
 					if(!$cobro->Load($id_cobro)) $cobro = null;
@@ -220,7 +219,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 					if(!$desde_webservice)
 					{
 						$pagina->AddInfo('El numero ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, pero se ha asignado uno nuevo, por favor verifique los datos y vuelva a guardar');
-			$factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie));
+                                                $factura->Edit('numero', $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie));
 					}
 					else
 						$resultado = array('error'=>'El número ' . $numero . ' del ' . __('documento tributario') .' ya fue usado, vuelva a intentar con número: '.$factura->ObtenerNumeroDocLegal($id_documento_legal));
@@ -259,14 +258,14 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 
 
 			# Esto se puede descomentar para imprimir facturas desde la edición
-				
+
 				if($id_cobro)
 				{
 					$cobro = new Cobro($sesion);
 					if ($cobro->Load($id_cobro)){
 						$cobro->CambiarEstadoSegunFacturas();
 					}
-					
+
 					$documento = new Documento($sesion);
 					$documento->LoadByCobro($id_cobro);
 
@@ -463,7 +462,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 				var direccion_cliente = document.getElementById('direccion_cliente');
 
 <?php
-if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {
+if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 	?>
 					var descripcion_honorarios_legales = document.getElementById('descripcion_honorarios_legales');
 					var monto_honorarios_legales = document.getElementById('monto_honorarios_legales');
@@ -715,6 +714,10 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactu
 			enviado = 0;
 			function Validar(form)
 			{
+				<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
+				if(!Validar_Rut())
+					return false;
+				<?php } ?>
 <?
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
 	?>
@@ -751,7 +754,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 			return false;
 		}
 <?php
-if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {
+if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	?>
 					if(form.descripcion_honorarios_legales.value == "")
 					{
@@ -894,7 +897,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactu
 				if(!enviado)
 				{
 <?php
-if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {
+if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	?>
 						form.iva_hidden.value = form.iva.value;
 	<?php
@@ -1003,6 +1006,89 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 		}
 		CancelarDocumentoMonedaPago();
 	}
+
+	/*Validador de Rut*/
+	function Validar_Rut()
+	{
+		var tipo = $('tipo_documento_identidad');
+		if(tipo.value != 5)
+			return true;
+
+		var o = $('RUT_cliente');
+		var tmpstr = "";
+		var intlargo = o.value
+		if (intlargo.length> 0)
+		{
+			crut = o.value
+			largo = crut.length;
+			if ( largo <2 )
+			{
+				alert('<?=__("Rut inválido")?>');
+				o.focus();
+				return false;
+			}
+			for ( i=0; i <crut.length ; i++ )
+			if ( crut.charAt(i) != ' ' && crut.charAt(i) != '.' && crut.charAt(i) != '-' )
+			{
+				tmpstr = tmpstr + crut.charAt(i);
+			}
+			rut = tmpstr;
+			crut=tmpstr;
+			largo = crut.length;
+		
+			if ( largo> 2 )
+				rut = crut.substring(0, largo - 1);
+			else
+				rut = crut.charAt(0);
+		
+			dv = crut.charAt(largo-1);
+		
+			if ( rut == null || dv == null )
+			{
+				alert('<?=__("Rut inválido")?>');
+				o.focus();
+				return false;
+			}
+		
+			var dvr = '0';
+			suma = 0;
+			mul  = 2;
+		
+			for (i= rut.length-1 ; i>= 0; i--)
+			{
+				suma = suma + rut.charAt(i) * mul;
+				if (mul == 7)
+					mul = 2;
+				else
+					mul++;
+			}
+		
+			res = suma % 11;
+			if (res==1)
+				dvr = 'k';
+			else if (res==0)
+				dvr = '0';
+			else
+			{
+				dvi = 11-res;
+				dvr = dvi + "";
+			}
+		
+			if ( dvr != dv.toLowerCase() )
+			{
+				alert('<?=__("El Rut Ingresado es Invalido")?>');
+				o.focus();
+				return false;
+			}
+			return true;
+		}
+		
+		alert('<?=__("Rut inválido")?>');
+		o.focus();
+		return false;
+		
+	}
+
 </script>
 <? echo Autocompletador::CSS(); ?>
 
@@ -1016,9 +1102,9 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 	<input type=hidden name="honorario_disp" id="honorario_disp" value='<?= $honorario_disp ?>'/>
 	<input type=hidden name="gastos_con_impuestos_disp" id="gastos_con_impuestos_disp" value='<?= $gastos_con_impuestos_disp ?>'/>
 	<input type=hidden name="gastos_sin_impuestos_disp" id="gastos_sin_impuestos_disp" value='<?= $gastos_sin_impuestos_disp ?>'/>
-  <input type=hidden name="honorario_total" id="honorario_total" value='<?=$honorario_total?>'/>
-  <input type=hidden name="gastos_con_impuestos_total" id="gastos_con_impuestos_total" value='<?=$gastos_con_impuestos_total?>'/>
-  <input type=hidden name="gastos_sin_impuestos_total" id="gastos_sin_impuestos_total" value='<?=$gastos_sin_impuestos_total?>'/>
+        <input type=hidden name="honorario_total" id="honorario_total" value='<?=$honorario_total?>'/>
+        <input type=hidden name="gastos_con_impuestos_total" id="gastos_con_impuestos_total" value='<?=$gastos_con_impuestos_total?>'/>
+        <input type=hidden name="gastos_sin_impuestos_total" id="gastos_sin_impuestos_total" value='<?=$gastos_sin_impuestos_total?>'/>
 	<input type='hidden' name='opc' id='opc' value='buscar'>
 	<input type="hidden" name="porcentaje_impuesto" id="porcentaje_impuesto" value="<?= $porcentaje_impuesto; ?>">
 	<input type="hidden" name="usar_adelantos" id="usar_adelantos" value="0"/>
@@ -1032,44 +1118,53 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 	<table width='90%'>
 		<tr>
 			<td align=left><b>
-<?= $txt_pagina ?>
-				</b></td>
+                            <?= $txt_pagina ?>
+			</b></td>
 		</tr>
 	</table>
 	<br>
 	<table style="border: 0px solid black;" width='90%'>
 		<tr>
-			<td align=left><b>
-<?= __('Información de') . ' ' . $tipo_documento_legal ?>
-				</b></td>
+                    <td align=left><b>
+                        <?= __('Información de') . ' ' . $tipo_documento_legal ?>
+                    </b></td>
 		</tr>
 	</table>
 	<table class="border_plomo" style="background-color:#FFFFFF;" width='90%'>
-<?
-$numero_documento = '';
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
-	$numero_documento = $factura->ObtieneNumeroFactura();
-}
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura') ) || ( method_exists('Conf', 'NuevoModuloFactura') && Conf::NuevoModuloFactura() ))) {
-	$serie_ = null;
-	//Primera serie
-	if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
-		$serie_ = $serienumero_documento->SeriesPorTipoDocumento($id_documento_legal, true);
-	}
-	$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie_);
-}
-?>
+                <?
+                $numero_documento = '';
+                if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
+                        $numero_documento = $factura->ObtieneNumeroFactura();
+                }
+                if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura') ) || ( method_exists('Conf', 'NuevoModuloFactura') && Conf::NuevoModuloFactura() ))) {
+                        $serie_ = null;
+                        //Primera serie
+                        if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
+                                $serie_ = $serienumero_documento->SeriesPorTipoDocumento($id_documento_legal, true);
+                        }
+                        $numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie_);
+                }
+                ?>
 		<tr>
+                    <td align=right><?= __('Número') ?></td>
+                    <td align="left">
+                        <?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')): ?>
+                                <?php
+                                        $valor_actual = str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT);
+                                        $select_serie = Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery(), "serie", $valor_actual, 'onchange="NumeroDocumentoLegal()"', null, 60); 
+                                        //Si el valor de esta serie no aparece, lo añandimos:
+                                        /*if(strpos($select_serie,$valor_actual)===false)
+                                        {
+                                                $select_serie = str_replace("</select>","<option value = '$valor_actual' selected>$valor_actual</option></select>",$select_serie);
+                                        } -- causa problemas con valor de serie por defecto Factura con sin serie definido y no funcionan los corelativos -- */
+                                        echo $select_serie;
 
-			<td align=right><?= __('Número') ?></td>
-			<td align="left">
-<?php if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')): ?>
-	<?php echo Html::SelectQuery($sesion, $serienumero_documento->SeriesQuery(), "serie", str_pad($factura->fields['serie_documento_legal'], 3, '0', STR_PAD_LEFT), 'onchange="NumeroDocumentoLegal()"', null, 60); ?>
-<?php endif; ?>
-				<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento ?>" id="numero" size="11" maxlength="10" />
-			</td>
-			<td align=right><?= __('Estado') ?></td>
-			<td align=left><?= Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?></td>
+                                ?>
+                        <?php endif; ?>
+			<input type="text" name="numero" value="<?php echo $factura->fields['numero'] ? $factura->fields['numero'] : $numero_documento ?>" id="numero" size="11" maxlength="10" />
+                    </td>
+                    <td align=right><?= __('Estado') ?></td>
+                    <td align=left><?= Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?></td>
 		</tr>
 <?
 //Se debe elegir un documento legal padre si:
@@ -1155,21 +1250,38 @@ if ($buscar_padre) {
 			<td align=left colspan=3>
 				<select type="text" name="condicion_pago" value="<?= $factura->fields['condicion_pago'] ?>" id="condicion_pago" >
 					<?php
-						$valores_condicion = array(0,15,30,60,90);
-						foreach($valores_condicion as $vc)
+						$condiciones_pago = array(
+						1 =>	'CONTADO',
+						3 =>	'CC 15 días',
+						4 =>	'CC 30 días',
+						5 =>	'CC 45 días',
+						6 =>	'CC 60 días',
+						7 =>	'CC 75 días',
+						8 =>	'CC 90 días',
+						9 =>	'CC 120 días',
+						12 =>	'LETRA 30 días',
+						13 =>	'LETRA 45 días',
+						14 =>	'LETRA 60 días',
+						15 =>	'LETRA 90 días',
+						18 =>	'CHEQUE 30 días',
+						19 =>	'CHEQUE 45 días',
+						20 =>	'CHEQUE 60 días',
+						21 =>	'CHEQUE A FECHA'
+						);
+						foreach($condiciones_pago as $vc => $cond)
 						{
 							echo "<option ";
 							if( $factura->fields['condicion_pago'] == $vc )
 								echo "selected";
-							echo " value=".$vc.">".$vc."</option>";
-					
+							echo " value=".$vc.">".str_pad($vc, 2, '0', STR_PAD_LEFT).': '.$cond."</option>";
+
 						}
 					?>
-				</select>&nbsp;<?=__('días')?>.
+				</select>
 			</td>
 		</tr>
 		<?php
-		if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {
+		if ( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			?>
 			<tr id='descripcion_factura'>
 				<td align=right width="100">&nbsp;</td>
@@ -1276,7 +1388,7 @@ if ($buscar_padre) {
 			<td align=right colspan="4"><div id="TipoCambioFactura" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
 					<fieldset style="background-color:white;">
 						<legend>
-<?= __('Tipo de Cambio Docuemnto de Pago') ?>
+<?= __('Tipo de Cambio Documento de Pago') ?>
 						</legend>
 						<div id="contenedor_tipo_load">&nbsp;</div>
 						<div id="contenedor_tipo_cambio">
@@ -1348,7 +1460,7 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 	</table>
 </form>
 <?php
-if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactura') == 'con_desglose'))) {
+if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	?>
 	<script type="text/javascript">
 		desgloseMontosFactura(document.form_facturas);
@@ -1410,7 +1522,8 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'DesgloseFactu
 									<?php foreach ($numeros_serie as $numero_serie): ?>
 				series['<?php echo $numero_serie["serie"] ?>'] = <?php echo $numero_serie['numero'] ?>;
 									<?php endforeach; ?>
-			$('numero').value = series[$('serie').value];
+			if( $('serie').value in series)
+				$('numero').value = series[$('serie').value];
 			return true;
 		}
 

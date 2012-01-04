@@ -106,11 +106,14 @@
         'fecha_emision',
 	'glosa_grupo_cliente',
 	'id_usuario_responsable',
-	'id_usuario_secundario',
-	'mes_reporte',
+        'mes_reporte',
 	'dia_reporte',
 	'mes_emision'
 	);
+        if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'EncargadoSecundario') )
+        {
+            $agrupadores[] = 'id_usuario_secundario';
+        }
 	if($debug==1)
 	{
 		$agrupadores[] = 'id_trabajo';

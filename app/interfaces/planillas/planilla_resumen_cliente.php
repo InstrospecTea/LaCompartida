@@ -11,6 +11,8 @@
 $fila_debug = 20;
   $pagina = new Pagina( $sesion );
 
+  set_time_limit(300);
+  
 	$moneda = new Moneda($sesion);
 	$moneda->Load($id_moneda);
 	 
@@ -126,12 +128,18 @@ $fila_debug = 20;
 	}
 
 
-	if($x_anio_fin>$x_anio_ini)
+   
+       $m=$x_mes_ini;
+       
+            for($a=$x_anio_ini;$a<=$x_anio_fin;$a++)
 	{
-  	for($a=$x_anio_ini;$a<$x_anio_fin;$a++)
+                if( $a == $x_anio_fin ) {
+                    $mes_f = $x_mes_fin;
+                } else {
+                    $mes_f = 12;
+                }
+                for(;$m<=$mes_f;$m++)
   	{
-  		for($m=1;$m<=12;$m++)
-  		{
   			$dosdigitos = 2 - strlen($m);
   			if($dosdigitos>0)
   			{
@@ -140,18 +148,8 @@ $fila_debug = 20;
   			$select_col .= " ,IF(DATE_FORMAT(fecha_emision,'%Y-%m')='".$a."-".$m."', id_cobro,null) AS emitido_".$a.$m." ";
   			$select_group .= " ,group_concat(emitido_".$a.$m.") AS list_idcobro_".$a.$m." ";			 			
 			}
+                $m = 1;
   	}
-  }
-	for($m=$x_mes_ini;$m<=$x_mes_fin;$m++)
-	{
-		$dosdigitos = 2 - strlen($m);
-		if($dosdigitos>0)
-		{
-			$m = "0".$m;
-		}
-		$select_col .= " ,IF(DATE_FORMAT(fecha_emision,'%Y-%m')='".$x_anio_fin."-".$m."', id_cobro,null) AS emitido_".$x_anio_fin.$m." ";
-		$select_group .= " ,group_concat(emitido_".$x_anio_fin.$m.") AS list_idcobro_".$x_anio_fin.$m." ";
-  }
 
   $where= "";
     if(is_array($forma_cobro))
@@ -203,12 +201,18 @@ $fila_debug = 20;
   {
   	$glosa_comentario[$row['codigo_cliente']] = array();
 		$x_monto[$row['codigo_cliente']]['glosa_cliente']	=$row['glosa_cliente'];
-		if($x_anio_fin>$x_anio_ini)
+	
+                $m=$x_mes_ini;
+        
+	  	for($a=$x_anio_ini;$a<=$x_anio_fin;$a++)
   	{
-	  	for($a=$x_anio_ini;$a<$x_anio_fin;$a++)
+                    if( $a == $x_anio_fin ) {
+                        $mes_f = $x_mes_fin;
+                    } else {
+                        $mes_f = 12;
+                    }
+	  		for(;$m<=$mes_f;$m++)
 	  	{
-	  		for($m=1;$m<=12;$m++)
-	  		{
 	  			$dosdigitos = 2 - strlen($m);
 	  			if($dosdigitos>0)
 	  			{
@@ -241,40 +245,8 @@ $fila_debug = 20;
 						}
 					}	
 	  		}	
+                        $m = 1;
 	  	}
-	  }
-  	for($m=$x_mes_ini;$m<=$x_mes_fin;$m++)
-  	{
-			$dosdigitos = 2 - strlen($m);
-			if($dosdigitos>0)
-			{
-				$m = "0".$m;
-			}
-			if($row['list_idcobro_'.$x_anio_fin.$m]!=null)
-			{
-				$arr_idcobro_cliente=array();
-				$arr_idcobro_cliente=explode(",",$row['list_idcobro_'.$x_anio_fin.$m]);
-				if(count($arr_idcobro_cliente)>=0)
-				{
-					for($o=0;$o<=count($arr_idcobro_cliente);$o++)
-					{
-						$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $arr_idcobro_cliente[$o]);
-						$x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m]	+=$x_resultados[$campo_monto][$id_moneda];
-						$x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m]	+=$x_resultados[$campo_monto_thh][$id_moneda];
-						if( $arr_idcobro_cliente[$o] > 0 )
-							$glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m] = $glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m] . "C".$arr_idcobro_cliente[$o].": $simbolo_moneda".$x_resultados[$campo_monto][$id_moneda]. "\n";
-					}
-				}
-				else
-				{
-					$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $row['list_idcobro_'.$x_anio_fin.$m]);
-					$x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m]	+=$x_resultados[$campo_monto][$id_moneda];
-					$x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m]	+=$x_resultados[$campo_monto_thh][$id_moneda];
-					if( $arr_idcobro_cliente[$o] > 0 )
-						$glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m] = $glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m] . "C".$arr_idcobro_cliente[$o].": $simbolo_moneda".$x_resultados[$campo_monto][$id_moneda]. "\n";
-				}
-			}
-		}
 	
 		if($ultimo_cliente != $row['codigo_cliente'])
 		{
@@ -287,12 +259,18 @@ $fila_debug = 20;
 		}
 		
 		$col=1;
-  	if($x_anio_fin>$x_anio_ini)
+  	
+                $m=$x_mes_ini;
+                
+	  	for($a=$x_anio_ini;$a<=$x_anio_fin;$a++)
   	{
-	  	for($a=$x_anio_ini;$a<$x_anio_fin;$a++)
+                    if( $a == $x_anio_fin ) {
+                        $mes_f = $x_mes_fin;
+                    } else {
+                        $mes_f = 12;
+                    }
+	  		for(;$m<=$mes_f;$m++)
 	  	{
-	  		for($m=1;$m<=12;$m++)
-	  		{
 	  			$dosdigitos = 2 - strlen($m);
 	  			if($dosdigitos>0)
 	  			{
@@ -302,55 +280,30 @@ $fila_debug = 20;
 	  			if($x_monto[$row['codigo_cliente']]['monto_'.$a.$m] < $x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m])
 					{
 						$formato = $formato_moneda_rojo;
-						if($x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m] == 0)
-						{
-							$x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m] = 1;
 						}
-						$diferencia_cobrada = floor(100*($x_monto[$row['codigo_cliente']]['monto_'.$a.$m])/$x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m]);
-						$glosa_comentario[$row['codigo_cliente']][$a.$m] = "El valor cobrado es menor al valor segun tasa de horas hombres. Cobrado/THH :". $diferencia_cobrada."%\n\n".$glosa_comentario[$row['codigo_cliente']][$a.$m];
-					}
 					else
 					{
 						$formato = $formato_moneda;
 					}
+					if($x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m] == 0)
+					{
+						$diferencia_cobrada = "inf";
+					}
+					else {
+						$diferencia_cobrada = floor(100*($x_monto[$row['codigo_cliente']]['monto_'.$a.$m])/$x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m])."%";
+					}
+					$glosa_comentario[$row['codigo_cliente']][$a.$m] .= "Valor THH: $simbolo_moneda ".$x_monto[$row['codigo_cliente']]['monto_thh_'.$a.$m]."\n";
+					$glosa_comentario[$row['codigo_cliente']][$a.$m] .= "Cobrado/THH :". $diferencia_cobrada;
 					if($x_monto[$row['codigo_cliente']]['monto_'.$a.$m]!=0)
 					{
 						$ws1->writeNote($filas,$col , $glosa_comentario[$row['codigo_cliente']][$a.$m]);
 						$ws1->write($filas,$col , number_format($x_monto[$row['codigo_cliente']]['monto_'.$a.$m],$moneda->fields['cifras_decimales'],'.','') ,$formato);
 					}
 				}
-			}
-		}
-  	for($m=$x_mes_ini;$m<=$x_mes_fin;$m++)
-  	{
-			$col++;
-			$dosdigitos = 2 - strlen($m);
-			if($dosdigitos>0)
-			{
-				$m = "0".$m;
-			}
-			if($x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m] < $x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m])
-			{
-				$formato = $formato_moneda_rojo;
-				if($x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m] == 0)
-				{
-					$x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m] = 1;
-				}
-				$diferencia_cobrada = floor(100*($x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m])/$x_monto[$row['codigo_cliente']]['monto_thh_'.$x_anio_fin.$m]);
-				$glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m] = "El valor cobrado es menor al valor segun tasa de horas hombres. Cobrado/THH : ".$diferencia_cobrada."%\n\n".$glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m];
-			}
-			else
-			{
-				$formato = $formato_moneda;
+                                $m=1;
 			}
 			
-			if($x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m]!=0)
-			{
-				$ws1->writeNote($filas,$col , $glosa_comentario[$row['codigo_cliente']][$x_anio_fin.$m]);
-				$ws1->write($filas,$col , number_format($x_monto[$row['codigo_cliente']]['monto_'.$x_anio_fin.$m],$moneda->fields['cifras_decimales'],'.','') ,$formato);
 			}
-  	}
-  }
 
 	#TOTALES
 	$fila_inicial = ($filas - $total_clientes)+2;

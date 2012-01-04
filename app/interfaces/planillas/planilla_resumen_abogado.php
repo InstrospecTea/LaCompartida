@@ -31,8 +31,8 @@
                                 'VAlign' => 'top',
                                 'Align' => 'left',
                                 'Bold' => '1',
-																'BgColor' => '37',
-																'fgColor' => '37',
+				'BgColor' => '37',
+				'fgColor' => '37',
                                 'Color' => 'white'));
 	$formato_duracion_morado=$formato_morado;
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  ) )
@@ -46,14 +46,13 @@
                                 'Color' => 'white'));
 	$formato_morado_numero->setNumFormat("#,##0$string_decimales");
 
-
 	$wb->setCustomColor ( 36, 255, 255, 220 );
 	$formato_titulo_rotado =& $wb->addFormat(array('Size' => 11,
-																'Valign' => 'top',
-																'Align' => 'left',
-																'Border' => 1,
-																'fgColor' => '36',
-																'Color' => 'black'));
+				'Valign' => 'top',
+				'Align' => 'left',
+				'Border' => 1,
+				'fgColor' => '36',
+				'Color' => 'black'));
 	$formato_titulo_rotado->setTextRotation(270);
 	$formato_titulo =& $wb->addFormat(array('Size' => 11,
                                 'Valign' => 'top',
@@ -83,7 +82,7 @@
 	$formato_periodo =& $wb->addFormat(array('Size' => 11,
                                 'Valign' => 'top',
                                 'Align' => 'center',
-																'fgColor' => '40',
+				'fgColor' => '40',
                                 'Border' => 1,
                                 'Bold' => 1,
                                 'Color' => 'black'));
@@ -105,7 +104,7 @@
                                 'VAlign' => 'top',
                                 'Align' => 'right',
                                 'Border' => 1,
-																'RightColor' => 'blue',
+				'RightColor' => 'blue',
                                 'Color' => 'black'));
 	$formato_moneda->setNumFormat("#,##0$string_decimales");
 	$wb->setCustomColor ( 39, 102,102,153 );
@@ -113,21 +112,21 @@
                                 'VAlign' => 'top',
                                 'Align' => 'right',
                                 'Border' => 1,
-								'RightColor' => 'blue',
-								#'TopColor' => '41',
-								#'LeftColor' => '41',
+				'RightColor' => 'blue',
+				#'TopColor' => '41',
+				#'LeftColor' => '41',
                                 #'fgColor' => '39',
                                 'fgColor' => '41',
                                 'Color' => 'black'));
 	$formato_moneda2->setNumFormat("#,##0$string_decimales");
 	$wb->setCustomColor ( 35, 220, 255, 220 );
 	$titulo_filas =& $wb->addFormat(array('Size' => 12,
-								'Align' => 'center',
-								'Bold' => '1',
-								'FgColor' => '35',
-								'Border' => 1,
-								'Locked' => 1,
-								'Color' => 'black'));
+				'Align' => 'center',
+				'Bold' => '1',
+				'FgColor' => '35',
+				'Border' => 1,
+				'Locked' => 1,
+                                'Color' => 'black'));
 									
 	#$ws1->setColumn( 1, 9, 19.00);
 	$hoy = date("d-m-Y");
@@ -158,14 +157,33 @@
 			$reporte->addRangoFecha(Utiles::fecha2sql($fecha_ini),Utiles::fecha2sql($fecha_fin));
 			$reporte->Query();
 			$resultado[$usuario][$td] = $reporte->toCross();
+                }
+        }
+
+	$filas_nombres = array();
+	$query_nombres = "SELECT id_usuario,CONCAT_WS(', ',TRIM(apellido1),TRIM(nombre)) as corto, CONCAT_WS(', ',TRIM(apellido1),TRIM(apellido2),TRIM(nombre)) as largo FROM usuario";
+	$resp = mysql_query($query_nombres, $sesion->dbh) or Utiles::errorSQL($query_nombres,__FILE__,__LINE__,$sesion->dbh);
+	while($row = mysql_fetch_array($resp)){
+		if(!isset($filas_nombres[$row['corto']])) $filas_nombres[$row['corto']] = array();
+		$filas_nombres[$row['corto']][] = $row;
+	}
+	$nombres_paginas = array();
+	foreach($filas_nombres as $filas){
+		if(count($filas)==1){
+			$nombres_paginas[$filas[0]['id_usuario']] = $filas[0]['corto'];
+		}
+		else{
+			foreach($filas as $fila){
+				$nombres_paginas[$fila['id_usuario']] = $fila['largo'];
+			}
 		}
 	}
-
+        
 	//Recorro el arreglo ingresando los datos
 	foreach($resultado as $u => $tipo_dato)
 	{
 		//Veo el profesional
-		$profesional = Utiles::Glosa( $sesion, $u, 'username', 'usuario');
+		$profesional = $nombres_paginas[$u];
 		$ws1 =& $wb->addWorksheet($profesional);
 		$ws1->setInputEncoding('utf-8');
 		$ws1->fitToPages(1,1);
@@ -175,10 +193,10 @@
 		$ws1->setMarginLeft(0.25);
 		$ws1->setLandscape();
 		$fila=19;
-
+                
 		Print_Prof($ws1, $tipo_dato);
 	}
-
+        
 	function extender($ws1,$fila_titulos,$col,$ancho,$formato_periodo)
 	{
 		for($i = 1; $i < $ancho; $i++)

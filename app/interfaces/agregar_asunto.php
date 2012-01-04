@@ -283,6 +283,7 @@ if ($opcion == "guardar") {
 		$asunto->Edit("id_idioma", $id_idioma);
 		$asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
+		$asunto->Edit("id_encargado2",!empty($id_encargado2) ? $id_encargado2 : "NULL");
 		$asunto->Edit("contacto", $asunto_contacto);
 		$asunto->Edit("fono_contacto", $fono_contacto);
 		$asunto->Edit("email_contacto", $email_contacto);
@@ -329,7 +330,9 @@ if ($opcion == "guardar") {
 						$contrato->Edit("contacto", $contra_clie->fields['contacto']);
 					$contrato->Edit("fono_contacto", $contra_clie->fields['fono_contacto']);
 					$contrato->Edit("email_contacto", $contra_clie->fields['email_contacto']);
-					$contrato->Edit("direccion_contacto", $contra_clie->fields['direccion_contacto']);
+					$contrato->Edit("direccion_contacto", $contra_clie->fields['direccion_contacto']);	
+					$contrato->Edit("id_pais", $id_pais);
+					$contrato->Edit("id_cuenta", $id_cuenta);
 					$contrato->Edit("es_periodico", $contra_clie->fields['es_periodico']);
 					$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 					$contrato->Edit("usa_impuesto_separado", $contra_clie->fields['usa_impuesto_separado']);
@@ -556,6 +559,7 @@ if ($opcion == "guardar") {
 				$contrato->Edit("opc_ver_carta", $opc_ver_carta);
 				$contrato->Edit("opc_papel", $opc_papel);
 				$contrato->Edit("opc_moneda_total", $opc_moneda_total);
+                                        $contrato->Edit("opc_ver_columna_cobrable",$opc_ver_columna_cobrable); 
 				$contrato->Edit("codigo_idioma", $codigo_idioma != '' ? $codigo_idioma : 'es');
 				$contrato->Edit("tipo_descuento", $tipo_descuento);
 				if ($tipo_descuento == 'PORCENTAJE') {
@@ -1237,6 +1241,19 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 								<?php } ?>
 						<tr>
 							<td align=right>
+			<?=__('Encargado 2')?>
+		</td>
+		<td align=left>
+			<?= Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+																				FROM usuario
+																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
+																				AND usuario.activo = 1
+																				ORDER BY usuario.apellido1","id_encargado2",
+									$asunto->fields['id_encargado2'], "","Seleccione","200"); ?>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
 <?= __('Contacto solicitante') ?>
 							</td>
 							<td align=left>

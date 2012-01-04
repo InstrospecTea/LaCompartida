@@ -279,7 +279,7 @@ class Notificacion
 					$mail['tr_retraso_max'] =
 						"<tr>
 							<td>
-								<span style='color:#CC2233;'>Alerta:</span> Se ha superado el tiempo m&aacute;ximo (%MAX horas) sin ingresar trabajos. El ultimo trabajo se ingres&oacute; hace %ACTUAL d&iacute;as.
+								<span style='color:#CC2233;'>Alerta:</span> Se ha superado el tiempo m&aacute;ximo (%MAX horas) sin ingresar trabajos. El ultimo trabajo se ingres&oacute; hace %ACTUAL horas.
 							</td>
 						</tr>
 						";
@@ -302,6 +302,15 @@ class Notificacion
 						</tr>
 					";
 					
+					$mail['tr_horas_mensuales'] = 
+						"<tr>
+							<td>&nbsp;</td>
+							<td>
+								Ha ingresado un total de %HORAS horas durante este mes.
+							</td>
+						</tr>
+						"; 
+						
 					$mail['tr_modificacion_contrato'] =
 					"
 						<tr>
@@ -361,6 +370,48 @@ class Notificacion
 					";
 					
 					$mail['lista_hitos'] = "<p>" . __('Hito') . ": %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
+					
+						
+					$mail['bottom'] =
+						"</table>";
+				break;
+			case 'programados':					
+					$mail = array();
+					$mail['header'] = 
+						"<table style='border:1px solid black'>			
+							<tr>
+								<td colspan=7>Estimado/a %USUARIO:</td>
+							</tr>
+							<tr>
+								<td width='10px'>&nbsp;</td>
+								<td colspan=7>El d&iacute;a de hoy se generaron los borradores de los siguientes cobros programados por contrato:</td>
+							</tr>
+						";
+					
+					$mail['tr_cobros_programados'] =
+						"<tr>
+							<td>&nbsp;</td>
+							<td colspan=7>
+								<fieldset>
+								<legend>Cobros Programados</legend>
+									<table width=100% style='border-collapse:collapse;'>
+										<tr style='background-color:#B3E58C;'>
+											<th> Cliente </th>
+											<th> Asuntos </th>
+											<th> Monto </th>
+										</tr>
+										%FILAS
+									</table>
+								</fieldset>
+							</td>
+						</tr>";
+					
+					$mail['sub_tr_cobros_programados'] =
+						"<tr style='background-color:%COLOR'>
+							<td> %CLIENTE </td>
+							<td style='padding-right: 8px; padding-left:8px;'> %ASUNTOS </td>
+							<td> %MONTO </td>
+						</tr>";
 					
 						
 					$mail['bottom'] =
@@ -534,7 +585,7 @@ class Notificacion
 				if(isset($alertas['retraso_max']))
 				{
 						$tabla = $estructura['tr_retraso_max'];
-						$tabla = str_replace('%ACTUAL',($alertas['retraso_max']['actual']/24),$tabla);
+						$tabla = str_replace('%ACTUAL',round($alertas['retraso_max']['actual'],1),$tabla);
 						$tabla = str_replace('%MAX',$alertas['retraso_max']['max'],$tabla);
 						$filas_alertas .= $tabla;
 						$enviar = true;
@@ -609,6 +660,12 @@ class Notificacion
 						$enviar = true;
 					}
 						
+				if($alertas['horas_mensuales'])
+				{
+					$mensaje .= str_replace('%HORAS', $alertas['horas_mensuales'], $estructura['tr_horas_mensuales']);
+				}
+						
+				$mensaje .= $estructura['bottom'];
 				if (isset($alertas['hitos_cumplidos']) && is_array($alertas['hitos_cumplidos'])) {
 					$tabla = "";
 
@@ -640,6 +697,46 @@ class Notificacion
 				if($enviar)
 					$mensajes[$id_usuario_mail] = $mensaje;
 			}
+		return $mensajes;
+	}
+	
+	/*Parseo y emisión de aviso de generación de cobros programados*/
+	function mensajeProgramados($dato)
+	{
+		$estructura = $this->estructura('programados');
+		$mensajes = array();
+		
+		if(is_array($dato))
+		{
+			$i = 0;
+			$filas = '';
+			
+			foreach($dato as $id_contrato => $alertas)
+			{
+				$enviar = false;
+				//puse hardcoded 'ADMINISTRADOR' por que se le va a enviar solo al administrador del sistema (seteado por config)
+				$mensaje = str_replace('%USUARIO',"ADMINISTRADOR",$estructura['header']);
+				
+				$fila = str_replace('%CLIENTE',$alertas['glosa_cliente'],$estructura['sub_tr_cobros_programados']);
+				$fila = str_replace('%ASUNTOS',$alertas['asuntos'],$fila);
+				$fila = str_replace('%MONTO',$alertas['monto_programado'],$fila);
+
+				$color = $i%2? '#DDDDDD':'#FFFFFF';
+				$fila = str_replace('%COLOR',$color,$fila);
+				$filas.=$fila;
+				$i++;
+}
+			$tabla = str_replace('%FILAS',$filas,$estructura['tr_cobros_programados']);
+			$mensaje .= $tabla;
+			$enviar = true;
+
+			$mensaje .= $estructura['bottom'];
+
+			if($enviar){
+				array_push($mensajes, $mensaje);
+			}
+		}
+		
 		return $mensajes;
 	}
 	

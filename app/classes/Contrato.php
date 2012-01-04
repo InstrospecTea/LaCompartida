@@ -31,7 +31,7 @@ class Contrato extends Objeto
 	function SetIncluirEnCierre()
 	{
 		$query = "UPDATE contrato SET contrato.incluir_en_cierre=1 WHERE contrato.incluir_en_cierre=0";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
 
@@ -106,7 +106,7 @@ class Contrato extends Objeto
 			if($values != "")
 			{
 				$query2 = "INSERT INTO cobro_asunto (id_cobro, codigo_asunto) values $values";
-				$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
+				mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
 			}
 		}
 		return true;
@@ -667,7 +667,6 @@ class Contrato extends Objeto
                                         AND trabajo.cobrable = 1 
                                         AND trabajo.id_tramite = 0 
 					AND asunto.id_contrato='".$this->fields['id_contrato']."'"; 
-                        $lista_trabajos = new ListaTrabajos($this->sesion,'',$query);
                 }
                 else 
 		{
@@ -821,7 +820,7 @@ class Contrato extends Objeto
            {
                $trabajo = $lista_trabajos->Get($z);
                $valor_trabajo = 0;
-               $valor_estandar_trabajo = 0;
+               $valor_trabajo_estandar = 0;
                $duracion_retainer_trabajo = 0;
                
                if( $trabajo->fields['cobrable'] ) {
@@ -1060,10 +1059,9 @@ class Contrato extends Objeto
 				//Guarda ultimo cambio en la tabla historial de modificaciones
 				$query3 = " INSERT INTO modificaciones_contrato 
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-										SELECT id_contrato, fecha_creacion, fecha_modificacion, id_usuario_modificador, id_usuario_responsable
-										FROM contrato 
-										ORDER BY fecha_modificacion DESC
-										LIMIT 1";
+                                                                           VALUES ( '".$this->fields['id_contrato']."', '".$this->fields['fecha_creacion']."', 
+                                                                                    '".$this->fields['fecha_modificacion']."', '".$this->sesion->usuario->fields['id_usuario']."', 
+                                                                                    '".$this->fields['id_usuario_responsable']."' )";	
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			}
 			else //Retorna true ya que si no quiere hacer update la función corrió bien
@@ -1093,10 +1091,9 @@ class Contrato extends Objeto
 			
 			$query3 = " INSERT INTO modificaciones_contrato 
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-										SELECT id_contrato, fecha_creacion, fecha_modificacion, id_usuario_modificador, id_usuario_responsable
-										FROM contrato 
-										ORDER BY fecha_creacion DESC
-										LIMIT 1";
+                                                                           VALUES ( '".$this->fields['id_contrato']."', '".$this->fields['fecha_creacion']."', 
+                                                                                    '".$this->fields['fecha_modificacion']."', '".$this->sesion->usuario->fields['id_usuario']."', 
+                                                                                    '".$this->fields['id_usuario_responsable']."' )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			
 			if( $enviar_mail_asunto_nuevo )

@@ -397,7 +397,6 @@ function Cobrable(& $fila) {
 	  $Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
 	  return $Check;
 	 */
-	global $sesion;
 	global $id_cobro;
 	$checked = '';
 
@@ -435,7 +434,6 @@ function SplitDuracion($time) {
 }
 
 function funcionTR(& $asunto) {
-	global $sesion;
 	global $formato_fecha;
 	static $i = 0;
 

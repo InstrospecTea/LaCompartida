@@ -15,7 +15,6 @@
 	$pagina->titulo = __('Reporte Gráfico asuntos');
 	$pagina->PrintTop();
 
-	
 	if(!$fecha_ini)
 	{
 		$fecha_anio = date('Y');
@@ -64,7 +63,16 @@
 			<?=__('Profesionales')?>
 		</td>
 		<td align=left>
-			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","230"); ?>	  </td>
+			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","230"); ?>	  </td>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+			<?=__('Solo activos')?>
+		</td>
+		<td>
+			<? if( $solo_activos ) $chk = "checked='checked'"; ?>
+			<input type="checkbox" name="solo_activos" id="solo_activos" value=1 <?=$chk ?> />
 		</td>
 	</tr>
 	<tr>
@@ -111,9 +119,11 @@
 			$url_usuarios .= $usuarios;
 		else
 			$url_usuarios = '';
+			
+		$url_activos = "&solo_activos=".$solo_activos;
 ?>
 		<br />
-		<img src="graficos/grafico_<?=$tipo_reporte?>.php?popup=1<?=$url_clientes?><?=$url_usuarios?>&fecha_ini=<?=Utiles::fecha2sql($fecha_ini)?>&fecha_fin=<?=Utiles::fecha2sql($fecha_fin)?>" alt='' />
+		<img src="graficos/grafico_<?=$tipo_reporte?>.php?popup=1<?=$url_clientes?><?=$url_activos?><?=$url_usuarios?>&fecha_ini=<?=Utiles::fecha2sql($fecha_ini)?>&fecha_fin=<?=Utiles::fecha2sql($fecha_fin)?>" alt='' />
 
 		<!--
 		<?

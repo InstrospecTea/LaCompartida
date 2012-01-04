@@ -66,7 +66,7 @@ class CobroMoneda extends Objeto
 			{
 				$row['id_moneda'];
 				$query_insert = "INSERT INTO cobro_moneda SET id_cobro = ".$id_cobro.", id_moneda = ".$row['id_moneda'].", tipo_cambio = ".$row['tipo_cambio']." ";
-				$result = mysql_query($query_insert);
+				mysql_query($query_insert);
 			}
 			return true;
 		}
@@ -90,7 +90,7 @@ class CobroMoneda extends Objeto
 	function UpdateTipoCambioCobro($id_moneda, $tipo_cambio, $id_cobro)
 	{
 		$sql = "UPDATE cobro_moneda SET tipo_cambio = $tipo_cambio WHERE id_cobro = $id_cobro AND id_moneda = $id_moneda LIMIT 1";
-		$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$this->sesion->dbh);
+		mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}	
 }

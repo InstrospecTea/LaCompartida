@@ -285,8 +285,6 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($nombre, $email) = mysql_fetch_array($resp);
 
-		$from = Conf::AppName();
-
 		if (method_exists('Conf','GetConf'))
 		{
 			$MailAdmin = Conf::GetConf($sesion, 'MailAdmin');
@@ -295,15 +293,12 @@ function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto=
 		{
 			$MailAdmin = Conf::MailAdmin();
 		}
-
-		$headers = "From: Time & Billing <$MailAdmin>\r\n" .
-						 "Reply-To: $MailAdmin \r\n" .
-						 'X-Mailer: PHP/' . phpversion();
-						 
+			 
 		Utiles::Insertar( $sesion,  __("Alerta")." ".__("ASUNTO")." - ".$this->fields['glosa_asunto']." | ".Conf::AppName(), $mensaje, $email, $nombre);
 		Utiles::Insertar( $sesion,  __("Alerta")." ".__("ASUNTO")." - ".$this->fields['glosa_asunto']." | ".Conf::AppName(), $mensaje, $MailAdmin, $nombre);
 		return true;
 	}
+	
 	function Eliminar()
 	{
 		if(!$this->Loaded())

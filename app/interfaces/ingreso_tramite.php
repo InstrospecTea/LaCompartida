@@ -19,10 +19,12 @@
 	$pagina = new Pagina($sesion);
 	
 	$tramite = new Tramite($sesion);
-	if($id_tramite > 0)
+	if ($id_tramite > 0) {
 		$tramite->Load($id_tramite);
-	if( $tramite->fields['trabajo_si_no']==1 || $como_trabajo==1 )
+	}
+	if ( $tramite->fields['trabajo_si_no']==1 || $como_trabajo==1 ) {
 		$t = new Trabajo($sesion);
+	}
 	
 	$params_array['codigo_permiso'] = 'REV';
 	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
@@ -81,8 +83,9 @@
 	}
 	else //Si no se está editando un trámite
 	{
-			if(!$id_usuario)
+			if(!$id_usuario) {
 				$id_usuario = $sesion->usuario->fields['id_usuario'];
+			}
 			if( $opcion != 'guardar' )
 			{
 				$tramite->fields['cobrable']=1;
@@ -96,8 +99,7 @@
 	{
 			$valida = true;
 			$asunto = new Asunto($sesion);
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			{
+			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) {
 				$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
 				$codigo_asunto=$asunto->fields['codigo_asunto'];
 			}
@@ -205,8 +207,9 @@
 			}
 			
 		
-			if(($Ordenado_por==1 || $Ordenado_por==2) && $t)
+			if(($Ordenado_por==1 || $Ordenado_por==2) && $t){
 				$t->Edit('solicitante',$solicitante);
+			}
 
 			if($t) {
 			$t->Edit('descripcion',$descripcion);
@@ -218,8 +221,9 @@
 			if($codigo_actividad && $t)
 				$t->Edit('codigo_actividad',$codigo_actividad);
 			if($revisado) {
-				if($t)
+				if($t) {
 				$t->Edit('revisado',1);
+				}
 				$tramite->Edit('revisado',1);
 				}
 		
@@ -233,22 +237,23 @@
 			
 		
 			if($t) {
-				if(!$cobrable)
+				if(!$cobrable) {
 					$t->Edit('cobrable','0');
-				else
+				} else {
 					$t->Edit('cobrable','1');
+				}
 				$t->Edit('visible','1');
 				}
 			
 			if(!$id_usuario) {
-				if($t)
+				if ($t) {
 				$t->Edit("id_usuario",$sesion->usuario->fields['id_usuario']);
-				$tramite->Edit("id_usuario",$sesion->usuario->fields['id_usuario']);
 				}
-			else
-				{
-				if($t)
-				$t->Edit("id_usuario",$id_usuario);
+				$tramite->Edit("id_usuario",$sesion->usuario->fields['id_usuario']);
+			} else {
+				if($t) {
+					$t->Edit("id_usuario",$id_usuario);
+				}
 				$tramite->Edit("id_usuario",$id_usuario);
 				}
 			
@@ -272,10 +277,12 @@
 			$tramite->Edit('id_moneda_tramite', $contrato->fields['id_moneda_tramite']);
 			$tramite->Edit('tarifa_tramite', Funciones::TramiteTarifa($sesion, $lista_tramite, $contrato->fields['id_moneda_tramite'], $codigo_asunto));
 			if($t) {
-			if(!$t->fields['tarifa_hh'])
+				if (!$t->fields['tarifa_hh']) {
 				$t->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
-			if(!$t->fields['costo_hh'])
+				}
+				if (!$t->fields['costo_hh']) {
 				$t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
+			}
 			}
 			
 			if( $como_trabajo==0 && $t )
@@ -285,8 +292,9 @@
 		
 	if($tramite->Write())
 			{
-			if($t)
+			if($t){
 				$t->Edit('id_tramite',$tramite->fields['id_tramite']);
+			}
 			if( !$t )
 				{
 						
@@ -301,9 +309,8 @@
 												window.opener.Refrescar( 'edit' );
 												}
 										</script>
-						<?
-						}
-				else {
+<?php
+				} else {
 						?>
 										<script>
 											if(window.opener)
@@ -311,11 +318,9 @@
 												window.opener.Refrescar( 'nuevo' );
 												}
 										</script>
-						<?	
+<?php
 						}
-				}
-else if($t->Write())
-				{
+			} else if($t->Write()) {
 						
 								$pagina->AddInfo(__('Trámite').' '.($nuevo?__('guardado con exito'):__('editado con éxito')));
 				#refresca el listado de horas.php cuando se graba la informacion desde el popup
@@ -328,9 +333,8 @@ else if($t->Write())
 												window.opener.Refrescar( 'edit' );
 												}
 										</script>
-						<?
-						}
-				else {
+<?php
+				} else {
 						?>
 										<script>
 											if(window.opener)
@@ -338,7 +342,7 @@ else if($t->Write())
 												window.opener.Refrescar( 'nuevo' );
 												}
 										</script>
-						<?	
+<?php
 						}
 				}
 			}

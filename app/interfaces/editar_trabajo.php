@@ -113,135 +113,147 @@
                     if( round(10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','')) != 10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','') ) 
                         $pagina->AddError(__("Solo se permite ingresar un decimal en el campo ").' <b>'.__('Duración Cobrable').'</b>');
                 }
+                if($duracion == '00:00:00' )  {
+                    $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
+                }
                 $errores = $pagina->GetErrors();
             
                 if( empty($errores) )
                 {
-                    if( Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
+                    if(Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
                     {
-			$valida = true;
-			$asunto = new Asunto($sesion);
-			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
-			{
-				$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-				$codigo_asunto=$asunto->fields['codigo_asunto'];
-			}
-			else
-			{
-				$asunto->LoadByCodigo($codigo_asunto);
-			}
+                            $valida = true;
+                            $asunto = new Asunto($sesion);
+                            if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
+                            {
+                                    $asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
+                                    $codigo_asunto=$asunto->fields['codigo_asunto'];
+                            }
+                            else
+                            {
+                                    $asunto->LoadByCodigo($codigo_asunto);
+                            }
 
-			/*
-			Ha cambiado el asunto del trabajo se setea nuevo Id_cobo de alguno que esté creado
-			y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
-			*/
-			if($cambio_asunto)
-			{
-				$cobro = new Cobro($sesion);
-				$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($codigo_asunto, $t->fields['fecha']);
-				if($id_cobro_cambio)
-				{
-					$t->Edit('id_cobro',$id_cobro_cambio);
-				}
-				else
-					$t->Edit('id_cobro','NULL');
-			}
+                            /*
+                            Ha cambiado el asunto del trabajo se setea nuevo Id_cobo de alguno que esté creado
+                            y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
+                            */
+                            if($cambio_asunto)
+                            {
+                                    $cobro = new Cobro($sesion);
+                                    $id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($codigo_asunto, $t->fields['fecha']);
+                                    if($id_cobro_cambio)
+                                    {
+                                            $t->Edit('id_cobro',$id_cobro_cambio);
+                                    }
+                                    else
+                                            $t->Edit('id_cobro','NULL');
+                            }
 
-			$t->Edit("duracion", $tipo_ingreso == 'decimal' ?
-				UtilesApp::Decimal2Time($duracion) : $duracion);
+                            $t->Edit("duracion", $tipo_ingreso == 'decimal' ?
+                                    UtilesApp::Decimal2Time($duracion) : $duracion);
 
-			if($duracion_cobrada == '') $duracion_cobrada = $duracion;
+                            if($duracion_cobrada == '') $duracion_cobrada = $duracion;
 
-			$t->Edit("duracion_cobrada", $tipo_ingreso == 'decimal' ?
-				UtilesApp::Decimal2Time($duracion_cobrada) : $duracion_cobrada);
-                        
-                        $query = "SELECT id_categoria_usuario FROM usuario WHERE id_usuario = '$id_usuario' ";
-                        $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-                        list( $id_categoria_usuario ) = mysql_fetch_array($resp);
-                        
-			$t->Edit('id_usuario', $id_usuario);
-                        $t->Edit('id_categoria_usuario', $id_categoria_usuario );
-			$t->Edit('codigo_asunto', $codigo_asunto);
+                            $t->Edit("duracion_cobrada", $tipo_ingreso == 'decimal' ?
+                                    UtilesApp::Decimal2Time($duracion_cobrada) : $duracion_cobrada);
 
-			if (method_exists('Conf','GetConf'))
-			{
-				$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-			}
-			else if(method_exists('Conf','Ordenado_por'))
-			{
-				$Ordenado_por = Conf::Ordenado_por();
-			}
-			else
-			{
-				$Ordenado_por = 0;
-			}
+                            $query = "SELECT id_categoria_usuario FROM usuario WHERE id_usuario = '$id_usuario' ";
+                            $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+                            list( $id_categoria_usuario ) = mysql_fetch_array($resp);
 
-			if($Ordenado_por==1 || $Ordenado_por==2)
-				$t->Edit('solicitante',$solicitante);
+                            $t->Edit('id_usuario', $id_usuario);
+							if( is_numeric($id_usuario) ) {
+								$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
+								mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+							}
+                            $t->Edit('id_categoria_usuario', $id_categoria_usuario );
+                            $t->Edit('codigo_asunto', $codigo_asunto);
 
-			if( UtilesApp::GetConf($sesion,'TodoMayuscula') ) {
-                            $t->Edit('descripcion',strtoupper($descripcion));
-                        } else {
+                            if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')){
+                                    //id_area_trabajo
+                                    $t->Edit('id_area_trabajo', empty($id_area_trabajo) ? "NULL": $id_area_trabajo );
+                            }
+
+                            if (method_exists('Conf','GetConf'))
+                            {
+                                    $Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
+                            }
+                            else if(method_exists('Conf','Ordenado_por'))
+                            {
+                                    $Ordenado_por = Conf::Ordenado_por();
+                            }
+                            else
+                            {
+                                    $Ordenado_por = 0;
+                            }
+
+                            if($Ordenado_por==1 || $Ordenado_por==2)
+                                    $t->Edit('solicitante',addslashes($solicitante));
+
+                            if( UtilesApp::GetConf($sesion,'TodoMayuscula') ) {
+                                $t->Edit('descripcion',strtoupper($descripcion));
+                            } else {
                             $t->Edit('descripcion',$descripcion);
-                        }
-			$t->Edit('fecha',Utiles::fecha2sql($fecha));
-			#$t->Edit('fecha',$fecha);
-			if($codigo_actividad)
-				$t->Edit('codigo_actividad',$codigo_actividad);
-			if($revisado)
-				$t->Edit('revisado',1);
+                            }
+                            $t->Edit('fecha',Utiles::fecha2sql($fecha));
+                            #$t->Edit('fecha',$fecha);
+                            if($codigo_actividad)
+                                    $t->Edit('codigo_actividad',$codigo_actividad);
+                            if($revisado)
+                                    $t->Edit('revisado',1);
 
-			if(!$cobrable)
-			{
-				$t->Edit("cobrable",'0');
-				if(!$visible)
-					$t->Edit("visible",'0');
-				else
-					$t->Edit('visible','1');
-			}
-			else
-			{
-				$t->Edit('cobrable','1');
-				$t->Edit('visible','1');
-			}
-			if($asunto->fields['cobrable']==0)//Si el asunto no es cobrable
-			{
-				$t->Edit("cobrable",'0');
-				$t->Edit("visible",'0');
-				$pagina->AddInfo(__('El Trabajo se guardó como NO COBRABLE (Por Maestro).'));
-			}
-			if(!$id_usuario)
-				$t->Edit("id_usuario",$sesion->usuario->fields['id_usuario']);
-			else
-				$t->Edit("id_usuario",$id_usuario);
+                            if(!$cobrable)
+                            {
+                                    $t->Edit("cobrable",'0');
+                                    if(!$visible)
+                                            $t->Edit("visible",'0');
+                                    else
+                                            $t->Edit('visible','1');
+                            }
+                            else
+                            {
+                                    $t->Edit('cobrable','1');
+                                    $t->Edit('visible','1');
+                            }
+                            if($asunto->fields['cobrable']==0)//Si el asunto no es cobrable
+                            {
+                                    $t->Edit("cobrable",'0');
+                                    $t->Edit("visible",'0');
+                                    $pagina->AddInfo(__('El Trabajo se guardó como NO COBRABLE (Por Maestro).'));
+                            }
+                            if(!$id_usuario)
+                                    $t->Edit("id_usuario",$sesion->usuario->fields['id_usuario']);
+                            else
+                                    $t->Edit("id_usuario",$id_usuario);
 
-			// Agregar valores de tarifa
-			$asunto = new Asunto($sesion);
-			$asunto->LoadByCodigo($t->fields['codigo_asunto']);
-			$contrato = new Contrato($sesion);
-			$contrato->Load($asunto->fields['id_contrato']);
-			if(!$t->fields['tarifa_hh'])
-				$t->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
-			if(!$t->fields['costo_hh'])
-				$t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
+                            // Agregar valores de tarifa
+                            $asunto = new Asunto($sesion);
+                            $asunto->LoadByCodigo($t->fields['codigo_asunto']);
+                            $contrato = new Contrato($sesion);
+                            $contrato->Load($asunto->fields['id_contrato']);
+                            if(!$t->fields['tarifa_hh'])
+                                    $t->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
+                            if(!$t->fields['costo_hh'])
+                                    $t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
 
-			if($t->Write())
-			{
-				if( $actualizar_trabajo_tarifa )
-					$t->InsertarTrabajoTarifa();
-				$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con éxito'):__('editado con éxito')));
-#refresca el listado de horas.php cuando se graba la informacion desde el popup
-?>
-				<script>
-					if(window.opener)
-						window.opener.Refrescar();
-					/*{
+                            if($t->Write())
+                            {
+                                    if( $actualizar_trabajo_tarifa )
+                                            $t->InsertarTrabajoTarifa();
+                                    $pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con éxito'):__('editado con éxito')));
+    #refresca el listado de horas.php cuando se graba la informacion desde el popup
+    ?>
+                                    <script>
+                                            if(window.opener)
+                                                    window.opener.Refrescar();
+                                            /*{
 
-						//window.close();
-					}*/
-				</script>
-<?
-			}
+                                                    //window.close();
+                                            }*/
+                                    </script>
+    <?
+                            }
                     }
                     else
                     {
@@ -355,7 +367,7 @@
 	if(($opcion == 'guardar' || $opcion == 'eliminar') )
 	{
 ?>
-<script type=text/javascript>
+<script type="text/javascript">
 var str_url = new String(top.location);
 if(str_url.search('/trabajo.php') > 0)//Si la página está siendo llamada desde trabajo.php
 	top.frames.semana.location.reload();
@@ -433,6 +445,25 @@ function Validar(form)
         form.duracion.focus();
         return false;
     }
+	else
+	{
+		if( form.duracion.value == '00:00:00' ){
+			alert("<?php echo __('La duración debe ser mayor a 0')?>");
+<?php
+	if( method_exists('Conf','GetConf') )
+	{
+		if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector'){
+			echo "document.getElementById('hora_duracion').focus();";
+		}
+		else
+		{
+			echo "form.duracion.focus();";
+		}
+	}
+?>
+			return false;
+		}
+	}
  <?
 	//Revisa el Conf si esta permitido y la función existe
 	if($tipo_ingreso=='decimal')
@@ -463,6 +494,19 @@ function Validar(form)
         form.descripcion.focus();
         return false;
     }
+
+<?php
+	if  ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarAreaTrabajos') ) {
+?>
+            if( !form.id_area_trabajo.value ) 
+            {
+                alert("<?=__('Debe seleccionar una area de trabajo')?>");
+                form.id_area_trabajo.focus();
+                return false;
+            }
+<?php
+        }
+?>
 
 	//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
 	if(form.id_cobro.value != '' && $('id_trabajo').value != '')
@@ -528,8 +572,9 @@ function Validar(form)
 		if ($Ordenado_por!=0)
 			echo "form.solicitante.value=form.solicitante.value.toUpperCase();";
 	}
+	
 	// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
-	if (!$permiso_cobranza->fields['permitido'])
+	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0)
 	{
 ?>
 	temp = $('fecha').value.split("-");
@@ -539,7 +584,7 @@ function Validar(form)
 	if (fecha_tope > fecha)
 	{
 		var dia = fecha_tope.getDate();
-		var mes = fecha_tope.getMonth();
+		var mes = fecha_tope.getMonth()+1;
 		var anio = fecha_tope.getFullYear();
 		alert("No se pueden ingresar trabajos anteriores a "+ dia + "-" + mes + "-" + anio);
 		$('fecha').focus;
@@ -1166,6 +1211,26 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 ?>
        </td>
     </tr>
+<?php
+	if  ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarAreaTrabajos') ) {
+?>
+	 <tr>
+        <td align='center'>
+        	<span id="img_asunto">&nbsp;&nbsp;&nbsp;</span>
+		</td>
+        <td align='right'>
+             <?=__('Área Trabajo')?>
+        </td>
+        <td align=left width="440" nowrap>
+<?php
+					//$sesion, $query, $name, $selected='', $opciones='',$titulo='',$width='150'
+					echo Html::SelectQuery($sesion,"SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC",'id_area_trabajo', $t->fields['id_area_trabajo'],'', 'Elegir', '400' );
+?>
+       </td>
+    </tr>
+<?php
+	}
+?>	
     <? if( UtilesApp::GetConf($sesion,'UsoActividades') ){ ?>
     <tr>
         <td colspan="2" align=right>
@@ -1552,7 +1617,7 @@ Calendar.setup(
 		inputField	: "fecha",				// ID of the input field
 		ifFormat	: "%d-%m-%Y",			// the date format
 <?php
-	if (!$permiso_cobranza->fields['permitido'])
+	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0)
 	{
 		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";
 	}

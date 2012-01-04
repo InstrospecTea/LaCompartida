@@ -24,7 +24,15 @@
 	$sesion = new Sesion (null, true);
 	$alerta = new Alerta ($sesion);
 
+        set_time_limit(300);
 
+        $timezone_offset = UtilesApp::get_offset_os_utc()-UtilesApp::get_utc_offset( Conf::GetConf($sesion,'ZonaHoraria') );
+        
+        if(method_exists('Conf','GetConf'))
+            date_default_timezone_set(Conf::GetConf($sesion,'ZonaHoraria'));
+	else
+            date_default_timezone_set('America/Santiago');
+        
 	$notificacion = new Notificacion($sesion);
 
 	//El arreglo dato_x se construirá con los datos de cada usuarios de la forma: id_usuario => datos (otro arreglo)
@@ -76,7 +84,7 @@
 				$horas = '0.00';
 			if(!$horas_cobrables)
 				$horas_cobrables = '0.00';
-			
+
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AlertaSemanalTodosAbogadosaAdministradores') ) {
 				$ids_usuarios_profesionales .= ',' . $id_usuario;
 			}
@@ -115,7 +123,8 @@
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables,1);
 		}
 		// Mensaje para REV: horas de cada revisado, alertas.
-			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') 
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') ) 
+					|| ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenHorasSemanalesAAbogadosIndividuales') )
 					|| ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AlertaSemanalTodosAbogadosaAdministradores') ))
 				$having = "";
 			else
@@ -145,7 +154,9 @@
 				}
 				else if( $revisados != "" )
 					$revisados .= ','.$id_usuario;
-
+				else if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenHorasSemanalesAAbogadosIndividuales') )
+					$revisados = $id_usuario;
+				
 				// Comentado por Stefan Moers 5.4.2011, siempre se debería hacer el intersect con el array de los revisados.
 				/*if($codigo_permiso == 'REV') //Si es revisor, informo sobre todos en cache_revisados
 					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
@@ -155,6 +166,9 @@
 				else
 					$dato_semanal[$id_usuario]['alerta_revisados'] = array_intersect_key($cache_revisados,array_flip(explode(',',$revisados)));
 			}
+		
+		
+		
 		// Mensaje para REP: Imagenes de Reporte Consolidado. Genero el pdf que se anexará
 
 		/* Imagenes para Encargado comercial:
@@ -272,9 +286,8 @@
 			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $asunto->TotalMonto(false);
 
 		//Notificacion "Límite de monto"
-		$total_monto = number_format($total_monto,1);
+		$total_monto = number_format($total_monto,1,'.','');
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
-
 		if (($total_monto > $asunto->fields['limite_monto']) && ($asunto->fields['limite_monto'] > 0) && ($asunto->fields['notificado_monto_excedido']==0))
 		{
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_monto'] = array(
@@ -585,9 +598,12 @@
 	while(list($id_usuario,$username,$restriccion_mensual) = mysql_fetch_array($result))
 	{
 		$dato_diario[$id_usuario]['nombre_pila'] = $username;
+		if( method_exists('Conf','GetConf') )
+			$adelanto_alerta_fin_de_mes = (int)Conf::GetConf($sesion,'AdelantoAlertaFinDeMes');
+		$manana = mktime(date('G'),date('i'),date('s'),date('n'),date('j')+$adelanto_alerta_fin_de_mes,date('Y'));
 
 		/*Cuarto componente: Mail de alerta mensual de cierre de cobranza*/
-		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CorreosMensuales') ) || ( method_exists('Conf','CorreosMensuales') && Conf::CorreosMensuales() ) ) && UtilesApp::esUltimoDiaHabilDelMes())
+		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CorreosMensuales') ) || ( method_exists('Conf','CorreosMensuales') && Conf::CorreosMensuales() ) ) && UtilesApp::esUltimoDiaHabilDelMes( $manana ))
 		{
 			$dato_diario[$id_usuario]['fin_de_mes'] = 1;
 		}
@@ -676,7 +692,7 @@
 
 					if($prof->fields['restriccion_diario'] > 0)
 					{
-						$query = "SELECT SUM( TIME_TO_SEC( duracion )/3600 ) FROM trabajo WHERE id_usuario = '$id_usuario' AND fecha = CURDATE()";
+						$query = "SELECT SUM( TIME_TO_SEC( duracion )/3600 ) FROM trabajo WHERE id_usuario = '$id_usuario' AND fecha = DATE( DATE_ADD( NOW(), INTERVAL $timezone_offset HOUR ) ) ";
 						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 						list($cantidad_horas) = mysql_fetch_array($resp);
 						if(!$cantidad_horas) $cantidad_horas = 0;
@@ -758,6 +774,20 @@
 		$dato_diario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
 	}
 
+	
+	if(UtilesApp::GetConf($sesion,'AlertaDiariaHorasMensuales'))
+	{
+		$query = "SELECT id_usuario, TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(duracion))), '%H:%i') as horas
+					FROM trabajo
+					WHERE fecha >= '".date('Y-m')."-01'
+					GROUP BY id_usuario";
+		$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		while(list($id_usuario, $horas) = mysql_fetch_array($result))
+		{
+			$dato_diario[$id_usuario]['horas_mensuales'] = $horas;
+		}
+	}
+		
 	// Fin del mail diario. Envío.
 	$mensajes = $notificacion->mensajeDiario($dato_diario);
 

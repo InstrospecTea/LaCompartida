@@ -317,7 +317,7 @@ class NeteoDocumento extends Objeto
 		if($cobro->Loaded())
 		{
 			//echo $cobro->fields['estado'] . "<br>" . $saldo_cobro_honorarios . "<br>" . $saldo_cobro_gastos;
-			if( ( ( $cobro->fields['estado']=='PAGADO')  || ($cobro->fields['estado']=='PAGO_PARCIAL') ) && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
+			if( ( ( $cobro->fields['estado']=='PAGADO')  || ($cobro->fields['estado']=='PAGO PARCIAL') ) && (($saldo_cobro_honorarios!=0) || ($saldo_cobro_gastos!=0)))
 			{
 				if( $cobro->TienePago() )
 				{
@@ -339,12 +339,13 @@ class NeteoDocumento extends Objeto
 				else {
 					$cobro->Edit('estado','EMITIDO');					
 				}
+                $cobro->Write();
 			}
-			elseif((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE') || ($cobro->fields['estado']=='FACTURADO') || ($cobro->fields['estado']=='PAGO_PARCIAL') ) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
+			elseif((($cobro->fields['estado']=='EMITIDO') || ($cobro->fields['estado']=='ENVIADO AL CLIENTE') || ($cobro->fields['estado']=='FACTURADO') || ($cobro->fields['estado']=='PAGO PARCIAL') ) && (($saldo_cobro_honorarios<=0) && ($saldo_cobro_gastos<=0)))
 			{
 				$cobro->Edit('estado','PAGADO');
+                $cobro->Write();
 			}
-			$cobro->Write();
 		}
 	}
 

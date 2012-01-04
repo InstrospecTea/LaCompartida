@@ -230,7 +230,6 @@
 		function Opciones(& $fila)
 		{
 			global $sesion;
-			global $where;
 			$html_opcion = "";
 			//la variable editar existe para que en el caso de que el cobro ya esté emitido no se pueda modificar
 			$editar=false;

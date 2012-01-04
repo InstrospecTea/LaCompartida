@@ -205,10 +205,12 @@ if ($print) {
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
 	}
-	if ($programados) {
+	/*if ($programados) {
 		$join .= " INNER JOIN cobro_pendiente ON cobro_pendiente.id_contrato=contrato.id_contrato ";
 		$where .= " AND cobro_pendiente.hito = '0' ";
-	}
+	}*/
+	$join .= "LEFT JOIN cobro_pendiente ON ( cobro_pendiente.id_contrato=contrato.id_contrato AND cobro_pendiente.id_cobro IS NULL AND cobro_pendiente.fecha_cobro >= NOW() )";
+	$where .= " AND cobro_pendiente.id_cobro_pendiente IS NULL ";
 	$query = "SELECT SQL_CALC_FOUND_ROWS contrato.id_contrato,cliente.codigo_cliente, contrato.id_moneda, contrato.forma_cobro, contrato.monto, contrato.retainer_horas, contrato.id_moneda, contrato.separar_liquidaciones
 				FROM contrato
 				$join
@@ -225,6 +227,7 @@ if ($print) {
 		while ($contra = mysql_fetch_array($resp)) {
 			set_time_limit(100);
 			//Mala documentaciÃ³n!!! Que significa $contra? Que hace GeneraProceso??? ICC
+				// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM )
 			$Cobro = new Cobro($Sesion);
 			if (!$id_proceso_nuevo) {
 				$id_proceso_nuevo = $Cobro->GeneraProceso();
@@ -238,7 +241,8 @@ if ($print) {
 			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, false, true, false);
 		}
 		//fin gastos
-	} else if ($programados) {
+	} /* else if ($programados) {
+		//comentado por esanmartin, ya que ahora los cobros programados se generan via cron, y no hay que "generarlos"
 		//cobros programados
 		while ($contra = mysql_fetch_array($resp)) {
 			$Cobro = new Cobro($Sesion);
@@ -259,7 +263,7 @@ if ($print) {
 			$Cobro->PrepararCobro('', Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, $monto_programado, $id_cobro_pendiente, false, false, $inc_gastos == '1', $inc_honorarios == '1');
 		}
 		//fin cobros programados
-	} else {
+	} */ else {
 		//cobros wip
 		while ($contra = mysql_fetch_array($resp)) {
 			$Cobro = new Cobro($Sesion);

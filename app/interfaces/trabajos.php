@@ -212,6 +212,9 @@
                                 $where_gastos .= " AND cta_corriente.id_cobro = '$id_cobro'";
                         }
 		}
+		//para tema de los gastos que se preseleccionaran para cobro4.php
+		$codigo_cliente = $cobro->fields['codigo_cliente'];
+		$where_gasto .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
 	
 		if($cobrable == 'SI')
 			$where .= " AND trabajo.cobrable = 1";
@@ -255,12 +258,14 @@
 	
 		#BUSCAR
 		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
+                                        trabajo.id_trabajo,
 												trabajo.id_cobro,
 												trabajo.revisado, 
 												trabajo.id_trabajo, 
 												trabajo.codigo_asunto,
 												trabajo.cobrable,
 												prm_moneda.simbolo as simbolo,
+                                        prm_moneda.id_moneda as id_moneda,
 												asunto.codigo_cliente as codigo_cliente, 
 												contrato.id_moneda as id_moneda_asunto, 
 												asunto.id_asunto AS id,
@@ -282,7 +287,9 @@
 												tramite_tipo.id_tramite_tipo,
 												DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
 												cobro.estado, 
+                                        cliente.glosa_cliente, 
 												asunto.forma_cobro, 
+                                        asunto.codigo_asunto_secundario, 
 												asunto.monto, 
 												asunto.glosa_asunto,
 												contrato.descuento, 
@@ -786,9 +793,7 @@ function EditarTodosLosArchivos()
 	}
 	function Cobrable(& $fila)
 	{
-		global $sesion;
 		global $id_cobro;
-		global $motivo;
 		#$checked = "";
 		#$checked = "checked";
 			if($fila->fields['id_cobro'] == $id_cobro)
@@ -806,8 +811,6 @@ function EditarTodosLosArchivos()
 	}
 	function Revisado(& $fila)
 	{
-		global $sesion;
-		global $motivo;
 		#$checked = "";
 		#$checked = "checked";
 		if($fila->fields['revisado'] == 1)
@@ -838,7 +841,6 @@ function EditarTodosLosArchivos()
 		{
 			$opc_html = Cobrable($trabajo);
 		}
-		$id_asunto = $fila->fields['id_asunto'];
 
 		if($p_revisor->fields['permitido'])
 		{
@@ -874,10 +876,8 @@ function EditarTodosLosArchivos()
 	function funcionTR(& $trabajo)
 	{
 		global $sesion;
-		global $id_cobro;
 		global $p_revisor;
 		global $p_cobranza;
-		global $p_profesional;
 		global $select_usuario;
 		static $i = 0;
 		

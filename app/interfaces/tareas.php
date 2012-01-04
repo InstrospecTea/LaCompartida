@@ -714,7 +714,6 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 
 			function Opciones(&$fila)
 			{
-					global $sesion;
 					$id_tarea = $fila->fields['id_tarea'];
 			
 					$o .= "<a href='javascript:void(0)' onclick=\"AbrirTarea(".$id_tarea.")\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";

@@ -76,6 +76,7 @@ class Reporte
 	function requiereMoneda($tipo_dato)
 	{
 		$extras = array('rentabilidad','rentabilidad_base');
+
 		if(in_array($tipo_dato,array_merge($extras,Reporte::tiposMoneda())))
 			return true;
 		return false;
@@ -840,6 +841,7 @@ class Reporte
 		if
 		(
 			$this->requiereMoneda($this->tipo_dato)
+                        && $this->tipo_dato != 'valor_hora' 
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
@@ -860,7 +862,6 @@ class Reporte
 	function toBars()
 	{
 		$data = array();
-		$data_divisora = array();
 		$data['total'] = 0;
 		$data['total_divisor'] = 0;
 		$data['barras'] = 0;

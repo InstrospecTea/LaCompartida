@@ -748,6 +748,9 @@ $_LANG['Ago'] = 'Aug';
 $_LANG['Dic'] = 'Dec';
 $_LANG['honorario_yo_gastos'] = 'Legal Fees and Expenses';
 
+$_LANG['Piso'] = 'Floor';
+$_LANG['4to'] = '4th';
+
 // frases monedas en ingles
 $_LANG['nuevos soles'] = "peruvian nuevos soles";
 $_LANG['dólares americanos'] = "american dollars";

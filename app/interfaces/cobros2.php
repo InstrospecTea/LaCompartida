@@ -200,7 +200,6 @@ function GrabarCampo(accion,asunto,cobro,valor,id_moneda)
 
     function Cobrable(& $fila)
     {
-	    global $sesion;
 		global $id_cobro;
 		$checked = '';
 		if($fila->fields['id_cobro'] == $id_cobro and $id_cobro != '')
@@ -212,8 +211,6 @@ function GrabarCampo(accion,asunto,cobro,valor,id_moneda)
 
     function funcionTR(& $asunto)
     {
-        global $sesion;
-		
         static $i = 0;
 		
         if($i % 2 == 0)

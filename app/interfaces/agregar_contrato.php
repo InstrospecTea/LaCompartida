@@ -23,6 +23,7 @@ require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 $tip_tasa = __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
 $tip_suma = __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de ") . __("cobro") . __(" que no puede tener límites.");
 $tip_retainer = __("El cliente compra un número de HH. El límite puede ser por horas o por un monto.");
+	$tip_retainer_usuarios = __("Si usted selecciona usuarios en esta lista, las horas de estos usuarios se van a descontar de las horas retainer con preferencia");
 $tip_proporcional = __("El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.");
 $tip_flat = __("El cliente acuerda cancelar un <strong>monto fijo</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
 $tip_cap = __("Cap");
@@ -159,6 +160,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 	$retainer_horas = str_replace(',', '.', $retainer_horas); //en caso de usar comas en vez de puntos
 	$contrato->Edit("retainer_horas", $retainer_horas);
+		if( is_array($usuarios_retainer) )
+			$retainer_usuarios = implode(',',$usuarios_retainer);
+		else
+			$retainer_usuarios = $usuarios_retainer;
+		$contrato->Edit("retainer_usuarios", $retainer_usuarios);
 	$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
 	$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
 	$contrato->Edit("id_formato", $id_formato ? $id_formato : 'NULL');
@@ -189,6 +195,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("opc_ver_detalles_por_hora_importe", $opc_ver_detalles_por_hora_importe);
 	$contrato->Edit("opc_ver_descuento", $opc_ver_descuento);
 	$contrato->Edit("opc_ver_tipo_cambio", $opc_ver_tipo_cambio);
+		$contrato->Edit('opc_ver_valor_hh_flat_fee', $opc_ver_valor_hh_flat_fee);
 	$contrato->Edit("opc_ver_numpag", $opc_ver_numpag);
 	$contrato->Edit("opc_ver_carta", $opc_ver_carta);
 	$contrato->Edit("opc_papel", $opc_papel);
@@ -198,6 +205,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$contrato->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$contrato->Edit("opc_ver_cobrable", $opc_ver_cobrable);
+                $contrato->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable); 
 	if ($opc_restar_retainer) {
 		$contrato->Edit("opc_restar_retainer", $opc_restar_retainer);
 	}
@@ -590,36 +598,42 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		return true;
 	}
 
-	function SetFormatoRut()
-	{
-		var rut = $('rut').value;
+function SetFormatoRut()
+{
+	var rut = $('rut').value;
 		if( rut == "" )
 			return true;
-		while( rut.indexOf('.') != -1 )
-			rut = rut.replace('.','');
-		var con_raya = rut.indexOf('-');
-
-		if( con_raya != -1 )
-		{
-			var arr_rut = rut.split('-');
-			var rut = arr_rut[0];
-			var dv  = arr_rut[1];
-		}
-		else
-		{
-			var dv = rut.substr(rut.length-1);
-			var rut = rut.substr(0,rut.length-1);
-		}
-		var rut3 = rut.substr(rut.length-3,3);
-		var rut2 = rut.substr(rut.length-6,3);
-		var rut1 = rut.substr(0,rut.length-6);
-
-		if(rut.length > 6)
-			var rut = rut1 + '.' + rut2 + '.' + rut3 + '-' + dv;
-		else
-			var rut = rut2 + '.' + rut3 + '-' + dv;
-		$('rut').value = rut;
+	while( rut.indexOf('.') != -1 )
+		rut = rut.replace('.','');
+	var con_raya = rut.indexOf('-');
+	
+	if( con_raya != -1 )
+	{
+		var arr_rut = rut.split('-');
+		var rut = arr_rut[0];
+		var dv  = arr_rut[1];
 	}
+	else
+	{
+		var dv = rut.substr(rut.length-1);
+		var rut = rut.substr(0,rut.length-1);
+	}
+	var rut3 = rut.substr(rut.length-3,3);
+        if( rut.length >= 6 ) {
+            var rut2 = rut.substr(rut.length-6,3);
+            var rut1 = rut.substr(0,rut.length-6);
+        } else {
+            var rut2 = rut.substr(0,rut.length-3);
+        }
+	if(rut.length > 6)
+		var rut = rut1 + '.' + rut2 + '.' + rut3 + '-' + dv;
+	else if( rut.length > 3 )
+		var rut = rut2 + '.' + rut3 + '-' + dv;
+        else
+                var rut = rut3 + '-' + dv;
+                
+	$('rut').value = rut;
+}
 
 	function MuestraOculta(divID)
 	{
@@ -701,6 +715,8 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		div.style.display = "none";
 		div = $("div_escalonada");
 		div.style.display = "none";
+	div = $("div_retainer_usuarios");
+	div.style.display = "inline";
 		$('tabla_hitos').hide();
 	}
 	function ShowProporcional()
@@ -718,6 +734,8 @@ list($cant_encargados) = mysql_fetch_array($resp);
 		div = $("div_escalonada");
 		div.style.display = "none";
 		$('tabla_hitos').hide();
+	div = $("div_retainer_usuarios");
+	div.style.display = "none";
 	}
 	function ShowCap()
 	{
@@ -1046,7 +1064,7 @@ list($numero_cobro) = mysql_fetch_array($resp);
 
 		for(i=1;i<=cant_cobros;i++)
 		{
-			var dia=parseInt(fecha_inicio[0]);
+		var dia=parseInt(fecha_inicio[0]*1);
 			if(i==1)
 			{
 				$('valor_fecha_1').value=$('periodo_fecha_inicio').value;
@@ -1656,7 +1674,7 @@ if (!$contrato->loaded()) {
                                 <?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
 				</td>
 				<td align="left" width = '70%'>
-                                    <?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', 'onchange="CambioEncargado()"', "Vacio", "200"); ?>
+<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', 'onchange="CambioEncargado()"', "Vacio", "200"); ?>
 				</td>
 			</tr>
 			<?
@@ -1969,6 +1987,10 @@ if (!$contrato->fields['forma_cobro'])
 	$contrato_forma_cobro = 'TASA';
 else
 	$contrato_forma_cobro = $contrato->fields['forma_cobro'];
+					
+				// Setear valor del multiselect por de usuarios retainer
+				if( !is_array($usuarios_retainer) )
+					$usuarios_retainer = explode(',',$contrato->fields['retainer_usuarios']);
 ?>
 						<td align="left" style="font-size:10pt;">
 							<div id="div_cobro" align="left">
@@ -1999,12 +2021,20 @@ else
 	echo $obligatorio ?>
 									&nbsp;<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"', '', "80"); ?>
 								</div>
-								<div id="div_horas" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
+						<div id="div_horas" align="left" style="display:none; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 									&nbsp;<?= __('Horas') ?>
 									<?php if ($validaciones_segun_config)
 										echo $obligatorio ?>
-									&nbsp;<input name=retainer_horas size="7" value="<?= $contrato->fields['retainer_horas'] ?>" />
-								</div>
+							&nbsp;<input name=retainer_horas size="7" value="<?= $contrato->fields['retainer_horas'] ?>" style="vertical-align: top;" />
+							<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se 
+									 desuentan las horas con preferencia -->
+							<? if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RetainerUsuarios') ) { ?>
+							<div id="div_retainer_usuarios" style="display:inline; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
+								&nbsp;<?=__('Usuarios')?>
+								&nbsp;<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer,  TTip($tip_retainer_usuarios)." class=\"selectMultiple\" multiple size=5 ","","160"); ?> 
+							</div>
+							<? } ?>
+						</div>
 								<div id="div_fecha_cap" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;">
 									<table style='border: 0px solid' bgcolor='#C6DEAD'>
 <? if ($cobro) { ?>
@@ -2060,7 +2090,7 @@ else
 										</table>
 										<div onclick="agregar_eliminar_escala('escalon_2')" style="cursor:pointer;" >
 											<span id="escalon_2_img"><?php echo !isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] <= 0 ? '<img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"> ' . __('Agregar')  : '<img src="' . Conf::ImgDir() . '/menos.gif" border="0" id="datos_cobranza_img"> ' . __('Eliminar') ?>	</span>	
-										</div>
+							</div>
 									</div>
 									<div class="template_escalon" id="escalon_2" style="display: <?php echo isset($contrato->fields['esc2_tiempo']) && $contrato->fields['esc2_tiempo'] > 0 ? 'block' : 'none'; ?>;">
 										<table style='padding: 5px; border: 0px solid' bgcolor='#C6DEAD'>
@@ -2624,6 +2654,10 @@ if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPo
 					<td align="right" colspan='1'><input type="checkbox" name="opc_ver_numpag" value="1" <?= $contrato->fields['opc_ver_numpag'] == '1' ? 'checked="checked"' : '' ?> /></td>
 					<td align="left" colspan='5'><?= __('Mostrar números de página') ?></td>
 				</tr>
+                <tr>        
+                        <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?=$contrato->fields['opc_ver_columna_cobrable']=='1'?'checked':''?>></td>
+                        <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?=__('Mostrar columna cobrable')?></label></td>
+                </tr> <!-- Andres Oestemer -->
 <?php
 if (method_exists('Conf', 'GetConf')) {
 	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');

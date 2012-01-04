@@ -1,8 +1,7 @@
 <?
  require_once dirname(__FILE__).'/../conf.php';
- require_once dirname(__FILE__).'/en.php';
+ require_once dirname(__FILE__).'/es.php';
  
-	$_LANG['Ordenado Por'] = "Requested By";
         $_LANG['Sr.'] = "Sr.";
         $_LANG['Sra.'] = "Sra.";
         $_LANG['Srta.'] = "Srta.";

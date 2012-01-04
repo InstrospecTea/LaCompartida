@@ -183,7 +183,7 @@
 			$this->nueva_pagina = true;
 		}
 
-		function getDatos($tipo_dato, $fecha_desde, $fecha_hasta, $detalles=false, $vista='mes-glosa_cliente', $campo_fecha='trabajo')
+		function getDatos($tipo_dato, $fecha_desde, $fecha_hasta, $detalles=false, $vista='mes_reporte-glosa_cliente', $campo_fecha='trabajo')
 		{
 			$reporte = new Reporte($this->sesion);
 			$reporte->id_moneda = $this->id_moneda;
@@ -193,7 +193,7 @@
 			$reporte->setCampoFecha($campo_fecha);
 			if($this->areas_excluidas[0])
 				foreach($this->areas_excluidas as $area)
-					$reporte->addFiltro('asunto', 'id_area_proyecto', $area, false);
+					$reporte->addFiltro('asunto', 'id_area_proyecto', $area, false);		
 			$reporte->Query();
 			if($detalles)
 				return $reporte->toBars();

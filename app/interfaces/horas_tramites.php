@@ -45,15 +45,15 @@ $pagina->PrintTop();
 </script>
 <?
 
-    if($estado == "")
+    if ($estado == "") {
         $estado = "abiertos";
+	}
     
-    if($from == 'cliente')
+    if ($from == 'cliente') {
     	$url_iframe = 'listar_tramites.php?popup=1&id_usuario='.$id_usuario.'&codigo_cliente='.$codigo_cliente.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin).'&id_grupo='.$id_grupo.'&clientes='.$clientes.'&usuarios='.$usuarios;
-    elseif($from == 'asunto')
+	} else if ($from == 'asunto') {
     	$url_iframe = 'listar_tramites.php?popup=1&id_usuario='.$id_usuario.'&codigo_cliente='.$codigo_cliente.'&codigo_asunto='.$codigo_asunto.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin);
-	elseif($from == 'reporte')
-	{
+	} else if ($from == 'reporte') {
     	$url_iframe = 'listar_tramites.php?popup=1&opc=buscar&from=reporte';
 		$url_iframe .= $id_usuario? "&id_usuario=".$id_usuario:'';
 		$url_iframe .= $usuarios? "&usuarios=".$usuarios:'';
@@ -68,14 +68,10 @@ $pagina->PrintTop();
 		$url_iframe .= $lis_usuarios? "&lis_usuarios=".$lis_usuarios:'';
 		$url_iframe .= $lis_clientes? "&lis_clientes=".$lis_clientes:'';
 		$url_iframe .= $campo_fecha? "&campo_fecha=".$campo_fecha:'';
-	}
-    elseif($from == 'horas')
-    {
+	} else if ($from == 'horas') {
     	$id_usuario = $sesion->usuario->fields['id_usuario'];
     	$url_iframe = "listar_tramites.php?popup=1&id_usuario=".$id_usuario."&codigo_cliente=".$codigo_cliente."&opc=buscar";
-    }
-	else
-	{
+    } else {
     	$id_usuario = $sesion->usuario->fields['id_usuario'];
     	$url_iframe = "listar_tramites.php?popup=1&id_usuario=".$id_usuario."&motivo=horas";
     }

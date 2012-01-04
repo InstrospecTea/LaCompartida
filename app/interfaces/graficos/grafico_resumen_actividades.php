@@ -1,4 +1,5 @@
 <?php
+
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
 require_once "../../../fw/classes/Utiles.php";

@@ -381,7 +381,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		}
 	} else {
 		$decimales_total = '';
-	}
+	} 
 	$formato_moneda = & $wb->addFormat(array('Size' => 10,
 				'VAlign' => 'top',
 				'Align' => 'right',
@@ -478,7 +478,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
             $asunto->LoadByCodigo($Cobro->asuntos[$k]);
             $glosa_asuntos[] = $asunto->fields['glosa_asunto'];
 	}
-        
+       
         //Agrega una nueva linea en el caso que los asuntos se pasen del largo de la hoja
         $sum_largos = 0;
         $largo_hoja = 78;

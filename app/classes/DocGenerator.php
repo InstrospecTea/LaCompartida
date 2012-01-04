@@ -58,7 +58,7 @@ class DocGenerator
 	 * @param $headerMargin: margen del encabezado del documento, en centímetros
 	 * @param $footerMargin: margen del pie de página del documento, en centímetros
 	 */
-	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25)
+	function DocGenerator($html='', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado='EMITIDO', $id_formato='', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25, $lang = null)
 	{
 		global $desde;
 
@@ -96,6 +96,7 @@ class DocGenerator
 
 		$this->numImages =0;
 		$this->estado=$estado;
+		$this->lang=$lang;
 
 		$this->configuracion=$configuracion;
 
@@ -255,7 +256,7 @@ class DocGenerator
 		else
 		{
 			$this->formatBuffer .= "   mso-header: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
-			$this->formatBuffer .= "	 mso-footer: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') f1;\r\n";
+			$this->formatBuffer .= "	 mso-footer: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
 		}
 		$this->formatBuffer .= "}\r\n";
 		$this->formatBuffer .= "div.$sessionName\r\n";

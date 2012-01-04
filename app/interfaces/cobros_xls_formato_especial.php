@@ -411,7 +411,7 @@
 								'Color' => 'black',
 								'NumFormat' => 0));
 
-
+/*
 	// Agregar una segunda hoja con el código copiado directamente de cobros3.xls.php
 	// Muestra el detalle de trabajos del cobro.
 	$ws =& $wb->addWorksheet(__('Revision horas'));
@@ -583,6 +583,6 @@
 			$ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
 			$ws->writeFormula($fila_inicial+$i, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada".($fila_inicial+1).":$col_formula_duracion_cobrada".($fila_inicial+$i).")", $time_format);
 		}
-
+*/
 	$wb->close();
 ?>

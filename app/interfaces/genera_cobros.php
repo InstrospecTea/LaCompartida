@@ -266,7 +266,6 @@ function GeneraCobros(form, desde, opcion)
 		text_window += '<br><br><span style="font-size:12px; text-align:center; color:#FF0000;"><?=__('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos')?></span><br>';
 		text_window += '<br><span style="font-size:12px; text-align:center;font-weight:bold"><?=__('¿Desea generar los borradores?')?></span><br><br>';
 		text_window += '<input type="radio" name="radio_generacion" id="radio_wip" checked /><?=__('WIP') . __(', se incluirán horas hasta el')?> '+$('fecha_fin').value+'<br>';
-		text_window += '<input type="radio" name="radio_generacion" id="radio_programado" /><?=__('Cobros Programados')?><br>';
 <?
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SoloGastos') ) || ( method_exists('Conf','SoloGastos') && Conf::SoloGastos() ) )
 		{
@@ -293,9 +292,6 @@ function GeneraCobros(form, desde, opcion)
 <?
 		}
 ?>
-				if($('radio_programado').checked==true)
-					form.action = 'genera_cobros_guarda.php?programados=1';
-				else
 					form.action = 'genera_cobros_guarda.php';
 
 				form.submit();

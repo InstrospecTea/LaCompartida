@@ -125,6 +125,12 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			#Buscar nuevo numero por la factura y ocupalo dentro de la tabla cobros
 			$cobro->Edit('documento', '');
 			$cobro->Edit('facturado', 0);
+			if( $cobro->fields['estado'] == 'FACTURADO' ) {
+				$estado = 'EMITIDO';
+				$cambiar_estado = true;
+				$fecha_facturacion = '';
+				$cobro->Edit('fecha_facturacion', $fecha_facturacion);
+			}
 			$cobro->Write();
 			$factura->Edit('anulado', 1);
 			if ($factura->Escribir())
@@ -153,17 +159,23 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		$factura->Edit('codigo_cliente', $cobro->fields['codigo_cliente']);
 		$factura->Edit('direccion_cliente', $contrato->fields['factura_direccion']);
 		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() )) {
-			$factura->Edit('subtotal', number_format($documento_cobro->fields['subtotal_honorarios'], $moneda_factura->fields['cifras_decimales'], ".", ""));
-			$factura->Edit('subtotal_gastos', number_format($documento_cobro->fields['subtotal_gastos'], $moneda_factura->fields['cifras_decimales'], ".", ""));
-			$factura->Edit('descuento_honorarios', number_format($documento_cobro->fields['descuento_honorarios'], $moneda_factura->fields['cifras_decimales'], ".", ""));
-			$factura->Edit('subtotal_sin_descuento', number_format($documento_cobro->fields['subtotal_sin_descuento'], $moneda_factura->fields['cifras_decimales'], ".", ""));
+			$factura->Edit('subtotal', number_format(!empty($documento_cobro->fields['subtotal_honorarios']) ? $documento_cobro->fields['subtotal_honorarios'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
+			$factura->Edit('subtotal_gastos', number_format(!empty($documento_cobro->fields['subtotal_gastos']) ? $documento_cobro->fields['subtotal_gastos'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
+			$factura->Edit('descuento_honorarios', number_format(!empty($documento_cobro->fields['descuento_honorarios']) ? $documento_cobro->fields['descuento_honorarios'] : '0' , $moneda_factura->fields['cifras_decimales'], ".", ""));
+			$factura->Edit('subtotal_sin_descuento', number_format(!empty($documento_cobro->fields['subtotal_sin_descuento']) ? $documento_cobro->fields['subtotal_sin_descuento'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
 		}
 		else {
-			$factura->Edit('subtotal', number_format(($documento_cobro->fields['honorarios'] - $documento_cobro->fields['impuesto']), $decimales_base, ".", ""));
+                                $factura->Edit('subtotal',number_format(($documento_cobro->fields['honorarios']-$documento_cobro->fields['impuesto']),$moneda_factura->fields['cifras_decimales'],".","")); 
 		}
-		$factura->Edit('iva', number_format($documento_cobro->fields['impuesto'], $decimales_base, ".", ""));
-		$factura->Edit('total', number_format($documento_cobro->fields['honorarios'] + $documento_cobro->fields['gastos'], $decimales_base, ".", ""));
+                $factura->Edit('iva',number_format($documento_cobro->fields['impuesto'],$moneda_factura->fields['cifras_decimales'],".","")); 
+                $factura->Edit('total',number_format($documento_cobro->fields['honorarios']+$documento_cobro->fields['gastos'],$moneda_factura->fields['cifras_decimales'],".","")); 
 
+		$estado = 'FACTURADO';
+		$cambiar_estado = false;
+        if( $cobro->fields['estado'] != 'FACTURADO' ) {
+            $cambiar_estado = true;
+        }
+		$cobro->Edit('fecha_facturacion',date('Y-m-d H:i:s'));
 		$cobro->Edit('facturado', 1);
 		if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			$query_lista_docLegalesActivos = "SELECT
@@ -182,7 +194,12 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			$resp_lista_docLegalesActivos = mysql_query($query_lista_docLegalesActivos, $sesion->dbh) or Utiles::errorSQL($resp_lista_docLegalesActivos, __FILE__, __LINE__, $sesion->dbh);
 			list($lista_facturasActivas, $lista_NotaCreditoActivas) = mysql_fetch_array($resp_lista_docLegalesActivos);
 			$cobro->Edit('documento', $lista_facturasActivas);
-			if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() ))
+			$estado = 'FACTURADO';
+                        $cambiar_estado = false;
+                        if( $cobro->fields['estado'] != 'FACTURADO' ) {
+                            $cambiar_estado = true;
+                        }
+                        if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() ))
 				$cobro->Edit('nota_cobro', $lista_NotaCreditoActivas);
 		}
 		else {
@@ -274,17 +291,30 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 }
 
 if ($opc == 'guardar') {
+	if( !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
+		if ($facturado == 1 ) {
+			if( !$cobro->fields['fecha_facturacion'] )
+				$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
+			$cobro->Edit('facturado', $facturado );
+			$estado = 'FACTURADO';
+		} else {
+			$cobro->Edit('facturado', '0');
+			if( $cobro->fields['estado'] == 'FACTURADO' ) {
+				$estado = 'EMITIDO';
+				$fecha_facturacion = '';
+			}
+		}
+	}
+	
 	$cambiar_estado = false;
 	if ($estado != $cobro->fields['estado'])
 		$cambiar_estado = true;
 
-	if ($facturado == 1 && !$cobro->fields['fecha_facturacion'])
-		$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
-
-	$cobro->Edit('facturado', $facturado ? $facturado : 0);
 	$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 	$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
 	$cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
+        $cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
+        $cobro->Edit('fecha_facturacion', $fecha_facturacion ? Utiles::fecha2sql($fecha_facturacion) : '');
 
 	$cobro->SetPagos($honorarios_pagados, $gastos_pagados);
 	//Ahora hay que revisar que no se haya pasado a PAGADO, cambiando estado a PAGADO (por Historial).
@@ -293,8 +323,8 @@ if ($opc == 'guardar') {
 
 	$cobro->Edit('forma_envio', $forma_envio);
 
-	if (!( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) && !( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
-		if (UtilesApp::GetConf($sesion, 'PermitirFactura')) {
+	if ( !UtilesApp::GetConf($sesion,'UsaNumeracionAutomatica') ) {
+		if( UtilesApp::GetConf($sesion,'PermitirFactura') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 			$factura->Edit('numero', $documento);
 			$factura->Escribir();
 		}
@@ -377,6 +407,8 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit('id_carta', $id_carta);
 	$cobro->Edit('id_formato', $id_formato);
 	$cobro->Edit('codigo_idioma', $lang);
+                $cobro->Edit("opc_ver_columna_cobrable",$opc_ver_columna_cobrable); 
+                
 	if ($cobro->Write()) {
 		if ($opc == 'grabar_documento' || $opc == 'grabar_documento_pdf') {
 			include dirname(__FILE__) . '/cobro_doc.php';
@@ -423,6 +455,8 @@ elseif ($opc == 'descargar_excel' || $opc == 'descargar_excel_especial') {
 	$cobro->Edit('id_carta', $id_carta);
 	$cobro->Edit('id_formato', $id_formato);
 	$cobro->Edit('codigo_idioma', $lang);
+                
+                $cobro->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable); 
 	if ($cobro->Write()) {
 		$desde_cobros_emitidos = true;
 		/*
@@ -644,7 +678,12 @@ function Informar(form,valor)
 
 			if( form.estado.value == 'EN REVISION' ) //Significa que estoy anulando la emisión
 			{
-				if(!confirm('<?= __("¿Está seguro que requiere anular la emisión de este cobro?") ?>'))
+				if( form.existe_pago.value == 1 ) {
+					var texto = '¡Este cobro tiene pagos asociados! ';
+				} else if( form.existe_factura.value == 1 ) {
+					var texto = '¡Este cobro tiene facturas esociados! ';
+				}
+				if(!confirm( texto + '<?= __("¿Está seguro que requiere anular la emisión de este cobro?") ?>'))
 				return false;
 				else
 				{
@@ -1249,6 +1288,10 @@ else
 													<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?= $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?= __('Mostrar números de página') ?></label></td>
 												</tr>
+                                        <tr>        
+						<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?=$cobro->fields['opc_ver_columna_cobrable']=='1'?'checked':''?>></td>
+						<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?=__('Mostrar columna cobrable')?></label></td>
+					</tr> <!-- Andres Oestemer -->
 <?
 if (method_exists('Conf', 'GetConf'))
 	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -1289,11 +1332,11 @@ elseif ($solicitante == 2) { // opcional
 												</tr>
 <? if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ResumenProfesionalVial') ) || ( method_exists('Conf', 'ResumenProfesionalVial') && Conf::ResumenProfesionalVial() )) { ?>
 													<tr>
-														<td align="right"><input type="checkbox" name="opc_restar_retainer" id="opc_restar_retainer" value="1"  <?= $cobro->fields['opc_restar_retainer'] == '1' ? 'checked="checked"' : '' ?>></td>
+						<td align="right"><input type="checkbox" name="opc_restar_retainer" id="opc_restar_retainer" value="1" onclick="ActivaCarta(this.checked)" <?=$cobro->fields['opc_restar_retainer']=='1'?'checked="checked"':''?>></td>
 														<td align="left" style="font-size: 10px;"><label for="opc_restar_retainer"><?= __('Restar valor retainer') ?></label></td>
 													</tr>
 													<tr>
-														<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" id="opc_ver_detalle_retainer" value="1"  <?= $cobro->fields['opc_ver_detalle_retainer'] == '1' ? 'checked="checked"' : '' ?>></td>
+						<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" id="opc_ver_detalle_retainer" value="1" onclick="ActivaCarta(this.checked)" <?=$cobro->fields['opc_ver_detalle_retainer']=='1'?'checked="checked"':''?>></td>
 														<td align="left" style="font-size: 10px;"><label for="opc_ver_detalle_retainer"><?= __('Mostrar detalle retainer') ?></label></td>
 													</tr>
 												<? } ?>
@@ -1923,7 +1966,8 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		<? } ?>
 											</td>
 										</tr>
-												<? if (( empty($id_factura) || $factura->fields['anulado'] == 1 ) && ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'PermitirFactura') ) || ( method_exists('Conf', 'PermitirFactura') && Conf::PermitirFactura() ) )) { ?>
+						<?	if( !$cobro->TieneFacturaActivoAsociado() && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura') ) || ( method_exists('Conf','PermitirFactura') && Conf::PermitirFactura() ) ) ) 
+									{ ?>
 											<tr>
 												<td align="center" colspan=3>
 													<a href='#' onclick="ValidarFactura(this.form,'','generar');" >Generar Factura</a>

@@ -43,7 +43,6 @@ class Alerta {
 
 	function AlertaAsunto($id_asunto) {
 		$asunto = new Asunto($this->sesion);
-		$cobro = new Cobro($this->sesion);
 		$asunto->Load($id_asunto);
 
 		$query = "SELECT id_contrato FROM asunto WHERE id_asunto='$id_asunto'";
@@ -218,7 +217,20 @@ class Alerta {
 		list($horas_mes) = mysql_fetch_array($resp);
 		return $horas_mes;
 	}
+		
+	function enviarAvisoCobrosProgramados( $mensajes, $sesion )
+	{
+		$from = Conf::AppName();
 
+		if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MailAdmin') != '' )
+		{
+			$to = Conf::GetConf($sesion,'MailAdmin'); // Mail al admin
+		}
+
+		foreach( $mensajes as $id_usuario => $mensaje )
+		{
+			Utiles::Insertar( $sesion, "Aviso $from", $mensaje, $to, "Administrador");
+		}
+	}
 }
-
 ?>

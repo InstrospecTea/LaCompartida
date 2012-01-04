@@ -91,10 +91,26 @@ class Funciones
 	
 		$query = "SELECT tarifa FROM tramite_valor JOIN tramite_tarifa ON tramite_valor.id_tramite_tarifa=tramite_tarifa.id_tramite_tarifa
 							WHERE id_tramite_tipo='$id_tramite_tipo' AND id_moneda='$id_moneda' AND tramite_valor.id_tramite_tarifa='$id_tramite_tarifa'";
+		
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		$checktarifa = mysql_num_rows($resp);
+		if( $checktarifa > 0 ) {
 		$arreglo = mysql_fetch_array($resp);
+			return $arreglo['tarifa'];
+		} else {
+			$query = "SELECT MAX( tv.tarifa * mon.tipo_cambio / montram.tipo_cambio ) as valor_tramite
+						FROM tramite_tarifa tt 
+						JOIN tramite_valor tv ON ( tv.id_tramite_tarifa=tt.id_tramite_tarifa)
+						JOIN prm_moneda mon ON ( tv.id_moneda = mon.id_moneda )
+						JOIN prm_moneda montram ON ( montram.id_moneda = '$id_moneda' )
+						WHERE tv.id_tramite_tipo = '$id_tramite_tipo'
+						  AND tv.id_tramite_tarifa = '$id_tramite_tarifa'
+						GROUP BY tv.id_tramite_tipo;";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$arreglo = mysql_fetch_array($resp);
+			return $arreglo['valor_tramite'];
+		}
 
-		return $arreglo[tarifa];
 	}
 
 	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda. 

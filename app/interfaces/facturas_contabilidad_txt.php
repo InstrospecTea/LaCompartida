@@ -5,6 +5,8 @@ $nombre = __('Archivo_Contabilidad');
 header('Content-type: text/plain');
 header('Content-Disposition: attachment; filename="' . $nombre . '.txt"');
 
+$MARCA_CONTABILIDAD = 'INFORMADO A CONTABILIDAD';
+
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
@@ -89,18 +91,15 @@ if ($where == '') {
 		$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
 	}
 
-	if ($id_cia && UtilesApp::GetConf($sesion, 'dbUser') == "rebaza") {
-		$where .= " AND factura.id_cia = '$id_cia' ";
-	}
 	if ($razon_social) {
 		$where .= " AND factura.cliente LIKE '%$razon_social%'";
 	}
 	if ($descripcion_factura) {
 		$where .= " AND (factura.descripcion LIKE '%$descripcion_factura%' OR factura.descripcion_subtotal_gastos LIKE '%$descripcion_factura%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%$descripcion_factura%')";
 	}
-	if (isset($desde_asiento_contable) && is_numeric($desde_asiento_contable)) {
-		$where .= " AND factura.asiento_contable >= $desde_asiento_contable";
-	}
+	// Para evitar enviar los informados anteriormente
+	$where .= " AND factura.numero != ''";
+	$where .= " AND factura.observacion_adicional NOT LIKE '$MARCA_CONTABILIDAD'";
 } else {
 	$where = base64_decode($where);
 }
@@ -125,7 +124,6 @@ $query .= "				, '' glosa_asunto
 						, factura.RUT_cliente
 						, prm_moneda.simbolo
 						, prm_moneda.cifras_decimales
-						, prm_moneda.tipo_cambio
 						, factura.id_moneda
 						, factura.honorarios
 						, factura.subtotal_gastos
@@ -142,6 +140,7 @@ $query .= "				, '' glosa_asunto
 						, prm_estado_factura.codigo as estado
 						, prm_estado_factura.glosa as estado_glosa
 						, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+						, cobro_moneda.tipo_cambio
 					FROM factura
 					JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 					JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -152,10 +151,12 @@ $query .= "				, '' glosa_asunto
 					LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 					LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
+					LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro = cobro.id_cobro AND cobro_moneda.id_moneda = 2
 					WHERE $where";
 $lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 if ($lista_suntos_liquidar->num == 0) {
-	$pagina->FatalError('No existe información con este criterio');
+	echo 'No existen facturas con este criterio o ya se encuentran todas informadas.';
+	exit;
 }
 
 $fecha_actual = date('Y-m-d');
@@ -271,6 +272,7 @@ $formato_linea = '02'
  * Fin configuraciones
  */
 
+$facturas_para_marcar = array();
 
 // Escribir filas
 $mes = 0;
@@ -278,6 +280,10 @@ $variable = false;
 for ($j = 0; $j < $lista_suntos_liquidar->num; $j++) {
 
 	$documento = $lista_suntos_liquidar->Get($j);
+
+	if (isset($documento->fields['id_factura'])) {
+		$facturas_para_marcar[] = $documento->fields['id_factura'];
+	}
 
 	// Datos
 	$fecha_impresion = $documento->fields['fecha'];
@@ -287,7 +293,7 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; $j++) {
 	$nuevo_mes = intval($nueva_fecha[1]);
 
 	// Correlativo, de acuerdo al algoritmo extraño de PRC
-	$correlativo = $documento->fields['asiento_contable'];
+	$correlativo = $desde_asiento_contable++; //$documento->fields['asiento_contable'];
 
 	// Si la moneda es soles, al centro de costo 12111, sino al 12112
 	// Nuevo cambio 12111 -> 12131, 12112 -> 12132
@@ -497,7 +503,12 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; $j++) {
 //	}
 }
 
+// Actualizar los documentos legales informados
+if (count($facturas_para_marcar) > 0) {
+	$sql = "UPDATE factura SET observacion_adicional = '$MARCA_CONTABILIDAD' ";
+	$sql.= "WHERE id_factura IN (" . implode(',', $facturas_para_marcar) . ");";
 
+	mysql_query($sql, $sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $sesion->dbh);
+}
 
 exit;
-?>

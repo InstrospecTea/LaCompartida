@@ -65,16 +65,22 @@
 		if($solo_gastos && Conf::CSSSoloGastos())
 			$css_cobro=2;
 	}
+	
+	if( empty( $cobro->fields['id_formato'] ) ) {
+		$id_formato = $css_cobro;
+	} else {
+		$id_formato = $cobro->fields['id_formato'];
+	}
 
 	#$cobro->GuardarCobro();
 
-	$html .= $cobro->GeneraHTMLCobro(false,$cobro->fields['id_formato']);
+	$html .= $cobro->GeneraHTMLCobro(false,$id_formato);
 	$cssData = UtilesApp::TemplateCartaCSS($sesion,$cobro->fields['id_carta']);
-	$cssData .= UtilesApp::CSSCobro($sesion,$cobro->fields['id_formato']);
+	$cssData .= UtilesApp::CSSCobro($sesion,$id_formato);
 	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $sesion, $cobro->fields['id_carta']);
 	
 	// margenes 1.5, 2.0, 2.0, 2.0
-	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $cobro->fields['id_formato'], '',$docm_header, $docm_footer);
+	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang);
 	$valor_unico=substr(time(),-3);
 
 	//echo '<style>'.$cssData.'</style>'.$html;
@@ -576,6 +582,7 @@
 			$html = str_replace('%descripcion%',__('Descripción'), $html);
 			$html = str_replace('%profesional%',__('Profesional'), $html);
 			$html = str_replace('%duracion%',__('Duración'), $html);
+                        $html = str_replace('%cobrable%',__('Cobrable'), $html);        
 			$html = str_replace('%valor%',__('Valor'), $html);
 			break;
 		case 'TRABAJOS_FILAS':
@@ -622,6 +629,12 @@
 				$row = str_replace('%descripcion%', $trabajo->fields['descripcion'], $row);
 				$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
 				$row = str_replace('%duracion%', $h.':'.$m, $row);
+                                
+                                if ( $trabajo->fields['cobrable'] == 1 )  
+                                    $row = str_replace( '%cobrable%' , __('Si'), $row );  
+                                else
+                                    $row = str_replace( '%cobrable%' , __('No'), $row );
+                                
 				$row = str_replace('%valor%', $trabajo->fields['monto_cobrado']>0 ? number_format($trabajo->fields['monto_cobrado'],$moneda->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']):'---', $row);
 				$html .= $row;
 			}

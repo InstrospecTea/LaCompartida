@@ -284,6 +284,8 @@ $col=0;
 		$ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_mail_contacto, $row['email_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_dir_contacto, $row['direccion_contacto'], $f4);
+                $ws1->write($fila_inicial, $col_fecha_creacion, $row['fecha_creacion'], $f4);
+                $ws1->write($fila_inicial, $col_fecha_inactivo, $row['fecha_inactivo'], $f4);
 		
 		// Nueva columna estado del cliente
 		$ws1->write($fila_inicial, $col_estado, ($row['activo'] == 1 ? __('Si') : __('No')), $f4);

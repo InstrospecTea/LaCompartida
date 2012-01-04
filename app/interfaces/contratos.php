@@ -208,7 +208,6 @@ if($codigo_cliente)
 	}
 	function Cobrable(& $fila)
 	{
-	    global $sesion;
         global $id_cobro;
         $checked = '';
 

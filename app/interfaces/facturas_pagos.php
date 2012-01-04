@@ -19,7 +19,7 @@ $pagina = new Pagina($Sesion);
 
 $factura = new Factura($Sesion);
 
-$series_documento = new DocumentoLegalNumero($sesion);
+$series_documento = new DocumentoLegalNumero($Sesion);
 
 if ($id_factura != "") {
 	$factura->Load($id_factura);
@@ -341,9 +341,6 @@ function SaldoPago(& $fila) {
 }
 
 function Opciones(& $fila) {
-	global $where;
-	global $Sesion;
-
 	$id_factura_pago = $fila->fields['id_factura_pago'];
 	$codigo_cliente = $fila->fields['cliente_pago'];
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
@@ -352,8 +349,6 @@ function Opciones(& $fila) {
 }
 
 function Cobro(& $fila) {
-	global $Sesion;
-
 	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',950,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a>";
 }
 
@@ -369,7 +364,6 @@ function GlosaCliente(& $fila) {
 
 function funcionTR(& $fila) {
 	global $Sesion;
-	global $id_cobro;
 	static $i = 0;
 
 	$idioma = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
@@ -386,10 +380,8 @@ function funcionTR(& $fila) {
 	$formato_fechas = UtilesApp::ObtenerFormatoFecha($Sesion);
 
 	$html .= "<tr id=\"t" . $fila->fields['id_factura'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
-	$glosa_tramite = $tramite->fields['glosa_tramite'];
 	$html .= "<td align=left>" . Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas, '-') . "</td>";
 	$html .= "<td align=left>" . $fila->fields['tipo'] . "</td>";
-	$factura_ = new Factura($Sesion);
 	$html .= "<td align=right>#" . NumeroFactura(& $fila, $Sesion) . "&nbsp;</td>";
 	$html .= "<td align=left>" . GlosaCliente(& $fila) . "</td>";
 	$html .= "<td align=right>" . Glosa_asuntos(& $fila, $Sesion) . "</td>";

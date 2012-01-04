@@ -38,6 +38,6 @@ function CheckAll($id_cobro, $codigo_cliente)
          $query_insert = "INSERT INTO cobro_asunto SET id_cobro='$id_cobro', codigo_asunto = '$codigo_asunto', id_moneda = '$id_moneda'
                           ON DUPLICATE KEY UPDATE id_cobro='$id_cobro', codigo_asunto = '$codigo_asunto', id_moneda = '$id_moneda'";
 
-         $result = mysql_query($query_insert);
+         mysql_query($query_insert);
       }
 }

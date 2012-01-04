@@ -13,14 +13,14 @@
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
-
+	
 	 set_time_limit(300);
-
+	 
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	if($xls)
-	{
+	{ 
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
@@ -83,7 +83,7 @@
 
 		// Generar formatos para los distintos tipos de moneda
 		$formatos_moneda = array();
-		$query = 'SELECT id_moneda, simbolo, cifras_decimales
+		$query = 'SELECT id_moneda, simbolo, cifras_decimales 
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -132,6 +132,7 @@
 			$col_nota_cobro = ++$col;
 		$col_factura = ++$col;
 		$col_fecha_emision = ++$col;
+		$col_grupo_cliente = ++$col;
 		$col_cliente = ++$col;
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 		{
@@ -146,6 +147,7 @@
 		$col_fecha_ultimo_trabajo = ++$col;
 		$col_horas_trabajadas = ++$col;
 		$col_horas_cobradas = ++$col;
+		$col_honorarios_original = ++$col;
 		$col_total_cobro_original = ++$col;
 		if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
 			$col_total_con_iva = ++$col;
@@ -177,12 +179,13 @@
 			}
 		else
 			$col_formula_total_cobro = Utiles::NumToColumnaExcel($col_total_cobro);
-
+		
 		$ws1->setColumn($col_numero_cobro, $col_numero_cobro, 15);
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 			$ws1->setColumn($col_nota_cobro, $col_nota_cobro, 15);
 		$ws1->setColumn($col_factura, $col_factura, 15);
 		$ws1->setColumn($col_fecha_emision, $col_fecha_emision, 16);
+		$ws1->setColumn($col_grupo_cliente, $col_grupo_cliente, 30);
 		$ws1->setColumn($col_cliente, $col_cliente, 40);
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 		{
@@ -197,6 +200,7 @@
 		$ws1->setColumn($col_fecha_ultimo_trabajo, $col_fecha_ultimo_trabajo, 25);
 		$ws1->setColumn($col_horas_trabajadas, $col_horas_trabajadas, 17);
 		$ws1->setColumn($col_horas_cobradas, $col_horas_cobradas, 15);
+		$ws1->setColumn($col_honorarios_original, $col_honorarios_original, 22);
 		$ws1->setColumn($col_total_cobro_original, $col_total_cobro_original, 22);
 		$ws1->setColumn($col_honorarios, $col_honorarios, 22); // Los trámites están incluídos aqu.
 		$ws1->setColumn($col_gastos, $col_gastos, 22);
@@ -216,7 +220,7 @@
 		$ws1->setColumn($col_fecha_facturacion, $col_fecha_facturacion, 17);
 		$ws1->setColumn($col_fecha_envio_a_cliente, $col_fecha_envio_a_cliente, 17);
 		$ws1->setColumn($col_fecha_pago, $col_fecha_pago, 13);
-
+		
 		++$filas;
 		$ws1->write($filas, $col_numero_cobro, __('REPORTE LIQUIDACIONES'), $encabezado);
 		$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_numero_cobro+2);
@@ -319,43 +323,44 @@
 		}
 		$filas +=4;
 		$tabla_creada=false;
-		$query = "SELECT
-								cobro.fecha_creacion,
-								cliente.glosa_cliente,
-								CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre,
-								usuario.username as username,
-								CONCAT(usuario_secundario.nombre,' ', usuario_secundario.apellido1) AS nombre_secundario,
-								usuario_secundario.username as username_secundario,
-								cobro.saldo_final_gastos * (cobro_moneda.tipo_cambio /cambio.tipo_cambio)*-1 as gastos,
-								cobro.estado,
-								cobro.id_cobro,
-								prm_moneda_cobro.simbolo,
-								prm_moneda_titulo.glosa_moneda,
-								cobro.monto,
-								cobro.monto_subtotal,
-								prm_moneda_cobro.cifras_decimales,
-								cobro.tipo_cambio_moneda,
-								cambio.tipo_cambio,
-								cobro.id_moneda_monto as id_moneda_monto,
-								prm_moneda_titulo.cifras_decimales as cifras_decimales_titulo,
-								cobro.fecha_emision,
-								cobro.forma_cobro,
-								cobro.porcentaje_impuesto,
+		$query = "SELECT 
+								cobro.fecha_creacion, 
+								cliente.glosa_cliente, 
+								grupo_cliente.glosa_grupo_cliente as glosa_grupo_cliente, 
+								CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre, 
+								usuario.username as username, 
+								CONCAT(usuario_secundario.nombre,' ', usuario_secundario.apellido1) AS nombre_secundario, 
+								usuario_secundario.username as username_secundario, 
+								cobro.saldo_final_gastos * (cobro_moneda.tipo_cambio /cambio.tipo_cambio)*-1 as gastos, 
+								cobro.estado, 
+								cobro.id_cobro, 
+								prm_moneda_cobro.simbolo, 
+								prm_moneda_titulo.glosa_moneda, 
+								cobro.monto, 
+								cobro.monto_subtotal, 
+								prm_moneda_cobro.cifras_decimales, 
+								cobro.tipo_cambio_moneda, 
+								cambio.tipo_cambio, 
+								cobro.id_moneda_monto as id_moneda_monto, 
+								prm_moneda_titulo.cifras_decimales as cifras_decimales_titulo, 
+								cobro.fecha_emision, 
+								cobro.forma_cobro, 
+								cobro.porcentaje_impuesto, 
 								cobro.fecha_fin,
-								cobro.nota_cobro,
+								cobro.nota_cobro, 
 								cobro.monto_contrato as monto_contrato,
 								cobro.fecha_en_revision,
 								cobro.opc_moneda_total,
-								cobro.porcentaje_impuesto_gastos,
-								cobro.descuento,
-								cobro.subtotal_gastos,
-								cobro.fecha_facturacion,
-								cobro.fecha_enviado_cliente,
-								cobro.fecha_cobro,
-								cobro.documento,
-								cobro.monto_gastos,
-								cobro.id_moneda,
-								cobro.modalidad_calculo,
+								cobro.porcentaje_impuesto_gastos, 
+								cobro.descuento, 
+								cobro.subtotal_gastos, 
+								cobro.fecha_facturacion, 
+								cobro.fecha_enviado_cliente, 
+								cobro.fecha_cobro, 
+								cobro.documento, 
+								cobro.monto_gastos, 
+								cobro.id_moneda, 
+								cobro.modalidad_calculo, 
 								(SELECT MIN(fecha) FROM trabajo WHERE trabajo.id_cobro = cobro.id_cobro) as fecha_primer_trabajo,
 								(SELECT MAX(fecha) FROM trabajo WHERE trabajo.id_cobro = cobro.id_cobro) as fecha_ultimo_trabajo,
 								GROUP_CONCAT( documento_pago.id_documento ) as pagos,
@@ -367,11 +372,12 @@
 								documento.saldo_gastos
 							FROM cobro
 								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'
-								LEFT JOIN documento as documento_pago ON documento_pago.id_cobro = cobro.id_cobro AND documento_pago.tipo_doc != 'N'
-								LEFT JOIN neteo_documento AS nd ON nd.id_documento_pago = documento_pago.id_documento
-								LEFT JOIN documento_moneda AS dm1 ON dm1.id_documento = documento_pago.id_documento AND dm1.id_moneda = documento_pago.id_moneda
-								LEFT JOIN documento_moneda AS dm2 ON dm2.id_documento = documento_pago.id_documento AND dm2.id_moneda = '".$moneda."'
+								LEFT JOIN documento as documento_pago ON documento_pago.id_cobro = cobro.id_cobro AND documento_pago.tipo_doc != 'N' 
+								LEFT JOIN neteo_documento AS nd ON nd.id_documento_pago = documento_pago.id_documento 
+								LEFT JOIN documento_moneda AS dm1 ON dm1.id_documento = documento_pago.id_documento AND dm1.id_moneda = documento_pago.id_moneda 
+								LEFT JOIN documento_moneda AS dm2 ON dm2.id_documento = documento_pago.id_documento AND dm2.id_moneda = '".$moneda."' 
 								LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+								LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente 
 								LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 								LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 								LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
@@ -381,8 +387,8 @@
 									(SELECT id_cobro,tipo_cambio FROM cobro_moneda WHERE id_moneda=".$moneda.")
 									AS cambio ON cambio.id_cobro=cobro.id_cobro
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
-							WHERE $where
-							GROUP BY cobro.id_cobro
+							WHERE $where 
+							GROUP BY cobro.id_cobro 
 							ORDER BY cliente.glosa_cliente,
 								cobro.fecha_creacion";
 		// Obtener los asuntos de cada cobro
@@ -409,7 +415,7 @@
 		//echo $query;
 		$fila_inicial = $filas + 2;
 		while($cobro = mysql_fetch_array($resp))
-                {
+                {			
 			if(!$tabla_creada)
 			{
 				$ws1->write($filas, $col_numero_cobro, __('N° del Cobro'), $titulo_filas);
@@ -417,6 +423,7 @@
 					$ws1->write($filas, $col_nota_cobro, __('Nota Cobro'), $titulo_filas);
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_creacion, __('Fecha Creación'), $titulo_filas);
+				$ws1->write($filas, $col_grupo_cliente, __('Grupo Cliente'), $titulo_filas);
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 				{
@@ -431,15 +438,16 @@
 				$ws1->write($filas, $col_fecha_ultimo_trabajo, __('Fecha ultimo trabajo'), $titulo_filas);
 				$ws1->write($filas, $col_horas_trabajadas, __('Hrs. Trabajadas'), $titulo_filas);
 				$ws1->write($filas, $col_horas_cobradas, __('Hrs. Cobradas'), $titulo_filas);
+				$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios original'), $titulo_filas);
 				$ws1->write($filas, $col_total_cobro_original, __('Total Cobro Original'), $titulo_filas);
 				if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
 					{
 					if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura') ) || ( method_exists('Conf','PermitirFactura') && Conf::PermitirFactura() ) )  )
 						$ws1->write($filas, $col_total_con_iva, __('Total facturado'), $titulo_filas);
-					else
+					else 
 						$ws1->write($filas, $col_total_con_iva, __('Total con IVA'), $titulo_filas);
 					}
-				else
+				else	
 					{
 					if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura') ) || ( method_exists('Conf','PermitirFactura') && Conf::PermitirFactura() ) )  )
 						$ws1->write($filas, $col_total_cobro, __('Total facturado'), $titulo_filas);
@@ -471,10 +479,10 @@
 
 			// Calcular gastos
 			$gastos=0;
-
-
-
-
+			
+			
+			
+			
 			$cobro_moneda = new CobroMoneda($sesion);
 			$cobro_moneda->Load($cobro['id_cobro']);
 
@@ -482,22 +490,23 @@
 				{
 					if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) )  )
 						$aproximacion_gastos = $cobro['subtotal_gastos'];
-					else
+					else 
 						$aproximacion_gastos = $cobro['monto_gastos'];
 					$monto_gastos = $aproximacion_gastos*$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']/$cobro['tipo_cambio'];
-
+					
 					if( $cobro['porcentaje_impuesto'] > 0 )
 						$aproximacion_honorarios = $cobro['monto_subtotal']-$cobro['descuento'];
 					else
 						$aproximacion_honorarios = $cobro['monto'];
 					$monto_honorarios = $aproximacion_honorarios*($cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro['tipo_cambio']);
-
+					$monto_honorarios_original = $aproximacion_honorarios;
+					
 					//Caso flat fee
 					if($cobro['forma_cobro']=='FLAT FEE'&&$cobro['id_moneda']!=$cobro['id_moneda_monto']&&$cobro['id_moneda_monto']==$cobro['opc_moneda_total']&&empty($cobro['descuento'])&&empty($cobro['monto_tramites']))
 					{
 						$monto_honorarios = number_format($cobro['monto_contrato']*$cobro_moneda->moneda[$cobro['id_moneda_monto']]['tipo_cambio']/$cobro['tipo_cambio'],$cobro_moneda->moneda[$moneda]['cifras_decimales'],'.','');
 					}
-
+					
 					if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
 						{
 							if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) )  )
@@ -506,17 +515,17 @@
 								$aproximacion_iva = (($cobro['monto_subtotal']-$cobro['descuento'])*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'])*$cobro['porcentaje_impuesto']/100;
 							$monto_iva = $aproximacion_iva*$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']/$cobro['tipo_cambio'];
 						}
-
+					
 					if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
 						{
 								if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) )  )
 									$aproximacion_monto = (($cobro['monto_subtotal']-$cobro['descuento'])*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'])*(1+$cobro['porcentaje_impuesto']/100)+$cobro['subtotal_gastos']*(1+$cobro['porcentaje_impuesto_gastos']/100);
-								else
+								else 
 									$aproximacion_monto = (($cobro['monto_subtotal']-$cobro['descuento'])*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'])*(1+$cobro['porcentaje_impuesto']/100)+$cobro['monto_gastos'];
 						}
-					else
+					else	
 						$aproximacion_monto = $cobro['monto']*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']+$cobro['monto_gastos'];
-
+					
 					//Caso flat fee
 					if($cobro['forma_cobro']=='FLAT FEE'&&$cobro['id_moneda']!=$cobro['id_moneda_monto']&&$cobro['id_moneda_monto']==$cobro['opc_moneda_total']&&empty($cobro['descuento'])&&empty($cobro['monto_tramites']))
 					{
@@ -527,23 +536,24 @@
 				{
 					if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) )
 						$aproximacion_gastos = $cobro['subtotal_gastos'];
-					else
+					else 
 						$aproximacion_gastos = $cobro['monto_gastos'];
 					$monto_gastos = number_format($aproximacion_gastos*$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']/$cobro['tipo_cambio'],$cobro_moneda->moneda[$moneda]['cifras_decimales'],'.','');
-
+					
 					if( $cobro['porcentaje_impuesto'] > 0 )
 						$aproximacion_honorarios = number_format($cobro['monto_subtotal']-$cobro['descuento'],$cobro['cifras_decimales'],'.','');
 					else
 						$aproximacion_honorarios = number_format($cobro['monto'],$cobro['cifras_decimales'],'.','');
 					$monto_honorarios = number_format($aproximacion_honorarios*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro['tipo_cambio'],$cobro_moneda->moneda[$moneda]['cifras_decimales'],'.','');
-
+					$monto_honorarios_original = $aproximacion_honorarios;
+					
 					//Caso flat fee
 					if($cobro['forma_cobro']=='FLAT FEE'&&$cobro['id_moneda']!=$cobro['id_moneda_monto']&&$cobro['id_moneda_monto']==$cobro['opc_moneda_total']&&empty($cobro['descuento'])&&empty($cobro['monto_tramites']))
 					{
 						$monto_honorarios = number_format($cobro['monto_contrato']*$cobro_moneda->moneda[$cobro['id_moneda_monto']]['tipo_cambio']/$cobro['tipo_cambio'],$cobro_moneda->moneda[$moneda]['cifras_decimales'],'.','');
 					}
-
-					if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
+					
+					if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  ) 
 						{
 							if( $cobro['opc_moneda_total'] == $moneda )
 								{
@@ -561,7 +571,7 @@
 									$monto_iva = number_format($aproximacion_iva*($cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']/$cobro['tipo_cambio']),$cobro['cifras_decimales'],'.','');
 								}
 						}
-
+					
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) )
 						{
 						if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoPorGastos') ) || ( method_exists('Conf','UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) )
@@ -571,19 +581,19 @@
 						}
 					else
 						$aproximacion_monto = number_format($cobro['monto']*$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio']+$cobro['monto_gastos'], $cobro_moneda->moneda[$cobro['opc_moneda_total']]['cifras_decimales'], '.', '');
-
+					
 					//Caso flat fee
 					if($cobro['forma_cobro']=='FLAT FEE'&&$cobro['id_moneda']!=$cobro['id_moneda_monto']&&$cobro['id_moneda_monto']==$cobro['opc_moneda_total']&&empty($cobro['descuento'])&&empty($cobro['monto_tramites']))
 					{
 						$aproximacion_monto = number_format(($cobro['monto_contrato']*$cobro_moneda->moneda[$cobro['id_moneda_monto']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'])*(1+$cobro['porcentaje_impuesto']/100)+$cobro['monto_gastos'],$cobro_moneda->moneda[$moneda]['cifras_decimales'],'.','');
 					}
 				}
-
+			
 			// Calcular monto pago para honorarios y gastos (por separado)
 			// Calcular monto pago para honorarios y gastos (por separado)
 			$monto_pago_gastos = $cobro['gastos']-$cobro['saldo_gastos'];
 			$monto_pago_honorarios = $cobro['honorarios']-$cobro['saldo_honorarios'];
-
+			
 			/* Cambio al tipo de cambio del cobro*/
 			$monto_pago_gastos *= $cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
 			$monto_pago_honorarios *= $cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
@@ -593,7 +603,7 @@
 
 			$monto_pago_honorarios = $cobro['monto_pago_honorarios'];
 			$monto_pago_gastos = $cobro['monto_pago_gastos'];
-
+			
 			$pago_parcial = false;
 			if( $cobro['gastos'] > $cobro['saldo_gastos'] && $cobro['saldo_gastos'] > 0)
 				$pago_parcial = true;
@@ -601,7 +611,7 @@
 				$pago_parcial = true;
 			if( $cobro['estado'] == 'PAGADO' )
 				$pago_parcial = false;
-
+				
 			/*
 			 * IF para mostrar calculo segun forma antigua o nueva
 			 * Si forma_calculo == 1 (forma nueva, con función procesaCobroIdMoneda)
@@ -627,6 +637,7 @@
 				$x_monto_honorarios							=$x_resultados['monto_honorarios'][$moneda];
 				$x_subtotal_gastos							=$x_resultados['subtotal_gastos'][$moneda];
 				$x_monto_gastos									=$x_resultados['monto_gastos'][$moneda];
+				$x_monto_honorarios_original		=$x_resultados['monto_honorarios'][$cobro['id_moneda']];
 				$x_monto_cobro_original					=$x_resultados['monto_cobro_original'][$cobro['opc_moneda_total']];
 				$x_monto_cobro_original_con_iva	=$x_resultados['monto_cobro_original_con_iva'][$cobro['opc_moneda_total']];
 			}
@@ -635,21 +646,22 @@
 				$x_monto_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_subtotal_gastos = number_format($monto_gastos, $cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
 				$x_monto_iva = number_format($monto_iva,$cobro_moneda->moneda[$moneda]['cifras_decimales_titulo'], '.', '');
+				$x_monto_honorarios_original = number_format($monto_honorarios_original, $cobro_moneda->moneda[$cobro['id_moneda']]['cifras_decimales_titulo'],'.','');
 				$x_monto_cobro_original = $aproximacion_monto;
 				$x_monto_cobro_original_con_iva = $aproximacion_monto;
 			}
-
+			
 			++$filas;
-
+			
 			// Nombres de clientes segun facturas asociadas al cobro;
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
 				$facturas = "";
 				$clientes_factura = "";
-				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo, f.serie_documento_legal
-                                                             FROM factura f
-                                                             JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )
-                                                             JOIN prm_estado_factura pef ON pef.id_estado = f.id_estado
+				$query_obtener_facturas = "SELECT f.numero, f.cliente, pdl.codigo, f.serie_documento_legal 
+                                                             FROM factura f 
+                                                             JOIN prm_documento_legal pdl ON ( f.id_documento_legal = pdl.id_documento_legal )  
+                                                             JOIN prm_estado_factura pef ON pef.id_estado = f.id_estado 
                                                              WHERE f.id_cobro = '" . $cobro['id_cobro'] . "' AND pef.codigo != 'A'";
 				$resp3 = mysql_query($query_obtener_facturas, $sesion->dbh) or Utiles::errorSQL($query_obtener_facturas, __FILE__, __LINE__, $sesion->dbh);
 				while( list( $numero_factura, $cliente_factura, $codigo_legal_factura, $serie )  = mysql_fetch_array($resp3))
@@ -663,7 +675,7 @@
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
 				}
 			}
-
+			
 			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $fecha);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 			{
@@ -678,13 +690,14 @@
 				$ws1->write($filas, $col_factura, str_replace(",","\n",$cobro['documento']), $fecha);
 			}
 			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, '-'), $fecha);
+			$ws1->write($filas, $col_grupo_cliente, $cobro['glosa_grupo_cliente'], $txt_opcion);
 			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $txt_opcion);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
 				$ws1->write($filas, $col_cliente_facturable, str_replace(",","\n",$clientes_factura), $txt_opcion);
 			}
 
-                        $ws1->write($filas, $col_codigos_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_opcion);
+                        $ws1->write($filas, $col_codigos_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_opcion);                        
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_opcion);
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
 				$ws1->write($filas, $col_encargado, $cobro['username'], $txt_opcion);
@@ -700,14 +713,15 @@
 			$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 			$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
+			$ws1->writeNumber($filas, $col_honorarios_original, $x_monto_honorarios_original, $formatos_moneda[$cobro['id_moneda']]);
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) )
-			{
+			{	
 				$ws1->writeNumber($filas, $col_total_cobro_original, $x_monto_cobro_original_con_iva, $formatos_moneda[$cobro['opc_moneda_total']]);
 			}
 			else{
 				$ws1->writeNumber($filas, $col_total_cobro_original, $x_monto_cobro_original, $formatos_moneda[$cobro['opc_moneda_total']]);
 			}
-
+			
 			if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  )  )
 			{
 				$ws1->writeFormula($filas, $col_total_con_iva, "=$col_formula_honorarios".($filas+1)."+$col_formula_gastos".($filas+1)."+$col_formula_iva".($filas+1), $formatos_moneda[$moneda]);
@@ -722,12 +736,12 @@
 			{
 				$ws1->writeNumber($filas, $col_iva, $x_monto_iva, $formatos_moneda[$moneda]);
 			}
-
+			
 			if(!$pago_parcial)
 				$ws1->write($filas, $col_estado, $cobro['estado'], $txt_centro);
 			else
 				$ws1->write($filas, $col_estado, __('PAGO PARCIAL'), $txt_centro);
-
+				
 			$ws1->write($filas, $col_fecha_revision,Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_en_revision'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->write($filas, $col_fecha_emision,Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->write($filas, $col_fecha_corte,Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_fin'], $formato_fecha, '-') : ' - ', $fecha);

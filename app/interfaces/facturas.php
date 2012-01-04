@@ -249,11 +249,9 @@
 	function Opciones(& $fila)
 	{
 		global $sesion;
-		global $where;
 
 		$id_factura = $fila->fields['id_factura'];
 		$codigo_cliente = $fila->fields['codigo_cliente'];
-		$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 		if( UtilesApp::GetConf($sesion,'ImprimirFacturaDoc') ) {
 			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/doc.gif' border=0 title=\"Imprimir Word\"></a>";
@@ -333,9 +331,6 @@
 
 		//echo "<br>".$query;
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$monto_pago = 0;
-		$simbolo_aporte_pago = $fila->fields['simbolo'];
-		$cifras_decimales_aporte_pago = $fila->fields['cifras_decimales'];
 		list($ultima_fecha_pago) = mysql_fetch_array($resp);
 		return  $ultima_fecha_pago;
 	}
@@ -360,7 +355,6 @@
 	function funcionTR(& $fila)
 	{
 		global $sesion;
-		global $id_cobro;
 		static $i = 0;
 
 		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
@@ -377,7 +371,6 @@
 		$formato_fechas = UtilesApp::ObtenerFormatoFecha($sesion);
 
 		$html .= "<tr id=\"t".$fila->fields['id_factura']."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
-		$glosa_tramite = $tramite->fields['glosa_tramite'];
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas)."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
 		$html .= "<td align=right>#" . NumeroFactura(& $fila, $sesion) . "&nbsp;</td>";

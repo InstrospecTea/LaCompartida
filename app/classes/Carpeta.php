@@ -37,7 +37,7 @@ class Carpeta extends Objeto
 	function Eliminar()
 	{
 		$query = "DELETE FROM carpeta WHERE codigo_carpeta = '".$this->fields['codigo_carpeta']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
 

@@ -71,6 +71,7 @@
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS doc.id_documento as id_documento,
 								doc.tipo_doc,
+					cobro.documento as numero_factura,
 								doc.monto as monto,
 								doc.glosa_documento,
 								doc.fecha,
@@ -93,6 +94,7 @@
 		$b->titulo = "Documentos";
 
 		$b->AgregarEncabezado("id_documento",__('N°'));
+		$b->AgregarEncabezado("numero_factura",__('N° Factura'), "width=100");
 		if(!$codigo_cliente)
 			$b->AgregarEncabezado("nombre_cliente",__('Cliente'));
 		$b->AgregarEncabezado("fecha",__('Fecha'));

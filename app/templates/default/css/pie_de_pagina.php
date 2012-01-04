@@ -55,8 +55,16 @@ $query = "SELECT html_header, html_pie FROM cobro_rtf $where";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
 list($html_header, $html_pie) = mysql_fetch_array($resp); 
 
+if (empty($lang)) $lang = 'es';
+require_once Conf::ServerDir() . "/lang/$lang.php";
+
+$html_pie = str_replace('%texto_fono%', __('Fono'), $html_pie);
+$html_pie = str_replace('%texto_piso%', __('Piso'), $html_pie);
+$html_pie = str_replace('%texto_cuarto%', __('4to'), $html_pie);
+
 // reemplacar anchores 
 $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header); 
+
 ?> 
 
 <p class=MsoHeader align=center style='text-align:center'> 
@@ -101,5 +109,3 @@ $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 </body>
 
 </html>
-<?
-?>

@@ -216,7 +216,6 @@ if( $buscar == 1 )
 
 function funcionTR(& $trabajo_historial)
 	{
-		global $sesion;
 		static $i = 0;
 		
 		if($i % 2 == 0)
@@ -289,7 +288,7 @@ function funcionTR(& $trabajo_historial)
 				if( strlen($trabajo_historial->fields['trabajador']) > 14 && strlen($trabajo_historial->fields['trabajador_anterior']) > 14 )
 					$html .= "<td width=\"10%\"><div onmouseover=\"ddrivetip('".$trabajo_historial->fields['trabajador']."<br><font color=red>".$trabajo_historial->fields['trabajador_anterior']."</font>');\" onmouseout=\"hideddrivetip();\">".substr($trabajo_historial->fields['trabajador'],0,12)."..<br><font color=red>".substr($trabajo_historial->fields['trabajador_anterior'],0,12)."..</font></td>";
 				else if( strlen($trabajo_historial->fields['trabajador']) > 14 )
-					$html .= "<td width=\"10%\"><div onmouseover=\"ddrivetip('".$trabajo_historial->fields['trabajador']."<br><font color=red>".$trabajo_historial->fields['trabajador_anterior']."</font>');\" onmouseout=\"hideddrivetip();\">".substr($trabajo_historial->fields['trabajador'],0,12)."..<br><font color=red>".$trabajador_historial->fields['trabajador_anterior']."</font></td>";
+					$html .= "<td width=\"10%\"><div onmouseover=\"ddrivetip('".$trabajo_historial->fields['trabajador']."<br><font color=red>".$trabajo_historial->fields['trabajador_anterior']."</font>');\" onmouseout=\"hideddrivetip();\">".substr($trabajo_historial->fields['trabajador'],0,12)."..<br><font color=red>".$trabajado_historial->fields['trabajador_anterior']."</font></td>";
 				else if( strlen($trabajo_historial->fields['trabajador_anterior']) > 14 )
 					$html .= "<td width=\"10%\"><div onmouseover=\"ddrivetip('".$trabajo_historial->fields['trabajador']."<br><font color=red>".$trabajo_historial->fields['trabajador_anterior']."</font>');\" onmouseout=\"hideddrivetip();\">".$trabajo_historial->fields['trabajador']."<br><font color=red>".substr($trabajo_historial->fields['trabajo_anterior'],0,12)."</font></td>";
 				else

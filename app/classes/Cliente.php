@@ -13,7 +13,7 @@ class Cliente extends Objeto
 		$this->campo_id = "id_cliente";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
-		$this->guardar_fecha = false;
+		$this->guardar_fecha = true;
 	}
   
   function LoadByCodigo($codigo)
@@ -159,7 +159,7 @@ class Cliente extends Objeto
 	function InactivarAsuntos()
 	{
 		$query = "UPDATE asunto SET activo = 0 WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
-		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		return true;
 	}
 

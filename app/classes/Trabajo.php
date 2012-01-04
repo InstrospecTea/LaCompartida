@@ -257,16 +257,16 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°') 
+		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('Nº') 
 					&& 
-					in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day','Month','Mes')) ) 
+					in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) ) 
 				&& 
 					$fila_base<$excel->sheets[0]['numRows'] )
-						{ 
+						{
 							++$fila_base;
-						} 
+						}
 		//Paso de ubicación ini,med,fin (2,3,4) a glosa dia,mes,anyo (2,3,4)-> español (3,2,4)->inglés
-		if(in_array($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini],array('Día','Day')) )
+		if(in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day')) )
 		{
 			$col_fecha_dia = $col_fecha_ini;
 			$col_fecha_mes = $col_fecha_med;
@@ -389,7 +389,7 @@ class Trabajo extends Objeto
 					$codigo_asunto_escondido = $hoja['cells'][$fila][$col_descripcion];
 					
 				// Importan solo las filas que guardan trabajos.
-				if(!is_numeric($hoja['cells'][$fila][$col_id_trabajo]) && ( $hoja['cells'][$fila][$col_id_trabajo] || !$hoja['cells'][$fila][$col_fecha] || !$hoja['cells'][$fila][$col_descripcion] || !$hoja['cells'][$fila][$col_duracion_cobrable] ) )
+				if(!is_numeric($hoja['cells'][$fila][$col_id_trabajo]) && ( $hoja['cells'][$fila][$col_id_trabajo] || !$hoja['cells'][$fila][$col_fecha_dia] || !$hoja['cells'][$fila][$col_fecha_mes] || !$hoja['cells'][$fila][$col_fecha_anyo] || !$hoja['cells'][$fila][$col_descripcion] || !$hoja['cells'][$fila][$col_duracion_cobrable] ) )
 					continue;
 				
 				// Para ignorar los lineas escondidas que se usan por el resumen profesional
@@ -522,7 +522,6 @@ class Trabajo extends Objeto
 					&& $trabajo_original->fields['id_cobro']==$id_cobro) )
 					continue;
 					
-							
 				if( !$id_trabajo )
 					{	
 						$tarifa_hh = Funciones::Tarifa($sesion,$usuario->fields['id_usuario'],$cobro->fields['id_moneda'],$codigo_asunto);

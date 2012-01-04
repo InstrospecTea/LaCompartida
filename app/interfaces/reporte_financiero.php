@@ -52,6 +52,16 @@
 	text-align:right;
 }
 </style>
+<script type="text/javascript">
+function ShowSeleccion()
+{
+    if( $('vista').value == 'profesional' ) {
+        $('tr_seleccion').style.display = 'table-row';
+    } else {
+        $('tr_seleccion').style.display = 'none';
+    }
+}
+</script>
 <form name="formulario2" id="formulario2" method="post" action='' autocomplete="off">
 	<table style="border: 1px solid black;">
 		<tr>
@@ -115,7 +125,7 @@
 				<?=__('Agrupar por')?>
 			</td>
 			<td align="left">
-				<select name="vista" id="vista">
+				<select name="vista" id="vista" onchange="ShowSeleccion();">
 <?
 					$vistas = array('profesional', 'mes', 'glosa_cliente', 'glosa_asunto');
 					$nombre_vistas = array(__('profesional'), __('mes'), __('glosa_cliente'), __('glosa_cliente').' - '.__('glosa_asunto'));
@@ -126,6 +136,17 @@
 					}
 ?>
 				  </select>
+			</td>
+		</tr>
+                <tr id="tr_seleccion">
+			<td align="right">
+				<?=__('Mostrar')?>
+			</td>
+			<td align="left">
+				<select name="seleccion" id="seleccion">
+                                    <option value='profesionales'>solo profesionales</option>
+                                    <option value='todos'>todo el personal</option>
+				</select>
 			</td>
 		</tr>
 <? /* Por ahora todo funciona en moneda base

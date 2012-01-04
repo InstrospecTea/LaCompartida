@@ -117,8 +117,7 @@ else
 <?
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 	
-	if( is_array($usuarios) )
-		$objeto_semana = new Semana($sesion,"",$usuarios);
+  
   
 	$usr = new Usuario($sesion);
 
@@ -131,6 +130,11 @@ else
 			$usuarios[] = $id_usuario;
 	}
 
+	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
+
+	if( is_array($usuarios) )
+		$objeto_semana = new Semana($sesion,"",$usuarios);
+	
 	for($j=0;$j<count($usuarios);$j++)
 	{
 
@@ -249,10 +253,12 @@ else
 			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			{
 				$cod_asunto = $lista->Get($i)->fields[codigo_asunto_secundario];
+				$cod_asunto_color = $lista->Get($i)->fields[codigo_asunto];
 			}
 			else
 			{
 				$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
+				$cod_asunto_color = $lista->Get($i)->fields[codigo_asunto];
 			}
 			$dia_semana = $lista->Get($i)->fields[dia_semana];
 			if($dia_semana == 1)
@@ -302,7 +308,8 @@ else
 			else
 			{
 				$no_cobrable = '';
-				$color = $objeto_semana->colores[$cod_asunto];
+				$color = $objeto_semana->colores[$cod_asunto_color];
+				
 				if($color == '')
 					$color = '#E8E7D9';
 			}
@@ -310,14 +317,15 @@ else
 			$total[$dia_semana]  += $hh + $mm/60;
 			#$total[$dia_semana] += ($alto/40);
 
+			$descripcion = nl2br(str_replace("'","`",$lista->Get($i)->fields['descripcion']));
 			$id_trabajo = $lista->Get($i)->fields[id_trabajo];
 			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			{
-				$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente_secundario]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto_secundario]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".nl2br($lista->Get($i)->fields[descripcion])."<br><b>".$no_cobrable."</b>");
+				$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente_secundario]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto_secundario]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
 			}
 			else
 			{
-				$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".nl2br($lista->Get($i)->fields[descripcion])."<br><b>".$no_cobrable."</b>");
+				$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
 			}
 			if($dia_anterior != $dia_semana)
 			{

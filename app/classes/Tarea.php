@@ -257,9 +257,11 @@ function Write()
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		while(list($id,$nombre,$email) = mysql_fetch_array($resp))
 		{
-			$query2 = "SELECT rut, dv_rut, password FROM usuario WHERE id_usuario=".$id;
+			/* --- no se usan las variables recibidos ---
+                        $query2 = "SELECT rut, dv_rut, password FROM usuario WHERE id_usuario=".$id;
 			$resp2 = mysql_query($query2,$this->sesion->dbh) or Utiles::errorSQL($query2,$this->sesion->dbh);
 			list($rut,$dv_rut,$password)=mysql_fetch_array($resp2);
+                        */ 
 			
 			$subject = "[Tarea] ".$this->fields['nombre'];
 			$mensaje = "Estimado Sr. ".$nombre.", <br><br>".$estado." <br><br> Cliente: ".$nombre_cliente."<br> ".$texto_asunto." Tarea: ".$this->fields['nombre']."<br><br> Para ingresar haga clic (<a href=".Conf::Server().Conf::RootDir()."/app/interfaces/agregar_tarea.php?popup=1&id_tarea=".$this->fields['id_tarea'].">aquí</a>).";

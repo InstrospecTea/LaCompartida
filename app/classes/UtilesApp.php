@@ -254,7 +254,19 @@ class UtilesApp extends Utiles
 		}
 	}
 
-
+        function DiferenciaDbAplicacionEnSegundos(&$sesion)
+        {
+            $query = "SELECT NOW()";
+            $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+            list($ahora) = mysql_fetch_array($resp);
+            
+            $ahora_db_timestamp = strtotime($ahora);
+            $ahora_app_timestamp = strtotime(date("Y-m-d H:i:s"));
+            
+            $diferencia = $ahora_app_timestamp - $ahora_db_timestamp;
+            
+            return $diferencia;
+        }
 	/*
 	Reemplaza , por . para numero
 	*/
@@ -311,14 +323,14 @@ class UtilesApp extends Utiles
 		*/
 	}
 
-
-
 	/*
 	La cuenta corriente funciona sólo restando de los ingresos para gastos,
 	todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	*/
-	function TotalCuentaCorriente(&$sesion, $where = '')
+	function TotalCuentaCorriente(&$sesion, $where = '1')
 	{
+                $where .= " AND cta_corriente.cobrable = 1 AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
+		
 		$total_ingresos=0;
 		$total_egresos=0;
 
@@ -338,6 +350,7 @@ class UtilesApp extends Utiles
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
+                
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while(list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp))
 		{
@@ -603,12 +616,40 @@ class UtilesApp extends Utiles
 		return false;
 	}
 
-	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
-	function esUltimoDiaHabilDelMes()
+	function ArregloMeses()
 	{
+		$meses 		 = array();
+		$meses[1]  = "Enero";
+		$meses[2]  = "Febrero";
+		$meses[3]  = "Marzo";
+		$meses[4]  = "Abril";
+		$meses[5]  = "Mayo";
+		$meses[6]  = "Junio";
+		$meses[7]  = "Julio";
+		$meses[8]  = "Agosto";
+		$meses[9]  = "Septiembre";
+		$meses[10] = "Octubre";
+		$meses[11] = "Noviembre";
+		$meses[12] = "Diciembre";
+		
+		return $meses;
+	}
+
+	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
+	function esUltimoDiaHabilDelMes( $timestamp = '' )
+	{
+		if( $timestamp == '' )
+		{
 		$dia_semana = date('N');	// día entre 1 y 7
 		$dia_mes = date('j');		// día entre 1 y 31
 		$mes = date('n');			// mes entre 1 y 12
+		}
+		else
+		{
+			$dia_semana = date('N',$timestamp);
+			$dia_mes = date('j',$timestamp);
+			$mes = date('n',$timestamp);
+		}
 		$largoMes = array(31, 28+date('L'), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 		if($dia_mes==$largoMes[$mes-1] && $dia_semana<6)
 			return true;
@@ -782,6 +823,38 @@ HTML;
 		return $menu_html;
     }
 
+        /**    Returns the offset from the origin timezone to the remote timezone, in seconds.
+        *    @param $remote_tz;
+        *    @param $origin_tz; If null the servers current timezone is used as the origin.
+        *    @return int;
+        */
+        function get_timezone_offset($remote_tz, $origin_tz = null) {
+            if($origin_tz === null) {
+                if(!is_string($origin_tz = date_default_timezone_get())) {
+                    return false; // A UTC timestamp was returned -- bail out!
+                }
+            }
+            $origin_dtz = new DateTimeZone($origin_tz);
+            $remote_dtz = new DateTimeZone($remote_tz);
+            $origin_dt = new DateTime("now", $origin_dtz);
+            $remote_dt = new DateTime("now", $remote_dtz);
+            $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+            return $offset;
+        }
+        
+        function get_utc_offset( $tz='America/Santiago' ) {
+            $offset = self::get_timezone_offset( $tz, 'UTC')/3600;
+            switch( $tz ) {
+                case 'America/Bogota': $offset = 5; break;
+                case 'America/Santiago': $offset = 3; break;
+            }
+            return $offset;
+        }
+        
+        function get_offset_os_utc() {
+            return self::get_timezone_offset('UTC',@date("T"))/3600;
+        }
+        
 	//Calcula cambio de moneda
 	function CambiarMoneda($monto_ini, $tipo_cambio1=1, $decimales1=0, $tipo_cambio2=1,$decimales2=0,$conv_string=true)
 	{
@@ -1415,6 +1488,7 @@ HTML;
 		{
 			$gasto = $lista_gastos->Get($v);
 			$suma_a_base = 0;
+                        $suma_a_original = 0;
 			$suma_a_total = 0;
 			$suma_total_impuesto = 0;
 			$suma_fila = 0;
@@ -1427,6 +1501,7 @@ HTML;
 														 ,$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']//tipo de cambio fin
 														 ,$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales']//decimales fin
 														);
+                                $suma_a_original += $gasto->fields['monto_cobrable'];
 				$suma_a_base += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
 				$suma_fila = UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable']//monto_moneda_l
 														 ,$cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
@@ -1442,6 +1517,7 @@ HTML;
 														 ,$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']//tipo de cambio fin
 														 ,$cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales']//decimales fin
 														);
+				$suma_a_original -= $gasto->fields['monto_cobrable'];
 				$suma_a_base -= $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
 				$suma_fila = (-1) * UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable']//monto_moneda_l
 														 ,$cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
@@ -1477,10 +1553,12 @@ HTML;
 					$lista[$v]['id_movimiento'] = $id_gasto;
 					$lista[$v]['monto_total'] = $suma_a_total;
 					$lista[$v]['monto_base'] = $suma_a_base;
+                                        $lista[$v]['monto_original'] = $suma_a_original;
 					$lista[$v]['con_impuesto'] = $gasto->fields['con_impuesto'];
 					$lista[$v]['monto_total_impuesto'] = $suma_total_impuesto;
 					$lista[$v]['monto_total_mas_impuesto'] = $suma_total_impuesto + $suma_a_total;
 					$lista[$v]['descripcion'] = $gasto->fields['descripcion'];
+                                        $lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
 					$lista[$v]['fecha'] = $gasto->fields['fecha'];
 					$lista[$v]['numero_documento'] = $gasto->fields['numero_documento'];
 					$lista[$v]['tipo_gasto'] = $gasto->fields['tipo_gasto'];

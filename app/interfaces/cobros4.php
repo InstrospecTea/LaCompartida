@@ -59,7 +59,7 @@
 		$where .= " AND cta_corriente.cobrable = 1 ";
 		$where .= " AND (cobro.estado is NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION')";
 		$where .= " AND (cta_corriente.incluir_en_cobro = 'SI')";
-		$where .= " AND DATE(cta_corriente.fecha) BETWEEN DATE('" . $cobro->fields['fecha_ini'] . "') AND DATE('" . $cobro->fields['fecha_fin'] . "') ";
+		
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SepararGastosPorAsunto') ) || ( method_exists('Conf', 'SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto() ) )
 			{
 				$join_cobro_asunto = " JOIN cobro_asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto ";
@@ -314,7 +314,6 @@ function GrabarTodosCampos(id_gastos,id_cobro, valor, sinc)
 	}
 	function Cobrable(& $fila)
 	{
-		global $sesion;
 			global $id_cobro;
 			$checked = '';
 			#if($fila->fields['cobrable_actual'])
@@ -336,7 +335,6 @@ function Opciones(& $fila)
 		}
 	function funcionTR(& $gasto)
 	{
-		global $sesion;
 		static $i = 0;
 	
 		if($i % 2 == 0)

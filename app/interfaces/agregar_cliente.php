@@ -227,27 +227,12 @@ if ($opcion == "guardar") {
 		else if ($activo == 1 && $cliente->fields['activo'] != '1')
 			$cliente->Edit("fecha_inactivo", 'NULL');
 		$cliente->Edit("activo", $activo == 1 ? '1' : '0');
-		$cliente->Edit("id_usuario_encargado", $id_usuario_secundario);
+		$cliente->Edit("id_usuario_encargado", $id_usuario_encargado);
 		$cliente->Edit("id_grupo_cliente", $id_grupo_cliente > 0 ? $id_grupo_cliente : 'NULL');
 		$cliente->Edit("alerta_hh", $cliente_alerta_hh);
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
-		if ( $id_cliente == 0) {
-			$cliente->Edit("fecha_creacion", date('Y-m-d H:i:s'));
-		} elseif( $id_cliente > 0 ) {
-			$cliente->Edit("fecha_modificacion", date('Y-m-d H:i:s'));
-		}
-
-					if ( $id_cliente == 0) {
-						$cliente->Edit("fecha_creacion", date('Y-m-d H:i:s'));
-					} elseif( $id_cliente > 0 ) { 
-						/*  TODO:
-						 *	Mejorar este proceso para que genere un log decente
-						 */
-						
-						$cliente->Edit("fecha_modificacion", date('Y-m-d H:i:s'));
-					}
 
 					if($cliente->Write())
 					{
@@ -306,6 +291,8 @@ if ($opcion == "guardar") {
 			$contrato->Edit("fono_contacto", $fono_contacto_contrato);
 			$contrato->Edit("email_contacto", $email_contacto_contrato);
 			$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
+			$contrato->Edit("id_pais", $id_pais);
+			$contrato->Edit("id_cuenta", $id_cuenta);
 			$contrato->Edit("es_periodico", $es_periodico);
 			$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 			$contrato->Edit("periodo_fecha_inicio", Utiles::fecha2sql($periodo_fecha_inicio));
@@ -314,8 +301,14 @@ if ($opcion == "guardar") {
 			$contrato->Edit("periodo_unidad", $codigo_unidad);
 			$contrato->Edit("monto", $monto);
 			$contrato->Edit("id_moneda", $id_moneda);
+                                                $contrato->Edit("id_moneda_tramite", $id_moneda_tramite);
 			$contrato->Edit("forma_cobro", $forma_cobro);
 			$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
+						if( is_array($usuarios_retainer) )
+							$retainer_usuarios = implode(',',$usuarios_retainer);
+						else
+							$retainer_usuarios = $usuarios_retainer;
+						$contrato->Edit("retainer_usuarios", $retainer_usuarios);
 			$contrato->Edit("retainer_horas", $retainer_horas);
 			$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
 			$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
@@ -386,6 +379,7 @@ if ($opcion == "guardar") {
 			$contrato->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 			$contrato->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 			$contrato->Edit("opc_ver_cobrable", $opc_ver_cobrable);
+                                          $contrato->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable ); 
 			$contrato->Edit("codigo_idioma", $codigo_idioma != '' ? $codigo_idioma : 'es');
 			#descto.
 			$contrato->Edit("tipo_descuento", $tipo_descuento);
@@ -577,7 +571,7 @@ if ($opcion == "guardar") {
 			$asunto->Edit("fono_contacto", $fono_contacto_contrato);
 			$asunto->Edit("email_contacto", $email_contacto_contrato);
 			$asunto->Edit("direccion_contacto", $direccion_contacto_contrato);
-			$asunto->Edit("id_encargado", $id_usuario_secundario);
+			$asunto->Edit("id_encargado", $id_usuario_encargado);
 			$asunto->Write();
 		}
 	}
@@ -1040,7 +1034,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 				usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
 				WHERE $where AND usuario.activo=1 AND usuario.visible=1
 					GROUP BY id_usuario ORDER BY nombre"
-												, "id_usuario_encargado", $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : $sesion->usuario->fields['id_usuario'], '', '', 'width="170"') ?>
+												, "id_usuario_encargado", $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '', '', 'Vacio', 'width="170"') ?>
 										</td>
 									</tr>
 									<?php } ?>

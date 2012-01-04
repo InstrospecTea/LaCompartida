@@ -11,6 +11,9 @@ if($usuarios)
 else
 	$where_usuario = '';
 
+if($solo_activos)
+	$where_usuario = ' AND usuario.activo = 1 ';
+
 if($clientes)
 	$where_cliente = ' AND cliente.codigo_cliente IN ('.$clientes.')';
 else
@@ -20,7 +23,9 @@ $total_tiempo = 0;
 $query = "SELECT 
 						asunto.codigo_asunto, 
 						SUM(TIME_TO_SEC(duracion))/3600 as tiempo
-					FROM trabajo JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto) JOIN cliente ON (cliente.codigo_cliente = asunto.codigo_cliente)
+					FROM trabajo 
+					JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto) 
+					JOIN cliente ON (cliente.codigo_cliente = asunto.codigo_cliente)
 						WHERE 1 ".$where_cliente.$where_usuario." AND
 						trabajo.fecha BETWEEN '".$fecha_ini."' AND '".$fecha_fin."'  
 					GROUP BY asunto.codigo_asunto 
