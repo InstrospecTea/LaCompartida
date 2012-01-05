@@ -28,7 +28,7 @@ if ($permisos->fields['permitido'] && $accion == "eliminar") {
 	if (!$asunto->Eliminar()) {
 		$pagina->AddError($asunto->error);
 	} else {
-		$pagina->AddInfo(__('Asunto') . ' ' . __('eliminado con éxito'));
+		$pagina->AddInfo(__('Asunto') . ' ' . __('eliminado con ï¿½xito'));
 		$buscar = 1;
 	}
 }
@@ -38,6 +38,18 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
+   
+       jQuery(document).ready(function() {
+        jQuery("#agregar_asunto").click(function() {
+           var CODCLIENTE='<?php echo $codigo_cliente; ?>';
+           if (CODCLIENTE=='') {CODCLIENTE=jQuery("#campo_codigo_cliente").val();}
+           nuevaVentana('Agregar_Asunto',730,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
+        });
+    });
+
+
+   // $('#agregar_asunto').click(function() {     alert("clickeado");        });
+  
 	function GrabarCampo(accion,asunto,cobro,valor)
 	{
 		var http = getXMLHTTP();
@@ -121,8 +133,8 @@ if ($id_cobro == "") {
 		<table style="border: 0px solid black" width='100%'>
 			<tr>
 				<td></td>
-				<td colspan=3 align=right>
-					<a href=# onclick="nuevaVentana('Agregar_Asunto',730,600,'agregar_asunto.php?codigo_cliente=<?= $codigo_cliente ?>&popup=1&motivo=agregar_proyecto');" title="<?= __('Agregar Asunto') ?>"><img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0><?= __('Agregar') . ' ' . __('Asunto') ?></a>
+				<td colspan="3" align="right">
+                                    <a href="#" id="agregar_asunto" title="<?= __('Agregar Asunto') ?>"><img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0><?= __('Agregar') . ' ' . __('Asunto') ?></a>
 				</td>
 			</tr>
 		</table>
@@ -181,7 +193,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 							</tr>
 							<tr>
 								<td width=25% align=right style="font-weight:bold;">
-									<?= __('Código asunto') ?>
+									<?= __('C&oacute;digo asunto') ?>
 								</td>
 								<td nowrap align=left colspan=4>
 									<?php
@@ -195,7 +207,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 										?>
 										<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?= $codigo_asunto ?>" onchange="this.value=this.value.toUpperCase();">
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<b><?= __('Título asunto') ?></b>
+										<b><?= __('T&iacute;tulo asunto') ?></b>
 										<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?= $glosa_asunto ?>">
 										<?php
 									}
@@ -204,7 +216,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-									<?= __('Fecha creación') ?> 
+									<?= __('Fecha creaci&oacute;n') ?> 
 								</td>
 								<td nowrap align=left colspan= 3>
 									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" value="<?= $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
@@ -225,7 +237,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 							<tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-	<?= __('Área') ?>
+	<?= __('&Aacute;rea') ?>
 								</td>
 								<td align=left colspan=3>
 									<?= Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden ASC", "id_area_proyecto", $id_area_proyecto, '', 'Todos', '200') ?>
@@ -236,7 +248,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 								<td align=left colspan=3>
 									<input type="button" class=btn name="buscar" value="<?= __('Buscar') ?>" onclick="Listar( this.form, 'buscar')">
 									<input type="button" class=btn value="<?= __('Descargar listado a Excel') ?>" onclick="Listar(this.form, 'xls')" >
-									<input type="button" class=btn value="<?= __('Descargar Información Comercial a Excel') ?>" onclick="Listar(this.form,'facturacion_xls')" >
+									<input type="button" class=btn value="<?= __('Descargar Informaci&oacute;n Comercial a Excel') ?>" onclick="Listar(this.form,'facturacion_xls')" >
 								</td>
 							</tr>
 						</table>
@@ -320,7 +332,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.id_encargado = '$id_usuario' ";
 	if ($id_area_proyecto)
 		$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
-//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
+//Este query es mejorable, se podrï¿½a sacar horas_no_cobradas y horas_trabajadas, pero ya no se podrï¿½a ordenar por estos campos.
 	$query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secundario,a1.id_moneda, a1.activo,
 					a1.fecha_creacion, (SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600
 					FROM trabajo AS t2
@@ -359,19 +371,19 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('Asuntos');
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-		$b->AgregarEncabezado("codigo_asunto_secundario", __('Código'), "align=left");
+		$b->AgregarEncabezado("codigo_asunto_secundario", __('Cï¿½digo'), "align=left");
 	} else {
-		$b->AgregarEncabezado("codigo_asunto", __('Código'), "align=left");
+		$b->AgregarEncabezado("codigo_asunto", __('Cï¿½digo'), "align=left");
 	}
 	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "align=left");
 	$b->AgregarEncabezado("glosa_asunto", __('Asunto'), "align=left");
-	#		$b->AgregarEncabezado("descripcion_asunto","Descripción","align=left");
+	#		$b->AgregarEncabezado("descripcion_asunto","Descripciï¿½n","align=left");
 	#		$b->AgregarEncabezado("horas_trabajadas","Horas trabajadas","","","SplitDuracion");
 	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "align=left");
 	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "align=left");
 	#		$b->AgregarEncabezado("horas_no_cobradas","Horas no cobradas","","","SplitDuracion");
-	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
-	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creación"'));
+	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha ï¿½ltimo cobro'));
+	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creaciï¿½n"'));
 	if ($permisos->fields['permitido'])
 		$b->AgregarFuncion("$link", 'Opciones', "align=center nowrap");
 	$b->color_mouse_over = "#bcff5c";
@@ -420,10 +432,10 @@ function Opciones(& $fila) {
 	$id_asunto = $fila->fields['id_asunto'];
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
 		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+				. "<a href='javascript:void(0);' onclick=\"if  (confirm('ï¿½" . __('Estï¿½ seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
 	} else {
 		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
+				. "<a href='javascript:void(0);' onclick=\"if  (confirm('ï¿½" . __('Estï¿½ seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 	}
 }
 

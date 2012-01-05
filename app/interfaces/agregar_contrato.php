@@ -1984,7 +1984,7 @@ $config_validar_tarifa = ( method_exists('Conf', 'GetConf') && Conf::GetConf($se
 						</td>
 <?
 if (!$contrato->fields['forma_cobro'])
-	$contrato_forma_cobro = 'TASA';
+	$contrato_forma_cobro = 'TASA';	
 else
 	$contrato_forma_cobro = $contrato->fields['forma_cobro'];
 					
@@ -2006,8 +2006,10 @@ else
 								<label for="fc6">Proporcional</label> &nbsp;
 								<input <?= TTip($tip_hitos) ?> onclick="ActualizarFormaCobro();" id=fc7 type=radio name=forma_cobro value="HITOS" <?= $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
 								<label for="fc7"><?= __('Hitos') ?></label>
-								<input <?= TTip($tip_escalonada) ?> onclick="ActualizarFormaCobro();" id=fc8 type=radio name=forma_cobro value="ESCALONADA" <?= $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
-								<label for="fc8"><?= __('Escalonada') ?></label>
+								<?php if( !UtilesApp::GetConf($sesion,'EsconderTarifaEscalonada') ) { ?>
+									<input <?= TTip($tip_escalonada) ?> onclick="ActualizarFormaCobro();" id=fc8 type=radio name=forma_cobro value="ESCALONADA" <?= $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
+									<label for="fc8"><?=__('Escalonada') ?></label>
+								<?php } ?>
 							</div>
 							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 								<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">

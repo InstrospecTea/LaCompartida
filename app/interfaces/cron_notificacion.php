@@ -640,9 +640,9 @@
 	{
 			$opc = 'mail_retrasos';
 			$query="SELECT usuario.id_usuario
-													from usuario
-													JOIN usuario_permiso USING(id_usuario)
-													where codigo_permiso='PRO' AND alerta_diaria = '1' AND activo=1";
+						FROM usuario
+						JOIN usuario_permiso USING(id_usuario)
+						WHERE codigo_permiso='PRO' AND alerta_diaria = '1' AND retraso_max_notificado = 0 AND activo=1";
 			$result = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			while ($row = mysql_fetch_array($result))
 			{
@@ -687,6 +687,8 @@
 						if($horas_retraso > $prof->fields['retraso_max'])
 						{
 							$dato_diario[$id_usuario]['retraso_max'] = array('actual'=>$horas_retraso,'max'=>$prof->fields['retraso_max']);
+							$query = "UPDATE usuario SET retraso_max_notificado = 1 WHERE id_usuario = '$id_usuario'";
+							mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 						}
 					}
 

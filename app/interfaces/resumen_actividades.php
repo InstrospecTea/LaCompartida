@@ -489,8 +489,10 @@ $hoy = date("Y-m-d");
       <select name="tipo">
       	<option value="Profesional" <?=$tipo == 'Profesional' ? 'selected' : ''?>><?=__('Profesional') ?></option>
         <option value="Cliente" <?=$tipo == 'Cliente' ? 'selected' : ''?>><?=__('Cliente') ?></option>
-                        <option value="AreaProfesional" <?=$tipo == 'AreaProfesional' ? 'selected' : '' ?>><?=__('Area - Profesional') ?></option>
-                        <option value="AreaCliente" <?=$tipo == 'AreaCliente' ? 'selected' : '' ?>><?=__('Area - Cliente') ?></option>
+     <?php if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
+        <option value="AreaProfesional" <?=$tipo == 'AreaProfesional' ? 'selected' : '' ?>><?=__('Área Trabajo - Profesional') ?></option>
+        <option value="AreaCliente" <?=$tipo == 'AreaCliente' ? 'selected' : '' ?>><?=__('Área Trabajo - Cliente') ?></option>
+       <?php endif; ?>
       </select><br><br>
 			<?=__('Horas')?>:&nbsp;
 			<select name='horas_sql' id='horas_sql' style='width:200px'>
@@ -531,15 +533,11 @@ $hoy = date("Y-m-d");
 			<td align="left">
 				<b><?=__('Área')?>:</b>
 			</td>
-			<?php
-				if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')){
-			?>
+			<?php 	if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
 			<td align="left">
 				<b><?=__('Área Trabajo')?>:</b>
 			</td>
-			<?php
-				}
-			?>
+			<?php 	endif; 	?>
 			<td align="left">
 				<b><?=__('Categoría')?>:</b>
 			</td>
@@ -549,15 +547,11 @@ $hoy = date("Y-m-d");
 			<td rowspan="2" align="left">
 				<?php echo Html::SelectQuery($sesion,"SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 			</td>
-			<?php
-				if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')){
-			?>
+			<?php if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
 			<td rowspan="2" align="left">
 				<?php echo Html::SelectQuery($sesion,"SELECT * FROM prm_area_trabajo ORDER BY id_area_trabajo ASC",'id_area_trabajo[]', $id_area_trabajo, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200" ); ?>
 			</td>
-			<?php
-				}
-			?>
+			<?php 	endif; 	?>
 			<td rowspan="2" align="left">
 				<?php echo Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 			</td>
