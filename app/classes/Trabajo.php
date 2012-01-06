@@ -257,10 +257,10 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('Nº') 
+		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°') 
 					&& 
 					in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) ) 
-				&& 
+					&& 
 					$fila_base<$excel->sheets[0]['numRows'] )
 						{
 							++$fila_base;

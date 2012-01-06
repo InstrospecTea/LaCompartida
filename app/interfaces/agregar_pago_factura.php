@@ -50,16 +50,23 @@
 	}
 	else
 	{
-	if(isset($_GET['id_factura_pago'])) { $id_factura_pago = $_GET['id_factura_pago'];}
-		if(!empty($id_factura_pago))
-	{
-		$pago->Load($id_factura_pago);
-		$id_moneda = $pago->fields['id_moneda'];
-		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
-		if($id_factura) $lista_facturas = empty($lista_facturas) ? $id_factura : $lista_facturas.','.$id_factura;
-		$codigo_cliente = $pago->fields['codigo_cliente'];
-	}
+	if(isset($_GET['id_factura_pago'])) { 
+		$id_factura_pago = $_GET['id_factura_pago'];}
+		if(!empty($id_factura_pago)) {
+			$pago->Load($id_factura_pago);
+			$id_moneda = $pago->fields['id_moneda'];
+			$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
+			$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
+			$arreglo_facturas = explode(',',$lista_facturas);
+			if($id_factura) {
+				if( empty($lista_facturas) ) {
+					$lista_facturas = $id_factura;
+				} else if( !in_array( $id_factura, $arreglo_facturas ) ) {
+					$lista_facturas = $lista_facturas.','.$id_factura;
+				} 
+			}
+			$codigo_cliente = $pago->fields['codigo_cliente'];
+		}
 	}
 	$moneda_pago = new Moneda($sesion);
 	$moneda_pago->Load($id_moneda);

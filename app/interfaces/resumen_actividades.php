@@ -482,6 +482,20 @@ $hoy = date("Y-m-d");
 <?
 	if(!$tipo)
 		$tipo = 'Profesional';
+             switch($tipo):
+         case 'AreaProfesional':
+             $desc='Área Trabajo y Profesional';
+             break;
+         case 'AreaCliente':
+             $desc='Área Trabajo y Cliente';
+             break;
+         case 'Cliente':
+             $desc='Cliente';
+             break;
+         default:
+             $desc='Profesional';
+             break;
+     endswitch;
 ?>
 	<tr valign=top>
 	  <td align=left colspan=2>
@@ -489,10 +503,15 @@ $hoy = date("Y-m-d");
       <select name="tipo">
       	<option value="Profesional" <?=$tipo == 'Profesional' ? 'selected' : ''?>><?=__('Profesional') ?></option>
         <option value="Cliente" <?=$tipo == 'Cliente' ? 'selected' : ''?>><?=__('Cliente') ?></option>
-     <?php if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
+     <?php 
+     
+        if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')): ?>
         <option value="AreaProfesional" <?=$tipo == 'AreaProfesional' ? 'selected' : '' ?>><?=__('Área Trabajo - Profesional') ?></option>
         <option value="AreaCliente" <?=$tipo == 'AreaCliente' ? 'selected' : '' ?>><?=__('Área Trabajo - Cliente') ?></option>
-       <?php endif; ?>
+       
+     <?php 
+
+     endif; ?>
       </select><br><br>
 			<?=__('Horas')?>:&nbsp;
 			<select name='horas_sql' id='horas_sql' style='width:200px'>
@@ -741,7 +760,7 @@ $query ="SELECT
 					$where_categoria
 					$group_by 
 					$orderby";
-#echo $query;
+// echo $query;
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
@@ -752,7 +771,7 @@ $contador=0;
 if($opc=='grafico')
 {
 	########## VER GRAFICO ##########
-	$titulo_reporte = __('Gráfico de').' '.__($horas_sql).' '.__('en vista por').' '.$tipo;
+	$titulo_reporte = __('Gráfico de').' '.__($horas_sql).' '.__('en vista por').' '.$desc;
 	$datos_grafico = '';
 	$total = 0;
 
@@ -815,7 +834,7 @@ if($opc=='grafico')
 else
 {
 	########## VER INFORME ##########
-	$titulo_reporte = __('Reporte de').' '.__($horas_sql).' '.__('en vista por').' '.$tipo;
+	$titulo_reporte = __('Reporte de').' '.__($horas_sql).' '.__('en vista por').' '.$desc;
 
 	if($ver == 'prof')
 	{
@@ -1209,9 +1228,10 @@ else
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos')&& Conf::MostrarSoloMinutos() ) )
 				$html_info .= Utiles::Formato($total_hr_minutos,'%s');
 			else
-				$html_info .= Utiles::Formato($total_hr,'%f', $idioma, 2);
+				$html_info .= Utiles::Formato($total_hr,'%f');
 			$html_info .= "</td></tr>";
 			$html_info .= "<tr><td colspan=2 align=left><u>".__('Periodo consultado').": ".$periodo_txt."</u></td></table>";
+
 			$html_info .= "</td></tr><tr><td>&nbsp;</td></tr>";
 			$html_info .= "<tr><td>";
 			$html_info .= "<table class='tbl_general' border=1 width='100%' cellpadding='0' cellspacing='0'>";
@@ -1297,7 +1317,7 @@ else
 								</table>";
 		$tr_area = "<tr>
 								<td class='alt' style='width:150px'>
-									".__('Area')."
+									".__('Área Trabajo')."
 								</td>
 								<td class='alt' id='td_horas' style='width:50px'>
 									".__($col_resultado)."
@@ -1718,7 +1738,7 @@ else
 								</table>";
 		$tr_area = "<tr>
 								<td class=alt style='width:80px'>
-									".__('Area')."
+									".__('Área Trabajo')."
 								</td>
 								<td class=alt id='td_horas' style='width:50px' style='cursor:pointer'>
 									".__($col_resultado)."
@@ -1870,14 +1890,16 @@ else
 				$html_info .= "<tr><td>&nbsp;</td></tr>";
 			}
 			$html_info .= "<tr><td>";
-			$html_info .= "<table width=100%><tr><td style='font-size:12px; font-weight:bold' align=left>".$titulo_reporte."&nbsp;&nbsp;".__('Total').":&nbsp;";
+			$html_info .= "<table width=100%><tr><td style='font-size:13px; font-weight:bold' align=left>".$titulo_reporte."</td><td width=25% style='font-size:12px; font-weight:bold' align=right>".__('Total').":&nbsp;";
 			$minutos_total_hr = number_format(($total_hr-floor($total_hr))*60,2);
 			$total_hr_minutos = floor($total_hr).':'.sprintf('%02d',round($minutos_total_hr));
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) )
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos')&& Conf::MostrarSoloMinutos() ) )
 				$html_info .= Utiles::Formato($total_hr_minutos,'%s');
 			else
 				$html_info .= Utiles::Formato($total_hr,'%f');
-			$html_info .= "</td></tr></table>";
+			$html_info .= "</td></tr>";
+			$html_info .= "<tr><td colspan=2 align=left><u>".__('Periodo consultado').": ".$periodo_txt."</u></td></table>";
+
 			$html_info .= "</td></tr><tr><td>&nbsp;</td></tr>";
 			$html_info .= "<tr><td>";
 			$html_info .= "<table class='tbl_general' border=1 width='100%' cellpadding='0' cellspacing='0'>";
@@ -2258,14 +2280,16 @@ else
 				$html_info .= "<tr><td>&nbsp;</td></tr>";
 			}
 			$html_info .= "<tr><td>";
-			$html_info .= "<table width=100%><tr><td style='font-size:12px; font-weight:bold' align=left>".$titulo_reporte."&nbsp;&nbsp;".__('Total').":&nbsp;";
+			$html_info .= "<table width=100%><tr><td style='font-size:13px; font-weight:bold' align=left>".$titulo_reporte."</td><td width=25% style='font-size:12px; font-weight:bold' align=right>".__('Total').":&nbsp;";
 			$minutos_total_hr = number_format(($total_hr-floor($total_hr))*60,2);
 			$total_hr_minutos = floor($total_hr).':'.sprintf('%02d',round($minutos_total_hr));
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() ) )
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) || ( method_exists('Conf','MostrarSoloMinutos')&& Conf::MostrarSoloMinutos() ) )
 				$html_info .= Utiles::Formato($total_hr_minutos,'%s');
 			else
-				$html_info .= Utiles::Formato($total_hr,'%f', $idioma, 2);
-			$html_info .= "</td></tr></table>";
+				$html_info .= Utiles::Formato($total_hr,'%f');
+			$html_info .= "</td></tr>";
+			$html_info .= "<tr><td colspan=2 align=left><u>".__('Periodo consultado').": ".$periodo_txt."</u></td></table>";
+
 			$html_info .= "</td></tr><tr><td>&nbsp;</td></tr>";
 			$html_info .= "<tr><td>";
 			$html_info .= "<table class='tbl_general' border=1 width='100%' cellpadding='0' cellspacing='0'>";
