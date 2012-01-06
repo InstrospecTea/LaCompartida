@@ -1061,7 +1061,7 @@ class Contrato extends Objeto
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
                                                                            VALUES ( '".$this->fields['id_contrato']."', '".$this->fields['fecha_creacion']."', 
                                                                                     NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 
-                                                                                    ".$this->fields['id_usuario_responsable']." )";	
+                                                                                    ".($this->fields['id_usuario_responsable'] ? $this->fields['id_usuario_responsable'] : NULL )." )";	
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			}
 			else //Retorna true ya que si no quiere hacer update la función corrió bien
@@ -1093,7 +1093,7 @@ class Contrato extends Objeto
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
                                                                            VALUES ( '".$this->fields['id_contrato']."', NOW(), 
                                                                                     NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 
-                                                                                    ".$this->fields['id_usuario_responsable']." )";
+                                                                                    ".($this->fields['id_usuario_responsable'] ? $this->fields['id_usuario_responsable'] : NULL )." )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			
 			if( $enviar_mail_asunto_nuevo )
