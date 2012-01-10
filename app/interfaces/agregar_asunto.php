@@ -1345,7 +1345,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 				-->
 				<br>
 <?
-if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']))
+if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) )
 	$checked = 'checked';
 else
 	$checked = '';
