@@ -508,6 +508,8 @@ class Factura extends Objeto {
 												<td class="monto_normal" align="right">%descuento_honorarios%</td></tr>', $html2);
 				else
 					$html2 = str_replace('%tr_descuento%', '', $html2);
+				
+				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto) , $html2);
 
 				if ($lang == 'es') {
 					if ($descuento_honorarios > 0)

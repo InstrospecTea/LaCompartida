@@ -2215,7 +2215,8 @@ class Cobro extends Objeto {
 				}
 
 				/* valor porcentaje de impuesto */
-				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);
+				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);								
+				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($this->fields['porcentaje_impuesto']) , $html2);
 
 				/* Datos detalle */
 				if (method_exists('Conf', 'GetConf')) {
@@ -6638,7 +6639,8 @@ class Cobro extends Objeto {
 				}
 
 				/* valor porcentaje de impuesto */
-				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);
+				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);				
+				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($this->fields['porcentaje_impuesto']) , $html2);
 
 				/*
 				  Total Gastos

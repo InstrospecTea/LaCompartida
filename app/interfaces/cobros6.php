@@ -296,7 +296,8 @@ if ($opc == 'guardar') {
 			if( !$cobro->fields['fecha_facturacion'] )
 				$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
 			$cobro->Edit('facturado', $facturado );
-			$estado = 'FACTURADO';
+			if( $cobro->fields['estado'] == 'EMITIDO' )	
+				$estado = 'FACTURADO';
 		} else {
 			$cobro->Edit('facturado', '0');
 			if( $cobro->fields['estado'] == 'FACTURADO' ) {

@@ -68,7 +68,7 @@ class UtilesApp extends Utiles
 	function ObtenerMargenesFactura( $sesion, $id_template)
 	{
 		$margenes = array();
-		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_factura_formato ='$id_template' LIMIT 1";
+		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		if( mysql_num_rows( $resp) > 0 )
 		{
