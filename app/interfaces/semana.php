@@ -66,7 +66,7 @@
 	if($semana == "")
 	{
 		$semana2 = "CURRENT_DATE()";
-		$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL - ( DAYOFWEEK(CURDATE()) - 2 ) DAY ) AS semana_inicio";
+		$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL -  WEEKDAY(CURDATE())  DAY ) AS semana_inicio";
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
 		$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
@@ -75,8 +75,9 @@
 	else
 	{
 		$semana2 = "'$semana'";
-		$sql_f = "SELECT DATE_ADD( '".$semana."', INTERVAL - ( DAYOFWEEK('".$semana."') - 2 ) DAY ) AS semana_inicio";
-		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
+		$sql_f = "SELECT DATE_ADD( '".$semana."', INTERVAL - WEEKDAY('".$semana."')  DAY ) AS semana_inicio";
+		
+                $resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
 		$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
 		$semana_siguiente = date("Y-m-d",strtotime("$semana_actual+7 days"));
@@ -100,7 +101,8 @@
 					trabajo.id_usuario = '$id_usuario' 
 					AND YEARWEEK(fecha,1) = YEARWEEK($semana2,1)
 					ORDER BY fecha,id_trabajo";
-	$lista = new ListaTrabajos($sesion, "", $query);
+	
+        $lista = new ListaTrabajos($sesion, "", $query);
 
 	$dias = array(__("Lunes"), __("Martes"), __("Miércoles"), __("Jueves"), __("Viernes"), __("Sábado"),__("Domingo"));
 	$tip_anterior = Html::Tooltip("<b>".__('Semana anterior').":</b><br>".Utiles::sql3fecha($semana_anterior,'%d de %B de %Y'));
@@ -193,7 +195,7 @@ else
 ?>
     <tr>
     		<td align='left' colspan='4'>
-        	<?=__('Semana del')?>:
+        	<?=__('Semana del');  ?>:
 					<b><?=$semana2 != '' ? Utiles::sql3fecha($semana_actual,'%d de %B de %Y') : Utiles::sql3fecha(date('Y-m-d'),'%d de %B de %Y') ?></b>
         </td>
         
@@ -210,10 +212,12 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 <?
 	echo("<tr>");
 	$fecha_dia = Utiles::sql2date($semana_actual);
-	for($i = 0; $i < 7; $i++)
+	
+        for($i = 0; $i < 7; $i++)
 	{
 		$dia_de_mes = date("j",strtotime(Utiles::add_date($semana_actual,$i)));
-		$mouse_over = 'onmouseover = "this.style.background=\'#DF9862\'"';
+		//echo $semana_actual.' '.$fecha_dia.' '.$dia_de_mes;
+                $mouse_over = 'onmouseover = "this.style.background=\'#DF9862\'"';
 		$mouse_out = 'onmouseout = "this.style.background=\'#FFFFFF\'"';
 		echo("
 			<td width=14% style='border: 1px solid black; text-align:center;' id='dia_$i' ".$mouse_over." ".$mouse_out.">
@@ -229,9 +233,10 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 	for($i = 0; $i < $lista->num; $i++)
 	{
 		$asunto = new Asunto($sesion);
-		if($i == 0)
-			echo("<td width=14%>");
+		if($i == 0) 
+			echo("<td width=14%>");  
 
+              
         $img_dir = Conf::ImgDir();
 		
 		$alto = max($lista->Get($i)->fields[alto],12)."px";
@@ -250,9 +255,8 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		else
 			$cobrado = false;
 
-        if($dia_semana == 1)
-            $dia_semana = 8;
-            
+       // if($dia_semana == 1)             $dia_semana = 8;
+           
 		$duracion = $lista->Get($i)->fields[duracion];
 		//echo $duracion;
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) ) 

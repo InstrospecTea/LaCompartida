@@ -813,7 +813,7 @@ $hoy = date("Y-m-d");
 <table class="border_plomo tb_base" width:650px" cellpadding="0" cellspacing="3" align="center">
 	<tr>
 		<td align="center">
-<table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3">
+<table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3" >
 	<tr valign=top>
 		<td align=left width='25%' >
 			<b><?=__('Clientes')?>:</b>
@@ -830,18 +830,18 @@ $hoy = date("Y-m-d");
 	</tr>
 	<tr valign=top>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","160"); ?>
+			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
 			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=6 ","","160"); ?>
+				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos,"class=\"selectMultiple\" multiple size=6 ","","160"); ?>
+			<?=Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados, "class=\"selectMultiple\" multiple size=6 ","","160"); ?>
+			<?=Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados, "class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 	</tr>
 	<tr><td colspan="3">&nbsp;</td></tr>
@@ -872,10 +872,9 @@ $hoy = date("Y-m-d");
 	<tr>
 		<td align=right>
 			<b><?=__('Periodo') ?>:</b>&nbsp;&nbsp;
-			<input type="checkbox" id="rango" name="rango" value="1" <?=$rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
-			<label for="rango" style="font-size:9px"><?=__('Otro rango') ?></label>
+
 		</td>
-		<td align=left colspan="2">
+		<td align=left colspan="1">
 <?
 		if(!$fecha_mes)
 			$fecha_mes = date('m');
@@ -906,14 +905,30 @@ $hoy = date("Y-m-d");
 				</select>
 			</div>
 			<div id=periodo_rango style='display:<?=$rango ? 'inline' : 'none' ?>;'>
-				<?=__('Fecha desde')?>:
-					<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_ini" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
-				<br />
-				<?=__('Fecha hasta')?>:&nbsp;
-					<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+				<table>
+					<tr>
+						<td nowrap>
+							<?=__('Fecha desde')?>:
+								<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_ini" size="8" maxlength="10" />
+								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+						</td>
+					</tr>
+					<tr>
+						<td nowrap>
+							<?=__('Fecha hasta')?>:&nbsp;
+								<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="8" maxlength="10" />
+								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+						</td>
+					</tr>
+				</table>
 			</div>
+			<td align="left" colspan="2">
+<!--			<div id=otro_rango style='display:inline; margin-top: 0px;' >-->
+							<input type="checkbox" id="rango" name="rango" value="1" <?=$rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
+							<label for="rango" style="font-size:9px"><?=__('Otro rango') ?></label>
+<!--			</div>-->
+			</td>
+
 	</tr>
 	<tr>
 		<td align=right>

@@ -577,7 +577,7 @@
 		exit;
 	}
 
-	$pagina->titulo = __('Reporte Facturación pendiente');
+	$pagina->titulo = __('Reporte Horas por Facturar');
 	$pagina->PrintTop();
 ?>
 <script type="text/javascript">

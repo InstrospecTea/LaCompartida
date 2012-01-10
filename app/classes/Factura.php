@@ -730,6 +730,127 @@ class Factura extends Objeto {
 					}
 				}
 
+				/* 
+				 * Montos Especiales de Vouga y Olmedo (o Paraguay en general )
+				 * 
+				 * anchors:
+				 * 
+				 * %simbolo_honorarios_sin_impuesto% simbolo de moneda de honorarios sin impuesto
+				 * %monto_honorarios_sin_impuesto% valor de honorarios cuando por contrato no llevan impuesto
+				 * %simbolo_honorarios_con_impuesto% simbolo de moneda de honorarios
+				 * %monto_honorarios_con_impuesto% valor de honorarios cuando si incluyen impuesto es excluyente con %monto_honorarios_sin_impuesto%
+				 * 
+				 * %simbolo_subtotal_gastos_con_impuesto% 
+				 * %subtotal_gastos_con_impuesto%
+				 * descripcion_subtotal_gastos_sin_impuesto%
+				 * %simbolo_subtotal_gastos_sin_impuesto% 
+				 * %subtotal_gastos_sin_impuesto%
+				 * %total_exentos% sumatoria de los valores que no llevan impuesto
+				 * %total_diez% sumatoria de los valores que en paraguay llevan 10% de impuesto
+				 * %total% sumatoria de exentos más 10
+				 * %iva_diez% total de iva de la sumatoria de montos con iva
+				 * %total_iva% iva de lo que lleva iva
+				 */
+				
+				$subtotal_exentos = 0;
+				$subtotal_diez = 0;
+				$subtotal_completo = 0;
+				$honorarios_con_impuesto = 0;
+				$honorarios_sin_impuesto = 0;
+				$gastos_con_impuesto = 0;
+				$gastos_sin_impuesto = 0;
+				$monto_impuesto_honorarios = 0;
+				$monto_impuesto_gastos = 0;
+				$glosa_banco = "";
+				
+				if( isset( $cobro ) && $cobro->loaded() ){
+					
+					if( $cobro->fields['porcentaje_impuesto'] > 0 ){
+						
+						$honorarios_con_impuesto = $this->fields['honorarios'] * ( 1 + ( $cobro->fields['porcentaje_impuesto'] / 100) ) ;
+						$monto_impuesto_honorarios = $this->fields['honorarios'] * ( $cobro->fields['porcentaje_impuesto'] / 100) ;					
+						
+					} else {
+						
+						$honorarios_sin_impuesto = $this->fields['honorarios'];
+						$gastos_sin_impuestos = $this->fields['subtotal_gastos_sin_impuesto'];
+						
+					}
+					
+					$gastos_con_impuesto = $this->fields['subtotal_gastos'] * ( 1 + ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ) ;
+					$monto_impuesto_gastos = $this->fields['subtotal_gastos'] * ( $cobro->fields['porcentaje_impuesto'] / 100) ;
+					
+					$subtotal_diez = number_format( $honorarios_con_impuesto + $gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles'] );
+					$subtotal_exentos = number_format( $honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles'] );
+					
+					$subtotal_completo = $subtotal_diez + $subtotal_exentos;
+					
+					$query_glosa_banco = " SELECT cb.glosa 
+												FROM cuenta_banco cb 
+													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta ) 
+													JOIN cobro cob ON ( c.id_contrato = cob.id_contrato ) 
+												WHERE cob.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
+					//echo $query_glosa_banco; exit;
+					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
+					list($glosa_banco) = mysql_fetch_array($resu_glosa);
+												
+				}
+				
+				if ($mostrar_honorarios) {
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto', '%simbolo_honorarios%', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto', '%simbolo_honorarios%', $html2); 
+					
+					
+					/* debe mostrar ceros en los espacios que sea 0 */
+					$html2 = str_replace('%monto_honorarios_sin_impuesto%', number_format($honorarios_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					$html2 = str_replace('%monto_honorarios_con_impuesto%', number_format($honorarios_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					
+				} else {
+					
+					/* 
+					 * se reemplazan por '', por que si se pone &nbsp; se corre todo para abajo y dejaria un espacio,
+					 *  al no tener nada html esconde la fila 
+					 */
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto', '', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto', '', $html2); 
+					
+					$html2 = str_replace('%monto_honorarios_sin_impuesto%', '', $html2);
+					$html2 = str_replace('%monto_honorarios_con_impuesto%', '', $html2);
+				}
+				
+				if ($gastos_con_impuesto > 0) {
+					 
+					$html2 = str_replace('%subtotal_gasto_con_impuesto%', number_format($gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+				} else {
+					
+					$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto', '', $html2);
+					$html2 = str_replace('%subtotal_gasto_con_impuesto%', '', $html2);
+					
+				}
+				
+				if ($gastos_sin_impuesto > 0) {
+					 
+					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', number_format($gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+				} else {
+					
+					$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto', '', $html2);
+					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
+					
+				}
+				
+				$html2 = str_replace('%glosa_banco%', $glosa_banco, $html2);
+				$html2 = str_replace('%total_exentos%', number_format($subtotal_exentos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%total_diez%', number_format($subtotal_diez, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%total_paraguay%', number_format($subtotal_diez + $subtotal_exentos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%ceros%', number_format(0, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+				$html2 = str_replace('%iva_diez%', number_format($monto_impuesto_honorarios + $monto_impuesto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+				$html2 = str_replace('%total_iva%', number_format($monto_impuesto_honorarios + $monto_impuesto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				
+				
 				/*
 				  Montos Rebaza-alcazar
 				 */

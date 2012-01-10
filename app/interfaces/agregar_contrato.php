@@ -671,119 +671,92 @@ function SetFormatoRut()
 
 	function ShowTHH()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "none";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "none";
-		$('span_monto').show();
-		div = $("div_horas");
-		div.style.display = "none";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		div = $("div_escalonada");
-		div.style.display = "none";
-		$('tabla_hitos').hide();
+		jQuery("#div_forma_cobro").css('width','400px').hide();
+                jQuery("#div_monto").hide();
+                 jQuery("#div_horas").show();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").show();
+
 	}
 	function ShowFlatFee()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "block";
-		$('span_monto').show();
-		div = $("div_horas");
-		div.style.display = "none";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		div = $("div_escalonada");
-		div.style.display = "none";
-		$('tabla_hitos').hide();
+            jQuery("#div_forma_cobro").css('width','400px').show();
+                jQuery("#div_monto").show();
+                 jQuery("#div_horas").hide();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").show();
+
 	}
 	function ShowRetainer()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "block";
-		$('span_monto').show();
-		div = $("div_horas");
-		div.style.display = "block";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		div = $("div_escalonada");
-		div.style.display = "none";
-	div = $("div_retainer_usuarios");
-	div.style.display = "inline";
-		$('tabla_hitos').hide();
+		
+                jQuery("#div_forma_cobro").css('width','400px').show();
+                jQuery("#div_monto").show();
+                jQuery("#div_horas").show();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").show();
+               jQuery("#div_retainer_usuarios").css('display','inline').show();
+               
 	}
 	function ShowProporcional()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "block";
-		$('span_monto').show();
-		div = $("div_horas");
-		div.style.display = "block";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		div = $("div_escalonada");
-		div.style.display = "none";
-		$('tabla_hitos').hide();
-	div = $("div_retainer_usuarios");
-	div.style.display = "none";
+             jQuery("#div_forma_cobro").css('width','400px').show();
+                jQuery("#div_monto").show();
+                 jQuery("#div_horas").show();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").show();
+               jQuery("#div_retainer_usuarios").css('display','inline').hide();
+
+
 	}
 	function ShowCap()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "block";
-		$('span_monto').show();
-		div = $("div_horas");
-		div.style.display = "none";
-		div = $("div_fecha_cap");
-		div.style.display = "block";
-		div = $("div_escalonada");
-		div.style.display = "none";
-		$('tabla_hitos').hide();
+		
+                 jQuery("#div_forma_cobro").css('width','400px').show();
+                jQuery("#div_monto").show();
+                 jQuery("#div_horas").hide();
+		jQuery("#div_fecha_cap").show();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").show();
+               jQuery("#div_retainer_usuarios").css('display','inline').hide();
+              
+  
 	}
 	function ShowHitos()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '400px';
-		div = $("div_monto");
-		div.style.display = "block";
-		$('span_monto').hide();
-		div = $("div_horas");
-		div.style.display = "none";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		div = $("div_escalonada");
-		div.style.display = "none";
-		$('tabla_hitos').show();
+             jQuery("#div_forma_cobro").css('width','91%').show();
+                jQuery("#div_monto").show();
+                 jQuery("#div_horas").hide();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").show();
+                jQuery("#id_moneda_monto").show();
+                jQuery("#span_monto").hide();
+               jQuery("#div_retainer_usuarios").css('display','inline').hide();
+            
+
 	}
 	function ShowEscalonada()
 	{
-		div = $("div_forma_cobro");
-		div.style.display = "block";
-		div.style.width = '730px';
-		div = $("div_monto");
-		div.style.display = "none";
-		$('span_monto').hide();
-		div = $("div_horas");
-		div.style.display = "none";
-		div = $("div_fecha_cap");
-		div.style.display = "none";
-		$('tabla_hitos').hide();
-		div = $("div_escalonada");
-		div.style.display = "block";
+		jQuery("#div_forma_cobro").css('width','730px').show();
+                jQuery("#div_monto").hide();
+                 jQuery("#div_horas").show();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#span_monto").hide();
+               jQuery("#div_retainer_usuarios").css('display','inline').hide();
+                
+
 	}
 	function ActualizaRango(desde, cant){
 		var aplicar = parseInt(desde.substr(-1,1));
@@ -917,27 +890,20 @@ function SetFormatoRut()
 	
 	function ActualizarFormaCobro()
 	{
-		fc1 = $("fc1");
-		fc2 = $("fc2");
-		fc3 = $("fc3");
-		fc5 = $("fc5");
-		fc6 = $("fc6");
-		fc7 = $("fc7");
-		fc8 = $("fc8");
 
-		if(fc1.checked)
+		if(jQuery("#fc1").is(':checked'))
 			ShowTHH();
-		else if(fc2.checked)
+		else if(jQuery("#fc2").is(':checked'))
 			ShowRetainer();
-		else if(fc3.checked)
+		else if(jQuery("#fc3").is(':checked'))
 			ShowFlatFee();
-		else if(fc5.checked)
+		else if(jQuery("#fc5").is(':checked'))
 			ShowCap();
-		else if(fc6.checked)
+		else if(jQuery("#fc6").is(':checked'))
 			ShowProporcional();
-		else if(fc7.checked)
+		else if(jQuery("#fc7").is(':checked'))
 			ShowHitos();
-		else if(fc8.checked)
+		else if(jQuery("#fc8").is(':checked'))
 			ShowEscalonada();
 	}
 	function CreaTarifa(form, opcion)
@@ -1785,6 +1751,18 @@ if (!$contrato->loaded()) {
 						<?= Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $contrato->fields['id_banco'] ? $contrato->fields['id_banco'] : $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
 					</td>
 				</tr>
+<?php 
+	$tiene_banco = false;
+	if( !empty($contrato->fields['id_banco']) ) {
+		$tiene_banco = true;
+		$where_banco = " WHERE cuenta_banco.id_banco = '".$contrato->fields['id_banco']."' ";
+	} else if( !empty($id_banco) ) {
+		$tiene_banco = true;
+		$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
+	} else {
+		$where_banco = "";
+	}
+?>
 				<tr>
 					<td align="right" colspan="1">
 <?= __('Cuenta') ?>
@@ -1794,7 +1772,7 @@ if (!$contrato->loaded()) {
 																						, CONCAT( cuenta_banco.numero,
 																						     IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 																						FROM cuenta_banco
-																						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150") ?>
+																						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', $tiene_banco ? "" : "Cualquiera", "150") ?>
 					</td>
 				</tr>
 
@@ -2021,7 +1999,10 @@ else
 									&nbsp;&nbsp;<?= __('Moneda') ?>
 <?php if ($validaciones_segun_config)
 	echo $obligatorio ?>
-									&nbsp;<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"', '', "80"); ?>
+									&nbsp;<?= 
+    Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda_monto", $contrato->fields['id_moneda_monto'] > 0 ? $contrato->fields['id_moneda_monto'] : ($contrato->fields['id_moneda'] > 0 ? $contrato->fields['id_moneda'] : $id_moneda_monto), 'onchange="actualizarMonto();"', '', "80"); 
+
+?>
 								</div>
 						<div id="div_horas" align="left" style="display:none; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 									&nbsp;<?= __('Horas') ?>
@@ -2796,7 +2777,9 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 	</form>
 						<? } ?>
 <script type="text/javascript">
+     jQuery(document).ready(function() {
 	ActualizarFormaCobro();
+     });
 	Calendar.setup(
 	{
 		inputField	: "valor_fecha_1",				// ID of the input field

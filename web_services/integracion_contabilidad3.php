@@ -508,7 +508,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$factura_cobro['cliente'] = $cliente;
 											$factura_cobro['rut_cliente'] = $RUT_cliente;
 											$factura_cobro['direccion_cliente'] = $direccion_cliente;
-											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha);
+											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha,'%Y-%m-%d');
 											$factura_cobro['descripcion'] = $descripcion;
 											$factura_cobro['moneda'] = $codigo_moneda_factura;
 

@@ -1,6 +1,7 @@
 <?
 require_once dirname(__FILE__).'/../../../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 $sesion = new Sesion();
 ?>
@@ -105,8 +106,11 @@ $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 	<span style='mso-no-proof:yes;'>
 		<? echo $html_pie; ?>
 	</span>
+<?php if( !UtilesApp::GetConf($sesion,'EliminarLetraBorradorEnPieDePagina') ) { ?>	
 	<br><span lang=ES
-style='font-size:22.0pt;mso-ansi-language:ES'>Borrador<o:p></o:p></span></p>
+style='font-size:22.0pt;mso-ansi-language:ES'>Borrador<o:p></o:p></span>
+<?php } ?>
+</p>
 
 </div>
 

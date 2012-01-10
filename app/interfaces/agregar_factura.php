@@ -137,7 +137,9 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
                                 if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
                                     if( !is_numeric($monto_honorarios_legales) )    $pagina->AddError(__('Debe ingresar un monto válido para los honorarios. ('.$monto_honorarios_legales.')'));
                                     if( !is_numeric($monto_gastos_con_iva) )        $pagina->AddError(__('Debe ingresar un monto válido para los gastos c/ IVA. ('.$monto_gastos_con_iva.')'));
-                                    if( !is_numeric($monto_gastos_sin_iva) )        $pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. ('.$monto_gastos_sin_iva.')'));
+                                    if( UtilesApp::GetConf($sesion,'UsarGastosConSinImpuesto') ) {
+										if( !is_numeric($monto_gastos_sin_iva) )    $pagina->AddError(__('Debe ingresar un monto válido para los gastos s/ IVA. ('.$monto_gastos_sin_iva.')'));
+									}
                                 }
 				$errores = $pagina->GetErrors();
 			}
@@ -817,7 +819,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 						return false;
 					}
 	<?php
-	if (!$factura->loaded() && ($id_documento_legal != 2)) {
+	if (!$factura->loaded() && ($id_documento_legal != 2)) {	
 		?>
 						ValidaSaldoPendienteCobro(form);
 						if((form.id_documento_legal.value!=2) && (saltar_validacion_saldo==0) && (

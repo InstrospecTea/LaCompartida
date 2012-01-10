@@ -84,6 +84,23 @@ if ($id_asunto > 0) {
 		} else {
 			$codigo_asunto = $asunto->AsignarCodigoAsunto($codigo_cliente);
 		}
+		// validación para que al cambiar un asunto de un cliente a otro, 
+		// no existan cobros ni gastos asociados para el cliente inicial
+		if ($opcion == "guardar"){
+			
+			$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '".$asunto->fields['codigo_asunto']."' ) AND codigo_cliente = '".$cliente->fields['codigo_cliente']."' ";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($count) = mysql_fetch_array($resp);
+
+			if ($count>0){$pagina->AddError(__('El Cliente tiene cobros asociado con el asunto.'));}
+			
+			$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '".$asunto->fields['codigo_asunto']."' AND codigo_cliente = '".$cliente->fields['codigo_cliente']."' ";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($count) = mysql_fetch_array($resp);		
+		
+			if ($count > 0){$pagina->AddError(__('El Cliente tiene gastos asociado con el asunto.'));}
+			
+		}
 	}
 	else if ($cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		$codigo_asunto = $asunto->AsignarCodigoAsunto($codigo_cliente);
