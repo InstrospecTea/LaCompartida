@@ -682,6 +682,8 @@ class Factura extends Objeto {
 
 				$monto_gastos_sin_impuesto = $monto_gastos / ( 1 + ( $porcentaje_impuesto / 100 ) );
 				$impuesto_gastos = $monto_gastos - $monto_gastos_sin_impuesto;
+				
+				
 
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
 					if ($mostrar_honorarios) {
@@ -785,8 +787,7 @@ class Factura extends Objeto {
 					$subtotal_diez = number_format( $honorarios_con_impuesto + $gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles'] );
 					$subtotal_exentos = number_format( $honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles'] );
 					
-					$subtotal_completo = $subtotal_diez + $subtotal_exentos;
-					
+					$subtotal_completo = $honorarios_con_impuesto + $gastos_con_impuesto + $honorarios_sin_impuesto + $gastos_sin_impuesto;
 					$query_glosa_banco = " SELECT cb.glosa 
 												FROM cuenta_banco cb 
 													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta ) 
