@@ -1327,21 +1327,26 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?
 
 	if($permisos->fields['permitido'])
-		$where = " ( usuario_permiso.codigo_permiso='PRO' ";
-	else
-		$where = " usuario_permiso.codigo_permiso='PRO' AND ( (usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
-							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].")  ";
-	$where .= " AND usuario.visible=1 OR usuario.id_usuario = '$id_usuario' ) ";
+		$where = " usuario_permiso.codigo_permiso='PRO' AND ( ";
+	else {
+		$where = " usuario_permiso.codigo_permiso='PRO' 
+							AND ( usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
+									OR usuario.id_usuario IN ('$id_usuario','{$sesion->usuario->fields['id_usuario']}') 
+									OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields['id_usuario'].") ) AND ( ";
+	}
+	$where .= " usuario.visible=1 OR usuario.id_usuario = '$id_usuario' ) ";
 	
-	$query = "SELECT SQL_CALC_FOUND_ROWS usuario.id_usuario,
-							CONCAT_WS(' ', apellido1, apellido2,',',nombre)
-							as nombre FROM usuario
-							JOIN usuario_permiso USING(id_usuario)
-							LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
-							WHERE $where GROUP BY id_usuario ORDER BY nombre";
+	$query = "SELECT SQL_CALC_FOUND_ROWS usuario.id_usuario, 
+							CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+							as nombre 
+					FROM usuario 
+					JOIN usuario_permiso USING(id_usuario)
+					LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
+					WHERE $where GROUP BY id_usuario ORDER BY nombre";
+	
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
-	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario",$id_usuario,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
+	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
 ?>
 
 <?
