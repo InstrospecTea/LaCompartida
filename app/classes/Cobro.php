@@ -2215,7 +2215,7 @@ class Cobro extends Objeto {
 				}
 
 				/* valor porcentaje de impuesto */
-				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);								
+				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($this->fields['porcentaje_impuesto']) , $html2);
 
 				/* Datos detalle */
@@ -2590,8 +2590,14 @@ class Cobro extends Objeto {
 				//echo 'simbolo: '.$moneda_total->fields['simbolo'].'<br>
 				if (( $this->fields['monto_gastos'] > 0 || $cantidad_de_gastos > 0 ) && $this->fields['opc_ver_gastos']) {
 					// Calculo especial para BAZ, en ves de mostrar el total de gastos, se muestra la cuenta corriente al día
+					$where_gastos = " 1 ";
 					$lista_asuntos = implode(',', $this->asuntos);
-					$cuenta_corriente_actual = number_format(UtilesApp::TotalCuentaCorriente($this->sesion, $lista_asuntos, $this->fields['codigo_cliente'], '', $this->fields['fecha_fin']), $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					if( !empty($lista_asuntos) ) {
+						$where_gastos = " AND cta_corriente.codigo_asunto IN ('$lista_asuntos') ";
+					}
+					$where_gastos = " AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+					$where_gastos = " AND cta_corriente.fecha <= '".$this->fields['fecha_fin']."' ";
+					$cuenta_corriente_actual = number_format(UtilesApp::TotalCuentaCorriente($this->sesion, $where_gastos ), $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 					$html2 = str_replace('%frase_gastos_ingreso%', '<tr>
 												    <td width="5%">&nbsp;</td>
@@ -6639,7 +6645,7 @@ class Cobro extends Objeto {
 				}
 
 				/* valor porcentaje de impuesto */
-				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);				
+				$html2 = str_replace('%porcentaje_impuesto%', (int) ($this->fields['porcentaje_impuesto']) . '%', $html2);
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($this->fields['porcentaje_impuesto']) , $html2);
 
 				/*
@@ -6969,8 +6975,14 @@ class Cobro extends Objeto {
 				//echo 'simbolo: '.$moneda_total->fields['simbolo'].'<br>
 				if (( $this->fields['monto_gastos'] > 0 || $cantidad_de_gastos > 0 ) && $this->fields['opc_ver_gastos']) {
 					// Calculo especial para BAZ, en ves de mostrar el total de gastos, se muestra la cuenta corriente al día
-					$lista_asuntos = implode(',', $this->asuntos);
-					$cuenta_corriente_actual = number_format(UtilesApp::TotalCuentaCorriente($this->sesion, $lista_asuntos, $this->fields['codigo_cliente'], '', $this->fields['fecha_fin']), $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+					$where_gastos = " 1 ";
+					$lista_asuntos = implode("','", $this->asuntos);
+					if( !empty($lista_asuntos) ) {
+						$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos') ";
+					}
+					$where_gastos .= " AND cta_corriente.codigo_cliente = '".$this->fields['codigo_cliente']."' ";
+					$where_gastos .= " AND cta_corriente.fecha <= '".$this->fields['fecha_fin']."' ";
+					$cuenta_corriente_actual = number_format(UtilesApp::TotalCuentaCorriente($this->sesion, $where_gastos ), $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 					$html2 = str_replace('%frase_gastos_ingreso%', '<tr>
 												    <td width="5%">&nbsp;</td>
