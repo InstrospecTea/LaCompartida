@@ -141,8 +141,9 @@ if ($print) {
 			$ret = $Cobro->GuardarCobro(true);
 			$Cobro->Edit('etapa_cobro', '5');
 			$Cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
+			$estado_anterior = $Cobro->fields['estado'];
 			$Cobro->Edit('estado', 'EMITIDO');
-			if ($ret == '') {
+			if ($ret == '' && $estado_anterior != 'EMITIDO') {
 				$his = new Observacion($Sesion);
 				$his->Edit('fecha', date('Y-m-d H:i:s'));
 				$his->Edit('comentario', __('COBRO EMITIDO'));

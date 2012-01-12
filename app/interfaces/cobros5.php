@@ -63,13 +63,20 @@
 		else
 			$cobro->AnularEmision();
 		#Se ingresa la anotación en el historial
-		$his = new Observacion($sesion);
-		$his->Edit('fecha',date('Y-m-d H:i:s'));
-		$his->Edit('comentario',__('COBRO ANULADO'));
-		$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
-		$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-		if($his->Write())
-			$pagina->AddInfo(__('Historial ingresado'));
+		$estado_anterior = $this->fields['estado'];
+		$nuevo_estado = $estado;
+		
+		
+		if ($estado_anterior != $nuevo_estado ) {
+			$his = new Observacion($sesion);
+			$his->Edit('fecha',date('Y-m-d H:i:s'));
+			$his->Edit('comentario',__('COBRO ANULADO'));
+			$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
+			$his->Edit('id_cobro',$cobro->fields['id_cobro']);
+			if($his->Write()) {
+				$pagina->AddInfo(__('Historial ingresado'));
+			}
+		}
 	}
 	elseif($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') #Guardamos todos los datos del cobro
 	{
@@ -270,18 +277,22 @@
                 } else if( $cantidad_facturas > 0 ) {
                     $pagina->AddError("Este cobro no se puede volver al estado CREADO, ya que tiene facturas asociados.");
                 } else {
-		$cobro->Edit('estado','CREADO');
-		if($cobro->Write())
-			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
-		$historial_comentario = __('REVISION ANULADO');
-		##Historial##
-		$his = new Observacion($sesion);
-		$his->Edit('fecha',date('Y-m-d H:i:s'));
-		$his->Edit('comentario',$historial_comentario);
-		$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
-		$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-		$his->Write();
-	}
+					$cobro->Edit('estado','CREADO');
+					if($cobro->Write())
+						$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
+					$historial_comentario = __('REVISION ANULADO');
+					##Historial##
+					$estado_anterior = $this->fields['estado'];		
+
+					if ( $estado_anterior != 'CREADO' ) {
+						$his = new Observacion($sesion);
+						$his->Edit('fecha',date('Y-m-d H:i:s'));
+						$his->Edit('comentario',$historial_comentario);
+						$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro',$cobro->fields['id_cobro']);
+						$his->Write();
+					}
+				}
 	}
 
 	$cobro->Edit('etapa_cobro','4');

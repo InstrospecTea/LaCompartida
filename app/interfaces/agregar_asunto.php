@@ -92,7 +92,7 @@ if ($id_asunto > 0) {
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($count) = mysql_fetch_array($resp);
 
-			if ($count>0){$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene').__('cobros').__('asociados'));}
+			if ($count>0){$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ').__('cobros').' '.__('asociados'));}
 			
 			$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '".$asunto->fields['codigo_asunto']."' AND codigo_cliente = '".$cliente->fields['codigo_cliente']."' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);

@@ -88,16 +88,19 @@ class Cobro extends Objeto {
 			if (!$this->fields['fecha_cobro'])
 				$this->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 
+			$estado_anterior = $this->fields['estado'];
 			$this->Edit('estado', 'PAGADO');
 
 			#Se ingresa la anotación en el historial
-			$his = new Observacion($this->sesion);
-			$his->Edit('fecha', date('Y-m-d H:i:s'));
-			$his->Edit('comentario', __('COBRO PAGADO'));
-			$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-			$his->Edit('id_cobro', $this->fields['id_cobro']);
-			if ($his->Write())
-				$pagado = true;
+			if( $estado_anterior != 'PAGADO') {
+				$his = new Observacion($this->sesion);
+				$his->Edit('fecha', date('Y-m-d H:i:s'));
+				$his->Edit('comentario', __('COBRO PAGADO'));
+				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+				$his->Edit('id_cobro', $this->fields['id_cobro']);
+				if ($his->Write())
+					$pagado = true;
+			}
 		}
 		$this->Write();
 		return $pagado;
@@ -375,8 +378,9 @@ class Cobro extends Objeto {
 				$this->Edit('fecha_pago_parcial', "0000-00-00 00:00:00"); /* esta fecha debiese existir solo con pagos */
 			}
 		}
+		$estado_anterior = $this->fields['estado'];
 		$this->Edit('estado', $estado);
-		if ($this->Write()) {
+		if ($this->Write() && $estado_anterior != $estado ) {
 			$his = new Observacion($this->sesion);
 			$his->Edit('fecha', date('Y-m-d H:i:s'));
 			$his->Edit('comentario', __('COBRO ' . $estado));
@@ -1753,12 +1757,14 @@ class Cobro extends Objeto {
 							$cobro_pendiente->AsociarCobro($this->sesion, $this->fields['id_cobro']);
 
 					#Se ingresa la anotación en el historial
-					$his = new Observacion($this->sesion);
-					$his->Edit('fecha', date('Y-m-d H:i:s'));
-					$his->Edit('comentario', __('COBRO CREADO'));
-					$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-					$his->Edit('id_cobro', $this->fields['id_cobro']);
-					$his->Write();
+					if( $this->fields['estado'] != 'COBRO CREADO'){
+						$his = new Observacion($this->sesion);
+						$his->Edit('fecha', date('Y-m-d H:i:s'));
+						$his->Edit('comentario', __('COBRO CREADO'));
+						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro', $this->fields['id_cobro']);
+						$his->Write();
+					}
 
 					$this->GuardarCobro();
 				}

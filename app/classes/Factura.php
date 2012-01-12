@@ -1182,7 +1182,7 @@ class Factura extends Objeto {
 		}
 
 		$numero += 1;
-		if ($this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie)) {
+		if ( $this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie) || UtilesApp::GetConf($this->sesion,'InformarContabilidad') ) {
 			$numero = $this->MaxNumeroDocLegal($tipo_documento_legal, $serie) + 1;
 		}
 

@@ -85,16 +85,22 @@ $idioma->Load($contrato->fields['codigo_idioma']);
 
 /* Antes de cargar el documento_cobro, es posible que se deje en 0 (anular emisión) o que se reinicie (cambio de estado desde incobrable) */
 if ($opc == 'anular_emision') {
+	$estado_anterior = $this->fields['estado'];
+	
 	$cobro->AnularEmision($estado);
 
 	#Se ingresa la anotación en el historial
-	$his = new Observacion($sesion);
-	$his->Edit('fecha', date('Y-m-d H:i:s'));
-	$his->Edit('comentario', __('COBRO INCOBRABLE'));
-	$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-	$his->Edit('id_cobro', $cobro->fields['id_cobro']);
-	if ($his->Write())
-		$pagina->AddInfo(__('Historial ingresado'));
+	
+					
+	if ( $estado_anterior != 'COBRO INCOBRABLE' ) {
+		$his = new Observacion($sesion);
+		$his->Edit('fecha', date('Y-m-d H:i:s'));
+		$his->Edit('comentario', __('COBRO INCOBRABLE'));
+		$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+		$his->Edit('id_cobro', $cobro->fields['id_cobro']);
+		if ($his->Write())
+			$pagina->AddInfo(__('Historial ingresado'));
+	}
 }
 //Se reinicia el documento del cobro
 if ($cobro->fields['estado'] == 'INCOBRABLE' && $opc == 'guardar' && $estado != 'INCOBRABLE') {
@@ -353,6 +359,8 @@ if ($opc == 'guardar') {
 
 
 if ($cambiar_estado) {
+	$estado_anterior = $this->fields['estado'];
+	
 	if ($estado == 'EMITIDO' && !$cobro->fields['fecha_emision'])
 		$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
 	if ($estado == 'ENVIADO AL CLIENTE' && !$cobro->fields['fecha_enviado_cliente'])
@@ -367,13 +375,17 @@ if ($cambiar_estado) {
 	$cobro->Write();
         
 	#Se ingresa la anotación en el historial
-	$his = new Observacion($sesion);
-	$his->Edit('fecha', date('Y-m-d H:i:s'));
-	$his->Edit('comentario', __("COBRO $estado"));
-	$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-	$his->Edit('id_cobro', $cobro->fields['id_cobro']);
-	if ($his->Write())
-		$pagina->AddInfo(__('Historial ingresado'));
+	
+	if ( $estado_anterior != $estado ) {
+		$his = new Observacion($this->sesion);
+		$his->Edit('fecha', date('Y-m-d H:i:s'));
+		$his->Edit('comentario', __("COBRO $estado"));
+		$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+		$his->Edit('id_cobro', $this->fields['id_cobro']);
+		if ($his->Write())
+			$pagina->AddInfo(__('Historial ingresado'));
+	}
+	
 }
 
 if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf') {
