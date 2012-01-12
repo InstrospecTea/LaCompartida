@@ -951,8 +951,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, $col_fecha_anyo, $f[0], $formato_normal_centrado);
 
 					//$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
-					if (!$opc_ver_asuntos_separados)
-						$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $formato_descripcion);
+								if (!$opc_ver_asuntos_separados) {
+									if( UtilesApp::GetConf($sesion,'TipoCodigoAsunto') == 2 ) {
+										$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -3), $formato_descripcion);
+									} else {
+										$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $formato_descripcion);
+									}
+								}
 										$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $formato_descripcion);
 										// Se guarda el nombre en una variable porque se usa en el detalle profesional.
 										$nombre = $trabajo->fields['username'];
