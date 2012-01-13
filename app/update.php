@@ -7380,6 +7380,31 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+	
+            case 5.37:
+				$query = array();
+				$query[] = "ALTER TABLE  `factura_rtf` ADD  `factura_template_xml` TEXT NOT NULL , ADD  `usaxml` TINYINT( 1 ) NOT NULL";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.38:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'EliminarLetraBorradorEnPieDePagina',  '0', NULL ,  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
 	}
 }
 
@@ -7702,6 +7727,8 @@ $VERSIONES[$num++] = 5.33;
 $VERSIONES[$num++] = 5.34;
 $VERSIONES[$num++] = 5.35;
 $VERSIONES[$num++] = 5.36;
+$VERSIONES[$num++] = 5.37;
+$VERSIONES[$num++] = 5.38;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

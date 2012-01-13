@@ -177,11 +177,16 @@ class Factura extends Objeto {
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);
 			$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, 2);
+                        $xmlData = UtilesApp::TemplateFacturaXML($this->sesion, 2);
+                         $xmlBit = UtilesApp::TemplateBitXML($this->sesion,2);
 		} else {
 			if ($id_formato_factura != null) {
 				$templateData = UtilesApp::TemplateFactura($this->sesion, $id_formato_factura);
 				$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, $id_formato_factura);
-			} else {
+			         $xmlData = UtilesApp::TemplateFacturaXML($this->sesion,$id_formato_factura);
+                                  $xmlBit = UtilesApp::TemplateBitXML($this->sesion,$id_formato_factura);
+                                
+                        } else {
 				// verificar el tipo de documento legal, y mostrar ese formato, sino mostrar por defecto
 				$query = "";
 				if ($this->fields['id_documento_legal'] > 0) {
@@ -194,15 +199,22 @@ class Factura extends Objeto {
 				if ($id_formato_factura > 0) {
 					$templateData = UtilesApp::TemplateFactura($this->sesion, $id_formato_factura);
 					$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, $id_formato_factura);
-				} else {
+		                        $xmlData = UtilesApp::TemplateFacturaXML($this->sesion,$id_formato_factura);
+                                        $xmlBit = UtilesApp::TemplateBitXML($this->sesion,$id_formato_factura);
+                                } else {
 					$templateData = UtilesApp::TemplateFactura($this->sesion);
 					$cssData = UtilesApp::TemplateFacturaCSS($this->sesion);
+                                          $xmlData = UtilesApp::TemplateFacturaXML($this->sesion);
+                                          $xmlBit = UtilesApp::TemplateBitXML($this->sesion);
 				}
 			}
 		}
+                                                          
+
+               
 		$templateData = $this->ReemplazarMargenes($templateData);
 		$parser = new TemplateParser($templateData);
-
+             //echo '<pre>';print_r($parser);echo '<pre>';die();
 		$query = "SELECT cobro.codigo_idioma
 							FROM factura
 							LEFT JOIN cobro ON factura.id_cobro=cobro.id_cobro
@@ -233,12 +245,18 @@ class Factura extends Objeto {
 		}
 
 		$html = $this->GenerarDocumento($parser, 'CARTA_FACTURA', $lang);
-
+          
 		$html_css = array();
 		$html_css['html'] = $html;
-		$html_css['css'] = $cssData;
-
-		return $html_css;
+		$html_css['css'] = $cssData;               
+		$html_css['xmlbit']=$xmlBit;
+                if($xmlBit) {
+                    $xml = $this->GenerarDocumento($xmlData, 'ENCABEZADO', $lang, true);
+                    $xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
+                    $xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
+                    $html_css['xml'] = str_replace(array('UTF-8','&nbsp;'),array('ISO-8859-1','&#160;'),$xml);
+                }
+                return $html_css;
 	}
 
 	function ReemplazarMargenes($html) {
@@ -264,8 +282,8 @@ class Factura extends Objeto {
 		return $html;
 	}
 
-	function GenerarDocumento($parser_factura, $theTag='', $lang='es') {
-		if (!isset($parser_factura->tags[$theTag])) {
+	function GenerarDocumento($parser_factura, $theTag='', $lang='es',$xml=false) {
+		if (!$xml && !isset($parser_factura->tags[$theTag])) {
 			return;
 		}
 
@@ -284,7 +302,7 @@ class Factura extends Objeto {
 
 		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 
-		$html2 = $parser_factura->tags[$theTag];
+		$html2 = ($xml)? $parser_factura : $parser_factura->tags[$theTag];
 
 		switch ($theTag) {
 			case 'CARTA_FACTURA':
@@ -800,8 +818,8 @@ class Factura extends Objeto {
 				}
 				
 				if ($mostrar_honorarios) {
-					$html2 = str_replace('%simbolo_honorarios_sin_impuesto', '%simbolo_honorarios%', $html2); 
-					$html2 = str_replace('%simbolo_honorarios_con_impuesto', '%simbolo_honorarios%', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '%simbolo_honorarios%', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '%simbolo_honorarios%', $html2); 
 					
 					
 					/* debe mostrar ceros en los espacios que sea 0 */
@@ -814,8 +832,8 @@ class Factura extends Objeto {
 					 * se reemplazan por '', por que si se pone &nbsp; se corre todo para abajo y dejaria un espacio,
 					 *  al no tener nada html esconde la fila 
 					 */
-					$html2 = str_replace('%simbolo_honorarios_sin_impuesto', '', $html2); 
-					$html2 = str_replace('%simbolo_honorarios_con_impuesto', '', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '', $html2); 
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '', $html2); 
 					
 					$html2 = str_replace('%monto_honorarios_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%monto_honorarios_con_impuesto%', '', $html2);
@@ -827,7 +845,7 @@ class Factura extends Objeto {
 				
 				} else {
 					
-					$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto', '', $html2);
+					$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_con_impuesto%', '', $html2);
 					
 				}
@@ -838,7 +856,7 @@ class Factura extends Objeto {
 				
 				} else {
 					
-					$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto', '', $html2);
+					$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
 					
 				}
@@ -987,7 +1005,7 @@ class Factura extends Objeto {
 
 		return $html2;
 	}
-
+       
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		if ($this->Loaded()) {
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {

@@ -659,11 +659,21 @@ if ($cobro->fields['id_contrato'] != '') {
 			return resultado;
 		}
 
-function Informar(form,valor)
-{
-	form.opc_informar_contabilidad.value = valor;
-	ValidarTodo(form);
-}
+		function Informar(form,valor,estado_contabilidad)
+		{
+			if( estado_contabilidad ) {
+				var estado = estado_contabilidad.toUpperCase();
+				if( estado == 'INFORMADO' && valor == 'informar' ) { 
+					alert( 'El Cobro ya ha sido informado a Contabilidad.');
+					return false;
+				} else if( estado == 'INFORMADO PARA FACTURAR' ) {
+					alert( 'El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar.' );
+					return false;
+				}
+			}
+			form.opc_informar_contabilidad.value = valor;
+			ValidarTodo(form);
+		}
 
 		function ValidarTodo(form)
 		{
@@ -1462,9 +1472,9 @@ if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetCon
 
 <? if (UtilesApp::GetConf($sesion, 'InformarContabilidad')) { ?>
 							<div align=left>
-								<input type=button value="<?=__('Informar a Contabilidad')?>" onclick="Informar(this.form,'informar')" />
+								<input type=button value="<?=__('Informar a Contabilidad')?>" onclick="Informar(this.form,'informar','<?=$cobro->fields['estado_contabilidad']?>')" />
 								&nbsp;
-								<input type=button value="<?=__('Informar y Facturar')?>" onclick="Informar(this.form,'informar y facturar')" />&nbsp;&nbsp;
+								<input type=button value="<?=__('Informar y Facturar')?>" onclick="Informar(this.form,'informar y facturar','<?=$cobro->fields['estado_contabilidad']?>')" />&nbsp;&nbsp;
 								<? if($cobro->fields['estado_contabilidad']=='NO INFORMADO') 
 								{
 								?>

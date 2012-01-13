@@ -479,6 +479,12 @@ class DocGenerator
 
 		return $body;
 	}//end getBody()
+        function outputxml($xml,$filename) {
+         $this->endSession();
+           header("Content-Type: application/msword; charset=ISO-8859-1");
+           header("Content-Disposition: attachment; filename=\"$filename\"");
+           echo $xml;
+       }
 }//end class DocGenerator
 
 

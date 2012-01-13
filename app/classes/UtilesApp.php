@@ -116,6 +116,30 @@ class UtilesApp extends Utiles
 		if(list($format)=mysql_fetch_array($resp))
 			return $format;
 	}
+        function TemplateFacturaXML( &$sesion, $id_factura_formato=1 )
+	{
+		$existexml=mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'factura_template_xml'",$sesion->dbh));
+                if($existexml) {
+                $query = "SELECT factura_template_xml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($format)=mysql_fetch_array($resp))
+			return $format;
+                 } else {
+                        return '';
+               }
+	}
+        function TemplateBitXML( &$sesion, $id_factura_formato=1 )
+	{
+		$existebitxml=mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'usaxml'",$sesion->dbh));
+               if($existebitxml) {
+                   $query = "SELECT usaxml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if(list($resultado)=mysql_fetch_array($resp))
+			return $resultado;
+               } else {
+                        return 0;
+               }
+	}
 
 	####################### Formato carta factura pago ######################
 	function TemplateFacturaPago( &$sesion, $id_factura_pago_formato=1 )

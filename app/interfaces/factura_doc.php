@@ -34,6 +34,8 @@ $desactivar_clave_rtf = UtilesApp::GetConf($sesion, 'DesactivarClaveRTF');
 $html_css = $factura->GeneraHTMLFactura();
 $html = $html_css['html'];
 $cssData = $html_css['css'];
+$xml = $html_css['xml'];
+$xmlbit=$html_css['xmlbit'];
 
 $configuracion = array();
 $configuracion['desactivar_clave_rtf'] = $desactivar_clave_rtf;
@@ -44,6 +46,13 @@ $configuracion['desactivar_clave_rtf'] = $desactivar_clave_rtf;
 	
 	$doc = new DocGenerator($html,$cssData,'LETTER',false,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,'EMITIDO','', $configuracion,$docm_header, $docm_footer);
 $valor_unico = substr(time(), -3);
-$doc->output('doc_tributario_' . $id_factura_grabada . '_' . $valor_unico . '.doc', '', 'factura');
+
+if($xmlbit==1) {
+$doc->outputxml($xml,'doc_tributario_' . $id_factura_grabada . '_' . $valor_unico . '.xml');
+} else {
+$doc->output('doc_tributario_' . $id_factura_grabada . '_' . $valor_unico . '.doc', '', 'factura');    
+  
+}
+
 exit;
 	?>

@@ -348,6 +348,7 @@
 								cobro.porcentaje_impuesto, 
 								cobro.fecha_fin,
 								cobro.nota_cobro, 
+								cobro.nota_venta_contabilidad,
 								cobro.monto_contrato as monto_contrato,
 								cobro.fecha_en_revision,
 								cobro.opc_moneda_total,
@@ -679,7 +680,7 @@
 			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $fecha);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 			{
-				$ws1->write($filas, $col_nota_cobro, $cobro['nota_cobro'], $fecha);
+				$ws1->write($filas, $col_nota_cobro, !empty($cobro['nota_venta_contabilidad']) ? $cobro['nota_venta_contabilidad'] : $cobro['nota_cobro'], $fecha);
 			}
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
