@@ -254,7 +254,7 @@ class Factura extends Objeto {
                     $xml = $this->GenerarDocumento($xmlData, 'ENCABEZADO', $lang, true);
                     $xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
                     $xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
-                    $html_css['xml'] = str_replace(array('UTF-8','&nbsp;'),array('ISO-8859-1','&#160;'),$xml);
+                    $html_css['xml'] = str_replace(array('UTF-8','&nbsp;','<br>','<br/>','<br />','<v:shape '),array('ISO-8859-1','&#160;','&#xD;','&#xD;','&#xD;','<v:shape filled="f" stroked="f" '),$xml);
                 }
                 return $html_css;
 	}
