@@ -1117,9 +1117,9 @@ class Factura extends Objeto {
 		}
 
 		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "SELECT COUNT(*) FROM factura WHERE numero = " . $numero . " AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
+			$query = "SELECT COUNT(*) FROM factura WHERE numero = '" . $numero . "' AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
 		} else {
-			$query = "SELECT COUNT(*) FROM factura WHERE numero = " . $numero . " AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
+			$query = "SELECT COUNT(*) FROM factura WHERE numero = '" . $numero . "' AND id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
 		}
 		$cantidad_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad) = mysql_fetch_array($cantidad_resp);
@@ -1176,9 +1176,9 @@ class Factura extends Objeto {
 			return false;
 		}
 		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "SELECT MAX(numero) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
+			$query = "SELECT MAX(numero+0) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
 		} else {
-			$query = "SELECT MAX(numero) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
+			$query = "SELECT MAX(numero+0) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
 		}
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($numero_max) = mysql_fetch_array($numero_resp);

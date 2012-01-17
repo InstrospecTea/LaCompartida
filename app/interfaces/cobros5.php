@@ -54,16 +54,16 @@
 	$retainer = "";
 
 	if($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION' && $opc != 'anular_emision')
-		$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
+            $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 
 	if($opc == 'anular_emision')
 	{
 		if($estado=='EN REVISION')
 			$cobro->AnularEmision('EN REVISION');
-		else
+	else
 			$cobro->AnularEmision();
 		#Se ingresa la anotación en el historial
-		$estado_anterior = $this->fields['estado'];
+		$estado_anterior = $cobro->fields['estado'];
 		$nuevo_estado = $estado;
 		
 		
@@ -197,7 +197,8 @@
                         } else {
 			$cobro->GuardarCobro(true);
                         }
-			$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
+			
+                       if (!$cobro->fields['fecha_emision']) $cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado','EMITIDO');
 			if($cobro->Write())
 			{
@@ -282,7 +283,7 @@
 						$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: Creado'));
 					$historial_comentario = __('REVISION ANULADO');
 					##Historial##
-					$estado_anterior = $this->fields['estado'];		
+					$estado_anterior = $cobro->fields['estado'];		
 
 					if ( $estado_anterior != 'CREADO' ) {
 						$his = new Observacion($sesion);

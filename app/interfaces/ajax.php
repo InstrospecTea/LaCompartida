@@ -121,6 +121,20 @@
 			else
 				echo false;
 		}
+		else if( $accion == "obtener_num_pagos" )
+		{
+			$query = "SELECT fp.id_factura_pago
+				FROM factura_pago AS fp
+					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+				WHERE ccfm2.id_factura = '{$_REQUEST['id_factura']}'
+				ORDER BY fp.fecha,fp.id_factura_pago DESC";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$cantidad_pagos = mysql_num_rows($resp);
+			
+			echo $cantidad_pagos;
+		}
 		else if( $accion == "buscar_banco" )
 		{
 			$query = "SELECT id_banco FROM cuenta_banco WHERE id_cuenta = '".$id."'";

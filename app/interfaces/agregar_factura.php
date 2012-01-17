@@ -818,6 +818,25 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 						form.monto_iva_gastos_con_iva.focus();
 						return false;
 					}
+					
+					
+					var http = getXMLHTTP();
+					http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura='+id_factura, false);
+					http.onreadystatechange = revisaEstado;
+					http.send(null);
+
+					function revisaEstado()
+					{
+					   if(http.readyState == 4)
+					   {
+						   num_pagos = http.responseText;
+					   }
+					}
+
+					if( num_pagos == 0 ) {
+					   alert('<?php echo  __('La factura posee pagos asociados. No se puede anular la factura hasta que se eliminen los pagos.'); ?>');
+					   return false;
+				   }
 	<?php
 	if (!$factura->loaded() && ($id_documento_legal != 2)) {	
 		?>
@@ -869,6 +888,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 						form.descripcion.focus();
 						return false;
 					}
+					
 	<?php
 }
 ?>
@@ -981,7 +1001,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 			$('tipo_cambios_factura').value += $('factura_moneda_'+arreglo_ids[i]).value + ",";
 		i=arreglo_ids.length-1;
 		$('tipo_cambios_factura').value += $('factura_moneda_'+arreglo_ids[i]).value;
-		alert( $('id_factura').value );
+		//alert( $('id_factura').value );
 		if( $('id_factura').value != '' )
 		{
 			var tc = new Array();
@@ -1089,6 +1109,26 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 		o.focus();
 		return false;
 		
+	}
+	
+	function ObtenerPagos( id_factura )
+	{
+		/* por algun motivo no me lo toma, aunque sea sincrono */
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura='+id_factura, false);
+		http.onreadystatechange = revisaEstado;
+		http.send(null);
+		
+		function revisaEstado()
+		{
+		   if(http.readyState == 4)
+		   {
+			   response = http.responseText;
+			   return response;
+		   }
+		}
+		
+		return http.responseText;
 	}
 
 </script>

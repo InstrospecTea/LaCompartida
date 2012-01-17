@@ -85,7 +85,7 @@ $idioma->Load($contrato->fields['codigo_idioma']);
 
 /* Antes de cargar el documento_cobro, es posible que se deje en 0 (anular emisión) o que se reinicie (cambio de estado desde incobrable) */
 if ($opc == 'anular_emision') {
-	$estado_anterior = $this->fields['estado'];
+	$estado_anterior = $cobro->fields['estado'];
 	
 	$cobro->AnularEmision($estado);
 
@@ -359,7 +359,7 @@ if ($opc == 'guardar') {
 
 
 if ($cambiar_estado) {
-	$estado_anterior = $this->fields['estado'];
+	$estado_anterior = $cobro->fields['estado'];
 	
 	if ($estado == 'EMITIDO' && !$cobro->fields['fecha_emision'])
 		$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
@@ -664,11 +664,13 @@ if ($cobro->fields['id_contrato'] != '') {
 			if( estado_contabilidad ) {
 				var estado = estado_contabilidad.toUpperCase();
 				if( estado == 'INFORMADO' && valor == 'informar' ) { 
-					alert( 'El Cobro ya ha sido informado a Contabilidad.');
-					return false;
-				} else if( estado == 'INFORMADO PARA FACTURAR' ) {
-					alert( 'El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar.' );
-					return false;
+					if( !confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?') ) {
+						return false;
+					}
+				} else if( estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR' ) {
+					if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
+						return false;
+					}
 				}
 			}
 			form.opc_informar_contabilidad.value = valor;
