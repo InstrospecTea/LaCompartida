@@ -443,6 +443,15 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
  */
 ?>
 <script type="text/javascript">
+
+    jQuery(document).ready(function() {
+        
+        jQuery('#RUT_cliente').blur(function() {
+         
+          Validar_Rut();
+        });      
+    })
+   
 	<!-- funcion ajax para asignar valores a los campos del cliente en agregar factura -->
 	function CargarDatosCliente()
 	{
@@ -1032,10 +1041,11 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 	/*Validador de Rut*/
 	function Validar_Rut()
 	{
-		var tipo = $('tipo_documento_identidad');
+		<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) : ?>
+                var tipo = $('tipo_documento_identidad');
 		if(tipo.value != 5)
 			return true;
-
+                <?php  endif; ?>
 		var o = $('RUT_cliente');
 		var tmpstr = "";
 		var intlargo = o.value

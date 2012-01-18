@@ -158,7 +158,7 @@ $server->wsdl->addComplexType(
 			array(
 				'id_cobro' => array('name' => 'id_cobro', 'type' => 'xsd:integer'),
 				'nota_venta' => array('name' => 'nota_venta', 'type' => 'xsd:integer'),
-				'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:integer'),
+				'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
 				'encargado_comercial' => array('name' => 'encargado_comercial', 'type' => 'xsd:string'),
 				'encargado_secundario' => array('name' => 'encargado_secundario', 'type' => 'xsd:string'),
 				'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
@@ -508,7 +508,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$factura_cobro['cliente'] = $cliente;
 											$factura_cobro['rut_cliente'] = $RUT_cliente;
 											$factura_cobro['direccion_cliente'] = $direccion_cliente;
-											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha,'%Y-%m-%d');
+											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha,'%d-%m-%y');
 											$factura_cobro['descripcion'] = $descripcion;
 											$factura_cobro['moneda'] = $codigo_moneda_factura;
 

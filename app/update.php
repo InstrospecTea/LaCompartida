@@ -7405,6 +7405,25 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+			
+			case 5.39:
+				$query = array();
+				$query[] = "CREATE TABLE `evaluacion` (
+							  `id_evaluacion` tinyint(11) NOT NULL auto_increment,
+							  `id_usuario` tinyint(11) NOT NULL default '0',
+							  `valuacion` tinyint(11) NOT NULL default '0',
+							  `glosa_valuacion` text,
+							  `fecha_creacion` datetime NOT NULL default '0000-00-00 00:00:00',
+							  PRIMARY KEY  (`id_evaluacion`)
+							) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+
 	}
 }
 
@@ -7729,6 +7748,7 @@ $VERSIONES[$num++] = 5.35;
 $VERSIONES[$num++] = 5.36;
 $VERSIONES[$num++] = 5.37;
 $VERSIONES[$num++] = 5.38;
+$VERSIONES[$num++] = 5.39;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

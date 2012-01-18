@@ -731,9 +731,15 @@ if ($cobro->fields['id_contrato'] != '') {
 				}
 			}
 
-			if(form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && !form.existe_pago.value) //No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
+			if(form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && ( !form.existe_pago.value || form.existe_pago.value == 0 ) ) //No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
 			{
 				alert('<?= __("No puede definir ") . __("el Cobro") . __(" como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente.") ?>');
+				return false;
+			}
+			
+			if(form.estado.value == 'PAGO PARCIAL' && form.estado_original.value != 'PAGO PARCIAL' && ( !form.existe_pago.value || form.existe_pago.value == 0 ) ) //No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
+			{
+				alert('<?= __("No puede definir ") . __("el Cobro") . __(" como \"PAGO PARCIAL\". Debe ingresar un documento de pago.") ?>');
 				return false;
 			}
 
@@ -901,6 +907,13 @@ else {
 
 	function RevisarPagado(estado)
 	{
+		<?php
+			if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
+		?>
+				return true;
+		<?php
+			}
+		?>
 		if(estado == 'PAGADO')
 		{
 			if($("estado_original").value=='INCOBRABLE')

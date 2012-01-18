@@ -367,6 +367,12 @@
 		$contrato = new Contrato($sesion);
 		echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);');
 	}
+	else if($accion == 'evaluacion'){
+		// sí existe la ventana del evaluacion después el login
+		$query = "INSERT evaluacion SET id_usuario= '$id', valuacion = '$valuacion', 
+						glosa_valuacion = '$glosa_valuacion', fecha_creacion = '".Utiles::fecha2sql(date())."'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	}
 	else{
 		echo("ERROR");
 	}
