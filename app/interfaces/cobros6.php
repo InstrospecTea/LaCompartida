@@ -312,12 +312,14 @@ if ($opc == 'guardar') {
 			}
 		}
 	}
-	
 	$cambiar_estado = false;
 	if ($estado != $cobro->fields['estado'])
 		$cambiar_estado = true;
+       
 
-	$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
+           
+           
+        $cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 	$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
 	$cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
         $cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
@@ -360,9 +362,11 @@ if ($opc == 'guardar') {
 
 if ($cambiar_estado) {
 	$estado_anterior = $cobro->fields['estado'];
+		
 	
-	if ($estado == 'EMITIDO' && !$cobro->fields['fecha_emision'])
-		$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
+        if ($estado == 'EMITIDO' && !$cobro->fields['fecha_emision'])
+		
+            $cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
 	if ($estado == 'ENVIADO AL CLIENTE' && !$cobro->fields['fecha_enviado_cliente'])
 		$cobro->Edit('fecha_enviado_cliente', date('Y-m-d H:i:s'));
 	if ($estado == 'FACTURADO' && !$cobro->fields['fecha_facturacion'])
@@ -675,6 +679,7 @@ if ($cobro->fields['id_contrato'] != '') {
 			}
 			form.opc_informar_contabilidad.value = valor;
 			ValidarTodo(form);
+                        //PARA INFORMAR Y FACTURAR
 		}
 
 		function ValidarTodo(form)
@@ -1064,7 +1069,7 @@ else
 	$existe_factura = 0;
 
 
-$query = "SELECT count(*) FROM documento WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "' AND tipo_doc != 'N'";
+$query = "SELECT count(*) FROM documento WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "' AND tipo_doc != 'N' and monto!=0";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 list($numero_documentos_pagos_asociados) = mysql_fetch_array($resp);
 
