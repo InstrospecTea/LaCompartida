@@ -45,6 +45,7 @@ $validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($
 $obligatorio = '<span class="req">*</span>';
 $usuario_responsable_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioCliente');
+$usuario_encargado_obligatorio = (substr(UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'),0,4)=='true')? true:false;
 
 if ($opcion == "guardar") {
 	#Validaciones
@@ -189,6 +190,9 @@ if ($opcion == "guardar") {
         
         if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1')) {
             $pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
+        }
+        if ($usuario_encargado_obligatorio && (empty($id_usuario_encargado) or $id_usuario_encargado == '-1')) {
+            $pagina->AddError(__("Debe ingresar el") . " " . __('Usuario Encargado'));
         }
 
         if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
@@ -473,7 +477,7 @@ if ($opcion == "guardar") {
 		else
 			$pagina->AddError($cliente->error);
 	}
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'AgregarAsuntosPorDefecto') != '' ) || ( method_exists('Conf', 'AgregarAsuntosPorDefecto') ) ) && $loadasuntos) {
+	if (( ( method_exists('Conf', 'GetConf') && substr(Conf::GetConf($sesion, 'AgregarAsuntosPorDefecto'),0,4)=='true' ) || ( method_exists('Conf', 'AgregarAsuntosPorDefecto') ) ) && $loadasuntos) {
 		if (method_exists('Conf', 'GetConf'))
 			$asuntos = explode(';', Conf::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
 		else
@@ -648,7 +652,14 @@ $pagina->PrintTop();
 			form.glosa_cliente.focus();
 			return false;
 		}
-
+                <?php if($usuario_encargado_obligatorio): ?>
+                if(!form.id_usuario_encargado.value || form.id_usuario_encargado.value==-1)
+		{
+			alert("<?= __('Debe ingresar el usuario encargado') ?>");
+			form.id_usuario_encargado.focus();
+			return false;
+		}
+                <?php endif; ?>
 		if(validarUnicoCliente(form.glosa_cliente.value,'glosa',form.id_cliente.value))
 		{
 			if(!glosa_cliente_unica)

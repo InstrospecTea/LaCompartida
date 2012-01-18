@@ -834,8 +834,8 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 					}
 
 					if( num_pagos == 0 ) {
-					   alert('<?php echo  __('La factura posee pagos asociados. No se puede anular la factura hasta que se eliminen los pagos.'); ?>');
-					   return false;
+					   respuesta_num_pagos = confirm('<?php echo  __('La factura posee pagos asociados. \n¿Está seguro de continuar?.'); ?>');
+					   return respuesta_num_pagos;
 				   }
 	<?php
 	if (!$factura->loaded() && ($id_documento_legal != 2)) {	

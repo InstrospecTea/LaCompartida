@@ -523,13 +523,26 @@
 			$('monto').focus();
 			$('boton_guardar').disabled = false;
 			return false;
-		}
+		} 
 		else if( !isNumber( $('monto_moneda_cobro').value ) ) {
 			alert( 'El formato del monto ingresado no es valido.' );
 			$('monto_moneda_cobro').focus();
 			$('boton_guardar').disabled = false;
 			return false;
 		}
+		
+		if( $('monto').value <= 0 ){
+			alert( 'El monto ingresado debe ser mayor a 0' );
+			$('monto').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		} else if( $('monto_moneda_cobro').value <= 0 ) {
+			alert( 'El monto ingresado debe ser mayor a 0' );
+			$('monto_moneda_cobro').focus();
+			$('boton_guardar').disabled = false;
+			return false;
+		}
+		
 		$$('[id^="saldo_"]').each(function(elem){
 			if( !isNumber( $(elem.id).value ) ) {
 				alert( 'El formato del monto ingresado no es valido.' );

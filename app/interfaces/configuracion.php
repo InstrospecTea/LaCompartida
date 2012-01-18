@@ -11,7 +11,6 @@
 
 	$pagina->titulo = __('Configuración');
 	$pagina->PrintTop();
-
 	if($opc=='guardar')
 	{
 		foreach($opcion as $id => $valor)
@@ -54,17 +53,33 @@
 ?>
 
 <script type="text/javascript">
-
+  
 function MostrarTablaAsuntos( check, tabla, valor_hidden )
 {
-	var check_elemento = document.getElementById( check );
-	var tabla_elemento = document.getElementById( tabla );
-	var valorhidden = document.getElementById( valor_hidden );
+	//var check_elemento = document.getElementById( check );
+	//var tabla_elemento = document.getElementById( tabla );
 	
-	if( check_elemento.checked )
-		tabla_elemento.style.display = 'table';
-	else
-		tabla_elemento.style.display = 'none';
+        //var valorhidden = document.getElementById( valor_hidden );
+       // var valorhidden = jQuery('#'+valor_hidden).val();
+      
+	var string_asuntos = jQuery('#'+valor_hidden).val();
+        var array_asuntos = string_asuntos.split(';');
+	//if( check_elemento.checked ) {
+	//	tabla_elemento.style.display = 'table';
+        if (jQuery('#'+check).is(':checked')) {
+        jQuery('#'+tabla).show();
+        string_asuntos='true';
+	} else {
+	//	tabla_elemento.style.display = 'none';
+        jQuery('#'+tabla).hide();
+            string_asuntos='false';  
+        }    
+   for( var i = 1; i < array_asuntos.length; i++)
+  	{
+  	string_asuntos += ';'+array_asuntos[i];
+        }
+	         
+        jQuery('#'+valor_hidden).val(string_asuntos)  ;  
 }
 
 function Ocultar( version, trID, valor_hidden, inputID )
@@ -125,7 +140,12 @@ function AgregarAsunto( numero , valor_hidden )
 	var string_asuntos = valorhidden.value;
 	
   var array_asuntos = string_asuntos.split(';');
-  for( var i = 0; i < array_asuntos.length; i++)
+ if (jQuery('#usa_asuntos_por_defecto').is(':checked')) {
+  string_asuntos='true';
+  } else {
+  string_asuntos='false';    
+  }
+  for( var i = 1; i < array_asuntos.length; i++)
   	{
   		if( input_elemento.value == array_asuntos[i] )
   			{
@@ -133,8 +153,10 @@ function AgregarAsunto( numero , valor_hidden )
   				input_elemento.focus();
   				return false;
   			}
-  	}
-	string_asuntos += ';'+input_elemento.value;
+  	string_asuntos += ';'+array_asuntos[i];
+        }
+        string_asuntos += ';'+input_elemento.value;
+//	alert(string_asuntos);
 	valorhidden.value = string_asuntos; 
 	div_elemento.innerHTML = input_elemento.value;
 	div_elemento.style.display = 'inline';
@@ -197,10 +219,10 @@ function AgregarAsunto( numero , valor_hidden )
 				echo "<input type='radio' ".($valor_opcion?"checked='checked'":"")." name='".$valores[1]."' />";
 				break;
 			case 'array':
-				echo "<input type='hidden' id='opcion[$id]' name='opcion[$id]' value='".$valor_opcion."' />";
+				echo "<input type='hidden' id='opcion_$id' name='opcion[$id]' value='".$valor_opcion."' />";
 				$valores_array = explode(';', $valor_opcion);
-				echo "<input type='checkbox' value='1' id='usa_asuntos_por_defecto' ".(($valor_opcion != '' && $valor_opcion != 'false' && $valor_opcion != 'true')?"checked='checked'":"")." onChange=\"MostrarTablaAsuntos( 'usa_asuntos_por_defecto', 'tabla_asuntos', 'opcion[$id]' );\" />";
-				echo "<table id='tabla_asuntos' ".(($valor_opcion=='' || $valor_opcion=='false' || $valor_opcion=='true')?"style='display: none;'":"").">";
+				echo "<input type='checkbox'  id='usa_asuntos_por_defecto' ".(($valores_array[0]== 'true')?"checked='checked'":"")." onChange=\"MostrarTablaAsuntos( 'usa_asuntos_por_defecto', 'tabla_asuntos', 'opcion_$id' );\" />";
+				echo "<table id='tabla_asuntos' ".(($valores_array[0]!='true')?"style='display: none;'":"").">";
 				for($i=1; $i<count($valores_array); ++$i )
 					echo "<tr id='$valores_array[$i]'><td>".$valores_array[$i]."</td><td><img style=\"filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('viejo','".$valores_array[$i]."', 'opcion[".$id."]');\"/></td></tr>";
 				echo "<tr id='hidden_1'><td><input type='text' id='text_1' size='12' value='' /><div id='texto_1' style=\"display:none;\"/></td><td><img id='img_1' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_1', 'opcion[".$id."]', 'text_1');\"/><input type='button' id='agregar_1' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('1','opcion[".$id."]');\" /></td></tr>";

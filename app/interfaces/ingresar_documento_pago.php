@@ -89,7 +89,10 @@
 				if( window.opener.Refrescar )
 					window.opener.Refrescar();
 			</script>
-		<?php if($nuevo && $id_documento){ ?>
+		<?php if($nuevo && $id_documento) {	
+			
+			$_SESSION["infos_tmp"] = $pagina->infos;  /* es en este caso que da problemas que se pierden los avisos */
+			?>
 			<script type="text/javascript">
 				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '&id_documento=<?=$id_documento?>';
 			</script>
@@ -115,6 +118,23 @@
 	$txt_tipo = empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelanto');
 
 	$pagina->titulo = $txt_pagina;
+	
+	/*
+	 * esto fue agregado por que por algun motivo no funciona ni con $_COOKIES ni con $_SESSION para recuperarlo en la pagina 
+	 * luego del redirect efectuado producto de comprobación por adelantos.
+	 * no me gusta la solución pero es la única que está funcionando
+	 */
+	if( isset( $_SESSION['infos_tmp'] ) ){
+		foreach ( $_SESSION['infos_tmp'] as $key => $info ){
+			$pagina->addInfo( $info );
+		}
+		
+		/* magia porque por ahora no puedo explicarlo */
+		$en_query_string = strpos( $_SERVER['QUERY_STRING'], "id_documento" ) ;
+		if( $en_query_string > -1 ){
+			unset( $_SESSION['infos_tmp']);
+		}
+	}
 	$pagina->PrintTop($popup);
 ?>
 
