@@ -187,9 +187,15 @@
 							LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto
                                                         ";
                                                         if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')):
-                                                         $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))  documentof 
-                                                                    FROM `prm_documento_legal` prm join factura  f using (id_documento_legal) left join prm_estado_factura pef using (id_estado) group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
-                                                        else:    
+                                                            if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) :
+                                                            $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))  documentof 
+                                                                      FROM `prm_documento_legal` prm join factura  f using (id_documento_legal) left join prm_estado_factura pef using (id_estado) group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
+                                                            else:
+                                                            $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)',''))  documentof 
+                                                                      FROM `prm_documento_legal` prm join factura  f using (id_documento_legal) left join prm_estado_factura pef using (id_estado) group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
+                                                                
+                                                            endif;
+                                                         else:    
                                                          $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))  documentof 
                                                                     FROM `prm_documento_legal` prm join factura  f using (id_documento_legal)  group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
                                                         endif;

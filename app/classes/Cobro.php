@@ -10313,7 +10313,7 @@ class Cobro extends Objeto {
 					$resumen_hrs_descontadas += $data['duracion_descontada'];
 					$resumen_hrs_incobrables += $data['duracion_incobrables'];
 					$resumen_hh += $data['duracion_tarificada'];
-					if ($this->fields['forma_cobro']) {
+					if ($this->fields['forma_cobro'] == 'ESCALONADA' ) {
 						$resumen_valor += $data['monto_cobrado_escalonada'];
 					} else {
 						$resumen_valor += $data['valor_tarificada'];

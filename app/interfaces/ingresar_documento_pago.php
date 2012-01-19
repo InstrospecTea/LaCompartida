@@ -217,6 +217,7 @@ function Validar(form)
 		$('monto').focus();
 		return false;
 	}
+	
 	var monto_pagos = Math.round($F('monto_pagos')*1000)/1000;
 	monto = Math.round(monto*1000)/1000;
 	
@@ -234,7 +235,7 @@ function Validar(form)
 	}
 	<?php } ?>
 	
-	if(monto < 0)
+	if(monto <= 0)
 	{
 		alert('<?=__('El monto de un pago debe ser siempre mayor a 0')?>');
 		$('monto').focus();

@@ -307,13 +307,21 @@
 			$group_by="contrato.id_contrato";
 		}
 
+		if( UtilesApp::GetConf($sesion, 'UsarCodigoSecundarioReporteHPF') ) {
+			$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
+			$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
+		} else {
+			$codigos_asuntos_secundarios = "";
+			$codigo_asunto_secundario_sep = "";
+		}
 		$query = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
+								$codigos_asuntos_secundarios
 								asunto.glosa_asunto,
 								GROUP_CONCAT( asunto.glosa_asunto ) as asuntos,
                                                                 asunto.codigo_asunto, 
+																$codigo_asunto_secundario_sep 
                                                                 GROUP_CONCAT( IF(asunto.cobrable=1,'SI','NO') ) as asuntos_cobrables,
-								cliente.codigo_cliente,
 								cliente.glosa_cliente,
 								GROUP_CONCAT( cliente.glosa_cliente ) as clientes,
 								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
@@ -376,10 +384,14 @@
 			$id_ultimo_cobro = $contrato->UltimoCobro();
 			$ultimo_cobro = new Cobro($sesion);
 			$ultimo_cobro->Load($id_ultimo_cobro);
-                        
-                        $codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos']));
-                        $asuntos         = implode("\n",explode(',',$cobro['asuntos']));
-                        $asuntos_cobrables = implode("\n",explode(',',$cobro['asuntos_cobrables']));
+            
+			if( UtilesApp::GetConf($sesion, 'UsarCodigoSecundarioReporteHPF') ) {
+				$codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos_secundarios']));
+			} else {
+				$codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos']));
+			}			
+			$asuntos         = implode("\n",explode(',',$cobro['asuntos']));
+			$asuntos_cobrables = implode("\n",explode(',',$cobro['asuntos_cobrables']));
                         
 			if( empty( $id_moneda_trabajos ) ) {
 				$id_moneda_trabajos = $cobro['id_moneda_contrato'];

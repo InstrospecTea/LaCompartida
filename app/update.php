@@ -7423,6 +7423,19 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+			
+			case 5.40:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+					VALUES ('UsarCodigoSecundarioReporteHPF', '0', 'Usar Codigo Secundario en Reporte Horas por facturar', 'boolean', '5', '-1');";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+				
+				break;
 
 	}
 }
@@ -7749,6 +7762,7 @@ $VERSIONES[$num++] = 5.36;
 $VERSIONES[$num++] = 5.37;
 $VERSIONES[$num++] = 5.38;
 $VERSIONES[$num++] = 5.39;
+$VERSIONES[$num++] = 5.40;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

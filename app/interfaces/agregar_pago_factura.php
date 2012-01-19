@@ -43,6 +43,7 @@
 	}
 
 	$pago = new FacturaPago($sesion);
+       // echo '<pre>';print_r($sesion);echo '</pre>';
 	//Desde el webservice viene un id_pago (id_contabilidad).
 	if($desde_webservice)
 	{
@@ -112,7 +113,8 @@
 
 		if( $guardar_datos)
 		{
-			if(empty($id_neteo_documento_adelanto)){
+		//echo '<pre>';print_r($_POST);echo '</pre>';
+                    if(empty($id_neteo_documento_adelanto)){
 				if(!empty($id_factura_pago))
 				{
 					$pago->Edit('id_factura_pago',$id_factura_pago);
@@ -125,7 +127,8 @@
 				//$pago->Edit('codigo_cliente', $codigo_cliente);
 				$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 				$pago->Edit('monto', $monto);
-				$pago->Edit('id_moneda', $id_moneda);
+				if(is_numeric($_POST['id_moneda']) && $_POST['id_moneda']!=$id_moneda ) $id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
+                                $pago->Edit('id_moneda', $id_moneda);
 				$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
 				$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
 				$pago->Edit('tipo_doc', $tipo_doc);
@@ -336,7 +339,7 @@
 			});
 		}
 		$('monto_moneda_cobro').value = Redondear(monto, cifras_decimales);
-		if($F('id_moneda') == '<?=$id_moneda_cobro?>'){
+		if($('id_moneda') == '<?=$id_moneda_cobro?>'){
 			$('monto').value = $('monto_moneda_cobro').value;
 		}
 	}

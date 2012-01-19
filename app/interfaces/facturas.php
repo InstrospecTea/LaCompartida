@@ -203,7 +203,9 @@
 							LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 							WHERE $where";
 
-		$resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		//echo $query;
+                
+                $resp = mysql_query($query.' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$monto_saldo_total = 0;
 		$glosa_monto_saldo_total = '';
 		$where_moneda = ' WHERE moneda_base = 1';
@@ -296,14 +298,14 @@
 	{
 		global $idioma;
 		$query = "SELECT SUM(ccfmn.monto) as monto_aporte
-						,ccfm.id_moneda as id_moneda
+						,ccfm2.id_moneda as id_moneda
 						,mo.cifras_decimales
 						,mo.simbolo
 					FROM factura_pago AS fp
 					JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
 					JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
 					LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-					LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
+					LEFT JOIN prm_moneda mo ON ccfm2.id_moneda = mo.id_moneda
 					WHERE ccfm2.id_factura =  '".$fila->fields['id_factura']."' GROUP BY ccfm2.id_factura ";
 
 		//echo "<br>".$query;
