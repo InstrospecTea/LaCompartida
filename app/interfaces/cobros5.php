@@ -2018,15 +2018,15 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							</tr>
 							<tr>
 								<td colspan="2">&nbsp;</td>
-							</tr>
+							</tr>	
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Archivo')?>" onclick="ImprimirCobro(this.form);" />
 								</td>
 							</tr>
 							<?php
-								if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
-								{
+							if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
+							{
 							?>
 							<tr>
 								<td colspan="2" align="center">
@@ -2041,15 +2041,16 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 									<input type="button" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="ImprimirExcel(this.form);" />
 								</td>
 							</tr>
-							<?
-								if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' )
-								{ ?>
+							<?php 
+							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador') ) {
+								if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('Descargar Excel Cobro')?>" onclick="ImprimirExcel(this.form, 'especial');" />
 								</td>
 							</tr>
-						<? } ?>
+							<? } 
+							} ?>
 						</table>
 					</td>
 				</tr>
