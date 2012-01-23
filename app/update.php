@@ -7436,6 +7436,18 @@ NULL ,  'RUT'
                 }
 				
 				break;
+				
+			case 5.41:
+				$query = array();
+				$query[] = "DELETE FROM `configuracion` WHERE glosa_opcion = 'UsarCodigoSecundarioReporteHPF'";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+				
+				break;
 
 	}
 }

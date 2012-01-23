@@ -209,9 +209,9 @@ function Cerrar()
 
 function Validar(form)
 {
-	monto = parseFloat($('monto').value);
+	monto = parseFloat(form.monto.value);
 
-	if(isNaN(monto))
+	if(isNaN(monto) || monto == '')
 	{
 		alert('<?=__('Debe ingresar un monto para el pago')?>');
 		$('monto').focus();

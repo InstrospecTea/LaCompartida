@@ -486,7 +486,11 @@ function funcionTR(& $fila) {
 						valores = cuentas[i].split('|');
 
 						var option = new Option();
-						option.value = valores[0];
+						if( valores[0] == "Vacio" ) {
+							option.value = '';
+						} else {
+							option.value = valores[0];
+						}
 						option.text = valores[1];
 
 						try

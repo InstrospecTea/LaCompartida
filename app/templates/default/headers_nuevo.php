@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
+   
+    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
 	<meta http-equiv="Page-Enter" content="blendTrans(Duration=0.2)" />
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />

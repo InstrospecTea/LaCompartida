@@ -155,8 +155,37 @@ function cambia_tarifa(valor)
 }
 function Eliminar()
 {
-	if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?'))
-		location.href="agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_eliminar=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
+	var http = getXMLHTTP();
+	http.open('get', 'ajax.php?accion=obtener_tarifa_defecto&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+	http.send(null);
+	tarifa_defecto_en_bd = http.responseText;
+	
+	if( tarifa_defecto_en_bd != <?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?> ){
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=contratos_con_esta_tarifa&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+		http.send(null);
+		num_contratos = http.responseText;
+
+		if( num_contratos > 0 ) {
+			respuesta_num_pagos = confirm('<?php echo  __('La tarifa posee'); ?> ' + num_contratos + ' <?php echo __('contratos asociados. \nSi continua se le asignará la tarifa estándar a los contratos afectados.\n¿Está seguro de continuar?.'); ?>');
+			if( respuesta_num_pagos ) {
+				http.open('get', 'ajax.php?accion=cambiar_a_tarifa_por_defecto&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+				http.send(null);
+				num_contratos = http.responseText;
+
+				location.href="agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_eliminar=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
+			} else {
+				return false;
+			}					   
+		} else {
+			if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?')) {
+				location.href="agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_eliminar=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
+			}
+		}
+	} else {
+		alert( 'No puede eliminar la tarifa estándar (por defecto)' );
+		return false;
+	}
 }
 
 function ActualizarTarifaUsuario(glosa_categoria,valor,glosa_moneda,vacio)

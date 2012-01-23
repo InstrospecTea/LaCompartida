@@ -29,26 +29,25 @@
 	
 	if(!$id_usuario)
 	{
-		if($p_profesional->fields['permitido'])
+		if($p_profesional->fields['permitido']) {
 			$id_usuario = $sesion->usuario->fields['id_usuario'];
-                else if($p_secretaria->fields['permitido'])
-                {
-                        $query = "SELECT usuario.id_usuario,
-								CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
-								as nombre
-								FROM usuario
-                                                                JOIN usuario_permiso USING(id_usuario)
-                                                                JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario 
-                                                                WHERE usuario.visible = 1 AND 
-                                                                      usuario_permiso.codigo_permiso='PRO' AND 
-                                                                      usuario_secretario.id_secretario='".$sesion->usuario->fields['id_usuario']."'
-                                                                GROUP BY usuario.id_usuario ORDER BY nombre LIMIT 1";
-                        $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		}
+		else if($p_secretaria->fields['permitido']) {
+            $query = "SELECT usuario.id_usuario,
+						CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+						as nombre
+						FROM usuario
+			          JOIN usuario_permiso USING(id_usuario)
+                      JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario 
+                      WHERE usuario.visible = 1 AND 
+                            usuario_permiso.codigo_permiso='PRO' AND 
+                            usuario_secretario.id_secretario='".$sesion->usuario->fields['id_usuario']."'
+                      GROUP BY usuario.id_usuario ORDER BY nombre LIMIT 1";
+            $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			$temp=mysql_fetch_array($resp);
 			$id_usuario=$temp['id_usuario'];
-                }
-		else
-		{
+        }
+		if( !$id_usuario ) {
 			$query = "SELECT usuario.id_usuario,
 								CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
 								as nombre

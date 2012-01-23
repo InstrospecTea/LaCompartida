@@ -307,7 +307,7 @@
 			$group_by="contrato.id_contrato";
 		}
 
-		if( UtilesApp::GetConf($sesion, 'UsarCodigoSecundarioReporteHPF') ) {
+		if( UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
 			$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
 			$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
 		} else {
@@ -385,7 +385,7 @@
 			$ultimo_cobro = new Cobro($sesion);
 			$ultimo_cobro->Load($id_ultimo_cobro);
             
-			if( UtilesApp::GetConf($sesion, 'UsarCodigoSecundarioReporteHPF') ) {
+			if( UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
 				$codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos_secundarios']));
 			} else {
 				$codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos']));

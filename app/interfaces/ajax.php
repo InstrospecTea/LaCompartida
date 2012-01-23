@@ -135,6 +135,34 @@
 			
 			echo $cantidad_pagos;
 		}
+		else if ( $accion == 'contratos_con_esta_tarifa' )
+		{
+			$query = "SELECT id_contrato FROM contrato WHERE id_tarifa = '{$_REQUEST['id_tarifa']}'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$cantidad_contratos = mysql_num_rows($resp);
+			
+			echo $cantidad_contratos;
+		}
+		else if ( $accion == 'obtener_tarifa_defecto' )
+		{
+			$query = "SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1 ORDER BY id_tarifa ASC LIMIT 1";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($id_tarifa_defecto) = mysql_fetch_array($resp);
+			
+			echo $id_tarifa_defecto;
+		}
+		else if ( $accion == 'cambiar_a_tarifa_por_defecto' )
+		{
+			$query = "SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1 ORDER BY id_tarifa ASC LIMIT 1";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($id_tarifa_defecto) = mysql_fetch_array($resp);
+			
+			$query = "UPDATE contrato SET id_tarifa = $id_tarifa_defecto WHERE id_tarifa = '{$_REQUEST['id_tarifa']}'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$cantidad_contratos = mysql_num_rows($resp);
+			
+			echo $cantidad_contratos;
+		}
 		else if( $accion == "buscar_banco" )
 		{
 			$query = "SELECT id_banco FROM cuenta_banco WHERE id_cuenta = '".$id."'";
@@ -160,6 +188,9 @@
 				else
 					$respuesta .= "//$id_cuenta|$numero";
 				$cont++;
+			}
+			if(!$id ) {
+				$respuesta = "Vacio|Cualquiera//".$respuesta;
 			}
 			if(!$respuesta)
 				echo "~noexiste";
@@ -196,6 +227,9 @@
 					$respuesta .= "//$id_cuenta|$numero";
 				}
 				$cont++;
+			}
+			if( !$id ) {
+				$respuesta = "Vacio|Cualquiera//".$respuesta;
 			}
 			if(!$respuesta) {
 				echo "~noexiste";

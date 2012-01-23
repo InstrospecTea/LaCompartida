@@ -830,21 +830,21 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 					
 					
 					var http = getXMLHTTP();
-					http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura='+id_factura, false);
-					http.onreadystatechange = revisaEstado;
+					http.open('get', 'ajax.php?accion=obtener_num_pagos&id_factura='+form.id_factura.value, false);  //debe ser syncrono para que devuelva el valor antes de continuar
 					http.send(null);
-
-					function revisaEstado()
-					{
-					   if(http.readyState == 4)
-					   {
-						   num_pagos = http.responseText;
-					   }
-					}
-
-					if( num_pagos == 0 ) {
-					   respuesta_num_pagos = confirm('<?php echo  __('La factura posee pagos asociados. \n¿Está seguro de continuar?.'); ?>');
-					   return respuesta_num_pagos;
+					num_pagos = http.responseText;
+					/*opcion_seleccionada = form.id_estado.options[form.id_estado.selectedIndex].text;
+					
+					if( num_pagos > 0 && ( opcion_seleccionada.toLowerCase() == "anulado" || opcion_seleccionada.toLowerCase() == "anulada" ) ) {
+						respuesta_num_pagos = confirm('<?php echo  __('La factura posee pagos asociados. \n¿Está seguro de continuar?.'); ?>');
+						if( !respuesta_num_pagos ) {
+							return false;   
+						}					   
+				   }*/
+			
+				   if( num_pagos > 0 ){
+					   alert('<?php echo  __('La factura no puede eliminarse ya que posee pagos asociados.'); ?>');
+					   return false;
 				   }
 	<?php
 	if (!$factura->loaded() && ($id_documento_legal != 2)) {	

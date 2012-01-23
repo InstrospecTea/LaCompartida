@@ -6,8 +6,13 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 	$sesion = new Sesion( array() );
+        $rel='v ';
+          if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 13,5)) $rel.=$versionsvn; 
+           if (file_exists(Conf::ServerDir().'/../app/version.php') and $versiondb=file_get_contents(Conf::ServerDir().'/../app/version.php', NULL, NULL, 13,5)) $rel.=' db'.$versiondb; 
+
 ?>
-<body onload="SetFocoPrimerElemento();" class="non_popup">
+<body onload="SetFocoPrimerElemento();" class="non_popup" rel="<?php echo $rel;?>">
+         
 <table width="100%" height="100%" align="center" border="0" cellspacing="0" cellpadding="0">
 	  <? if($color=='') {
 	  echo "<tr style=\"height:55px;\" class=\"tb_facebook\">";
