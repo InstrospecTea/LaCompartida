@@ -7405,7 +7405,7 @@ class Cobro extends Objeto {
 				else
 					$html = str_replace('%RESUMEN_CAP%', '', $html);
 				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ParafoAsuntosSoloSiHayTrabajos') ) || ( method_exists('Conf', 'ParafoAsuntosSoloSiHayTrabajos') && Conf::ParafoAsuntosSoloSiHayTrabajos() )) {
-					if ($cont_trab || $cont_tram) {
+					if ($cont_trab || $cont_tram || ( $cont_gastos > 0 && UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') ) ) {
 						$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html);
 					}else
 						$html = str_replace('%ASUNTOS%', '', $html);
@@ -8408,7 +8408,7 @@ class Cobro extends Objeto {
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($cont_trabajos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0) {
+					if ($cont_trabajos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') ) ) {
 						$html .= $row;
 					}
 				}

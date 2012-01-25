@@ -1764,7 +1764,7 @@ if (!$contrato->loaded()) {
 		$tiene_banco = true;
 		$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
 	} else {
-		$where_banco = "";
+		$where_banco = " WHERE 1=2 ";
 	}
 ?>
 				<tr>

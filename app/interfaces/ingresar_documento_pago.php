@@ -728,12 +728,19 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 			<?=InputId::Imprimir($sesion,"prm_banco","id_banco","nombre", "id_banco", $id_banco,"","CargarSelect('id_banco','id_cuenta','cargar_cuenta_banco');", 125, $id_cuenta);?>
 		</td>
 	</tr>
+	<?php
+		if( !empty($id_banco) ) {
+			$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
+		} else {
+			$where_banco = " WHERE 1=2 ";
+		}
+	?>
 	<tr>
 		<td align=right>
 			<?=__('N° Cuenta')?>
 		</td>
 		<td align=left>
-			<?=InputId::Imprimir($sesion,"cuenta_banco","id_cuenta","numero", "id_cuenta", $id_cuenta,"","", 125, $id_banco);?>
+			<?=InputId::Imprimir($sesion,"cuenta_banco","id_cuenta","numero", "id_cuenta", $id_cuenta,"","", 125, "", "", "", !empty($id_banco) ? $id_banco : "no_existe" );?>
 		</td>
 	</tr>
 	<tr>

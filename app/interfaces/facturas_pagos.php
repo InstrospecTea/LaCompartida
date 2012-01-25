@@ -713,18 +713,23 @@ function funcionTR(& $fila) {
 				</td>
 				<td align=left>
 					<?php 
+						if( !empty($id_banco) ) {
+							$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
+						} else {
+							$where_banco = " WHERE 1=2 ";
+						}
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
 							echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
 				, CONCAT( cuenta_banco.numero,
 					 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 				FROM cuenta_banco
-									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta[]", $id_cuenta, ' multiple size="4" ', "Cualquiera", "150"); 
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta[]", $id_cuenta, ' multiple size="5" ', "Cualquiera", "150"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
 									, CONCAT( cuenta_banco.numero,
 										 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 									FROM cuenta_banco
-									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta", $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150"); 
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150"); 
 						}
 					?>
 				</td>

@@ -814,6 +814,15 @@
 			<?=Html::SelectQuery($sesion,"SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $pago->fields['id_banco'] ? $pago->fields['id_banco'] : $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"',"Cualquiera","150")?>
 		</td>
 	</tr>
+	<?php
+		if( !empty($pago->fields['id_banco']) ) {
+			$where_banco = " WHERE cuenta_banco.id_banco = '".$pago->fields['id_banco']."' ";
+		} else if( !empty($id_banco) ) {
+			$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
+		} else {
+			$where_banco = " WHERE 1=2 ";
+		}
+	?>
 	<tr>
 		<td align=right>
 			<?=__('N° Cuenta')?>
@@ -823,7 +832,7 @@
 , CONCAT( cuenta_banco.numero,
      IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 FROM cuenta_banco
-LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuenta", $pago->fields['id_cuenta'] ? $pago->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"',"Cualquiera","150")?>
+LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $pago->fields['id_cuenta'] ? $pago->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"',"Cualquiera","150")?>
 		</td>
 	</tr>
 	<tr>

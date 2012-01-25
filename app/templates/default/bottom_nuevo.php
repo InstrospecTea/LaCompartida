@@ -24,6 +24,7 @@ $laurl= $_SERVER['HTTP_HOST'];
 $punto=strpos($laurl,'.'); 
 $subdomain=substr($laurl,0,$punto); 
 $maindomain=str_replace($subdomain.'.','',$laurl); 
+if($subdomain) $subdomain='/'.$subdomain;
 $elpath=$subdomain.$_SERVER['PHP_SELF'];
 ?>
 <script type="text/javascript">

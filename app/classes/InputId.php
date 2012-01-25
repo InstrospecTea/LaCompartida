@@ -18,7 +18,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		$this->onchange = $onchange;
 	}
 
-	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false, $desde = "")
+	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false, $desde = "", $filtro_banco = "")
 	{
 		$join = '';
 		if($tabla == "asunto")
@@ -47,6 +47,13 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		else
 			$oncambio=$onchange;
 			
+		if( $filtro_banco != "" ) {
+			if( $filtro_banco == "no_existe" ) {
+				$where .= " WHERE 1=2 ";
+			} else {
+				$where .= " WHERE cuenta_banco.id_banco = '$filtro_banco' ";
+			}
+		}
 			
 
 		$output .= "<input maxlength=10 id=\"campo_".$name."\" size=10 value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" $opciones />";

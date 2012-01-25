@@ -190,7 +190,7 @@
 				$cont++;
 			}
 			if(!$id ) {
-				$respuesta = "Vacio|Cualquiera//".$respuesta;
+				$respuesta = "Vacio|Cualquiera";
 			}
 			if(!$respuesta)
 				echo "~noexiste";
@@ -229,7 +229,7 @@
 				$cont++;
 			}
 			if( !$id ) {
-				$respuesta = "Vacio|Cualquiera//".$respuesta;
+				$respuesta = "Vacio|Cualquiera";
 			}
 			if(!$respuesta) {
 				echo "~noexiste";
