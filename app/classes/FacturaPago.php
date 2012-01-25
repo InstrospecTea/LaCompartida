@@ -367,7 +367,8 @@ class FacturaPago extends Objeto
 								LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_pago = ccfm2.id_cta_cte_mvto
 								LEFT JOIN factura_pago fp ON ccfm2.id_factura_pago = fp.id_factura_pago
 								WHERE fp.".$col_condicion." =  '".$id."'";
-		return new ListaFacturas($this->sesion, null, $query);
+//		echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
+                return new ListaFacturas($this->sesion, null, $query);
 	}
 	
 	function GetListaFacturasSoyPago($id=null,$col_condicion=null,$col_seleccion=null){

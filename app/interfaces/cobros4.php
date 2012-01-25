@@ -107,6 +107,8 @@
         
 	#echo $query;
 
+	$pagina->PrintTop($popup);
+	
 	if($popup)
 	{
 ?>
@@ -120,7 +122,6 @@
 		<br>
 <?
 	} 
-	$pagina->PrintTop($popup);
 	$pagina->PrintPasos($sesion,3,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 ?>
 

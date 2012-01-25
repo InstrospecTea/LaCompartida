@@ -113,6 +113,8 @@ function calcHeight(idIframe, idMainElm){
 }
 </script>
 <?
+	$pagina->PrintTop($popup);
+	
 	if($popup)
 	{
 ?>
@@ -126,7 +128,6 @@ function calcHeight(idIframe, idMainElm){
 		<br>
 <?
 	}
-	$pagina->PrintTop($popup);
 	$pagina->PrintPasos($sesion,1,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 	if($orden == "")
 		$orden = "fecha_creacion DESC";

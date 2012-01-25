@@ -205,7 +205,7 @@ $query .= "			, cliente.glosa_cliente
 					, ( factura.honorarios + factura.subtotal_gastos + factura.subtotal_gastos_sin_impuesto ) as subtotal_factura
 					, factura.iva
 					, factura.total
-					, fp.monto AS monto_aporte
+					, ccfmn.monto  AS monto_aporte
 					, -1 * ccfm2.saldo as saldo_factura
 					, ccfm.saldo as saldo
 					, fp.id_moneda AS id_moneda_factura_pago
@@ -217,7 +217,8 @@ $query .= "			, cliente.glosa_cliente
 				LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 				LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
 				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+				left join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
+                                LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 				LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
@@ -402,7 +403,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 		case 'subtotal_factura':		$titulo_columna = __('Valor de Venta'); break;
 		case 'iva':						$titulo_columna = __('IVA'); break;
 		case 'total':					$titulo_columna = __('Monto Factura'); break;
-		case 'monto_aporte':			$titulo_columna = __('Monto Pago'); break;
+		case 'monto_aporte':			$titulo_columna = __('Monto Aporte'); break;
 		case 'saldo_factura':			$titulo_columna = __('Saldo Factura'); break;
 		case 'saldo':					$titulo_columna = __('Saldo Pago'); break;
 		default: $titulo_columna = str_replace('_', ' ', $col_name[$i]); break;

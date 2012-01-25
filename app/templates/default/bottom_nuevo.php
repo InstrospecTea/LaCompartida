@@ -17,9 +17,22 @@
      </td>
   </tr>
 </table>
+
 <script language="Javascript" type="text/javascript" src="<?=Conf::RootDir()?>/app/js/google_analytics.js"></script>
+<?php
+$dataurl=parse_url($_SERVER['SCRIPT_URI']); 
+$dataurl['aux']=explode('.',$dataurl['host']); 
+$dataurl['path']='/'.$dataurl['aux'][0].$dataurl['path']; 
+$dataurl['host']=$dataurl['aux'][1].'.'.$dataurl['aux'][2];
+?>
 <script type="text/javascript">
-var _sf_async_config={uid:32419,domain:"demo1.thetimebilling.com"};
+var _sf_async_config={};
+/** CONFIGURATION START **/
+_sf_async_config.uid = 32419;
+_sf_async_config.domain = "<?php echo $dataurl['host']; ?>"; 
+_sf_async_config.path = "<?php echo $dataurl['path']; ?>";
+/** CONFIGURATION END **/
+
 (function(){
   function loadChartbeat() {
     window._sf_endpt=(new Date()).getTime();

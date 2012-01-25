@@ -231,16 +231,50 @@
 										 ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda 
 										AND ccfmn.id_mvto_pago = '".$mvto_pago->fields['id_cta_cte_mvto']."' 
 							LEFT JOIN factura AS f ON ccfm.id_factura = f.id_factura 
-							JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda 
+                                                        join (select d.id_cobro from documento d where d.tipo_doc='N') doc on doc.id_cobro=f.id_cobro							
+                                                        JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda 
 							LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal";
 	$query__listado .="	WHERE (f.codigo_cliente = '$codigo_cliente'";
 	$query__listado .=  $where_lista_cobro;
-	$query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 AND ccfm.saldo < 0 OR ccfmn.monto != 0";
+	$query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and pdl.codigo!='NC' AND ccfm.saldo < 0 OR ccfmn.monto != 0";
 	
+        //echo $query__listado;
 	
 ?>
 
 <script type="text/javascript">
+         jQuery(document).ready(function() {
+          
+        jQuery('.saldojq').keyup(function() {
+         var total=Number(0);
+         MontoValido( jQuery(this).attr('id') );
+          var max=Number(jQuery('#x_'+jQuery(this).attr('id').replace('_','_hide_')).val());
+        if (Number(jQuery(this).val())>max) jQuery(this).val(max);
+          jQuery('.saldojq').each(function() {
+          total=total+Number(jQuery(this).val());
+            });      
+           jQuery('#monto_moneda_cobro').val(total); 
+                  var moneda = jQuery('#id_moneda').val();
+      
+       var num2=Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
+       var div= Number(jQuery('#factura_pago_moneda_'+moneda).val());
+       var decimales= Number(jQuery('#cifras_decimales_pago').val());
+       
+       jQuery('#monto').val((Number(total*num2/div).toFixed(decimales)));
+       
+        });
+    jQuery('#monto_moneda_cobro').keyup(function() {
+       var moneda = jQuery('#id_moneda').val();
+       var num1=Number(jQuery('#monto_moneda_cobro').val());
+       var num2=Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
+       var div= Number(jQuery('#factura_pago_moneda_'+moneda).val());
+       var decimales= Number(jQuery('#cifras_decimales_pago').val());
+       
+       jQuery('#monto').val((Number(num1*num2/div).toFixed(decimales))).keyup();
+       
+       
+    });
+    });
 	function ShowCheque()
 	{
 		if( $('tipo_doc').value == "C" )
@@ -400,11 +434,7 @@
           			valores = cuentas[i].split('|');
           			
           			var option = new Option();
-					if( valores[0] == "Vacio" ) {
-						option.value = '';
-					} else {
-						option.value = valores[0];
-					}
+          			option.value = valores[0];
           			option.text = valores[1];
           			
           			try
@@ -659,7 +689,7 @@
 </table>
 <table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
 	<tr>
-		<td align=right width="30%">
+		<td align=right width="20%">
 			<?=__('Fecha')?>
 		</td>
 		<td align=left colspan="3">
@@ -668,7 +698,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td align="right" width="30%"><?=__('Cliente ')?></td>
+		<td align="right" width="20%"><?=__('Cliente ')?></td>
 		<td colspan="3" align="left">
 			<?
 			if(UtilesApp::GetConf($sesion,'CodigoSecundario')){
@@ -929,7 +959,7 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda", "id_cuen
 			$saldo_pago -= $monto_a_pagar;
 		}
 			
-		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" value=\"".$monto_a_pagar."\" onkeyup=\"MontoValido( this.id );ActualizarMonto();\"/>";
+		$opc_html = $fila->fields['simbolo']."&nbsp;<input type=\"text\" size=7 class=\"saldojq\" id=\"saldo_".$fila->fields['id_factura']."\" name=\"saldo_".$fila->fields['id_factura']."\" value=\"".$monto_a_pagar."\" onkeyup=\"MontoValido( this.id );ActualizarMonto();\"/>";
 		$opc_html .= "<input type=hidden name=\"x_saldo_hide_".$fila->fields['id_factura']."\" id=\"x_saldo_hide_".$fila->fields['id_factura']."\" value=\"".$fila->fields['saldo_factura']."\" />";
 		$opc_html .= "<input type=hidden name=\"tipo_cambio_".$fila->fields['id_factura']."\" id=\"tipo_cambio_".$fila->fields['id_factura']."\" value=\"".$fila->fields['tipo_cambio']."\" />";
 		$opc_html .= "<input type=hidden name=\"cifras_decimales_".$fila->fields['id_factura']."\" id=\"cifras_decimales_".$fila->fields['id_factura']."\" value=\"".$fila->fields['cifras_decimales']."\" />";

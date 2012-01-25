@@ -507,6 +507,8 @@ $cobro->Write();
 $moneda->Load($cobro->fields['id_moneda']);
 
 $pagina->titulo = __('Imprimir') . ' ' . __('Cobro') . ' #' . $id_cobro . ' ' . __('para') . " " . Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'], 'glosa_cliente', 'cliente', 'codigo_cliente');
+$pagina->PrintTop($popup);
+
 if ($popup) {
 	$cobro->LoadAsuntos();
 	$asunto = new Asunto($sesion);
@@ -541,7 +543,7 @@ if ($popup) {
 	<br>
 	<?
 }
-$pagina->PrintTop($popup);
+
 $pagina->PrintPasos($sesion, 5, '', $id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 
 #Moneda base

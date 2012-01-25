@@ -8393,6 +8393,9 @@ class Cobro extends Objeto {
 						$row = str_replace('%TRAMITES_FILAS%', '', $row);
 						$row = str_replace('%TRAMITES_TOTAL%', '', $row);
 					}
+					// El parametro separar_asunto se define para asegurarse que solamente se separan los asuntos,
+					// cuando el template de ese cliente lo soporta.
+					$asunto->separar_asuntos = true;
 					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos') ) || ( method_exists('Conf', 'ParafoGastosSoloSiHayGastos') && Conf::ParafoGastosSoloSiHayGastos() )) {
 						if ($cont_gastos > 0)
 							$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $row);
@@ -8401,7 +8404,7 @@ class Cobro extends Objeto {
 					}
 					else
 						$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $row);
-
+					$asunto->separar_asuntos = false;
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
@@ -10832,7 +10835,9 @@ class Cobro extends Objeto {
 				$row_tmpl = $html;
 				$html = '';
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararGastosPorAsunto') ) || ( method_exists('Conf', 'SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto() ))) {
-					$where_gastos_asunto = " AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'";
+					if( !empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos ) {
+						$where_gastos_asunto = " AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'";
+					}
 				} else {
 					$where_gastos_asunto = "";
 				}
@@ -10874,7 +10879,19 @@ class Cobro extends Objeto {
 				}
 				$cont_gasto_egreso = 0;
 				$cont_gasto_ingreso = 0;
+				
+				global $monto_gastos_neto_por_asunto;
+				global $monto_gastos_impuesto_por_asunto;
+				global $monto_gastos_bruto_por_asunto;
+				
+				$monto_gastos_neto_por_asunto = 0;
+				$monto_gastos_impuesto_por_asunto = 0;
+				$monto_gastos_bruto_por_asunto = 0;
+				
 				foreach ($x_cobro_gastos['gasto_detalle'] as $id_gasto => $detalle) {
+					if( UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') && $asunto->separar_asuntos && !empty($asunto->fields['codigo_asunto']) && $asunto->fields['codigo_asunto'] != $detalle['codigo_asunto'] ) {
+						continue;
+					}
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($detalle['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
@@ -10895,6 +10912,11 @@ class Cobro extends Objeto {
 						$row = str_replace('%monto_original%', '', $row);
 					}
 					#$row = str_replace('%monto%', $moneda_total->fields['simbolo'].' '.number_format($saldo_moneda_total,$moneda_total->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']),$row);
+					
+					$monto_gastos_neto_por_asunto		+= $detalle['monto_total'];
+					$monto_gastos_impuesto_por_asunto	+= $detalle['monto_total_impuesto'];
+					$monto_gastos_bruto_por_asunto		+= $detalle['monto_total_mas_impuesto'];
+					
 					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
 						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
@@ -10902,6 +10924,7 @@ class Cobro extends Objeto {
 						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . ' ' . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
+					// El código de aquí a 10 lineas más abajo es inútil ya que los reemplazos se hacen el las lineas anteriores bajos las mismas condiciones 
 					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
 						$row = str_replace('%monto_moneda_total%', $moneda_total->fields['simbolo'] . number_format($detalle['monto_total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						$row = str_replace('%monto%', $moneda_total->fields['simbolo'] . number_format($saldo_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
@@ -10934,6 +10957,10 @@ class Cobro extends Objeto {
 				break;
 
 			case 'GASTOS_TOTAL':
+				global $monto_gastos_neto_por_asunto;
+				global $monto_gastos_impuesto_por_asunto;
+				global $monto_gastos_bruto_por_asunto;
+				
 				$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td>&nbsp;</td>', $html);
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
@@ -10952,7 +10979,11 @@ class Cobro extends Objeto {
 				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$this->fields['tipo_cambio_moneda_base']))/$this->fields['opc_moneda_total_tipo_cambio'];
 				#$gastos_moneda_total = ($totales['total']*($this->fields['tipo_cambio_moneda']/$tipo_cambio_cobro_moneda_base))/$tipo_cambio_moneda_total;
 				# Comentado por ICC $gastos_moneda_total = $totales['total']*$moneda->fields['tipo_cambio']/$tipo_cambio_moneda_total;
-				$gastos_moneda_total = $x_cobro_gastos['gasto_total'];
+				if( UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') && !empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos ) {
+					$gastos_moneda_total = $monto_gastos_neto_por_asunto;
+				} else {
+					$gastos_moneda_total = $x_cobro_gastos['gasto_total'];
+				}
 				#$gastos_moneda_total = ($totales['total']*($moneda->fields['tipo_cambio']/$moneda_base->fields['tipo_cambio']))/$this->fields['opc_moneda_total_tipo_cambio'];
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
 					$html = str_replace('%valor_total_monedabase%', $moneda_total->fields['simbolo'] . number_format($gastos_moneda_total, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
@@ -10979,15 +11010,22 @@ class Cobro extends Objeto {
 				 * Calculo de gastos con impuesto
 				 * JMBT 10/02/2011
 				 */
-
+				
+				if( UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') && !empty($asunto->fields['codigo_asunto']) && $asunto->separar_asuntos ) {
+					$gasto_impuesto_moneda_total = $monto_gastos_impuesto_por_asunto;
+					$gasto_bruto_moneda_total    = $monto_gastos_bruto_por_asunto;
+				} else {
+					$gasto_impuesto_moneda_total = $x_cobro_gastos['gasto_impuesto'];
+					$gasto_bruto_moneda_total	 = $x_cobro_gastos['gasto_total_con_impuesto'];
+				}
+				
 				if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
-
 					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
-						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_cobro_gastos['gasto_impuesto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_cobro_gastos['gasto_total_con_impuesto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					} else {
-						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_cobro_gastos['gasto_impuesto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_cobro_gastos['gasto_total_con_impuesto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%valor_impuesto_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($gasto_impuesto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+						$html = str_replace('%valor_total_monedabase_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($gasto_bruto_moneda_total, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
 				} else {
 					$html = str_replace('%valor_impuesto_monedabase%', '', $html);

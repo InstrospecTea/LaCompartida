@@ -306,6 +306,7 @@
 	$moneda_cobro = new Objeto($sesion,'','','prm_moneda','id_moneda');
 	$moneda_cobro->Load($cobro->fields['id_moneda']);
 
+	$pagina->PrintTop($popup);
 	if($popup)
 	{
 ?>
@@ -319,7 +320,6 @@
 		<br>
 <?
 	}
-	$pagina->PrintTop($popup);
 
 	$pagina->PrintPasos($sesion,4,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 

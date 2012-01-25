@@ -40,6 +40,8 @@
 
 	$comma_separated = implode("','", $cobro->asuntos);
  
+	$pagina->PrintTop($popup);
+	
 	if($popup)
 	{
 ?>
@@ -53,7 +55,6 @@
 		<br>
 <?
 	}
-	$pagina->PrintTop($popup);
 
 ?>
     <form method=post>

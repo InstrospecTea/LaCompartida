@@ -240,7 +240,8 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
                         LEFT JOIN prm_banco ON fp.id_banco = prm_banco.id_banco 
                         LEFT JOIN cuenta_banco ON fp.id_cuenta = cuenta_banco.id_cuenta 
 			LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+			left join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
+                        LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 			LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 			LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 			LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
@@ -249,7 +250,9 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 			LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
 			LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			WHERE $where";
-	$resp = mysql_query($query . ' LIMIT 0,12', $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	
+        
+        $resp = mysql_query($query . ' LIMIT 0,12', $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
 	$where_moneda = ' WHERE moneda_base = 1';
@@ -266,7 +269,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		$glosa_monto_saldo_total = '<b>' . __('Saldo') . ' ' . $simbolo_moneda_tmp . ' ' . number_format($monto_saldo_total, $cifras_decimales_tmp, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']) . "</b>";
 	}
 	// calcular el saldo en moneda base
-
+//echo $query;
 	$x_pag = 12;
 	$b = new Buscador($Sesion, $query, "Objeto", $desde, $x_pag, $orden);
 	$b->nombre = "busc_facturas";
@@ -284,8 +287,10 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$b->AgregarEncabezado("numero_cuenta", __('Cuenta'), "align=center");
 	$b->AgregarEncabezado("fecha_pago", __('Fecha pago'), "width=60px ");
 	$b->AgregarFuncion("Monto Factura", "MontoTotalFactura", "align=right nowrap");
-	$b->AgregarFuncion("Monto Pago", "MontoTotalPago", "align=right nowrap");
-	$b->AgregarFuncion("Saldo Factura", "SaldoFactura", "align=right nowrap");
+	//$b->AgregarFuncion("Monto Pago", "MontoTotalPago", "align=right nowrap");
+        $b->AgregarFuncion("Monto Aporte", "MontoAporte", "align=right nowrap");
+
+        $b->AgregarFuncion("Saldo Factura", "SaldoFactura", "align=right nowrap");
 	$b->AgregarFuncion("Saldo Pago", "SaldoPago", "align=right nowrap");
 	$b->AgregarFuncion(__('Opción'), "Opciones", "align=right nowrap");
 	$b->color_mouse_over = "#bcff5c";
@@ -309,7 +314,14 @@ function MontoTotalPago(& $fila) {
 
 	return $fila->fields['simbolo_pago'] . ' ' . number_format($fila->fields['monto_pago'], $fila->fields['cifras_decimales_pago'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 }
+function MontoAporte(& $fila) {
+	global $Sesion;
 
+	$idioma = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
+	$idioma->Load($fila->fields['codigo_idioma']);
+
+	return $fila->fields['simbolo_pago'] . ' ' . number_format($fila->fields['monto_aporte'], $fila->fields['cifras_decimales_pago'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+}
 function NumeroFactura(& $fila) {
 	global $Sesion;
 

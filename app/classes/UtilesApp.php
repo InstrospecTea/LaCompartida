@@ -719,7 +719,8 @@ class UtilesApp extends Utiles
     {
     	$actual=split('\?',$url_actual);
     	$url_actual=$actual[0];
-    	switch( $url_actual ) {
+    	$bitmodfactura=UtilesApp::GetConf($sesion,'NuevoModuloFactura');
+        switch( $url_actual ) {
     		case '/app/interfaces/agregar_tarifa.php': 														$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1'; break;
     		case '/app/interfaces/tarifas_tramites.php': 													$url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1'; break;
     		case '/app/interfaces/agregar_cliente.php': 													$url_actual = '/app/interfaces/clientes.php'; break;
@@ -751,7 +752,10 @@ class UtilesApp extends Utiles
     	$menu_html .= <<<HTML
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
-    	$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') ORDER BY orden";//Tipo=1 significa menu principal
+    
+        
+        
+      $query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') and bitmodfactura<=$bitmodfactura  ORDER BY orden";//Tipo=1 significa menu principal
       $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
       for($i=0; $row = mysql_fetch_assoc($resp);$i++)
       {
@@ -769,7 +773,7 @@ HTML;
 						$estilo = 'style="align:center;"';
 						}
 						//Ahora imprimo los sub-menu
-            $query = "SELECT * from menu WHERE tipo=0 and codigo in ('$lista_menu_permiso') and codigo_padre='${row['codigo']}' ORDER BY orden";
+            $query = "SELECT * from menu WHERE tipo=0 and codigo in ('$lista_menu_permiso') and codigo_padre='${row['codigo']}' and bitmodfactura<=$bitmodfactura ORDER BY orden";
             //Tipo=0 significa menu secundario
             $resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
             $root_dir = Conf::RootDir();
@@ -1577,12 +1581,13 @@ HTML;
 					$lista[$v]['id_movimiento'] = $id_gasto;
 					$lista[$v]['monto_total'] = $suma_a_total;
 					$lista[$v]['monto_base'] = $suma_a_base;
-                                        $lista[$v]['monto_original'] = $suma_a_original;
+                    $lista[$v]['monto_original'] = $suma_a_original;
 					$lista[$v]['con_impuesto'] = $gasto->fields['con_impuesto'];
 					$lista[$v]['monto_total_impuesto'] = $suma_total_impuesto;
 					$lista[$v]['monto_total_mas_impuesto'] = $suma_total_impuesto + $suma_a_total;
 					$lista[$v]['descripcion'] = $gasto->fields['descripcion'];
-                                        $lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
+                    $lista[$v]['codigo_asunto'] = $gasto->fields['codigo_asunto'];
+					$lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
 					$lista[$v]['fecha'] = $gasto->fields['fecha'];
 					$lista[$v]['numero_documento'] = $gasto->fields['numero_documento'];
 					$lista[$v]['tipo_gasto'] = $gasto->fields['tipo_gasto'];
@@ -1643,6 +1648,7 @@ HTML;
     {
     	$actual=split('\?',$url_actual);
     	$url_actual=$actual[0];
+        $bitmodfactura=UtilesApp::GetConf($sesion,'NuevoModuloFactura');
     	switch( $url_actual ) {
     		case '/app/interfaces/agregar_tarifa.php': 														$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1'; break;
     		case '/app/interfaces/tarifas_tramites.php': 													$url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1'; break;
@@ -1675,7 +1681,7 @@ HTML;
     	$menu_html .= <<<HTML
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
-    	$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') ORDER BY orden";//Tipo=1 significa menu principal
+    	$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso')  and bitmodfactura<=$bitmodfactura ORDER BY orden";//Tipo=1 significa menu principal
       $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
       for($i=0; $row = mysql_fetch_assoc($resp);$i++)
       {
@@ -1699,7 +1705,7 @@ HTML;
 			$estilo = 'style="align:center;"';
 		}
 						//Ahora imprimo los sub-menu
-            $query = "SELECT * from menu WHERE tipo=0 and codigo in ('$lista_menu_permiso') and codigo_padre='${row['codigo']}' ORDER BY orden";
+            $query = "SELECT * from menu WHERE tipo=0 and codigo in ('$lista_menu_permiso') and codigo_padre='${row['codigo']}'  and bitmodfactura<=$bitmodfactura  ORDER BY orden";
             //Tipo=0 significa menu secundario
             $resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
             $root_dir = Conf::RootDir();
