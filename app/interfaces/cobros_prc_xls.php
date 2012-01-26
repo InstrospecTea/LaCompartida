@@ -1102,12 +1102,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$query = "SELECT SQL_CALC_FOUND_ROWS 
 									cta_corriente.ingreso, 
 									cta_corriente.egreso, 
-									cta_corriente.codigo_asunto, 
+									ifnull(cta_corriente.codigo_asunto,'0') codigo_asunto, 
 									cta_corriente.monto_cobrable, 
 									cta_corriente.fecha, 
 									cta_corriente.id_moneda, 
 									cta_corriente.descripcion, 
-									asunto.glosa_asunto 
+									ifnull(asunto.glosa_asunto,'Sin Asunto') glosa_asunto 
 								FROM cta_corriente 
 								LEFT JOIN asunto USING( codigo_asunto ) 
 								WHERE id_cobro='" . $Cobro->fields['id_cobro'] . "' 
