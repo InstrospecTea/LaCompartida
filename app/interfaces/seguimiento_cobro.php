@@ -147,6 +147,27 @@
 			}
 			$mostrar_codigo_asuntos .= ", ' ', ";
 		}
+                        // FFF 25-01-2012 el estado de la factura se saca de la tabla factura en el mod viejo, y de prm_estado_factura en el nuevo. Ademas, según el conf sale con o sin N de Serie
+                                                        if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')):
+                                                            
+                                                            $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
+                                                                          left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
+                                                                          left join prm_estado_factura pef on f1.id_estado=pef.id_estado "; 
+                                                            if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) :
+                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))    ";
+                                                            else:
+                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)','')) ";
+                                                            endif;
+                                                        else:  
+                                                             
+                                                            $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
+                                                                          left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";  
+                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))   ";
+                                                        endif;
+                                                        
+                                                        
+                                                        
+                                                                        
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 								cobro.id_cobro,
@@ -158,7 +179,7 @@
 								cobro.id_proceso,
 								cobro.codigo_idioma,
 								cobro.forma_cobro as cobro_forma,
-								facturas.documentof as documento,
+								$documentof as documento,
 								cobro.estado,
 								moneda_monto.simbolo as simbolo_moneda_contrato,
 								moneda_monto.cifras_decimales as cifras_decimales_moneda_contrato,
@@ -185,22 +206,8 @@
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
 							LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto
-                                                        ";
-                                                        if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')):
-                                                            if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) :
-                                                            $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))  documentof 
-                                                                      FROM `prm_documento_legal` prm join factura  f using (id_documento_legal) left join prm_estado_factura pef using (id_estado) group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
-                                                            else:
-                                                            $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)',''))  documentof 
-                                                                      FROM `prm_documento_legal` prm join factura  f using (id_documento_legal) left join prm_estado_factura pef using (id_estado) group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
-                                                                
-                                                            endif;
-                                                         else:    
-                                                         $query.=" LEFT JOIN (SELECT f.id_cobro, group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))  documentof 
-                                                                    FROM `prm_documento_legal` prm join factura  f using (id_documento_legal)  group by id_cobro ) facturas on cobro.id_cobro=facturas.id_cobro ";
-                                                        endif;
-                                                        
-							$query.="WHERE $where 
+                                                        $joinfactura 
+                                                        WHERE $where 
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 		$x_pag = 20;
 		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';

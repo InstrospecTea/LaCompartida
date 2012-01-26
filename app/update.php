@@ -5238,13 +5238,20 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.16:
 						$query = array();
 
-						$query[] = "ALTER TABLE `contrato` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
-						$query[] = "ALTER TABLE `cobro` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
-						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-						VALUES (
-						NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
-						);";
-						$query[] = "ALTER TABLE `factura` ADD `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
+						$query[] = "ALTER TABLE `contrato` ADD IF NOT EXISTS `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						$query[] = "ALTER TABLE `cobro` ADD IF NOT EXISTS `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						
+						$query_consulta = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'SerieDocumentosLegales' ";
+						$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+						list($cont) = mysql_fetch_array($resp);
+						if( !$cont ) {
+							
+							$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+							VALUES (
+							NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
+							);";
+						}
+						$query[] = "ALTER TABLE `factura` ADD IF NOT EXISTS `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
 
 					foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
@@ -5353,10 +5360,16 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							
 						$query = array();
 						$query[] = "ALTER TABLE  `contrato` CHANGE  `centro_costo`  `centro_costo` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT  'Depricated, no se usa'";
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+						
+						$query_consulta = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'MonedaTotalPorDefecto' ";
+						$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+						list($cont) = mysql_fetch_array($resp);
+						if( !$cont ) {
+							$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
 														NULL ,  'MonedaTotalPorDefecto',  '".$glosa_moneda_base."',  '',  '".$valores_posibles."', 2, 299
 													);";
+						}
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_cobro` );";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_estado` );";
 						$query[] = "ALTER TABLE `factura` ADD INDEX ( `id_moneda` );";
@@ -6350,11 +6363,16 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.80:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				
+				$query_consulta = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'SetFormatoRut' ";
+				$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+				list($cont) = mysql_fetch_array($resp);
+				if( !$cont ) {
+					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'SetFormatoRut',  '0',  'Decide si al campo Rut del contrato se agrega el formato de manera automatica',  'boolean',  '6',  '-1'
 											);";
-											
+				}				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
@@ -6633,7 +6651,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5:
 			$query = array();
-			$query[] = "ALTER TABLE `cliente` ADD `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
+			$query[] = "ALTER TABLE `cliente` ADD IF NOT EXISTS `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6730,11 +6748,16 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.07:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			
+			$query_consulta = "SELECT count(*) FROM configuracion WHERE glosa_opcion = 'SepararLiquidacionesPorDefecto' ";
+			$resp = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
+			list($cont) = mysql_fetch_array($resp);
+			if( !$cont ) {
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'SepararLiquidacionesPorDefecto',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
-
+			}
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());

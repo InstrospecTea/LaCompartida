@@ -254,7 +254,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		else
 			$cobrado = false;
 
-       // if($dia_semana == 1)             $dia_semana = 8;
+        if($dia_semana == 1)             $dia_semana = 8;
            
 		$duracion = $lista->Get($i)->fields[duracion];
 		//echo $duracion;
