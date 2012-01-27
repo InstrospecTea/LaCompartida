@@ -691,7 +691,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 									LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
 									LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
-								WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=" . $Cobro->fields['id_cobro'] . "
+								WHERE $where_trabajos AND trabajo.cobrable = 1 AND trabajo.id_tramite=0 AND trabajo.id_cobro=" . $Cobro->fields['id_cobro'] . "
 									GROUP BY usuario.id_usuario";
 
 			$orden = "usuario.id_categoria_usuario, trabajo.fecha, trabajo.descripcion";
@@ -897,6 +897,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
 								WHERE $where_trabajos
 									AND trabajo.id_tramite=0
+									AND trabajo.cobrable = 1 
 									AND trabajo.id_cobro='" . $Cobro->fields['id_cobro'] . "'";
 
 			$orden = "trabajo.codigo_asunto, trabajo.fecha, usuario.id_categoria_usuario, trabajo.descripcion";

@@ -154,15 +154,15 @@
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
                                                                           left join prm_estado_factura pef on f1.id_estado=pef.id_estado "; 
                                                             if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) :
-                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))    ";
+                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(pef.glosa='Anulado', ' (Anulado)',''))    ";
                                                             else:
-                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)','')) ";
+                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)','')) ";
                                                             endif;
                                                         else:  
                                                              
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";  
-                                                                $documentof=" group_concat(' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))   ";
+                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))   ";
                                                         endif;
                                                         
                                                         

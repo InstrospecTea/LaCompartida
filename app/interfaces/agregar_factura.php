@@ -835,7 +835,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 					num_pagos = http.responseText;
 					opcion_seleccionada = form.id_estado.options[form.id_estado.selectedIndex].text;
 					id_opcion_seleccionada = form.id_estado.options[form.id_estado.selectedIndex].value;
-					id_opcion_original = <?php echo $factura->fields['id_estado'] ?>;
+					id_opcion_original = <?php echo $factura->fields['id_estado'] ? $factura->fields['id_estado'] : '1' ?>;
 					
 				   if( num_pagos > 0 && ( opcion_seleccionada.toLowerCase() == "anulado" || opcion_seleccionada.toLowerCase() == "anulada" ) && id_opcion_seleccionada != id_opcion_original  ){
 					   alert('<?php echo  __('La factura no puede anularse ya que posee pagos asociados.'); ?>');
