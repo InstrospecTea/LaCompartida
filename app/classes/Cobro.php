@@ -8313,9 +8313,16 @@ class Cobro extends Objeto {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($cont_tramites) = mysql_fetch_array($resp);
 
+					if( UtilesApp::GetConf($this->sesion,'NoMostrarHorasIncobrablesEnNotaDeCobro') ) {
+						$mostrar_horas_incobrables = " AND trabajo.cobrable = 1 ";
+					} else {
+						$mostrar_horas_incobrables = "";
+					}
+					
 					$query = "SELECT count(*) FROM trabajo
 									WHERE id_cobro=" . $this->fields['id_cobro'] . "
 										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
+										$mostrar_horas_incobrables 
 										AND id_tramite=0";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($cont_trabajos) = mysql_fetch_array($resp);
@@ -8730,6 +8737,12 @@ class Cobro extends Objeto {
 					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
 				else
 					$dato_monto_cobrado = " trabajo.monto_cobrado ";
+				
+				if( UtilesApp::GetConf($this->sesion,'NoMostrarHorasIncobrablesEnNotaDeCobro') ) {
+					$mostrar_horas_incobrables = " AND trabajo.cobrable = 1 ";
+				} else {
+					$mostrar_horas_incobrables = "";
+				}
 
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
@@ -8758,6 +8771,7 @@ class Cobro extends Objeto {
 							LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
+							$mostrar_horas_incobrables 
 							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 

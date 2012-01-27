@@ -7483,11 +7483,26 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
-                        case 5.43:
+			
+            case 5.43:
 				$query = array();
 				$query[] = "ALTER TABLE `menu` ADD `bitmodfactura` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT 'marca opciones exclusivas mod factura'";
 				$query[] = "UPDATE `menu` SET `url` = '/app/interfaces/facturas_pagos.php', `codigo_padre` = 'COBRANZA', `bitmodfactura` = '1' WHERE codigo = 'FACT_PAGO';";
                                 
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.44:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES (
+								NULL ,  'NoMostrarHorasIncobrablesEnNotaDeCobro',  '0',  'para que en el detalle de horas de PRC no les muestra las horas definidos como incobrables',  'boolean',  '6',  '-1'
+							);";
+				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
 				 		throw new Exception($q . "---" . mysql_error());
@@ -7824,6 +7839,7 @@ $VERSIONES[$num++] = 5.40;
 $VERSIONES[$num++] = 5.41;
 $VERSIONES[$num++] = 5.42;
 $VERSIONES[$num++] = 5.43;
+$VERSIONES[$num++] = 5.44;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
