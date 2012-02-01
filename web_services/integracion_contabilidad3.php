@@ -1,5 +1,4 @@
 <?
-require_once("lib/nusoap.php");
 require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -11,9 +10,14 @@ require_once Conf::ServerDir().'/../app/classes/Reporte.php';
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 
-
+$sesion = new Sesion();
 $ns = "urn:TimeTracking";
 
+if( UtilesApp::GetConf($sesion,'NuevaLibreriaNusoap') ) {
+	require_once("lib2/nusoap.php");
+} else {
+	require_once("lib/nusoap.php");
+}
 #First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
 
@@ -508,7 +512,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											$factura_cobro['cliente'] = $cliente;
 											$factura_cobro['rut_cliente'] = $RUT_cliente;
 											$factura_cobro['direccion_cliente'] = $direccion_cliente;
-											$factura_cobro['fecha'] = Utiles::sql2fecha($fecha,'%d-%m-%y');
+											$factura_cobro['fecha'] = $fecha;
 											$factura_cobro['descripcion'] = $descripcion;
 											$factura_cobro['moneda'] = $codigo_moneda_factura;
 

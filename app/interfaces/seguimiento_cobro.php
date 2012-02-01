@@ -162,7 +162,7 @@
                                                              
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";  
-                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f.anulado=1, ' (Anulado)',''))   ";
+                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f1.anulado=1, ' (Anulado)',''))   ";
                                                         endif;
                                                         
                                                         

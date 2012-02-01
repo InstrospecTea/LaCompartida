@@ -121,7 +121,10 @@ $col=0;
 	$col_fono_contacto = $col++;
 	$col_mail_contacto = $col++;
 	$col_dir_contacto = $col++;
-	$col_fecha_creacion = $col++;
+	if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+		$col_cliente_referencia = $col++;
+	}
+ 	$col_fecha_creacion = $col++;
 	$col_fecha_inactivo = $col++;
 	
 	// Nueva columna estado del cliente
@@ -148,6 +151,9 @@ $col=0;
 	$ws1->setColumn( $col_fono_contacto, $col_fono_contacto,  20.00);
 	$ws1->setColumn( $col_mail_contacto, $col_mail_contacto,  30.00);
 	$ws1->setColumn( $col_dir_contacto, $col_dir_contacto, 40.00);
+	if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+		$ws1->setColumn( $col_cliente_referencia, $col_cliente_referencia, 25.00);
+	}
 	$ws1->setColumn( $col_fecha_creacion, $col_fecha_creacion,  20.00);
 	$ws1->setColumn( $col_fecha_inactivo, $col_fecha_inactivo,  20.00);
 
@@ -186,6 +192,9 @@ $col=0;
 	$ws1->write($fila_inicial, $col_fono_contacto, __('Teléfono Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_mail_contacto, __('E-mail Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_dir_contacto, __('Dirección contacto'), $tit);
+	if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+		$ws1->write($fila_inicial, $col_cliente_referencia, __('Referencia'), $tit);
+	}
 	$ws1->write($fila_inicial, $col_fecha_creacion, __('Fecha Creación'), $tit);
 	$ws1->write($fila_inicial, $col_fecha_inactivo, __('Fecha Inactivo'), $tit);
 	
@@ -232,6 +241,7 @@ $col=0;
 								contrato.direccion_contacto,
 								contrato.forma_cobro,
 								contrato.monto,
+								prm_cliente_referencia.glosa_cliente_referencia, 
 								tarifa.glosa_tarifa,
 								contrato.id_moneda_monto,
 								cliente.fecha_creacion,
@@ -239,11 +249,12 @@ $col=0;
 								cliente.activo
 						FROM cliente 
 						LEFT JOIN grupo_cliente USING (id_grupo_cliente)
-						LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato
+						LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia 
+						LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato 
 						LEFT JOIN prm_moneda AS moneda ON contrato.id_moneda = moneda.id_moneda 
 						LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario 
 						LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario 
-						LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+						LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa 
 						WHERE $where ORDER BY cliente.glosa_cliente ASC";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_array($resp))
@@ -284,6 +295,9 @@ $col=0;
 		$ws1->write($fila_inicial, $col_fono_contacto, $row['fono_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_mail_contacto, $row['email_contacto'], $f4);
 		$ws1->write($fila_inicial, $col_dir_contacto, $row['direccion_contacto'], $f4);
+		if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+			$ws1->write($fila_inicial, $col_cliente_referencia, $row['glosa_cliente_referencia'], $f4);
+		}
                 $ws1->write($fila_inicial, $col_fecha_creacion, $row['fecha_creacion'], $f4);
                 $ws1->write($fila_inicial, $col_fecha_inactivo, $row['fecha_inactivo'], $f4);
 		

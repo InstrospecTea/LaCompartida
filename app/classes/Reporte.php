@@ -13,6 +13,7 @@ class Reporte
 
 	// Arreglos con filtros
 	var $filtros = array();
+	var $filtros_especiales = array();
 	var $rango = array();
 
 	//Arreglo de datos
@@ -106,6 +107,18 @@ class Reporte
 			case "horas_castigadas":
 			{
 				$this->addFiltro('trabajo','cobrable','1');
+				break;
+			}
+			case "horas_spot":
+			{
+				$this->addFiltro('trabajo','cobrable','1');
+				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND ( cobro.forma_cobro IN ('TASA','CAP') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('TASA','CAP') OR contrato.forma_cobro IS NULL ) ) ";
+				break;
+			}
+			case "horas_convenio":
+			{
+				$this->addFiltro('trabajo','cobrable','1');
+				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND  ( cobro.forma_cobro IN ('FLAT FEE','RETAINER') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('FLAT FEE','RETAINER') ) )";
 				break;
 			}
 			case "horas_no_cobrables":
@@ -226,6 +239,9 @@ class Reporte
 			case "glosa_cliente_asunto":
 				$this->id_agrupador[] = "codigo_asunto";
 				break;
+			case "area_trabajo":
+				$this->id_agrupador[] = "trabajo.id_area_trabajo";
+				break;
 			default:
 				$this->id_agrupador[] = $s;
 		}
@@ -236,6 +252,9 @@ class Reporte
 			case "mes_reporte": 
 			case "dia_reporte":
 				$this->orden_agrupador[] = "fecha_final";
+				break;
+			case "area_trabajo":
+				$this->orden_agrupador[] = "trabajo.id_area_trabajo";
 				break;
 			default:
 				$this->orden_agrupador[] = $s;
@@ -348,6 +367,15 @@ class Reporte
 				cobro.estado AS estado,
 				cobro.forma_cobro AS forma_cobro,
 			';
+		
+			if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
+				$s .= " ' - ' as glosa_actividad, ";
+			}
+			
+			if( in_array('area_trabajo', $this->agrupador ) ){
+				$s.= " ' - ' as area_trabajo, ";
+			}
+		
 			// TIPO DE DATO
 			switch($this->tipo_dato)
 			{
@@ -429,7 +457,7 @@ class Reporte
 					$s .= ' SUM( 0 )';
 					break;
 				}
-			}
+			}			
 			 $s .= ' as '.$this->tipo_dato;
 			 $s .= ' FROM cobro
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
@@ -468,8 +496,17 @@ class Reporte
 
 			$s .= $this->sWhere('cobro');
 
-			$s .= ' AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL OR (cobro.monto_thh_estandar = 0 AND cobro.forma_cobro = \'FLAT FEE\') OR (cobro.forma_cobro <> \'FLAT FEE\' AND cobro.monto_thh = 0) )';
+			$s .= ' AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL  ';
+                   
+                // FFF: Si se saca el reporte a proporcionalidad cliente, esta query debe traer los cobros con monto_thh=0. Si no, los con monto_thh_estandar=0        
+                if($this->proporcionalidad == 'estandar') {
+                        $s .= ' OR (cobro.monto_thh_estandar = 0 AND cobro.forma_cobro = \'FLAT FEE\') ';
+                } else {
+                        $s .= ' OR (cobro.monto_thh = 0 AND cobro.forma_cobro = \'FLAT FEE\') ';
+                }
+                        $s .= ' OR (cobro.forma_cobro <> \'FLAT FEE\' AND cobro.monto_thh = 0) )';
 
+                        
 			$s .= ' GROUP BY '.implode(', ', $this->id_agrupador_cobro);
 		return $s;
 	}
@@ -517,11 +554,19 @@ class Reporte
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
 						';
+		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
+			$s .= " IFNULL( actividad.glosa_actividad, 'Indefinido' ) as glosa_actividad, ";
+		}
+		
+		if( in_array('area_trabajo', $this->agrupador ) ){
+			$s.= " IFNULL( prm_area_trabajo.glosa, 'Indefinido' ) as area_trabajo, ";
+		}
+		
 		if(in_array('id_trabajo',$this->agrupador))
-			$s.= ' trabajo.id_trabajo, ';				
+			$s.= ' trabajo.id_trabajo, ';
 
-
-
+		
+		
 		//Datos que se repiten
 		$s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
 		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
@@ -611,7 +656,7 @@ class Reporte
 				$s .= "SUM(TIME_TO_SEC(trabajo.duracion)-TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
 				break;
 			}
-			case "horas_visibles": case "horas_cobradas": case "horas_por_cobrar": case "horas_pagadas": case "horas_por_pagar": case "horas_incobrables":
+			case "horas_visibles": case "horas_cobradas": case "horas_por_cobrar": case "horas_pagadas": case "horas_por_pagar": case "horas_incobrables": case "horas_spot": case "horas_convenio":
 			{
 				$s .= "SUM(TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
 				break;
@@ -731,6 +776,14 @@ class Reporte
 			$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		}
 
+		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
+			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
+		}
+		
+		if( in_array('area_trabajo', $this->agrupador ) ){			
+			$s .= " LEFT JOIN prm_area_trabajo ON ( trabajo.id_area_trabajo = prm_area_trabajo.id_area_trabajo ) ";
+		}
+			
 		return $s;
 	}
 
@@ -787,6 +840,9 @@ class Reporte
 		if( ($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo')
 			$s .= " AND cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') ";
 
+		foreach ($this->filtros_especiales as $fe )
+			$s .= " AND (".$fe.") ";
+		
 		return $s;
 	}
 
@@ -1351,6 +1407,8 @@ class Reporte
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_visibles":
+			case "horas_spot":
+			case "horas_convenio":
 			case "horas_castigadas":
 			case "horas_por_cobrar":
 			case "horas_pagadas":
@@ -1392,6 +1450,8 @@ class Reporte
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_visibles":
+			case "horas_spot":
+			case "horas_convenio":
 			case "horas_castigadas":
 			case "horas_por_cobrar":
 			case "horas_pagadas":

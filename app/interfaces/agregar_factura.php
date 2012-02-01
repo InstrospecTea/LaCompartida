@@ -336,11 +336,11 @@ $suma_iva = 0;
 $suma_total = 0;
 
 //CON DESGLOSE
-$descripcion_honorario = __('Honorarios Legales');
+$descripcion_honorario = __(UtilesApp::GetConf($sesion,'FacturaDescripcionHonorarios'));
 $monto_honorario = 0;
-$descripcion_subtotal_gastos = __('Gastos c/ IVA');
+$descripcion_subtotal_gastos = __(UtilesApp::GetConf($sesion,'FacturaDescripcionGastosConIva'));
 $monto_subtotal_gastos = 0;
-$descripcion_subtotal_gastos_sin_impuesto = __('Gastos s/ IVA');
+$descripcion_subtotal_gastos_sin_impuesto = __(UtilesApp::GetConf($sesion,'FacturaDescripcionGastosSinIva'));
 $monto_subtotal_gastos_sin_impuesto = 0;
 
 //ASIGNO LOS MONTOS POR DEFECTO DE LOS DOCUMENTOS
@@ -364,14 +364,14 @@ $suma_total = $subtotal_honorarios + $subtotal_gastos + $impuesto_gastos + $impu
 
 //CON DESGLOSE
 $cobro_ = new Cobro($sesion);
-$descripcion_honorario = __('Honorarios Legales');
+$descripcion_honorario = __(UtilesApp::GetConf($sesion,'FacturaDescripcionHonorarios'));
 if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 	$descripcion_honorario .= "\n" . implode(', ', $cobro_->AsuntosNombreCodigo($id_cobro));
 }
 $monto_honorario = $subtotal_honorarios;
-$descripcion_subtotal_gastos = __('Gastos c/ IVA');
+$descripcion_subtotal_gastos = __(UtilesApp::GetConf($sesion,'FacturaDescripcionGastosConIva'));
 $monto_subtotal_gastos = $subtotal_gastos;
-$descripcion_subtotal_gastos_sin_impuesto = __('Gastos s/ IVA');
+$descripcion_subtotal_gastos_sin_impuesto = __(UtilesApp::GetConf($sesion,'FacturaDescripcionGastosSinIva'));
 $monto_subtotal_gastos_sin_impuesto = $subtotal_gastos_sin_impuestos;
 
 if ($factura->loaded()) {

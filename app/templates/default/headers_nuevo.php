@@ -1,12 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
    
-    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
 	<meta http-equiv="Page-Enter" content="blendTrans(Duration=0.2)" />
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<script language="JavaScript" type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
 	<title><?=Conf::AppName()?> - <?= $this->titulo ?></title>
 	<!-- <?=Conf::TimestampDeployCSS()?> -->
 	<link rel="stylesheet" type="text/css" href="<?=Conf::RootDir()?>/app/templates/<?=Conf::Templates()?>/css/deploy/all.1226330411_nuevo.css" />
@@ -26,8 +26,12 @@
 	<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/droplinemenu.js"></script>
 	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/iframe_dinamico.js"></script>-->
 	<!--Droplinemenu-->
-	<script type="text/javascript" src="<?=Conf::Rootdir()?>/app/deploy/jquery.min.js"></script>
-	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/EditInPlace.js"></script>-->
+	<?php
+        // cambio jquery interno por el de google DCN
+       //echo '<script type="text/javascript" src="'.Conf::Rootdir().'/app/deploy/jquery.min.js"></script>';
+	echo '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>';
+        ?>
+        <!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/EditInPlace.js"></script>-->
 	<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/app/deploy/all.1234370043.js"></script>
 	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/datepicker.js"></script>-->
 	<? require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>

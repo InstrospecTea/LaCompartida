@@ -7509,7 +7509,85 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+			
+			case 5.45:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
+								VALUES (
+									NULL ,  'Descripciones por defecto'
+								);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'FacturaDescripcionHonorarios',  'Honorarios Legales', NULL ,  'string',  '9',  '-1'
+								), (
+									NULL ,  'FacturaDescripcionGastosConIva', '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos c/ IGV' : 'Gastos c/ IVA')."', NULL ,  'string',  '9',  '-1'
+								);";
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'FacturaDescripcionGastosSinIva',  '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos c/ IGV' : 'Gastos c/ IVA')."', NULL ,  'string',  '9',  '-1'
+								);";
 				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.46:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'ClienteReferencia', ".(Conf::dbUser()=='prc' ? '1' : '0').",  'Activando el config se mostrará un selector al agregar un cliente para indica cual referencia trajo el cliente',  'boolean',  '6',  '-1'
+								);";
+				$query[] = "CREATE TABLE  `prm_cliente_referencia` (
+								 `id_cliente_referencia` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+								 `glosa_cliente_referencia` VARCHAR( 50 ) NOT NULL ,
+								 `orden` INT( 11 ) NOT NULL DEFAULT  '0'
+								) ENGINE = INNODB;";
+				$query[] = "ALTER TABLE `cliente` ADD `id_cliente_referencia` INT( 11 ) NULL DEFAULT NULL ;";
+				$query[] = "ALTER TABLE `cliente` ADD INDEX (  `id_cliente_referencia` )";
+				$query[] = "ALTER TABLE `cliente`
+							  ADD CONSTRAINT `cliente_ibfk_1` FOREIGN KEY (`id_cliente_referencia`) REFERENCES `prm_cliente_referencia` (`id_cliente_referencia`) ON UPDATE CASCADE;";
+				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+								VALUES (
+								'1',  'Clientes',  '1'
+								), (
+								'2',  'Estudios de abogados extranjeros',  '2'
+								);";
+				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+								VALUES (
+								'3',  'Estudios de abogados locales',  '3'
+								), (
+								'4',  'Página web',  '4'
+								);";
+				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+								VALUES (
+								'5',  'U&M',  '5'
+								), (
+								'6',  'WGL',  '6'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.47:
+				$query = array();
+				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+								VALUES (
+									'7',  'Otro',  '7'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
 	}
 }
 
@@ -7840,6 +7918,9 @@ $VERSIONES[$num++] = 5.41;
 $VERSIONES[$num++] = 5.42;
 $VERSIONES[$num++] = 5.43;
 $VERSIONES[$num++] = 5.44;
+$VERSIONES[$num++] = 5.45;
+$VERSIONES[$num++] = 5.46;
+$VERSIONES[$num++] = 5.47;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

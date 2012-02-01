@@ -107,6 +107,8 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		if (empty($factura_telefono))
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
+		if ( UtilesApp::GetConf($sesion,'ClienteReferencia') && empty($id_cliente_referencia) )
+			$pagina->AddError(__("Por favor ingrese la referencia"));
 
 		if ((method_exists('Conf', 'GetConf') and Conf::GetConf($sesion, 'TituloContacto')) or
 				(method_exists('Conf', 'TituloContacto') and Conf::TituloContacto())) {
@@ -236,6 +238,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
+		$cliente->Edit("id_cliente_referencia", !empty($id_cliente_referencia) ? $id_cliente_referencia : "NULL" );
 
 					if($cliente->Write())
 					{
@@ -670,6 +673,17 @@ $pagina->PrintTop();
 <? if ($validaciones_segun_config) { ?>
 			// DATOS FACTURACION
 
+			<?php if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) { ?>
+
+			if(!form.id_cliente_referencia.value || form.id_cliente_referencia.value == -1)
+			{
+				alert("<?= __('Debe ingresar la referencia')?>");
+				form.id_cliente_referencia.focus();
+				return false;
+			}
+
+			<?php } ?>
+
 			if(!form.factura_rut.value)
 			{
 				alert("<?= __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
@@ -1016,11 +1030,25 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 										<td align="right">
 											<?= __('Grupo') ?>
 										</td>
-										<td align="left">
-<?= Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno')) ?>
+										<td align="left">&nbsp;
+											<?= Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno')) ?>
 										</td>
 									</tr>
-											<?
+									<?php 
+										if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+									?>
+										<tr>
+											<td align="right">
+												<?= __('Referencia') ?>
+												<?php if ($validaciones_segun_config)
+													echo $obligatorio ?>
+											</td>
+											<td align="left">&nbsp;
+												<?=Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', '', "Vacio")?>
+											</td>
+										</tr>
+									<?php
+										}
 											$params_array['lista_permisos'] = array('REV'); // permisos de consultor jefe
 											$permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 											if ($permisos->fields['permitido'])

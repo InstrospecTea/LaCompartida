@@ -753,6 +753,8 @@ $_LANG['Reporte de'] = 'Reporte de';
 $_LANG['en vista por'] = 'en vista por';
 $_LANG['tipo_asunto'] = "Tipo Asunto";
 $_LANG['area_asunto'] = "Area Asunto";
+$_LANG['glosa_actividad'] = "Actividad";
+$_LANG['area_trabajo'] = "Area Trabajo";
 
 
 ##### MESES

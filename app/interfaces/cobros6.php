@@ -150,7 +150,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 
 		# Se genera una factura "base", esta puede ser modificada
 		$factura = new Factura($sesion);
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
+		if ( UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica') ) {
 			if (UtilesApp::GetConf($sesion, 'PermitirFactura'))
 				$numero_documento = $factura->ObtieneNumeroFactura();
 			else
@@ -164,7 +164,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		$factura->Edit('RUT_cliente', $contrato->fields['rut']);
 		$factura->Edit('codigo_cliente', $cobro->fields['codigo_cliente']);
 		$factura->Edit('direccion_cliente', $contrato->fields['factura_direccion']);
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() )) {
+		if (UtilesApp::GetConf($sesion, 'CalculacionCyC') ) {
 			$factura->Edit('subtotal', number_format(!empty($documento_cobro->fields['subtotal_honorarios']) ? $documento_cobro->fields['subtotal_honorarios'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
 			$factura->Edit('subtotal_gastos', number_format(!empty($documento_cobro->fields['subtotal_gastos']) ? $documento_cobro->fields['subtotal_gastos'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
 			$factura->Edit('descuento_honorarios', number_format(!empty($documento_cobro->fields['descuento_honorarios']) ? $documento_cobro->fields['descuento_honorarios'] : '0' , $moneda_factura->fields['cifras_decimales'], ".", ""));
@@ -205,16 +205,16 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
                         if( $cobro->fields['estado'] != 'FACTURADO' ) {
                             $cambiar_estado = true;
                         }
-                        if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() ))
+                        if (UtilesApp::GetConf($sesion, 'NotaCobroExtra') )
 				$cobro->Edit('nota_cobro', $lista_NotaCreditoActivas);
 		}
 		else {
-			if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
+			if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica') ) {
 				$cobro->Edit('documento', $numero_documento);
 			}
 			else
 				$cobro->Edit('documento', $documento);
-			if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() ))
+			if (UtilesApp::GetConf($sesion, 'NotaCobroExtra') )
 				$cobro->Edit('nota_cobro', $nota_cobro);
 		}
 		$cobro->Write();
@@ -338,7 +338,7 @@ if ($opc == 'guardar') {
 			$factura->Escribir();
 		}
 		$cobro->Edit('documento', $documento);
-		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() ))
+		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra') )
 			$cobro->Edit('nota_cobro', $nota_cobro);
 	}
 
@@ -496,7 +496,7 @@ elseif ($opc == 'descargar_excel' || $opc == 'descargar_excel_especial') {
 		exit;
 	}
 	$desde_cobros_emitidos = true;
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'XLSFormatoEspecial') ) || ( method_exists('Conf', 'XLSFormatoEspecial') && Conf::XLSFormatoEspecial() ))
+	if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') )
 		require_once Conf::ServerDir() . '/../app/interfaces/cobros_xls_formato_especial.php';
 	else
 		require_once Conf::ServerDir() . '/../app/interfaces/cobros_xls.php';
@@ -535,7 +535,7 @@ if ($popup) {
 	?>
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
-			<td valign="top" align="left" class="titulo" bgcolor="<?= (method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'ColorTituloPagina') : Conf::ColorTituloPagina()) ?>">
+			<td valign="top" align="left" class="titulo" bgcolor="<?php echo UtilesApp::GetConf($sesion, 'ColorTituloPagina'); ?>">
 				<span title="<?= $glosa_asunto_alt ?>"><?= __('Imprimir') . ' ' . __('Cobro') . ' #' . $id_cobro . ' ' . __('para') . " " . Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'], 'glosa_cliente', 'cliente', 'codigo_cliente') . " " . $glosa_asunto_titulo; ?></span>
 			</td>
 		</tr>
@@ -562,6 +562,91 @@ if ($cobro->fields['id_contrato'] != '') {
 }
 ?>
 <script>
+var ciclo=self.setInterval("refrescaestado('estado_contabilidad')",9000);
+    jQuery(document).ready(function() {
+     
+     		
+     
+     
+     jQuery(".integracion").click(function() {
+          
+           var estado = jQuery(this).attr('rel').toUpperCase();           
+           
+          var Idcobro='<?php echo $cobro->fields['id_cobro']; ?>';
+           var Opc='guardar';
+           var Opcic=jQuery(this).attr('id');
+           var Confirma=0;
+           if( estado == 'INFORMADO' && Opcic == 'parainfo' ) { 
+		if( !confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?') ) {
+		   return false;
+		}
+                Confirma=1;
+	    } else if( estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR' ) {
+		if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
+		   return false;
+		}
+                Confirma=1;
+            }
+           
+           
+           jQuery.post('cobros7.php',{id_cobro: Idcobro, opc: Opc, opc_ic: Opcic, confirma: Confirma},function(data) {
+              
+               var respuesta=data.split('|');
+               jQuery('#estado_contabilidad').html(respuesta[0]).attr('title',respuesta[1]);
+               jQuery("#retorno").html(respuesta[3]);
+               jQuery(".integracion").attr('rel',respuesta[2]);
+                 if(respuesta[4].length>0)  {
+                     jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');    
+                  } else {
+                     jQuery("#nota_venta_contabilidad").fadeOut("slow");     
+                  }
+            });
+           
+         });
+     
+        
+        
+         
+    });
+ 
+        function refrescaestado(id) {
+             jQuery('#'+id).css("opacity","0.75");
+             var Idcobro='<?php echo $cobro->fields['id_cobro']; ?>';
+             jQuery.post('cobros7.php',{id_cobro: Idcobro, opc: 'refrescar'},function(data) {
+                    var respuesta=data.split('|');
+                    jQuery("#retorno").html(respuesta[3]);
+                    jQuery(".integracion").attr('rel',respuesta[2]);
+                    jQuery('#'+id).html(respuesta[0]).attr('title',respuesta[1]).animate({opacity:'1'},500);    
+                     if(respuesta[4].length>0)  {
+                     jQuery("#nota_venta_contabilidad").html('Nota de venta: '+respuesta[4]).css('display','inline-block');    
+                     } else {
+                     jQuery("#nota_venta_contabilidad").fadeOut("slow");     
+                     }
+            });
+         } 
+    
+   		function Informar(form,valor,estado_contabilidad)
+		{
+			if( estado_contabilidad ) {
+				var estado = estado_contabilidad.toUpperCase();
+				if( estado == 'INFORMADO' && valor == 'informar' ) { 
+					if( !confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?') ) {
+						return false;
+					}
+				} else if( estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR' ) {
+					if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
+						return false;
+					}
+				}
+			}
+			//form.opc_informar_contabilidad.value = valor;
+			//ValidarTodo(form);
+        return false;
+                        //PARA INFORMAR Y FACTURAR
+		}       
+    
+    
+    
 	document.observe('dom:loaded', function() {
 		//new Tip('c_edit', 'Continuar con el cobro', {offset: {x:-2, y:5}});
 	});
@@ -664,25 +749,8 @@ if ($cobro->fields['id_contrato'] != '') {
 			var resultado = ( Math.pow(10,cd2) * ( monto * tc1 / tc2 ) ).round() / Math.pow(10,cd2);
 			return resultado;
 		}
+       
 
-		function Informar(form,valor,estado_contabilidad)
-		{
-			if( estado_contabilidad ) {
-				var estado = estado_contabilidad.toUpperCase();
-				if( estado == 'INFORMADO' && valor == 'informar' ) { 
-					if( !confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?') ) {
-						return false;
-					}
-				} else if( estado == 'INFORMADO PARA FACTURAR' || estado == 'INFORMADO Y FACTURADO' || estado == 'PARA INFORMAR Y FACTURAR' ) {
-					if( !confirm('El Cobro ya ha sido informado a Contabilidad con la instrucción de facturar. ¿Está seguro que quiere informar nuevamente?') ) {
-						return false;
-					}
-				}
-			}
-			form.opc_informar_contabilidad.value = valor;
-			ValidarTodo(form);
-                        //PARA INFORMAR Y FACTURAR
-		}
 
 		function ValidarTodo(form)
 		{
@@ -785,7 +853,7 @@ if ($cobro->fields['id_contrato'] != '') {
 		function ValidarFactura(form,id_factura,opcion)
 		{
 <?
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'PermitirFactura') ) || ( method_exists('Conf', 'PermitirFactura') && Conf::PermitirFactura() )) {
+if (UtilesApp::GetConf($sesion, 'PermitirFactura') )  {
 	?>
 			if(!form)
 				var form = $('todo_cobro');
@@ -966,7 +1034,7 @@ else {
 
 			function AgregarFactura(idx){
 <?php
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
+if (UtilesApp::GetConf($sesion, 'CodigoSecundario') )  {
 	$cliente_factura = new Cliente($sesion);
 	$codigo_cliente_secundario_factura = $cliente_factura->CodigoACodigoSecundario($cobro->fields['codigo_cliente']);
 	$url_agregar_factura = "agregar_factura.php?popup=1&id_cobro=" . $id_cobro . "&codigo_cliente_secundario=" . $codigo_cliente_secundario_factura;
@@ -1337,18 +1405,16 @@ else
 						<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?=$cobro->fields['opc_ver_columna_cobrable']=='1'?'checked':''?>></td>
 						<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?=__('Mostrar columna cobrable')?></label></td>
 					</tr> <!-- Andres Oestemer -->
-<?
-if (method_exists('Conf', 'GetConf'))
-	$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
-elseif (method_exists('Conf', 'Ordenado_por'))
-	$solicitante = Conf::Ordenado_por();
+<?php
+if (UtilesApp::GetConf($sesion, 'OrdenadoPor')) 
+        $solicitante = UtilesApp::GetConf($sesion, 'OrdenadoPor');
 else
 	$solicitante = 2;
 
 if ($solicitante == 0) {  // no mostrar
-	?>
-													<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />
-	<?
+	
+	echo '<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />';
+	
 }
 elseif ($solicitante == 1) { // obligatorio
 	?>
@@ -1375,7 +1441,7 @@ elseif ($solicitante == 2) { // opcional
 													<td align="right"><input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" <?= $cobro->fields['opc_ver_cobrable'] == '1' ? 'checked' : '' ?>></td>
 													<td align="left" style="font-size: 10px;"><label for="opc_ver_cobrable"><?= __('Mostrar trabajos no visibles') ?></label></td>
 												</tr>
-<? if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ResumenProfesionalVial') ) || ( method_exists('Conf', 'ResumenProfesionalVial') && Conf::ResumenProfesionalVial() )) { ?>
+<? if (UtilesApp::GetConf($sesion, 'ResumenProfesionalVial') ) { ?>
 													<tr>
 						<td align="right"><input type="checkbox" name="opc_restar_retainer" id="opc_restar_retainer" value="1" onclick="ActivaCarta(this.checked)" <?=$cobro->fields['opc_restar_retainer']=='1'?'checked="checked"':''?>></td>
 														<td align="left" style="font-size: 10px;"><label for="opc_restar_retainer"><?= __('Restar valor retainer') ?></label></td>
@@ -1456,7 +1522,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 														<?= __('Idioma') ?>: <?= Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
 										<br>
 														<?php
-														if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MostrarBotonCobroPDF')) {
+														if (UtilesApp::GetConf($sesion, 'MostrarBotonCobroPDF')) {
 															?>
 											<input type="submit" class="btn" value="<?= __('Descargar Archivo') ?> Word" onclick="return VerDetalles(this.form);" />
 											<br>
@@ -1494,49 +1560,45 @@ if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetCon
 
 <? if (UtilesApp::GetConf($sesion, 'InformarContabilidad')) { ?>
 							<div align=left>
-								<input type=button value="<?=__('Informar a Contabilidad')?>" onclick="Informar(this.form,'informar','<?=$cobro->fields['estado_contabilidad']?>')" />
+								<input type="button" class="integracion" id="parainfo" value="<?=__('Informar a Contabilidad')?>" rel="<?php echo $cobro->fields['estado_contabilidad']?>" />
 								&nbsp;
-								<input type=button value="<?=__('Informar y Facturar')?>" onclick="Informar(this.form,'informar y facturar','<?=$cobro->fields['estado_contabilidad']?>')" />&nbsp;&nbsp;
-								<? if($cobro->fields['estado_contabilidad']=='NO INFORMADO') 
-								{
-								?>
-									<? $estado_c = __('Sin informar');
-									   $titulo_c = __('El Cobro no ha sido informado.');
-									?>
-								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR') {?>
-									<? $estado_c = __('Para informar');
-									   $titulo_c = __('El Cobro se ha informado a Contabilidad');
-									?>
-								<?} else if($cobro->fields['estado_contabilidad']=='PARA INFORMAR Y FACTURAR') {?>
-									<? $estado_c = __('Para informar y facturar');
-									   $titulo_c = __('El Cobro se ha informado a Contabilidad con la instrucción de facturar.');
-									?>
-								<?} else if($cobro->fields['estado_contabilidad']=='INFORMADO'){?>
-									<? $estado_c = __('Informado');
-									   $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
-									?>
-								<?} else {?>
-									<? $estado_c = __('Informado para Facturar');
-									   $titulo_c = __('El Cobro ha sido requerido por Contabilidad, se ha indicado que debe facturarse');
-									?>
-								<?}?>
+								<input type="button" class="integracion" id="parainfoyfacturar" value="<?=__('Informar y Facturar')?>" rel="<?php echo $cobro->fields['estado_contabilidad']?>" />&nbsp;&nbsp;
+								<?php switch($cobro->fields['estado_contabilidad']):
+                                                                        case 'NO INFORMADO': 
+                                                                            $estado_c = __('Sin informar');
+                                                                            $titulo_c = __('El Cobro no ha sido informado.');
+                                                                        break;    
+                                                                        case 'PARA INFORMAR': 
+                                                                            $estado_c = __('Para informar');
+                                                                            $titulo_c = __('El Cobro se ha informado a Contabilidad');									
+                                                                        break;
+                                                                        case 'PARA INFORMAR Y FACTURAR':
+                                                                            $estado_c = __('Para informar y facturar');
+                                                                            $titulo_c = __('El Cobro se ha informado a Contabilidad con la instrucción de facturar.');
+                                                                        break;									
+                                                                        case 'INFORMADO':
+                                                                            $estado_c = __('Informado');
+                                                                            $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
+                                                                        break;
+                                                                        default:
+                                                                            $estado_c = __('Informado para Facturar');
+                                                                            $titulo_c = __('El Cobro ha sido requerido por Contabilidad, se ha indicado que debe facturarse');
+                                                                        break;								
+                                                                    endswitch;?>
 
 								<div id="estado_contabilidad" style="display:inline-block; padding:3px; border:1px solid grey; background-color:#EFEFEF;" title="<?=$titulo_c?>">
 								<?=$estado_c?>
 								</div>
 
 								
-								<? if($cobro->fields['nota_venta_contabilidad']) 
-								{
-								?>
+								
+								
 									&nbsp;&nbsp;
-									<div id="nota_venta_contabilidad" style="display:inline-block; padding:3px; border:1px solid grey; background-color:#EFEFEF;">
+									<div id="nota_venta_contabilidad" style="display: <?php echo ($cobro->fields['nota_venta_contabilidad'])? 'inline-block':'none'?>; padding:3px; border:1px solid grey; background-color:#EFEFEF;">
 									<?=__('Nota de Venta')?>: <?=$cobro->fields['nota_venta_contabilidad']?>
 									</div>
 
-								<?
-								}
-								?>
+								
 							</div>
 						<?} else {?> &nbsp; <?} ?>
 						</td>
@@ -1975,7 +2037,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 							</td>
 							<td align="center" width="33%">
 											<?
-											if (!( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NuevoModuloFactura') )) {
+											if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 												?>
 									<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="220" height=100>
 										<tr style="height: 26px;">
@@ -1988,7 +2050,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 										<?= __('Facturado') ?>: <input type="checkbox" name=facturado id=facturado value=1 <?= $cobro->fields['facturado'] ? 'checked' : '' ?> >
 											</td>
 										</tr>
-												<? if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'NotaCobroExtra') ) || ( method_exists('Conf', 'NotaCobroExtra') && Conf::NotaCobroExtra() )) { ?>
+												<? if (UtilesApp::GetConf($sesion, 'NotaCobroExtra') ) { ?>
 											<tr>
 												<td align="left" colspan=3>
 			<?= __('Nota Cobro') ?>: <input name='nota_cobro' size='5' value='<?= $cobro->fields['nota_cobro'] ?>'>
@@ -1997,15 +2059,15 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 												<? } ?>
 										<tr>
 											<td align="left" colspan=3>
-												<? if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) { ?>
+												<? if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica') ) { ?>
 													<?= __('Factura N°') ?>: <input name='documento' size='5' value='<?= $cobro->fields['documento'] ?>'>
-													<? if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'PermitirFactura') ) || ( method_exists('Conf', 'PermitirFactura') && Conf::PermitirFactura() ) ) && !empty($id_factura)) { ?>
+													<? if (UtilesApp::GetConf($sesion, 'PermitirFactura')  && !empty($id_factura)) { ?>
 														<a href='javascript:void(0)' onclick="nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=<?= $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?= Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
 											<? } ?>
 										<? }
 										else { ?>
 											<?= __('Factura N°') ?>: <input name='documento' size='5' value='<?= $cobro->fields['documento'] ?>'>
-			<? if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'PermitirFactura') ) || ( method_exists('Conf', 'PermitirFactura') && Conf::PermitirFactura() ) ) && !empty($id_factura)) { ?>
+			<? if (UtilesApp::GetConf($sesion, 'PermitirFactura')  && !empty($id_factura)) { ?>
 														<a href='javascript:void(0)' onclick="nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=<?= $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?= Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
 													<? } ?>
 		<? } ?>
@@ -2019,7 +2081,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 												</td>
 											</tr>
 		<? }
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'PermitirFactura') ) || ( method_exists('Conf', 'PermitirFactura') && Conf::PermitirFactura() ))) { ?>
+		else if (UtilesApp::GetConf($sesion, 'PermitirFactura') ) { ?>
 											<tr>
 												<td align="center" colspan=3>
 													<input type=button class=btn value="<?= __('Descargar') ?>" onclick="ValidarFactura(this.form,<?= $id_factura ?>,'imprimir');">
@@ -2201,7 +2263,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2">
+			<td colspan="1">
 				<table cellspacing="0" cellpadding="3" width="220px" style='border:1px dotted #bfbfcf'>
 					<tr>
 						<td bgcolor="#dfdfdf">
@@ -2230,6 +2292,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 					</tr>
 				</table>
 			</td>
+                        <td><div id="retorno" style="display:none;" >Caja Respuesta</div></td>
 		</tr>
 		<tr>
 			<!-- Submit -->

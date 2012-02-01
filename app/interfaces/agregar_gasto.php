@@ -731,10 +731,14 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
 			{
 				$numero_factura = explode('-',$gasto->fields['codigo_factura_gasto']);
-				if(sizeof($numero_factura) == 2)
+				$tamano_numero_factura = sizeof($numero_factura);
+				if($tamano_numero_factura > 1)
 				{
 					$pre_numero_factura_asociada = $numero_factura[0];
 					$post_numero_factura_asociada = $numero_factura[1];
+					for($i=2;$i<$tamano_numero_factura;$i++) {
+						$post_numero_factura_asociada .= '-'.$numero_factura[$i];
+					}
 				}
 			?>
 				<input name="pre_numero_factura_asociada" size=3 maxlength=3 value="<?=$pre_numero_factura_asociada? $pre_numero_factura_asociada:''?>" />

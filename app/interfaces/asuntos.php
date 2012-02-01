@@ -19,7 +19,7 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 } else {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
-
+ 
 $params_array['codigo_permiso'] = 'DAT';
 $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array); #tiene permiso de admin de datos
 if ($permisos->fields['permitido'] && $accion == "eliminar") {
@@ -28,7 +28,7 @@ if ($permisos->fields['permitido'] && $accion == "eliminar") {
 	if (!$asunto->Eliminar()) {
 		$pagina->AddError($asunto->error);
 	} else {
-		$pagina->AddInfo(__('Asunto') . ' ' . __('eliminado con ï¿½xito'));
+		$pagina->AddInfo(__('Asunto') . ' ' . __('eliminado con éxito'));
 		$buscar = 1;
 	}
 }
@@ -332,7 +332,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		$where .= " AND a1.id_encargado = '$id_usuario' ";
 	if ($id_area_proyecto)
 		$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
-//Este query es mejorable, se podrï¿½a sacar horas_no_cobradas y horas_trabajadas, pero ya no se podrï¿½a ordenar por estos campos.
+//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
 	$query = "SELECT SQL_CALC_FOUND_ROWS *, a1.codigo_asunto, a1.codigo_asunto_secundario,a1.id_moneda, a1.activo,
 					a1.fecha_creacion, (SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600
 					FROM trabajo AS t2
@@ -371,19 +371,19 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('Asuntos');
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-		$b->AgregarEncabezado("codigo_asunto_secundario", __('Cï¿½digo'), "align=left");
+		$b->AgregarEncabezado("codigo_asunto_secundario", __('Código'), "align=left");
 	} else {
-		$b->AgregarEncabezado("codigo_asunto", __('Cï¿½digo'), "align=left");
+		$b->AgregarEncabezado("codigo_asunto", __('Código'), "align=left");
 	}
 	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "align=left");
 	$b->AgregarEncabezado("glosa_asunto", __('Asunto'), "align=left");
-	#		$b->AgregarEncabezado("descripcion_asunto","Descripciï¿½n","align=left");
+	#		$b->AgregarEncabezado("descripcion_asunto","Descripción","align=left");
 	#		$b->AgregarEncabezado("horas_trabajadas","Horas trabajadas","","","SplitDuracion");
 	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "align=left");
 	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "align=left");
 	#		$b->AgregarEncabezado("horas_no_cobradas","Horas no cobradas","","","SplitDuracion");
-	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha ï¿½ltimo cobro'));
-	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creaciï¿½n"'));
+	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
+	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creación"'));
 	if ($permisos->fields['permitido'])
 		$b->AgregarFuncion("$link", 'Opciones', "align=center nowrap");
 	$b->color_mouse_over = "#bcff5c";
@@ -432,10 +432,10 @@ function Opciones(& $fila) {
 	$id_asunto = $fila->fields['id_asunto'];
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
 		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('ï¿½" . __('Estï¿½ seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
 	} else {
 		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('ï¿½" . __('Estï¿½ seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
+				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 	}
 }
 
