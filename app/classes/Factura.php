@@ -890,13 +890,21 @@ class Factura extends Objeto {
 					} else {
 						$html2 = str_replace('%honorarios%', '', $html2);
 					}
+					
+					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
+						$descripcion_subtotal_gastos_separado = str_replace("\n","<br/>",$descripcion_subtotal_gastos);
+						$descripcion_subtotal_gastos_sin_impuesto_separado = str_replace("\n","<br/>",$descripcion_subtotal_gastos_sin_impuesto);
+					} else {
+						$descripcion_subtotal_gastos_separado = $descripcion_subtotal_gastos;
+						$descripcion_subtotal_gastos_sin_impuesto_separado = $descripcion_subtotal_gastos_sin_impuesto;
+					}
 
 					if ($mostrar_gastos_con_impuesto) {
 						$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', $simbolo, $html2);
 						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
-							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', strtoupper($descripcion_subtotal_gastos), $html2);
+							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', strtoupper($descripcion_subtotal_gastos_separado), $html2);
 						} else {
-							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', $descripcion_subtotal_gastos, $html2);
+							$html2 = str_replace('%descripcion_subtotal_gastos_con_impuesto%', $descripcion_subtotal_gastos_separado, $html2);
 						}
 						$html2 = str_replace('%subtotal_gastos_con_impuesto%', number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -909,9 +917,9 @@ class Factura extends Objeto {
 						if ($mostrar_gastos_sin_impuesto) {
 							$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', $simbolo, $html2);
 							if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
-								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', strtoupper($descripcion_subtotal_gastos_sin_impuesto), $html2);
+								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', strtoupper($descripcion_subtotal_gastos_sin_impuesto_separado), $html2);
 							} else {
-								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
+								$html2 = str_replace('%descripcion_subtotal_gastos_sin_impuesto%', $descripcion_subtotal_gastos_sin_impuesto_separado, $html2);
 							}
 
 							$html2 = str_replace('%subtotal_gastos_sin_impuesto%', number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
