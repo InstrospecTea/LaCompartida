@@ -7524,7 +7524,7 @@ NULL ,  'RUT'
 								);";
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
-									NULL ,  'FacturaDescripcionGastosSinIva',  '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos c/ IGV' : 'Gastos c/ IVA')."', NULL ,  'string',  '9',  '-1'
+									NULL ,  'FacturaDescripcionGastosSinIva',  '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos s/ IGV' : 'Gastos s/ IVA')."', NULL ,  'string',  '9',  '-1'
 								);";
 				
 				foreach ($query as $q) {
