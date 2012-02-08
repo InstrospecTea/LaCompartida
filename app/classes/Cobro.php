@@ -780,7 +780,7 @@ class Cobro extends Objeto {
 			$contrato->Edit('notificado_hr_excedida_ult_cobro', '0');
 			$contrato->Write();
 		}
-
+		
 		if (!$mantener_porcentaje_impuesto) {
 			if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado'])
 				$this->Edit('porcentaje_impuesto', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuesto') : Conf::ValorImpuesto()));
@@ -1246,6 +1246,26 @@ class Cobro extends Objeto {
 		$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']); #revisar 15-05-2009
 
 		if ($this->Write()) {
+			if( UtilesApp::GetConf($this->sesion,'SeEstaCobrandoEspecial') ) {
+							$se_esta_cobrando = "Honorarios Profesionales\n";
+							$se_esta_cobrando .= "Periodo Comprendido: \n";
+							
+							if( $this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini']) ) {
+								$se_esta_cobrando_fecha_ini = Utiles::sql2date($this->fields['fecha_ini']);
+								$se_esta_cobrando .=__('Desde').': '.$se_esta_cobrando_fecha_ini."\n";
+							}
+							if($this->fields['fecha_fin'] != '0000-00-00' && !empty($this->fields['fecha_fin']))
+							{
+									$se_esta_cobrando_fecha_fin = Utiles::sql2date($this->fields['fecha_fin']);
+									$se_esta_cobrando .=__('Hasta').': '.$se_esta_cobrando_fecha_fin."\n";
+							}
+							$se_esta_cobrando .= "Tarifa Cobrada: ";
+							$se_esta_cobrando .= $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo']." ";
+							$se_esta_cobrando .= $this->fields['monto'];
+							
+							$this->Edit('se_esta_cobrando',$se_esta_cobrando);
+							$this->Write();
+						}
 			if ($emitir) {
 				$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
 				$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);

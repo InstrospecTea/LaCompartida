@@ -7,6 +7,6 @@ $_LANG['Asuntos'] =  "Asuntos";
 
 
 $_LANG['glosa_asunto'] = "Asunto";
-$_LANG['prm_area_proyecto.glosa'] = "Área Asunto";
+$_LANG['prm_area_proyecto_glosa'] = "Área Asunto";
 
 ?>

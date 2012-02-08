@@ -278,6 +278,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$Cobro->GuardarCobro();
 
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($Sesion, $Cobro->fields['id_cobro'], array(), 0, true);
+	$x_gastos = UtilesApp::ProcesaGastosCobro($Sesion, $Cobro->fields['id_cobro'], array(), 0, true);
 
 	// Total del cobro según su forma / Total del cobro en tasa HH
 	if ($x_resultados['monto_thh'][$Cobro->fields['opc_moneda_total']] > 0) {
@@ -537,13 +538,23 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($Sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_chica_underline);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
-	$ws->writeNumber($filas, 4, $x_resultados['subtotal_gastos'][$Cobro->fields['opc_moneda_total']], $formato_total);
+	$ws->writeNumber($filas, 4, $x_gastos['subtotal_gastos_con_impuestos'], $formato_total);
 	$fila_gasto = $filas + 1;
 	$filas += 3;
-
+	
 	$col_formula_pago = Utiles::NumToColumnaExcel(4);
+	
+	if( $x_gastos['subtotal_gastos_sin_impuestos'] > 0 ) {
+		$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($Sesion, 'gastos_sin_iva', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo').':', $letra_chica_underline);
+		$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
+		$ws->writeNumber($filas, 4, $x_gastos['subtotal_gastos_sin_impuestos'], $formato_total);
+		$fila_gasto_sin_impuesto = $filas + 1;
+		$extension_formula = ";".$col_formula_pago.$fila_gasto_sin_impuesto;
+		$filas += 3;
+	}
+
 	$fila_total_sin_descuento = $filas + 1;
-	$ws->writeFormula($filas, 4, "=SUM(" . $col_formula_pago . $fila_honorario . ";" . $col_formula_pago . $fila_gasto . ")", $formato_total);
+	$ws->writeFormula($filas, 4, "=SUM(" . $col_formula_pago . $fila_honorario . ";" . $col_formula_pago . $fila_gasto . $extension_formula.")", $formato_total);
 	$ws->write($filas, $col_id_trabajo, 'Total', $letra_chica_bold);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
 	$filas++;

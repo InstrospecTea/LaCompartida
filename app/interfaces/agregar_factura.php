@@ -1329,6 +1329,7 @@ if ($buscar_padre) {
 			</td>
 		</tr>
 		<?php
+		$cantidad_lineas_descripcion = UtilesApp::GetConf($sesion, 'CantidadLineasDescripcionFacturas');
 		if ( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			?>
 			<tr id='descripcion_factura'>
@@ -1343,9 +1344,11 @@ if ($buscar_padre) {
 				<?php
 				if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 				?>
-<textarea name="descripcion_honorarios_legales" cols="50" rows="5" style="font-family: Arial; font-size: 11px">
-<?php echo $descripcion_honorario; ?>
-</textarea>
+					<textarea name="descripcion_honorarios_legales" cols="50" rows="5" style="font-family: Arial; font-size: 11px"><?php echo $descripcion_honorario; ?></textarea>
+				<?php
+				} else if( $cantidad_lineas_descripcion > 1 ) { 
+					?>
+					<textarea name="descripcion_honorarios_legales" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_honorario; ?></textarea>
 				<?php
 				} else {
 				?>
@@ -1361,7 +1364,13 @@ if ($buscar_padre) {
 			</tr>
 			<tr>
 				<td align=right><?= __('Gastos c/ IVA'); ?></td>
-				<td align=left><input type="text" name="descripcion_gastos_con_iva" value="<?= $descripcion_subtotal_gastos; ?>" size="40" maxlength="30"></td>
+				<td align=left>
+					<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
+							<textarea name="descripcion_gastos_con_iva" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos; ?></textarea>
+					<?php }  else {?>
+							<input type="text" name="descripcion_gastos_con_iva" value="<?=$descripcion_subtotal_gastos; ?>" size="40" maxlength="30">
+					<?php } ?>
+				</td>
 				<td align=left nowrap><?= $simbolo; ?>
 					<input type="text" name="monto_gastos_con_iva" id="monto_gastos_con_iva" value="<?php echo isset($gastos_con_iva) ? $gastos_con_iva : $monto_subtotal_gastos; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)" onkeydown="MontoValido( this.id );"></td>
 				<td align=left nowrap><?= $simbolo; ?>
@@ -1372,7 +1381,13 @@ if ($buscar_padre) {
 				?>
 				<tr>
 					<td align=right><?= __('Gastos s/ IVA'); ?></td>
-					<td align=left><input type="text" name="descripcion_gastos_sin_iva" id="descripcion_gastos_sin_iva" value="<?= $descripcion_subtotal_gastos_sin_impuesto; ?>" size="40" maxlength="30" onkeydown="MontoValido( this.id );"></td>
+					<td align=left>
+						<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
+								<textarea name="descripcion_gastos_sin_iva" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos_sin_impuesto; ?></textarea>
+						<?php } else { ?>
+								<input type="text" name="descripcion_gastos_sin_iva" id="descripcion_gastos_sin_iva" value="<?= $descripcion_subtotal_gastos_sin_impuesto; ?>" size="40" maxlength="30" onkeydown="MontoValido( this.id );">
+						<?php } ?>
+					</td>
 					<td align=left nowrap><?= $simbolo; ?>
 						<input type="text" name="monto_gastos_sin_iva" id="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)" onkeydown="MontoValido( this.id );"></td>
 					<td align=left>&nbsp;</td>

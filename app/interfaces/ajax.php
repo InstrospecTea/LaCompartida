@@ -239,16 +239,26 @@
 		}
 		else if( $accion == "num_abogados_sin_tarifa" )
 		{
-			$query = "SELECT DISTINCT u.id_usuario, 
-							CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre_usuario, 
-							ut.tarifa 
-						FROM trabajo AS t 
-							 JOIN cobro AS c ON c.id_cobro=t.id_cobro 
-							 JOIN contrato AS co ON c.id_contrato=co.id_contrato 
-							 JOIN usuario AS u ON u.id_usuario=t.id_usuario 
-							 LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda=c.id_moneda AND ut.id_usuario=u.id_usuario AND co.id_tarifa=ut.id_tarifa ) 
-													WHERE c.id_cobro=".$id_cobro." AND ( ut.tarifa=0 OR ut.tarifa='' OR ut.tarifa IS NULL )";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
+				$query = " SELECT trabajo.id_trabajo, trabajo.descripcion, trabajo.codigo_asunto
+				FROM trabajo 
+				JOIN trabajo_tarifa ON ( trabajo.id_trabajo = trabajo_tarifa.id_trabajo AND trabajo.id_moneda = trabajo_tarifa.id_moneda ) 
+				WHERE trabajo.id_cobro = '$id_cobro' 
+				AND ( trabajo_tarifa.valor = 0 OR trabajo_tarifa.valor = '' OR trabajo_tarifa.valor IS NULL ) 
+				GROUP BY id_trabajo";
+				$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			} else {
+				$query = "SELECT DISTINCT u.id_usuario, 
+								CONCAT_WS(' ',u.nombre,u.apellido1, u.apellido2) as nombre_usuario, 
+								ut.tarifa 
+							FROM trabajo AS t 
+								 JOIN cobro AS c ON c.id_cobro=t.id_cobro 
+								 JOIN contrato AS co ON c.id_contrato=co.id_contrato 
+								 JOIN usuario AS u ON u.id_usuario=t.id_usuario 
+								 LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda=c.id_moneda AND ut.id_usuario=u.id_usuario AND co.id_tarifa=ut.id_tarifa ) 
+														WHERE c.id_cobro=".$id_cobro." AND ( ut.tarifa=0 OR ut.tarifa='' OR ut.tarifa IS NULL )";
+				$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			}
 			$num = mysql_num_rows($resp);
 			
 			if($num > 0)
@@ -256,14 +266,14 @@
 			else 
 				$respuesta = $num;
 			$cont = 1;
-			while( list( $id_usuario, $nombre_usuario, $tarifa ) = mysql_fetch_array($resp) )
-				{
-					if($cont==$num)
-						$respuesta .= $id_usuario.'~'.$nombre_usuario;
-					else
-						$respuesta .= $id_usuario.'~'.$nombre_usuario.'//'; 
-					$cont++;
+			while( list( $id_usuario, $nombre_usuario, $tarifa ) = mysql_fetch_array($resp) ) {
+				if($cont==$num) {
+					$respuesta .= $id_usuario.'~'.$nombre_usuario;
+				} else {
+					$respuesta .= $id_usuario.'~'.$nombre_usuario.'//'; 
 				}
+				$cont++;
+			}
 			echo $respuesta;
 		}
     else if($accion == "set_duracion_defecto")

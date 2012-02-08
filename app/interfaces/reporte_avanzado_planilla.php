@@ -56,12 +56,66 @@ td
 .td_h4	{		<? if( sizeof($agrupadores) < 3  ) echo "display:none;"   ?>	}
 .td_h5	{		<? if( sizeof($agrupadores) < 2  ) echo "display:none;"   ?>	}
 
+
+<?
+	$email_style = array();
+	$email_style_valor = array();
+
+	$email_style['primer'] = '';
+	$email_style['segundo'] = '';
+	$email_style['tercer'] = '';
+	$email_style['cuarto'] = '';
+	$email_style['quinto'] = '';
+	$email_style['sexto'] = '';
+	$email_style_valor['primer'] = '';
+	$email_style_valor['segundo'] = '';
+	$email_style_valor['tercer'] = '';
+	$email_style_valor['cuarto'] = '';
+	$email_style_valor['quinto'] = '';
+	$email_style_valor['sexto'] = '';
+	if($email)
+	{
+		$base = 'style="border:1px solid #CCC;vertical-align:top;';
+		$principal = 'style="border:1px solid #E33;vertical-align:top;';
+		$secundario = 'style="border:1px solid #33E;vertical-align:top;';
+
+		$email_style['primer'] = $base.'background-color:#c4c4dd;font-size:95%;text-align:center;"';
+		$email_style['segundo'] = $base.'background-color:#d2d2ee; font-size:90%;text-align:center;"';
+		$email_style['tercer'] = $base.'font-size:84%;background-color:#d9d9f2;text-align:center;"';
+		$email_style['cuarto'] = $base.'font-size:80%;background-color:#e5e5f5;text-align:center;"';
+		$email_style['quinto'] = $base.'font-size:76%;background-color:#f1f1f9;text-align:center;"';
+		$email_style['sexto'] = $base.'font-size:74%;background-color:#f9f9ff;text-align:center;"';
+
+		$email_style_valor['primer']['base'] = $base.'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+		$email_style_valor['segundo']['base'] = $base.'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+		$email_style_valor['tercer']['base'] = $base.'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+		$email_style_valor['cuarto']['base'] = $base.'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+		$email_style_valor['quinto']['base'] = $base.'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+		$email_style_valor['sexto']['base'] = $base.'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+
+		$email_style_valor['primer']['principal'] = $principal.'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+		$email_style_valor['segundo']['principal'] = $principal.'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+		$email_style_valor['tercer']['principal'] = $principal.'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+		$email_style_valor['cuarto']['principal'] = $principal.'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+		$email_style_valor['quinto']['principal'] = $principal.'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+		$email_style_valor['sexto']['principal'] = $principal.'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+
+		$email_style_valor['primer']['secundario'] = $secundario.'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+		$email_style_valor['segundo']['secundario'] = $secundario.'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+		$email_style_valor['tercer']['secundario'] = $secundario.'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+		$email_style_valor['cuarto']['secundario'] = $secundario.'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+		$email_style_valor['quinto']['secundario'] = $secundario.'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+		$email_style_valor['sexto']['secundario'] = $secundario.'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+	}
+?>
+
 td.primer
 {
 	background-color:#c4c4dd;
 	font-size:95%;
 	<? if( sizeof($agrupadores)<6 ) echo "display:none;"   ?>
 }
+
 td.segundo
 {
 	background-color:#d2d2ee;
@@ -151,7 +205,22 @@ span.indefinido { color: #550000; }
 	foreach($users as $usuario)
 		if($usuario)
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
-		
+	
+	/*ENCARGADOS*/
+	$encargados = explode(",",$en_com);
+	if(!is_array($encargados))	
+		$encargados = array($encargados);
+	foreach($encargados as $encargado)
+		if($encargado)
+			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado);
+	/*ESTADOS*/
+	$estados = explode(",",$es_cob);
+	if(!is_array($estados))	
+		$estados = array($estados);
+	foreach($estados as $estado)
+		if($estado)
+			$reporte->addFiltro('cobro','estado',$estado);
+
 	/*CLIENTES*/
 	$clients = explode(",",$clientes);
 	if(!is_array($clients))	
@@ -220,36 +289,8 @@ span.indefinido { color: #550000; }
 
 	if($tipo_dato_comparado)
 	{
-		$reporte = new Reporte($sesion);
-		foreach($users as $usuario)
-			if($usuario)
-				$reporte->addFiltro('usuario','id_usuario',$usuario);
-		foreach($clients as $cliente)
-			if($cliente)
-				$reporte->addFiltro('cliente','codigo_cliente',$cliente);
-		foreach($tipos as $tipo)
-			if($tipo)
-				$reporte->addFiltro('asunto','id_tipo_asunto',$tipo);
-		foreach($areas as $area)
-			if($area)
-				$reporte->addFiltro('asunto','id_area_proyecto',$area);
-		foreach($areas_usuario as $area_usuario)
-			if($area_usuario)
-				$reporte->addFiltro('usuario','id_area_usuario',$area_usuario);
-		foreach($categorias_usuario as $categoria_usuario)
-			if($categoria_usuario)
-				$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
-
-
-		$reporte->id_moneda = $id_moneda;	
-		$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 		$reporte->setTipoDato($tipo_dato_comparado);
-		$reporte->setVista($vista);
-		$reporte->setProporcionalidad($prop);
-
-		if($campo_fecha)
-			$reporte->setCampoFecha($campo_fecha);
-
+	
 		$reporte->Query();
 		$r_c = $reporte->toArray();
 
@@ -285,10 +326,10 @@ span.indefinido { color: #550000; }
 		</a>
 	</div>
 
-	<table border=1 cellpadding="3" class="planilla" id ="tabla_planilla" style="width:99%" >
+	<table cellpadding="3" class="planilla" id ="tabla_planilla" style="width:99%" >
 	<tbody>
 	<tr>
-		<td colspan=5 style='font-size:90%; font-weight:bold' align=center> 
+		<td colspan=5 style='font-size:90%; font-weight:bold; <?= $email? 'border:0px;':'' ?>' align=center> 
 			<?=$titulo_reporte?>
 		</td>
 		<td colspan=3 >
@@ -323,13 +364,17 @@ span.indefinido { color: #550000; }
 	</tr>
 	</tbody>
 </table>
-<table border=1 cellpadding="3" class="planilla" id="tabla_planilla_2" >
-</tbody>
+<table border=1 cellpadding="3" class="planilla" id="tabla_planilla_2">
+<tbody>
 		<?
 		//Imprime un valor en forma de Link. Añade los filtros correpondientes para ver los trabajos.
-		function url($valor,$filtros = array())
+		if(!function_exists('url')){
+		function url($valor,$filtros = array(), $email)
 		{
 			global $fecha_ini, $fecha_fin,$clientes,$usuarios;
+			
+			if($email)
+				return $valor;
 
 			$u_clientes = '&lis_clientes='.$clientes;
 			if(!$clientes)
@@ -350,109 +395,136 @@ span.indefinido { color: #550000; }
 			if($valor === '99999!*')
 				$u .= " title = \"".__("Valor Indeterminado: el denominador de la fórmula es 0.")."\" class = \"indefinido\"  "; 
 			$u.= ">".$valor."</a>";
-			return $u;
-		}
 
-		function celda_valor($valor,$filtros=array(),$valor_comparado)
+			return $u;
+		}}
+
+		if(!function_exists('celda_valor')){
+		function celda_valor(&$s,$orden,$valor,$filtros=array(),$valor_comparado,$comparado,$email, $email_style)
 		{
 			global $sesion;
-			global $tipo_dato_comparado;
+			//global $tipo_dato_comparado; //No puede ser global, conflicto con CRON
 			global $tipo_dato;
 			global $formato_valor;
 			
-			if($tipo_dato_comparado)
+			if($comparado)
 			{
-				echo "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros);
-				echo "</td> <tr > <td class=\"valor secundario\"> ";
-				echo url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado,'',$formato_valor),$filtros);
-				echo "</td> </tr> </table>";
+				$s .= "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\" ";
+				if($email)
+					$s .= ' '.$email_style[$orden]['principal'].' ';
+				$s .= " > ";
+				$s .= url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros,$email);
+				$s .= "</td> <tr > <td class=\"valor secundario\" ";
+				if($email)
+					$s .= ' '.$email_style[$orden]['secundario'].' ';
+				$s .= " > ";
+				$s .= url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado,'',$formato_valor),$filtros,$email);
+				$s .= "</td> </tr> </table>";
 			}
 			else
-				echo url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros);
-		}
+				$s .= url(Reporte::FormatoValor($sesion,$valor['valor'],$tipo_dato,'',$formato_valor),$filtros,$email);
+		}}
 
-		function celda_campo($orden,$filas,$valor)
+		if(!function_exists('celda_campo')){
+		function celda_campo(&$s,$orden,$filas,$valor, $email, $email_style)
 		{
-			echo "<td class=\"".$orden." campo\" rowspan=".$filas;
+
+			$s .= "<td class=\"".$orden." campo\" rowspan=".$filas;
 			
+			if($email)
+				$s .= ' '.$email_style[$orden].' ';
+
 			if($valor == __('Indefinido'))
-				echo "> <span title = \"".__("Agrupador no existe, o no está definido para estos datos.")."\" class=\"indefinido\" ";
-			echo " >".$valor;
+				$s .= "> <span title = \"".__("Agrupador no existe, o no está definido para estos datos.")."\" class=\"indefinido\" ";
+			$s .= " >".$valor;
 			if($valor == __('Indefinido'))
-				echo " </span>";
-			echo	"</td>";
-		}
+				$s .= " </span>";
+			$s .=	"</td>";
+		}}
 
 		/* HEADERS son agrupadores y tipos de datos */
-		echo	"<tr>";
+		$t =	"<tr>";
 		for($i=0;$i<6;$i++)
 		{
-			echo "<td class='td_header td_h".($i+1)."' style='width:80px; border-right: 1px solid #CCCCCC;'>";
-			echo __($reporte->agrupador[$i]);
-			echo "</td>";
-			echo "<td class='td_header td_h".($i+1)."' style='width:50px; border-right: 1px solid #CCCCCC;'>";
-			echo __(Reporte::simboloTipoDato($tipo_dato,$sesion,$id_moneda));
+			$t .= "<td class='td_header td_h".($i+1)."' style='width:80px; ";
+			if($email)
+				$t .= " background-color: #D7ECF7;
+						color: #000000;
+						font-size:14px;
+						text-align:center;
+						border-right: 1px solid #CCCCCC; ";
+			$t .= "' >";
+			$t .= __($reporte->agrupador[$i]);
+			$t .= "</td>";
+			$t .= "<td class='td_header td_h".($i+1)."' style='width:50px; ";
+			if($email)
+				$t .= " background-color: #D7ECF7;
+						color: #000000;
+						font-size:14px;
+						text-align:center;
+						border-right: 1px solid #CCCCCC;' ";
+			$t .= "' >";
+			$t .= __(Reporte::simboloTipoDato($tipo_dato,$sesion,$id_moneda));
 			if($tipo_dato_comparado)
-				echo __(" vs. ").__(Reporte::simboloTipoDato($tipo_dato_comparado,$sesion,$id_moneda));
-			echo "</td>";
+				$t .= __(" vs. ").__(Reporte::simboloTipoDato($tipo_dato_comparado,$sesion,$id_moneda));
+			$t .= "</td>";
 		}
-		echo	"</tr>";
+		$t .=	"</tr>";
 		
 		/*Iteración principal de Tabla. Se recorren las 4 profundidades del arreglo resultado */ 		
-		echo "<tr class=\"primera\">";
+		$t .= "<tr class=\"primera\">";
 		foreach($r as $k_a => $a)
 		{
 			if(is_array($a))
 			{
-				celda_campo('primer',$a['filas'],$k_a);
-				echo "<td class=\"primer valor\" rowspan=".$a['filas']." > ";
-					celda_valor($a,array($a),$r_c[$k_a]);
-				echo " </td> ";
+				celda_campo($t,'primer',$a['filas'],$k_a,$email,$email_style);
+				$t .= "<td class=\"primer valor\" rowspan=".$a['filas']." ".$email_style_valor['primer']['base']." > ";
+					celda_valor($t,'primer',$a,array($a),$r_c[$k_a],$tipo_dato_comparado,$email,$email_style_valor);
+				$t .= " </td> ";
 
 				foreach($a as $k_b => $b)
 				{
 					if(is_array($b))
 					{
-						celda_campo('segundo',$b['filas'],$k_b);
-						echo "<td class=\"segundo valor\" rowspan=".$b['filas']." > ";
-							echo celda_valor($b,array($a,$b),$r_c[$k_a][$k_b]);
-							echo " </td> ";
+						celda_campo($t,'segundo',$b['filas'],$k_b,$email,$email_style);
+						$t .= "<td class=\"segundo valor\" rowspan=".$b['filas']." ".$email_style_valor['segundo']['base']." > ";
+							celda_valor($t,'segundo',$b,array($a,$b),$r_c[$k_a][$k_b],$tipo_dato_comparado,$email,$email_style_valor);
+							$t .= " </td> ";
 						foreach($b as $k_c => $c)
 						{
 							if(is_array($c))
 							{
-								celda_campo('tercer',$c['filas'],$k_c);
-								echo "<td class=\"tercer valor\" rowspan=".$c['filas']." > ";
-									echo celda_valor($c,array($a,$b,$c),$r_c[$k_a][$k_b][$k_c]);
-								echo " </td>";
+								celda_campo($t,'tercer',$c['filas'],$k_c,$email,$email_style);
+								$t .= "<td class=\"tercer valor\" rowspan=".$c['filas']." ".$email_style_valor['tercer']['base']." > ";
+									$t .= celda_valor($t,'tercer',$c,array($a,$b,$c),$r_c[$k_a][$k_b][$k_c],$tipo_dato_comparado,$email,$email_style_valor);
+								$t .= " </td>";
 								foreach($c as $k_d => $d)
 								{
 									if(is_array($d))
 									{
-										celda_campo('cuarto',$d['filas'],$k_d);
-										echo "<td class=\"cuarto valor\" rowspan=".$d['filas']." > ";
-											echo celda_valor($d,array($a,$b,$c,$d),$r_c[$k_a][$k_b][$k_c][$k_d]);
-										echo " </td>";
+										celda_campo($t,'cuarto',$d['filas'],$k_d,$email,$email_style);
+										$t .= "<td class=\"cuarto valor\" rowspan=".$d['filas']." ".$email_style_valor['cuarto']['base']." > ";
+											celda_valor($t,'cuarto',$d,array($a,$b,$c,$d),$r_c[$k_a][$k_b][$k_c][$k_d],$tipo_dato_comparado,$email,$email_style_valor);
+										$t .= " </td>";
 
 										foreach($d as $k_e => $e)
 										{
 											if(is_array($e))
 											{
-												celda_campo('quinto',$e['filas'],$k_e);
-												echo "<td class=\"quinto valor\" rowspan=".$e['filas']." > ";
-													echo celda_valor($e,array($a,$b,$c,$d,$e),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e]);
-												echo " </td>";
+												celda_campo($t,'quinto',$e['filas'],$k_e,$email,$email_style);
+												$t .= "<td class=\"quinto valor\" rowspan=".$e['filas']." ".$email_style_valor['quinto']['base']." > ";
+													celda_valor($t,'quinto',$e,array($a,$b,$c,$d,$e),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e],$tipo_dato_comparado,$email,$email_style_valor);
+												$t .= " </td>";
 												
 												foreach($e as $k_f => $f)
 												{
 													if(is_array($f))
 													{
-														celda_campo('sexto',$f['filas'],$k_f);
-														echo "<td class=\"sexto valor\" rowspan=".$f['filas']." > ";
-															echo celda_valor($f,array($a,$b,$c,$d,$e,$f),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]);
-														echo " </td>";
-														echo "</tr> <tr class=\"no_primera\"> ";													
+														celda_campo($t,'sexto',$f['filas'],$k_f,$email,$email_style);
+														$t .= "<td class=\"sexto valor\" rowspan=".$f['filas']." ".$email_style_valor['sexto']['base']." > ";
+															celda_valor($t,'sexto',$f,array($a,$b,$c,$d,$e,$f),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e][$k_f],$tipo_dato_comparado,$email,$email_style_valor);
+														$t .= " </td>";
+														$t .= "</tr> <tr class=\"no_primera\"> ";	
 													}
 												}
 											}
@@ -463,10 +535,13 @@ span.indefinido { color: #550000; }
 						}
 					}
 				}
-				echo "</tr>";
+				
 			}
 		}
+		$t .= "</tr>";
+		echo $t;
 ?>
+	
 	</tbody>
 	</table>
 <script>

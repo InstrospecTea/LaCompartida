@@ -147,7 +147,7 @@ else
 		if($semana == "")
 		{
 			$semana2 = "CURRENT_DATE()";
-			$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL - ( DAYOFWEEK(CURDATE()) - 2 ) DAY ) AS semana_inicio";
+			$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL -  WEEKDAY(CURDATE())  DAY ) AS semana_inicio";
 			$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 			list($semana_actual) = mysql_fetch_array($resp);
 			$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
@@ -156,7 +156,7 @@ else
 		else
 		{
 			$semana2 = "'$semana'";
-			$sql_f = "SELECT DATE_ADD( '".$semana."', INTERVAL - ( DAYOFWEEK('".$semana."') - 2 ) DAY ) AS semana_inicio";
+                        $sql_f = "SELECT DATE_ADD( '".$semana."', INTERVAL - WEEKDAY('".$semana."')  DAY ) AS semana_inicio";
 			$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 			list($semana_actual) = mysql_fetch_array($resp);
 			$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));

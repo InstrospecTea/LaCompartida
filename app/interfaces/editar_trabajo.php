@@ -318,6 +318,7 @@
 		$valores = array();
 		foreach($_POST as $index => $valor) {
 			list( $key1, $key2, $id_moneda ) = split('_',$index);
+			// echo $key1 . " - " . $key2 . " - " . $id_moneda . "<br /> ---- <br />";
 			if( $key1 == 'trabajo' && $key2 == 'tarifa' && $id_moneda > 0 ) {
 				if( empty($valor) ) $valor = "0";
 				$t->ActualizarTrabajoTarifa($id_moneda,$valor);

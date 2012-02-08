@@ -7,7 +7,29 @@
 	
 	if($argv[1]!='inconsistencia') exit;
 	
-	// Revisiones de inconsistencías 
+	// Revisiones de inconsistencías entre código cliente y código asunto de los gastos del cliente.
+	$query = "SELECT 
+					cta_corriente.id_movimiento, 
+					cta_corriente.codigo_cliente, 
+					cta_corriente.codigo_asunto 
+				FROM cta_corriente 
+				JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente 
+				JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto 
+				WHERE asunto.codigo_cliente != cliente.codigo_cliente 
+				   OR cta_corriente.codigo_cliente != SUBSTRING( cta_corriente.codigo_asunto,1,4) "; 
+	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	
+	$enviar = false;
+	$mensaje = "Se han observado inconistencias en los siguientes gastos del cliente <b>".strtoupper(Conf::dbUser())."</b>:<br/><br/>";
+	while( list($id_movimiento,$codigo_cliente,$codigo_asunto) = mysql_fetch_array($resp) ) {
+		$mensaje .= "ID: $id_movimiento   Código cliente: $codigo_cliente   Código Asunto: $codigo_asunto <br/>";
+		$enviar = true;
+	}
+	if( $enviar ) {
+		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "smoers@lemontech.cl,gtigre@lemontech.cl", "Soporte");
+	}
+	
+	// Revisiones de inconsistencías entre monto_thh del cobro y sumatoria de tarifas_hh 
 	$query = "SELECT 
 					cobro.id_cobro, 
 					cobro.monto_thh, 
@@ -22,12 +44,12 @@
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	
 	$enviar = false;
-	$mensaje = "Se han observado inconistencias en las siguientes cobros del cliente ".Conf::dbUser().":<br/><br/>";
+	$mensaje = "Se han observado inconistencias en los siguientes cobros del cliente ".Conf::dbUser().":<br/><br/>";
 	while( list($id_cobro,$monto_thh,$sumatoria) = mysql_fetch_array($resp) ) {
 		$mensaje .= "Cobro: $id_cobro   Monto_thh: $monto_thh   Sumatoria según horas: $sumatoria <br/>";
 		$enviar = true;
 	}
 	if( $enviar ) {
-		Utiles::Insertar($sesion, "Inconsistencia base de datos", $mensaje, "smoers@lemontech.cl", "Stefan");
+		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "smoers@lemontech.cl,gtigre@lemontech.cl", "Soporte");
 	}
 ?>

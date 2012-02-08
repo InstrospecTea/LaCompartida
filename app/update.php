@@ -7588,6 +7588,83 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+			
+			case 5.48:
+				$query = array();
+			
+				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `glosa` VARCHAR( 60 ) NOT NULL DEFAULT  '' AFTER  `reporte` ;";
+				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `envio` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `glosa` ;";
+				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `segun` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'trabajo' COMMENT 'trabajo,corte,emision' AFTER  `glosa` ;";
+
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.49:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'CantidadLineasDescripcionFacturas',  '1', NULL ,  'numero',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+			case 5.50:
+				$query = array();
+				$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` ,  `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+								VALUES (
+									NULL ,  'gastos_sin_iva',  'Gastos no afectos al ".(Conf::dbUser()=='prc'?'IGV':'IVA')."',  'Disbursements not affecting taxes',  '0',  ''
+								);";
+				$query[] = "UPDATE  `prm_excel_cobro` SET  `grupo` =  'Resumen' WHERE  `nombre_interno` = 'gastos_sin_iva' LIMIT 1 ;";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
+			
+            case 5.51:
+				$query = array();
+                $query[] = "CREATE TABLE IF NOT EXISTS `version_db` (`version` DECIMAL( 3,2 ) NOT NULL DEFAULT '1.00', `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY ( `version` ) ) ENGINE = MYISAM ";
+			    $query[] = "replace INTO version_db (version) values (".number_format($new_version,2,'.','').");";
+            
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+            break;
+			
+			case 5.52:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` (
+								`id` ,
+								`glosa_opcion` ,
+								`valor_opcion` ,
+								`comentario` ,
+								`valores_posibles` ,
+								`id_configuracion_categoria` ,
+								`orden`
+								)
+								VALUES (
+								NULL ,  'SeEstaCobrandoEspecial',  ".(Conf::dbUser()=='bmahj'?'1':'0').",  'Este config se usa en Bofillmir, cuales llenan el campo \"Se esta cobrando\" con mas información que el resto de los clientes.',  'boolean',  '6',  '-1'
+								) on duplicate key update glosa_opcion='SeEstaCobrandoEspecial';";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+                }
+			break;
 	}
 }
 
@@ -7921,6 +7998,11 @@ $VERSIONES[$num++] = 5.44;
 $VERSIONES[$num++] = 5.45;
 $VERSIONES[$num++] = 5.46;
 $VERSIONES[$num++] = 5.47;
+$VERSIONES[$num++] = 5.48;
+$VERSIONES[$num++] = 5.49;
+$VERSIONES[$num++] = 5.50;
+$VERSIONES[$num++] = 5.51;
+$VERSIONES[$num++] = 5.52;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
@@ -7955,14 +8037,21 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 	if( $_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1] )
 		die('Credenciales inválidas.');
 
-	$versionFileName = dirname(__FILE__).'/../app/version.php';
+        $versionfiledb = dirname(__FILE__).'/../app/version_db.php';
+
+        
+	 
+         $versionFileName = dirname(__FILE__).'/../app/version.php';
 
 	if( !file_exists($versionFileName) )
 		die('Error, el archivo de versión no se encuentra.');
 	if( !is_writable($versionFileName) )
 		die('Error, el archivo de versión no se puede escribir.');
+       
+            require_once $versionFileName;
 
-    require_once $versionFileName;
+       if(file_exists($versionfiledb) )    require_once $versionfiledb;
+        
 
 	if( !isset($VERSION) or $VERSION < 0.01 )
 		die('Error en la versión del software.');
@@ -7998,14 +8087,17 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 				exit(1);
 			}
 
-			GuardarVersion( $versionFileName, $new_version );
+			GuardarVersion( $versionFileName, $new_version ,$sesion);
 			echo 'Proceso de cambios para versión '.number_format($new_version,2,'.','').' finalizado<br>';
 		}
 	}
 
-	function GuardarVersion( $versionFileName, $new_version )
+	function GuardarVersion( $versionFileName, $new_version,$sesion )
 	{
-		$data = '<?	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
+       
+            mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (`version` DECIMAL(3,2) NOT NULL DEFAULT '1.00', `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY ( `version` ) ) ENGINE = MYISAM ", $sesion->dbh);
+            mysql_query("insert ignore INTO version_db (version) values (".number_format($new_version,2,'.','').");", $sesion->dbh);
+                $data = '<?	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
 		file_put_contents( $versionFileName, $data );
 	}
 ?>

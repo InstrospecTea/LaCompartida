@@ -503,7 +503,8 @@ function EnRevision( form )
 {
 	form.opc.value = 'en_revision';
 	form.submit();
-	return true;
+	return true;v4lh4ll4
+	
 }
 
 function VolverACreado( form )
@@ -525,35 +526,68 @@ function Emitir(form)
 		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
 		http.onreadystatechange = function()
 		{
-      if(http.readyState == 4)
-      {
+			  if(http.readyState == 4)
+			  {
 				var response = http.responseText;
 				response = response.split('//');
+<?php
+if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
+?>
 
 				var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-				if( response[0] != 0 )
-					{
-						if( response[0] < 2 )
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("La tarifa del abogado ")?></span>';
-						else
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Las tarifas de los abogados ")?></span><br><br>';
-						for(i=1;i<response.length;i++)
-							{
-								var datos = response[i].split('~');
-								if( response[0] < 2 )
-									text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span>';
-								else
-									text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span><br>';
-							}
-						if( response[0] < 2 )
-							text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__(" no esta definido.")?></span><br>';
-						else
-							text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?=__(" no estan definidos.")?></span><br>';
-						text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';
+				if( response[0] != 0 ) {
+					if( response[0] < 2 ) {
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("El siguiente trabajo ")?></span>';
+					} else if ( response[0] <= 10 ) {
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Los siguientes trabajos ")?></span><br><br>';
+					} else {
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("hay más de 10 trabajos que")?></span><br><br>';
 					}
+					for(i=1;i<response.length;i++) {
+						var datos = response[i].split('~');
+						if ( response[0] <= 10 ) {
+							text_window += '<br /><span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span> <a href="javascript:;" onclick="nuevaVentana(\'Editar_Trabajo\',600,500,\'editar_trabajo.php?id_cobro=&id_trabajo='+datos[0]+'&popup=1\',\'\');" style="color:blue;">Definir tarifas</a><br>';
+						}
+					}
+					if( response[0] < 2 )
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__(" no tiene tarifa definida.")?></span><br>';
+					else
+						text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?=__(" no tienen tarifa definida.")?></span><br>';
+					/*text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';*/
+				}
 				text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?"?></span><br>';
 				text_window += '<br><table><tr>';
 				text_window += '</table>';
+<?php
+} else {
+?>
+
+				var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
+				if( response[0] != 0 ) {
+					if( response[0] < 2 )
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("La tarifa del abogado ")?></span>';
+					else
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Las tarifas de los abogados ")?></span><br><br>';
+					for(i=1;i<response.length;i++)
+						{
+							var datos = response[i].split('~');
+							if( response[0] < 2 )
+								text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span>';
+							else
+								text_window += '<span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span><br>';
+						}
+					if( response[0] < 2 )
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__(" no esta definido.")?></span><br>';
+					else
+						text_window += '<br><span style="text-align:center; font-size:11px; color:#000; "><?=__(" no estan definidos.")?></span><br>';
+					text_window += '<a href="#" onclick="DefinirTarifas();" style="color:blue;">Definir tarifas</a><br><br>';
+				}
+				text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Una vez efectuado") . " " . __("el cobro") . ", " . __("la información no podrá ser modificada sin reemitir") . " " . __("el cobro") . ", " . __("¿Está seguro que desea Emitir") . " " . __("el Cobro") . "?"?></span><br>';
+				text_window += '<br><table><tr>';
+				text_window += '</table>';
+<?php
+}
+?>
 				Dialog.confirm(text_window,
 				{
 					top:150, left:290, width:400, okLabel: "<?=__('Continuar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
@@ -1673,23 +1707,33 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				<tr>
 					<td>
 						<?php
-						$se_esta_cobrando = __('Periodo');
-						$se_esta_cobrando .=': ';
-						if($cobro->fields['fecha_ini'] != '0000-00-00')
-						{
-								$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
-								$se_esta_cobrando .=__('Desde').': '.$se_esta_cobrando_fecha_ini;
-						}
-						if($cobro->fields['fecha_fin'] != '0000-00-00')
-						{
-								$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
-								$se_esta_cobrando .=__('Hasta').': '.$se_esta_cobrando_fecha_fin;
+						if( UtilesApp::GetConf($sesion,'SeEstaCobrandoEspecial') ) {
+							$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+							$disabled = "disabled";
+							$lineas = 'rows="6"';
+							$columnas = 'cols="25"';
+						} else {
+							$se_esta_cobrando = __('Periodo');
+							$se_esta_cobrando .=': ';
+							if( $cobro->fields['fecha_ini'] != '0000-00-00' && !empty($cobro->fields['fecha_ini']) )
+							{
+									$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
+									$se_esta_cobrando .=__('Desde').': '.$se_esta_cobrando_fecha_ini;
+							}
+							if( $cobro->fields['fecha_fin'] != '0000-00-00' && !empty($cobro->fields['fecha_fin']) )
+							{
+									$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
+									$se_esta_cobrando .=__('Hasta').': '.$se_esta_cobrando_fecha_fin;
+							}
+							$disabled = "";
+							$lineas = 'rows="3"';
+							$columnas = '';
 						}
 
 						if($cobro->fields['se_esta_cobrando'])
 							$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
 						?>
-						<textarea name="se_esta_cobrando" id="se_esta_cobrando"><?php echo $se_esta_cobrando;?></textarea>
+						<textarea name="se_esta_cobrando" <?php echo $disabled.' '.$lineas.' '.$columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando;?></textarea>
 					</td>
 				</tr>
 			</table>

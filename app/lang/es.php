@@ -890,6 +890,7 @@ $_LANG['profesional'] = "Profesional";
 $_LANG['glosa_grupo_cliente'] = "Grupo";
 $_LANG['glosa_cliente'] = "Cliente";
 $_LANG['glosa_asunto'] = "Asunto";
+$_LANG['prm_area_proyecto_glosa'] = "Área Asunto";
 $_LANG['codigo_asunto'] = "Código Asunto";
 $_LANG['glosa_asunto_con_codigo'] = "Asunto";
 

@@ -197,7 +197,8 @@ class Reporte
 	//Establece el Campo de la fecha
 	function setCampoFecha($campo_fecha)
 	{
-		if($campo_fecha == 'cobro')
+		//mis reportes usa 'corte'.
+		if($campo_fecha == 'cobro' || $campo_fecha == 'corte')
 		{
 			$this->campo_fecha = 'cobro.fecha_fin';
 			$this->campo_fecha_2 = 'cobro.fecha_creacion';
@@ -273,7 +274,7 @@ class Reporte
 			case "id_trabajo":
 				break;
 
-			case "prm_area_proyecto.glosa": case "profesional":
+			case "prm_area_proyecto_glosa": case "profesional":
 			case "username":
 				$this->id_agrupador_cobro[] = "profesional";
 				break;
@@ -339,7 +340,7 @@ class Reporte
 				cliente.glosa_cliente,
 				contrato.id_contrato,
 				'.(in_array('codigo_cliente_secundario',$this->agrupador)?'cliente.codigo_cliente_secundario,':'').'
-				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?"'".__('Indefinido')."' AS glosa,":'').'
+				'.(in_array('prm_area_proyecto_glosa',$this->agrupador)?"'".__('Indefinido')."' AS glosa,":'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)? $this->nombre_usuario('usuario_responsable').' AS nombre_usuario_responsable,':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?' usuario_responsable.id_usuario AS id_usuario_responsable,':'').'
 				cliente.glosa_cliente,
@@ -376,6 +377,32 @@ class Reporte
 				$s.= " ' - ' as area_trabajo, ";
 			}
 		
+			$where = ' FROM cobro
+				LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
+				LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
+				LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
+				LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+				'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
+				'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
+				LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
+			';
+
+			if($this->tipo_dato == 'valor_por_cobrar')
+			{
+				$tabla = 'cobro';
+			}
+			else
+			{
+				$where .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
+				$tabla = 'documento';
+			}
+			//moneda buscada
+			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda ON (cobro_moneda.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda.id_moneda = '".$this->id_moneda."' )";
+			//moneda del cobro
+			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
+			//moneda_base
+			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
+		
 			// TIPO DE DATO
 			switch($this->tipo_dato)
 			{
@@ -384,14 +411,14 @@ class Reporte
 				case 'valor_hora':
 				{
 					$s .=
-					' 0 as valor_divisor, SUM( cobro.monto_trabajos
+					' 0 as valor_divisor, SUM( '.$tabla.'.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				}
 				case 'rentabilidad_base':
 				{
-					$s .= ' 0 as valor_divisor, SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_trabajos
+					$s .= ' 0 as valor_divisor, SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), '.$tabla.'.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio), 0 ))';
 					break;
@@ -399,7 +426,7 @@ class Reporte
 				case 'valor_pagado':
 				{
 					$s .= ' SUM( IF(cobro.estado = \'PAGADO\',
-									(cobro.monto_trabajos
+									('.$tabla.'.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									),
@@ -408,7 +435,7 @@ class Reporte
 				}
 				case 'valor_pagado_parcial':
 				{
-					$s .= ' SUM( (cobro.monto_trabajos
+					$s .= ' SUM( ('.$tabla.'.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( 1 - documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -416,7 +443,7 @@ class Reporte
 				}
 				case 'valor_por_pagar_parcial':
 				{
-					$s .= ' SUM( (cobro.monto_trabajos
+					$s .= ' SUM( ('.$tabla.'.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -425,7 +452,7 @@ class Reporte
 				case 'valor_por_pagar':
 				{
 					$s .= 'SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
-									(cobro.monto_trabajos
+									('.$tabla.'.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) 
 									)) )';
@@ -434,7 +461,7 @@ class Reporte
 				case 'valor_incobrable':
 				{
 					$s .= 'SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
-									(cobro.monto_trabajos
+									('.$tabla.'.monto_trabajos
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									)) )';
@@ -442,11 +469,11 @@ class Reporte
 				}
 				case 'rentabilidad':
 					$s .= ' 0 AS valor_divisor,
-						SUM(cobro.monto_trabajos * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
+						SUM('.$tabla.'.monto_trabajos * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				case 'diferencia_valor_estandar':
 				{
-					$s .= ' SUM( cobro.monto_trabajos
+					$s .= ' SUM( '.$tabla.'.monto_trabajos
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
@@ -459,33 +486,7 @@ class Reporte
 				}
 			}			
 			 $s .= ' as '.$this->tipo_dato;
-			 $s .= ' FROM cobro
-			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
-						LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
-						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
-						'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
-						LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
-					';
-
-				if($this->tipo_dato == 'valor_por_cobrar')
-				{
-					$tabla = 'cobro';
-				}
-				else
-				{
-					$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
-					$tabla = 'documento';
-				}
-				//moneda buscada
-				$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda ON (cobro_moneda.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda.id_moneda = '".$this->id_moneda."' )";
-				//moneda del cobro
-				$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
-				//moneda_base
-				$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
-		
-			
+			$s .= $where;
 
 			/*WHERE SIN USUARIOS NI TRABAJOS*/
 			unset($this->filtros['trabajo.cobrable']);
@@ -525,7 +526,7 @@ class Reporte
 						cliente.id_cliente,
 						cliente.codigo_cliente,
 						'.(in_array('codigo_cliente_secundario',$this->agrupador)?'cliente.codigo_cliente_secundario,':'').'
-						'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?'prm_area_proyecto.glosa,':'').'
+						'.(in_array('prm_area_proyecto_glosa',$this->agrupador)?'prm_area_proyecto.glosa,':'').'
 						'.(in_array('area_usuario',$this->agrupador)?'IFNULL(prm_area_usuario.glosa,\'-\') as area_usuario,':'').'
 						'.(in_array('categoria_usuario',$this->agrupador)?'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\') as categoria_usuario,':'').'
 						'.(in_array('id_usuario_responsable',$this->agrupador)?'IF(usuario_responsable.id_usuario IS NULL,\'Sin Resposable\', ' .$this->nombre_usuario('usuario_responsable').') AS nombre_usuario_responsable,':'').'
@@ -555,7 +556,7 @@ class Reporte
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
 						';
 		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
-			$s .= " IFNULL( actividad.glosa_actividad, 'Indefinido' ) as glosa_actividad, ";
+			$s .= " IFNULL( NULLIF( IFNULL( actividad.glosa_actividad, 'Indefinido' ), ' ' ), 'Indefinido' ) as glosa_actividad, ";
 		}
 		
 		if( in_array('area_trabajo', $this->agrupador ) ){
@@ -746,7 +747,7 @@ class Reporte
 				LEFT JOIN prm_tipo_proyecto AS tipo ON asunto.id_tipo_asunto = tipo.id_tipo_proyecto
 				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?'LEFT JOIN prm_area_proyecto ON prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto':'').'
+				'.(in_array('prm_area_proyecto_glosa',$this->agrupador)?'LEFT JOIN prm_area_proyecto ON prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto':'').'
 				'.(in_array('area_usuario',$this->agrupador)?'LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario':'').'
 				'.(in_array('categoria_usuario',$this->agrupador)?'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
@@ -933,7 +934,7 @@ class Reporte
 			$id = 'id_usuario_secundario';
 			$label = 'nombre_usuario_secundario';
 		}
-		elseif($this->agrupador[0]=='prm_area_proyecto.glosa')
+		elseif($this->agrupador[0]=='prm_area_proyecto_glosa')
 		{
 			$id = 'glosa';
 			$label = 'glosa';
@@ -1025,6 +1026,21 @@ class Reporte
 		$a['valor'] = number_format($a['valor']/$a['valor_divisor'],2,".","");
 	}
 
+	/*Entrega el label a usar para un agrupador*/
+	function label($agrupador)
+	{
+		switch($agrupador)
+		{
+			case 'id_usuario_responsable':
+				return 'nombre_usuario_responsable';
+			case 'id_usuario_secundario':
+				return 'nombre_usuario_secundario';
+			case 'prm_area_proyecto_glosa':
+				return 'glosa';
+		}
+		return $agrupador;
+	}
+
 	/*Constructor de Arreglo Cruzado: Sólo vista Cliente o Profesional*/
 	function toCross()
 	{
@@ -1034,8 +1050,8 @@ class Reporte
 
 		$id = $this->id_agrupador[0];
 		$id_col = $this->id_agrupador[5];
-		$label = $this->agrupador[0];
-		$label_col = $this->agrupador[5];
+		$label = $this->label($this->agrupador[0]);
+		$label_col = $this->label($this->agrupador[5]);
 
 		if(empty($this->row))
 			return $r;
@@ -1058,6 +1074,10 @@ class Reporte
 			$identificador = $row[$id];
 			$nombre_col = $row[$label_col];
 			$identificador_col = $row[$id_col];
+
+		
+
+
 
 			if(!isset($r['labels'][$identificador]['nombre']))
 			{
@@ -1159,9 +1179,9 @@ class Reporte
 				${$agrupador_temp[$k]} = 'nombre_usuario_responsable';
 			if($this->agrupador[$k]=='id_usuario_secundario')
 				${$agrupador_temp[$k]} = 'nombre_usuario_secundario';
-			elseif($this->agrupador[$k]=='prm_area_proyecto.glosa')
+			elseif($this->agrupador[$k]=='prm_area_proyecto_glosa')
 				${$agrupador_temp[$k]} ='glosa';
-			${$id_temp[$k]} = ($this->id_agrupador[$k]=='prm_area_proyecto.glosa'?'glosa':$this->id_agrupador[$k]);
+			${$id_temp[$k]} = ($this->id_agrupador[$k]=='prm_area_proyecto_glosa'?'glosa':$this->id_agrupador[$k]);
 		}
 
 		foreach($this->row as $row)

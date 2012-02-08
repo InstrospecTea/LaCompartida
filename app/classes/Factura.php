@@ -529,6 +529,14 @@ class Factura extends Objeto {
 				
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto) , $html2);
 
+				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
+					// Lo separo en lineas
+					$factura_descripcion_separado = explode("\n", $factura_descripcion);
+					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
+				} else {
+					$factura_descripcion_separado = $factura_descripcion;
+				}
+				
 				if ($lang == 'es') {
 					if ($descuento_honorarios > 0)
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
@@ -536,10 +544,10 @@ class Factura extends Objeto {
 						$html2 = str_replace('%<br><br>%', '<br><br><br><br>', $html2);
 					if ($mostrar_honorarios) {
 						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
-							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion), $html2);
+							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion_separado), $html2);
 							$html2 = str_replace('%servicios_periodo%', strtoupper('Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%'), $html2);
 						} else {
-							$html2 = str_replace('%servicios_periodo%', $factura_descripcion, $html2);
+							$html2 = str_replace('%servicios_periodo%', $factura_descripcion_separado, $html2);
 							$html2 = str_replace('%servicios_periodo%', 'Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%', $html2);
 						}
 					} else {
@@ -592,7 +600,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%<br><br>%', '', $html2);
 					else
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
-					$html2 = str_replace('%servicios_periodo%', $factura_descripcion, $html2);
+					$html2 = str_replace('%servicios_periodo%', $factura_descripcion_separado, $html2);
 					$html2 = str_replace('%servicios_periodo%', 'For legal services rendered %fecha_ini% %fecha_fin%', $html2);
 					$meses_org = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 					$month_short = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');

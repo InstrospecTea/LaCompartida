@@ -33,27 +33,43 @@
 	
 	
 	$mis_reportes = array();
-	
+	$mis_reportes_glosa = array();
+	$mis_reportes_envio = array();
+	$mis_reportes_segun = array();
 	
 	if($opc == 'eliminar_reporte')
-		if(!in_array($nuevo_reporte,$mis_reportes))
-		{
-			$query = "DELETE FROM usuario_reporte  WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."' AND reporte =  '".mysql_real_escape_string($eliminado_reporte)."';";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		}
-	
-	$query_mis_reportes = "SELECT reporte FROM usuario_reporte WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."'";
-	$resp_mis_reportes = mysql_query($query_mis_reportes,$sesion->dbh) or Utiles::errorSQL($query_mis_reportes,__FILE__,__LINE__,$sesion->dbh);
-	while( list($reporte_encontrado) = mysql_fetch_array($resp_mis_reportes) )
-			$mis_reportes[] = $reporte_encontrado;
-	
+	{
+		$query = "DELETE FROM usuario_reporte  WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."' AND reporte =  '".mysql_real_escape_string($eliminado_reporte)."';";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	}
+
 	if($opc == 'nuevo_reporte')
-		if(!in_array($nuevo_reporte,$mis_reportes))
-		{
-			$query = "INSERT INTO usuario_reporte (id_usuario,reporte) VALUES ('".$sesion->usuario->fields['id_usuario']."' , '".mysql_real_escape_string($nuevo_reporte)."' );";
+	{
+			$nuevo_reporte_envio = intval($nuevo_reporte_envio);
+			$nuevo_reporte_segun = mysql_real_escape_string($nuevo_reporte_segun);
+			$id_reporte_editado = intval($id_reporte_editado);
+			if($id_reporte_editado)
+			{
+				$query = "UPDATE usuario_reporte SET reporte= '".mysql_real_escape_string($nuevo_reporte)."',glosa='".mysql_real_escape_string($nombre_reporte)."' ,segun= '".$nuevo_reporte_segun."',envio=".$nuevo_reporte_envio." WHERE id_reporte = '".$id_reporte_editado."';";
+			}
+			else
+			{
+				$query = "INSERT INTO usuario_reporte (id_usuario,reporte,glosa,segun,envio) VALUES ('".$sesion->usuario->fields['id_usuario']."' , '".mysql_real_escape_string($nuevo_reporte)."' , '".mysql_real_escape_string($nombre_reporte)."','".$nuevo_reporte_segun."',".$nuevo_reporte_envio." );";
+			}
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			$mis_reportes[] = mysql_real_escape_string($nuevo_reporte);
-		}
+	}
+	
+	$query_mis_reportes = "SELECT reporte, glosa, segun, envio, id_reporte FROM usuario_reporte WHERE id_usuario = '".$sesion->usuario->fields['id_usuario']."'";
+	$resp_mis_reportes = mysql_query($query_mis_reportes,$sesion->dbh) or Utiles::errorSQL($query_mis_reportes,__FILE__,__LINE__,$sesion->dbh);
+	while( list($reporte_encontrado,$nombre_reporte_encontrado,$segun_reporte_encontrado,$envio_reporte_encontrado,$id_reporte_encontrado) = mysql_fetch_array($resp_mis_reportes) )
+	{
+			$mis_reportes[] = $reporte_encontrado;
+			$mis_reportes_glosa[] = $nombre_reporte_encontrado;
+			$mis_reportes_envio[] = $envio_reporte_encontrado;
+			$mis_reportes_segun[] = $segun_reporte_encontrado;
+			$mis_reportes_id[] = $id_reporte_encontrado;
+	}
+	
 	
 	
 
@@ -90,6 +106,14 @@
 	
 	}
 
+	$estados_cobro = array("CREADO",
+			"EMITIDO",
+			"EN REVISION",
+			"ENVIADO AL CLIENTE",
+			"FACTURADO",
+			"INCOBRABLE",
+			"PAGADO",
+			"PAGO PARCIAL");
 
 	$agrupadores = array(
 	'glosa_cliente',
@@ -100,7 +124,7 @@
 	'id_cobro',
 	'forma_cobro',
 	'tipo_asunto',
-	'prm_area_proyecto.glosa',
+	'prm_area_proyecto_glosa',
 	'categoria_usuario',
 	'area_usuario',
         'fecha_emision',
@@ -154,6 +178,7 @@
 
 	$tipos_moneda = Reporte::tiposMoneda();
 
+	/*Calculos de fechas*/
 	$hoy = date("Y-m-d");
 	if(!$fecha_anio)
 		$fecha_anio = date('Y');
@@ -162,12 +187,31 @@
 
 	$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
 
+	/*Genero fecha_ini,fecha_fin para la semana pasada y el mes pasado.*/
+	$week = date('W');
+	$year = date('Y');
+	$lastweek=$week-1;
+	if ($lastweek==0){
+		$lastweek = 52;
+		$year--;
+	}
+	$lastweek=sprintf("%02d", $lastweek);
+	$semana_pasada = "'".date('d-m-Y',strtotime("$year". "W$lastweek"."1"))."','".date('d-m-Y',strtotime("$year". "W$lastweek"."7"))."'";
+
+	
+	$last_month = strtotime("-".(date('j'))." day");
+	$mes_pasado ="'01".date('-m-Y',$last_month)."','".date('t-m-Y',$last_month)."'";
+
+	$actual ="'01-01-".date('Y')."','".date('d-m-Y')."'";
+			
+
 	if(!isset($numero_agrupadores))
 		$numero_agrupadores = 1;
 	if(!$popup)
 	{
 		$pagina->PrintTop($popup);
-		if(!$filtros_check)
+		/*Si se eligió fecha con el selector [MES] [AÑO] (o viene default), se cambia a lo indicado por este.*/
+		if(!$filtros_check && ($fecha_corta != 'anual' && $fecha_corta != 'semanal' && $fecha_corta != 'mensual'))
 		{
 			$fecha_m = ''.$fecha_mes;
 
@@ -196,6 +240,8 @@ input.btn{ margin:3px;}
 
 .visible{display:'block';}
 .invisible{display: none;}
+
+.editar_reporte{ padding:4px; margin-left: 10px; margin-right: 10px;}
 
 </style>
 
@@ -228,6 +274,7 @@ function Agrupadores(num)
 	//else
 	//	$('mas_agrupadores').show();
 	RevisarTabla();
+	ActualizarNuevoReporte();
 }
 
 //Al cambiar un agrupador, en los agrupadores siguientes, el valor previo se hace disponible y el valor nuevo se indispone.
@@ -271,6 +318,8 @@ function CambiarAgrupador(num)
 	txt = selector.options[selector.selectedIndex].text;
 	opc = new Option(txt,valor);
 	selector_previo.options[0] = opc;	
+
+	ActualizarNuevoReporte();
 }
 
 function ResizeIframe(width, height)
@@ -372,6 +421,7 @@ function Comparar()
 	RevisarMoneda();
 	RevisarCircular();
 	RevisarTabla();
+	ActualizarNuevoReporte();
 }
 
 //Sincroniza los selectores de Campo de Fecha Visibles e Invisibles
@@ -401,6 +451,7 @@ function SincronizarCampoFecha()
 			}
 		}
 	}
+	ActualizarNuevoReporte();
 }
 
 //Muestra Categoría y Area
@@ -479,26 +530,89 @@ function SelectValueSet(SelectName, Value)
      SelectObject.selectedIndex = index;
    }
 }
-
-function CargarReporte(reporte)
+/*Traduce los codigos utilizados para mostrarlos al usuario*/
+function Traductor(s)
 {
+	switch(s)
+	{
+	<? foreach($tipos_de_dato as $td) echo "case '".$td."': return '".__($td)."'; "?>
+	<? foreach($agrupadores as $td) echo "case '".$td."': return '".__($td)."'; "?>
+		default: return s;
+	}
+}
+
+/*Carga lo elegido en el deglose del nuevo reporte*/
+function ActualizarNuevoReporte()
+{
+
+	var s = Traductor($('tipo_dato').value);
+	if($('comparar').checked == true)
+		s += ' vs. '+Traductor($('tipo_dato_comparado').value);
+	
+
+	$('tipos_datos_nuevo_reporte').innerHTML = s;
+
+	s = '';
+	var numero_agrupadores = parseInt($('numero_agrupadores').value);
+	for(i = 0; i < numero_agrupadores; i++)
+	{
+			if(i != 0 && i != 3)
+			 s += ' - ';
+			s += Traductor($('agrupador_'+i).value);
+			if(i==2)
+				s += '<br />';
+	}
+	$('agrupadores_nuevo_reporte').innerHTML = s;
+	
+	s = "<i>Puede seleccionar 'Semana pasada',<br /> 'Mes pasado' o 'Año en curso'.</i>";
+	var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
+
+	if(fecha_corta == 'semanal')
+		s = "<?=__('Semana pasada')?>";
+	
+	if(fecha_corta == 'mensual')
+		s = "<?=__('Mes pasado')?>";
+
+	if(fecha_corta == 'anual')
+		s = "<?=__('Año en curso')?>";
+
+	$('periodo_nuevo_reporte').innerHTML = s;
+
+	var campo_fecha =  document.formulario.campo_fecha;
+	if(campo_fecha[0].checked)
+		s = '<?=__("Trabajo")?>';
+	else if(campo_fecha[1].checked)
+		s = '<?=__("Corte")?>';
+	else
+		s = '<?=__("Emisión")?>';
+
+	$('segun_nuevo_reporte').innerHTML = s;
+
+}
+
+/*Carga los datos del reporte elegido en los selectores*/
+function CargarReporte()
+{
+	var reporte = $('mis_reportes').value;
 	if(reporte == "0")
 	{
 		$('span_eliminar_reporte').style.visibility = 'hidden';
+		$('span_editar_reporte').style.visibility = 'hidden';
 		return 0;
 	}
-	else if(reporte == 'nuevo_reporte')
-	{
-		$('span_eliminar_reporte').style.visibility = 'hidden';
-		GenerarReporte();
-	}
-	else
-		$('span_eliminar_reporte').style.visibility = 'visible';
-	
+	$('span_eliminar_reporte').style.visibility = 'visible';
+	$('span_editar_reporte').style.visibility = 'visible';
+
+	/*Se añade 'envio'*/
+	var separa = reporte.split('*');
+	reporte = separa[0];
+	var envio = separa[1];
+	var segun = separa[2];
+
 	var elementos = reporte.split('.');
 	var datos = elementos[0].split(',');
 	var agrupadores = elementos[1].split(',');
-	
+
 	SelectValueSet('tipo_dato',datos[0]);
 	if(datos.size() == 2)
 	{
@@ -516,10 +630,42 @@ function CargarReporte(reporte)
 		SelectValueSet('agrupador_'+i,agrupadores[i]);
 		CambiarAgrupador(i);
 	}
-	
+
+	if(segun == 'trabajo')
+	{
+		$('campo_fecha_trabajo').click();
+		$('campo_fecha_trabajo_F').click();
+	}
+	else if(segun == 'cobro')
+	{
+		$('campo_fecha_cobro').click();
+		$('campo_fecha_cobro_F').click();
+	}
+	else
+	{
+		$('campo_fecha_emision').click();
+		$('campo_fecha_emision_F').click();
+	}
+
+	if(elementos.size()==3)
+	{
+		var periodo = elementos[2];
+		if(periodo=='semanal')
+		{
+			$('fecha_corta_semana').click();
+		}
+		else if(periodo=='mensual')
+		{
+			$('fecha_corta_mes').click();
+		}
+		else if(periodo=='anual')
+		{
+			$('fecha_corta_anual').click();
+		}
+	}	
 	$('eliminado_reporte').value = reporte;
 }
-
+/*Submitea la form para que genere un reporte segun lo elegido.*/
 function GenerarReporte()
 {
 		var s = $('tipo_dato').value;
@@ -533,15 +679,113 @@ function GenerarReporte()
 				 s += ',';
 				s += $('agrupador_'+i).value;
 		}
+	
+	var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
+	
+	if(fecha_corta == 'semanal' || fecha_corta == 'mensual' || fecha_corta == 'anual')
+		s += '.'+fecha_corta;
+
+	var reporte_envio = 0;
+	if(fecha_corta == 'semanal')
+		reporte_envio = $('select_reporte_envio_semana').value;
+	if(fecha_corta == 'mensual')
+		reporte_envio = $('select_reporte_envio_mes').value;
+	if(fecha_corta == 'anual')
+		reporte_envio = $('select_reporte_envio_mes').value;
+
+	$('nuevo_reporte_envio').value = reporte_envio;
+	
+	var campo_fecha =  document.formulario.campo_fecha;
+	if(campo_fecha[0].checked)
+		$('nuevo_reporte_segun').value = 'trabajo';
+	else if(campo_fecha[1].checked)
+		$('nuevo_reporte_segun').value = 'cobro';
+	else
+		$('nuevo_reporte_segun').value = 'emision';
+
 		$('nuevo_reporte').value = s;
 		$('formulario').opc.value = 'nuevo_reporte';
+
+
 		$('formulario').submit();	
 }
 
 function EliminarReporte()
 {
-		$('formulario').opc.value = 'eliminar_reporte';
-		$('formulario').submit();	
+	$('formulario').opc.value = 'eliminar_reporte';
+	$('formulario').submit();	
+}
+
+function NuevoReporte()
+{
+	$('div_nuevo_reporte').show();
+	$('label_nuevo_reporte').show();
+	$('label_editar_reporte').hide();
+	$('nombre_reporte').value='';
+	$('id_reporte_editado').value = 0;
+	ActualizarNuevoReporte();
+}
+
+function EditarReporte()
+{
+	var mis_reportes = $('mis_reportes');
+	var texto = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].innerHTML : undefined;
+	var id_reporte = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-id_reporte") : 0;
+
+	var envio_reporte = mis_reportes.selectedIndex >= 0 ? 
+	mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-envio_reporte") : 0;
+
+	texto = texto.split('&nbsp;');
+	$('nombre_reporte').value = texto[2];
+	$('id_reporte_editado').value = id_reporte;
+
+
+	$('div_nuevo_reporte').show();
+	$('label_nuevo_reporte').hide();
+	$('label_editar_reporte').show();
+	ActualizarNuevoReporte();
+
+	if(envio_reporte)
+	{
+		var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
+		if(fecha_corta == 'semanal')
+			$('select_reporte_envio_semana').selectedIndex = envio_reporte;
+		else 
+			$('select_reporte_envio_mes').selectedIndex=envio_reporte;
+	}
+}
+
+
+function SeleccionarSemana()
+{
+	ActualizarPeriodo(<?=$semana_pasada?>);
+	$('reporte_envio_semana').show();
+	$('reporte_envio_mes').hide();
+	$('reporte_envio_selector').hide();
+	ActualizarNuevoReporte();
+}
+function SeleccionarMes()
+{
+	ActualizarPeriodo(<?=$mes_pasado?>);
+	$('reporte_envio_mes').show();
+	$('reporte_envio_semana').hide();
+	$('reporte_envio_selector').hide();
+	ActualizarNuevoReporte();
+}
+function SeleccionarSelector()
+{
+	$('reporte_envio_selector').show();
+	$('reporte_envio_semana').hide();
+	$('reporte_envio_mes').hide();
+	ActualizarNuevoReporte();
+}
+function SeleccionarAnual()
+{
+	ActualizarPeriodo(<?=$actual?>);
+	$('reporte_envio_selector').hide();
+	$('reporte_envio_semana').hide();
+	$('reporte_envio_mes').show();
+	ActualizarNuevoReporte();
 }
 
 
@@ -607,6 +851,11 @@ function MostrarLimite(visible)
 		limite_check.style['display'] = 'none';
 	}
 }
+function ActualizarPeriodo(fi,ff)
+{
+	$('fecha_ini').value = fi;
+	$('fecha_fin').value = ff;
+}
 
 /*Setea el Tipo de Dato, marcando la selección, haciendo visible la moneda y el gráfico circular*/
 function TipoDato(valor)
@@ -650,6 +899,7 @@ function TipoDato(valor)
 	}
 	RevisarMoneda();
 	RevisarCircular();
+	ActualizarNuevoReporte();
 }
 
 </script>
@@ -669,12 +919,18 @@ if(!$popup)
 </div>
 <!-- Fin calendario DIV -->
 
-<!-- SELECTOR DE FILTROS -->
+<!-- MIS REPORTES -->
 <table width="90%"><tr><td align="center">
 
 <fieldset width="100%" class="border_plomo tb_base" align="center"><legend><?=__('Mis Reportes')?></legend>
 <div>
-	<select name="mis_reportes_elegido" id='mis_reportes' onchange="CargarReporte($('mis_reportes').value);">
+	
+	<div style="float:right" align=right>
+			<input type=button value="<?=__('Nuevo Reporte')?>" onclick="NuevoReporte()"  />
+	</div>
+
+	<div>
+	<select name="mis_reportes_elegido" id='mis_reportes' onchange="CargarReporte();">
 		<option value="0"><?=__('Seleccione Reporte...')?></option>
 		<?
 		   $estilo_eliminar_reporte = 'style="visibility:hidden"';
@@ -685,7 +941,7 @@ if(!$popup)
 		   else
 		   {
 			   $j = 1;
-			   foreach($mis_reportes as $mi_reporte)
+			   foreach($mis_reportes as $indice_reporte => $mi_reporte)
 			   {
 				   $elementos = explode('.',$mi_reporte);
 				   $mis_datos = explode(',',$elementos[0]);
@@ -702,21 +958,114 @@ if(!$popup)
 						$selected_mi_reporte = 'selected';
 						$estilo_eliminar_reporte = '';
 					}
+					$glosa = $mis_reportes_glosa[$indice_reporte];
+					if(!$glosa)
+						$glosa = implode(' vs. ',$mis_datos).' : '.implode(' - ',$mis_agrupadores);
+
+					
+					$mi_reporte_envio = $mis_reportes_envio[$indice_reporte];
+					$mi_reporte_segun = $mis_reportes_segun[$indice_reporte];
+					$mi_reporte_id = $mis_reportes_id[$indice_reporte];
+					//mi_reporte : tipo_dato(s),agrupador(es),periodo
+					//mi_reporte_envio : dia (semana o mes)
+					$string_mi_reporte = $mi_reporte.'*'.$mi_reporte_envio.'*'.$mi_reporte_segun;
 					
 					$num = $j<10? '0'.$j:$j;
-				    echo '<option '.$selected_mi_reporte.' value="'.$mi_reporte.'">'.$num.' )&nbsp;&nbsp;'.implode(' vs. ',$mis_datos).' : '.implode(' - ',$mis_agrupadores)."</option>";
+				    echo '<option '.$selected_mi_reporte.' value="'.$string_mi_reporte.'" id="mi_reporte_'.$mi_reporte.'" data-id_reporte="'.$mi_reporte_id.'" data-envio_reporte="'.$mi_reporte_envio.'" >'.$num.' )&nbsp;&nbsp;'.$glosa."</option>";
 				    $j++;
 				}
 		   }
 		?>
-		<option value = "nuevo_reporte">+++ <?=__('Agregar selección actual')?>. +++</option>
 	</select>
+	<span id="span_editar_reporte" <?=$estilo_eliminar_reporte?> >&nbsp;<a style='color:#009900' href="javascript:void(0)" onclick="EditarReporte();"><?=__('Editar')?></a></span>&nbsp;
 	<span id="span_eliminar_reporte" <?=$estilo_eliminar_reporte?> >&nbsp;<a style='color:#CC1111' href="javascript:void(0)" onclick="EliminarReporte();"><?=__('Eliminar')?></a></span>
 	<input type=hidden name='nuevo_reporte' id='nuevo_reporte' />
+	<input type=hidden name='nuevo_reporte_envio' id='nuevo_reporte_envio' />
+	<input type=hidden name='nuevo_reporte_segun' id='nuevo_reporte_segun' />
 	<input type=hidden name='eliminado_reporte' id='eliminado_reporte' />
+	</div>
+	
+	<div id="div_nuevo_reporte" style="display:none; position:absolute; left:30%; top:150px; background-color:white;">
+		<div align=left  class='editar_reporte' >
+			<fieldset class="border_plomo tb_base">
+			<legend>
+				<span id='label_nuevo_reporte'><b><?=__('Nuevo Reporte')?></b></span>
+				<span id='label_editar_reporte'><b><?=__('Editar Reporte')?></b></span>
+			</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align=right><?=__("Nombre")?>:</td>
+						<td>
+							<input type="text" name="nombre_reporte" id="nombre_reporte"/>
+							<input type="hidden" name="id_reporte_editado" id="id_reporte_editado" value="0"/>
+						</td>
+					</tr>
+					<tr>
+						<td align=right><?=__("Tipos de Datos")?>:</td>
+						<td><span id="tipos_datos_nuevo_reporte"></span></td>
+					</tr>
+					<tr>
+						<td align=right><?=__("Agrupar por")?>:</td>
+						<td><span id="agrupadores_nuevo_reporte"></span></td>
+					</tr>
+					<tr>
+						<td  align=right><?=__("Periodo")?>:</td>
+						<td><span id="periodo_nuevo_reporte"></span></td>
+					</tr>
+					<tr>
+						<td  align=right><?=__("Según")?>:</td>
+						<td><span id="segun_nuevo_reporte"></span></td>
+					</tr>
+					<tr id = 'reporte_envio'>
+						<td align=right><?=__('Enviar cada')?>:</td>
+						<td>
+							<span id='reporte_envio_selector' style="<?= $fecha_corta=='selector'||!$fecha_corta ? '':'display:none;'?>" ><i><?=__("Debe seleccionar un periodo de reporte")?>.</i></span>
+							<span id='reporte_envio_semana' style="<?= $fecha_corta=='semanal'? '':'display:none;'?>">
+								<select name='reporte_envio_semana' id='select_reporte_envio_semana'>
+									<option value='0'><?=__('No enviar')?></option>
+									<option value='1'><?=__('Lunes')?></option>
+									<option value='2'><?=__('Martes')?></option>
+									<option value='3'><?=__('Miércoles')?></option>
+									<option value='4'><?=__('Jueves')?></option>
+									<option value='5'><?=__('Viernes')?></option>
+									<option value='6'><?=__('Sábado')?></option>
+									<option value='7'><?=__('Domingo')?></option>
+								</select>
+							</span>
+							<span id='reporte_envio_mes' style="<?= $fecha_corta=='mensual'|| $fecha_corta=='anual' ? '':'display:none;'?>">
+								<select name='reporte_envio_mes' id='select_reporte_envio_mes'>
+									<option value='0'><?=__('No enviar')?></option>
+									<? for ($i = 1; $i <= 30; $i++) 
+									{
+										echo "<option value='".$i."'>";
+										echo __('día')." ".str_pad($i, 2, '0', STR_PAD_LEFT);
+										echo " ".__('del mes')."</option>";	
+									} 
+									?>
+								</select>
+							</span>
+							<br>
+						</td>
+					</tr>
+					<tr>
+						<td  align=center colspan=2>
+							<input type="button" class="btn" value="<?=__('Guardar')?>" onclick="GenerarReporte();" />
+							<input type="button" class="btn" value="<?=__('Cancelar')?>" onclick="$('div_nuevo_reporte').hide();$('nombre_reporte').value='';">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</fieldset>
+		</div>
+	</div>
 </div>
+
+
 </fieldset>
 
+
+<!-- SELECTOR DE FILTROS -->
 <fieldset width="100%" class="border_plomo tb_base" align="center">
 <legend onClick="MostrarOculto('filtros')" style="cursor:pointer">
 <span id="filtros_img"><img src= "<?=Conf::ImgDir()?><?=$filtros_check? '/menos.gif':'/mas.gif'?>" border="0" ></span>
@@ -732,43 +1081,86 @@ if(!$popup)
 		<td align=left>
 			<b><?=__('Cliente')?>:</b>
 		</td>
-		<td align=left width='80px'>
-			<b><?=__('Periodo de') ?>:</b>
-
-			<br>
+		<td align=center colspan=2>
+			<b><?=__('Periodo') ?>:</b>
 		</td>
-		<td>
-			<?
-				$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
-				$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
-				$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
-			?>
-			<span title="<?=__($explica_periodo_trabajo)?>">
-			<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
-																					 <? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_trabajo"><?=__("Trabajo")?></label>
-			</span>
-			<span title="<?=__($explica_periodo_cobro)?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-																					<? if($campo_fecha=='cobro' ) echo 'checked="checked"';
-																					 ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_cobro"><?=__("Corte")?></label>
-			</span>
-			<span title="<?=__($explica_periodo_emision)?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-																					<? if($campo_fecha=='emision' ) echo 'checked="checked"';
-																					 ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_emision"><?=__("Emisión")?></label>
-			</span>
+		<td align=center colspan=2 >
+			<b><?=__('Según')?>:</b>
 		</td>
 	</tr>
 	<tr>
-		<td align=left>
+		<td align=left rowspan=4>
 			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"","Todos","200"); ?>	 </td>
 		</td>
-		<td align=left>
+		<td align=left rowspan=4>
 			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]",$clientes,"","Todos","200"); ?>
 		</td>
-		<td align=left colspan=2 width='40%'>
-			<div id=periodo style='display:<?=!$rango ? 'inline' : 'none' ?>;'>
+		<td align=right>
+			<input type="radio" name="fecha_corta" id="fecha_corta_semana" value="semanal" <? if($fecha_corta=='semanal' ) echo 'checked="checked"'; ?> onclick ="SeleccionarSemana()" />
+		</td>
+		<td align=left>
+			<label for="fecha_corta_semana"><?= __("Semana pasada")?></label>
+		</td>
+
+		<?
+				$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
+				$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
+				$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
+		?>
+		
+		<td align=right>
+			<span title="<?=__($explica_periodo_trabajo)?>">
+			<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
+																					 <? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
+																					 onclick ="SincronizarCampoFecha()" />
+			</span>
+		</td>
+		<td align=left>
+			<label for="campo_fecha_trabajo"  title="<?=__($explica_periodo_trabajo)?>"><?=__("Trabajo")?></label>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+				<input type="radio" name="fecha_corta" id="fecha_corta_mes" value="mensual" <? if($fecha_corta=='mensual' ) echo 'checked="checked"'; ?> onclick ="SeleccionarMes()" />
+		</td>
+		<td align=left>
+			<label for="fecha_corta_mes"><?=__("Mes pasado")?></label>
+		</td>
+		<td align=right>
+			<span title="<?=__($explica_periodo_cobro)?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
+																					<? if($campo_fecha=='cobro' ) echo 'checked="checked"';
+																					 ?>
+																					 onclick ="SincronizarCampoFecha()" />
+			</span>
+		</td>
+		<td align=left>
+			<label for="campo_fecha_cobro" title="<?=__($explica_periodo_cobro)?>"><?=__("Corte")?></label>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+			<input type="radio" name="fecha_corta" id="fecha_corta_anual" value="anual" <? if($fecha_corta=='anual' ) echo 'checked="checked"' ?>  onclick ="SeleccionarAnual()" />
+		</td>
+		<td align=left>
+			<label for="fecha_corta_anual"><?= __("Año en curso")?></label>
+		</td>
+		<td align=right>
+			<span title="<?=__($explica_periodo_emision)?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
+																					<? if($campo_fecha=='emision' ) echo 'checked="checked"';
+																					 ?>
+																					 onclick ="SincronizarCampoFecha()" />
+			</span>
+		</td>
+		<td align=left>
+			<label for="campo_fecha_emision" title="<?=__($explica_periodo_emision)?>"><?=__("Emisión")?></label>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+				<input type="radio" name="fecha_corta" id="fecha_corta_selector" value="selector" onclick ="SeleccionarSelector()" <? if($fecha_corta=='selector'||!$fecha_corta) echo 'checked="checked"';?> />
+		</td>
+		<td align=left colspan=3>
+				<label for="fecha_corta_selector">
 				<select name="fecha_mes" style='width:90px'>
 					<option value='1' <?=$fecha_mes==1 ? 'selected':'' ?>><?=__('Enero') ?></option>
 					<option value='2' <?=$fecha_mes==2 ? 'selected':'' ?>><?=__('Febrero') ?></option>
@@ -787,8 +1179,7 @@ if(!$popup)
 					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
 					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
 					<? } ?>
-				</select>
-			</div>
+				</select></label>
 		</td>
 	</tr>
 </table>
@@ -815,127 +1206,211 @@ if(!$popup)
 		}
 	?>
 
-<table id="full_filtros" style="border: 0px solid black; width:730px; <?=$filtros_check? '':'display:none;'?> " cellpadding="0" cellspacing="3">
-	<tr valign=top>
-		<td align=left>
-			<b><?=__('Profesionales')?>:</b></td>
-		<td align=left>
-			<b><?=__('Clientes')?>:</b></td>
-		<td align=left width='80px'>
-			<b><?=__('Periodo de') ?>:</b>
-		</td>
-		<td colspan="<?= $filtros_extra? '2':'1'?>">
-			<span title="<?=__($explica_periodo_trabajo)?>">
-			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
-																					<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Trabajo")?>
-			</span>
-			<span title="<?=__($explica_periodo_cobro)?>">
-			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
-																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
-																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Corte")?>
-			<span title="<?=__($explica_periodo_emision)?>">
-			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
-																					<? if($campo_fecha=='emision') echo 'checked="checked"';
-																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Emisión")?>
-			</span>
-		</td>
-	</tr>
+<div id="full_filtros" style="border: 0px solid black; width:730px; <?=$filtros_check? '':'display:none;'?> ">
 
-	<tr valign=top>
-		<td rowspan="3" align=left>
-		<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]",$usuariosF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>		</td>
-		<td rowspan="3" align=left>
-		<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]",$clientesF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
-	 	</td>
-	 	<!-- PERIODOS -->
-	 	<td colspan="<?= $filtros_extra? '3':'2'?>" align=center>
-			<div id=periodo_rango>
-				<?=__('Fecha desde')?>:&nbsp;
-					<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
-				<br />
-				<?=__('Fecha hasta')?>:&nbsp;
-					<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
-			</div>
-		</td>
-	</tr>
-	<!-- TIPO DE ASUNTO Y AREA (CONFIGURABLE) !-->
-	<?
-	if($filtros_extra)
-	{?>
-	<tr>
-		<td align=center colspan=2>
-			<b><?=__("Tipo de Asunto")?>:</b>
+	<div style='float:right'>
+		<table>
+			<tr valign=top>
+				<td align=center width='80px' colspan=2 >
+					<b><?=__('Periodo') ?>:</b>
+				</td>
+				<td align=center colspan=2>
+					<b><?=__('Según') ?>:</b>
+				</td>
+			</tr>
+			<tr valign=top>
+				<!-- PERIODOS -->
+				<td colspan=2 align=center rowspan=3>
+					<div id=periodo_rango>
+						<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
+							<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+						<br /><?=__('al')?>
+						<br />
+							<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
+							<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+					</div>
+				</td>
+				<td align=right>
+					<span title="<?=__($explica_periodo_trabajo)?>">
+					<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_trabajo_F"
+																							<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
+					</span>
+				</td>
+				<td align=left>
+					<span title="<?=__($explica_periodo_trabajo)?>"><?=__("Trabajo")?>
+					</span>
+				</td>	
+			</tr>
+			<tr>
+				<td align=right>
+					<span title="<?=__($explica_periodo_cobro)?>">
+					<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_cobro_F"
+																							<? if($campo_fecha=='cobro') echo 'checked="checked"';
+																							 ?> onclick ="SincronizarCampoFecha()" />
+					</span>
+				</td>
+				<td align=left>
+					<span title="<?=__($explica_periodo_cobro)?>">
+					<?=__("Corte")?>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td align=right>
+					<span title="<?=__($explica_periodo_emision)?>">
+					<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_emision_F"
+																							<? if($campo_fecha=='emision') echo 'checked="checked"';
+																							 ?> onclick ="SincronizarCampoFecha()" />
+				</td>
+				<td align=left>
+					<span title="<?=__($explica_periodo_emision)?>">
+					<?=__("Emisión")?>
+					</span>
+				</td>
+			</tr>
+		</table>
+	</div>
 
-		</td>
-		<td align=center>
-			<b><?=__("Area")?>:</b>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=2>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto","tipos_asunto[]",$tipos_asunto,"class=\"selectMultiple\" multiple size=5 ","","110"); ?>
-		</td>
-		<td colspan=2>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto","areas_asunto[]", $areas_asunto,"class=\"selectMultiple\" multiple size=5 ","","140");?>
-		</td>
-	</tr>
-	<?}
-	else
-	{?>
-		<tr>
-			<td align=center>
-				&nbsp;
-			</td>
-			<td align=center>
-				&nbsp;
-			</td>
-		</tr>
-		<tr>
-			<td rowspan=2>
-				&nbsp;
-			</td>
-			<td rowspan=2>
-				&nbsp;
-			</td>
-		</tr>
-	<?}?>
-	<tr>
-		<td align=left colspan=2>
-			<input type="checkbox" name="area_y_categoria" value="1" <?=$area_y_categoria ? 'checked="checked"' : '' ?> onclick="Categorias(this, this.form);" title="Seleccionar área y categoría" />&nbsp;<span style="font-size:9px"><?=__('Seleccionar área y categoría') ?>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=4>
-			<div id="area_categoria" style="display:<?=$area_y_categoria ? 'inline' : 'none' ?>;">
-				<table>
-					<tr valign="top">
-						<td align="left">
-							<b><?=__('Área')?>:</b>
-						</td>
-						<td align="left">
-							<b><?=__('Categoría')?>:</b>
-						</td>
-						<td align="left" colspan="2" width="40%">&nbsp;</td>
-					</tr>
-					<tr valign="top">
-						<td rowspan="2" align="left">
-							<?=Html::SelectQuery($sesion,"SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
-						</td>
-						<td rowspan="2" align="left">
-							<?=Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
-						</td>
-						<td align="left" colspan="2" width="40%">&nbsp;</td>
-					</tr>
-				</table>
-			</div>
-		</td>
-	</tr>
-</table>
+	<div style ='float:left; width:60%' align=center>
+		<table >
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_clientes" id="check_clientes" value="1" onchange="$$('.cliente_full').invoke('toggle')" <?= $check_clientes? 'checked':''?> />
+					<label for="check_clientes">
+						<b><?=__('Clientes')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'cliente_full' style='width:200px;<?=$check_clientes? "display:none;":""?>'>
+						<label for="check_clientes" style="cursor:pointer"><hr></label>
+					</div>
+					<div class = 'cliente_full' style="<?=$check_clientes? "":"display:none;"?>">
+						<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]",$clientesF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
+					</div>
+				</td>
+			</tr>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_profesionales" id="check_profesionales" value="1" onchange="$$('.prof_full').invoke('toggle')" <?= $check_profesionales? 'checked':''?> />
+					<label for="check_profesionales">
+					<b><?=__('Profesionales')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'prof_full' style='width:200px;<?=$check_profesionales? "display:none;":""?>'>
+						<label for="check_profesionales" style="cursor:pointer"><hr></label>
+					</div>
+					<div class = 'prof_full' style="<?=$check_profesionales? "":"display:none;"?>">
+						<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]",$usuariosF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
+					</div>
+				</td>
+			</tr>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_encargados" id="check_encargados" value="1" onchange="$$('.encargados_full').invoke('toggle')" <?= $check_encargados? 'checked':''?> />
+					<label for="check_encargados">
+					<b><?=__('Encargado Comercial')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'encargados_full' style='width:200px;<?=$check_encargados? "display:none;":""?>'>
+						<label for="check_encargados" style="cursor:pointer;" ><hr></label>
+					</div>
+					<div class = 'encargados_full' style="<?=$check_encargados? "":"display:none;"?>" >
+						<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "encargados[]",$encargados,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
+					</div>
+				</td>
+			</tr>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_area_prof" id="check_area_prof" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?= $check_area_prof? 'checked':''?> />
+					<label for="check_area_prof">
+					<b><?=__('Área Profesional')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'area_prof_full' style='width:200px;<?=$check_area_prof? "display:none;":""?>'>
+						<label for="check_area_prof" style="cursor:pointer"><hr></label>
+					</div>
+					<div class = 'area_prof_full' style="<?=$check_area_prof? "":"display:none;"?>">
+						<?=Html::SelectQuery($sesion,"SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
+					</div>
+				</td>
+			</tr>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_cat_prof" id="check_cat_prof" value="1" onchange="$$('.cat_prof_full').invoke('toggle')" <?= $check_cat_prof? 'checked':''?> />
+					<label for="check_cat_prof">
+					<b><?=__('Categoría Profesional')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'cat_prof_full' style='width:200px;<?=$check_cat_prof? "display:none;":""?>'>
+						<label for="check_cat_prof" style="cursor:pointer"><hr></label>
+					</div>
+					<div class = 'cat_prof_full' style="<?=$check_cat_prof? "":"display:none;"?>">
+						<?=Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+					</div>
+				</td>
+			</tr>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_area_asunto" id="check_area_asunto" value="1" onchange="$$('.area_asunto_full').invoke('toggle')" <?= $check_area_asunto? 'checked':''?> />
+					<label for="check_area_asunto">
+					<b><?=__('Área de Asunto')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'area_asunto_full' style='width:200px;<?=$check_area_asunto? "display:none;":""?>'>
+						<label for="check_area_asunto" style="cursor:pointer"><hr></label>
+					</div>
+					<div class = 'area_asunto_full' style="<?=$check_area_asunto? "":"display:none;"?>" >
+						<?= Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto","areas_asunto[]", $areas_asunto,"class=\"selectMultiple\" multiple size=5 ","","200");?>
+					</div>
+				</td>
+			</tr>
+			<? if($filtros_extra) { ?>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_tipo_asunto" id="check_tipo_asunto" value="1" onchange="$$('.tipo_asunto_full').invoke('toggle')" <?= $check_tipo_asunto? 'checked':''?> />
+					<label for="check_tipo_asunto">
+					<b><?=__('Tipo de Asunto')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'tipo_asunto_full' style='width:200px;<?=$check_tipo_asunto? "display:none;":""?>'>
+						<label for="check_tipo_asunto" style="cursor:pointer;" ><hr></label>
+					</div>
+					<div class = 'tipo_asunto_full' style="<?=$check_tipo_asunto? "":"display:none;"?>" >
+						<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto","tipos_asunto[]",$tipos_asunto,"class=\"selectMultiple\" multiple size=5 ","","200"); ?>
+					</div>
+				</td>
+			</tr>
+			<? } ?>
+			<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_estado_cobro" id="check_estado_cobro" value="1" onchange="$$('.estado_cobro_full').invoke('toggle')" <?= $check_estado_cobro? 'checked':''?> />
+					<label for="check_estado_cobro">
+					<b><?=__('Estado de Cobro')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'estado_cobro_full' style='width:200px;<?=$check_estado_cobro? "display:none;":""?>'>
+						<label for="check_estado_cobro" style="cursor:pointer;" ><hr></label>
+					</div>
+					<div class = 'estado_cobro_full' style="<?=$check_estado_cobro? "":"display:none;"?>" >
+						<select name='estado_cobro[]' id='estado_cobro[]' class="SelectMultiple" multiple size=8 style="width:200px" />
+							<?foreach($estados_cobro as $ec )
+							{?>
+								<option value="<?=$ec?>" <? if($estado_cobro) if( in_array($ec,$estado_cobro) ) echo "selected";?> ><?=__($ec)?></option>
+							<?}?>
+						</select>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
 </fieldset>
 
 
@@ -1456,26 +1931,35 @@ if(!$popup)
 
 	if($filtros_check)
 	{
-		if(is_array($clientesF))
-			$url_iframe .= "&clientes=".implode(',',$clientesF);
-		if(is_array($usuariosF))
-			$url_iframe .= "&usuarios=".implode(',',$usuariosF);
+		if($check_clientes)
+			if(is_array($clientesF))
+				$url_iframe .= "&clientes=".implode(',',$clientesF);
+		if($check_profesionales)
+			if(is_array($usuariosF))
+				$url_iframe .= "&usuarios=".implode(',',$usuariosF);
 
-		if(is_array($areas_asunto))
-			$url_iframe .= "&areas_asunto=".implode(',',$areas_asunto);
-		if(is_array($tipos_asunto))
-			$url_iframe .= "&tipos_asunto=".implode(',',$tipos_asunto);
+		if($check_area_asunto)
+			if(is_array($areas_asunto))
+				$url_iframe .= "&areas_asunto=".implode(',',$areas_asunto);
+		if($check_tipo_asunto)
+			if(is_array($tipos_asunto))
+				$url_iframe .= "&tipos_asunto=".implode(',',$tipos_asunto);
 
-		if($area_y_categoria)
-		{
+		if($check_area_prof)
 			if(is_array($areas))
 				$url_iframe .= "&areas_usuario=".implode(',',$areas);
+		if($check_cat_prof)
 			if(is_array($categorias))
 				$url_iframe .= "&categorias_usuario=".implode(',',$categorias);
-		}
-
-		$url_iframe .= "&fecha_ini=".$fecha_ini;
-		$url_iframe .= "&fecha_fin=".$fecha_fin;
+		
+		if($check_encargados)
+			if(is_array($encargados))
+				$url_iframe .= "&en_com=".implode(',',$encargados);
+		
+		if($check_estado_cobro)
+			if(is_array($estado_cobro))
+				$url_iframe .= "&es_cob=".implode(',',$estado_cobro);
+		
 	}
 	else
 	{
@@ -1483,11 +1967,11 @@ if(!$popup)
 			$url_iframe .= "&clientes=".implode(',',$clientes);
 		if(is_array($usuarios))
 			$url_iframe .= "&usuarios=".implode(',',$usuarios);
-
-		$url_iframe .= "&fecha_ini=01-".$fecha_mes."-".$fecha_anio;
-		$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
-		$url_iframe .= "&fecha_fin=".$fecha_ultimo_dia."-".$fecha_mes."-".$fecha_anio;
 	}
+
+	$url_iframe .= "&fecha_ini=".$fecha_ini;
+	$url_iframe .= "&fecha_fin=".$fecha_fin;
+
 	$url_iframe .= "&campo_fecha=".$campo_fecha;
 
 	if($comparar)
@@ -1517,6 +2001,11 @@ Calendar.setup(
 		button			: "img_fecha_fin"		// ID of the button
 	}
 );
+
+document.observe("dom:loaded", function() {
+  CargarReporte();
+});
+
 </script>
 <?
 	$pagina->PrintBottom($popup);

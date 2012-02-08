@@ -304,7 +304,7 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											cobro.monto,
 											cobro.monto_gastos,
 											cobro.fecha_emision,
-											cobro.tipo_cambio_moneda,
+											cobro_moneda_tarifa.tipo_cambio as tipo_cambio_moneda,
 											cobro.tipo_cambio_moneda_base,
 											cobro.nota_venta_contabilidad,
 											cobro.se_esta_cobrando,
@@ -312,20 +312,21 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 											usuario_secundario.username AS encargado_secundario,
 											cobro.estado_contabilidad,
 											prm_moneda.cifras_decimales,
-											prm_moneda_total.tipo_cambio as tipo_cambio_moneda_total,
+											cobro_moneda_mt.tipo_cambio as tipo_cambio_moneda_total,
 											prm_moneda_total.cifras_decimales as cifras_decimales_total,
 											prm_moneda_total.codigo as codigo,
 											carta.descripcion as glosa_carta,
 											cobro.documento
 											FROM cobro
-											JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=1 
-											LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
-											LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total
-											LEFT JOIN carta ON carta.id_carta=cobro.id_carta
-											LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-											LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-											LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-											WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
+											JOIN cobro_moneda as cobro_moneda_mt ON cobro_moneda_mt.id_cobro = cobro.id_cobro AND cobro_moneda_mt.id_moneda = cobro.opc_moneda_total 
+											JOIN cobro_moneda as cobro_moneda_tarifa ON cobro_moneda_tarifa.id_cobro = cobro.id_cobro AND cobro_moneda_tarifa.id_moneda = cobro.id_moneda 
+											LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda 
+											LEFT JOIN prm_moneda AS prm_moneda_total ON prm_moneda_total.id_moneda = cobro.opc_moneda_total 
+											LEFT JOIN carta ON carta.id_carta=cobro.id_carta 
+											LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato 
+											LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario 
+											LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario 
+											WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR') 
 											$query_timestamp											GROUP BY cobro.id_cobro";
 
 		if(!($resp = mysql_query($query, $sesion->dbh) ))
@@ -360,14 +361,10 @@ function ListaCobrosFacturados($usuario,$password,$timestamp)
 			/* FIN CALCULO DE MONTOS DEL COBRO */
 
 			//calculo del monto sin iva
-			$aproximacion_monto = number_format($temp['monto_subtotal']-$temp['descuento'],$temp['cifras_decimales'],'.','');
-			$total_en_moneda = $aproximacion_monto*($temp['tipo_cambio_moneda'])/$temp['tipo_cambio_moneda_total'];
-			$cobro['total_honorarios_sin_iva'] = number_format($total_en_moneda,$temp['cifras_decimales_total'],'.','');
-
+			$cobro['total_honorarios_sin_iva'] = $x_resultados['monto_honorarios'][$c->fields['opc_moneda_total']];
+			
 			//monto del cobro
-			$aproximacion_monto = number_format($temp['monto'],$temp['cifras_decimales'],'.','');
-			$total_en_moneda = $aproximacion_monto*($temp['tipo_cambio_moneda'])/$temp['tipo_cambio_moneda_total'];
-			$cobro['total_honorarios'] = number_format($total_en_moneda,$temp['cifras_decimales_total'],'.','');
+			$cobro['total_honorarios'] = $x_resultados['monto'][$c->fields['opc_moneda_total']];
 
 			//gastos sin iva
 			$cobro['total_gastos_sin_iva'] = number_format($temp['subtotal_gastos'],$temp['cifras_decimales_total'],'.','');

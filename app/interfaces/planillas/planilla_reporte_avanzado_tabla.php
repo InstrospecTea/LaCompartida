@@ -21,14 +21,28 @@
 	}
 	else
 	{
-		$clientes = $clientesF;
-		$usuarios = $usuariosF;
+		$clientes = null;
+		$usuarios = null;
 
-		if($area_y_categoria)
-		{
+		if($check_clientes)
+			$clientes = $clientesF;
+		if($check_profesionales)
+			$usuarios = $usuariosF;
+
+		if($check_area_prof)
 			$areas_usuario = $areas;
+
+		if($check_cat_prof)
 			$categorias_usuario = $categorias;
-		}
+	
+		if(!$check_area_asunto)
+			$areas_asunto = null;
+		if(!$check_tipo_asunto)
+			$tipos_asunto = null;
+		if(!$check_estado_cobro)
+			$estado_cobro = null;
+		if(!$check_encargados)
+			$encargados = null;
 	}
 
 	$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' '.__('en vista por').' '.__($agrupadores[0]);
@@ -61,10 +75,20 @@
 				if($area_usuario)
 					$reporte->addFiltro('usuario','id_area_usuario',$area_usuario);
 
-		if($categorias_usuario)
-			foreach($categorias_usuario as $categoria_usuario)
-				if($categoria_usuario)
-					$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
+	if($categorias_usuario)
+		foreach($categorias_usuario as $categoria_usuario)
+			if($categoria_usuario)
+				$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
+
+	if($encargados)
+		foreach($encargados as $encargado)
+			if($encargado)
+				$reporte->addFiltro('contrato','id_usuario_responsable',$encargado);
+			
+	if($estado_cobro)
+		foreach($estado_cobro as $estado)
+			if($estado)
+				$reporte->addFiltro('cobro','estado',$estado);
 
 	$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 	if($campo_fecha)

@@ -2286,8 +2286,16 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 
 					if ($cobro->fields['se_esta_cobrando'])
 						$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+					
+					if( UtilesApp::GetConf($sesion,'SeEstaCobrandoEspecial') ) {
+							$lineas = 'rows="6"';
+							$columnas = 'cols="25"';
+					} else {
+							$lineas = 'rows="3"';
+							$columnas = "";
+					}
 					?>
-							<textarea name="se_esta_cobrando" id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
+							<textarea name="se_esta_cobrando" <?php echo $lineas.' '.$columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
 						</td>
 					</tr>
 				</table>

@@ -29,6 +29,21 @@
 	foreach($users as $usuario)
 		if($usuario)
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
+	
+	/*ENCARGADOS*/
+	$encargados = explode(",",$en_com);
+	if(!is_array($encargados))	
+		$encargados = array($encargados);
+	foreach($encargados as $encargado)
+		if($encargado)
+			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado);
+	/*ESTADOS*/
+	$estados = explode(",",$es_cob);
+	if(!is_array($estados))	
+		$estados = array($estados);
+	foreach($estados as $estado)
+		if($estado)
+			$reporte->addFiltro('cobro','estado',$estado);
 		
 	/*CLIENTES*/
 	$clients = explode(",",$clientes);
@@ -89,33 +104,6 @@
 	/**REPORTE COMPARADO**/
 	if($tipo_dato_comparado)
 	{
-		$reporte = new Reporte($sesion);
-		foreach($users as $usuario)
-			if($usuario)
-				$reporte->addFiltro('usuario','id_usuario',$usuario);
-		foreach($clients as $cliente)
-			if($cliente)
-				$reporte->addFiltro('cliente','codigo_cliente',$cliente);
-		foreach($areas as $area)
-			if($area)
-				$reporte->addFiltro('asunto','id_area_proyecto',$area);
-		foreach($tipos as $tipo)
-			if($tipo)
-				$reporte->addFiltro('asunto','id_tipo_asunto',$tipo);
-		foreach($areas_usuario as $area_usuario)
-			if($area_usuario)
-				$reporte->addFiltro('usuario','id_area_usuario',$area_usuario);
-		foreach($categorias_usuario as $categoria_usuario)
-			if($categoria_usuario)
-				$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
-
-		$reporte->id_moneda = $id_moneda;
-		$reporte->addRangoFecha($fecha_ini,$fecha_fin);
-		$reporte->setVista($vista);
-		$reporte->setProporcionalidad($prop);
-
-		if($campo_fecha)
-		$reporte->setCampoFecha($campo_fecha);
 
 		$reporte->setTipoDato($tipo_dato_comparado);
 		$reporte->Query();
@@ -133,9 +121,7 @@
 		$valores_comparados = array();
 		foreach($r as $id => $fila)		
 			if(is_array($fila))
-				$valores_comparados[] = str_replace(',','.',$r_c[$id]['valor']);
-
-		
+				$valores_comparados[] = str_replace(',','.',$r_c[$id]['valor']);	
 }
 else
 {
