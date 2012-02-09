@@ -6297,7 +6297,13 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.71:
 				$query = array();
 				$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES ( NULL, 'senores', 'Señores', 'Dear', 0, 'Encabezado');";
-				$query[] = "UPDATE `menu_permiso` SET  `codigo_permiso` =  'COB' WHERE CONVERT(  `menu_permiso`.`codigo_permiso` USING utf8 ) =  'ADM' AND CONVERT(  `menu_permiso`.`codigo_menu` USING utf8 ) =  'FACT_PAGO' LIMIT 1 ;";
+				
+				$sql = "SELECT count(*) FROM menu_permiso WHERE codigo_permiso = 'COB' AND codigo_menu = 'FACT_PAGO' ";
+				$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
+				list($tiene_dato) = mysql_fetch_array($resp);
+				if( !$tiene_dato ) {
+					$query[] = "UPDATE `menu_permiso` SET  `codigo_permiso` =  'COB' WHERE CONVERT(  `menu_permiso`.`codigo_permiso` USING utf8 ) =  'ADM' AND CONVERT(  `menu_permiso`.`codigo_menu` USING utf8 ) =  'FACT_PAGO' LIMIT 1 ;";
+				}
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
