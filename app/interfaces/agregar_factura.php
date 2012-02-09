@@ -448,7 +448,10 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
         
         jQuery('#RUT_cliente').blur(function() {
          
-          Validar_Rut();
+          
+          <?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
+				Validar_Rut();
+	  <?php } ?>
         });      
     })
    
@@ -1037,7 +1040,9 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 	/*Validador de Rut*/
 	function Validar_Rut()
 	{
-		<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) : ?>
+		<?php if (!UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) : ?>
+                return true;
+                <?php else: ?>
                 var tipo = $('tipo_documento_identidad');
 		if(tipo.value != 5)
 			return true;
