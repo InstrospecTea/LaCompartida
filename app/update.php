@@ -4773,17 +4773,50 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				}
 
 			break;
+			
 			case 3.87:
 						$query = array();
-
-						$query[] = "ALTER TABLE `contrato` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
-						$query[] = "ALTER TABLE `cobro` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
-						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-						VALUES (
-						NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
-						);";
-						$query[] = "ALTER TABLE `factura` ADD `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
-
+						
+						$tiene_columna = false;
+						$query = " DESCRIBE contrato ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `contrato` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						}
+						
+						$tiene_columna = false;
+						$query = " DESCRIBE cobro ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `cobro` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						}
+						
+						$tiene_dato = false;
+							$query = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'serie_documento_legal'";
+							$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+							list($tiene_dato) = mysql_fetch_array($resp);
+							if( !$tiene_dato ) {
+							$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+							VALUES (
+							NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
+							);";
+						}
+						
+						$tiene_columna = false;
+						$query = " DESCRIBE factura ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'serie_documento_legal' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `factura` ADD `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
+						}
 					foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 					throw new Exception($q."---".mysql_error());
@@ -5238,8 +5271,25 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.16:
 						$query = array();
 
-						$query[] = "ALTER TABLE `contrato` ADD IF NOT EXISTS `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
-						$query[] = "ALTER TABLE `cobro` ADD IF NOT EXISTS `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						$tiene_columna = false;
+						$query = " DESCRIBE contrato ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `contrato` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						}
+						
+						$tiene_columna = false;
+						$query = " DESCRIBE cobro ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `cobro` ADD `opc_ver_valor_hh_flat_fee` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `opc_ver_detalle_retainer` ;";
+						}
 						
 						$query_consulta = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'SerieDocumentosLegales' ";
 						$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
@@ -5251,8 +5301,17 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
 							);";
 						}
-						$query[] = "ALTER TABLE `factura` ADD IF NOT EXISTS `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
-
+						
+						$tiene_columna = false;
+						$query = " DESCRIBE factura ";
+						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						while( $row = mysql_fetch_assoc($resp) ) {
+							if( $row['Field'] == 'serie_documento_legal' ) $tiene_columna = true;
+						}
+						if( !$tiene_columna ) {
+							$query[] = "ALTER TABLE `factura` ADD `serie_documento_legal` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `numero` ;";
+						}
+						
 					foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh)))
 					throw new Exception($q."---".mysql_error());
@@ -6648,10 +6707,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 						throw new Exception($q."---".mysql_error());
 					}
 				}
+				break;
 
 		case 5:
 			$query = array();
-			$query[] = "ALTER TABLE `cliente` ADD IF NOT EXISTS `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
+			$tiene_columna = false;
+			$query = " DESCRIBE cliente ";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			while( $row = mysql_fetch_assoc($resp) ) {
+				if( $row['Field'] == 'fecha_inactivo' ) $tiene_columna = true;
+			}
+			if( !$tiene_columna ) {
+				$query[] = "ALTER TABLE `cliente` ADD `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
+			}
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6926,8 +6994,13 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.17:
 			$query = array();
-			$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
+			$query = "SELECT count(*) FROM configuracion WHERE glosa_opcion = 'EsconderValoresFacturaEnCero'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,$sesion->dbh);
+			list($tiene_dato) = mysql_fetch_array($resp);
+			if(!$tiene_dato) {
+				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
                                             `comentario` =  'No mostrar honorarios o gastos en la factura si la cantidad es cero' WHERE  `glosa_opcion` = 'EsconderHonorariosEnCero' LIMIT 1 ;";
+			}
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
