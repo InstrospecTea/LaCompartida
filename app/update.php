@@ -7665,6 +7665,20 @@ NULL ,  'RUT'
 				 	}
                 }
 			break;
+			
+			case 5.53:
+				$query = array();
+                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'ActualizacionTerminado',  '1',  'para reactivar el sistema después de la actualización.',  'boolean',  '6',  '-1'
+								);";
+            
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+            break;
 	}
 }
 
@@ -8003,6 +8017,7 @@ $VERSIONES[$num++] = 5.49;
 $VERSIONES[$num++] = 5.50;
 $VERSIONES[$num++] = 5.51;
 $VERSIONES[$num++] = 5.52;
+$VERSIONES[$num++] = 5.53;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
