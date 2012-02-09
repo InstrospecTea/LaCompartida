@@ -4778,8 +4778,8 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						$query = array();
 						
 						$tiene_columna = false;
-						$query = " DESCRIBE contrato ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE contrato ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
 						}
@@ -4788,8 +4788,8 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						}
 						
 						$tiene_columna = false;
-						$query = " DESCRIBE cobro ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE cobro ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
 						}
@@ -4798,8 +4798,8 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						}
 						
 						$tiene_dato = false;
-							$query = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'serie_documento_legal'";
-							$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+							$sql = " SELECT count(*) FROM configuracion WHERE glosa_opcion = 'serie_documento_legal'";
+							$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 							list($tiene_dato) = mysql_fetch_array($resp);
 							if( !$tiene_dato ) {
 							$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
@@ -4809,8 +4809,8 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 						}
 						
 						$tiene_columna = false;
-						$query = " DESCRIBE factura ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE factura ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'serie_documento_legal' ) $tiene_columna = true;
 						}
@@ -5272,8 +5272,8 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$query = array();
 
 						$tiene_columna = false;
-						$query = " DESCRIBE contrato ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE contrato ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
 						}
@@ -5282,8 +5282,8 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						}
 						
 						$tiene_columna = false;
-						$query = " DESCRIBE cobro ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE cobro ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'opc_ver_valor_hh_flat_fee' ) $tiene_columna = true;
 						}
@@ -5303,8 +5303,8 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						}
 						
 						$tiene_columna = false;
-						$query = " DESCRIBE factura ";
-						$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+						$sql = " DESCRIBE factura ";
+						$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 						while( $row = mysql_fetch_assoc($resp) ) {
 							if( $row['Field'] == 'serie_documento_legal' ) $tiene_columna = true;
 						}
@@ -6712,8 +6712,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 5:
 			$query = array();
 			$tiene_columna = false;
-			$query = " DESCRIBE cliente ";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			$sql = " DESCRIBE cliente ";
+			$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 			while( $row = mysql_fetch_assoc($resp) ) {
 				if( $row['Field'] == 'fecha_inactivo' ) $tiene_columna = true;
 			}
@@ -6994,8 +6994,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.17:
 			$query = array();
-			$query = "SELECT count(*) FROM configuracion WHERE glosa_opcion = 'EsconderValoresFacturaEnCero'";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,$sesion->dbh);
+			$sql = "SELECT count(*) FROM configuracion WHERE glosa_opcion = 'EsconderValoresFacturaEnCero'";
+			$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,$sesion->dbh);
 			list($tiene_dato) = mysql_fetch_array($resp);
 			if(!$tiene_dato) {
 				$query[] = "UPDATE  `configuracion` SET  `glosa_opcion` =  'EsconderValoresFacturaEnCero', 
