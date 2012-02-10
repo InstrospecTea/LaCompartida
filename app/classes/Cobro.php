@@ -35,6 +35,28 @@ class Cobro extends Objeto {
 		$this->log_update = true;
 		$this->guardar_fecha = true;
 	}
+	
+	function Write() {
+		$ingreso_historial = false;
+		if( $this->fields['estado'] != $this->valor_antiguo['estado'] && 
+				!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado']) ) {
+			$ingreso_historial = true;
+		}
+		if( parent::Write() ) {
+			if( $ingreso_historial ) {
+				// Esa linea es necesaria para que el estado no se guardará dos veces
+				$this->valor_antiguo['estado'] = $this->fields['estado'];
+				
+				$his = new Observacion($this->sesion);
+				$his->Edit('fecha', date('Y-m-d H:i:s'));
+				$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+				$his->Edit('id_cobro', $this->fields['id_cobro']);
+				$his->Write();
+			}
+			return true;
+		}
+	}
 
 	//Guarda los pagos que pudo haber hecho un documento
 	function SetPagos($pago_honorarios, $pago_gastos, $id_documento=null) {
@@ -93,13 +115,14 @@ class Cobro extends Objeto {
 
 			#Se ingresa la anotación en el historial
 			if( $estado_anterior != 'PAGADO') {
-				$his = new Observacion($this->sesion);
+				/*$his = new Observacion($this->sesion);
 				$his->Edit('fecha', date('Y-m-d H:i:s'));
 				$his->Edit('comentario', __('COBRO PAGADO'));
 				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				$his->Edit('id_cobro', $this->fields['id_cobro']);
 				if ($his->Write())
-					$pagado = true;
+					$pagado = true;*/
+				$pagado = true;
 			}
 		}
 		$this->Write();
@@ -381,12 +404,12 @@ class Cobro extends Objeto {
 		$estado_anterior = $this->fields['estado'];
 		$this->Edit('estado', $estado);
 		if ($this->Write() && $estado_anterior != $estado ) {
-			$his = new Observacion($this->sesion);
+			/*$his = new Observacion($this->sesion);
 			$his->Edit('fecha', date('Y-m-d H:i:s'));
 			$his->Edit('comentario', __('COBRO ' . $estado));
 			$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro', $this->fields['id_cobro']);
-			$his->Write();
+			$his->Write();*/
 			return $estado;
 		}
 		return null;
@@ -8890,7 +8913,7 @@ class Cobro extends Objeto {
 						$horas_descontadas = $ht - $h;
 						$minutos_descontadas = $mt - $m;
 					}
-
+					
 					if (method_exists('Conf', 'GetConf'))
 						$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 					else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -8938,7 +8961,7 @@ class Cobro extends Objeto {
 							$row = str_replace('%duracion_descontada%', number_format($duracion_decimal_descontada, UtilesApp::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
 						} else {
 							$row = str_replace('%duracion_trabajada%', $ht . ':' . sprintf("%02d", $mt), $row);
-							$row = str_replace('%duracion_descontada%', $horas_descontadas . ':' . sprintf("%02d", $minutos_descontadas), $row);
+							$row = str_replace('%duracion_descontada%', Utiles::Decimal2GlosaHora($duracion_decimal_descontada), $row);
 						}
 						$row = str_replace('%duracion_decimal_descontada%', number_format($duracion_decimal_descontada, UtilesApp::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else if ($this->fields['opc_ver_horas_trabajadas']) {
@@ -8948,7 +8971,7 @@ class Cobro extends Objeto {
 							$row = str_replace('%duracion_descontada%', number_format($duracion_decimal_descontada, UtilesApp::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
 						} else {
 							$row = str_replace('%duracion_trabajada%', $ht . ':' . sprintf("%02d", $mt), $row);
-							$row = str_replace('%duracion_descontada%', $horas_descontadas . ':' . sprintf("%02d", $minutos_descontadas), $row);
+							$row = str_replace('%duracion_descontada%', Utiles::Decimal2GlosaHora($duracion_decimal_descontada), $row);
 						}
 						$row = str_replace('%duracion_decimal_descontada%', number_format($duracion_decimal_descontada, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else {
@@ -10190,7 +10213,7 @@ class Cobro extends Objeto {
 				if ($descontado || $retainer || $flatfee) {
 					if ($this->fields['opc_ver_horas_trabajadas']) {
 						$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
-						$html = str_replace('%hrs_descontadas_real%', $horas_descontado_real . ':' . $minutos_descontado_real, $html);
+						$html = str_replace('%hrs_descontadas_real%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado_real'] / 60), $html);
 					} else {
 						$html = str_replace('%hrs_trabajadas_real%', '', $html);
 						$html = str_replace('%hrs_descontadas_real%', '', $html);
@@ -10199,7 +10222,7 @@ class Cobro extends Objeto {
 				} else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%hrs_trabajadas%', $horas_trabajadas . ':' . $minutos_trabajadas, $html);
 					$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
-					$html = str_replace('%hrs_descontadas_real%', $horas_descontado_real . ':' . $minutos_descontado_real, $html);
+					$html = str_replace('%hrs_descontadas_real%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado_real'] / 60), $html);
 					$html = str_replace('%hrs_descontadas%', $horas_descontado . ':' . $minutos_descontado, $html);
 				} else {
 					$html = str_replace('%hrs_trabajadas%', '', $html);
@@ -10232,7 +10255,7 @@ class Cobro extends Objeto {
 				}
 				if ($descontado) {
 					$html = str_replace('%columna_horas_no_cobrables%', '<td align="center" width="65">%hrs_descontadas%</td>', $html);
-					$html = str_replace('%hrs_descontadas_real%', $horas_descontadas_real . ':' . $minutos_descontadas_real, $html);
+					$html = str_replace('%hrs_descontadas_real%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado_real'] / 60), $html);
 					$html = str_replace('%hrs_descontadas%', $horas_descontado . ':' . $minutos_descontado, $html);
 				} else {
 					$html = str_replace('%columna_horas_no_cobrables%', '', $html);

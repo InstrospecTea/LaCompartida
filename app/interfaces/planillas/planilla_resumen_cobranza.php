@@ -385,7 +385,7 @@
 								LEFT JOIN prm_moneda as prm_moneda_cobro ON prm_moneda_cobro.id_moneda = cobro.id_moneda
 								LEFT JOIN prm_moneda as prm_moneda_titulo ON prm_moneda_titulo.id_moneda = ".$moneda."
 								LEFT JOIN
-									(SELECT id_cobro,tipo_cambio FROM cobro_moneda WHERE id_moneda=".$moneda.")
+									(SELECT id_cobro,tipo_cambio FROM cobro_moneda WHERE id_moneda='".$moneda."')
 									AS cambio ON cambio.id_cobro=cobro.id_cobro
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
 							WHERE $where 

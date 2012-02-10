@@ -69,14 +69,14 @@
 		
 		
 		if ($estado_anterior != $nuevo_estado ) {
-			$his = new Observacion($sesion);
+			/*$his = new Observacion($sesion);
 			$his->Edit('fecha',date('Y-m-d H:i:s'));
 			$his->Edit('comentario',__('COBRO ANULADO'));
 			$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 			$his->Edit('id_cobro',$cobro->fields['id_cobro']);
 			if($his->Write()) {
 				$pagina->AddInfo(__('Historial ingresado'));
-			}
+			}*/
 		}
 	}
 	elseif($opc == 'guardar_cobro' || $opc == 'guardar_cobro_pdf') #Guardamos todos los datos del cobro
@@ -257,12 +257,12 @@
 			$pagina->AddInfo(__('El Cobro ha sido transferido') . " " . __('al estado: En Revisión'));
 		$historial_comentario = __('COBRO EN REVISION');
 		##Historial##
-		$his = new Observacion($sesion);
+		/*$his = new Observacion($sesion);
 		$his->Edit('fecha',date('Y-m-d H:i:s'));
 		$his->Edit('comentario',$historial_comentario);
 		$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 		$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-		$his->Write();
+		$his->Write();*/
 	}
 	elseif($opc == 'volver_a_creado')
 	{
@@ -287,12 +287,12 @@
 					$estado_anterior = $cobro->fields['estado'];		
 
 					if ( $estado_anterior != 'CREADO' ) {
-						$his = new Observacion($sesion);
+						/*$his = new Observacion($sesion);
 						$his->Edit('fecha',date('Y-m-d H:i:s'));
 						$his->Edit('comentario',$historial_comentario);
 						$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 						$his->Edit('id_cobro',$cobro->fields['id_cobro']);
-						$his->Write();
+						$his->Write();*/
 					}
 				}
 	}
@@ -537,7 +537,7 @@ if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
 				var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
 				if( response[0] != 0 ) {
 					if( response[0] < 2 ) {
-						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("El siguiente trabajo ")?></span>';
+						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("El siguiente trabajo ")?></span><br /><br />';
 					} else if ( response[0] <= 10 ) {
 						text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__("Los siguientes trabajos ")?></span><br><br>';
 					} else {
@@ -546,7 +546,7 @@ if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
 					for(i=1;i<response.length;i++) {
 						var datos = response[i].split('~');
 						if ( response[0] <= 10 ) {
-							text_window += '<br /><span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span> <a href="javascript:;" onclick="nuevaVentana(\'Editar_Trabajo\',600,500,\'editar_trabajo.php?id_cobro=&id_trabajo='+datos[0]+'&popup=1\',\'\');" style="color:blue;">Definir tarifas</a><br>';
+							text_window += '<br /><span style="text-align:center; font-size:11px; color:#000; ">'+datos[1]+'</span> <a href="javascript:;" onclick="nuevaVentana(\'Editar_Trabajo\',600,500,\'editar_trabajo.php?id_cobro=&id_trabajo='+datos[0]+'&popup=1\',\'\');" style="color:blue;">Corregir aquí</a><br>';
 						}
 					}
 					if( response[0] < 2 )

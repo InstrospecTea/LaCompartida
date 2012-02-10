@@ -93,13 +93,13 @@ if ($opc == 'anular_emision') {
 	
 					
 	if ( $estado_anterior != 'COBRO INCOBRABLE' ) {
-		$his = new Observacion($sesion);
+		/*$his = new Observacion($sesion);
 		$his->Edit('fecha', date('Y-m-d H:i:s'));
 		$his->Edit('comentario', __('COBRO INCOBRABLE'));
 		$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
 		$his->Edit('id_cobro', $cobro->fields['id_cobro']);
 		if ($his->Write())
-			$pagina->AddInfo(__('Historial ingresado'));
+			$pagina->AddInfo(__('Historial ingresado'));*/
 	}
 }
 //Se reinicia el documento del cobro
@@ -381,13 +381,13 @@ if ($cambiar_estado) {
 	#Se ingresa la anotación en el historial
 	
 	if ( $estado_anterior != $estado ) {
-		$his = new Observacion($sesion);
+		/*$his = new Observacion($sesion);
 		$his->Edit('fecha', date('Y-m-d H:i:s'));
 		$his->Edit('comentario', __("COBRO $estado"));
 		$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
 		$his->Edit('id_cobro', $cobro->fields['id_cobro']);
 		if ($his->Write())
-			$pagina->AddInfo(__('Historial ingresado'));
+			$pagina->AddInfo(__('Historial ingresado'));*/
 	}
 	
 }

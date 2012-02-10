@@ -1322,6 +1322,16 @@ class Factura extends Objeto {
 			$neteos = array(array($this->fields['id_factura'], $monto_moneda_cobro, $monto_pago));
 			$ccf->AgregarNeteos($mvto_pago, $neteos);
 			$saldo_fact -= $monto_moneda_cobro;
+			
+			//aqui deberia agregar la descripcion del pago
+			$factura_pago = new FacturaPago($this->sesion);
+			$facturas_asociadas = $factura_pago->GetListaFacturasSoyPago($id_pago, 'id_factura_pago', 'numero');
+			$facturas_array = explode(",", $facturas_asociadas);
+			$facturas_asociadas = "#" . join( ", #", $facturas_array);
+			$factura_pago->Load($id_pago);
+			$descripcion_pago = explode( " :: ", $factura_pago->fields['descripcion']);
+			$factura_pago->Edit('descripcion', $descripcion_pago[0] . " :: Facturas: " . $facturas_asociadas);
+			$factura_pago->Write();
 		}
 
 		$query = "SELECT id_estado FROM factura WHERE id_factura = '" . $this->fields['id_factura'] . "'";

@@ -144,12 +144,12 @@ if ($print) {
 			$estado_anterior = $Cobro->fields['estado'];
 			$Cobro->Edit('estado', 'EMITIDO');
 			if ($ret == '' && $estado_anterior != 'EMITIDO') {
-				$his = new Observacion($Sesion);
+				/*$his = new Observacion($Sesion);
 				$his->Edit('fecha', date('Y-m-d H:i:s'));
 				$his->Edit('comentario', __('COBRO EMITIDO'));
 				$his->Edit('id_usuario', $Sesion->usuario->fields['id_usuario']);
 				$his->Edit('id_cobro', $Cobro->fields['id_cobro']);
-				$his->Write();
+				$his->Write();*/
 				$Cobro->Write();
 			}
 		}
