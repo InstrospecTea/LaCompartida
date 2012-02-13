@@ -2243,7 +2243,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 						<tr>
 							<td colspan="3" align=center>
 								<img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0 />
-								<?php if($hay_adelantos){ ?>
+								<?php if($hay_adelantos && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ){ ?>
 								<a href='javascript:void(0)' onclick="UsarAdelanto(<?=$pago_honorarios?>, <?=$pago_gastos?>)" title="<?= __('Usar Adelanto') ?>"><?= __('Usar Adelanto') ?></a>
 								<?php } else { ?>
 								<a href='javascript:void(0)' onclick="AgregarPago()" title="<?= __('Agregar Pago') ?>"><?= __('Agregar Pago') ?></a>

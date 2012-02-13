@@ -254,7 +254,9 @@ class Factura extends Objeto {
                     $xml = $this->GenerarDocumento($xmlData, 'ENCABEZADO', $lang, true);
                     $xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
                     $xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
-                    $html_css['xml'] = str_replace(array('UTF-8','&nbsp;','<br>','<br/>','<br />','<v:shape '),array('ISO-8859-1','&#160;','&#xD;','&#xD;','&#xD;','<v:shape filled="f" stroked="f" '),$xml);
+                     $html_css['xml'] = str_replace(array('UTF-8','&nbsp;','<br>','<br/>',"<br />\n",'<br />','<v:shape '),array('ISO-8859-1','&#160;','&#xD;','&#xD;','</w:t></w:r></w:p><w:p><w:r><w:t>','</w:t></w:r></w:p><w:p><w:r><w:t>', '<v:shape filled="f" stroked="f" '),$xml);
+
+                  
                 }
                 return $html_css;
 	}
@@ -808,7 +810,9 @@ class Factura extends Objeto {
 					}
 					
 					$gastos_con_impuesto = $this->fields['subtotal_gastos'] * ( 1 + ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ) ;
-					$monto_impuesto_gastos = $this->fields['subtotal_gastos'] * ( $cobro->fields['porcentaje_impuesto'] / 100) ;
+					$monto_impuesto_gastos = $this->fields['subtotal_gastos'] * ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ;
+					
+					$gastos_sin_impuesto = $this->fields['subtotal_gastos_sin_impuesto'];
 					
 					$subtotal_diez = number_format( $honorarios_con_impuesto + $gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '' );
 					$subtotal_exentos = number_format( $honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '' );

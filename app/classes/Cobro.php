@@ -383,7 +383,7 @@ class Cobro extends Objeto {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				$monto_total = mysql_result($resp, 0, 0);
 				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
-				$estado = round($monto_pagado) < round($monto_total) ? "PAGO PARCIAL" : "PAGADO";
+				$estado = round($monto_pagado, 2, PHP_ROUND_HALF_UP) < round($monto_total, 2, PHP_ROUND_HALF_UP) ? "PAGO PARCIAL" : "PAGADO";
 				if ($estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' )) {
 					$fecha_primer_pago = $this->FechaPrimerPago();
 					$this->Edit('fecha_pago_parcial', $fecha_primer_pago);
