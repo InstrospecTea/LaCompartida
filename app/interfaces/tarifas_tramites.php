@@ -31,7 +31,7 @@
 			$pagina->AddError($tramite_tarifa_eliminar->error);
 	} 
 	
-	if(!$tramite_tarifa->Load($id_tramite_tarifa_edicion)) {
+	if( !$tramite_tarifa->Load($id_tramite_tarifa_edicion) && $crear != 1 ) {
 		$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_tramite_tarifa_edicion) = mysql_fetch_array($resp);
