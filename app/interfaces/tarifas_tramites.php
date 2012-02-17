@@ -30,7 +30,13 @@
 		else
 			$pagina->AddError($tramite_tarifa_eliminar->error);
 	} 
-	$tramite_tarifa->loadById($id_tramite_tarifa_edicion);
+	
+	if(!$tramite_tarifa->Load($id_tramite_tarifa_edicion)) {
+		$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1";
+		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		list($id_tramite_tarifa_edicion) = mysql_fetch_array($resp);
+		$tramite_tarifa->Load($id_tramite_tarifa_edicion);
+	}
 	
 	if($opc != 'guardar')
 	{
@@ -107,10 +113,11 @@
 	$pagina->AddInfo(__('La tarifa se ha modificado satisfactoriamente'));
 	}
 	
-	
 	$pagina->titulo = __('Ingreso de Tarifas de Trámites');
 
+	$id_tr_tar_ed = $id_tramite_tarifa_edicion;
 	$pagina->PrintTop($popup);
+	$id_tramite_tarifa_edicion = $id_tr_tar_ed;
 
 	$active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 ?>
@@ -134,8 +141,37 @@ function no_foco(elemento)
 
 function Eliminar()
 {
-	if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?'))
-		location.href="tarifas_tramites.php?popup=<?=$popup?>&id_tramite_tarifa_eliminar=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>&opc=eliminar";
+	var http = getXMLHTTP();
+	http.open('get', 'ajax.php?accion=obtener_tramite_tarifa_defecto&id_tarifa=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+	http.send(null);
+	tarifa_defecto_en_bd = http.responseText;
+	
+	if( tarifa_defecto_en_bd != <?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?> ){
+		var http = getXMLHTTP();
+		http.open('get', 'ajax.php?accion=contratos_con_esta_tramite_tarifa&id_tarifa=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+		http.send(null);
+		num_contratos = http.responseText;
+
+		if( num_contratos > 0 ) {
+			respuesta_num_pagos = confirm('<?php echo  __('La tarifa posee'); ?> ' + num_contratos + ' <?php echo __('contratos asociados. \nSi continua se le asignará la tarifa estándar a los contratos afectados.\n¿Está seguro de continuar?.'); ?>');
+			if( respuesta_num_pagos ) {
+				http.open('get', 'ajax.php?accion=cambiar_a_tramite_tarifa_por_defecto&id_tarifa=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+				http.send(null);
+				num_contratos = http.responseText;
+
+				location.href="tarifas_tramites.php?popup=<?=$popup?>&id_tramite_tarifa_eliminar=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>&opc=eliminar";
+			} else {
+				return false;
+			}					   
+		} else {
+			if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?')) {
+				location.href="tarifas_tramites.php?popup=<?=$popup?>&id_tramite_tarifa_eliminar=<?=$id_tramite_tarifa_edicion ? $id_tramite_tarifa_edicion : $id_tramite_tarifa_previa ?>&opc=eliminar";
+			}
+		}
+	} else {
+		alert( 'No puede eliminar la tarifa estándar (por defecto)' );
+		return false;
+	}
 }
 
 
@@ -171,7 +207,7 @@ function CrearTarifa( from, id )
 }
 </style>
 
-<?
+<? 
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
 	echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">"; ?>
 <form name=formulario id=formulario method=post action='' autocomplete="off">

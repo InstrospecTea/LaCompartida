@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -42,10 +42,69 @@
 ?>
 
 <script type="text/javascript">
+    jQuery(document).ready(function() {
+       
+       jQuery("#losadelantos").load('lista_adelantos.php?ajax=1', function() {
+           jQuery('.pagination ul li a').each(function() {
+              valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
+              jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
+           });
+        });
+        jQuery('.printlinkpage').live('click',function() {
+            multi=jQuery("input[name=x_pag]").val();
+            //alert(multi);
+            valrel=multi*(jQuery(this).attr('rel')-1);
+            jQuery('#xdesde').val(valrel);
+            jQuery.post('lista_adelantos.php?ajax=1', { xdesde: valrel },
+                function(data) {
+                jQuery("#losadelantos").html(data);
+                
+                jQuery('.pagination ul li a').each(function() {
+                valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
+                jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
+                });
+            });
+        });
+        jQuery("#boton_buscar").click(function() {
+           // alert('buscando...');
+            jQuery.post('lista_adelantos.php?ajax=1', jQuery('#form_adelantos').serialize(),
+                        function(data) {
+                        jQuery("#losadelantos").html(data);
+
+                        jQuery('.pagination ul li a').each(function() {
+                        valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
+                        jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
+                        });
+                    });
+        });
+        jQuery('#codigo_cliente').change(function(){
+            jQuery('#loading').remove();
+            jQuery('#xdesde').val(0);
+        });
+        jQuery('#campo_codigo_cliente').change(function(){
+            jQuery('#loading').remove();
+            jQuery('#xdesde').val(0);
+        });
+    
+    });
+    
+
+    function Refrescarse() {
+                var desdepg=jQuery('#xdesde').val();
+                jQuery.post('lista_adelantos.php?ajax=1', { xdesde: desdepg },
+                function(data) {
+                jQuery("#losadelantos").html(data);
+                
+                jQuery('.pagination ul li a').each(function() {
+                valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
+                jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
+                });
+            });
+    }
 	function AgregarNuevo(tipo)
 	{
 		<?php
-		if (((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))) { ?>
+		if (UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente_secundario;
 		<? } else { ?>
@@ -55,8 +114,19 @@
 		if(tipo == 'adelanto')
 		{
 			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
-			nuevaVentana('Agregar_Adelanto', 720, 420, urlo, 'top=100, left=125');
-		}
+
+                        if(window.hs===undefined) {
+                            	return	nuevaVentana('Agregar_Adelanto', 720, 420, urlo, 'top=100, left=125');
+
+                        }else {
+                             var objeto = document.createElement('a');
+                             objeto.href=urlo;
+                             objeto.title='Agregar Adelanto';
+                                return hs.htmlExpand(objeto, {objectType: 'iframe',height:580,width:800});
+                        }
+        
+                }
+    
 	}
 	function Refrescar()
 	{
@@ -77,6 +147,7 @@
 		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+pagina_desde+"&buscar=1"+($F('tiene_saldo') ? '&tiene_saldo=1' : '');
 		self.location.href= url;
 	}
+        
 </script>
 
 <?php echo Autocompletador::CSS(); ?>
@@ -85,6 +156,7 @@
 	<tr>
 		<td>
 			<form method='post' name="form_adelantos" action='adelantos.php' id="form_adelantos">
+                            <input  id="xdesde"  name="xdesde" type="hidden" value="">
 				<input type='hidden' name='opc' id='opc' value=buscar>
 				<!-- Calendario DIV -->
 				<div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -104,18 +176,18 @@
 	    					<td align="right" width="30%"><?php echo __('Nombre Cliente') ?></td>
 	    					<td colspan="3" align="left">
 							<?php
-							if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') || 
-								(method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()))
-								{
-									if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))
+							if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
+									if (UtilesApp::GetConf($sesion,'CodigoSecundario') ):
 										echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-									else	
+									else:
 										echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+                                                                        endif;
 								} else {
-									if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario()))
+									if(UtilesApp::GetConf($sesion,'CodigoSecundario') ):
 										echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
-									else
+									else:
 										echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+                                                                        endif;
 								}
 							?>
 	  						</td>
@@ -153,7 +225,8 @@
 						<tr>
 							<td></td>
 							<td colspan=2 align=left>
-								<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn">
+								<input name="boton_buscar" id="boton_buscar" type="button" value="<?php echo __('Buscar') ?>" class="btn">
+                                                                
 							</td>
 							<td width='40%' align="right">
 								<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?=__('Agregar')?> <?php echo __('adelanto') ?></a>
@@ -164,13 +237,13 @@
 			</form>
 		</td>
 	</tr>
-</table>
+</table><div id="losadelantos">
 <?php
 	//Lista de adelantos
-	include("lista_adelantos.php");
+	//include("lista_adelantos.php");
+       echo '</div>';
 
-	if ((method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') ||
-		( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()))
+	if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	{
 		echo(Autocompletador::Javascript($sesion));
 	}

@@ -11,6 +11,7 @@
 	
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	
+header("Content-Type: text/html; charset=ISO-8859-1");
 
     $sesion = new Sesion('');
     $pagina = new Pagina ($sesion);

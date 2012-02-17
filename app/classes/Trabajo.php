@@ -230,6 +230,10 @@ class Trabajo extends Objeto
 			descripción
 			duración cobrable
 		*/
+		$ingresado_por_decimales = false;
+		if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
+			$ingresado_por_decimales = true;
+		}
 		if(!$archivo_data["tmp_name"])
 			return __('Debe seleccionar un archivo a subir.');
 		require_once Conf::ServerDir().'/classes/ExcelReader.php';
@@ -453,7 +457,7 @@ class Trabajo extends Objeto
 					}
 				// Excel guarda la duración como número, donde 1 es un día.
 				
-				$duracion_cobrable = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_cobrable]);
+				$duracion_cobrable = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_cobrable], $ingresado_por_decimales);
 				if($duracion_cobrable != '00:00:00')
 					$cobrable=1;
 				else 
@@ -461,7 +465,7 @@ class Trabajo extends Objeto
 					
 				// Si existe una columna duracion_trabajada, toma el valor si no ponga lo igual a la duracion cobrable.
 				if($col_duracion_trabajada != 23 ) 
-					$duracion_trabajada = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_trabajada]);
+					$duracion_trabajada = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_trabajada], $ingresado_por_decimales);
 				else
 					$duracion_trabajada = $duracion_cobrable;
 			 

@@ -6,8 +6,6 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Proveedor.php';
 
@@ -40,6 +38,24 @@
 			</script>
 			<?
 		}
+	} else if( $opcion == 'eliminar' ) {	
+		if(!empty($id_proveedor))
+		{
+			if($proveedor->Load($id_proveedor))
+			{
+				if( $proveedor->Eliminar() ) {
+					$pagina->AddInfo( __('Proveedor eliminado con éxito.'));
+					?>
+					<script type="text/javascript">
+						window.opener.location.reload();
+					</script>
+					<?
+				} else {
+					$pagina->AddError($proveedor->error);
+				}
+			}
+		}
+		unset($id_proveedor);
 	}
 
 	if($opcion == 'Buscar')
@@ -77,6 +93,18 @@
 		$('glosa').value=$('glosa_'+id).value
 	}
 	
+	function EliminarProveedor(id)
+	{
+		if( confirm('Está seguro que quiere eliminar el proveedor.') ) {
+			$('id_proveedor').value=id;
+			$('opcion').value = 'eliminar'; 
+			$('form_documentos').submit();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	var continuar = 1;
 	function Guardar(form)
 	{
@@ -107,9 +135,8 @@
 	
 </script>
 
-<? echo Autocompletador::CSS(); ?>
 <form method=post action="" id="form_documentos" autocomplete='off'>
-<input type=hidden name="opcion" value="guardar" />
+<input type=hidden name="opcion" id="opcion" value="guardar" />
 <input type=hidden name="id_proveedor" id="id_proveedor" value="" />
 <br>
 <table width='90%'>
@@ -183,6 +210,7 @@
         $opc_html = "<input type='hidden' value='".$fila->fields['rut']."' id='rut_".$id_proveedor."'  name='rut_".$id_proveedor."'>";
 		$opc_html .= "<input type='hidden' value='".$fila->fields['glosa']."' id='glosa_".$id_proveedor."'  name='glosa_".$id_proveedor."'>";
 		$opc_html .= "<a target=\"_parent\" onClick=EditarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Proveedor></a>";
+		$opc_html .= "<a target=\"_parent\" onClick=EliminarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title=Eliminar Proveedor></a>";
     
 		return $opc_html;
 	}
@@ -190,28 +218,6 @@
 </form>
 
 
-<script type="text/javascript">
-
-Calendar.setup(
-	{
-		inputField	: "fecha",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_pago"		// ID of the button
-	}
-);
-</script>
 <?
-if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		echo Autocompletador::Javascript($sesion,false);
-	}
-	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);
 ?>

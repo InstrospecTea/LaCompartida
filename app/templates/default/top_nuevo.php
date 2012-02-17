@@ -11,7 +11,7 @@
            if (file_exists(Conf::ServerDir().'/../app/version.php') and $versiondb=file_get_contents(Conf::ServerDir().'/../app/version.php', NULL, NULL, 13,5)) $rel.=' db'.$versiondb; 
 
 		if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
-			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora approximadamente 10 a 15 minutos ...";
+			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
 			?>
 			<br/><br/>
 			<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />

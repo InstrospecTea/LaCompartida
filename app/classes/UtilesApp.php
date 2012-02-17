@@ -448,11 +448,17 @@ class UtilesApp extends Utiles
 	}
 
 	// En Excel los tiempos se guardan como números donde 1 equivale a 24 horas.
-	function tiempoExcelASQL($tiempo)
+	function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false )
 	{
 		$tiempo = str_replace(',', '.', $tiempo);
-		$h = (int)($tiempo*24);
-		$m = round(($tiempo*24 - $h)*60);
+		if( $ingresado_via_decimales ) {
+			$h = (int)($tiempo);
+			$m = round(($tiempo - $h)*60);
+		} else {
+			$h = (int)($tiempo*24);
+			$m = round(($tiempo*24 - $h)*60);
+		}
+		
 		// Esta comprobación es necesaria porque la aproximación puede dejar 60 minutos y MySQL no los soporta.
 		if($m==60)
 		{

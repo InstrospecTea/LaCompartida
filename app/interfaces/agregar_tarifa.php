@@ -28,7 +28,12 @@
 		else
 			$pagina->AddError($tarifa_eliminar->error);
 	}
-	$tarifa->loadById($id_tarifa_edicion);
+	if( !$tarifa->loadById($id_tarifa_edicion) ) {
+		$query = " SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		list($id_tarifa_edicion) = mysql_fetch_array($resp);
+		$tarifa->Load($id_tarifa);
+	}
 	
 	
 	if($opc != 'guardar')

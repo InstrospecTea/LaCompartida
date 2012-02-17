@@ -7758,6 +7758,25 @@ NULL ,  'RUT'
 				 	}
 				}
             break;
+			
+			case 5.54:
+				$query = array();
+				$query[] = "ALTER TABLE  `contrato` ADD INDEX (  `id_tramite_tarifa` );";
+				$query[] = "UPDATE contrato LEFT JOIN tramite_tarifa USING( id_tramite_tarifa ) 
+								SET contrato.id_tramite_tarifa = NULL 
+							  WHERE tramite_tarifa.id_tramite_tarifa IS NULL;";
+				$query[] = "ALTER TABLE `contrato` 
+								ADD CONSTRAINT `contrato_ibfk_35` 
+								FOREIGN KEY (`id_tramite_tarifa`) 
+								REFERENCES `tramite_tarifa` (`id_tramite_tarifa`) ON UPDATE CASCADE;";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+            break;
+				
 	}
 }
 
@@ -8097,6 +8116,7 @@ $VERSIONES[$num++] = 5.50;
 $VERSIONES[$num++] = 5.51;
 $VERSIONES[$num++] = 5.52;
 $VERSIONES[$num++] = 5.53;
+$VERSIONES[$num++] = 5.54;
 
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 

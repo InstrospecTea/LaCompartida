@@ -2,13 +2,21 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 $sesion = new Sesion(array('COB'));
-if ($popup)
+if  ($_GET['ajax']) header("Content-Type: text/html; charset=ISO-8859-1");
+
+if ($_GET['popup'] || $_GET['ajax'])
 {
 	require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-	$pagina = new Pagina($sesion);
+          require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
+        $pagina = new Pagina($sesion);
 	$pagina->titulo = $titulo ? $titulo : "Adelantos";
-	$pagina->PrintTop($popup);
+	if ($_GET['ajax']) $desde=$_POST['xdesde'];
+        
+}
+        if ($_GET['popup']==1)
+{
+      
+	$pagina->PrintTop($_GET['popup']);
 }
 
 $query = "
@@ -108,8 +116,10 @@ function ElegirParaPago(&$fila)
 
 function OpcionesListaAdelanto(&$fila)
 {
-	$accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
-	if ($fila->fields['monto'] == $fila->fields['saldo_pago'])
+$accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
+   	// $accion_adelanto = "<a href='ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1&codigo_cliente=". $fila->fields['codigo_cliente'] ."&tipopago=editaadelanto' onclick=\"return hs.htmlExpand(this, {objectType: 'iframe',height:580,width:800})\" title='Editar Adelanto'><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
+	
+    if ($fila->fields['monto'] == $fila->fields['saldo_pago'])
 	{
 		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='EliminarAdelanto(" . $fila->fields['id_documento'] . ");return false;' /></a>";
 	}
@@ -121,6 +131,19 @@ function OpcionesListaAdelanto(&$fila)
 }
 ?>
 <script type="text/javascript" charset="utf-8">
+    function nuovaFinestra( name, w, h, url, opciones ) {
+        
+                if(window.hs===undefined) {
+                             return  nuevaVentana( name, w, h, url, opciones );
+                        }else {
+                             var objeto = document.createElement('a');
+                             objeto.href=url;
+                             objeto.title=name;
+                                return hs.htmlExpand(objeto, {objectType: 'iframe',height:h,width:w});
+                        }
+        
+    }
+    
 	function EliminarAdelanto(adelanto)
 	{
 		if (confirm('¿Esta seguro que desea eliminar el adelanto?'))
@@ -141,4 +164,4 @@ function OpcionesListaAdelanto(&$fila)
 	}
 	<?php } ?>
 </script>
-<?php if ($popup) $pagina->PrintBottom($popup); ?>
+<?php if ($_GET['popup']) $pagina->PrintBottom($_GET['popup']); ?>

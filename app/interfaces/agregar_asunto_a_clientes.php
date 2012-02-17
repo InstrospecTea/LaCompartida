@@ -76,7 +76,7 @@
 				$asunto->Edit("fono_contacto",$cliente->fields['fono_contacto']);
 				$asunto->Edit("email_contacto",$cliente->fields['mail_contacto']);
 				$asunto->Edit("direccion_contacto",$cliente->fields['dir_calle']);
-				$asunto->Edit("id_encargado",!empty($cliente->fields['id_usuario_encargado']) ? $cliente->fields['id_usuario_encargado'] : "NULL");
+				$asunto->Edit("id_encargado",( !empty($cliente->fields['id_usuario_encargado']) && $cliente->fields['id_usuario_encargado'] != '-1' ) ? $cliente->fields['id_usuario_encargado'] : "NULL");
 				
 				if( $asunto->Write() )
 					$contador++;

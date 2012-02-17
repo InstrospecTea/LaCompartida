@@ -457,6 +457,7 @@ elseif ($opc == 'descargar_excel' || $opc == 'descargar_excel_especial') {
 	$cobro->Edit("opc_ver_detalles_por_hora_categoria", $opc_ver_detalles_por_hora_categoria);
 	$cobro->Edit("opc_ver_detalles_por_hora_tarifa", $opc_ver_detalles_por_hora_tarifa);
 	$cobro->Edit("opc_ver_detalles_por_hora_importe", $opc_ver_detalles_por_hora_importe);
+	$cobro->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
 	$cobro->Edit("opc_ver_descuento", $opc_ver_descuento);
 	$cobro->Edit("opc_ver_tipo_cambio", $opc_ver_tipo_cambio);
 	$cobro->Edit("opc_ver_numpag", $opc_ver_numpag);

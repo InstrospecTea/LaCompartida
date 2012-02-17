@@ -240,7 +240,7 @@
 			$prov = $fila->fields[egreso] != '' ? 'false' : 'true';
 			if($editar)
 			{
-				$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Gasto',730,580,'agregar_gasto.php?id_gasto=$id_gasto&popup=1&prov=$prov', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+				$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Gasto',730,580,'agregar_gasto.php?id_gasto=$id_gasto&popup=1&prov=$prov');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 					$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title=Eliminar></a>";
 				else	
@@ -446,12 +446,12 @@ function AgregarNuevo(tipo)
 	if(tipo == 'provision')
 	{
 		var urlo = "agregar_gasto.php?popup=1&prov=true"+url_extension;
-		nuevaVentana('Agregar_Gasto',730,400,urlo,'top=100, left=125');
+		nuevaVentana('Agregar_Gasto',730,400,urlo);
 	}
 	else if(tipo == 'gasto')
 	{
 		var urlo = "agregar_gasto.php?popup=1&prov=false"+url_extension;
-		nuevaVentana('Agregar_Gasto',730,570,urlo,'top=100, left=125');
+		nuevaVentana('Agregar_Gasto',730,570,urlo);
 	}
 }
 

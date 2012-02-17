@@ -1057,9 +1057,6 @@ if($opc == 'buscar')
 			case 2: $txt_wip = $wip_gastos; break;
 			default: $txt_wip = $wip_honorarios.' y '.$wip_gastos; break;
 		}
-		if($contrato->fields['forma_cobro'] == 'HITOS'){
-			$txt_wip = $wip_gastos;
-		}
 
 		$html .= "<td align=left style='font-size:10px'>$txt_wip</td>";
 		$html .= "<td width='8%' align='center' nowrap>";

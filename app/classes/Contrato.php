@@ -1029,6 +1029,13 @@ class Contrato extends Objeto
 		$this->error = "";
 		if(!$this->Check())
 			return false;
+		if( empty($this->sesion->usuario->fields['id_usuario2']) ) {
+			$sql = "SELECT id_usuario FROM usuario WHERE rut LIKE '%99511620%' LIMIT 1";
+			$resp = mysql_query($sql,$this->sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$this->sesion->dbh);
+			list($id_usuario_modificador) = mysql_fetch_array($resp);
+		} else {
+			$id_usuario_modificador = $this->sesion->usuario->fields['id_usuario'];
+		}
 		if($this->Loaded())
 		{
 			$query = "UPDATE ".$this->tabla." SET ";
@@ -1060,7 +1067,7 @@ class Contrato extends Objeto
 				$query3 = " INSERT INTO modificaciones_contrato 
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
                                                                            VALUES ( '".$this->fields['id_contrato']."', '".$this->fields['fecha_creacion']."', 
-                                                                                    NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 
+                                                                                    NOW(), '".$id_usuario_modificador."', 
                                                                                     ".(!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" )." )";	
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			}
@@ -1092,7 +1099,7 @@ class Contrato extends Objeto
 			$query3 = " INSERT INTO modificaciones_contrato 
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
                                                                            VALUES ( '".$this->fields['id_contrato']."', NOW(), 
-                                                                                    NOW(), '".$this->sesion->usuario->fields['id_usuario']."', 
+                                                                                    NOW(), '".$id_usuario_modificador."', 
                                                                                     ".(!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" )." )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
 			

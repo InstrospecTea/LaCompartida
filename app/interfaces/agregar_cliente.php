@@ -107,7 +107,7 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		if (empty($factura_telefono))
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
-		if ( UtilesApp::GetConf($sesion,'ClienteReferencia') && empty($id_cliente_referencia) )
+		if ( UtilesApp::GetConf($sesion,'ClienteReferencia') && ( empty($id_cliente_referencia) || $id_cliente_referencia = '-1' ) )
 			$pagina->AddError(__("Por favor ingrese la referencia"));
 
 		if ((method_exists('Conf', 'GetConf') and Conf::GetConf($sesion, 'TituloContacto')) or
@@ -238,7 +238,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("alerta_monto", $cliente_alerta_monto);
 		$cliente->Edit("limite_hh", $cliente_limite_hh);
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
-		$cliente->Edit("id_cliente_referencia", !empty($id_cliente_referencia) ? $id_cliente_referencia : "NULL" );
+		$cliente->Edit("id_cliente_referencia", ( !empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 
 					if($cliente->Write())
 					{

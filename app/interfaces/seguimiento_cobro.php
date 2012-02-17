@@ -129,7 +129,7 @@
 		}*/
 		if($codigo_asunto)
 		{
-			$where .= " AND asunto.codigo_asunto ='".$codigo_asunto."' ";
+			$where .= " AND ( asunto.codigo_asunto ='".$codigo_asunto."' OR '$codigo_asunto' IN ( SELECT codigo_asunto FROM cobro_asunto as c_a WHERE c_a.id_cobro = cobro.id_cobro ) ) ";
 		}
 		if($codigo_asunto_secundario)
 		{

@@ -50,145 +50,160 @@
 
 	if($opcion == "guardar")
 	{
-		if($_POST['cobrable']==1)
-		{
-			$gasto->Edit("cobrable",1);
-		}
-		else
-		{
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
+			if(!$codigo_cliente && $codigo_cliente_secundario)
 			{
-				$gasto->Edit("cobrable","0");
+				$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
+				$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				list($codigo_cliente) = mysql_fetch_array($resp);
+			}
+			if(!$codigo_asunto && $codigo_asunto_secundario)
+			{
+				$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
+				$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				list($codigo_asunto) = mysql_fetch_array($resp);
+			}
+			
+			// Buscar cliente según asunto seleccionado para revisar consistencia ...
+			$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($codigo_cliente_segun_asunto) = mysql_fetch_array($resp);
+			
+			if( $codigo_cliente_segun_asunto !=  $codigo_cliente ) {
+				$pagina->AddError("El asunto seleccionado no corresponde al cliente seleccionado.");
+			}
+			
+			$errores = $pagina->GetErrors();
+	
+		if( empty($errores) ) {
+			if($_POST['cobrable']==1)
+			{
+				$gasto->Edit("cobrable",1);
 			}
 			else
 			{
-				$gasto->Edit("cobrable","1");
-			}
-		}
-
-		/*
-		 *  Si el gasto se considera con IVA,
-		 *  se calcula en base al porcentaje impuesto gasto
-		 *  del cobro
-		 */
-		if( !UtilesApp::GetConf($sesion,'UsarGastosConSinImpuesto') )
-			$con_impuesto = 1;
-		$gasto->Edit("con_impuesto",$con_impuesto==1 ? "SI" : "NO");
-
-		if(!$codigo_cliente && $codigo_cliente_secundario)
-		{
-			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($codigo_cliente) = mysql_fetch_array($resp);
-		}
-		if(!$codigo_asunto && $codigo_asunto_secundario)
-		{
-			$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
-			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($codigo_asunto) = mysql_fetch_array($resp);
-		}
-		$monto=str_replace(',','.',$monto);
-		if($prov == 'true')
-		{
-			$gasto->Edit("ingreso",$monto);
-			$gasto->Edit("monto_cobrable",$monto);
-		}
-		else if($prov=='false')
-		{
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-			{
-				if($monto <=0)
-					$gasto->Edit("egreso",$monto_cobrable);
-				else
-					$gasto->Edit("egreso",$monto);
-
-				if($monto_cobrable >= 0)
+				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 				{
-				$monto_cobrable=str_replace(',','.',$monto_cobrable);
-				$gasto->Edit("monto_cobrable",$monto_cobrable);
+					$gasto->Edit("cobrable","0");
 				}
 				else
-					$gasto->Edit("monto_cobrable",$monto);
+				{
+					$gasto->Edit("cobrable","1");
+				}
+			}
+
+			/*
+			 *  Si el gasto se considera con IVA,
+			 *  se calcula en base al porcentaje impuesto gasto
+			 *  del cobro
+			 */
+			if( !UtilesApp::GetConf($sesion,'UsarGastosConSinImpuesto') )
+				$con_impuesto = 1;
+			$gasto->Edit("con_impuesto",$con_impuesto==1 ? "SI" : "NO");
+
+			
+			$monto=str_replace(',','.',$monto);
+			if($prov == 'true')
+			{
+				$gasto->Edit("ingreso",$monto);
+				$gasto->Edit("monto_cobrable",$monto);
+			}
+			else if($prov=='false')
+			{
+				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
+				{
+					if($monto <=0)
+						$gasto->Edit("egreso",$monto_cobrable);
+					else
+						$gasto->Edit("egreso",$monto);
+
+					if($monto_cobrable >= 0)
+					{
+					$monto_cobrable=str_replace(',','.',$monto_cobrable);
+					$gasto->Edit("monto_cobrable",$monto_cobrable);
+					}
+					else
+						$gasto->Edit("monto_cobrable",$monto);
+				}
+				else
+				{
+
+				$gasto->Edit("egreso",$monto);
+				$gasto->Edit("monto_cobrable",$monto);
+				}
+			}
+
+
+
+			$gasto->Edit("fecha",Utiles::fecha2sql($fecha));
+			$gasto->Edit("id_usuario",$id_usuario);
+			$gasto->Edit("descripcion",$descripcion);
+			$gasto->Edit("id_glosa_gasto", ( !empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
+			$gasto->Edit("id_moneda",$id_moneda);
+			$gasto->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
+			$gasto->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
+			$gasto->Edit("id_usuario_orden",(!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
+			$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
+			$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
+
+			$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
+			if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
+			{
+				$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada;
+			}
+			$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
+			$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
+			$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
+
+
+
+			if($pagado && $prov == 'false')
+			{
+				$ingreso->Edit('fecha',$fecha_pago ? Utiles::fecha2sql($fecha_pago) : "NULL");
+				$ingreso->Edit("id_usuario",$id_usuario);
+				$ingreso->Edit("descripcion",$descripcion_ingreso);
+				$ingreso->Edit("id_moneda",$gasto->fields['id_moneda'] ? $gasto->fields['id_moneda'] : $id_moneda);
+				$ingreso->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
+				$ingreso->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
+				$ingreso->Edit("id_usuario_orden",( !empty($id_usuario_orden) && $id_usuario_orden != -1 ) ? $id_usuario_orden : "NULL");
+				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) && $monto_cobrable > 0)
+				$ingreso->Edit('ingreso',$monto_pago ? $monto_pago : $monto_cobrable );
+				else
+				$ingreso->Edit('ingreso',$monto_pago ? $monto_pago : '0');
+				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
+				$ingreso->Edit('monto_cobrable',$monto_cobrable ? $monto_cobrable : $ingreso);
+				else
+				$ingreso->Edit('monto_cobrable',$ingreso);
+				$ingreso->Edit("documento_pago",$documento_pago ? $documento_pago : "NULL");
+				if($ingreso->Write())
+					$gasto->Edit('id_movimiento_pago',$ingreso->fields['id_movimiento'] ? $ingreso->fields['id_movimiento'] : 'NULL');
 			}
 			else
 			{
+				if($elimina_ingreso != '')
+				{
+					if(!$ingreso->EliminaIngreso($id_gasto))
+						$ingreso_eliminado = '<br>'.__('El ingreso no pudo ser eliminado ya que existen otros gastos asociados.');
+				}
 
-			$gasto->Edit("egreso",$monto);
-			$gasto->Edit("monto_cobrable",$monto);
+				$gasto->Edit('id_movimiento_pago',NULL);
 			}
-		}
+			/*
+			Ha cambiado el asunto del gasto se setea id_cobro NULL
+			*/
+			if($cambio_asunto)
+				$gasto->Edit('id_cobro','NULL');
 
+			$gasto->Edit('id_proveedor',$id_proveedor ? $id_proveedor : NULL);
 
-
-		$gasto->Edit("fecha",Utiles::fecha2sql($fecha));
-		$gasto->Edit("id_usuario",$id_usuario);
-		$gasto->Edit("descripcion",$descripcion);
-		$gasto->Edit("id_glosa_gasto", ( !empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
-		$gasto->Edit("id_moneda",$id_moneda);
-		$gasto->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
-		$gasto->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
-		$gasto->Edit("id_usuario_orden",(!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
-		$gasto->Edit("id_cta_corriente_tipo",$id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
-		$gasto->Edit("numero_documento",$numero_documento ? $numero_documento : "NULL");
-
-		$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado ? $id_tipo_documento_asociado : -1);
-		if( UtilesApp::GetConf($sesion,'FacturaAsociadaCodificada') )
-		{
-			$numero_factura_asociada = $pre_numero_factura_asociada.'-'.$post_numero_factura_asociada;
-		}
-		$gasto->Edit("codigo_factura_gasto",$numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura",$fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "");
-		$gasto->Edit("numero_ot",$numero_ot ? $numero_ot : "NULL");
-
-
-
-		if($pagado && $prov == 'false')
-		{
-			$ingreso->Edit('fecha',$fecha_pago ? Utiles::fecha2sql($fecha_pago) : "NULL");
-			$ingreso->Edit("id_usuario",$id_usuario);
-			$ingreso->Edit("descripcion",$descripcion_ingreso);
-			$ingreso->Edit("id_moneda",$gasto->fields['id_moneda'] ? $gasto->fields['id_moneda'] : $id_moneda);
-			$ingreso->Edit("codigo_cliente",$codigo_cliente ? $codigo_cliente : "NULL");
-			$ingreso->Edit("codigo_asunto",$codigo_asunto ? $codigo_asunto : "NULL");
-			$ingreso->Edit("id_usuario_orden",( !empty($id_usuario_orden) && $id_usuario_orden != -1 ) ? $id_usuario_orden : "NULL");
-			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) && $monto_cobrable > 0)
-			$ingreso->Edit('ingreso',$monto_pago ? $monto_pago : $monto_cobrable );
-			else
-			$ingreso->Edit('ingreso',$monto_pago ? $monto_pago : '0');
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-			$ingreso->Edit('monto_cobrable',$monto_cobrable ? $monto_cobrable : $ingreso);
-			else
-			$ingreso->Edit('monto_cobrable',$ingreso);
-			$ingreso->Edit("documento_pago",$documento_pago ? $documento_pago : "NULL");
-			if($ingreso->Write())
-				$gasto->Edit('id_movimiento_pago',$ingreso->fields['id_movimiento'] ? $ingreso->fields['id_movimiento'] : 'NULL');
-		}
-		else
-		{
-			if($elimina_ingreso != '')
+			if ($gasto->Write())
 			{
-				if(!$ingreso->EliminaIngreso($id_gasto))
-					$ingreso_eliminado = '<br>'.__('El ingreso no pudo ser eliminado ya que existen otros gastos asociados.');
+				$pagina->AddInfo($txt_tipo.' '.__('Guardado con éxito.').' '.$ingreso_eliminado);
+	?>
+				<script language='javascript'>
+					window.opener.Refrescar();
+				</script>
+	<?
 			}
-
-			$gasto->Edit('id_movimiento_pago',NULL);
-		}
-		/*
-		Ha cambiado el asunto del gasto se setea id_cobro NULL
-		*/
-		if($cambio_asunto)
-			$gasto->Edit('id_cobro','NULL');
-
-		$gasto->Edit('id_proveedor',$id_proveedor ? $id_proveedor : NULL);
-
-		if ($gasto->Write())
-		{
-			$pagina->AddInfo($txt_tipo.' '.__('Guardado con éxito.').' '.$ingreso_eliminado);
-?>
-			<script language='javascript'>
-				window.opener.Refrescar();
-			</script>
-<?
 		}
 	}
 
@@ -328,8 +343,8 @@ function Validar(form)
 	}
 <?php } ?>
 
+	RevisarConsistenciaClienteAsunto( form );
 	
-
 <? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) ) { ?>
 	if((monto <= 0 || isNaN(monto)) && (monto_cobrable <= 0 || isNaN(monto_cobrable)))
 	{
@@ -448,6 +463,7 @@ function CargaIdioma( codigo )
 	    http.send(null);
 	}
 }
+
 function AgregarNuevo(tipo, prov)
 {
 	<?
@@ -476,7 +492,7 @@ function AgregarNuevo(tipo, prov)
 function AgregarProveedor()
 {
 	var urlo = 'agregar_proveedor.php?popup=1';
-	nuevaVentana('Agregar_Proveedor',430,370,urlo,'top=100, left=125');
+	nuevaVentana('Agregar_Proveedor',430,370,urlo);
 }
 </script>
 <? echo(Autocompletador::CSS()); ?>
