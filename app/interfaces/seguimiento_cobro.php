@@ -77,9 +77,12 @@
 			$codigo_cliente_secundario=$cliente->fields['codigo_cliente_secundario'];
 		}
 		$where = 1;
-		if($id_cobro)
+		if($id_cobro) {
 			$where .= " AND cobro.id_cobro = '$id_cobro' ";
-		else if($factura || $tipo_documento_legal || $serie){
+		} else if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') && !empty($numero_factura) ) {
+			$where .= " AND TRIM(cobro.documento) = TRIM('$numero_factura') ";
+		}
+		else if( $factura || $tipo_documento_legal || $serie ){
 			//$where .= " AND concat(cobro.documento, ',') LIKE '%$tipo_documento_legal $factura %' ";
 			$factura_obj = new Factura($sesion);
 			$lista_cobros_x_factura = $factura_obj->GetlistaCobroSoyDatoFactura('',$tipo_documento_legal,$factura,$serie);
@@ -158,12 +161,15 @@
                                                             else:
                                                                 $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', numero),if(pef.glosa='Anulado', ' (Anulado)','')) ";
                                                             endif;
-                                                        else:  
+                                                        elseif(UtilesApp::GetConf($sesion,'PermitirFactura')):  
                                                              
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";  
-                                                                $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f1.anulado=1, ' (Anulado)',''))   ";
-                                                        endif;
+                                                            $documentof=" group_concat(DISTINCT ' ',concat(prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero),if(f1.anulado=1, ' (Anulado)',''))   ";
+                                                        else:
+															$joinfactura = "";
+															$documentof = " cobro.documento ";
+														endif;
                                                         
                                                         
                                                         
@@ -209,6 +215,7 @@
                                                         $joinfactura 
                                                         WHERE $where 
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
+								
 		$x_pag = 20;
 		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
 		
@@ -547,6 +554,10 @@ function Refrescar(id_foco)
 			<td colspan=2 align=left>
 				<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=text size=6 name=id_cobro id=id_cobro value="<?=$id_cobro ?>">
 				<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=hidden size=6 name=proceso id=proceso value="<?=$proceso ?>">
+				<?php if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) { ?>
+					&nbsp;&nbsp;<b><?=__('N° Factura')?></b>&nbsp;
+					<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type=text size=6 name=numero_factura id=numero_factura value="<?=$numero_factura ?>">
+				<?php } ?>
 			</td>
 		</tr>
 		<?

@@ -877,10 +877,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 								// Si existen trabajos imprime la tabla
 			if ($cont_trabajos > 0) {
 										// Buscar todos los trabajos de este asunto/cobro
-										$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS *,
+										$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
 																				trabajo.id_cobro,
 																				trabajo.id_trabajo,
 																				trabajo.codigo_asunto,
+																				trabajo.descripcion,
+																				trabajo.solicitante,
+																				trabajo.fecha,
 																				trabajo.id_usuario,
 																				trabajo.cobrable,
 																				prm_moneda.simbolo AS simbolo,
@@ -890,6 +893,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 																				IF( trabajo.cobrable = 1, 'SI', 'NO') AS glosa_cobrable,
 																				trabajo.visible,
 																				username AS usr_nombre,
+																				usuario.username,
 																				DATE_FORMAT(duracion, '%H:%i') AS duracion,
 																				DATE_FORMAT(duracion_cobrada, '%H:%i') AS duracion_cobrada,
 																				TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_decimal,
@@ -897,17 +901,23 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 																				TIME_TO_SEC(duracion)/3600 AS duracion_horas,
 																				IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
 																				DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
-																				asunto.codigo_asunto_secundario as codigo_asunto_secundario
+																				asunto.codigo_asunto_secundario as codigo_asunto_secundario, 
+																				prm_categoria_usuario.orden as orden 
 																			FROM trabajo
 																				JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 																				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 																				JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
 																				LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 																				LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
+																				LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario 
 																				LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
 																			WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=".$cobro->fields['id_cobro'];
-
-									$orden = "trabajo.fecha, trabajo.descripcion";
+									
+									if( UtilesApp::GetConf($sesion,'OrdenarPorCategoriaUsuario') ) {
+										$orden = " prm_categoria_usuario.orden ASC, usuario.id_usuario ASC, trabajo.fecha ASC, trabajo.descripcion ";
+									} else {
+										$orden = "trabajo.fecha, trabajo.descripcion";
+									}
 									$b1 = new Buscador($sesion, $query_trabajos, "Trabajo", $desde, '', $orden);
 									$lista_trabajos = $b1->lista;
 
