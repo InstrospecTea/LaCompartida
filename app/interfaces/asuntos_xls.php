@@ -73,6 +73,7 @@
     $total->setNumFormat("0");
 
 	$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+	$mostrar_encargado2 = UtilesApp::GetConf($sesion, 'AsuntosEncargado2');
 	$mostrar_codigo_secundario = UtilesApp::GetConf($sesion,'CodigoSecundario');
 
    $ws1 =& $wb->addWorksheet(__('Asuntos'));
@@ -91,7 +92,7 @@
    $col_horas_trabajadas = $col++;
    $col_horas_a_cobrar = $col++;
    $col_encargado = $col++;
-	if($mostrar_encargado_secundario)
+	if($mostrar_encargado_secundario || $mostrar_encargado2)
 		$col_encargado_secundario = $col++;
    $col_tarifa = $col++;
    $col_moneda = $col++;
@@ -119,7 +120,7 @@
 	$ws1->setColumn( $col_horas_trabajadas, $col_horas_trabajadas,  19.80);
 	$ws1->setColumn( $col_horas_a_cobrar, $col_horas_a_cobrar,  19.80);
 	$ws1->setColumn( $col_encargado, $col_encargado,  28.50);
-	if($mostrar_encargado_secundario)
+	if($mostrar_encargado_secundario || $mostrar_encargado2)
 		$ws1->setColumn( $col_encargado_secundario, $col_encargado_secundario,  28.50);
 	$ws1->setColumn( $col_tarifa, $col_tarifa,  30.00);
 	$ws1->setColumn( $col_moneda, $col_moneda,  20.00);
@@ -159,8 +160,11 @@
     $ws1->write($fila_inicial, $col_horas_trabajadas, __('Horas Trabajadas'), $tit);
     $ws1->write($fila_inicial, $col_horas_a_cobrar, __('Horas a cobrar'), $tit);
 		if($mostrar_encargado_secundario) {
-   		$ws1->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
+			$ws1->write($fila_inicial, $col_encargado, __('Encargado Comercial'), $tit);
 			$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado Secundario'), $tit);
+		} else if($mostrar_encargado2) {
+			$ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
+			$ws1->write($fila_inicial, $col_encargado_secundario, __('Encargado 2'), $tit);
 		}
 		else {
 			$ws1->write($fila_inicial, $col_encargado, __('Encargado'), $tit);
@@ -231,6 +235,12 @@
 
 		if($id_area_proyecto)
 			$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
+		
+		if( $mostrar_encargado_secundario ) {
+			$on_encargado2 = " contrato.id_usuario_secundario = usuario_secundario.id_usuario ";
+		} else {
+			$on_encargado2 = " a1.id_encargado2 = usuario_secundario.id_usuario ";
+		}
 			
 		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
     $query = "SELECT SQL_CALC_FOUND_ROWS
@@ -293,8 +303,8 @@
                     LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
                     LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
                     LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-										LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario 
-										LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+					LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario 
+					LEFT JOIN usuario as usuario_secundario ON $on_encargado2 
                     WHERE $where
                     GROUP BY a1.codigo_asunto ORDER BY
                     a1.codigo_asunto, a1.codigo_cliente ASC";
@@ -325,8 +335,8 @@
 						$ws1->write($fila_inicial, $col_horas_trabajadas, $row['horas_trabajadas'], $f4);
 						$ws1->write($fila_inicial, $col_horas_a_cobrar, $row['horas_no_cobradas'], $f4);
 						if(UtilesApp::GetConf($sesion,'UsaUsernameEnTodoElSistema') ){
-							if($mostrar_encargado_secundario) {
-							$ws1->write($fila_inicial, $col_encargado, $row['username_ec'], $f4);
+							if($mostrar_encargado_secundario || $mostrar_encargado2) {
+								$ws1->write($fila_inicial, $col_encargado, $row['username_ec'], $f4);
 								$ws1->write($fila_inicial, $col_encargado_secundario, $row['username_secundario'], $f4);
 							}
 							else {
@@ -334,7 +344,7 @@
 							}
 						}
 						else{
-							if($mostrar_encargado_secundario) {
+							if($mostrar_encargado_secundario || $mostrar_encargado2) {
 								$ws1->write($fila_inicial, $col_encargado, $row['apellido1_ec'].', '.$row['nombre_ec'], $f4);
 								$ws1->write($fila_inicial, $col_encargado_secundario, empty($row['username_secundario']) ? '' : $row['apellido1_secundario'].', '.$row['nombre_secundario'], $f4);
 							}

@@ -1241,7 +1241,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							</td>
 						</tr>
 								<?php
-								if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
+								if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
 									?>
 							<tr>
 								<td align=right>
@@ -1255,7 +1255,8 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "", "", "200"); ?>
 								</td>
 							</tr>
-								<?php } ?>
+								<?php } 
+								IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') || UtilesApp::GetConf($sesion,'EncargadoSecundario') ) { ?>
 						<tr>
 							<td align=right>
 			<?=__('Encargado 2')?>
@@ -1269,6 +1270,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 									$asunto->fields['id_encargado2'], "","Seleccione","200"); ?>
 		</td>
 	</tr>
+		<?php } ?>
 	<tr>
 		<td align=right>
 <?= __('Contacto solicitante') ?>

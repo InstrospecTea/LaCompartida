@@ -7747,7 +7747,7 @@ NULL ,  'RUT'
 			
 			case 5.53:
 				$query = array();
-                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                            $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'ActualizacionTerminado',  '1',  'para reactivar el sistema después de la actualización.',  'boolean',  '6',  '-1'
 								);";
@@ -7757,26 +7757,55 @@ NULL ,  'RUT'
 				 		throw new Exception($q . "---" . mysql_error());
 				 	}
 				}
-            break;
-			
+                        break;
 			case 5.54:
 				$query = array();
-				$query[] = "ALTER TABLE  `contrato` ADD INDEX (  `id_tramite_tarifa` );";
-				$query[] = "UPDATE contrato LEFT JOIN tramite_tarifa USING( id_tramite_tarifa ) 
-								SET contrato.id_tramite_tarifa = NULL 
-							  WHERE tramite_tarifa.id_tramite_tarifa IS NULL;";
-				$query[] = "ALTER TABLE `contrato` 
-								ADD CONSTRAINT `contrato_ibfk_35` 
-								FOREIGN KEY (`id_tramite_tarifa`) 
-								REFERENCES `tramite_tarifa` (`id_tramite_tarifa`) ON UPDATE CASCADE;";
+                            
+                            // inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
+                            $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página');"; 
+
+                            $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 100 )";
+                            
+                            // inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
+                            $query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`) 
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,216 as cellW,297 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+            
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+                        break;
+						
+			case 5.55:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES ( 'EsconderExcelCobroModificable',  '0',  'Esconder Excel Cobro Modificable',  'boolean',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
 				 		throw new Exception($q . "---" . mysql_error());
 				 	}
 				}
-            break;
 				
+				break;
+				
+				case 5.56:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+								NULL ,  'AsuntosEncargado2',  '0', NULL ,  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+				break;
 	}
 }
 
@@ -8117,7 +8146,8 @@ $VERSIONES[$num++] = 5.51;
 $VERSIONES[$num++] = 5.52;
 $VERSIONES[$num++] = 5.53;
 $VERSIONES[$num++] = 5.54;
-
+$VERSIONES[$num++] = 5.55;
+$VERSIONES[$num++] = 5.56;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
@@ -8152,19 +8182,18 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 		die('Credenciales inválidas.');
 
         $versionfiledb = dirname(__FILE__).'/../app/version_db.php';
+        $versionFileName = dirname(__FILE__).'/../app/version.php';
 
-        
-	 
-         $versionFileName = dirname(__FILE__).'/../app/version.php';
+	
 
-	if( !file_exists($versionFileName) )
-		die('Error, el archivo de versión no se encuentra.');
-	if( !is_writable($versionFileName) )
-		die('Error, el archivo de versión no se puede escribir.');
-       
+       if(file_exists($versionfiledb) )   {
+           if(file_exists($versionFileName) )    require_once $versionFileName;
+           require_once $versionfiledb;
+       } else {
+           if( !file_exists($versionFileName) )		die('Error, el archivo de versión no se encuentra.');
+           if( !is_writable($versionFileName) )		die('Error, el archivo de versión no se puede escribir.');
             require_once $versionFileName;
-
-       if(file_exists($versionfiledb) )    require_once $versionfiledb;
+       }
         
 
 	if( !isset($VERSION) or $VERSION < 0.01 )
@@ -8203,7 +8232,9 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 
 			GuardarVersion( $versionFileName, $new_version ,$sesion);
 			echo 'Proceso de cambios para versión '.number_format($new_version,2,'.','').' finalizado<br>';
-		}
+		} else {
+                  if($VERSION ==  $new_version)  echo '<p>Su software está corriendo la versi&oacute;n '.number_format($VERSION,2,'.','').'</p>';
+                }
 	}
 
 	function GuardarVersion( $versionFileName, $new_version,$sesion )
