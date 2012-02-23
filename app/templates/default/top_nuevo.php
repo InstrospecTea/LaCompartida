@@ -9,7 +9,15 @@
         $rel='v ';
           if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 13,5)) $rel.=$versionsvn; 
            if (file_exists(Conf::ServerDir().'/../app/version.php') and $versiondb=file_get_contents(Conf::ServerDir().'/../app/version.php', NULL, NULL, 13,5)) $rel.=' db'.$versiondb; 
-
+		
+        if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
+			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
+			?>
+			<br/><br/>
+			<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />
+			<?php
+			exit; 
+		}
 ?>
 <body  class="non_popup" rel="<?php echo $rel;?>">
 <script type="text/javascript" src="https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js"></script>
@@ -52,18 +60,7 @@
 			tabPosition: lado
 		});
 	}
-</script>
-<?php		
-           if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
-			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
-			?>
-			<br/><br/>
-			<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />
-			<?php
-			exit; 
-		}
-		   
-?>         
+</script>       
 <table width="100%" height="100%" align="center" border="0" cellspacing="0" cellpadding="0">
 	  <?php if($color=='') {
 	  echo "<tr style=\"height:55px;\" class=\"tb_facebook\">";
