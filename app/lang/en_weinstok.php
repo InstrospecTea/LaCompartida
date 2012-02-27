@@ -14,4 +14,10 @@
 	$_LANG['RUT personal'] = 'I.d';
 	$_LANG['RUT Proveedor'] = 'I.d. Proveedor';
 	$_LANG['Descripción'] = 'Narrative';
+	$_LANG['No hay gastos en este cobro'] = "No expenses in this invoice.";
+	$_LANG['Gastos'] = "Expenses";
+	$_LANG['Gastos:'] = "Expenses:";
+	$_LANG['Monto'] =  "Cost";
+	$_LANG['Profesional'] =  "Name";
+	$_LANG['Resumen detalle profesional'] =  "Summary";
 ?>
