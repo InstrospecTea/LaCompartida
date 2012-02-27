@@ -31,7 +31,13 @@
 
 	if( $lang == '' )
 		$lang = 'es';
-	require_once Conf::ServerDir()."/lang/$lang.php";
+	if( file_exists(Conf::ServerDir()."/lang/{$lang}_".Conf::dbUser().".php") ) {
+		$lang_archivo = $lang.'_'.Conf::dbUser().'.php';
+	} else {
+		$lang_archivo = $lang.'.php';
+	}
+	
+	require_once Conf::ServerDir()."/lang/$lang_archivo";
 
 	//Usa el segundo formato de nota de cobro
 	//solo si lo tiene definido en el conf y solo tiene gastos
