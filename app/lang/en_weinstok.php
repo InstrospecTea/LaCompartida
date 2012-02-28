@@ -24,4 +24,5 @@
 	$_LANG['Hrs. Tarificadas'] = "Hours";
 	$_LANG['TARIFA'] = "Rate";
 	$_LANG['IMPORTE'] = "Value";
+	$_LANG['Importe'] = "Value";
 ?>
