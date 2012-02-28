@@ -20,4 +20,8 @@
 	$_LANG['Monto'] =  "Cost";
 	$_LANG['Profesional'] =  "Name";
 	$_LANG['Resumen detalle profesional'] =  "Summary";
+	$_LANG['Servicios prestados'] =  "Services rendered";
+	$_LANG['Hrs. Tarificadas'] = "Hours";
+	$_LANG['TARIFA'] = "Rate";
+	$_LANG['IMPORTE'] = "Value";
 ?>
