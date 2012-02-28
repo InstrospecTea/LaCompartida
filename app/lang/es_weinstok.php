@@ -11,4 +11,7 @@
 	$_LANG['RUT Proveedor'] = 'Cédula Proveedor';
 	$_LANG['Hrs. Tarificadas'] = "Horas";
 	$_LANG['Total Trabajos'] = "Total";
+	$_LANG['TARIFA'] = "Tarifa";
+	$_LANG['IMPORTE'] = "Monto";
+	$_LANG['Importe'] = "Monto";
 ?>
