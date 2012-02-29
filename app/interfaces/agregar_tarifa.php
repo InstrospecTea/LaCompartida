@@ -28,7 +28,7 @@
 		else
 			$pagina->AddError($tarifa_eliminar->error);
 	}
-	if( !$tarifa->loadById($id_tarifa_edicion) ) {
+	if( !empty($id_tarifa_edicion) && !$tarifa->loadById($id_tarifa_edicion) ) {
 		$query = " SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_tarifa_edicion) = mysql_fetch_array($resp);
@@ -50,7 +50,7 @@
 	}
 	
 	if($id_tarifa_previa && !$id_tarifa_edicion && $opc != 'guardar')
-	{
+	{ 
 		$query="INSERT INTO tarifa(fecha_creacion) VALUES(NOW())";
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	
@@ -62,7 +62,7 @@
 		$id_tarifa_edicion=$tarifa->fields['id_tarifa'];
 	}
 	else if($id_tarifa_previa && !$id_tarifa_edicion)
-	{
+	{ 
 		$query="SELECT id_tarifa FROM tarifa ORDER BY id_tarifa DESC";
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($id_nuevo)=mysql_fetch_array($resp);
@@ -73,7 +73,7 @@
 	
 	// Copia los datos al nuevo tarifa.
 	if($id_nuevo && $opc != 'guardar')
-	{
+	{ 
 		$query="SELECT id_usuario, id_moneda, tarifa FROM usuario_tarifa WHERE id_tarifa=".$id_tarifa_previa;
 		$resp=mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		 
