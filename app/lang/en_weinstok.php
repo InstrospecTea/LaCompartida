@@ -25,4 +25,6 @@
 	$_LANG['TARIFA'] = "Rate";
 	$_LANG['IMPORTE'] = "Value";
 	$_LANG['Importe'] = "Value";
+	$_LANG['Detalle Cobro'] =  "Report Details";
+	$_LANG['Total Cobro'] = "Total Charges";
 ?>
