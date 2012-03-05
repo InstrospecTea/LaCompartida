@@ -240,6 +240,13 @@
 		if($id_encargado_comercial)
 			$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
 		
+		
+		# Filtro para Actividades si están activos
+		
+		if( isset( $glosa_actividad ) && $glosa_actividad != '' ) {
+			$where .= " AND actividad.glosa_actividad = '$glosa_actividad'";
+		}
+	
 		#TOTAL HORAS
 		$query = "SELECT 
 								SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
@@ -256,6 +263,10 @@
 	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
 	
+	  $select_glosa_actividad = "";
+	  if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
+		  $select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
+	  }
 		#BUSCAR
 		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
                                         trabajo.id_trabajo,
@@ -297,6 +308,7 @@
 												trabajo.fecha, 
 		              			prm_idioma.codigo_idioma as codigo_idioma,
 		              			contrato.id_tarifa  
+								$select_glosa_actividad
 		              FROM trabajo
 		              JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 		              LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
@@ -613,7 +625,7 @@ function editarMultiplesArchivos()
 	// La página editar_multiples_trabajos.php se encarga de parsear este string.
 	var ids = getIdTrabajosSeleccionados();
 	if(ids != '')
-		nuevaVentana('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos.php?ids='+ids+'&popup=1','');
+		nuovaFinestra('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos.php?ids='+ids+'&popup=1','');
 	else
 		alert('Debe seleccionar por lo menos un trabajo para editar.');
 }
@@ -621,7 +633,7 @@ function editarMultiplesArchivos()
 function EditarTodosLosArchivos()
 {
 	var where = $('where_query_listado_completo').value;
-	nuevaVentana('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&listado='+where, '');
+	nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&listado='+where, '');
 }
 </script>
 <? echo(Autocompletador::CSS()); ?>
@@ -703,6 +715,20 @@ function EditarTodosLosArchivos()
 ?>
 		</td>
 	</tr>
+<?php
+if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
+?>
+<tr>
+		<td align=right>
+			<?=__('Actividad')?>
+		</td>
+		<td nowrap align='left' colspan=3>
+			<?=Html::SelectQuery($sesion,"SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad","glosa_actividad",$glosa_actividad,'','Cualquiera','200'); ?>
+		</td>
+	</tr>	
+<?php
+}
+?>
 	<tr>
 		<td align=right>
 			<?=__('Encargado Comercial')?>
@@ -845,7 +871,7 @@ function EditarTodosLosArchivos()
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-				$opc_html.= "<a href=# onclick=\"nuevaVentana('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+				$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
 			else
 				$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\"><img src=$img_dir/editar_off.gif border=0></a>";
 
@@ -857,7 +883,7 @@ function EditarTodosLosArchivos()
 			else
 			{
 				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-					$opc_html.= "<a href=# onclick=\"nuevaVentana('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+					$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
 				else
 					$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" ><img src=$img_dir/editar_off.gif border=0></a>";
 			}

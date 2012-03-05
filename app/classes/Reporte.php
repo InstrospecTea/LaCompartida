@@ -399,7 +399,7 @@ class Reporte
 			//moneda buscada
 			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda ON (cobro_moneda.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda.id_moneda = '".$this->id_moneda."' )";
 			//moneda del cobro
-			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
+			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = ".$tabla.".id_moneda )";
 			//moneda_base
 			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		

@@ -90,6 +90,10 @@
     	$id_usuario = $sesion->usuario->fields['id_usuario'];
     	$url_iframe = "trabajos.php?popup=1&id_usuario=".$id_usuario."&motivo=horas";
     }
+	
+	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
+		$url_iframe .= "&glosa_actividad=".$glosa_actividad;
+	}
 
 ?>
 <iframe name=trabajos onload="calcHeight(this.id, 'pagina_body');" id=trabajos src='<?=$url_iframe ?>' frameborder=0 width=100% height=2000px></iframe>
