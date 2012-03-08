@@ -25,6 +25,8 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
                         position: ['center',30],
                         dialogClass: 'lemondialog',
                         close: function() { 
+							if( top.window.Refrescar )
+								top.window.Refrescar();
                             jQuery(this).html('');
                             console.log('cerrado');
                         }
