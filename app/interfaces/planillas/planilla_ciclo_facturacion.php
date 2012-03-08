@@ -251,12 +251,12 @@ if ($xls) {
 		}
 		++$filas;
 		$ws1->write($filas, $col_fecha_pago_total, __('Promedio facturas con pago'), $formato_subtitulo);
-		$ws1->write($filas, $col_dias_primer_pago, number_format(($sum_dias_primer_pago / $num_facturas_primer), 2), $formato_numero);
-		$ws1->write($filas, $col_dias_pago_final, number_format(($sum_dias_pago_total / $num_facturas_total), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_primer_pago, number_format( ( $num_facturas_primer > 0 ? ($sum_dias_primer_pago / $num_facturas_primer) : 0 ), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_pago_final, number_format( ( $num_facturas_total > 0 ? ($sum_dias_pago_total / $num_facturas_total) : 0 ), 2), $formato_numero);
 		++$filas;
 		$ws1->write($filas, $col_fecha_pago_total, __('Promedio todas'), $formato_subtitulo);
-		$ws1->write($filas, $col_dias_primer_pago, number_format(($sum_dias_primer_pago / $num_facturas), 2), $formato_numero);
-		$ws1->write($filas, $col_dias_pago_final, number_format(($sum_dias_pago_total / $num_facturas), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_primer_pago, number_format( ( $num_facturas > 0 ? ($sum_dias_primer_pago / $num_facturas) : 0 ), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_pago_final, number_format( ( $num_facturas > 0 ? ($sum_dias_pago_total / $num_facturas) : 0 ), 2), $formato_numero);
 	} else {
 		$where = " d.tipo_doc = 'N'
 				AND ( cob.estado != 'CREADO' AND cob.estado!='EN REVISION' AND cob.estado != 'INCOBRABLE') ";
@@ -335,12 +335,12 @@ if ($xls) {
 		}
 		++$filas;
 		$ws1->write($filas, $col_fecha_pago_total, __('Promedio facturas con pago'), $formato_subtitulo);
-		$ws1->write($filas, $col_dias_primer_pago, number_format(($sum_dias_primer_pago / $num_facturas_primer), 2), $formato_numero);
-		$ws1->write($filas, $col_dias_pago_final, number_format(($sum_dias_pago_total / $num_facturas_total), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_primer_pago, number_format( ( $num_facturas_primer > 0 ? ($sum_dias_primer_pago / $num_facturas_primer) : 0 ), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_pago_final, number_format( ( $num_facturas_total > 0 ? ($sum_dias_pago_total / $num_facturas_total) : 0 ), 2), $formato_numero);
 		++$filas;
 		$ws1->write($filas, $col_fecha_pago_total, __('Promedio todas'), $formato_subtitulo);
-		$ws1->write($filas, $col_dias_primer_pago, number_format(($sum_dias_primer_pago / $num_facturas), 2), $formato_numero);
-		$ws1->write($filas, $col_dias_pago_final, number_format(($sum_dias_pago_total / $num_facturas), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_primer_pago, number_format( ( $num_facturas > 0 ? ($sum_dias_primer_pago / $num_facturas) : 0 ), 2), $formato_numero);
+		$ws1->write($filas, $col_dias_pago_final, number_format( ( $num_facturas > 0 ? ($sum_dias_pago_total / $num_facturas) : 0), 2), $formato_numero);
 	}
 	$wb->send("Reporte ciclo facturacion.xls");
 	$wb->close();
