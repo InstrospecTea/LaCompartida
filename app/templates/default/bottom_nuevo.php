@@ -120,8 +120,10 @@ function Cerrar() {
                         position: ['center',30],
                         dialogClass: 'lemondialog',
                         close: function() { 
+							if( top.window.Refrescar )
+								top.window.Refrescar();
                             jQuery(this).html('');
-                            console.log('cerrado');
+                            //console.log('cerrado');
                         }
          });
     });  
