@@ -147,7 +147,7 @@ function Eliminar(id)
 					}
 
 					
-					$txt = "<a href=\"#\" onclick=\"nuevaVentana('Archivo','500','100','ver_archivo.php?id_archivo=".$id_archivo."')\"><img src='".Conf::ImgDir()."/".$_icono."' border=0 style='cursor:pointer' /></a>";
+					$txt = "<a href=\"#\" onclick=\"nuovaFinestra('Archivo','500','100','ver_archivo.php?id_archivo=".$id_archivo."')\"><img src='".Conf::ImgDir()."/".$_icono."' border=0 style='cursor:pointer' /></a>";
 					if (!empty($id_cliente))
 						$txt .= "&nbsp;<img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' onclick=\"return Eliminar('".$id_archivo."')\" class='mano_on' />";
 					else if (!empty($id_asunto))

@@ -176,13 +176,13 @@ function NuevaTarea()
 		} 
 	?>
 
-	nuevaVentana('Agregar_Tarea',730,470,urlo,'scrollbars=yes, top=100, left=125');
+	nuovaFinestra('Agregar_Tarea',730,470,urlo,'scrollbars=yes, top=100, left=125');
 }
 
 function AbrirTarea(id_tarea)
 {
 	var urlo = "agregar_tarea.php?popup=1&id_tarea="+id_tarea;
-	nuevaVentana('Agregar_Tarea',730,470,urlo,'scrollbars=yes, top=100, left=125');
+	nuovaFinestra('Agregar_Tarea',730,470,urlo,'scrollbars=yes, top=100, left=125');
 }
 
 //Ya que los cambios en el popup de Tarea cambian los datos, es importante refrescar la pagina con todos los parametros anteriores.

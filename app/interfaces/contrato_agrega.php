@@ -304,11 +304,11 @@ function CreaTarifa(form, opcion)
 {
 	var form = $('formulario');
 	if(opcion)
-		nuevaVentana( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1', '' );
+		nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1', '' );
 	else
 	{
 		var id_tarifa = form.id_tarifa.value;
-		nuevaVentana( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
+		nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
 	}
 }
 

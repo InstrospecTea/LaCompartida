@@ -355,7 +355,7 @@ function SaldoPago(& $fila) {
 function Opciones(& $fila) {
 	$id_factura_pago = $fila->fields['id_factura_pago'];
 	$codigo_cliente = $fila->fields['cliente_pago'];
-	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumentoPago(" . $id_factura_pago . ");\" ><img src='" . Conf::ImgDir() . "/pdf.gif' border=0 title=Imprimir></a>";
 	return $html_opcion;
 }
@@ -456,7 +456,7 @@ function funcionTR(& $fila) {
 	function AgregarNuevo()
 	{
 		var urlo = "agregar_factura.php?popup=1";
-		nuevaVentana('Agregar_Factura',730,470,urlo,'top=100, left=125');
+		nuovaFinestra('Agregar_Factura',730,470,urlo,'top=100, left=125');
 	}
 
 	function CargarCuenta( origen, destino, multiple )
@@ -789,7 +789,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNue
 			dl_url += '&id_cobro='+$('id_cobro').value
 			$('id_cobro').focus();
 		}
-		nuevaVentana('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';
+		nuovaFinestra('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';
 	}
 
 

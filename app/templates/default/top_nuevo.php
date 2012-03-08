@@ -10,18 +10,8 @@
           if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 13,5)) $rel.=$versionsvn; 
            if (file_exists(Conf::ServerDir().'/../app/version.php') and $versiondb=file_get_contents(Conf::ServerDir().'/../app/version.php', NULL, NULL, 13,5)) $rel.=' db'.$versiondb; 
 		
-        if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
-			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
-			?>
-			<br/><br/>
-			<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />
-			<?php
-			exit; 
-		}
+      
 ?>
-<body  class="non_popup" rel="<?php echo $rel;?>">
-<script type="text/javascript" src="https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js"></script>
-<link type="text/css" media="screen, projection" rel="stylesheet" href="https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" />
 <style type="text/css">
 	#zenbox_tab {
 		border-radius: 10px 0px 0px 10px !important;    /* cambiar por 0px 10px 10px 0px si el lado que va es izquierdo*/
@@ -31,36 +21,19 @@
 		overflow: hidden;
 	}
 </style>
-<script type="text/javascript">
-	function getInternetExplorerVersion()
-	{
-	  var rv = -1; // Return value assumes failure.
-	  if (navigator.appName == 'Microsoft Internet Explorer')
-	  {
-		var ua = navigator.userAgent;
-		var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-		if (re.exec(ua) != null)
-		  rv = parseFloat( RegExp.$1 );
-	  }
-	  return rv;
-	}
-	if (typeof(Zenbox) !== "undefined") {
-		var ver = getInternetExplorerVersion();
-		var lado = "Right";
-		var imagen_fondo = "<?php echo Conf::ImgDir() ? Conf::ImgDir() : '/app/templates/default/img'; ?>/lemontech_logo_" + lado.toLowerCase() +".png";
-		if( ver > -1) {
-			imagen_fondo = "<?php echo Conf::ImgDir() ? Conf::ImgDir() : '/app/templates/default/img'; ?>/lemontech_logo" + lado.toLowerCase() +"_ie.png";
+<body  class="non_popup" rel="<?php echo $rel;?>">
+<?php
+  if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
+			echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
+			?>
+			<br/><br/>
+			<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />
+			<?php
+			exit; 
 		}
-		Zenbox.init({
-			dropboxID:   "20042787",
-			url:         "https://lemontech.zendesk.com",
-			tabID:       "support", 
-			tabImageURL:    imagen_fondo,
-			tabColor:    "#02782e",
-			tabPosition: lado
-		});
-	}
-</script>       
+
+?>
+   
 <table width="100%" height="100%" align="center" border="0" cellspacing="0" cellpadding="0">
 	  <?php if($color=='') {
 	  echo "<tr style=\"height:55px;\" class=\"tb_facebook\">";

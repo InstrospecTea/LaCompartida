@@ -224,12 +224,13 @@
 				require_once Conf::ServerDir().'/../app/interfaces/'.UtilesApp::GetConf($sesion,'XLSFormatoEspecial');
 			exit;
 		}
+		elseif($accion == 'descargar_excel_rentabilidad')
+		{
+			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_rentabilidad.php';
+		}
 		elseif($accion == 'descargar_excel')
 		{
-			if( UtilesApp::GetConf($sesion,'XLSFormatoEspecial') == 'cobros_xls_formato_especial.php' )
-				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls_formato_especial.php';
-			else
-				require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
+			require_once Conf::ServerDir().'/../app/interfaces/cobros_xls.php';
 			exit;
 		}
 		elseif($accion == 'anterior')									################## ANTERIOR PASO ###################
@@ -653,7 +654,9 @@ function ImprimirExcel( form, formato_especial )
 	}
 	if( !AgregarParametros( form ) )
 		return false;
-	if( formato_especial == 'especial' )
+	if( formato_especial == 'rentabilidad' )
+		form.accion.value = 'descargar_excel_rentabilidad';
+	else if( formato_especial == 'especial' )
 		form.accion.value = 'descargar_excel_especial';
 	else
 		form.accion.value = 'descargar_excel';
@@ -1586,7 +1589,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				<tr bgcolor='#F3F3F3'>
 					<td align=right>&nbsp;</td>
 					<td align=left>
-						<input type="text" name="porcentaje_descuento" style="text-align: right;" id="porcentaje_descuento" onkeydown="MontoValido( this.id );" size=12 value=<?=number_format($cobro->fields['porcentaje_descuento'],$moneda_cobro->fields['cifras_decimales'],'.','') ?>>
+						<input type="text" name="porcentaje_descuento" style="text-align: right;" id="porcentaje_descuento" onkeydown="MontoValido( this.id );" size=12 value=<?=number_format( ( !empty($cobro->fields['porcentaje_descuento']) ? $cobro->fields['porcentaje_descuento'] : '0'),$moneda_cobro->fields['cifras_decimales'],'.','') ?>>
 						<input type="radio" name="tipo_descuento" id="tipo_descuento" value='PORCENTAJE' <?=$chk == 'PORCENTAJE' ? 'checked' : '' ?>><?=__('%')?>
 					</td>
 				</tr>
@@ -1677,7 +1680,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 						 <span style='font-size:10px;float:left'><?=__('Total Honorarios ').(UtilesApp::GetConf($sesion,'UsarImpuestoSeparado')?'<br/>('.__('con impuestos').')':'')?></span> (<span id="divCobroUnidadHonorariosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
 					</td>
 					<td align="left" width="55%" nowrap>
-						<input type="text" id="total_honorarios" value="<?=$x_resultados['monto'][$cobro->fields['opc_moneda_total']]-$x_resultados['descuento'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
+						<input type="text" id="total_honorarios" value="<?=$x_resultados['monto'][$cobro->fields['opc_moneda_total']]?>" size="12" readonly="readonly" style="text-align: right;">
 					</td>
 				</tr>
 				<tr>
@@ -1693,7 +1696,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 						<span style='font-size:10px'><?=__('Total')?></span> (<span id="divCobroUnidadGastosTotal" style='font-size:10px'><?=$moneda_total->fields['simbolo']?></span>):
 					</td>
 					<td align="left" width="55%" nowrap>
-						<input type="text" id="total" value="<?= number_format($x_resultados['monto_gastos'][$cobro->fields['opc_moneda_total']]+$x_resultados['monto'][$cobro->fields['opc_moneda_total']]-$x_resultados['descuento'][$cobro->fields['opc_moneda_total']],$moneda_cobro->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
+						<input type="text" id="total" value="<?= number_format($x_resultados['monto_gastos'][$cobro->fields['opc_moneda_total']]+$x_resultados['monto'][$cobro->fields['opc_moneda_total']],$moneda_total->fields['cifras_decimales'],'.','')?>" size="12" readonly="readonly" style="text-align: right;">
 					</td>
 				</tr>
 			</table>
@@ -2078,14 +2081,28 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 								</td>
 							</tr>
 							<?php
-								}
+							}
+							
+							if( !UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable') ) {
 							?>
 							<tr>
 								<td colspan="2" align="center">
 									<input type="button" class="btn" value="<?=__('descargar_excel_modificable')?>" onclick="ImprimirExcel(this.form);" />
 								</td>
 							</tr>
-							<?php 
+							<?php
+							}
+							
+							if( UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) { 
+							?>
+							<tr>
+								<td colspan="2" align="center">
+									<input type="button" class="btn" value="<?=__('Excel rentabilidad')?>" onclick="ImprimirExcel(this.form, 'rentabilidad');" />
+								</td>
+							</tr>
+							<?php
+							}
+							
 							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador') ) {
 								if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
 							<tr>

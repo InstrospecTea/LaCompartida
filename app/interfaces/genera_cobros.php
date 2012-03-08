@@ -877,7 +877,7 @@ if($opc == 'buscar')
 		}
 
 		$html .= "<td style='font-size:10px' align=left valign=top colspan=2>";
-		$html .= "&nbsp;&nbsp;<b>".$texto_acuerdo.', Tarifa: '.$contrato->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',730,600,'agregar_contrato.php?popup=1&id_contrato=".$contrato->fields['id_contrato']."');\" style='font-size:10px' title='".__('Editar Información Comercial')."'>Editar</a></td>";
+		$html .= "&nbsp;&nbsp;<b>".$texto_acuerdo.', Tarifa: '.$contrato->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Contrato',730,600,'agregar_contrato.php?popup=1&id_contrato=".$contrato->fields['id_contrato']."');\" style='font-size:10px' title='".__('Editar Información Comercial')."'>Editar</a></td>";
 		$html .= "</tr>";
 
 		if ($lista_cobros->num > 0 && $contrato->fields['id_contrato'] > 0)

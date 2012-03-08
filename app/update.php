@@ -7762,7 +7762,7 @@ NULL ,  'RUT'
 				$query = array();
                             
                             // inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
-                            $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página');"; 
+                            $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';"; 
 
                             $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 100 )";
                             
@@ -7782,7 +7782,7 @@ NULL ,  'RUT'
 			case 5.55:
 				$query = array();
 				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
-								VALUES ( 'EsconderExcelCobroModificable',  '0',  'Esconder Excel Cobro Modificable',  'boolean',  '6',  '-1' );";
+								VALUES ( 'EsconderExcelCobroModificable',  ".( Conf::dbUser()=='cg' ? '1' : '0').",  'Esconder Excel Cobro Modificable',  'boolean',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7790,9 +7790,9 @@ NULL ,  'RUT'
 				 	}
 				}
 				
-				break;
-				
-				case 5.56:
+			break;
+			
+			case 5.56:
 				$query = array();
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
@@ -7805,7 +7805,168 @@ NULL ,  'RUT'
 				 	}
 				}
 				
+			break;
+                        
+                        case 5.57:
+				$query = array();
+				$query[] = "ALTER TABLE  `version_db` ADD `version_ct` DECIMAL( 3, 2 ) NOT NULL DEFAULT  '1.00' AFTER  `version` ";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;
+		case 5.58:
+				$query = array();
+				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( NULL , 'ObservacionReversarCobroPagado', '0', 'Agregar obsevación al historial al reversar cobro pagado', 'boolean', '6', '-1' );";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;
+		case 5.59:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )  VALUES ( NULL ,  'CopiarEncargadoAlAsunto',  '0',  'Copia el encargado comercial del cliente a los asuntos',  'boolean',  '6',  '-1' );";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;
+			
+			case 5.60:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'PermitirCampoCobrableAProfesional',  '0',  'Con ese conf activado los Abogados podrán decidir si su hora ingresado será cobrable o no',  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;
+			            
+            case 5.61:
+                 $query = array();
+                 $query[] = "ALTER TABLE `tramite` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+                 $query[] = "ALTER TABLE `trabajo` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+                 $query[] = "ALTER TABLE `cta_corriente` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+
+                 $query[] = "ALTER TABLE `tramite` ADD INDEX ( `estado_cobro` ) ;";
+                 $query[] = "ALTER TABLE `trabajo` ADD INDEX ( `estado_cobro` ) ;";
+                 $query[] = "ALTER TABLE `cta_corriente` ADD INDEX ( `estado_cobro` ) ;";
+                 $query[] = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado;";
+                 $query[] = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado;";
+                 $query[] = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado;";
+
+                foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		 throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;
+
+			case 5.62:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'ExcelRentabilidadFlatFee',  '0', NULL ,  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;   
+                        
+                        case 5.63:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'AbogadoVeDuracionCobrable',  '0', NULL ,  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;                 
+                        
+			case 5.64:
+			    $query=array();
+			    $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `Ejemplo` VARCHAR( 300 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL ;";
+                            foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+			break;      
+			
+                            
+    
+			case 5.65:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'FiltroHistorialUsuarios',  'id_categoria_usuario,activo,permisos',  'Filtros de que cosas se van a mostrar en el historial',  'string',  '6',  '-1' );";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+
+			    
+			case 5.66:
+				$query = array();
+				$query[] = "ALTER TABLE  `factura_pdf_tipo_datos` ADD UNIQUE (`codigo_tipo_dato`)";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		//throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+			
+			case 5.67:
+				$query = array();
+				
+				$query[] = "REPLACE INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES 
+							('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS', 1)";
+
+
+				$query[] = "REPLACE INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES
+							('ADM', 'MPDF'),
+							('COB',	'MPDF');";
+
+
+				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'MostrarMenuMantencionPDF',  '0',  'Mostrar Menu Mantencion PDF Facturaen Sección Admin. Sistema',  'boolean',  '6',  '-1' );";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
 				break;
+			
 	}
 }
 
@@ -7813,341 +7974,9 @@ NULL ,  'RUT'
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-$VERSIONES[$num++] = 1.0;
-$VERSIONES[$num++] = 1.1;
-$VERSIONES[$num++] = 1.2;
-$VERSIONES[$num++] = 1.3;
-$VERSIONES[$num++] = 1.4;
-$VERSIONES[$num++] = 1.5;
-$VERSIONES[$num++] = 1.6;
-$VERSIONES[$num++] = 1.7;
-$VERSIONES[$num++] = 1.8;
-$VERSIONES[$num++] = 1.9;
-$VERSIONES[$num++] = 2;
-$VERSIONES[$num++] = 2.1;
-$VERSIONES[$num++] = 2.2;
-$VERSIONES[$num++] = 2.21;
-$VERSIONES[$num++] = 2.22;
-$VERSIONES[$num++] = 2.23;
-$VERSIONES[$num++] = 2.24;
-$VERSIONES[$num++] = 2.25;
-$VERSIONES[$num++] = 2.26;
-$VERSIONES[$num++] = 2.27;
-$VERSIONES[$num++] = 2.28;
-$VERSIONES[$num++] = 2.29;
-$VERSIONES[$num++] = 2.3;
-$VERSIONES[$num++] = 2.31;
-$VERSIONES[$num++] = 2.32;
-$VERSIONES[$num++] = 2.33;
-$VERSIONES[$num++] = 2.34;
-$VERSIONES[$num++] = 2.35;
-$VERSIONES[$num++] = 2.36;
-$VERSIONES[$num++] = 2.4;
-$VERSIONES[$num++] = 2.41;
-$VERSIONES[$num++] = 2.42;
-$VERSIONES[$num++] = 2.43;
-$VERSIONES[$num++] = 2.44;
-$VERSIONES[$num++] = 2.45;
-$VERSIONES[$num++] = 2.46;
-$VERSIONES[$num++] = 2.47;
-$VERSIONES[$num++] = 2.48;
-$VERSIONES[$num++] = 2.49;
-$VERSIONES[$num++] = 2.5;
-$VERSIONES[$num++] = 2.51;
-$VERSIONES[$num++] = 2.52;
-$VERSIONES[$num++] = 2.53;
-$VERSIONES[$num++] = 2.54;
-$VERSIONES[$num++] = 2.55;
-$VERSIONES[$num++] = 2.56;
-$VERSIONES[$num++] = 2.57;
-$VERSIONES[$num++] = 2.59;
-$VERSIONES[$num++] = 2.6;
-$VERSIONES[$num++] = 2.61;
-$VERSIONES[$num++] = 2.62;
-$VERSIONES[$num++] = 2.63;
-$VERSIONES[$num++] = 2.64;
-$VERSIONES[$num++] = 2.65;
-$VERSIONES[$num++] = 2.66;
-$VERSIONES[$num++] = 2.67;
-$VERSIONES[$num++] = 2.68;
-$VERSIONES[$num++] = 2.69;
-$VERSIONES[$num++] = 2.70;
-$VERSIONES[$num++] = 2.71;
-$VERSIONES[$num++] = 2.72;
-$VERSIONES[$num++] = 2.73;
-$VERSIONES[$num++] = 2.74;
-$VERSIONES[$num++] = 2.75;
-$VERSIONES[$num++] = 2.76;
-$VERSIONES[$num++] = 2.8;
-$VERSIONES[$num++] = 2.81;
-$VERSIONES[$num++] = 2.82;
-$VERSIONES[$num++] = 2.83;
-$VERSIONES[$num++] = 2.84;
-$VERSIONES[$num++] = 2.85;
-$VERSIONES[$num++] = 2.86;
-$VERSIONES[$num++] = 2.87;
-$VERSIONES[$num++] = 2.88;
-$VERSIONES[$num++] = 2.89;
-$VERSIONES[$num++] = 2.90;
-$VERSIONES[$num++] = 2.91;
-$VERSIONES[$num++] = 2.92;
-$VERSIONES[$num++] = 2.93;
-$VERSIONES[$num++] = 2.94;
-$VERSIONES[$num++] = 2.95;
-$VERSIONES[$num++] = 2.96;
-$VERSIONES[$num++] = 2.97;
-$VERSIONES[$num++] = 2.98;
-$VERSIONES[$num++] = 2.99;
-$VERSIONES[$num++] = 3.00;
-$VERSIONES[$num++] = 3.01;
-$VERSIONES[$num++] = 3.02;
-$VERSIONES[$num++] = 3.03;
-$VERSIONES[$num++] = 3.04;
-$VERSIONES[$num++] = 3.05;
-$VERSIONES[$num++] = 3.06;
-$VERSIONES[$num++] = 3.07;
-$VERSIONES[$num++] = 3.08;
-$VERSIONES[$num++] = 3.09;
-$VERSIONES[$num++] = 3.10;
-$VERSIONES[$num++] = 3.11;
-$VERSIONES[$num++] = 3.12;
-$VERSIONES[$num++] = 3.13;
-$VERSIONES[$num++] = 3.14;
-$VERSIONES[$num++] = 3.15;
-$VERSIONES[$num++] = 3.16;
-$VERSIONES[$num++] = 3.17;
-$VERSIONES[$num++] = 3.18;
-$VERSIONES[$num++] = 3.19;
-$VERSIONES[$num++] = 3.20;
-$VERSIONES[$num++] = 3.21;
-$VERSIONES[$num++] = 3.22;
-$VERSIONES[$num++] = 3.23;
-$VERSIONES[$num++] = 3.24;
-$VERSIONES[$num++] = 3.25;
-$VERSIONES[$num++] = 3.26;
-$VERSIONES[$num++] = 3.27;
-$VERSIONES[$num++] = 3.28;
-$VERSIONES[$num++] = 3.29;
-$VERSIONES[$num++] = 3.30;
-$VERSIONES[$num++] = 3.31;
-$VERSIONES[$num++] = 3.32;
-$VERSIONES[$num++] = 3.33;
-$VERSIONES[$num++] = 3.34;
-$VERSIONES[$num++] = 3.35;
-$VERSIONES[$num++] = 3.36;
-$VERSIONES[$num++] = 3.37;
-$VERSIONES[$num++] = 3.38;
-$VERSIONES[$num++] = 3.39;
-$VERSIONES[$num++] = 3.40;
-$VERSIONES[$num++] = 3.41;
-$VERSIONES[$num++] = 3.42;
-$VERSIONES[$num++] = 3.43;
-$VERSIONES[$num++] = 3.44;
-$VERSIONES[$num++] = 3.45;
-$VERSIONES[$num++] = 3.46;
-$VERSIONES[$num++] = 3.47;
-$VERSIONES[$num++] = 3.48;
-$VERSIONES[$num++] = 3.49;
-$VERSIONES[$num++] = 3.50;
-$VERSIONES[$num++] = 3.51;
-$VERSIONES[$num++] = 3.52;
-$VERSIONES[$num++] = 3.53;
-$VERSIONES[$num++] = 3.54;
-$VERSIONES[$num++] = 3.55;
-$VERSIONES[$num++] = 3.56;
-$VERSIONES[$num++] = 3.57;
-$VERSIONES[$num++] = 3.58;
-$VERSIONES[$num++] = 3.59;
-$VERSIONES[$num++] = 3.60;
-$VERSIONES[$num++] = 3.61;
-$VERSIONES[$num++] = 3.62;
-$VERSIONES[$num++] = 3.63;
-$VERSIONES[$num++] = 3.64;
-$VERSIONES[$num++] = 3.65;
-$VERSIONES[$num++] = 3.66;
-$VERSIONES[$num++] = 3.67;
-$VERSIONES[$num++] = 3.68;
-$VERSIONES[$num++] = 3.69;
-$VERSIONES[$num++] = 3.70;
-$VERSIONES[$num++] = 3.71;
-$VERSIONES[$num++] = 3.72;
-$VERSIONES[$num++] = 3.73;
-$VERSIONES[$num++] = 3.74;
-$VERSIONES[$num++] = 3.75;
-//merge lab -> trunk
-	$VERSIONES[$num++] = 3.76;
-	$VERSIONES[$num++] = 3.77;
-	$VERSIONES[$num++] = 3.78;
-	$VERSIONES[$num++] = 3.79;
-	$VERSIONES[$num++] = 3.80;
-	$VERSIONES[$num++] = 3.81;
-	$VERSIONES[$num++] = 3.82;
-	$VERSIONES[$num++] = 3.83;
-	$VERSIONES[$num++] = 3.84;
-	$VERSIONES[$num++] = 3.85;
-	$VERSIONES[$num++] = 3.86;
-	$VERSIONES[$num++] = 3.87;
-	$VERSIONES[$num++] = 3.88;
-	$VERSIONES[$num++] = 3.89;
-        $VERSIONES[$num++] = 3.90;
-        $VERSIONES[$num++] = 3.91;
-//fin merge lab -> trunk
-$VERSIONES[$num++] = 4;
-$VERSIONES[$num++] = 4.01;
-$VERSIONES[$num++] = 4.02;
-$VERSIONES[$num++] = 4.03;
-$VERSIONES[$num++] = 4.04;
-$VERSIONES[$num++] = 4.05;
-$VERSIONES[$num++] = 4.06;
-$VERSIONES[$num++] = 4.07;
-$VERSIONES[$num++] = 4.08;
-$VERSIONES[$num++] = 4.09;
-$VERSIONES[$num++] = 4.10;
-$VERSIONES[$num++] = 4.11;
-$VERSIONES[$num++] = 4.12;
-$VERSIONES[$num++] = 4.13;
-$VERSIONES[$num++] = 4.14;
-$VERSIONES[$num++] = 4.15;
-$VERSIONES[$num++] = 4.16;
-$VERSIONES[$num++] = 4.17;
-$VERSIONES[$num++] = 4.18;
-$VERSIONES[$num++] = 4.19;
-$VERSIONES[$num++] = 4.20;
-$VERSIONES[$num++] = 4.21;
-$VERSIONES[$num++] = 4.22;
-$VERSIONES[$num++] = 4.23;
-$VERSIONES[$num++] = 4.24;
-$VERSIONES[$num++] = 4.25;
-$VERSIONES[$num++] = 4.26;
-$VERSIONES[$num++] = 4.27;
-$VERSIONES[$num++] = 4.28;
-$VERSIONES[$num++] = 4.29;
-$VERSIONES[$num++] = 4.30;
-$VERSIONES[$num++] = 4.31;
-$VERSIONES[$num++] = 4.32;
-$VERSIONES[$num++] = 4.33;
-$VERSIONES[$num++] = 4.34;
-$VERSIONES[$num++] = 4.35;
-$VERSIONES[$num++] = 4.36;
-$VERSIONES[$num++] = 4.37;
-$VERSIONES[$num++] = 4.38;
-$VERSIONES[$num++] = 4.39;
-$VERSIONES[$num++] = 4.40;
-$VERSIONES[$num++] = 4.41;
-$VERSIONES[$num++] = 4.42;
-$VERSIONES[$num++] = 4.43;
-$VERSIONES[$num++] = 4.44;
-$VERSIONES[$num++] = 4.45;
-$VERSIONES[$num++] = 4.46;
-$VERSIONES[$num++] = 4.47;
-$VERSIONES[$num++] = 4.48;
-$VERSIONES[$num++] = 4.49;
-$VERSIONES[$num++] = 4.50;
-$VERSIONES[$num++] = 4.51;
-$VERSIONES[$num++] = 4.52;
-$VERSIONES[$num++] = 4.53;
-$VERSIONES[$num++] = 4.54;
-$VERSIONES[$num++] = 4.55;
-$VERSIONES[$num++] = 4.56;
-$VERSIONES[$num++] = 4.57;
-$VERSIONES[$num++] = 4.58;
-$VERSIONES[$num++] = 4.59;
-$VERSIONES[$num++] = 4.60;
-$VERSIONES[$num++] = 4.61;
-$VERSIONES[$num++] = 4.62;
-$VERSIONES[$num++] = 4.63;
-$VERSIONES[$num++] = 4.64;
-$VERSIONES[$num++] = 4.65;
-$VERSIONES[$num++] = 4.66;
-$VERSIONES[$num++] = 4.67;
-$VERSIONES[$num++] = 4.68;
-$VERSIONES[$num++] = 4.69;
-$VERSIONES[$num++] = 4.70;
-$VERSIONES[$num++] = 4.71;
-$VERSIONES[$num++] = 4.72;
-$VERSIONES[$num++] = 4.73;
-$VERSIONES[$num++] = 4.74;
-$VERSIONES[$num++] = 4.75;
-$VERSIONES[$num++] = 4.76;
-$VERSIONES[$num++] = 4.77;
-$VERSIONES[$num++] = 4.78;
-$VERSIONES[$num++] = 4.79;
-$VERSIONES[$num++] = 4.80;
-$VERSIONES[$num++] = 4.81;
-$VERSIONES[$num++] = 4.82;
-$VERSIONES[$num++] = 4.83;
-$VERSIONES[$num++] = 4.84;
-$VERSIONES[$num++] = 4.85;
-$VERSIONES[$num++] = 4.86;
-$VERSIONES[$num++] = 4.87;
-$VERSIONES[$num++] = 4.88;
-$VERSIONES[$num++] = 4.89;
-	$VERSIONES[$num++] = 4.90;
-	$VERSIONES[$num++] = 4.91;
-	$VERSIONES[$num++] = 4.92;
-	$VERSIONES[$num++] = 4.93;
-    $VERSIONES[$num++] = 4.94;
-	$VERSIONES[$num++] = 4.95;
-	$VERSIONES[$num++] = 4.96;
-	$VERSIONES[$num++] = 4.97;
-	$VERSIONES[$num++] = 4.98;
-$VERSIONES[$num++] = 5;
-$VERSIONES[$num++] = 5.01;
-$VERSIONES[$num++] = 5.02;
-$VERSIONES[$num++] = 5.03;
-$VERSIONES[$num++] = 5.04;
-$VERSIONES[$num++] = 5.05;
-$VERSIONES[$num++] = 5.06;
-$VERSIONES[$num++] = 5.07;
-$VERSIONES[$num++] = 5.08;
-$VERSIONES[$num++] = 5.09;
-$VERSIONES[$num++] = 5.10;
-$VERSIONES[$num++] = 5.11;
-$VERSIONES[$num++] = 5.12;
-$VERSIONES[$num++] = 5.13;
-$VERSIONES[$num++] = 5.14;
-$VERSIONES[$num++] = 5.15;
-$VERSIONES[$num++] = 5.16;
-$VERSIONES[$num++] = 5.17;
-$VERSIONES[$num++] = 5.18;
-$VERSIONES[$num++] = 5.19;
-$VERSIONES[$num++] = 5.20;
-$VERSIONES[$num++] = 5.21;
-$VERSIONES[$num++] = 5.22;
-$VERSIONES[$num++] = 5.23;
-$VERSIONES[$num++] = 5.24;
-$VERSIONES[$num++] = 5.25;
-$VERSIONES[$num++] = 5.26;
-$VERSIONES[$num++] = 5.27;
-$VERSIONES[$num++] = 5.28;
-$VERSIONES[$num++] = 5.29;
-$VERSIONES[$num++] = 5.30;
-$VERSIONES[$num++] = 5.31;
-$VERSIONES[$num++] = 5.32;
-$VERSIONES[$num++] = 5.33;
-$VERSIONES[$num++] = 5.34;
-$VERSIONES[$num++] = 5.35;
-$VERSIONES[$num++] = 5.36;
-$VERSIONES[$num++] = 5.37;
-$VERSIONES[$num++] = 5.38;
-$VERSIONES[$num++] = 5.39;
-$VERSIONES[$num++] = 5.40;
-$VERSIONES[$num++] = 5.41;
-$VERSIONES[$num++] = 5.42;
-$VERSIONES[$num++] = 5.43;
-$VERSIONES[$num++] = 5.44;
-$VERSIONES[$num++] = 5.45;
-$VERSIONES[$num++] = 5.46;
-$VERSIONES[$num++] = 5.47;
-$VERSIONES[$num++] = 5.48;
-$VERSIONES[$num++] = 5.49;
-$VERSIONES[$num++] = 5.50;
-$VERSIONES[$num++] = 5.51;
-$VERSIONES[$num++] = 5.52;
-$VERSIONES[$num++] = 5.53;
-$VERSIONES[$num++] = 5.54;
-$VERSIONES[$num++] = 5.55;
-$VERSIONES[$num++] = 5.56;
+for($version=1;$version<=5.67;$version+=0.01):
+    $VERSIONES[$num++]=$version;
+endfor;
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))
@@ -8240,7 +8069,7 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 	function GuardarVersion( $versionFileName, $new_version,$sesion )
 	{
        
-            mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (`version` DECIMAL(3,2) NOT NULL DEFAULT '1.00', `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY ( `version` ) ) ENGINE = MYISAM ", $sesion->dbh);
+            mysql_query("CREATE TABLE IF NOT EXISTS version_db (  version decimal(3,2) NOT NULL DEFAULT '1.00',  version_ct decimal(3,2) NOT NULL DEFAULT '1.00',  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  PRIMARY KEY (version)) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
             mysql_query("insert ignore INTO version_db (version) values (".number_format($new_version,2,'.','').");", $sesion->dbh);
                 $data = '<?	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
 		file_put_contents( $versionFileName, $data );

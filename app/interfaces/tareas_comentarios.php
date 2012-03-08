@@ -235,7 +235,7 @@
 					{
 						var url = "editar_trabajo.php?id_trabajo="+campos[6]+"&popup=1";
 						var span = "<span class='link_trabajo' ";
-						span += "onclick=\"nuevaVentana('Editar_Trabajo',550,450,'"+url+"','');\" ";
+						span += "onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'"+url+"','');\" ";
 						span +=	"style = 'cursor:pointer; text-decoration:underline;' >";
 
 			
@@ -603,7 +603,7 @@
 		{
 			return '<span 
 							class="link_trabajo" 
-							onclick="nuevaVentana(\'Editar_Trabajo\',550,450,\'editar_trabajo.php?id_trabajo='.$id_trabajo.'&popup=1\',\'\');"
+							onclick="nuovaFinestra(\'Editar_Trabajo\',550,450,\'editar_trabajo.php?id_trabajo='.$id_trabajo.'&popup=1\',\'\');"
 							style=" cursor:pointer; text-decoration:underline; "
 							>N° '.$id_trabajo.'</span>';
 		}

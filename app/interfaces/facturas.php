@@ -160,6 +160,7 @@
 								, numero
 								, factura.serie_documento_legal
 								, cliente.glosa_cliente
+								, factura.codigo_cliente 
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
 											factura.cliente,
 											IF( contrato.factura_razon_social IN ('',' '),
@@ -254,7 +255,7 @@
 
 		$id_factura = $fila->fields['id_factura'];
 		$codigo_cliente = $fila->fields['codigo_cliente'];
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 		if( UtilesApp::GetConf($sesion,'ImprimirFacturaDoc') ) {
 			$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$id_factura.");\" ><img src='".Conf::ImgDir()."/doc.gif' border=0 title=\"Imprimir Word\"></a>";
 		}
@@ -454,7 +455,7 @@ function BuscarFacturas( form, from )
 function AgregarNuevo()
 {
 	var urlo = "agregar_factura.php?popup=1";
-	nuevaVentana('Agregar_Factura',730,470,urlo,'top=100, left=125');
+	nuovaFinestra('Agregar_Factura',730,470,urlo,'top=100, left=125');
 }
 </script>
 
@@ -664,7 +665,7 @@ function CrearNuevoDocumentoLegal()
 		dl_url += '&id_cobro='+$('id_cobro').value
 		$('id_cobro').focus();
 	}
-	nuevaVentana('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';
+	nuovaFinestra('Agregar_Factura',730,580,dl_url, 'top=100, left=155');')	';
 }
 
 

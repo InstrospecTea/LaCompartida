@@ -116,9 +116,9 @@
 			else
 			{
 				if($fila->fields['monto'] > 0)
-					$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Ingreso',730,580,'ingresar_documento_cobro.php?id_documento=$id_documento&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+					$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Ingreso',730,580,'ingresar_documento_cobro.php?id_documento=$id_documento&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 				else
-					$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Ingreso',730,580,'ingresar_documento_pago.php?id_documento=$id_documento&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+					$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Ingreso',730,580,'ingresar_documento_pago.php?id_documento=$id_documento&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 
 				$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaDocumento($id_documento,'$codigo_cliente')\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a>";
 			}
@@ -593,12 +593,12 @@ function AgregarNuevo(tipo)
 	if(tipo == 'ingreso')
 	{
 		var urlo = "ingresar_documento_pago.php?popup=1&pago=true"+valor_cliente;
-		nuevaVentana('Ingreso',730,470,urlo,'top=100, left=125');
+		nuovaFinestra('Ingreso',730,470,urlo,'top=100, left=125');
 	}
 	else if(tipo == 'egreso')
 	{
 		var urlo = "ingresar_documento_cobro.php?popup=1&pago=false"+valor_cliente;
-		nuevaVentana('Egreso',730,470,urlo,'top=100, left=125');
+		nuovaFinestra('Egreso',730,470,urlo,'top=100, left=125');
 	}
 }
 

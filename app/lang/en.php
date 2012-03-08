@@ -507,6 +507,7 @@ $_LANG['Categoría de asunto'] = "Categoría de asunto";
 #Tarifas
 $_LANG['Tarifas'] = "Rates";
 $_LANG['Tarifa'] = "Rate";
+$_LANG['TARIFA'] = 'RATE';
 $_LANG['Tarifas especiales'] = "Tarifas especiales";
 $_LANG['Código inválido'] = "Código inválido";
 $_LANG['Listado de tarifas especiales para'] = "Listado de tarifas especiales para";

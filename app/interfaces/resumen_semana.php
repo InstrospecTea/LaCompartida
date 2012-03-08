@@ -455,7 +455,7 @@ function OpcionesTrabajo(id_trabajo, opcion )
 	if(opcion == 'nuevo' || opcion == 'edit')
 	{
 		var id_edicion_trabajo = id_trabajo.split('-',1);
-		nuevaVentana('Editar_Trabajo',550,350,'editar_trabajo.php?id_trabajo='+id_edicion_trabajo+'&popup=1&opcion='+opcion,'');
+		nuovaFinestra('Editar_Trabajo',550,350,'editar_trabajo.php?id_trabajo='+id_edicion_trabajo+'&popup=1&opcion='+opcion,'');
 	}
 	else
 	{

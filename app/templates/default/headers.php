@@ -1,19 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<?php
+$laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
+$punto=strpos($laurl,'.'); 
+$subdomain=substr($laurl,0,$punto); 
+$maindomain=str_replace($subdomain.'.','',$laurl); 
+if($subdomain) $subdomain='/'.$subdomain;
+$elpath=$subdomain.$_SERVER['PHP_SELF'];
+$pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
+?>
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
-    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
-	<meta http-equiv="Page-Enter" content="blendTrans(Duration=0.2)" />
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+        <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<script language="JavaScript" type="text/javascript">
+            var _sf_startpt=(new Date()).getTime();
+            var root_dir = '<?=Conf::RootDir()?>';
+            var img_dir = '<?=Conf::ImgDir()?>';
+        </script>
 	<title><?=Conf::AppName()?> - <?= $this->titulo ?></title>
 	<!-- <?=Conf::TimestampDeployCSS()?> -->
 	<link rel="stylesheet" type="text/css" href="<?=Conf::RootDir()?>/app/templates/<?=Conf::Templates()?>/css/deploy/all.1226330411.css" />
 	<!--<link rel="stylesheet" type="text/css" href="<?=Conf::RootDir()?>/app/templates/<?=Conf::Templates()?>/css/datepicker.css" />-->
-	<script language="JavaScript" type="text/javascript">
-		var root_dir = '<?=Conf::RootDir()?>';
-		var img_dir = '<?=Conf::ImgDir()?>';
-	</script>
+
 	<? require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 	
 	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/EditInPlace.js"></script>-->

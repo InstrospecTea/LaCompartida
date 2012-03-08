@@ -1,36 +1,45 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+$laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
+$punto=strpos($laurl,'.'); 
+$subdomain=substr($laurl,0,$punto); 
+$maindomain=str_replace($subdomain.'.','',$laurl); 
+if($subdomain) $subdomain='/'.$subdomain;
+$elpath=$subdomain.$_SERVER['PHP_SELF'];
+$pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
+?>
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
    
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-	<script language="JavaScript" type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+	<script language="JavaScript" type="text/javascript">
+        var _sf_startpt=(new Date()).getTime();
+        var _sf_async_config={};
+            _sf_async_config.uid = 32419;
+            _sf_async_config.domain = "<?php echo $maindomain; ?>"; 
+            _sf_async_config.path = "<?php echo $elpath; ?>";
+            _sf_async_config.pathseguro="<?php echo $pathseguro; ?>";
+        var root_dir = '<?php echo Conf::RootDir();?>';
+	var img_dir = '<?php echo Conf::ImgDir()?>';
+    </script>
 	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
 	<!-- <?php echo Conf::TimestampDeployCSS()?> -->
-	<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir();?>/app/templates/<?php echo Conf::Templates()?>/css/deploy/all.1226330411_nuevo.css" />
-	<script language="JavaScript" type="text/javascript">
-		var root_dir = '<?php echo Conf::RootDir();?>';
-		var img_dir = '<?php echo Conf::ImgDir()?>';
-	</script>
+	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
 	<!--[if IE]>
-	<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir()?>/app/templates/<?php echo Conf::Templates()?>/css/css_ie_only.css" />
+	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_ie_only.css" />
 	<![endif]-->
 	<!--[if !IE]><!-->
-	<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir()?>/app/templates/<?php echo Conf::Templates()?>/css/css_navegadores_menos_ie.css" />
+	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 	<!--<![endif]-->
-	<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir()?>/app/templates/<?php echo Conf::Templates()?>/css/css_nuevo_diseno.css" />
-        
+	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
+        <link rel="shortcut icon" href="https://files.thetimebilling.com/favicon.ico" />
+
 
 	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/app/deploy/all.1234370043.js"></script>
-        <script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/app/deploy/resize_iframe.js"></script>
-        <!--Droplinemenu
-        <script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/fw/js/curvycorners.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/fw/js/droplinemenu.js"></script>
-	
-	<script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/app/deploy/resize_iframe.js"></script>-->
+        <script language="JavaScript" type="text/javascript" src="https://files.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://files.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
 
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 

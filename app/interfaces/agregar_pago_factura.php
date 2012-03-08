@@ -283,11 +283,7 @@
 			$('tr_cheque').style.display = "none";
 	}
 	
-	function Cerrar()
-	{
-		window.opener.Refrescar();
-		window.close();
-	}
+	
 	
 	function MostrarTipoCambioPago()
 	{

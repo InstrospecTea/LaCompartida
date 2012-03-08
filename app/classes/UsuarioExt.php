@@ -369,6 +369,8 @@ class UsuarioExt extends Usuario
 					if( $valor1 == '0' && $arr2[$indice1] == '' )
 						continue;
 					$arr_diff[$indice1] = array('valor_original'=> $valor1, 'valor_actual'=> $arr2[$indice1]);
+					
+					/* Bitácora de usuario */
 					$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
 					$query .= " VALUES('".$arr1['id_usuario']."','".$usuario_activo."','".$indice1."','".$valor1."','".$arr2[$indice1]."',NOW())";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -385,6 +387,7 @@ class UsuarioExt extends Usuario
 		$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
 		$query .= " VALUES('".$id_usuario."','".$usuario_activo."','".$dato."','".$actuales."','".$nuevos."',NOW())";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		echo "entré";
 		return true;
 	}
 
@@ -406,10 +409,38 @@ class UsuarioExt extends Usuario
 	 */
 	function ListaCambios($id_usuario )
 	{
-		$query = "SELECT usuario_historial.id_usuario_creador,usuario_historial.nombre_dato,usuario_historial.valor_original,usuario_historial.valor_actual,usuario_historial.fecha, usuario.nombre,usuario.apellido1,usuario.apellido2 FROM usuario_cambio_historial AS usuario_historial";
+		/* 
+		 * Ej:
+		 * AND nombre_dato IN ('id_categoria_usuario','activo');
+		 * Otros datos
+		 * 
+		 * dias_ingreso_trabajo
+		 * permisos
+		 * etc.
+		 * 
+		 */ 
+		$nombre_dato = "";
+		if ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios') != '' )  {
+			$filtros = explode(',', Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios') );
+			$filtros = implode( "', '", $filtros);
+			$nombre_dato = " AND nombre_dato IN ( '" . $filtros . "' )";
+		}
+		
+		$query = "SELECT 
+						usuario_historial.id_usuario_creador,
+						usuario_historial.nombre_dato,
+						usuario_historial.valor_original,
+						usuario_historial.valor_actual,
+						usuario_historial.fecha, 
+						usuario.nombre,
+						usuario.apellido1,
+						usuario.apellido2 
+					FROM usuario_cambio_historial usuario_historial ";
 		$query .= " JOIN usuario ON usuario.id_usuario = usuario_historial.id_usuario_creador";
-		$query .= " WHERE usuario_historial.id_usuario = '".$id_usuario."' AND nombre_dato IN ('id_categoria_usuario','activo')";
+		$query .= " WHERE usuario_historial.id_usuario = '".$id_usuario."' ";
+		$query .= $nombre_dato;
 		$query .= " ORDER BY fecha DESC";
+		
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		while( list($id_usuario_creador,$nombre_dato,$valor_original,$valor_actual,$fecha,$nombre,$apellido1,$apellido2) = mysql_fetch_array($resp) )
 		{

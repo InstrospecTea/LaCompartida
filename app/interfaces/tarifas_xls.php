@@ -46,7 +46,22 @@
                                 'Color' => 'black'));
     $f4->setNumFormat("0");
 
-	$ws1 =& $wb->addWorksheet(__('Tarifa').' '.$glosa);
+    
+    if($id_tarifa_edicion==0):
+    	$querytarifas = "SELECT distinct id_tarifa, glosa_tarifa FROM tarifa";
+    else:
+        $querytarifas="SELECT   id_tarifa, glosa_tarifa FROM tarifa where id_tarifa=".$id_tarifa_edicion;
+    endif;
+    mail('ffigueroa@lemontech.cl','Querytarifa',$querytarifas);
+    $resptarifas = mysql_query($querytarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas,__FILE__,__LINE__,$sesion->dbh);
+    while($hojas=mysql_fetch_array( $resptarifas )):
+	
+	
+	
+	$id_tarifa=$hojas['id_tarifa'];
+    $ws1 =& $wb->addWorksheet(__('Tarifa').' '.$id_tarifa.' '.substr($hojas['glosa_tarifa'],0,20));
+
+   
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1,0);
 	$ws1->setZoom(75);
@@ -56,22 +71,16 @@
 	$ws1->setColumn( 0, 0,  45.00);
 	$ws1->setColumn( 1, 10, 15.00);
 
-	if (method_exists('Conf','GetConf'))
-	{
-		$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
-		$PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
-	}
-	else
-	{
-		$PdfLinea1 = Conf::PdfLinea1();
-		$PdfLinea2 = Conf::PdfLinea2();
-	}
-	$ws1->write(0, 0, 'Detalle de tarifa '.$glosa, $encabezado);
+	
+		$PdfLinea1 = UtilesApp::GetConf($sesion, 'PdfLinea1');
+		$PdfLinea2 = UtilesApp::GetConf($sesion, 'PdfLinea2');
+	
+	$ws1->write(0, 0, 'Detalle de tarifa '.$hojas['glosa_tarifa'], $encabezado);
 	$ws1->mergeCells (0, 0, 0, 8);
-	$info_usr1 = str_replace('<br>',' - ',$PdfLinea1);
+	$info_usr1 = str_replace(array('<br>','<br/>','<br />'),' - ',$PdfLinea1);
 	$ws1->write(2, 0, utf8_decode($info_usr1), $encabezado);
 	$ws1->mergeCells (2, 0, 2, 8);
-	$info_usr = str_replace('<br>',' - ',$PdfLinea2);
+	$info_usr = str_replace(array('<br>','<br/>','<br />'),' - ',$PdfLinea2);
 	$ws1->write(3, 0, utf8_decode($info_usr), $encabezado);
 	$ws1->mergeCells (3, 0, 3, 8);
 
@@ -89,8 +98,8 @@
 		$td_tarifas = '';
 		$cont = 0;
 		$where = '1';
-		if($id_tarifa_edicion)
-			$where .= " AND usuario_tarifa.id_tarifa = '$id_tarifa_edicion'";
+		if($id_tarifa)
+			$where .= " AND usuario_tarifa.id_tarifa =$id_tarifa";
 		$query_tarifas = "SELECT	usuario_tarifa.id_usuario,
 														usuario_tarifa.id_tarifa,
 														IF(usuario_tarifa.tarifa > 0,usuario_tarifa.tarifa,'') AS tarifa,
@@ -130,6 +139,8 @@
 			}
 			$fila_inicial++;
 		}
+
+    endwhile;
 
     $wb->close();
     exit;

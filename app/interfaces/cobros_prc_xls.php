@@ -281,10 +281,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$x_gastos = UtilesApp::ProcesaGastosCobro($Sesion, $Cobro->fields['id_cobro'], array(), 0, true);
 
 	// Total del cobro según su forma / Total del cobro en tasa HH
-	if ($x_resultados['monto_thh'][$Cobro->fields['opc_moneda_total']] > 0) {
+	
+	$query = "SELECT SUM( IF( trabajo.cobrable =1, trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) /3600, 0 ) ) FROM trabajo WHERE id_cobro = '".$Cobro->fields['id_cobro']."' ";
+	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	list($monto_thh) = mysql_fetch_array($resp);
+	$monto_thh = number_format($monto_thh,2,'.','');
+	
+	if ( $monto_thh > 0 ) {
 		$factor_proporcional_forma_cobro =
-			$x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']] /
-			$x_resultados['monto_thh'][$Cobro->fields['opc_moneda_total']];
+			$x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']] / $monto_thh;
 	} else {
 		$factor_proporcional_forma_cobro = 1;
 	}
@@ -435,7 +440,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->setPaper(9);
 	$ws->hideGridlines();
 	$ws->hideScreenGridlines();
-	$ws->setLandscape();
+	$ws->setLandscape();  // esto debería dejar como landscape.	
+	$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja
+	$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
 	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 15);
 	$ws->setColumn($col_fecha, $col_fecha, 15);

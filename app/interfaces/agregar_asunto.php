@@ -1252,11 +1252,11 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "", "", "200"); ?>
+																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "", "Seleccione", "200"); ?>
 								</td>
 							</tr>
 								<?php } 
-								IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') || UtilesApp::GetConf($sesion,'EncargadoSecundario') ) { ?>
+								IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') ) { ?>
 						<tr>
 							<td align=right>
 			<?=__('Encargado 2')?>

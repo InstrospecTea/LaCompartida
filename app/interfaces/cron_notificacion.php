@@ -766,7 +766,15 @@
 
 	}
 
-
+        // refresca los cobros pagados ayer
+         $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS ) ;";
+                $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado  where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS );";
+                $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS ) ;";
+                $resp = mysql_query($update1, $sesion->dbh);
+                        $resp = mysql_query($update2, $sesion->dbh);
+                                $resp = mysql_query($update3, $sesion->dbh);
+        
+        
 	//Correo Hitos
 	$cobro_pendiete = new CobroPendiente($sesion);
 	$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();

@@ -60,6 +60,7 @@
     $pagina->PrintHeaders();
     $pagina->PrintTop(1);
 ?>
+
 <table width=100%>
        <tr>
 			<td colspan=4>
@@ -88,10 +89,11 @@ function Validar(form)
 	return true;
 }
 </script>
+</table>
 <form name="formulario" method="post" id="formulario">
-<input type=hidden name=opc>
-<input type=hidden name=id_persona value="<?=$id_persona?>">
-<input type=hidden name=id_proceso value="<?=$id_proceso?>"
+<input type="hidden" name="opc" id="opcion">
+<input type="hidden" name="id_persona" value="<?=$id_persona?>">
+<input type="hidden" name="id_proceso" value="<?=$id_proceso?>">
 <table width=100%>
 <tr>
     <td>
@@ -121,7 +123,7 @@ function Validar(form)
         <?=__('Observaciones')?>
     </td>
     <td>
-		<textarea cols=50 rows=4 name="observacion_obs"></textarea>
+		<textarea id="historial_observaciones" cols="50" rows="4" name="observacion_obs"></textarea>
     </td>
 </tr>
 <tr>

@@ -1,5 +1,5 @@
 <?
-    require_once dirname(__FILE__).'/../conf.php';
+    require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -14,9 +14,8 @@
 
     $sesion = new Sesion(array('PRO','REV','SEC'));
     $pagina = new Pagina($sesion);
-    $pagina->titulo = __('Modificación de').' '.__('Trabajo');
-    $pagina->PrintTop($popup);
     
+    header("Content-Type: text/html; charset=ISO-8859-1");
 	//Permisos
 	$params_array['codigo_permiso'] = 'PRO';
 	$p_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
@@ -103,11 +102,10 @@
 	
         $lista = new ListaTrabajos($sesion, "", $query);
 
-	$dias = array(__("Lunes"), __("Martes"), __("Miércoles"), __("Jueves"), __("Viernes"), __("Sábado"),__("Domingo"));
+	$dias = array(__("Lunes"), __("Martes"), __("Mi&eacute;rcoles"), __("Jueves"), __("Viernes"), __("S&aacute;bado"),__("Domingo"));
 	$tip_anterior = Html::Tooltip("<b>".__('Semana anterior').":</b><br>".Utiles::sql3fecha($semana_anterior,'%d de %B de %Y'));
 	$tip_siguiente = Html::Tooltip("<b>".__('Semana siguiente').":</b><br>".Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y'));
 	?> 	<center> <?
-	echo("<strong>".__('Haga clic en el botón derecho sobre algún trabajo para modificarlo')."</strong><br />");
 	
 #agregado para el nuevo select
 
@@ -128,67 +126,15 @@
    </script>
    
 <form method='post' name='form_semana' id='form_semana'>
-	<table width='90%'>
-		<tr>
-			<td align='left' width='3%'> <?
-				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
-				<img src='<?=Conf::ImgDir()."/izquierda_nuevo.gif"?>' <?=$tip_anterior?> class='mano_on' onclick="CambiaSemana('<?=$semana_anterior?>')">
-			<? } else { ?>
-				<img src='<?=Conf::ImgDir()."/izquierda.gif"?>' <?=$tip_anterior?> class='mano_on' onclick="CambiaSemana('<?=$semana_anterior?>')">
-			<? } ?>
-				</td>
-			 
-<?
-if ($p_revisor->fields['permitido'])
-{
-?>	
-	<td align='center' width='45%'>
-<?
-	echo ( __('Usuario') . "&nbsp;");
-	echo Html::SelectQuery($sesion,
-						"SELECT usuario.id_usuario, 
-							CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
-							as nombre FROM usuario 
-							JOIN usuario_permiso USING(id_usuario)
-							LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional 
-							WHERE $where GROUP BY id_usuario ORDER BY nombre"
-						,"id_usuario",$id_usuario,"onchange='Refrescar(this.value,form.semana.value);'",'',"170");
-?>
-	</td>
-	<td align='right' width='30%'>
-		<?echo Html::PrintCalendar('semana',$semana);?>
-	</td>
-	<td align ='left' width='19%'>
-		<input type='button' class='btn' value="Ver semana" onclick="CambiaSemana(form.semana.value)">
-	</td>
 	
-<?
-}
-else
-{
-?>
-	<td align='right' width='47%'>
-		<?echo Html::PrintCalendar('semana',$semana);?>
-	</td>
-	<td align ='left' width='47%'>
-		<input type='button' class='btn' value='Ver semana' onclick="CambiaSemana(form.semana.value)">
-	</td>
-<?
-}
-?>
-	<td align='right' width='3%'>
-		<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
-			<img src='<?=Conf::ImgDir()."/derecha_nuevo.gif"?>' <?=$tip_siguiente?> class='mano_on' onclick="CambiaSemana('<?=$semana_siguiente?>')">
-		<? } else { ?>
-			<img src='<?=Conf::ImgDir()."/derecha.gif"?>' <?=$tip_siguiente?> class='mano_on' onclick="CambiaSemana('<?=$semana_siguiente?>')">
-		<? } ?>
-	</td>
- </tr>
-</table>
+    
+
+<?php
+echo '<input type="hidden" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
+      <input type="hidden" value="'.$semana_anterior.'" id="hiddensemanaanterior" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
 
 
-<?
-	echo("<table style='width:600px'>");
+echo("<table style='width:600px'>");
 	
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 ?>
@@ -209,15 +155,15 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		</td>
     </tr>
 <?
-	echo("<tr>");
+	echo("<tr id='cabecera_dias'>");
 	$fecha_dia = Utiles::sql2date($semana_actual);
 	
         for($i = 0; $i < 7; $i++)
 	{
 		$dia_de_mes = date("j",strtotime(Utiles::add_date($semana_actual,$i)));
 		//echo $semana_actual.' '.$fecha_dia.' '.$dia_de_mes;
-                $mouse_over = 'onmouseover = "this.style.background=\'#DF9862\'"';
-		$mouse_out = 'onmouseout = "this.style.background=\'#FFFFFF\'"';
+                /*$mouse_over = 'onmouseover = "this.style.background=\'#DF9862\'"';
+		$mouse_out = 'onmouseout = "this.style.background=\'#FFFFFF\'"';*/
 		echo("
 			<td width=14% style='border: 1px solid black; text-align:center;' id='dia_$i' ".$mouse_over." ".$mouse_out.">
 				<input type=hidden name='dia$i' id='dia$i' value=".$fecha_dia.">
@@ -227,7 +173,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		$fecha_dia = date("d-m-Y",strtotime("$fecha_dia+1 days"));
 	}
 	echo("</tr>");
-	echo("<tr>");
+	echo("<tr id='celdastrabajo'>");
 	$dia_anterior=2;
 	for($i = 0; $i < $lista->num; $i++)
 	{
@@ -240,10 +186,11 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		
 		$alto = max($lista->Get($i)->fields[alto],12)."px";
 		$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
-		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
+		if (UtilesApp::GetConf($sesion,'CodigoSecundario') ):
 			$cod_asunto_color = $asunto->CodigoSecundarioACodigo($cod_asunto);
-		else
+		else:
 			$cod_asunto_color = $cod_asunto;
+                endif;
 		$cliente = $lista->Get($i)->fields[codigo_cliente];
 		$dia_semana = $lista->Get($i)->fields[dia_semana];
 		
@@ -258,13 +205,10 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
            
 		$duracion = $lista->Get($i)->fields[duracion];
 		//echo $duracion;
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) ) 
-		{
+		if( (UtilesApp::GetConf($sesion,'TipoIngresoHoras')=='decimal' )) {
 			list($hh,$mm,$ss) = split(":",$duracion);
 			$duracion = UtilesApp::Time2Decimal( $duracion );
-		}
-		else
-		{
+		} else 	{
 			list($hh,$mm,$ss) = split(":",$duracion);
 			$duracion = "$hh:$mm";
 		}
@@ -295,7 +239,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 				echo("</td><td width=14%>");
 		}	
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div class='cajatrabajo' id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");
@@ -348,178 +292,13 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
             <strong><?=$horas_trabajadas_semana?></strong>
 		</td>
 		</tr>
-		<?
-	echo("</table>");
-	
-	echo("</form>");
-#	echo(InputId::Javascript($sesion));
-?>
+		</table>
+</form>
 </center>
-<script>
-	/* Array de los items del Menú */
-	document.observe('dom:loaded', function(){
-	var myMenuItems = [
-	  {
-	  	name: 'Ingresar como nueva hora',
-	    className: 'new', 
-	    callback: function(e) {
-	      OpcionesTrabajo(e.target.id,'nuevo','');
-	    }
-	  },{
-	    name: 'Editar',
-	    className: 'edit', 
-	    callback: function(e) {
-	    	OpcionesTrabajo(e.target.id,'','')
-	    }
-	  },{	    
-	    name: 'Eliminar',
-	    disabled: false,
-	    className: 'delete',
-	    callback: function(e) {
-	      if( confirm('<?=__("¿Desea eliminar este trabajo?")?>') )
-	      	OpcionesTrabajo(e.target.id,'eliminar','');
-	    }
-	  },{
-	    separator: true
-	  },{
-	    name: 'Cancelar',
-	    className: 'cancel',
-	    callback: function(e) {
-					OpcionesTrabajo('','cancelar');
-	    }
-	  }
-	]
-	
-	/* Array para todos los trabajos ingresador */
-	var arr_trabajos = new Array();
-<?
-	for($i = 0; $i < $lista->num; $i++)
-	{
-?>
-		arr_trabajos[<?=$i?>] = <?=$lista->Get($i)->fields[id_trabajo]?>;
-<?
-	}
-?>
-	/* 
-		Inicializando Menú 
-		creando cada menú según cantidad de trabajos hayan ingresados
-	*/
-	var list_div = parseInt(<?=$lista->num;?>);
-	for(i=0;i<list_div;i++)
-	{
-			new Proto.Menu({
-		  selector: '#'+arr_trabajos[i], // context menu will be shown when element with id of "contextArea" is clicked
-		  className: 'menu desktop',
-		  menuItems: myMenuItems
-		})
-	}
-})
-
-/* Opciones menu para los días */
-	document.observe('dom:loaded', function()
-	{
-		var MenuDias = [
-	  	{
-	  		name: 'Nueva hora',
-	    	className: 'new', 
-	    	callback: function(e) {
-	    		var fecha = e.target.id.split('_',2);
-	    		var fecha_id = fecha[0]+''+fecha[1];
-	    		var f_dia = $F(fecha_id);
-					OpcionesTrabajo('','',f_dia);
-	    	}
-	  	}
-		]
-		
-		/*Menu para cada día de la semana*/
-		for(i=0;i<7;i++)
-		{
-				new Proto.Menu({
-			  selector: '#dia_'+i, // context menu will be shown when element with id of "contextArea" is clicked
-			  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
-			  menuItems: MenuDias // array of menu items
-			})
-		}
-	})
-</script>
-<script>
-function relocate(id_trabajo,semana)
-{
-	var string = new String(top.location);
-	if(string.search('trabajo.php') > 0)//Si la página está siendo llamada desde trabajo.php 
-		top.location='trabajo.php?opcion=editar&id_trab='+id_trabajo+'&semana='+semana;
-	else
-		self.location='trabajo.php?opcion=editar&id_trab='+id_trabajo+'&semana='+semana;
-}
-//La funcion Refrescar solo debe estar presente cuando el usuario sea revisor 
-<?
-if ($p_revisor->fields['permitido'])
-{
-?>
-	function Refrescar(id_usu ,semana)
-	{
-		var form = $('form_semana');
-		form.semana.value = semana;
-		//alert(semana);
-		//alert("semana.php?popup=1&id_usuario=" + id_usu + "&semana=");
-		self.location.href='semana.php?popup=1&id_usuario='+ id_usu+'&semana='+semana;	
 
 
-	}
-<?
-}
-?>
-
-/* 
-	Opcion menu lateral 
-	opcion->elimina; nuevo o '' ('' editar)
-	f_dia->fecha para menu sobre dias semana
-*/
-function OpcionesTrabajo(id_trabajo, opcion, f_dia )
-{
-	if(opcion == 'nuevo')
-		top.asuntos.location = 'editar_trabajo.php?opcion='+opcion+'&id_trabajo='+id_trabajo+'&popup=1';
-	else if(opcion == 'cancelar')
-		top.asuntos.location = 'editar_trabajo.php?id_trabajo=&popup=1';
-	else
-	{
-		top.asuntos.location = 'editar_trabajo.php?opcion='+opcion+'&id_trabajo='+id_trabajo+'&popup=1&fecha='+f_dia;
-	}
-}
-
-/* Cambia semana */
-function CambiaSemana( fecha )
-{
-	var form = $('form_semana');
-	form.semana.value = fecha;
-<?
-if ($p_revisor->fields['permitido'])
-{
-?>
-	var sel_usu = document.getElementById('id_usuario');
-	//alert(sel_usu);
-	//var index = sel_usu.selectedIndex;
-	var sel_usu_val = sel_usu.value;
-	//alert(sel_usu_val);
-	var url = "semana.php?popup=1&semana="+fecha+"&id_usuario="+sel_usu_val;
-	/*var accion = 'semana.php?popup=1';
-	form.action = accion;
-	form.target = '_self';
-	form.submit();*/
-<?
-}
-else
-{
-?>
-	var url="semana.php?popup=1&semana="+fecha+"&id_usuario="+<?=$id_usuario?>;
-<?
-}
-?>
-self.location.href = url;
-}
-</script>
-<?
-    $pagina->PrintBottom($popup);
+<?php
+   
 
     function SplitDuracion($time)
     {

@@ -200,7 +200,11 @@
 				$pagina->AddInfo($txt_tipo.' '.__('Guardado con éxito.').' '.$ingreso_eliminado);
 	?>
 				<script language='javascript'>
-					window.opener.Refrescar();
+					  if(  parent.window.Refrescarse ) {
+                                                  parent.window.Refrescarse(); 
+                                           } else if( window.opener.Refrescar ) {
+                                                window.opener.Refrescar(); 
+                                           }
 				</script>
 	<?
 			}
@@ -282,11 +286,6 @@ function ShowGastos(valor)
 		$('tabla_gastos').style.display = 'none';
 }
 
-function Cerrar()
-{
-	//window.opener.BuscarGastos('','buscar');
-	window.close();
-}
 
 function CambiaMonto( form )
 {
@@ -376,6 +375,7 @@ function Validar(form)
 	}
 <?php
 	}
+        
 ?>
 
 	var radio_choice = false;
@@ -391,6 +391,9 @@ function Validar(form)
 		alert('<?=__('Debe seleccionar una Moneda')?>');
 		return false;
 	}
+        
+        //if(jQuery('#id_usuario_orden').val()==-1) jQuery('#id_usuario_orden').val(<?php echo $id_usuario;?>);
+        if(jQuery('#id_usuario').val()==-1) jQuery('#id_usuario').val(<?php echo $id_usuario;?>);
 	form.submit();
 }
 
@@ -414,7 +417,9 @@ function ActualizarDescripcion()
 
 function CargaIdioma( codigo )
 {
-	var txt_span = document.getElementById('txt_span');
+	if(jQuery('#txt_span').length==0) return true;
+        var txt_span = document.getElementById('txt_span');
+        
 	if(!codigo)
 	{
 		txt_span.innerHTML = '';
@@ -492,7 +497,7 @@ function AgregarNuevo(tipo, prov)
 function AgregarProveedor()
 {
 	var urlo = 'agregar_proveedor.php?popup=1';
-	nuevaVentana('Agregar_Proveedor',430,370,urlo);
+	nuovaFinestra('Agregar_Proveedor',430,370,urlo);
 }
 </script>
 <? echo(Autocompletador::CSS()); ?>

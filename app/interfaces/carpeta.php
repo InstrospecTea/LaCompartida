@@ -115,8 +115,8 @@
   		global $sesion;
 			global $desde;
 			$id_carpeta = $fila->fields['id_carpeta'];
-			$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Mover_Carpeta',730,300,'agregar_carpeta_movimiento.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/encuesta_xresp16.gif' border=0 title='".__('Mover carpeta')."' alt='' /></a>&nbsp;";
-			$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Carpeta',730,300,'agregar_carpeta.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar carpeta')."' alt='' /></a>&nbsp;";
+			$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Mover_Carpeta',730,300,'agregar_carpeta_movimiento.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/encuesta_xresp16.gif' border=0 title='".__('Mover carpeta')."' alt='' /></a>&nbsp;";
+			$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Carpeta',730,300,'agregar_carpeta.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title='".__('Editar carpeta')."' alt='' /></a>&nbsp;";
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 				$html_opcion .= "<a target='_top' onclick=\"return confirm('¿".__('Está seguro de eliminar la')." ".__('carpeta')."?');\" href=?id_carpeta=$id_carpeta&opcion=eliminar&desde=$desde><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
     	else
@@ -135,7 +135,7 @@
 	$pagina->PrintTop();
 	if ($p_edicion)
 		$NuevoArchivo = "<tr>
-        <td align=right colspan=2><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Carpeta',730,300,'agregar_carpeta.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/agregar.gif' border=0 title='".__('Agregar carpeta')."' alt='' />".__('Agregar carpeta')."</a></td></tr>";
+        <td align=right colspan=2><a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Carpeta',730,300,'agregar_carpeta.php?id_carpeta=$id_carpeta&popup=1','top=100, left=155');\"><img src='".Conf::ImgDir()."/agregar.gif' border=0 title='".__('Agregar carpeta')."' alt='' />".__('Agregar carpeta')."</a></td></tr>";
   else
   	$NuevoArchivo = "";
     

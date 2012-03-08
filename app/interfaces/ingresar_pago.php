@@ -189,11 +189,7 @@ function showCalendar(element, input, container, source)
 document.observe('dom:loaded', function() {
 });
 
-function Cerrar()
-{
-	window.opener.Refrescar(true);
-	window.close();
-}
+
 
 function Validar(form)
 {

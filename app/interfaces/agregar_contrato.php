@@ -91,6 +91,11 @@ if ($popup && !$motivo) {
 	$show = 'none';
 }
 
+$contrato_defecto = new Contrato($sesion);
+if (!empty($cliente->fields["id_contrato"])) {
+	$contrato_defecto->Load($cliente->fields["id_contrato"]);
+}
+
 $validaciones_segun_config = UtilesApp::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 
@@ -113,7 +118,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
 		}
 	}
-        
+
         if ($usuario_responsable_obligatorio && empty($id_usuario_responsable) or $id_usuario_responsable == '-1') {
             $pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
             $val = true;
@@ -749,9 +754,9 @@ function SetFormatoRut()
 	{
 		jQuery("#div_forma_cobro").css('width','730px').show();
                 jQuery("#div_monto").hide();
-                 jQuery("#div_horas").show();
+                 jQuery("#div_horas").hide();
 		jQuery("#div_fecha_cap").hide();
-		jQuery("#div_escalonada").hide();
+		jQuery("#div_escalonada").show();
 		jQuery("#tabla_hitos").hide();
                 jQuery("#span_monto").hide();
                jQuery("#div_retainer_usuarios").css('display','inline').hide();
@@ -906,15 +911,16 @@ function SetFormatoRut()
 		else if(jQuery("#fc8").is(':checked'))
 			ShowEscalonada();
 	}
-	function CreaTarifa(form, opcion)
+	function CreaTarifa(form, opcion, id_tarifa)
 	{
 		var form = $('formulario');
 		if(opcion)
-			nuevaVentana( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1', '' );
+			nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1', '' );
 		else
 		{
-			var id_tarifa = form.id_tarifa.value;
-			nuevaVentana( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
+			if(!id_tarifa)
+				var id_tarifa = form.id_tarifa.value;
+			nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
 		}
 	}
 
@@ -922,11 +928,11 @@ function SetFormatoRut()
 	{
 		var form = $('formulario');
 		if(opcion)
-			nuevaVentana( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1', '' );
+			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1', '' );
 		else
 		{
 			var id_tramite_tarifa = form.id_tramite_tarifa.value;
-			nuevaVentana( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
+			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
 		}
 	}
 
@@ -1317,9 +1323,25 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		//loading("Verificanco datos");
 		//cargando = true;
 		var text_window = "";
-
+		if( $('desde') && $('desde').value == 'agregar_asunto') {
+			if( $('cobro_independiente') ) {
+				if( $('cobro_independiente').checked ) {
+					var cobro_independiente = '&cobro_independiente=SI';
+					var cliente = '';
+				} else {
+					var cobro_independiente = '&cobro_independiente=NO';
+					var cliente = '&codigo_cliente='+$('codigo_cliente').value;
+				}
+			} else {
+				var cliente = '';
+				var cobro_independiente = "";
+			}
+		} else {
+			var cliente = '';
+			var cobro_independiente = "";
+		}
 		var http = getXMLHTTP();
-		var url = 'ajax.php?accion=revisar_tarifas&id_tarifa=' + $(tarifa).value + '&id_moneda=' + $(moneda).value;
+		var url = 'ajax.php?accion=revisar_tarifas&id_tarifa=' + $('id_tarifa').value + '&id_moneda=' + $(moneda).value + cobro_independiente + cliente;
 		if(http) {
 
 			http.open('get',url,false);
@@ -1382,7 +1404,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?= __('Hay más de 10 abogados sin valor para la tarifa y moneda seleccionadas.') ?></span><br><br>';
 					todos = false;
 				}
-				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false)"><?= __('Modificar tarifa.') ?></a></span>';
+				text_window += '<span style="font-size:12px; text-align:left;"><a href="javascript:;" onclick="CreaTarifa(this.form,false,'+parts[3]+')"><?= __('Modificar tarifa.') ?></a></span>';
 
 				if( todos && !desde_combo )
 				{
@@ -1469,7 +1491,18 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	}
 
 	var mismoEncargado = <?= UtilesApp::GetConf($sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
-	function CambioEncargado(){
+	function CambioEncargado(elemento){
+		<?php if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && $desde_agrega_cliente): ?>
+		if (elemento.name == "id_usuario_responsable") {
+			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) { ?> 
+				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+				$('id_usuario_secundario').disabled = "disabled";
+			<?php } else { ?>
+				$('id_usuario_encargado').value = $('id_usuario_responsable').value;
+				$('id_usuario_encargado').disabled = "disabled";
+			<?php } ?>
+		}
+		<?php else: ?>
 		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){
 			if(confirm('¿Desea cambiar también el <?= __('Encargado Secundario') ?>?')){
 				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
@@ -1478,6 +1511,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				mismoEncargado = false;
 			}
 		}
+		<?php endif; ?>
 	}
 
 	function agregarHito(){
@@ -1641,10 +1675,30 @@ if (!$contrato->loaded()) {
 			<tr>
 				<td align="left" width='30%'>
 				<?= __('Encargado Comercial') ?>
-                                <?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
+                                	<?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
 				</td>
 				<td align="left" width = '70%'>
-<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', 'onchange="CambioEncargado()"', "Vacio", "200"); ?>
+				<?php if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()){ ?>
+					<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200"); ?>
+					<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php 
+					} else { 
+						if ( $contrato_defecto->Loaded() && $contrato->Loaded()){ 							
+							if ($contrato_defecto->fields["id_contrato"] != $contrato->fields["id_contrato"]) { 
+				?>
+							<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php 								
+							}
+							
+							if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') ) {
+								$disable_select = ' disabled="disabled"';
+							} else {
+								$disable_select = '';
+							}
+						 }
+				?>
+					<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"' . $disable_select, "Vacio", "200"); ?>
+				<?php } ?>
 				</td>
 			</tr>
 			<?
@@ -1950,8 +2004,8 @@ $config_validar_tarifa = ( method_exists('Conf', 'GetConf') && Conf::GetConf($se
 										<input type="hidden" name="id_moneda_hidden" id="id_moneda_hidden" value="<?php echo $contrato->fields['id_moneda'] ? $contrato->fields['id_moneda'] : $id_moneda; ?>" />
 										&nbsp;&nbsp;
 <?php if ($tarifa_permitido) { ?>
-											<span style='cursor:pointer' <?= TTip(__('Agregar nueva tarifa')) ?> onclick='CreaTarifa(this.form,true)'><img src="<?= Conf::ImgDir() ?>/mas.gif" border="0"></span>
-											<span style='cursor:pointer' <?= TTip(__('Editar tarifa seleccionada')) ?> onclick='CreaTarifa(this.form,false)'><img src="<?= Conf::ImgDir() ?>/editar_on.gif" border="0"></span>
+											<span style='cursor:pointer' <?= TTip(__('Agregar nueva tarifa')) ?> onclick='CreaTarifa(this.form,true,false)'><img src="<?= Conf::ImgDir() ?>/mas.gif" border="0"></span>
+											<span style='cursor:pointer' <?= TTip(__('Editar tarifa seleccionada')) ?> onclick='CreaTarifa(this.form,false,false)'><img src="<?= Conf::ImgDir() ?>/editar_on.gif" border="0"></span>
 										<?php } ?>
 									</td>
 								</tr>
@@ -2815,6 +2869,20 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 	);});
 	$$('tr.esconder').each(function(item){item.hide()});
 	actualizarMoneda();
+
+	<?php 
+		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && $desde_agrega_cliente) {
+			if ( UtilesApp::GetConf( $sesion, 'EncargadoSecundario') ) {
+	?>
+		$('id_usuario_secundario').disabled = "disabled";
+	<?php 
+			} else {
+	?>
+		 $('id_usuario_encargado').disabled = "disabled";
+	<?php 			
+			}
+		}
+	?>
 </script>
 <?
 echo(InputId::Javascript($sesion));

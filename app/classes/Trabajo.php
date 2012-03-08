@@ -48,6 +48,7 @@ class Trabajo extends Objeto
 			return __("Revisado");
 
 			return __("Abierto");
+			
 	}
 
 	function Write($ingreso_historial = true)

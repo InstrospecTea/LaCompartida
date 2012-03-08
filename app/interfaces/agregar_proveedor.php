@@ -76,11 +76,7 @@
 ?>
 
 <script type="text/javascript">
-	function Cerrar()
-	{
-		window.opener.location.reload();
-		window.close();
-	}
+
 	function Buscar(form)
 	{
 		form.opcion.value='Buscar';

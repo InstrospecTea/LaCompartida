@@ -21,7 +21,7 @@
 
 	$t = new Trabajo($sesion);
 	$params_array['codigo_permiso'] = 'REV';
-	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	$permiso_revisor = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	$params_array['codigo_permiso'] = 'COB';
 	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 	$params_array['codigo_permiso'] = 'PRO';
@@ -36,23 +36,30 @@
 	{
 		$actualizar_trabajo_tarifa = false;
 		$t->Load($id_trabajo);
-		if($t->Estado() == 'Cobrado' && $opcion != 'nuevo')
+		
+		if(($t->Estado() == 'Cobrado' || $t->Estado()== __("Cobrado"))&& $opcion != 'nuevo')
 		{
+		      
 			$pagina->AddError(__('Trabajo ya cobrado'));
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
 			exit;
-		}
-		if($t->Estado() == 'Revisado' && $opcion != 'nuevo')
+		} elseif(($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo')
 		{
-			if(!$permisos->fields['permitido'])
+			if(!$permiso_revisor->fields['permitido'])
 			{
 				$pagina->AddError(__('Trabajo ya revisado'));
 				$pagina->PrintTop($popup);
 				$pagina->PrintBottom($popup);
 				exit;
 			}
-		}
+		} elseif($opcion=='cambiofecha') {
+                    $semana=Utiles::fecha2sql($fecha);
+                    $t->Edit('fecha',$semana);
+                    $t->Write(true);
+                    die('semana|'.$semana);
+                    
+                }
 		if(!$id_usuario)
 			$id_usuario = $t->fields['id_usuario'];
 
@@ -167,10 +174,10 @@
 								$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
 								mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 							}
-                            $t->Edit('id_categoria_usuario', $id_categoria_usuario );
+                            $t->Edit('id_categoria_usuario', !empty($id_categoria_usuario) ? $id_categoria_usuario : "NULL" );
                             $t->Edit('codigo_asunto', $codigo_asunto);
 
-                            if( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarAreaTrabajos')){
+                            if( UtilesApp::GetConf($sesion, 'UsarAreaTrabajos')){
                                     //id_area_trabajo
                                     $t->Edit('id_area_trabajo', empty($id_area_trabajo) ? "NULL": $id_area_trabajo );
                             }
@@ -370,10 +377,12 @@
 ?>
 <script type="text/javascript">
 var str_url = new String(top.location);
-if(str_url.search('/trabajo.php') > 0)//Si la página está siendo llamada desde trabajo.php
-	top.frames.semana.location.reload();
+if(str_url.search('/trabajo.php') > 0) {//Si la página está siendo llamada desde trabajo.php
+	if(top.frames.semana!==undefined)     top.frames.semana.location.reload();
+}
+if(top.Refrescar!==undefined) top.Refrescar();
 	</script>
-<? 
+<?php 
 	}
 ?>
 
@@ -420,7 +429,7 @@ function Validar(form)
 				echo "if(!form.codigo_asunto.value){";
 			}
 ?>
-			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
+			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
 <?
 			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
@@ -435,14 +444,14 @@ function Validar(form)
     }
     if(!form.fecha.value)
     {
-        alert("<?=__('Debe ingresar una fecha.')?>");
+        alert("<?php echo __('Debe ingresar una fecha.')?>");
         form.fecha.focus();
         return false;
     }
 
     if(!form.duracion.value)
     {
-        alert("<?=__('Debe establecer la duración')?>");
+        alert("<?php echo __('Debe establecer la duración')?>");
         form.duracion.focus();
         return false;
     }
@@ -474,7 +483,7 @@ function Validar(form)
 			var dur_cob=form.duracion_cobrada.value.replace(",",".");
 			if(isNaN(dur) || isNaN(dur_cob))
 			{
-				alert("<?=__('Solo se aceptan valores numéricos')?>");
+				alert("<?php echo __('Solo se aceptan valores numéricos')?>");
 				form.duracion.focus();
 				return false;
 			}
@@ -482,7 +491,7 @@ function Validar(form)
 			var decimales_cobrada=dur_cob.split(".");
 			if(decimales[1].length > 1 || decimales_cobrada[1].length > 1)
 			{
-				alert("<?=__('Solo se permite ingresar un decimal')?>");
+				alert("<?php echo __('Solo se permite ingresar un decimal')?>");
 				form.duracion.focus();
 				return false;
 			}
@@ -491,7 +500,7 @@ function Validar(form)
 ?>
     if(!form.descripcion.value)
     {
-        alert("<?=__('Debe ingresar la descripción')?>");
+        alert("<?php echo __('Debe ingresar la descripción')?>");
         form.descripcion.focus();
         return false;
     }
@@ -501,7 +510,7 @@ function Validar(form)
 ?>
             if( !form.id_area_trabajo.value ) 
             {
-                alert("<?=__('Debe seleccionar una area de trabajo')?>");
+                alert("<?php echo __('Debe seleccionar una area de trabajo')?>");
                 form.id_area_trabajo.focus();
                 return false;
             }
@@ -519,14 +528,14 @@ function Validar(form)
 					return true;
 				else
 					return false;
-	<? 	} 
+	<?php 	} 
 		else 
 			{ ?>
 				if(ActualizaCobro(form.codigo_asunto.value))
 					return true;
 				else
 					return false;
-	<? } ?>
+	<?php } ?>
 	}
 <?
 	if (method_exists('Conf','GetConf'))
@@ -547,7 +556,7 @@ function Validar(form)
 ?>
 	if(form.solicitante.value=='')
 	{
-		alert("<?=__('Debe ingresar la persona que solicitó el trabajo')?>");
+		alert("<?php echo __('Debe ingresar la persona que solicitó el trabajo')?>");
 		form.solicitante.focus();
 		return false;
 	}
@@ -581,7 +590,7 @@ function Validar(form)
 	temp = $('fecha').value.split("-");
 	fecha = new Date(temp[2]+'//'+temp[1]+'//'+temp[0]);
 	hoy = new Date();
-	fecha_tope = new Date(hoy.getTime()-(<?=($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
+	fecha_tope = new Date(hoy.getTime()-(<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
 	if (fecha_tope > fecha)
 	{
 		var dia = fecha_tope.getDate();
@@ -664,7 +673,7 @@ function IngresarNuevo(form)
 {
 	form.opcion.value = 'nuevo';
 	form.id_trabajo.value = '';
-	var url="semana.php?popup=1&semana="+form.semana.value+"&id_usuario="+<?=$id_usuario?>+"&opcion=nuevo";
+	var url="semana.php?popup=1&semana="+form.semana.value+"&id_usuario="+<?php echo $id_usuario?>+"&opcion=nuevo";
 	self.location.href = url;
 }
 
@@ -696,12 +705,12 @@ function DivClear(div, dvimg)
 	if( div == 'tr_cliente' )
 	{
 		var img = document.getElementById( 'img_asunto' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
 	}
 	else
 	{
 		var img = document.getElementById( 'img_historial' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
 	}
 }
 
@@ -727,7 +736,7 @@ function ShowDiv(div, valor, dvimg)
 	if( div == 'tr_asunto' && codigo == '')
 	{
 		tr.style['display'] = 'none';
-		alert("<?=__('Debe seleccionar un cliente')?>");
+		alert("<?php echo __('Debe seleccionar un cliente')?>");
 		form.codigo_cliente.focus();
 		return false;
 	}
@@ -759,12 +768,12 @@ function ShowDiv(div, valor, dvimg)
 	{
 		WCH.Apply('tr_asunto');
 		WCH.Apply('tr_cliente');
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
 	}
 	else
 	{
 		WCH.Discard(div);
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
 	}
 }
 
@@ -804,10 +813,8 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_asunto.value = codigo;
 		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<? if( UtilesApp::GetConf($sesion,'UsoActividades') )
-	 { ?>
-		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
-<? }?>
+<?php if( UtilesApp::GetConf($sesion,'UsoActividades') ) echo "CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');";?>
+
 	}
 
 	var http = getXMLHTTP();
@@ -884,9 +891,9 @@ function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, dura
 	tr.style['display'] = 'none';
 	tr2.style['display'] = 'none';
 
-	img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+	img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
 
-	img2.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+	img2.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
 }
 
 function CargaIdioma( codigo )
@@ -956,14 +963,14 @@ function ActualizaCobro(valor)
 	
 	if(codigo_asunto_hide != valor && id_cobro && id_trabajo)
 	{
-		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
-		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
+		var text_window = "<img src='<?php echo Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA")?></u><br><br>";
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
+		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,
 		{
-			top:100, left:80, width:400, okLabel: "<?=__('Aceptar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+			top:100, left:80, width:400, okLabel: "<?php echo __('Aceptar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 			id: "myDialogId",
 			cancel:function(win){ return false; },
 			ok:function(win){ if(ActualizarCobroAsunto(valor)) form.submit(); return true; }
@@ -1000,7 +1007,7 @@ function CheckVisible()
 {
 	if(!$('chkCobrable').checked)
 	{
-		<? if($permisos->fields['permitido']) { ?>
+		<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
 			$('chkVisible').checked=false;
 		<?
 			}
@@ -1014,13 +1021,13 @@ function CheckVisible()
 
 function AgregarNuevo(tipo)
 {
-<? if(UtilesApp::GetConf($sesion,'CodigoSecundario')){?>
+<?php if(UtilesApp::GetConf($sesion,'CodigoSecundario')){?>
 	var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 	var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-<? } else { ?>
+<?php } else { ?>
 	var codigo_cliente = $('codigo_cliente').value;
 	var codigo_asunto = $('codigo_asunto').value;
-<? } ?>
+<?php } ?>
 	if(tipo == 'trabajo')
 	{
 		var urlo = "editar_trabajo.php?popup=1";
@@ -1034,25 +1041,26 @@ A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<? echo(Autocompletador::CSS()); ?>
+<?php echo(Autocompletador::CSS()); ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?=$_SERVER[PHP_SELF]?>">
+<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>">
+    
 <input type="hidden" id="opcion" name="opcion" value="guardar" />
 <input type="hidden" name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
-<input type="hidden" name="max_hora" id="max_hora" value=<?=UtilesApp::GetConf($sesion,'MaxDuracionTrabajo')?> />
-<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?=$t->fields['codigo_asunto']?>" />
+<input type="hidden" name="max_hora" id="max_hora" value=<?php echo UtilesApp::GetConf($sesion,'MaxDuracionTrabajo')?> />
+<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo $t->fields['codigo_asunto']?>" />
 <?
 	if( $opcion != 'nuevo' )
 	{
 ?>
-<input type="hidden" name='id_trabajo' value="<?= $t->fields['id_trabajo'] ?>" id='id_trabajo' />
-<input type="hidden" name='edit' value="<?= $opcion == 'edit' ? 1 : '' ?>" id='edit' />
-<input type="hidden" name='fecha_trabajo_hide' value="<?= $t->fields['fecha'] ?>" id='fecha_trabajo_hide' />
+<input type="hidden" name='id_trabajo' value="<?php echo  $t->fields['id_trabajo'] ?>" id='id_trabajo' />
+<input type="hidden" name='edit' value="<?php echo  $opcion == 'edit' ? 1 : '' ?>" id='edit' />
+<input type="hidden" name='fecha_trabajo_hide' value="<?php echo  $t->fields['fecha'] ?>" id='fecha_trabajo_hide' />
 <?
 	}
 	if($id_trabajo == NULL) // si no tenemos id de trabajo es porque se estÃ¡ agregando uno nuevo.
@@ -1062,23 +1070,23 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?
 	}
 ?>
-<input type="hidden" name=id_cobro id=id_cobro value="<?=$t->fields['id_cobro'] !='NULL' ? $t->fields['id_cobro'] : '' ?>" />
-<input type="hidden" name=popup value='<?=$popup?>' id="popup">
+<input type="hidden" name=id_cobro id=id_cobro value="<?php echo $t->fields['id_cobro'] !='NULL' ? $t->fields['id_cobro'] : '' ?>" />
+<input type="hidden" name=popup value='<?php echo $popup?>' id="popup">
 
 <!-- TABLA HISTORIAL -->
-<?  if( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') )
+<?php  if( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') )
 	          $display_none = 'style="display: none;"';
 		else
 		  $display_none = ''; ?>
 			
-<table id="tr_cliente" cellpadding="0" cellspacing="0" width="100%" <?=$display_none?>>
+<table id="tr_cliente" cellpadding="0" cellspacing="0" width="100%" <?php echo $display_none?>>
 	<tr>
         <td colspan="7" class="td_transparente">&nbsp;</td>
     </tr>
     <tr>
     	<td class="td_transparente">&nbsp;</td>
         <td class="td_transparente" colspan="5" align="right">
-        	<img style="filter:alpha(opacity=100);" src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
+        	<img style="filter:alpha(opacity=100);" src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
         </td>
         <td class="td_transparente">&nbsp;</td>
     </tr>
@@ -1086,7 +1094,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         <td width="5%" class="td_transparente">&nbsp;</td>
         <td width="30%" id="leftcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Cliente') ?>
+                <?php echo __('Cliente') ?>
             </div>
             <div id="left_data" class="span_data"></div>
         </td>
@@ -1094,7 +1102,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="30%" id="content" class="box_historial">
             <div id="titulos">
-                <?=__('Asunto') ?>
+                <?php echo __('Asunto') ?>
             </div>
             <div id="content_data" class="span_data"></div>
         </td>
@@ -1102,7 +1110,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="30%" id="rightcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Trabajo') ?>
+                <?php echo __('Trabajo') ?>
             </div>
             <div id="right_data" class="span_data"></div>
         </td>
@@ -1113,14 +1121,14 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     </tr>
 </table>
 <!-- TABLA SOBRE ASUNTOS -->
-<table id="tr_asunto" cellpadding="0" cellspacing="0" width="100%" <?=$display_none?>>
+<table id="tr_asunto" cellpadding="0" cellspacing="0" width="100%" <?php echo $display_none?>>
 	<tr>
         <td colspan="6" class="td_transparente">&nbsp;</td>
     </tr>
     <tr>
         <td class="td_transparente">&nbsp;</td>
         <td align="right" colspan="4" class="td_transparente">
-            <img src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
+            <img src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
         </td>
         <td class="td_transparente">&nbsp;</td>
     </tr>
@@ -1128,7 +1136,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         <td width="5%" class="td_transparente">&nbsp;</td>
         <td width="45%" id="content" class="box_historial">
             <div id="titulos">
-                <?=__('Asunto') ?>
+                <?php echo __('Asunto') ?>
             </div>
             <div id="content_data2" class="span_data"></div>
         </td>
@@ -1136,7 +1144,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="45%" id="rightcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Trabajo') ?>
+                <?php echo __('Trabajo') ?>
             </div>
             <div id="right_data2" class="span_data"></div>
         </td>
@@ -1149,15 +1157,15 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     </tr>
 </table>
 
-<table style='border:0px solid black' <?=$txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
+<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
 	<tr>
-		<td align=left><span style=font-weight:bold; font-size:11px; backgroundcolor:#c6dead><?=$txt_opcion?></span></td>
+		<td align=left><span style=font-weight:bold; font-size:11px; backgroundcolor:#c6dead><?php echo $txt_opcion?></span></td>
 	</td>
-	<? if($id_trabajo > 0) { ?>
+	<?php if($id_trabajo > 0) { ?>
 		<td width='40%' align=right>
-			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
+			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('trabajo')" title="Ingresar Trabajo"><u>Ingresar nuevo Trabajo</u></a>
 		</td>
-	<? } ?>
+	<?php } ?>
 	</tr>
 </table>
 <br>
@@ -1166,10 +1174,10 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <table class="border_plomo" id="tbl_trabajo">
     <tr>
         <td align=center>
-        	<span <?=UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        	<span <?php echo UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
         </td>
         <td align=right>
-			<?=__('Cliente')?>
+			<?php echo __('Cliente')?>
         </td>
         <td align=left width="440" nowrap>
 <?
@@ -1192,10 +1200,10 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
      </tr>
      <tr>
         <td align='center'>
-        	<span <?=UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_asunto"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        	<span <?php echo UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_asunto"><img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
         <td align='right'>
-             <?=__('Asunto')?>
+             <?php echo __('Asunto')?>
         </td>
         <td align=left width="440" nowrap>
 <?
@@ -1220,7 +1228,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         	<span id="img_asunto">&nbsp;&nbsp;&nbsp;</span>
 		</td>
         <td align='right'>
-             <?=__('Área Trabajo')?>
+             <?php echo __('Área Trabajo')?>
         </td>
         <td align=left width="440" nowrap>
 <?php
@@ -1232,19 +1240,19 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <?php
 	}
 ?>	
-    <? if( UtilesApp::GetConf($sesion,'UsoActividades') ){ ?>
+    <?php if( UtilesApp::GetConf($sesion,'UsoActividades') ){ ?>
     <tr>
         <td colspan="2" align=right>
-            <?=__('Actividad')?>
+            <?php echo __('Actividad')?>
         </td>
         <td align=left width="440" nowrap>
-            <?= InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t->fields[codigo_actividad]) ?>
+            <?php echo  InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t->fields[codigo_actividad]) ?>
         </td>
     </tr>
-    <? }else{ ?>
+    <?php }else{ ?>
     <input type="hidden" name="codigo_actividad" id="codigo_actividad">
     <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-    <? }
+    <?php }
     if($fecha == '')
     {
 			$date = new DateTime();
@@ -1253,12 +1261,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     ?>
     <tr>
         <td colspan="2" align=right>
-            <?=__('Fecha')?>
+            <?php echo __('Fecha')?>
         </td>
         <td align=left valign="top">
-            <!--<?= Html::PrintCalendar("fecha", $t->fields[fecha] ? $t->fields[fecha] : $fecha); ?>-->
-            <input type="text" name="fecha" value="<?=$t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
-		        <img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+            <!--<?php echo  Html::PrintCalendar("fecha", $t->fields[fecha] ? $t->fields[fecha] : $fecha); ?>-->
+            <input type="text" name="fecha" value="<?php echo $t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
+		        <img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
 <?
 						if (method_exists('Conf','GetConf'))
 						{
@@ -1277,9 +1285,9 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 						{
 ?>
 						&nbsp;
-						<?=__('Ordenado por')?>
+						<?php echo __('Ordenado por')?>
 						&nbsp;
-						<input type="text" name="solicitante" value="<?=$t->fields['solicitante'] ? $t->fields['solicitante'] : ''?>" id="solicitante" size="32" />
+						<input type="text" name="solicitante" value="<?php echo $t->fields['solicitante'] ? $t->fields['solicitante'] : ''?>" id="solicitante" size="32" />
 <?
 						}
 ?>
@@ -1287,7 +1295,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     </tr>
     <tr>
         <td colspan="2" align=right>
-            <?=__('Duración')?>
+            <?php echo __('Duración')?>
         </td>
         <td align=left>
     <?
@@ -1312,7 +1320,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	else if( $tipo_ingreso=='decimal' )
 	{
 ?>
-		<input type="text" name="duracion" value="<?=$t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$duracion_editable ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
+		<input type="text" name="duracion" value="<?php echo $t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$duracion_editable ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
 <?
 	}
 	else if( $tipo_ingreso=='java')
@@ -1323,11 +1331,11 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	{
 		echo Html::PrintTime("duracion",$t->fields[duracion],"onchange='CambiaDuracion(this.form ,\"duracion\");'", $duracion_editable);
 	}
-?>
-			</td>
-<?
 
-	if($permisos->fields['permitido'])
+echo '</td>';
+
+
+	if($permiso_revisor->fields['permitido'])
 		$where = " usuario_permiso.codigo_permiso='PRO' AND ( ";
 	else {
 		$where = " usuario_permiso.codigo_permiso='PRO' 
@@ -1348,17 +1356,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($cantidad_usuarios) = mysql_fetch_array(mysql_query("SELECT FOUND_ROWS();",$sesion->dbh));
 	$select_usuario = Html::SelectResultado($sesion,$resp,"id_usuario", $id_usuario ,'onchange="CargarTarifa();" id="id_usuario"','','width="200"');
-?>
 
-<?
-	if($permisos->fields['permitido'])
+	if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable'))
 	{
-?>
-		<td>
-			&nbsp;&nbsp;<?=__('Duración Cobrable')?>
-		</td>
-		<td>
-<?
+
+		echo '<td>&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td>';
+
 		if($tipo_ingreso=='selector')
 		{
 			$duracion_cobrada = '00:00:00';
@@ -1367,7 +1370,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		else if($tipo_ingreso=='decimal')
 		{
 ?>
-			<input type="text" name="duracion_cobrada" value="<?=$t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
+			<input type="text" name="duracion_cobrada" value="<?php echo $t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
 <?
 		}
 		else if($tipo_ingreso=='java')
@@ -1406,19 +1409,19 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		if($IdiomaGrande)
 		{
 ?>
-				<?=__('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
+				<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
 <?
 		}
 		else
 		{
 ?>
-			<?=__('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
+			<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
 <?
 		}
 ?>
         </td>
         <td align=left>
-            <textarea id="descripcion" cols=45 rows=4 name=descripcion><?= stripslashes($t->fields[descripcion]) ?></textarea></td>
+            <textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo  stripslashes($t->fields[descripcion]) ?></textarea></td>
 
 		<script type="text/javascript">
 			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
@@ -1432,38 +1435,35 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			<tr>
 				<?
 					$mostrar_cobrable=true;
-					if($permiso_profesional->fields['permitido'] && !$permisos->fields['permitido']) {
+					if(!UtilesApp::GetConf($sesion,'PermitirCampoCobrableAProfesional') && $permiso_profesional->fields['permitido'] && !$permiso_revisor->fields['permitido'] && !UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
 						$mostrar_cobrable=false;
 					}
 				?>
 				<td colspan="2" align=right>
 					<?	if($mostrar_cobrable) { ?>
-					<?=__('Cobrable')?><br/>
-					<? } ?>
+					<?php echo __('Cobrable')?><br/>
+					<?php } ?>
 				</td>
 				<td align=left>
 					<?	if($mostrar_cobrable) { ?>
-					<input type=checkbox name=cobrable value=1 <?= $t->fields['cobrable'] == 1 ? "checked" : "" ?> id="chkCobrable" onClick="CheckVisible();">
-					<? } 
+					<input type=checkbox name=cobrable value=1 <?php echo  $t->fields['cobrable'] == 1 ? "checked" : "" ?> id="chkCobrable" onClick="CheckVisible();">
+					<?php } 
 					else {?>
 					<input type=hidden name=cobrable id="chkCobrable" value=1 >
-					<? } ?>
+					<?php } ?>
 					&nbsp;&nbsp;
-					<div id=divVisible <? if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
-					<? if($permisos->fields['permitido']) { ?>
-						<?=__('Visible')?>
-						<input type=checkbox name=visible value=1 <?= $t->fields['visible'] == 1 ? "checked" : "" ?> id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()">
-					<? }
-						 else
-						 {
-					?>
-						<input type=hidden name=visible value=<?= $t->fields['visible'] ? $t->fields['visible'] : 1 ?> id="hiddenVisible">
-					<?
-						 }
+					<div id=divVisible <?php if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
+					<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { 
+						echo __('Visible');
+						echo "<input type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
+					 } else {
+					
+						echo "<input type=\"hidden\" name=\"visible\" value=\"". (($t->fields['visible']) ? $t->fields['visible'] : 1) ."\" id=\"hiddenVisible\" />";
+					 }
 					?>
 					</div>
 					&nbsp;&nbsp;&nbsp;&nbsp;
-<? 
+<?php 
 	if( $cantidad_usuarios > 1 || $permiso_secretaria->fields['permitido'] ) // Depende de que no cambie la función Html::SelectQuery(...)
 	{
 		echo(__('Usuario'));
@@ -1475,7 +1475,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			</td>
 		</tr>
 <?
-		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') && $permisos->fields['permitido'] ) {
+		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') && $permiso_revisor->fields['permitido'] ) {
 			if( $t->fields['id_trabajo'] > 0 ) {
 				if( $t->fields['id_cobro'] > 0 ) {
 					$cobro = new Cobro($sesion);
@@ -1496,20 +1496,20 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 				<?php echo __('Tarifa por hora')?>
 			</td>
 			<td align="left">
-				<input type="text" size="10" id="tarifa_trabajo" disabled style="background-color: white; display: inline; border: 0px; color:black; vertical-align:middle;" value="<?=$tarifa_trabajo != '' ? $tarifa_trabajo : ''?>" />
+				<input type="text" size="10" id="tarifa_trabajo" disabled style="background-color: white; display: inline; border: 0px; color:black; vertical-align:middle;" value="<?php echo $tarifa_trabajo != '' ? $tarifa_trabajo : ''?>" />
 				&nbsp;&nbsp;&nbsp;
 				<?php if( $t->fields['id_trabajo'] > 0 ) { ?>
-				<img src="<?=Conf::ImgDir()?>/money_16.gif" border=0 /><a href='javascript:void(0)' onclick="MostrarTrabajoTarifas()"><?=__('Modificar tarifa del trabajo')?></a>
+				<img src="<?php echo Conf::ImgDir()?>/money_16.gif" border=0 /><a href='javascript:void(0)' onclick="MostrarTrabajoTarifas()"><?php echo __('Modificar tarifa del trabajo')?></a>
 				<?php } ?>
 			</td>
 		</tr>
 <?php if( $t->fields['id_trabajo'] > 0 ) { ?>
 		<tr>
 			<td>
-				<input type="hidden" id="id_moneda_trabajo" value="<?=$id_moneda_trabajo ?>" />
+				<input type="hidden" id="id_moneda_trabajo" value="<?php echo $id_moneda_trabajo ?>" />
 				<div id="TarifaTrabajo" style="display:none; left: 50px; top: 250px; background-color: white; position:absolute; z-index: 4;">
 				<fieldset style="background-color:white;">
-				<legend><?=__('Tarifas por hora')?></legend>
+				<legend><?php echo __('Tarifas por hora')?></legend>
 				<div id="contenedor_tipo_load">&nbsp;</div>
 				<div id="contenedor_tipo_cambio">
 				<table style='border-collapse:collapse;' cellpadding='3'>
@@ -1527,17 +1527,17 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 						{
 						?>
 							<td>
-									<span><b><?=$glosa_moneda?></b></span><br>
-									<input type='text' size=9 id='trabajo_tarifa_<?=$id_moneda?>' name='trabajo_tarifa_<?=$id_moneda?>' onkeyup="MontoValido(this.id);" value='<?=$valor?>' />
+									<span><b><?php echo $glosa_moneda?></b></span><br>
+									<input type='text' size=9 id='trabajo_tarifa_<?php echo $id_moneda?>' name='trabajo_tarifa_<?php echo $id_moneda?>' onkeyup="MontoValido(this.id);" value='<?php echo $valor?>' />
 							</td>
 						<?
 							$num_monedas++;
 						}
 						?>
 					<tr>
-						<td colspan=<?=$num_monedas?> align=center>
-							<input type=button onclick="ActualizarTrabajosTarifas();" value="<?=__('Guardar')?>" />
-							<input type=button onclick="CancelarTrabajoTarifas();" value="<?=__('Cancelar')?>" />
+						<td colspan=<?php echo $num_monedas?> align=center>
+							<input type=button onclick="ActualizarTrabajosTarifas();" value="<?php echo __('Guardar')?>" />
+							<input type=button onclick="CancelarTrabajoTarifas();" value="<?php echo __('Cancelar')?>" />
 						</td>
 					</tr>
 			</table>
@@ -1559,13 +1559,13 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 ?>
 		<tr>
 		<td colspan='3' align='right'>
-					<? if ($id_tabajo > 0)
+					<?php if ($id_tabajo > 0)
 							{ ?>
-					<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Confirmar(this.form)" />
-					<?  }
+					<input type=submit class=btn value=<?php echo __('Guardar')?> onclick="return Confirmar(this.form)" />
+					<?php  }
 						else
 							{ ?>
-					<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form)" />
+					<input type=submit class=btn value=<?php echo __('Guardar')?> onclick="return Validar(this.form)" />
 						<?	} ?>
 				</td>
 		</tr>

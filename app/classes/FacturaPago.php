@@ -88,7 +88,7 @@ class FacturaPago extends Objeto
 			$html .= "<td align=center>".$pago->fields['descripcion']."</td>";
 			$html .= "<td align=center>".$moneda->fields['simbolo']." ".number_format($pago->fields['monto_aporte'],$moneda->fields['cifras_decimales'])."</td>";
 			$html .= "<td align=center>
-									<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&id_factura=".$factura->fields['id_factura']."&id_cobro=".$factura->fields['id_cobro']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
+									<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&id_factura=".$factura->fields['id_factura']."&id_cobro=".$factura->fields['id_cobro']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
 									<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' onclick=\"if( confirm('Está eliminando un pago. Se reajustarán los saldos de los documentos asociados. ¿Desea continuar?') )EliminarPago('".$pago->fields['id_factura_pago']."');\" />
 								</td>";
 			$html .= "</tr>";

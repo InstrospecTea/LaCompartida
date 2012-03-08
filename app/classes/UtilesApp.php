@@ -786,6 +786,10 @@ HTML;
             for($j=0; $row2 = mysql_fetch_assoc($resp2);$j++)
             {
             	$glosa_submenu = __($row2['glosa']);
+				$codigo_submenu = $row2['codigo'];
+				if ( !self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF' ) {
+					//era mas fácil escribir el filtro de esta forma
+				} else {
 				      if( $j == 0 && $i == 0 )
 									{
 										$menu_html .= <<<HTML
@@ -819,7 +823,9 @@ HTML;
             	$menu_html .= <<<HTML
             			<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>$glosa_submenu</a></li>
 HTML;
-            }
+				}
+						
+			}
          $menu_html .= <<<HTML
          				</ul></li>
 HTML;
@@ -829,21 +835,24 @@ HTML;
 HTML;
     $query = "SELECT * FROM menu WHERE codigo_padre='$codigo' AND tipo=0 AND codigo in ('$lista_menu_permiso') ORDER BY orden";
     $resp3 = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-    for($j=0; $row3 = mysql_fetch_assoc($resp3);$j++)
-      {
-      $glosa_submenu = __($row3['glosa']);
-	if($url_actual==$row3['url']) {
+    for($j=0; $row3 = mysql_fetch_assoc($resp3);$j++) {
+		$glosa_submenu = __($row3['glosa']);
+		$codigo_submenu = $row3['codigo'];
+		if ( !self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF' ) {
+			//era mas fácil escribir el filtro de esta forma
+		} else {
+			if($url_actual==$row3['url']) {
 	            	$activo_adentro_ie = 'style="text-decoration: underline;"';
 	            	$activo_adentro_otros = 'style="background: #119011;-webkit-border-radius: 5px; -ms-border-radius: 5px;-moz-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px;"';
-	            	}
-            else {
+	      	} else {
             		$activo_adentro_ie = '';
             		$activo_adentro_otros = '';
-            		}
+         	}
 	$menu_html .= <<<HTML
             			<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>$glosa_submenu</span></a></li><![endif]-->
             			<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>$glosa_submenu</span></a></li><!--<![endif]-->
 HTML;
+		}
      }
     $menu_html .= <<<HTML
       </ul>

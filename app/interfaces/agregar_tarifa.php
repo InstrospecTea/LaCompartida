@@ -165,7 +165,7 @@ function Eliminar()
 	http.send(null);
 	tarifa_defecto_en_bd = http.responseText;
 	
-	if( tarifa_defecto_en_bd != <?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?> ){
+	if( tarifa_defecto_en_bd != <?=$id_tarifa_edicion ? $id_tarifa_edicion : ( $id_tarifa_previa ? $id_tarifa_previa : '0' ) ?> ){
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=contratos_con_esta_tarifa&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
 		http.send(null);
@@ -269,12 +269,12 @@ function CrearTarifa( from, id )
 			<td colspan=<?=$colspan?> align=right>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan=<?=$colspan-1?> align=right width="60%">
+			<td colspan="<?=$colspan?>" align="right" style="text-align:right;" >
 				<input type=submit value='<?=__('Guardar') ?>' class=btn > &nbsp;
-			</td>
-			<td align=left>
+			
 				<input type=button onclick="CrearTarifa( this.form , <?=$id_tarifa_edicion ?> );" value='<?=__('Crear nueva tarifa') ?>' class=btn >
 				<input type=button onclick="self.location.href='tarifas_xls.php?id_tarifa_edicion=<?=$id_tarifa_edicion ?>&glosa=<?=$tarifa->fields['glosa_tarifa'] ?>'" value='<?=__('Imprimir tarifas') ?>' class='btn' >
+				<input type=button onclick="self.location.href='tarifas_xls.php?id_tarifa_edicion=0&glosa=todas_las_tarifas'" value='<?=__('Imprimir Todas') ?>' class='btn' >
 				<input type=button onclick="Eliminar();" value='<?=__('Eliminar Tarifa') ?>' class="btn_rojo" >
 			</td>
 		</tr>
@@ -343,7 +343,7 @@ function CrearTarifa( from, id )
 																WHERE $where
 																ORDER BY prm_categoria_usuario.glosa_categoria,prm_categoria_usuario.id_categoria_usuario, categoria_tarifa.id_moneda ASC";
 	$resp_categoria = mysql_query($query_tarifas_categoria, $sesion->dbh) or Utiles::errorSQL($query_tarifas_categoria,__FILE__,__LINE__,$sesion->dbh);
-	list($id_categoria_usuario_tarifa,$id_tarifa,$tarifa,$id_moneda) = mysql_fetch_array($resp_categoria);
+	list($id_categoria_usuario_tarifa,$id_tarifa,$valor,$id_moneda) = mysql_fetch_array($resp_categoria);
 
 	########## CATEGORIA TARIFA #########
 	$query_categoria = "SELECT id_categoria_usuario, REPLACE(glosa_categoria,' ','_') AS glosa_categoria_corregido 
@@ -370,8 +370,8 @@ function CrearTarifa( from, id )
 			
 			if( $id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario)
 			{
-				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][".$money->fields['id_moneda']."]' value='".$tarifa."' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$tarifa');\"></td> \n";
-				list($id_categoria_usuario_tarifa,$id_tarifa,$tarifa,$id_moneda) = mysql_fetch_array($resp_categoria);
+				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][".$money->fields['id_moneda']."]' value='".$valor."' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$valor');\"></td> \n";
+				list($id_categoria_usuario_tarifa,$id_tarifa,$valor,$id_moneda) = mysql_fetch_array($resp_categoria);
 			}
 			else
 				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][".$money->fields['id_moneda']."]' value='' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda');\"></td> \n";
@@ -419,7 +419,7 @@ function CrearTarifa( from, id )
 														AND usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'
 														ORDER BY usuario.apellido1, usuario.apellido2, usuario.nombre, usuario.id_usuario, usuario_tarifa.id_moneda ASC";
 	$resp = mysql_query($query_tarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas,__FILE__,__LINE__,$sesion->dbh);
-	list($id_usuario_tarifa,$id_tarifa,$tarifa,$id_moneda) = mysql_fetch_array($resp);
+	list($id_usuario_tarifa,$id_tarifa,$valor,$id_moneda) = mysql_fetch_array($resp);
 
 	########## USUARIO TARIFA #########
 	$query = "SELECT usuario.id_usuario, CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
@@ -447,8 +447,8 @@ function CrearTarifa( from, id )
 			
 			if($id_moneda == $money->fields['id_moneda'] && $id_usuario_tarifa == $id_usuario)
 			{
-				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' id='' name='tarifa_moneda[$id_usuario][".$money->fields['id_moneda']."]' value='".$tarifa."' $active tabindex=$tab></td> \n";
-				list($id_usuario_tarifa,$id_tarifa,$tarifa,$id_moneda) = mysql_fetch_array($resp);
+				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' id='' name='tarifa_moneda[$id_usuario][".$money->fields['id_moneda']."]' value='".$valor."' $active tabindex=$tab></td> \n";
+				list($id_usuario_tarifa,$id_tarifa,$valor,$id_moneda) = mysql_fetch_array($resp);
 			}
 			else
 				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' name='tarifa_moneda[$id_usuario][".$money->fields['id_moneda']."]' value='' $active tabindex=$tab></td> \n";

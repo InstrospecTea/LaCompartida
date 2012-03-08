@@ -410,7 +410,7 @@ function AgregarNuevo( name )
 			var asunto = document.getElementById('codigo_asunto').value;
 			urlo='ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' +usuario;
 	<?	} ?>
-	nuevaVentana('Agregar_Tramite',700,470,urlo,'top=100, left=125');
+	nuovaFinestra('Agregar_Tramite',750,470,urlo,'top=100, left=125');
 }
 
 
@@ -545,7 +545,7 @@ function editarMultiplesArchivos()
 	// La página editar_multiples_trabajos.php se encarga de parsear este string.
 	var ids = getIdTrabajosSeleccionados();
 	if(ids != '')
-		nuevaVentana('Editar_múltiples_trámites', 700, 450, 'editar_multiples_tramites.php?ids='+ids+'&popup=1','');
+		nuovaFinestra('Editar_múltiples_trámites', 700, 450, 'editar_multiples_tramites.php?ids='+ids+'&popup=1','');
 	else
 		alert('Debe seleccionar por lo menos un trabajo para editar.');
 }
@@ -689,7 +689,7 @@ function editarMultiplesArchivos()
 		<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trámites">Editar seleccionados</a>
 		<br />
 
-		<a href="#" onclick="nuevaVentana('Editar_listado_trámites',700,450,'editar_multiples_tramites.php?ids=<?=$ids_listado_tramites ?>&popup=1&listado_completo=1','');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+		<a href="#" onclick="nuovaFinestra('Editar_listado_trámites',700,450,'editar_multiples_tramites.php?ids=<?=$ids_listado_tramites ?>&popup=1&listado_completo=1','');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 		 
 		<br /> 
 		<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="window.open('listar_tramites.php?id_cobro=<?=$id_cobro?>&excel=1&motivo=<?=$motivo?>&where=<?=urlencode(base64_encode($where))?>')">
@@ -753,7 +753,7 @@ function editarMultiplesArchivos()
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro']))
-				$opc_html.= "<a href=# onclick=\"nuevaVentana('Editar_Trámite',650,450,'ingreso_tramite.php?id_cobro=".$id_cobro."&id_tramite=".$tramite->fields['id_tramite']."&popup=1&opcion=edit','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+				$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trámite',650,450,'ingreso_tramite.php?id_cobro=".$id_cobro."&id_tramite=".$tramite->fields['id_tramite']."&popup=1&opcion=edit','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
 			else
 				$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\"><img src=$img_dir/editar_off.gif border=0></a>";
 
@@ -779,7 +779,7 @@ function editarMultiplesArchivos()
 			else
 			{
 				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($tramite->fields['id_cobro']))
-					$opc_html.= "<a href=# onclick=\"nuevaVentana('Editar_Trámite',550,450,'ingreso_tramite.php?id_cobro=".$id_cobro."&id_tramite=".$tramite->fields['id_tramite']."&popup=1opcion=edit','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+					$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trámite',550,450,'ingreso_tramite.php?id_cobro=".$id_cobro."&id_tramite=".$tramite->fields['id_tramite']."&popup=1opcion=edit','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
 				else
 					$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" ><img src=$img_dir/editar_off.gif border=0></a>";
 			

@@ -1,8 +1,5 @@
 <?php
- require_once dirname(__FILE__).'/../conf.php';
- require_once dirname(__FILE__).'/es.php';
-
-	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
+ 	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
 	$_LANG['Seguimiento Cobros'] = "Seguimiento Liquidaciones";
 	$_LANG['Seguimiento de cobros'] = "Seguimiento de Liquidaciones";
 	$_LANG['Cobro N°'] = "Liquidación N°";
@@ -196,4 +193,5 @@
 	$_LANG['El cobro seleccionado se encuentra en estado EMITIDO, Ud. debe cambiarlo a estado CREADO o EN REVISION para poder eliminarlo.'] = "La liquidación seleccionada se encuentra en estado EMITIDO, Ud. debe cambiarlo a estado CREADO o EN REVISION para poder eliminarla.";
 	$_LANG['¿Desea eliminar el cobro seleccionado?'] = "¿Desea eliminar la liquidación seleccionada?";
 	$_LANG['No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.'] = "No se puede modificar este trabajo.\nLa Liquidación que lo incluye ya ha sido Emitida al Cliente.";
+
 ?>

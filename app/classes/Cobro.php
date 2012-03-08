@@ -383,7 +383,7 @@ class Cobro extends Objeto {
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				$monto_total = mysql_result($resp, 0, 0);
 				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
-				$estado = round($monto_pagado, 2, PHP_ROUND_HALF_UP) < round($monto_total, 2, PHP_ROUND_HALF_UP) ? "PAGO PARCIAL" : "PAGADO";
+				$estado = round($monto_pagado, 2) < round($monto_total, 2) ? "PAGO PARCIAL" : "PAGADO";
 				if ($estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' )) {
 					$fecha_primer_pago = $this->FechaPrimerPago();
 					$this->Edit('fecha_pago_parcial', $fecha_primer_pago);
@@ -652,7 +652,7 @@ class Cobro extends Objeto {
 			$this->escalonadas[$i2]['escalonada_tarificada'] = 1;
 		}
 	}
-
+	
 	// Para calcular monto honorarios en caso de forma de cobro ESCALONADA
 	function MontoHonorariosEscalonados($lista_trabajos) {
 		$cobro_moneda = new CobroMoneda($this->sesion);
@@ -663,7 +663,20 @@ class Cobro extends Objeto {
 
 		// Contador escalonadas 
 		$x_escalonada = 1;
-
+		$detalle_trabajos = array();
+		
+		$detalle_trabajos['trabajos'] = array();
+		
+		// Crear arreglos para traer datos detallados ...
+		$detalle_trabajos['detalle_escalonadas'] = array();
+		
+		$detalle_trabajos['detalle_escalonadas'][1] = array();
+		$detalle_trabajos['detalle_escalonadas'][1]['usuarios'] = array();
+		$detalle_trabajos['detalle_escalonadas'][1]['trabajos'] = array();
+		
+		$detalle_trabajos['detalle_escalonadas'][1]['totales'] = array();
+		$detalle_trabajos['detalle_escalonadas'][1]['totales']['duracion'] = 0;
+		$detalle_trabajos['detalle_escalonadas'][1]['totales']['valor'] = 0;
 		// Variable para sumar monto total
 		$cobro_total_honorario_cobrable = $this->escalonadas['monto_fijo'];
 
@@ -679,7 +692,9 @@ class Cobro extends Objeto {
 			$valor_trabajo_estandar = 0;
 			$duracion_retainer_trabajo = 0;
 			$aporte_monto_trabajo = 0;
-
+			
+			$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']] = array();
+			
 			if ($trabajo->fields['cobrable']) {
 				// Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada 
 				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
@@ -708,12 +723,14 @@ class Cobro extends Objeto {
 						$tarifa = UtilesApp::CambiarMoneda(
 										Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda'], '', $this->escalonadas[$x_escalonada]['id_tarifa']), $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
 						);
-
-						$valor_trabajo += ( 1 - $this->escalonadas[$x_escalonada]['descuento'] / 100 ) * $duracion_escalonada_actual * $tarifa;
-						$valor_trabajo_hh += ( 1 - $this->escalonadas[$x_escalonada]['descuento'] / 100 ) * $duracion_escalonada_actual * $tarifa;
+						
+						$valor_escalonada_actual = ( 1 - $this->escalonadas[$x_escalonada]['descuento'] / 100 ) * $duracion_escalonada_actual * $tarifa;
+						$valor_trabajo += $valor_escalonada_actual;
+						$valor_trabajo_hh += $valor_escalonada_actual;
 						$valor_trabajo_estandar += ( 1 - $this->escalonadas[$x_escalonada]['descuento'] / 100 ) * $duracion_escalonada_actual * $tarifa_estandar;
 					} else {
 						$duracion_retainer_trabajo += $duracion_escalonada_actual;
+						$valor_escalonada_actual = 0;
 						$valor_trabajo += 0;
 						$valor_trabajo_hh += $duracion_escalonada_actual * $tarifa_estandar;
 						$valor_trabajo_estandar += $duracion_escalonada_actual * $tarifa_estandar;
@@ -721,14 +738,42 @@ class Cobro extends Objeto {
 						// Esa variable hay que sumar al valor cobrado de ese trabajo ...
 						$deltatiempo=$this->escalonadas[$x_escalonada]['tiempo_final'] - $this->escalonadas[$x_escalonada]['tiempo_inicial'];
                                                 if($deltatiempo>0) {
-                                                    $aporte_monto_trabajo += $duracion_escalonada_actual * ( $this->escalonadas[$x_escalonada]['monto'] / ( $deltatiempo ) );
+                                                   $aporte_monto_trabajo += $duracion_escalonada_actual * ( $this->escalonadas[$x_escalonada]['monto'] / ( $deltatiempo ) );
                                                 } else {
                                                    $aporte_monto_trabajo +=  $this->escalonadas[$x_escalonada]['monto']; 
                                                 }
 					}
+					
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['duracion'] = $duracion_escalonada_actual;
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['valor'] = $valor_escalonada_actual;
+					
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['totales']['duracion'] += $duracion_escalonada_actual;
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['totales']['valor'] += $valor_escalonada_actual;
+					
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['usuario'] = $trabajo->fields['usr_nombre'];
+					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['categoria'] = $trabajo->fields['categoria'];
 
+					if( is_array($detalle_trabajos[$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]) ) {
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['duracion'] += $duracion_escalonada_actual;
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['valor'] += $valor_escalonada_actual;
+					} else {
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['duracion'] += $duracion_escalonada_actual;
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['valor'] += $valor_escalonada_actual;
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['usuario'] = $trabajo->fields['usr_nombre'];
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['categoria'] = $trabajo->fields['categoria'];
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['tarifa'] = ( !empty($tarifa) ? $tarifa : 0 );
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['descuento'] = $this->escalonadas[$x_escalonada]['descuento'];
+					}
+					
 					if ($duracion_hora_restante > 0 || $cobro_total_duracion == $this->escalonadas[$x_escalonada]['tiempo_final']) {
-						$x_escalonada++;
+						$detalle_trabajos['detalle_escalonadas'][++$x_escalonada] = array();
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'] = array();
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'] = array();
+						
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['totales'] = array();
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['totales']['duracion'] = 0;
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['totales']['valor'] = 0;
+						
 						if ($duracion_hora_restante > 0) {
 							$duracion = $duracion_hora_restante;
 						} else {
@@ -740,8 +785,19 @@ class Cobro extends Objeto {
 				}
 
 				$cobro_total_honorario_cobrable += $valor_trabajo;
-				$tarifa_hh = $valor_trabajo_hh / $duracion_trabajo;
-				$tarifa_hh_estandar = $valor_trabajo_estandar / $duracion_trabajo;
+				if( $duracion_trabajo > 0 ) {
+					$tarifa_hh = $valor_trabajo_hh / $duracion_trabajo;
+					$tarifa_hh_estandar = $valor_trabajo_estandar / $duracion_trabajo;
+				} else {
+					$tarifa_hh = 0;
+					$tarifa_hh_estandar = 0;
+				}
+				
+				$detalle_trabajos['trabajos'][$trabajo->fields['id_trabajo']]['usr_nombre'] = $trabajo->fields['usr_nombre'];
+				$detalle_trabajos['trabajos'][$trabajo->fields['id_trabajo']]['categoria'] = $trabajo->fields['categoria'];
+				$detalle_trabajos['trabajos'][$trabajo->fields['id_trabajo']]['duracion'] = $trabajo->fields['duracion_cobrada'];
+				$detalle_trabajos['trabajos'][$trabajo->fields['id_trabajo']]['tarifa'] = $tarifa_hh;
+				$detalle_trabajos['trabajos'][$trabajo->fields['id_trabajo']]['importe'] = $valor_trabajo + $aporte_monto_trabajo;
 
 				$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
 				$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
@@ -757,7 +813,7 @@ class Cobro extends Objeto {
 		}
 		$total_minutos_tmp = ( $cobro_total_duracion * 60 ) ;
 		
-		return array($cobro_total_honorario_cobrable, $total_minutos_tmp);
+		return array($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos );
 	}
 
 	// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos
@@ -10321,7 +10377,137 @@ class Cobro extends Objeto {
 				$html = str_replace('%valor_honorarios_monedabase%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
+				
 			case 'RESUMEN_PROFESIONAL':
+				if( $this->fields['forma_cobro'] == 'ESCALONADA' ) {
+					$cobro_valores = array();
+	
+					$cobro_valores['totales'] = array();
+					$cobto_valores['datos_escalonadas'] = array();
+
+					$this->CargarEscalonadas();
+					$cobro_valores['datos_escalonadas'] = $this->escalonadas;
+
+
+					$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
+
+					// Se seleccionan todos los trabajos del cobro, se incluye que sea cobrable ya que a los trabajos visibles
+					// tambien se consideran dentro del cobro, tambien se incluye el valor del retainer del trabajo.
+					$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada, 
+									trabajo.descripcion, 
+									trabajo.fecha, 
+									trabajo.id_usuario, 
+									$dato_monto_cobrado as monto_cobrado, 
+									trabajo.id_moneda as id_moneda_trabajo, 
+									trabajo.id_trabajo, 
+									trabajo.tarifa_hh, 
+									trabajo.cobrable, 
+									trabajo.visible, 
+									trabajo.codigo_asunto, 
+									CONCAT_WS(' ', nombre, apellido1) as usr_nombre, 
+									prm_categoria_usuario.glosa_categoria as categoria 
+							FROM trabajo
+							JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario 
+							WHERE trabajo.id_cobro = '".$this->fields['id_cobro']."' 
+							AND trabajo.id_tramite=0
+							ORDER BY trabajo.fecha ASC";
+					$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
+
+					list($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos) = $this->MontoHonorariosEscalonados($lista_trabajos);
+
+					$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
+					$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
+					$cobro_valores['detalle'] = $detalle_trabajos;
+
+					$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
+
+					$resumen_encabezado = $this->GenerarDocumento2($parser, 'PROFESIONAL_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto);
+
+					$html = "<br /><span class=\"subtitulo_seccion\">%glosa_profesional%</span><br>";
+					$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
+
+					$esc = 1;
+					while ( $esc <= $cantidad_escalonadas ) {
+						if( is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios']) ) {
+							$html .= "<h4>Escalon $esc: ";
+							if( $cobro_valores['datos_escalonadas'][$esc]['monto'] > 0 ) {
+								$html .= " Monto Fijo ".$cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo']." ".$cobro_valores['datos_escalonadas'][$esc]['monto']."</h4>";
+							} else {
+								$html .= " Tarifa HH";
+								if( $cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0 ) {
+									$html .= " con ".$cobro_valores['datos_escalonadas'][$esc]['descuento']."% de descuento";
+								}
+								$html .= "</h4>";
+							}
+							$html .= "<table class=\"tabla_normal\" width=\"100%\">";
+							$html .= $resumen_encabezado;
+
+							foreach( $cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'] as $id_usuario => $usuarios ) {
+								$resumen_fila = $parser->tags['PROFESIONAL_FILAS'];
+
+								$resumen_fila = str_replace('%nombre%', $usuarios['usuario'], $resumen_fila);
+								if( $this->fields['opc_ver_profesional_categoria'] ) 
+									$resumen_fila = str_replace('%categoria%', $usuarios['categoria'], $resumen_fila);
+								else 
+									$resumen_fila = str_replace('%categoria%', '', $resumen_fila);
+								$resumen_fila = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora( round($usuarios['duracion'],2) ), $resumen_fila );
+								$resumen_fila = str_replace('%hh_trabajada%', '', $resumen_fila);
+								if( $this->fields['opc_ver_profesional_tarifa'] ) {
+									$resumen_fila = str_replace('%td_tarifa%', '<td align="center">%tarifa_horas_demo%</td>', $resumen_fila);
+									$resumen_fila = str_replace('%td_tarifa_ajustada%', '<td align="center">%tarifa_horas_demo%</td>', $resumen_fila);
+								} else {
+									$resumen_fila = str_replace('%td_tarifa%', '', $resumen_fila);
+									$resumen_fila = str_replace('%td_tarifa_ajustada%', '', $resumen_fila);
+								}
+								$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $resumen_fila);
+								if( $this->fields['opc_ver_profesional_importe'] ) {
+									$resumen_fila = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
+									$resumen_fila = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
+								} else {
+									$resumen_fila = str_replace('%td_importe%', '', $resumen_fila);
+									$resumen_fila = str_replace('%td_importe_ajustado%', '', $resumen_fila);
+								} 
+								$resumen_fila = str_replace('%total_horas_demo%', number_format($usuarios['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $resumen_fila);
+
+								$resumen_fila = str_replace('%td_descontada%', '', $resumen_fila);
+								$resumen_fila = str_replace('%td_cobrable%', '', $resumen_fila);
+								$resumen_fila = str_replace('%td_retainer%', '', $resumen_fila);
+								if( $usuarios['duracion'] > 0 ) {
+									$html .= $resumen_fila;
+								}
+							}
+							// Total
+							$resumen_total = $parser->tags['PROFESIONAL_TOTAL'];
+
+							$resumen_total = str_replace('%glosa%',__('Total'), $resumen_total);
+							$resumen_total = str_replace('%hh_trabajada%', '', $resumen_total);
+							$resumen_total = str_replace('%td_descontada%', '', $resumen_total);
+							$resumen_total = str_replace('%td_cobrable%', '', $resumen_total);
+							$resumen_total = str_replace('%td_retainer%', '', $resumen_total);
+							$resumen_total = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora( round( $cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2) ), $resumen_total);
+							if( $this->fields['opc_ver_profesional_tarifa'] ) {
+								$resumen_total = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $resumen_total);
+								$resumen_total = str_replace('%td_tarifa_ajustada%', '<td>&nbsp;</td>', $resumen_total);
+							} else {
+								$resumen_total = str_replace('%td_tarifa%', '', $resumen_total);
+								$resumen_total = str_replace('%td_tarifa_ajustada%', '', $resumen_total);
+							}
+							if( $this->fields['opc_ver_profesional_importe'] ) {
+								$resumen_total = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $resumen_total);
+								$resumen_total = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_demo%</td>', $resumen_total);
+							} else {
+								$resumen_total = str_replace('%td_importe%', '', $resumen_total);
+								$resumen_total = str_replace('%td_importe_ajustado%', '', $resumen_total);
+							}
+							$resumen_total = str_replace('%total_horas_demo%', number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'],$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'],'.',''), $resumen_total);
+							$html .= $resumen_total;
+							$html .= "</table>";
+						}
+						$esc++;
+					}
+					return $html;
+				}
 				$columna_hrs_retainer = $GLOBALS['columna_hrs_retainer'];
 				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
 				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
@@ -10683,7 +10869,7 @@ class Cobro extends Objeto {
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $resumen_filas, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
-				break;
+			break;
 
 			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA':
 				if ($this->fields['opc_ver_profesional'] == 0)

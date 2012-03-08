@@ -369,17 +369,16 @@ $tini=time();
 				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2, $cobro['codigo_asunto'] );
 				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2, $cobro['codigo_asunto'] );
 				$horas_no_cobradas = $contrato->TotalHoras( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-                                list($monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato) = $contrato->TotalMonto( false, '', $fecha1, $fecha2 );
-                                list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+								list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,$cantidad_asuntos,$monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,$monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->TotalMontoPlus( false, $cobro['codigos_asuntos'], $fecha1, $fecha2 );
+
 				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
                         }
 			else {
 				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2 );
 				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2 );
 				$horas_no_cobradas = $contrato->TotalHoras( false, '', $fecha1, $fecha2 );
-				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, '', $fecha1, $fecha2 );
-				list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, '', $fecha1, $fecha2 );
+								list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,$cantidad_asuntos,$monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,$monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->TotalMontoPlus( false, '', $fecha1, $fecha2 );
+
 				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, '', $fecha1, $fecha2 );
 			} 
 			$id_ultimo_cobro = $contrato->UltimoCobro();
@@ -584,13 +583,10 @@ $tini=time();
                             $ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $formato_tiempo);
                         }
 		}
- $tfin=time();
-                $ws1->write(3,3,"demora ". ($tfin-$tini)." segundos",$formato_texto);
-                                $ws1->write(3,4,"desde ". $fecha1." a ".$fecha2,$formato_texto);
 
 		$wb->send("Planilla horas por facturar.xls");
 		$wb->close();
-                
+                 $tfin=time();
                 mail('ffigueroa@lemontech.cl','gen reporte','Demoró mas o menos'.($tfin-$tini));
 		exit;
 	}

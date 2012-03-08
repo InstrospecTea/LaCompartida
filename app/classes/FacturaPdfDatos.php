@@ -95,6 +95,53 @@
 			return $glosa_dato;
 		}
 		
+                function CargarFilaDato( $id_factura )
+		{
+			$factura = new Factura($this->sesion);
+			$factura->Load($id_factura);
+			
+			$cobro = new Cobro($this->sesion);
+			$cobro->Load($factura->fields['id_cobro']);
+			
+			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
+			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
+			
+			$arreglo_monedas = ArregloMonedas($this->sesion);
+			$monto_palabra=new MontoEnPalabra($this->sesion);
+			$fila=array();
+			
+				$fila['razon_social']= $factura->fields['cliente']; 
+				$fila[ 'rut']= 				$factura->fields['RUT_cliente'];
+				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
+				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
+				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
+				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1); 
+				$fila[ 'direccion']=			$factura->fields['direccion_cliente']; 
+				$fila[ 'descripcion_honorarios']=		$factura->fields['descripcion']; 
+				$fila[ 'descripcion_gastos_con_iva']= 	$factura->fields['descripcion_subtotal_gastos']; 
+				$fila[ 'descripcion_gastos_sin_iva']=	$factura->fields['descripcion_subtotal_gastos_sin_impuesto']; 
+				$fila[ 'monto_honorarios']= 		number_format($factura->fields['subtotal_sin_descuento'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
+				$fila[ 'monto_gastos_con_iva']= 		number_format($factura->fields['subtotal_gastos'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
+				$fila[ 'monto_gastos_sin_iva']= 		number_format($factura->fields['subtotal_gastos_sin_impuesto'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
+				$fila[ 'moneda_honorarios']= 		$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'moneda_gastos_con_iva']= 		$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'moneda_gastos_sin_iva']= 		$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'monto_en_palabra']= 		strtoupper($monto_palabra->ValorEnLetras($factura->fields['total'],$factura->fields['id_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda'],$arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])); 
+				$fila[ 'porcentaje_impuesto']= 		$factura->fields['porcentaje_impuesto']."%"; 
+				$fila[ 'moneda_subtotal']= 		$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'moneda_iva']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'moneda_total']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'monto_subtotal']= 			number_format( 
+												$factura->fields['subtotal_sin_descuento'] + $factura->fields['monto_gastos_con_iva'] + $factura->fields['monto_gastos_sin_iva'],
+												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+												$idioma->fields['separador_decimales'],
+												$idioma->fields['separador_decimales']); 
+				$fila[ 'monto_iva']= 			number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); 
+				$fila[ 'monto_total']=			number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); 
+						
+			return $fila;
+		}
+                
 		function generarFacturaPDF($id_factura, $mantencion = false)
 		{
 			require_once Conf::ServerDir().'/../app/fpdf/fpdf.php';

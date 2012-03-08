@@ -183,10 +183,7 @@ function ActualizarEstado(indice)
 		$('estado').selectedIndex = indice;
 }
 
-function Cerrar()
-{
-	window.close();
-}
+
 
 function Validar(form)
 {

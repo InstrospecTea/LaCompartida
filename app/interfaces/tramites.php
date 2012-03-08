@@ -319,7 +319,7 @@ function EliminaTramite(id_tramite_tipo)
 function EditarTramite( id_tramite_tipo ) 
 {
 	var urlo = "tramites.php?id_tramite_tipo=" + id_tramite_tipo + "&popup=1&opcion=editar";
-	nuevaVentana('Editar_Tramite',730,470,urlo,'top=100, left=125');
+	nuovaFinestra('Editar_Tramite',730,470,urlo,'top=100, left=125');
 }
 
 function AgregarNuevo( tipo )
@@ -327,7 +327,7 @@ function AgregarNuevo( tipo )
 	var nombre = document.getElementById('glosa_tramite').value;
 	
 	var urlo = "tramites.php?popup=1&opcion=agregar&glosa_tramite=" + nombre;
-	nuevaVentana('Agregar_Tramite',730,470,urlo,'top=100, left=125');
+	nuovaFinestra('Agregar_Tramite',730,470,urlo,'top=100, left=125');
 }
 
 function Refrescar()

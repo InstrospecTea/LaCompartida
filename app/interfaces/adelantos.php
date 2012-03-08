@@ -114,16 +114,7 @@
 		if(tipo == 'adelanto')
 		{
 			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
-
-                        if(window.hs===undefined) {
-                            	return	nuevaVentana('Agregar_Adelanto', 720, 420, urlo, 'top=100, left=125');
-
-                        }else {
-                             var objeto = document.createElement('a');
-                             objeto.href=urlo;
-                             objeto.title='Agregar Adelanto';
-                                return hs.htmlExpand(objeto, {objectType: 'iframe',height:580,width:800});
-                        }
+                        return	nuovaFinestra('Agregar_Adelanto', 720, 500, urlo, 'top=100, left=125');
         
                 }
     

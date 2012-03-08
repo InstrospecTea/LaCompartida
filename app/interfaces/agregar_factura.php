@@ -939,10 +939,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 				return true;
 			}
 
-			function Cerrar()
-			{
-				window.close();
-			}
+			
 
 			function desgloseMontosFactura(form){
 				var porcentaje_impuesto = <?= $porcentaje_impuesto; ?>;

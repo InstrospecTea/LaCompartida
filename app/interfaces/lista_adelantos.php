@@ -131,19 +131,7 @@ $accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Agrega
 }
 ?>
 <script type="text/javascript" charset="utf-8">
-    function nuovaFinestra( name, w, h, url, opciones ) {
-        
-                if(window.hs===undefined) {
-                             return  nuevaVentana( name, w, h, url, opciones );
-                        }else {
-                             var objeto = document.createElement('a');
-                             objeto.href=url;
-                             objeto.title=name;
-                                return hs.htmlExpand(objeto, {objectType: 'iframe',height:h,width:w});
-                        }
-        
-    }
-    
+
 	function EliminarAdelanto(adelanto)
 	{
 		if (confirm('¿Esta seguro que desea eliminar el adelanto?'))

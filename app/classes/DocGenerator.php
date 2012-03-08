@@ -256,7 +256,7 @@ class DocGenerator
 		else
 		{
 			$this->formatBuffer .= "   mso-header: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
-			$this->formatBuffer .= "	 mso-footer: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
+			$this->formatBuffer .= "   mso-footer: url('".Conf::Host()."app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
 		}
 		$this->formatBuffer .= "}\r\n";
 		$this->formatBuffer .= "div.$sessionName\r\n";

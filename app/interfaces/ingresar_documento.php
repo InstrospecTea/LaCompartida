@@ -201,11 +201,7 @@ function showCalendar(element, input, container, source)
 document.observe('dom:loaded', function() {
 });
 
-function Cerrar()
-{
-	window.opener.Refrescar();
-	window.close();
-}
+
 
 function Validar(form)
 {
