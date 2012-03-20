@@ -4,15 +4,16 @@ require_once(dirname(__FILE__).'/../app/conf.php');
 require_once(dirname(__FILE__).'/lib/limonade.php');
 
 function wsClient() {
-    $webservice=Conf::Rootdir().'web_services/webservices.php?wsdl';
+    $webservice=str_replace('//','/',Conf::Rootdir().'/web_services/webservices.php?wsdl');
 	return new SoapClient($webservice);
 }
 
 dispatch_get('/', 'root');
 function root() {
-    $redirect=Conf::Rootdir().'movil/public/index.php';
+    $redirect=str_replace('//','/',Conf::Rootdir().'/movil/public/index.php');
 	redirect_to($redirect);
 }
+
 
 
 dispatch_post('/login', 'check_login');
