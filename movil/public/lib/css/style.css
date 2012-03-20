@@ -1,0 +1,188 @@
+
+* { margin: 0; padding: 0;font-family:arial}
+				
+		.x-input-text, .x-input-password{
+			color: #DDD;		
+		}
+		
+		
+		.x-button img.relojBlink{
+			//opacity:1;			
+			background-image: -webkit-linear-gradient(white, white 100%, white);
+			-webkit-animation-name: blinker; 
+			-webkit-animation-iteration-count: infinite; 
+			-webkit-animation-timing-function: cubic-bezier(1.0,0,0,1.0); 
+			-webkit-animation-duration: 1s;
+		}		
+				
+			
+			
+		@keyframes 'blink' {
+			0% { opacity: 0.3; }
+			100% { opacity: 1; }
+		}
+
+		@-webkit-keyframes blinker { 
+			from { opacity: 1.0; } to { opacity: 0.0; } 
+		} 
+		
+		.css3-blink { 
+			-webkit-animation-name: blinker; 
+		} 
+		
+				
+		.number
+		{
+			background: #141212; 
+			background: -moz-linear-gradient(top, #141212 0%, #232323 50%, #0a0e0a 50%, #0a0809 100%); 
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#141212), color-stop(50%,#232323), color-stop(50%,#0a0e0a), color-stop(100%,#0a0809)); 
+			border-radius: 15px;
+			-moz-border-radius: 15px;
+			line-height: 180%;
+			color:#fff;
+			font-size:600%;
+			font-weight:bold;
+			height:1000%;
+			width:100%;
+			
+			position:relative;
+			-webkit-box-shadow: 0px 4px 0px #181818;
+			border-left:solid 1px #000;
+			border-right:solid 1px #000;
+			border-bottom:solid 1px #262626;
+			
+			margin:0 3%;
+			text-align:center;
+			-webkit-box-shadow: 0px 10px 15px #000000;
+			-moz-box-shadow: 0px 10px 15px #000000;
+			box-shadow: 0px 10px 15px #000000;
+		
+		}
+		
+		
+		.number hr
+		{
+			border-top:solid 3px RGBA(0,0,0,0.9);
+			border-bottom:solid 3px RGBA(87,87,87,0.9);
+			border-left:none;
+			border-right:none;
+			position:absolute;
+			top: 50%;
+			z-index:9999;
+			width:100%;
+		}
+	
+	
+	
+		.x-button-enviar {
+		  -webkit-animation-name: rotateThis;
+		  -webkit-animation-duration:0.45s;
+		  -webkit-animation-iteration-count:infinite;
+		  -webkit-animation-timing-function:linear;
+		}
+		@-webkit-keyframes rotateThis {
+		  from {-webkit-transform: rotate(0deg);}
+		  to {-webkit-transform:  rotate(360deg);}
+		} 
+		
+		.x-list-header2 {
+			color: #1F3651;
+			text-shadow: rgba(255, 255, 255, 0.25) 0 0.08em 0;
+			font-weight: bold;
+			font-size: 1.0em;
+			text-shadow: rgba(255, 255, 255, 0.25) 0 0.08em 0;
+			position: absolute;
+		}
+		
+		.x-list-header3 {
+			background-color: #AAA;
+			background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #363636), color-stop(2%, #1C1C1C), color-stop(100%, #282828));
+			background-image: -webkit-linear-gradient(#363636,#1C1C1C 2%,#282828);
+			background-image: linear-gradient(#363636,#1C1C1C 2%,#282828);
+			color: #5D5D5D;
+			text-shadow: rgba(255, 255, 255, 0.25) 0 0.08em 0;
+			border-top: 1px solid #AAA;
+			border-bottom: 1px solid #777;
+			font-weight: bold;
+			font-size: 0.8em;
+			padding: 0.2em 1.02em;
+			text-shadow: rgba(255, 255, 255, 0.25) 0 0.08em 0;
+			-webkit-box-shadow: 0px 0.1em 0.3em rgba(0, 0, 0, 0.3);
+		}
+		
+		.errorField-tab{
+			text-align: center;
+			font-size: 0.8em; 
+			color: red;		
+		}
+				
+		.x-button-backs::after{
+			background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #BCCFE6), color-stop(2%, #6792C5), color-stop(100%, #3F6EA6));
+			background-image:linear-gradient(#BCCFE6, #6792C5 2%, #3F6EA6);
+		}
+		
+		@include sencha-button-ui('myBack', #6792C5, 'flat');
+		
+		.x-button-back2{
+			-webkit-background-clip: padding-box;
+			-webkit-box-align: center;
+			-webkit-box-shadow: rgba(255, 255, 255, 0.0976563) 0px 1px 0px 0px;
+			-webkit-user-select: none;
+			background-clip: padding-box;
+			background-color: #CCC;
+			background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0.02, #1F2F41), to(#080C11));
+			border-bottom-color: black;
+			border-bottom-left-radius: 5px;
+			border-bottom-right-radius: 5px;
+			border-bottom-style: solid;
+			border-bottom-width: 1px;
+			border-left-color: black;
+			border-left-style: solid;
+			border-left-width: 1px;
+			border-right-color: black;
+			border-right-style: solid;
+			border-right-width: 1px;
+			border-top-color: black;
+			border-top-left-radius: 5px;
+			border-top-right-radius: 5px;
+			border-top-style: solid;
+			border-top-width: 1px;
+			box-sizing: border-box;
+			color: white;
+			display: -webkit-box;
+			font-family: arial;
+			font-size: 15px;
+			font-weight: bold;
+			height: 26px;
+			margin-bottom: 0px;
+			margin-left: 12px;
+			margin-right: 2px;
+			margin-top: 0px;
+			min-height: 26px;
+			overflow-x: visible;
+			overflow-y: visible;
+			padding-bottom: 4px;
+			padding-left: 5px;
+			padding-right: 8px;
+			padding-top: 4px;
+			position: relative;
+			text-shadow: rgba(0, 0, 0, 0.496094) 0px -1px 0px;
+			width: 48px;
+			z-index: 1;	
+		
+		}
+	
+		.logoLemon {
+			background: url('../images/logoLemon.png') center 0 no-repeat ;
+			background-size: 11em;
+			background-color: #111;
+		}
+		
+		.logoLemonRotation {
+			//background: url('lemonRotation.png') center no-repeat;						
+			background: url('../images/logoLemon.png') center no-repeat;
+			background-size: 17em 4.28em;
+			background-color: #FFF;
+			height:200px;
+			//width:155;
+		}
