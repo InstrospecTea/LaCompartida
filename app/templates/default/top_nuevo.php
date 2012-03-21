@@ -8,8 +8,7 @@
 	$sesion = new Sesion( array() );
         $rel='v ';
           if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 13,5)) $rel.=$versionsvn; 
-           if (file_exists(Conf::ServerDir().'/../app/version_db.php') and $versiondb=file_get_contents(Conf::ServerDir().'/../app/version_db.php', NULL, NULL, 13,5)) $rel.=' db'.$versiondb; 
-		
+        if (file_exists(Conf::ServerDir().'/../app/version_db.php'))  $rel.=' db'.$VERSION; 		
       
 ?>
 <style type="text/css">
