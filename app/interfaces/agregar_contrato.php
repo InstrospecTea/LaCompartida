@@ -23,7 +23,7 @@ require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 $tip_tasa = __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
 $tip_suma = __("Es un único monto de dinero para el asunto. Aquí interesa llevar la cuenta de HH para conocer la rentabilidad del proyecto. Esta es la única modalida de ") . __("cobro") . __(" que no puede tener límites.");
 $tip_retainer = __("El cliente compra un número de HH. El límite puede ser por horas o por un monto.");
-	$tip_retainer_usuarios = __("Si usted selecciona usuarios en esta lista, las horas de estos usuarios se van a descontar de las horas retainer con preferencia");
+$tip_retainer_usuarios = __("Si usted selecciona usuarios en esta lista, las horas de estos usuarios se van a descontar de las horas retainer con preferencia");
 $tip_proporcional = __("El cliente compra un número de horas, el exceso de horas trabajadas se cobra proporcional a la duración de cada trabajo.");
 $tip_flat = __("El cliente acuerda cancelar un <strong>monto fijo</strong> por atender todos los trabajos de este asunto. Puede tener límites por HH o monto total");
 $tip_cap = __("Cap");
@@ -48,6 +48,7 @@ $query_permiso_tarifa = "SELECT count(*)
 							FROM usuario_permiso
 							WHERE id_usuario = '{$sesion->usuario->fields['id_usuario']}'
 							AND codigo_permiso = 'TAR' ";
+                            
 $resp_permiso_tarifa = mysql_query($query_permiso_tarifa, $sesion->dbh) or Utiles::errorSQL($query_permiso_tarifa, __FILE__, __LINE__, $sesion->dbh);
 list( $cantidad_permisos ) = mysql_fetch_array($resp_permiso_tarifa);
 
@@ -893,10 +894,80 @@ function SetFormatoRut()
 		}
 	}
 	
-	function ActualizarFormaCobro()
-	{
-
-		if(jQuery("#fc1").is(':checked'))
+	function ActualizarFormaCobro(laID) {
+		
+		if(!laID) {
+		  if(jQuery("#fc1").is(':checked')) laID='fc1';
+			
+		else if(jQuery("#fc2").is(':checked'))
+			laID='fc2';
+		else if(jQuery("#fc3").is(':checked'))
+			laID='fc3';
+		else if(jQuery("#fc5").is(':checked'))
+			laID='fc5';
+		else if(jQuery("#fc6").is(':checked'))
+			laID='fc6';
+		else if(jQuery("#fc7").is(':checked'))
+			laID='fc7';
+		else if(jQuery("#fc8").is(':checked'))
+			laID='fc8';
+		}
+		   
+		jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).hide();
+		jQuery("#div_retainer_usuarios").css('display','inline').hide();
+                jQuery("#div_monto").hide();
+                jQuery("#div_horas").hide();
+		jQuery("#span_monto").hide();
+		jQuery("#div_fecha_cap").hide();
+		jQuery("#div_escalonada").hide();
+		jQuery("#tabla_hitos").hide();
+                jQuery("#id_moneda_monto").show();
+		 
+		
+		   if(laID=="fc1") {	//ShowTHH();
+		       jQuery("#div_horas").show();
+		       jQuery("#span_monto").show();
+		    jQuery("#divthh").fadeTo('fast',1);
+		   } else if(laID=="fc2") {	    //ShowRetainer();
+		       jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).show();
+			jQuery("#div_monto").show();
+			jQuery("#div_horas").show();
+			jQuery("#span_monto").show();
+			jQuery("#divthh").fadeTo('fast',1);
+		       jQuery("#div_retainer_usuarios").css('display','inline').show();
+		       
+		   } else if(laID=="fc3")	{   //ShowFlatFee();
+		         jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).show();
+			jQuery("#div_monto").show();
+			jQuery("#span_monto").show();
+			jQuery("#divthh").fadeTo('slow',0.2);
+		   } else if(laID=="fc5")	{   //ShowCap();
+		        jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).show();
+			jQuery("#div_monto").show();
+			jQuery("#span_monto").show();
+		       jQuery("#div_fecha_cap").show();
+		     jQuery("#divthh").fadeTo('fast',1);
+		      
+		   } else if(laID=="fc6")	{   //ShowProporcional();
+		        jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).show();
+			jQuery("#div_monto").show();
+			jQuery("#span_monto").show();
+			 jQuery("#div_horas").show();
+			jQuery("#divthh").fadeTo('fast',1);
+		   } else if(laID=="fc7") {	//ShowHitos();
+		   jQuery("#div_forma_cobro").css({'width':'500px','margin-left':'21%'}).show();
+		   jQuery("#div_monto").show();
+		  jQuery("#divthh").fadeTo('slow',0.2);
+		   jQuery("#tabla_hitos").slideDown();
+		  
+		   } else if(laID=="fc8") {//	ShowEscalonada();
+		   jQuery("#div_forma_cobro").css({'width':'720px','margin-left':'5%'}).show();
+		  jQuery("#divthh").fadeTo('slow',0.2);
+		   jQuery("#div_escalonada").slideDown();
+		    
+		   }
+		
+		/*if(jQuery("#fc1").is(':checked'))
 			ShowTHH();
 		else if(jQuery("#fc2").is(':checked'))
 			ShowRetainer();
@@ -909,8 +980,9 @@ function SetFormatoRut()
 		else if(jQuery("#fc7").is(':checked'))
 			ShowHitos();
 		else if(jQuery("#fc8").is(':checked'))
-			ShowEscalonada();
+			ShowEscalonada();*/
 	}
+
 	function CreaTarifa(form, opcion, id_tarifa)
 	{
 		var form = $('formulario');
@@ -1262,7 +1334,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			{
 				var response = http.responseText;
 				if( response == "~noexiste" )
-					alert( "Ústed no tiene cuentas en este banco." );
+					alert( "Usted no tiene cuentas en este banco." );
 				else
 				{
 					$(destino).options.length = 0;
@@ -1330,7 +1402,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					var cliente = '';
 				} else {
 					var cobro_independiente = '&cobro_independiente=NO';
-					var cliente = '&codigo_cliente='+$('codigo_cliente').value;
+					//var cliente = '&codigo_cliente='+$('codigo_cliente').value;
+					
+					var cliente = '&codigo_cliente='+$('<?php echo UtilesApp::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente'; ?>').value;
+					
 				}
 			} else {
 				var cliente = '';
@@ -1492,26 +1567,41 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	var mismoEncargado = <?= UtilesApp::GetConf($sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
 	function CambioEncargado(elemento){
-		<?php if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && $desde_agrega_cliente): ?>
+		<?php 
+		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") ) { 
+			
+			if( $desde_agrega_cliente ) {
+		?>
 		if (elemento.name == "id_usuario_responsable") {
 			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) { ?> 
 				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
 				$('id_usuario_secundario').disabled = "disabled";
 			<?php } else { ?>
+				
 				$('id_usuario_encargado').value = $('id_usuario_responsable').value;
 				$('id_usuario_encargado').disabled = "disabled";
 			<?php } ?>
 		}
-		<?php else: ?>
-		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){
+		<?php 
+		
+			}		
+		} else { 
+		?>
+		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
 			if(confirm('¿Desea cambiar también el <?= __('Encargado Secundario') ?>?')){
-				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+				if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) {
+					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+				} else {
+					$('id_usuario_encargado').value = $('id_usuario_responsable').value;
+				}				
 			}
 			else{
 				mismoEncargado = false;
 			}
 		}
-		<?php endif; ?>
+		<?php 		
+		} 
+		?>
 	}
 
 	function agregarHito(){
@@ -1572,6 +1662,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function eliminarHito(elem){
 		if(confirm('¿Está seguro que desea eliminar este hito?')) $(elem).up('tr').remove();
 	}
+	
 </script>
 <?php if ($popup && !$motivo) { ?>
 	<form name='formulario' id='formulario' method=post>
@@ -1684,21 +1775,26 @@ if (!$contrato->loaded()) {
 				<?php 
 					} else { 
 						if ( $contrato_defecto->Loaded() && $contrato->Loaded()){ 							
-							if ($contrato_defecto->fields["id_contrato"] != $contrato->fields["id_contrato"]) { 
+							if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && !$desde_agrega_cliente ) {
+								echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 				?>
-							<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
-				<?php 								
-							}
-							
-							if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') ) {
-								$disable_select = ' disabled="disabled"';
+								<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php
 							} else {
-								$disable_select = '';
-							}
-						 }
+								echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
+								if ($contrato_defecto->fields["id_contrato"] != $contrato->fields["id_contrato"]) { 
 				?>
-					<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"' . $disable_select, "Vacio", "200"); ?>
-				<?php } ?>
+								<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php 								
+								}
+							}
+						 } else if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && $desde_agrega_cliente ) {
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
+						 } else {
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', '', "Vacio", "200");
+						 }
+					} 
+				?>
 				</td>
 			</tr>
 			<?
@@ -1970,21 +2066,21 @@ $config_validar_tarifa = ( method_exists('Conf', 'GetConf') && Conf::GetConf($se
 ?>
 
 		<!-- COBRANZA -->
-		<fieldset style="width: 97%; background-color: #FFFFFF;">
+		<fieldset style="width: 98%; background-color: #FFFFFF;">
 			<legend <?= !$div_show ? 'onClick="MuestraOculta(\'datos_cobranza\')" style="cursor:pointer"' : '' ?> />
 		<?= !$div_show ? '<span id="datos_cobranza_img"><img src="' . Conf::ImgDir() . '/mas.gif" border="0" id="datos_cobranza_img"></span>' : '' ?>
 			&nbsp;<?= __('Datos de Tarificación') ?>
 			</legend>
-			<div id='datos_cobranza' style='display:<?= $show ?>' width="100%">
-				<table width="100%">
-					<tr>
-						<td align="right" width="25%" style="font-size:10pt;">
+			<div id='datos_cobranza' style='display:<?= $show ?>' width="98%">
+				<table width="100%" >
+					<tr id="divthh">
+						<td align="left" width="20%" style="font-size:10pt;">
 <?= __('Tarifa horas') ?>
 <?php if ($validaciones_segun_config)
 	echo $obligatorio ?>
 						</td>
-						<td align="left" width="75%" style="font-size:10pt;">
-							<table>
+						<td align="left" width="80%" style="font-size:10pt;">
+							<table  style="float:left;">
 								<tr>
 									<td>
 										<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?= empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
@@ -2013,7 +2109,7 @@ $config_validar_tarifa = ( method_exists('Conf', 'GetConf') && Conf::GetConf($se
 						</td>
 					</tr>
 					<tr>
-						<td align="right" style="font-size:10pt;">
+						<td align="left" style="font-size:10pt;">
 										<?= __('Forma de cobro') ?>
 <?php if ($validaciones_segun_config)
 	echo $obligatorio ?>
@@ -2029,24 +2125,26 @@ else
 					$usuarios_retainer = explode(',',$contrato->fields['retainer_usuarios']);
 ?>
 						<td align="left" style="font-size:10pt;">
-							<div id="div_cobro" align="left">
-								<input <?= TTip($tip_tasa) ?> onclick="ActualizarFormaCobro()" id=fc1 type=radio name=forma_cobro value=TASA <?= $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
+							<div id="div_cobro">
+								<input <?= TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?= $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 								<label for="fc1">Tasas/HH</label>&nbsp;
-								<input <?= TTip($tip_retainer) ?> onclick="ActualizarFormaCobro();" id=fc2 type=radio name=forma_cobro value=RETAINER <?= $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
+								<input <?= TTip($tip_retainer) ?> class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?= $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
 								<label for="fc2">Retainer</label> &nbsp;
-								<input <?= TTip($tip_flat) ?> id=fc3 onclick="ActualizarFormaCobro();" type=radio name=forma_cobro value="FLAT FEE" <?= $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
+								<input <?= TTip($tip_flat) ?>  class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?= $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
 								<label for="fc3"><?= __('Flat fee') ?></label>&nbsp;
-								<input <?= TTip($tip_cap) ?> id=fc5 onclick="ActualizarFormaCobro();" type=radio name=forma_cobro value="CAP" <?= $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
+								<input <?= TTip($tip_cap) ?>   class="formacobro"  id="fc5" type="radio" name="forma_cobro"  value="CAP" <?= $contrato_forma_cobro == "CAP" ? "checked='checked'" : "" ?> />
 								<label for="fc5"><?= __('Cap') ?></label>&nbsp;
-								<input <?= TTip($tip_proporcional) ?> onclick="ActualizarFormaCobro();" id=fc6 type=radio name=forma_cobro value=PROPORCIONAL <?= $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
+								<input <?= TTip($tip_proporcional) ?>  class="formacobro"  id="fc6" type="radio" name="forma_cobro"  value="PROPORCIONAL" <?= $contrato_forma_cobro == "PROPORCIONAL" ? "checked='checked'" : "" ?> />
 								<label for="fc6">Proporcional</label> &nbsp;
-								<input <?= TTip($tip_hitos) ?> onclick="ActualizarFormaCobro();" id=fc7 type=radio name=forma_cobro value="HITOS" <?= $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
+								<input <?= TTip($tip_hitos) ?>  class="formacobro"  id="fc7" type="radio" name="forma_cobro"  value="HITOS" <?= $contrato_forma_cobro == "HITOS" ? "checked='checked'" : "" ?> />
 								<label for="fc7"><?= __('Hitos') ?></label>
 								<?php if( !UtilesApp::GetConf($sesion,'EsconderTarifaEscalonada') ) { ?>
-									<input <?= TTip($tip_escalonada) ?> onclick="ActualizarFormaCobro();" id=fc8 type=radio name=forma_cobro value="ESCALONADA" <?= $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
+									<input <?= TTip($tip_escalonada) ?>  class="formacobro"  id="fc8" type="radio" name="forma_cobro"  value="ESCALONADA" <?= $contrato_forma_cobro == "ESCALONADA" ? "checked='checked'" : "" ?> />
 									<label for="fc8"><?=__('Escalonada') ?></label>
 								<?php } ?>
 							</div>
+						</td></tr>
+					<tr><td colspan="2">
 							<div style='border:1px solid #999999;width:400px;padding:4px 4px 4px 4px' id="div_forma_cobro">
 								<div id="div_monto" align="left" style="display:none; background-color:#C6DEAD;padding-left:2px;padding-top:2px;">
 									<span id="span_monto">&nbsp;<?= __('Monto') ?>
@@ -2284,7 +2382,7 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 						</td>
 					</tr>
 					<tr>
-						<td align="right" colspan='1' style="font-size:10pt;">
+						<td align="left" style="font-size:10pt;">
 <?= __('Mostrar total en') ?>:
 <?php if ($validaciones_segun_config)
 	echo $obligatorio ?>
@@ -2837,7 +2935,18 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 <script type="text/javascript">
      jQuery(document).ready(function() {
 	ActualizarFormaCobro();
-     });
+	    jQuery(".formacobro").click(function() {
+		var laID=jQuery(this).attr('id');
+		ActualizarFormaCobro(laID);
+	    });
+	});
+     
+
+function YoucangonowMichael() {
+    jQuery( "#div_cobro" ).buttonset();
+}
+	
+	
 	Calendar.setup(
 	{
 		inputField	: "valor_fecha_1",				// ID of the input field
@@ -2871,7 +2980,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 	actualizarMoneda();
 
 	<?php 
-		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && $desde_agrega_cliente) {
+		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && !$desde_agrega_cliente) {
 			if ( UtilesApp::GetConf( $sesion, 'EncargadoSecundario') ) {
 	?>
 		$('id_usuario_secundario').disabled = "disabled";
