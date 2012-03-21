@@ -238,7 +238,7 @@ if ($opcion == "guardar") {
 	}
 
         if ($cobro_independiente) {
-            if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1')) {
+            if ( $usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1') && $desde_agrega_cliente ) {
                 $pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
             }
 
@@ -1364,13 +1364,12 @@ else
 					</tr>
 				</table>
 				<br>
-				<table width='100%' cellspacing='0' cellpadding='0' id='tbl_contrato' style="display:<?= $checked != '' ? 'inline' : 'none' ?>;">
-					<tr>
-						<td width="100%">
+				<div  id='tbl_contrato' style="display:<?= $checked != '' ? 'block' : 'none' ?>;">
+					
 <? require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
-						</td>
-					</tr>
-				</table>
+					
+					
+				</div>
 				<br>
 				<fieldset class="border_plomo tb_base">
 					<legend><?= __('Alertas').' '.__('Asunto') ?></legend>
