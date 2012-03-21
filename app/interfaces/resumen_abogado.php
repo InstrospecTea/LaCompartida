@@ -52,6 +52,14 @@
             <?=Html::SelectQuery($sesion,"SELECT forma_cobro, descripcion FROM prm_forma_cobro ORDER BY forma_cobro", "forma_cobro[]",$forma_cobro,"multiple size=5","","200"); ?>
         </td>
     </tr>
+    <tr>
+  			<td align=right>
+  					<?=__('Mostrar valores en:')?>
+  			</td>
+  			<td align=left>
+  				<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda ? $id_moneda : $id_moneda_base, "", ""); ?>
+				</td>
+		</tr>
 	<tr>
 		<td colspan=4 align=right>
 			<input type=submit class=btn value="<?=__('Generar planilla')?>">
