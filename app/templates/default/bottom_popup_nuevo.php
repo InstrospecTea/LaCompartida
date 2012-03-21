@@ -3,17 +3,12 @@
 </table>
 <div id="dialogomodal" style="display:none;" ></div>  
 
-<?php
-$laurl= $_SERVER['HTTP_HOST']; 
-$punto=strpos($laurl,'.'); 
-$subdomain=substr($laurl,0,$punto); 
-$maindomain=str_replace($subdomain.'.','',$laurl); 
-if($subdomain) $subdomain='/'.$subdomain;
-$elpath=$subdomain.$_SERVER['PHP_SELF'];
-$pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
-?>
+
 <script type="text/javascript">
-    jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script' }) ).then(function() {
+	jQuery("head").append("<link id='uicss' />");
+        jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://files.thetimebilling.com/jquery-ui.css"   });
+        
+jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
           jQuery('#dialogomodal').dialog({
                         autoOpen: false,
 			height: 'auto',
@@ -28,18 +23,12 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
 							if( top.window.Refrescar )
 								top.window.Refrescar();
                             jQuery(this).html('');
-                            console.log('cerrado');
+                           
                         }
          });
-    });  
+    }});  
 
   
-var _sf_async_config={};
-/** CONFIGURATION START **/
-_sf_async_config.uid = 32419;
-_sf_async_config.domain = "<?php echo $maindomain; ?>"; 
-_sf_async_config.path = "<?php echo $elpath; ?>";
-/** CONFIGURATION END **/
 
 (function(){
   function loadChartbeat() {
@@ -60,48 +49,7 @@ _sf_async_config.path = "<?php echo $elpath; ?>";
 
 /* <![CDATA[   */
 
-
- function downloadJSAtOnload() {
- 
- if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
-    if ("https:" == document.location.protocol) {
-        var __dcid = __dcid || [];__dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
-    } else {
-       var pathseguro="<?php echo $pathseguro; ?>";
-       if (_sf_async_config.domain=='thetimebilling.com') {
-           jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+pathseguro+'"><img src="https://files.thetimebilling.com/templates/no_ssl.png" style="text-decoration:none;vertical-align:top;border: 0 none;" /></a>');
-       }
-    }
-}
-        
-	jQuery("head").append("<link id='uicss' />");
-        jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://files.thetimebilling.com/jquery-ui.css"   });
-
-	
-
-jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://files.thetimebilling.com/fw/js/droplinemenu.js', dataType: 'script' }) ).then(function() {
-    droplinemenu.buildmenu("droplinetabs1");
-});
-jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://files.thetimebilling.com/fw/js/curvycorners.js', dataType: 'script' }) ).then(function() {
-   var settings = {
-      tl: { radius: 5 },
-      tr: { radius: 5 },
-      bl: { radius: 5 },
-      br: { radius: 5 },
-      antiAlias: true
-    }
-    var divObj = document.getElementById("fd_menu_grey");
-    curvyCorners(settings, divObj); 
-});
-SetFocoPrimerElemento();
-
-}
- if (window.addEventListener)
- window.addEventListener("load", downloadJSAtOnload, false);
- else if (window.attachEvent)
- window.attachEvent("onload", downloadJSAtOnload);
- else window.onload = downloadJSAtOnload;
-
+    
  function nuovaFinestra(name, w, h, url, opciones ) {
 
                 if(top.window.jQuery('#soymodal').length>0 || top.window.jQuery('#dialogomodal').length==0) {
@@ -131,6 +79,45 @@ function Cerrar() {
         }
         
 }  
+
+SetFocoPrimerElemento();
+
+
+ function downloadJSAtOnload() {
+
+
+jQuery.when(jQuery.ajax({async: false,cache:true,type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/curvycorners.js', dataType: 'script' }) ).then(function() {
+   var settings = {
+      tl: { radius: 5 },
+      tr: { radius: 5 },
+      bl: { radius: 5 },
+      br: { radius: 5 },
+      antiAlias: true
+    }
+    var divObj = document.getElementById("fd_menu_grey");
+    curvyCorners(settings, divObj); 
+});
+
+if (_sf_async_config.pathseguro!==undefined) {
+         if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
+                jQuery('#ultimocontenedor').css({'width':'330px'});
+                if ("https:" == document.location.protocol) {
+                   __dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
+                } else {
+                        jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+_sf_async_config.pathseguro+'"><img src="https://estaticos.thetimebilling.com/templates/no_ssl.png" style="text-decoration:none;vertical-align:top;border: 0 none;margin-top:0;position:relative;top:0;right:0;" /></a>');
+                }
+            }
+}
+
+}
+
+
+ if (window.addEventListener)
+ window.addEventListener("load", downloadJSAtOnload, false);
+ else if (window.attachEvent)
+ window.attachEvent("onload", downloadJSAtOnload);
+ else window.onload = downloadJSAtOnload;
+ 
 
 /* ]]> */
 </script>
