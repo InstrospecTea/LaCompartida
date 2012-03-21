@@ -26,14 +26,26 @@
 	else if($moneda_base['cifras_decimales'] == 2)
 		$string_decimales = ".00";
 
-	$wb->setCustomColor ( 37, 100, 86, 171 );
+	define('CTEMONEDA',$id_moneda);
+	$arraymoneda=array();
+	
+		
+	
+	$wb->setCustomColor ( 35, 100, 86, 171 );
 	$formato_morado =&  $wb->addFormat(array('Size' => 12,
                                 'VAlign' => 'top',
                                 'Align' => 'left',
                                 'Bold' => '1',
-				'BgColor' => '37',
-				'fgColor' => '37',
-                                'Color' => 'white'));
+				'BgColor' => '35',
+				'fgColor' => '35',
+                                'Color' => 'black'));
+	$formato_morado_giant =&  $wb->addFormat(array('Size' => 14,
+                                'VAlign' => 'top',
+                                'Align' => 'left',
+                                'Bold' => '1',
+				'BgColor' => '35',
+				'fgColor' => '35',
+                                'Color' => 'black'));
 	$formato_duracion_morado=$formato_morado;
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  ) )
 		$formato_duracion_morado->setNumFormat("[hh]:mm");
@@ -41,9 +53,9 @@
                                 'VAlign' => 'top',
                                 'Align' => 'left',
                                 'Bold' => '1',
-                                'BgColor' => '37',
-                                'fgColor' => '37',
-                                'Color' => 'white'));
+                                'BgColor' => '35',
+                                'fgColor' => '35',
+                                'Color' => 'black'));
 	$formato_morado_numero->setNumFormat("#,##0$string_decimales");
 
 	$wb->setCustomColor ( 36, 255, 255, 220 );
@@ -129,6 +141,62 @@
                                 'Color' => 'black'));
 									
 	#$ws1->setColumn( 1, 9, 19.00);
+	$formatos_moneda_totales = array();
+	$formatos_moneda_morado= array();
+	$formatos_moneda_asunto = array();
+	$formatos_moneda_asunto2 = array();
+		$query = 'SELECT id_moneda, simbolo, cifras_decimales, glosa_moneda
+				FROM prm_moneda
+				ORDER BY id_moneda';
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		while(list($idmoneda, $simbolo_moneda, $cifras_decimales,$glosa_moneda) = mysql_fetch_array($resp)){
+		    $arraymoneda[$idmoneda]=array($simbolo_moneda, $cifras_decimales,$glosa_moneda);
+			if($cifras_decimales>0)
+			{
+				$decimales = '.';
+				while($cifras_decimales-- >0)
+					$decimales .= '0';
+			} else {
+				$decimales = '';
+			}
+		
+			$formatos_moneda_totales[$idmoneda] =& $wb->addFormat(array('Size' => 11,
+																'VAlign' => 'top',
+																'Align' => 'right',
+																'Border' => '1',
+																'Bold' => '1',
+																'Border' => '1',
+																'fgColor' => '38','Color' => 'white',
+																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+			$formatos_moneda_morado[$idmoneda] =& $wb->addFormat(array('Size' => 12,
+																'VAlign' => 'top',
+																'Align' => 'left',
+																'Bold' => '1',
+																'fgColor' => '35','Color' => 'black',
+																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+		
+			
+			
+			
+			$formatos_moneda_asunto[$idmoneda]=& $wb->addFormat(array('Size' => 11,
+																'VAlign' => 'top',
+																'Align' => 'right',
+																'Border' => '1',
+																'Color' => 'black',
+																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+				
+			$formatos_moneda_asunto2[$idmoneda]=& $wb->addFormat(array('Size' => 11,
+																'VAlign' => 'top',
+																'Align' => 'right',
+																'Border' => '1',
+																'fgColor' => '41',
+																'Color' => 'black',
+																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+			
+			
+			
+		}
+	
 	$hoy = date("d-m-Y");
 	$filas += 1;
 	if(is_array($usuarios))	
@@ -151,7 +219,7 @@
 					$reporte->addFiltro('cobro','forma_cobro',$fc);
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
 			$reporte->setTipoDato($td);
-			$reporte->id_moneda = 3;
+			$reporte->id_moneda = CTEMONEDA;
 			$reporte->ignorar_cobros_sin_horas = true;
 			$reporte->setVista('glosa_cliente_asunto-mes_reporte');
 			$reporte->addRangoFecha(Utiles::fecha2sql($fecha_ini),Utiles::fecha2sql($fecha_fin));
@@ -231,11 +299,19 @@
 		global $formato_totales_cobro;
 		global $fila, $hoy;
 		global $sesion;
+		global $arraymoneda;
+		global $id_moneda;
+		global $formato_morado_giant;
+		
+		global $formatos_moneda_totales;
+	global $formatos_moneda_morado;
+	global $formatos_moneda_asunto;
+	global $formatos_moneda_asunto2;
 		$fila_titulos = 13;
 		$time_periodo = strtotime($fecha_ini);
 		
 
-		$ws1->write($filas, 1, __('REPORTE RENDIMIENTO PROFESIONALES'), $formato_morado);
+		$ws1->write($filas, 1, __('REPORTE RENDIMIENTO PROFESIONALES'),$formato_morado_giant);
 		$ws1->mergeCells( $filas,1, $filas, 2+4 );	
 
 		$ws1->write(++$filas, 1, strtoupper(__('Profesional')), $formato_morado);
@@ -248,7 +324,7 @@
 		$ws1->write(++$filas, 1, __('PERIODO'), $formato_morado);
 		$ws1->write($filas, 2, Utiles::sql2date($fecha_ini).' a '.Utiles::sql2date($fecha_fin), $formato_morado);
 		$ws1->mergeCells( $filas, 2, $filas, 2+4 );
-		
+		$ws1->setColumn( 1, 2, 28);
 		//Aqui normalmente debería rellenar, pero como tengo el resultado 'Horas Trabajadas', este tiene siempre el universo de resultados.
 		//(Si un mes aparece en alguno, aparecerá en Horas Trabajadas).
 		$r = $td['horas_trabajadas'];
@@ -271,22 +347,25 @@
 			$ws1->write($fila_titulos+4, 1, __('Hrs. no Cobrables'), $formato_titulo);
 			$ws1->write($fila_titulos+4, 2,'', $formato_titulo);
 			$ws1->mergeCells( $fila_titulos+4, 1, $fila_titulos +4 , 2 );
-			$ws1->write($fila_titulos+5, 1, __('Ingresos devengados'), $formato_titulo);
+			$ws1->write($fila_titulos+5, 1, __('monto_facturado'), $formato_titulo);
 			$ws1->write($fila_titulos+5, 2,'', $formato_titulo);
 			$ws1->mergeCells( $fila_titulos+5, 1, $fila_titulos +5 , 2 );
 			$ws1->write($fila_titulos+6, 1, __('Cliente - Asunto'), $formato_titulo);
 			$ws1->write($fila_titulos+6, 2, __('Encargado Comercial'), $formato_titulo);
-			$ws1->setColumn( 1, 1, 30);
-			$ws1->setColumn( 2, 2, 15);
+			
+			
 
 
 			$fila_base = 20;
 			foreach($r['labels'] as $id_lab => $label)
 			{
-				if($fila_base%2)
+				if($fila_base%2) {
 					$formato = $formato_cliente_asunto2;
-				else
+					$formato_moneda_fila = $formatos_moneda_asunto2[CTEMONEDA];
+				} else {
 					$formato = $formato_cliente_asunto;
+					$formato_moneda_fila = $formatos_moneda_asunto[CTEMONEDA];
+				}
 				$query_encargado = "SELECT usuario.username FROM asunto JOIN contrato ON asunto.id_contrato = contrato.id_contrato JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable WHERE asunto.codigo_asunto = '".$id_lab."'";
 				$resp = mysql_query($query_encargado, $sesion->dbh) or Utiles::errorSQL($query_encargado,__FILE__,__LINE__,$sesion->dbh);
 				$row = mysql_fetch_assoc($resp);
@@ -327,7 +406,7 @@
 				extender($ws1,$fila_titulos+3,$col,5,$formato_periodo);
 				$ws1->write($fila_titulos+4, $col,n($td['horas_no_cobrables']['labels_col'][$id_col]['total']),$formato_duracion_totales);
 				extender($ws1,$fila_titulos+4,$col,5,$formato_periodo);
-				$ws1->write($fila_titulos+5, $col,n($td['valor_cobrado']['labels_col'][$id_col]['total']),$formato_totales_cobro);
+				$ws1->write($fila_titulos+5, $col,n($td['valor_cobrado']['labels_col'][$id_col]['total']),$formatos_moneda_totales[CTEMONEDA]);
 				extender($ws1,$fila_titulos+5,$col,5,$formato_periodo);
 				
 				
@@ -345,15 +424,18 @@
 				$fila_base = 20;
 				foreach($r['labels'] as $id_lab => $label)
 				{
-					if($fila_base%2)
+					if($fila_base%2) {
 						$formato = $formato_cliente_asunto2;
-					else
+						$formato_moneda_fila = $formatos_moneda_asunto2[CTEMONEDA];
+					} else {
 						$formato = $formato_cliente_asunto;
+						$formato_moneda_fila = $formatos_moneda_asunto[CTEMONEDA];
+					}
 					$ws1->writeNumber($fila_base,$col,Reporte::FormatoValor($sesion,number_format($td['horas_cobradas']['celdas'][$id_lab][$id_col]['valor'],2,'.',''),"horas_","excel"),$formato);
 					$ws1->writeNumber($fila_base,$col+1,Reporte::FormatoValor($sesion,number_format($td['horas_por_cobrar']['celdas'][$id_lab][$id_col]['valor'],2,'.',''),"horas_","excel"),$formato);
 					$ws1->writeNumber($fila_base,$col+2,Reporte::FormatoValor($sesion,number_format($td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'],2,'.',''),"horas_","excel"),$formato);
 					$ws1->writeNumber($fila_base,$col+3,Reporte::FormatoValor($sesion,number_format($td['horas_no_cobrables']['celdas'][$id_lab][$id_col]['valor'],2,'.',''),"horas_","excel"),$formato);
-					$ws1->writeNumber($fila_base,$col+4,n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']),$formato);
+					$ws1->writeNumber($fila_base,$col+4,n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']),$formato_moneda_fila);
 
 					$fila_base++;
 				}
@@ -363,7 +445,7 @@
 				$ws1->WriteFormula($fila_base,$col+1,'=SUM('.excel_column($col+1)."$fila_inicio:".excel_column($col+1).($fila_base).')',$formato_duracion_totales);
 				$ws1->WriteFormula($fila_base,$col+2,'=SUM('.excel_column($col+2)."$fila_inicio:".excel_column($col+2).($fila_base).')',$formato_duracion_totales);
 				$ws1->WriteFormula($fila_base,$col+3,'=SUM('.excel_column($col+3)."$fila_inicio:".excel_column($col+3).($fila_base).')',$formato_duracion_totales);
-				$ws1->WriteFormula($fila_base,$col+4,'=SUM('.excel_column($col+4)."$fila_inicio:".excel_column($col+4).($fila_base).')',$formato_totales_cobro);
+				$ws1->WriteFormula($fila_base,$col+4,'=SUM('.excel_column($col+4)."$fila_inicio:".excel_column($col+4).($fila_base).')',$formatos_moneda_totales[CTEMONEDA]);
 				
 				#FIN de una columna
 				$col+=5;
@@ -372,8 +454,12 @@
 			$ws1->write(++$filas, 1, __('HORAS TRABAJADAS'), $formato_morado);
 			$ws1->write($filas, 2, $td['horas_trabajadas']['total'], $formato_duracion_morado);
 			$ws1->mergeCells( $filas, 2, $filas, 2+4 );
-			$ws1->write(++$filas, 1, __('INGRESOS DEVENGADOS'), $formato_morado);
-			$ws1->write($filas, 2, $td['valor_cobrado']['total'], $formato_morado_numero);
+			$ws1->write(++$filas, 1, __('MONTO FACTURADO'), $formato_morado);
+			//$ws1->write($filas, 2, $td['valor_cobrado']['total'], $formatos_moneda_morado[CTEMONEDA]);
+			$ws1->write($filas, 2, '=SUM(D'.($fila_titulos+6).':FF'.($fila_titulos+6).')', $formatos_moneda_morado[CTEMONEDA]); // ojo, para la clase la fila titulos+6 es la 20, para el excel es la 19
+			
+			
+			
 			$ws1->mergeCells( $filas, 2, $filas, 2+4 );
 			$ws1->write(++$filas, 1, __('HORAS LIQUIDADAS'), $formato_morado);
 			$ws1->write($filas, 2, $td['horas_cobradas']['total'], $formato_duracion_morado);
