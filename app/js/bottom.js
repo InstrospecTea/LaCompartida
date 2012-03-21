@@ -27,6 +27,7 @@ jQuery.datepicker.setDefaults(   jQuery.datepicker.regional[ "es" ]    );
 		    }).attr('rel','activomodal').append(DivLoading).append('<iframe id="soymodal" rel="inactivo" style="display:none;height:100%;width:100%" frameborder="0"></iframe>');
 		     }
 	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
+	//if (console!==undefined) console.log('YCGNM es '+ top.window.YoucangonowMichael);
 	  
     });  
    }});
@@ -56,7 +57,7 @@ SetFocoPrimerElemento();
 
 function nuovaFinestra(name, w, h, url, opciones ) {
 
-                if(false || top.window.jQuery('#soymodal').attr('rel')=='inactivo' && top.window.jQuery('#dialogomodal').length>0 && top.window.jQuery('#dialogomodal').attr('rel')=='activomodal') {
+                if(1==0 && top.window.jQuery('#soymodal').attr('rel')=='inactivo' && top.window.jQuery('#dialogomodal').length>0 && top.window.jQuery('#dialogomodal').attr('rel')=='activomodal') {
                             
 				var inipos=Math.max(top.window.jQuery('body').scrollTop(), top.window.jQuery('html').scrollTop());
 			
