@@ -14,12 +14,15 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<script language="JavaScript" type="text/javascript">
-        var _sf_startpt=(new Date()).getTime();
-        var _sf_async_config={};
+       var _sf_startpt=(new Date()).getTime();
+        var DivLoading='<div class="divloading">&nbsp;</div>';
+	var _sf_async_config={};
+        var __dcid = __dcid || [];
             _sf_async_config.uid = 32419;
             _sf_async_config.domain = "<?php echo $maindomain; ?>"; 
             _sf_async_config.path = "<?php echo $elpath; ?>";
-            _sf_async_config.pathseguro="<?php echo $pathseguro; ?>";
+            <?php   if(defined('APPDOMAIN') && substr(APPDOMAIN,0,5)=='https') echo '_sf_async_config.pathseguro="'.$pathseguro.'";'; ?>
+	    
         var root_dir = '<?php echo Conf::RootDir();?>';
 	var img_dir = '<?php echo Conf::ImgDir()?>';
     </script>
