@@ -146,9 +146,7 @@ header('Location: ./m/');*/
 
 		</td>
 	</tr>
-        <tr><td align="center"><div id="DigiCertClickID_iIR9fwBQ" style="margin:5px auto 15px;" >&nbsp;</div></td>
-	</tr>
-
+          <tr><td align="center"><div id="DigiCertClickID_iIR9fwBQ" style="margin:5px auto 15px;" >&nbsp;</div></td></tr>
 </table>
 
 		
