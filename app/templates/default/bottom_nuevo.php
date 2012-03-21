@@ -23,37 +23,37 @@
   </tr>
 </table>
 <div id="dialogomodal" style="display:none;" ></div> 
-<script type="text/javascript">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-21661196-2']);
-_gaq.push(['_setDomainName', 'none']);
-_gaq.push(['_setAllowLinker', true]);
-_gaq.push(['_trackPageview']);
 
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>
-<?php
-$laurl= $_SERVER['HTTP_HOST']; 
-$punto=strpos($laurl,'.'); 
-$subdomain=substr($laurl,0,$punto); 
-$maindomain=str_replace($subdomain.'.','',$laurl); 
-if($subdomain) $subdomain='/'.$subdomain;
-$elpath=$subdomain.$_SERVER['PHP_SELF'];
-$pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
-?>
+
 <script type="text/javascript">
-    
-var _sf_async_config={};
-/** CONFIGURATION START **/
-_sf_async_config.uid = 32419;
-_sf_async_config.domain = "<?php echo $maindomain; ?>"; 
-_sf_async_config.path = "<?php echo $elpath; ?>";
-_sf_async_config.pathseguro="<?php echo $pathseguro; ?>";
-/** CONFIGURATION END **/
+    /* <![CDATA[   */
+jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/droplinemenu.js', dataType: 'script' }) ).then(function() {
+        droplinemenu.buildmenu("droplinetabs1");
+    });
+SetFocoPrimerElemento();
+ 	jQuery("head").append("<link id='uicss' />");
+        jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://files.thetimebilling.com/jquery-ui.css"   });
+        
+jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
+          jQuery('#dialogomodal').dialog({
+                        autoOpen: false,
+			height: 'auto',
+			width: 800,
+                        maxHeight: 550,
+			modal: true,
+                        show: 'fade',
+                        hide: 'fade',
+                        position: ['center',30],
+                        dialogClass: 'lemondialog',
+                        close: function() { 
+							if( top.window.Refrescar )
+								top.window.Refrescar();
+                            jQuery(this).html('');
+                           
+                        }
+         });
+    }});  
+
 
 (function(){
   function loadChartbeat() {
@@ -72,11 +72,7 @@ _sf_async_config.pathseguro="<?php echo $pathseguro; ?>";
 })();
 
 
-/* <![CDATA[   */
-jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://files.thetimebilling.com/fw/js/droplinemenu.js', dataType: 'script' }) ).then(function() {
-        droplinemenu.buildmenu("droplinetabs1");
-    });
-SetFocoPrimerElemento();
+
   
 function nuovaFinestra(name, w, h, url, opciones ) {
 
@@ -108,7 +104,7 @@ function Cerrar() {
         
 }    
 
-    jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script' }) ).then(function() {
+jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
           jQuery('#dialogomodal').dialog({
                         autoOpen: false,
 			height: 'auto',
@@ -126,78 +122,62 @@ function Cerrar() {
                             //console.log('cerrado');
                         }
          });
-    });  
+    }});  
 
   
 
  function downloadJSAtOnload() {
-    
-    jQuery("head").append("<link id='uicss' />");
-    jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://files.thetimebilling.com/jquery-ui.css"   });
- 
-     if (_sf_async_config.domain=='thetimebilling.com') {
-         if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
-                jQuery('#ultimocontenedor').css({'width':'330px'});
-                if ("https:" == document.location.protocol) {
-                   var __dcid = __dcid || [];__dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
-                } else {
-                        jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+_sf_async_config.pathseguro+'"><img src="https://files.thetimebilling.com/templates/no_ssl.png" style="text-decoration:none;vertical-align:top;border: 0 none;margin-top:0;position:relative;top:0;right:0;" /></a>');
-                }
-            }
-        }
+   
+   jQuery("head").append("<link id='zenboxcss' />");
+    jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" });
      
-    jQuery.when(jQuery.ajax({async: false,type: "GET", url: 'https://files.thetimebilling.com/fw/js/curvycorners.js', dataType: 'script' }) ).then(function() {
-          var settings = {
-              tl: { radius: 5 },
-              tr: { radius: 5 },
-              bl: { radius: 5 },
-              br: { radius: 5 },
-              antiAlias: true
-            }
+    jQuery.ajax({async: false,cache:true, type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/curvycorners.js', 
+	dataType: 'script',
+	complete: function() {
+		  var settings = {
+		      tl: { radius: 5 },
+		      tr: { radius: 5 },
+		      bl: { radius: 5 },
+		      br: { radius: 5 },
+		      antiAlias: true
+		    }
             var divObj = document.getElementById("fd_menu_grey");
             curvyCorners(settings, divObj); 
-
+	    }
         });            
-    
-  
 
-    jQuery.when(jQuery.ajax({async: true,type: "GET", 
-    url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', dataType: 'script' }) ).then(function() {
     
-        jQuery("head").append("<link id='zenboxcss' />");
-        jQuery("#zenboxcss").attr({
-          rel:  "stylesheet",
-          type: "text/css",
-          href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css"
-        });
-        
-    function getInternetExplorerVersion() {
-	  var rv = -1; // Return value assumes failure.
-	  if (navigator.appName == 'Microsoft Internet Explorer')
-	  {
-		var ua = navigator.userAgent;
-		var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-		if (re.exec(ua) != null)
-		  rv = parseFloat( RegExp.$1 );
-	  }
-	  return rv;
-	}
-	if (typeof(Zenbox) !== "undefined") {
-		var ver = getInternetExplorerVersion();
-		var lado = "Right";
-		var imagen_fondo = "https://files.thetimebilling.com/templates/default/img/lemontech_logo_" + lado.toLowerCase() +".png";
-		if( ver > -1) imagen_fondo = "https://files.thetimebilling.com/templates/default/img/lemontech_logo/lemontech_logo_" + lado.toLowerCase() +"_ie.png";
-		Zenbox.init({
-			dropboxID:   "20042787",
-			url:         "https://lemontech.zendesk.com",
-			tabID:       "support", 
-			tabImageURL:    imagen_fondo,
-			tabColor:    "#02782e",
-			tabPosition: lado
-		});
+  if (_sf_async_config.pathseguro!==undefined) {
+         if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
+                jQuery('#ultimocontenedor').css({'width':'335px'});
+                if ("https:" == document.location.protocol) {
+                   __dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
+                } else {
+                        jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+_sf_async_config.pathseguro+'"><img src="https://estaticos.thetimebilling.com/templates/no_ssl.png" style="text-decoration:none;vertical-align:top;border: 0 none;margin-top:0;position:relative;top:0;right:0;" /></a>');
+                }
             }
-        });
+    }
+    
 
+   
+        jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', 
+	dataType: 'script',
+	complete: function() {
+		if (typeof(Zenbox) !== "undefined") {
+			Zenbox.init({
+				dropboxID:   "20042787",
+				url:         "https://lemontech.zendesk.com",
+				tabID:       "support", 
+				tabImageURL: "https://estaticos.thetimebilling.com/templates/default/img/tag_soporte3.png",
+				tabColor:    "transparent",
+				tabPosition: "Right"
+			    });
+			}          		
+              jQuery('#zenbox_tab').hide();
+              jQuery('#zenbox_tab').css({'right':'-35', 'border':'0 none !important'})                                                                                                                                                                                                                                                  
+              jQuery('#zenbox_tab').show().animate({'right':'0'},3000);
+	    }
+        });
  }
 
 if (window.addEventListener)
@@ -207,6 +187,20 @@ if (window.addEventListener)
  else window.onload = downloadJSAtOnload;
         
 /* ]]> */
+</script>
+
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-21661196-2']);
+_gaq.push(['_setDomainName', 'none']);
+_gaq.push(['_setAllowLinker', true]);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
 </script>
 </body>
 </html>
