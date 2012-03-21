@@ -6,7 +6,7 @@ $subdomain=substr($laurl,0,$punto);
 $maindomain=str_replace($subdomain.'.','',$laurl); 
 if($subdomain) $subdomain='/'.$subdomain;
 $elpath=$subdomain.$_SERVER['PHP_SELF'];
-$pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
+$pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$_SERVER['PHP_SELF'];
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -14,7 +14,7 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<script language="JavaScript" type="text/javascript">
-       var _sf_startpt=(new Date()).getTime();
+        var _sf_startpt=(new Date()).getTime();
         var DivLoading='<div class="divloading">&nbsp;</div>';
 	var _sf_async_config={};
         var __dcid = __dcid || [];
@@ -28,30 +28,43 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
     </script>
 	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
 	<!-- <?php echo Conf::TimestampDeployCSS()?> -->
-	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
+	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
 	<!--[if IE]>
-	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_ie_only.css" />
+	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_ie_only.css" />
 	<![endif]-->
 	<!--[if !IE]><!-->
-	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
+	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 	<!--<![endif]-->
-	<link rel="stylesheet" type="text/css" href="https://files.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-        <link rel="shortcut icon" href="https://files.thetimebilling.com/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
+        <link rel="shortcut icon" href="https://estaticos.thetimebilling.com/favicon.ico" />
 
 
 	
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script language="JavaScript" type="text/javascript" src="https://files.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
-        <script language="JavaScript" type="text/javascript" src="https://files.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
 
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	
 <style type="text/css">
-.tb_facebook {	background: url(<?php echo Conf::ImgDir()?>/barra_tipo_facebook_final.gif) repeat-x;	height: 55px;}
-.non_popup {background: url(<?php echo Conf::ImgDir()?>/fondo_degradado2.gif) repeat-x;}
+.divloading {display:block;width:100%;height:120px;text-align:center;margin:50px auto;background:url('https://estaticos.thetimebilling.com/templates/cargando.gif') 50% 50% no-repeat;}
+.tb_facebook {	background: url(https://estaticos.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
+.non_popup {background: url(https://estaticos.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
+.alignleft {text-align:left;}
+#zenbox_tab {overflow: hidden; border: 0 none !important;}
+#mainttb {background:white;padding: 30px 0 5px ;width: 960px;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;}
+.titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
+.cont_tabla {padding:0 20px; background-color: #FFFFFF;text-align:center;margin:5px auto;}
+.cont_tabla table {margin-left:auto;margin-right:auto;}
+.iconzip {background: url(https://estaticos.thetimebilling.com/images/icon-zip.gif) no-repeat;height:20px;padding-left:25px;}
 </style>
+
+
+
+
+
 
 <!--[if lt IE 9]>
 <script>
