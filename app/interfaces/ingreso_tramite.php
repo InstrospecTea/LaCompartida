@@ -31,7 +31,7 @@
 	$params_array['codigo_permiso'] = 'COB';
 	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
 
-
+	//echo $como_trabajo . " < al abrir o recargar la página ";
 	if($id_tramite > 0)
 	{
 		if( $tramite->fields['trabajo_si_no']==1 || $como_trabajo==1 )
@@ -289,8 +289,46 @@
 			{
 				$t->Eliminar();
 			}
+	
+	if( !$como_trabajo ) { 		
+		$guardados = 0;
+		for($i = 1; $i <= $multiplicador; $i++) {
+			$tramite->fields['id_tramite'] = null;
+			if( $tramite->Write() ) {
+				$guardados++;
+			} else {
+				$pagina->AddError( __("Error al guardar") . ' ' . ( $multplicador > 1 ? __('los trámites')  : __('el trámite') ) );
+				$i = $multiplicador + 1;
+			}
+			
+		}
+		if( $guardados > 1 ) {
+			$pagina->AddInfo(__('Trámites').' '.($nuevo?__('guardados con exito'):__('editado con éxito')));
+		} else {
+			$pagina->AddInfo(__('Trámite').' '.($nuevo?__('guardado con exito'):__('editado con éxito')));
+		}
 		
-	if($tramite->Write())
+		if( $edit==1 ) {
+						?>
+										<script>
+											if(window.opener)
+												{
+												window.opener.Refrescar( 'edit' );
+												}
+										</script>
+<?php
+				} else {
+						?>
+										<script>
+											if(window.opener)
+												{
+												window.opener.Refrescar( 'nuevo' );
+												}
+										</script>
+<?php
+		}
+	} else {
+		if($tramite->Write())
 			{
 			if($t){
 				$t->Edit('id_tramite',$tramite->fields['id_tramite']);
@@ -346,8 +384,8 @@
 						}
 				}
 			}
-		unset($id_trab);
-		
+			unset($id_trab);
+		}
 		// Nuevo en el caso de ser llamado desde Resumen semana, para que haga
 		// refresh al form
 		if($nuevo || $edit)
@@ -404,6 +442,11 @@
 		$codigo_cliente_secundario=$cliente->fields['codigo_cliente_secundario'];
 	}
 	$pagina->titulo = __('Modificación de').' '.__('Trámite');
+	
+	if( isset($id_tramite) || !isset( $tramite->fields['multiplicador'] ) || !is_numeric($tramite->fields['multiplicador']) || ( is_numeric($tramite->fields['multiplicador']) && $tramite->fields['multiplicador'] < 1 ) ) {
+		$multiplicador = 1;
+		$tramite->fields['multiplicador'] = 1;
+	}
 	$pagina->PrintTop($popup);
 ?>
 
@@ -422,6 +465,26 @@ function ShowTime()
 		{
 			tr.style['display'] = 'none';
 		}
+}
+
+function ToggleCantidad(activar){
+	var idTramite = <?php echo ( $id_tramite || $tramite->fields['id_tramite'] ) ? true : false ;  ?>;
+	if( !idTramite ) {
+		var despliegue = ( activar ) ? 'none' : 'table-row';
+		jQuery('#filamultiplicador').css('display',despliegue);
+	}
+	document.getElementById('multiplicador').value = 1;
+}
+
+function validaCantidad(cantidad, desdedonde ) {
+	if( cantidad > 99 ) {
+		alert('La cantidad de repetición del trámite no puede superar las 99 veces.');		
+		if( desdedonde == 'validandoform') {
+			return false;
+		}
+		document.getElementById('multiplicador').focus();		
+	}
+	return true;
 }
 
 function ModificarMonto( tipo ) 
@@ -547,12 +610,14 @@ function SetDuracionDefecto( form )
 			$('duracion').value=response[0];
 			if( response[1]==1 ){
 				$('como_trabajo').checked = true;
-				$('time_tr').style['display'] = '';
+				$('time_tr').style['display'] = '';				
+				ToggleCantidad(true);
 			}
 			else if( response[1]==0 )
 				{
 				$('como_trabajo').checked = false;
 				$('time_tr').style['display'] = 'none';
+				ToggleCantidad(false);
 			}
         }
         cargando = false;
@@ -744,6 +809,8 @@ function Validar(form)
 <?php
 	}
 ?>
+	pasavalidacion = validaCantidad(document.getElementById('multiplicador').value, 'validandoform');
+	if( !pasavalidacion) { return false; }
 	
 	form.action='ingreso_tramite.php'
 	form.submit();
@@ -1275,12 +1342,15 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <tr>
     	<td></td>
     	<td> <?
-    		if(!$tramite->fields['trabajo_si_no']) {
+		//echo 'el field es '.$tramite->fields['trabajo_si_no'].' y como_trabajo es '.$como_trabajo;
+    		if( !isset($tramite->fields['id_tramite'] ) ) {
 					$query = "SELECT trabajo_si_no_defecto FROM tramite_tipo ORDER BY glosa_tramite LIMIT 1";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					list($como_trabajo)=mysql_fetch_array($resp);
-					} ?>
-    		<input type=checkbox name=como_trabajo id="como_trabajo" value="1" onClick="ShowTime()" <?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? 'checked' : '' ?> >Ingresar como trabajo
+					}
+		 ?>
+		
+    		<input type=checkbox name=como_trabajo id="como_trabajo" value="1" onClick="ShowTime(); ToggleCantidad(this.checked);" <?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? 'checked' : '' ?> >Ingresar como trabajo
     	</td>
     </tr>
 			<tr id="time_tr" style='display:<?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? '' :'none' ?>;'>
@@ -1398,6 +1468,12 @@ else
 			</tr>
 		</table>
         </td>
+    </tr>
+    <tr id="filamultiplicador" style="display: <?php echo ( isset($id_tramite) || $como_trabajo == 1 ) ? 'none' : 'table-row'; ?>">
+    	<td align="right"> <?=__('Cantidad de repeticiones')?> 	</td>
+    	<td align="left">
+    		<input type="text" size="6" name="multiplicador" id="multiplicador" onkeyup="validaCantidad(this.value, 'validandoinput');"   value="<?php echo isset($tramite->fields['multiplicador'])  ? $tramite->fields['multiplicador']  : $multiplicador ?>" />
+    	</td>
     </tr>
     <tr>
     	<td align="right">
@@ -1538,7 +1614,7 @@ Calendar.setup(
 		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";
 	}
 ?>
-		button			: "img_fecha"		// ID of the button
+		button			: "img_fecha"	;	// ID of the button
 	}
 );
 </script>
