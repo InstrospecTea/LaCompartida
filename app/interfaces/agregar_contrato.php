@@ -1573,14 +1573,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			if( $desde_agrega_cliente ) {
 		?>
 		if (elemento.name == "id_usuario_responsable") {
-			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) { ?> 
+			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) : ?> 
 				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
 				$('id_usuario_secundario').disabled = "disabled";
-			<?php } else { ?>
+			<?php  else: ?>
 				
 				$('id_usuario_encargado').value = $('id_usuario_responsable').value;
 				$('id_usuario_encargado').disabled = "disabled";
-			<?php } ?>
+			<?php endif; ?>
 		}
 		<?php 
 		
@@ -1589,11 +1589,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		?>
 		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
 			if(confirm('¿Desea cambiar también el <?= __('Encargado Secundario') ?>?')){
-				if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) {
+			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) : ?> 
 					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
-				} else {
+			<?php  else: ?>
 					$('id_usuario_encargado').value = $('id_usuario_responsable').value;
-				}				
+			<?php endif; ?>
+				
 			}
 			else{
 				mismoEncargado = false;
