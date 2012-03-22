@@ -1573,14 +1573,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			if( $desde_agrega_cliente ) {
 		?>
 		if (elemento.name == "id_usuario_responsable") {
-			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) : ?> 
+			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) { ?> 
 				$('id_usuario_secundario').value = $('id_usuario_responsable').value;
 				$('id_usuario_secundario').disabled = "disabled";
-			<?php  else: ?>
+			<?php } else { ?>
 				
 				$('id_usuario_encargado').value = $('id_usuario_responsable').value;
 				$('id_usuario_encargado').disabled = "disabled";
-			<?php endif; ?>
+			<?php } ?>
 		}
 		<?php 
 		
@@ -1589,12 +1589,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		?>
 		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
 			if(confirm('¿Desea cambiar también el <?= __('Encargado Secundario') ?>?')){
-			<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) : ?> 
+				<?php if (UtilesApp::GetConf($sesion, "EncargadoSecundario") ) { ?> 
 					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
-			<?php  else: ?>
+				<?php } else { ?>
 					$('id_usuario_encargado').value = $('id_usuario_responsable').value;
-			<?php endif; ?>
-				
+				<?php } ?>				
 			}
 			else{
 				mismoEncargado = false;
@@ -1903,14 +1902,14 @@ if (!$contrato->loaded()) {
 <?= __('Banco') ?>
 					</td>
 					<td align="left" colspan="5">
-						<?= Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $contrato->fields['id_banco'] ? $contrato->fields['id_banco'] : $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
+						<?= Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco",  $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
 					</td>
 				</tr>
 <?php 
 	$tiene_banco = false;
-	if( !empty($contrato->fields['id_banco']) ) {
+	if( $contrato->fields['cuentabanco'])  {
 		$tiene_banco = true;
-		$where_banco = " WHERE cuenta_banco.id_banco = '".$contrato->fields['id_banco']."' ";
+		$where_banco = " WHERE cuenta_banco.id_cuenta = '".$contrato->fields['id_cuenta']."' ";
 	} else if( !empty($id_banco) ) {
 		$tiene_banco = true;
 		$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
@@ -1927,7 +1926,7 @@ if (!$contrato->loaded()) {
 																						, CONCAT( cuenta_banco.numero,
 																						     IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 																						FROM cuenta_banco
-																						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', $tiene_banco ? "" : "Cualquiera", "150") ?>
+																						LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, '', $tiene_banco ? "" : "Cualquiera", "150") ?>
 					</td>
 				</tr>
 
@@ -2945,6 +2944,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 
 function YoucangonowMichael() {
     jQuery( "#div_cobro" ).buttonset();
+    
 }
 	
 	
