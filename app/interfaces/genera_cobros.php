@@ -500,7 +500,7 @@ function GenerarIndividual(
 			{
 				if($('radio_estimado').checked==true)
 					nuevaVentana(
-						'GeneraCobroIndividual', 780, 680,
+						'GeneraCobroIndividual', 1050, 690,
 						"genera_cobros_guarda.php?id_contrato=" + id_contrato +
 						"&fecha_ultimo_cobro=" + fecha_ultimo_cobro +
 						"&fecha_ini=" + fecha_ini +
@@ -515,7 +515,7 @@ function GenerarIndividual(
 			else
 			{
 				nuevaVentana(
-					'GeneraCobroIndividual', 780, 680,
+					'GeneraCobroIndividual', 1050, 690,
 					"genera_cobros_guarda.php?id_contrato=" + id_contrato +
 					"&fecha_ultimo_cobro=" + fecha_ultimo_cobro +
 					"&fecha_ini=" + fecha_ini +
@@ -913,7 +913,7 @@ if($opc == 'buscar')
 									<td align=center width=5% style='font-size:10px'>#".$cobro->fields['id_cobro']."</td>
 									<td align=left width=84% style='font-size:10px'>$texto_tipo&nbsp;de ".$texto_monto.$texto_horas."</td>";
 
-				$html .= "<td align=center width=8%><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1000,690,'cobros5.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1');\">&nbsp;";
+				$html .= "<td align=center width=8%><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1050,690,'cobros5.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1');\">&nbsp;";
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 					$html .= "<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'".$cobro->fields['id_cobro']."',$i,'".$contrato->fields['id_contrato']."')\"></td></tr>";
 				else

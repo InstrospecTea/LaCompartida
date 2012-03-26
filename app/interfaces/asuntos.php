@@ -43,7 +43,7 @@ $pagina->PrintTop($popup);
         jQuery("#agregar_asunto").click(function() {
            var CODCLIENTE='<?php echo $codigo_cliente; ?>';
            if (CODCLIENTE=='') {CODCLIENTE=jQuery("#campo_codigo_cliente").val();}
-           nuovaFinestra('Agregar_Asunto',730,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
+           nuovaFinestra('Agregar_Asunto',800,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
         });
     });
 

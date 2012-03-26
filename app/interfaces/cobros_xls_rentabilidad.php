@@ -97,7 +97,8 @@ if ($guardar_respaldo) {
 												'Bold' => 1,
 												'Color' => 'black'));
 		$formato_titulo =& $wb->addFormat(array('Size' => 10,
-												'VAlign' => 'top',
+												'VAlign' => 'vcenter',
+												'Align' => 'center',
 												'TextWrap' => 1,
 												'Bold' => 1,
 												'Locked' => 1,
@@ -110,6 +111,10 @@ $formato_normal_centrado = & $wb->addFormat(array('Size' => 7,
 			'Color' => 'black'));
 		$formato_normal =& $wb->addFormat(array('Size' => 7,
 												'VAlign' => 'top',
+												'Align' => 'center',
+												'Color' => 'black'));
+		$formato_normal_izq =& $wb->addFormat(array('Size' => 7,
+												'VAlign' => 'top',
 												'Color' => 'black'));
 		$formato_descripcion =& $wb->addFormat(array('Size' => 7,
 												'VAlign' => 'top',
@@ -117,10 +122,12 @@ $formato_normal_centrado = & $wb->addFormat(array('Size' => 7,
 												'Color' => 'black',
 												'TextWrap' => 1));
 		$formato_tiempo =& $wb->addFormat(array('Size' => 7,
+												'Align' => 'center',
 												'VAlign' => 'top',
 												'Color' => 'black',
 												'NumFormat' =>'[h]:mm'));
 		$formato_total =& $wb->addFormat(array('Size' => 10,
+												'Align' => 'center',
 												'VAlign' => 'top',
 												'Bold' => 1,
 												'Top' => 1,
@@ -150,6 +157,7 @@ $formato_normal_centrado = & $wb->addFormat(array('Size' => 7,
 												'NumFormat' => "0.00[$%]"));
 		$formato_tiempo_total =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'top',
+												'Align' => 'center',
 												'Bold' => 1,
 												'Top' => 1,
 												'Color' => 'black',
@@ -412,12 +420,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$decimales = '';
 			$formato_moneda =& $wb->addFormat(array('Size' => 7,
 												'VAlign' => 'top',
-												'Align' => 'right',
+												'Align' => 'center',
 												'Color' => 'black',
 												'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 			$formato_moneda_total =& $wb->addFormat(array('Size' => 10,
 												'VAlign' => 'top',
-												'Align' => 'right',
+												'Align' => 'center',
 												'Bold' => 1,
 												'Top' => 1,
 												'Color' => 'black',
@@ -688,11 +696,17 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$filas = max($filas, $filas2);
 					++$filas;
 				}
+				
+				$where_trabajos = " 1 ";
+										if(!$opc_ver_cobrable)
+											$where_trabajos .= " AND trabajo.visible = 1 ";
+										if(!$opc_ver_horas_trabajadas)
+											$where_trabajos .= " AND trabajo.duracion_cobrada != '00:00:00' ";
 
-				$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro=".$cobro->fields['id_cobro'];
+				$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE $where_trabajos AND trabajo.id_tramite = 0 AND id_cobro=".$cobro->fields['id_cobro'];
 				$resp_num_usuarios = mysql_query($query_num_usuarios,$sesion->dbh) or Utiles::errorSQL($query_num_usuarios,__FILE__,__LINE__,$sesion->dbh);
 				$num_usuarios = mysql_num_rows($resp_num_usuarios);
-
+				
 				// Dejar espacio para el resumen profesional si es necesario.
 	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional']) {
 						$fila_inicio_resumen_profesional = $filas - 1;
@@ -708,7 +722,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$cobro_tiene_trabajos = false;
 					$lineas_total_asunto = array();
 	while ($cobro->asuntos[$cont_asuntos]) {
-						
 						$asunto = new Asunto($sesion);
 						$asunto->LoadByCodigo($cobro->asuntos[$cont_asuntos]);
 						$codigo_asunto_secundario = $asunto->CodigoACodigoSecundario($cobro->asuntos[$cont_asuntos]);
@@ -1084,13 +1097,17 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$filas += 2;
 					} else {
 						// Construir formula para sumar totales de asuntos ...
-						$contador = 0;
-						$formula_total_hh = "=$col_formula_valor_trabajo".$lineas_total_asunto[$contador];
-						$formula_total_ff = "=$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$contador++];
 						
-						while($lineas_total_asunto[$contador]) {
-							$formula_total_hh .= "+$col_formula_valor_trabajo".$lineas_total_asunto[$contador];
-							$formula_total_ff .= "+$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$contador++];
+						foreach($lineas_total_asunto as $cont => $linea_asunto) {
+							if( $cont == 0 ) {
+								$formula_total_hh = "=$col_formula_valor_trabajo".$lineas_total_asunto[$cont];
+								$formula_total_ff = "=$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$cont];
+							} else {
+								if( $linea_asunto > 0 ) {
+									$formula_total_hh .= "+$col_formula_valor_trabajo".$lineas_total_asunto[$cont];
+									$formula_total_ff .= "+$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$cont];
+								}
+							}
 						}
 						
 						$filas += 2;
@@ -1107,7 +1124,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('Write off / Mark up:'), $formato_resumen_rentabilidad);
 						$ws->write($filas, $col_valor_trabajo, '', $formato_resumen_rentabilidad);
-						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=100*$col_formula_valor_trabajo_flat_fee".($filas-1)."/$col_formula_valor_trabajo_flat_fee$filas", $formato_porcentaje_rentabilidad);
+						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=100*(($col_formula_valor_trabajo_flat_fee".($filas-1)."/$col_formula_valor_trabajo_flat_fee$filas)-1)", $formato_porcentaje_rentabilidad);
 					
 						$filas += 2;
 					}
@@ -1136,8 +1153,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						// Encabezado
 						$filas+=2;
 						$ws->write($filas++, $col_descripcion, Utiles::GlosaMult($sesion, 'titulo', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
-						$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'nombre', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-		if ($opc_ver_horas_trabajadas) {
+						$ws->write($filas, $col_descripcion, __('Abogado'), $formato_titulo);
+						if ($opc_ver_horas_trabajadas) {
 							$ws->write($filas, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'horas_trabajadas', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 							$ws->write($filas, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'horas_cobrables', 'Detalle profesional', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 						}
@@ -1173,7 +1190,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 											$resp_tarifa = mysql_query($query_tarifa,$sesion->dbh) or Utiles::errorSQL($query_tarifa,__FILE__,__LINE__,$sesion->dbh);
 											list($data['tarifa']) = mysql_fetch_array($resp_tarifa);
 										}
-										$ws->write($filas, $col_descripcion, $data['nombre'], $formato_normal);
+										$ws->write($filas, $col_descripcion, $data['nombre'], $formato_normal_izq);
 										if($opc_ver_horas_trabajadas)
 											$ws->writeFormula($filas, $col_duracion_trabajada, "=DSUM($inicio_datos:$fin_datos; \"".Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')."\"; ".Utiles::NumToColumnaExcel($col_fecha+$contador).($fila_inicio_detalle_profesional-4).":".Utiles::NumToColumnaExcel($col_fecha+$contador).($fila_inicio_detalle_profesional-3).")", $formato_tiempo);
 										$ws->writeFormula($filas, $col_duracion_cobrable, "=DSUM($inicio_datos:$fin_datos; \"".Utiles::GlosaMult($sesion, 'duracion_cobrable', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')."\"; ".Utiles::NumToColumnaExcel($col_fecha+$contador).($fila_inicio_detalle_profesional-4).":".Utiles::NumToColumnaExcel($col_fecha+$contador).($fila_inicio_detalle_profesional-3).")", $formato_tiempo);

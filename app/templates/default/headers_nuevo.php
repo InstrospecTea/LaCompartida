@@ -43,7 +43,9 @@ $pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
         <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
         <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
-
+		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jshashtable-2.1.js"></script>
+		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
+		
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	

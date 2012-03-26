@@ -6067,7 +6067,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.56:
 				$query = array();
 					
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT INTO ignore `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
 												);";
@@ -7829,6 +7829,7 @@ NULL ,  'RUT'
 				}
 				
 			break;
+			
 		case 5.59:
 				$query = array();
 				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )  VALUES ( NULL ,  'CopiarEncargadoAlAsunto',  '0',  'Copia el encargado comercial del cliente a los asuntos',  'boolean',  '6',  '-1' );";
@@ -7943,7 +7944,6 @@ NULL ,  'RUT'
 				 	}
 				}
 			break;
-			
 			case 5.67:
 				$query = array();
 				
@@ -7966,7 +7966,268 @@ NULL ,  'RUT'
 				}
 				
 				break;
+			case 5.68:
+				$query = array();
+			$comentario = 'Esta opcion activa el uso de notificaciones de pago de comision a personas que contratan nuevos clientes';
+                
+				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+                                            VALUES('UsoPagoComisionNuevoCliente', 0, 'boolean','{$comentario}', 6, -1)";
+                        $comentario = 'Registra el email donde se notificara el termino de pago de comision a personas que contratan nuevos clientes';
+				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+                                            VALUES('UsoPagoComisionNuevoClienteEmail', 'soporte@lemontech.cl', 'string','{$comentario}', 3, 300)";
+    
+                        $comentario = 'Registra el umbral de tiempo(dias) para el termino de pago de comision a personas que contratan nuevos clientes';
+				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+                                        VALUES('UsoPagoComisionNuevoClienteTiempo', '730', 'string','{$comentario}', 6, -1)";
+                
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				
+				break;     
+				case 5.69:
+				$query = array();
+				$comentario = 'Cambia nombre a estado_cobro de 3 tablas para no colisionar con la tabla cobro';
+                 
+				$query[]="ALTER TABLE  `tramite` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";
+				$query[]="ALTER TABLE  `trabajo` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";
+				$query[]="ALTER TABLE  `cta_corriente` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";			
+				
+                                $query[]="ALTER TABLE  `trabajo` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  `cobro` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  `tramite` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  `contrato` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  `documento` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  `cta_corriente` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+				 $query[]="ALTER TABLE  factura  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  cliente  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  asunto  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+                                $query[]="ALTER TABLE  usuario  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+
+                                
+                            
+                                $query[]="ALTER TABLE  trabajo  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  cobro  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  tramite  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  contrato  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  documento  ADD   fecha_touch      TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  cta_corriente  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  factura ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  cliente ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  asunto ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                                $query[]="ALTER TABLE  usuario ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
 			
+			case 5.70:
+				$query = array();
+				$query[] = "UPDATE `configuracion` SET `valor_opcion`='' WHERE `glosa_opcion`='FiltroHistorialUsuarios' LIMIT 1;";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+			
+			case 5.71:
+				$query = array();
+				$query[] = "CREATE TABLE IF NOT EXISTS `olap_liquidaciones` (
+				  `codigos_asuntos` varchar(10) CHARACTER SET latin1 DEFAULT NULL,
+				  `codigo_asunto_secundario` varchar(20) CHARACTER SET latin1 DEFAULT NULL,
+				  `id_usuario_responsable` int(11) DEFAULT NULL,
+				  `asuntos` varchar(150) CHARACTER SET latin1 NOT NULL DEFAULT '',
+				  `asuntos_cobrables` enum('NO','SI') COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SI',
+				  `id_cliente` int(11) NOT NULL DEFAULT '0',
+				  `codigo_cliente_secundario` varchar(20) CHARACTER SET latin1 DEFAULT NULL,
+				  `glosa_cliente` varchar(100) CHARACTER SET latin1 NOT NULL DEFAULT '',
+				  `fecha_creacion_cliente` date NOT NULL DEFAULT '0000-00-00',
+				  `id_cliente_referencia` int(11) DEFAULT NULL,
+				  `nombre_encargado_comercial` varchar(90) CHARACTER SET latin1 DEFAULT NULL,
+				  `username_encargado_comercial` varchar(64) CHARACTER SET latin1 DEFAULT '',
+				  `nombre_encargado_secundario` varchar(90) CHARACTER SET latin1 DEFAULT NULL,
+				  `username_encargado_secundario` varchar(64) CHARACTER SET latin1 DEFAULT '',
+				  `id_contrato` int(11) NOT NULL DEFAULT '0',
+				  `monto` double DEFAULT NULL,
+				  `forma_cobro` varchar(20) CHARACTER SET latin1 NOT NULL DEFAULT 'TASA',
+				  `retainer_horas` decimal(11,2) NOT NULL,
+				  `id_moneda_contrato` tinyint(2) NOT NULL DEFAULT '1',
+				  `id_moneda_total` tinyint(4) NOT NULL DEFAULT '1',
+				  `tipo` varchar(3) CHARACTER SET latin1 DEFAULT '',
+				  `id_unico` bigint(20) NOT NULL DEFAULT '0',
+				  `id_entry` int(11) unsigned DEFAULT '0',
+				  
+				  `codigo_asunto` varchar(10) CHARACTER SET latin1 DEFAULT NULL,
+				  `cobrable` tinyint(1) NOT NULL DEFAULT '1',
+				  `incluir_en_cobro` enum('NO','SI') COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SI',
+				  `duracion_cobrada_segs` bigint(20) DEFAULT NULL,
+				  `monto_cobrable` double DEFAULT '0',
+				  `monto_thh` decimal(12,3) NOT NULL,
+				  `monto_thh_estandar` decimal(12,3) NOT NULL,
+				  `id_moneda_entry` tinyint(2) NOT NULL DEFAULT '1',
+				  `fechaentry` date NOT NULL DEFAULT '0000-00-00',
+				  `id_cobro` int(11) DEFAULT NULL,
+				  `estadocobro` varchar(20) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO',
+				  `fecha_modificacion` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+				  PRIMARY KEY (`id_unico`),
+				  KEY `id_cliente` (`id_cliente`),
+				  KEY `codigos_asuntos` (`codigos_asuntos`),
+				  KEY `id_contrato` (`id_contrato`),
+				  KEY `id_usuario_responsable` (`id_usuario_responsable`)
+				) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
+
+				
+				$query[] = "
+
+replace delayed into olap_liquidaciones (SELECT
+
+                                                                asunto.codigo_asunto as codigos_asuntos,
+                                                                asunto.codigo_asunto_secundario, 
+                  contrato.id_usuario_responsable,
+                                   asunto.glosa_asunto as asuntos,
+                                   (asunto.cobrable+1) as asuntos_cobrables,
+                                    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+								
+								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+								ec.username as username_encargado_comercial,
+								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+								es.username as username_encargado_secundario,
+								contrato.id_contrato,
+                                                                contrato.monto, 
+								contrato.forma_cobro,
+								contrato.retainer_horas,
+								contrato.id_moneda as id_moneda_contrato,
+								contrato.opc_moneda_total as id_moneda_total,
+                                                              
+															  movs.*, now()
+FROM  asunto JOIN contrato  using (id_contrato)
+JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+join
+(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+ tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+ 0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+ 
+ union all
+ 
+ SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+ cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+
+
+union all
+
+select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+from tramite tram where tram.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+
+) movs on movs.codigo_asunto=asunto.codigo_asunto
+ LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario);";
+				
+				$query[] = "replace delayed into olap_liquidaciones (SELECT
+
+                                                                asunto.codigo_asunto as codigos_asuntos,
+                                                                asunto.codigo_asunto_secundario, 
+                  contrato.id_usuario_responsable,
+                                   asunto.glosa_asunto as asuntos,
+                                   (asunto.cobrable+1) as asuntos_cobrables,
+                                    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+								
+								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+								ec.username as username_encargado_comercial,
+								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+								es.username as username_encargado_secundario,
+								contrato.id_contrato,
+                                                                contrato.monto, 
+								contrato.forma_cobro,
+								contrato.retainer_horas,
+								contrato.id_moneda as id_moneda_contrato,
+								contrato.opc_moneda_total as id_moneda_total,
+                                                              
+															  movs.*, now()
+FROM  asunto JOIN contrato  using (id_contrato)
+JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+join
+(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+ tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+ 0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  not in ('SIN COBRO','CREADO','EN REVISION')
+ 
+ union all
+ 
+ SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+ cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
+
+
+union all
+
+select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+from tramite tram where tram.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
+
+) movs on movs.codigo_asunto=asunto.codigo_asunto
+ LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)	;";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+			
+			case 5.72:
+				$query = array();
+				$query[] = "ALTER TABLE  `olap_liquidaciones` CHANGE  `tipo`  `tipo` VARCHAR( 3 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL DEFAULT NULL;";
+				$query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `id_usuario_entry` MEDIUMINT UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'El que realiza el trabajo o solicita el gasto' AFTER  `id_entry`";
+				$query[]="update  `olap_liquidaciones` ol join trabajo tr on ol.id_unico=(10000000+tr.id_trabajo) set ol.id_usuario_entry=tr.id_usuario where ol.tipo='TRB'";
+				$query[]="update  `olap_liquidaciones` ol join tramite tram on ol.id_unico=(30000000 + tram.id_tramite) set ol.id_usuario_entry=tram.id_usuario where ol.tipo='TRA'";
+				$query[]="update  `olap_liquidaciones` ol join cta_corriente cc on ol.id_unico=(20000000 + cc.id_movimiento) set ol.id_usuario_entry=cc.id_usuario_orden where ol.tipo='GAS'";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+			
+			case 5.73:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES (
+									NULL ,  'CodigoAsuntoEnColumnasSeparadas',  '1', NULL ,  'boolean',  '6',  '-1'
+								);";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			break;
+			
+			case 5.74:
+				$query = array();
+				$query[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+							VALUES ('CantidadLineasDescripcionFacturas', '2', NULL, 'numero', 6, -1)";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
 	}
 }
 
@@ -7974,9 +8235,11 @@ NULL ,  'RUT'
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-for($version=1;$version<=5.67;$version+=0.01):
-    $VERSIONES[$num++]=$version;
+for($version=1;$version<=5.74;$version+=0.01):
+    $VERSIONES[$num++]=round($version,2);
 endfor;
+
+
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
 function IngresarNotificacion($notificacion,$permisos=array('ALL'))

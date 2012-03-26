@@ -109,10 +109,48 @@
 	}
 
 	$pagina->PrintTop();
-	$tooltip_text = __('Para agregar un nuevo usuario ingresa su RUT aquí.');
+	$tooltip_text = __('Para agregar un nuevo usuario ingresa su '.UtilesApp::GetConf($sesion,'NombreIdentificador').' aquí.');
 ?>
 
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+	
+	   
+	    jQuery('.descargaxls').click(function() {
+		var activo=0;
+		if(jQuery('#activo').is(':checked')) activo=1;
+
+		var tipoxls=jQuery(this).attr('rel');
+
+		nom=jQuery('#nombre').val();
+		if(tipoxls == 'xls')
+		{
+			destino = '../interfaces/usuarios_xls.php?act='+activo+'&nombre='+nom;
+		}
+		else if(tipoxls == 'xls_vacacion')
+		{
+			destino = '../interfaces/usuarios_xls.php?act='+activo+'&nombre='+nom+'&vacacion=true';
+		}
+		else if(tipoxls == 'xls_modificaciones')
+		{
+			destino = '../interfaces/usuarios_xls.php?act='+activo+'&nombre='+nom+'&modificaciones=true';
+		}
+		top.window.location.href=destino;
+		if (console!==undefined) console.log(destino);
+	    });
+    });	    
+	function YoucangonowMichael() {
+	     //if (console!==undefined) console.log('jQUI Cargado');
+	     jQuery('.descargaxls').button({
+		 icons: {primary: "ui-icon-xls"	}
+	     }).show();
+	     jQuery('#btnbuscar, #costos').button({
+		 icons: {primary: "ui-icon-search"	}
+	     });
+
+	}
+
 function RevisarRut( form )
 {
 	//if( Rut(form.rut.value, form.dv_rut.value ) )
@@ -315,8 +353,7 @@ function Listar( form, from )
 		<td valign="top">
 
 <?
-  if( ( method_exists('Conf','GetConf') && strtolower(Conf::GetConf($sesion,'NombreIdentificador'))=='rut' ) || ( method_exists('Conf','NombreIdentificador') && strtolower(Conf::NombreIdentificador()) == 'rut' ) )
-		{ ?>
+  if( strtolower(UtilesApp::GetConf($sesion,'NombreIdentificador'))=='rut' )	{ ?>
 			<form action="usuario_paso2.php" method="post" onsubmit="return RevisarRut(this);">
 <?  }
 	else
@@ -327,31 +364,31 @@ function Listar( form, from )
 <table width=100% class="tb_base">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="2">
-			<?=__('Ingrese ')?> <?=( method_exists('Conf','GetConf')?Conf::GetConf($sesion,'NombreIdentificador'):Conf::NombreIdentificador() )?> <?=__('del usuario')?>:
+			<? echo __('Ingrese ') . UtilesApp::GetConf($sesion,'NombreIdentificador') . __(' del usuario')?>:
 			<hr class="subtitulo_linea_plomo"/>
 		</td>
 	</tr>
 	<tr>
 		<td valign="top" class="texto" align="right">
-			<strong><?=( method_exists('Conf','GetConf')?Conf::GetConf($sesion,'NombreIdentificador'):Conf::NombreIdentificador() )?></strong>
+			<strong><?php echo  UtilesApp::GetConf($sesion,'NombreIdentificador'); ?></strong>
 		</td>
 		<td valign="top" class="texto" align="left">
-			<? if( method_exists('Conf','GetConf') && strtoupper(Conf::GetConf($sesion,'NombreIdentificador'))=='RUT' ) { ?>
+			<?   if( strtolower(UtilesApp::GetConf($sesion,'NombreIdentificador'))=='rut' ) { ?>
 				<input type="text" name="rut" value="" size="10" onMouseover="ddrivetip('<?=$tooltip_text?>')" onMouseout="hideddrivetip()" />-<input type="text" name="dv_rut" value="" maxlength=1 size="1" />
 			<? } else { ?>
 				<input type="text" name="rut" value="" size="17" onMouseover="ddrivetip('<?=$tooltip_text?>')" onMouseout="hideddrivetip()" />
 			<? } ?>
-				<br />
+				&nbsp;
 			<?
 			if( $sesion->usuario->fields['id_visitante'] == 0 )
 				echo "<br><input type=\"submit\" class=btn name=\"boton\" value=\"".__('Aceptar')."\" />";
 			else
-				echo "<br><input type=\"button\" class=btn name=\"boton\" value=\"".__('Aceptar')."\" onclick=\"alert('Ústed no tiene derecho para agegar un usuario nuevo');\" />";
+				echo "<br><input type=\"button\" class=btn name=\"boton\" value=\"".__('Aceptar')."\" onclick=\"alert('Usted no tiene derecho para agegar un usuario nuevo');\" />";
 			?>
 		</td>
 	</tr>
 	<tr>
-		<td valign="top"><img src="../img/pix.gif" border="0" width="1" height="5" alt='' /></td>
+		<td valign="top"><img src="https://files.thetimebilling.com/templates/default/img/pix.gif" border="0" width="1" height="5" alt='' /></td>
 	</tr>
 </table>
 <br/>
@@ -473,7 +510,7 @@ function Listar( form, from )
 			<? if( $sesion->usuario->fields['id_visitante'] == 0 )
 						echo "<input type=\"button\" value=\"".__('Guardar')."\" class=btn onclick=\"ModificaTodos(this.form);\"  /> &nbsp;&nbsp;";
 				 else
-				 		echo "<input type=\"button\" value=\"".__('Guardar')."\" class=btn onclick=\"alert('Ústed no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
+				 		echo "<input type=\"button\" value=\"".__('Guardar')."\" class=btn onclick=\"alert('Usted no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
 			?>
 			<input type="button" value="<?=__('Cancelar')?>" onclick="Cancelar(this.form);" class=btn />
 		</td></tr>
@@ -501,19 +538,22 @@ function Listar( form, from )
 				</td>
 		</tr>
 		<tr>
-				<td valign="top" align="left" colspan="2"><img src="<?=Conf::ImgDir()?>/pix.gif" border="0" width="1" height="10"></td>
+				<td valign="top" align="left" colspan="2"><img src="https://files.thetimebilling.com/templates/default/img/pix.gif" border="0" width="1" height="10"></td>
 		</tr>
 		<tr>
 				<td valign="top" align="center" style="white-space:nowrap">
 			<form name="act"  method="post">
 					  <input type="checkbox" name="activo" value="1" id="activo" checked />solo activos &nbsp;&nbsp;&nbsp;
 						<strong>Nombre</strong>
-						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" value="<?=$nombre?>" size="20" />
-						&nbsp;&nbsp; <input type="submit" class=btn value="Buscar" onclick="Listar(this.form,'buscar')" />
-						&nbsp;&nbsp; <input type="button" class=btn value="<?=__('Descargar listado a Excel')?>" onclick="Listar(this.form,'xls')" />
-						&nbsp; <input type="button" class=btn value="<?=__('Descargar vacaciones a Excel')?>" onclick="Listar(this.form,'xls_vacacion')" />
-						&nbsp; <input type="button" class=btn value="<?=__('Descargar modificaciones a Excel')?>" onclick="Listar(this.form,'xls_modificaciones')" />
+						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" id="nombre" value="<?=$nombre?>" size="20" />
+						&nbsp;&nbsp; <input type="submit"  value="Buscar" id="btnbuscar" onclick="Listar(this.form,'buscar')" />
+						
+						&nbsp; <a href="#" class="descargaxls" style="display:none;" rel="xls">Descargar Listado</a>
+						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_vacacion">Descargar Vacaciones</a>
+						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_modificaciones">Descargar Modificaciones</a>
+						
 			</form>
+				    
 				</td>
 		</tr>
 		<tr>
@@ -563,7 +603,7 @@ function Listar( form, from )
 		</tr>
 		<tr>
 				<td colspan=2>
-				<ul><li><a href="<?=Conf::RootDir().'/app/interfaces/costos.php' ?>"  ><?=__('Editar costo mensual por usuario') ?></a></li></ul>
+				<ul><li id="costos"><a  href="<?=Conf::RootDir().'/app/interfaces/costos.php' ?>"  ><?=__('Editar costo mensual por usuario') ?></a></li></ul>
 				</td>
 		</tr>
 		</table>
@@ -598,12 +638,11 @@ function Listar( form, from )
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		$i++;
 				list($count) = mysql_fetch_array($resp);
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
-			{
+		if ( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') )	{
 				if($count > 0)
-					return "<img src='".Conf::ImgDir()."/check_nuevo.gif' alt='OK' />";
+					return "<div class='permiso on' id='". $fila->fields['id_usuario'].';'.$permiso."'><img src='".Conf::ImgDir()."/check_nuevo.gif' alt='OK' /></div>";
 				else
-					return "<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' alt='NO' />";
+					return "<div class='permiso off' id='". $fila->fields['id_usuario'].';'.$permiso."'><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' alt='NO' /></div>";
 			}
 		else
 			{

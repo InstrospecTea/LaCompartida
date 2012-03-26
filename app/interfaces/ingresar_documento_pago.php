@@ -724,6 +724,7 @@ function SetMontoPagos()
                 jQuery('#monto').val(Number(monto_tmp));
 		jQuery('#monto_pagos').val(Number(monto_tmp));
                    }*/
+    if (monto_tmp==undefined) monto_tmp=0;
                 if(jQuery('#saldo_pago_aux').length>0) {
                     saldopagomaximo=anterior+Number(jQuery('#saldo_pago_aux').val());
                     if(monto_tmp>saldopagomaximo) {

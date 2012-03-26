@@ -289,6 +289,8 @@ function ShowGastos(valor)
 
 function CambiaMonto( form )
 {
+	var monto = form.monto.value;
+	form.monto.value = monto.replace(',','.');
 <?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos') ) || ( method_exists('Conf','ComisionGastos') && Conf::ComisionGastos() ) )
 	{
@@ -299,7 +301,8 @@ function CambiaMonto( form )
 	else
 	{
 ?>
-	form.monto_cobrable.value = form.monto.value;
+	if( form.monto_cobrable )
+		form.monto_cobrable.value = form.monto.value;
 <?
 	}
 ?>
@@ -311,7 +314,7 @@ function Validar(form)
 	if( form.monto_cobrable )
 		monto_cobrable = parseFloat(form.monto_cobrable.value);
 
-	if(monto <= 0 || isNaN(monto))
+	if( form.monto_cobrable && ( monto <= 0 || isNaN(monto) ) )
 	monto=monto_cobrable;
 
 <?php if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) { ?>
@@ -669,7 +672,7 @@ else
 			<?=__('Monto')?>
 		</td>
 		<td align=left>
-			<input name=monto size=10 onchange="CambiaMonto(this.form);" value="<?=$gasto->fields['egreso'] ? $gasto->fields['egreso'] : $gasto->fields['ingreso'] ?>" />
+			<input name="monto" id="monto" size=10 onchange="CambiaMonto(this.form);" value="<?=$gasto->fields['egreso'] ? $gasto->fields['egreso'] : $gasto->fields['ingreso'] ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<?=__('Moneda')?>&nbsp;
 			<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $gasto->fields['id_moneda'] ? $gasto->fields['id_moneda'] : '', '','',"80"); ?>
@@ -698,7 +701,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ComisionGastos
 			<?=__('Monto facturable')?>&nbsp;
 		</td>
 		<td align=left>
-			<input name=monto_cobrable size=10 value="<?=$gasto->fields['monto_cobrable']?>" />
+			<input name="monto_cobrable" id="monto_cobrable" size=10 value="<?=$gasto->fields['monto_cobrable']?>" />
 		</td>
 	</tr>
 <?	}
@@ -1054,6 +1057,18 @@ CargaIdioma("<?= $codigo_asunto ?>");
 <?
 }
 ?>
+	jQuery("#monto").blur(function(){
+	   var str = jQuery(this).val();
+	   jQuery(this).val( str.replace(',','.') );
+	   jQuery(this).parseNumber({format:"#.00", locale:"us"});
+	   jQuery(this).formatNumber({format:"#.00", locale:"us"});
+	});
+	jQuery("#monto_cobrable").blur(function(){
+		var str = jQuery(this).val();
+	    jQuery(this).val( str.replace(',','.') );
+	    jQuery(this).parseNumber({format:"#.00", locale:"us"});
+	    jQuery(this).formatNumber({format:"#.00", locale:"us"});
+	});
 </script>
 <?
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )

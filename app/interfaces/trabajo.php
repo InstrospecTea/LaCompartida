@@ -123,7 +123,8 @@
     
 ?>
 <script type="text/javascript">
-    var arr_trabajos = new Array();
+    var arr_trabajosabiertos = new Array();
+    var arr_trabajoscerrados = new Array();
 	function calcHeight(idIframe, idMainElm){
     ifr = $(idIframe);
     the_size = ifr.$(idMainElm).offsetHeight + 20;
@@ -168,6 +169,24 @@ var MenuDias = [
 	    callback: function(e) {
 	      if( confirm('<?=__("¿Desea eliminar este trabajo?")?>') )
 	      	OpcionesTrabajo(e.target.id,'eliminar','');
+	    }
+	  },{
+	    separator: true
+	  },{
+	    name: 'Cancelar',
+	    className: 'cancel',
+	    callback: function(e) {
+					OpcionesTrabajo('','cancelar');
+	    }
+	  }
+	];
+       
+       var myClosedMenuItems = [
+	  {
+	  	name: 'Ingresar como nueva hora',
+	    className: 'new', 
+	    callback: function(e) {
+	      OpcionesTrabajo(e.target.id,'nuevo','');
 	    }
 	  },{
 	    separator: true
@@ -254,7 +273,7 @@ var dias=0;
 var diaplus=dias+1;
 var fecha='';
     jQuery.get('ajax/semana_ajax.php?popup=1&semana='+semana+'&id_usuario='+usuario, function(data) {
-               jQuery('#divsemana').html(data);
+               jQuery('#divsemana').html(data).slideDown();
            jQuery("#proxsemana").val(jQuery("#hiddensemanasiguiente").val());
            jQuery("#antsemana").val(jQuery("#hiddensemanaanterior").val());
             calendario(semana);
@@ -269,7 +288,7 @@ var fecha='';
                fecha=jQuery('#dia'+(diaplus-1)).val();
                 jQuery("#celdastrabajo").append('<td class="celdadias" width="14%" id="celda'+diaplus+'" rel="'+fecha+'"></td>');
           }
-          jQuery('.cajatrabajo').draggable({cursor:'move', containment:'#celdastrabajo', revert:'true', helper:'clone'});
+          jQuery('.trabajoabierto').draggable({cursor:'move', containment:'#celdastrabajo', revert:'true', helper:'clone'});
           jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false',
               drop: function (event,ui) {
                 var  cuando=jQuery(this).attr('rel');
@@ -285,6 +304,7 @@ var fecha='';
           });
               
      });
+     jQuery('#divsemana').html(DivLoading);
 }
 
 function Refrescar() {
@@ -300,19 +320,36 @@ function calendario(semana) {
 }
 
 function menues() {
-    var indice=0;
-    jQuery('.cajatrabajo').each(function() {
-       arr_trabajos[indice]=jQuery(this).attr('id');
-       indice++;
-       
-       
+    var indiceabierto=0;
+    var indicecerrado=0;
+    
+    var arr_trabajosabiertos = new Array();
+    var arr_trabajoscerrados = new Array();
+    
+    jQuery('.trabajoabierto').each(function() {
+       arr_trabajosabiertos[indiceabierto]=jQuery(this).attr('id');
+       indiceabierto++;
     });
-    for(i=0;i<indice;i++)
+    jQuery('.trabajocerrado').each(function() {
+       arr_trabajoscerrados[indicecerrado]=jQuery(this).attr('id');
+       indicecerrado++;
+    });
+   // console.log(arr_trabajosabiertos);
+   // console.log(arr_trabajoscerrados);
+    for(i=0;i<indiceabierto;i++)
 	{
 			new Proto.Menu({
-		  selector: '#'+arr_trabajos[i], // context menu will be shown when element with id of "contextArea" is clicked
+		  selector: '#'+arr_trabajosabiertos[i], // context menu will be shown when element with id of "contextArea" is clicked
 		  className: 'menu desktop',
 		  menuItems: myMenuItems
+		})
+	}
+     for(i=0;i<indicecerrado;i++)
+	{
+			new Proto.Menu({
+		  selector: '#'+arr_trabajoscerrados[i], // context menu will be shown when element with id of "contextArea" is clicked
+		  className: 'menu desktop',
+		  menuItems: myClosedMenuItems
 		})
 	}
     for(i=0;i<7;i++)
@@ -405,7 +442,7 @@ function OpcionesTrabajo(id_trabajo, opcion, f_dia ) {
 	<tr>
 		<td align=center>
 			<div class="tb_base" id="divsemana" style="width: 750px;">
-			
+                            <div class="divloading">&nbsp;</div>
 			</div>
 		</td>
 	</tr>

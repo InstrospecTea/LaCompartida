@@ -30,6 +30,7 @@
 			
 			$factura_pdf_datos = new FacturaPdfDatos($sesion);
 			$factura_pdf_datos->Load($id);
+			if(strtolower($campo)=='ejemplo') $value=utf8_decode($value);
 			$factura_pdf_datos->Edit($campo, $value);
 			if( empty($_POST['fac_activo_'.$id]) ) {
 				$factura_pdf_datos->Edit('activo','0');
@@ -114,7 +115,7 @@
                 echo "<li class='fatcell' id='fatcell'><input type=\"text\"  name=\"fac_font_".$row['id_dato']."\" id=\"fondo\"   value=\"". $row['font'] ."\" /></li>";
 		echo "</ul>";
             else:
-		$ejemplo=($row['Ejemplo']!='')? $row['Ejemplo']:$fila[$row['codigo_tipo_dato']] ;
+		$ejemplo=nl2br(($row['Ejemplo']!='')? $row['Ejemplo']:$fila[$row['codigo_tipo_dato']] );
                 echo "<ul  class='cat_".  $row['id_factura_pdf_datos_categoria']  ."' rel='".$celda."' id=\"fila_".$row['id_dato']."\">";
 		echo "<li   class='st1cell'  id='glosa_".$row['id_dato']."' rel='". $ejemplo ."'>".__($row['glosa_tipo_dato'])."</li>";
 		echo "<li  class='nd2cell' ><input rel='".  $row['id_factura_pdf_datos_categoria']  ."' type=\"checkbox\" class=\"fac_activo\" name=\"fac_activo_".$row['id_dato']."\" id=\"fac_activo_".$row['id_dato']."\"  value=\"1\" ".( $row['activo'] == 1 ? 'checked' : '' )." />";

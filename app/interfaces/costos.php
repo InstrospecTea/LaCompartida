@@ -46,13 +46,28 @@
                                     $query = "DELETE FROM usuario_costo WHERE id_usuario = '".$id_usuario."' AND fecha = '".sprintf("%04d-%02d-01", $fecha_a, $mes)."' ";
                                     mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
                                 } else {
-                                    $costo = str_replace('.','',$costo);
-                                    $costo = str_replace(',','',$costo);
-				    $query = "REPLACE INTO usuario_costo(id_usuario, fecha, costo) VALUES('".$id_usuario."', '".sprintf("%04d-%02d-01", $fecha_a, $mes)."', '".$costo."')";
+									$costo = NumberFormatToInt( $costo );
+									$query = "REPLACE INTO usuario_costo(id_usuario, fecha, costo) VALUES('".$id_usuario."', '".sprintf("%04d-%02d-01", $fecha_a, $mes)."', '".$costo."')";
                                     mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
                                 }
 			}
 		}
+	}
+	
+	function NumberFormatToInt( $string ) {
+		$len_string = strlen($string);
+		$len_punto = strlen(strrchr($string,'.'));
+		$len_comma = strlen(strrchr($string,','));
+		if($len_punto > $len_comma) {
+			$strip = ( $len_comma > 0 ? $len_comma : $len_punto );
+		} else {
+			$strip = ( $len_punto > 0 ? $len_punto : $len_comma );
+		}
+		if( $strip < 4 && $strip > 0 )
+			$result = str_replace('.','',str_replace(',','',substr($string,0,$len_string-$strip))).'.'.substr($string,-($strip-1));
+		else
+			$result = str_replace('.','',str_replace(',','',substr($string,0,$len_string)));
+		return $result;
 	}
 
 	$pagina->titulo = __('Costo por profesional');
@@ -161,7 +176,7 @@ function Guardar( opc )
 	while(list($id_usuario,$nombre_usuario,$username) = mysql_fetch_array($resp))
 	{
 		++$tab;
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') && !empty($username) )
 			$td_contenido .= '<tr><td align=left width="150">'.$username.'</td>';
 		else
 			$td_contenido .= '<tr><td align=left width="150">'.$nombre_usuario.'</td>';

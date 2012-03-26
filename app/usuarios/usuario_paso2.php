@@ -465,7 +465,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 
 	<fieldset>
 	<legend><?=__('Permisos')?></legend>
-	<table>
+	<table id="chkpermisos" style="display:none;">
 		<?=Html::PrintCheckbox($sesion, $usuario->permisos, 'codigo_permiso', 'glosa', 'permitido');?>
 <?
 	if(!$usuario->loaded)
@@ -697,7 +697,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 				<span id="historial_img"><img src= "<?=Conf::ImgDir()?>/mas.gif" border="0" ></span>
 				<?=__('Historial')?>
 			</legend>
-			<table id="historial_tabla" style='display:none;' width="600px">
+			<table id="historial_tabla" style='display:none;' width="780px">
 				<tr>
 					<td colspan="3" style="font-size:11px;"><b>Fecha creación:</b> <?php echo Utiles::sql2date($usuario->fields['fecha_creacion']); ?></td>
 				</tr>
@@ -706,22 +706,76 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 				</tr>
 				<tr style="border:1px solid #454545">
 					<td width="80px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fecha</td>
-					<td width="120px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Dato modificado</td>
-					<td width="150px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor actual</td>
-					<td width="150px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor anterior</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Dato modificado</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor actual</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor anterior</td>
 					<td width="250px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Modificado por</td>
 				</tr>
 <?php if( !empty($usuario_historial) ): ?>
-<?php foreach($usuario_historial as $k => $historia): 
-				if( trim($historia['nombre_dato']) == 'categoría' )
-				{
+<?php foreach($usuario_historial as $k => $historia):
+				if( trim($historia['nombre_dato']) == 'categoría'  ) {
 					$glosa_actual = (!empty($historia['valor_actual'])) ? Utiles::Glosa($sesion, $historia['valor_actual'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
 					$glosa_origen = (!empty($historia['valor_original'])) ? Utiles::Glosa($sesion, $historia['valor_original'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
-				}
-				else
-				{
+				} else if( trim($historia['nombre_dato']) == 'área usuario'  ) {
+					$glosa_actual = (!empty($historia['valor_actual'])) ? Utiles::Glosa($sesion, $historia['valor_actual'], 'glosa', 'prm_area_usuario','id') : 'sin asignación';
+					$glosa_origen = (!empty($historia['valor_original'])) ? Utiles::Glosa($sesion, $historia['valor_original'], 'glosa', 'prm_area_usuario','id') : 'sin asignación';
+				} else if( trim($historia['nombre_dato']) == 'permisos' ) {
+					$_permisos_anteriores = explode(",", $historia['valor_original']);
+					$_permisos_nuevos = explode(",", $historia['valor_actual']);
+					
+					$_permisos_agregados = array_diff($_permisos_nuevos, $_permisos_anteriores);
+					$_permisos_quitados = array_diff($_permisos_anteriores, $_permisos_nuevos);
+					
+					$_permisos_agregados_texto = "";
+					foreach ( $_permisos_agregados as $llave => $codigo ) {
+						if( strlen( $_permisos_agregados_texto ) > 0 ){
+							$_permisos_agregados_texto .= ", ";
+						}
+						$_permisos_agregados_texto .=  Utiles::Glosa($sesion, $codigo, 'glosa', 'prm_permisos','codigo_permiso') ;
+					}
+					if( strlen( $_permisos_agregados_texto) > 0 ) {
+						$_permisos_agregados_texto = "Se agregó: " . $_permisos_agregados_texto . "<br />";
+					}
+					
+					$_permisos_quitados_texto = "";
+					foreach ( $_permisos_quitados as $llave => $codigo ) {
+						if( strlen( $_permisos_quitados_texto ) > 0 ){
+							$_permisos_quitados_texto .= ", ";
+						}
+						$_permisos_quitados_texto .=  Utiles::Glosa($sesion, $codigo, 'glosa', 'prm_permisos','codigo_permiso') ;
+					}
+					if( strlen( $_permisos_quitados_texto) > 0 ) {
+						$_permisos_quitados_texto = "Se eliminó: " . $_permisos_quitados_texto;
+					}
+					
+					$glosa_origen = " - ";
+					$glosa_actual = $_permisos_agregados_texto . $_permisos_quitados_texto;
+				} else if( trim($historia['nombre_dato']) == 'usuario secretario de' || trim($historia['nombre_dato']) == 'usuario revisor de'  ) {
+					
+					$_sde_actual = explode( ",", $historia['valor_actual'] );
+					$_sde_original = explode( ",", $historia['valor_original'] );
+					
+					$_arr_sde_actual = array();
+					$_arr_sde_original = array();
+					
+					foreach( $_sde_actual as $key => $id_actual ) {
+						$_arr_sde_actual[] = Utiles::Glosa($sesion, $id_actual, 'CONCAT_WS(" ", nombre, apellido1, apellido2) as nombre_completo', 'usuario','id_usuario');
+					}
+					
+					foreach( $_sde_original as $key => $id_original ) {
+						$_arr_sde_original[] = Utiles::Glosa($sesion, $id_original, 'CONCAT_WS(" ", nombre, apellido1, apellido2) as nombre_completo', 'usuario','id_usuario');
+					}
+					
+					$glosa_actual = (sizeof( $_arr_sde_actual) ? implode("<br />", $_arr_sde_actual) : '');
+					$glosa_origen = (sizeof( $_arr_sde_original) ? implode("<br />", $_arr_sde_original) : '');
+					
+				} else if ( trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria' 
+						|| trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados' )  {
 					$glosa_actual = (!empty($historia['valor_actual'])) ? 'activo' : 'inactivo';
 					$glosa_origen = (!empty($historia['valor_original'])) ? 'activo' : 'inactivo';
+				} else {
+					$glosa_actual = $historia["valor_actual"];
+					$glosa_origen = $historia["valor_original"];
 				}
 ?>
 				<tr>
@@ -845,6 +899,33 @@ function CargarPermisos()
 }
 ?>
 <script>
+    
+     jQuery(document).ready(function() {
+	jQuery( "#chkpermisos" ).hide();
+	
+     jQuery("#chkpermisos .ui-button").live('change',function() {
+     alert(jQuery(this).attr('class'));
+     jQuery(this).button("option", {
+            icons: { primary: this.checked ? 'ui-icon-check' : 'ui-icon-closethick' }
+        });
+     });
+	});
+     
+
+function YoucangonowMichael() {
+    
+    jQuery( "#chkpermisos" ).buttonset().show();
+    jQuery("#chkpermisos .ui-button").each(function() {
+	jQuery(this).css({'width':'150px','text-align':'left','padding-left':'25px'});
+	console.log(jQuery(this));
+    });
+    
+
+   
+    
+    
+}
+	    
 	window.onbeforeunload = function(){
      return preguntarGuardar();
 	};

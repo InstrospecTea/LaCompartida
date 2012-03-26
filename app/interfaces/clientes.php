@@ -185,9 +185,16 @@ else { ?>
 	</fieldset>
 </td></tr></table>
 </form>
-<script src=<?=Conf::RootDir()."/fw/js/prototype.js"?> type="text/javascript"></script>
-<script src=<?=Conf::RootDir()."/fw/js/src/scriptaculous.js?load=effects,controls"?> type="text/javascript"></script>
 <script type="text/javascript">
+    
+	       
+		if(typeof(Prototype)=="undefined")    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js", dataType: "script" });
+		    
+		    if(typeof(Effect)=="undefined")    {
+		    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.2/effects.js", dataType: "script" });
+		    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.2/controls.js", dataType: "script" });
+		    }
+		
 Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cliente", "ajax_seleccionar_cliente.php", {minChars: 1, indicator: 'indicador_glosa_cliente'});
 Calendar.setup(
 	{

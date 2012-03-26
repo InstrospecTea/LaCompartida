@@ -37,6 +37,8 @@ class Trabajo extends Objeto
 	function Estado()
 	{
 		if(!$this->fields['estado_cobro'] && $this->fields['id_cobro'])
+		if(!$this->fields['estado_cobro'] && $this->fields['id_cobro'])
+		if($this->fields['id_cobro'])
 		{
 			$cobro= new Cobro($this->sesion);
 			$cobro->Load($this->fields['id_cobro']);

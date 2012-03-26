@@ -191,19 +191,15 @@
 							,cobro.id_cobro
 							,cobro.opc_moneda_total
 							,area.glosa
+							,moneda_base.id_moneda as id_moneda_base 
 							,moneda_cobro.simbolo
 							,moneda_cobro.id_moneda
 							,cobro.total_minutos
 							,cobro.opc_moneda_total
 							,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
 							,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
-							,IF( SUM( TIME_TO_SEC(duracion_cobrada))/60 != cobro.total_minutos,
-								 ( ( ( SUM( TIME_TO_SEC(duracion_cobrada))/60 ) / cobro.total_minutos ) * ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales)),
-								 ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales))
-								 AS monto_proporcional
-							,IF( SUM( TIME_TO_SEC(duracion_cobrada))/60 != cobro.total_minutos,
-								( ( ( SUM( TIME_TO_SEC(duracion_cobrada))/60 ) / cobro.total_minutos ) * ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio )),
-								ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales)) AS total_moneda_base
+							,ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) AS monto_proporcional
+							,ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
 							FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
@@ -247,13 +243,13 @@
 				$gasto = $lista_gastos->Get($i);
 				if($gasto->fields['egreso']>0)
 				{
-					$saldo_gastos += UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['opc_moneda_total']]['cifras_decimales']);
+					$saldo_gastos += UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['id_moneda_base']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['id_moneda_base']]['cifras_decimales']);
 					//$saldo_gastos += $x_resultados['monto_cobrable'][$cobro['opc_moneda_total']];
 					//$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
 				}
 				else if($gasto->fields['ingreso']>0)
 				{
-					$saldo_gastos -= UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['opc_moneda_total']]['cifras_decimales']);
+					$saldo_gastos -= UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['id_moneda_base']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['id_moneda_base']]['cifras_decimales']);
 					//$saldo_gastos -= $x_resultados['monto_cobrable'][$cobro['opc_moneda_total']];
 					//$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
 				}

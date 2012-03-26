@@ -64,6 +64,7 @@
                 jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
                 });
             });
+	     jQuery("#losadelantos").html(DivLoading);
         });
         jQuery("#boton_buscar").click(function() {
            // alert('buscando...');
@@ -76,6 +77,8 @@
                         jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
                         });
                     });
+		    jQuery("#losadelantos").html(DivLoading);
+		    
         });
         jQuery('#codigo_cliente').change(function(){
             jQuery('#loading').remove();
@@ -100,6 +103,7 @@
                 jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
                 });
             });
+	     jQuery("#losadelantos").html(DivLoading);
     }
 	function AgregarNuevo(tipo)
 	{

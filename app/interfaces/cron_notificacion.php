@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once dirname(__FILE__).'/../classes/AlertaCron.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -35,10 +35,10 @@
         
 	$notificacion = new Notificacion($sesion);
 
-	//El arreglo dato_x se construir√° con los datos de cada usuarios de la forma: id_usuario => datos (otro arreglo)
+	//El arreglo dato_x se construir· con los datos de cada usuarios de la forma: id_usuario => datos (otro arreglo)
 	//Por ejemplo, se pueden anexar los siguientes componentes
 	// $dato_x['usuarios'][5]['alerta_propia'] => 'Estimado usuario 5: no has ingresado horas'. (5: PRO)
-	// $dato_x['usuarios'][5]['alerta_revisado'][7] => 'Estimado usuario 5: usuario 7 no ha ingresado horas'. (5:REV √≥ revisor(5,7)
+	// $dato_x['usuarios'][5]['alerta_revisado'][7] => 'Estimado usuario 5: usuario 7 no ha ingresado horas'. (5:REV Û revisor(5,7)
 	// $dato_x['usuarios'][5]['reportes'][3] => 'Estimado usuario 5: <imagen_reporte_5>. (5:REP)
 	$dato_mensual = array();
 	$dato_semanal = array();
@@ -61,7 +61,7 @@
 
 	if( date("D") == $DiaMailSemanal || $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')
 	{
-		// Mensaje para JPRO: Alertas de M√≠nimo y M√°ximo de horas semanales
+		// Mensaje para JPRO: Alertas de MÌnimo y M·ximo de horas semanales
 		$ids_usuarios_profesionales = '';
 		$query = 	"SELECT usuario.id_usuario,
 									alerta_semanal,
@@ -157,10 +157,10 @@
 				else if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenHorasSemanalesAAbogadosIndividuales') )
 					$revisados = $id_usuario;
 				
-				// Comentado por Stefan Moers 5.4.2011, siempre se deber√≠a hacer el intersect con el array de los revisados.
+				// Comentado por Stefan Moers 5.4.2011, siempre se deberÌa hacer el intersect con el array de los revisados.
 				/*if($codigo_permiso == 'REV') //Si es revisor, informo sobre todos en cache_revisados
 					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
-				else */ //Si no, array_intersect_key devolver√° un segmento de cache_revisados dado por el arreglo 'revisados' (explotado e invertido).
+				else */ //Si no, array_intersect_key devolver· un segmento de cache_revisados dado por el arreglo 'revisados' (explotado e invertido).
 				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReporteRevisadosATodosLosAbogados') )
 					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
 				else
@@ -169,7 +169,7 @@
 		
 		
 		
-		// Mensaje para REP: Imagenes de Reporte Consolidado. Genero el pdf que se anexar√°
+		// Mensaje para REP: Imagenes de Reporte Consolidado. Genero el pdf que se anexar·
 
 		/* Imagenes para Encargado comercial:
 		 * Mis contratos: horas de la semana, monto de la semana, que tal el CAP.
@@ -190,7 +190,7 @@
 		echo implode('<br><br><br>',$mensajes);
 	}
 
-	// Mail diario, Primer componente: la modificaci√≥n de datos se alerta cada d√≠a a los responsables del contrato
+	// Mail diario, Primer componente: la modificaciÛn de datos se alerta cada dÌa a los responsables del contrato
 	$CorreosModificacionAdminDatos = '';
 	if(method_exists('Conf','GetConf'))
 		$CorreosModificacionAdminDatos = Conf::GetConf($sesion, 'CorreosModificacionAdminDatos');
@@ -256,7 +256,7 @@
 
 
 
-	//Mail diario, Segundo Componente: Alertas de l√≠mites de Asuntos
+	//Mail diario, Segundo Componente: Alertas de lÌmites de Asuntos
 	$query_asuntos=
 		"SELECT asunto.codigo_asunto,
 				usuario.id_usuario,
@@ -275,7 +275,7 @@
 
 		$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
 
-		/*Los cuatro l√≠mites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. */
+		/*Los cuatro lÌmites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. */
 		if($asunto->fields['limite_monto'] > 0)
 			list($total_monto,$moneda_total_monto) =  $asunto->TotalMonto();
 		if($asunto->fields['limite_hh'] > 0)
@@ -285,7 +285,7 @@
 		if($asunto->fields['alerta_monto'] > 0) //Significa que se requiere alerta por monto no emitido
 			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $asunto->TotalMonto(false);
 
-		//Notificacion "L√≠mite de monto"
+		//Notificacion "LÌmite de monto"
 		$total_monto = number_format($total_monto,1,'.','');
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
 		if (($total_monto > $asunto->fields['limite_monto']) && ($asunto->fields['limite_monto'] > 0) && ($asunto->fields['notificado_monto_excedido']==0))
@@ -300,10 +300,10 @@
             $asunto->Write();
 		}
 
-		//Notificacion "L√≠mite de horas"
+		//Notificacion "LÌmite de horas"
 		if(($total_horas_trabajadas > $asunto->fields['limite_hh']) && ($asunto->fields['limite_hh'] > 0 ) && ($asunto->fields['notificado_hr_excedido']==0))
 		{
-			echo "L√≠mite de horas\n";
+			echo "LÌmite de horas\n";
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_horas'] = array(
 			'cliente' => $glosa_cliente,
 			'asunto' => $asunto->fields['glosa_asunto'],
@@ -313,7 +313,7 @@
 			$asunto->Write();
 		}
 
-		//Notificacion "Monto desde el √∫ltimo cobro"
+		//Notificacion "Monto desde el ˙ltimo cobro"
 		if(($total_monto_ult_cobro > $asunto->fields['alerta_monto']) && ($asunto->fields['alerta_monto'] > 0) && ($asunto->fields['notificado_monto_excedido_ult_cobro']==0))
 		{
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_ultimo_cobro'] = array(
@@ -326,7 +326,7 @@
             $asunto->Write();
 		}
 
-		//Notificacion "Horas desde el √∫ltimo cobro"
+		//Notificacion "Horas desde el ˙ltimo cobro"
 		if(($total_horas_ult_cobro > $asunto->fields['alerta_hh']) &&  ($asunto->fields['alerta_hh'] > 0) && ($asunto->fields['notificado_hr_excedida_ult_cobro']==0)){
 
 			$dato_diario[$id_usuario]['asunto_excedido'][$asunto->fields['codigo_asunto']]['alerta_hh'] = array(
@@ -362,7 +362,7 @@
 		$cobro = new Cobro($sesion);
 		$contrato->Load($id_contrato);
 
-		// Los cuatro l√≠mites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
+		// Los cuatro lÌmites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 		if($contrato->fields['limite_monto'] > 0)
 			list($total_monto,$moneda_total_monto) =  $contrato->TotalMonto();
 		if($contrato->fields['limite_hh'] > 0)
@@ -372,7 +372,7 @@
 		if($contrato->fields['alerta_monto'] > 0) //Significa que se requiere alerta por monto no emitido
 			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $contrato->TotalMonto(false);
 
-		//Notificacion "L√≠mite de monto"
+		//Notificacion "LÌmite de monto"
 		$total_monto = number_format($total_monto,1);
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
 
@@ -411,7 +411,7 @@
             $contrato->Write();
 		}
 
-		//Notificacion "L√≠mite de horas"
+		//Notificacion "LÌmite de horas"
 		if(($total_horas_trabajadas > $contrato->fields['limite_hh']) && ($contrato->fields['limite_hh'] > 0 ) && ($contrato->fields['notificado_hr_excedido']==0))
 		{
 			
@@ -445,7 +445,7 @@
 			$contrato->Write();
 		}
 
-		//Notificacion "Monto desde el √∫ltimo cobro"
+		//Notificacion "Monto desde el ˙ltimo cobro"
 		if(($total_monto_ult_cobro > $contrato->fields['alerta_monto']) && ($contrato->fields['alerta_monto'] > 0) && ($contrato->fields['notificado_monto_excedido_ult_cobro']==0))
 		{
 			$contrato_excedido = array(
@@ -479,7 +479,7 @@
             $contrato->Write();
 		}
 
-		//Notificacion "Horas desde el √∫ltimo cobro"
+		//Notificacion "Horas desde el ˙ltimo cobro"
 		if(($total_horas_ult_cobro > $contrato->fields['alerta_hh']) &&  ($contrato->fields['alerta_hh'] > 0) && ($contrato->fields['notificado_hr_excedida_ult_cobro']==0)){
 			$contrato_excedido = array(
 				'cliente' => $glosa_cliente,
@@ -529,7 +529,7 @@
 
 		$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
 
-		//Los cuatro l√≠mites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
+		//Los cuatro lÌmites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 		if($cliente->fields['limite_monto'] > 0)
 			list($total_monto,$moneda_total_monto) =  $cliente->TotalMonto();
 		if($cliente->fields['limite_hh'] > 0)
@@ -540,7 +540,7 @@
 			list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $cliente->TotalMonto(false);
 
 
-		//Notificacion "L√≠mite de monto"
+		//Notificacion "LÌmite de monto"
 		$total_monto = number_format($total_monto,1);
 		$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
 
@@ -555,7 +555,7 @@
             $cliente->Write();
 		}
 
-		//Notificacion "L√≠mite de horas"
+		//Notificacion "LÌmite de horas"
 		if(($total_horas_trabajadas > $cliente->fields['limite_hh']) && ($cliente->fields['limite_hh'] > 0 ) && ($cliente->fields['notificado_hr_excedido']==0))
 		{
 			$dato_diario[$id_usuario]['cliente_excedido'][$cliente->fields['codigo_cliente']]['limite_horas'] = array(
@@ -566,7 +566,7 @@
 			$cliente->Write();
 		}
 
-		//Notificacion "Monto desde el √∫ltimo cobro"
+		//Notificacion "Monto desde el ˙ltimo cobro"
 		if(($total_monto_ult_cobro > $cliente->fields['alerta_monto']) && ($cliente->fields['alerta_monto'] > 0) && ($cliente->fields['notificado_monto_excedido_ult_cobro']==0))
 		{
 			$dato_diario[$id_usuario]['cliente_excedido'][$cliente->fields['codigo_cliente']]['limite_ultimo_cobro'] = array(
@@ -578,7 +578,7 @@
             $cliente->Write();
 		}
 
-		//Notificacion "Horas desde el √∫ltimo cobro"
+		//Notificacion "Horas desde el ˙ltimo cobro"
 		if(($total_horas_ult_cobro > $cliente->fields['alerta_hh']) &&  ($cliente->fields['alerta_hh'] > 0) && ($cliente->fields['notificado_hr_excedida_ult_cobro']==0)){
 
 			$dato_diario[$id_usuario]['cliente_excedido'][$cliente->fields['codigo_cliente']]['alerta_hh'] = array(
@@ -708,7 +708,7 @@
 	}
 
 	//Mail diario: septimo componente: Alertas de Tareas
-	//Ya que los mails se env√≠an al final del d√≠a, se debe enviar la alerta de 1 d√≠a si tiene plazo pasado ma√±ana.
+	//Ya que los mails se envÌan al final del dÌa, se debe enviar la alerta de 1 dÌa si tiene plazo pasado maÒana.
 	$query="SELECT cliente.glosa_cliente,
 					asunto.glosa_asunto,
 					CONCAT_WS(' ',e.nombre, e.apellido1, LEFT(e.apellido2,1)) AS nombre_encargado,
@@ -798,7 +798,7 @@
 		}
 	}
 		
-	// Fin del mail diario. Env√≠o.
+	// Fin del mail diario. EnvÌo.
 	$mensajes = $notificacion->mensajeDiario($dato_diario);
 
 	foreach($mensajes as $id_usuario => $mensaje)
@@ -816,4 +816,54 @@
 	if(date("j")==1)
 		CobroPendiente::GenerarCobrosPeriodicos($sesion);
 
+    /**
+     * Notificacion de suspencion de pago por comision por concepto de
+     * presentacion de nuevos clientes.
+     * 
+     */
+    if ( UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoCliente') == 1 )
+    {
+        $max    = UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoClienteTiempo');
+        $max    = $max && is_numeric($max) ? $max : 730; /* 730 dias */
+
+        $email  = UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoClienteEmail');
+        $email  = $email ? $email : 'soporte@lemontech.cl';
+
+        $column = 'c.id_cliente, c.fecha_creacion';
+
+        $query  = 'SELECT %s FROM cliente c, usuario u ';        
+        $query .= 'WHERE c.id_usuario_encargado = u.id_usuario ';        
+        $query .= 'AND UNIX_TIMESTAMP(CURRENT_DATE)-UNIX_TIMESTAMP(c.fecha_creacion) >= ' . $max;        
+
+        $r      = mysql_query(sprintf($query, 'COUNT(*) AS cant'), $sesion->dbh) 
+                    or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+
+        if ( ! $r ) {                
+        } else {  
+            $cant = array_shift(mysql_fetch_row($r));
+            if ($cant<1){
+            }else{
+                $pages = ceil($cant/10);
+                $query .= ' ORDER BY c.id_cliente DESC LIMIT %s, %s';
+
+                for($i = 10; $i <= $cant; $i = $i + 10)
+                {               
+                    $columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
+
+                    $q = sprintf($query, $columns, ($i-10), $i);
+                    $r = mysql_query($q, $sesion->dbh) 
+                                or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+
+                    $message = 'El usuario "%s" deja de recibir comision por concepto de captacion del cliente "%s"';
+
+                    while($row = mysql_fetch_object($r)) {
+                        $from = Conf::AppName();
+
+                        $m = sprintf($message, $row->usuario, $row->glosa_cliente);
+                        Utiles::Insertar($sesion, __("Notificacion")." $from", $m, $email, false);
+                    }
+                }                      
+            }             
+        }
+    }
 ?>

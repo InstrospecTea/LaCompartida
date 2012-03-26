@@ -150,7 +150,7 @@
   else if($accion == 'guardar_tipo_cambio')
   {
 	  	$tipo_cambio=str_replace(',','.',$tipo_cambio);
-	  	$sql = "UPDATE cobro_moneda SET tipo_cambio = ".$tipo_cambio." WHERE id_cobro = ".$id_cobro." AND id_moneda = ".$id_moneda;
+	  	$sql = "UPDATE cobro_moneda SET tipo_cambio = '".$tipo_cambio."' WHERE id_cobro = '".$id_cobro."' AND id_moneda = '".$id_moneda."'";
 			$resp = mysql_query($sql, $sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 			echo(utf8_encode("OK"));
   }

@@ -28,7 +28,7 @@ require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 	{
 			$sesion = new Sesion(array('COB'));
 			$pagina = new Pagina($sesion);
-$serienumero_documento = new DocumentoLegalNumero($sesion);
+			$serienumero_documento = new DocumentoLegalNumero($sesion);
 
 			$factura = new Factura($sesion);
 
@@ -38,10 +38,13 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 			$factura->Load($id_factura);
 			if( empty($codigo_cliente) )
 				$codigo_cliente=$factura->fields['codigo_cliente'];
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			{
+			if( ( UtilesApp::GetConf($sesion,'CodigoSecundario') ) ) {
 				$cliente_factura = new Cliente($sesion);
-				$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
+				if( $codigo_cliente && !$codigo_cliente_secundario ) {					
+					$codigo_cliente_secundario = $cliente_factura->CodigoACodigoSecundario( $codigo_cliente );
+				} else {
+					$codigo_cliente = $cliente_factura->CodigoSecundarioACodigo( $codigo_cliente_secundario );
+				} 
 			}
 		}
 
@@ -330,6 +333,33 @@ $pagina->PrintTop($popup);
  * Mostrar valores por defecto
  */
 
+if (  empty($factura->fields['id_factura']) && ($codigo_cliente || $codigo_cliente_secundario) ) {
+	
+	if ( UtilesApp::GetConf($sesion, 'CodigoSecundario')  ){
+		$where = "WHERE cliente.codigo_cliente_secundario = $codigo_cliente_secundario";
+		$join = " JOIN cliente ON ( cobro.codigo_cliente = cliente.codigo_cliente ) ";
+	} else {
+		$where = "WHERE contrato.codigo_cliente = $codigo_cliente";
+		$join = "";
+	}
+	$where .= " AND cobro.id_cobro = $id_cobro";
+	$query_clientes = "SELECT 
+					contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
+				FROM contrato
+					JOIN cobro ON ( contrato.id_contrato = cobro.id_contrato ) 
+					$join
+				$where					
+				LIMIT 1";
+	$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes,__FILE__,__LINE__,$sesion->dbh);
+	if( mysql_num_rows( $resp ) > 0 ) {
+		list( $factura_razon_social, $factura_direccion, $factura_rut ) = mysql_fetch_array( $resp );
+		
+		$factura->fields["RUT_cliente"] = $factura_rut;
+		$factura->fields["cliente"] = $factura_razon_social;
+		$factura->fields["direccion_cliente"] = $factura_direccion;
+	}
+}
+
 //SIN DESGLOSE
 $suma_monto = 0;
 $suma_iva = 0;
@@ -500,8 +530,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 ?>
 				var http = getXMLHTTP();
 
-				var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value ;
-
+				var url = root_dir + '/app/interfaces/ajax.php?accion=' + accion + '&codigo_cliente=' + select_origen.value  + '&id_cobro=<?php echo $id_cobro; ?>' ;
 				http.open('get', url, true);
 				http.onreadystatechange = function()
 				{
@@ -1267,7 +1296,7 @@ if ($buscar_padre) {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CambioCliente()", 280);
 			} else {
-				echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $factura->fields['codigo_cliente'] ? $factura->fields['codigo_cliente'] : $codigo_cliente, " ", "CambioCliente();", 280);
+				echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $factura->fields['codigo_cliente'] ? $fanamectura->fields['codigo_cliente'] : $codigo_cliente, " ", "CambioCliente();", 280);
 			}
 		}
 ?>
@@ -1360,7 +1389,7 @@ if ($buscar_padre) {
 				?>
 				</td>
 				<td align=left nowrap><?= $simbolo; ?>
-					<input type="text" name="monto_honorarios_legales" id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"; onkeydown="MontoValido( this.id );"></td>
+					<input type="text" name="monto_honorarios_legales" id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form);" onkeydown="MontoValido( this.id );"></td>
 				<td align=left nowrap><?= $simbolo; ?>
 					<input type="text" name="monto_iva_honorarios_legales" id="monto_iva_honorarios_legales" value="<?= $impuesto; ?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido( this.id );"></td>
 			</tr>
@@ -1594,7 +1623,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 
 </script>
 <?
-if ($codigo_cliente || $codigo_cliente_secundario) {
+/*if ($codigo_cliente || $codigo_cliente_secundario) {
 	if (empty($id_factura)) {
 		?>
 		<script type="text/javascript">
@@ -1602,7 +1631,7 @@ if ($codigo_cliente || $codigo_cliente_secundario) {
 		</script>
 		<?
 	}
-}
+}*/
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
 	echo Autocompletador::Javascript($sesion, false, 'CambioCliente();');
 }

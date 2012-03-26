@@ -52,6 +52,12 @@ class UsuarioExt extends Usuario
 		$query = "INSERT INTO usuario_vacacion (id_usuario,id_usuario_creador,fecha_inicio,fecha_fin)";
 		$query .= "	VALUES(".$this->fields['id_usuario'].", ".$this->sesion->usuario->fields['id_usuario'].", '".Utiles::fecha2sql($fecha_ini)."', '".Utiles::fecha2sql($fecha_fin)."')";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		$arr1 = array('id_usuario' => $this->fields['id_usuario'], 'vacaciones' => '');
+		$arr2 = array('id_usuario' => $this->fields['id_usuario'],'vacaciones' => 'agregado<br />f. inicio: ' . $fecha_ini . "<br />f. fin: " . $fecha_fin);
+		
+		self::GuardaCambiosUsuario($arr1, $arr2);
+		
 		return true;
 	}
 
@@ -74,8 +80,19 @@ class UsuarioExt extends Usuario
 	//Elimina VacacionesSELECT EXTRACT(YEAR_MONTH FROM DATE_FORMat('2011-01-01 01:01:01') );
 	function EliminaVacacion($ide,$id_usuario)
 	{
+		$query = "SELECT DATE_FORMAT(fecha_inicio, '%d/%m/%Y') as fecha_inicio, DATE_FORMAT(fecha_fin, '%d/%m/%Y') as fecha_fin, id_usuario_creador
+					FROM usuario_vacacion WHERE id = $ide AND id_usuario = $id_usuario LIMIT 1";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$vacacion = mysql_fetch_array($resp);
+		
 		$query = "DELETE FROM usuario_vacacion WHERE id = ".$ide." AND id_usuario = ".$id_usuario." LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		$arr1 = array('id_usuario' => $this->fields['id_usuario'], 'vacaciones' => 'f. inicio: ' . $vacacion['fecha_inicio'] . "<br />f. fin: " . $vacacion['fecha_fin']);
+		$arr2 = array('id_usuario' => $this->fields['id_usuario'],'vacaciones' => 'eliminado');
+		
+		self::GuardaCambiosUsuario($arr1, $arr2);
+		
 		return true;
 	}
 	
@@ -387,7 +404,6 @@ class UsuarioExt extends Usuario
 		$query = "INSERT INTO usuario_cambio_historial (id_usuario,id_usuario_creador,nombre_dato,valor_original,valor_actual,fecha)";
 		$query .= " VALUES('".$id_usuario."','".$usuario_activo."','".$dato."','".$actuales."','".$nuevos."',NOW())";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		echo "entré";
 		return true;
 	}
 
@@ -442,11 +458,37 @@ class UsuarioExt extends Usuario
 		$query .= " ORDER BY fecha DESC";
 		
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		
+		$datos_modificados = array(
+			'nombre' => 'nombre',
+			'apellido1' => 'apellido paterno',
+			'apellido2' => 'apellido materno',
+			'username' => 'código usuario',
+			'centro_de_costo' => 'centro de costo',
+			'id_categoria_usuario' => 'categoría',
+			'id_area_usuario' => 'área usuario',
+			'telefono1' => 'teléfono',
+			'email' => 'email',
+			'activo' => 'activo',
+			'secretarios' => 'usuario secretario de',
+			'revisores' => 'usuario revisor de',
+			'usuarios_revisados' => 'usuarios revisados',
+			'alerta_diaria' => 'alerta diaria',
+			'alerta_semanal' => 'alerta semanal',
+			'retraso_max' => 'retraso máximo en el ingreso de horas',
+			'restriccion_diario' => 'mínimo horas por día',
+			'restriccion_min' => 'min HH.',
+			'restriccion_max' => 'máx HH.',
+			'alerta_revisor' => 'resumen horas semanales de abogados revisados',
+			'restriccion_mensual' => 'restriccion mensual de horas',
+			'dias_ingreso_trabajo' => 'plazo máximo (en días) para ingreso de trabajos'
+		);
+		 
 		while( list($id_usuario_creador,$nombre_dato,$valor_original,$valor_actual,$fecha,$nombre,$apellido1,$apellido2) = mysql_fetch_array($resp) )
 		{
 			$lista[] = array(
 				'id_usuario_creador'=> $id_usuario_creador,
-				'nombre_dato'=> ($nombre_dato == 'id_categoria_usuario') ? 'categoría' : $nombre_dato,
+				'nombre_dato'=> ( $datos_modificados[$nombre_dato] ? $datos_modificados[$nombre_dato] : $nombre_dato ),
 				'valor_original'=> $valor_original,
 				'valor_actual'=> $valor_actual,
 				'fecha'=> Utiles::sql2date($fecha),

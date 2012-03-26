@@ -96,7 +96,7 @@
 	</td>
 	<td>
 		<input type=hidden id="moneda_<?=$mon->fields['id_moneda']?>" name="moneda_<?=$mon->fields['id_moneda']?>" value="<?=$mon->fields['tipo_cambio']?>"/>
-		<input type=text class=txt_input size=10 value="<?=$mon->fields['tipo_cambio']?>" <?=$mon->fields['tipo_cambio_referencia'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
+		<input type="text" class="txt_input" size="10" value="<?=number_format($mon->fields['tipo_cambio'],$mon->fields['cifras_decimales'],'.','')?>" <?=$mon->fields['tipo_cambio_referencia'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
 		<!-- onchange="GrabarCampo('moneda','<?=$mon->fields['id_moneda']?>',this.value,'<?=$mon->fields['glosa_moneda']?>');" -->
 	</td>
 </tr>
@@ -206,6 +206,22 @@ function Input(name)
     }
 ?>
 }
+<?php
+for($x=0;$x<$lista->num;$x++)
+	{
+		$mon = $lista->Get($x);
+		$cf = $mon->fields['cifras_decimales'];
+		if( $cf > 0 ) { $dec = "."; while( $cf-- > 0 ){ $dec .= "0"; } }
+?>
+	jQuery("#valor_<?=$mon->fields['id_moneda']?>").blur(function(){
+	   var str = jQuery(this).val();
+	   jQuery(this).val( str.replace(',','.') );
+	   jQuery(this).parseNumber({format:"#<?=$dec?>", locale:"us"});
+	   jQuery(this).formatNumber({format:"#<?=$dec?>", locale:"us"});
+	});
+<?php
+	}
+?>
 </script>
 <?
 	$pagina->PrintBottom();

@@ -31,7 +31,77 @@ class Cliente extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
- 
+  function IntentaInsertar() {
+     
+          $this->error = "";
+
+        if(!$this->Check())
+            return false;
+
+        if($this->Loaded())
+        {
+            $query = "UPDATE ".$this->tabla." SET ";
+            if($this->guardar_fecha)
+                $query .= "fecha_modificacion=NOW(),";
+
+            $c = 0;
+            foreach ( $this->fields as $key => $val )
+            {
+                if( $this->changes[$key] )
+                {
+                    $do_update = true;
+                    if($c > 0)
+                        $query .= ",";
+                    if($val != 'NULL')
+                        $query .= "$key = '".addslashes($val)."'";
+                    else
+                        $query .= "$key = NULL ";
+                    $c++;
+                }
+                if( $this->logear[$key] ) {         // log data
+                            $query_log ="INSERT INTO log_db SET id_field = '".$this->fields[$this->campo_id]."', titulo_tabla = '". $this->tabla."', campo_tabla = '".$key."', fecha = NOW(), usuario = '".$this->sesion->usuario->fields['id_usuario']."', valor_antiguo = '".$this->valor_antiguo[$key]."', valor_nuevo = '".addslashes($val)."' ";
+                            $resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+                            $this->logear[$key] = false;
+                }
+            }
+			
+		$query .= " WHERE ".$this->campo_id."='".$this->fields[$this->campo_id]."'";
+            	if( $do_update ) {
+                    $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+                }
+		return true;
+        }
+        else
+        {
+            $query = "INSERT INTO ".$this->tabla." SET ";
+            if($this->guardar_fecha)
+                $query .= "fecha_creacion=NOW(),";
+
+            $c = 0;
+            foreach ( $this->fields as $key => $val )
+            {
+                if( $this->changes[$key] )
+                {
+                    if($c > 0)
+                        $query .= ",";
+                    if($val != 'NULL')
+                        $query .= "$key = '".addslashes($val)."'";
+
+                    else
+                        $query .= "$key = NULL ";
+
+                    $c++;
+                }
+            }
+
+            $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+            $this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
+            #Utiles::CrearLog($this->sesion, "reserva", $this->fields['id_reserva'], "INSERTAR","",$query);
+
+        }
+        return true;
+    
+  }
   function InsertarDatos( /* Argumentos */)
   {
    // Copia de pedazo de codigo en agregar_cliente.php	

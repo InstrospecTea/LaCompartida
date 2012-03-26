@@ -89,11 +89,14 @@
 		$ws1->setLandscape();
 
 		$mostrar_encargado_secundario = UtilesApp::GetConf($sesion, 'EncargadoSecundario');
+		$mostrar_columna_codigo_asunto = UtilesApp::GetConf($sesion,'CodigoAsuntoEnColumnasSeparadas');
 
 		// Definir columnas a usar
 		$indice_columnas = 1;
 		$col_cliente = $indice_columnas++;
 		$col_total_pesos = $indice_columnas++;
+		if( $mostrar_columna_codigo_asunto ) 
+			$col_codigo_asuntos = $indice_columnas++;
 		$col_asuntos = $indice_columnas++;
 		if(!$desglosar_por_encargado)
 			$col_encargado = $indice_columnas++;
@@ -124,6 +127,8 @@
 		$ws1->setColumn($col_fecha_emision, $col_fecha_emision, 17);
 		$ws1->setColumn($col_fecha_envio, $col_fecha_envio, 14);
 		$ws1->setColumn($col_cobro, $col_cobro, 14);
+		if( $mostrar_columna_codigo_asunto ) 
+			$ws1->setColumn($col_codigo_asuntos, $col_codigo_asuntos, 30);
 		$ws1->setColumn($col_asuntos, $col_asuntos, 30);
 		if(!$desglosar_por_encargado)
 			$ws1->setColumn($col_encargado, $col_encargado, 30);
@@ -237,8 +242,11 @@
 				ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
 
+		
 		$query_asuntos = "SELECT cobro.id_cobro,
-												GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos
+												GROUP_CONCAT(distinct asunto.codigo_asunto SEPARATOR '\n') as codigos_asuntos, 
+												GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos, 
+												GROUP_CONCAT(distinct CONCAT(asunto.codigo_asunto, ' ', glosa_asunto) SEPARATOR '\n') as asuntos 
 											FROM cobro
 												LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 												LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
@@ -248,9 +256,19 @@
 											GROUP BY cobro.id_cobro";
 
 		$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-		$glosa_asuntos = array();
-		while(list($id_cobro, $asuntos) = mysql_fetch_array($resp)){
-			$glosa_asuntos[$id_cobro] = $asuntos;
+		
+		if( $mostrar_columna_codigo_asunto ) {
+			$glosa_asuntos = array();
+			$codigo_asuntos = array();
+			while(list($id_cobro, $codigos_asuntos, $glosas_asuntos) = mysql_fetch_array($resp)) {
+				$glosa_asuntos[$id_cobro] = $glosas_asuntos;
+				$codigo_asuntos[$id_cobro] = $codigos_asuntos;
+			}
+		} else {
+			$glosa_asuntos = array();
+			while(list($id_cobro, $codigos_asuntos, $glosas_asuntos, $asuntos) = mysql_fetch_array($resp)){
+				$glosa_asuntos[$id_cobro] = $asuntos;
+			}
 		}
 
 		#Clientes
@@ -279,6 +297,8 @@
 				//se ponen los titulos por tabla
 				$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 				$ws1->write($filas, $col_total_pesos, __('Total en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
+				if( $mostrar_columna_codigo_asunto ) 
+					$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				if(!$desglosar_por_encargado)
 					$ws1->write($filas, $col_encargado, __('Encargado Comercial'), $titulo_filas);
@@ -322,6 +342,8 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total en Pesos'), $titulo_filas);
+					if( $mostrar_columna_codigo_asunto ) 
+						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
 						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
@@ -367,6 +389,8 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
+					if( $mostrar_columna_codigo_asunto )
+						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
 						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
@@ -416,6 +440,8 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
+					if( $mostrar_columna_codigo_asunto )
+						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
 						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
@@ -453,6 +479,8 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
+					if( $mostrar_columna_codigo_asunto )
+						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
 						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
@@ -497,6 +525,8 @@
 					//se ponen los titulos por tabla
 					$ws1->write($filas, $col_cliente, __('Cliente'), $titulo_filas);
 					$ws1->write($filas, $col_total_pesos, __('Total'), $titulo_filas);
+					if( $mostrar_columna_codigo_asunto )
+						$ws1->write($filas, $col_codigo_asuntos, __('Código Asuntos'), $titulo_filas);
 					$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 					if(!$desglosar_por_encargado)
 						$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
@@ -585,6 +615,8 @@
 			$ws1->write($filas, $col_fecha_emision, Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_fecha_envio, Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
+			if( $mostrar_columna_codigo_asunto )
+				$ws1->write($filas, $col_codigo_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			if(!$desglosar_por_encargado)
 				$ws1->write($filas, $col_encargado, $cobro['nombre'], $txt_izquierda);

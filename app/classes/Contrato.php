@@ -23,6 +23,7 @@ class Contrato extends Objeto
 		$this->campo_id = "id_contrato";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->log_update = true;
 	}
 
 	/*
@@ -289,6 +290,21 @@ class Contrato extends Objeto
 		else
 		{
 			return array($horas_por_cobrar,$monto_por_cobrar, 0, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo']);
+		}
+	}
+	
+	
+	/*
+	 * actualiza todos los contratos para el cliente especificado, donde asigna el nuevo encargado comercial 
+	 * esto es para PRC por ahora, no hay otro cliente que lo necesite.
+	 */
+	function ActualizarEncargadoComercialTodosContratosCliente( $codigo_cliente, $nuevo_encargado_comercial) {
+		if( isset($codigo_cliente) && $codigo_cliente != null && isset($nuevo_encargado_comercial) && $nuevo_encargado_comercial != null ) {			
+			$query = "UPDATE contrato SET id_usuario_responsable='$nuevo_encargado_comercial' WHERE codigo_cliente='$codigo_cliente'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -1070,6 +1086,11 @@ class Contrato extends Objeto
 						$query .= "$key = NULL ";
 					$c++;
 				}
+				if( $this->logear[$key] ) {         // log data
+                            $query_log ="INSERT INTO log_db SET id_field = '".$this->fields[$this->campo_id]."', titulo_tabla = '". $this->tabla."', campo_tabla = '".$key."', fecha = NOW(), usuario = '".$this->sesion->usuario->fields['id_usuario']."', valor_antiguo = '".$this->valor_antiguo[$key]."', valor_nuevo = '".addslashes($val)."' ";
+                            $resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+                            $this->logear[$key] = false;
+                }
 			}
 
 			$query .= " WHERE ".$this->campo_id."='".$this->fields[$this->campo_id]."'";

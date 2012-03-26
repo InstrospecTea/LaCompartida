@@ -1255,7 +1255,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 					$tipo = $tipo_cambio_cobro[$moneda->fields['id_moneda']];
 			?>
 					<td align='center' style='padding-left:10px; padding-right:10px'>
-						<input type="text" size="8" name="cobro_tipo_cambio_<?=$moneda->fields['id_moneda']?>" id="cobro_tipo_cambio_<?=$moneda->fields['id_moneda']?>" onkeydown="MontoValido( this.id );" value="<?=$tipo > 0 ? $tipo : $moneda->fields['tipo_cambio']?>" onchange="GuardaTipoCambio(<?=$moneda->fields['id_moneda']?>,this.value)">
+						<input type="text" size="8" name="cobro_tipo_cambio_<?=$moneda->fields['id_moneda']?>" id="cobro_tipo_cambio_<?=$moneda->fields['id_moneda']?>" value="<?=$tipo > 0 ? number_format($tipo,$moneda->fields['cifras_decimales'],'.','') : number_format($moneda->fields['tipo_cambio'],$moneda->fields['cifras_decimales'],'.','')?>" onchange="GuardaTipoCambio(<?=$moneda->fields['id_moneda']?>,this.value)">
 					</td>
 			<?
 				}
@@ -2168,6 +2168,22 @@ function ActivaCarta(check)
 	else
 		form.id_carta.disabled = true;
 }
+<?php
+for( $i=0; $i<$monedas->num; $i++ )
+{
+	$moneda = $monedas->Get($i);
+	$cf = $moneda->fields['cifras_decimales'];
+	if( $cf > 0 ) { $dec = "."; while( $cf-- > 0 ){ $dec .= "0"; } }
+?>
+	jQuery("#cobro_tipo_cambio_<?=$moneda->fields['id_moneda']?>").blur(function(){
+	   var str = jQuery(this).val();
+	   jQuery(this).val( str.replace(',','.') );
+	   jQuery(this).parseNumber({format:"#<?=$dec?>", locale:"us"});
+	   jQuery(this).formatNumber({format:"#<?=$dec?>", locale:"us"});
+	});
+<?php
+}
+?>
 </script>
 <?
 	$pagina->PrintBottom($popup);

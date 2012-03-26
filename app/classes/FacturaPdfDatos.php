@@ -15,6 +15,7 @@
 			$this->guardar_fecha = false;
 			$this->sesion = $sesion;
 			$this->fields = $fields;
+                        $this->papel=array();
 		}
 		
 		function CargarDatos( $id_factura, $id_documento_legal ) 
@@ -45,6 +46,26 @@
 					}
 				}
 			}
+		
+			$querypapel = "SELECT 
+						codigo_tipo_dato, 
+						activo, 
+						coordinateX, 
+						coordinateY, 
+                                                cellW,
+                                                cellH,
+						font, 
+						style, 
+						mayuscula, 
+						tamano 
+					FROM factura_pdf_datos 
+                                        JOIN factura_pdf_tipo_datos USING( id_tipo_dato ) 
+					WHERE codigo_tipo_dato = 'tipo_papel' AND id_documento_legal= '$id_documento_legal' limit 1";
+			
+			$resppapel = mysql_query($querypapel,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
+			
+			$this->papel = mysql_fetch_assoc($resppapel);
+			
 		}
 		
 		function CargarGlosaDato( $tipo_dato, $id_factura )
@@ -142,12 +163,12 @@
 			return $fila;
 		}
                 
-		function generarFacturaPDF($id_factura, $mantencion = false)
+		function generarFacturaPDF($id_factura, $mantencion = false,$orientacion='P',$format='Letter')
 		{
-			require_once Conf::ServerDir().'/../app/fpdf/fpdf.php';
+			require_once Conf::ServerDir().'/fpdf/fpdf.php';
 			$factura = new Factura( $this->sesion );
 			if( !$factura->Load( $id_factura ) ) {
-				echo "<html><head><title>Error</title></head><body><p>No se encuentra la factura $numero_factura.</p></body></html>";
+				echo "<html><head><title>Error</title></head><body><p>No se encuentra la factura $id_factura.</p></body></html>";
 				return;
 			}
                         
@@ -155,16 +176,19 @@
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list( $id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 	
-			$this->CargarDatos( $id_factura, $id_documento_legal );
-			
+			$this->CargarDatos( $id_factura, $id_documento_legal ); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
+		 	
+                 if(count($this->papel)) {
+                        $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
+							$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
+							$pdf->SetAutoPageBreak(true,2*$margin);
+                } else {
 			// P: hoja vertical
 			// mm: todo se mide en milímetros
 			// Letter: formato de hoja
-			$pdf = new FPDF('P', 'mm', 'Letter');
+						$pdf = new FPDF($orientacion, 'mm', $format);
+                 }
 	
-			// Dimensiones de una hoja tamaño carta.
-			$ancho = 216;
-			$alto = 279;
 			
 			$query = " SELECT codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -173,13 +197,13 @@
 			$pdf->SetTitle($glosa_documento_legal ." ".$factura->fields['numero']);
 			// La orientación y formato de la página son los mismos que del documento
 			$pdf->AddPage();
-			
+			$datos['dato_letra']=str_replace(array("<br>\n","<br/>\n","<br />\n" ),"\n",$datos['dato_letra']);
 			foreach( $this->datos as $tipo_dato => $datos ) {
 				$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 				
-                                if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
-                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'], 0, 'L');
+                               if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
+                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0, 'L');
                                 } else if( $datos['mayuscula'] == 'may' ) {
 					$pdf->Write(4, strtoupper($datos['dato_letra']));
 				} else if( $datos['mayuscula'] == 'min' ) {
@@ -190,7 +214,7 @@
 			}
 			
                         if( $mantencion ) {
-                            $pdf->Output("../../pdf/factura.pdf","F");
+                         //   $pdf->Output("../../pdf/factura.pdf","F");
                         } else {
                             $pdf->Output($glosa_documento_legal."_".$factura->fields['numero'].".pdf","D");
                         }

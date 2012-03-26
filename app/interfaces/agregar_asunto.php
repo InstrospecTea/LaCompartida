@@ -1206,9 +1206,9 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							<td align=left>
 <?
 if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "", "SetearLetraCodigoSecundario();");
+	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
 } else {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "", "");
+	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "", "CambioEncargadoSegunCliente(this.value)");
 }
 ?>
 								<span style="color:#FF0000; font-size:10px">*</span>

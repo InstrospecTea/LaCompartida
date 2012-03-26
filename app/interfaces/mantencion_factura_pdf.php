@@ -54,15 +54,18 @@
 	$pagina->PrintTop();
  ?>
 <script>
-
-    jQuery(document).ready(function() {
-     var Filas=new Array;
+  
+var Filas=new Array;
      var Actual=0;
-     var Id_documento_legal=jQuery('#select_id_documento_legal').val();
+    
+     var staticpath='https://estaticos.thetimebilling.com/';
+
+	var factorx=1;
+        var factory=1;
+    
+    jQuery(document).ready(function() {    
+ var Id_documento_legal=jQuery('#select_id_documento_legal').val();
      var Id_categoria=jQuery('#select_id_factura_pdf_datos_categoria').val();
-     var staticpath='https://files.thetimebilling.com/';
-
-
 	jQuery(document).keydown(function(e){
 	
 	var x=0;
@@ -78,8 +81,8 @@
            var pgy=parseInt(jQuery('#alto').val());
            var alto=ancho*pgy/pgx;
            jQuery('#pizarra').height(alto);
-           var factorx=ancho/pgx;
-	   var factory=alto/pgy;
+            factorx=ancho/pgx;
+	    factory=alto/pgy;
 	   jQuery('#fac_coordinateX_'+Actual).val(parseInt(jQuery('#fac_coordinateX_'+Actual).val())+x);
 	   jQuery('#fac_coordinateY_'+Actual).val(parseInt(jQuery('#fac_coordinateY_'+Actual).val())+y); 
            var posx=parseInt(factorx*jQuery('#fac_coordinateX_'+Actual).val());
@@ -91,80 +94,28 @@
 	});
 
 
-	 jQuery.when(
-	 jQuery.ajax({async: false,type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js', dataType: 'script' }) ,
-	 jQuery.ajax({async: false,type: "GET", url: staticpath+'jquery.uploadify.v2.1.0.min.js', dataType: 'script' }) 	 
-	 ).then(function() {
-            jQuery.post('ajax/mantencion_factura_pdf_ajax.php',{opc: 'dibuja_tabla', id_documento_legal:Id_documento_legal},function(data) {
-                    jQuery("#tabla_coordenadas").html(data);                    
-                    pizarron();
-                    filasporcat();
-                    var Pos=jQuery(".cat_"+Id_categoria).first().attr('rel');  
-                    jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
-                    jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-					jQuery('#uploadify').appendTo('#fatcell').show();
-					jQuery('#datospdf').show();
-            });     
-     
-    jQuery("#cambio").click(function () {
-       
-        var Img = jQuery("#cambio").attr("rel");
-        jQuery.post( staticpath+'scan/uploadifyplus.php', {
-            action: 'borrar',
-            img: Img
-        });
-		  jQuery("#cambio").hide();
-            jQuery("#fotela").show();
-             jQuery("#fotelaUploader").show();
-				jQuery("#fotelaQueue").show();	
-				jQuery("#fondo").val('').change();
-				jQuery('#botonguardar').click();
-    });
-
-    jQuery('#fotela').uploadify({
-	'scriptAccess': 'always',
-        'uploader': staticpath+'scan/uploadify.swf',
-        'script': staticpath+'scan/uploadifyplus.php',
-        'folder': '/' + jQuery("#underscan").val(),
-        'cancelImg': staticpath+'images/cancel.png',
-        'fileDesc': 'Archivos de imagen para la web',
-        'fileExt': '*.jpg;*.gif;*.png',
-        'buttonImg': staticpath+'images/miniupload.gif',
-        'rollover': true,
-        'width': 20,
-        'height': 20,
-        'auto': true,
-        'multi':false,
-        
-        'onComplete': function (event, queueID, fileObj, response, data) {
-            jQuery("#uploading").hide();   
-            jQuery("#fotela").hide();
-            jQuery("#fotelaUploader").hide();
-            jQuery("#fotelaQueue").hide();		
-            jQuery("#cambio").attr("rel",  jQuery("#underscan").val() + '/' + fileObj.name).show();
-            jQuery("#fondo").val(staticpath+'scan/'+  jQuery("#cambio").attr('rel'));
-            jQuery("#fotelaQueue").hide();			 
-            jQuery('#botonguardar').click();
-        }
-        
-    });
     
     jQuery('#select_id_documento_legal').change(function() {
         var Id_documento_legal=jQuery('#select_id_documento_legal').val()
         jQuery('#id_documento_legal').val(Id_documento_legal);
         var Id_categoria=jQuery('#select_id_factura_pdf_datos_categoria').val();
-        jQuery('#uploadify').hide().appendTo('#cambio_tipo_doc');
+       jQuery('#uploadify').hide().appendTo('#cambio_tipo_doc');
         jQuery.post('ajax/mantencion_factura_pdf_ajax.php',{opc: 'dibuja_tabla', id_documento_legal:Id_documento_legal},function(data) {
-            jQuery("#tabla_coordenadas").html(data); 
+       
+       jQuery("#tabla_coordenadas").html(data).show(); 
             pizarron();
             filasporcat();
             var Pos=jQuery(".cat_"+Id_categoria).first().attr('rel');          
             jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
-            jQuery( "#tabla_coordenadas" ).css({'top':24*Filas[Id_categoria]});
+          //  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
+		  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
             jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
             jQuery('#uploadify').appendTo('#fatcell').show();
+	    jQuery("#contienecoordenadas").removeClass('divloading');
         });
-        
+	
+	jQuery( "#tabla_coordenadas" ).hide();
+        jQuery("#contienecoordenadas").addClass('divloading'); 
     });
     
     jQuery('#select_id_factura_pdf_datos_categoria').change(function() {
@@ -172,7 +123,8 @@
         jQuery('#id_factura_pdf_datos_categoria').val(Id_categoria);
         var Pos=jQuery(".cat_"+Id_categoria).first().attr('rel');
         jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
-        jQuery("#contienecoordenadas").css({'height':(24*Filas[Id_categoria])});
+        //  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
+		  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
         
     });
     
@@ -186,16 +138,23 @@
     });
     
     jQuery('#botonimprimir').click(function() {
-        var Id_documento_legal=jQuery('#id_documento_legal').val()
+        var Id_documento_legal=jQuery('#id_documento_legal').val();
         var Src="ajax/mantencion_factura_pdf_ajax.php?opc=imprimir_factura&id_documento_legal="+Id_documento_legal;
         jQuery('#botonimprimir').attr({'disabled':true, value:'Generando Documento'});
-        jQuery.post('ajax/mantencion_factura_pdf_ajax.php',jQuery('#datospdf').serialize(),function(data) {        
-            jQuery('<iframe id="TestFrame"></iframe>').appendTo('body');
-            jQuery('#TestFrame').hide();
-            jQuery.when(jQuery('#TestFrame').attr({'src':Src})).then(function() {
-                jQuery('#botonimprimir').attr({'disabled':false, value:'Imprimir Documento'});
-            });
-        });  
+        jQuery.ajax({
+	  type: 'POST',
+	  url: 'ajax/mantencion_factura_pdf_ajax.php',
+	  data: jQuery('#datospdf').serialize(),
+	  //dataType: xml,
+	  success: function(data) {
+		    jQuery('<iframe id="TestFrame"></iframe>').appendTo('body');
+		    jQuery('#TestFrame').hide();
+		      jQuery.when(jQuery('#TestFrame').attr({'src':Src})).then(function() {
+			    jQuery('#botonimprimir').attr({'disabled':false, value:'Imprimir Documento'});
+			});
+         
+		}
+	});
         return jQuery('#TestFrame').remove();
     });
     
@@ -206,23 +165,23 @@
         var Pos=jQuery(".cat_"+Id_categoria).first().attr('rel');
         jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
         jQuery("#fila_"+Actual).css({'background':'#CFC'});
-        jQuery("#contienecoordenadas").css({'height':(24*Filas[Id_categoria])});
+       //  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
+		    jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
         jQuery("#fila_"+Actual).animate({'backgroundColor':'#FFF'},2000);
     });
     
     jQuery('.cajitas').live('dblclick',function() {
-   
-    Editando=jQuery(this).attr('id').replace('caja_',''); 
-    Cat=jQuery(this).attr('rel');
-     var $exhtml=jQuery('#fac_ejemplo_'+Editando).val();
-    jQuery(this).html('<textarea class="temptextarea"  id="textarea_'+Editando+'" rel="'+Cat+'">'+$exhtml+'</textarea>');
-    jQuery('#textarea_'+Editando).focus();
+   	Editando=jQuery(this).attr('id').replace('caja_',''); 
+	Cat=jQuery(this).attr('rel');
+	 var $exhtml=jQuery('#fac_ejemplo_'+Editando).val();
+	jQuery(this).html('<textarea class="temptextarea"  id="textarea_'+Editando+'" rel="'+Cat+'">'+$exhtml+'</textarea>');
+	jQuery('#textarea_'+Editando).focus();
     });
    
    jQuery('.temptextarea').live('blur',function() {
 	ID=jQuery(this).attr('id').replace('textarea_',''); 
 	Cat=jQuery(this).attr('rel');
-	jQuery('#fac_ejemplo_'+ID).val(jQuery(this).val());
+	jQuery('#fac_ejemplo_'+ID).val(jQuery(this).val().replace("\n",'<br/>'));
 	jQuery('#caja_'+ID).remove();
 	agregaporid(ID,Cat);
     });
@@ -242,7 +201,10 @@
         var Font=jQuery('#fac_font_'+ID).val();
         jQuery('#caja_'+ID).css({'font-family':Font});
     });
-    
+
+   jQuery('#pizarra').mousemove(function(event) {
+     //console.log(event.pageX + ", " + event.pageY);
+    });
     
     jQuery('.facpos').live('keyup',function(){    
         var ID=jQuery(this).attr('rel');
@@ -267,8 +229,8 @@
         jQuery('#pizarra').height(alto);
         var factorx=ancho/pgx;
         var factory=alto/pgy;
-        var Width=parseint(factorx*jQuery('#fac_cellW_'+ID).val());
-        var Height=parseint(factory*jQuery('#fac_cellW_'+ID).val());
+        var Width=parseInt(factorx*jQuery('#fac_cellW_'+ID).val());
+        var Height=parseInt(factory*jQuery('#fac_cellW_'+ID).val());
         jQuery('#caja_'+ID).css({width:Width,height: Height});
     });
     
@@ -329,9 +291,27 @@
         var Fontsize=jQuery('#fac_tamano_'+ID).val();
         jQuery('#caja_'+ID).css({'font-size':Fontsize+'pt'});
     });
-    function pizarron() {
+      
+    jQuery("#cambio").click(function () {
+       
+        var Img = jQuery("#cambio").attr("rel");
+        jQuery.post( staticpath+'scan/uploadifyplus.php', {
+            action: 'borrar',
+            img: Img
+        });
+		  jQuery("#cambio").hide();
+            jQuery("#fotela").show();
+             jQuery("#fotelaUploader").show();
+				jQuery("#fotelaQueue").show();	
+				jQuery("#fondo").val('').change();
+				jQuery('#botonguardar').click();
+    });    
+
+
+});	// termina Document Ready
+
+function pizarron() {
         jQuery('#pizarra').html('');
-        var Fondo=jQuery('#fondo').val();
         jQuery("#pizarra").append('<div id="subpizarra" style="position:absolute;top:0;left:0;width:100%;height:100%;background: transparent 0 0 no-repeat;opacity:0.5; z-index:0;"></div>');
         jQuery('input:checkbox:checked', "#tabla_coordenadas").each(function() {
             var ID=jQuery(this).attr('id').replace('fac_activo_','');
@@ -339,6 +319,7 @@
             agregaporid(ID,Cat);
             
         });
+	var Fondo=jQuery('#fondo').val();
         if(Fondo!==undefined && Fondo.length>0) {
             jQuery('#subpizarra').css({'background-image':'url('+Fondo+')'});
             
@@ -346,7 +327,12 @@
             jQuery("#fotela").hide();
             jQuery("#fotelaUploader").hide();
             jQuery("#fotelaQueue").hide();			 
-        }
+        } else {
+	    jQuery("#cambio").attr("rel", '').hide();
+	  jQuery("#fotela").show();
+            jQuery("#fotelaUploader").show();
+            jQuery("#fotelaQueue").show();  
+	}
     }
     function filasporcat() {
         Filas[0]=0; Filas[1]=0;          Filas[2]=0;          Filas[3]=0;          Filas[4]=0;          Filas[8]=0;
@@ -360,88 +346,162 @@
     }
     
     function agregaporid(ID,Cat) {
-        ancho=jQuery('#pizarra').width();
-        pgx=parseInt(jQuery('#ancho').val());
-        pgy=parseInt(jQuery('#alto').val());
-        alto=ancho*pgy/pgx;
-        jQuery('#pizarra').height(alto);
-        var factorx=ancho/pgx;
-        var factory=alto/pgy;
-        var Pos=0;
-        var Relleno=jQuery('#fac_ejemplo_'+ID).val();
-        if(Relleno.length==0) Relleno=jQuery('#glosa_'+ID).attr('rel');
-	if(Relleno.length==0) Relleno=jQuery('#glosa_'+ID).html();
-        var Fontsize=jQuery('#fac_tamano_'+ID).val();
-        var Extension=Fontsize*Relleno.length;
-        var posx=factorx*jQuery('#fac_coordinateX_'+ID).val();
-        var posy=factory*jQuery('#fac_coordinateY_'+ID).val();
-        var Width=jQuery('#fac_cellW_'+ID).val();
-        if(Width==0) Width=Extension/2.7;
-        Width=Width*factorx;
-        
-        var Height=jQuery('#fac_cellH_'+ID).val();
-        if(Height==0) Height=Fontsize/1.4;
-        Height=Height*factory;
-        
-        var Font=jQuery('#fac_font_'+ID).val();
-        var Style=jQuery('#fac_style_'+ID).val();
-        
-        var Mayus=jQuery('#fac_mayuscula_'+ID).val();
-        var transform='none';
-        if(Mayus=='may') transform='uppercase';
-        if(Mayus=='min') transform='lowercase';
-        
-        var Style=jQuery('#fac_style_'+ID).val();
-        var Css='';
-        if(Style=='') Css={'text-decoration':'none', 'font-weight':'normal', 'font-style':'normal'};
-        if(Style=='B') Css={'text-decoration':'none', 'font-weight':'bold', 'font-style':'normal'};
-        if(Style=='I') Css={'text-decoration':'none', 'font-weight':'normal', 'font-style':'italics'};
-        if(Style=='U') Css={'text-decoration':'underline', 'font-weight':'normal', 'font-style':'normal'};
-        
-        
-        
-        
-        jQuery("#pizarra").append("<div rel='"+Cat+"' class='cajitas' id='caja_"+ID+"' style='text-transform:"+transform+";font-family:"+Font+";font-size:"+Fontsize+"pt;position:absolute; width:"+Width+"px;height:"+Height+"px;left:"+posx+"px;top:"+posy+"px;z-index:"+ID+";'>"+Relleno+"</div>");
-        jQuery('#caja_'+ID).draggable({cursor:'move', containment:'#pizarra', 
-            drag:function(event,ui) {
-                jQuery('#fac_coordinateX_'+ID).val(parseInt(ui.position.left/factorx));
-                jQuery('#fac_coordinateY_'+ID).val(parseInt(ui.position.top/factory)); 
-                jQuery('#fila_'+ID).css('background','#CFC');
-                jQuery('#select_id_factura_pdf_datos_categoria').val(Cat);
-                Pos=jQuery(".cat_"+Cat).first().attr('rel');
-                jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
-                jQuery("#fila_"+ID).css({'background':'#CFC'});
-                jQuery("#contienecoordenadas").css({'height':(24*Filas[Cat])});
-                jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
-            },
-            stop:function(event,ui) {
-                jQuery('#fila_'+ID).css('background','#FFF');
-            }
-        }).resizable({
-            resize:function(event,ui) {
-                jQuery('#fac_coordinateX_'+ID).val(parseInt(ui.position.left/factorx));
-                jQuery('#fac_coordinateY_'+ID).val(parseInt(ui.position.top/factory));  
-                jQuery('#fac_cellW_'+ID).val(parseInt(ui.size.width/factorx));
-                jQuery('#fac_cellH_'+ID).val(parseInt(ui.size.height/factory));  
-                jQuery('#fila_'+ID).css('background','#CFC');
-                jQuery('#select_id_factura_pdf_datos_categoria').val(Cat);
-                Pos=jQuery(".cat_"+Cat).first().attr('rel');
-                jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
-                jQuery("#fila_"+ID).css({'background':'#CFC'});
-                jQuery("#contienecoordenadas").css({'height':(24*Filas[Cat])});
-                jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
-            },
-            stop:function(event,ui) {
-                jQuery('#'+ID).css('background','#FFF');
-            }               
-        }).css(Css);
-    }
+	    ancho=jQuery('#pizarra').width();
+	    pgx=parseInt(jQuery('#ancho').val());
+	    pgy=parseInt(jQuery('#alto').val());
+	    factor=ancho/pgx;
+	     alto=factor*pgy;
+	    jQuery('#pizarra').height(alto);
+
+	    var Pos=0;
+	    var Relleno=jQuery('#fac_ejemplo_'+ID).val();
+	    if(Relleno.length==0) Relleno=jQuery('#glosa_'+ID).attr('rel');
+	    if(Relleno.length==0) Relleno=jQuery('#glosa_'+ID).html();
+	    var ArrayRelleno=Relleno.split("\n");
+
+
+	    var Fontsize=jQuery('#fac_tamano_'+ID).val();
+	    var Extension=Fontsize*ArrayRelleno[0].length;
+	    var posx=factor*jQuery('#fac_coordinateX_'+ID).val();
+	    var posy=factor*jQuery('#fac_coordinateY_'+ID).val();
+	    var Width=jQuery('#fac_cellW_'+ID).val();
+	    if(Width==0) Width=Extension/2.8;
+	    Width=Width*factor;
+
+	    var Height=jQuery('#fac_cellH_'+ID).val();
+	    if(Height==0) Height=Fontsize*(ArrayRelleno.length)/1.8;
+	    Height=Height*factor;
+	   // console.log(ArrayRelleno,ArrayRelleno[0].length,ArrayRelleno.length,Extension, Width, Height, factor);
+	    var Font=jQuery('#fac_font_'+ID).val();
+	    var Style=jQuery('#fac_style_'+ID).val();
+
+	    var Mayus=jQuery('#fac_mayuscula_'+ID).val();
+	    var transform='none';
+	    if(Mayus=='may') transform='uppercase';
+	    if(Mayus=='min') transform='lowercase';
+
+	    var Style=jQuery('#fac_style_'+ID).val();
+	    var Css='';
+	    if(Style=='') Css={'text-decoration':'none', 'font-weight':'normal', 'font-style':'normal'};
+	    if(Style=='B') Css={'text-decoration':'none', 'font-weight':'bold', 'font-style':'normal'};
+	    if(Style=='I') Css={'text-decoration':'none', 'font-weight':'normal', 'font-style':'italics'};
+	    if(Style=='U') Css={'text-decoration':'underline', 'font-weight':'normal', 'font-style':'normal'};
+	    jQuery("#pizarra").append("<div rel='"+Cat+"' class='cajitas' id='caja_"+ID+"' style='text-transform:"+transform+";font-family:"+Font+";font-size:"+Fontsize+"pt;position:absolute; width:"+Width+"px;height:"+Height+"px;left:"+posx+"px;top:"+posy+"px;z-index:"+ID+";'>"+Relleno+"</div>");
+	    jQuery('#caja_'+ID).draggable({cursor:'move', containment:'#pizarra', 
+		drag:function(event,ui) {
+		     Actual=jQuery(this).attr('id').replace('caja_','');      
+	    var Id_categoria=jQuery(this).attr('rel')
+	    jQuery('#select_id_factura_pdf_datos_categoria').val(Id_categoria);
+		    jQuery('#fac_coordinateX_'+ID).val(parseInt(ui.position.left/factor));
+		    jQuery('#fac_coordinateY_'+ID).val(parseInt(ui.position.top/factor)); 
+		    jQuery('#fila_'+ID).css('background','#CFC');
+		    jQuery('#select_id_factura_pdf_datos_categoria').val(Cat);
+		    Pos=jQuery(".cat_"+Cat).first().attr('rel');
+		    jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
+		    jQuery("#fila_"+ID).css({'background':'#CFC'});
+		  //  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+		    jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
+		},
+		stop:function(event,ui) {
+		    jQuery('#fila_'+ID).css('background','#FFF');
+		}
+	    }).resizable({
+		resize:function(event,ui) {
+		     Actual=jQuery(this).attr('id').replace('caja_','');      
+	    var Id_categoria=jQuery(this).attr('rel')
+	    jQuery('#select_id_factura_pdf_datos_categoria').val(Id_categoria);
+		    jQuery('#fac_coordinateX_'+ID).val(parseInt(ui.position.left/factor));
+		    jQuery('#fac_coordinateY_'+ID).val(parseInt(ui.position.top/factor));  
+		    jQuery('#fac_cellW_'+ID).val(parseInt(ui.size.width/factor));
+		    jQuery('#fac_cellH_'+ID).val(parseInt(ui.size.height/factor));  
+		    jQuery('#fila_'+ID).css('background','#CFC');
+		    jQuery('#select_id_factura_pdf_datos_categoria').val(Cat);
+		    Pos=jQuery(".cat_"+Cat).first().attr('rel');
+		    jQuery( "#tabla_coordenadas" ).css({'top':(24*(1-Pos))});
+		    jQuery("#fila_"+ID).css({'background':'#CFC'});
+		    //  jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria]});
+			jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+		    jQuery("#fila_"+ID).animate({'backgroundColor':'#FFF'},2000);
+		},
+		stop:function(event,ui) {
+		    jQuery('#'+ID).css('background','#FFF');
+		}               
+	    }).css(Css);
+	} //fin agregar por ID
+   	   
+function YoucangonowMichael() {
+  Id_documento_legal=jQuery('#select_id_documento_legal').val();
+   Id_categoria=jQuery('#select_id_factura_pdf_datos_categoria').val();
+   staticpath='https://estaticos.thetimebilling.com/';
+	     //if (typeof(console)!==undefined) console.log('cargando...'+Id_documento_legal);
+	 jQuery.post('ajax/mantencion_factura_pdf_ajax.php',{opc: 'dibuja_tabla', id_documento_legal:Id_documento_legal},function(data) { 
+		jQuery("#tabla_coordenadas").html(data);  
+		 filasporcat();
+                    var Pos=jQuery(".cat_"+Id_categoria).first().attr('rel');  
+                    jQuery( "#tabla_coordenadas" ).css({'top':24*(1-Pos)} );
+                   jQuery("#contienecoordenadas").css({'height':24*Filas[Id_categoria], 'margin-bottom':parseInt(216-24*Filas[Id_categoria])});
+		   jQuery('#datospdf').show();
+		    pizarron();
+                   
+		   jQuery('#uploadify').appendTo('#fatcell').show();
+		})        
+                  
+				
+            
+     
+
     
-      });   
- });
+    jQuery.when(jQuery.ajax({async: false,cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js', dataType: 'script' }) ,
+	 jQuery.ajax({async: false,cache:true,  type: "GET", url: staticpath+'jquery.uploadify.v2.1.0.min.js', dataType: 'script' })	 
+	 ).then(function() {
+           
+		      jQuery('#fotela').uploadify({
+			'scriptAccess': 'always',
+			'uploader': staticpath+'scan/uploadify.swf',
+			'script': staticpath+'scan/uploadifyplus.php',
+			'folder': '/' + jQuery("#underscan").val(),
+			'cancelImg': staticpath+'images/cancel.png',
+			'fileDesc': 'Archivos de imagen para la web',
+			'fileExt': '*.jpg;*.gif;*.png',
+			'buttonImg': staticpath+'images/miniupload.gif',
+			'rollover': true,
+			'width': 20,
+			'height': 19,
+			'auto': true,
+			'multi':false,
+
+			'onComplete': function (event, queueID, fileObj, response, data) {
+			    
+			    jQuery("#uploading").hide();   
+			    jQuery("#fotela").hide();
+			    jQuery("#fotelaUploader").hide();
+			    jQuery("#fotelaQueue").hide();		
+			    jQuery("#cambio").attr("rel",  jQuery("#underscan").val() + '/' + fileObj.name).show();
+			    jQuery("#fondo").val(staticpath+'scan/'+  jQuery("#cambio").attr('rel'));
+			    jQuery("#fotelaQueue").hide();			 
+			    jQuery('#botonguardar').click();
+			}
+
+		    });
+	var Fondo=jQuery('#fondo').val();
+        if(Fondo!==undefined && Fondo.length>0) {
+            jQuery('#subpizarra').css({'background-image':'url('+Fondo+')'});
+            
+            jQuery("#cambio").attr("rel",  Fondo.replace(staticpath+'scan/','')).show();
+            jQuery("#fotela").hide();
+            jQuery("#fotelaUploader").hide();
+            jQuery("#fotelaQueue").hide();			 
+        }
+		jQuery('#uploadify').appendTo('#fatcell').show();
+		jQuery('#pizarra').removeClass('divloading');
+            });  
+
+   } 
+
  </script>
 
-        <form id="cambio_tipo_doc" action="#" method="POST">
+      
         <table width="80%" >
             <tr>
                 <td style="text-align:right;vertical-align: middle;" >
@@ -468,12 +528,12 @@
 
             </tr>
         </table>
-        </form>
+ <div id="cambio_tipo_doc" style="display:none;">&nbsp;</div>
 			<div id="uploadify" style="display:none;height:22px;width:24px;overflow:hidden;margin:2px 0 0 5px; ">
-			<img id="uploading" src="https://files.thetimebilling.com/images/uploading.gif"  height="20" width="20" style="border:0;text-decoration:none;display:none;"/>
+			<img id="uploading" src="https://estaticos.thetimebilling.com/images/uploading.gif"  height="20" width="20" style="border:0;text-decoration:none;display:none;"/>
 			<div id="fotela" style="width:20px;overflow:hidden;"></div>
 			<a style="display:none;" href="#" id="cambio" rel="" >
-			<img  src="https://files.thetimebilling.com/images/delete-icon.gif"  height="19" width="19" style="border:0;text-decoration:none;"/>
+			<img  src="https://estaticos.thetimebilling.com/images/delete-icon.gif"  height="19" width="19" style="border:0;text-decoration:none;"/>
 			</a>
 			</div>
 
@@ -504,14 +564,13 @@ $underscan=CURHOST.'/'.CURROOTDIR;
 	echo "<li style='width:100px;' class=\"encabezado\">Mayúscula</li>";
 	echo "<li style='width:50px;text-align:left;' class=\"encabezado\">Tamaño</li>";
 	echo "</ul></div>";
-	//echo "<div id='slider-vertical' style='float:right;margin:5px 40px 0 0; width:10px;height:150px;'></div>";
 	echo "<div id='contienecoordenadas' ><div id='tabla_coordenadas' ></div></div>";
         echo "</form>";
 	
-	echo '<div id="mensaje" style="clear:both;display:block;margin:10px auto ;color:#999;font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>
-	<div id="pizarra" style="text-align:left; position:relative; border: 1px solid #CCC;width:800px;height:800px;margin-top:10px;">';
+	echo '<div id="mensaje" style="clear:both;display:block;margin:10px auto ;color:#999;font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>';
 	
-	echo '</div>';
+	echo '<div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC;width:800px;height:300px;margin:10px auto;">&nbsp;</div>';	
+	
 	
 	$pagina->PrintBottom();
 ?>

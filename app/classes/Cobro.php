@@ -2516,15 +2516,18 @@ class Cobro extends Objeto {
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? __('prestada ') . $texto_fecha_es : __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 				} else {
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('to') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
+					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 				}
 
 				if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
 					$fecha_diff = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
 					$fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
+					$fecha_diff_prestada = __('prestada en el mes de') . ' ' .  ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
 				}
 
 				//Se saca la fecha inicial según el primer trabajo
@@ -2631,6 +2634,8 @@ class Cobro extends Objeto {
 				$html2 = str_replace('%fecha%', $fecha_diff, $html2);
 				$html2 = str_replace('%fecha_al%', $fecha_al, $html2);
 				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);
+				$html2 = str_replace('%fecha_con_prestada%', $fecha_diff_prestada, $html2);
+				$html2 = str_replace('%fecha_con_prestada_minusculas%', strtolower($fecha_diff_prestada), $html2);
 				$html2 = str_replace('%fecha_emision%', $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d de %B') : Utiles::sql2fecha($this->fields['fecha_fin'], '%d de %B'), $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
@@ -6895,15 +6900,18 @@ class Cobro extends Objeto {
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? __('prestada ') . $texto_fecha_es : __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 				} else {
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('to') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
+					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 				}
 
 				if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
 					$fecha_diff = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
+					$fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
 				}
 
 				//Se saca la fecha inicial según el primer trabajo
@@ -7009,7 +7017,9 @@ class Cobro extends Objeto {
 				$html2 = str_replace('%fecha_primer_trabajo_de%', $fecha_primer_trabajo_de, $html2);
 				$html2 = str_replace('%fecha%', $fecha_diff, $html2);
 				$html2 = str_replace('%fecha_al%', $fecha_al, $html2);
-				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);
+				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);				
+				$html2 = str_replace('%fecha_con_prestada%', $fecha_diff_prestada, $html2);
+				$html2 = str_replace('%fecha_con_prestada_minusculas%', strtolower($fecha_diff_prestada), $html2);
 				$html2 = str_replace('%fecha_emision%', $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d de %B') : '', $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));

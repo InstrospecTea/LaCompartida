@@ -17,7 +17,7 @@
 		$correos=array();
 		$correo=array( 'nombre' => $nombre, 'mail' => $mail );
 		array_push($correos,$correo);
-		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,false,$id_archivo_anexo))
+		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,true,$id_archivo_anexo))
 		{
                     
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=".$id;

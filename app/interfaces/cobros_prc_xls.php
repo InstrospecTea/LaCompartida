@@ -440,8 +440,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->setPaper(9);
 	$ws->hideGridlines();
 	$ws->hideScreenGridlines();
-	$ws->setLandscape();  // esto debería dejar como landscape.	
-	$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja
+	$ws->setPortrait();  // setLandscape lo dice todo, y setPortrait lo mismo.	
+	$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja horizontalmente
 	$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
 	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 15);
@@ -603,7 +603,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->setPaper(9);
 		$ws->hideGridlines();
 		$ws->hideScreenGridlines();
-		$ws->setLandscape();
+		$ws->setPortrait();  // setLandscape lo dice todo, y setPortrait lo mismo.	
+		$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja horizontalmente
+		$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
 
 		$filas = 0;
@@ -820,7 +822,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->setPaper(9);
 		$ws->hideGridlines();
 		$ws->hideScreenGridlines();
-		$ws->setLandscape();
+		$ws->setPortrait();  // setLandscape lo dice todo, y setPortrait lo mismo.	
+		$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja horizontalmente
+		$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
 
 		$filas = 0;
@@ -1069,7 +1073,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->setPaper(9);
 		$ws->hideGridlines();
 		$ws->hideScreenGridlines();
-		$ws->setLandscape();
+		$ws->setPortrait();  // setLandscape lo dice todo, y setPortrait lo mismo.	
+		$ws->fitToPages(1,0); // para dejar que todo cuadre en una hoja horizontalmente
+		$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
 
 		$columna_inicial = 1;

@@ -271,7 +271,8 @@
 		$reporte->id_moneda = $id_moneda;
 		// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 		$reporte->addRangoFecha($fecha1, $fecha2);
-		$reporte->setVista($vista);
+		$vista_reporte = $vista == "glosa_asunto" ? "codigo_asunto" : $vista;
+		$reporte->setVista($vista_reporte);
 		imprimir_datos_columna($ws, $reporte, $tipo_dato[$i], $ids, $offset_columnas+1+$i, $formato_numero, $vista);
 	}
 

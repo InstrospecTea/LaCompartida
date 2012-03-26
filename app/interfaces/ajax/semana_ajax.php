@@ -92,7 +92,7 @@
 	#y primera semana del año
 	$query = "SELECT $select_codigo asunto.glosa_asunto,trabajo.duracion,trabajo.fecha,trabajo.id_trabajo, trabajo.descripcion
 				,(SELECT c1.glosa_cliente FROM cliente AS c1 WHERE c1.codigo_cliente=asunto.codigo_cliente) as glosa_cliente
-				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable
+				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable, trabajo.estadocobro, trabajo.revisado
 				 FROM trabajo 
 				 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 					WHERE
@@ -102,11 +102,11 @@
 	
         $lista = new ListaTrabajos($sesion, "", $query);
 
+        
 	$dias = array(__("Lunes"), __("Martes"), __("Mi&eacute;rcoles"), __("Jueves"), __("Viernes"), __("S&aacute;bado"),__("Domingo"));
 	$tip_anterior = Html::Tooltip("<b>".__('Semana anterior').":</b><br>".Utiles::sql3fecha($semana_anterior,'%d de %B de %Y'));
 	$tip_siguiente = Html::Tooltip("<b>".__('Semana siguiente').":</b><br>".Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y'));
-	?> 	<center> <?
-	
+		
 #agregado para el nuevo select
 
 	if($p_revisor->fields['permitido'])
@@ -154,7 +154,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
             <strong><?=$horas_trabajadas_mes?></strong>
 		</td>
     </tr>
-<?
+<?php  $arraytrabajo=array();
 	echo("<tr id='cabecera_dias'>");
 	$fecha_dia = Utiles::sql2date($semana_actual);
 	
@@ -231,7 +231,24 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 #		$total[$dia_semana] += ($alto/40);
 
 		$descripcion = nl2br(str_replace("'","`",$lista->Get($i)->fields['descripcion']));
-		$id_trabajo = $lista->Get($i)->fields[id_trabajo];
+		$id_trabajo = $lista->Get($i)->fields['id_trabajo'];
+                $arraytrabajo[$id_trabajo]=$lista->Get($i)->fields;
+                
+                if(!$p_revisor->fields['permitido'] && $arraytrabajo[$id_trabajo]['revisado']==1) {                 
+                    $arraytrabajo[$id_trabajo]['abierto']='trabajocerrado';
+                } else {
+                   switch($arraytrabajo[$id_trabajo]['estadocobro']):
+                       case 'SIN COBRO':
+                       case 'CREADO':
+                       case 'EN REVISION':
+                           $arraytrabajo[$id_trabajo]['abierto']='trabajoabierto';
+                       break;
+                       default:
+                           $arraytrabajo[$id_trabajo]['abierto']='trabajocerrado';
+                        break;
+                   endswitch;        
+                }
+                
 		$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
 		if($dia_anterior != $dia_semana)
 		{
@@ -239,7 +256,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 				echo("</td><td width=14%>");
 		}	
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div class='cajatrabajo' id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div class='cajatrabajo ".$arraytrabajo[$id_trabajo]['abierto']."' id='".$id_trabajo."'  $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");
@@ -294,7 +311,7 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 		</tr>
 		</table>
 </form>
-</center>
+
 
 
 <?php

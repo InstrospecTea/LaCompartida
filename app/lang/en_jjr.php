@@ -9,5 +9,6 @@
         $_LANG['Mr.'] = "Mr.";
         $_LANG['Ms.'] = "Ms.";
         $_LANG['Miss.'] = "Miss.";
+	$_LANG['TARIFA'] = "Rate";
 
 ?>

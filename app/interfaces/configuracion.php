@@ -53,34 +53,6 @@
 ?>
 
 <script type="text/javascript">
-  
-function MostrarTablaAsuntos( check, tabla, valor_hidden )
-{
-	//var check_elemento = document.getElementById( check );
-	//var tabla_elemento = document.getElementById( tabla );
-	
-        //var valorhidden = document.getElementById( valor_hidden );
-       // var valorhidden = jQuery('#'+valor_hidden).val();
-      
-	var string_asuntos = jQuery('#'+valor_hidden).val();
-        var array_asuntos = string_asuntos.split(';');
-	//if( check_elemento.checked ) {
-	//	tabla_elemento.style.display = 'table';
-        if (jQuery('#'+check).is(':checked')) {
-        jQuery('#'+tabla).show();
-        string_asuntos='true';
-	} else {
-	//	tabla_elemento.style.display = 'none';
-        jQuery('#'+tabla).hide();
-            string_asuntos='false';  
-        }    
-   for( var i = 1; i < array_asuntos.length; i++)
-  	{
-  	string_asuntos += ';'+array_asuntos[i];
-        }
-	         
-        jQuery('#'+valor_hidden).val(string_asuntos)  ;  
-}
 
 function Ocultar( version, trID, valor_hidden, inputID )
 {
@@ -116,18 +88,6 @@ function MuestraOculta(divID)
 	}
 }
 
-function AsuntosPorSeparado( valor, valor_hidden )
-{
-	var asuntos_por_separado = document.getElementById("asuntos_por_separado");
-	var valorhidden = document.getElementById( valor_hidden );
-	var string_asuntos = valorhidden.value;
-	
-	if( asuntos_por_separado.checked )
-		string_asuntos = string_asuntos.replace("false","true");
-	else
-		string_asuntos = string_asuntos.replace("true","false");
-	valorhidden.value = string_asuntos;
-}
 
 function AgregarAsunto( numero , valor_hidden )
 {
@@ -140,7 +100,7 @@ function AgregarAsunto( numero , valor_hidden )
 	var string_asuntos = valorhidden.value;
 	
   var array_asuntos = string_asuntos.split(';');
- if (jQuery('#usa_asuntos_por_defecto').is(':checked')) {
+ if (jQuery('#asuntos_por_separado').is(':checked')) {
   string_asuntos='true';
   } else {
   string_asuntos='false';    
@@ -156,16 +116,10 @@ function AgregarAsunto( numero , valor_hidden )
   	string_asuntos += ';'+array_asuntos[i];
         }
         string_asuntos += ';'+input_elemento.value;
-//	alert(string_asuntos);
 	valorhidden.value = string_asuntos; 
 	div_elemento.innerHTML = input_elemento.value;
 	div_elemento.style.display = 'inline';
 	input_elemento.style.display = 'none';
-	/*input_elemento.style.background = 'white';
-	input_elemento.style.color = 'black';
-	input_elemento.style.border = '0px';
-	input_elemento.style.margin = '0px';
-	input_elemento.style.padding = '0px';*/
 	
 	agregar_elemento.style.display = 'none';
 	img_elemento.style.display = 'block';
@@ -200,9 +154,9 @@ function AgregarAsunto( numero , valor_hidden )
 		if( $id_categoria != $id_categoria_anterior )
 			{
 			if( !$id_categoria_anterior )
-				echo "<fieldset class=\"tb_base\" style=\"width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span>".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
+				echo "<fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span>".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
 			else
-				echo "</table></fieldset><fieldset class=\"tb_base\" style=\"width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span> ".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
+				echo "</table></fieldset><fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span> ".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
 			}
 		$tooltip = $comentario?Html::Tooltip($comentario):'';
 		echo "<tr><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
@@ -221,16 +175,17 @@ function AgregarAsunto( numero , valor_hidden )
 			case 'array':
 				echo "<input type='hidden' id='opcion_$id' name='opcion[$id]' value='".$valor_opcion."' />";
 				$valores_array = explode(';', $valor_opcion);
-				echo "<input type='checkbox'  id='usa_asuntos_por_defecto' ".(($valores_array[0]== 'true')?"checked='checked'":"")." onChange=\"MostrarTablaAsuntos( 'usa_asuntos_por_defecto', 'tabla_asuntos', 'opcion_$id' );\" />";
-				echo "<table id='tabla_asuntos' ".(($valores_array[0]!='true')?"style='display: none;'":"").">";
+				echo "<input type='checkbox'  id='usa_asuntos_por_defecto' ".($valor_opcion? "checked='checked'":"")."  />";
+				echo "<table id='tabla_asuntos' ".((!$valor_opcion)?"style='display: none;'":"").">";
 				for($i=1; $i<count($valores_array); ++$i )
-					echo "<tr id='$valores_array[$i]'><td>".$valores_array[$i]."</td><td><img style=\"filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('viejo','".$valores_array[$i]."', 'opcion[".$id."]');\"/></td></tr>";
+				
+                                echo "<tr id='$valores_array[$i]'><td>".$valores_array[$i]."</td><td><img style=\"filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('viejo','".$valores_array[$i]."', 'opcion[".$id."]');\"/></td></tr>";
 				echo "<tr id='hidden_1'><td><input type='text' id='text_1' size='12' value='' /><div id='texto_1' style=\"display:none;\"/></td><td><img id='img_1' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_1', 'opcion[".$id."]', 'text_1');\"/><input type='button' id='agregar_1' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('1','opcion[".$id."]');\" /></td></tr>";
-				for($j=2; $j<21; ++$j)
-					echo "<tr id='hidden_".$j."' style=\"display: none;\"><td><input type='text' id='text_".$j."' size='12' value='' /><div id='texto_".$j."' style=\"display:none;\"/></td><td><img id='img_".$j."' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_".$j."', 'opcion[".$id."]','text_".$j."');\"/><input type='button' id='agregar_".$j."' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('".$j."','opcion[".$id."]');\"/></td></tr>";
-				echo "<tr><td colspan=2><input id=\"asuntos_por_separado\" type='checkbox' ".($valores_array[0]=='true'?"checked='checked'":"")." onChange=\"AsuntosPorSeparado(this.value, 'opcion[".$id."]');\"/> &nbsp;&nbsp; Cobrar los asuntos de forma independiente.</td></tr>";
+				for($j=2; $j<21; ++$j) echo "<tr id='hidden_".$j."' style=\"display: none;\"><td><input type='text' id='text_".$j."' size='12' value='' /><div id='texto_".$j."' style=\"display:none;\"/></td><td><img id='img_".$j."' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_".$j."', 'opcion[".$id."]','text_".$j."');\"/><input type='button' id='agregar_".$j."' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('".$j."','opcion[".$id."]');\"/></td></tr>";
+				echo "<tr><td colspan=2><input id=\"asuntos_por_separado\" rel=\"opcion_$id\" type='checkbox' ".($valores_array[0]=='true'?"checked='checked'":"")."/> &nbsp;&nbsp; Cobrar los asuntos de forma independiente.</td></tr>";
 				echo "</table>";
-				break;
+				
+                                break;
 			case 'numero':
 			case 'string':
 				// generar input de texto
@@ -286,6 +241,29 @@ if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura
 </form>
 
 <script language="javascript" type="text/javascript">
+jQuery(document).ready(function() {
+    jQuery('#usa_asuntos_por_defecto').click(function() {
+        jQuery('#tabla_asuntos').toggle();
+    }); 
+    jQuery('#asuntos_por_separado').click(function() {
+       hiddenid=jQuery(this).attr('rel');
+       var string_asuntos = jQuery('#'+hiddenid).val();
+       var array_asuntos = string_asuntos.split(';');
+       if(jQuery(this).is(':checked')) {
+            string_asuntos='true';
+       } else {
+            string_asuntos='false';  
+       } 
+             
+   for( var i = 1; i < array_asuntos.length; i++)
+  	{
+  	string_asuntos += ';'+array_asuntos[i];
+        }
+	         
+        jQuery('#'+hiddenid).val(string_asuntos)  ;  
+       
+    });
+});
 Calendar.setup(
 	{
 		inputField	: "fecha",				// ID of the input field

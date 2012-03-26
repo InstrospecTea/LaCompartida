@@ -171,10 +171,11 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			$factura->Edit('subtotal_sin_descuento', number_format(!empty($documento_cobro->fields['subtotal_sin_descuento']) ? $documento_cobro->fields['subtotal_sin_descuento'] : '0', $moneda_factura->fields['cifras_decimales'], ".", ""));
 		}
 		else {
-                                $factura->Edit('subtotal',number_format(($documento_cobro->fields['honorarios']-$documento_cobro->fields['impuesto']),$moneda_factura->fields['cifras_decimales'],".","")); 
+            $factura->Edit('subtotal',number_format(($documento_cobro->fields['honorarios']-$documento_cobro->fields['impuesto']),$moneda_factura->fields['cifras_decimales'],".","")); 
 		}
-                $factura->Edit('iva',number_format($documento_cobro->fields['impuesto'],$moneda_factura->fields['cifras_decimales'],".","")); 
-                $factura->Edit('total',number_format($documento_cobro->fields['honorarios']+$documento_cobro->fields['gastos'],$moneda_factura->fields['cifras_decimales'],".","")); 
+        
+		$factura->Edit('iva',number_format($documento_cobro->fields['impuesto'],$moneda_factura->fields['cifras_decimales'],".","")); 
+        $factura->Edit('total',number_format($documento_cobro->fields['honorarios']+$documento_cobro->fields['gastos'],$moneda_factura->fields['cifras_decimales'],".","")); 
 
 		$estado = 'FACTURADO';
 		$cambiar_estado = false;
@@ -333,10 +334,6 @@ if ($opc == 'guardar') {
 	$cobro->Edit('forma_envio', $forma_envio);
 
 	if ( !UtilesApp::GetConf($sesion,'UsaNumeracionAutomatica') ) {
-		if( UtilesApp::GetConf($sesion,'PermitirFactura') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
-			$factura->Edit('numero', $documento);
-			$factura->Escribir();
-		}
 		$cobro->Edit('documento', $documento);
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra') )
 			$cobro->Edit('nota_cobro', $nota_cobro);
@@ -762,7 +759,15 @@ var ciclo=self.setInterval("refrescaestado('estado_contabilidad')",15000);
 			return resultado;
 		}
        
-
+		function trim(s)
+		{
+			var l=0; var r=s.length -1;
+			while(l < s.length && s[l] == ' ')
+			{	l++; }
+			while(r > l && s[r] == ' ')
+			{	r-=1;	}
+			return s.substring(l, r+1);
+		}
 
 		function ValidarTodo(form)
 		{
@@ -791,7 +796,7 @@ var ciclo=self.setInterval("refrescaestado('estado_contabilidad')",15000);
 			if( form.estado.value == 'EN REVISION' ) //Significa que estoy anulando la emisión
 			{
 				<?php if (UtilesApp::GetConf($sesion, "ObservacionReversarCobroPagado")): ?>
-				if (form.estado_original.value == 'PAGADO' && form.estado_motivo.value == "")
+				if (form.estado_original.value == 'PAGADO' && trim(form.estado_motivo.value) == "" )
 				{
 					jQuery('#dialogomodal').html(jQuery('#div_motivo_cambio_estado').html());
 					jQuery('#dialogomodal').dialog('open').dialog('option','title','Ingresar Motivo').dialog('option','height','170');
@@ -896,32 +901,28 @@ if (UtilesApp::GetConf($sesion, 'PermitirFactura') )  {
 				var form = $('todo_cobro');
 			if(opcion=='imprimir')
 			{
-			<? if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
-		 			{ ?>
+			<? if( UtilesApp::GetConf($sesion,'ImprimirFacturaPdf') && !UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) { ?>
 					nuovaFinestra('Imprimir_Factura',730,580,'agregar_factura.php?opc=generar_factura&id_cobro=<?=$id_cobro?>&id_factura='+id_factura, 'top=500, left=500');
 					//ValidarTodo(form);
-			<?	}
-				else
-					{	?>
+			<?	} else {	?>
 					form.opc.value='grabar_documento_factura';
 					form.id_factura_grabada.value = id_factura;
 			<?	}	?>
-						}
-						else if(opcion =='imprimir_pdf')
-						{
-							form.opc.value='grabar_documento_factura_pdf';
-							form.id_factura_grabada.value = id_factura;
-						}
-						else
-						{
-							$('facturado').checked = true;
-							form.opc.value = 'facturar';
-						}
-						form.submit();
-						return true;
+			}
+			else if(opcion =='imprimir_pdf')
+			{
+				form.opc.value='grabar_documento_factura_pdf';
+				form.id_factura_grabada.value = id_factura;
+			}
+			else
+			{
+				$('facturado').checked = true;
+				form.opc.value = 'facturar';
+			}
+			form.submit();
+			return true;
 	<?
-}
-else {
+} else {
 	?>
 			alert('Funcionalidad en desarrollo.');
 			return false;
@@ -1106,9 +1107,9 @@ while (list($id, $codigo) = mysql_fetch_array($resp))
 	var gastos_con_impuestos_total = Numero($F('gastos_con_iva_total'));
 	var gastos_sin_impuestos_total = Numero($F('gastos_sin_iva_total'));
 	
-	var esCredito = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['NC']?>;
-	var esFactura = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['FA']?>;
-	var esDebito = $F('tipo_documento_legal_'+idx) == <?=$id_tipo_documento['ND']?>;
+	var esCredito = $F('tipo_documento_legal_'+idx) == <?=!empty($id_tipo_documento['NC']) ? $id_tipo_documento['NC'] : 0?>;
+	var esFactura = $F('tipo_documento_legal_'+idx) == <?=!empty($id_tipo_documento['FA']) ? $id_tipo_documento['FA'] : 1?>;
+	var esDebito = $F('tipo_documento_legal_'+idx) == <?=!empty($id_tipo_documento['ND']) ? $id_tipo_documento['ND'] : 0?>;
 
 			if(!honorarios && !gastos_con_impuestos && !gastos_sin_impuestos ||
 				honorarios<0 || gastos_con_impuestos<0 || gastos_sin_impuestos<0){

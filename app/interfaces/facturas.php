@@ -159,6 +159,7 @@
 									 prm_documento_legal.codigo as tipo
 								, numero
 								, factura.serie_documento_legal
+								, factura.codigo_cliente 
 								, cliente.glosa_cliente
 								, factura.codigo_cliente 
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),

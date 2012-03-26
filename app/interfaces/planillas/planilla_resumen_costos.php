@@ -65,20 +65,37 @@
 		$dato_usuario = "username";
 	else
 		$dato_usuario = "CONCAT(apellido1,' ',apellido2,', ',nombre)";
+	
+	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+			$dato_usuario_valor = 'usuario.username';
+		else
+			$dato_usuario_valor = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
 	// Lista de abogados sobre los que se calculan valores. Calculado aquí por eficiencia.
-	$query = "SELECT 
-							".$dato_usuario." AS nombre_usuario, 
+	if( $solo_pro ) {
+		$query = "SELECT ".$dato_usuario." AS nombre_usuario, 
+						 ".$dato_usuario_valor." AS codigo_usuario, 
+							usuario.id_usuario
+						FROM usuario
+						JOIN usuario_permiso USING( id_usuario )
+						WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso = 'PRO' 
+						ORDER BY nombre_usuario, usuario.id_usuario";
+	} else {
+		$query = "SELECT ".$dato_usuario." AS nombre_usuario, 
+						 ".$dato_usuario_valor." AS codigo_usuario, 
 							id_usuario
 						FROM usuario
 						WHERE usuario.visible=1
 						ORDER BY nombre_usuario, id_usuario";
+	}
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 	$nombres = array();
+	$codigos_usuarios = array();
 	$ids = array();
-	while(list($n, $i) = mysql_fetch_array($resp))
+	while(list($n, $c, $i) = mysql_fetch_array($resp))
 	{
 		$nombres[] = $n;
+		$codigos_usuarios[] = $c;
 		$ids[] = $i;
 	}
 
@@ -87,7 +104,7 @@
 		$duracion_mes = array('31', (Utiles::es_bisiesto($fecha2_a)?'29':'28'), '31', '30', '31', '30', '31', '31', '30', '31', '30', '31');
 		$fecha1 = $fecha1_a."-".sprintf("%02d", $fecha1_m+1)."-01";
 		$fecha2 = $fecha2_a."-".sprintf("%02d", $fecha2_m+1)."-".$duracion_mes[$fecha2_m];
-		generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids);
+		generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $codigos_usuarios);
 	}
 	else		// Generar planilla con una hoja por mes.
 	{
@@ -109,12 +126,12 @@
 		$primera_llamada = true;
 
 		for($j=1;$j<13;++$j)
-			generarHoja($wb, $sesion, $fecha_a."-".sprintf("%02d", $j)."-01", $fecha_a."-".sprintf("%02d", $j)."-".$duracion_mes[$j-1], $nombres, $ids, 'Costos '.$meses[$j-1]);
+			generarHoja($wb, $sesion, $fecha_a."-".sprintf("%02d", $j)."-01", $fecha_a."-".sprintf("%02d", $j)."-".$duracion_mes[$j-1], $nombres, $ids, $codigos_usuarios, 'Costos '.$meses[$j-1]);
 	}
 
 	$wb->close();
 
-	function generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $titulo='', $offset_filas=2, $offset_columnas=1)
+	function generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $codigos_usuarios, $titulo='', $offset_filas=2, $offset_columnas=1)
 	{
 		if($titulo == '')
 			$titulo = "Costos ".$fecha1." - ".$fecha2;
@@ -197,8 +214,8 @@
                         $reporte->Query();
                         
                         $resultado = $reporte->toArray();
-                        $total = number_format($resultado['total'],2,'.','');
-                        
+                        $total = number_format($resultado[$codigos_usuarios[$i]]['valor'],2,'.','');
+						
                         $reporte = new Reporte($sesion);
                         $reporte->AddFiltro('usuario','id_usuario',$ids[$i]);
                         $reporte->addRangoFecha(Utiles::sql2date($fecha1),Utiles::sql2date($fecha2));

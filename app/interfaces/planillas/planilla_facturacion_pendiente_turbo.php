@@ -291,8 +291,8 @@ $tini=time();
 			$ws1->write($filas, $col_porcentaje_retainer, __('Porcentaje Retainer'), $formato_titulo);
 		}
 
-		$where_trabajo = "  trabajo.estado_cobro in ('SIN COBRO','CREADO','EN REVISION' ) ";
-		$where_gasto   = "  cta_corriente.estado_cobro in ('SIN COBRO','CREADO','EN REVISION' )  ";
+		$where_trabajo = "  trabajo.estadocobro in ('SIN COBRO','CREADO','EN REVISION' ) ";
+		$where_gasto   = "  cta_corriente.estadocobro in ('SIN COBRO','CREADO','EN REVISION' )  ";
 		if( $fecha1 != '' && $fecha2 != '' ) {
 			$where_trabajo .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
 			$where_gasto .= " AND cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' ";
@@ -317,12 +317,64 @@ $tini=time();
 			$codigos_asuntos_secundarios = "";
 			$codigo_asunto_secundario_sep = "";
 		}
-                         $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAY ) ;";
-                $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado  where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAY );";
-                $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAY ) ;";
+                $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
+                $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
+                $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
                 $resp = mysql_query($update1, $sesion->dbh);
-                        $resp = mysql_query($update2, $sesion->dbh);
-                                $resp = mysql_query($update3, $sesion->dbh);
+                $resp = mysql_query($update2, $sesion->dbh);
+                $resp = mysql_query($update3, $sesion->dbh);
+		list($maxolaptime)=mysql_fetch_array(mysql_query("select max(fecha_modificacion) as maxfecha from olap_liquidaciones", $sesion->dbh));
+		
+		$update4="replace delayed into olap_liquidaciones (SELECT
+                                                                asunto.codigo_asunto as codigos_asuntos,
+                                                                asunto.codigo_asunto_secundario, 
+								  contrato.id_usuario_responsable,
+								   asunto.glosa_asunto as asuntos,
+								   (asunto.cobrable+1) as asuntos_cobrables,
+								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+								
+								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+								ec.username as username_encargado_comercial,
+								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+								es.username as username_encargado_secundario,
+								contrato.id_contrato,
+                                                                contrato.monto, 
+								contrato.forma_cobro,
+								contrato.retainer_horas,
+								contrato.id_moneda as id_moneda_contrato,
+								contrato.opc_moneda_total as id_moneda_total,
+                                                              
+															  movs.*
+								FROM  asunto JOIN contrato  using (id_contrato)
+								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+								join
+								(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+								 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+								 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+								,fecha_modificacion from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and  fecha_touch>=$maxolaptime
+
+								 union all
+
+								 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+								 cc.id_movimiento,cc.id_usuario_orden, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+								IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+								,fecha_modificacion from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and  fecha_touch>=$maxolaptime
+
+
+								union all
+
+								select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+								tram.id_tramite, tram.id_usuario, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+								tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+								,fecha_modificacion from tramite tram where fecha_touch>=$maxolaptime
+
+								) movs on movs.codigo_asunto=asunto.codigo_asunto
+								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
+
+								";
+		$resp = mysql_query($update4, $sesion->dbh);
+		
 		$query = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
 								$codigos_asuntos_secundarios
@@ -365,15 +417,16 @@ $tini=time();
 														AND $where_gasto ) > 0 )
 							GROUP BY $group_by ";
                 
+		//mail('ffigueroa@lemontech.cl','Primera Query',$query);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 		$fila_inicial = $filas+2;
                 $tiempomatriz=array();
                
                 
-                                $reportecontrato = new ReporteContrato($sesion);
-                                $ultimocobro=$reportecontrato->UltimosCobros();
-				$arraygastos=$reportecontrato->ArrayGastos(false, $separar_asuntos, $fecha1, $fecha2);
+                                $reportecontrato = new ReporteContrato($sesion,false, $separar_asuntos, $fecha1, $fecha2);
+                                $ultimocobro=$reportecontrato->arrayultimocobro;
+				$arrayolap=$reportecontrato->arrayolap;
 				
 								
                                //echo '<pre>';  print_r($ultimocobro);  echo '</pre>';   die();
@@ -386,19 +439,17 @@ $tini=time();
 			// Definir datos ...
 			if($separar_asuntos) {
                           $reportecontrato->LoadContrato($id_contrato,$cobro['codigo_asunto'],$fecha1,$fecha2,false);
-                          list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $arraygastos[$cobro['codigo_asunto']];
+                          list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos,$horas_no_cobradas , $fecha_ultimo_trabajo,$fecha_ultimo_gasto) = $arrayolap[$cobro['codigo_asunto']];
                         
 				
                         }
 			else {
                             $reportecontrato->LoadContrato($id_contrato,'',$fecha1,$fecha2,false);
-			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $arraygastos[$id_contrato];
+			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos,$horas_no_cobradas , $fecha_ultimo_trabajo,$fecha_ultimo_gasto) = $arrayolap[$id_contrato];
                         	
 			} 
                       
-                        $fecha_ultimo_trabajo = $reportecontrato->fechaultimotrabajo;
-				$fecha_ultimo_gasto =  $reportecontrato->fechaultimogasto;
-				$horas_no_cobradas = $reportecontrato->horasporfacturar;
+                
 				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,
                                      $cantidad_asuntos,
                                      $monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,
@@ -631,7 +682,7 @@ $tini=time();
 		$wb->send("Planilla horas por facturar_turbo.xls");
 		$wb->close();
                 
-                mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
+             //   mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
 		exit;
 	}
 

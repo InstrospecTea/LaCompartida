@@ -115,6 +115,11 @@
 		</tr>
 		<tr>
 			<td align=right colspan=2>
+				<input type="checkbox" name="solo_pro" value="1" checked /><?=__('Solo profesionales')?>
+			</td>
+		</tr>
+		<tr>
+			<td align=right colspan=2>
 				<input type=hidden name='opc' value='reporte'>
 				<input type="submit" class=btn value="<?=__('Generar reporte')?>" name="btn_reporte">
 			</td>

@@ -16,8 +16,6 @@
 
 	$wb->send("Planilla_resumen_profesionales.xls");
 
-	global $formato_morado;
-	global $formato_morado;
 
 	if($moneda_base['cifras_decimales'] == 0)
 		$string_decimales = "";

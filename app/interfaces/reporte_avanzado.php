@@ -118,7 +118,7 @@
 	$agrupadores = array(
 	'glosa_cliente',
 	'codigo_asunto',
-	'glosa_asunto',
+	'glosa_asunto_con_codigo',
 	'profesional',
 	'estado',
 	'id_cobro',
@@ -203,7 +203,140 @@
 	$mes_pasado ="'01".date('-m-Y',$last_month)."','".date('t-m-Y',$last_month)."'";
 
 	$actual ="'01-01-".date('Y')."','".date('d-m-Y')."'";
+	
+	
+			function celda($nombre)
+			{
+				global $tipo_dato;
+				global $tipo_dato_comparado;
+				global $comparar;
+				global $glosa_dato;
+				echo "<td id=\"".$nombre."\"rowspan=2 align=\"center\" class=";
+				if($tipo_dato == $nombre || ( !isset($tipo_dato) && $nombre=='horas_trabajadas' ))
+					echo "boton_presionado";
+				else if($tipo_dato_comparado == $nombre && $comparar)
+					echo "boton_comparar";
+				else
+					echo "boton_normal";
+				echo " style=\"height:25px; font-size: 11px; vertical-align: middle; cursor:pointer; \"";
+				echo "onclick= TipoDato('".$nombre."')";
+				echo " title= \"".__($glosa_dato[$nombre])."\"";
+				echo " > ".__($nombre)."</td>";
+			}
+			function celda_disabled($nombre)
+			{
+				echo "<td id=\"".$nombre."\"rowspan=2 align=\"center\" class= boton_disabled style=\"height:25px; font-size: 11px; vertical-align: middle;\"";
+				echo " title= \"".__($glosa_dato[$nombre])."\"";
+				echo " > ".__($nombre)."</td>";
 			
+			}
+			function borde_abajo($colspan = 1)
+			{
+				echo "<td";
+				if($colspan!=1) echo " colspan=".$colspan;
+				echo " style=\"width:10px; font-size: 3px; border-bottom-style: dotted; border-width: 1px; \"> &nbsp; </td>";
+			}
+			function borde_derecha()
+			{
+				echo "<td rowspan=3 style=\"font-size: 3px; width:10px; border-right-style: dotted; border-width: 1px; \"> &nbsp; </td>";
+			}
+			function nada($numero = 1)
+			{
+				for($i=0; $i< $numero; $i++)
+				echo "<td style=\"font-size: 3px; width:10px; height:7px; \"> &nbsp; </td>";
+			}
+			function titulo_proporcionalidad()
+			{
+				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
+				echo "<div id='titulo_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
+				echo "&nbsp;&nbsp;".__('Proporcionalidad').":</div>";
+				echo "</td>";
+			}
+			function select_proporcionalidad()
+			{
+				global $proporcionalidad;
+				$o1 = 'selected';
+				$o2 = '';
+				if($proporcionalidad == 'cliente')
+				{
+					$o1 = '';
+					$o2 = 'selected';
+				}
+				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
+				echo "<div id='select_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
+				echo "&nbsp;&nbsp;<select name='proporcionalidad'>";
+					echo "<option value='estandar' ".$o1.">".__('Estándar')."</option>";
+					echo "<option value='cliente' ".$o2.">".__('Cliente')."</option>";
+				echo "</select></td>";
+			}
+			function visible_moneda($s,$select = '')
+			{
+				global $tipo_dato;
+				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
+				echo "<div id='moneda".$select."' style =\" height:25px; font-size: 14px; ";
+				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
+					echo " display:inline;\" >";
+				else
+					echo " display:none;\" >";
+				echo $s."</div>";
+
+				echo "<div id='anti_moneda".$select."' style =\" ";
+				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
+					echo " display:inline;\" >";
+				else
+					echo " display:none;\" >";
+				echo "&nbsp; </div>";
+
+				echo "</td>";
+			}
+			function moneda()
+			{
+				visible_moneda(__('Moneda').':');
+			}
+			function select_moneda()
+			{
+				global $sesion;
+				global $id_moneda;
+                                if( $id_moneda ) 
+                                    $moneda = $id_moneda;
+                                else 
+                                    $moneda = Moneda::GetMonedaReportesAvanzados( $sesion );
+				visible_moneda(Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$moneda, '','',"60"),'_select');
+			}
+			function tinta2()
+			{
+				global $comparar;
+				echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:70px; height: 20px; \"> ";
+					echo "<table id = \"tipo_tinta\" ";
+					if(!$comparar)
+						echo " style =\" display:none; \" ";
+					else
+						echo " ";
+					echo ">";
+						echo "<tr>";
+							echo "<td> <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"rojo\" checked=\"checked\" > </td>";
+							echo "<td style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+							echo "<td> <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> </td>";
+							echo "<td style= \"background-color: blue;\" > &nbsp;&nbsp;&nbsp;&nbsp;</td>";
+						echo "</tr>";
+					echo "</table>";
+				echo "&nbsp; </td>";
+			}
+			function tinta()
+			{
+				global $comparar;
+				echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:100px; height: 20px; \"> ";
+					echo "<span id= \"tipo_tinta\" style =\" width: 100px; ";
+					if(!$comparar)
+						echo " display:none; ";
+					echo " \" >";
+							echo "<input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"rojo\" checked=\"checked\" >";
+							echo "<span style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+							echo " <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> ";
+							echo "<span style= \"background-color: blue;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span> </span>";
+				echo "&nbsp; </td>";
+			}
+		
 
 	if(!isset($numero_agrupadores))
 		$numero_agrupadores = 1;
@@ -1461,142 +1594,10 @@ if(!$popup)
 </table>
 </center>
 				<!-- SELECTOR TIPO DE DATO EXPANDIDO-->
-<table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;" cellpadding="0" cellspacing="0">
+<table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;" border="1" cellpadding="0" cellspacing="0">
 	<tr>
 		<td align="center">
-		<?
-			function celda($nombre)
-			{
-				global $tipo_dato;
-				global $tipo_dato_comparado;
-				global $comparar;
-				global $glosa_dato;
-				echo "<td id=\"".$nombre."\"rowspan=2 align=\"center\" class=";
-				if($tipo_dato == $nombre || ( !isset($tipo_dato) && $nombre=='horas_trabajadas' ))
-					echo "boton_presionado";
-				else if($tipo_dato_comparado == $nombre && $comparar)
-					echo "boton_comparar";
-				else
-					echo "boton_normal";
-				echo " style=\"height:25px; font-size: 11px; vertical-align: middle; cursor:pointer; \"";
-				echo "onclick= TipoDato('".$nombre."')";
-				echo " title= \"".__($glosa_dato[$nombre])."\"";
-				echo " > ".__($nombre)."</td>";
-			}
-			function celda_disabled($nombre)
-			{
-				echo "<td id=\"".$nombre."\"rowspan=2 align=\"center\" class= boton_disabled style=\"height:25px; font-size: 11px; vertical-align: middle;\"";
-				echo " title= \"".__($glosa_dato[$nombre])."\"";
-				echo " > ".__($nombre)."</td>";
-			
-			}
-			function borde_abajo($colspan = 1)
-			{
-				echo "<td";
-				if($colspan!=1) echo " colspan=".$colspan;
-				echo " style=\"width:10px; font-size: 3px; border-bottom-style: dotted; border-width: 1px; \"> &nbsp; </td>";
-			}
-			function borde_derecha()
-			{
-				echo "<td rowspan=3 style=\"font-size: 3px; width:10px; border-right-style: dotted; border-width: 1px; \"> &nbsp; </td>";
-			}
-			function nada($numero = 1)
-			{
-				for($i=0; $i< $numero; $i++)
-				echo "<td style=\"font-size: 3px; width:10px; height:7px; \"> &nbsp; </td>";
-			}
-			function titulo_proporcionalidad()
-			{
-				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
-				echo "<div id='titulo_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
-				echo "&nbsp;&nbsp;".__('Proporcionalidad').":</div>";
-				echo "</td>";
-			}
-			function select_proporcionalidad()
-			{
-				global $proporcionalidad;
-				$o1 = 'selected';
-				$o2 = '';
-				if($proporcionalidad == 'cliente')
-				{
-					$o1 = '';
-					$o2 = 'selected';
-				}
-				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
-				echo "<div id='select_proporcionalidad' style =\" height:25px; font-size: 14px;  display:inline;\" >";
-				echo "&nbsp;&nbsp;<select name='proporcionalidad'>";
-					echo "<option value='estandar' ".$o1.">".__('Estándar')."</option>";
-					echo "<option value='cliente' ".$o2.">".__('Cliente')."</option>";
-				echo "</select></td>";
-			}
-			function visible_moneda($s,$select = '')
-			{
-				global $tipo_dato;
-				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
-				echo "<div id='moneda".$select."' style =\" height:25px; font-size: 14px; ";
-				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
-					echo " display:inline;\" >";
-				else
-					echo " display:none;\" >";
-				echo $s."</div>";
-
-				echo "<div id='anti_moneda".$select."' style =\" ";
-				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
-					echo " display:inline;\" >";
-				else
-					echo " display:none;\" >";
-				echo "&nbsp; </div>";
-
-				echo "</td>";
-			}
-			function moneda()
-			{
-				visible_moneda(__('Moneda').':');
-			}
-			function select_moneda()
-			{
-				global $sesion;
-				global $id_moneda;
-                                if( $id_moneda ) 
-                                    $moneda = $id_moneda;
-                                else 
-                                    $moneda = Moneda::GetMonedaReportesAvanzados( $sesion );
-				visible_moneda(Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$moneda, '','',"60"),'_select');
-			}
-			function tinta2()
-			{
-				global $comparar;
-				echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:70px; height: 20px; \"> ";
-					echo "<table id = \"tipo_tinta\" ";
-					if(!$comparar)
-						echo " style =\" display:none; \" ";
-					else
-						echo " ";
-					echo ">";
-						echo "<tr>";
-							echo "<td> <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"rojo\" checked=\"checked\" > </td>";
-							echo "<td style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-							echo "<td> <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> </td>";
-							echo "<td style= \"background-color: blue;\" > &nbsp;&nbsp;&nbsp;&nbsp;</td>";
-						echo "</tr>";
-					echo "</table>";
-				echo "&nbsp; </td>";
-			}
-			function tinta()
-			{
-				global $comparar;
-				echo "<td rowspan=3 align=\"center\" style=\"vertical-align: middle; width:100px; height: 20px; \"> ";
-					echo "<span id= \"tipo_tinta\" style =\" width: 100px; ";
-					if(!$comparar)
-						echo " display:none; ";
-					echo " \" >";
-							echo "<input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"rojo\" checked=\"checked\" >";
-							echo "<span style= \"background-color: red;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span>";
-							echo " <input type=\"radio\" name=\"tinta\" id=\"tinta\" value=\"azul\"> ";
-							echo "<span style= \"background-color: blue;\" >&nbsp;&nbsp;&nbsp;&nbsp;</span> </span>";
-				echo "&nbsp; </td>";
-			}
-		?>
+		
 		<table style="border: 0px solid black; width:730px" cellpadding="0" cellspacing="0">
 			<tr>
 				<?=celda('horas_trabajadas')?>

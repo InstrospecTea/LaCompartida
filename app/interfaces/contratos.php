@@ -233,7 +233,7 @@ if($codigo_cliente)
 		}
 		$id_contrato = $fila->fields['id_contrato'];
         return 
-		"<a href=# onclick=\"nuovaFinestra('Editar_Contrato',730,600,'agregar_contrato.php?id_contrato=$id_contrato&popup=1');\" title='Editar Contrato'><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Contrato></a>"
+		"<a href=# onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?id_contrato=$id_contrato&popup=1');\" title='Editar Contrato'><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Contrato></a>"
 		. "<a href='javascript:void
 		(0);' onclick=\"if(confirm('¿Desea generar este cobro individualmente?'))nuevaVentana('Cobrar',750,660,'genera_cobros_guarda.php?id_contrato=$id_contrato&individual=true');\"><img src='".Conf::ImgDir()."/coins_16.png' border=0 title=Cobrar></a>";
 			#<a target='_top' onclick=\"return confirm('¿Está seguro de eliminar este contrato?');\" href=contratos.php?id_contrato=$id_contrato&accion=eliminar&buscar=1&mostrar_filtros=1><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' /></a>

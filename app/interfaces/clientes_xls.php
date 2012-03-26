@@ -210,7 +210,7 @@ $col=0;
 		$where .= " AND cliente.glosa_cliente Like '%$nombre%'";
 	}
 	if( $codigo != '')
-		$where .= " AND codigo_cliente = '$codigo'";
+		$where .= " AND cliente.codigo_cliente = '$codigo'";
 	if( $id_grupo_cliente > 0 )
 		$where .= " AND cliente.id_grupo_cliente = ".$id_grupo_cliente."";
 	if(!empty($fecha1)){

@@ -189,6 +189,8 @@
 								cobro.estado,
 								moneda_monto.simbolo as simbolo_moneda_contrato,
 								moneda_monto.cifras_decimales as cifras_decimales_moneda_contrato,
+								moneda_total.simbolo as simbolo_moneda_total,
+								moneda_total.cifras_decimales as cifras_decimales_moneda_total,
 								contrato.id_contrato,
 								contrato.codigo_cliente,
 								cliente.glosa_cliente,
@@ -209,6 +211,7 @@
 							LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 							LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
 							LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
+							LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda 
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
 							LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto
@@ -329,8 +332,8 @@
 				$texto_tipo = '';
 			}
 
-			$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['cobro_monto'],2,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) . ' por ' . number_format($total_horas, 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
-			$texto_gastos = $cobro->fields['simbolo'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_opcion'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).' en gastos ';
+			$texto_honorarios = $cobro->fields['simbolo'].' '.number_format($cobro->fields['cobro_monto'],$cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) . ' por ' . number_format($total_horas, 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
+			$texto_gastos = $cobro->fields['simbolo_moneda_total'].' '.number_format($cobro->fields['monto_gastos'],$cobro->fields['cifras_decimales_moneda_total'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']).' en gastos ';
 
 			if (!empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos'])) {
 				$texto_monto = "$texto_honorarios y $texto_gastos";
@@ -364,7 +367,7 @@
 						$html.= "#".$cobro->fields['documento'];
 					$html .= "</td>";
 			}
-			$html .= "<td align=center style=\"width: 52px;\"><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1000,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
+			$html .= "<td align=center style=\"width: 52px;\"><img src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
 			#if($cobro->fields['estado'] == 'EMITIDO' || $cobro->fields['estado'] == 'CREADO')
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 				$html .=  "<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">";
@@ -441,7 +444,7 @@ function EliminarCobros(id_cobro, estado)
 			top:150, left:290, width:400, okLabel: "<?=__('Continuar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 			id: "myDialogId",
 			cancel:function(win){ return false; },
-			ok:function(win){ nuevaVentana('Editar_Contrato',1000,700,'cobros6.php?id_cobro='+id_cobro+'&popup=1&contitulo=true'); return true; }
+			ok:function(win){ nuevaVentana('Editar_Contrato',1050,700,'cobros6.php?id_cobro='+id_cobro+'&popup=1&contitulo=true'); return true; }
 		});
 	}
 	else if(estado == 'CREADO' || estado == 'EN REVISION')

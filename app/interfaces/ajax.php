@@ -541,9 +541,19 @@
 	}
 	else if ($accion == 'cargar_datos_cliente')
 	{
-		$query_clientes = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
-												FROM contrato
-												WHERE contrato.codigo_cliente=$codigo_cliente LIMIT 1";
+		$join = "";
+		$and = "";
+		if( isset($_REQUEST['id_cobro']) && $_REQUEST['id_cobro'] != '' && $_REQUEST['id_cobro'] != 'NULL' ){
+			$join = " JOIN cobro ON ( contrato.id_contrato = cobro.id_contrato ) ";
+			$and = " AND cobro.id_cobro = {$_REQUEST['id_cobro']}";
+		}
+		$query_clientes = "SELECT 
+								contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
+							FROM contrato
+								$join
+							WHERE contrato.codigo_cliente=$codigo_cliente 
+								$and
+							LIMIT 1";
 		$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes,__FILE__,__LINE__,$sesion->dbh);
 
 		for($i = 0; $fila = mysql_fetch_assoc($resp); $i++)
@@ -753,7 +763,8 @@
 	{
 		$id_usuario = $sesion->usuario->fields['id_usuario'];	
 		if( isset($_GET["cobro_independiente"]) && $_GET["cobro_independiente"] == "NO" && !empty($_GET["codigo_cliente"]) ) {
-			$query = "SELECT id_tarifa FROM contrato JOIN cliente USING( id_contrato ) WHERE cliente.codigo_cliente = '".$_GET['codigo_cliente']."'";
+			$codigo_cliente_texto = UtilesApp::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
+			$query = "SELECT id_tarifa FROM contrato JOIN cliente USING( id_contrato ) WHERE cliente.$codigo_cliente_texto = '".$_GET['codigo_cliente']."'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($id_tarifa) = mysql_fetch_array($resp);
 			$id_moneda = " ( SELECT contrato.id_moneda FROM contrato JOIN cliente USING( id_contrato ) WHERE cliente.codigo_cliente = '".$_GET['codigo_cliente']."' ) ";
@@ -807,6 +818,17 @@
 			$tipos_cambio[$tipo[0]] = $tipo[1];
 		}
 		echo $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda, $tipos_cambio);
+	}	
+	else if($accion == 'cargar_encargado_segun_cliente')
+	{
+		$saldo=0;
+		if($codigo_cliente_consulta){
+			$query = "SELECT id_usuario_responsable FROM contrato JOIN cliente ON ( contrato.id_contrato = cliente.id_contrato ) WHERE cliente.codigo_cliente = '$codigo_cliente_consulta' LIMIT 1";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($id_usuario_responsable_ajax) = mysql_fetch_array($resp);
+		}
+		
+		echo $id_usuario_responsable_ajax;
 	}
 	else
 		echo("ERROR AJAX. Acción: $accion");
