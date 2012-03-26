@@ -74,7 +74,7 @@ function nuovaFinestra(name, w, h, url, opciones ) {
 				
 			    });
                         } else {
-			    console.log(top.window.jQuery('#dialogomodal'));
+			   if(typeof(console)!==undefined) console.log(top.window.jQuery('#dialogomodal'));
 			     return  nuevaVentana( name, w, h, url, opciones );  
                         }
                 }
