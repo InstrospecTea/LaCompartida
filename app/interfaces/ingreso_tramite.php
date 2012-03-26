@@ -1608,7 +1608,7 @@ Calendar.setup(
 	{
 		inputField	: "fecha",				// ID of the input field
 		ifFormat	: "%d-%m-%Y",			// the date format
-<?
+<?php
 	if (!$permiso_cobranza->fields['permitido'])
 	{
 		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";
