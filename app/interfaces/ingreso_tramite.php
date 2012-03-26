@@ -468,7 +468,7 @@ function ShowTime()
 }
 
 function ToggleCantidad(activar){
-	var idTramite = <?php echo ( $id_tramite || $tramite->fields['id_tramite'] ) ? true : false ;  ?>;
+	var idTramite = <?php echo ( $id_tramite || $tramite->fields['id_tramite'] ) ? 'true' : 'false' ;  ?>;
 	if( !idTramite ) {
 		var despliegue = ( activar ) ? 'none' : 'table-row';
 		jQuery('#filamultiplicador').css('display',despliegue);
