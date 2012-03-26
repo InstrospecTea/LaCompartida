@@ -27,7 +27,7 @@ jQuery.datepicker.setDefaults(   jQuery.datepicker.regional[ "es" ]    );
 		    }).attr('rel','activomodal').append(DivLoading).append('<iframe id="soymodal" rel="inactivo" style="display:none;height:100%;width:100%" frameborder="0"></iframe>');
 		     }
 	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
-	//if (console!==undefined) console.log('YCGNM es '+ top.window.YoucangonowMichael);
+	//if(window.console)  console.log('YCGNM es '+ top.window.YoucangonowMichael);
 	  
     });  
    }});
@@ -74,7 +74,7 @@ function nuovaFinestra(name, w, h, url, opciones ) {
 				
 			    });
                         } else {
-			   if(typeof(console)!==undefined) console.log(top.window.jQuery('#dialogomodal'));
+			  if(window.console)  console.log(top.window.jQuery('#dialogomodal'));
 			     return  nuevaVentana( name, w, h, url, opciones );  
                         }
                 }
