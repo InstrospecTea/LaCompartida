@@ -725,7 +725,7 @@ var ciclo=self.setInterval("refrescaestado('estado_contabilidad')",15000);
 			});
 			lista_facturas = lista_facturas.substr(1);
 			var codigo_cliente = '<?= $cobro->fields['codigo_cliente'] ?>';
-			nuovaFinestra('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?= $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');
+			nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?= $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');
 		
                 
                 }
@@ -1056,7 +1056,7 @@ if (UtilesApp::GetConf($sesion, 'PermitirFactura') )  {
 	function AgregarPago() 	{
     var urlo = "ingresar_documento_pago.php?popup=1&pago=true&id_cobro=<?php echo $cobro->fields['id_cobro'] . "&codigo_cliente=" . $cobro->fields['codigo_cliente'];?>";
 			                       
-                            return         nuovaFinestra('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
+                            return         nuevaVentana('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
                                           
                         
                         
@@ -1065,7 +1065,7 @@ if (UtilesApp::GetConf($sesion, 'PermitirFactura') )  {
 	function EditarPago(id)	{
 <?= "var urlo = \"ingresar_documento_pago.php?popup=1&pago=true&id_cobro=" . $cobro->fields['id_cobro'] . "&id_documento=\"+id+\"&codigo_cliente=" . $cobro->fields['codigo_cliente'] . "\";" ?>
 			 
-                            return         nuovaFinestra('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
+                            return         nuevaVentana('Ingreso',730,600,urlo,'top=100, left=125, scrollbars=yes');
                        
                    
                  }
@@ -1162,7 +1162,7 @@ function Numero(texto){
 }
 
 function UsarAdelanto(honorarios, gastos){
-	nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>'+
+	nuevaVentana('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>'+
 			'&codigo_cliente=<?php echo $cobro->fields['codigo_cliente'] ?>&elegir_para_pago=1&mantener_ventana=1'+
 			(honorarios ? '&pago_honorarios=1' : '')+
 			(gastos ? '&pago_gastos=1' : '')+

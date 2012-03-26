@@ -112,16 +112,18 @@
                 
                 ?>
 			<script type="text/javascript">
-				if(window.location==parent.window.location) {
+				/*if(window.location==parent.window.location) {
                                    if( window.opener.Refrescarse ) {
                                             window.opener.Refrescarse(); 
                                    } else if( window.opener.Refrescar ) {
                                        window.opener.Refrescar(); 
                                        }
-                                } else 	{
-                                   if( parent.window.Refrescarse ) parent.window.Refrescarse();
+                                } else 	{ 
+                                   if( parent.window.Refrescar ) parent.window.Refrescar();
                                     parent.window.jQuery('#dialogomodal').dialog('option','title','Datos ingresados con éxito');
-                                }			
+                                }			*/
+								if( window.opener.Refrescar ) 
+									window.opener.Refrescar();
 			</script>
 		<?php if($nuevo && $id_documento) {	
 			
@@ -677,7 +679,7 @@ function  Actualizar_Monto_Pagos(tipo,id)
 
 function SetMontoPagos()
 {
-              
+               var monto_tmp;
                var tipopago=jQuery('#tipodocumento').val();
                 
                var anterior=0;
