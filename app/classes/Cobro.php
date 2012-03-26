@@ -41,6 +41,7 @@ class Cobro extends Objeto {
 		if( $this->fields['estado'] != $this->valor_antiguo['estado'] && 
 				!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado']) ) {
 			$ingreso_historial = true;
+			mail('ffigueroa@lemontech.cl','Cambio estado','De '.$this->fields['estado'].' a '.$this->valor_antiguo['estado']);
 		}
 		if( parent::Write() ) {
 			if( $ingreso_historial ) {
