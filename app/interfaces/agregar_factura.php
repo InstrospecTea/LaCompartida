@@ -1148,6 +1148,48 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 		
 	}
 	
+	jQuery(document).ready(function() {
+		jQuery('.disable_paste').bind('paste', function(e) {
+			e.preventDefault();
+		});
+	});
+	
+	function RestriccionGlosaFactura( e, desde ) {		
+		texto_glosa = desde.value;
+		texto_glosa = texto_glosa.replace("\r\n", "\n");
+		texto_glosa = texto_glosa.replace("\r", "\n");
+		
+		tecla = (window.event) ? window.event.keyCode : e.which;
+		isCtrl = (window.event) ? window.event.ctrlKey : e.crtlKey;
+		isShift = (window.event) ? window.event.shiftKey : e.shiftKey;
+		if( tecla == 86 && isCtrl ) {
+			return false;
+		} else if( tecla == 45 && isShift ) {
+			return false;
+		} else  if( tecla == 8 || tecla == 35 || tecla == 36 || tecla == 37 || tecla == 38 || tecla == 39 || tecla == 40 || tecla == 45 || tecla == 46 ) {
+			return true;
+		} else if( texto_glosa.length >= parseInt( <?php echo  UtilesApp::GetConf($sesion, 'CantidadLineasDescripcionFacturas'); ?>* 70 ) ) {			
+			return false;		
+		} else if( tecla == 13 ) {
+			lineas = texto_glosa.split("\n");
+			if( lineas.length >= <?php echo  UtilesApp::GetConf($sesion, 'CantidadLineasDescripcionFacturas'); ?>){
+				return false;
+			}
+		} else {
+			glosa = '';
+			lineas = texto_glosa.split("\n");			
+			glosa_linea = '';
+			for( i = 0; i < lineas.length; i++) {
+				glosa_linea = lineas[i];
+				if( lineas[i].length >= 70 ) {
+					return false;
+				}
+			}
+		}
+		return true;
+		
+	}
+	
 	function ObtenerPagos( id_factura )
 	{
 		/* por algun motivo no me lo toma, aunque sea sincrono */
@@ -1379,7 +1421,7 @@ if ($buscar_padre) {
 				<?php
 				} else if( $cantidad_lineas_descripcion > 1 ) { 
 					?>
-					<textarea name="descripcion_honorarios_legales" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_honorario; ?></textarea>
+					<textarea name="descripcion_honorarios_legales" cols="50" class="disable_paste" onkeydown="return RestriccionGlosaFactura(event, this);" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_honorario; ?></textarea>
 				<?php
 				} else {
 				?>
@@ -1397,7 +1439,7 @@ if ($buscar_padre) {
 				<td align=right><?= __('Gastos c/ IVA'); ?></td>
 				<td align=left>
 					<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
-							<textarea name="descripcion_gastos_con_iva" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos; ?></textarea>
+							<textarea name="descripcion_gastos_con_iva" cols="50" class="disable_paste" onkeydown="return RestriccionGlosaFactura(event, this);" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos; ?></textarea>
 					<?php }  else {?>
 							<input type="text" name="descripcion_gastos_con_iva" value="<?=$descripcion_subtotal_gastos; ?>" size="40" maxlength="30">
 					<?php } ?>
@@ -1414,7 +1456,7 @@ if ($buscar_padre) {
 					<td align=right><?= __('Gastos s/ IVA'); ?></td>
 					<td align=left>
 						<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
-								<textarea name="descripcion_gastos_sin_iva" cols="50" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos_sin_impuesto; ?></textarea>
+								<textarea name="descripcion_gastos_sin_iva" cols="50" class="disable_paste" onkeydown="return RestriccionGlosaFactura(event, this);" rows="<?=$cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo $descripcion_subtotal_gastos_sin_impuesto; ?></textarea>
 						<?php } else { ?>
 								<input type="text" name="descripcion_gastos_sin_iva" id="descripcion_gastos_sin_iva" value="<?= $descripcion_subtotal_gastos_sin_impuesto; ?>" size="40" maxlength="30" onkeydown="MontoValido( this.id );">
 						<?php } ?>

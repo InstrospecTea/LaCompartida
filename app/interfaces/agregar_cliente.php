@@ -271,6 +271,13 @@ if ($opcion == "guardar") {
 			if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
 				$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
 			}
+			if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')) {
+				$id_usuario_responsable_def = (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL";
+				$sql_cambia = "UPDATE contrato SET id_usuario_responsable = $id_usuario_responsable_def  WHERE codigo_cliente = '$codigo_cliente'";
+				if (!($res = mysql_query($sql_cambia, $sesion->dbh) )) {
+					throw new Exception($sql_cambia . "---" . mysql_error());
+				}
+			}
 			$contrato->Edit("observaciones", $observaciones);
 			if (method_exists('Conf', 'GetConf')) {
 				if (Conf::GetConf($sesion, 'TituloContacto')) {

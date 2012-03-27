@@ -726,7 +726,11 @@ class Reporte
 				break;
 			}
 		}
-		$s .= ' as '.$this->tipo_dato;
+		if($this->tipo_dato) {
+		    $s .= ' as '.$this->tipo_dato;
+		} else {
+		    $s .= '1 as tipodato '; 
+		}
 		return $s;
 	}
 
@@ -881,7 +885,8 @@ class Reporte
 	//Ejecuta la Query y guarda internamente las filas de resultado.
 	function Query()
 	{
-		
+			mail('ffigueroa@lemontech.cl','Query Rep Finanz',$this->sQuery())	;
+
 	    $resp = mysql_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
 		
 		$this->row = array();

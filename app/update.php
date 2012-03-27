@@ -8001,11 +8001,10 @@ NULL ,  'RUT'
                                 $query[]="ALTER TABLE  `contrato` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  `documento` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  `cta_corriente` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
-				 $query[]="ALTER TABLE  factura  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+								$query[]="ALTER TABLE  factura  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  cliente  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  asunto  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
-                                $query[]="ALTER TABLE  usuario  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
-
+                                
                                 
                             
                                 $query[]="ALTER TABLE  trabajo  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
