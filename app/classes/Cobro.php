@@ -352,8 +352,9 @@ class Cobro extends Objeto {
                                             JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total 
 				WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
 			} else {
-				$query = "SELECT ROUND( SUM(-1*documento.monto) ), ROUND( SUM(-1*documento.monto) ) 
+				$query = "SELECT ROUND( SUM(-1*documento.monto), mon.cifras_decimales ), ROUND( SUM(-1*documento.monto), mon.cifras_decimales ) 
                                         FROM documento
+										JOIN prm_moneda as mon ON mon.id_moneda = documento.id_moneda 
                                         JOIN cobro_moneda as md ON md.id_cobro = documento.id_cobro AND md.id_moneda = documento.id_moneda 
                                         JOIN cobro_moneda as mc ON mc.id_cobro = '" . $this->fields['id_cobro'] . "' AND mc.id_moneda = '" . $this->fields['opc_moneda_total'] . "' 
                                        WHERE documento.id_cobro = '" . $this->fields['id_cobro'] . "' AND tipo_doc != 'N' ";
