@@ -52,7 +52,7 @@
     else:
         $querytarifas="SELECT   id_tarifa, glosa_tarifa FROM tarifa where id_tarifa=".$id_tarifa_edicion;
     endif;
-    mail('ffigueroa@lemontech.cl','Querytarifa',$querytarifas);
+   // mail('ffigueroa@lemontech.cl','Querytarifa',$querytarifas);
     $resptarifas = mysql_query($querytarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas,__FILE__,__LINE__,$sesion->dbh);
     while($hojas=mysql_fetch_array( $resptarifas )):
 	
