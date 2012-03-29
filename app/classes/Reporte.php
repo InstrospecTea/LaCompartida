@@ -85,12 +85,12 @@ class Reporte
 	//Retorna un arreglo con los tipos de datos que requieren especificar Moneda
 	function tiposMoneda()
 	{
-		return array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar','valor_trabajado_estandar');
+		return array('costo','costo_hh','valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar','valor_trabajado_estandar');
 	}
 
 	function usaDivisor()
 	{
-		if(in_array($this->tipo_dato,array('rentabilidad','rentabilidad_base','valor_hora')))
+		if(in_array($this->tipo_dato,array('rentabilidad','rentabilidad_base','valor_hora','costo_hh')))
 			return true;
 		return false;
 	}
@@ -253,6 +253,7 @@ class Reporte
 			case "area_asunto":
 			case "tipo_asunto":
 			case "id_trabajo":
+			  
 				break;
 			case "glosa_asunto": 
 			case "glosa_asunto_con_codigo":
@@ -395,6 +396,7 @@ class Reporte
 				case 'valor_cobrado': 
 				case 'valor_por_cobrar':
 				case 'valor_hora':
+				
 				{
 					$s .=
 					' 0 as valor_divisor, (1/count(distinct asunto.id_asunto))*SUM( cobro.monto_trabajos
@@ -466,6 +468,7 @@ class Reporte
 				}
 				case 'valor_estandar':
 				case 'valor_trabajado_estandar':
+				case 'costo_hh':
 				{
 					$s .= ' SUM( 0 )';
 					break;
@@ -666,6 +669,7 @@ class Reporte
 										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 									)";
 		$datos_monedas = "cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, cobro_moneda_base.id_moneda, cobro_moneda_base.tipo_cambio, cobro_moneda_cobro.id_moneda, cobro_moneda_cobro.tipo_cambio";
+		
 		switch($this->tipo_dato)
 		{
 			case "horas_trabajadas": case "horas_cobrables": case "horas_no_cobrables":
@@ -673,6 +677,12 @@ class Reporte
 				$s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600";
 				break;
 			}
+			case "costo":
+			    {
+				$s .= $datos_monedas.", (cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio)*cut.costo_hh*SUM(TIME_TO_SEC( trabajo.duracion ))/3600";
+			    }
+			    break;
+			
 			case "horas_castigadas":
 			{
 				$s .= "SUM(TIME_TO_SEC(trabajo.duracion)-TIME_TO_SEC(trabajo.duracion_cobrada))/3600";
@@ -742,6 +752,16 @@ class Reporte
 				$s .= " $datos_monedas, $monto_honorarios ";
 				break;
 			}
+			case "costo_hh":
+			{	
+				$s .= "SUM(
+						(TIME_TO_SEC( duracion)/3600)
+					) as valor_divisor, ";
+				$s .= $datos_monedas.",SUM( (cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio)*cut.costo_hh * 	(TIME_TO_SEC( duracion)/3600)	) ";
+			    
+				break;
+			}
+			
 		}
 		if($this->tipo_dato) {
 		    $s .= ' as '.$this->tipo_dato;
@@ -762,7 +782,7 @@ class Reporte
 			LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '".$this->id_moneda."'
 		";
 
-		$s = ' FROM trabajo
+		$s = ' FROM trabajo left join usuario_costo_hh cut on trabajo.id_usuario=cut.id_usuario and date_format(trabajo.fecha,\'%Y%m\')=cut.yearmonth
 				LEFT JOIN usuario ON usuario.id_usuario = trabajo.id_usuario
 				LEFT JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
 				LEFT JOIN cobro on trabajo.id_cobro = cobro.id_cobro
@@ -902,7 +922,7 @@ class Reporte
 	//Ejecuta la Query y guarda internamente las filas de resultado.
 	function Query()
 	{
-			
+		$stringquery="";	
 
 	    $resp = mysql_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
 		
@@ -915,18 +935,23 @@ class Reporte
 		(
 			$this->requiereMoneda($this->tipo_dato)
                         && $this->tipo_dato != 'valor_hora' 
+			&& $this->tipo_dato != 'costo' 
+				&& $this->tipo_dato != 'costo_hh'
 			&& $this->cobroQuery() 
 			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
 			&& !$this->ignorar_cobros_sin_horas 
 		)
 		{
-			$this->cobroQuery(); 
+			$cobroquery=$this->cobroQuery(); 
 			
-			$resp = mysql_query($this->cobroQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->cobroQuery(),__FILE__,__LINE__,$this->sesion->dbh);
+			$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery,__FILE__,__LINE__,$this->sesion->dbh);
 			while($row = mysql_fetch_array($resp))
 				$this->row[] = $row;
 		}
+		    $stringquery=($cobroquery)?" \n union all \n $cobroquery":"";
+			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery() . $stringquery."\n --tipo dato es".$this->tipo_dato, $this->sesion->dbh)."'";
+        	$respt = mysql_query($testimonio, $this->sesion->dbh);
 		
 			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery()."\n union all \n".$this->cobroQuery(), $this->sesion->dbh)."'";
         	//$respt = mysql_query($testimonio, $this->sesion->dbh);
@@ -1445,11 +1470,14 @@ class Reporte
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
+			case "costo"    :
+			    
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);
 				return $moneda->fields['simbolo'];
 			}
+			case "costo_hh"    :
 			case "valor_hora":
 			{
 				$moneda = new Moneda($sesion);
@@ -1486,8 +1514,10 @@ class Reporte
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
+			case "costo":
 				return "$";
 			case "valor_hora":
+			    case "costo_hh"    :
 				return "$/Hr.";
 		}
 		return "%";
@@ -1507,6 +1537,7 @@ class Reporte
 			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
+			case "costo":
 			{
 				$moneda = new Moneda($sesion);
 				$moneda->Load($id_moneda);
