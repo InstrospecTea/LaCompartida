@@ -179,7 +179,7 @@
 		if( method_exists('Conf','ReporteMorosidadEnviados') && Conf::ReporteMorosidadEnviados() )
 			$where .= " AND cobro.estado = 'ENVIADO AL CLIENTE' ";
 		else
-			$where .= " AND  cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE' ) ";
+			$where .= " AND  cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE','PAGADO' ) ";
 			$where_documento = "AND documento.tipo_doc = 'N'";
 
 		//Orden de los datos
