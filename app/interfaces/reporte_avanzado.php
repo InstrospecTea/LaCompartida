@@ -99,6 +99,8 @@
 
 	$tipos_de_dato[] ='valor_trabajado_estandar';
 	$tipos_de_dato[] ='rentabilidad_base';
+	$tipos_de_dato[] ='costo';
+	$tipos_de_dato[] ='costo_hh';
 	if($debug == 1)
 	{
 		$tipos_de_dato[] ='valor_pagado_parcial';
@@ -168,7 +170,8 @@
 	$glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
 	$glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
 	$glosa_dato['rentabilidad_base'] = __("Valor Cobrado / Valor Trabajado Estándar");
-
+	$glosa_dato['costo']= __("Costo para la firma, por concepto de sueldos");
+	$glosa_dato['costo_hh']= __("Costo HH para la firma, por concepto de sueldos");
 	$glosa_boton['planilla'] = "Despliega una Planilla con deglose por cada Agrupador elegido.";
 	$glosa_boton['excel'] = "Genera la Planilla como un Documento Excel.";
 	$glosa_boton['tabla'] = "Genera un Documento Excel con una tabla cruzada.";
@@ -354,7 +357,7 @@
 ?>
 <style>
 
-TD.boton_normal { border: solid 2px #e0ffe0; background-color: #e0ffe0; }
+TD.boton_normal { width:100px;border: solid 2px #e0ffe0; background-color: #e0ffe0; }
 
 TD.boton_presionado { border: solid 2px red; background-color: #e0ffe0; }
 
@@ -606,10 +609,10 @@ function RevisarMoneda()
 
 	if(
 		tipo_de_dato.value in
-			{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
+			{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
 		||
 			(comparar.checked && tipo_de_dato_comparado.value in
-				{'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
+			{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
 			)
 		)
 		Monedas(true);
@@ -1594,11 +1597,8 @@ if(!$popup)
 </table>
 </center>
 				<!-- SELECTOR TIPO DE DATO EXPANDIDO-->
-<table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;" border="1" cellpadding="0" cellspacing="0">
-	<tr>
-		<td align="center">
-		
-		<table style="border: 0px solid black; width:730px" cellpadding="0" cellspacing="0">
+<table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;padding:10px;margin:auto;" border="0" cellpadding="0" cellspacing="0">
+	
 			<tr>
 				<?=celda('horas_trabajadas')?>
 				<?=borde_abajo(2)?>
@@ -1612,13 +1612,13 @@ if(!$popup)
 			</tr>
 			<tr>
 				<?=borde_derecha()?>
-				<?=nada()?>
+				<?=nada(1)?>
 				<?=borde_derecha()?>
-				<?=nada()?>
+				<?=nada(1)?>
 				<?=borde_derecha()?>
-				<?=nada()?>
+				<?=nada(1)?>
 				<?=borde_derecha()?>
-				<?=nada()?>
+				<?=nada(1)?>
 			</tr>
 			<tr>
 				<?=nada(9)?>
@@ -1635,7 +1635,7 @@ if(!$popup)
 				<?=celda("horas_por_pagar")?>
 			</tr>
 			<tr>
-				<?=nada(5)?>
+				<?=nada(6)?>
 				<?=borde_derecha()?>
 				<?=nada(3)?>
 			</tr>
@@ -1643,7 +1643,7 @@ if(!$popup)
 				<?=nada(12)?>
 			</tr>
 			<tr>
-				<?=nada(7)?>
+				<?=nada(8)?>
 				<?=borde_abajo()?>
 				<?=celda("horas_incobrables")?>
 				<?=nada(3)?>
@@ -1690,7 +1690,7 @@ if(!$popup)
 				<?=celda("valor_por_pagar")?>
 			</tr>
 			<tr>
-				<?=nada(4)?>
+				<?=nada(6)?>
 				<?=borde_derecha()?>
 				<?=nada(3)?>
 			</tr>
@@ -1698,7 +1698,7 @@ if(!$popup)
 				<?=nada(12)?>
 			</tr>
 			<tr>
-				<?=nada(7)?>
+				<?=nada(8)?>
 				<?=borde_abajo()?>
 				<?=celda("valor_incobrable")?>
 				<?=nada(3)?>
@@ -1721,8 +1721,10 @@ if(!$popup)
 				<?=celda("valor_hora");?>
 			</tr>
 			<tr>
-				<?=nada(2)?>
-				<?=nada(6)?>
+				<?=nada(1)?>
+			</tr>
+			<tr>
+				<?=nada(1)?>
 			</tr>
 			<tr>
 				<?=nada(12)?>
@@ -1732,20 +1734,32 @@ if(!$popup)
 				<?=nada(2)?>
 				<?=select_moneda()?>
 				<?=nada(5)?>
+			    	
 				<?=celda("rentabilidad_base")?>
 				<?=nada(2)?>
 				<?=celda("rentabilidad")?>
 			</tr>
 			<tr>
-				<?=nada(8)?>
+				<?=nada(1)?>
 			</tr>
 			<tr>
-				<?=nada(12)?>
-				<?=tinta()?>
+				<?=nada(1)?>
 			</tr>
-		</table>
-	 </td>
-	</tr>
+						<tr>
+				<?=nada(12)?>
+			</tr>
+			<tr>	<?=tinta()?>
+				<?=nada(8)?>
+			  <?=celda("costo")?>
+			    <?=nada(2)?>
+			    <?=celda("costo_hh")?>
+			    
+			</tr>
+			<tr>
+				<?=nada(9)?>
+				
+			</tr>
+		
 </table>
 </fieldset>
 			<!-- SELECTOR DE VISTA -->
