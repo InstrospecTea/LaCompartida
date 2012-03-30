@@ -126,7 +126,7 @@
 	'id_cobro',
 	'forma_cobro',
 	'tipo_asunto',
-	'prm_area_proyecto_glosa',
+	'area_proyecto',
 	'categoria_usuario',
 	'area_usuario',
         'fecha_emision',
@@ -245,8 +245,8 @@
 			}
 			function nada($numero = 1)
 			{
-				for($i=0; $i< $numero; $i++)
-				echo "<td style=\"font-size: 3px; width:10px; height:7px; \"> &nbsp; </td>";
+				
+				echo "<td colspan=\"$numero\" style=\"font-size: 3px; width:10px; height:7px; \"> &nbsp; </td>";
 			}
 			function titulo_proporcionalidad()
 			{
@@ -277,14 +277,14 @@
 				global $tipo_dato;
 				echo "<td rowspan=2 style=\"vertical-align: middle;\" >";
 				echo "<div id='moneda".$select."' style =\" height:25px; font-size: 14px; ";
-				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
+				if ( in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar','costo','costo_hh')))
 					echo " display:inline;\" >";
 				else
 					echo " display:none;\" >";
 				echo $s."</div>";
 
 				echo "<div id='anti_moneda".$select."' style =\" ";
-				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar')))
+				if ( !in_array($tipo_dato,array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_trabajado_estandar','costo','costo_hh')))
 					echo " display:inline;\" >";
 				else
 					echo " display:none;\" >";
