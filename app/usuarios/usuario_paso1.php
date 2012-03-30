@@ -137,9 +137,20 @@
 			destino = '../interfaces/usuarios_xls.php?act='+activo+'&nombre='+nom+'&modificaciones=true';
 		}
 		top.window.location.href=destino;
-		if (console!==undefined) console.log(destino);
+		//if (console!==undefined) console.log(destino);
 	    });
-    });	    
+ 	    
+	     jQuery('#costos').click(function(){
+
+		 var theform=jQuery(this).parents('form:first');
+		  theform.submit();
+	     });
+	     jQuery('#btnbuscar').click(function(){
+
+		 jQuery(this).parents('form:first').attr('action','usuario_paso1.php?buscar=1').submit();
+
+	     });
+        });
 	function YoucangonowMichael() {
 	     //if (console!==undefined) console.log('jQUI Cargado');
 	     jQuery('.descargaxls').button({
@@ -546,8 +557,9 @@ function Listar( form, from )
 					  <input type="checkbox" name="activo" value="1" id="activo" checked />solo activos &nbsp;&nbsp;&nbsp;
 						<strong>Nombre</strong>
 						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" id="nombre" value="<?=$nombre?>" size="20" />
-						&nbsp;&nbsp; <input type="submit"  value="Buscar" id="btnbuscar" onclick="Listar(this.form,'buscar')" />
+						&nbsp;&nbsp; 
 						
+						&nbsp; <a href="#" id="btnbuscar"   rel="buscar">Buscar</a>
 						&nbsp; <a href="#" class="descargaxls" style="display:none;" rel="xls">Descargar Listado</a>
 						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_vacacion">Descargar Vacaciones</a>
 						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_modificaciones">Descargar Modificaciones</a>
