@@ -615,7 +615,7 @@ function Listar( form, from )
 		</tr>
 		<tr>
 				<td colspan=2>
-				<ul><li id="costos"><a  href="<?=Conf::RootDir().'/app/interfaces/costos.php' ?>"  ><?=__('Editar costo mensual por usuario') ?></a></li></ul>
+				<a  id="costos" style="margin:auto;width:200px;" href="<?=Conf::RootDir().'/app/interfaces/costos.php' ?>"  ><?=__('Editar costo mensual por usuario') ?></a>
 				</td>
 		</tr>
 		</table>
