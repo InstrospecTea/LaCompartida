@@ -181,7 +181,7 @@
 	$mensajes = $notificacion->mensajeSemanal($dato_semanal);
 	foreach($mensajes as $id_usuario => $mensaje)
 	{
-		if($argv[1]=='correo')
+		if($argv[1]=='correo' || isset($_GET['correo']))
 			$alerta->EnviarAlertaProfesional($id_usuario,$mensaje, $sesion, false);
 	}
 	if($desplegar_correo == 'aefgaeddfesdg23k1h3kk1')
@@ -249,7 +249,7 @@
 			$query_update = " UPDATE modificaciones_contrato
 											SET fecha_enviado=NOW()
 											WHERE fecha_modificacion >= '".$fecha."'";
-			if($argv[1]=='correo')
+			if($argv[1]=='correo' || isset($_GET['correo']))
 				$resp_update = mysql_query($query_update, $sesion->dbh) or Utiles::errorSQL($query_update,__FILE__,__LINE__,$sesion->dbh);
 		}
 	}
@@ -803,7 +803,7 @@
 
 	foreach($mensajes as $id_usuario => $mensaje)
 	{
-			if($argv[1]=='correo')
+			if($argv[1]=='correo' || isset($_GET['correo']))
 				$alerta->EnviarAlertaProfesional($id_usuario,$mensaje, $sesion, false);
 	}
 
