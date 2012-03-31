@@ -5,7 +5,7 @@
 	
 	$sesion = new Sesion();
 	
-	if($argv[1]!='inconsistencia') exit;
+	if($argv[1]!='inconsistencia' && !isset($_GET['inconsistencia'])) exit;
 	
 	// Revisiones de inconsistencías entre código cliente y código asunto de los gastos del cliente.
 	$query = "SELECT 
