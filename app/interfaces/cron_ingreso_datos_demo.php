@@ -12,13 +12,11 @@ fecha_fin
 max_dia
 porcentaje */
 
-if( $argv[1] != 'ambienteprueba' )
-	exit;
+if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die($argv[1].$_GET['ambienteprueba']);
 	
-$sesion = new Sesion( null, true);
 
-if( method_exists('Conf','EsAmbientePrueba') && Conf::EsAmbientePrueba() )
-{
+$sesion = new Sesion( null, true );
+if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 
 if( method_exists('Conf','GetConf') )
 {

@@ -7,11 +7,11 @@
 
 $sesion = new Sesion( null, true );
 
-if( $argv[1] != 'ambienteprueba' )
-	exit;
+if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die($argv[1].$_GET['ambienteprueba']);
+	
 
-if( method_exists( 'Conf','EsAmbientePrueba' ) && Conf::EsAmbientePrueba() )
-	{
+$sesion = new Sesion( null, true );
+if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 		/* Query para borrar factura */
 		$query = "TRUNCATE TABLE  `cta_cte_fact_mvto_neteo`;";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
