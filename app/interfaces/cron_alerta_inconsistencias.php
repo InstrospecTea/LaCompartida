@@ -51,6 +51,6 @@
 		$enviar = true;
 	}
 	if( $enviar ) {
-		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "smoers@lemontech.cl,gtigre@lemontech.cl", "Soporte");
+		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "ffigueroa@lemontech.cl,gtigre@lemontech.cl", "Soporte");
 	}
 ?>
