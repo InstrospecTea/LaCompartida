@@ -5,7 +5,8 @@
 	
 	$sesion = new Sesion();
 	
-	if($argv[1]!='inconsistencia' && !isset($_GET['inconsistencia'])) exit;
+		if($argv[1]!='inconsistencia' && !isset($_GET['inconsistencia'])) exit;
+
 	
 	// Revisiones de inconsistencías entre código cliente y código asunto de los gastos del cliente.
 	$query = "SELECT 
@@ -26,7 +27,7 @@
 		$enviar = true;
 	}
 	if( $enviar ) {
-		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "smoers@lemontech.cl,gtigre@lemontech.cl", "Soporte");
+		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "ffigueroa@lemontech.cl,gtigre@lemontech.cl", "Soporte");
 	}
 	
 	// Revisiones de inconsistencías entre monto_thh del cobro y sumatoria de tarifas_hh 
