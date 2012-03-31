@@ -340,7 +340,7 @@
 	$mensajes = $notificacion->mensajeDiario($dato_diario);
 	foreach($mensajes as $id_usuario => $mensaje)
 	{
-			if($argv[1]=='correo')
+			if($argv[1]=='correo' || isset($_GET['correo']))
 				$alerta->EnviarAlertaProfesional($id_usuario,$mensaje, $sesion, false);
 	}
 	if($desplegar_correo == 'aefgaeddfesdg23k1h3kk1')
