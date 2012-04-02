@@ -53,8 +53,8 @@ switch($cobro->fields['estado_contabilidad']):
         $titulo_c = __('El Cobro ha sido requerido por Contabilidad');
     break;
     case 'INFORMADO Y FACTURADO':
-        $estado_c = __('Informado para Facturar');
-        $titulo_c = __('El Cobro ha sido requerido por Contabilidad, se ha indicado que debe facturarse');
+        $estado_c = __('Informado y Facturado');
+        $titulo_c = __('El Cobro ha sido requerido por Contabilidad, se confirma que debe facturarse');
     break;
     default:
         $estado_c=$cobro->fields['estado_contabilidad'];
