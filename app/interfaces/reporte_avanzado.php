@@ -126,7 +126,7 @@
 	'id_cobro',
 	'forma_cobro',
 	'tipo_asunto',
-	'area_proyecto',
+	'area_asunto',
 	'categoria_usuario',
 	'area_usuario',
         'fecha_emision',
