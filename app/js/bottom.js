@@ -1,8 +1,26 @@
 jQuery("head").append("<link id='uicss' />");
 
 jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
-jQuery.ajax({async: true, cache:true, type: "GET", url: 'https://jquery-ui.googlecode.com/svn/trunk/ui/i18n/jquery.ui.datepicker-es.js', dataType: 'script'});
-jQuery.datepicker.setDefaults(   jQuery.datepicker.regional[ "es" ]    );
+ 
+    jQuery.datepicker.regional['es'] = {
+		closeText: 'Cerrar',
+		prevText: '&#x3c;Ant',
+		nextText: 'Sig&#x3e;',
+		currentText: 'Hoy',
+		monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+		'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+		monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun',
+		'Jul','Ago','Sep','Oct','Nov','Dic'],
+		dayNames: ['Domingo','Lunes','Martes','Mi&eacute;rcoles','Jueves','Viernes','S&aacute;bado'],
+		dayNamesShort: ['Dom','Lun','Mar','Mi&eacute;','Juv','Vie','S&aacute;b'],
+		dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','S&aacute;'],
+		weekHeader: 'Sm',
+		dateFormat: 'dd/mm/yy',
+		firstDay: 1,
+		isRTL: false,
+		showMonthAfterYear: false,
+		yearSuffix: ''};
+	    
    jQuery.when(jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://estaticos.thetimebilling.com/jquery-ui.css"   }) )
 		.then(function() {
 		if(window.location==top.window.location) {
