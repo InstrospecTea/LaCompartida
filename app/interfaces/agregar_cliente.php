@@ -486,89 +486,13 @@ if ($opcion == "guardar") {
 		else
 			$pagina->AddError($cliente->error);
 	}
-	if (( ( method_exists('Conf', 'GetConf') && substr(Conf::GetConf($sesion, 'AgregarAsuntosPorDefecto'),0,4)=='true' ) || ( method_exists('Conf', 'AgregarAsuntosPorDefecto') ) ) && $loadasuntos) {
 		if (method_exists('Conf', 'GetConf'))
-			$asuntos = explode(';', Conf::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
+			$asuntos = explode(';', UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
 		else
 			$asuntos = Conf::AgregarAsuntosPorDefecto();
-
-		for ($i = 1; $i < count($asuntos); $i++) { /*
-		  if($i>1 && $asuntos[0])
-		  {
-		  $contra= new Contrato($sesion);
-		  $contra->Edit('codigo_cliente',$codigo_cliente);
-		  $contra->Edit('id_usuario_responsable',$id_usuario);
-		  $contra->Edit("activo",$activo_contrato ? 'SI' : 'NO');
-		  $contra->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0');
-		  $contra->Edit("glosa_contrato",$glosa_contrato);
-		  $contra->Edit("codigo_cliente",$codigo_cliente);
-		  $contra->Edit("id_usuario_responsable",$id_usuario_responsable);
-		  $contra->Edit("observaciones",$observaciones);
-		  if (method_exists('Conf','TituloContacto'))
-		  {
-		  if(Conf::TituloContacto())
-		  {
-		  $contra->Edit("titulo_contacto",$titulo_contacto);
-		  $contra->Edit("contacto",$nombre_contacto);
-		  $contra->Edit("apellido_contacto",$apellido_contacto);
-		  }
-		  else
-		  $contra->Edit("contacto",$contacto);
-		  }
-		  else
-		  $contra->Edit("contacto",$contacto);
-		  $contra->Edit("fono_contacto",$fono_contacto_contrato);
-		  $contra->Edit("email_contacto",$email_contacto_contrato);
-		  $contra->Edit("direccion_contacto",$direccion_contacto_contrato);
-		  $contra->Edit("es_periodico",$es_periodico);
-		  $contra->Edit("activo",$activo_contrato ? 'SI' : 'NO');
-		  $contra->Edit("periodo_fecha_inicio", Utiles::fecha2sql($periodo_fecha_inicio));
-		  $contra->Edit("periodo_repeticiones", $periodo_repeticiones);
-		  $contra->Edit("periodo_intervalo", $periodo_intervalo);
-		  $contra->Edit("periodo_unidad", $codigo_unidad);
-		  $contra->Edit("monto", $monto);
-		  $contra->Edit("id_moneda", $id_moneda);
-		  $contra->Edit("forma_cobro", $forma_cobro);
-		  $contra->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
-		  $contra->Edit("retainer_horas", $retainer_horas);
-		  $contra->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
-		  $contra->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
-		  $contra->Edit("id_tarifa", $id_tarifa ? $id_tarifa : 'NULL');
-		  $contra->Edit("id_tramite_tarifa", $id_tramite_tarifa ? $id_tramite_tarifa : 'NULL' );
-		  #facturacion
-		  $contra->Edit("rut",$factura_rut);
-		  $contra->Edit("factura_razon_social",$factura_razon_social);
-		  $contra->Edit("factura_giro",$factura_giro);
-		  $contra->Edit("factura_direccion",$factura_direccion);
-		  $contra->Edit("factura_telefono",$factura_telefono);
-		  $contra->Edit("cod_factura_telefono",$cod_factura_telefono);
-		  #Opc contrato
-		  $contra->Edit("opc_ver_modalidad",$opc_ver_modalidad);
-		  $contra->Edit("opc_ver_profesional",$opc_ver_profesional);
-		  $contra->Edit("opc_ver_gastos",$opc_ver_gastos);
-		  $contra->Edit("opc_ver_morosidad",$opc_ver_morosidad);
-		  $contra->Edit("opc_ver_descuento",$opc_ver_descuento);
-		  $contra->Edit("opc_ver_tipo_cambio",$opc_ver_tipo_cambio);
-		  $contra->Edit("opc_ver_numpag",$opc_ver_numpag);
-		  $contra->Edit("opc_ver_carta",$opc_ver_carta);
-		  $contra->Edit("opc_papel",$opc_papel);
-		  $contra->Edit("opc_moneda_total",$opc_moneda_total);
-		  $contra->Edit("codigo_idioma",$codigo_idioma != '' ? $codigo_idioma : 'es');
-		  #descto.
-		  $contra->Edit("tipo_descuento",$tipo_descuento);
-		  if($tipo_descuento == 'PORCENTAJE')
-		  {
-		  $contra->Edit("porcentaje_descuento",$porcentaje_descuento > 0 ? $porcentaje_descuento : '0');
-		  $contra->Edit("descuento", '0');
-		  }
-		  else
-		  {
-		  $contra->Edit("descuento",$descuento > 0 ? $descuento : '0');
-		  $contra->Edit("porcentaje_descuento",'0');
-		  }
-		  $contra->Edit("id_moneda_monto",$id_moneda_monto);
-		  $contra->Write();
-		  } */
+	if ( $asuntos[0] == "true" && $loadasuntos ) {
+		
+		for ($i = 1; $i < count($asuntos); $i++) { 
 
 			$asunto = new Asunto($sesion);
 			$asunto->Edit('codigo_asunto', $asunto->AsignarCodigoAsunto($codigo_cliente));
@@ -585,9 +509,9 @@ if ($opcion == "guardar") {
 			$asunto->Edit("email_contacto", $email_contacto_contrato);
 			$asunto->Edit("direccion_contacto", $direccion_contacto_contrato);
 			if (!$id_usuario_encargado || $id_usuario_encargado==-1) {
-                          $id_usuario_encargado = ($id_usuario_secundario)? $id_usuario_secundario : 0;
-                        }
-                        $asunto->Edit("id_encargado", $id_usuario_encargado);
+                $id_usuario_encargado = ($id_usuario_secundario)? $id_usuario_secundario : 0;
+            }
+            $asunto->Edit("id_encargado", $id_usuario_encargado);
 			$asunto->Write();
 		}
 	}
@@ -1198,10 +1122,10 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 }
 ?>
     
- function YoucangonowMichael() {
-    jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
-   
-}
+
+ setTimeout(function() {
+  jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
+  }, 3000);
 
     
     </script>
