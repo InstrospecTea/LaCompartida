@@ -364,7 +364,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	if ($motivo == "cobros")
 		$x_pag = 15;
 	else
-		$x_pag = 7;
+		$x_pag = 10;
 	$b = new Buscador($sesion, $query, "Asunto", $desde, $x_pag, $orden);
 	$b->formato_fecha = "$formato_fecha";
 	$b->mensaje_error_fecha = "N/A";
