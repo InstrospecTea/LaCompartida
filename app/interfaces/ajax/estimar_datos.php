@@ -4,7 +4,7 @@
     require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 
-    $sesion = new Sesion( array('OFI','COB') );
+    $sesion = new Sesion( array('ADM','OFI','COB') );
 
     
 		
@@ -100,6 +100,6 @@
 					WHERE $where";
 		$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($query, $sesion)."'";
         	$respt = mysql_query($testimonio, $sesion);
-	echo mysql_num_rows(mysql_query($query, $sesion))	;
+	//echo mysql_num_rows(mysql_query($query, $sesion))	;
     exit;
 ?>
