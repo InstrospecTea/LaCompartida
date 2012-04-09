@@ -491,6 +491,7 @@ function BuscarGastos( form, from )
 	jQuery.post('ajax/estimar_datos.php',jQuery('#form_gastos').serialize(),function(data) {
 	    alert('Su consulta recorre '+data+' registros');
 	});
+	return false;
 	} else {
 	    	return false;
 	}
@@ -656,7 +657,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) ||
 			<input name=boton_xls type=button value="<?=__('Descargar Excel')?>" onclick="BuscarGastos(this.form,'excel')" class=btn>
 			<input name="boton_xls_resumen" type="button" value="<?=__('Descargar Resumen Excel')?>" onclick="BuscarGastos(this.form,'excel_resumen')" class="btn" />
 			
-			<input name="boton_xls_estimar" type="button" value="<?=__('Estimar Cantidad de Datos')?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
+			<input id="boton_xls_estimar" name="boton_xls_estimar" type="button" value="<?=__('Estimar Cantidad de Datos')?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
 		</td>
 		<td width='40%' align=right>
 			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?=__('Agregar provisión')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
