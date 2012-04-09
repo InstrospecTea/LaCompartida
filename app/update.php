@@ -8227,6 +8227,80 @@ from tramite tram where tram.estadocobro not in ('SIN COBRO','CREADO','EN REVISI
 				 	}
 				}
 				break;
+				
+				
+			case 5.75:
+			    $query=array();
+			    $query[]="CREATE TABLE IF NOT EXISTS `usuario_costo_hh` (
+			  `id_costohh` mediumint(12) NOT NULL AUTO_INCREMENT,
+			  `id_usuario` mediumint(8) NOT NULL DEFAULT '0',
+			  `yearmonth` mediumint(6) NOT NULL DEFAULT '200001',
+			  `costo_hh` decimal(12,5) NOT NULL DEFAULT '0.00000',
+			  `fecha_touch` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'La fecha de insert o update',
+			  PRIMARY KEY (`id_costohh`),
+			  UNIQUE KEY `id_usuario` (`id_usuario`,`yearmonth`)
+			) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+				
+				$query[]="replace delayed into `usuario_costo_hh` (id_usuario, yearmonth, costo_hh)
+			    (SELECT t.id_usuario, date_format( uc.fecha, '%Y%m' ),costo *3600 / sum( time_to_sec( duracion ) )
+			    FROM trabajo t
+			    JOIN usuario_costo uc ON t.id_usuario = uc.id_usuario
+			    AND date_format( uc.fecha, '%Y%m%d' ) = concat( extract(
+			    YEAR_MONTH FROM t.fecha ) , '01' )
+			    GROUP BY id_usuario, uc.fecha)";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.76:
+			    $query[]="CREATE TABLE if not exists `z_log_fff` (
+				      `idlog` bigint(20) NOT NULL auto_increment,
+				      `fecha` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+				      `mensaje` text NOT NULL,
+				      PRIMARY KEY  (`idlog`)
+				    ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=109 ;";
+			    foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			    break;
+			case 5.77:
+				$query = array();
+				$query[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+							VALUES ('AsuntosPorDefectoSeCobranPorSeparado', 'false', 'Define si al crear un nuevo cliente, y generar sus asuntos por defecto, ellos generan un contrato independiente cada uno. La config es redundante con el inicio del config AgregarAsuntosPorDefecto', 'boolean', 1, 101)";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+				
+			case 5.78:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'DejarTarifaCeroRetainerPRC',  '0',  'En el caso de PRC en la nota de cobro dejan en 0 la tarifa de los usuarios que quedan con todas sus horas pagadas por el Retainer',  'boolean',  '6',  '-1');";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.79:
+				$query = array();
+				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'UsaAfectoImpuesto',  '0',  'Agrega columna en excel de gastos, para indicar si es afecto a impuesto o no',  'boolean',  '6',  '-1' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+				
 	}
 }
 
@@ -8234,7 +8308,7 @@ from tramite tram where tram.estadocobro not in ('SIN COBRO','CREADO','EN REVISI
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-for($version=1;$version<=5.74;$version+=0.01):
+for($version=1;$version<=5.79;$version+=0.01):
     $VERSIONES[$num++]=round($version,2);
 endfor;
 
