@@ -6,6 +6,28 @@
 
 /* IMPORTANTE:
 	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
+function existecampo($campo,$tabla,$dbh) { 
+    
+    $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
+    if(!$existencampos):
+	return false;
+    elseif(mysql_num_rows($existencampos)>0): 
+	return true;
+    endif;
+        return false;
+}
+
+function cuentaregistros($tabla,$dbh) { 
+    
+    $registros = mysql_query("select count(*)  from $tabla", $dbh);
+    if(!$registros):
+	return 0;
+    elseif ($cantidad=mysql_fetch_value($registros)):
+	return $cantidad;
+    endif;
+    return 0;
+        
+}
 
 function Actualizaciones( &$dbh, $new_version )
 {
@@ -7992,21 +8014,21 @@ NULL ,  'RUT'
 				$comentario = 'Cambia nombre a estado_cobro de 3 tablas para no colisionar con la tabla cobro';
                  
 				
-				if(!$existencampos = mysql_query("show columns  from trabajo like 'estadocobro'", $dbh) || !mysql_num_rows($existencampos)):
+				if(!existecampo('estadocobro','trabajo',$dbh)):
 				  $query[]="ALTER TABLE  `trabajo` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
-				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh) &&  mysql_num_rows($existencampos)>0):
+				elseif (existecampo('estado_cobro','trabajo',$dbh)):
 				   $query[]="ALTER TABLE  `trabajo` drop  `estado_cobro`";
 				endif;
 				
-				if(!$existencampos = mysql_query("show columns  from tramite like 'estadocobro'", $dbh)|| !mysql_num_rows($existencampos)):
+				if(!existecampo('estadocobro','tramite',$dbh)):
 				  $query[]="ALTER TABLE  `tramite` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
-				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh)&&  mysql_num_rows($existencampos)>0):
+				elseif (existecampo('estado_cobro','tramite',$dbh)):
 				   $query[]="ALTER TABLE  `tramite` drop  `estado_cobro`";
 				endif;
 				
-				if(!$existencampos = mysql_query("show columns  from cta_corriente like 'estadocobro'", $dbh)|| !mysql_num_rows($existencampos)):
+				if(!existecampo('estadocobro','cta_corriente',$dbh)):
 				  $query[]="ALTER TABLE  `cta_corriente` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
-				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh)&&  mysql_num_rows($existencampos)>0):
+				elseif (existecampo('estado_cobro','cta_corriente',$dbh)):
 				   $query[]="ALTER TABLE  `cta_corriente` drop  `estado_cobro`";
 				endif;
 				
@@ -8025,16 +8047,16 @@ NULL ,  'RUT'
                                 
                                 
                             
-                                $query[]="ALTER TABLE  trabajo  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  cobro  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  tramite  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  contrato  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  documento  ADD   fecha_touch      TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  cta_corriente  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  factura ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  cliente ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  asunto ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                                $query[]="ALTER TABLE  usuario ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'trabajo', $dbh)) $query[]="ALTER TABLE  trabajo  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'cobro', $dbh)) $query[]="ALTER TABLE  cobro  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'tramite', $dbh)) $query[]="ALTER TABLE  tramite  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'contrato', $dbh)) $query[]="ALTER TABLE  contrato  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'trabajo', $dbh)) $query[]="ALTER TABLE  documento  ADD   fecha_touch      TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'cta_corriente', $dbh)) $query[]="ALTER TABLE  cta_corriente  ADD   fecha_touch     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'factura', $dbh)) $query[]="ALTER TABLE  factura ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'cliente', $dbh)) $query[]="ALTER TABLE  cliente ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'asunto', $dbh)) $query[]="ALTER TABLE  asunto ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                               if(!existecampo('fecha_touch', 'usuario', $dbh)) $query[]="ALTER TABLE  usuario ADD  fecha_touch  TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
 
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -8101,7 +8123,7 @@ NULL ,  'RUT'
 				  KEY `id_usuario_responsable` (`id_usuario_responsable`)
 				) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
 
-			if($existenvalores = mysql_query("select count(*) from olap_liquidaciones", $dbh) && mysql_fetch_field($existencampos)==0) {
+			if(cuentaregistros('olap_liquidaciones', $dbh)>0) {
 				    
 				
 					
