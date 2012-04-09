@@ -7991,9 +7991,27 @@ NULL ,  'RUT'
 				$query = array();
 				$comentario = 'Cambia nombre a estado_cobro de 3 tablas para no colisionar con la tabla cobro';
                  
-				$query[]="ALTER TABLE  `tramite` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";
-				$query[]="ALTER TABLE  `trabajo` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";
-				$query[]="ALTER TABLE  `cta_corriente` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";			
+				
+				if(!$existencampos = mysql_query("show columns  from trabajo like 'estadocobro'", $dbh) || !mysql_num_rows($existencampos)):
+				  $query[]="ALTER TABLE  `trabajo` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
+				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh) &&  mysql_num_rows($existencampos)>0):
+				   $query[]="ALTER TABLE  `trabajo` drop  `estado_cobro`";
+				endif;
+				
+				if(!$existencampos = mysql_query("show columns  from tramite like 'estadocobro'", $dbh)|| !mysql_num_rows($existencampos)):
+				  $query[]="ALTER TABLE  `tramite` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
+				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh)&&  mysql_num_rows($existencampos)>0):
+				   $query[]="ALTER TABLE  `tramite` drop  `estado_cobro`";
+				endif;
+				
+				if(!$existencampos = mysql_query("show columns  from cta_corriente like 'estadocobro'", $dbh)|| !mysql_num_rows($existencampos)):
+				  $query[]="ALTER TABLE  `cta_corriente` CHANGE  `estado_cobro`  `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT  'SIN COBRO'";  
+				elseif ($existencampos = mysql_query("show columns  from trabajo like 'estado_cobro'", $dbh)&&  mysql_num_rows($existencampos)>0):
+				   $query[]="ALTER TABLE  `cta_corriente` drop  `estado_cobro`";
+				endif;
+				
+				
+				
 				
                                 $query[]="ALTER TABLE  `trabajo` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  `cobro` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
@@ -8001,7 +8019,7 @@ NULL ,  'RUT'
                                 $query[]="ALTER TABLE  `contrato` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  `documento` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  `cta_corriente` CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
-								$query[]="ALTER TABLE  factura  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
+				$query[]="ALTER TABLE  factura  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  cliente  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 $query[]="ALTER TABLE  asunto  CHANGE  `fecha_modificacion`  `fecha_modificacion` DATETIME NULL DEFAULT NULL";
                                 
@@ -8083,14 +8101,15 @@ NULL ,  'RUT'
 				  KEY `id_usuario_responsable` (`id_usuario_responsable`)
 				) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
 
+			if($existenvalores = mysql_query("select count(*) from olap_liquidaciones", $dbh) && mysql_fetch_field($existencampos)==0) {
+				    
 				
-				$query[] = "
-
-replace delayed into olap_liquidaciones (SELECT
+					
+				$query[] = "replace delayed into olap_liquidaciones (SELECT
 
                                                                 asunto.codigo_asunto as codigos_asuntos,
                                                                 asunto.codigo_asunto_secundario, 
-                  contrato.id_usuario_responsable,
+				contrato.id_usuario_responsable,
                                    asunto.glosa_asunto as asuntos,
                                    (asunto.cobrable+1) as asuntos_cobrables,
                                     cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
@@ -8107,31 +8126,31 @@ replace delayed into olap_liquidaciones (SELECT
 								contrato.opc_moneda_total as id_moneda_total,
                                                               
 															  movs.*, now()
-FROM  asunto JOIN contrato  using (id_contrato)
-JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-join
-(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
- tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
- 0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
-from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
- 
- union all
- 
- SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
- cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
-IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
-from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+			FROM  asunto JOIN contrato  using (id_contrato)
+			JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+			join
+			(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+			 tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+			 0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+			from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+
+			 union all
+
+			 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+			 cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+			IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+			from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
 
 
-union all
+			union all
 
-select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
-tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
-tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
-from tramite tram where tram.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
+			select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+			tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+			tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+			from tramite tram where tram.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')
 
-) movs on movs.codigo_asunto=asunto.codigo_asunto
- LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+			) movs on movs.codigo_asunto=asunto.codigo_asunto
+			 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario);";
 				
 				$query[] = "replace delayed into olap_liquidaciones (SELECT
@@ -8155,32 +8174,36 @@ from tramite tram where tram.estadocobro  in ('SIN COBRO','CREADO','EN REVISION'
 								contrato.opc_moneda_total as id_moneda_total,
                                                               
 															  movs.*, now()
-FROM  asunto JOIN contrato  using (id_contrato)
-JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-join
-(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
- tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
- 0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
-from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  not in ('SIN COBRO','CREADO','EN REVISION')
- 
- union all
- 
- SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
- cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
-IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
-from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
+		    FROM  asunto JOIN contrato  using (id_contrato)
+		    JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+		    join
+		    (select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+		     tr.id_trabajo, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+		     0 as monto_cobrable, TIME_TO_SEC(duracion_cobrada)*tarifa_hh/3600 as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar/3600 as monto_thh_estandar,tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+		    from  trabajo tr where tr.id_tramite = 0  AND tr.duracion_cobrada >0 and tr.estadocobro  not in ('SIN COBRO','CREADO','EN REVISION')
+
+		     union all
+
+		     SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+		     cc.id_movimiento, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+		    IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+		    from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and cc.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
 
 
-union all
+		    union all
 
-select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
-tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
-tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
-from tramite tram where tram.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
+		    select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+		    tram.id_Tramite, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+		    tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+		    from tramite tram where tram.estadocobro not in ('SIN COBRO','CREADO','EN REVISION')
 
-) movs on movs.codigo_asunto=asunto.codigo_asunto
- LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+		    ) movs on movs.codigo_asunto=asunto.codigo_asunto
+		     LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)	;";
+		
+		
+			}
+				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
 				 		throw new Exception($q . "---" . mysql_error());
