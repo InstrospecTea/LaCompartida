@@ -9290,7 +9290,7 @@ class Cobro extends Objeto {
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
 				$query = "SELECT SQL_CALC_FOUND_ROWS tramite.duracion, tramite_tipo.glosa_tramite as glosa_tramite, tramite.descripcion, tramite.fecha, tramite.id_usuario,
-							tramite.id_tramite, tramite.tarifa_tramite as tarifa, tramite.codigo_asunto, tramite.id_moneda_tramite,
+							tramite.id_tramite, SUM(tramite.tarifa_tramite) as tarifa, COUNT(*) as cantidad_repeticion, tramite.codigo_asunto, tramite.id_moneda_tramite,
 							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria,
 							usuario.username
 							FROM tramite
@@ -9301,6 +9301,7 @@ class Cobro extends Objeto {
 							$join_categoria
 							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND tramite.cobrable=1
+							GROUP BY tramite_tipo.glosa_tramite, tramite.descripcion, tramite.codigo_asunto, tramite.id_moneda_tramite
 							ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query);
@@ -9332,7 +9333,8 @@ class Cobro extends Objeto {
 
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
-					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
+					$glosa_cantidad = ( $tramite->fields['cantidad_repeticion'] > 1 ? " ( {$tramite->fields['cantidad_repeticion']} veces )  " : '');
+					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'] . $glosa_cantidad) ), $row);
 					$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
 					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
@@ -11623,6 +11625,18 @@ class Cobro extends Objeto {
 			}
 		}
 
+		if( UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC') ) {
+			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
+												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
+												 AND t2.id_usuario = u.id_usuario
+												 AND t2.cobrable = 1";
+		} else {
+			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada)  ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada)  )
+												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
+												 AND t2.id_usuario = u.id_usuario
+												 AND t2.cobrable = 1";
+		}
+		
 		$query = "	SELECT
 										t.id_usuario as id_usuario,
 										t.codigo_asunto as codigo_asunto,
@@ -11635,10 +11649,7 @@ class Cobro extends Objeto {
 										SUM( (TIME_TO_SEC(duracion)-TIME_TO_SEC(duracion_cobrada))/3600 ) as duracion_descontada,
 										SUM( TIME_TO_SEC( duracion_retainer )/3600 ) as duracion_retainer,
 										(
-											SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
-												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
-												 AND t2.id_usuario = u.id_usuario
-												 AND t2.cobrable = 1
+											$query_tarifa
 										) as tarifa,
 										SUM(t.monto_cobrado) as monto_cobrado_escalonada
 									FROM trabajo as t
@@ -11650,6 +11661,7 @@ class Cobro extends Objeto {
 										$where_horas_cero
 									GROUP BY t.codigo_asunto, t.id_usuario
 									ORDER BY $order_categoria t.fecha ASC, t.descripcion ";
+		//echo $query; exit;
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		$contrato_horas = $this->fields['retainer_horas'];
