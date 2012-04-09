@@ -362,7 +362,7 @@
 }
 
 ?>
-<script style="text/javascript">
+<script type="text/javascript">
 function Preparar_Cobro(form)
 {
 	form.action = 'gastos.php?preparar_cobro=1';
@@ -480,14 +480,20 @@ function BuscarGastos( form, from )
 
 	if(!form)
 		var form = $('form_gastos');
-	if(from == 'buscar')
+	if(from == 'buscar') {
 		form.action = 'gastos.php?buscar=1';
-	else if(from == 'excel')
+	} else if(from == 'excel') {
 		<?=$pagina_excel?>
-	else if(from == 'excel_resumen')
+	} else if(from == 'excel_resumen') {
 		form.action = 'gastos_xls_resumen.php';
-	else
-		return false;
+	} else if(from =='estimar_datos') {
+
+	jQuery.post('ajax/estimar_datos.php',jQuery('#form_gastos').serialize(),function(data) {
+	    alert('Su consulta recorre '+data+' registros');
+	});
+	} else {
+	    	return false;
+	}
 	form.submit();
 	return true;
 }
@@ -649,6 +655,8 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) ||
 			<input name=boton_buscar id='boton_buscar' type=button value="<?=__('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
 			<input name=boton_xls type=button value="<?=__('Descargar Excel')?>" onclick="BuscarGastos(this.form,'excel')" class=btn>
 			<input name="boton_xls_resumen" type="button" value="<?=__('Descargar Resumen Excel')?>" onclick="BuscarGastos(this.form,'excel_resumen')" class="btn" />
+			
+			<input name="boton_xls_estimar" type="button" value="<?=__('Estimar Cantidad de Datos')?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
 		</td>
 		<td width='40%' align=right>
 			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?=__('Agregar provisión')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
