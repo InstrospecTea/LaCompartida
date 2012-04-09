@@ -22,7 +22,7 @@ function cuentaregistros($tabla,$dbh) {
     $registros = mysql_query("select count(*)  from $tabla", $dbh);
     if(!$registros):
 	return 0;
-    elseif ($cantidad=mysql_fetch_value($registros)):
+    elseif ($cantidad=mysql_fetch_field($registros)):
 	return $cantidad;
     endif;
     return 0;
