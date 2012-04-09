@@ -133,7 +133,10 @@
 		$col_ingreso = $col++;
 		if ( UtilesApp::GetConf($sesion,'UsaMontoCobrable') ){
 			$col_monto_cobrable = $col++;
-		}	
+		}
+		if ( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ){
+			$col_afecto_impuesto = $col++;
+		}
 		$col_liquidacion = $col++;
 		$col_estado = $col++;
 		if ( UtilesApp::GetConf($sesion,'UsarGastosCobrable') ){
@@ -184,7 +187,10 @@
 		$ws1->setColumn( $col_ingreso, $col_ingreso, 25.00); #ingreso
 		if ( UtilesApp::GetConf($sesion,'UsaMontoCobrable') ){
 			$ws1->setColumn( $col_monto_cobrable, $col_monto_cobrable, 25.00); #monto cobrable
-		}		
+		}
+		if ( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ){
+			$ws1->setColumn( $col_afecto_impuesto, $col_afecto_impuesto, 25.00); #monto cobrable
+		}
 		$ws1->setColumn( $col_liquidacion, $col_liquidacion, 25.00); #liquidacion
 		$ws1->setColumn( $col_estado, $col_estado, 15.00); #estado cobro
 		$ws1->setColumn( $col_facturable, $col_facturable, 10.00); #facturable
@@ -281,6 +287,9 @@
 		{
 			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 		}
+		if ( UtilesApp::GetConf( $sesion, 'UsaAfectoImpuesto') ){
+			$col_select .= ", IF( cta_corriente.con_impuesto IS NOT NULL, cta_corriente.con_impuesto, ' - ') as afecto_impuesto";
+		}
 		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
 			$col_select .= ", IF( cta_corriente.id_glosa_gasto IS NOT NULL, prm_glosa_gasto.glosa_gasto, '-') as concepto";
 		}
@@ -313,7 +322,8 @@
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 					WHERE $where";
-		
+		$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($query, $sesion)."'";
+        	$respt = mysql_query($testimonio, $sesion);
 		$lista_gastos = new ListaGastos($sesion,'',$query);
 		$moneda_unica = true; #para verificar en el ciclo si es la moneda única
 		$id_moneda_check = 0; #igual que el de arriba
@@ -397,6 +407,9 @@
 	{
 	    $ws1->write($fila_inicial, $col_monto_cobrable, __('Monto cobrable'), $tit);
 	}
+if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
+	$ws1->write($fila_inicial, $col_afecto_impuesto, __('Afecto a Impuesto'), $tit);
+}
     $ws1->write($fila_inicial, $col_liquidacion, __('Cobro'), $tit);
     $ws1->write($fila_inicial, $col_estado, __('Estado Cobro'), $tit);
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::TipoGasto() ) )
@@ -525,7 +538,9 @@
 			}
 		}	
 	    
-	    
+	    if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
+		$ws1->write($fila_inicial, $col_afecto_impuesto, $row['afecto_impuesto'], $f4);
+	}
 	    $ws1->write($fila_inicial, $col_liquidacion, $row['id_cobro'], $f4);
 		$ws1->write($fila_inicial, $col_estado, $row['estado'], $f4);
 		
