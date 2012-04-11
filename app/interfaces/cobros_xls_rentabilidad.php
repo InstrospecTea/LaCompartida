@@ -104,6 +104,15 @@ if ($guardar_respaldo) {
 												'Bottom' => 1,
 												'FgColor' => 35,
 												'Color' => 'black'));
+		$formato_titulo_centrado =& $wb->addFormat(array('Size' => 10,
+												'VAlign' => 'top',
+												'Align' => 'center',
+												'TextWrap' => 1,
+												'Bold' => 1,
+												'Locked' => 1,
+												'Bottom' => 1,
+												'FgColor' => 35,
+												'Color' => 'black'));
 $formato_normal_centrado = & $wb->addFormat(array('Size' => 7,
 			'Align' => 'center',
 			'VAlign' => 'top',
@@ -456,7 +465,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->fitToPages(1,1);
 				}
 
-				// Seteamas el ancho de las columnas >>>>>>>>>>>>>>>>>
+				// Seteamos el ancho de las columnas >>>>>>>>>>>>>>>>>
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarResumenExcel') ) || ( method_exists('Conf','UsarResumenExcel') && Conf::UsarResumenExcel() ) )
 					{
 						$ws->setColumn($col_fecha, $col_fecha, 20);
@@ -818,14 +827,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									if($opc_ver_cobrable)
 										$ws->write($filas, $col_es_cobrable, Utiles::GlosaMult($sesion, 'cobrable', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 
-									$ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'tarifa_hh_rentabilidad', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo);
-									$ws->write($filas, $col_valor_trabajo, __('Valor según Tarifa'), $formato_titulo);
+									$ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, Utiles::GlosaMult($sesion, 'tarifa_hh_rentabilidad', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo')), $formato_titulo_centrado);
+									$ws->write($filas, $col_valor_trabajo, __('Valor según Tarifa'), $formato_titulo_centrado);
 									if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
-										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Retainer'), $formato_titulo);
+										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Retainer'), $formato_titulo_centrado);
 									} else if( $cobro->fields['forma_cobro'] == 'FLAT FEE' ) {
-										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Flat'), $formato_titulo);
+										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Flat'), $formato_titulo_centrado);
 									} else {
-										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Estándar'), $formato_titulo);
+										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Estándar'), $formato_titulo_centrado);
 									} 
 									
 									$ws->write($filas, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
