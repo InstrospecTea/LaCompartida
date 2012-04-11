@@ -18,7 +18,8 @@ if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die($argv[
 	
 
 $sesion = new Sesion( null, true );
-if( 1 || UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
+if( method_exists('Conf','EsAmbientePrueba') && Conf::EsAmbientePrueba() )
+ 	{
 
 if( method_exists('Conf','GetConf') )
 {
