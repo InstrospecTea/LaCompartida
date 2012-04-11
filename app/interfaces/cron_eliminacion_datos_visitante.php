@@ -4,6 +4,8 @@
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+	require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
+
 
 $sesion = new Sesion( null, true );
 
