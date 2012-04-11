@@ -563,7 +563,7 @@ list($id_usuario_cobro) = mysql_fetch_array($resp_usuario);
 
 echo '<br>---------Ingreso finalizado!--------<br>';
 } else {
-    echo '<!-- Denegado '.UtilesApp::GetConf($sesion,'EsAmbientePrueba' ).'_'.BACKUP.'-->';
+    echo '<!-- Denegado '.Conf::EsAmbientePrueba().'_'.BACKUP.'-->';
     
 }
 ?>
