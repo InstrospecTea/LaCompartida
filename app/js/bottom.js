@@ -1,8 +1,7 @@
 jQuery("head").append("<link id='uicss' />");
 
 jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
- 
-    jQuery.datepicker.regional['es'] = {
+   jQuery.datepicker.regional['es'] = {
 		closeText: 'Cerrar',
 		prevText: '&#x3c;Ant',
 		nextText: 'Sig&#x3e;',
@@ -20,9 +19,115 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-	    
    jQuery.when(jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://estaticos.thetimebilling.com/jquery-ui.css"   }) )
 		.then(function() {
+		
+		(function( jQuery ) {
+		jQuery.widget( "ui.combobox", {
+			_create: function() {
+				var self = this,
+					select = this.element.hide(),
+					selected = select.children( ":selected" ),
+					value = selected.val() ? selected.text() : "";
+				var input = this.input = jQuery( "<input>" )
+					.insertAfter( select )
+					.val( value )
+					.autocomplete({
+						delay: 0,
+						minLength: 0,
+						source: function( request, response ) {
+							var matcher = new RegExp( jQuery.ui.autocomplete.escapeRegex(request.term), "i" );
+							response( select.children( "option" ).map(function() {
+								var text = jQuery( this ).text();
+								if ( this.value && ( !request.term || matcher.test(text) ) )
+									return {
+										label: text.replace(
+											new RegExp(
+												"(?![^&;]+;)(?!<[^<>]*)(" +
+												jQuery.ui.autocomplete.escapeRegex(request.term) +
+												")(?![^<>]*>)(?![^&;]+;)", "gi"
+											), "<strong>$1</strong>" ),
+										value: text,
+										option: this
+									};
+							}) );
+						},
+						select: function( event, ui ) {
+							ui.item.option.selected = true;
+							self._trigger( "selected", event, {
+								item: ui.item.option
+							});
+						},
+						change: function( event, ui ) {
+							if ( !ui.item ) {
+								var matcher = new RegExp( "^" + jQuery.ui.autocomplete.escapeRegex( jQuery(this).val() ) + "$", "i" ),
+									valid = false;
+								select.children( "option" ).each(function() {
+									if ( jQuery( this ).text().match( matcher ) ) {
+										this.selected = valid = true;
+										return false;
+									}
+								});
+								if ( !valid ) {
+									// remove invalid value, as it didn't match anything
+									jQuery( this ).val( "" );
+									select.val( "" );
+									input.data( "autocomplete" ).term = "";
+									return false;
+								}
+							}
+						}
+					})
+					.addClass( "ui-widget ui-widget-content ui-corner-left" );
+
+				input.data( "autocomplete" )._renderItem = function( ul, item ) {
+					return jQuery( "<li></li>" )
+						.data( "item.autocomplete", item )
+						.append( "<a>" + item.label + "</a>" )
+						.appendTo( ul );
+				};
+
+				this.button = jQuery( "<button type='button'>&nbsp;</button>" )
+					.attr( "tabIndex", -1 )
+					.attr( "title", "Mostrar Todo" )
+					.insertAfter( input )
+					.button({
+						icons: {
+							primary: "ui-icon-triangle-1-s"
+						},
+						text: false
+					})
+					.removeClass( "ui-corner-all" )
+					.removeClass( "ui-state-default" )
+					.addClass( "ui-widget-black ui-corner-right ui-button-icon" )
+					.click(function() {
+						// close if already visible
+						if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
+							input.autocomplete( "close" );
+							return;
+						}
+
+						// work around a bug (likely same cause as #5265)
+						jQuery( this ).blur();
+
+						// pass empty string as value to search for, displaying all results
+						input.autocomplete( "search", "" );
+						input.focus();
+					});
+			},
+
+			destroy: function() {
+				this.input.remove();
+				this.button.remove();
+				this.element.show();
+				jQuery.Widget.prototype.destroy.call( this );
+			}
+		});
+	})( jQuery );
+	
+	
+	
+	
 		if(window.location==top.window.location) {
 		    jQuery('#dialogomodal').dialog({
 			    autoOpen: false, height: 'auto',width: 800,  maxHeight: 550, modal: true,  
@@ -45,7 +150,8 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 		    }).attr('rel','activomodal').append(DivLoading).append('<iframe id="soymodal" rel="inactivo" style="display:none;height:100%;width:100%" frameborder="0"></iframe>');
 		     }
 	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
-	//if(window.console)  console.log('YCGNM es '+ top.window.YoucangonowMichael);
+	if(window.console)  console.log('YCGNM es '+ top.window.YoucangonowMichael);
+	jQuery('.combox').combobox();
 	  
     });  
    }});
@@ -75,7 +181,7 @@ SetFocoPrimerElemento();
 
 function nuovaFinestra(name, w, h, url, opciones ) {
 
-                if(1==0 && top.window.jQuery('#soymodal').attr('rel')=='inactivo' && top.window.jQuery('#dialogomodal').length>0 && top.window.jQuery('#dialogomodal').attr('rel')=='activomodal') {
+                if(top.window.jQuery('body').attr('title')=='overlay' && top.window.jQuery('#soymodal').attr('rel')=='inactivo' && top.window.jQuery('#dialogomodal').length>0 && top.window.jQuery('#dialogomodal').attr('rel')=='activomodal') {
                             
 				var inipos=Math.max(top.window.jQuery('body').scrollTop(), top.window.jQuery('html').scrollTop());
 			
@@ -92,7 +198,7 @@ function nuovaFinestra(name, w, h, url, opciones ) {
 				
 			    });
                         } else {
-			  if(window.console)  console.log(top.window.jQuery('#dialogomodal'));
+			  if(window.console) console.log(top.window.jQuery('#dialogomodal'));
 			     return  nuevaVentana( name, w, h, url, opciones );  
                         }
                 }
