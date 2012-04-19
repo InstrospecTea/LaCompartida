@@ -44,7 +44,7 @@ header('Location: ./m/');*/
 	<tr>
 		<td align="center" style="padding: 8px;">
 <table width="100%" cellspacing="2" cellpadding="2">
- <form action="fw/usuarios/login.php" method="post">
+ <form action="app/usuarios/login.php" method="post">
 	<tr>
 		<td align="right" rowspan="3">
 			<? 
