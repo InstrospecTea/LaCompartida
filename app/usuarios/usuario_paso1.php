@@ -115,8 +115,31 @@
 <script type="text/javascript">
     jQuery(document).ready(function() {
 
+jQuery('.permiso').click(function() {
+   var Objeto=jQuery(this);
+   var Dato=jQuery(this).attr('rel').split(';');
+  
+   var Act=jQuery(this).attr('alt');
+  
+   var Accion='';
+    if(Act=='OK') {
+	Accion='revocar';
+	jQuery(this).attr('alt','NO');
+    } else {
+	Accion='conceder';
+	jQuery(this).attr('alt','OK');
 	
-	   
+    }
+     jQuery.post('../interfaces/ajax/permiso_ajax.php',{accion:Accion,userid:Dato[0], permiso:Dato[1]},function(data) {
+		
+		Objeto.attr('src',data);
+		 
+	    });
+	    return false;
+  
+});
+
+	
 	    jQuery('.descargaxls').click(function() {
 		var activo=0;
 		if(jQuery('#activo').is(':checked')) activo=1;
@@ -158,7 +181,7 @@
 	     }).show();
 	     jQuery('#btnbuscar, #costos').button({
 		 icons: {primary: "ui-icon-search"	}
-	     });
+	     }).show();
 
 	}
 
@@ -559,10 +582,10 @@ function Listar( form, from )
 						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" id="nombre" value="<?=$nombre?>" size="20" />
 						&nbsp;&nbsp; 
 						
-						&nbsp; <a href="#" id="btnbuscar"   rel="buscar">Buscar</a>
-						&nbsp; <a href="#" class="descargaxls" style="display:none;" rel="xls">Descargar Listado</a>
-						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_vacacion">Descargar Vacaciones</a>
-						&nbsp; <a href="#" class="descargaxls"  style="display:none;" rel="xls_modificaciones">Descargar Modificaciones</a>
+						&nbsp; <a href="#" id="btnbuscar"  class="u1" rel="buscar">Buscar</a>
+						&nbsp; <a href="#" class="u1 descargaxls"  rel="xls">Descargar Listado</a>
+						&nbsp; <a href="#" class="u1 descargaxls"  rel="xls_vacacion">Descargar Vacaciones</a>
+						&nbsp; <a href="#" class="u1 descargaxls"  rel="xls_modificaciones">Descargar Modificaciones</a>
 						
 			</form>
 				    
@@ -652,9 +675,9 @@ function Listar( form, from )
 				list($count) = mysql_fetch_array($resp);
 		if ( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') )	{
 				if($count > 0)
-					return "<div class='permiso on' id='". $fila->fields['id_usuario'].';'.$permiso."'><img src='".Conf::ImgDir()."/check_nuevo.gif' alt='OK' /></div>";
+					return "<div class='permiso on' id='". $fila->fields['id_usuario'].';'.$permiso."'><input class='permiso' type='image' src='".Conf::ImgDir()."/check_nuevo.gif' alt='OK' rel='". $fila->fields['id_usuario'].';'.$permiso."'/></div>";
 				else
-					return "<div class='permiso off' id='". $fila->fields['id_usuario'].';'.$permiso."'><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' alt='NO' /></div>";
+					return "<div class='permiso off' id='". $fila->fields['id_usuario'].';'.$permiso."'><input class='permiso'  type='image' src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' rel='". $fila->fields['id_usuario'].';'.$permiso."' alt='NO' /></div>";
 			}
 		else
 			{

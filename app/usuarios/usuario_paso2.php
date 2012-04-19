@@ -901,7 +901,7 @@ function CargarPermisos()
 <script>
     
      jQuery(document).ready(function() {
-	jQuery( "#chkpermisos" ).hide();
+	
 	
      jQuery("#chkpermisos .ui-button").live('change',function() {
      alert(jQuery(this).attr('class'));
