@@ -13,7 +13,9 @@ $tini=time();
 	require_once Conf::ServerDir().'/classes/Reporte.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-
+        require_once Conf::ServerDir().'/classes/ReporteContrato.php';
+        
+        
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
@@ -289,8 +291,8 @@ $tini=time();
 			$ws1->write($filas, $col_porcentaje_retainer, __('Porcentaje Retainer'), $formato_titulo);
 		}
 
-		$where_trabajo = " ( trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
-		$where_gasto   = " ( cta_corriente.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
+		$where_trabajo = "  trabajo.estadocobro in ('SIN COBRO','CREADO','EN REVISION' ) ";
+		$where_gasto   = "  cta_corriente.estadocobro in ('SIN COBRO','CREADO','EN REVISION' )  ";
 		if( $fecha1 != '' && $fecha2 != '' ) {
 			$where_trabajo .= " AND trabajo.fecha >= '".$fecha1."' AND trabajo.fecha <= '".$fecha2."'";
 			$where_gasto .= " AND cta_corriente.fecha >= '".$fecha1."' AND cta_corriente.fecha <= '".$fecha2."' ";
@@ -315,6 +317,64 @@ $tini=time();
 			$codigos_asuntos_secundarios = "";
 			$codigo_asunto_secundario_sep = "";
 		}
+                $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
+                $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
+                $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+                $resp = mysql_query($update1, $sesion->dbh);
+                $resp = mysql_query($update2, $sesion->dbh);
+                $resp = mysql_query($update3, $sesion->dbh);
+		list($maxolaptime)=mysql_fetch_array(mysql_query("select max(fecha_modificacion) as maxfecha from olap_liquidaciones", $sesion->dbh));
+		
+		$update4="replace delayed into olap_liquidaciones (SELECT
+                                                                asunto.codigo_asunto as codigos_asuntos,
+                                                                asunto.codigo_asunto_secundario, 
+								  contrato.id_usuario_responsable,
+								   asunto.glosa_asunto as asuntos,
+								   (asunto.cobrable+1) as asuntos_cobrables,
+								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+								
+								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+								ec.username as username_encargado_comercial,
+								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+								es.username as username_encargado_secundario,
+								contrato.id_contrato,
+                                                                contrato.monto, 
+								contrato.forma_cobro,
+								contrato.retainer_horas,
+								contrato.id_moneda as id_moneda_contrato,
+								contrato.opc_moneda_total as id_moneda_total,
+                                                              
+															  movs.*
+								FROM  asunto JOIN contrato  using (id_contrato)
+								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+								join
+								(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+								 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+								 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+								,fecha_modificacion from  trabajo tr where   fecha_touch>=$maxolaptime 
+
+								 union all
+
+								 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+								 cc.id_movimiento,cc.id_usuario_orden, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+								IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+								,fecha_modificacion from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and  fecha_touch>=$maxolaptime
+
+
+								union all
+
+								select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+								tram.id_tramite, tram.id_usuario, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+								tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+								,fecha_modificacion from tramite tram where fecha_touch>=$maxolaptime
+
+								) movs on movs.codigo_asunto=asunto.codigo_asunto
+								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
+															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
+
+								"; // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
+		$resp = mysql_query($update4, $sesion->dbh);
+		
 		$query = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
 								$codigos_asuntos_secundarios
@@ -356,36 +416,50 @@ $tini=time();
                                                                                                                 AND cta_corriente.monto_cobrable > 0 
 														AND $where_gasto ) > 0 )
 							GROUP BY $group_by ";
+                
+		//mail('ffigueroa@lemontech.cl','Primera Query',$query);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 		$fila_inicial = $filas+2;
+                $tiempomatriz=array();
+               
+                
+                                $reportecontrato = new ReporteContrato($sesion,false, $separar_asuntos, $fecha1, $fecha2);
+                                $ultimocobro=$reportecontrato->arrayultimocobro;
+				$arrayolap=$reportecontrato->arrayolap;
+				
+								
+                               //echo '<pre>';  print_r($ultimocobro);  echo '</pre>';   die();
 		while($cobro = mysql_fetch_array($resp))
 		{
-			$contrato = new Contrato($sesion);
-			$contrato->Load($cobro['id_contrato']);
+		$id_contrato=$cobro['id_contrato'];
+			  
+                          
 
 			// Definir datos ...
 			if($separar_asuntos) {
-				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2, $cobro['codigo_asunto'] );
-				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2, $cobro['codigo_asunto'] );
-				$horas_no_cobradas = $contrato->TotalHoras( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-                                list($monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato) = $contrato->TotalMonto( false, '', $fecha1, $fecha2 );
-                                list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
+                          $reportecontrato->LoadContrato($id_contrato,$cobro['codigo_asunto'],$fecha1,$fecha2,false);
+                          list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos,$horas_no_cobradas , $fecha_ultimo_trabajo,$fecha_ultimo_gasto) = $arrayolap[$cobro['codigo_asunto']];
+                        
+				
                         }
 			else {
-				$fecha_ultimo_trabajo = $contrato->FechaUltimoTrabajo( $fecha1, $fecha2 );
-				$fecha_ultimo_gasto = $contrato->FechaUltimoGasto( $fecha1, $fecha2 );
-				$horas_no_cobradas = $contrato->TotalHoras( false, '', $fecha1, $fecha2 );
-				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos) = $contrato->TotalMonto( false, '', $fecha1, $fecha2 );
-				list($monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $contrato->MontoHHTarifaSTD( false, '', $fecha1, $fecha2 );
-				list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos) = $contrato->MontoGastos( false, '', $fecha1, $fecha2 );
+                            $reportecontrato->LoadContrato($id_contrato,'',$fecha1,$fecha2,false);
+			list($monto_estimado_gastos, $simbolo_moneda_gastos, $id_moneda_gastos,$horas_no_cobradas , $fecha_ultimo_trabajo,$fecha_ultimo_gasto) = $arrayolap[$id_contrato];
+                        	
 			} 
-			$id_ultimo_cobro = $contrato->UltimoCobro();
-			$ultimo_cobro = new Cobro($sesion);
-			$ultimo_cobro->Load($id_ultimo_cobro);
-            
+                      
+                
+				list($monto_estimado_trabajos, $simbolo_moneda_trabajos, $id_moneda_trabajos,
+                                     $cantidad_asuntos,
+                                     $monto_estimado_trabajos_segun_contrato, $simbolo_moneda_trabajos_segun_contrato, $id_moneda_trabajos_segun_contrato,
+                                     $monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $reportecontrato->arraymonto;
+
+				
+                      
+                                    
+                        
+                        
 			if( UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
 				$codigos_asuntos = implode("\n",explode(',',$cobro['codigos_asuntos_secundarios']));
 			} else {
@@ -434,9 +508,9 @@ $tini=time();
                                 $ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
                         }
                         if( !$ocultar_ultimo_cobro )
-                            $ws1->write($filas, $col_ultimo_cobro,$ultimo_cobro->fields['fecha_fin'] != '' ? Utiles::sql2fecha($ultimo_cobro->fields['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
+                            $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
 			if( !$ocultar_estado_ultimo_cobro )
-                            $ws1->write($filas, $col_estado_ultimo_cobro,$ultimo_cobro->fields['estado'] != '' ? $ultimo_cobro->fields['estado'] : '', $formato_texto);
+                            $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
 			if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
                             $ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas,1,'.',''), $fdd);
                         } else {
@@ -445,21 +519,24 @@ $tini=time();
 			$ws1->write($filas, $col_forma_cobro, $cobro['forma_cobro'], $formato_texto);
 
 			// En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
-			if( $cobro['id_contrato'] != $id_contrato_anterior )
+			if( $id_contrato != $id_contrato_anterior )
 				$valor_descuento = $cobro['valor_descuento'];
 
 			$valor_estimado = $monto_estimado_trabajos;
 
+                        
+                      
+                        
 			if($cobro['forma_cobro']=='CAP')
 			{
                             if( $separar_asuntos ) {
                                         $cobro_aux = new Cobro($sesion);
-					$usado = $cobro_aux->TotalCobrosCap($cobro['id_contrato']); //Llevamos lo cobrado en el CAP a la moneda TOTAL
+					$usado = $cobro_aux->TotalCobrosCap($id_contrato); //Llevamos lo cobrado en el CAP a la moneda TOTAL
 					if( $monto_estimado_trabajos_segun_contrato + $usado > $cobro['monto'] )
 					{
-                                                $cantidad_asuntos = $contrato->CantidadAsuntosPorFacturar( $fecha1, $fecha2 );
-                                                list($monto_hh_asunto,$x,$y) = $contrato->MontoHHTarifaSTD( false, $cobro['codigo_asunto'], $fecha1, $fecha2 );
-                                                list($monto_hh_contrato,$X,$Y) = $contrato->MontoHHTarifaSTD( false, '', $fecha1, $fecha2 );
+                                                $cantidad_asuntos = $reportecontrato->asuntosporfacturar;
+                                                list($monto_hh_asunto,$x,$y) = $reportecontrato->MHHXA;
+                                                list($monto_hh_contrato,$X,$Y) = $reportecontrato->MHHXC;
                                                 unset($x,$y,$X,$Y);
                                                 
                                                 if( $monto_hh_contrato > 0 ) {
@@ -475,7 +552,7 @@ $tini=time();
 						$valor_estimado = $monto_estimado_trabajos;
                             } else {
 					$cobro_aux = new Cobro($sesion);
-					$usado = $cobro_aux->TotalCobrosCap($cobro['id_contrato']); //Llevamos lo cobrado en el CAP a la moneda TOTAL
+					$usado = $cobro_aux->TotalCobrosCap($id_contrato); //Llevamos lo cobrado en el CAP a la moneda TOTAL
 					if($monto_estimado_trabajos+$usado > $cobro['monto'] )
 					{
 						$valor_estimado = $cobro['monto'] - $usado;
@@ -486,9 +563,9 @@ $tini=time();
 						$valor_estimado = $monto_estimado_trabajos;
                             }
 			}
-			else
+			else {
 				$valor_estimado = $monto_estimado_trabajos;
-
+                        }
 			// Aplicar descuentos del contrato al valor estimado
 			if( $cobro['porcentaje_descuento'] > 0 )
 				{
@@ -505,6 +582,9 @@ $tini=time();
 					else
 						$valor_descuento = 0;
 				}
+                       
+                        
+                        
 			$valor_estimado = UtilesApp::CambiarMoneda( $valor_estimado,
 									number_format($arreglo_monedas[$id_moneda_trabajos]['tipo_cambio'],$arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'],'.',''),
 									$arreglo_monedas[$id_moneda_trabajos]['cifras_decimales'],
@@ -522,7 +602,8 @@ $tini=time();
 									number_format($moneda_base['tipo_cambio'],$moneda_base['cifras_decimales'],'.',''),
 									$moneda_base['cifras_decimales']);
 
-			if( $desglosar_moneda ) {
+			
+                        if( $desglosar_moneda ) {
                             foreach($arreglo_monedas as $id_moneda => $moneda) {
                                 if( $id_moneda == $cobro['id_moneda_total'] ) {
                                     $ws1->writeNumber($filas, $col_valor_estimado_{$id_moneda}, $valor_estimado, $formatos_moneda[$cobro['id_moneda_total']] );
@@ -545,7 +626,18 @@ $tini=time();
 			else
 				$formato = $formatos_moneda[$moneda_base['id_moneda']];
 			$ws1->write($filas, $col_valor_en_moneda_base_segun_THH, $valor_thh_moneda_base, $formato);
+                        
+                       // $tact=microtime(true);
+                        /*$ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+1, round($reportecontrato->tiempos[0]-$tant,4) , $formato_numero );                     
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+2, round($reportecontrato->tiempos[1]-$reportecontrato->tiempos[0],4) , $formato_numero );
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+3, round($reportecontrato->tiempos[2]-$reportecontrato->tiempos[1],4) , $formato_numero );
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+4, round($reportecontrato->tiempos[3]-$reportecontrato->tiempos[2],4) , $formato_numero );
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+5, round($reportecontrato->tiempos[4]-$reportecontrato->tiempos[3],4) , $formato_numero );
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+6, round($reportecontrato->tiempos[5]-$reportecontrato->tiempos[4],4) , $formato_numero );
+                        $ws1->writeNumber($filas, $col_valor_en_moneda_base_segun_THH+7, round($tact-$reportecontrato->tiempos[5],4) , $formato_numero );*/
+                                            
 
+                        //$tant=$tact;
 			// Excel guarda los tiempos en base a días, por eso se divide en 24.
 			//$ws1->writeNumber($filas, $col_horas_trabajadas, $cobro['horas_por_cobrar']/24, $formato_tiempo);
 
@@ -564,7 +656,7 @@ $tini=time();
 			}
 			// Memorizarse el id_contrato para ver en el proximo
 			// paso si todavia estamos en el mismo contrato, importante por el tema del descuento
-			$id_contrato_anterior = $cobro['id_contrato'];
+			$id_contrato_anterior = $id_contrato;
 		}
 
 		if($fila_inicial != ($filas+2))
@@ -584,14 +676,13 @@ $tini=time();
                             $ws1->writeFormula($filas, $col_horas_trabajadas, "=SUM($col_formula_horas_trabajadas$fila_inicial:$col_formula_horas_trabajadas$filas)", $formato_tiempo);
                         }
 		}
- $tfin=time();
-                $ws1->write(3,3,"demora ". ($tfin-$tini)." segundos",$formato_texto);
-                                $ws1->write(3,4,"desde ". $fecha1." a ".$fecha2,$formato_texto);
-
-		$wb->send("Planilla horas por facturar.xls");
+                 $tfin=time();
+               $ws1->write(3,3,"demora ". ($tfin-$tini)." segundos",$formato_texto);
+                $ws1->write(3,4,"desde ". $fecha1." a ".$fecha2,$formato_texto);
+		$wb->send("Planilla horas por facturar_turbo.xls");
 		$wb->close();
                 
-                mail('ffigueroa@lemontech.cl','gen reporte','Demoró mas o menos'.($tfin-$tini));
+             //   mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
 		exit;
 	}
 
@@ -613,9 +704,9 @@ $tini=time();
     }
     
 </script>
-<form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
+<form method=post name=formulario action="planilla_facturacion_pendiente_turbo.php?xls=1">
     <input type="hidden" name="reporte" value="generar" />
-	<table class="border_plomo tb_base">
+	<table class="border_plomo tb_base" style="width:350px;">
 		<tr>
 			<td align=right>
 				<?=__('Fecha desde')?>
@@ -636,7 +727,7 @@ $tini=time();
 			<td align=center colspan="2">
 				<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+					WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=8 ","","280"); ?>
 			</td>
 		</tr>
 		<tr>
