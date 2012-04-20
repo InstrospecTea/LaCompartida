@@ -7784,9 +7784,9 @@ NULL ,  'RUT'
 				$query = array();
                             
                             // inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
-                            $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';"; 
+                               $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';"; 
 
-                            $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 100 )";
+                            $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 255 )";
                             
                             // inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
                             $query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`) 
