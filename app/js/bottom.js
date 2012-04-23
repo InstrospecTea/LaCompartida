@@ -152,6 +152,11 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
 	if(window.console)  console.log('YCGNM es '+ top.window.YoucangonowMichael);
 	jQuery('.combox').combobox();
+	jQuery('.fechadiff').datepicker( {
+			showOn: "both",
+			buttonImage: "https://estaticos.thetimebilling.com/images/calendario.png",
+			buttonImageOnly: true
+    }); 
 	  
     });  
    }});
