@@ -254,6 +254,7 @@ Calendar.setup(
 
 		$b = new Buscador($sesion, $query, "Cliente", $desde, $x_pag, $orden);
 		$b->AgregarEncabezado("glosa_cliente",__('Nombre Cliente'),"align=left");
+		$b->AgregarEncabezado("fecha_creacion",__('Fecha Creación'),"align=left");
 		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 		{
 			$b->AgregarEncabezado("codigo_cliente_secundario",__('Código Secundario'),"align=left");
