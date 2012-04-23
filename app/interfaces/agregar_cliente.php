@@ -1010,7 +1010,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 											 
 										</td>
 										<td align="left">
-											<input name="glosa_cliente" class="fechadiff" id="fecha_creacion" size="50" value="<?php echo $cliente->fields['fecha_creacion'] ?>"  />
+											<input name="glosa_cliente" class="fechadiff" id="fecha_creacion" size="50" value="<?php echo date('Y-m-d',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
 										</td>
 									</tr>
 									
