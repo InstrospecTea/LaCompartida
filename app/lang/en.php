@@ -1,5 +1,6 @@
-<?
-	require_once dirname(__FILE__).'/../../fw/funciones/funciones.php';
+<?php
+
+require_once dirname(__FILE__) . '/../../fw/funciones/funciones.php';
 
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
@@ -21,15 +22,15 @@ $_LANG['Duración trabajada'] = "Worked duration";
 $_LANG['Duración cobrable'] = "Collectible duration";
 $_LANG['Status'] = "Status";
 $_LANG['Valor'] = "Rate";
-$_LANG['Monto'] =  "Amount";
-$_LANG['Trabajo'] =  "Task";
-$_LANG['Trabajos'] =  "Tasks";
-$_LANG['Total'] =  "Total";
-$_LANG['Detalle Cobro'] =  "Invoice Details";
-$_LANG['Servicios prestados'] =  "Services";
-$_LANG['Profesional'] =  "Professional";
-$_LANG['Detalle profesional'] =  "Summary of fees";
-$_LANG['Resumen detalle profesional'] =  "Global summary of fees";
+$_LANG['Monto'] = "Amount";
+$_LANG['Trabajo'] = "Task";
+$_LANG['Trabajos'] = "Tasks";
+$_LANG['Total'] = "Total";
+$_LANG['Detalle Cobro'] = "Invoice Details";
+$_LANG['Servicios prestados'] = "Services";
+$_LANG['Profesional'] = "Professional";
+$_LANG['Detalle profesional'] = "Summary of fees";
+$_LANG['Resumen detalle profesional'] = "Global summary of fees";
 $_LANG['HH'] = "Hours";
 $_LANG['Valor HH'] = "Hourly Rate";
 $_LANG['Teléfono'] = "Phone Number";
@@ -59,7 +60,7 @@ $_LANG['Total a pagar'] = "Total Fee";
 $_LANG['Total HH'] = "Total HH";
 $_LANG['Total Trabajos'] = "Total";
 $_LANG['Modalidad'] = "Fee Arrangement";
-$_LANG['TASA'] ="HOURLY RATE";
+$_LANG['TASA'] = "HOURLY RATE";
 $_LANG['Tasa Horas Hombres'] = "Hourly Rate";
 $_LANG['FLAT FEE'] = "FLAT FEE";
 $_LANG['Total Horas'] = "Total Hours";
@@ -102,26 +103,26 @@ $_LANG['Solicitado Por'] = "Requested By";
 $_LANG['Ordenado Por'] = "Name of Client";
 $_LANG['Estimado'] = "Dear";
 #Monedas
-$_LANG['Tipos de Cambio']="Exchange Rates";
+$_LANG['Tipos de Cambio'] = "Exchange Rates";
 $_LANG['Dólar'] = "Dollar";
 $_LANG['Euro'] = "Euro";
 $_LANG['Libra'] = "Pound";
 #CONTRATOS
-/*$_LANG['Agregar contratos'] = "Agregar contratos";
-$_LANG['Listado de Contratos'] = "Listado de Contratos";
-$_LANG['Contrato Eliminado con éxito'] = "Contrato Eliminado con éxito";
-$_LANG['Contrato guardado con éxito'] = "Contrato guardado con éxito";
-$_LANG['No se pudieron actualizar los Asuntos del contrato'] = "No se pudieron actualizar los Asuntos del contrato";
-$_LANG['Contratos'] = "Contratos";
-$_LANG['contratos'] = "contratos";
-$_LANG['contrato'] = "contrato";
-$_LANG['Contrato'] = "Contrato";
-$_LANG['Ingresa el'] = "Ingresa el";
-$_LANG['Agregar Contrato'] = "Agregar Contrato";
-$_LANG['Editar Contrato'] = "Editar Contrato";
-$_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :'] = "El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :";
-$_LANG['Datos generales Contrato'] = "Datos generales Contrato";
-*/
+/* $_LANG['Agregar contratos'] = "Agregar contratos";
+  $_LANG['Listado de Contratos'] = "Listado de Contratos";
+  $_LANG['Contrato Eliminado con éxito'] = "Contrato Eliminado con éxito";
+  $_LANG['Contrato guardado con éxito'] = "Contrato guardado con éxito";
+  $_LANG['No se pudieron actualizar los Asuntos del contrato'] = "No se pudieron actualizar los Asuntos del contrato";
+  $_LANG['Contratos'] = "Contratos";
+  $_LANG['contratos'] = "contratos";
+  $_LANG['contrato'] = "contrato";
+  $_LANG['Contrato'] = "Contrato";
+  $_LANG['Ingresa el'] = "Ingresa el";
+  $_LANG['Agregar Contrato'] = "Agregar Contrato";
+  $_LANG['Editar Contrato'] = "Editar Contrato";
+  $_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :'] = "El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :";
+  $_LANG['Datos generales Contrato'] = "Datos generales Contrato";
+ */
 $_LANG['Listado de Contratos'] = "List of Contracts";
 $_LANG['Contrato Eliminado con éxito'] = "Contract deleted successfully";
 $_LANG['Contrato guardado con éxito'] = "Contract saved successfully";
@@ -138,7 +139,6 @@ $_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/
 $_LANG['Datos generales Contrato'] = "General data of Contract";
 
 #Agregando _LANG
-
 #USUARIOS
 $_LANG['Usuario'] = "User";
 $_LANG['Usuarios'] = "Users";
@@ -273,7 +273,7 @@ $_LANG['¿Está seguro de que desea modificar el estado del cobro?'] = "¿Está segu
 $_LANG['Estado del Cobro'] = "Estado del Cobro";
 $_LANG['Cambiar a'] = "Cambiar a";
 $_LANG['Director proyecto'] = "Project Manager";
-$_LANG['Factura'] = "Invoice Ref.";
+$_LANG['Factura'] = "Invoice";
 $_LANG['Boleta'] = "Invoice Ref.";
 $_LANG['Facturación'] = "Facturación";
 $_LANG['Ver Factura'] = "View Invoice";
@@ -460,7 +460,7 @@ $_LANG['Trabajos masivos ya cobrados'] = "Uno o varios de los trabajos seleccion
 $_LANG['Trabajo ya revisado'] = "No puede Modificar un trabajo que se encuentra revisado sin perfil de revisor";
 $_LANG['El Trabajo se guardó como NO COBRABLE ya que el asunto está marcado de esta manera.'] = "El Trabajo se guardó como NO COBRABLE ya que el asunto está marcado de esta manera.";
 $_LANG['eliminado con éxito'] = "eliminado con éxito";
-$_LANG['Arreglo Días'] = array("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado","Domingo");
+$_LANG['Arreglo Días'] = array("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo");
 $_LANG['Para Editar haga clic en el trabajo'] = "Para Editar haga clic en el trabajo";
 $_LANG['Total mes actual'] = "Total mes actual";
 $_LANG['Mis horas'] = "Mis horas";
@@ -567,7 +567,9 @@ $_LANG['Via Fax'] = "Via Fax";
 $_LANG['y'] = "and";
 
 ###### Cartas Clientes ######
+//
 #Carta MB
+$_LANG['Hitos'] = "Milestones";
 $_LANG['Sr.'] = "Mr.";
 $_LANG['Sra.'] = "Mrs.";
 $_LANG['Srta.'] = "Ms.";
@@ -585,6 +587,11 @@ $_LANG['%nombre_contacto_mb%'] = "%sr%&nbsp;%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Re.:";
 $_LANG['%saludo_mb%'] = "Dear %sr% %ApellidoContacto%:";
 $_LANG['%despedida_mb%'] = "Cordially yours,";
+
+#Carta JJR
+$_LANG['Nota Disclaimer'] = "Note:  The exchange rate used in this invoice is exclusively for referential purposes. The final calculations are made as per the applicable exchange rate given by the Central Bank of Chile on the date when the funds are effectively received by the Firm. In this respect, the Firm reserves the right to request payment of any balance that may arise due to variations in the exchange rate, if applicable.";
+$_LANG['Nota Disclaimer2'] = "Note: Please make sure to cover any transfer fees from your bank relating this account to avoid charges in following invoices.";
+
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matter. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
 $_LANG['%detalle_mb_asuntos%'] = "Enclosed please find our Invoice #%num_letter% in the total amount of <b>%monto_con_gasto%</b> for services rendered %si_gastos% %fecha% in connection with the above captioned matters. Please contact me with any questions or comments in this regard. To make payment, you may send us a check to Morales, Besa y Cía. Ltda.<br><br>";
@@ -759,4 +766,9 @@ $_LANG['dólares americanos'] = "american dollars";
 $_LANG['Trámites'] = "Other charges";
 $_LANG['Honorarios totales'] = "Total amount";
 $_LANG['Hrs. Castigadas'] = "Non Billable Hours";
+
+// Lang para facturas
+$_LANG['Honorarios Legales'] = 'Legal Fees';
+$_LANG['Gastos c/ IVA'] = 'Expenses (plus VAT)';
+$_LANG['Gastos s/ IVA'] = 'Expenses (without VAT)';
 ?>
