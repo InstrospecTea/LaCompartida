@@ -8094,7 +8094,7 @@ class Cobro extends Objeto {
 
 			case 'HITOS_FILAS':
 				global $total_hitos,$estehito,$cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
-				$query_hitos = "select * from (select  (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid, round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,  cp.fecha_cobro, cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  FROM `cobro_pendiente` cp join  contrato c using (id_contrato) join prm_moneda pm using (id_moneda) join cobro cbr using(id_contrato)  join (select @a:=0) FFF
+				$query_hitos = "select * from (select  (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid, round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,  ifnull(cp.fecha_cobro,0) as fecha_cobro, cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  FROM `cobro_pendiente` cp join  contrato c using (id_contrato) join prm_moneda pm using (id_moneda) join cobro cbr using(id_contrato)  join (select @a:=0) FFF
 					where cp.hito=1 and cbr.id_cobro=".$this->fields['id_cobro'].") hitos where hitos.thisid!=0 ";
 				
 				
@@ -8103,7 +8103,7 @@ class Cobro extends Objeto {
 				$html='';
 					while($hitos = mysql_fetch_array($resp_hitos)) {
 						$row = $row_tmpl;
-						$row = str_replace('%fecha%', date('d-m-Y',strtotime($hitos['fecha_cobro'])), $row);
+						$row = str_replace('%fecha%', ($hitos['fecha_cobro']==0? '':date('d-m-Y',strtotime($hitos['fecha_cobro']))), $row);
 						$row = str_replace('%descripcion%',$hitos['descripcion'], $row);
 						$total_hitos=$total_hitos+$hitos['monto_estimado'];
 						$moneda_hitos=$hitos['simbolo'];
