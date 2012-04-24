@@ -17,7 +17,7 @@
 		{
 			if(isset($opcion_hidden[$id]))
 				$opcion_hidden[$id] = 1;
-			$query = "UPDATE configuracion SET valor_opcion='$valor' WHERE id='$id'";
+			$query = "UPDATE configuracion SET valor_opcion='".trim(str_replace("\n",'',$valor))."' WHERE id='$id'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		}
 		foreach($opcion_hidden as $id => $valor)
@@ -109,7 +109,7 @@ function AgregarAsunto( numero , valor_hidden )
   	{
   		if( input_elemento.value == array_asuntos[i] )
   			{
-  				alert( 'EL asunto indicado ya existe.' );
+  				alert( 'El asunto indicado ya existe.' );
   				input_elemento.focus();
   				return false;
   			}
@@ -129,12 +129,20 @@ function AgregarAsunto( numero , valor_hidden )
 	tr_elemento_nuevo.style.display = 'table-row';
 }
 </script>
-
+<div id="flechaverde" style="background:url('https://estaticos.thetimebilling.com/graphics/arrowleft.gif') 0 0 no-repeat;display:block;width:41px;height:20px;display:none;position:absolute;"></div>
 
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
-	
+
+<div id="buscacampos">Buscar un campo en particular:&nbsp;&nbsp;&nbsp;</div>
+
+<div id="configuracion" class="tabs"	>
+    
+<ul id="tabs">
+		
+	</ul>
+	<div id="tabs-1">    
 <form name="formulario" id="formulario" method="post" action='' autocomplete="off" onsubmit="return validar_doc_legales(true)">
 	<input type=hidden name='opc' value='guardar'>
 <?
@@ -151,15 +159,21 @@ function AgregarAsunto( numero , valor_hidden )
 	
 	while(list($id, $glosa_opcion, $valor_opcion, $comentario, $valores_posibles, $id_categoria, $glosa_categoria, $orden) = mysql_fetch_array($resp))
 	{
-		if( $id_categoria != $id_categoria_anterior )
-			{
-			if( !$id_categoria_anterior )
-				echo "<fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span>".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
-			else
-				echo "</table></fieldset><fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span> ".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
+	    $arrayopciones[]=array($id,$glosa_opcion,$id_categoria);
+	    
+		if( $id_categoria != $id_categoria_anterior ):
+			
+			if( !$id_categoria_anterior ) {
+				//echo "<fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span>".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
+				echo "<div class=\"grupoconf\" id='caja".$id_categoria."' rel='".$glosa_categoria."' ><table width='80%'  >";
+			} else {
+				//echo "</table></fieldset><fieldset class=\"tb_base\" style=\"margin:auto;text-align:left;width:85%; border: 1px solid #BDBDBD;\"><legend onClick=\"MuestraOculta('".$glosa_categoria."')\" style=\"cursor:pointer\"><span id='".$glosa_categoria."_img'><img src='".Conf::ImgDir()."/mas.gif' border=0 id='".$glosa_categoria."_img'></span> ".$glosa_categoria."</legend><table width=80% id='".$glosa_categoria."' style='display:none'>";
+				echo "</table></div><div class=\"grupoconf\" id='caja".$id_categoria."' rel='".$glosa_categoria."' ><table width='80%' >";
 			}
+		endif;
+			
 		$tooltip = $comentario?Html::Tooltip($comentario):'';
-		echo "<tr><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
+		echo "<tr id='fila_$id'><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
 		$valores = explode(';', $valores_posibles);
 		switch($valores[0])
 		{
@@ -173,16 +187,15 @@ function AgregarAsunto( numero , valor_hidden )
 				echo "<input type='radio' ".($valor_opcion?"checked='checked'":"")." name='".$valores[1]."' />";
 				break;
 			case 'array':
-				echo "<input type='hidden' id='opcion_$id' name='opcion[$id]' value='".$valor_opcion."' />";
+				echo "<input type='hidden' id='opcion[$id]' name='opcion[$id]' value='".$valor_opcion."' />";
 				$valores_array = explode(';', $valor_opcion);
-				echo "<input type='checkbox'  id='usa_asuntos_por_defecto' ".($valor_opcion? "checked='checked'":"")."  />";
+				echo "<input type='checkbox'  id='usa_asuntos_por_defecto' ".($valores_array[0]=="true"? "checked='checked'":"")." rel='opcion[$id]' />";
 				echo "<table id='tabla_asuntos' ".((!$valor_opcion)?"style='display: none;'":"").">";
 				for($i=1; $i<count($valores_array); ++$i )
 				
                                 echo "<tr id='$valores_array[$i]'><td>".$valores_array[$i]."</td><td><img style=\"filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('viejo','".$valores_array[$i]."', 'opcion[".$id."]');\"/></td></tr>";
 				echo "<tr id='hidden_1'><td><input type='text' id='text_1' size='12' value='' /><div id='texto_1' style=\"display:none;\"/></td><td><img id='img_1' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_1', 'opcion[".$id."]', 'text_1');\"/><input type='button' id='agregar_1' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('1','opcion[".$id."]');\" /></td></tr>";
 				for($j=2; $j<21; ++$j) echo "<tr id='hidden_".$j."' style=\"display: none;\"><td><input type='text' id='text_".$j."' size='12' value='' /><div id='texto_".$j."' style=\"display:none;\"/></td><td><img id='img_".$j."' style=\"display:none; filter:alpha(opacity=100);\" src='".Conf::ImgDir()."/cruz_roja_13.gif' border='0' class='mano_on' alt='Ocultar' onclick=\"Ocultar('nuevo','hidden_".$j."', 'opcion[".$id."]','text_".$j."');\"/><input type='button' id='agregar_".$j."' name='agregar_asunto' value=\"Agregar Asunto\" onclick=\"AgregarAsunto('".$j."','opcion[".$id."]');\"/></td></tr>";
-				echo "<tr><td colspan=2><input id=\"asuntos_por_separado\" rel=\"opcion_$id\" type='checkbox' ".($valores_array[0]=='true'?"checked='checked'":"")."/> &nbsp;&nbsp; Cobrar los asuntos de forma independiente.</td></tr>";
 				echo "</table>";
 				
                                 break;
@@ -211,57 +224,90 @@ function AgregarAsunto( numero , valor_hidden )
 		echo "</td></tr>\n";
 		$id_categoria_anterior = $id_categoria;
 	}
+	echo '<select id="buscacampo" class="combox" width="300px;" ><option value="0-0"></option>';
+	foreach ($arrayopciones as $opcion) echo '<option  value="'.$opcion[0].'-'.$opcion[2].'">'.$opcion[1].'</option>';
+	echo '</select>';
 ?>
 	</table>
-</fieldset>
-
+</div>
+</div>
 <?
-if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
-{
+//if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) {
 ?>
 <!-- ASOCIAR DOC LEGALES -->
-<fieldset class="tb_base" style="width:85%; border: 1px solid #BDBDBD;">
-	<legend onclick="MuestraOculta('div_doc_legales_asociados')" style="cursor:pointer">
-		<span id="doc_legales_img"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" id="doc_legales_img"></span>
-		&nbsp;<?=__('Documentos legales por defecto')?>
-	</legend>
-	<div id="div_doc_legales_asociados" style='display:none'>
-		<p><center>Ingrese los documentos legales que desea generar en el proceso de facturación</center></p>
-		<?php include dirname(__FILE__) . '/agregar_doc_legales.php'; ?>
-	</div>
-</fieldset>
+<div class="grupoconf" id="caja20" rel="Documentos Legales" >
+
+		    <p><center>Ingrese los documentos legales que desea generar en el proceso de facturación</center></p>
+		    <?php include dirname(__FILE__) . '/agregar_doc_legales.php'; ?>
+	    
+</div>
 <!-- ASOCIAR DOC LEGALES -->
 <? 
-} 
+//} 
 ?>
 
 	<table>
-	<tr><td>&nbsp;</td><td><input type="submit" value="<?=__('Guardar') ?>" class="btn" /></td></tr>
+	<tr><td>&nbsp;</td>
+	    <td><input type="button" id="enviarconf" value="<?=__('Guardar') ?>" class="btn" /></td>
+	</tr>
+	<tr><td colspan="2" id="mensaje">&nbsp;</td>
+	    
+	</tr>
 	</table>
 </form>
+</div>
 
 <script language="javascript" type="text/javascript">
 jQuery(document).ready(function() {
+    
+    jQuery('#buscacampos').append(jQuery('#buscacampo'));
+    
+    jQuery('#buscacampo').change(function() {
+	var clave=jQuery('#buscacampo').val().split('-')
+	jQuery('#configuracion').tabs("select",clave[1]-1);
+	jQuery('#fila_'+clave[0]).css('background-color','#FF9');
+	var pos=jQuery('#fila_'+clave[0]).offset();
+	
+	jQuery('#flechaverde').show().offset({top:pos.top,left:pos.left});
+    });
+    jQuery('.ui-corner-all').live('click',function() {
+	var clave=jQuery('#buscacampo').val().split('-')
+	jQuery('#configuracion').tabs("select",clave[1]-1);
+	jQuery('#fila_'+clave[0]).css('background-color','#FF9');
+	var pos=jQuery('#fila_'+clave[0]).offset();
+	
+	jQuery('#flechaverde').show().css('z-index',500).offset({top:pos.top,left:pos.left-60});
+    });
+    
+    jQuery('#enviarconf').click(function() {
+	jQuery.post('configuracion.php',jQuery('#formulario').serialize(),function(data) {
+	   jQuery('#mensaje').delay(1000).html('');
+	});
+	jQuery('#mensaje').append('Enviando configuracion...');
+    });
     jQuery('#usa_asuntos_por_defecto').click(function() {
-        jQuery('#tabla_asuntos').toggle();
-    }); 
-    jQuery('#asuntos_por_separado').click(function() {
-       hiddenid=jQuery(this).attr('rel');
-       var string_asuntos = jQuery('#'+hiddenid).val();
+	   hiddenid=jQuery(this).attr('rel');
+       var string_asuntos = document.getElementById(hiddenid).value;
        var array_asuntos = string_asuntos.split(';');
-       if(jQuery(this).is(':checked')) {
+	   if(jQuery(this).is(':checked')) {
             string_asuntos='true';
        } else {
             string_asuntos='false';  
        } 
              
-   for( var i = 1; i < array_asuntos.length; i++)
-  	{
-  	string_asuntos += ';'+array_asuntos[i];
+	   for( var i = 1; i < array_asuntos.length; i++)
+		{
+			string_asuntos += ';'+array_asuntos[i];
         }
-	         
-        jQuery('#'+hiddenid).val(string_asuntos)  ;  
+		
+	    document.getElementById(hiddenid).value = string_asuntos;
        
+    });
+    jQuery('.grupoconf').each(function() {
+	var LaID=jQuery(this).attr('id');
+		var Glosa=jQuery(this).attr('rel');
+
+	jQuery('#tabs').append('<li><a href="#'+LaID+'">'+Glosa+'</a></li>');
     });
 });
 Calendar.setup(
@@ -272,6 +318,7 @@ Calendar.setup(
 	}
 
 );
+
 </script>
 <?
 	$pagina->PrintBottom($popup);
