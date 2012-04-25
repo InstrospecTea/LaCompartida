@@ -323,7 +323,7 @@ $tini=time();
                 $resp = mysql_query($update1, $sesion->dbh);
                 $resp = mysql_query($update2, $sesion->dbh);
                 $resp = mysql_query($update3, $sesion->dbh);
-		list($maxolaptime)=mysql_fetch_array(mysql_query("select max(fecha_modificacion) as maxfecha from olap_liquidaciones", $sesion->dbh));
+		list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( MAX( fecha_modificacion ) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
 		
 		$update4="replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
