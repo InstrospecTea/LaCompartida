@@ -8525,7 +8525,7 @@ if(isset($_GET['lastver']))  {
 
 	foreach( $VERSIONES as $key => $new_version )
 	{
-		if( $VERSION <  $new_version || $force=1)
+		if( $VERSION <  $new_version || $force==1)
 		{
 			echo '<hr>Comienzo de proceso de cambios para versión '.number_format($new_version,2,'.','').'<br>';
 
