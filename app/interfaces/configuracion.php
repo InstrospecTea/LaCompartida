@@ -17,13 +17,13 @@
 		{
 			if(isset($opcion_hidden[$id]))
 				$opcion_hidden[$id] = 1;
-			$query = "UPDATE configuracion SET valor_opcion='".trim(str_replace("\n",'',$valor))."' WHERE id='$id'";
+			$query = "UPDATE configuracion SET valor_opcion='".trim(str_replace("\n",'',utf8_decode($valor)))."' WHERE id='$id'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		}
 		foreach($opcion_hidden as $id => $valor)
 			if($valor==0)
 			{
-				$query = "UPDATE configuracion SET valor_opcion='$valor' WHERE id='$id'";
+				$query = "UPDATE configuracion SET valor_opcion='".utf8_decode($valor)."' WHERE id='$id'";
 				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			}
 
@@ -173,7 +173,7 @@ function AgregarAsunto( numero , valor_hidden )
 		endif;
 			
 		$tooltip = $comentario?Html::Tooltip($comentario):'';
-		echo "<tr id='fila_$id'><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
+		echo "<tr class='filasx' id='fila_$id'><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
 		$valores = explode(';', $valores_posibles);
 		switch($valores[0])
 		{
@@ -229,7 +229,7 @@ function AgregarAsunto( numero , valor_hidden )
 	echo '</select>';
 ?>
 	</table>
-</div>
+
 </div>
 <?
 //if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) {
@@ -273,9 +273,10 @@ jQuery(document).ready(function() {
     jQuery('.ui-corner-all').live('click',function() {
 	var clave=jQuery('#buscacampo').val().split('-')
 	jQuery('#configuracion').tabs("select",clave[1]-1);
+	jQuery('.filasx').css('background-color','#FFF');
 	jQuery('#fila_'+clave[0]).css('background-color','#FF9');
 	var pos=jQuery('#fila_'+clave[0]).offset();
-	
+	jQuery(window).scrollTop(pos.top-100);
 	jQuery('#flechaverde').show().css('z-index',500).offset({top:pos.top,left:pos.left-60});
     });
     
