@@ -1782,15 +1782,35 @@ if (!$contrato->loaded()) {
 				<td align="left"><?= __('Liquidar por separado (Por honorario y gastos)') ?></td>
 				<td align="left"><input id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?= $separar_liquidaciones == '1' ? 'checked="checked"' : '' ?>  /></td>
 			</tr>
-				<?
-				$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1";
-				?>
+            <?php $query = "SELECT usuario.id_usuario AS id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY 2"; ?>
+
+            <?php if (UtilesApp::GetConf($sesion, 'EncargadoComercialComoCaptadorCliente')): ?>
+            <tr>
+                <td align="left" width="30%">
+                    <?php echo __('Encargado Comercial'); ?>
+                </td>
+                <td align="left" width="70%">
+                    <?php 
+                        $r = mysql_query($query, $sesion->dbh);
+                        
+                        echo '<select name="id_usuario_encargado">';
+                        echo '<option></option>';
+                        while($row = mysql_fetch_object($r)) {
+                            if ( isset($cliente->fields['id_usuario_encargado']) && $cliente->fields['id_usuario_encargado'] == $row->id_usuario) {
+                                echo sprintf('<option value="%s" selected>%s</option>', $row->id_usuario, $row->nombre);
+                            } else {
+                                echo sprintf('<option value="%s">%s</option>', $row->id_usuario, $row->nombre);
+                            }
+                        }
+                        echo '</select>';
+                    ?>
+                </td>
+            </tr>
+            <?php else: ?>
 			<tr>
 				<td align="left" width='30%'>
 				<?= __('Encargado Comercial') ?>
-                                	<?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
+                <?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
 				</td>
 				<td align="left" width = '70%'>
 				<?php 
@@ -1809,7 +1829,8 @@ if (!$contrato->loaded()) {
 					}
 				?>
 				</td>
-			</tr>
+			</tr>            
+            <?php endif; ?>
 			<?
 			if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
 				$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)

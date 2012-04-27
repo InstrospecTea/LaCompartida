@@ -975,7 +975,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 													echo $obligatorio ?>
 											</td>
 											<td align="left">&nbsp;
-												<?php echoHtml::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', '', "Vacio")?>
+												<?php echo Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', '', "Vacio")?>
 											</td>
 										</tr>
 									<?php
@@ -988,10 +988,10 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 												$where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "'
                 OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
 											?>
-									<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+									<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario') && UtilesApp::GetConf($sesion, 'EncargadoComercialComoCaptadorCliente') != 1) { ?>
 									<tr>
 										<td align="right">
-<?php echo __('Usuario encargado') ?>
+                                            <?php echo __('Usuario encargado') ?>
 											<?php if ($validaciones_segun_config)
 												echo $obligatorio ?>
 										</td>
@@ -1010,7 +1010,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 											 
 										</td>
 										<td align="left">
-											<input name="glosa_cliente" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
+											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
 										</td>
 									</tr>
 									
