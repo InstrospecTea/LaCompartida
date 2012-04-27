@@ -7945,7 +7945,7 @@ NULL ,  'RUT'
     
 			case 5.65:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'FiltroHistorialUsuarios',  'id_categoria_usuario,activo,permisos',  'Filtros de que cosas se van a mostrar en el historial',  'string',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
@@ -8249,7 +8249,7 @@ NULL ,  'RUT'
 			
 			case 5.73:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'CodigoAsuntoEnColumnasSeparadas',  '1', NULL ,  'boolean',  '6',  '-1'
 								);";
@@ -8327,7 +8327,7 @@ NULL ,  'RUT'
 				
 			case 5.78:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'DejarTarifaCeroRetainerPRC',  '0',  'En el caso de PRC en la nota de cobro dejan en 0 la tarifa de los usuarios que quedan con todas sus horas pagadas por el Retainer',  'boolean',  '6',  '-1');";
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -8337,7 +8337,7 @@ NULL ,  'RUT'
 				break;
 			case 5.79:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'UsaAfectoImpuesto',  '0',  'Agrega columna en excel de gastos, para indicar si es afecto a impuesto o no',  'boolean',  '6',  '-1' );";
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -8345,41 +8345,153 @@ NULL ,  'RUT'
 				 	}
 				}
 				break;
+			case 5.80:
+				$query = array();
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'HostJuicios',  '',  'URL Case Tracking',  'text',  '1',  '100' );";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'HostTimeTracking',  '',  'URL Time Tracking',  'text',  '1',  '100' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.81:
+				$query = array();
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'EnviarAlClienteAntesDeFacturar',  '0',  'Permite invertir el flujo de liquidaciones para que primero se envíe al cliente y luego se facture (solicitado por PRC y BMAHJ) OJO: Invertir los valores de prm_estado_cobro',  'boolean',  '6',  '-1' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.82:
+				$query = array();
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'UsarOverlay',  '0',  'Determina si se usa overlay. Si no, se usa popup',  'boolean',  '6',  '-1' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
 				
-	}
+			case 5.83:	// FFF 2012-04-20
+				$query[] = "ALTER TABLE `configuracion_categoria` ADD UNIQUE (`glosa_configuracion_categoria`) ";
+				$query[] = "INSERT ignore INTO  `configuracion_categoria` (	`glosa_configuracion_categoria`	) VALUES ( 'Modificaciones del Cliente');";
+				$query[] = "INSERT IGNORE INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'AtacheSecundarioSoloAsunto',  '0',  'Si se activa, el attache secundario no aparece en la ficha de cliente y es obligaroio en la de asunto',  'boolean',  '10',  '-1' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			
+			case 5.84:	 
+				$query[] = "INSERT ignore INTO  `configuracion_categoria` (	`glosa_configuracion_categoria`	) VALUES ( 'Plugins - Hooks');";
+				
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.85:	 
+				
+			       if(!existecampo('id_usuario_responsable', 'trabajo', $dbh)) $query[]="ALTER TABLE  `trabajo` ADD  `id_usuario_responsable` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien era el encargado comercial cuando se hizo el trabajo';";
+                               if(!existecampo('id_usuario_responsable', 'cobro', $dbh)) $query[]="ALTER TABLE  `cobro` ADD  `id_usuario_responsable` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien era el encargado comercial cuando se emitio el cobro';";
+			       if(!existecampo('id_ultimo_emisor', 'cobro', $dbh)) $query[]="ALTER TABLE  `cobro` ADD  `id_ultimo_emisor` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien  emitió el cobro por última vez'";
+			    
+			       $query[]="update cobro set id_ultimo_emisor=id_usuario";
+			       $query[]="update cobro c set c.id_usuario_responsable=(select id_usuario_responsable from contrato where id_contrato=c.id_contrato)";
+			       $query[]="update trabajo t join asunto a on t.codigo_asunto=a.codigo_asunto join contrato c on c.id_contrato=a.id_contrato set t.id_usuario_responsable=c.id_usuario_responsable ;";
+			       
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+			case 5.86: // sincroniza el setting con la manera vieja de comprobarlo
+			    
+			    $query[]="update configuracion c1, configuracion c2 set c1.valor_opcion=if(LEFT( c2.valor_opcion, 4 ) =  'true', 1, 0 ) 
+					WHERE c2.glosa_opcion =  'AgregarAsuntosPorDefecto' and c1.glosa_opcion ='AsuntosPorDefectoSeCobranPorSeparado'";
+			    foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			    break;
+			case 5.87: // sincroniza el setting con la manera vieja de comprobarlo
+			    
+			    $query[]="CREATE TABLE if not exists `prm_mantencion_tablas` (
+				    `id_tabla` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT,
+				    `nombre_tabla` VARCHAR( 64 ) NOT NULL ,
+				    `glosa_tabla` VARCHAR( 255 ) NULL ,
+				    `info_tabla` TEXT NULL ,
+				    PRIMARY KEY (  `id_tabla` ) ,
+				    UNIQUE (
+				    `nombre_tabla`
+				    )
+				    ) ENGINE = MYISAM";
+			
+			    $query[]="INSERT ignore INTO `prm_mantencion_tablas` (`id_tabla`, `nombre_tabla`, `glosa_tabla`, `info_tabla`) VALUES
+				    (1, 'grupo_cliente', 'Grupo Cliente', NULL),
+				    (2, 'prm_mantencion_tablas', 'Tablas Paramétricas', NULL),
+				    (3, 'prm_comuna', 'Comuna', NULL),
+				    (4, 'prm_area_proyecto', 'Área Proyecto', NULL),
+				    (5, 'prm_area_usuario', 'Área Usuario', NULL),
+				    (6, 'prm_tipo_proyecto', 'Tipo Asunto o Proyecto', NULL),
+				    (7, 'prm_moneda', 'Monedas y Tasas de Cambio', NULL),
+				    (8, 'j_prm_materia', 'Juicios: Materia de la Causa', NULL),
+				    (9, 'j_prm_estado_causa', 'Juicios: Estado de la Causa', NULL),
+				    (10, 'prm_categoria_usuario', 'Categorías de Usuario', NULL),
+				    (11, 'prm_banco', 'Bancos', NULL);";
+			    
+			    foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+			    break;
+			    
+			    case 5.88:
+				$query = array();
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							VALUES ( 'NuevoMetodoGastoProvision',  '0',  'Si está activo, la cta corriente se cuadra dividiendo una provisión en vez de generando 2 ficticias',  'boolean',  '10',  '-1' );";
+				foreach ($query as $q) {
+					if (!($res = mysql_query($q, $dbh) )) {
+				 		throw new Exception($q . "---" . mysql_error());
+				 	}
+				}
+				break;
+					
+	}			
+				
 }
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-for($version=1;$version<=5.79;$version+=0.01):
-    $VERSIONES[$num++]=round($version,2);
-endfor;
-
-
-/* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
-
-function IngresarNotificacion($notificacion,$permisos=array('ALL'))
-{
-	global $sesion;
-	$q = "INSERT INTO notificacion SET fecha=NOW(),texto_notificacion='".$notificacion."'";
-	if(! ($resp = mysql_query($q,$sesion->dbh)))
-					throw new Exception($q ."---".mysql_error());
-
-	$where = "usuario_permiso.codigo_permiso='ADM'";
-	foreach($permisos as $p)
-	{
-		$where .= " OR usuario_permiso.codigo_permiso='".$p."'";
-	}
-
-	$query = "UPDATE usuario
-						SET usuario.id_notificacion_tt=LAST_INSERT_ID()
-						WHERE usuario.id_usuario NOT IN
-						(SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE $where)";
-	if(! ($resp = mysql_query($query,$sesion->dbh)))
-		throw new Exception($query ."---".mysql_error());
+$min_update=1;
+$max_update=5.88;
+$force=0;
+if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
+if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
+if(isset($_GET['force'])) $force=$_GET['force'];
+for ($version = $min_update; $version <= $max_update; $version += 0.01) {
+    $VERSIONES[$num++] = round($version, 2);
 }
+if(isset($_GET['lastver']))  {
+    $lastver=array_pop($VERSIONES);
+    echo $lastver;
+   
+} else {
+/* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
     require_once dirname(__FILE__).'/../app/conf.php';
     require_once dirname(__FILE__).'/../fw/classes/Sesion.php';
@@ -8413,7 +8525,7 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
 
 	foreach( $VERSIONES as $key => $new_version )
 	{
-		if( $VERSION <  $new_version )
+		if( $VERSION <  $new_version || $force=1)
 		{
 			echo '<hr>Comienzo de proceso de cambios para versión '.number_format($new_version,2,'.','').'<br>';
 
@@ -8446,13 +8558,36 @@ function IngresarNotificacion($notificacion,$permisos=array('ALL'))
                   if($VERSION ==  $new_version)  echo '<p>Su software está corriendo la versi&oacute;n '.number_format($VERSION,2,'.','').'</p>';
                 }
 	}
+}
 
 	function GuardarVersion( $versionFileName, $new_version,$sesion )
 	{
        
             mysql_query("CREATE TABLE IF NOT EXISTS version_db (  version decimal(3,2) NOT NULL DEFAULT '1.00',  version_ct decimal(3,2) NOT NULL DEFAULT '1.00',  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  PRIMARY KEY (version)) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
             mysql_query("insert ignore INTO version_db (version) values (".number_format($new_version,2,'.','').");", $sesion->dbh);
-                $data = '<?	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
-		file_put_contents( $versionFileName, $data );
+                $data = '<?php	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
+		//file_put_contents( $versionFileName, $data );
 	}
+	
+	function IngresarNotificacion($notificacion,$permisos=array('ALL'))
+{
+	global $sesion;
+	$q = "INSERT INTO notificacion SET fecha=NOW(),texto_notificacion='".$notificacion."'";
+	if(! ($resp = mysql_query($q,$sesion->dbh)))
+					throw new Exception($q ."---".mysql_error());
+
+	$where = "usuario_permiso.codigo_permiso='ADM'";
+	foreach($permisos as $p)
+	{
+		$where .= " OR usuario_permiso.codigo_permiso='".$p."'";
+	}
+
+	$query = "UPDATE usuario
+						SET usuario.id_notificacion_tt=LAST_INSERT_ID()
+						WHERE usuario.id_usuario NOT IN
+						(SELECT usuario_permiso.id_usuario FROM usuario_permiso WHERE $where)";
+	if(! ($resp = mysql_query($query,$sesion->dbh)))
+		throw new Exception($query ."---".mysql_error());
+}
+	
 ?>
