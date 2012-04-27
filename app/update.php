@@ -8483,7 +8483,7 @@ NULL ,  'RUT'
 				}
 				break;
                 case 5.89:
-                    $query = "INSERT INTO  aguilar.configuracion (id , glosa_opcion , valor_opcion , comentario , valores_posibles , id_configuracion_categoria , orden) VALUES (NULL ,  'EncargadoComercialComoCaptadorCliente',  '0', 'Para aguilar castillo love se necesita tener identificado al usuario que trae a la firma de abogados un nuevo cliente, para entregar una comisión por dos años',  'boolean',  '6',  '-1')";
+                    $query = "INSERT INTO configuracion (id , glosa_opcion , valor_opcion , comentario , valores_posibles , id_configuracion_categoria , orden) VALUES (NULL ,  'EncargadoComercialComoCaptadorCliente',  '0', 'Para aguilar castillo love se necesita tener identificado al usuario que trae a la firma de abogados un nuevo cliente, para entregar una comisión por dos años',  'boolean',  '6',  '-1')";
                     mysql_query($q, $dbh);
                 break;                
 					
