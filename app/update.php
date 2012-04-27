@@ -6089,7 +6089,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.56:
 				$query = array();
 					
-					$query[] = "INSERT INTO ignore `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
 												);";
@@ -8482,12 +8482,35 @@ NULL ,  'RUT'
 				 	}
 				}
 				break;
-                case 5.89:
-                    $query = "INSERT INTO configuracion (id , glosa_opcion , valor_opcion , comentario , valores_posibles , id_configuracion_categoria , orden) VALUES (NULL ,  'EncargadoComercialComoCaptadorCliente',  '0', 'Para aguilar castillo love se necesita tener identificado al usuario que trae a la firma de abogados un nuevo cliente, para entregar una comisión por dos años',  'boolean',  '6',  '-1')";
-                    mysql_query($q, $dbh);
-                break;                
-					
-	}			
+				
+				case 5.89:
+					$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden` )
+									VALUES ('MostrarColumnaSecretaria', '0', 'Columna que muestra username (iniciales en algunos casos', 'boolean', '6', '-1');";
+					foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}
+				break;
+				case 5.90:
+				    $query[]="CREATE TABLE IF NOT EXISTS `trabajos_por_actualizar` (
+					      `id_trabajo` int(11) NOT NULL DEFAULT '0',
+					      `codigo_asunto` varchar(10) CHARACTER SET latin1 DEFAULT NULL,
+					      `duracion_cobrada_segs` bigint(20) DEFAULT NULL,
+					      `time_to_sec(t.duracion_cobrada)` int(10) DEFAULT NULL,
+					      `fecha_modificacion` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+					      `fecha_touch` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+					      PRIMARY KEY (`id_trabajo`)
+					    ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
+				   
+				    foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}
+				break;
+				
+	}
 				
 }
 
@@ -8496,7 +8519,7 @@ NULL ,  'RUT'
 
 $num = 0;
 $min_update=1;
-$max_update=5.89;
+$max_update=5.90;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
