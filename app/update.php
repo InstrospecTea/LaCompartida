@@ -8482,6 +8482,10 @@ NULL ,  'RUT'
 				 	}
 				}
 				break;
+                case 5.89:
+                    $query = "INSERT INTO  aguilar.configuracion (id , glosa_opcion , valor_opcion , comentario , valores_posibles , id_configuracion_categoria , orden) VALUES (NULL ,  'EncargadoComercialComoCaptadorCliente',  '0', 'Para aguilar castillo love se necesita tener identificado al usuario que trae a la firma de abogados un nuevo cliente, para entregar una comisión por dos años',  'boolean',  '6',  '-1')";
+                    mysql_query($q, $dbh);
+                break;                
 					
 	}			
 				
@@ -8492,7 +8496,7 @@ NULL ,  'RUT'
 
 $num = 0;
 $min_update=1;
-$max_update=5.88;
+$max_update=5.89;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
