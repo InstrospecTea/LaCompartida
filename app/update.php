@@ -4023,7 +4023,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 													(142, 'ReportesAvanzados_FiltrosExtra', false, NULL, 'boolean', 5, -1);";
 					
 					if( method_exists('Conf','NombreIdentificador') )
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES 
+						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES 
 													(143 ,  'NombreIdentificador',  '".Conf::NombreIdentificador()."', NULL ,  'string',  '6',  -1);";
 					else
 						$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES 
@@ -4100,7 +4100,7 @@ ADD `notificado_monto_excedido` tinyint(4) NOT NULL default '0' AFTER `notificad
 
 			$query[] = "ALTER TABLE  `log_correo` ADD  `id_archivo_anexo` INT( 11 ) NULL DEFAULT NULL AFTER  `nombre` ;";
 			
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 VALUES (
 NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Alerta.',  'boolean',  '6',  '20'
 );";
@@ -4121,7 +4121,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 		case 3.41:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` , `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` , `orden` ) 
 								VALUES ( NULL ,  'UsarGastosConSinImpuesto',  '0', NULL ,  'boolean',  '2',  '245');";
 
 		foreach($query as $q)
@@ -4212,7 +4212,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 				
 				case 3.43:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES ( NULL ,  'NuevoModuloFactura',  '0', NULL ,  'boolean',  '6',  '-1' );";
 												
 				foreach($query as $q)
@@ -4281,9 +4281,9 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 				
 				case 3.49:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES ( NULL ,  'CiudadEstudio',  'Santiago', NULL ,  'string',  '6',  '-1' );";
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													 VALUES ( NULL ,  'PaisEstudio',  'Chile', NULL ,  'string',  '6',  '-1' );";
 				
 				foreach($query as $q)
@@ -4305,7 +4305,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 					$query[] = "ALTER TABLE `usuario` ADD `alerta_revisor` INT( 11 ) NOT NULL DEFAULT '0' AFTER `alerta_semanal` ;";
 					$query[] = "ALTER TABLE `usuario` CHANGE `alerta_revisor` `alerta_revisor` TINYINT( 1 ) NOT NULL DEFAULT '0';";
 					$query[] = "ALTER TABLE `usuario` ADD `restriccion_diario` SMALLINT( 6 ) NOT NULL DEFAULT '0' AFTER `retraso_max` ;";
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
 													NULL ,  'UsernameEnListaDeTrabajos',  '0',  'para que en la lista de trabajos sale el username como nombre y asi sea modificable por el administrador del estudio',  'boolean',  '6',  '-1'
 													);";
@@ -4458,7 +4458,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				
 				case 3.63:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retención',  'boolean',  '6',  '-1'
 												);";
@@ -4484,7 +4484,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 					list($glosa_moneda_base) = mysql_fetch_array($resp_moneda_base);
 				
 					$query = array();
-					$query[] = " INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = " INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
 													NULL ,  'MonedaTarifaPorDefecto',  '".$glosa_moneda_base."',  '',  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299'
 													);";
@@ -4506,7 +4506,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				
 				case 3.67:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'UsaUsernameEnTodoElSistema',  '1', NULL ,  'boolean',  '6',  '-1'
 												);";
@@ -4565,7 +4565,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				
 				case 3.71:
 					$query = array();
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'ReporteRevisadosATodosLosAbogados',  '0', NULL ,  'boolean',  '3',  '460'
 												);";
@@ -4727,7 +4727,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.81:
 					$query = array();
 					
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'ResumenHorasSemanalesAAbogadosIndividuales',  '0',  'Para configurar el envio del reporte Revisados',  'boolean',  '3',  '444'
 												);";
@@ -4739,7 +4739,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.82:
 					$query = array();
 					
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 													NULL ,  'AdelantoAlertaFinDeMes',  '1', NULL ,  'numero',  '3',  '-1'
 												);";
@@ -4751,7 +4751,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.83:
 					$query = array();
 					
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 												NULL ,  'OrdenarPorCategoriaNombreUsuario',  '0', NULL ,  'boolean',  '3',  '333'
 												);";
@@ -4762,7 +4762,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
                         
 			case 3.84:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( 'MostrarCodigoUsuarioExcel',  '0',  'Mostrar el codigo de usuario en el excel de descarga',  'boolean',  '6',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( 'MostrarCodigoUsuarioExcel',  '0',  'Mostrar el codigo de usuario en el excel de descarga',  'boolean',  '6',  '-1');";
 					
 				foreach($query as $q) {
 						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -4771,7 +4771,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
                         
                         case 3.85:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
                                                 VALUES (
                                                     NULL ,  'MontoGastoOriginalSiMonedaDistinta',  '0', NULL ,  'boolean',  '6',  '-1'
                                                 );";
@@ -4893,7 +4893,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 					
                         case 3.90:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'SetFormatoRut',  '".( Conf::dbUser()=='Fontaine' ? '1' : '0' )."',  'Decide si al campo Rut del contrato se agrega el formato de manera automatica',  'boolean',  '6',  '-1'
 											);";
@@ -4904,7 +4904,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
                         
                         case 3.91:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
                                                 VALUES (
                                                     NULL ,  'ColumnaIdYCodigoAsuntoAExcelRevisarHoras',  '0',  'Config para Grasty Quintana que quieren esas columnas en su excel revisar horas.',  'boolean',  '6',  '-1'
                                                 );";
@@ -5446,7 +5446,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
 						list($cont) = mysql_fetch_array($resp);
 						if( !$cont ) {
-							$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+							$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 													VALUES (
 														NULL ,  'MonedaTotalPorDefecto',  '".$glosa_moneda_base."',  '',  '".$valores_posibles."', 2, 299
 													);";
@@ -5471,7 +5471,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					
 					case 4.24:
 						$query = array();
-						$query[] = "INSERT INTO  `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) 
+						$query[] = "INSERT ignore INTO  `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) 
 													VALUES (
 													NULL ,  'ExcelGastosDesglosado', '0', NULL ,  'boolean',  '6',  '-1'
 													);";
@@ -5532,7 +5532,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 							$query[] = "INSERT INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
 															 VALUES ( '1',  'TARIFA BASE',  '0000-00-00 00:00:00', NULL ,  '1',  '1' );";
 						
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 														VALUES (
 														NULL ,  'MaxDuracionTrabajo',  '14',  'duración maxima que puede tener un trabajo',  'numero',  '2',  '240'
 														);";
@@ -5559,7 +5559,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 
 					case 4.30:
 						$query = array();
-						$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+						$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 VALUES (
 'DesactivarClaveRTF',  '0', NULL ,  'boolean', 6, -1
 );";
@@ -5913,7 +5913,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						$query[] = "ALTER TABLE  `cobro` ADD  `informado` VARCHAR( 2 ) NOT NULL DEFAULT  'NO' AFTER  `facturado` ,
 												ADD  `fecha_informado` DATETIME NULL DEFAULT NULL AFTER  `informado` ;";
 
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` ) 
+						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 								NULL ,  'InformarContabilidad',  '0',  'Permite que los cobros se informen a la area de contabilidad mediante Webservice 3',  'boolean',  '6',  '-1'
 								);";
@@ -5933,7 +5933,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					
 					case 4.43:
 						$query = array();
-						$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  
+						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  
 							`comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( NULL ,  'RevisarTarifas',  '1',  
 							'Revisa si los abogados tienen fijados los precios para la tarifa y moneda seleccionada',  'boolean',  '6',  '-1');";
@@ -6048,7 +6048,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			case 4.52:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociada',  '0',  'Permite asociar una factura a un gasto',  'boolean',  '6',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociada',  '0',  'Permite asociar una factura a un gasto',  'boolean',  '6',  '-1');";
 				$query[] = "ALTER TABLE  `factura` ADD  `id_contrato` INT NOT NULL ;";
 
 			foreach($query as $q)
@@ -6159,7 +6159,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			break;
 			case 4.62:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES (NULL ,  'MonedaTramitePorDefecto',  'Dólar', NULL ,  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299');";
 				
 				foreach($query as $q)
@@ -6172,41 +6172,41 @@ WHERE  `id` =105 LIMIT 1 ;";
 											VALUES (
 											'7',  'Margenes Factura'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'EspacioEncabezado',  '88', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'EspacioCuerpo',  '117', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'MargenIzquierdaRsocial',  '21', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'EspacioMontoPalabra',  '7', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'MargenDerechaCuerpo',  '105', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoColumnaMes',  '33', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaAnyo',  '49', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoColumnaDia',  '35', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoColumnaBaseCuerpo',  '505', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaBaseEncabezado',  '200', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'MargenIzquierdaCuerpo',  '7', NULL ,  'string',  '7',  '-1'
 											);";
@@ -6218,13 +6218,13 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.64:
 				$query = array();
 				
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoColumnaMontoSubtotal',  '90', NULL ,  'string',  '7',  '-1'
 											), (
 											NULL ,  'AnchoColumnaMontoIVA',  '32', NULL ,  'string',  '7',  '-1'
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoColumnaMontoTotal',  '40', NULL ,  'string',  '7',  '-1'
 											);";
@@ -6237,31 +6237,31 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query = array();
 				
 				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresión Carta');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHora',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerModalidad',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesional',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalIniciales',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalCategoria',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalTarifa',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalImporte',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerGastos',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerMorosidad',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerResumenCobro',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraIniciales',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraCategoria',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraTarifa',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraImporte',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDescuento',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerTipoCambio',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerNumPag',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerCarta',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerSolicitante',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerAsuntosSeparado',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerHorasTrabajadas',  '0', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcRestarRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetalleRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerValorHHFlatFee',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHora',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerModalidad',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesional',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalIniciales',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalCategoria',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalTarifa',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesionalImporte',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerGastos',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerMorosidad',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerResumenCobro',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraIniciales',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraCategoria',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraTarifa',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHoraImporte',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDescuento',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerTipoCambio',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerNumPag',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerCarta',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerSolicitante',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerAsuntosSeparado',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerHorasTrabajadas',  '0', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerCobrable',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcRestarRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetalleRetainer',  '1', NULL ,  'boolean',  '8',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerValorHHFlatFee',  '0', NULL ,  'boolean',  '8',  '-1');";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6269,7 +6269,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			case 4.66:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'MostrarBotonCobroPDF',  '0',  'Dar la opción de bajar Pre-liquidación (Word de cobros) en formato PDF',  'boolean',  '6',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'MostrarBotonCobroPDF',  '0',  'Dar la opción de bajar Pre-liquidación (Word de cobros) en formato PDF',  'boolean',  '6',  '-1');";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6281,7 +6281,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "ALTER TABLE `cobro` DROP `fecha_informado`;";
 				$query[] = "ALTER TABLE  `cobro` ADD  `estado_contabilidad` VARCHAR( 25 ) NOT NULL DEFAULT  'NO INFORMADO' COMMENT  'webservice contabilidad' AFTER  `facturado` , ADD  `fecha_contabilidad` DATETIME NULL DEFAULT NULL COMMENT  'webservice contabilidad' AFTER  `estado_contabilidad` ;";
 
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociadaCodificada',  '0',  'La factura asociada a un gasto tiene forma XXX-XXXXXXXXXX',  'boolean',  '6',  '-1');";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociadaCodificada',  '0',  'La factura asociada a un gasto tiene forma XXX-XXXXXXXXXX',  'boolean',  '6',  '-1');";
 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6298,7 +6298,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.69:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'MailAsuntoNuevoATodosLosAdministradores',  '1', NULL ,  'boolean',  '3',  '-1'
 											);";
@@ -6409,7 +6409,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query[] = "ALTER TABLE `trabajo_tarifa`
 										  ADD CONSTRAINT `trabajo_tarifa_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
 										  ADD CONSTRAINT `trabajo_tarifa_ibfk_1` FOREIGN KEY (`id_trabajo`) REFERENCES `trabajo` (`id_trabajo`) ON DELETE CASCADE ON UPDATE CASCADE;";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL , 'GuardarTarifaAlIngresoDeHora',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
@@ -6422,7 +6422,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.78:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES (
 							NULL ,  'AnchoGraficoReporteGeneral',  '730',  'ancho que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
 							), (
@@ -6455,7 +6455,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				$resp = mysql_query($query_consulta, $dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
 				list($cont) = mysql_fetch_array($resp);
 				if( !$cont ) {
-					$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'SetFormatoRut',  '0',  'Decide si al campo Rut del contrato se agrega el formato de manera automatica',  'boolean',  '6',  '-1'
 											);";
@@ -6479,7 +6479,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.82:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 													NULL ,  'MostrarColumnasGastosEnHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
 												);";
@@ -6491,7 +6491,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			case 4.83:
 				$query = array();
 				$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'
 											), (
@@ -6569,7 +6569,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.87:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 				VALUES (
 				NULL ,  'ImprimirExcelCobrosUnaPagina',  '0',  'Imprimir excel cobros una página (fit to pages)',  'boolean',  '6',  '-1'
 				);";
@@ -6584,7 +6584,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 											VALUES (
 												NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
 											);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'ImprimirFacturaDoc',  '1', NULL ,  'boolean',  '6',  '-1'
 											);";
@@ -6595,7 +6595,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.89:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 												NULL ,  'SepararLiquidacionesPorDefecto',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
@@ -6637,7 +6637,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.92:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 					VALUES (
 					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
 					);";
@@ -6662,7 +6662,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                 
                         case 4.94:
                                 $query = array();
-                                $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                                $query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
                                                 VALUES (
                                                     NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
                                                 );";
@@ -6725,7 +6725,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				break;
 			case 4.98:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 					VALUES (
 					NULL ,  'MostrarMontosPorCobrar',  '0',  'En resumen de gastos mostrar el monto que falta por facturar(cobrar) de los gastos.',  'boolean',  '6',  '-1'
 					);";
@@ -6849,7 +6849,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$resp = mysql_query($query_consulta,$dbh) or Utiles::errorSQL($query_consulta,__FILE__,__LINE__,$dbh);
 			list($cont) = mysql_fetch_array($resp);
 			if( !$cont ) {
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'SepararLiquidacionesPorDefecto',  '0', NULL ,  'boolean',  '6',  '-1'
 											);";
@@ -6861,7 +6861,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.08:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'DescargarArchivoContabilidad',  '0', 'Permite descargar el archivo de las facturas con el formato de contabilidad para PRC' ,  'boolean',  '6',  '-1'
 											);";
@@ -6873,7 +6873,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.09:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
                                                 VALUES (
                                                     NULL ,  'EsPRC',  '0', NULL ,  'boolean',  '6',  '-1'
                                                 );";
@@ -6885,19 +6885,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.10:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'AnchoMaximoGlosaCliente',  '0', NULL ,  'numero',  '7',  '-1'
 				);";
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'AnchoMaximoDireccionCliente',  '0', NULL ,  'numero',  '7',  '-1'
 				);";
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'MaximoCaracterPorLineaDescripcion',  '0', NULL ,  'numero',  '7',  '-1'
 				);";
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'MaximoLineasDescripcion',  '0', NULL ,  'numero',  '7',  '-1'
 				);";
@@ -6915,7 +6915,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                                 );";
 			$query[] = "INSERT INTO menu_permiso ( codigo_menu, codigo_permiso )
                                             VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
                                                 VALUES (
                                                 NULL ,  'MostrarColumnaCodigoAsuntoHorasPorFacturar',  '1', NULL ,  'boolean',  '6',  '-1'
                                                 ), (
@@ -7009,7 +7009,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.16:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 					VALUES (
 					NULL ,  'EsconderHonorariosEnCero',  '0',  'No mostrar honorarios en documento de la factura si la cantidad es cero',  'boolean',  '6',  '-1'
 					);";
@@ -7039,7 +7039,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.18:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 					VALUES (
 					NULL ,  'UsarGlosaFacturaMayusculas',  '1',  'Transformar a mayusculas todas las glosas honorarios gastos con y sin impuesto a mayuscula',  'boolean',  '6',  '-1'
 					);";
@@ -7186,7 +7186,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.22:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 					VALUES (
 					NULL ,  'MostrarCodigoAsuntoEnListados',  '0',  'Muestra el codigo de asunto en listados y los asuntos de cada cobro',  'boolean',  '6',  '-1'
 					);";
@@ -7217,7 +7217,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 		case 5.24:
 			$query = array();
-			$query[] = "INSERT INTO  `configuracion` ( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+			$query[] = "INSERT ignore INTO  `configuracion` ( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'AlertaSemanalTodosAbogadosaAdministradores',  '0',  'enviar alertas de las horas ingresadas, semanalmente a los usuarios administradores',  'boolean',  '3',  '500' );";
 
 			foreach ($query as $q) {
@@ -7257,7 +7257,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.27:
 			$query = array();
 			/* este debe ser el update más feo de mi vida */
-			$query[] = "CREATE TABLE `cobro_log` ( `id_cobro` int( 11 ) NOT NULL default '0', `incluye_honorarios` tinyint( 1 ) NOT NULL default '1', 
+			$query[] = "CREATE TABLE IF NOT EXISTS  `cobro_log` ( `id_cobro` int( 11 ) NOT NULL default '0', `incluye_honorarios` tinyint( 1 ) NOT NULL default '1', 
 				`incluye_gastos` tinyint( 1 ) NOT NULL default '1', `id_usuario` int( 11 ) default NULL , `codigo_cliente` varchar( 10 ) NOT NULL default '', 
 				`monto_subtotal` double NOT NULL default '0', `monto_ajustado` double NOT NULL default '0', `monto_original` double NOT NULL default '0', 
 				`impuesto` double NOT NULL default '0', 
@@ -7319,7 +7319,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00'
 				, `usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1;";
 			
-			$query[] = "CREATE TABLE `factura_log` ( `id_factura` int( 11 ) NOT NULL default '0', `id_factura_padre` int( 11 ) default NULL , 
+			$query[] = "CREATE TABLE IF NOT EXISTS  `factura_log` ( `id_factura` int( 11 ) NOT NULL default '0', `id_factura_padre` int( 11 ) default NULL , 
 				`id_documento_legal` int( 11 ) NOT NULL default '1' COMMENT 'tipo de documento legal', `id_documento_legal_motivo` int( 11 ) default NULL , 
 				`numero` int( 11 ) NOT NULL default '0', `comprobante_erp` varchar( 20 ) default NULL , `condicion_pago` tinyint( 2 ) NOT NULL default '0', 
 				`serie_documento_legal` tinyint( 4 ) NOT NULL default '1', `fecha` date NOT NULL default '0000-00-00', 
@@ -7343,7 +7343,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00', 
 				`usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1;";
 			
-			$query[] = "CREATE TABLE `documento_log` ( `id_documento` int( 11 ) NOT NULL default '0', 
+			$query[] = "CREATE TABLE IF NOT EXISTS `documento_log` ( `id_documento` int( 11 ) NOT NULL default '0', 
 				`id_tipo_documento` int( 11 ) NOT NULL default '0' COMMENT 'tipo documento', `codigo_cliente` varchar( 10 ) NOT NULL default '', 
 				`id_contrato` int( 11 ) default NULL , `id_cobro` int( 11 ) default NULL , `glosa_documento` text NOT NULL , 
 				`monto` double NOT NULL default '0' COMMENT 'monto que paga el documento', `subtotal_honorarios` double NOT NULL default '0', 
@@ -7379,7 +7379,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
                         
                         case 5.28:
                             $query = array();
-                            $query[] = "ALTER TABLE `prm_categoria_usuario` ADD `orden` INT( 11 ) NOT NULL DEFAULT  '0';";
+                            if(!existecampo('orden', 'prm_categoria_usuario', $dbh)) $query[] = "ALTER TABLE `prm_categoria_usuario` ADD `orden` INT( 11 ) NOT NULL DEFAULT  '0';";
                             $query[] = "UPDATE prm_categoria_usuario SET orden = id_categoria_usuario";
                             
                             foreach ($query as $q) {
@@ -7391,7 +7391,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
                         
                         case 5.29:
                             $query = array();
-                            $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                            $query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
                                             VALUES (
                                             NULL ,  'OcultarColumnasHorasPorFacturar',  '0', NULL ,  'boolean',  '6',  '-1'
                                             );";
@@ -7405,7 +7405,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
                         
                         case 5.30:
                             $query = array();
-                            $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                            $query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
                                             VALUES (
                                                 NULL ,  'CantidadDecimalesIngresoHoras',  '1', NULL ,  'numero',  '6',  '-1'
                                             );";
@@ -7419,7 +7419,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 				 case 5.31:
                             $query = array();
-                            $query[] = "INSERT INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` ) 
+                            $query[] = "INSERT ignore INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` ) 
 VALUES (
 NULL ,  'RUT'
 );";
@@ -7434,7 +7434,7 @@ NULL ,  'RUT'
 
 			case 5.32:
                             $query = array();
-                            $query[] = "ALTER TABLE  `cuenta_banco` ADD  `glosa` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `numero` ;";
+                           if(!existecampo('glosa', 'cuenta_banco', $dbh))  $query[] = "ALTER TABLE  `cuenta_banco` ADD  `glosa` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `numero` ;";
                             
                             foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -7479,7 +7479,7 @@ NULL ,  'RUT'
 				
 			case 5.35:
 				$query = array();
-				$query[] = "ALTER TABLE  `usuario` ADD  `retraso_max_notificado` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `retraso_max` ;";
+				if(!existecampo('retraso_max_notificado', 'usuario', $dbh)) $query[] = "ALTER TABLE  `usuario` ADD  `retraso_max_notificado` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `retraso_max` ;";
 
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7490,11 +7490,11 @@ NULL ,  'RUT'
 				
 			case 5.36:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 								NULL ,  'EsconderTarifaEscalonada',  '1', NULL ,  'boolean',  '6',  '-1'
 								);";
-				$query[] = "INSERT INTO `cobro_rtf` (`id_formato`, `descripcion`, `formato_cobro`, `formato_cobro_fila`, `formato_cobro_fila_prof`, `formato_cobro_asunto`, `formato_cobro_fila_gasto`, `formato_cobro_fila_movimiento`, `html_header`, `html_pie`, `cobro_template`, `cobro_css`, `pdf_encabezado_imagen`, `pdf_encabezado_texto`) 
+				$query[] = "INSERT ignore INTO `cobro_rtf` (`id_formato`, `descripcion`, `formato_cobro`, `formato_cobro_fila`, `formato_cobro_fila_prof`, `formato_cobro_asunto`, `formato_cobro_fila_gasto`, `formato_cobro_fila_movimiento`, `html_header`, `html_pie`, `cobro_template`, `cobro_css`, `pdf_encabezado_imagen`, `pdf_encabezado_texto`) 
 							VALUES (NULL, 'Nota de Cobro Parametrizable', '{\r\ntf1adeflang1025ansiansicpg1252uc1adeff0deff0stshfdbch0stshfloch0stshfhich0stshfbi0deflang3082deflangfe3082	hemelang3082	hemelangfe0	hemelangcs0{fonttbl{f0fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}{f1fbidi fswissfcharset0fprq2{*panose 020b0604020202020204}Arial;}\r\n\r\n{f34fbidi fromanfcharset0fprq2{*panose 02040503050406030204}Cambria Math;}{f38fbidi fswissfcharset0fprq2{*panose 020b0604030504040204}Tahoma;}{f39fbidi fromanfcharset0fprq2{*panose 00000000000000000000}Times;}\r\n\r\n{flomajorf31500fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}{fdbmajorf31501fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}\r\n\r\n{fhimajorf31502fbidi fromanfcharset0fprq2{*panose 02040503050406030204}Cambria;}{fbimajorf31503fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}\r\n\r\n{flominorf31504fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}{fdbminorf31505fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}\r\n\r\n{fhiminorf31506fbidi fswissfcharset0fprq2{*panose 020f0502020204030204}Calibri;}{fbiminorf31507fbidi fromanfcharset0fprq2{*panose 02020603050405020304}Times New Roman;}{f42fbidi fromanfcharset238fprq2 Times New Roman CE;}\r\n\r\n{f43fbidi fromanfcharset204fprq2 Times New Roman Cyr;}{f45fbidi fromanfcharset161fprq2 Times New Roman Greek;}{f46fbidi fromanfcharset162fprq2 Times New Roman Tur;}{f47fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}\r\n\r\n{f48fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}{f49fbidi fromanfcharset186fprq2 Times New Roman Baltic;}{f50fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}{f52fbidi fswissfcharset238fprq2 Arial CE;}\r\n\r\n{f53fbidi fswissfcharset204fprq2 Arial Cyr;}{f55fbidi fswissfcharset161fprq2 Arial Greek;}{f56fbidi fswissfcharset162fprq2 Arial Tur;}{f57fbidi fswissfcharset177fprq2 Arial (Hebrew);}\r\n\r\n{f58fbidi fswissfcharset178fprq2 Arial (Arabic);}{f59fbidi fswissfcharset186fprq2 Arial Baltic;}{f60fbidi fswissfcharset163fprq2 Arial (Vietnamese);}{f382fbidi fromanfcharset238fprq2 Cambria Math CE;}\r\n\r\n{f383fbidi fromanfcharset204fprq2 Cambria Math Cyr;}{f385fbidi fromanfcharset161fprq2 Cambria Math Greek;}{f386fbidi fromanfcharset162fprq2 Cambria Math Tur;}{f389fbidi fromanfcharset186fprq2 Cambria Math Baltic;}\r\n\r\n{f422fbidi fswissfcharset238fprq2 Tahoma CE;}{f423fbidi fswissfcharset204fprq2 Tahoma Cyr;}{f425fbidi fswissfcharset161fprq2 Tahoma Greek;}{f426fbidi fswissfcharset162fprq2 Tahoma Tur;}\r\n\r\n{f427fbidi fswissfcharset177fprq2 Tahoma (Hebrew);}{f428fbidi fswissfcharset178fprq2 Tahoma (Arabic);}{f429fbidi fswissfcharset186fprq2 Tahoma Baltic;}{f430fbidi fswissfcharset163fprq2 Tahoma (Vietnamese);}\r\n\r\n{f431fbidi fswissfcharset222fprq2 Tahoma (Thai);}{f432fbidi fromanfcharset238fprq2 Times CE;}{f433fbidi fromanfcharset204fprq2 Times Cyr;}{f435fbidi fromanfcharset161fprq2 Times Greek;}{f436fbidi fromanfcharset162fprq2 Times Tur;}\r\n\r\n{f437fbidi fromanfcharset177fprq2 Times (Hebrew);}{f438fbidi fromanfcharset178fprq2 Times (Arabic);}{f439fbidi fromanfcharset186fprq2 Times Baltic;}{f440fbidi fromanfcharset163fprq2 Times (Vietnamese);}\r\n\r\n{flomajorf31508fbidi fromanfcharset238fprq2 Times New Roman CE;}{flomajorf31509fbidi fromanfcharset204fprq2 Times New Roman Cyr;}{flomajorf31511fbidi fromanfcharset161fprq2 Times New Roman Greek;}\r\n\r\n{flomajorf31512fbidi fromanfcharset162fprq2 Times New Roman Tur;}{flomajorf31513fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}{flomajorf31514fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}\r\n\r\n{flomajorf31515fbidi fromanfcharset186fprq2 Times New Roman Baltic;}{flomajorf31516fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}{fdbmajorf31518fbidi fromanfcharset238fprq2 Times New Roman CE;}\r\n\r\n{fdbmajorf31519fbidi fromanfcharset204fprq2 Times New Roman Cyr;}{fdbmajorf31521fbidi fromanfcharset161fprq2 Times New Roman Greek;}{fdbmajorf31522fbidi fromanfcharset162fprq2 Times New Roman Tur;}\r\n\r\n{fdbmajorf31523fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}{fdbmajorf31524fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}{fdbmajorf31525fbidi fromanfcharset186fprq2 Times New Roman Baltic;}\r\n\r\n{fdbmajorf31526fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}{fhimajorf31528fbidi fromanfcharset238fprq2 Cambria CE;}{fhimajorf31529fbidi fromanfcharset204fprq2 Cambria Cyr;}\r\n\r\n{fhimajorf31531fbidi fromanfcharset161fprq2 Cambria Greek;}{fhimajorf31532fbidi fromanfcharset162fprq2 Cambria Tur;}{fhimajorf31535fbidi fromanfcharset186fprq2 Cambria Baltic;}\r\n\r\n{fbimajorf31538fbidi fromanfcharset238fprq2 Times New Roman CE;}{fbimajorf31539fbidi fromanfcharset204fprq2 Times New Roman Cyr;}{fbimajorf31541fbidi fromanfcharset161fprq2 Times New Roman Greek;}\r\n\r\n{fbimajorf31542fbidi fromanfcharset162fprq2 Times New Roman Tur;}{fbimajorf31543fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}{fbimajorf31544fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}\r\n\r\n{fbimajorf31545fbidi fromanfcharset186fprq2 Times New Roman Baltic;}{fbimajorf31546fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}{flominorf31548fbidi fromanfcharset238fprq2 Times New Roman CE;}\r\n\r\n{flominorf31549fbidi fromanfcharset204fprq2 Times New Roman Cyr;}{flominorf31551fbidi fromanfcharset161fprq2 Times New Roman Greek;}{flominorf31552fbidi fromanfcharset162fprq2 Times New Roman Tur;}\r\n\r\n{flominorf31553fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}{flominorf31554fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}{flominorf31555fbidi fromanfcharset186fprq2 Times New Roman Baltic;}\r\n\r\n{flominorf31556fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}{fdbminorf31558fbidi fromanfcharset238fprq2 Times New Roman CE;}{fdbminorf31559fbidi fromanfcharset204fprq2 Times New Roman Cyr;}\r\n\r\n{fdbminorf31561fbidi fromanfcharset161fprq2 Times New Roman Greek;}{fdbminorf31562fbidi fromanfcharset162fprq2 Times New Roman Tur;}{fdbminorf31563fbidi fromanfcharset177fprq2 Times New Roman (Hebrew);}\r\n\r\n{fdbminorf31564fbidi fromanfcharset178fprq2 Times New Roman (Arabic);}{fdbminorf31565fbidi fromanfcharset186fprq2 Times New Roman Baltic;}{fdbminorf31566fbidi fromanfcharset163fprq2 Times New Roman (Vietnamese);}\r\n\r\n{fhiminorf31568fbidi fswissfcharset238fprq2 Calibri CE;', '	rowd irow0irowband0lastrow 	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5040clshdrawnil cellx6120clvertalt\r\n\r\nclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx7920clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1260clshdrawnil \r\n\r\ncellx9180clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1094clshdrawnil cellx10274pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0pararsid7551218yts16 \r\n\r\nfs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid4726267charrsid14369732 %f_a%}{f165fs20insrsid14761216charrsid14369732 cell }{f165fs20insrsid4726267charrsid14369732 %desc_asunto%}{\r\n\r\nf165fs20insrsid14761216charrsid14369732 cell }{f165fs20insrsid4726267charrsid14369732 %prof_asunto%}{f165fs20insrsid14761216charrsid14369732 cell }{f165fs20insrsid4726267charrsid14369732 %dur_a%}{\r\n\r\nf165fs20insrsid14761216charrsid14369732 cell }{f165fs20insrsid4726267charrsid14369732 %val_a%}{f165fs20insrsid14761216charrsid14369732 cell }pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0 \r\n\r\nfs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid4726267charrsid14369732 	rowd irow0irowband0lastrow \r\n\r\n	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl \r\n\r\nclbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5040clshdrawnil cellx6120clvertaltclbrdrtrdrtbl clbrdrlrdrtbl \r\n\r\nclbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx7920clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1260clshdrawnil cellx9180clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1094clshdrawnil cellx10274\r\now }pard ql li0\r\ni0widctlparaspalphaaspnumfaautoadjustright\r\nin0lin0itap0pararsid8206207', '	rowd irow0irowband0lastrow 	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5470clshdrawnil cellx5400clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1440clshdrawnil cellx6840clvertalt\r\n\r\nclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx8640clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1634clshdrawnil \r\n\r\ncellx10274pardplain ql li0\r\ni0sl360slmult1widctlparintbl	x0aspalphaaspnumfaautoadjustright\r\nin0lin0pararsid8586928yts16 fs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid13505969charrsid876826 %cell1%cell \r\n\r\n%cell2%cell %cell3%cell %cell4%cell }pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0 fs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid13505969charrsid876826 \r\n\r\n	rowd irow0irowband0lastrow 	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl clbrdrl\r\n\r\nrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5470clshdrawnil cellx5400clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1440clshdrawnil cellx6840clvertaltclbrdrt\r\n\r\nrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx8640clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1634clshdrawnil cellx10274\r\n\r\n\r\now }pard ql li0\r\ni0widctlparaspalphaaspnumfaautoadjustright\r\nin0lin0itap0pararsid13531181 ', '{\r\ntlchfcs1 af39 ltrchfcs0 f39insrsid6637367charrsid6513469 \r\n\r\n_____________________________________________________________________________________\r\n\r\npar \r\n\r\npar ltrrow}	rowd irow0irowband0ltrrow	s15	rgaph70	rleft-70	rftsWidth3	rwWidth10330	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	blrsid727264	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol\r\n\r\n	blind38	blindtype3 clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWi', '	rowd irow0irowband0lastrow 	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5040clshdrawnil cellx6120clvertalt\r\n\r\nclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx7920clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1260clshdrawnil \r\n\r\ncellx9180clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1094clshdrawnil cellx10274pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0pararsid7551218yts16 \r\n\r\nfs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid4726267charrsid5460056 %f_a%}{f165fs20insrsid14761216charrsid5460056 cell }{f165fs20insrsid4726267charrsid5460056 %desc_asunto%}{\r\n\r\nf165fs20insrsid14761216charrsid5460056 cell }{f165fs20insrsid4726267charrsid5460056 %prof_asunto%}{f165fs20insrsid14761216charrsid5460056 cell }{f165fs20insrsid4726267charrsid5460056 %dur_a%}{f165fs20insrsid14761216charrsid5460056 \r\n\r\ncell }{f165fs20insrsid4726267charrsid5460056 %val_a%}{f165fs20insrsid14761216charrsid5460056 cell }pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0 fs24lang3082langfe3082cgridlangnp3082langfenp3082 {\r\n\r\nf165fs20insrsid4726267charrsid5460056 	rowd irow0irowband0lastrow \r\n\r\n	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl \r\n\r\nclbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth5040clshdrawnil cellx6120clvertaltclbrdrtrdrtbl clbrdrlrdrtbl \r\n\r\nclbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1800clshdrawnil cellx7920clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1260clshdrawnil cellx9180clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1094clshdrawnil cellx10274\r\now }pard ql li0\r\ni0widctlparaspalphaaspnumfaautoadjustright\r\nin0lin0itap0pararsid7551218', '	rowd irow0irowband0lastrow 	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl \r\n\r\nclbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth2340clshdrawnil cellx3420clvertalt\r\n\r\nclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth2160clshdrawnil cellx5580clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth4694clshdrawnil \r\n\r\ncellx10274pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0pararsid8814148yts16 fs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid10314260charrsid6572367 %col1%cell }{\r\n\r\nf165fs20insrsid3166989charrsid6572367 %col2%}{f165fs20insrsid10314260charrsid6572367 cell %col3%cell %col4%cell }pardplain ql li0\r\ni0widctlparintblaspalphaaspnumfaautoadjustright\r\nin0lin0 \r\n\r\nfs24lang3082langfe3082cgridlangnp3082langfenp3082 {f165fs20insrsid10314260charrsid6572367 	rowd irow0irowband0lastrow \r\n\r\n	s16	rgaph70	rleft-70	rftsWidth1	rftsWidthB3	rftsWidthA3	rautofit1	rpaddl108	rpaddr108	rpaddfl3	rpaddft3	rpaddfb3	rpaddfr3	bllkhdrrows	bllklastrow	bllkhdrcols	bllklastcol clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl \r\n\r\nclbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth1150clshdrawnil cellx1080clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth2340clshdrawnil cellx3420clvertaltclbrdrtrdrtbl clbrdrlrdrtbl \r\n\r\nclbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth2160clshdrawnil cellx5580clvertaltclbrdrtrdrtbl clbrdrlrdrtbl clbrdrbrdrtbl clbrdrrrdrtbl cltxlrtbclftsWidth3clwWidth4694clshdrawnil cellx10274\r\now }pard \r\n\r\nql li0\r\ni0widctlparaspalphaaspnumfaautoadjustright\r\nin0lin0itap0pararsid8814148 ', '', '', '###INFORME###\r\n\r\n%COBRO_CARTA%\r\n\r\n<hr size=\"2\" class=\"separador\">\r\n\r\n%CLIENTE%\r\n\r\n<hr size=\"2\" class=\"separador\">\r\n\r\n%DETALLE_COBRO%\r\n\r\n%RESUMEN_PROFESIONAL%\r\n\r\n<hr size=\"2\" class=\"separador\">\r\n\r\n%ASUNTOS%\r\n\r\n<hr size=\"2\" class=\"separador\">\r\n\r\n%GASTOS%\r\n\r\n%SALTO_PAGINA%\r\n\r\n###CLIENTE###\r\n<span class=\"titulo_seccion\">%glosa_cliente%</span><br>\r\n\r\n<table class=\"tabla_normal\" width=\"50%\">\r\n    <tr>\r\n        <td width=\"30%\">%rut%</td>\r\n        <td width=\"70%\">%valor_rut%</td>\r\n    </tr>\r\n    <tr>\r\n        <td>%direccion%</td>\r\n        <td>%valor_direccion_uc%</td>\r\n    </tr>\r\n    <tr>\r\n        <td>%contacto%</td>\r\n        <td>%valor_contacto%</td>\r\n    </tr>\r\n    <tr>\r\n        <td>%telefono%</td>\r\n        <td>%valor_telefono%</td>\r\n    </tr>\r\n</table>\r\n\r\n###DETALLE_COBRO###\r\n<span class=\"titulo_seccion\">%glosa_cobro%</span><br>\r\n\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n    <tr>\r\n        <td width=\"45%\" valign=\"top\">\r\n\r\n<table  class=\"tabla_normal\" width=\"100%\">\r\n    <tr>\r\n        <td width=\"50%\" align=\"left\">%factura%</td>\r\n        <td width=\"50%\" align=\"left\">%nro_factura%</td>\r\n    </tr>\r\n    <tr>\r\n        <td width=\"50%\" align=\"left\">%fecha_ini%</td>\r\n        <td width=\"50%\" align=\"left\">%valor_fecha_ini%</td>\r\n    </tr>\r\n    <tr>\r\n        <td width=\"50%\" align=\"left\">%fecha_fin%</td>\r\n        <td width=\"50%\" align=\"left\">%valor_fecha_fin%</td>\r\n    </tr>\r\n    <tr>\r\n        <td align=\"left\">%modalidad%</td>\r\n        <td align=\"left\">%valor_modalidad%</td>\r\n    </tr>\r\n    <tr>\r\n        <td align=\"left\">&nbsp;</td>\r\n        <td align=\"left\">%detalle_modalidad%</td>\r\n    </tr>\r\n</table>\r\n\r\n        </td>\r\n        <td width=\"10%\">&nbsp;</td>\r\n        <td width=\"45%\" valign=\"top\">\r\n\r\n<table  class=\"tabla_normal\" width=\"100%\">\r\n    <tr class=\"tr_datos\">\r\n        <td width=\"50%\" align=\"left\">%horas%</td>\r\n        <td width=\"*\" align=\"right\">%valor_horas%</td>\r\n    </tr>\r\n    %DETALLE_COBRO_DESCUENTO%\r\n    <tr class=\"tr_total3\">\r\n        <td align=\"left\">%honorarios%</td>\r\n        <td align=\"right\"><b>%valor_honorarios_demo%</b></td>\r\n    </tr>\r\n    %DETALLE_COBRO_MONEDA_TOTAL%\r\n    %DETALLE_TRAMITES%\r\n    <tr class=\"tr_datos\">\r\n        <td align=\"left\">%gastos%</td>\r\n        <td align=\"right\">%valor_gastos%</td>\r\n    </tr>\r\n    %IMPUESTO%\r\n    <tr class=\"tr_total3\">\r\n        <td align=\"left\">%total_cobro%</td>\r\n        <td align=\"right\"><b>%valor_total_cobro_demo%</b></td>\r\n    </tr>\r\n</table>\r\n\r\n        </td>\r\n    </tr>\r\n</table>\r\n\r\n###DETALLE_COBRO_MONEDA_TOTAL###\r\n    <tr class=\"tr_datos\">\r\n        <td align=\"left\">%monedabase%</td>\r\n        <td align=\"right\">%valor_honorarios_monedabase_demo%</td>\r\n    </tr>\r\n\r\n###DETALLE_COBRO_DESCUENTO###\r\n    <tr>\r\n        <td align=\"left\">%honorarios%</td>\r\n        <td align=\"right\">%valor_honorarios_demo%</td>\r\n    </tr>\r\n    <tr>\r\n        <td align=\"left\">%descuento% %porcentaje_descuento_demo%</td>\r\n        <td align=\"right\">%valor_descuento_demo%</td>\r\n    </tr>\r\n\r\n###IMPUESTO###\r\n		<tr class=\"tr_datos\">\r\n        <td align=\"left\">%impuesto%</td>\r\n        <td align=\"right\">%valor_impuesto%</td>\r\n    </tr>\r\n\r\n###DETALLE_TRAMITES###\r\n		<tr class=\"tr_datos\">\r\n        <td align=\"left\">%tramites%</td>\r\n        <td align=\"right\">%valor_tramites%</td>\r\n    </tr>\r\n\r\n###RESUMEN_PROFESIONAL###\r\n<br />\r\n<span class=\"subtitulo_seccion\">%glosa_profesional%</span><br>\r\n\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%RESUMEN_PROFESIONAL_ENCABEZADO%\r\n%RESUMEN_PROFESIONAL_FILAS%\r\n%RESUMEN_PROFESIONAL_TOTAL%\r\n</table>\r\n\r\n###RESUMEN_PROFESIONAL_ENCABEZADO###\r\n<br />\r\n<span class=\"subtitulo_seccion\">%glosa_profesional%</span><br>\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n<tr class=\"tr_titulo\">\r\n    <td align=\"left\" width=\"*\">%nombre%</td>\r\n    <td align=\"center\" width=\"80\">%hh_trabajada%</td>\r\n    <td align=\"center\" width=%width_descontada%>%hh_descontada%</td>\r\n    <td align=\"center\" width=%width_cobrable%>%hh_cobrable%</td>\r\n    <td align=\"center\" width=%width_retainer%>%hh_retainer%</td>\r\n    <td align=\"center\" width=\"80\">%hh_demo%</td>\r\n    <td align=\"center\" width=\"60\">%tarifa_horas%</td>\r\n    <td align=\"center\" width=\"70\">%total_horas%</td>\r\n</tr>\r\n\r\n###RESUMEN_PROFESIONAL_TOTAL###\r\n<tr class=\"tr_total\">\r\n    <td>%glosa%</td>\r\n    <td align=\"center\">%hh_trabajada%</td>\r\n    <td align=\"center\">%hh_descontada%</td>\r\n    <td align=\"center\">%hh_cobrable%</td>\r\n    <td align=\"center\">%hh_retainer%</td>\r\n    <td align=\"center\">%hh_demo%</td>\r\n    <td>&nbsp;</td>\r\n    <td align=\"right\">%total_horas_demo%</td>\r\n</tr>\r\n</table>\r\n\r\n###ASUNTOS###\r\n<table class=\"asuntos\" width=\"70%\">\r\n    <tr>\r\n        <td width=\"25%\">%asunto%</td>\r\n        <td width=\"75%\">%glosa_asunto%</td>\r\n    </tr>\r\n    <tr>\r\n        <td>%contacto%</td>\r\n        <td>%valor_contacto%</td>\r\n    </tr>\r\n    <tr>\r\n        <td>%telefono%</td>\r\n        <td>%valor_telefono%</td>\r\n    </tr>\r\n</table>\r\n<span class=\"subtitulo_seccion\">%servicios%</span><br>\r\n<br>\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%TRABAJOS_ENCABEZADO%\r\n%TRABAJOS_FILAS%\r\n%TRABAJOS_TOTAL%\r\n</table>\r\n<br>\r\n<br>\r\n<span class=\"titulo_seccion\">%servicios_tramites%</span><br>\r\n\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%TRAMITES_ENCABEZADO%\r\n%TRAMITES_FILAS%\r\n%TRAMITES_TOTAL%\r\n</table>\r\n\r\n###TRABAJOS_ENCABEZADO###\r\n\r\n<thead>\r\n<tr class=\"tr_titulo\">\r\n    <td width=\"80\" align=\"center\">%fecha%</td>\r\n    <td width=\"100\" align=\"left\">%profesional%</td>\r\n    %td_categoria%\r\n    <td width=\"5\">&nbsp;</td>\r\n    <td width=\"300\" align=\"left\">%descripcion%</td>\r\n    <td width=\"5\">&nbsp;</td>\r\n    <td width=\"80\" align=\"center\">%duracion_trabajada_bmahj%</td>\r\n    <td width=\"80\" align=\"center\">%duracion_descontada_bmahj%</td>\r\n    <td width=\"80\" align=\"center\">%duracion_bmahj%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n</thead>\r\n\r\n###TRABAJOS_FILAS###\r\n<tr class=\"tr_datos\" style=\"page-break-inside:avoid;\">\r\n    <td align=\"center\">%fecha%</td>\r\n    <td align=\"left\">%profesional%</td>\r\n    %td_categoria%\r\n		<td>&nbsp;</td>\r\n    <td align=\"left\">%descripcion%</td>\r\n    <td>&nbsp;</td>\r\n    <td align=\"center\">%duracion_trabajada%</td>\r\n    <td align=\"center\">%duracion_descontada%</td>\r\n    <td align=\"center\">%duracion%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n\r\n###TRABAJOS_TOTAL###\r\n<tr class=\"tr_total\">\r\n    <td align=\"center\">%glosa%</td>\r\n		<td>&nbsp;</td>\r\n		%td_categoria%\r\n    <td>&nbsp;</td>\r\n    <td>&nbsp;</td>\r\n    <td>&nbsp;</td>\r\n		<td align=\"center\">%duracion_trabajada%</td>\r\n		<td align=\"center\">%duracion_descontada%</td>\r\n    <td align=\"center\">%duracion%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n\r\n###TRAMITES_ENCABEZADO###\r\n<tr class=\"tr_titulo\">\r\n<td width=\"60\" align=\"left\">%profesional%</td>\r\n<td width=\"70\" align=\"center\">%fecha%</td>\r\n	<td width=\"*\" align=\"left\">%descripcion%</td>\r\n	<td width=\"80\" align=\"center\">%duracion_tramites%</td>\r\n	<td width=\"80\" align=\"center\">%valor%</td>\r\n</tr>\r\n\r\n###TRAMITES_FILAS###\r\n<tr class=\"tr_datos\">\r\n<td align=\"left\">%iniciales%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"left\">%descripcion%</td>\r\n	<td align=\"center\">%duracion_tramites%</td>\r\n	<td align=\"center\">%valor%</td>\r\n</tr>\r\n\r\n###TRAMITES_TOTAL###\r\n<tr class=\"tr_total\">\r\n	<td align=\"center\" nowrap>%glosa_tramites%</td>\r\n	<td>&nbsp;</td>\r\n	<td>&nbsp;</td>\r\n	<td align=\"center\">%duracion_tramites%</td>\r\n	<td align=\"center\">%valor_tramites%</td>\r\n</tr>\r\n\r\n###DETALLE_PROFESIONAL###\r\n<br>\r\n<span class=\"subtitulo_seccion\">%glosa_profesional%</span><br>\r\n\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%PROFESIONAL_ENCABEZADO%\r\n%PROFESIONAL_FILAS%\r\n%PROFESIONAL_TOTAL%\r\n</table>\r\n###PROFESIONAL_ENCABEZADO###\r\n\r\n<tr class=\"tr_titulo\">\r\n    <td align=\"left\" width=\"120\">%nombre%</td>\r\n    <td align=\"left\" width=\"120\">%categoria%</td>\r\n    <td align=\"center\" width=\"80\">%hh_trabajada%</td>\r\n    %td_descontada%\r\n    %td_cobrable%\r\n    %td_retainer%\r\n    <td align=\"center\" width=\"80\">%hh%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n\r\n###PROFESIONAL_FILAS###\r\n<tr class=\"tr_datos\">\r\n    <td align=\"left\">%nombre%</td>\r\n    <td align=\"left\">%categoria%</td>\r\n    <td align=\"center\">%hh_trabajada%</td>\r\n    %td_descontada%\r\n    %td_cobrable%\r\n    %td_retainer%\r\n    <td align=\"center\">%hh_demo%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n\r\n###PROFESIONAL_TOTAL###\r\n<tr class=\"tr_total\">\r\n    <td>%glosa%</td>\r\n    <td>&nbsp;</td>\r\n    <td align=\"center\">%hh_trabajada%</td>\r\n    %td_descontada%\r\n    %td_cobrable%\r\n    %td_retainer%\r\n    <td align=\"center\">%hh_demo%</td>\r\n    %td_tarifa%\r\n    %td_importe%\r\n</tr>\r\n\r\n###GASTOS###\r\n<br>\r\n<span class=\"titulo_seccion\">%glosa_gastos%</span><br>\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%GASTOS_ENCABEZADO%\r\n%GASTOS_FILAS%\r\n%GASTOS_TOTAL%\r\n</table>\r\n\r\n###GASTOS_ENCABEZADO###\r\n<tr class=\"tr_titulo\">\r\n    <td align=\"center\" width=\"70\">%fecha%</td>\r\n    <td align=\"left\">%descripcion%</td>\r\n    <td align=\"center\" width=\"80\">&nbsp;</td>\r\n    <td align=\"center\" width=\"80\">%monto_moneda_total%</td>\r\n    <td align=\"center\" width=\"80\">%monto_impuesto_total%</td>\r\n    <td align=\"center\" width=\"80\">%monto_moneda_total_con_impuesto%</td>\r\n</tr>\r\n###GASTOS_FILAS###\r\n<tr class=\"tr_datos\">\r\n    <td align=\"center\">%fecha%</td>\r\n    <td align=\"left\">%descripcion%</td>\r\n    <td align=\"center\">&nbsp;</td>\r\n    <td align=\"center\">%monto_moneda_total%</td>\r\n    <td align=\"center\">%monto_impuesto_total%</td>\r\n    <td align=\"center\">%monto_moneda_total_con_impuesto%</td>\r\n</tr>\r\n###GASTOS_TOTAL###\r\n<tr class=\"tr_total\">\r\n    <td>&nbsp;</td>\r\n    <td>&nbsp;</td>\r\n    <td align=\"right\">&nbsp;</td>\r\n    <td align=\"center\">%valor_total_monedabase%</td>\r\n    <td align=\"center\">%valor_impuesto_monedabase%</td>\r\n    <td align=\"center\">%valor_total_monedabase_con_impuesto%</td>\r\n</tr>\r\n\r\n###CTA_CORRIENTE###\r\n<hr size=\"2\" class=\"separador\">\r\n<br>\r\n<span class=\"titulo_seccion\">%titulo_detalle_cuenta%</span>\r\n<br>\r\n<table class=\"tabla_normal\" width=\"100%\">\r\n%CTA_CORRIENTE_SALDO_INICIAL%\r\n%CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO%\r\n%CTA_CORRIENTE_MOVIMIENTOS_FILAS%\r\n%CTA_CORRIENTE_MOVIMIENTOS_TOTAL%\r\n%CTA_CORRIENTE_SALDO_FINAL%\r\n</table>\r\n\r\n###CTA_CORRIENTE_SALDO_INICIAL###\r\n<tr class=\"tr_total\">\r\n	<td align=\"right\" colspan=3>%saldo_inicial_cuenta%</td>\r\n	<td align=\"right\">%valor_saldo_inicial_cuenta%</td>\r\n</tr>\r\n\r\n\r\n###CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO###\r\n<tr>\r\n	<td align=\"center\" class=\"tr_titulo\" colspan=4>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n	<td align=\"center\" class=\"tr_titulo\" colspan=4><hr noshade size=\"1\" width=\"100%\" align=\"center\"></td>\r\n</tr>\r\n<tr class=\"tr_titulo\">\r\n	<td align=\"left\" colspan=4>%movimientos%</td>\r\n</tr>\r\n<tr class=\"tr_titulo\">\r\n    <td align=\"left\" width=\"70\">%fecha%</td>\r\n    <td align=\"left\">%descripcion%</td>\r\n    <td align=\"right\" width=\"80\">%egreso%</td>\r\n    <td align=\"right\" width=\"80\">%ingreso%</td>\r\n</tr>\r\n\r\n\r\n###CTA_CORRIENTE_MOVIMIENTOS_FILAS###\r\n<tr class=\"tr_datos\">\r\n	<td align=\"left\">%fecha%</td>\r\n	<td align=\"left\">%descripcion%</td>\r\n	<td align=\"right\">%monto_egreso%</td>\r\n	<td align=\"right\">%monto_ingreso%</td>\r\n</tr>\r\n\r\n\r\n###CTA_CORRIENTE_MOVIMIENTOS_TOTAL###\r\n<tr class=\"tr_total\">\r\n    <td>&nbsp;</td>\r\n    <td align=\"right\">%total%</td>\r\n    <td align=\"right\">%total_monto_egreso%</td>\r\n    <td align=\"right\">%total_monto_ingreso%</td>\r\n</tr>\r\n<tr>\r\n	<td align=\"center\" class=\"tr_titulo\" colspan=4><hr noshade size=\"1\" width=\"100%\" align=\"center\" style=''height: 1px;''></td>\r\n</tr>\r\n<tr>\r\n	<td align=\"center\" class=\"tr_titulo\" colspan=4>&nbsp;</td>\r\n</tr>\r\n<tr class=tr_total>\r\n    <td align=\"right\" colspan=3>%saldo_periodo%</td>\r\n    <td align=\"right\">%total_monto_gastos%</td>\r\n</tr>\r\n\r\n\r\n###CTA_CORRIENTE_SALDO_FINAL###\r\n<tr class=\"tr_total\">\r\n	<td align=\"right\" colspan=3>%saldo_final_cuenta%</td>\r\n	<td align=\"right\">%valor_saldo_final_cuenta%</td>\r\n</tr>\r\n\r\n\r\n###MOROSIDAD###\r\n<br>\r\n<span class=\"titulo_seccion\">%titulo_morosidad%</span>\r\n<br>\r\n<table class=\"tabla_normal\" width=\"100%\" style=''border:1px solid;''>\r\n%MOROSIDAD_ENCABEZADO%\r\n%MOROSIDAD_FILAS%\r\n%MOROSIDAD_TOTAL%\r\n</table>\r\n\r\n###MOROSIDAD_ENCABEZADO###\r\n<tr class=\"tr_titulo\">\r\n	<td align=\"center\">%numero_nota_cobro%</td>\r\n	<td align=\"center\">%numero_factura%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"center\">%moneda%</td>\r\n	<td align=\"center\">%monto_moroso%</td>\r\n</tr>\r\n\r\n###MOROSIDAD_FILAS###\r\n<tr class=\"tr_datos\">\r\n	<td align=\"center\">%numero_nota_cobro%</td>\r\n	<td align=\"center\">%numero_factura%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"center\">%moneda_total%</td>\r\n	<td align=\"right\">%monto_moroso_documento%</td>\r\n</tr>\r\n\r\n###MOROSIDAD_HONORARIOS_TOTAL###\r\n<tr class=\"tr_total\">\r\n	<td align=\"center\">%numero_nota_cobro%</td>\r\n	<td align=\"center\">%numero_factura%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"right\">%moneda%</td>\r\n	<td align=\"right\">%monto_moroso_documento%</td>\r\n</tr>\r\n\r\n###MOROSIDAD_GASTOS###\r\n<tr class=\"tr_total\">\r\n	<td align=\"center\">%numero_nota_cobro%</td>\r\n	<td align=\"center\">%numero_factura%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"right\">%moneda%</td>\r\n	<td align=\"right\">%monto_moroso_documento%</td>\r\n</tr>\r\n\r\n###MOROSIDAD_TOTAL###\r\n<tr class=\"tr_total\">\r\n	<td align=\"center\">%numero_nota_cobro%</td>\r\n	<td align=\"center\">%numero_factura%</td>\r\n	<td align=\"center\">%fecha%</td>\r\n	<td align=\"right\">%moneda%</td>\r\n	<td align=\"right\">%monto_moroso_documento%</td>\r\n</tr>\r\n<tr class=\"tr_total\">\r\n	<td align=\"left\" colspan=5>%nota%</td>\r\n</tr>\r\n\r\n###SALTO_PAGINA###\r\n<br size=\"1\" class=\"divisor\">', 'TABLE\r\n{\r\n  border-collapse: collapse;\r\n}\r\n\r\nTD\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: normal;\r\n}\r\n\r\nHR.separador\r\n{\r\n  margin: 0px 0px 7px 0px;\r\n  color: #000000;\r\n}\r\n\r\nTD.empresa_titulo\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 14pt;\r\n  font-weight: bold;\r\n}\r\n\r\nSPAN.empresa_subtitulo\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 13pt;\r\n  font-weight: bold;\r\n}\r\n\r\nSPAN.empresa_subtitulo2\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 9pt;\r\nfont-weight: normal;\r\n}\r\n\r\nSPAN.empresa_subtitulo3\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 10pt;\r\nfont-weight: normal;\r\n}\r\n\r\nTD.empresa_logo\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 8pt;\r\n  vertical-align: top;\r\n}\r\n\r\nTD.empresa_direccion\r\n{\r\n  font-family:Times New Roman;\r\n  font-size: 6pt;\r\n  vertical-align: top;\r\n}\r\n\r\nSPAN.titulo_seccion\r\n{\r\nfont-family:Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\nSPAN.subtitulo_seccion\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\nTABLE.asuntos TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTABLE.tabla_normal TR.tr_titulo TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n  border-bottom: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTR.tr_titulo_detalle_profesional TD\r\n{\r\n  font-family: Times New Roman;\r\n  font-size: 7pt;\r\n  font-weight: bold;\r\n  border-bottom: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTABLE.tabla_normal TR.tr_titulo_detalle TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n  border-bottom: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTABLE.tabla_normal TR.tr_total TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n  border-top: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\nTABLE.tabla_normal TR.tr_total_detalle TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 8pt;\r\n  font-weight: bold;\r\n  border-top: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\nTABLE.tabla_normal TR.tr_total2 TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTABLE.tabla_normal TR.tr_total3 TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-weight: bold;\r\n  border-top: 1px solid #999999;\r\n  margin: 0px;\r\n  padding: 0px;\r\n}\r\n\r\nTABLE.tabla_normal TR.tr_datos\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: normal;\r\n  padding-bottom:5px;\r\n  vertical-align:top;\r\n}\r\nTABLE.tabla_normal TR.tr_datos_detalle TD\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 8pt;\r\n  font-weight: normal;\r\n  padding-bottom:5px;\r\n  vertical-align:top;\r\n}\r\nTD.fecha\r\n{\r\nfont-family: Times New Roman;\r\n  font-size: 10pt;\r\n  font-weight: normal;\r\n}\r\n\r\n.divisor\r\n{\r\n	margin: 0px 0px 7px 0px;\r\n	color: #000000;\r\n	page-break-after:always;\r\n}\r\n\r\nBR \r\n{\r\n  font-family: Times New Roman;\r\n  font-size: 8pt;\r\n  font-weight: normal;\r\n}', '', '');";
 
 				
@@ -7507,7 +7507,7 @@ NULL ,  'RUT'
 	
             case 5.37:
 				$query = array();
-				$query[] = "ALTER TABLE  `factura_rtf` ADD  `factura_template_xml` TEXT NOT NULL , ADD  `usaxml` TINYINT( 1 ) NOT NULL";
+				if(!existecampo('factura_template_xml', 'factura_rtf', $dbh))  $query[] = "ALTER TABLE  `factura_rtf` ADD  `factura_template_xml` TEXT NOT NULL , ADD  `usaxml` TINYINT( 1 ) NOT NULL";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7518,7 +7518,7 @@ NULL ,  'RUT'
 			
 			case 5.38:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'EliminarLetraBorradorEnPieDePagina',  '0', NULL ,  'boolean',  '6',  '-1'
 								);";
@@ -7532,7 +7532,7 @@ NULL ,  'RUT'
 			
 			case 5.39:
 				$query = array();
-				$query[] = "CREATE TABLE `evaluacion` (
+				$query[] = "CREATE TABLE IF NOT EXISTS `evaluacion` (
 							  `id_evaluacion` tinyint(11) NOT NULL auto_increment,
 							  `id_usuario` tinyint(11) NOT NULL default '0',
 							  `valuacion` tinyint(11) NOT NULL default '0',
@@ -7550,7 +7550,7 @@ NULL ,  'RUT'
 			
 			case 5.40:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+				$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
 					VALUES ('UsarCodigoSecundarioReporteHPF', '0', 'Usar Codigo Secundario en Reporte Horas por facturar', 'boolean', '5', '-1');";
 				
 				foreach ($query as $q) {
@@ -7573,7 +7573,7 @@ NULL ,  'RUT'
 				
 			case 5.42:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'EsconderDescargarLiquidacionEnBorrador',  ".( Conf::DbUser()=='prc' ? '1' : '0' ).", 'Para esconder Buton para descargar Word de liquidación en caso de que liquidación está en estado EN REVISION todavía.',  'boolean',  '6',  '-1'
 								);";
@@ -7587,7 +7587,7 @@ NULL ,  'RUT'
 			
             case 5.43:
 				$query = array();
-				$query[] = "ALTER TABLE `menu` ADD `bitmodfactura` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT 'marca opciones exclusivas mod factura'";
+				if(!existecampo('bitmodfactura', 'menu', $dbh)) $query[] = "ALTER TABLE `menu` ADD `bitmodfactura` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT 'marca opciones exclusivas mod factura'";
 				$query[] = "UPDATE `menu` SET `url` = '/app/interfaces/facturas_pagos.php', `codigo_padre` = 'COBRANZA', `bitmodfactura` = '1' WHERE codigo = 'FACT_PAGO';";
                                 
 				foreach ($query as $q) {
@@ -7599,7 +7599,7 @@ NULL ,  'RUT'
 			
 			case 5.44:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES (
 								NULL ,  'NoMostrarHorasIncobrablesEnNotaDeCobro',  '0',  'para que en el detalle de horas de PRC no les muestra las horas definidos como incobrables',  'boolean',  '6',  '-1'
 							);";
@@ -7613,17 +7613,17 @@ NULL ,  'RUT'
 			
 			case 5.45:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
+				$query[] = "INSERT ignore INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
 								VALUES (
 									NULL ,  'Descripciones por defecto'
 								);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'FacturaDescripcionHonorarios',  'Honorarios Legales', NULL ,  'string',  '9',  '-1'
 								), (
 									NULL ,  'FacturaDescripcionGastosConIva', '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos c/ IGV' : 'Gastos c/ IVA')."', NULL ,  'string',  '9',  '-1'
 								);";
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'FacturaDescripcionGastosSinIva',  '".(Conf::dbUser()=='rebaza' ? 'Reembolso de gastos s/ IGV' : 'Gastos s/ IVA')."', NULL ,  'string',  '9',  '-1'
 								);";
@@ -7637,19 +7637,21 @@ NULL ,  'RUT'
 			
 			case 5.46:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'ClienteReferencia', ".(Conf::dbUser()=='prc' ? '1' : '0').",  'Activando el config se mostrará un selector al agregar un cliente para indica cual referencia trajo el cliente',  'boolean',  '6',  '-1'
 								);";
-				$query[] = "CREATE TABLE  `prm_cliente_referencia` (
+				$query[] = "CREATE TABLE IF NOT EXISTS `prm_cliente_referencia` (
 								 `id_cliente_referencia` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 								 `glosa_cliente_referencia` VARCHAR( 50 ) NOT NULL ,
 								 `orden` INT( 11 ) NOT NULL DEFAULT  '0'
 								) ENGINE = INNODB;";
+				if(!existecampo('id_cliente_referencia', 'cliente', $dbh)) {
 				$query[] = "ALTER TABLE `cliente` ADD `id_cliente_referencia` INT( 11 ) NULL DEFAULT NULL ;";
 				$query[] = "ALTER TABLE `cliente` ADD INDEX (  `id_cliente_referencia` )";
 				$query[] = "ALTER TABLE `cliente`
 							  ADD CONSTRAINT `cliente_ibfk_1` FOREIGN KEY (`id_cliente_referencia`) REFERENCES `prm_cliente_referencia` (`id_cliente_referencia`) ON UPDATE CASCADE;";
+				}
 				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
 								VALUES (
 								'1',  'Clientes',  '1'
@@ -7693,9 +7695,9 @@ NULL ,  'RUT'
 			case 5.48:
 				$query = array();
 			
-				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `glosa` VARCHAR( 60 ) NOT NULL DEFAULT  '' AFTER  `reporte` ;";
-				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `envio` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `glosa` ;";
-				$query[] = "ALTER TABLE  `usuario_reporte` ADD  `segun` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'trabajo' COMMENT 'trabajo,corte,emision' AFTER  `glosa` ;";
+			if(!existecampo('glosa', 'usuario_reporte', $dbh))	$query[] = "ALTER TABLE  `usuario_reporte` ADD  `glosa` VARCHAR( 60 ) NOT NULL DEFAULT  '' AFTER  `reporte` ;";
+			if(!existecampo('envio', 'usuario_reporte', $dbh))	$query[] = "ALTER TABLE  `usuario_reporte` ADD  `envio` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `glosa` ;";
+			if(!existecampo('segun', 'usuario_reporte', $dbh))	$query[] = "ALTER TABLE  `usuario_reporte` ADD  `segun` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'trabajo' COMMENT 'trabajo,corte,emision' AFTER  `glosa` ;";
 
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7706,7 +7708,7 @@ NULL ,  'RUT'
 			
 			case 5.49:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'CantidadLineasDescripcionFacturas',  '1', NULL ,  'numero',  '6',  '-1'
 								);";
@@ -7720,7 +7722,7 @@ NULL ,  'RUT'
 			
 			case 5.50:
 				$query = array();
-				$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` ,  `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+				$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` ,  `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 								VALUES (
 									NULL ,  'gastos_sin_iva',  'Gastos no afectos al ".(Conf::dbUser()=='prc'?'IGV':'IVA')."',  'Disbursements not affecting taxes',  '0',  ''
 								);";
@@ -7747,7 +7749,7 @@ NULL ,  'RUT'
 			
 			case 5.52:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (
+				$query[] = "INSERT ignore INTO `configuracion` (
 								`id` ,
 								`glosa_opcion` ,
 								`valor_opcion` ,
@@ -7769,7 +7771,7 @@ NULL ,  'RUT'
 			
 			case 5.53:
 				$query = array();
-                            $query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+                            $query[] = "INSERT ignore  INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'ActualizacionTerminado',  '1',  'para reactivar el sistema después de la actualización.',  'boolean',  '6',  '-1'
 								);";
@@ -7803,7 +7805,7 @@ NULL ,  'RUT'
 						
 			case 5.55:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES ( 'EsconderExcelCobroModificable',  ".( Conf::dbUser()=='cg' ? '1' : '0').",  'Esconder Excel Cobro Modificable',  'boolean',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
@@ -7816,7 +7818,7 @@ NULL ,  'RUT'
 			
 			case 5.56:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 								NULL ,  'AsuntosEncargado2',  '0', NULL ,  'boolean',  '6',  '-1'
 								);";
@@ -7831,7 +7833,7 @@ NULL ,  'RUT'
                         
                         case 5.57:
 				$query = array();
-				$query[] = "ALTER TABLE  `version_db` ADD `version_ct` DECIMAL( 3, 2 ) NOT NULL DEFAULT  '1.00' AFTER  `version` ";
+			if(!existecampo('version_ct', 'version_db', $dbh))	$query[] = "ALTER TABLE  `version_db` ADD `version_ct` DECIMAL( 3, 2 ) NOT NULL DEFAULT  '1.00' AFTER  `version` ";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7842,7 +7844,7 @@ NULL ,  'RUT'
 			break;
 		case 5.58:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( NULL , 'ObservacionReversarCobroPagado', '0', 'Agregar obsevación al historial al reversar cobro pagado', 'boolean', '6', '-1' );";
+				$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( NULL , 'ObservacionReversarCobroPagado', '0', 'Agregar obsevación al historial al reversar cobro pagado', 'boolean', '6', '-1' );";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7854,7 +7856,7 @@ NULL ,  'RUT'
 			
 		case 5.59:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )  VALUES ( NULL ,  'CopiarEncargadoAlAsunto',  '0',  'Copia el encargado comercial del cliente a los asuntos',  'boolean',  '6',  '-1' );";
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )  VALUES ( NULL ,  'CopiarEncargadoAlAsunto',  '0',  'Copia el encargado comercial del cliente a los asuntos',  'boolean',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7866,7 +7868,7 @@ NULL ,  'RUT'
 			
 			case 5.60:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'PermitirCampoCobrableAProfesional',  '0',  'Con ese conf activado los Abogados podrán decidir si su hora ingresado será cobrable o no',  'boolean',  '6',  '-1'
 								);";
@@ -7881,16 +7883,26 @@ NULL ,  'RUT'
 			            
             case 5.61:
                  $query = array();
-                 $query[] = "ALTER TABLE `tramite` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-                 $query[] = "ALTER TABLE `trabajo` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-                 $query[] = "ALTER TABLE `cta_corriente` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-
+             if(!existecampo('estadocobro', 'tramite', $dbh) && !existecampo('estado_cobro', 'tramite', $dbh))  {
+		 $query[] = "ALTER TABLE `tramite` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
                  $query[] = "ALTER TABLE `tramite` ADD INDEX ( `estado_cobro` ) ;";
+		 $query[] = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado;";
+	     }
+             
+	     if(!existecampo('estadocobro', 'trabajo', $dbh) && !existecampo('estado_cobro', 'trabajo', $dbh))  {
+		 $query[] = "ALTER TABLE `trabajo` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
                  $query[] = "ALTER TABLE `trabajo` ADD INDEX ( `estado_cobro` ) ;";
-                 $query[] = "ALTER TABLE `cta_corriente` ADD INDEX ( `estado_cobro` ) ;";
-                 $query[] = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado;";
-                 $query[] = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado;";
-                 $query[] = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado;";
+		 $query[] = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado;";
+	     }
+             
+	     if(!existecampo('estadocobro', 'cta_corriente', $dbh) &&  !existecampo('estado_cobro', 'cta_corriente', $dbh)) {
+		 $query[] = "ALTER TABLE `cta_corriente` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+		 $query[] = "ALTER TABLE `cta_corriente` ADD INDEX ( `estado_cobro` ) ;";
+		 $query[] = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado;";
+	    }
+                 
+                 
+            
 
                 foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
@@ -7902,7 +7914,7 @@ NULL ,  'RUT'
 
 			case 5.62:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'ExcelRentabilidadFlatFee',  '0', NULL ,  'boolean',  '6',  '-1'
 								);";
@@ -7917,7 +7929,7 @@ NULL ,  'RUT'
                         
                         case 5.63:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 								VALUES (
 									NULL ,  'AbogadoVeDuracionCobrable',  '0', NULL ,  'boolean',  '6',  '-1'
 								);";
@@ -7930,9 +7942,11 @@ NULL ,  'RUT'
 				
 			break;                 
                         
+			             
+		 
 			case 5.64:
 			    $query=array();
-			    $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `Ejemplo` VARCHAR( 300 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL ;";
+			    if(!existecampo('Ejemplo', 'factura_pdf_datos', $dbh)) $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `Ejemplo` VARCHAR( 300 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL ;";
                             foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
 				 		// no levante error, mySQL maneja los alter duplicados // throw new Exception($q . "---" . mysql_error());
@@ -7978,7 +7992,7 @@ NULL ,  'RUT'
 							('COB',	'MPDF');";
 
 
-				$query[] = "INSERT INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'MostrarMenuMantencionPDF',  '0',  'Mostrar Menu Mantencion PDF Facturaen Sección Admin. Sistema',  'boolean',  '6',  '-1' );";
 				
 				foreach ($query as $q) {
@@ -7992,14 +8006,14 @@ NULL ,  'RUT'
 				$query = array();
 			$comentario = 'Esta opcion activa el uso de notificaciones de pago de comision a personas que contratan nuevos clientes';
                 
-				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+				$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
                                             VALUES('UsoPagoComisionNuevoCliente', 0, 'boolean','{$comentario}', 6, -1)";
                         $comentario = 'Registra el email donde se notificara el termino de pago de comision a personas que contratan nuevos clientes';
-				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+				$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
                                             VALUES('UsoPagoComisionNuevoClienteEmail', 'soporte@lemontech.cl', 'string','{$comentario}', 3, 300)";
     
                         $comentario = 'Registra el umbral de tiempo(dias) para el termino de pago de comision a personas que contratan nuevos clientes';
-				$query[] = "INSERT INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+				$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
                                         VALUES('UsoPagoComisionNuevoClienteTiempo', '730', 'string','{$comentario}', 6, -1)";
                 
 				foreach ($query as $q) {
@@ -8426,7 +8440,7 @@ NULL ,  'RUT'
 				}
 			    break;
 			case 5.87: // sincroniza el setting con la manera vieja de comprobarlo
-			    
+			     $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 255 )";
 			    $query[]="CREATE TABLE if not exists `prm_mantencion_tablas` (
 				    `id_tabla` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT,
 				    `nombre_tabla` VARCHAR( 64 ) NOT NULL ,
@@ -8459,7 +8473,7 @@ NULL ,  'RUT'
 			    break;
 			    
 			    case 5.88:
-				$query = array();
+				
 				$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 							VALUES ( 'NuevoMetodoGastoProvision',  '0',  'Si está activo, la cta corriente se cuadra dividiendo una provisión en vez de generando 2 ficticias',  'boolean',  '10',  '-1' );";
 				foreach ($query as $q) {
