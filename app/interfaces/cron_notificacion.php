@@ -823,19 +823,23 @@
      */
     if ( UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoCliente') == 1 )
     {
+        $query  = 'CREATE TABLE IF NOT EXISTS alerta_comision(cliente_id INT)';
+        $r      = mysql_query($query, $sesion->dbh);
+
         $max    = UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoClienteTiempo');
         $max    = $max && is_numeric($max) ? $max : 730; /* 730 dias */
 
         $email  = UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoClienteEmail');
         $email  = $email ? $email : 'soporte@lemontech.cl';
 
-        $column = 'c.id_cliente, c.fecha_creacion';
-
-        $query  = 'SELECT %s FROM cliente c, usuario u ';        
+        $query  = 'SELECT %s FROM cliente c LEFT JOIN alerta_comision ac ON ';
+        $query .= 'ac.cliente_id = c.id_cliente, usuario u ';
         $query .= 'WHERE c.id_usuario_encargado = u.id_usuario ';        
+        $query .= 'AND ac.cliente_id IS NULL ';
         $query .= 'AND UNIX_TIMESTAMP(CURRENT_DATE)-UNIX_TIMESTAMP(c.fecha_creacion) >= ' . $max;        
+        $query_count  = sprintf($query, 'COUNT(*) AS cant');
 
-        $r      = mysql_query(sprintf($query, 'COUNT(*) AS cant'), $sesion->dbh) 
+        $r      = mysql_query($query_count, $sesion->dbh) 
                     or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
         if ( ! $r ) {                
@@ -843,14 +847,15 @@
             $cant = array_shift(mysql_fetch_row($r));
             if ($cant<1){
             }else{
-                $pages = ceil($cant/10);
+                $cant_max = 15;
+                $pages = ceil($cant/$cant_max);
                 $query .= ' ORDER BY c.id_cliente DESC LIMIT %s, %s';
 
-                for($i = 10; $i <= $cant; $i = $i + 10)
+                for($i = 0; $i < $pages; $i = $i + 1)
                 {               
                     $columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
 
-                    $q = sprintf($query, $columns, ($i-10), $i);
+                    $q = sprintf($query, $columns, ($i*$cant_max), $cant_max);
                     $r = mysql_query($q, $sesion->dbh) 
                                 or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
@@ -861,6 +866,8 @@
 
                         $m = sprintf($message, $row->usuario, $row->glosa_cliente);
                         Utiles::Insertar($sesion, __("Notificacion")." $from", $m, $email, false);
+                        $query_enviado = 'INSERT INTO alerta_comision VALUES(' . $row->id_cliente . ')';
+                        $r_enviado = mysql_query($query_enviado, $sesion->dbh);
                     }
                 }                      
             }             
