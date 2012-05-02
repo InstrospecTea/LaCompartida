@@ -477,6 +477,7 @@ $tini=time();
                 
                                 $reportecontrato = new ReporteContrato($sesion,false, $separar_asuntos, $fecha1, $fecha2);
                                 $ultimocobro=$reportecontrato->arrayultimocobro;
+                                //echo '<pre>';print_r($ultimocobro);echo '</pre>';                                die();
 				$arrayolap=$reportecontrato->arrayolap;
 				
 								
