@@ -8526,14 +8526,15 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 					}
 				break;
 				case 5.91:
-					$query[]= "INSERT ignore INTO configuracion (id ,glosa_opcion ,valor_opcion ,comentario ,valores_posibles ,id_configuracion_categoria ,orden) VALUES (NULL ,  'VerCampoUsuarioEncargado',  '10',  'se debe de esconder el campo de Usuario Encargado en Agregar Cliente',  'boolean',  '0',  '250')";
+                                    $query[]= "INSERT ignore INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`) VALUES (10, 'Modificaciones del Cliente'), (11, 'Plugins - Hooks');";
+                                    $query[]= "INSERT ignore INTO configuracion (id ,glosa_opcion ,valor_opcion ,comentario ,valores_posibles ,id_configuracion_categoria ,orden) VALUES (NULL ,  'VerCampoUsuarioEncargado',  '10',  'se debe de esconder el campo de Usuario Encargado en Agregar Cliente',  'boolean',  '0',  '250')";
 					foreach ($query as $q) {
 						if (!($res = mysql_query($q, $dbh) )) {
-						//	throw new Exception($q . "---" . mysql_error());
+							throw new Exception($q . "---" . mysql_error());
 						}
 					}					
 				break;
-                                case 5.92:
+				case 5.92:
 				if(!existecampo('eliminado','olap_liquidaciones',$dbh))	$query[]= "ALTER TABLE  `olap_liquidaciones` ADD  `eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'";
                                    $query[]=   "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
                                   $query[]= "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
@@ -8542,6 +8543,20 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 							throw new Exception($q . "---" . mysql_error());
 						}
 					}					
+				break;
+				case 5.93:
+					$query = array();
+					
+					if(!existecampo('link_carpeta', 'carpeta', $dbh)){
+						$query[] = "ALTER TABLE `carpeta` ADD `link_carpeta` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL AFTER `nombre_carpeta` ;";
+					}
+					$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+						VALUES ( 'MostrarLinkCarpeta', '0', 'Campo Link especial para correa gubbins', 'boolean', '6', '-1' );";
+					$query[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) 
+						VALUES ('CantidadCharsGlosaCarpeta', '60', 'cantidad de chars que tendrá la glosa de la carpeta', 'numero', '6', '-1');";
+					
+					foreach($query as $q)
+						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				break;
 				
 	}
@@ -8553,7 +8568,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 $num = 0;
 $min_update=1;
-$max_update=5.92;
+$max_update=5.93;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
