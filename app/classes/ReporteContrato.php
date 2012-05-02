@@ -255,7 +255,7 @@ class ReporteContrato extends Contrato
 
 	function UltimosCobros() {
           
-            if($this->separarasuntos==0) {
+            if($this->separar_asuntos==0) {
             $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin 
 			    from cobro c join
 			    (select id_contrato, max(fecha_fin) as maxfecha from cobro group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_fin=maxfechas.maxfecha
