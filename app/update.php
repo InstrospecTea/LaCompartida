@@ -8529,7 +8529,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 					$query[]= "INSERT ignore INTO configuracion (id ,glosa_opcion ,valor_opcion ,comentario ,valores_posibles ,id_configuracion_categoria ,orden) VALUES (NULL ,  'VerCampoUsuarioEncargado',  '10',  'se debe de esconder el campo de Usuario Encargado en Agregar Cliente',  'boolean',  '0',  '250')";
 					foreach ($query as $q) {
 						if (!($res = mysql_query($q, $dbh) )) {
-							throw new Exception($q . "---" . mysql_error());
+						//	throw new Exception($q . "---" . mysql_error());
 						}
 					}					
 				break;
