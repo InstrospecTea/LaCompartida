@@ -254,12 +254,17 @@ class ReporteContrato extends Contrato
 	
 
 	function UltimosCobros() {
+          
+            if($this->separarasuntos==0) {
             $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin 
 			    from cobro c join
 			    (select id_contrato, max(fecha_fin) as maxfecha from cobro group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_fin=maxfechas.maxfecha
 			    group by id_contrato
 			    having id_cobro=max(id_cobro)
                            ";
+            } else {
+              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
+            }
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
 		while($listacobro=mysql_fetch_array($resp)):
 		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2]);
@@ -888,7 +893,7 @@ class ReporteContrato extends Contrato
 		from olap_liquidaciones ol
 join prm_moneda  AS moneda_contrato ON ol.id_moneda_total = moneda_contrato.id_moneda
   JOIN prm_moneda AS moneda_gasto ON moneda_gasto.id_moneda = ol.id_moneda_entry
-where 1
+where ol.eliminado=0  
 					
 					    $bwherefecha1
 					     $bwherefecha2
