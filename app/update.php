@@ -6110,7 +6110,7 @@ WHERE  `id` =105 LIMIT 1 ;";
            
          case 4.58:
          		$query = array();
-             if(existecampo('opc_ver_resumen_cobro_categoria','contrato', $dbh)) {
+             if(existecampo('opc_ver_resumen_cobro_categoria','contrato', $dbh) && !existecampo('opc_ver_detalles_por_hora_iniciales','contrato',$dbh)) {
          		$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
 							   CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
 							   CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
