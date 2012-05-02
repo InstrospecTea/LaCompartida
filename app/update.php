@@ -4677,9 +4677,9 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				case 3.78:
 					$query = array();
 					
-					$query[] = "ALTER TABLE `contrato` ADD  `retainer_usuarios` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer' AFTER  `retainer_horas` ;";
-					$query[] = "ALTER TABLE `cobro` ADD  `retainer_usuarios` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer' AFTER  `retainer_horas` ;";
-					$query[] = "INSERT INTO `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+					if(!existecampo('retainer_usuarios', 'contrato', $dbh))  $query[] = "ALTER TABLE `contrato` ADD  `retainer_usuarios` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer' AFTER  `retainer_horas` ;";
+					if(!existecampo('retainer_usuarios', 'cobro', $dbh)) $query[] = "ALTER TABLE `cobro` ADD  `retainer_usuarios` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer' AFTER  `retainer_horas` ;";
+					$query[] = "INSERT ignore INTO `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 												VALUES (
 													NULL ,  'RetainerUsuarios',  '0',  'Permite definir los usuario de quienes se van a incluir las horas en un cobro Retainer',  'boolean',  '6',  '-1'
 												);";
@@ -4691,21 +4691,21 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				case 3.79:
 						$query = array();
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trabajos'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
 						);";
-						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
+						$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trámites'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trámites'
 						);";
-						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
+						$query[] = "INSERT  ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
 
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -4714,12 +4714,13 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.80:
 					$query = array();
 					
-					$query[] = "ALTER TABLE  `asunto` ADD  `id_encargado2` INT( 11 ) NULL AFTER  `id_encargado` ;";
+				if(!existecampo('id_encargado2', 'asunto', $dbh)) {	
+                                        $query[] = "ALTER TABLE  `asunto` ADD  `id_encargado2` INT( 11 ) NULL AFTER  `id_encargado` ;";
 					$query[] = "ALTER TABLE  `asunto` ADD INDEX (  `id_encargado2` );";
 					$query[] = "ALTER TABLE `asunto`
 												ADD CONSTRAINT `asunto_ibfk_36` FOREIGN KEY (`id_encargado2`)
 												REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;";
-					
+                                }
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
@@ -4783,10 +4784,10 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
                         
             case 3.86:
 				$query = array();
-				$query[] = "ALTER TABLE `contrato` 
+				if(!existecampo('opc_ver_columna_cobrable', 'contrato', $dbh)) 	 $query[] = "ALTER TABLE `contrato` 
                                                 ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0' 
                                                 AFTER `opc_ver_profesional` ;";
-                                $query[] = "ALTER TABLE `cobro` 
+                                if(!existecampo('opc_ver_columna_cobrable', 'cobro', $dbh)) $query[] = "ALTER TABLE `cobro` 
                                                 ADD `opc_ver_columna_cobrable` TINYINT( 1 ) NOT NULL DEFAULT '0' 
                                                 AFTER `opc_ver_profesional` ;";
 					
@@ -4824,7 +4825,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 							$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
 							list($tiene_dato) = mysql_fetch_array($resp);
 							if( !$tiene_dato ) {
-							$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+							$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (
 							NULL , 'SerieDocumentosLegales', '2', NULL , 'numero', '6', '-1'
 							);";
@@ -4847,15 +4848,15 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.88:
 				$query = array();
 				
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+				$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
 					VALUES ('UsarAreaTrabajos', '0', 'usar area en trabajos ', 'boolean', '6', '-1');";
 				
-				$query[] = "CREATE TABLE  `prm_area_trabajo` (
+				$query[] = "CREATE TABLE if not exists `prm_area_trabajo` (
 								 `id_area_trabajo` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 								 `glosa` VARCHAR( 100 ) NOT NULL
 								) ENGINE = INNODB CHARACTER SET latin1 COLLATE latin1_swedish_ci;";
 				
-				$query[] = "INSERT INTO  `prm_area_trabajo` ( `glosa` )
+				$query[] = "INSERT ignore INTO  `prm_area_trabajo` ( `glosa` )
 								VALUES ( 'Corporativo' ),
 								( 'Contratación Estatal' ),
 								( 'Financiero' ),
@@ -4866,13 +4867,12 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 								( 'Litigio y Arbitraje' ),
 								( 'Tributario' );";
 				
-				$query[] = "ALTER TABLE  `trabajo` ADD  `id_area_trabajo` INT( 11 ) NULL ;";
-				
-				$query[] = "ALTER TABLE `trabajo` ADD INDEX ( `id_area_trabajo` );";
-				
+				 if(!existecampo('id_area_trabajo', 'trabajo', $dbh)) { 
+                                     $query[] = "ALTER TABLE  `trabajo` ADD  `id_area_trabajo` INT( 11 ) NULL ;";
+                                    $query[] = "ALTER TABLE `trabajo` ADD INDEX ( `id_area_trabajo` );";
 				$query[] = "ALTER TABLE `trabajo`
 				 ADD CONSTRAINT `trabajo_ibfk_28` FOREIGN KEY (`id_area_trabajo`) REFERENCES `prm_area_trabajo` (`id_area_trabajo`) ON DELETE SET NULL ON UPDATE CASCADE;";
-				
+                                 }
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
 						throw new Exception($q."---".mysql_error());
@@ -4883,7 +4883,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 			case 3.89:
 						$query = array();
 
-						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+						$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (NULL , 'AlertaDiariaHorasMensuales', '0', 'Mandar un correo diario con la cantidad de horas ingresadas el mes actual', 'boolean', '3', '-1');";
 
 					foreach($query as $q)
@@ -4916,7 +4916,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
 				
 				case 4:
 					$query = array(); 
-					$query[] = "CREATE TABLE factura_documento_cobro (
+					$query[] = "CREATE TABLE if not exists factura_documento_cobro (
   id int(11) NOT NULL auto_increment,
   id_factura int(11) NOT NULL default '0',
   id_documento_cobro int(11) default NULL,
@@ -4927,7 +4927,7 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
   KEY id_cobro (id_cobro)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-					$query[] = "CREATE TABLE prm_estado_factura (
+					$query[] = "CREATE TABLE if not exists prm_estado_factura (
   id_estado int(11) NOT NULL auto_increment,
   codigo char(1) NOT NULL default '',
   glosa varchar(50) NOT NULL default '',
@@ -4935,43 +4935,43 @@ ADD `descripcion` VARCHAR( 40 ) NOT NULL ;";
   KEY codigo (codigo)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-					$query[] = "INSERT INTO `prm_estado_factura` (`id_estado`, `codigo`, `glosa`)
+					$query[] = "INSERT ignore  INTO `prm_estado_factura` (`id_estado`, `codigo`, `glosa`)
 						VALUES  (1, 'F', 'Facturado'),
 								(2, 'C', 'Cobrado'),
 								(3, 'O', 'Obsequio'),
 								(4, 'L', 'Canjeado por letra'),
 								(5, 'A', 'Anulado');";
 
-					$query[] = "ALTER TABLE `factura` CHANGE `id_documento_legal_motivo` `id_documento_legal_motivo` INT( 11 ) NULL;";
+					if(!existecampo('id_documento_legal_motivo', 'factura', $dbh)) $query[] = "ALTER TABLE `factura` CHANGE `id_documento_legal_motivo` `id_documento_legal_motivo` INT( 11 ) NULL;";
 					$query[] = "UPDATE `factura` SET `id_documento_legal_motivo` = NULL WHERE `id_documento_legal_motivo` = 0;";
 
 					$query[] = "ALTER TABLE `factura` CHANGE `id_documento_legal` `id_documento_legal` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'tipo de documento legal';";
-					$query[] = "ALTER TABLE `factura` ADD `id_estado` INT( 11 ) DEFAULT NULL AFTER `anulado` ;";
+					if(!existecampo('id_estado', 'factura', $dbh)) $query[] = "ALTER TABLE `factura` ADD `id_estado` INT( 11 ) DEFAULT NULL AFTER `anulado` ;";
 
 					$query[] = "UPDATE `factura` SET `id_documento_legal_motivo` = 1 WHERE `id_documento_legal_motivo` = 0;";
 
-					$query[] = "ALTER TABLE `factura`
-  ADD INDEX ( `id_documento_legal_motivo` ),
-  ADD CONSTRAINT factura_ibfk_1 FOREIGN KEY (id_estado) REFERENCES prm_estado_factura (id_estado),
-  ADD CONSTRAINT factura_ibfk_2 FOREIGN KEY (id_documento_legal_motivo) REFERENCES prm_documento_legal_motivo (id_documento_legal_motivo);";
+				if(!existecampo('id_documento_legal_motivo', 'factura', $dbh))	$query[] = "ALTER TABLE `factura`
+                                    ADD INDEX ( `id_documento_legal_motivo` ),
+                                    ADD CONSTRAINT factura_ibfk_1 FOREIGN KEY (id_estado) REFERENCES prm_estado_factura (id_estado),
+                                    ADD CONSTRAINT factura_ibfk_2 FOREIGN KEY (id_documento_legal_motivo) REFERENCES prm_documento_legal_motivo (id_documento_legal_motivo);";
 
 					$query[] = "ALTER TABLE `factura_documento_cobro`
   ADD CONSTRAINT factura_documento_cobro_ibfk_3 FOREIGN KEY (id_cobro) REFERENCES cobro (id_cobro) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT factura_documento_cobro_ibfk_1 FOREIGN KEY (id_factura) REFERENCES factura (id_factura) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT factura_documento_cobro_ibfk_2 FOREIGN KEY (id_documento_cobro) REFERENCES documento (id_documento) ON DELETE SET NULL ON UPDATE CASCADE;";
 
-					$query[] = "INSERT INTO factura_documento_cobro( id_factura, id_cobro, id_documento_cobro )
+					$query[] = "INSERT ignore INTO factura_documento_cobro( id_factura, id_cobro, id_documento_cobro )
 SELECT f.id_factura AS id_factura, f.id_cobro AS id_cobro, d.id_documento AS id_documento_cobro
 FROM factura f
 LEFT JOIN documento d ON ( f.id_cobro = d.id_cobro AND d.tipo_doc = 'N' )
 INNER JOIN cobro c ON ( f.id_cobro = c.id_cobro );";
 
-					$query[] = "ALTER TABLE `contrato` ADD `separar_liquidaciones` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT 'generar las liquidaciones de honorarios y gastos por separado' AFTER `usa_impuesto_gastos` ;";
+					if(!existecampo('separar_liquidaciones', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD `separar_liquidaciones` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT 'generar las liquidaciones de honorarios y gastos por separado' AFTER `usa_impuesto_gastos` ;";
 
-					$query[] = "ALTER TABLE `cobro` ADD `incluye_honorarios` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `id_cobro` ,
+                                        if(!existecampo('incluye_honorarios', 'cobro', $dbh)) $query[] = "ALTER TABLE `cobro` ADD `incluye_honorarios` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `id_cobro` ,
 ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios` ;";
 
-					$query[] = "CREATE TABLE `contrato_documento_legal` (
+					$query[] = "CREATE TABLE if not exists `contrato_documento_legal` (
 											  `id_contrato_documento_legal` int(11) NOT NULL auto_increment,
 											  `id_contrato` int(11) NOT NULL default '0',
 											  `id_tipo_documento_legal` int(11) NOT NULL default '0',
@@ -4984,11 +4984,11 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 											  KEY `id_tipo_documento_legal` (`id_tipo_documento_legal`)
 											) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='documentos legales que se generaran por defecto tras emitir ' AUTO_INCREMENT=1 ;";
 
-					$query[] = "ALTER TABLE `contrato_documento_legal`
+					 $query[] = "ALTER TABLE `contrato_documento_legal`
 											  ADD CONSTRAINT `contrato_documento_legal_ibfk_2` FOREIGN KEY (`id_tipo_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`) ON DELETE CASCADE ON UPDATE CASCADE,
 											  ADD CONSTRAINT `contrato_documento_legal_ibfk_1` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
-					$query[] = "ALTER TABLE `cobro_pendiente` ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `id_cobro` ,
+					 if(!existecampo('incluye_gastos', 'cobro_pendiente', $dbh)) $query[] = "ALTER TABLE `cobro_pendiente` ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `id_cobro` ,
 												ADD `incluye_honorarios` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_gastos` ;";
 
 					foreach($query as $q)
@@ -5001,7 +5001,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 
 					$query[] = "ALTER TABLE `contrato_documento_legal` CHANGE `id_contrato` `id_contrato` INT( 11 ) NULL ";
 
-					$query[] = "ALTER TABLE `contrato` ADD `opc_moneda_gastos` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `opc_moneda_total` ;";
+				if(!existecampo('opc_moneda_gastos', 'contrato', $dbh)) 	$query[] = "ALTER TABLE `contrato` ADD `opc_moneda_gastos` TINYINT( 4 ) NOT NULL DEFAULT '1' AFTER `opc_moneda_total` ;";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5011,7 +5011,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 					case 4.02:
 					$query = array();
 
-					$query[] = "ALTER TABLE  `cobro` ADD  `se_esta_cobrando` VARCHAR( 254 ) NULL COMMENT  'glosa resumen de lo que se esta cobrando';";
+					if(!existecampo('se_esta_cobrando', 'cobro', $dbh))  $query[] = "ALTER TABLE  `cobro` ADD  `se_esta_cobrando` VARCHAR( 254 ) NULL COMMENT  'glosa resumen de lo que se esta cobrando';";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5021,7 +5021,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 					case 4.03:
 						$query = array();
 						
-						$query[] = "CREATE TABLE `cta_cte_fact_mvto` (
+						$query[] = "CREATE TABLE if not exists `cta_cte_fact_mvto` (
 												  `id_cta_cte_mvto` int(11) NOT NULL auto_increment,
 												  `tipo_mvto` varchar(10) NOT NULL default '',
 												  `id_factura` int(11) default NULL COMMENT 'si es un documento legal, apunta a la tabla factura (si no es null)',
@@ -5039,13 +5039,13 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 												  UNIQUE KEY `id_factura` (`id_factura`),
 												  UNIQUE KEY `id_factura_pago` (`id_factura_pago`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Movimientos de CtaCte Factura';";
-						$query[] = "CREATE TABLE `cta_cte_fact_mvto_moneda` (
+						$query[] = "CREATE TABLE if not exists  `cta_cte_fact_mvto_moneda` (
 												  `id_cta_cte_fact_mvto_moneda` int(11) NOT NULL auto_increment,
 												  `id_moneda` int(11) NOT NULL default '0',
 												  `tipo_cambio` double NOT NULL default '0',
 												  PRIMARY KEY  (`id_cta_cte_fact_mvto_moneda`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='tipos de cambio de los movimientos';";
-						$query[] = "CREATE TABLE `cta_cte_fact_mvto_neteo` (
+						$query[] = "CREATE TABLE if not exists  `cta_cte_fact_mvto_neteo` (
 												  `id_cta_cte_mvto_neteo` int(11) NOT NULL auto_increment,
 												  `id_mvto_deuda` int(11) NOT NULL default '0' COMMENT 'la factura. A este se le suma el monto',
 												  `id_mvto_pago` int(11) NOT NULL default '0' COMMENT 'el pago. A este se le resta el valor',
@@ -5064,7 +5064,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 					case 4.04:
 					$query = array();
 					
-					$query[] = "CREATE TABLE  `factura_pago` (
+					$query[] = "CREATE TABLE  if not exists  `factura_pago` (
 											 `id_factura_pago` INT( 11 ) NOT NULL AUTO_INCREMENT ,
 											 `fecha` DATE NOT NULL DEFAULT  '0000-00-00',
 											 `codigo_cliente` VARCHAR( 10 ) NOT NULL DEFAULT  '',
@@ -5095,8 +5095,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 					case 4.05:
 					$query = array();
 
-					$query[] = "ALTER TABLE  `cobro` ADD  `descuento_incobrable` DOUBLE NOT NULL ,
-ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
+					if(!existecampo('descuento_incobrable', 'cobro', $dbh)) $query[] = "ALTER TABLE  `cobro` ADD  `descuento_incobrable` DOUBLE NOT NULL , ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5105,7 +5104,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.06:
 					$query = array();
 
-					$query[] = "INSERT INTO cta_cte_fact_mvto (
+					$query[] = "INSERT ignore INTO cta_cte_fact_mvto (
 									tipo_mvto,
 									id_factura,
 									id_factura_pago,
@@ -5147,14 +5146,15 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.07:
 					$query = array();
 
-					$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda` CHANGE `id_cta_cte_fact_mvto_moneda` `id_cta_cte_fact_mvto` INT( 11 ) NOT NULL;";
+					if(existecampo('id_cta_cte_fact_mvto_moneda','cta_cte_fact_mvto_moneda', $dbh)) {
+                                            $query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda` CHANGE `id_cta_cte_fact_mvto_moneda` `id_cta_cte_fact_mvto` INT( 11 ) NOT NULL;";
 					$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda` DROP PRIMARY KEY;";
 					$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda` ADD PRIMARY KEY ( `id_cta_cte_fact_mvto` , `id_moneda` ) ;";
 
 					$query[] = "ALTER TABLE `cta_cte_fact_mvto_moneda`
   ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_2` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `cta_cte_fact_mvto_moneda_ibfk_1` FOREIGN KEY (`id_cta_cte_fact_mvto`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON DELETE CASCADE ON UPDATE CASCADE;";
-
+                                        }
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5163,19 +5163,18 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.08:
 					$query = array();
 
-					$query[] = "INSERT INTO cta_cte_fact_mvto_moneda (id_cta_cte_fact_mvto, id_moneda, tipo_cambio) 
+					$query[] = "INSERT ignore INTO cta_cte_fact_mvto_moneda (id_cta_cte_fact_mvto, id_moneda, tipo_cambio) 
 								SELECT mvto.id_cta_cte_mvto, cm.id_moneda, cm.tipo_cambio
 								FROM cta_cte_fact_mvto mvto
 								INNER JOIN factura fac ON fac.id_factura = mvto.id_factura
 								JOIN cobro_moneda cm ON cm.id_cobro = fac.id_cobro;";
 
-					$query[] = "ALTER TABLE `documento` ADD `id_factura_pago` INT NULL COMMENT 'si es un pago generado desde un pago a facturas, apunta al factura_pago q lo creo';";
-
-					$query[] = "ALTER TABLE `documento` ADD INDEX ( `id_factura_pago` ) ;";
-
-					$query[] = "ALTER TABLE `documento`
+					if(!existecampo('id_factura_pago', 'documento', $dbh)) {
+                                            $query[] = "ALTER TABLE `documento` ADD `id_factura_pago` INT NULL COMMENT 'si es un pago generado desde un pago a facturas, apunta al factura_pago q lo creo';";
+                                            $query[] = "ALTER TABLE `documento` ADD INDEX ( `id_factura_pago` ) ;";
+                                            $query[] = "ALTER TABLE `documento`
   ADD CONSTRAINT `documento_ibfk_13` FOREIGN KEY (`id_factura_pago`) REFERENCES `factura_pago` (`id_factura_pago`) ON DELETE CASCADE ON UPDATE CASCADE;";
-
+                                        }
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
 								throw new Exception($q."---".mysql_error());
@@ -5184,7 +5183,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.09:
 					$query = array();
 
-					$query[] = "CREATE TABLE  `factura_pago_rtf` (
+					$query[] = "CREATE TABLE if not exists  `factura_pago_rtf` (
 								  `id_formato` int(11) NOT NULL auto_increment,
 								  `descripcion` varchar(60) default NULL,
 								  `factura_pago_formato` mediumtext NOT NULL,
@@ -5203,7 +5202,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.10:
 					$query = array();
 
-					$query[] = "ALTER TABLE  `factura_pago` ADD  `pago_retencion` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
+					if(!existecampo('pago_retencion', 'factura_pago', $dbh)) $query[] = "ALTER TABLE  `factura_pago` ADD  `pago_retencion` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5213,7 +5212,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.11:
 					$query = array();
 
-					$query[] = "ALTER TABLE  `prm_moneda` ADD  `glosa_moneda_plural` VARCHAR( 100 ) NOT NULL COMMENT  'este campo se usa principalmente en cambiar montos por palabras' AFTER `glosa_moneda` ;";
+					if(!existecampo('glosa_moneda_plural', 'prm_moneda', $dbh)) $query[] = "ALTER TABLE  `prm_moneda` ADD  `glosa_moneda_plural` VARCHAR( 100 ) NOT NULL COMMENT  'este campo se usa principalmente en cambiar montos por palabras' AFTER `glosa_moneda` ;";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =  'Pesos' WHERE glosa_moneda =  'Peso'";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Dólares' WHERE glosa_moneda =  'Dólar'";
 					$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Euros' WHERE glosa_moneda =  'Euro'";
@@ -5229,7 +5228,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.12:
 					$query = array();
 
-					$query[] = "ALTER TABLE  `cuenta_banco` ADD  `id_moneda` INT NOT NULL ;";
+					if(!existecampo('id_moneda', 'cuenta_banco', $dbh)) $query[] = "ALTER TABLE  `cuenta_banco` ADD  `id_moneda` INT NOT NULL ;";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5239,13 +5238,8 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.13:
 					$query = array();
 
-					$query[] = "CREATE TABLE `prm_factura_pago_concepto` (
-  `id_concepto` int(11) NOT NULL auto_increment,
-  `glosa` varchar(50) NOT NULL default '',
-  `orden` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`id_concepto`)
-);";
-					$query[] = "ALTER TABLE  `factura_pago` ADD  `id_concepto` INT NOT NULL COMMENT  'es la glosa que se muestra en el voucher';";
+					$query[] = "CREATE TABLE if not exists  `prm_factura_pago_concepto` (  `id_concepto` int(11) NOT NULL auto_increment,  `glosa` varchar(50) NOT NULL default '',  `orden` int(11) NOT NULL default '0',  PRIMARY KEY  (`id_concepto`));";
+					if(!existecampo('id_concepto', 'factura_pago', $dbh)) $query[] = "ALTER TABLE  `factura_pago` ADD  `id_concepto` INT NOT NULL COMMENT  'es la glosa que se muestra en el voucher';";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5255,25 +5249,25 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.14:
 					$query = array();
 
-					$query[] = 	"ALTER TABLE  `prm_factura_pago_concepto` ADD  `pje_variable` INT NOT NULL COMMENT  'si es 1, se hace un replace de % por el % que corresponda' AFTER  `glosa` ;";
+					if(!existecampo('pje_variable', 'prm_factura_pago_concepto', $dbh)) $query[] = 	"ALTER TABLE  `prm_factura_pago_concepto` ADD  `pje_variable` INT NOT NULL COMMENT  'si es 1, se hace un replace de % por el % que corresponda' AFTER  `glosa` ;";
 				
-					$query[] = "INSERT INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
-(1, 'Cobranza al 100%', 0, 2),
-(2, 'Cobranza de detracción 12%', 0, 6),
-(3, 'Comisión y gastos bancarios', 0, 7),
-(4, 'Retención', 0, 15),
-(5, 'Dscto. nota de credito', 0, 8),
-(6, 'Cobranza al 88%', 0, 3),
-(7, 'Gastos Financieros', 0, 10),
-(8, 'Pago a cuenta', 0, 13),
-(9, 'Saldo de factura', 0, 14),
-(10, 'Pago por canje', 0, 12),
-(11, 'Otros ingresos', 0, 11),
-(12, 'Ajuste por tipo de cambio', 0, 1),
-(13, 'Cobranza al 6%', 0, 4),
-(14, 'Cobranza al 94%', 0, 5),
-(15, 'Dscto. nota de credito parcial', 0, 9),
-(16, 'Concepto pagado', 0, 16);";
+					$query[] = "INSERT ignore INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
+                                                (1, 'Cobranza al 100%', 0, 2),
+                                                (2, 'Cobranza de detracción 12%', 0, 6),
+                                                (3, 'Comisión y gastos bancarios', 0, 7),
+                                                (4, 'Retención', 0, 15),
+                                                (5, 'Dscto. nota de credito', 0, 8),
+                                                (6, 'Cobranza al 88%', 0, 3),
+                                                (7, 'Gastos Financieros', 0, 10),
+                                                (8, 'Pago a cuenta', 0, 13),
+                                                (9, 'Saldo de factura', 0, 14),
+                                                (10, 'Pago por canje', 0, 12),
+                                                (11, 'Otros ingresos', 0, 11),
+                                                (12, 'Ajuste por tipo de cambio', 0, 1),
+                                                (13, 'Cobranza al 6%', 0, 4),
+                                                (14, 'Cobranza al 94%', 0, 5),
+                                                (15, 'Dscto. nota de credito parcial', 0, 9),
+                                                (16, 'Concepto pagado', 0, 16);";
 
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5283,7 +5277,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.15:
 					$query = array();
 
-					$query[] = 	"ALTER TABLE `cta_cte_fact_mvto` ADD `anulado` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `saldo` ;";
+					if(!existecampo('anulado', 'cta_cte_fact_mvto', $dbh)) $query[] = 	"ALTER TABLE `cta_cte_fact_mvto` ADD `anulado` TINYINT( 1 ) NOT NULL DEFAULT '0' AFTER `saldo` ;";
 				
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5357,7 +5351,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					case 4.18:
 					$query = array();
 
-					$query[] = 	"ALTER TABLE  `prm_documento_legal` ADD  `grupo` VARCHAR( 40 ) NOT NULL ;";
+					if(!existecampo('grupo', 'prm_documento_legal', $dbh)) $query[] = 	"ALTER TABLE  `prm_documento_legal` ADD  `grupo` VARCHAR( 40 ) NOT NULL ;";
 					$query[] =  "UPDATE  `prm_documento_legal` SET  `grupo` =  'VENTA' WHERE  `prm_documento_legal`.`id_documento_legal` =1 LIMIT 1 ;";
 					$query[] =  "UPDATE  `prm_documento_legal` SET  `grupo` =  'VENTA' WHERE  `prm_documento_legal`.`id_documento_legal` =2 LIMIT 1 ;";
 					foreach($query as $q)
@@ -5368,7 +5362,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					/*Crea tbl usuario_vacacion*/
 					case 4.19:
 						$query = array();
-						$query[] = "CREATE TABLE `usuario_vacacion` (
+						$query[] = "CREATE TABLE if not exists  `usuario_vacacion` (
 							  `id` int(11) NOT NULL auto_increment,
 							  `id_usuario` int(10) NOT NULL default '0',
 							  `id_usuario_creador` int(10) default NULL,
@@ -5388,9 +5382,9 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					
 					case 4.20:
 						$query = array();
-						$query[] = "ALTER TABLE `factura_pago` ADD `monto_moneda_cobro` DOUBLE NOT NULL COMMENT 'monto en la moneda del cobro' AFTER `id_moneda` ;";
-						$query[] = "ALTER TABLE `factura_pago` ADD `id_moneda_cobro` INT NOT NULL DEFAULT '1' COMMENT 'moneda del cobro' AFTER `monto_moneda_cobro` ;";
-						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` ADD `monto_pago` DOUBLE NOT NULL COMMENT 'monto en la moneda del pago' AFTER `monto` ;";
+					if(!existecampo('monto_moneda_cobro', 'factura_pago', $dbh))	$query[] = "ALTER TABLE `factura_pago` ADD `monto_moneda_cobro` DOUBLE NOT NULL COMMENT 'monto en la moneda del cobro' AFTER `id_moneda` ;";
+					if(!existecampo('id_moneda_cobro', 'factura_pago', $dbh))	$query[] = "ALTER TABLE `factura_pago` ADD `id_moneda_cobro` INT NOT NULL DEFAULT '1' COMMENT 'moneda del cobro' AFTER `monto_moneda_cobro` ;";
+					if(!existecampo('monto_pago', 'cta_cte_fact_mvto_neteo', $dbh))	$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` ADD `monto_pago` DOUBLE NOT NULL COMMENT 'monto en la moneda del pago' AFTER `monto` ;";
 						$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo` CHANGE `monto` `monto` DOUBLE NOT NULL DEFAULT '0' COMMENT 'monto en la moneda de la deuda'";
 						$query[] = "UPDATE `factura_pago` SET `monto_moneda_cobro` = `monto`, `id_moneda_cobro` = `id_moneda` WHERE 1";
 						$query[] = "UPDATE `cta_cte_fact_mvto_neteo` SET `monto_pago` = `monto` WHERE 1"; 
@@ -5402,7 +5396,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					
 					case 4.21:
 						$query = array();
-						$query[] = "ALTER TABLE  `factura` ADD  `porcentaje_impuesto` DOUBLE NOT NULL COMMENT  'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos';";
+					if(!existecampo('porcentaje_impuesto', 'factura', $dbh))	$query[] = "ALTER TABLE  `factura` ADD  `porcentaje_impuesto` DOUBLE NOT NULL COMMENT  'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos';";
 						$query[] = "UPDATE factura SET porcentaje_impuesto = ((iva*100)/honorarios)";
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh)))
@@ -5411,7 +5405,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 					
 					case 4.22:
 						$query = array();
-						$query[] = "CREATE TABLE `usuario_cambio_historial` (
+						$query[] = "CREATE TABLE if not exists `usuario_cambio_historial` (
 						  `id_usuario` int(11) default NULL,
 						  `id_usuario_creador` int(11) NOT NULL default '0',
 						  `nombre_dato` varchar(255) default NULL,
@@ -5483,7 +5477,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 			
 					case 4.25:
 						$query = array();
-						$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ValidacionesCliente', '0', NULL , 'boolean', '6', '-1');";
+						$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ValidacionesCliente', '0', NULL , 'boolean', '6', '-1');";
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
@@ -5529,7 +5523,7 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 						
 						$query = array();
 						if( $cantidad == 0 )
-							$query[] = "INSERT INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
+							$query[] = "INSERT ignore INTO `tramite_tarifa` ( `id_tramite_tarifa` , `glosa_tramite_tarifa` , `fecha_creacion` , `fecha_modificacion` , `tarifa_defecto` , `guardado` )
 															 VALUES ( '1',  'TARIFA BASE',  '0000-00-00 00:00:00', NULL ,  '1',  '1' );";
 						
 						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
@@ -5545,13 +5539,14 @@ ADD  `descuento_obsequio` DOUBLE NOT NULL ;";
 
 					case 4.29:
 						$query = array();
-						$query[] = "CREATE TABLE `prm_proveedor` (
+						$query[] = "CREATE TABLE if not exists `prm_proveedor` (
 									  `id_proveedor` int(11) NOT NULL auto_increment,
 									  `rut` varchar(12) NOT NULL default '',
 									  `glosa` varchar(50) NOT NULL default '',
 									  PRIMARY KEY  (`id_proveedor`)
 									) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-						$query[] = "ALTER TABLE `cta_corriente` ADD  `id_proveedor` INT( 11 ) NOT NULL ;";
+						
+                                                if(!existecampo('id_proveedor','cta_corriente')) $query[] = "ALTER TABLE `cta_corriente` ADD  `id_proveedor` INT( 11 ) NOT NULL ;";
 
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5570,7 +5565,7 @@ VALUES (
 
 					case 4.31:
 						$query = array();
-						$query[] = "ALTER TABLE `tarifa` ADD `tarifa_flat` DOUBLE NULL COMMENT 'si es una tarifa flat (igual para todos los profesionales) se guarda el monto. si no, es null';";
+						if(!existecampo('tarifa_flat', 'tarifa', $dbh)) $query[] = "ALTER TABLE `tarifa` ADD `tarifa_flat` DOUBLE NULL COMMENT 'si es una tarifa flat (igual para todos los profesionales) se guarda el monto. si no, es null';";
 
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5578,8 +5573,8 @@ VALUES (
 
 					case 4.32:
 						$query = array();
-						$query[] = "ALTER TABLE  `contrato` ADD  `id_cuenta` INT( 11 ) NOT NULL ;";
-						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `cod_swift` VARCHAR( 50 ) NOT NULL ;";
+					if(!existecampo('id_cuenta', 'contrato', $dbh)) 	$query[] = "ALTER TABLE  `contrato` ADD  `id_cuenta` INT( 11 ) NOT NULL ;";
+					if(!existecampo('cod_swift', 'cuenta_banco', $dbh)) 	$query[] = "ALTER TABLE  `cuenta_banco` ADD  `cod_swift` VARCHAR( 50 ) NOT NULL ;";
 
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5587,8 +5582,8 @@ VALUES (
 
 					case 4.33:
 						$query = array();
-						$query[] = "ALTER TABLE  `contrato` ADD  `id_pais` INT( 11 ) NOT NULL ;";
-						$query[] = "CREATE TABLE `prm_pais` (
+						if(!existecampo('id_pais', 'contrato', $dbh))  $query[] = "ALTER TABLE  `contrato` ADD  `id_pais` INT( 11 ) NOT NULL ;";
+						$query[] = "CREATE TABLE if not exists `prm_pais` (
   `id_pais` int(11) NOT NULL auto_increment,
   `iso_num` smallint(6) default NULL,
   `iso_2siglas` char(2) default NULL,
@@ -5598,7 +5593,7 @@ VALUES (
   PRIMARY KEY  (`id_pais`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 						$query[] = "
-INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganistán', 0),
+INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganistán', 0),
 (2, 248, 'AX', 'ALA', 'Islas Gland', 0),
 (3, 8, 'AL', 'ALB', 'Albania', 0),
 (4, 276, 'DE', 'DEU', 'Alemania', 0),
@@ -5854,7 +5849,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 
 					case 4.35:
 						$query = array();
-						$query[] = "ALTER TABLE  `cuenta_banco` ADD  `CCI` VARCHAR( 50 ) NOT NULL ;";
+					if(!existecampo('CCI', 'cuenta_banco', $dbh)) 	$query[] = "ALTER TABLE  `cuenta_banco` ADD  `CCI` VARCHAR( 50 ) NOT NULL ;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5862,7 +5857,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 
 					case 4.36:
 						$query = array();
-						$query[] = "DROP TABLE  `usuario_tarifa_cliente`;";
+						$query[] = "DROP TABLE if exists  `usuario_tarifa_cliente`;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5870,7 +5865,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 
 					case 4.37:
 						$query = array();
-						$query[] = "ALTER TABLE  `cobro_historial` ADD  `id_factura` INT( 11 ) NOT NULL DEFAULT  '0' AFTER  `id_cobro` ;";
+					if(!existecampo('id_factura', 'cobro_historial', $dbh))	$query[] = "ALTER TABLE  `cobro_historial` ADD  `id_factura` INT( 11 ) NOT NULL DEFAULT  '0' AFTER  `id_cobro` ;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5886,16 +5881,16 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					
 					case 4.39:
 						$query = array();
-						$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACT_PAGO', 'Factura Pago', '/app/interfaces/facturas_pagos.php', '', '', 0, 53, 'COBRANZA');";
-						$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACT_PAGO');";
-						$query[] = "INSERT INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('COB',  'FACT_PAGO');";
+						$query[] = "INSERT ignore INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACT_PAGO', 'Factura Pago', '/app/interfaces/facturas_pagos.php', '', '', 0, 53, 'COBRANZA');";
+						$query[] = "INSERT ignore INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACT_PAGO');";
+						$query[] = "INSERT ignore INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('COB',  'FACT_PAGO');";
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 					break;
 
 					case 4.40:
 						$query = array();
-						$query[] = "ALTER TABLE  `cobro` ADD  `monto_ajustado` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_subtotal`;";
+						if(!existecampo('monto_ajustado', 'cobro', $dbh)) $query[] = "ALTER TABLE  `cobro` ADD  `monto_ajustado` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_subtotal`;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5903,14 +5898,14 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 
 					case 4.41:
 						$query = array();
-						$query[] = "ALTER TABLE  `prm_moneda` ADD  `codigo` VARCHAR( 7 ) NOT NULL DEFAULT  'CLP' AFTER  `simbolo` ;";
+							if(!existecampo('codigo', 'prm_moneda', $dbh)) $query[] = "ALTER TABLE  `prm_moneda` ADD  `codigo` VARCHAR( 7 ) NOT NULL DEFAULT  'CLP' AFTER  `simbolo` ;";
 						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'USD' WHERE  `id_moneda`=2;";
 						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UF' WHERE  `id_moneda`=3;";
 						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UTM' WHERE  `id_moneda`=4;";
 						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'EUR ' WHERE  `id_moneda`=5;";
 						$query[] = "UPDATE  `prm_moneda` SET  `codigo` =  'CLP UTA' WHERE  `id_moneda`=6;";
 
-						$query[] = "ALTER TABLE  `cobro` ADD  `informado` VARCHAR( 2 ) NOT NULL DEFAULT  'NO' AFTER  `facturado` ,
+						if(!existecampo('informado', 'cobro', $dbh))  $query[] = "ALTER TABLE  `cobro` ADD  `informado` VARCHAR( 2 ) NOT NULL DEFAULT  'NO' AFTER  `facturado` ,
 												ADD  `fecha_informado` DATETIME NULL DEFAULT NULL AFTER  `informado` ;";
 
 						$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,		`id_configuracion_categoria` ,  `orden` ) 
@@ -5946,7 +5941,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 						
 					case 4.44:
 						$query = array();
-						$query[] = "ALTER TABLE `cobro` ADD  `monto_original` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_ajustado` ;";
+						if(!existecampo('monto_original', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD  `monto_original` DOUBLE NOT NULL DEFAULT  '0' AFTER  `monto_ajustado` ;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5954,27 +5949,28 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					
 					case 4.45:
 						$query = array();
-						$query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ,
-																	ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ,
-																	ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ,
-																	ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ,
-																	ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ,
-																	ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
-																							$query[] = "ALTER TABLE `contrato` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ,
-																	ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ,
-																	ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ,
-																	ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ,
-																	ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ,
-																	ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
+						if(!existecampo('opc_ver_resumen_cobro_categoria', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro`";
+						if(!existecampo('opc_ver_resumen_cobro_tarifa', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ";
+                                                if(!existecampo('opc_ver_resumen_cobro_importe', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ";
+						if(!existecampo('opc_ver_profesional_iniciales', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ";
+                                                if(!existecampo('opc_ver_profesional_tarifa', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ";
+						if(!existecampo('opc_ver_profesional_importe', 'cobro', $dbh))  $query[] = "ALTER TABLE `cobro` ADD `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
+                                                                                                                                            
+						if(!existecampo('opc_ver_resumen_cobro_categoria', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD `opc_ver_resumen_cobro_categoria` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro` ";
+						if(!existecampo('opc_ver_resumen_cobro_tarifa', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD `opc_ver_resumen_cobro_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_categoria` ";
+						if(!existecampo('opc_ver_resumen_cobro_importe', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD `opc_ver_resumen_cobro_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_resumen_cobro_tarifa` ";
+						if(!existecampo('opc_ver_profesional_iniciales', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional` ";
+						if(!existecampo('opc_ver_profesional_tarifa', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_profesional_tarifa` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_iniciales` ";
+						if(!existecampo('opc_ver_profesional_importe', 'contrato', $dbh)) $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_profesional_importe` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_profesional_tarifa` ;";
 						
 						foreach( $query as $q)
 						{
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 						}
 						break;
-			case 4.46:
+			case 4.46: 
 						$query = array();
-						$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_factura` INT( 11 ) NULL , ADD  `fecha_factura` DATE NULL ;";
+						if(!existecampo('id_factura','cta_corriente', $dbh))  $query[] = "ALTER TABLE  `cta_corriente` ADD  `id_factura` INT( 11 ) NULL , ADD  `fecha_factura` DATE NULL ;";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -5982,7 +5978,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 
 			case 4.47:
 						$query = array();
-						$query[] = "CREATE TABLE  `moneda_historial` (
+						$query[] = "CREATE TABLE  if not exists `moneda_historial` (
 							 `id_moneda_historial` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 							 `id_moneda` INT( 11 ) NOT NULL DEFAULT  '0',
 							 `fecha` DATETIME NULL ,
@@ -5995,7 +5991,7 @@ INSERT INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nom
 					break;
 			case 4.48:
 						$query = array();
-						$query[] = "ALTER TABLE  `moneda_historial` ADD  `id_usuario` INT( 11 ) NOT NULL DEFAULT  '0';";
+						if(!existecampo('id_usuario', 'moneda_historial', $dbh)) $query[] = "ALTER TABLE  `moneda_historial` ADD  `id_usuario` INT( 11 ) NOT NULL DEFAULT  '0';";
 						
 						foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6015,21 +6011,21 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.50:
 						$query = array();
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trabajos'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
 						);";
-						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
+						$query[] = "INSERT ignore  INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
 
-						$query[] = "INSERT INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
+						$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` ) 
 						VALUES (
 						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trámites'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trámites'
 						);";
-						$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
+						$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
 
 
 						foreach($query as $q)
@@ -6049,7 +6045,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.52:
 				$query = array();
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociada',  '0',  'Permite asociar una factura a un gasto',  'boolean',  '6',  '-1');";
-				$query[] = "ALTER TABLE  `factura` ADD  `id_contrato` INT NOT NULL ;";
+				if(!existecampo('id_contrato', 'factura', $dbh)) $query[] = "ALTER TABLE  `factura` ADD  `id_contrato` INT NOT NULL ;";
 
 			foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6057,11 +6053,13 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			case 4.53:
 				$query = array();
-				$query[] = "ALTER TABLE `contrato` ADD `id_usuario_secundario` INT NULL COMMENT 'encargado secundario' AFTER `id_usuario_responsable` ;";
-				$query[] = "ALTER TABLE `contrato` ADD INDEX ( `id_usuario_secundario` ) ;";
-				$query[] = "ALTER TABLE `contrato` ADD CONSTRAINT `contrato_ibfk_13` FOREIGN KEY (`id_usuario_secundario`) REFERENCES `usuario` (`id_usuario`);";
-				$query[] = "UPDATE `contrato` SET `id_usuario_secundario` = `id_usuario_responsable`;";
-				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+				if(!existecampo('id_contrato', 'factura', $dbh)) {
+                                    $query[] = "ALTER TABLE `contrato` ADD `id_usuario_secundario` INT NULL COMMENT 'encargado secundario' AFTER `id_usuario_responsable` ;";
+                                    $query[] = "ALTER TABLE `contrato` ADD INDEX ( `id_usuario_secundario` ) ;";
+                                    $query[] = "ALTER TABLE `contrato` ADD CONSTRAINT `contrato_ibfk_13` FOREIGN KEY (`id_usuario_secundario`) REFERENCES `usuario` (`id_usuario`);";
+                                    $query[] = "UPDATE `contrato` SET `id_usuario_secundario` = `id_usuario_responsable`;";
+                                 }
+				$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 				VALUES (NULL , 'EncargadoSecundario', '0', NULL , 'boolean', '6', '-1');";
 
 			foreach($query as $q)
@@ -6069,7 +6067,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			break;
 			case 4.54:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (182, 'SelectClienteAsuntoEspecial', '1', 'Usar Select para Clientes y Autocompletador para Asuntos en  pantalla Asunto', 'boolean', 6, -1);";
+				$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (182, 'SelectClienteAsuntoEspecial', '1', 'Usar Select para Clientes y Autocompletador para Asuntos en  pantalla Asunto', 'boolean', 6, -1);";
 				
 				foreach( $query as $q )
 				{
@@ -6078,7 +6076,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				break;
 			case 4.55:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'MostrarDetalleProfesionalCartaCobro', '1', 'Mostrar el detalle de los profesionales en la carta de cobro', 'boolean', '4', '-1');";
+				$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'MostrarDetalleProfesionalCartaCobro', '1', 'Mostrar el detalle de los profesionales en la carta de cobro', 'boolean', '4', '-1');";
 				
 				foreach( $query as $q )
 				{
@@ -6093,7 +6091,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 												VALUES (
 												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
 												);";
-					$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_factura` `codigo_factura_gasto` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+					if(existecampo('id_factura','cta_corriente')) $query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_factura` `codigo_factura_gasto` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
 					
 					foreach($query as $q)
 							if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6101,8 +6099,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 				
 				case 4.57:
            $query = array();
-           $query[] = "ALTER TABLE `cobro` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
-           $query[] = "ALTER TABLE `contrato` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
+         if(!existecampo('opc_ver_detalles_por_hora', 'cobro', $dbh))   $query[] = "ALTER TABLE `cobro` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
+         if(!existecampo('opc_ver_detalles_por_hora', 'contrato', $dbh))  $query[] = "ALTER TABLE `contrato` ADD `opc_ver_detalles_por_hora` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_valor_hh_flat_fee`;";
                                
            foreach( $query as $q )
            {
@@ -6112,17 +6110,18 @@ WHERE  `id` =105 LIMIT 1 ;";
            
          case 4.58:
          		$query = array();
-         		$query[] = "ALTER TABLE `contrato` 
-         									CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
-													CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
-													CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
+             if(existecampo('opc_ver_resumen_cobro_categoria','contrato', $dbh)) {
+         		$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1',
+							   CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1',
+							   CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `contrato` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_importe` `opc_ver_detalles_por_hora_importe` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_tarifa` `opc_ver_detalles_por_hora_tarifa` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_resumen_cobro_categoria` `opc_ver_detalles_por_hora_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
 						$query[] = "ALTER TABLE `cobro` CHANGE `opc_ver_profesional_iniciales` `opc_ver_profesional_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1'";
-						$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
-						$query[] = "ALTER TABLE `cobro` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
+             }
+                                         if(!existecampo('opc_ver_detalles_por_hora_categoria', 'contrato', $dbh))   	$query[] = "ALTER TABLE `contrato` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
+					 if(!existecampo('opc_ver_detalles_por_hora_categoria', 'cobro', $dbh))   	$query[] = "ALTER TABLE `cobro` ADD  `opc_ver_detalles_por_hora_categoria` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_detalles_por_hora_iniciales` ;";
 						
 						foreach( $query as $q )
             {
@@ -6132,11 +6131,11 @@ WHERE  `id` =105 LIMIT 1 ;";
          
 		 case 4.59:
 				$query = array();
-				$query[] = "INSERT INTO `prm_estado_cobro` (`codigo_estado_cobro`, `orden`) VALUES ('FACTURADO', '4'), ('PAGO PARCIAL', '6');";
+				$query[] = "INSERT ignore INTO `prm_estado_cobro` (`codigo_estado_cobro`, `orden`) VALUES ('FACTURADO', '4'), ('PAGO PARCIAL', '6');";
 				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '5' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'ENVIADO AL CLIENTE' AND  `orden` =4 LIMIT 1 ;";
 				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '7' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'PAGADO' AND  `orden` =5 LIMIT 1 ;";
 				$query[] = "UPDATE  `prm_estado_cobro` SET  `orden` =  '8' WHERE CONVERT(  `codigo_estado_cobro` USING utf8 ) =  'INCOBRABLE' AND  `orden` =6 LIMIT 1 ;";
-				$query[] = "ALTER TABLE  `cobro` ADD  `fecha_pago_parcial` DATETIME NULL AFTER  `fecha_enviado_cliente` ;";
+				 if(!existecampo('fecha_pago_parcial', 'cobro', $dbh))   $query[] = "ALTER TABLE  `cobro` ADD  `fecha_pago_parcial` DATETIME NULL AFTER  `fecha_enviado_cliente` ;";
 
 			foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6144,15 +6143,15 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.60:
 				$query = array();
-				$query[] = "ALTER TABLE  `cobro` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
-				$query[] = "ALTER TABLE  `contrato` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
+			 if(!existecampo('opc_ver_profesional_iniciales', 'cobro', $dbh)) 	$query[] = "ALTER TABLE  `cobro` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
+			 if(!existecampo('opc_ver_profesional_iniciales', 'contrato', $dbh)) 	$query[] = "ALTER TABLE  `contrato` ADD  `opc_ver_profesional_iniciales` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `opc_ver_profesional` ;";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 			break;
 			case 4.61:
 				$query = array();
-				$query[] = "ALTER TABLE  `cobro_rtf` ADD  `pdf_encabezado_imagen` TEXT NULL , ADD  `pdf_encabezado_texto` TEXT NULL ;";
+			 if(!existecampo('pdf_encabezado_imagen', 'cobro_rtf', $dbh)) 	$query[] = "ALTER TABLE  `cobro_rtf` ADD  `pdf_encabezado_imagen` TEXT NULL , ADD  `pdf_encabezado_texto` TEXT NULL ;";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6168,7 +6167,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.63:
 				$query = array();
-				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
+				$query[] = "INSERT ignore INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) 
 											VALUES (
 											'7',  'Margenes Factura'
 											);";
@@ -6236,7 +6235,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			case 4.65:
 				$query = array();
 				
-				$query[] = "INSERT INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresión Carta');";
+				$query[] = "INSERT ignore INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresión Carta');";
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHora',  '1', NULL ,  'boolean',  '8',  '-1');";
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerModalidad',  '0', NULL ,  'boolean',  '8',  '-1');";
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesional',  '1', NULL ,  'boolean',  '8',  '-1');";
@@ -6279,7 +6278,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				$query = array();
 				$query[] = "ALTER TABLE `cobro` DROP `informado`;";
 				$query[] = "ALTER TABLE `cobro` DROP `fecha_informado`;";
-				$query[] = "ALTER TABLE  `cobro` ADD  `estado_contabilidad` VARCHAR( 25 ) NOT NULL DEFAULT  'NO INFORMADO' COMMENT  'webservice contabilidad' AFTER  `facturado` , ADD  `fecha_contabilidad` DATETIME NULL DEFAULT NULL COMMENT  'webservice contabilidad' AFTER  `estado_contabilidad` ;";
+			 if(!existecampo('estado_contabilidad', 'cobro', $dbh)) 		$query[] = "ALTER TABLE  `cobro` ADD  `estado_contabilidad` VARCHAR( 25 ) NOT NULL DEFAULT  'NO INFORMADO' COMMENT  'webservice contabilidad' AFTER  `facturado` , ADD  `fecha_contabilidad` DATETIME NULL DEFAULT NULL COMMENT  'webservice contabilidad' AFTER  `estado_contabilidad` ;";
 
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES ( NULL ,  'FacturaAsociadaCodificada',  '0',  'La factura asociada a un gasto tiene forma XXX-XXXXXXXXXX',  'boolean',  '6',  '-1');";
 
@@ -6289,7 +6288,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.68:
 				$query = array();
-				$query[] = "ALTER TABLE  `tramite` ADD  `id_moneda_tramite_individual` INT( 11 ) NULL ,
+				 if(!existecampo('id_moneda_tramite_individual', 'tramite', $dbh))  $query[] = "ALTER TABLE  `tramite` ADD  `id_moneda_tramite_individual` INT( 11 ) NULL ,
 											ADD  `tarifa_tramite_individual` DOUBLE NULL ;";
 				
 				foreach($query as $q)
@@ -6309,7 +6308,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.70:
 				$query = array();
-				$query[] = "ALTER TABLE `prm_moneda` ADD `tipo_cambio_referencia` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
+				 if(!existecampo('tipo_cambio_referencia', 'prm_moneda', $dbh))  $query[] = "ALTER TABLE `prm_moneda` ADD `tipo_cambio_referencia` TINYINT( 1 ) NOT NULL DEFAULT  '0';";
 				$query[] = "UPDATE prm_moneda SET tipo_cambio_referencia = 1 WHERE moneda_base = 1;";
 				
 				foreach($query as $q)
@@ -6333,10 +6332,10 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.72:
 				$query = array();
-				$query[] = "INSERT INTO `prm_permisos` ( `codigo_permiso` , `glosa` ) VALUES ( 'TAR', 'Tarifa' );";
-				$query[] = "INSERT INTO `usuario_permiso` SELECT DISTINCT id_usuario, 'TAR' FROM `usuario_permiso` WHERE codigo_permiso IN ( 'ADM', 'COB' );";
-				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'COBRANZA' );";
-				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'TARIFA' );";
+				$query[] = "INSERT ignore INTO `prm_permisos` ( `codigo_permiso` , `glosa` ) VALUES ( 'TAR', 'Tarifa' );";
+				$query[] = "INSERT ignore INTO `usuario_permiso` SELECT DISTINCT id_usuario, 'TAR' FROM `usuario_permiso` WHERE codigo_permiso IN ( 'ADM', 'COB' );";
+				$query[] = "INSERT ignore INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'COBRANZA' );";
+				$query[] = "INSERT ignore INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ( 'TAR', 'TARIFA' );";
 				$query[] = "DELETE FROM menu_permiso WHERE codigo_permiso = 'COB' AND codigo_menu = 'TARIFA'";
 				$query[] = "UPDATE `menu_permiso` SET `codigo_permiso` = 'TAR' WHERE CONVERT( `codigo_permiso` USING utf8 ) = 'COB' AND CONVERT( `codigo_menu` USING utf8 ) = 'TAR_TRA' LIMIT 1;";
 				
@@ -6346,12 +6345,15 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.73:
 				$query = array();
-				$query[] = "ALTER TABLE  `carta` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
+				if(!existecampo('margen_superior', 'carta', $dbh)) {
+                                    $query[] = "ALTER TABLE  `carta` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
+                                
 											ADD `margen_inferior` DOUBLE NOT NULL DEFAULT  '2',
 											ADD `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2',
 											ADD `margen_derecho` DOUBLE NOT NULL DEFAULT  '2',
 											ADD `margen_encabezado` DOUBLE NOT NULL DEFAULT  '0.88',
 											ADD `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '0.88';";
+                                    }
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6360,7 +6362,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.74:
 				$query = array();
-				$query[] = "ALTER TABLE  `asunto` ADD  `fecha_inactivo` DATETIME NOT NULL AFTER  `activo` ;";
+				if(!existecampo('fecha_inactivo', 'asunto', $dbh))  $query[] = "ALTER TABLE  `asunto` ADD  `fecha_inactivo` DATETIME NOT NULL AFTER  `activo` ;";
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6369,8 +6371,8 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			case 4.75:
 				$query = array();
-				$query[] = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` ) VALUES ('ADELANTO', 'Adelantos', '/app/interfaces/adelantos.php', 'Adelantos', '', '0', '58', 'COBRANZA');";
-				$query[] = "INSERT INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ('COB', 'ADELANTO');";
+				$query[] = "INSERT ignore INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` ) VALUES ('ADELANTO', 'Adelantos', '/app/interfaces/adelantos.php', 'Adelantos', '', '0', '58', 'COBRANZA');";
+				$query[] = "INSERT ignore INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` ) VALUES ('COB', 'ADELANTO');";
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6379,17 +6381,17 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.76:
 				$query = array();
-				$query[] = "CREATE TABLE `prm_tipo_documento_asociado` (
+				$query[] = "CREATE TABLE if not exists `prm_tipo_documento_asociado` (
 						  `id_tipo_documento_asociado` int(11) NOT NULL auto_increment,
 						  `glosa` varchar(250) NOT NULL default '',
 						  PRIMARY KEY  (`id_tipo_documento_asociado`)
 						) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
 				
-				$query[] = "INSERT INTO `prm_tipo_documento_asociado` (`id_tipo_documento_asociado`, `glosa`) VALUES (NULL, 'Factura Asociada'),
+				$query[] = "INSERT ignore INTO `prm_tipo_documento_asociado` (`id_tipo_documento_asociado`, `glosa`) VALUES (NULL, 'Factura Asociada'),
 					(NULL, 'Boleta Asociada'),
 					(NULL, 'Recibo por honorarios');";
 				
-				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_tipo_documento_asociado` INT(11) NULL AFTER  `id_proveedor` ;";
+				if(!existecampo('id_tipo_documento_asociado', 'cta_corriente', $dbh))   $query[] = "ALTER TABLE  `cta_corriente` ADD  `id_tipo_documento_asociado` INT(11) NULL AFTER  `id_proveedor` ;";
 				foreach($query as $q)
 				{
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6398,7 +6400,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 				
 			case 4.77:
 				$query = array();
-				$query[] = "CREATE TABLE `trabajo_tarifa` (
+				$query[] = "CREATE TABLE if not exists `trabajo_tarifa` (
 										  `id_trabajo` int(11) NOT NULL default '0',
 										  `id_moneda` int(11) NOT NULL default '0',
 										  `valor` double NOT NULL default '0',
@@ -6437,12 +6439,15 @@ WHERE  `id` =105 LIMIT 1 ;";
 			
 			case 4.79:
 				$query = array();
-				$query[] = "ALTER TABLE `documento` ADD `id_contrato` INT NULL AFTER `codigo_cliente` ;";
+			if(!existecampo('id_contrato', 'documento', $dbh)) 	{
+                            $query[] = "ALTER TABLE `documento` ADD `id_contrato` INT NULL AFTER `codigo_cliente` ;";
 				$query[] = "ALTER TABLE `documento` ADD INDEX ( `id_contrato` ) ;";
 				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT `documento_ibfk_15` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id_contrato`) ON UPDATE CASCADE;";
-				$query[] = "ALTER TABLE `documento` ADD `pago_honorarios` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar honorarios',
+                        }
+                        
+                        if(!existecampo('pago_honorarios', 'documento', $dbh)) 	        $query[] = "ALTER TABLE `documento` ADD `pago_honorarios` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar honorarios',
 ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo sobrante se puede usar para pagar gastos';";
-				$query[] = "ALTER TABLE `documento` ADD `es_adelanto` TINYINT( 1 ) NOT NULL DEFAULT '0';";
+			  if(!existecampo('es_adelanto', 'documento', $dbh)) 	$query[] = "ALTER TABLE `documento` ADD `es_adelanto` TINYINT( 1 ) NOT NULL DEFAULT '0';";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6466,7 +6471,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.81:
 				$query = array();
-				$query[] = "ALTER TABLE  `prm_excel_cobro` CHANGE  `nombre_interno`  `nombre_interno` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+				if(existecampo('nombre_interno','prm_excel_cobro', $dbh)) $query[] = "ALTER TABLE  `prm_excel_cobro` CHANGE  `nombre_interno`  `nombre_interno` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 												CHANGE  `glosa_es`  `glosa_es` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 												CHANGE  `glosa_en`  `glosa_en` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 												CHANGE  `grupo`  `grupo` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
@@ -6490,14 +6495,15 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.83:
 				$query = array();
-				$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
+				$query[] = "INSERT ignore INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 											VALUES (
 											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'
 											), (
 											NULL ,  'AltoFacturaPdf',  '279', NULL ,  'numero',  '6',  '-1'
 											);";
-				$query[] = "CREATE TABLE `factura_pdf_datos` (
+$query[] = "DROP TABLE if exists `factura_pdf_datos` ";
+                                $query[] = "CREATE TABLE if not exists `factura_pdf_datos` (
 										  `id_tipo_dato` int(11) NOT NULL auto_increment,
 										  `tipo_dato` varchar(30) NOT NULL default '',
 										  `glosa_dato` varchar(30) NOT NULL default '',
@@ -6510,7 +6516,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 										  `tamano` int(11) NOT NULL default '0',
 										  PRIMARY KEY  (`id_tipo_dato`)
 										) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;";
-				$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
+				$query[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
 											(2, 'fecha_ano', 'Fecha Año', 1, 90, 50, 'Times', '', '', 8),
 											(3, 'fecha_dia', 'Fecha Día', 1, 45, 50, 'Times', '', '', 8),
 											(4, 'fecha_mes', 'Fecha Mes', 1, 60, 50, 'Times', '', 'may', 8),
@@ -6540,9 +6546,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.84:
 				$query = array();
-				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_glosa_gasto` TINYINT( 4 ) NULL AFTER  `codigo_asunto` ;
+				  if(!existecampo('id_glosa_gasto', 'cta_corriente', $dbh))  $query[] = "ALTER TABLE  `cta_corriente` ADD  `id_glosa_gasto` TINYINT( 4 ) NULL AFTER  `codigo_asunto` ;
 ";
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualización del campo descripción al agregar gastos.', 'boolean', 6, -1);";
+				$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualización del campo descripción al agregar gastos.', 'boolean', 6, -1);";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6550,7 +6556,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.85:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaAsociadaEsconderListado', '0', 'Esconder las columnas factura y fecha factura (de las asociadas al gasto), en gastos.php', 'boolean', '6', '-1');";
+				$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'FacturaAsociadaEsconderListado', '0', 'Esconder las columnas factura y fecha factura (de las asociadas al gasto), en gastos.php', 'boolean', '6', '-1');";
 				
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6558,9 +6564,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.86:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+				$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (NULL , 'ModuloAdelantos', '0', NULL , 'boolean', '6', '-1');";
-				$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+				$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES (NULL , 'UsarHorasMesConsulta', '0', NULL , 'boolean', '6', '-1');";
 				
 				foreach($query as $q)
@@ -6580,7 +6586,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 			case 4.88:
 				$query = array();
-				$query[] = "INSERT INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` ) 
+				$query[] = "INSERT ignore INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` ) 
 											VALUES (
 												NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
 											);";
@@ -6606,15 +6612,15 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                         
             case 4.90:
 				$query = array();
-				$query[] = "CREATE TABLE  `prm_tipo_pago` (
+				$query[] = "CREATE TABLE  if not exists `prm_tipo_pago` (
                                              `codigo` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
                                              `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
                                             PRIMARY KEY (  `codigo` )
                                             ) ENGINE = INNODB;";
-                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortización' );";
-                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'E', 'Efectivo' ), ( 'C', 'Cheque' );";
-                                $query[] = "INSERT INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'O',  'Otro' ), ( 'N',  'Ninguno' );";
-                                $query[] = "ALTER TABLE  `prm_tipo_pago` ADD  `orden` TINYINT( 6 ) NOT NULL ;";
+                                $query[] = "INSERT ignore INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortización' );";
+                                $query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'E', 'Efectivo' ), ( 'C', 'Cheque' );";
+                                $query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'O',  'Otro' ), ( 'N',  'Ninguno' );";
+                             if(!existecampo('orden', 'prm_tipo_pago', $dbh))    $query[] = "ALTER TABLE  `prm_tipo_pago` ADD  `orden` TINYINT( 6 ) NOT NULL ;";
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '2' WHERE codigo = 'A' LIMIT 1 ;";
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '1' WHERE codigo = 'T' LIMIT 1 ;";
                                 $query[] = "UPDATE  `prm_tipo_pago` SET  `orden` =  '3' WHERE codigo = 'C' LIMIT 1 ;";
@@ -6627,7 +6633,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			break;
 			case 4.91:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( 'SelectMultipleFacturasPago', '0', 'Cambiar los combo de banco, estado y concepto por selectores múltiples', 'boolean', '6', '-1' );";
+				$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( 'SelectMultipleFacturasPago', '0', 'Cambiar los combo de banco, estado y concepto por selectores múltiples', 'boolean', '6', '-1' );";
 				foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
 						throw new Exception($q."---".mysql_error());
@@ -6655,7 +6661,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				
                                 foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
-						throw new Exception($q."---".mysql_error());
+						//throw new Exception($q."---".mysql_error());
 					}
 				}
 			break;
@@ -6666,8 +6672,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                                 VALUES (
                                                     NULL ,  'OpcVerConceptoGastos',  '1',  'Para decidir si por defecto se ve el concepto de gastos o no',  'boolean',  '6',  '-1'
                                                 );";
-                                $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
-                                $query[] = "ALTER TABLE `cobro` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
+                             if(!existecampo('opc_ver_concepto_gastos', 'contrato', $dbh))     $query[] = "ALTER TABLE `contrato` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
+                              if(!existecampo('opc_ver_concepto_gastos', 'cobro', $dbh))    $query[] = "ALTER TABLE `cobro` ADD  `opc_ver_concepto_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `opc_ver_gastos` ;";
                                 
                                 foreach( $query as $q ) {
 					if( !($res = mysql_query($q, $dbh) ) ) {
@@ -6678,19 +6684,19 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 			case 4.95:
 				$query = array();
-				$query[] = "CREATE TABLE  `log_contabilidad` (
+				$query[] = "CREATE TABLE  if not exists `log_contabilidad` (
 	 `id_log_contabilidad` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	 `id_cobro` INT( 11 ) NOT NULL ,
 	 `timestamp` INT( 11 ) NOT NULL ,
 	INDEX (  `timestamp` )
 	) ENGINE = INNODB COMMENT =  'log de envio de cobros a contabilidad';";
-				$query[] = "ALTER TABLE  `cobro` ADD  `nota_venta_contabilidad` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `fecha_contabilidad` ;";
+				  if(!existecampo('nota_venta_contabilidad', 'cobro', $dbh))  $query[] = "ALTER TABLE  `cobro` ADD  `nota_venta_contabilidad` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `fecha_contabilidad` ;";
 
-				$query[] = "ALTER TABLE  `usuario` ADD  `centro_de_costo` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `username` ;";
+				  if(!existecampo('centro_de_costo', 'usuario', $dbh))  $query[] = "ALTER TABLE  `usuario` ADD  `centro_de_costo` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `username` ;";
 
 				$query[] = "UPDATE usuario SET centro_de_costo = username;";
 
-				$query[] = "ALTER TABLE  `factura_pago` ADD  `id_contabilidad` INT( 11 ) NULL DEFAULT NULL AFTER  `id_factura_pago` ;";
+				 if(!existecampo('id_contabilidad', 'factura_pago', $dbh))  $query[] = "ALTER TABLE  `factura_pago` ADD  `id_contabilidad` INT( 11 ) NULL DEFAULT NULL AFTER  `id_factura_pago` ;";
 
 				foreach($query as $q)
 					if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
@@ -6699,12 +6705,14 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		
 			case 4.96:
 				$query = array();
-				$query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
+                             if(!existecampo('margen_superior', 'factura_rtf', $dbh))   { 
+				if(!existecampo('margen_superior','factura_rtf')) $query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
 								ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_derecho` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_encabezado` DOUBLE NOT NULL DEFAULT  '1.25',
 								ADD  `margen_pie_de_pagina` DOUBLE NOT NULL DEFAULT  '1.25';";
+                             }
 				
 				foreach($query as $q) {
 					if(!($res = mysql_query($q,$dbh))) {
@@ -6714,7 +6722,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				break;
 			case 4.97:
 				$query = array();
-				$query[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+				$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
 					VALUES ( 'FacturaPagoSubtotalIva', '1', 'Monto Factura se divide en 3 (valor de venta, igv, monto de la factura)', 'boolean', '6', '-1');";
 				
 				foreach($query as $q) {
@@ -6739,15 +6747,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5:
 			$query = array();
-			$tiene_columna = false;
-			$sql = " DESCRIBE cliente ";
-			$resp = mysql_query($sql,$sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$sesion->dbh);
-			while( $row = mysql_fetch_assoc($resp) ) {
-				if( $row['Field'] == 'fecha_inactivo' ) $tiene_columna = true;
-			}
-			if( !$tiene_columna ) {
-				$query[] = "ALTER TABLE `cliente` ADD `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
-			}
+			
+                        if(!existecampo('fecha_inactivo','cliente', $dbh)) $query[] = "ALTER TABLE `cliente` ADD `fecha_inactivo` DATETIME NULL AFTER `activo` ;";
+			
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6758,7 +6760,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 
 			$query[] = "
-				INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'NumeroFacturaConSerie', '0', 'Agregar numero de serie al numero correlativo de los documentos legales', 'boolean', '6', '-1');
+				INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'NumeroFacturaConSerie', '0', 'Agregar numero de serie al numero correlativo de los documentos legales', 'boolean', '6', '-1');
 				";
 
 			$query[] = "
@@ -6766,7 +6768,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				-- Estructura de tabla para la tabla `prm_doc_legal_numero`
 				--
 
-				CREATE TABLE `prm_doc_legal_numero` (
+				CREATE TABLE  if not exists`prm_doc_legal_numero` (
 				  `id_doc_legal_numero` int(11) NOT NULL auto_increment,
 				  `id_documento_legal` int(11) NOT NULL default '0',
 				  `numero_inicial` varchar(11) NOT NULL default '0',
@@ -6782,7 +6784,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				  ADD CONSTRAINT `prm_doc_legal_numero_ibfk_1` FOREIGN KEY (`id_documento_legal`) REFERENCES `prm_documento_legal` (`id_documento_legal`);
 				";
 
-			$query[] = "INSERT INTO `prm_doc_legal_numero` (`id_documento_legal`, `numero_inicial`, `serie`) SELECT `id_documento_legal`, `numero_inicial`, '001' AS serie FROM prm_documento_legal;";
+			$query[] = "INSERT ignore INTO `prm_doc_legal_numero` (`id_documento_legal`, `numero_inicial`, `serie`) SELECT `id_documento_legal`, `numero_inicial`, '001' AS serie FROM prm_documento_legal;";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6791,7 +6793,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.02:
 			$query = array();
-			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'CantidadCerosFormatoDNI', '0', 'Completa N ceros al inicio del DNI', 'string', '6', '-1');";
+			$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL, 'CantidadCerosFormatoDNI', '0', 'Completa N ceros al inicio del DNI', 'string', '6', '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6801,9 +6803,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		case 5.03:
 			$query = array();
 
-			$query[] = "INSERT INTO `prm_forma_cobro` ( `forma_cobro` , `descripcion` ) VALUES ('HITOS', 'Hitos');";
-			$query[] = "ALTER TABLE `cobro_pendiente` CHANGE `fecha_cobro` `fecha_cobro` DATE NULL;";
-			$query[] = "ALTER TABLE `cobro_pendiente` ADD `hito` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT '1 si es un hito, 0 si no (cobro programado)';";
+			$query[] = "INSERT ignore INTO `prm_forma_cobro` ( `forma_cobro` , `descripcion` ) VALUES ('HITOS', 'Hitos');";
+			 if(existecampo('fecha_cobro', 'cobro_pendiente', $dbh))  $query[] = "ALTER TABLE `cobro_pendiente` CHANGE `fecha_cobro` `fecha_cobro` DATE NULL;";
+			 if(!existecampo('hito', 'cobro_pendiente', $dbh)) $query[] = "ALTER TABLE `cobro_pendiente` ADD `hito` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT '1 si es un hito, 0 si no (cobro programado)';";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6812,7 +6814,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.04:
 			$query = array();
-			$query[] = "ALTER TABLE `cobro_pendiente` ADD `observaciones` TEXT NULL COMMENT 'para los hitos';";
+			if(!existecampo('observaciones', 'cobro_pendiente', $dbh))  $query[] = "ALTER TABLE `cobro_pendiente` ADD `observaciones` TEXT NULL COMMENT 'para los hitos';";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6821,7 +6823,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.05:
 			$query = array();
-			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'PapelPorDefecto',  'LETTER',  'Tamaño de papel por defecto',  'select;LETTER;LEGAL;A4;A5',  '6',  '-1');";
+			$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'PapelPorDefecto',  'LETTER',  'Tamaño de papel por defecto',  'select;LETTER;LEGAL;A4;A5',  '6',  '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6830,13 +6832,14 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.06:
 			$query = array();
-			$query[] = "INSERT INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
+			$query[] = "INSERT ignore  INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
 
-			$query[] = "ALTER TABLE  `contrato`
+			if(!existecampo('notificar_encargado_principal', 'contrato', $dbh)) {
+                                        $query[] = "ALTER TABLE  `contrato`
 					ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ,
 					ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ,
 					ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
-
+                                        }   
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());
@@ -6909,11 +6912,11 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.11:
 			$query = array();
-			$query[] = "INSERT INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` )
+			$query[] = "INSERT ignore INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` )
                                                 VALUES (
                                                     'SEC',  'Secretaría'
                                                 );";
-			$query[] = "INSERT INTO menu_permiso ( codigo_menu, codigo_permiso )
+			$query[] = "INSERT ignore  INTO menu_permiso ( codigo_menu, codigo_permiso )
                                             VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
                                                 VALUES (
@@ -6929,9 +6932,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.12:
 			$query = array();
-			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoComercial', '0', 'Obligatorio Encargado Comercial', 'boolean', '6', '-1');";
-			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioAsunto', '0', 'Obligatorio Encargado Secundario Asunto', 'boolean', '6', '-1');";
-			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioCliente', '0', 'Obligatorio Encargado Secundario Cliente', 'boolean', '6', '-1');";
+			$query[] = "INSERT ignore  INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoComercial', '0', 'Obligatorio Encargado Comercial', 'boolean', '6', '-1');";
+			$query[] = "INSERT  ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioAsunto', '0', 'Obligatorio Encargado Secundario Asunto', 'boolean', '6', '-1');";
+			$query[] = "INSERT  ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ObligatorioEncargadoSecundarioCliente', '0', 'Obligatorio Encargado Secundario Cliente', 'boolean', '6', '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6940,11 +6943,12 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.13:
 			$query = array();
-			$query[] = "ALTER TABLE `factura_pago` ADD `id_neteo_documento_adelanto` INT NULL COMMENT 'neteo correspondiente al uso de un adelanto para pagar un cobro' AFTER `id_concepto` ;";
+			if(!existecampo('id_neteo_documento_adelanto', 'factura_pago', $dbh)) {
+                        $query[] = "ALTER TABLE `factura_pago` ADD `id_neteo_documento_adelanto` INT NULL COMMENT 'neteo correspondiente al uso de un adelanto para pagar un cobro' AFTER `id_concepto` ;";
 			$query[] = "ALTER TABLE `factura_pago` ADD INDEX ( `id_neteo_documento_adelanto` ) ;";
 			$query[] = "ALTER TABLE `factura_pago`  ADD CONSTRAINT `factura_pago_ibfk_1` FOREIGN KEY (`id_neteo_documento_adelanto`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
-
-			$query[] = "INSERT INTO `prm_factura_pago_concepto` ( `id_concepto` , `glosa` , `pje_variable` , `orden` )
+                        }
+			$query[] = "INSERT ignore INTO `prm_factura_pago_concepto` ( `id_concepto` , `glosa` , `pje_variable` , `orden` )
 								VALUES (NULL , 'Adelanto', '0', '999');";
 
 			foreach ($query as $q)
@@ -6954,10 +6958,12 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.14:
 			$query = array();
-			$query[] = "ALTER TABLE `factura` ADD `asiento_contable` INT NULL COMMENT 'correlativo mensual (para PRC)',
-									ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
+			if(!existecampo('asiento_contable', 'factura', $dbh)) {
+                            $query[] = "ALTER TABLE `factura` ADD `asiento_contable` INT NULL COMMENT 'correlativo mensual (para PRC)',
+                        						ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
+                            
 			$query[] = "ALTER TABLE `factura` ADD UNIQUE (`asiento_contable` ,`mes_contable`);";
-
+                        }
 			$query[] = "UPDATE factura SET mes_contable = YEAR( fecha ) *100 + MONTH( fecha ) ;";
 
 			foreach ($query as $q)
@@ -6990,16 +6996,16 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.15:
 			$query = array();
-			$query[] = "CREATE TABLE  `prm_tipo_documento_identidad` (
+			$query[] = "CREATE TABLE if not exists `prm_tipo_documento_identidad` (
 					 `id_tipo_documento_identidad` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 					 `glosa` VARCHAR( 255 ) NOT NULL
 					) ENGINE = MYISAM ;";
-			$query[] = "INSERT INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` )
+			$query[] = "INSERT ignore INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` )
 					VALUES (NULL ,  'RUC'), (NULL ,  'Documento de Extranjería'), (NULL ,  'Libreta Electoral'), (NULL ,  'DNI');";
 
-			$query[] = "ALTER TABLE  `factura` ADD  `id_tipo_documento_identidad` INT NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC';";
+			if(!existecampo('id_tipo_documento_identidad', 'factura', $dbh)) $query[] = "ALTER TABLE  `factura` ADD  `id_tipo_documento_identidad` INT NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC';";
 
-			$query[] = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'TipoDocumentoIdentidadFacturacion', '0', 'Permite seleccionar el tipo de documento de identidad que se utilizó para facturar al cliente', 'boolean', '6', '-1');";
+			$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'TipoDocumentoIdentidadFacturacion', '0', 'Permite seleccionar el tipo de documento de identidad que se utilizó para facturar al cliente', 'boolean', '6', '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7054,31 +7060,36 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.19:
 			$query = array();
-			$query[] = "CREATE TABLE  `factura_pdf_tipo_datos` (
+			$query[] = "CREATE TABLE if not exists `factura_pdf_tipo_datos` (
                                          `id_tipo_dato` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
                                          `codigo_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
                                          `glosa_tipo_dato` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
                                         ) ENGINE = INNODB;";
-			$query[] = "INSERT INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato ) 
-                                            SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` CHANGE  `id_tipo_dato`  `id_dato` INT( 11 ) NOT NULL AUTO_INCREMENT";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_tipo_dato` INT( 11 ) NOT NULL AFTER  `id_dato` ;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX ( `id_tipo_dato` ) ;";
+			
+		if(existecampo('id_tipo_dato', 'factura_pdf_datos', $dbh) && !existecampo('id_dato', 'factura_pdf_datos', $dbh)) 	$query[] = "ALTER TABLE  `factura_pdf_datos` CHANGE  `id_tipo_dato`  `id_dato` INT( 11 ) NOT NULL AUTO_INCREMENT";
+                        
+			if(!existecampo('id_tipo_dato', 'factura_pdf_datos', $dbh)) {
+                            $query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_tipo_dato` INT( 11 ) NOT NULL AFTER  `id_dato` ;";
+                            $query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX ( `id_tipo_dato` ) ;";
+                       
 			$query[] = "UPDATE factura_pdf_datos SET factura_pdf_datos.id_tipo_dato = (
                                                 SELECT factura_pdf_tipo_datos.id_tipo_dato
                                                 FROM factura_pdf_tipo_datos
                                                 WHERE factura_pdf_tipo_datos.codigo_tipo_dato = factura_pdf_datos.tipo_dato
                                             )";
+                          }
 			$query[] = "ALTER TABLE `factura_pdf_datos`
                                         ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`) 
                                         REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
 			$query[] = "ALTER TABLE  `factura_pdf_datos` 
                                             DROP  `tipo_dato` ,
                                             DROP  `glosa_dato` ;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
-			$query[] = "UPDATE factura_pdf_datos SET id_documento_legal =1;";
-			$query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano ) 
+			if(!existecampo('id_documento_legal', 'factura_pdf_datos', $dbh)) { 
+                            $query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
+                            $query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
+                            $query[] = "UPDATE factura_pdf_datos SET id_documento_legal =1;";
+                        }
+                            $query[] = "INSERT INTO factura_pdf_datos ( id_documento_legal, id_tipo_dato, activo, coordinateX, coordinateY, font, style, mayuscula, tamano ) 
                                             SELECT 
                                                 prm_documento_legal.id_documento_legal, 
                                                 id_tipo_dato, 
@@ -7092,26 +7103,30 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                                             FROM factura_pdf_datos 
                                             JOIN prm_documento_legal ON 1=1
                                             WHERE prm_documento_legal.id_documento_legal > 1";
-			$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellW` INT( 11 ) NOT NULL DEFAULT '0' AFTER `coordinateY` ;";
-			$query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellH` INT( 11 ) NOT NULL DEFAULT '0' AFTER `cellW` ;";
-			$query[] = "CREATE TABLE  `factura_pdf_datos_categoria` (
+			if(!existecampo('cellW', 'factura_pdf_datos', $dbh)) $query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellW` INT( 11 ) NOT NULL DEFAULT '0' AFTER `coordinateY` ;";
+			if(!existecampo('cellH', 'factura_pdf_datos', $dbh))  $query[] = "ALTER TABLE `factura_pdf_datos` ADD `cellH` INT( 11 ) NOT NULL DEFAULT '0' AFTER `cellW` ;";
+			$query[] = "CREATE TABLE  if not exists `factura_pdf_datos_categoria` (
                                          `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
                                          `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
                                         ) ENGINE = MYISAM ;";
-			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+			$query[] = "INSERT ignore INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
                                             VALUES ( '1', 'Fecha' ), ( '2', 'Datos cliente' );";
-			$query[] = "INSERT INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
+			$query[] = "INSERT ignore INTO  `factura_pdf_datos_categoria` (  `id_factura_pdf_datos_categoria` ,  `glosa` ) 
                                             VALUES ( '3', 'Detalle factura' ), ( '4', 'Totales factura' );";
-			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD  `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AFTER  `id_tipo_dato`;";
-			$query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD INDEX ( `id_factura_pdf_datos_categoria` );";
-			$query[] = "ALTER TABLE  `factura_pdf_datos_categoria` ENGINE = INNODB";
+			if(!existecampo('id_factura_pdf_datos_categoria', 'factura_pdf_datos', $dbh))  {
+                            $query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD  `id_factura_pdf_datos_categoria` INT( 11 ) NOT NULL AFTER  `id_tipo_dato`;";
+                            $query[] = "ALTER TABLE `factura_pdf_tipo_datos` ADD INDEX ( `id_factura_pdf_datos_categoria` );";
+                            $query[] = "ALTER TABLE  `factura_pdf_datos_categoria` ENGINE = INNODB";
+                           $query[] = "INSERT ignore INTO factura_pdf_tipo_datos ( codigo_tipo_dato, glosa_tipo_dato ) 
+                                            SELECT tipo_dato, glosa_dato FROM factura_pdf_datos;";
+                            $query[] = "ALTER TABLE `factura_pdf_tipo_datos`    ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
+                    
+                        }
 			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 1 WHERE id_tipo_dato IN(2,3,4,24);";
 			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 2 WHERE id_tipo_dato IN(1,5,6);";
 			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 3 WHERE id_tipo_dato > 6 AND id_tipo_dato < 16;";
 			$query[] = "UPDATE factura_pdf_tipo_datos SET id_factura_pdf_datos_categoria = 4 WHERE id_tipo_dato > 15 AND id_tipo_dato < 24;";
-			$query[] = "ALTER TABLE `factura_pdf_tipo_datos`
-                                                ADD CONSTRAINT `factura_pdf_tipo_datos_ibfk_1` FOREIGN KEY (`id_factura_pdf_datos_categoria`) REFERENCES `factura_pdf_datos_categoria` (`id_factura_pdf_datos_categoria`) ON UPDATE CASCADE;";
-
+			   
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -7135,6 +7150,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			
 		case 5.21 :
 			$query = array();
+                    if(!existecampo('esc1_tiempo', 'cobro', $dbh)) {
 			$query[] = "ALTER TABLE  `cobro` ADD  `esc1_tiempo` DOUBLE NULL ,
 							ADD  `esc1_id_tarifa` INT NULL ,
 							ADD  `esc1_monto` DOUBLE NULL ,
@@ -7155,8 +7171,10 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 							ADD  `esc4_monto` DOUBLE NULL ,
 							ADD  `esc4_id_moneda` INT NULL ,
 							ADD  `esc4_descuento` DOUBLE NULL ;";
-			$query[] = "ALTER TABLE  `contrato` ADD  `esc1_tiempo` DOUBLE NULL ,
-							ADD  `esc1_id_tarifa` INT NULL ,
+                    }
+                     if(!existecampo('esc1_tiempo', 'cobro', $dbh)) {
+                            $query[] = "ALTER TABLE  `contrato` ADD  `esc1_tiempo` DOUBLE NULL ,
+                        				ADD  `esc1_id_tarifa` INT NULL ,
 							ADD  `esc1_monto` DOUBLE NULL ,
 							ADD  `esc1_id_moneda` INT NULL ,
 							ADD  `esc1_descuento` DOUBLE NULL ,
@@ -7175,7 +7193,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 							ADD  `esc4_monto` DOUBLE NULL ,
 							ADD  `esc4_id_moneda` INT NULL ,
 							ADD  `esc4_descuento` DOUBLE NULL ;";
-
+                        }
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -7201,12 +7219,13 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
                         
 		case 5.23:
 			$query = array();
+                     if(!existecampo('id_categoria_usuario', 'trabajo', $dbh)) {
 			$query[] = "ALTER TABLE  `trabajo` ADD  `id_categoria_usuario` INT( 11 ) NULL DEFAULT NULL AFTER  `id_usuario` ;";
                         $query[] = "ALTER TABLE  `trabajo` ADD INDEX (  `id_categoria_usuario` )";
                         $query[] = "ALTER TABLE `trabajo`
                                         ADD CONSTRAINT `trabajo_ibfk_31` FOREIGN KEY (`id_categoria_usuario`) 
                                         REFERENCES `prm_categoria_usuario` (`id_categoria_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
-
+                     }
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -7230,7 +7249,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 		
 		case 5.25:
 			$query = array();
-			$query[] = "INSERT INTO  `prm_forma_cobro` (  `forma_cobro` ,  `descripcion` ) 
+			$query[] = "INSERT ignore INTO  `prm_forma_cobro` (  `forma_cobro` ,  `descripcion` ) 
 						VALUES (
 						'ESCALONADA',  'Escalonada'
 						);";
@@ -7244,7 +7263,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.26:
 			$query = array();
-			$query[] = "ALTER TABLE  `factura` ADD  `comprobante_erp` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `numero` ,
+			 if(!existecampo('comprobante_erp', 'factura', $dbh)) $query[] = "ALTER TABLE  `factura` ADD  `comprobante_erp` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `numero` ,
 ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp` ;";
 
 			foreach ($query as $q) {
@@ -7419,10 +7438,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 				 case 5.31:
                             $query = array();
-                            $query[] = "INSERT ignore INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` ) 
-VALUES (
-NULL ,  'RUT'
-);";
+                            $query[] = "INSERT ignore INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` ) VALUES (NULL ,  'RUT');";
                             
                             foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -7652,19 +7668,19 @@ NULL ,  'RUT'
 				$query[] = "ALTER TABLE `cliente`
 							  ADD CONSTRAINT `cliente_ibfk_1` FOREIGN KEY (`id_cliente_referencia`) REFERENCES `prm_cliente_referencia` (`id_cliente_referencia`) ON UPDATE CASCADE;";
 				}
-				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+				$query[] = "INSERT ignore  INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
 								VALUES (
 								'1',  'Clientes',  '1'
 								), (
 								'2',  'Estudios de abogados extranjeros',  '2'
 								);";
-				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
 								VALUES (
 								'3',  'Estudios de abogados locales',  '3'
 								), (
 								'4',  'Página web',  '4'
 								);";
-				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
 								VALUES (
 								'5',  'U&M',  '5'
 								), (
@@ -7680,7 +7696,7 @@ NULL ,  'RUT'
 			
 			case 5.47:
 				$query = array();
-				$query[] = "INSERT INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
+				$query[] = "INSERT ignore INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` ) 
 								VALUES (
 									'7',  'Otro',  '7'
 								);";
@@ -7786,7 +7802,7 @@ NULL ,  'RUT'
 				$query = array();
                             
                             // inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
-                               $query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';"; 
+                            $query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';"; 
 
                             $query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 255 )";
                             
@@ -8509,6 +8525,24 @@ NULL ,  'RUT'
 						}
 					}
 				break;
+				case 5.91:
+					$query[]= "INSERT ignore INTO configuracion (id ,glosa_opcion ,valor_opcion ,comentario ,valores_posibles ,id_configuracion_categoria ,orden) VALUES (NULL ,  'VerCampoUsuarioEncargado',  '10',  'se debe de esconder el campo de Usuario Encargado en Agregar Cliente',  'boolean',  '0',  '250')";
+					foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}					
+				break;
+                                case 5.92:
+					$query[]= "ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'";
+                                   $query[]=   "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
+                                  $query[]= "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
+                                    foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}					
+				break;
 				
 	}
 				
@@ -8519,7 +8553,7 @@ NULL ,  'RUT'
 
 $num = 0;
 $min_update=1;
-$max_update=5.90;
+$max_update=5.92;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
