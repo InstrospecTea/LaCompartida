@@ -1,4 +1,5 @@
-<?
+<?php 
+
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -135,7 +136,7 @@
 		if($cobrado == 'NO')
 			$where .= " AND ( trabajo.id_cobro is null OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
 		if($cobrado == 'SI')
-			$where .= " AND trabajo.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado = 'INCOBRABLE') ";
+			$where .= " AND trabajo.id_cobro is not null AND (cobro.estado != 'CREADO' AND cobro.estado != 'EN REVISION') ";
 	
 		if($from == 'reporte')
 		{
@@ -260,6 +261,7 @@
 	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
 		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
 		          WHERE $where ";
+               // echo $query;
 	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
 	
@@ -453,7 +455,7 @@ function GrabarCampo(accion,id_trabajo,cobro,valor)
 function Refrescar()
 {
 //todo if $motivo=="cobros",$motivo=="horas"
-<?
+<?php 
 	if($desde)
 		echo "var pagina_desde = '&desde=".$desde."';";
 	else
@@ -469,14 +471,14 @@ function Refrescar()
 ?>
 				var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
 				var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
-<?
+<?php 
 			}
 		else
 			{
 ?>
 				var cliente = 'codigo_cliente='+$('codigo_cliente').value;
 				var asunto = 'codigo_asunto='+$('codigo_asunto').value;
-<?
+<?php 
 			}
 ?>
 
@@ -487,16 +489,16 @@ function Refrescar()
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
 	var url = "trabajos.php?from=horas&id_usuario="+usuario+"&cobrable="+cobrable+"&motivo=horas&revisado="+revisado+"&cobrado="+cobrado+"&"+asunto+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&popup=1&opc=buscar"+pagina_desde+orden+"&"+cliente;
-<?
+<?php 
 	}
 	elseif ($motivo == "cobros")
 	{
 ?>
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
-	var url = "trabajos.php?id_cobro=<?=$id_cobro?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
+	var url = "trabajos.php?id_cobro=<?php echo $id_cobro?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
 
-<?	}?>
+<?php 	}?>
 
 	self.location.href= url;
 }
@@ -636,14 +638,13 @@ function EditarTodosLosArchivos()
 	nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&listado='+where, '');
 }
 </script>
-<? echo(Autocompletador::CSS()); ?>
+<?php  echo(Autocompletador::CSS()); ?>
 <form method='get' name="form_trabajos" id="form_trabajos">
 <input type='hidden' name='opc' id='opc' value='buscar'>
-<input type='hidden' name='id_cobro' id='id_cobro' value='<?=$id_cobro ?>'>
 <input type='hidden' name='buscar' id='id_cobro' value='1'>
-<input type='hidden' name='popup' id)='popup' value='<?=$popup?>'>
-<input type='hidden' name='motivo' id='motivo' value='<?=$motivo?>'>
-<input type='hidden' name='id_usuario' id='id_usuario' value='<?=$id_usuario?>'>
+<input type='hidden' name='popup' id='popup' value='<?php echo $popup?>'>
+<input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo?>'>
+<input type='hidden' name='id_usuario' id='id_usuario' value='<?php echo $id_usuario?>'>
 <input type='hidden' name='check_trabajo' id='check_trabajo' value=''>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -653,9 +654,9 @@ function EditarTodosLosArchivos()
 <center>
 <table width="90%" align="center"><tr><td>
 <fieldset class="tb_base" width="100%" style="border: 1px solid #BDBDBD;">
-<legend><?=__('Filtros')?></legend>
-<table style="border: 0px solid black;" >
-<?
+<legend><?php echo __('Filtros')?></legend>
+<table   style="border: 0px solid black;" >
+<?php 
 
 	if($motivo != "cobros")
 	{
@@ -664,23 +665,40 @@ function EditarTodosLosArchivos()
 ?>
 	<tr>
 		<td align=right>
-			<?=__('Cobrado')?>
+			<?php echo __('Cobrado')?>
 		</td>
-		<td align='left'>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrado",$cobrado,'','Todos','60')?>
-			<?=__('Cobrable')?> <?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrable",$cobrable,'','Todos','60')?>
-			<?=__('Revisado')?> <?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","revisado",$revisado,'','Todos','60')?>
-		</td>
+		 
+                   <td align='left'>
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrado",$cobrado,'','Todos','60')?>
+			<?php echo __('Cobrable')?> <?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrable",$cobrable,'','Todos','60')?>
+			<?php echo __('Revisado')?> <?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","revisado",$revisado,'','Todos','60')?>
+		
+                       </td>
+                       <td style="text-align:right;">
+                <?php
+                
+           
+                 
+                if($motivo=='horas'):
+                    echo '&nbsp;<div style="float:left;text-align:left;width:60px;">'.__('Cobro')." &nbsp;&nbsp;</div><input type='text' style='float:left;width:80px;' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
+                else:
+                    echo "<input type='hidden' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
+                
+                endif;
+                
+                ?>
+
+                </td>
 	</tr>
-<?
+<?php 
 		}
 ?>
    	<tr>
         <td align=right>
-            <?=__('Nombre Cliente')?>
+            <?php echo __('Nombre Cliente')?>
         </td>
-        <td nowrap align='left' colspan=3>
-<?
+        <td nowrap align='left' colspan="2">
+<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -700,10 +718,10 @@ function EditarTodosLosArchivos()
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Asunto')?>
+			<?php echo __('Asunto')?>
 		</td>
-		<td nowrap align='left' colspan=3>
-			<?
+		<td nowrap align='left' colspan="2">
+			<?php 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
@@ -720,24 +738,24 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 ?>
 <tr>
 		<td align=right>
-			<?=__('Actividad')?>
+			<?php echo __('Actividad')?>
 		</td>
-		<td nowrap align='left' colspan=3>
-			<?=Html::SelectQuery($sesion,"SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad","glosa_actividad",$glosa_actividad,'','Cualquiera','200'); ?>
+		<td nowrap align='left' colspan="2">
+			<?php echo Html::SelectQuery($sesion,"SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad","glosa_actividad",$glosa_actividad,'','Cualquiera','200'); ?>
 		</td>
 	</tr>	
 <?php
 }
 ?>
 	<tr>
-		<td align=right>
-			<?=__('Encargado Comercial')?>
+		<td align="right">
+			<?php echo __('Encargado Comercial')?>
 		</td>
-		<td align='left' colspan=3>
-			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='SOC' ORDER BY nombre ASC","id_encargado_comercial",$id_encargado_comercial,'','Todos','200'); ?>
+		<td align='left' colspan="2">
+			<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='SOC' ORDER BY nombre ASC","id_encargado_comercial",$id_encargado_comercial,'','Todos','200'); ?>
 		<td>
 	</tr>
-<? 
+<?php  
 		// Explicacion adicional: Esa condición "strlen($select_usuario) > 164" esta validando si hay mas usuarios
 		// que solamente Admin Lemontech
 		if(strlen($select_usuario) > 164) // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
@@ -745,13 +763,13 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 ?>
 	<tr>
 		<td align=right>
-			<?=__('Usuario')?>
+			<?php echo __('Usuario')?>
 		</td>
-		<td align='left' colspan=3>
-			<?=$select_usuario?>
+		<td align='left' colspan="2">
+			<?php echo $select_usuario?>
 		</td>
 	</tr>
-<?
+<?php 
 		}
 	}
   	### Validando fecha
@@ -774,20 +792,20 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 ?>
 		<tr>
 			<td align=right colspan=1>
-					<?=__('Fecha desde')?>:
+					<?php echo __('Fecha desde')?>:
 			</td>
-			<td align=left colspan=3>
-				<input type="text" name="fecha_ini" value="<?=$fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />&nbsp;&nbsp;&nbsp;&nbsp;
-				<?=__('Fecha hasta')?>:&nbsp;
-				<input type="text" name="fecha_fin" value="<?=$fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+			<td align=left colspan="2">
+				<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
+				<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />&nbsp;&nbsp;&nbsp;&nbsp;
+				<?php echo __('Fecha hasta')?>:&nbsp;
+				<input type="text" name="fecha_fin" value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+				<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
 			</td>
 		</tr>
 		<tr>
 			<td></td>
-			<td colspan='3'  align=left>
-				<input name='boton_buscar' id='boton_buscar' type='submit' class=btn onclick="this.form.check_trabajo.value=1"  value=<?=__('Buscar')?>>
+			<td colspan="2"  align=left>
+				<input name='boton_buscar' id='boton_buscar' type='submit' class=btn onclick="this.form.check_trabajo.value=1"  value=<?php echo __('Buscar')?>>
 			</td>
 		</tr>
 </table>
@@ -796,7 +814,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 </center>
 </form>
 
-<?
+<?php 
 	if(isset($cobro) || $opc == 'buscar')
 	{
 		echo "<center>";
@@ -808,14 +826,15 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
 		<br />
-		<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?=urlencode(base64_encode($where))?>'>
+		<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where))?>'>
 		<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 		<br />
-		<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="window.open('trabajos.php?id_cobro=<?=$id_cobro?>&excel=1&motivo=<?=$motivo?>&where=<?=urlencode(base64_encode($where))?>')">
+		<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&excel=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">
 		<br />
 	</center>
-		<!--<input type=button class=btn value="<?=__('Descargar Archivo a Word')?>" onclick="window.open('trabajos.php?id_cobro=<?=$id_cobro?>&word=1&motivo=<?=$motivo?>&where=<?=urlencode(base64_encode($where))?>')">-->
-<?
+		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word')?>" onclick="window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&word=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">-->
+<?php 
+
 	}
 	function Cobrable(& $fila)
 	{
@@ -851,7 +870,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		return $Check;
 	}
 
-	function Opciones(& $trabajo)
+	function Opciones(& $trabajo,$texto='')
 	{
 		$img_dir = Conf::ImgDir();
 		global $motivo;
@@ -871,25 +890,26 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-				$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 			else
-				$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\"><img src=$img_dir/editar_off.gif border=0></a>";
+				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\">".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 
 		}
 		elseif($p_profesional->fields['permitido'])
 		{
 			if($trabajo->Estado()== 'Revisado')
-				$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='".__('Este trabajo ya ha sido revisado')."'>";
+				$opc_html .= "<span title='".__('Este trabajo ya ha sido revisado')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";
 			else
 			{
 				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-					$opc_html.= "<a href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar')."><img src=$img_dir/editar_on.gif border=0></a>";
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 				else
-					$opc_html.= "<a href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" ><img src=$img_dir/editar_off.gif border=0></a>";
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" >".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 			}
 		}
 		else
-			$opc_html .= "<img src=$img_dir/candado_16.gif border=0 title='".__('Usted no tiene permiso de Revisor')."'>";
+		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";	
+                    
 
 		return $opc_html;
 	}
@@ -1024,7 +1044,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
         		else
 		        	$html .= "<td>".substr($trabajo->fields['nombre'],0,1).". ".$trabajo->fields['apellido1']."</td>";
 		      }
-				$html .= '<td align=center>'.Opciones(& $trabajo).'</td>';
+				$html .= '<td align=center>'.Opciones($trabajo).'</td>';
         $html .= "</tr>";
         $html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B; \">";
 
@@ -1033,8 +1053,8 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			$desc_colspan=8;
         if($p_revisor->fields['permitido'])
 			$desc_colspan=5;
-		$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-        $html .= "<td><strong>Desc.</strong></td><td colspan=$desc_colspan align=left>".stripslashes($trabajo->fields['descripcion'])."</td>";
+		//$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+        $html .= "<td><strong>Desc.</strong></td><td colspan='".($desc_colspan+1)."' align=left>".Opciones($trabajo,'#'.$trabajo->fields['id_trabajo'])."&nbsp;".stripslashes($trabajo->fields['descripcion'])."</td>";
 
 		if( $p_revisor->fields['permitido'])
 		{
@@ -1047,6 +1067,15 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	}
 ?>
 <script type="text/javascript">
+   
+
+jQuery(document).ready(function() { 
+   /* jQuery('#uicss').load(function() {
+        jQuery('#cobrado').buttonset();
+        jQuery('#cobrable').buttonset();
+        jQuery('#revisado').buttonset();
+    });*/
+});
 Calendar.setup(
 	{
 		inputField	: "fecha_ini",				// ID of the input field
@@ -1062,7 +1091,8 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php 
+
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo(Autocompletador::Javascript($sesion));
