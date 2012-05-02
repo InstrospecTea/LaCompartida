@@ -320,9 +320,13 @@ $tini=time();
                 $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
                 $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
                 $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+                   $update3A=  "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
+                    $update3B="update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
                 $resp = mysql_query($update1, $sesion->dbh);
                 $resp = mysql_query($update2, $sesion->dbh);
                 $resp = mysql_query($update3, $sesion->dbh);
+                 $resp = mysql_query($update3A, $sesion->dbh);
+                  $resp = mysql_query($update3B, $sesion->dbh);
 		list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( MAX( fecha_modificacion ) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
 		
 		$update4="replace delayed into olap_liquidaciones (SELECT
@@ -554,10 +558,22 @@ $tini=time();
 				$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
                                 $ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
                         }
-                        if( !$ocultar_ultimo_cobro )
-                            $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
-			if( !$ocultar_estado_ultimo_cobro )
-                            $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
+                        if( !$ocultar_ultimo_cobro ) {
+                            if($separar_asuntos) :
+                             $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$cobro['codigo_asunto']]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$cobro['codigo_asunto']]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
+                            else:
+                              $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto); 
+                            endif;
+                        }
+                           
+			if( !$ocultar_estado_ultimo_cobro ) {
+                            if($separar_asuntos) :
+                              $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$cobro['codigo_asunto']]['estado'] != '' ? $ultimocobro[$cobro['codigo_asunto']]['estado'] : '', $formato_texto);
+                            else:
+                               $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
+                            endif;
+                        }
+                           
 			if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
                             $ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas,1,'.',''), $fdd);
                         } else {
@@ -726,7 +742,7 @@ $tini=time();
                  $tfin=time();
                $ws1->write(3,3,"demora ". ($tfin-$tini)." segundos",$formato_texto);
                 $ws1->write(3,4,"desde ". $fecha1." a ".$fecha2,$formato_texto);
-		$wb->send("Planilla horas por facturar_turbo.xls");
+		$wb->send("Planilla horas por facturar.xls");
 		$wb->close();
                 
              //   mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
