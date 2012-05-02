@@ -6053,7 +6053,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			case 4.53:
 				$query = array();
-				if(!existecampo('id_contrato', 'factura', $dbh)) {
+				if(!existecampo('id_usuario_secundario', 'contrato', $dbh)) {
                                     $query[] = "ALTER TABLE `contrato` ADD `id_usuario_secundario` INT NULL COMMENT 'encargado secundario' AFTER `id_usuario_responsable` ;";
                                     $query[] = "ALTER TABLE `contrato` ADD INDEX ( `id_usuario_secundario` ) ;";
                                     $query[] = "ALTER TABLE `contrato` ADD CONSTRAINT `contrato_ibfk_13` FOREIGN KEY (`id_usuario_secundario`) REFERENCES `usuario` (`id_usuario`);";
