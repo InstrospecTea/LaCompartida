@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -168,6 +168,11 @@
 		$col_fecha_facturacion = ++$col;
 		$col_fecha_envio_a_cliente = ++$col;
 		$col_fecha_pago = ++$col;
+		
+		if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
+			$col_secretaria = ++$col;
+		}
+		
 		unset($col);
 		// Para las fórmulas de la hoja
 		$col_formula_honorarios = Utiles::NumToColumnaExcel($col_honorarios);
@@ -220,6 +225,10 @@
 		$ws1->setColumn($col_fecha_facturacion, $col_fecha_facturacion, 17);
 		$ws1->setColumn($col_fecha_envio_a_cliente, $col_fecha_envio_a_cliente, 17);
 		$ws1->setColumn($col_fecha_pago, $col_fecha_pago, 13);
+		
+		if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
+			$ws1->setColumn($col_secretaria, $col_secretaria, 13);
+		}
 		
 		++$filas;
 		$ws1->write($filas, $col_numero_cobro, __('REPORTE LIQUIDACIONES'), $encabezado);
@@ -321,6 +330,13 @@
 			$lista_estados = join("','", $estados);
 			$where .= " AND cobro.estado IN ('$lista_estados')";
 		}
+		/*id_ultimo_emisor*/
+		$selecciona_extra = "";
+		$join_extra = "";
+		if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
+			$selecciona_extra = ",usuario_emisor.username as iniciales_emisor";
+			$join_extra = " LEFT JOIN usuario usuario_emisor ON ( cobro.id_ultimo_emisor = usuario.id_usuario )";
+		}
 		$filas +=4;
 		$tabla_creada=false;
 		$query = "SELECT 
@@ -361,7 +377,7 @@
 								cobro.documento, 
 								cobro.monto_gastos, 
 								cobro.id_moneda, 
-								cobro.modalidad_calculo, 
+								cobro.modalidad_calculo, 								
 								(SELECT MIN(fecha) FROM trabajo WHERE trabajo.id_cobro = cobro.id_cobro) as fecha_primer_trabajo,
 								(SELECT MAX(fecha) FROM trabajo WHERE trabajo.id_cobro = cobro.id_cobro) as fecha_ultimo_trabajo,
 								GROUP_CONCAT( documento_pago.id_documento ) as pagos,
@@ -371,10 +387,14 @@
 								documento.gastos,
 								documento.saldo_honorarios,
 								documento.saldo_gastos
-							FROM cobro
+								$selecciona_extra
+								FROM cobro
 								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'
-								LEFT JOIN documento as documento_pago ON documento_pago.id_cobro = cobro.id_cobro AND documento_pago.tipo_doc != 'N' 
-								LEFT JOIN neteo_documento AS nd ON nd.id_documento_pago = documento_pago.id_documento 
+								
+								LEFT JOIN neteo_documento AS nd ON nd.id_documento_cobro = documento.id_documento 
+								
+								LEFT JOIN documento as documento_pago ON nd.id_documento_pago = documento_pago.id_documento  AND documento_pago.tipo_doc != 'N' 
+								
 								LEFT JOIN documento_moneda AS dm1 ON dm1.id_documento = documento_pago.id_documento AND dm1.id_moneda = documento_pago.id_moneda 
 								LEFT JOIN documento_moneda AS dm2 ON dm2.id_documento = documento_pago.id_documento AND dm2.id_moneda = '".$moneda."' 
 								LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
@@ -388,6 +408,7 @@
 									(SELECT id_cobro,tipo_cambio FROM cobro_moneda WHERE id_moneda='".$moneda."')
 									AS cambio ON cambio.id_cobro=cobro.id_cobro
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+								$join_extra
 							WHERE $where 
 							GROUP BY cobro.id_cobro 
 							ORDER BY cliente.glosa_cliente,
@@ -468,6 +489,12 @@
 				$ws1->write($filas, $col_fecha_pago, __('Fecha Pago'), $titulo_filas);
 				$ws1->write($filas, $col_monto_pago_honorarios, __('Honorarios pagados'), $titulo_filas);
 				$ws1->write($filas, $col_monto_pago_gastos, __('Gastos pagados'), $titulo_filas);
+				
+				
+				if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
+					$ws1->write($filas, $col_secretaria, __('Secretaria'), $titulo_filas);
+				}
+				
 				$tabla_creada=true;
 			}
 			$query_trabajos = "SELECT SUM(TIME_TO_SEC(duracion)),SUM(TIME_TO_SEC(duracion_cobrada))
@@ -751,7 +778,7 @@
 			$ws1->write($filas, $col_fecha_pago,Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_cobro'], $formato_fecha, '-') : ' - ', $fecha);
 			$ws1->writeNumber($filas, $col_monto_pago_honorarios, number_format($monto_pago_honorarios, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->writeNumber($filas, $col_monto_pago_gastos, number_format($monto_pago_gastos, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
-
+			
 			if($cobro['estado']!='CREADO' && $cobro['estado']!='EN REVISION'){
 				$comentario="";
 				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
@@ -773,6 +800,11 @@
 				++$filas2;
 				$ws1->writeNote($filas, $col_estado, $comentario);
 			}
+			
+			if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
+				$ws1->write($filas, $col_secretaria, $cobro["iniciales_emisor"], $txt_opcion);
+			}
+			
 			$tabla_creada=true;
 		}
 		if ($tabla_creada)
@@ -802,13 +834,13 @@
 	$pagina->PrintTop();
 ?>
 <form method=post name=formulario action="<?php echo $_server['php_self'];?>?xls=1">
-<input type=hidden name=horas_sql id=horas_sql value='<?=$horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
+<input type=hidden name=horas_sql id=horas_sql value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<?
+<?php
 $hoy = date("Y-m-d");
 ?>
 <table class="border_plomo tb_base" width:650px" cellpadding="0" cellspacing="3" align="center">
@@ -817,46 +849,46 @@ $hoy = date("Y-m-d");
 <table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3" >
 	<tr valign=top>
 		<td align=left width='25%' >
-			<b><?=__('Clientes')?>:</b>
+			<b><?php echo __('Clientes')?>:</b>
 		</td>
 		<td align=left width='25%'>
-			<b><?=__('Encargados Comerciales')?>:</b>
+			<b><?php echo __('Encargados Comerciales')?>:</b>
 		</td>
 		<td align=left width='25%'>
-			<b><?=__('Grupos Clientes')?>:</b>
+			<b><?php echo __('Grupos Clientes')?>:</b>
 		</td>
 		<td align=left width='25%'>
-			<b><?=__('Estado')?>:</b>
+			<b><?php echo __('Estado')?>:</b>
 		</td>
 	</tr>
 	<tr valign=top>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+			<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
 				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
+			<?php echo Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos,"class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados, "class=\"selectMultiple\" multiple size=6 ","","170"); ?>
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados, "class=\"selectMultiple\" multiple size=6 ","","170"); ?>
 		</td>
 	</tr>
 	<tr><td colspan="3">&nbsp;</td></tr>
-<?
+<?php
 	if(!$tipo)
 		$tipo = 'Profesional';
 ?>
 <!-- PERIODOS -->
 	<tr>
 		<td rowspan="3">
-			<b><?=__('Facturado en:')?></b><br>
-			<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda ASC","monedas[]", $monedas, "class=\"selectMultiple\" multiple size=3 ","","160"); ?>
+			<b><?php echo __('Facturado en:')?></b><br>
+			<?php echo Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda ASC","monedas[]", $monedas, "class=\"selectMultiple\" multiple size=3 ","","160"); ?>
 		</td>
-		<td align=right><b><?=__('Fecha de') ?>:&nbsp;</b></td><td align=left>
+		<td align=right><b><?php echo __('Fecha de') ?>:&nbsp;</b></td><td align=left>
 		<select name='estado' id='estado' style='width: 120px;'>
 			<option value='CORTE'>CORTE</option>
 			<option value='CREADO'>CREADO</option>
@@ -872,76 +904,76 @@ $hoy = date("Y-m-d");
 	</tr>
 	<tr>
 		<td align=right>
-			<b><?=__('Periodo') ?>:</b>&nbsp;&nbsp;
+			<b><?php echo __('Periodo') ?>:</b>&nbsp;&nbsp;
 
 		</td>
 		<td align=left colspan="1">
-<?
+<?php
 		if(!$fecha_mes)
 			$fecha_mes = date('m');
 ?>
-			<div id=periodo style='display:<?=!$rango ? 'inline' : 'none' ?>;'>
+			<div id=periodo style='display:<?php echo !$rango ? 'inline' : 'none' ?>;'>
 				<select name="fecha_mes" style='width:60px'>
-					<option value='1' <?=$fecha_mes==1 ? 'selected':'' ?>><?=__('Enero') ?></option>
-					<option value='2' <?=$fecha_mes==2 ? 'selected':'' ?>><?=__('Febrero') ?></option>
-					<option value='3' <?=$fecha_mes==3 ? 'selected':'' ?>><?=__('Marzo') ?></option>
-					<option value='4' <?=$fecha_mes==4 ? 'selected':'' ?>><?=__('Abril') ?></option>
-					<option value='5' <?=$fecha_mes==5 ? 'selected':'' ?>><?=__('Mayo') ?></option>
-					<option value='6' <?=$fecha_mes==6 ? 'selected':'' ?>><?=__('Junio') ?></option>
-					<option value='7' <?=$fecha_mes==7 ? 'selected':'' ?>><?=__('Julio') ?></option>
-					<option value='8' <?=$fecha_mes==8 ? 'selected':'' ?>><?=__('Agosto') ?></option>
-					<option value='9' <?=$fecha_mes==9 ? 'selected':'' ?>><?=__('Septiembre') ?></option>
-					<option value='10' <?=$fecha_mes==10 ? 'selected':'' ?>><?=__('Octubre') ?></option>
-					<option value='11' <?=$fecha_mes==11 ? 'selected':'' ?>><?=__('Noviembre') ?></option>
-					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
+					<option value='1' <?php echo $fecha_mes==1 ? 'selected':'' ?>><?php echo __('Enero') ?></option>
+					<option value='2' <?php echo $fecha_mes==2 ? 'selected':'' ?>><?php echo __('Febrero') ?></option>
+					<option value='3' <?php echo $fecha_mes==3 ? 'selected':'' ?>><?php echo __('Marzo') ?></option>
+					<option value='4' <?php echo $fecha_mes==4 ? 'selected':'' ?>><?php echo __('Abril') ?></option>
+					<option value='5' <?php echo $fecha_mes==5 ? 'selected':'' ?>><?php echo __('Mayo') ?></option>
+					<option value='6' <?php echo $fecha_mes==6 ? 'selected':'' ?>><?php echo __('Junio') ?></option>
+					<option value='7' <?php echo $fecha_mes==7 ? 'selected':'' ?>><?php echo __('Julio') ?></option>
+					<option value='8' <?php echo $fecha_mes==8 ? 'selected':'' ?>><?php echo __('Agosto') ?></option>
+					<option value='9' <?php echo $fecha_mes==9 ? 'selected':'' ?>><?php echo __('Septiembre') ?></option>
+					<option value='10' <?php echo $fecha_mes==10 ? 'selected':'' ?>><?php echo __('Octubre') ?></option>
+					<option value='11' <?php echo $fecha_mes==11 ? 'selected':'' ?>><?php echo __('Noviembre') ?></option>
+					<option value='12' <?php echo $fecha_mes==12 ? 'selected':'' ?>><?php echo __('Diciembre') ?></option>
 				</select>
-<?
+<?php
 			if(!$fecha_anio)
 				$fecha_anio = date('Y');
 ?>
 				<select name="fecha_anio" style='width:55px'>
-					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
-					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-					<? } ?>
+					<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
+					<option value='<?php echo $i?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
+					<?php } ?>
 				</select>
 			</div>
-			<div id=periodo_rango style='display:<?=$rango ? 'inline' : 'none' ?>;'>
+			<div id=periodo_rango style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
 				<table>
 					<tr>
 						<td nowrap>
-							<?=__('Fecha desde')?>:
-								<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_ini" size="8" maxlength="10" />
-								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+							<?php echo __('Fecha desde')?>:
+								<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_ini" size="8" maxlength="10" />
+								<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
 						</td>
 					</tr>
 					<tr>
 						<td nowrap>
-							<?=__('Fecha hasta')?>:&nbsp;
-								<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="8" maxlength="10" />
-								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+							<?php echo __('Fecha hasta')?>:&nbsp;
+								<input type="text" name="fecha_fin" value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="8" maxlength="10" />
+								<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
 						</td>
 					</tr>
 				</table>
 			</div>
 			<td align="left" colspan="2">
 <!--			<div id=otro_rango style='display:inline; margin-top: 0px;' >-->
-							<input type="checkbox" id="rango" name="rango" value="1" <?=$rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
-							<label for="rango" style="font-size:9px"><?=__('Otro rango') ?></label>
+							<input type="checkbox" id="rango" name="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
+							<label for="rango" style="font-size:9px"><?php echo __('Otro rango') ?></label>
 <!--			</div>-->
 			</td>
 
 	</tr>
 	<tr>
 		<td align=right>
-			<b><?=__('Mostrar valores en: ') ?></b>&nbsp;
+			<b><?php echo __('Mostrar valores en: ') ?></b>&nbsp;
 		</td>
 		<td colspan="3" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT id_moneda,glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "moneda", $moneda,"","","80"); ?>&nbsp;
+			<?php echo Html::SelectQuery($sesion,"SELECT id_moneda,glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "moneda", $moneda,"","","80"); ?>&nbsp;
 		</td>
 	</tr>
 	<tr>
 			<td align=right colspan="4">
-				<input type=submit class=btn value="<?=__('Generar planilla')?>" />
+				<input type=submit class=btn value="<?php echo __('Generar planilla')?>" />
 			</td>
 	</tr>
 </table>
@@ -983,7 +1015,7 @@ Calendar.setup(
 );
 // ->
 </script>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>
