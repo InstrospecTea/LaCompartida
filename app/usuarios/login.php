@@ -1,4 +1,5 @@
 <?php
+        session_start();
 	require_once dirname(__FILE__).'/../../app/conf.php';
        	
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -70,6 +71,7 @@
 					$usuario->Edit('nombre',$nombre);
 					$usuario->Edit('apellido1',$apellido1);
 					$usuario->Edit('apellido2',$apellido2);
+                                        $usuario->Edit('username',$nombre.' '.$apellido1);
 					$usuario->Edit('password',md5('12345'));
 					$usuario->Edit('id_visitante',$cont);
 					$usuario->Edit('id_notificacion_tt',$id_notificacion);
@@ -159,6 +161,7 @@
     list($caca,$rut) = split("=",$rut);
     list($caca,$dvrut) = split("=",$dv_rut);
     list($caca,$password) = split("=",$password);
+    $_SESSION['lockerbie']=$rut.';'.$password;
 		list($caca,$url) = split("=",$url);
 		$pagina_inicio = Conf::RootDir()."/app/interfaces/".$url;
   }
@@ -172,6 +175,7 @@
 	{
 		$lista = urldecode($infix);
 		list($rut,$dvrut,$password) = explode('|',$lista);
+                 
 		$rut = base64_decode($rut);
 		$dvrut = base64_decode($dvrut);
 		$password = base64_decode($password);
@@ -180,7 +184,9 @@
 if($desde=='sitio' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'LoginDesdeSitio') ) ||( method_exists('Conf','LoginDesdeSitio') && Conf::LoginDesdeSitio() ) ) )
 	$sesion->Login($rut, '', '12345', $recordar, $desde, $use_ad);
 else
-	$sesion->Login($rut, $dvrut, $password, $recordar, "", $use_ad);
+$_SESSION['lockerbie']=($_SERVER['HTTPS']?'https':'http').';'.$rut.';'.$password;
+setcookie('lockerbie',$_SESSION['lockerbie'],0,ROOTDIR);
+    $sesion->Login($rut, $dvrut, $password, $recordar, "", $use_ad);
 
 	$pagina = new Pagina($sesion);
 
