@@ -348,7 +348,7 @@ $tini=time();
 								contrato.id_moneda as id_moneda_contrato,
 								contrato.opc_moneda_total as id_moneda_total,
                                                               
-															  movs.*, 0
+															  movs.*,0
 								FROM  asunto JOIN contrato  using (id_contrato)
 								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								join
