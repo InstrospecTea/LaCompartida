@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -12,6 +12,7 @@
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 
 	$sesion = new Sesion(array('DAT','LEE'));
@@ -61,20 +62,30 @@
 		$nombre = strtr($nombre_carpeta, ' ', '%' );
 		$where .= " AND carpeta.nombre_carpeta LIKE '%$nombre%'";
 	}
-	if( $codigo_carpeta != '')
+	if( $codigo_carpeta != '') {
 		$where .= " AND carpeta.codigo_carpeta = '".$codigo_carpeta."'";
-	if ( $codigo_asunto > 0 )
+	}
+	if ( $codigo_asunto > 0 ) {
 		$where .= " AND carpeta.codigo_asunto = '".$codigo_asunto."'";
-	if ( $codigo_cliente > 0 )
+	}
+	if ( $codigo_cliente > 0 ) {
 		$where .= " AND cliente.codigo_cliente = '".$codigo_cliente."'";
-	if ( $id_bodega > 0 )
+	}
+	if ( $id_bodega > 0 ) {
 		$where .= " AND bodega.id_bodega = ".$id_bodega."";
-	if ( $id_tipo_carpeta > 0 )
+	}
+	if ( $id_tipo_carpeta > 0 ) {
 		$where .= " AND prm_tipo_carpeta.id_tipo_carpeta = ".$id_tipo_carpeta."";
-	if ( $id_tipo_movimiento_carpeta > 0 )
+	}
+	if ( $id_tipo_movimiento_carpeta > 0 ) {
 		$where .= " AND prm_tipo_movimiento_carpeta.id_tipo_movimiento_carpeta = ".$id_tipo_movimiento_carpeta."";
-	if ( $id_usuario_ultimo_movimiento > 0 )
+	}
+	if ( $id_usuario_ultimo_movimiento > 0 ) {
 		$where .= " AND usuario.id_usuario = ".$id_usuario_ultimo_movimiento."";
+	}	
+	if( $link_carpeta != '' && UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) {
+		$where .= " AND carpeta.link_carpeta LIKE '%$link_carpeta%'";
+	}
 	$query = "SELECT SQL_CALC_FOUND_ROWS *
 						FROM carpeta
 						LEFT JOIN asunto USING (codigo_asunto)
@@ -194,41 +205,41 @@
 	}
 	
 </script>
-<? echo Autocompletador::CSS(); ?>
-<form method="post" action="<?= $_SERVER[PHP_SELF] ?>" name="form_carpetas" id="form_carpetas">
+<?php echo Autocompletador::CSS(); ?>
+<form method="post" action="<?php echo  $_SERVER[PHP_SELF] ?>" name="form_carpetas" id="form_carpetas">
 <input type=hidden name=opcion value="buscar" />
-<!--input type=hidden name=codigo_carpeta value="<?= $carpeta->fields['codigo_carpeta'] ?>" />-->
-<input type=hidden name=id_carpeta value="<?= $carpeta->fields['id_carpeta'] ?>" />
+<!--input type=hidden name=codigo_carpeta value="<?php echo  $carpeta->fields['codigo_carpeta'] ?>" />-->
+<input type=hidden name=id_carpeta value="<?php echo  $carpeta->fields['id_carpeta'] ?>" />
 
 <table class="border_plomo tb_base" width="90%">
 	<tr>
 		<td align=right>
-			<?=__('Nº Carpeta')?>
+			<?php echo __('Nº Carpeta')?>
 		</td>
 		<td align=left>
-			<input name="codigo_carpeta" size="5" maxlength="5" value="<?=$codigo_carpeta ?>" id="codigo_carpeta" />
-			<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SistemaCarpetasEspecial') ) || ( method_exists('Conf','SistemaCarpetasEspecial') && Conf::SistemaCarpetasEspecial() ) ){?>
-			<?=__('Nombre')?>
-			<input name='nombre_carpeta' size='35' value="<?=$nombre_carpeta ?>" />
+			<input name="codigo_carpeta" size="5" maxlength="5" value="<?php echo $codigo_carpeta ?>" id="codigo_carpeta" />
+			<?php if( UtilesApp::GetConf($sesion,'SistemaCarpetasEspecial') ) {?>
+			<?php echo __('Nombre')?>
+			<input name='nombre_carpeta' size='35' value="<?php echo $nombre_carpeta ?>" />
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Contenido')?>
+			<?php echo __('Contenido')?>
 		</td>
 		<td align=left>
-	<? } else {?>
-			<?=__('Contenido')?>
-	<? } ?>
-			<input name='glosa_carpeta' size='60' value="<?=$glosa_carpeta ?>" />
+	<?php } else {?>
+			<?php echo __('Contenido')?>
+	<?php } ?>
+			<input name='glosa_carpeta' size='<?php echo (UtilesApp::GetConf($sesion,'CantidadCharsGlosaCarpeta') > 0 ? UtilesApp::GetConf($sesion,'CantidadCharsGlosaCarpeta') : 60 ) ?>' value="<?php echo $glosa_carpeta ?>" />
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Cliente')?>
+			<?php echo __('Cliente')?>
 		</td>
 		<td align=left nowrap>
-			<?
+			<?php
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -248,10 +259,10 @@
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Asunto')?>
+			<?php echo __('Asunto')?>
 		</td>
 		<td align=left >
-			<?
+			<?php
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,  $codigo_cliente_secundario,true);
 					else
@@ -262,37 +273,47 @@
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Ubicación')?>
+			<?php echo __('Ubicación')?>
 		</td>
 		<td align=left >
-			<?= Html::SelectQuery($sesion, "SELECT * FROM bodega ORDER BY glosa_bodega","id_bodega", $id_bodega ? $id_bodega : $carpeta->fields['id_bodega'],"onchange='cambia_bodega(this.value)'","Cualquiera","120"); ?>
+			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM bodega ORDER BY glosa_bodega","id_bodega", $id_bodega ? $id_bodega : $carpeta->fields['id_bodega'],"onchange='cambia_bodega(this.value)'","Cualquiera","120"); ?>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<?=__('Tipo')?>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_carpeta ORDER BY glosa_tipo_carpeta","id_tipo_carpeta", $id_tipo_carpeta ? $id_tipo_carpeta : $carpeta->fields['id_tipo_carpeta'],"onchange='cambia_tipo_carpeta(this.value)'","Cualquiera","120"); ?>
+			<?php echo __('Tipo')?>
+			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_carpeta ORDER BY glosa_tipo_carpeta","id_tipo_carpeta", $id_tipo_carpeta ? $id_tipo_carpeta : $carpeta->fields['id_tipo_carpeta'],"onchange='cambia_tipo_carpeta(this.value)'","Cualquiera","120"); ?>
 		</td>
 	</tr>
+	<?php if ( UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) { ?>
 	<tr>
 		<td align=right>
-			<?=__('Estado')?>
+			<?php echo __('Link')?>
 		</td>
 		<td align=left >
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_movimiento_carpeta ORDER BY glosa_tipo_movimiento_carpeta","id_tipo_movimiento_carpeta", $id_tipo_movimiento_carpeta ? $id_tipo_movimiento_carpeta : $carpeta->fields['id_tipo_movimiento_carpeta'],"","Cualquiera","120"); ?>
+			<input name='link_carpeta' size='80' value="<?php echo  $link_carpeta ?>" />
+		</td>
+	</tr>
+	<?php } ?>
+	<tr>
+		<td align=right>
+			<?php echo __('Estado')?>
+		</td>
+		<td align=left >
+			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_movimiento_carpeta ORDER BY glosa_tipo_movimiento_carpeta","id_tipo_movimiento_carpeta", $id_tipo_movimiento_carpeta ? $id_tipo_movimiento_carpeta : $carpeta->fields['id_tipo_movimiento_carpeta'],"","Cualquiera","120"); ?>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<?=__('Persona')?>
-			<?= Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario WHERE visible=1","id_usuario_ultimo_movimiento", $id_usuario_ultimo_movimiento ? $id_usuario_ultimo_movimiento : $carpeta->fields['id_usuario_ultimo_movimiento'],"","Cualquiera","200"); ?>
+			<?php echo __('Persona')?>
+			<?php echo  Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario WHERE visible=1","id_usuario_ultimo_movimiento", $id_usuario_ultimo_movimiento ? $id_usuario_ultimo_movimiento : $carpeta->fields['id_usuario_ultimo_movimiento'],"","Cualquiera","200"); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align=center colspan=2>
-    	<input type=button class=btn name=buscar value=<?=__('Buscar')?> onclick="Listar(this.form, 'buscar')">
-    	<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="descargarPlanilla(this.form)">
+    	<input type=button class=btn name=buscar value=<?php echo __('Buscar')?> onclick="Listar(this.form, 'buscar')">
+    	<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="descargarPlanilla(this.form)">
 		</td>
 	</tr>
-	<?= $NuevoArchivo ?>
+	<?php echo  $NuevoArchivo ?>
  </table>
 </form>
 
-<?
+<?php
 if($buscar)
 	$b->Imprimir();
 echo(InputId::Javascript($sesion));
