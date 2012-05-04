@@ -2,7 +2,7 @@
 <div style="clear:both;display:block;">&nbsp;</div>
 
     <div id="ultimocontenedor" style="clear:both;height:70px; width:130px;margin:40px auto 5px ;text-align:center;">
-            <img src="<?=Conf::ImgDir()?>/logo_bottom.jpg" width="125" height="37" style="padding:15px 15px 0;float:left;" />&nbsp;
+            <img src="<?php echo Conf::ImgDir()?>/logo_bottom.jpg" width="125" height="37" style="padding:15px 15px 0;float:left;" />&nbsp;
     <div id="DigiCertClickID_iIR9fwBQ" style="float:right;" >&nbsp;</div>
     </div>
 
@@ -19,7 +19,7 @@
     });
     
  
-jQuery.ajax({async: false,cache:true,type: "GET", url: root_dir+'/app/js/bottom.js', dataType: 'script' });
+jQuery.ajax({async: false,cache:false,type: "GET", url: root_dir+'/app/js/bottom.js', dataType: 'script' });
 
 
  function downloadJSAtOnload() {
