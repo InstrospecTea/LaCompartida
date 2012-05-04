@@ -262,7 +262,8 @@ class ReporteContrato extends Contrato
 			    group by id_contrato
 			    having id_cobro=max(id_cobro)
                            ";
-              
+            } else {
+              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
             }
             mail('ffigueroa@lemontech.cl','UltimosCobros',$querycobros);
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
@@ -271,7 +272,6 @@ class ReporteContrato extends Contrato
                 endwhile;
                 
         }
-
         
        
         
