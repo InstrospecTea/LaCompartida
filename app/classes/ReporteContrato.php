@@ -253,12 +253,10 @@ class ReporteContrato extends Contrato
 
 	
 
-	function UltimosCobros($separar_asuntos==0) {
+	function UltimosCobros($separar_asuntos) {
           
-            if($this->separar_asuntos || $separar_asuntos ) {
-                $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
-            } else {
-                  $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin 
+            if(!$this->separar_asuntos && !$separar_asuntos ) {
+            $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin 
 			    from cobro c join
 			    (select id_contrato, max(fecha_fin) as maxfecha from cobro group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_fin=maxfechas.maxfecha
 			    group by id_contrato
@@ -266,7 +264,7 @@ class ReporteContrato extends Contrato
                            ";
               
             }
-            mail('ffigueroa@lemontech.cl','Ultimoscobros',$querycobros);
+            mail('ffigueroa@lemontech.cl','UltimosCobros',$querycobros);
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
 		while($listacobro=mysql_fetch_array($resp)):
 		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2]);
@@ -911,10 +909,9 @@ GROUP BY  $bagrupador";
 	    
 	}
 	
+
 	
-	
-        function MontoGastos2($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '')
-	{
+        function MontoGastos2($emitido = true, $codigo_asunto = '', $fecha_ini = '', $fecha_fin = '') 	{
 		$where = " 1 AND cta_corriente.cobrable=1";
 		if( !$emitido ) {
 			$where .= " AND ( cta_corriente.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')  ) ";
@@ -960,145 +957,14 @@ GROUP BY  $bagrupador";
 
         
 	
-        
-       
-	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
-	function Write( $enviar_mail_asunto_nuevo = true )
-	{
-		$this->error = "";
-		if(!$this->Check())
-			return false;
-		if( empty($this->sesion->usuario->fields['id_usuario2']) ) {
-			$sql = "SELECT id_usuario FROM usuario WHERE rut LIKE '%99511620%' LIMIT 1";
-			$resp = mysql_query($sql,$this->sesion->dbh) or Utiles::errorSQL($sql,__FILE__,__LINE__,$this->sesion->dbh);
-			list($id_usuario_modificador) = mysql_fetch_array($resp);
-		} else {
-			$id_usuario_modificador = $this->sesion->usuario->fields['id_usuario'];
-		}
-		if($this->Loaded())
-		{
-			$query = "UPDATE ".$this->tabla." SET ";
-			if($this->guardar_fecha)
-				$query .= "fecha_modificacion=NOW(),";
-
-			$c = 0;
-			foreach ( $this->fields as $key => $val )
-			{
-				if( $this->changes[$key] )
-				{
-					$do_update = true;
-					if($c > 0)
-						$query .= ",";
-					if($val != 'NULL')
-						$query .= "$key = '".addslashes($val)."'";
-					else
-						$query .= "$key = NULL ";
-					$c++;
-				}
-			}
-
-			$query .= " WHERE ".$this->campo_id."='".$this->fields[$this->campo_id]."'";
-			if($do_update) //Solo en caso de que se haya modificado algún campo
-			{
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				
-				//Guarda ultimo cambio en la tabla historial de modificaciones
-				$query3 = " INSERT INTO modificaciones_contrato 
-										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-                                                                           VALUES ( '".$this->fields['id_contrato']."', '".$this->fields['fecha_creacion']."', 
-                                                                                    NOW(), '".$id_usuario_modificador."', 
-                                                                                    ".(!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" )." )";	
-				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
-			}
-			else //Retorna true ya que si no quiere hacer update la función corrió bien
-				return true;
-		}
-		else
-		{
-			$query = "INSERT INTO ".$this->tabla." SET ";
-			if($this->guardar_fecha)
-				$query .= "fecha_creacion=NOW(),";
-			$c = 0;
-			foreach ( $this->fields as $key => $val )
-			{
-				if( $this->changes[$key] )
-				{
-					if($c > 0)
-						$query .= ",";
-					if($val != 'NULL')
-						$query .= "$key = '".addslashes($val)."'";
-					else
-						$query .= "$key = NULL ";
-					$c++;
-				}
-			}
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			$this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
-			
-			$query3 = " INSERT INTO modificaciones_contrato 
-										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)
-                                                                           VALUES ( '".$this->fields['id_contrato']."', NOW(), 
-                                                                                    NOW(), '".$id_usuario_modificador."', 
-                                                                                    ".(!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" )." )";
-				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$this->sesion->dbh);
-			
-			if( $enviar_mail_asunto_nuevo )
-			{
-				// Mandar un email al encargado comercial
-				if (method_exists('Conf','GetConf'))
-				{
-					$CorreosModificacionAdminDatos = Conf::GetConf($this->sesion, 'CorreosModificacionAdminDatos');
-				}
-				else if (method_exists('Conf','CorreosModificacionAdminDatos'))
-				{
-					$CorreosModificacionAdminDatos = Conf::CorreosModificacionAdminDatos();
-				}
-				else
-				{
-					$CorreosModificacionAdminDatos = '';
-				}
-				if ($CorreosModificacionAdminDatos != '')
-				{
-					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
-					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=".$this->fields['id_usuario_responsable'];
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-					if(list($nombre,$email) = mysql_fetch_array($resp))
-					{
-						$email .= ','.$CorreosModificacionAdminDatos;
-									 
-						$subject = 'Creación de contrato'; 
-	
-						// Obtener el nombre del cliente asociado al contrato.
-						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
-						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
-						list($nombre_cliente) = mysql_fetch_array($resp2);
-	
-						// Revisar si el contrato está asociado a algún asunto.
-						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
-						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$this->sesion->dbh);
-						if(list($glosa_asunto) = mysql_fetch_array($resp2))
-							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
-						else
-							$asunto_contrato = '';
-						$mensaje = "Estimado ".$nombre.": \r\n   El contrato del cliente ".$nombre_cliente.$asunto_contrato." ha sido creado por ".$this->sesion->usuario->fields['nombre'].' '.$this->sesion->usuario->fields['apellido1'].' '.$this->sesion->usuario->fields['apellido2']." el día ".date('d-m-Y')." a las ".date('H:i')." en el sistema de Time & Billing.";
-							
-						Utiles::Insertar( $this->sesion, $subject, $mensaje, $email, $nombre, false);
-					}
-				}
-			}
-		}
-		return true;
-	}
-	
-	function ListaSelector($codigo_cliente, $onchange=null, $selected=null, $width=320){
-		$query = "SELECT contrato.id_contrato, SUBSTRING(GROUP_CONCAT(glosa_asunto), 1, 70) AS asuntos
-			FROM contrato
-			JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
-			JOIN asunto ON asunto.id_contrato = contrato.id_contrato
-			WHERE cliente.codigo_cliente = '$codigo_cliente'
-				AND asunto.activo = 1 AND contrato.activo = 'SI'
-			GROUP BY contrato.id_contrato";
+        	function ListaSelector($codigo_cliente, $onchange=null, $selected=null, $width=320){
+		$query = "SELECT contrato.id_contrato, SUBSTRING(GROUP_CONCAT(glosa_asunto), 1, 70) AS asuntos 	FROM contrato 	JOIN cliente ON contrato.codigo_cliente =  cliente.codigo_cliente  JOIN asunto ON asunto.id_contrato = contrato.id_contrato WHERE cliente.codigo_cliente = '$codigo_cliente' 	AND asunto.activo = 1 AND contrato.activo = 'SI' 			GROUP BY contrato.id_contrato";
 		return Html::SelectQuery($this->sesion, $query, 'id_contrato', $selected, empty($onchange) ? null : 'onchange='.$onchange, __("Cualquiera"), $width);
-	}
+            
+             
+                }
+       
+	
+	
 }
 
