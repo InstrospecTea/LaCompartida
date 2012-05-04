@@ -150,8 +150,9 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 		    }).attr('rel','activomodal').append(DivLoading).append('<iframe id="soymodal" rel="inactivo" style="display:none;height:100%;width:100%" frameborder="0"></iframe>');
 		     }
 	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
-	if(window.console)  console.log('YCGNM es '+ top.window.YoucangonowMichael);
+	
 	jQuery('.combox').combobox();
+	jQuery('.tabs' ).tabs();
 	jQuery('.fechadiff').datepicker( {
 			showOn: "both",
 			buttonImage: "https://estaticos.thetimebilling.com/images/calendario.png",
