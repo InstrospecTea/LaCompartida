@@ -768,7 +768,7 @@ $tini=time();
     }
     
 </script>
-<form method=post name=formulario action="planilla_facturacion_pendiente_turbo.php?xls=1">
+<form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
     <input type="hidden" name="reporte" value="generar" />
 	<table class="border_plomo tb_base" style="width:350px;">
 		<tr>
