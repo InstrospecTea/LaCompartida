@@ -91,9 +91,45 @@
 
 	//echo '<style>'.$cssData.'</style>'.$html;
 	//exit;
+        if($enpdf) {
+            require_once '../classes/tcpdf/config/lang/eng.php';
+            require_once '../classes/tcpdf/tcpdf.php';
+             //create new PDF document (document units are set by default to millimeters)
+            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true); 
 
-	if( $enpdf )
-	{
+
+
+            $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, 'Carta de Cobro');
+
+            //set margins
+            $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+            //set auto page breaks
+            $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+            $pdf->SetCreator('The Time Billing');
+            $pdf->SetAuthor('The Time Billing') ;
+            $pdf->SetSubject('The Time Billing Carta de Cobro');
+            $pdf->SetTitle('Carta de Cobro '.$cobro->fields['id_cobro']); 
+            $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+            $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+            $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO); //set image scale factor
+
+            $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+            $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+            $pdf->setLanguageArray($l); //set language items
+
+
+            //initialize document
+            $pdf->AliasNbPages();
+
+            $pdf->AddPage();
+            // output some HTML code
+            $pdf->writeHTML($html, true, 0);
+            
+            //$pdf->writeHTML($textoqtz, true, 0);
+            $pdf->Output();
+            
+        } elseif( $xenpdf ) 	{
 		require_once '../dompdf/dompdf_config.inc.php';
 		$cambios = array("TR" => "tr", "TD" => "td", "TABLE" =>  "table", "TH"=>"th", "BR" => "br" , "HR" => "hr", "SPAN" => "span");
 		$cssData = strtr($cssData, $cambios);
