@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
   require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -12,6 +12,8 @@
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	
+	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('EDI'));
 	$pagina = new Pagina($sesion);
@@ -67,6 +69,9 @@
 		$carpeta->Edit('codigo_asunto', $codigo_asunto);
 		$carpeta->Edit('id_tipo_carpeta',$id_tipo_carpeta);
 		$carpeta->Edit('id_bodega',$id_bodega);
+		if ( UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) {
+			$carpeta->Edit('link_carpeta',$link_carpeta);
+		}
 		
 
 		if($carpeta->Write())
@@ -90,11 +95,11 @@ function Validar()
 
 	if(!form.glosa_carpeta.value)
 	{
-		alert("<?=__('Ud. debe ingresar el título del archivo')?>");
+		alert("<?php echo __('Ud. debe ingresar el título del archivo')?>");
 		form.glosa_carpeta.focus();
         return false;
 	}
-	<?
+<?php
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "if(!form.codigo_asunto_secundario.value){";
@@ -104,8 +109,8 @@ function Validar()
 				echo "if(!form.codigo_asunto.value){";
 			}
 ?>
-			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
-<?
+			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
+<?php
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "form.codigo_asunto_secundario.focus();";
@@ -117,7 +122,7 @@ function Validar()
 ?>
 			return false;
     }
-    <?
+<?php
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "if(!form.codigo_cliente_secundario.value){";
@@ -127,8 +132,8 @@ function Validar()
 				echo "if(!form.codigo_cliente.value){";
 			}
 ?>
-			alert("<?=__('Debe seleccionar un').' '.__('cliente')?>");
-<?
+			alert("<?php echo __('Debe seleccionar un').' '.__('cliente')?>");
+<?php
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "form.codigo_cliente_secundario.focus();";
@@ -144,17 +149,17 @@ form.submit();
 return true;
 }
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php echo Autocompletador::CSS(); ?>
 <form method="post" action="agregar_carpeta.php" name="form_agregar_carpeta" id="form_agregar_carpeta">
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name=popup value="1" />
-<input type=hidden name=codigo_carpeta value="<?= $carpeta->fields['codigo_carpeta'] ?>" />
-<input type=hidden name=id_carpeta value="<?= $carpeta->fields['id_carpeta'] ?>" />
+<input type=hidden name=codigo_carpeta value="<?php echo  $carpeta->fields['codigo_carpeta'] ?>" />
+<input type=hidden name=id_carpeta value="<?php echo  $carpeta->fields['id_carpeta'] ?>" />
 
 <br>
 <table width='90%'>
 	<tr>
-		<td align=left><b><?=$txt_pagina ?></b></td>
+		<td align=left><b><?php echo $txt_pagina ?></b></td>
 	</tr>
 </table>
 <br>
@@ -162,34 +167,34 @@ return true;
 <table style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right>
-			<?=__('Nº Archivo')?>
+			<?php echo __('Nº Archivo')?>
 		</td>
 		<td align=left>
-			<input name="codigo_carpeta" size="5" maxlength="5" readonly value="<?=$carpeta->fields['codigo_carpeta']?>" id="codigo_carpeta" />
-	<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SistemaCarpetasEspecial') ) || ( method_exists('Conf','SistemaCarpetasEspecial') && Conf::SistemaCarpetasEspecial() ) ){?>
-			<?=__('Nombre')?>
-			<input name='nombre_carpeta' size='35' value="<?= $carpeta->fields['nombre_carpeta'] ?>" />
+			<input name="codigo_carpeta" size="5" maxlength="5" readonly value="<?php echo $carpeta->fields['codigo_carpeta']?>" id="codigo_carpeta" />
+	<?php if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'SistemaCarpetasEspecial') ) || ( method_exists('Conf','SistemaCarpetasEspecial') && Conf::SistemaCarpetasEspecial() ) ){?>
+			<?php echo __('Nombre')?>
+			<input name='nombre_carpeta' size='35' value="<?php echo  $carpeta->fields['nombre_carpeta'] ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Contenido')?>
+			<?php echo __('Contenido')?>
 		</td>
 		<td align=left>
-	<? } else {?>
-			<?=__('Contenido')?>
-	<? } ?>
-			<input name='glosa_carpeta' size='60' value="<?= $carpeta->fields['glosa_carpeta'] ?>" />
+	<?php } else {?>
+			<?php echo __('Contenido')?>
+	<?php } ?>
+			<input name='glosa_carpeta' size='60' value="<?php echo  $carpeta->fields['glosa_carpeta'] ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Cliente')?>
+			<?php echo __('Cliente')?>
 		</td>
 		<td align=left nowrap>
-			<?
+			<?php
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 					{
 						if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -213,10 +218,10 @@ return true;
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Asunto')?>
+			<?php echo __('Asunto')?>
 		</td>
 		<td align=left >
-			<?
+			<?php
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,  $codigo_cliente_secundario);
@@ -231,28 +236,38 @@ return true;
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Ubicación')?>
+			<?php echo __('Ubicación')?>
 		</td>
 		<td align=left >
-			<?= Html::SelectQuery($sesion, "SELECT * FROM bodega ORDER BY glosa_bodega","id_bodega", $id_bodega ? $id_bodega : $carpeta->fields['id_bodega'],"onchange='cambia_bodega(this.value)'","","120"); ?>
-			<?=__('Tipo')?>
-			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_carpeta ORDER BY glosa_tipo_carpeta","id_tipo_carpeta", $id_tipo_carpeta ? $id_tipo_carpeta : $carpeta->fields['id_tipo_carpeta'],"onchange='cambia_bodega(this.value)'","","120"); ?>
+			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM bodega ORDER BY glosa_bodega","id_bodega", $id_bodega ? $id_bodega : $carpeta->fields['id_bodega'],"onchange='cambia_bodega(this.value)'","","120"); ?>
+			<?php echo __('Tipo')?>
+			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_carpeta ORDER BY glosa_tipo_carpeta","id_tipo_carpeta", $id_tipo_carpeta ? $id_tipo_carpeta : $carpeta->fields['id_tipo_carpeta'],"onchange='cambia_bodega(this.value)'","","120"); ?>
 		</td>
 	</tr>
+	<?php if ( UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) { ?>
+	<tr>
+		<td align=right>
+			<?php echo __('Link')?>
+		</td>
+		<td align=left >
+			<input name='link_carpeta' size='80' value="<?php echo  $carpeta->fields['link_carpeta'] ?>" />
+		</td>
+	</tr>
+	<?php } ?>
 	<tr><td colspan=2>&nbsp;</td></tr>
 	<tr>
 		<td colspan=2 align="center">
-			<input type="button" class=btn value="<?=__('Guardar')?>" onclick="return Validar()" />
+			<input type="button" class=btn value="<?php echo __('Guardar')?>" onclick="return Validar()" />
 		</td>
 	</tr>
-	<? if($id_carpeta){ ?>
+	<?php if($id_carpeta){ ?>
 <tr>
-        <td align=right colspan=2><img src='<?=Conf::ImgDir()?>/agregar.gif' border=0> 
+        <td align=right colspan=2><img src='<?php echo Conf::ImgDir()?>/agregar.gif' border=0> 
         <a href='agregar_carpeta.php?popup=1'>Agregar nuevo archivo</a></td></tr>
-        	<?}?>
-        			<? if($carpeta->Loaded()){ ?>
+        	<?php } ?>
+        			<?php if($carpeta->Loaded()){ ?>
 	<tr><td colspan=2 align='center'>
-		<?
+		<?php
 			if($carpeta->fields['id_tipo_movimiento_carpeta'] > 0)
 			{
 				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_abogado,
@@ -274,12 +289,12 @@ return true;
 		?>
 	</td>
 </tr>
-<?}?>
+<?php } ?>
 </table>
 	
 </form>
 <br/><br/>
-<?
+<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo(Autocompletador::Javascript($sesion));
