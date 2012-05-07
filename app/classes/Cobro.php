@@ -3125,6 +3125,13 @@ class Cobro extends Objeto {
 				$html = str_replace('%a%', __('A'), $html);
 				$html = str_replace('%a_min%', empty($contrato->fields['contacto']) ? '' : __('a'), $html);
 				$html = str_replace('%cliente%', __('Cliente'), $html);
+				
+				$query = "SELECT glosa_cliente FROM cliente 
+									WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				list($glosa_cliente) = mysql_fetch_array($resp);
+				$html = str_replace('%nombre_cliente%', $glosa_cliente, $html);
+				
 				$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%direccion%', __('Dirección'), $html);
 				$html = str_replace('%valor_direccion%', $contrato->fields['factura_direccion'], $html);
@@ -3304,6 +3311,7 @@ class Cobro extends Objeto {
 
 				$html = str_replace('%valor_fecha_ini_primer_trabajo%', Utiles::sql2fecha($fecha_inicial_primer_trabajo, $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%valor_fecha_fin_ultimo_trabajo%', Utiles::sql2fecha($fecha_final_ultimo_trabajo, $idioma->fields['formato_fecha']), $html);
+				$html = str_replace('%valor_fecha_ini_o_primer_trabajo%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? Utiles::sql2fecha($fecha_primer_trabajo, $idioma->fields['formato_fecha']) : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%valor_fecha_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
 				$html = str_replace('%fecha_fin%', ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '') ? '' : __('Fecha hasta'), $html);
 				$html = str_replace('%valor_fecha_fin%', ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_fin'], $idioma->fields['formato_fecha']), $html);
@@ -6522,7 +6530,14 @@ class Cobro extends Objeto {
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
 				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
-
+                                $html2 = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html2);
+                                 $html2 = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html2);
+                                 $html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html2);
+				 
+                                $html2 = str_replace(array('%xnombre_cliente%','%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
+				
+				$html2 = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html2);
+				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%FECHA%', $this->GenerarDocumentoCarta2($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCarta2($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%DETALLE%', $this->GenerarDocumentoCarta2($parser_carta, 'DETALLE', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
@@ -7384,8 +7399,19 @@ class Cobro extends Objeto {
 		$html = $parser->tags[$theTag];
 
 		switch ($theTag) {
-			case 'INFORME':
+                    
+                     	case 'INFORME':
 				#INSERTANDO CARTA
+                                 $html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
+                                 $html = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html);
+                                  $html = str_replace('%xfecha_mes_dia_ano%',date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
+				 
+                                
+                                $html = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html);
+				$html = str_replace('%xnombre_cliente%', $contrato->fields['factura_razon_social'], $html);
+                                $html = str_replace('%xglosa_cliente%', $contrato->fields['factura_razon_social'], $html);
+				$html = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html);
+				$html = str_replace('%xrut%', $contrato->fields['rut'], $html);
 				$html = str_replace('%COBRO_CARTA%', $this->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html);
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
@@ -7419,7 +7445,7 @@ class Cobro extends Objeto {
 
 				$html = str_replace('%logo_cobro%', Conf::Server() . Conf::ImgDir(), $html);
 				$html = str_replace('%subtitulo%', $PdfLinea2, $html);
-				$html = str_replace('%direccion%', $PdfLinea3, $html);
+				
 				$html = str_replace('%direccion_blr%', __('%direccion_blr%'), $html);
 				$html = str_replace('%glosa_fecha%', __('Fecha') . ':', $html);
 				$html = str_replace('%fecha_gqmc%', ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL') ? ucwords(strftime("%e %B %Y", time())) : ucwords(strftime("%e %B %Y", strtotime($this->fields['fecha_emision']))), $html);
@@ -7552,6 +7578,13 @@ class Cobro extends Objeto {
 				} else {
 					$html = str_replace('%SALTO_PAGINA%', '', $html);
 				}
+				
+				
+				$html = str_replace('%DESGLOSE_POR_ASUNTO_DETALLE%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_DETALLE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%DESGLOSE_POR_ASUNTO_TOTALES%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_TOTALES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				
+				
+				
 				break;
 
 			case 'CLIENTE':
@@ -8013,7 +8046,68 @@ class Cobro extends Objeto {
 				//Adelantos
 				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
+			//FFF Esto se hizo para Aguilar Castillo Love. Reparte HH y Gasto por asunto
+			case 'DESGLOSE_POR_ASUNTO_DETALLE':
+			global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales;
+			
+			    $query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
+						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
+						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),4) pthhac
+						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
+						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
+						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
+						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
+  					            ,c.monto_trabajos
+						    ,c.monto_thh
+						    ,c.monto_thh_estandar
+						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos  
+						    ,kant.kant 
 
+						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
+						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
+						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
+						    join prm_moneda pm on pm.id_moneda=c.id_moneda
+						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
+						    FROM trabajo
+
+						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
+						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
+						    from cta_corriente where cobrable=1
+						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
+						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
+
+			    	
+				//mail('ffigueroa@lemontech.cl','Query ACL',$query_desglose_asuntos);
+				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				$row_tmpl = $html;
+				$html='';
+					while($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
+					list($subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
+						$row = $row_tmpl;
+						$row = str_replace('%glosa_asunto%',$rowdesglose['glosa_asunto'], $row);
+						$row = str_replace('%simbolo%',$simbolo, $row);
+						$row = str_replace('%honorarios_asunto%',round($rowdesglose['monto_trabajos']*$rowdesglose['pthh'],$cifras_decimales), $row);
+						$row = str_replace('%gastos_asunto%',round($rowdesglose['subtotal_gastos']*$rowdesglose['pg'],$cifras_decimales), $row);
+						
+					$html .= $row;
+					
+					}
+					
+					
+			    break;
+			//FFF Esto se hizo para Aguilar Castillo Love
+			case 'DESGLOSE_POR_ASUNTO_TOTALES':
+			global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto,$simbolo,$cifras_decimales;
+			
+			    $html = str_replace('%simbolo%',$simbolo, $html);    
+			    $html = str_replace('%desglose_subtotal_hh%', round($subtotal_hh,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_subtotal_gasto%', round($subtotal_gasto,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($impuesto_hh)+floatval($impuesto_gasto),$cifras_decimales), $html);
+			    
+			    break;
+				    
 			case 'DETALLES_PAGOS':
 				$fila = $html;
 				$monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
