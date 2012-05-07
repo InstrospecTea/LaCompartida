@@ -7900,21 +7900,21 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
             case 5.61:
                  $query = array();
              if(!existecampo('estadocobro', 'tramite', $dbh) && !existecampo('estado_cobro', 'tramite', $dbh))  {
-		 $query[] = "ALTER TABLE `tramite` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-                 $query[] = "ALTER TABLE `tramite` ADD INDEX ( `estado_cobro` ) ;";
-		 $query[] = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado;";
+		 $query[] = "ALTER TABLE `tramite` ADD `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+                 $query[] = "ALTER TABLE `tramite` ADD INDEX ( `estadocobro` ) ;";
+		 $query[] = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado;";
 	     }
              
 	     if(!existecampo('estadocobro', 'trabajo', $dbh) && !existecampo('estado_cobro', 'trabajo', $dbh))  {
-		 $query[] = "ALTER TABLE `trabajo` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-                 $query[] = "ALTER TABLE `trabajo` ADD INDEX ( `estado_cobro` ) ;";
-		 $query[] = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado;";
+		 $query[] = "ALTER TABLE `trabajo` ADD `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+                 $query[] = "ALTER TABLE `trabajo` ADD INDEX ( `estadocobro` ) ;";
+		 $query[] = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado;";
 	     }
              
 	     if(!existecampo('estadocobro', 'cta_corriente', $dbh) &&  !existecampo('estado_cobro', 'cta_corriente', $dbh)) {
-		 $query[] = "ALTER TABLE `cta_corriente` ADD `estado_cobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
-		 $query[] = "ALTER TABLE `cta_corriente` ADD INDEX ( `estado_cobro` ) ;";
-		 $query[] = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado;";
+		 $query[] = "ALTER TABLE `cta_corriente` ADD `estadocobro` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO';";
+		 $query[] = "ALTER TABLE `cta_corriente` ADD INDEX ( `estadocobro` ) ;";
+		 $query[] = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado;";
 	    }
                  
                  
@@ -8558,6 +8558,12 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 					foreach($query as $q)
 						if(!($res = mysql_query($q,$dbh))) throw new Exception($q."---".mysql_error());
 				break;
+				case 5.94:
+					$q = "INSERT INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ExportacionLedes', '0', 'Usar exportación de cobros en formato LEDES', 'boolean', '6', '0');";
+					if ( ! ($res = mysql_query($q, $dbh)) ) {
+						throw new Exception($q . "---" . mysql_error());
+					}					
+				break;
 				
 	}
 				
@@ -8568,7 +8574,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 $num = 0;
 $min_update=1;
-$max_update=5.93;
+$max_update=5.92;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
