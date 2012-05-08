@@ -8415,7 +8415,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 							VALUES ( 'AtacheSecundarioSoloAsunto',  '0',  'Si se activa, el attache secundario no aparece en la ficha de cliente y es obligaroio en la de asunto',  'boolean',  '10',  '-1' );";
 				foreach ($query as $q) {
 					if (!($res = mysql_query($q, $dbh) )) {
-				 		throw new Exception($q . "---" . mysql_error());
+				 	//	throw new Exception($q . "---" . mysql_error());
 				 	}
 				}
 				break;
