@@ -8501,7 +8501,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				
 				case 5.89:
 					$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden` )
-									VALUES ('MostrarColumnaSecretaria', '0', 'Columna que muestra username (iniciales en algunos casos', 'boolean', '6', '-1');";
+									VALUES ('MostrarColumnaSecretaria', '0', 'Columna que muestra username o iniciales del ultimo emisor de la liquidacion', 'boolean', '6', '-1');";
 					foreach ($query as $q) {
 						if (!($res = mysql_query($q, $dbh) )) {
 							throw new Exception($q . "---" . mysql_error());
@@ -8563,6 +8563,21 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 					if ( ! ($res = mysql_query($q, $dbh)) ) {
 						throw new Exception($q . "---" . mysql_error());
 					}					
+				break;
+				
+				case 5.95:
+					
+					if(existecampo('id_ultimo_emisor','cobro',$dbh)) {
+						$q="update cobro c join (select ch.id_cobro, ch.id_usuario from cobro_historial ch join
+							(select id_cobro, max(ch.id_cobro_historial) max_cobro_historial from cobro_historial ch
+							where ch.comentario like '%EMITID%'
+							group by id_cobro) as maxes on maxes.max_cobro_historial=ch.id_cobro_historial) emisores on emisores.id_cobro=c.id_cobro
+							set c.id_ultimo_emisor=emisores.id_usuario 
+							";
+						if ( ! ($res = mysql_query($q, $dbh)) ) {
+						throw new Exception($q . "---" . mysql_error());
+						}
+					}
 				break;
 				
 	}
