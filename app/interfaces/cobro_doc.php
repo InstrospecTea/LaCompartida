@@ -139,9 +139,36 @@
 		</style>
 	</head>
 	<body style="margin-top: <?php echo $margin_body; ?>pt;">
-		
-		   <?php //FFF AQUI IBA UN SCRIPT de tipo TEXT/PHP. Ya no. Lo saque-;
-		    echo $html; ?>
+		<script type="text/php">
+		   if ( isset($pdf) )
+		   {
+			$anchodoc = $pdf->get_width();
+			$header = $pdf->open_object(); 
+			if( '<?php echo $img_archivo; ?>' != '&nbsp;' )
+			{
+				if( '<?php echo $img_x; ?>' != '-1' )
+				{
+					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", <?php echo $img_x; ?>, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
+				}
+				else
+				{
+					$pdf->image("<?php echo $img_dir . $img_archivo; ?>", "<?php echo $img_formato; ?>", ( $anchodoc -  <?php echo ($img_ancho ); ?> ) / 2, <?php echo $img_y; ?>, <?php echo $img_ancho; ?>, <?php echo $img_alto; ?>);
+				}
+			} 
+			
+			if( '<?php echo $texto_texto; ?>' != '&nbsp;')
+			{
+				$font = Font_Metrics::get_font("<?php echo $texto_tipografia; ?>", "<?php echo $texto_estilo; ?>");
+				$pdf->page_text( <?php echo $texto_x; ?>, <?php echo $texto_y; ?>, '<?php echo $texto_texto; ?>', $font, <?php echo $texto_size; ?>, <?php echo $texto_color; ?>);
+			}
+			$pdf->close_object(); 
+			if( strlen( $header ) > 0 )
+			{
+				$pdf->add_object($header, 'all'); 
+			}
+		   }
+		   </script>
+		   <?php     echo $html; ?>
 	</body>
 </html>
 <?php
