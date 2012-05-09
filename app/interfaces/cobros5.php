@@ -55,7 +55,7 @@
 	$retainer = "";
 
 	if($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION' && $opc != 'anular_emision')
-            $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
+            $pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&opc=guardar");
 
 	if($opc == 'anular_emision')
 	{
@@ -205,9 +205,8 @@
                        if (!$cobro->fields['fecha_emision']) $cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado','EMITIDO');
 			
-			
-			$cobro->Edit('id_ultimo_emisor',$sesion->usuario->fields['id_usuario']);
-			$cobro->Edit('id_usuario_responsable',$id_usuario_responsable);
+			if(isset($cobro->fields['id_ultimo_emisor'])) 	$cobro->Edit('id_ultimo_emisor',$sesion->usuario->fields['id_usuario']);
+			if(isset($cobro->fields['id_usuario_responsable'])) $cobro->Edit('id_usuario_responsable',$id_usuario_responsable);
 			
 			
 			if($cobro->Write())
@@ -219,7 +218,7 @@
 				}
 				$cobro->CambiarEstadoSegunFacturas();
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
-				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1");
+				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1&opc=guardar");
 			}
 		}
 		elseif($accion == 'imprimir' && $ret == '' ) 	#################### IMPRESION #####################
@@ -280,7 +279,7 @@
                 $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
                 list($cantidad_pagos) = mysql_fetch_array($resp);
                 
-                $query = "SELECT count(*) FROM factura WHERE id_cobro = '".$cobro->fields['id_cobro']."' ";
+                $query = "SELECT count(*) FROM factura WHERE estado!='ANULADA' and id_cobro = '".$cobro->fields['id_cobro']."' ";
                 $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
                 list($cantidad_facturas) = mysql_fetch_array($resp);
                 
@@ -519,7 +518,7 @@ function EnRevision( form )
 
 function VolverACreado( form )
 {
-	if($('existe_factura').value == 1)
+	if($('existe_factura').value == 1 )
 	{
 			alert("<?php echo __('No se puede regresar a estado CREADO. Existen Documentos Tributarios creados para') . " " . __('este cobro')?>");
 			return false;
@@ -1128,12 +1127,12 @@ function UpdateCap(monto_update, guardar)
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'],array(),0,false);
 
 	#Para revisar si existen facturas (No puede volver a creado).
-	$query = "SELECT count(*) FROM factura_cobro WHERE id_cobro = '".$cobro->fields['id_cobro']."'";
+	$query = "select count(*) from factura_cobro fc join factura f using(id_factura)  where   f.estado!='ANULADA' AND fc.id_cobro= '".$cobro->fields['id_cobro']."'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	list($numero_facturas_asociados) = mysql_fetch_array($resp);
 	if( $numero_facturas_asociados > 0 )
 		$existe_factura = 1;
-	else
+	else 
 		$existe_factura = 0;
 ?>
 
