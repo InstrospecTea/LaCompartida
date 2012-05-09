@@ -8169,8 +8169,8 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			
 			case 5.72:
 				$query = array();
-				$query[] = "ALTER TABLE  `olap_liquidaciones` CHANGE  `tipo`  `tipo` VARCHAR( 3 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL DEFAULT NULL;";
-				$query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `id_usuario_entry` MEDIUMINT UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'El que realiza el trabajo o solicita el gasto' AFTER  `id_entry`";
+				 $query[] = "ALTER TABLE  `olap_liquidaciones` CHANGE  `tipo`  `tipo` VARCHAR( 3 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NULL DEFAULT NULL;";
+				if(!existecampo('id_usuario_entry','olap_liquidaciones')) $query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `id_usuario_entry` MEDIUMINT UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'El que realiza el trabajo o solicita el gasto' AFTER  `id_entry`";
 				$query[]="update  `olap_liquidaciones` ol join trabajo tr on ol.id_unico=(10000000+tr.id_trabajo) set ol.id_usuario_entry=tr.id_usuario where ol.tipo='TRB'";
 				$query[]="update  `olap_liquidaciones` ol join tramite tram on ol.id_unico=(30000000 + tram.id_tramite) set ol.id_usuario_entry=tram.id_usuario where ol.tipo='TRA'";
 				$query[]="update  `olap_liquidaciones` ol join cta_corriente cc on ol.id_unico=(20000000 + cc.id_movimiento) set ol.id_usuario_entry=cc.id_usuario_orden where ol.tipo='GAS'";
