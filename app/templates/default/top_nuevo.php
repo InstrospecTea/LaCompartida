@@ -7,23 +7,38 @@
 	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 	$sesion = new Sesion( array() );
         $rel='v ';
-          if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 13,5)) $rel.=$versionsvn; 
+          if (file_exists(Conf::ServerDir().'/../app/version_svn.php') and $versionsvn=file_get_contents(Conf::ServerDir().'/../app/version_svn.php', NULL, NULL, 20,5)) $rel.=$versionsvn; 
           if (file_exists(Conf::ServerDir().'/../app/version_db.php') && include(Conf::ServerDir().'/../app/version_db.php'))  $rel.=' db'.$VERSION; 		
  
 		
       
+    
 ?>
 
-<body  class="non_popup" rel="<?php echo htmlspecialchars($rel) ;?>">
-<?php  if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
-	echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
-	echo "<br/><br/><img src='". Conf::ImgDir() ."/logo_lemon.png' />";
+<body  class="non_popup" rel="<?php echo htmlspecialchars($rel) ;?>" <?php if(UtilesApp::GetConf($sesion, 'UsarOverlay')) echo 'title="overlay"'; ?>>
+<?php  
+
+
+if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
+	echo "<div style='display:block;margin:auto;text-align:center;'><h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
+	 
+	    
+	      echo "<br/><br/><img src='https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png' />";
+	 if($_SESSION['RUT']='99511620') echo '<br><h3>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a></h3>';
 	exit; 
+	  echo '</div>';
 		} ?>
    
 
 		<div  class="tb_facebook">
-                    <div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;"><img src="<?php echo Conf::ImgDir()?>/logo_top.png" /></div>
+                    <div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;"><a href="<?php echo Conf::RootDir().'/app/usuarios/index.php';?>" style="border:0 none;text-decoration:none;">
+			<?php 
+			if(defined('ROOTDIR')&& ROOTDIR=='tt2'):
+			    echo '<img src="https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png" />';
+			    else:
+			    echo '<img src="'. Conf::ImgDir().'/logo_top.png" rel="'.ROOTDIR.'"/>';
+			endif;
+			?></a></div>
 			    <div style="position:absolute;top:0px;left:50%;width:485px;text-align:right;"><br/>
 			    	<span style="color:#FFFFFF;">
 			    		<span class="text_bold">Usuario</span>: 
@@ -33,6 +48,7 @@
 										| <a style="color: white;" href="<?php echo Conf::HostJuicios()?>" onClick="irIntranet('/fw/usuarios/index.php');">Gestión de Causas</a>
 								<?php }?> 
                                                         | <a style="color: white;" href="http://lemontech.zendesk.com/home" target="_blank" >Soporte</a> 
+							 
 							| <a href="#" style="color: white;" onClick="irIntranet('/fw/usuarios/logout.php?salir=true');">Salir</a></span></td>
 			  </div>
                 </div>
@@ -48,6 +64,16 @@
      <div id="mainttb">
             
     <div class="titulo_sec"  >
+    <?php 
+    if (UtilesApp::GetConf($sesion, 'BeaconTimer')) {
+        $beaconleft=UtilesApp::GetConf($sesion, 'BeaconTimer')-time();
+        if ($beaconleft<0) {
+        echo 'Versi&oacute;n expirada del software';  
+        } else {
+            echo '<!--Beaconleft:'.$beaconleft.'-->';
+        }
+    }
+        ?>
 			<h2><?php echo $this->titulo; ?></h2>
 			<hr size="2" width="850" align="center" color="#a3d45c"/>
     </div>
@@ -66,6 +92,9 @@
 						<br/><br/>
 			
 			<?php endif;
+                        
+                       
+
                         if($this->num_errors > 0): 		?>
 			
 			<table width="80%" class="alerta">

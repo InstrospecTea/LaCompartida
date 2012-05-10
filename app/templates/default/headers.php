@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <?php
+
 $laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
 $punto=strpos($laurl,'.'); 
 $subdomain=substr($laurl,0,$punto); 
@@ -14,19 +15,19 @@ $pathseguro='https://'.$laurl.$_SERVER['PHP_SELF'];
         <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<script language="JavaScript" type="text/javascript">
             var _sf_startpt=(new Date()).getTime();
-            var root_dir = '<?=Conf::RootDir()?>';
-            var img_dir = '<?=Conf::ImgDir()?>';
+            var root_dir = '<?php echo Conf::RootDir()?>';
+            var img_dir = '<?php echo Conf::ImgDir()?>';
         </script>
-	<title><?=Conf::AppName()?> - <?= $this->titulo ?></title>
-	<!-- <?=Conf::TimestampDeployCSS()?> -->
-	<link rel="stylesheet" type="text/css" href="<?=Conf::RootDir()?>/app/templates/<?=Conf::Templates()?>/css/deploy/all.1226330411.css" />
-	<!--<link rel="stylesheet" type="text/css" href="<?=Conf::RootDir()?>/app/templates/<?=Conf::Templates()?>/css/datepicker.css" />-->
+	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
+	<!-- <?php echo Conf::TimestampDeployCSS()?> -->
+	<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir()?>/app/templates/<?php echo Conf::Templates()?>/css/deploy/all.1226330411.css" />
+	<!--<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir()?>/app/templates/<?php echo Conf::Templates()?>/css/datepicker.css" />-->
 
 	<? require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 	
-	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/EditInPlace.js"></script>-->
-	<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/app/deploy/all.1234370043.js"></script> 
-	<!--<script language="JavaScript" type="text/javascript" src="<?=Conf::RootDir()?>/fw/js/src/datepicker.js"></script>-->
+	<!--<script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/fw/js/src/EditInPlace.js"></script>-->
+	<script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/app/deploy/all.1234370043.js"></script> 
+	<!--<script language="JavaScript" type="text/javascript" src="<?php echo Conf::RootDir()?>/fw/js/src/datepicker.js"></script>-->
 <style type="text/css"> 
 	.border_plomo {
 		border: 1px solid black;

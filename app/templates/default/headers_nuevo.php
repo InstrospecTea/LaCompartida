@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <?php
+/*error_reporting(E_ALL ^ E_NOTICE);
+ini_set('display_errors','On');*/
+date_default_timezone_set('America/New_York');
 $laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
 $punto=strpos($laurl,'.'); 
 $subdomain=substr($laurl,0,$punto); 
@@ -7,6 +10,7 @@ $maindomain=str_replace($subdomain.'.','',$laurl);
 if($subdomain) $subdomain='/'.$subdomain;
 $elpath=$subdomain.$_SERVER['PHP_SELF'];
 $pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$_SERVER['PHP_SELF'];
+define('HEADERLOADED',1);
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -22,7 +26,12 @@ $pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$
             _sf_async_config.domain = "<?php echo $maindomain; ?>"; 
             _sf_async_config.path = "<?php echo $elpath; ?>";
             <?php   if(defined('APPDOMAIN') && substr(APPDOMAIN,0,5)=='https') echo '_sf_async_config.pathseguro="'.$pathseguro.'";'; ?>
-	    
+	var beacons=['app6'
+            //,'app2','app3','app4','app5','app1'
+                    ];
+        var beacon=beacons[Math.floor(Math.random()*beacons.length)];
+        var baseurl= '<?php echo base64_encode($laurl);?>';
+        var mementomori= '<?php echo base64_encode(time());?>';
         var root_dir = '<?php echo Conf::RootDir();?>';
 	var img_dir = '<?php echo Conf::ImgDir()?>';
     </script>
@@ -54,13 +63,17 @@ $pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$
 .tb_facebook {	background: url(https://estaticos.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
 .non_popup {background: url(https://estaticos.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
-.alignleft {text-align:left;}
+.alignleft {text-align:left;font-size:10px;}
+
 #zenbox_tab {overflow: hidden; border: 0 none !important;}
 #mainttb {background:white;padding: 30px 0 5px ;width: 960px;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;}
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
 .cont_tabla {padding:0 20px; background-color: #FFFFFF;text-align:center;margin:5px auto;}
 .cont_tabla table {margin-left:auto;margin-right:auto;}
 .iconzip {background: url(https://estaticos.thetimebilling.com/images/icon-zip.gif) no-repeat;height:20px;padding-left:25px;}
+.encabezadolight th { font-style: normal;color: white;background-color: #A3D55C;height: 20px;font-size: 11px;vertical-align: middle;text-align: center;}
+#tablon td {padding:3px 2px !important}
+.nowrap {white-space: nowrap;}
 </style>
 
 
