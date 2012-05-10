@@ -1,15 +1,16 @@
 <?php
+
 	require_once dirname(__FILE__).'/../../conf.php';
+	
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
+	$sesion = new Sesion(array('ADM'));
 
-    $sesion = new Sesion( array('ADM','OFI','COB') );
 
     
 		
 
-   
 		########################### SQL INFORME DE GASTOS #########################
 		$where = 1;
 		if($cobrado == 'NO')
@@ -61,30 +62,11 @@
 			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
 		}
 		
-		$col_select ="";
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
-		{
-			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
-		}
-		if ( UtilesApp::GetConf( $sesion, 'UsaAfectoImpuesto') ){
-			$col_select .= ", IF( cta_corriente.con_impuesto IS NOT NULL, cta_corriente.con_impuesto, ' - ') as afecto_impuesto";
-		}
-		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
-			$col_select .= ", IF( cta_corriente.id_glosa_gasto IS NOT NULL, prm_glosa_gasto.glosa_gasto, '-') as concepto";
-		}
 		
 		
 		
 
-		$query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
-					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.codigo_asunto, asunto.glosa_asunto,
-					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
-					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_tipo_documento_asociado.glosa as tipo_doc_asoc, 
-					prm_moneda.cifras_decimales, cobro.estado
-					$col_select,
-					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor,
-					CONCAT(usuario.apellido1 , ', ' , usuario.nombre) as usuario_ingresa,
-					CONCAT(usuario2.apellido1 , ', ' , usuario2.nombre) as usuario_ordena
+		$query = "SELECT count(*)
 					FROM cta_corriente 
 					LEFT JOIN asunto USING(codigo_asunto)
 					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
@@ -98,8 +80,14 @@
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 					WHERE $where";
-		$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($query, $sesion)."'";
-        	$respt = mysql_query($testimonio, $sesion);
-	//echo mysql_num_rows(mysql_query($query, $sesion))	;
-    exit;
+		
+		
+		
+		
+		$resultado=mysql_query($query,$sesion->dbh) or die(mysql_error($sesion->dbh));
+		
+
+	echo mysql_result($resultado,0,0)
+		
+    
 ?>

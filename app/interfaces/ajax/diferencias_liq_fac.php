@@ -44,7 +44,7 @@ $querydiff.=" GROUP BY cobro.id_cobro, contrato.id_contrato, contrato.factura_ra
 
 
 
-        $resp = mysql_query($querydiff, $sesion->dbh);
+        $resp = mysql_unbuffered_query($querydiff, $sesion->dbh);
 	echo '{ "aaData": [';
 	echo "\n";
 	$i=0;
@@ -69,7 +69,7 @@ $querydiff.=" GROUP BY cobro.id_cobro, contrato.id_contrato, contrato.factura_ra
 		if($fila[1]=='') $fila[1]='Contrato sin Raz&oacute;n Social';
 		if($i++>0) echo ',';
 		
-		   $string=  '["'.$fila[0].'","'.str_replace("\\","",$fila[1]).'","'.$fila[2].'","'.$fila[3].'","'.$fila[4].'","'.$fila[6].'","'.$deuda.' "]';
+		   $string=  '["'.intval($fila[3]).'","'.$fila[2].'","'.$fila[0].'","'.str_replace("\\","",$fila[1]).'","'.$fila[4].'","'.$fila[6].'","'.$deuda. '"]';
 		   echo preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $string);
 	    }
 		
