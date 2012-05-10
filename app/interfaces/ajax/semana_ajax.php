@@ -1,5 +1,4 @@
-<?
-    require_once dirname(__FILE__).'/../../conf.php';
+<?php     require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -140,18 +139,17 @@ echo("<table style='width:600px'>");
 ?>
     <tr>
     		<td align='left' colspan='4'>
-        	<?=__('Semana del');  ?>:
-					<b><?=$semana2 != '' ? Utiles::sql3fecha($semana_actual,'%d de %B de %Y') : Utiles::sql3fecha(date('Y-m-d'),'%d de %B de %Y') ?></b>
+        	<?php echo __('Semana del');  ?>:
+					<b><?php echo $semana2 != '' ? Utiles::sql3fecha($semana_actual,'%d de %B de %Y') : Utiles::sql3fecha(date('Y-m-d'),'%d de %B de %Y') ?></b>
         </td>
         
         <td align='right' colspan='2'>
-        	<?=$horas_mes_consulta ? __('Total mes') : __('Total mes actual')?>:
+        	<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual')?>:
         </td>
         <td style="vertical-align: middle">
-<?
-$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
+<?php $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
 ?>
-            <strong><?=$horas_trabajadas_mes?></strong>
+            <strong><?php echo $horas_trabajadas_mes?></strong>
 		</td>
     </tr>
 <?php  $arraytrabajo=array();
@@ -184,18 +182,18 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
               
         $img_dir = Conf::ImgDir();
 		
-		$alto = max($lista->Get($i)->fields[alto],12)."px";
-		$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
+		$alto = max($lista->Get($i)->fields['alto'],12)."px";
+		$cod_asunto = $lista->Get($i)->fields['codigo_asunto'];
 		if (UtilesApp::GetConf($sesion,'CodigoSecundario') ):
 			$cod_asunto_color = $asunto->CodigoSecundarioACodigo($cod_asunto);
 		else:
 			$cod_asunto_color = $cod_asunto;
                 endif;
-		$cliente = $lista->Get($i)->fields[codigo_cliente];
-		$dia_semana = $lista->Get($i)->fields[dia_semana];
+		$cliente = $lista->Get($i)->fields['codigo_cliente'];
+		$dia_semana = $lista->Get($i)->fields['dia_semana'];
 		
 		$t = new Trabajo($sesion);
-		$t->Load($lista->Get($i)->fields[id_trabajo]);
+		$t->Load($lista->Get($i)->fields['id_trabajo']);
 		if($t->Estado() == 'Cobrado')
 			$cobrado = true;
 		else
@@ -203,7 +201,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 
         if($dia_semana == 1)             $dia_semana = 8;
            
-		$duracion = $lista->Get($i)->fields[duracion];
+		$duracion = $lista->Get($i)->fields['duracion'];
 		//echo $duracion;
 		if( (UtilesApp::GetConf($sesion,'TipoIngresoHoras')=='decimal' )) {
 			list($hh,$mm,$ss) = split(":",$duracion);
@@ -214,7 +212,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		}
 		$fecha = $lista->Get($i)->fields[fecha];
 		
-		if($lista->Get($i)->fields[cobrable] == 0 || $lista->Get($i)->fields[cobrable] == 2)
+		if($lista->Get($i)->fields['cobrable'] == 0 || $lista->Get($i)->fields['cobrable'] == 2)
 		{
 			$no_cobrable = __('No cobrable');
 			$color = '#FFFFFF';
@@ -249,7 +247,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
                    endswitch;        
                 }
                 
-		$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields[codigo_cliente]."):</b><br>".$lista->Get($i)->fields[glosa_cliente]."<br><b>".__('Asunto')."(".$lista->Get($i)->fields[codigo_asunto]."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
+		$tooltip = Html::Tooltip("<b>".__('Cliente')."(".$lista->Get($i)->fields['codigo_cliente']."):</b><br>".$lista->Get($i)->fields['glosa_cliente']."<br><b>".__('Asunto')."(".$lista->Get($i)->fields['codigo_asunto']."):</b><br>".$lista->Get($i)->fields[glosa_asunto]."<br /><b>".__('Duración').":</b><br>".$duracion."<br /><b>".__('Descripción').":</b><br>".$descripcion."<br><b>".$no_cobrable."</b>");
 		if($dia_anterior != $dia_semana)
 		{
 			for($q = $dia_anterior+1; $q <= $dia_semana; $q++)
@@ -300,13 +298,12 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 	?>
 	<tr>
 	<td align='right' colspan='6'>
-        		<?=__('Total semana')?>:
+        		<?php echo __('Total semana')?>:
         </td>
         <td style="vertical-align: middle">
-<?
-$horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario,$semana_actual);
+<?php $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario,$semana_actual);
 ?>
-            <strong><?=$horas_trabajadas_semana?></strong>
+            <strong><?php echo $horas_trabajadas_semana?></strong>
 		</td>
 		</tr>
 		</table>
