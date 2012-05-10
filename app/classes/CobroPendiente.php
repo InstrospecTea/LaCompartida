@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
@@ -54,14 +54,17 @@ class CobroPendiente extends Objeto
 			list($numero_pendientes) = mysql_fetch_array($resp3);
 
 			#datos del siguiente cobro pendiente por contrato
-			if($numero_pendientes > 0 && $contrato['periodo_repeticiones']==0 && $contrato['periodo_intervalo']!=0 && ($numero_pendientes*$contrato['periodo_intervalo']) < 24)
-			{
+			if($numero_pendientes > 0 
+					&& $contrato['periodo_repeticiones']==0 
+					&& $contrato['periodo_intervalo']!=0 
+					&& ($numero_pendientes*$contrato['periodo_intervalo']) < 24) {
 				$numero_pendientes++;
 				$siguiente_fecha = strtotime(date("Y-m-d", strtotime($ultima_fecha)) . " +".$contrato['periodo_intervalo']." month");
+				$monto_cobro_pendiente = (($contrato['forma_cobro']=='FLAT FEE' || $contrato['forma_cobro']=='RETAINER') ? $contrato['monto'] : '');
 				$query4 = "INSERT INTO cobro_pendiente (id_contrato,fecha_cobro,descripcion,monto_estimado) 
-										VALUES (".$contrato['id_contrato'].",'".$siguiente_fecha."',
-										'Cobro N° ".$numero_pendientes."',
-										".(($contrato['forma_cobro']=='FLAT FEE' || $contrato['forma_cobro']=='RETAINER') ? $contrato['monto'] : '').")";
+										VALUES ('{$contrato['id_contrato']}','$siguiente_fecha',
+										'Cobro N° $numero_pendientes',
+										'$monto_cobro_pendiente')";
 					mysql_query($query4, $sesion->dbh) or Utiles::errorSQL($query4,__FILE__,__LINE__,$sesion->dbh);
 			}
 		}

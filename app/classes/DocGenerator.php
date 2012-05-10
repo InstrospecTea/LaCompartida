@@ -442,7 +442,7 @@ class DocGenerator
 		if( $desde == 'factura' && $this->configuracion['desactivar_clave_rtf']!=1 )
       	{
 			$header .= "<w:DocumentProtection>ReadOnly</w:DocumentProtection>";
-			$header .= "<w:UnprotectPassword>12345</w:UnprotectPassword>";
+			$header .= "<w:UnprotectPassword>4560CA9C</w:UnprotectPassword>";
 			$header .= "<w:StyleLock/>";
 			$header .= "<w:StyleLockEnforced/>";
 		}

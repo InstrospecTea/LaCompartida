@@ -42,9 +42,10 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 			if(!$usa_inactivo)
 				$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
 
-		if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
+		/*if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) 
+			|| ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
 			$oncambio='';
-		else
+		else*/
 			$oncambio=$onchange;
 			
 		if( $filtro_banco != "" ) {

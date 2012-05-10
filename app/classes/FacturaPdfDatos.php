@@ -46,7 +46,10 @@
 					}
 				}
 			}
+			/*$factura = new Factura($this->sesion);
+			$factura->Load($id_factura);
 		
+			echo '<pre>';print_r($factura->fields);echo '</pre>';*/
 			$querypapel = "SELECT 
 						codigo_tipo_dato, 
 						activo, 
@@ -105,7 +108,7 @@
 				case 'moneda_iva': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_total': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'monto_subtotal': 			$glosa_dato = number_format( 
-												$factura->fields['subtotal_sin_descuento'] + $factura->fields['monto_gastos_con_iva'] + $factura->fields['monto_gastos_sin_iva'],
+												$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
 												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 												$idioma->fields['separador_decimales'],
 												$idioma->fields['separador_decimales']); break;
@@ -153,7 +156,7 @@
 				$fila[ 'moneda_iva']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
 				$fila[ 'moneda_total']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
 				$fila[ 'monto_subtotal']= 			number_format( 
-												$factura->fields['subtotal_sin_descuento'] + $factura->fields['monto_gastos_con_iva'] + $factura->fields['monto_gastos_sin_iva'],
+												$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
 												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 												$idioma->fields['separador_decimales'],
 												$idioma->fields['separador_decimales']); 
@@ -198,7 +201,27 @@
 			// La orientación y formato de la página son los mismos que del documento
 			$pdf->AddPage();
 			$datos['dato_letra']=str_replace(array("<br>\n","<br/>\n","<br />\n" ),"\n",$datos['dato_letra']);
+			
+			//echo '<pre>';print_r($this->datos);echo '</pre>';
+			if (intval($this->datos['monto_honorarios']['dato_letra'])===0) {
+			    unset($this->datos['monto_honorarios']);
+			    unset($this->datos['moneda_honorarios']);
+			    unset($this->datos['descripcion_honorarios']);
+			}
+			if (intval($this->datos['monto_gastos_con_iva']['dato_letra'])===0) {
+			    unset($this->datos['monto_gastos_con_iva']);
+			    unset($this->datos['moneda_gastos_con_iva']);
+			    unset($this->datos['descripcion_gastos_con_iva']);
+			}
+			if (intval($this->datos['monto_gastos_sin_iva']['dato_letra'])===0) {
+			    unset($this->datos['monto_gastos_sin_iva']);
+			    unset($this->datos['moneda_gastos_sin_iva']);
+			    unset($this->datos['descripcion_gastos_sin_iva']);
+			}
+			 
 			foreach( $this->datos as $tipo_dato => $datos ) {
+			    
+			  
 				$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 				

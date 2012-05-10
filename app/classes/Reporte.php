@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -101,6 +101,13 @@ class Reporte
 		$this->tipo_dato = $nombre;
 		switch($nombre)
 		{
+			case "costo":
+			case "costo_hh":
+			case "horas_trabajadas":
+			{
+			 unset($this->filtros['cobro.estado']);   // el costo es independiente de los cobros
+			}
+			 break;
 			case "horas_cobrables":
 			case "horas_visibles":
 			case "horas_castigadas":
@@ -526,6 +533,9 @@ class Reporte
 			 $s .= ' GROUP BY agrupador_general, id_cobro ';
 			} else {
 		$agrupa_cobro = array();
+			$agrupa_cobro[] = "id_usuario";
+			$agrupa_cobro[] = "id_cliente";
+			$agrupa_cobro[] ="codigo_asunto";
 
 		if($this->requiereMoneda($this->tipo_dato))
 			$agrupa_cobro[] = "id_cobro";
@@ -587,6 +597,10 @@ class Reporte
 						IFNULL(cobro.estado,\'Indefinido\') as estado,
 						IFNULL(cobro.forma_cobro,\'Indefinido\') as forma_cobro,
 						';
+		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
+			$s .= " IFNULL( NULLIF( IFNULL( actividad.glosa_actividad, 'Indefinido' ), ' ' ), 'Indefinido' ) as glosa_actividad, ";
+		}
+		
 		if(in_array('id_trabajo',$this->agrupador))
 			$s.= ' trabajo.id_trabajo, ';				
 
@@ -679,7 +693,7 @@ class Reporte
 			}
 			case "costo":
 			    {
-				$s .= $datos_monedas.", (cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio)*cut.costo_hh*SUM(TIME_TO_SEC( trabajo.duracion ))/3600";
+				$s .= $datos_monedas.", ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*SUM(cut.costo_hh*TIME_TO_SEC( trabajo.duracion ))/3600";
 			    }
 			    break;
 			
@@ -757,13 +771,12 @@ class Reporte
 				$s .= "SUM(
 						(TIME_TO_SEC( duracion)/3600)
 					) as valor_divisor, ";
-				$s .= $datos_monedas.",SUM( (cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio)*cut.costo_hh * 	(TIME_TO_SEC( duracion)/3600)	) ";
+				$s .= $datos_monedas.",SUM( ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*cut.costo_hh * 	(TIME_TO_SEC( duracion)/3600)	) ";
 			    
 				break;
 			}
 			
 		}
-		if($this->tipo_dato) {
 		    $s .= ' as '.$this->tipo_dato;
 		} else {
 		    $s .= '1 as tipodato '; 
@@ -822,6 +835,9 @@ class Reporte
 			$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		}
 
+		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
+			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
+		}
 		return $s;
 	}
 
@@ -888,6 +904,9 @@ class Reporte
 			return ' GROUP BY agrupador_general, id_cobro ';
 
 		$agrupa = array();
+		    $agrupa[] = "id_usuario";
+		    	$agrupa[] = "id_cliente";
+			$agrupa[] ="codigo_asunto";
 
 		if($this->requiereMoneda($this->tipo_dato))
 			$agrupa[] = "id_cobro";
@@ -924,7 +943,7 @@ class Reporte
 	{
 		$stringquery="";	
 
-	    $resp = mysql_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
+	    $resp = mysql_unbuffered_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
 		
 		$this->row = array();
 		while($row = mysql_fetch_array($resp))
@@ -1381,11 +1400,8 @@ class Reporte
 	{
 		foreach($data2 as $ag1 => $a)
 		{
-			if(is_array($a))
-			if(!isset($data[$ag1]))
-			{
-				Reporte::rellenar($data[$ag1],$data2[$ag1]);
-			}
+
+			
 
 			if(is_array($a))
 			foreach($a as $ag2 => $b)
@@ -1417,8 +1433,8 @@ class Reporte
 											if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5]))
 												Reporte::rellenar($data[$ag1][$ag2][$ag3][$ag4][$ag5],$data2[$ag1][$ag2][$ag3][$ag4][$ag5]);
 											
-											foreach($e as $ag6 => $f)
-											if(is_array($f))
+											foreach($e as $ag6 => $f) {
+											if(is_array($f)) {
 											if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]))
 											{
 												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor'] = 0;
@@ -1431,6 +1447,8 @@ class Reporte
 												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'];
 												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'];
 											}
+											    } else {
+												if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6])) $data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor']=0;
 										}
 									}
 								}
@@ -1438,6 +1456,8 @@ class Reporte
 						}
 					}
 				}
+			}
+		}
 			}
 		}
 		return $data;
@@ -1560,7 +1580,7 @@ class Reporte
 				$valor_tiempo=sprintf('%02d',$valor_horas).":".sprintf('%02d',$valor_minutos);
 			return $valor_tiempo;
 		}
-		if(strpos($tipo_dato,'valor_')!==false) 
+		if(strpos($tipo_dato,'valor_')!==false || strpos($tipo_dato,'costo')!==false) 
 			return number_format($valor,$formato_valor['cifras_decimales'],$formato_valor['decimales'],$formato_valor['miles']);
 		return $valor;
 	}

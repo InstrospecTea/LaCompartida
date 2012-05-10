@@ -406,12 +406,18 @@ class Documento extends Objeto
 		$modulo_fact = UtilesApp::GetConf($this->sesion,'NuevoModuloFactura');
 			
 		$out = '';
-		$query = "
-						SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
+		$query = "	 SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
 							FROM neteo_documento
 							JOIN documento ON documento.id_documento=neteo_documento.id_documento_pago 
-							WHERE neteo_documento.id_documento_cobro = '".$this->fields['id_documento']."';
-				 ";
+							WHERE neteo_documento.id_documento_cobro = '".$this->fields['id_documento']."'
+				 UNION
+				 SELECT id_documento AS id, honorarios, subtotal_gastos AS gastos, pago_retencion, es_adelanto
+				FROM documento left join neteo_documento on  documento.id_documento=neteo_documento.id_documento_pago 
+				WHERE tipo_doc !=  'N'
+        and neteo_documento.id_neteo_documento is null 
+				AND id_cobro = '".$this->fields['id_cobro']."'";
+
+						 
 
 		$resp = mysql_query ($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
@@ -430,13 +436,15 @@ class Documento extends Objeto
 				
 				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')).$id;
 				
-				if( $modulo_fact && !$es_adelanto )
-					$out .= "<tr><td align=left>".$nombre."</td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td><td>&nbsp;</td></tr>";
-				else
-					$out .= "<tr><td align=left><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(".$id.")\" title=\"Editar Pago\">".$nombre."</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
-				if( $pago_retencion )
-					$out .= "<tr><td align=left colspan=2> ( Pago retención impuestos ) </td></tr>";
+				if( $modulo_fact && !$es_adelanto ) {
+					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>".$nombre."</td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td><td>&nbsp;</td></tr>";
+				} else {
+					$out .= "<tr><td style='white-space: nowrap;text-align:left;'><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(".$id.")\" title=\"Editar Pago\">".$nombre."</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
+				}
+				if( $pago_retencion ) {
+					$out .= "<tr><td style='text-align:left;' colspan=2> ( Pago retención impuestos ) </td></tr>";
 			}
+		}
 		}
 		return $out;
 	}

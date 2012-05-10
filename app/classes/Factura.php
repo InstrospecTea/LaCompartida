@@ -185,7 +185,6 @@ class Factura extends Objeto {
 				$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, $id_formato_factura);
 			         $xmlData = UtilesApp::TemplateFacturaXML($this->sesion,$id_formato_factura);
                                   $xmlBit = UtilesApp::TemplateBitXML($this->sesion,$id_formato_factura);
-                                
                         } else {
 				// verificar el tipo de documento legal, y mostrar ese formato, sino mostrar por defecto
 				$query = "";
@@ -255,8 +254,6 @@ class Factura extends Objeto {
                     $xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
                     $xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
                      $html_css['xml'] = str_replace(array('UTF-8','&nbsp;','<br>','<br/>',"<br />\n",'<br />','<v:shape '),array('ISO-8859-1','&#160;','&#xD;','&#xD;','</w:t></w:r></w:p><w:p><w:r><w:t>','</w:t></w:r></w:p><w:p><w:r><w:t>', '<v:shape filled="f" stroked="f" '),$xml);
-
-                  
                 }
                 return $html_css;
 	}
@@ -313,17 +310,17 @@ class Factura extends Objeto {
 				$html2 = str_replace('%BOTTOM%', $this->GenerarDocumento($parser_factura, 'BOTTOM', $lang), $html2);
 				$html2 = str_replace('%BOTTOM_COPIA%', $this->GenerarDocumento($parser_factura, 'BOTTOM_COPIA', $lang), $html2);
 				if ($cobro->fields['modalidad_calculo'] == 1) {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento2($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento2($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento2($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento2($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento2($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento2($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento2($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento2($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento2($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento2($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				} else {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, & $idioma, $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				}
 				break;
 
@@ -521,6 +518,28 @@ class Factura extends Objeto {
 					}
 				}
 
+				if( UtilesApp::GetConf($this->sesion, 'CalculacionCYC') ) {
+					/* esto habría que mejorarlo en el caso de que se les ocurriera facturar en más de 1 documento */
+					$query_cyc = "SELECT 
+									subtotal_honorarios,
+									subtotal_sin_descuento,
+									descuento_honorarios,
+									honorarios
+									impuesto,
+									subtotal_gastos,
+									subtotal_gastos_sin_impuesto,
+									subtotal_sin_descuento
+
+								FROM documento 
+								WHERE id_cobro = '{$this->fields["id_cobro"]}'
+									AND tipo_doc='N'
+								;";
+
+					//echo $query_cyc; exit;
+					$resp_cyc = mysql_query($query_cyc, $this->sesion->dbh) or Utiles::errorSQL($query_cyc, __FILE__, __LINE__, $this->sesion->dbh);
+					list( $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios_con_descuento_con_impuesto, $impuesto_factura, $subtotal_gastos, $monto_gastos, $subtotal_gastos_sin_impuesto, $subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
+					/* Fin de lo que hay que mejorar */
+				}
 
 				if ($descuento_honorarios > 0)
 					$html2 = str_replace('%tr_descuento%', '<tr>
@@ -533,10 +552,18 @@ class Factura extends Objeto {
 
 				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 					// Lo separo en lineas
-					$factura_descripcion_separado = explode("\n", $factura_descripcion);
+					$factura_descripcion_separado = explode("\n", __($factura_descripcion));
 					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
+					if (intval($subtotal_gastos_con_impuesto) > 0)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
+					if (intval($subtotal_gastos_sin_impuesto) > 0)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
 				} else {
-					$factura_descripcion_separado = $factura_descripcion;
+					$factura_descripcion_separado = __($factura_descripcion);
+					if (intval($subtotal_gastos_con_impuesto) > 0)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
+					if (intval($subtotal_gastos_sin_impuesto) > 0)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
 				}
 				
 				if ($lang == 'es') {
@@ -573,6 +600,7 @@ class Factura extends Objeto {
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
 					}
+					$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
 					$html2 = str_replace('%texto_gastos%', 'GASTOS', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Gastos incurridos en su caso, según relación adjunta.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total servicios profesionales y gastos incurridos', $html2);
@@ -597,7 +625,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%descuento_glosa%', '', $html2);
 					}
 				} else if ($lang == 'en') {
-
+				    $html2 = str_replace('%firma%', 'Signature', $html2);
 					if ($descuento_honorarios > 0)
 						$html2 = str_replace('%<br><br>%', '', $html2);
 					else
@@ -623,6 +651,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
 					}
 
+					$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
 					$html2 = str_replace('%texto_gastos%', 'EXPENSES', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Expenses incurred in this case.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total legal services and expenses', $html2);
@@ -644,6 +673,7 @@ class Factura extends Objeto {
 						$html2 = str_replace($meses, $months, $html2);
 					}
 					$html2 = str_replace('%texto_total%', 'Total ', $html2);
+					$html2 = str_replace('%firma%', 'Signature', $html2);
 					if ($descuento_honorarios > 0) {
 						$html2 = str_replace('%descuento_honorarios%', '- ' . number_format($descuento_honorarios, $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 						$html2 = str_replace('%descuento_glosa%', __('Discount'), $html2);
@@ -654,7 +684,7 @@ class Factura extends Objeto {
 				}
 				if (UtilesApp::GetConf($this->sesion, "DescripcionFacturaConAsuntos")) {
 					// Lo separo en lineas
-					$factura_descripcion_con_asuntos = explode("\n", $factura_descripcion);
+					$factura_descripcion_con_asuntos = explode("\n", __($factura_descripcion));
 
 					$max_caracter_por_linea = UtilesApp::GetConf($this->sesion, 'MaximoCaracterPorLineaDescripcion');
 
@@ -714,6 +744,7 @@ class Factura extends Objeto {
 				
 
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+					
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%monto_honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -801,12 +832,10 @@ class Factura extends Objeto {
 						
 						$honorarios_con_impuesto = $this->fields['honorarios'] * ( 1 + ( $cobro->fields['porcentaje_impuesto'] / 100) ) ;
 						$monto_impuesto_honorarios = $this->fields['honorarios'] * ( $cobro->fields['porcentaje_impuesto'] / 100) ;					
-						
 					} else {
 						
 						$honorarios_sin_impuesto = $this->fields['honorarios'];
 						$gastos_sin_impuestos = $this->fields['subtotal_gastos_sin_impuesto'];
-						
 					}
 					
 					$gastos_con_impuesto = $this->fields['subtotal_gastos'] * ( 1 + ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ) ;
@@ -826,7 +855,6 @@ class Factura extends Objeto {
 					//echo $query_glosa_banco; exit;
 					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
 					list($glosa_banco) = mysql_fetch_array($resu_glosa);
-												
 				}
 				
 				if ($mostrar_honorarios) {
@@ -837,7 +865,6 @@ class Factura extends Objeto {
 					/* debe mostrar ceros en los espacios que sea 0 */
 					$html2 = str_replace('%monto_honorarios_sin_impuesto%', number_format($honorarios_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_honorarios_con_impuesto%', number_format($honorarios_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-					
 				} else {
 					
 					/* 
@@ -854,23 +881,19 @@ class Factura extends Objeto {
 				if ($gastos_con_impuesto > 0) {
 					 
 					$html2 = str_replace('%subtotal_gasto_con_impuesto%', number_format($gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				
 				} else {
 					
 					$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_con_impuesto%', '', $html2);
-					
 				}
 				
 				if ($gastos_sin_impuesto > 0) {
 					 
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', number_format($gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				
 				} else {
 					
 					$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
-					
 				}
 				
 				$html2 = str_replace('%glosa_banco%', $glosa_banco, $html2);
@@ -889,6 +912,8 @@ class Factura extends Objeto {
 				 */
 
 				if ( UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura') ) {
+					
+					
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -896,11 +921,11 @@ class Factura extends Objeto {
 					}
 					
 					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
-						$descripcion_subtotal_gastos_separado = str_replace("\n","<br/>",$descripcion_subtotal_gastos);
-						$descripcion_subtotal_gastos_sin_impuesto_separado = str_replace("\n","<br/>",$descripcion_subtotal_gastos_sin_impuesto);
+						$descripcion_subtotal_gastos_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos));
+						$descripcion_subtotal_gastos_sin_impuesto_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos_sin_impuesto));
 					} else {
-						$descripcion_subtotal_gastos_separado = $descripcion_subtotal_gastos;
-						$descripcion_subtotal_gastos_sin_impuesto_separado = $descripcion_subtotal_gastos_sin_impuesto;
+						$descripcion_subtotal_gastos_separado = __($descripcion_subtotal_gastos);
+						$descripcion_subtotal_gastos_sin_impuesto_separado = __($descripcion_subtotal_gastos_sin_impuesto);
 					}
 
 					if ($mostrar_gastos_con_impuesto) {
@@ -949,6 +974,7 @@ class Factura extends Objeto {
 					$monto_subtotal_honorario_y_gastos = $monto_subtotal + $subtotal_gastos + $subtotal_gastos_sin_impuesto;
 					$html2 = str_replace('%monto_subtotal_honorario_y_gastos%', number_format($monto_subtotal_honorario_y_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
+					
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
