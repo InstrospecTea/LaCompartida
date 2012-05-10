@@ -16,6 +16,8 @@
 	$pagina->PrintTop();
 	
 	
+       
+        
 	// Si existe 'ColumnaNotificacion' en Conf demonstra una ventana con noticias del sistema
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ColumnaNotificacion') != '' ) || method_exists('Conf','ColumnaNotificacion') )
 	{

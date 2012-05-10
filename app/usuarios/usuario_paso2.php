@@ -465,7 +465,7 @@ function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
 
 	<fieldset>
 	<legend><?=__('Permisos')?></legend>
-	<table id="chkpermisos" style="display:none;">
+	<table id="chkpermisos" >
 		<?=Html::PrintCheckbox($sesion, $usuario->permisos, 'codigo_permiso', 'glosa', 'permitido');?>
 <?
 	if(!$usuario->loaded)
@@ -914,7 +914,7 @@ function CargarPermisos()
 
 function YoucangonowMichael() {
     
-    jQuery( "#chkpermisos" ).buttonset().show();
+    jQuery( "#chkpermisos").buttonset();
     jQuery("#chkpermisos .ui-button").each(function() {
 	jQuery(this).css({'width':'150px','text-align':'left','padding-left':'25px'});
 	console.log(jQuery(this));
