@@ -1,29 +1,24 @@
 <?php
 
-require_once "GraficoBarras.php";
-require_once "../../../fw/classes/Sesion.php";
-require_once "../../../fw/classes/Utiles.php";
-require_once dirname(__FILE__).'/../../conf.php';
+
+require_once dirname(__FILE__) . '/../../conf.php';
+require_once(Conf::RutaGraficos());
+
+require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
+require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
+
+require_once Conf::ServerDir() . '/../app/interfaces/graficos/GraficoBarras.php';
+
+
 
 $sesion = new Sesion();
 # The data for the pie chart
 
-if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AnchoGraficoReporteGeneral') != NULL )
-{
-	$ancho = Conf::GetConf($sesion,'AnchoGraficoReporteGeneral');
-}
-else
-{
-	$ancho = 900;
-}
-if ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'AltoGraficoReporteGeneral') != NULL )
-{
-	$alto = Conf::GetConf($sesion,'AltoGraficoReporteGeneral');
-}
-else
-{
-	$alto = 900;
-}
+$ancho= ( UtilesApp::GetConf($sesion,'AnchoGraficoReporteGeneral'))? UtilesApp::GetConf($sesion,'AnchoGraficoReporteGeneral'):900;
+
+$alto =(UtilesApp::GetConf($sesion,'AltoGraficoReporteGeneral')  )? UtilesApp::GetConf($sesion,'AltoGraficoReporteGeneral') : 900;
+
 $radio = 100;
 
 

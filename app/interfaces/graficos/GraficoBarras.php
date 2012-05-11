@@ -1,6 +1,5 @@
 <?php 
-require_once "../../conf.php";
-require_once(Conf::RutaGraficos());
+
 	
 class GraficoBarras extends XYChart
 {
