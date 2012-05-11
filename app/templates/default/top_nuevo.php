@@ -37,6 +37,11 @@ if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
 			    echo '<img src="https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png" />';
 			    else:
 			    echo '<img src="'. Conf::ImgDir().'/logo_top.png" rel="'.ROOTDIR.'"/>';
+                            
+                            echo '<script>';
+                            echo "var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;";
+                            echo "if (is_chrome && window.console) console.log('Es Chrome '+navigator.userAgent);";
+                            echo '</script>';
 			endif;
 			?></a></div>
 			    <div style="position:absolute;top:0px;left:50%;width:485px;text-align:right;"><br/>
