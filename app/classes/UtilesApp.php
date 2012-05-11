@@ -1,64 +1,67 @@
 <?php
-//Clase UtilesApp
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../app/classes/DocumentoMoneda.php';
 
-class UtilesApp extends Utiles
-{
-	public static function  GetConf($sesion, $conf){
-		if (method_exists('Conf', $conf)) return Conf::$conf();
-		if (method_exists('Conf', 'GetConf')) return Conf::GetConf($sesion, $conf);
+//Clase UtilesApp
+require_once dirname(__FILE__) . '/../conf.php';
+require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
+require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
+require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
+require_once Conf::ServerDir() . '/../app/classes/Debug.php';
+require_once Conf::ServerDir() . '/../app/classes/DocumentoMoneda.php';
+
+class UtilesApp extends Utiles {
+
+	public static function GetConf($sesion, $conf) {
+		if (method_exists('Conf', $conf))
+			return Conf::$conf();
+		if (method_exists('Conf', 'GetConf'))
+			return Conf::GetConf($sesion, $conf);
 		return false;
 	}
-	public static function ComparaEstadoCobro($sesion,$estadoactual,$operador='=',$estado) {
-	    //Pregunta si $estadoactual es un estado previo a $estado en el cobro o factura
-	    $estado=strtoupper($estado);
-	    $estadoactual=strtoupper($estadoactual);
-	    $queryorden="SELECT if(pec2.orden $operador pec1.orden,1,0) respuesta FROM 
+
+	public static function ComparaEstadoCobro($sesion, $estadoactual, $operador = '=', $estado) {
+		//Pregunta si $estadoactual es un estado previo a $estado en el cobro o factura
+		$estado = strtoupper($estado);
+		$estadoactual = strtoupper($estadoactual);
+		$queryorden = "SELECT if(pec2.orden $operador pec1.orden,1,0) respuesta FROM 
 			`prm_estado_cobro` pec1 ,`prm_estado_cobro` pec2
 			WHERE pec1.codigo_estado_cobro='$estado'
 			and pec2.codigo_estado_cobro='$estadoactual' ";
-	    $queryrespuesta=mysql_query($queryorden,$sesion->dbh);
-	    if(!queryrespuesta) return false;
-	    list($respuesta)=mysql_fetch_array($queryrespuesta);
-	    if($respuesta==1) return true;
-	    return false;
+		$queryrespuesta = mysql_query($queryorden, $sesion->dbh);
+		if (!queryrespuesta)
+			return false;
+		list($respuesta) = mysql_fetch_array($queryrespuesta);
+		if ($respuesta == 1)
+			return true;
+		return false;
 	}
-	public static function EstadoPosteriorA($sesion,$tabla,$estado) {
-	    
+
+	public static function EstadoPosteriorA($sesion, $tabla, $estado) {
+		
 	}
-        public static function printRadio($idbuttonset='',$valores,$actual,$ancho='') {
-                    echo "<div ".($ancho ? $ancho:'' )." id='$idbuttonset'>";
-                    foreach($valores as $valor):
-                        echo '<span ><input '.($valor[0]==$actual? 'checked="checked" ':'').' id="'.$idbuttonset.'_'.$valor[0].'" type="radio" value="" name="'.$idbuttonset.'"  /><label for="'.$idbuttonset.'_'.$valor[0].'">'.$valor[1].'</label>';
-                    endforeach;
-                    echo "</div>";
-                    
-        }
+
+	public static function printRadio($idbuttonset = '', $valores, $actual, $ancho = '') {
+		echo "<div " . ($ancho ? $ancho : '' ) . " id='$idbuttonset'>";
+		foreach ($valores as $valor):
+			echo '<span ><input ' . ($valor[0] == $actual ? 'checked="checked" ' : '') . ' id="' . $idbuttonset . '_' . $valor[0] . '" type="radio" value="" name="' . $idbuttonset . '"  /><label for="' . $idbuttonset . '_' . $valor[0] . '">' . $valor[1] . '</label>';
+		endforeach;
+		echo "</div>";
+	}
+
 	#obtener el formato de la fecha segun un query, o el seteado en el idioma por defecto
-	function ObtenerFormatoFecha($sesion,$query=""){
-		if ( strlen( $query ) > 0 ) //si tiene query para intentar obtener el idioma según asunto, cobro, u otro ejecutamos query
-		{
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			if (mysql_num_rows($resp) > 0)
-			{
+
+	function ObtenerFormatoFecha($sesion, $query = "") {
+		if (strlen($query) > 0) { //si tiene query para intentar obtener el idioma según asunto, cobro, u otro ejecutamos query
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			if (mysql_num_rows($resp) > 0) {
 				list($formato) = mysql_fetch_array($resp);
-			}
-			else //si la clase (objeto, cobro, asunto, etc, no tiene idioma asociado, buscamos el formato del idioma por defecto)
-			{
+			} else { //si la clase (objeto, cobro, asunto, etc, no tiene idioma asociado, buscamos el formato del idioma por defecto)
 				$query_idioma_defecto = "SELECT pi.formato_fecha FROM prm_idioma pi WHERE pi.codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma' )  ";
-				$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				list($formato) = mysql_fetch_array($resp);
 			}
-		}
-		else //si no buscamos el idioma por defecto.
-		{
+		} else { //si no buscamos el idioma por defecto.
 			$query_idioma_defecto = "SELECT pi.formato_fecha FROM prm_idioma pi WHERE pi.codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma' )  ";
-			$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query_idioma_defecto,__FILE__,__LINE__,$sesion->dbh);
+			$resp = mysql_query($query_idioma_defecto, $sesion->dbh) or Utiles::errorSQL($query_idioma_defecto, __FILE__, __LINE__, $sesion->dbh);
 			list($formato) = mysql_fetch_array($resp);
 		}
 		return ($formato);
@@ -70,43 +73,30 @@ class UtilesApp extends Utiles
 	 * @param int $id_carta
 	 * @return array $margenes
 	 */
-	function ObtenerMargenesCarta( $sesion, $id_carta)
-	{
+	function ObtenerMargenesCarta($sesion, $id_carta) {
 		$margenes = array();
 		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM carta WHERE id_carta ='$id_carta' LIMIT 1";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if( mysql_num_rows( $resp) > 0 )
-		{
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		if (mysql_num_rows($resp) > 0) {
 			$margenes = mysql_fetch_array($resp);
-
-		}
-		else
-		{
-			$margenes = array(1.5, 2, 2, 2 , 0.88, 0.88);
+		} else {
+			$margenes = array(1.5, 2, 2, 2, 0.88, 0.88);
 		}
 		return $margenes;
-
 	}
 
-	function ObtenerMargenesFactura( $sesion, $id_template)
-	{
+	function ObtenerMargenesFactura($sesion, $id_template) {
 		$margenes = array();
 		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if( mysql_num_rows( $resp) > 0 )
-		{
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		if (mysql_num_rows($resp) > 0) {
 			$margenes = mysql_fetch_array($resp);
-
-		}
-		else
-		{
-			$margenes = array(1.5, 2, 2, 2 , 0.88, 0.88);
+		} else {
+			$margenes = array(1.5, 2, 2, 2, 0.88, 0.88);
 		}
 		return $margenes;
-
 	}
 
-<<<<<<< .working
 	####################### Formato carta #############################
 
 	function TemplateCarta(&$sesion, $id_carta = 1) {
@@ -115,7 +105,6 @@ class UtilesApp extends Utiles
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
-    }
 
 	function TemplateCartaCSS(&$sesion, $id_carta = 1) {
 		$query = "SELECT formato_css FROM carta WHERE id_carta='$id_carta'";
@@ -123,7 +112,6 @@ class UtilesApp extends Utiles
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
-    }
 
 	####################### Formato carta factura ######################
 
@@ -140,83 +128,46 @@ class UtilesApp extends Utiles
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
-=======
-	####################### Formato carta #############################
-	function TemplateCarta( &$sesion, $id_carta=1 )
-	{
-		$query = "SELECT formato FROM carta WHERE id_carta='$id_carta'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)= mysql_fetch_array($resp))
-			return $format;
+
+	public static function TemplateFacturaXML(&$sesion, $id_factura_formato = 1) {
+		$existexml = mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'factura_template_xml'", $sesion->dbh));
+		if ($existexml) {
+			$query = "SELECT factura_template_xml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			if (list($format) = mysql_fetch_array($resp))
+				return $format;
+		} else {
+			return '';
+		}
 	}
 
-	function TemplateCartaCSS( &$sesion, $id_carta=1 )
-	{
-		$query = "SELECT formato_css FROM carta WHERE id_carta='$id_carta'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)= mysql_fetch_array($resp))
-			return $format;
-	}
-
-	####################### Formato carta factura ######################
-	public static function TemplateFactura( &$sesion, $id_factura_formato=1 )
-	{
-		$query = "SELECT factura_template FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)=mysql_fetch_array($resp))
-			return $format;
-	}
-
-	public static function TemplateFacturaCSS( &$sesion, $id_factura_formato=1 )
-	{
-		$query = "SELECT factura_css FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)=mysql_fetch_array($resp))
-			return $format;
-	}
-        public static function TemplateFacturaXML( &$sesion, $id_factura_formato=1 )
-	{
-		$existexml=mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'factura_template_xml'",$sesion->dbh));
-                if($existexml) {
-                $query = "SELECT factura_template_xml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)=mysql_fetch_array($resp))
-			return $format;
-                 } else {
-                        return '';
-               }
-	}
-        public static function TemplateBitXML( &$sesion, $id_factura_formato=1 )
-	{
-		$existebitxml=mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'usaxml'",$sesion->dbh));
-               if($existebitxml) {
-                   $query = "SELECT usaxml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($resultado)=mysql_fetch_array($resp))
-			return $resultado;
-               } else {
-                        return 0;
-               }
+	public static function TemplateBitXML(&$sesion, $id_factura_formato = 1) {
+		$existebitxml = mysql_num_rows(mysql_query("SHOW COLUMNS FROM factura_rtf like 'usaxml'", $sesion->dbh));
+		if ($existebitxml) {
+			$query = "SELECT usaxml FROM factura_rtf WHERE id_factura_formato='$id_factura_formato'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			if (list($resultado) = mysql_fetch_array($resp))
+				return $resultado;
+		} else {
+			return 0;
+		}
 	}
 
 	####################### Formato carta factura pago ######################
-	function TemplateFacturaPago( &$sesion, $id_factura_pago_formato=1 )
-	{
+
+	function TemplateFacturaPago(&$sesion, $id_factura_pago_formato = 1) {
 		$query = "SELECT factura_pago_template FROM factura_pago_rtf WHERE id_formato='$id_factura_pago_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)=mysql_fetch_array($resp))
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function TemplateFacturaPagoCSS( &$sesion, $id_factura_pago_formato=1 )
-	{
+	function TemplateFacturaPagoCSS(&$sesion, $id_factura_pago_formato = 1) {
 		$query = "SELECT factura_pago_css FROM factura_pago_rtf WHERE id_formato='$id_factura_pago_formato'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($format)=mysql_fetch_array($resp))
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
-
-
 
 	###################### Formato cobro #######################
 
@@ -287,18 +238,7 @@ class UtilesApp extends Utiles
 		else
 			$semana2 = "'$semana'";
 
-    function GenerarSemana($id_usuario, $semana) {
-	global $sesion;
-
-	if (!$id_usuario)
-	    $id_usuario = $sesion->usuario->fields['id_usuario'];
-	#$id_usuario2 = $sesion->usuario->fields[id_usuario];
-	if ($semana == "")
-	    $semana2 = "CURRENT_DATE()";
-	else
-	    $semana2 = "'$semana'";
-
-	$query = "SELECT *, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana
+		$query = "SELECT *, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana
 					 FROM trabajo WHERE
 						id_usuario = $id_usuario
 						AND (
@@ -306,12 +246,12 @@ class UtilesApp extends Utiles
 							)
 						ORDER BY fecha,id_trabajo";
 
-	$lista = new ListaTrabajos($sesion, "", $query);
+		$lista = new ListaTrabajos($sesion, "", $query);
 
 		$dias = array("Lunes", "Martes", "Miécoles", "Jueves", "Viernes", "Sábado", "Domingo");
 
 
-	echo("<br /><br /><strong>Haga clic en algún trabajo para modificarlo</strong><br /><br />");
+		echo("<br /><br /><strong>Haga clic en algún trabajo para modificarlo</strong><br /><br />");
 
 		echo("<table style='width:500px'>");
 		echo("<tr>");
@@ -330,7 +270,7 @@ class UtilesApp extends Utiles
 			if ($i == 0)
 				echo("<td style='width: 100px'>");
 
-	    $img_dir = Conf::ImgDir();
+			$img_dir = Conf::ImgDir();
 
 			$alto = $lista->Get($i)->fields[alto] . "px";
 			$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
@@ -339,7 +279,6 @@ class UtilesApp extends Utiles
 				$dia_semana = 8;
 		}
 	}
-    }
 
 	function DiferenciaDbAplicacionEnSegundos(&$sesion) {
 		$query = "SELECT NOW()";
@@ -353,21 +292,7 @@ class UtilesApp extends Utiles
 
 		return $diferencia;
 	}
-    }
 
-        function DiferenciaDbAplicacionEnSegundos(&$sesion)
-        {
-            $query = "SELECT NOW()";
-            $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-            list($ahora) = mysql_fetch_array($resp);
-            
-            $ahora_db_timestamp = strtotime($ahora);
-            $ahora_app_timestamp = strtotime(date("Y-m-d H:i:s"));
-            
-            $diferencia = $ahora_app_timestamp - $ahora_db_timestamp;
-            
-            return $diferencia;
-        }
 	/*
 	  Reemplaza , por . para numero
 	 */
@@ -378,25 +303,20 @@ class UtilesApp extends Utiles
 			return $valor;
 		}
 	}
-	return $cont;
-    }
 
-	function CantidadDiasHabiles( $fecha_ini, $fecha_fin )
-	{
-			$fecha1 = strtotime($fecha_ini);
-			$fecha2 = strtotime($fecha_fin);
+	function CantidadDiasHabiles($fecha_ini, $fecha_fin) {
+		$fecha1 = strtotime($fecha_ini);
+		$fecha2 = strtotime($fecha_fin);
 
-			$cont = 0;
-			//echo date("d-m-Y",$fecha);
-			while($fecha1 <= $fecha2)
-			{
-				if( date("N",$fecha1) < 6 )
-					$cont++;
-				$fecha1 = mktime(0,0,0,date('m',$fecha1),date('d',$fecha1)+1,date('Y',$fecha1));
-			}
-			return $cont;
+		$cont = 0;
+		//echo date("d-m-Y",$fecha);
+		while ($fecha1 <= $fecha2) {
+			if (date("N", $fecha1) < 6)
+				$cont++;
+			$fecha1 = mktime(0, 0, 0, date('m', $fecha1), date('d', $fecha1) + 1, date('Y', $fecha1));
+		}
+		return $cont;
 	}
-
 
 	/*
 	  HTML 2 (F)PDF
@@ -429,12 +349,12 @@ class UtilesApp extends Utiles
 	  La cuenta corriente funciona sólo restando de los ingresos para gastos,
 	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
-	function TotalCuentaCorriente(&$sesion, $where = '1')
-	{
-                $where .= " AND cta_corriente.cobrable = 1 AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-		
-		$total_ingresos=0;
-		$total_egresos=0;
+
+	function TotalCuentaCorriente(&$sesion, $where = '1') {
+		$where .= " AND cta_corriente.cobrable = 1 AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
+
+		$total_ingresos = 0;
+		$total_egresos = 0;
 
 		$query = "SELECT
 								IF( cta_corriente.id_cobro IS NOT NULL, ingreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), ingreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
@@ -452,11 +372,10 @@ class UtilesApp extends Utiles
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
-                
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		while(list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp))
-		{
-			if($ingreso > 0)
+
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		while (list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp)) {
+			if ($ingreso > 0)
 				$total_ingresos += $monto_cobrable;
 			else if ($egreso > 0)
 				$total_egresos += $monto_cobrable;
@@ -464,9 +383,6 @@ class UtilesApp extends Utiles
 		$total = $total_ingresos - $total_egresos;
 		return $total;
 	}
-	$total = $total_ingresos - $total_egresos;
-	return $total;
-    }
 
 	/*
 	  La cuenta del cliente funciona sólo sumando los montos asociados al cliente
@@ -477,12 +393,7 @@ class UtilesApp extends Utiles
 		if ($codigo_cliente != '')
 			$where .= " AND codigo_cliente = '$codigo_cliente' ";
 
-    function TotalCuentaCliente(&$sesion, $codigo_cliente='') {
-	$where = 1;
-	if ($codigo_cliente != '')
-	    $where .= " AND codigo_cliente = '$codigo_cliente' ";
-
-	$query = "SELECT SUM(monto*tipo_cambio)
+		$query = "SELECT SUM(monto*tipo_cambio)
 							FROM mvto_cta_corriente JOIN prm_moneda on prm_moneda.id_moneda =mvto_cta_corriente.id_moneda
 							WHERE $where";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -499,8 +410,6 @@ class UtilesApp extends Utiles
 		}
 		return '0,0';
 	}
-	return '0,0';
-    }
 
 	//Funcion que transforma de tiempo x,xx o x.xx en Time mysql
 	function Decimal2Time($duracion) {
@@ -518,8 +427,6 @@ class UtilesApp extends Utiles
 				return true;
 		return false;
 	}
-	return sprintf("$h:%02d", $m);
-    }
 
 	// Transforma el formato de las horas, aproximando para que 23.999 sea 24:00 en vez de 23:00.
 	function Hora2HoraMinuto($hora) {
@@ -533,17 +440,16 @@ class UtilesApp extends Utiles
 	}
 
 	// En Excel los tiempos se guardan como números donde 1 equivale a 24 horas.
-	function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false )
-	{
+	function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false) {
 		$tiempo = str_replace(',', '.', $tiempo);
-		if( $ingresado_via_decimales ) {
-			$h = (int)($tiempo);
-			$m = round(($tiempo - $h)*60);
+		if ($ingresado_via_decimales) {
+			$h = (int) ($tiempo);
+			$m = round(($tiempo - $h) * 60);
 		} else {
-			$h = (int)($tiempo*24);
-			$m = round(($tiempo*24 - $h)*60);
+			$h = (int) ($tiempo * 24);
+			$m = round(($tiempo * 24 - $h) * 60);
 		}
-		
+
 		// Esta comprobación es necesaria porque la aproximación puede dejar 60 minutos y MySQL no los soporta.
 		if ($m == 60) {
 			$m = 0;
@@ -551,8 +457,6 @@ class UtilesApp extends Utiles
 		}
 		return sprintf("%02d:%02d:00", $h, $m);
 	}
-	return sprintf("%02d:%02d:00", $h, $m);
-    }
 
 	function generarFacturaPDF($id_factura, $sesion) {
 		require_once Conf::ServerDir() . '/../app/fpdf/fpdf.php';
@@ -584,64 +488,64 @@ class UtilesApp extends Utiles
 			return;
 		}
 
-		$query_tipo_doc = "SELECT id_documento_legal, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$id_documento_legal."'";
+		$query_tipo_doc = "SELECT id_documento_legal, glosa FROM prm_documento_legal WHERE id_documento_legal = '" . $id_documento_legal . "'";
 		$resp_tipo_doc = mysql_query($query_tipo_doc, $sesion->dbh) or Utiles::errorSQL($query_tipo_doc, __FILE__, __LINE__, $sesion->dbh);
-		list($id_documento_legal_tipo,$tipo_documento_legal) = mysql_fetch_array($resp_tipo_doc);
+		list($id_documento_legal_tipo, $tipo_documento_legal) = mysql_fetch_array($resp_tipo_doc);
 
-		if(!$tipo_documento_legal)
+		if (!$tipo_documento_legal)
 			$pagina->FatalError('Error al cargar el tipo de Documento Legal');
 
-	// P: hoja vertical
-	// mm: todo se mide en milímetros
-	// Letter: formato de hoja
-	$pdf = new FPDF('P', 'mm', 'Letter');
+		// P: hoja vertical
+		// mm: todo se mide en milímetros
+		// Letter: formato de hoja
+		$pdf = new FPDF('P', 'mm', 'Letter');
 
-	// Dimensiones de una hoja tamaño carta.
-	$ancho = 216;
-	$alto = 279;
+		// Dimensiones de una hoja tamaño carta.
+		$ancho = 216;
+		$alto = 279;
 
 		$pdf->SetTitle($tipo_documento_legal . " " . $numero_factura);
 
-	// La orientación y formato de la página son los mismos que del documento
-	$pdf->AddPage();
+		// La orientación y formato de la página son los mismos que del documento
+		$pdf->AddPage();
 
-	// Definimos el tipo de letra para todo el documento.
-	$pdf->SetFont('Arial', '', 12);
+		// Definimos el tipo de letra para todo el documento.
+		$pdf->SetFont('Arial', '', 12);
 
-	// Definir los parámetros para el formato de moneda
-	$simbolo_moneda = Utiles::glosa($sesion, $id_moneda, 'simbolo', 'prm_moneda', 'id_moneda');
-	$cifras_decimales = Utiles::glosa($sesion, $id_moneda, 'cifras_decimales', 'prm_moneda', 'id_moneda');
+		// Definir los parámetros para el formato de moneda
+		$simbolo_moneda = Utiles::glosa($sesion, $id_moneda, 'simbolo', 'prm_moneda', 'id_moneda');
+		$cifras_decimales = Utiles::glosa($sesion, $id_moneda, 'cifras_decimales', 'prm_moneda', 'id_moneda');
 
-	// Escribimos el contenido
-	// Fecha
-	$pdf->SetXY(52, 66);
-	$pdf->Write(4, ucfirst(Utiles::sql3fecha(date($fecha), '%B')) . date(' j, Y', strtotime($fecha)));
+		// Escribimos el contenido
 		// Fecha
 		$pdf->SetXY(52, 66);
 		$pdf->Write(4, ucfirst(Utiles::sql3fecha(date($fecha), '%B')) . date(' j, Y', strtotime($fecha)));
 
-	// RUT (NIT) cliente
-	$pdf->SetXY(52, 86);
-	$pdf->Write(4, $RUT_cliente);
+		// Nombre cliente
+		$pdf->SetXY(52, 77);
+		$pdf->Write(4, $cliente);
 
-	// Dirección cliente
-	// Cambia el margen para que aparezca alineado si ocupa más de una línea.
-	$pdf->SetLeftMargin(52);
-	$pdf->SetXY(52, 93);
-	$pdf->Write(4, $direccion_cliente);
+		// RUT (NIT) cliente
+		$pdf->SetXY(52, 86);
+		$pdf->Write(4, $RUT_cliente);
 
-	$pdf->SetLeftMargin(25);
+		// Dirección cliente
+		// Cambia el margen para que aparezca alineado si ocupa más de una línea.
+		$pdf->SetLeftMargin(52);
+		$pdf->SetXY(52, 93);
+		$pdf->Write(4, $direccion_cliente);
 
-	// Gastos, están antes que los honorarios porque ocupan solo 1 línea, mientras que los honorarios pueden ocupar muchas.
-	if ($gastos > 0) {
-	    $pdf->SetXY(25, 119);
-	    $pdf->Write(4, 'Gastos Reembolsables');
-	    $pdf->SetXY(165, 119);
-	    $pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($gastos, $cifras_decimales, ',', '.'), 0, 0, 'R');
-	}
+		$pdf->SetLeftMargin(25);
 
-		if($id_factura_padre > 0)
-		{
+		// Gastos, están antes que los honorarios porque ocupan solo 1 línea, mientras que los honorarios pueden ocupar muchas.
+		if ($gastos > 0) {
+			$pdf->SetXY(25, 119);
+			$pdf->Write(4, 'Gastos Reembolsables');
+			$pdf->SetXY(165, 119);
+			$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($gastos, $cifras_decimales, ',', '.'), 0, 0, 'R');
+		}
+
+		if ($id_factura_padre > 0) {
 			$query_tipo_doc = "select
 					m.id_documento_legal,
 					m.glosa,
@@ -650,7 +554,7 @@ class UtilesApp extends Utiles
 					join prm_documento_legal m on m.id_documento_legal = f.id_documento_legal
 					where f.id_factura = $id_factura_padre";
 			$resp_tipo_doc = mysql_query($query_tipo_doc, $sesion->dbh) or Utiles::errorSQL($query_tipo_doc, __FILE__, __LINE__, $sesion->dbh);
-			list($id_factura_padre,$glosa_tipo_doc,$numero_factura_padre) = mysql_fetch_array($resp_tipo_doc);
+			list($id_factura_padre, $glosa_tipo_doc, $numero_factura_padre) = mysql_fetch_array($resp_tipo_doc);
 
 			$query_motivo_doc = "SELECT
 						m.id_documento_legal_motivo,
@@ -659,7 +563,7 @@ class UtilesApp extends Utiles
 					JOIN prm_documento_legal_motivo m ON m.id_documento_legal_motivo = f.id_documento_legal_motivo
 					where f.numero = $numero_factura";
 			$resp_motivo_doc = mysql_query($query_motivo_doc, $sesion->dbh) or Utiles::errorSQL($query_motivo_doc, __FILE__, __LINE__, $sesion->dbh);
-			list($id_documento_legal_motivo,$glosa_motivo) = mysql_fetch_array($resp_motivo_doc);
+			list($id_documento_legal_motivo, $glosa_motivo) = mysql_fetch_array($resp_motivo_doc);
 
 
 			$motivo_documento_legal = "$tipo_documento_legal creado para $glosa_motivo la $glosa_tipo_doc numero $numero_factura_padre";
@@ -676,9 +580,9 @@ class UtilesApp extends Utiles
 		$pdf->SetXY(25, 127);
 		$pdf->Write(4, $descripcion);
 
-	// Honorarios
-	$pdf->SetXY(165, 127);
-	$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($honorarios, $cifras_decimales, ',', '.'), 0, 0, 'R');
+		// Honorarios
+		$pdf->SetXY(165, 127);
+		$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($honorarios, $cifras_decimales, ',', '.'), 0, 0, 'R');
 
 		// Información bancaria
 		if (method_exists('Conf', 'GetConf')) {
@@ -689,18 +593,18 @@ class UtilesApp extends Utiles
 			$pdf->Write(4, __('Información Bancaria') . ":\n" . Conf::InformacionBancaria());
 		}
 
-	// Subtotal
-	$pdf->SetXY(165, 212);
-	$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($subtotal, $cifras_decimales, ',', '.'), 0, 0, 'R');
-	// IVA
-	$pdf->SetXY(165, 220);
-	$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($iva, $cifras_decimales, ',', '.'), 0, 0, 'R');
-	// Total
-	$pdf->SetXY(165, 228);
-	$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($total, $cifras_decimales, ',', '.'), 0, 0, 'R');
+		// Subtotal
+		$pdf->SetXY(165, 212);
+		$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($subtotal, $cifras_decimales, ',', '.'), 0, 0, 'R');
+		// IVA
+		$pdf->SetXY(165, 220);
+		$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($iva, $cifras_decimales, ',', '.'), 0, 0, 'R');
+		// Total
+		$pdf->SetXY(165, 228);
+		$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($total, $cifras_decimales, ',', '.'), 0, 0, 'R');
 
-	$pdf->Output();
-    }
+		$pdf->Output();
+	}
 
 	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
 	// Las posibilidades de segundo día hábil son M2, W2, J2, V2, L4, M4 y M3.
@@ -721,57 +625,43 @@ class UtilesApp extends Utiles
 		}
 		return false;
 	}
-	return false;
-    }
 
-	function ArregloMeses()
-	{
-		$meses 		 = array();
-		$meses[1]  = "Enero";
-		$meses[2]  = "Febrero";
-		$meses[3]  = "Marzo";
-		$meses[4]  = "Abril";
-		$meses[5]  = "Mayo";
-		$meses[6]  = "Junio";
-		$meses[7]  = "Julio";
-		$meses[8]  = "Agosto";
-		$meses[9]  = "Septiembre";
+	function ArregloMeses() {
+		$meses = array();
+		$meses[1] = "Enero";
+		$meses[2] = "Febrero";
+		$meses[3] = "Marzo";
+		$meses[4] = "Abril";
+		$meses[5] = "Mayo";
+		$meses[6] = "Junio";
+		$meses[7] = "Julio";
+		$meses[8] = "Agosto";
+		$meses[9] = "Septiembre";
 		$meses[10] = "Octubre";
 		$meses[11] = "Noviembre";
 		$meses[12] = "Diciembre";
-		
+
 		return $meses;
 	}
 
 	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
-	function esUltimoDiaHabilDelMes( $timestamp = '' )
-	{
-		if( $timestamp == '' )
-		{
+	function esUltimoDiaHabilDelMes($timestamp = '') {
+		if ($timestamp == '') {
 			$dia_semana = date('N'); // día entre 1 y 7
 			$dia_mes = date('j');  // día entre 1 y 31
 			$mes = date('n');   // mes entre 1 y 12
+		} else {
+			$dia_semana = date('N', $timestamp);
+			$dia_mes = date('j', $timestamp);
+			$mes = date('n', $timestamp);
 		}
-		else
-		{
-			$dia_semana = date('N',$timestamp);
-			$dia_mes = date('j',$timestamp);
-			$mes = date('n',$timestamp);
-		}
-		$largoMes = array(31, 28+date('L'), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-		if($dia_mes==$largoMes[$mes-1] && $dia_semana<6)
+		$largoMes = array(31, 28 + date('L'), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+		if ($dia_mes == $largoMes[$mes - 1] && $dia_semana < 6)
 			return true;
 		if (($dia_mes == $largoMes[$mes - 1] - 1 || $dia_mes == $largoMes[date('n') - 1] - 2) && $dia_semana == 5)
 			return true;
 		return false;
 	}
-	$largoMes = array(31, 28 + date('L'), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-	if ($dia_mes == $largoMes[$mes - 1] && $dia_semana < 6)
-	    return true;
-	if (($dia_mes == $largoMes[$mes - 1] - 1 || $dia_mes == $largoMes[date('n') - 1] - 2) && $dia_semana == 5)
-	    return true;
-	return false;
-    }
 
 	// Asumiendo que el logo no cambia durante la ejecución, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
 	var $altura_logo_excel;
@@ -805,34 +695,55 @@ class UtilesApp extends Utiles
 	}
 
 	//Imprime el menú
-	function PrintMenuDisenoNuevojQuery($sesion, $url_actual)
-    {
-    	$actual=split('\?',$url_actual);
-    	$url_actual=$actual[0];
-    	$bitmodfactura=UtilesApp::GetConf($sesion,'NuevoModuloFactura');
-        switch( $url_actual ) {
-    		case '/app/interfaces/agregar_tarifa.php': 														$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1'; break;
-    		case '/app/interfaces/tarifas_tramites.php': 													$url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1'; break;
-    		case '/app/interfaces/agregar_cliente.php': 													$url_actual = '/app/interfaces/clientes.php'; break;
-    		case '/app/interfaces/agregar_asunto.php': 														$url_actual = '/app/interfaces/asuntos.php'; break;
-    		case '/app/usuarios/usuario_paso2.php': 															$url_actual = '/app/usuarios/usuario_paso1.php'; break;
-    		case '/app/interfaces/reportes_asuntos.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/resumen_cliente.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_facturacion_pendiente.php':  $url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_cobros_por_area.php': 				$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_resumen_cobranza.php': 			$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_morosidad.php': 							$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/resumen_abogado.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reportes_usuarios.php': 												$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reportes_horas.php': 														$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas.php': 																$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/olap.php': 																			$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_avanzado.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_financiero.php': 												$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_costos.php': 														$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_participacion_abogado.php': 	$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_consolidado.php': 											$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/fw/tablas/agregar_campo.php':																	$url_actual = '/fw/tablas/mantencion_tablas.php'; break;
+	function PrintMenuDisenoNuevojQuery($sesion, $url_actual) {
+		$actual = split('\?', $url_actual);
+		$url_actual = $actual[0];
+		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
+		switch ($url_actual) {
+			case '/app/interfaces/agregar_tarifa.php': $url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
+				break;
+			case '/app/interfaces/tarifas_tramites.php': $url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1';
+				break;
+			case '/app/interfaces/agregar_cliente.php': $url_actual = '/app/interfaces/clientes.php';
+				break;
+			case '/app/interfaces/agregar_asunto.php': $url_actual = '/app/interfaces/asuntos.php';
+				break;
+			case '/app/usuarios/usuario_paso2.php': $url_actual = '/app/usuarios/usuario_paso1.php';
+				break;
+			case '/app/interfaces/reportes_asuntos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/resumen_cliente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_facturacion_pendiente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_cobros_por_area.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_resumen_cobranza.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_morosidad.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/resumen_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reportes_usuarios.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reportes_horas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/olap.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_avanzado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_financiero.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_costos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_participacion_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_consolidado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/fw/tablas/agregar_campo.php': $url_actual = '/fw/tablas/mantencion_tablas.php';
+				break;
 		}
 		$lista_menu_permiso = Html::ListaMenuPermiso($sesion);
 		$query = "SELECT codigo_padre FROM menu WHERE url='$url_actual'";
@@ -842,16 +753,14 @@ class UtilesApp extends Utiles
 		$menu_html .= <<<HTML
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
-    
-        
-        
-      $query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') and bitmodfactura<=$bitmodfactura  ORDER BY orden";//Tipo=1 significa menu principal
-      $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-      for($i=0; $row = mysql_fetch_assoc($resp);$i++)
-      {
-      	$glosa_menu=__($row['glosa']);
-      	if( $codigo==$row['codigo'] )
-      			{
+
+
+
+		$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') and bitmodfactura<=$bitmodfactura  ORDER BY orden"; //Tipo=1 significa menu principal
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
+			$glosa_menu = __($row['glosa']);
+			if ($codigo == $row['codigo']) {
 				$active = 'active=true';
 				$estilo_con_margin = 'style="margin:0 4px 0 10px;"';
 				$estilo = 'style="color:#FFFFFF; align:center;"';
@@ -865,15 +774,13 @@ HTML;
 			//Tipo=0 significa menu secundario
 			$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			$root_dir = Conf::RootDir();
-            for($j=0; $row2 = mysql_fetch_assoc($resp2);$j++)
-            {
-            	$glosa_submenu = __($row2['glosa']);
+			for ($j = 0; $row2 = mysql_fetch_assoc($resp2); $j++) {
+				$glosa_submenu = __($row2['glosa']);
 				$codigo_submenu = $row2['codigo'];
-				if ( !self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF' ) {
+				if (!self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF') {
 					//era mas fácil escribir el filtro de esta forma
 				} else {
-				      if( $j == 0 && $i == 0 )
-									{
+					if ($j == 0 && $i == 0) {
 						$menu_html .= <<<HTML
 											<li $active><div id="top_tap_$i"><a href="$root_dir${row2['url']}" class="a_color_activo" $estilo_con_margin>
 																				<!--[if IE]><b class="spiffy">
@@ -904,7 +811,6 @@ HTML;
             			<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>$glosa_submenu</a></li>
 HTML;
 				}
-						
 			}
 			$menu_html .= <<<HTML
          				</ul></li>
@@ -914,14 +820,14 @@ HTML;
     		</ul></div><div id="fd_menu_grey" class="barra_fija"><ul active=true>
 HTML;
 		$query = "SELECT * FROM menu WHERE codigo_padre='$codigo' AND tipo=0 AND codigo in ('$lista_menu_permiso') ORDER BY orden";
-    $resp3 = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-    for($j=0; $row3 = mysql_fetch_assoc($resp3);$j++) {
-      $glosa_submenu = __($row3['glosa']);
-		$codigo_submenu = $row3['codigo'];
-		if ( !self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF' ) {
-			//era mas fácil escribir el filtro de esta forma
-		} else {
-	if($url_actual==$row3['url']) {
+		$resp3 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		for ($j = 0; $row3 = mysql_fetch_assoc($resp3); $j++) {
+			$glosa_submenu = __($row3['glosa']);
+			$codigo_submenu = $row3['codigo'];
+			if (!self::GetConf($sesion, 'MostrarMenuMantencionPDF') && $codigo_submenu == 'MPDF') {
+				//era mas fácil escribir el filtro de esta forma
+			} else {
+				if ($url_actual == $row3['url']) {
 					$activo_adentro_ie = 'style="text-decoration: underline;"';
 					$activo_adentro_otros = 'style="background: #119011;-webkit-border-radius: 5px; -ms-border-radius: 5px;-moz-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px;"';
 				} else {
@@ -942,53 +848,53 @@ HTML;
      </div>
 HTML;
 
-	$menu_html.="<!-- End Menu Section--> \n";
-	return $menu_html;
+		$menu_html.="<!-- End Menu Section--> \n";
+		return $menu_html;
 	}
 
-        /**    Returns the offset from the origin timezone to the remote timezone, in seconds.
-        *    @param $remote_tz;
-        *    @param $origin_tz; If null the servers current timezone is used as the origin.
-        *    @return int;
-        */
-        function get_timezone_offset($remote_tz, $origin_tz = null) {
-            if($origin_tz === null) {
-                if(!is_string($origin_tz = date_default_timezone_get())) {
-                    return false; // A UTC timestamp was returned -- bail out!
-                }
-            }
-            $origin_dtz = new DateTimeZone($origin_tz);
-            $remote_dtz = new DateTimeZone($remote_tz);
-            $origin_dt = new DateTime("now", $origin_dtz);
-            $remote_dt = new DateTime("now", $remote_dtz);
-            $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
-            return $offset;
-        }
-        
-        function get_utc_offset( $tz='America/Santiago' ) {
-            $offset = self::get_timezone_offset( $tz, 'UTC')/3600;
-            switch( $tz ) {
-                case 'America/Bogota': $offset = 5; break;
-                case 'America/Santiago': $offset = 3; break;
-            }
-            return $offset;
-        }
-        
-        function get_offset_os_utc() {
-            return self::get_timezone_offset('UTC',@date("T"))/3600;
-        }
-        
+	/**    Returns the offset from the origin timezone to the remote timezone, in seconds.
+	 *    @param $remote_tz;
+	 *    @param $origin_tz; If null the servers current timezone is used as the origin.
+	 *    @return int;
+	 */
+	function get_timezone_offset($remote_tz, $origin_tz = null) {
+		if ($origin_tz === null) {
+			if (!is_string($origin_tz = date_default_timezone_get())) {
+				return false; // A UTC timestamp was returned -- bail out!
+			}
+		}
+		$origin_dtz = new DateTimeZone($origin_tz);
+		$remote_dtz = new DateTimeZone($remote_tz);
+		$origin_dt = new DateTime("now", $origin_dtz);
+		$remote_dt = new DateTime("now", $remote_dtz);
+		$offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+		return $offset;
+	}
+
+	function get_utc_offset($tz = 'America/Santiago') {
+		$offset = self::get_timezone_offset($tz, 'UTC') / 3600;
+		switch ($tz) {
+			case 'America/Bogota': $offset = 5;
+				break;
+			case 'America/Santiago': $offset = 3;
+				break;
+		}
+		return $offset;
+	}
+
+	function get_offset_os_utc() {
+		return self::get_timezone_offset('UTC', @date("T")) / 3600;
+	}
+
 	//Calcula cambio de moneda
-	function CambiarMoneda($monto_ini, $tipo_cambio1=1, $decimales1=0, $tipo_cambio2=1,$decimales2=0,$conv_string=true)
-	{
-		if( $monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini) )
-		{
+	function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
+		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
-		$monto_ini=number_format($monto_ini,$decimales1,".","");
+		//FFF: no se debe redondear antes de hacer la división, la siguiente linea generaba un error:
+		//$monto_ini = number_format($monto_ini, $decimales1, ".", "");
 
-		if($tipo_cambio1==$tipo_cambio2)// si no es el mismo tipo de moneda, que haga el calculo
-		{
+		if ($tipo_cambio1 == $tipo_cambio2) {// si no es el mismo tipo de moneda, que haga el calculo
 			$monto_fin = $monto_ini;
 		}
 		if (empty($tipo_cambio2) || ($tipo_cambio2 == 0)) {
@@ -998,59 +904,54 @@ HTML;
 		}
 
 		// Retorno de monto con decimales
-		$resultado=round($monto_fin,$decimales2);
-		if($conv_string)
-			(string) $resultado=number_format($resultado,$decimales2,".","");
+		$resultado = round($monto_fin, $decimales2);
+		if ($conv_string)
+			(string) $resultado = number_format($resultado, $decimales2, ".", "");
 		return $resultado;
 	}
-	$monto_ini = number_format($monto_ini, $decimales1, ".", "");
 
-	function ProcesaCobroIdMoneda($sesion, $id_cobro,$arr_monto=array(),$id_moneda=0,$carga_documento=true,$soloegreso=false){
+	function ProcesaCobroIdMoneda($sesion, $id_cobro, $arr_monto = array(), $id_moneda = 0, $carga_documento = true, $soloegreso = false) {
 
-	function ProcesaCobroIdMoneda($sesion, $id_cobro,$arr_monto=array(),$id_moneda=0,$carga_documento=true,$soloegreso=false){
-	    
-		if($soloegreso) {
-		    $arr_datos_gastos = UtilesApp::ProcesaGastosCobro($sesion,$id_cobro,array('listar_detalle'),true);
+		// Se llama a la funcion que procesa los gatos
+
+		if ($soloegreso) {
+			$arr_datos_gastos = UtilesApp::ProcesaGastosCobro($sesion, $id_cobro, array('listar_detalle'), true);
 		} else {
-	    
-		if($soloegreso) {
-		    $arr_datos_gastos = UtilesApp::ProcesaGastosCobro($sesion,$id_cobro,array('listar_detalle'),true);
-		} else {
-		    $arr_datos_gastos = UtilesApp::ProcesaGastosCobro($sesion,$id_cobro);
+			$arr_datos_gastos = UtilesApp::ProcesaGastosCobro($sesion, $id_cobro);
 		}
 		//ARRAY DE MONTOS A CALCULAR POR DEFECTO
-		if(count($arr_monto)==0){
-			$arr_monto=array();
-			$arr_monto['cobro'][0]='monto';
-			$arr_monto['cobro'][1]='monto_subtotal';//--> honorarios: monto_subtotal(moneda_tarifa)-descuento(moneda_tarifa)
-			$arr_monto['cobro'][2]='monto_trabajos';//-->monto Trabajo: monto_trabajos(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['cobro'][3]='monto_tramites';//-->monto tramites: monto_tramites(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['cobro'][4]='monto_contrato';//-->monto contrato: monto_contrato(id_moneda_monto)
-			$arr_monto['cobro'][5]='subtotal_gastos';//--> gastos: subtotal_gastos(moneda_total)
-			$arr_monto['cobro'][6]='impuesto';//-->iva honorarios: impuesto(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['cobro'][7]='impuesto_gastos';//-->iva gastos: impuesto_gastos(moneda_total) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['cobro'][8]='descuento';//--> descuento: descuento(moneda_tarifa)
-			$arr_monto['cobro'][9]='monto_gastos';//--> descuento: descuento(moneda_tarifa)
-			$arr_monto['cobro'][10]='monto_thh';//--> descuento: descuento(moneda_tarifa)$arr_monto[0]='monto';
-			$arr_monto['cobro'][11]='saldo_honorarios'; // no se usa en cobro
-			$arr_monto['cobro'][12]='saldo_gastos'; // no se usa en cobro
+		if (count($arr_monto) == 0) {
+			$arr_monto = array();
+			$arr_monto['cobro'][0] = 'monto';
+			$arr_monto['cobro'][1] = 'monto_subtotal'; //--> honorarios: monto_subtotal(moneda_tarifa)-descuento(moneda_tarifa)
+			$arr_monto['cobro'][2] = 'monto_trabajos'; //-->monto Trabajo: monto_trabajos(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['cobro'][3] = 'monto_tramites'; //-->monto tramites: monto_tramites(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['cobro'][4] = 'monto_contrato'; //-->monto contrato: monto_contrato(id_moneda_monto)
+			$arr_monto['cobro'][5] = 'subtotal_gastos'; //--> gastos: subtotal_gastos(moneda_total)
+			$arr_monto['cobro'][6] = 'impuesto'; //-->iva honorarios: impuesto(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['cobro'][7] = 'impuesto_gastos'; //-->iva gastos: impuesto_gastos(moneda_total) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['cobro'][8] = 'descuento'; //--> descuento: descuento(moneda_tarifa)
+			$arr_monto['cobro'][9] = 'monto_gastos'; //--> descuento: descuento(moneda_tarifa)
+			$arr_monto['cobro'][10] = 'monto_thh'; //--> descuento: descuento(moneda_tarifa)$arr_monto[0]='monto';
+			$arr_monto['cobro'][11] = 'saldo_honorarios'; // no se usa en cobro
+			$arr_monto['cobro'][12] = 'saldo_gastos'; // no se usa en cobro
 
-			$arr_monto['documento'][0]='honorarios';
-			$arr_monto['documento'][1]='subtotal_honorarios';//--> honorarios: monto_subtotal(moneda_tarifa)-descuento(moneda_tarifa)
-			$arr_monto['documento'][2]='monto_trabajos';//-->monto Trabajo: monto_trabajos(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['documento'][3]='monto_tramites';//-->monto tramites: monto_tramites(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['documento'][4]='monto_contrato';// no se usa en documento
-			$arr_monto['documento'][5]='subtotal_gastos';//--> gastos: subtotal_gastos(moneda_total)
-			$arr_monto['documento'][6]='impuesto';//-->iva honorarios: impuesto(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['documento'][7]='impuesto_gastos';//-->iva gastos: impuesto_gastos(moneda_total) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
-			$arr_monto['documento'][8]='descuento_honorarios';//--> descuento: descuento(moneda_tarifa)
-			$arr_monto['documento'][9]='subtotal_sin_descuento';
-			$arr_monto['documento'][10]='gastos';//--> descuento: descuento(moneda_tarifa)
-			$arr_monto['documento'][11]='monto_thh';//--> descuento: descuento(moneda_tarifa)$arr_monto[0]='monto';
-			$arr_monto['documento'][12]='saldo_honorarios';
-			$arr_monto['documento'][13]='saldo_gastos';
-			$arr_monto['documento'][14]='subtotal_gastos_sin_impuesto';
-			$arr_monto['documento'][15]='subtotal_gastos_con_impuesto';
+			$arr_monto['documento'][0] = 'honorarios';
+			$arr_monto['documento'][1] = 'subtotal_honorarios'; //--> honorarios: monto_subtotal(moneda_tarifa)-descuento(moneda_tarifa)
+			$arr_monto['documento'][2] = 'monto_trabajos'; //-->monto Trabajo: monto_trabajos(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['documento'][3] = 'monto_tramites'; //-->monto tramites: monto_tramites(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['documento'][4] = 'monto_contrato'; // no se usa en documento
+			$arr_monto['documento'][5] = 'subtotal_gastos'; //--> gastos: subtotal_gastos(moneda_total)
+			$arr_monto['documento'][6] = 'impuesto'; //-->iva honorarios: impuesto(moneda_tarifa) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['documento'][7] = 'impuesto_gastos'; //-->iva gastos: impuesto_gastos(moneda_total) #esto hay que revisarlo porque se hizo hace poco y no se que pasa hacia atras
+			$arr_monto['documento'][8] = 'descuento_honorarios'; //--> descuento: descuento(moneda_tarifa)
+			$arr_monto['documento'][9] = 'subtotal_sin_descuento';
+			$arr_monto['documento'][10] = 'gastos'; //--> descuento: descuento(moneda_tarifa)
+			$arr_monto['documento'][11] = 'monto_thh'; //--> descuento: descuento(moneda_tarifa)$arr_monto[0]='monto';
+			$arr_monto['documento'][12] = 'saldo_honorarios';
+			$arr_monto['documento'][13] = 'saldo_gastos';
+			$arr_monto['documento'][14] = 'subtotal_gastos_sin_impuesto';
+			$arr_monto['documento'][15] = 'subtotal_gastos_con_impuesto';
 		}
 
 		/*
@@ -1059,41 +960,40 @@ HTML;
 		 * si no, se carga con los datos de la tabla cobro
 		 */
 		$campo = array();
-		$campo['cobro']['id_moneda']='id_moneda';
-		$campo['cobro']['id_moneda_monto']='id_moneda_monto';
-		$campo['cobro']['opc_moneda_total']='opc_moneda_total';
-		$campo['cobro']['descuento']='descuento';
-		$campo['cobro']['forma_cobro']='forma_cobro';
-		$campo['cobro']['impuesto_gastos']='impuesto_gastos';
-		$campo['cobro']['monto']='monto';
-		$campo['cobro']['monto_contrato']='monto_contrato';
-		$campo['cobro']['monto_gastos']='monto_gastos';
-		$campo['cobro']['monto_subtotal']='monto_subtotal';
-		$campo['cobro']['monto_trabajos']='monto_trabajos';
-		$campo['cobro']['monto_tramites']='monto_tramites';
-		$campo['cobro']['retainer_horas']='retainer_horas';
-		$campo['cobro']['subtotal_gastos']='subtotal_gastos';
-		$campo['cobro']['total_minutos']='total_minutos';
+		$campo['cobro']['id_moneda'] = 'id_moneda';
+		$campo['cobro']['id_moneda_monto'] = 'id_moneda_monto';
+		$campo['cobro']['opc_moneda_total'] = 'opc_moneda_total';
+		$campo['cobro']['descuento'] = 'descuento';
+		$campo['cobro']['forma_cobro'] = 'forma_cobro';
+		$campo['cobro']['impuesto_gastos'] = 'impuesto_gastos';
+		$campo['cobro']['monto'] = 'monto';
+		$campo['cobro']['monto_contrato'] = 'monto_contrato';
+		$campo['cobro']['monto_gastos'] = 'monto_gastos';
+		$campo['cobro']['monto_subtotal'] = 'monto_subtotal';
+		$campo['cobro']['monto_trabajos'] = 'monto_trabajos';
+		$campo['cobro']['monto_tramites'] = 'monto_tramites';
+		$campo['cobro']['retainer_horas'] = 'retainer_horas';
+		$campo['cobro']['subtotal_gastos'] = 'subtotal_gastos';
+		$campo['cobro']['total_minutos'] = 'total_minutos';
 
-		$campo['documento']['id_moneda']='id_moneda';
-		$campo['documento']['id_moneda_monto']='id_moneda';
-		$campo['documento']['opc_moneda_total']='id_moneda';
-		$campo['documento']['descuento']='descuento_honorarios';
-		$campo['documento']['forma_cobro']='forma_cobro';
-		$campo['documento']['impuesto_gastos']='impuesto_gastos';
-		$campo['documento']['monto']='honorarios';
-		$campo['documento']['monto_contrato']='monto_contrato';
-		$campo['documento']['monto_gastos']='gastos';
-		$campo['documento']['monto_subtotal']='subtotal_honorarios';
-		$campo['documento']['monto_trabajos']='monto_trabajos';
-		$campo['documento']['monto_tramites']='monto_tramites';
-		$campo['documento']['subtotal_sin_descuento']='subtotal_sin_descuento';
-		$campo['documento']['retainer_horas']='retainer_horas';
-		$campo['documento']['subtotal_gastos']='subtotal_gastos';
-		$campo['documento']['total_minutos']='total_minutos';
-		$campo['documento']['subtotal_gastos_sin_impuesto']='subtotal_gastos_sin_impuesto';
+		$campo['documento']['id_moneda'] = 'id_moneda';
+		$campo['documento']['id_moneda_monto'] = 'id_moneda';
+		$campo['documento']['opc_moneda_total'] = 'id_moneda';
+		$campo['documento']['descuento'] = 'descuento_honorarios';
+		$campo['documento']['forma_cobro'] = 'forma_cobro';
+		$campo['documento']['impuesto_gastos'] = 'impuesto_gastos';
+		$campo['documento']['monto'] = 'honorarios';
+		$campo['documento']['monto_contrato'] = 'monto_contrato';
+		$campo['documento']['monto_gastos'] = 'gastos';
+		$campo['documento']['monto_subtotal'] = 'subtotal_honorarios';
+		$campo['documento']['monto_trabajos'] = 'monto_trabajos';
+		$campo['documento']['monto_tramites'] = 'monto_tramites';
+		$campo['documento']['subtotal_sin_descuento'] = 'subtotal_sin_descuento';
+		$campo['documento']['retainer_horas'] = 'retainer_horas';
+		$campo['documento']['subtotal_gastos'] = 'subtotal_gastos';
+		$campo['documento']['total_minutos'] = 'total_minutos';
+		$campo['documento']['subtotal_gastos_sin_impuesto'] = 'subtotal_gastos_sin_impuesto';
 
->>>>>>> .merge-right.r7665
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 
@@ -1139,9 +1039,6 @@ HTML;
 		$arr_resultado['cifras_decimales_id_moneda_monto'] = $cobro_moneda->moneda[$arr_resultado['id_moneda_monto']]['cifras_decimales'];
 		$arr_resultado['cifras_decimales_opc_moneda_total'] = $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales'];
 
-	$arr_resultado['tipo_cambio_id_moneda'] = $cobro_moneda->moneda[$arr_resultado['id_moneda']]['tipo_cambio'];
-	$arr_resultado['tipo_cambio_id_moneda_monto'] = $cobro_moneda->moneda[$arr_resultado['id_moneda_monto']]['tipo_cambio'];
-	$arr_resultado['tipo_cambio_opc_moneda_total'] = $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio'];
 
 		/*		 * *
 		 * CALCULO FORMAS DE PAGO - INICIO
@@ -1163,10 +1060,8 @@ HTML;
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
 					$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales'];
 
-						for($a=0; $a<count($arr_monto[$xtabla]); $a++)
-							{
-								if(($arr_monto[$xtabla][$a]=='impuesto_gastos')||($arr_monto[$xtabla][$a]=='subtotal_gastos')||($arr_monto[$xtabla][$a]=='monto_gastos'))
-								{
+					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
+						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
 							$id_moneda_original = $arr_resultado['opc_moneda_total'];
 						} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
 							$id_moneda_original = $arr_resultado['id_moneda_monto'];
@@ -1230,10 +1125,8 @@ HTML;
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
 					$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales'];
 
-						for($a=0; $a<count($arr_monto[$xtabla]); $a++)
-							{
-								if(($arr_monto[$xtabla][$a]=='impuesto_gastos')||($arr_monto[$xtabla][$a]=='subtotal_gastos')||($arr_monto[$xtabla][$a]=='monto_gastos'))
-								{
+					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
+						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
 							$id_moneda_original = $arr_resultado['opc_moneda_total'];
 						} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
 							$id_moneda_original = $arr_resultado['id_moneda_monto'];
@@ -1270,8 +1163,9 @@ HTML;
 												, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 												, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 										)
-																							-$arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]
-																							+$arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);;
+										- $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]
+										+ $arr_resultado[$campo[$xtabla]['monto_tramites']][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+						;
 						$arr_resultado[$campo[$xtabla]['monto_trabajos']][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
 										, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
 										, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
@@ -1308,10 +1202,8 @@ HTML;
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
 					$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales'];
 
-						for($a=0; $a<count($arr_monto[$xtabla]); $a++)
-							{
-								if(($arr_monto[$xtabla][$a]=='impuesto_gastos')||($arr_monto[$xtabla][$a]=='subtotal_gastos')||($arr_monto[$xtabla][$a]=='monto_gastos'))
-								{
+					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
+						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
 							$id_moneda_original = $arr_resultado['opc_moneda_total'];
 						} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
 							$id_moneda_original = $arr_resultado['id_moneda_monto'];
@@ -1378,26 +1270,20 @@ HTML;
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
 					$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales'];
 
-						/***
+					/*					 * *
 					 * FOR PARA CALCULAR LOS MONTOS SOLICITADOS,
 					 * SI NO SE INDICO ALGUN MONTO EN PARTICULAR,
 					 * SE CALCULAN LOS MONOS INGRESADOS POR DEFECTOS
-						**/
+					 * */
 
-						for($a=0; $a<count($arr_monto[$xtabla]); $a++)
-						{
-							if(($arr_monto[$xtabla][$a]=='impuesto_gastos')||($arr_monto[$xtabla][$a]=='subtotal_gastos')||($arr_monto[$xtabla][$a]=='monto_gastos'))
-							{
+					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
+						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
 							$id_moneda_original = $arr_resultado['opc_moneda_total'];
 						} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
 							$id_moneda_original = $arr_resultado['id_moneda_monto'];
 						} else {
 							$id_moneda_original = $arr_resultado['id_moneda'];
 						}
-							else
-							{
-								$id_moneda_original = $arr_resultado['id_moneda'];
-							}
 						$arr_resultado[$arr_monto[$xtabla][$a]][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
@@ -1428,13 +1314,8 @@ HTML;
 					if ($xtabla == 'cobro') {
 						$valor_monto_honorarios = $arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual];
 					}
-						if($xtabla == 'documento') {
-							$valor_monto_honorarios=$arr_resultado['subtotal_sin_descuento'][$id_moneda_actual];
-						}
-						$arr_resultado['monto_honorarios'][$id_moneda_actual] 			= UtilesApp::CambiarMoneda($valor_monto_honorarios,'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-						$arr_resultado['impuesto'][$id_moneda_actual]								=	UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual]-$arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual])*($cobro->fields['porcentaje_impuesto']/100),'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-						$arr_resultado['monto'][$id_moneda_actual]									=	UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual]-$arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]+$arr_resultado['impuesto'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-						$arr_resultado['saldo_honorarios'][$id_moneda_actual]				= UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
+					if ($xtabla == 'documento') {
+						$valor_monto_honorarios = $arr_resultado['subtotal_sin_descuento'][$id_moneda_actual];
 					}
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $cifras_decimales_actual, '', $cifras_decimales_actual);
@@ -1491,9 +1372,7 @@ HTML;
 		 */
 		$arr_resultado['gastos'] = array();
 		$arr_resultado['tipo_cambio'] = array();
-		for($e=0;$e<$lista_monedas->num;$e++)
-		{
-<<<<<<< .working
+		for ($e = 0; $e < $lista_monedas->num; $e++) {
 			$id_moneda_obj = $lista_monedas->Get($e);
 			$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
 
@@ -1507,37 +1386,16 @@ HTML;
 							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 							, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 			);
-=======
-			$id_moneda_obj = $lista_monedas->Get($e);
-			$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
-			
-			$arr_resultado['tipo_cambio'][$id_moneda_actual] = $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio'];
-			
-			$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales'];
-			//$arr_resultado['impuesto_gastos'][$id_moneda_actual]							=	UtilesApp::CambiarMoneda($arr_resultado['subtotal_gastos'][$id_moneda_actual]*($cobro->fields['porcentaje_impuesto_gastos']/100),'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-			$arr_resultado['impuesto_gastos'][$id_moneda_actual]=	UtilesApp::CambiarMoneda($arr_datos_gastos['gasto_impuesto']//monto_moneda_l
-																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio']//tipo de cambio ini
-																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales']//decimales ini
-																	 ,$cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-																	 ,$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-																	);
->>>>>>> .merge-right.r7665
 
-			foreach($arr_datos_gastos as $campo => $valor){
-				if(is_array($valor)) continue;
-				$arr_resultado['gastos'][$campo][$id_moneda_actual]= UtilesApp::CambiarMoneda($valor//monto_moneda_l
-																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio']//tipo de cambio ini
-																	 ,$cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales']//decimales ini
-																	 ,$cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-																	 ,$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
-																	);
-			}
-
-			if( $xtabla == 'cobro' )
-				{
-					$arr_resultado['subtotal_honorarios'][$id_moneda_actual] 	= UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-					$arr_resultado['descuento_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['descuento'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-					$arr_resultado['saldo_gastos'][$id_moneda_actual] 				= UtilesApp::CambiarMoneda($arr_resultado['monto_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
+			foreach ($arr_datos_gastos as $campo => $valor) {
+				if (is_array($valor))
+					continue;
+				$arr_resultado['gastos'][$campo][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor//monto_moneda_l
+								, $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio']//tipo de cambio ini
+								, $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales']//decimales ini
+								, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+								, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+				);
 			}
 
 			if ($xtabla == 'cobro') {
@@ -1552,54 +1410,30 @@ HTML;
 				$arr_resultado['subtotal_gastos'][$id_moneda_actual] = $arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['subtotal_gastos_sin_impuesto'][$id_moneda_actual];
 			}
 
-			$arr_resultado['monto_gastos'][$id_moneda_actual]									= UtilesApp::CambiarMoneda($arr_resultado['subtotal_gastos'][$id_moneda_actual]+$arr_resultado['impuesto_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-			$arr_resultado['saldo_gastos'][$id_moneda_actual]									= UtilesApp::CambiarMoneda($arr_resultado['saldo_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-			$arr_resultado['monto_iva'][$id_moneda_actual]										=	UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual]+$arr_resultado['impuesto_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-			$arr_resultado['monto_total_cobro'][$id_moneda_actual]						=	UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]+$arr_resultado['monto_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);//monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
-			$arr_resultado['monto_total_cobro_thh'][$id_moneda_actual]				=	UtilesApp::CambiarMoneda($arr_resultado['monto_thh'][$id_moneda_actual]+$arr_resultado['monto_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);//monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
-			$arr_resultado['monto_cobro_original'][$id_moneda_actual] 				= UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-			$arr_resultado['monto_cobro_original_con_iva'][$id_moneda_actual]	= UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['monto_iva'][$id_moneda_actual],'',$cifras_decimales_actual,'',$cifras_decimales_actual);
-
+			$arr_resultado['monto_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['saldo_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['saldo_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['monto_iva'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['monto_total_cobro'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
+			$arr_resultado['monto_total_cobro_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_thh'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
+			$arr_resultado['monto_cobro_original'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['monto_cobro_original_con_iva'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['monto_iva'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 		}
 		return $arr_resultado;
 	}
 
-	/*Replica el calculo de cobro_total_gastos y cobro_base_gastos en GuardarCobro*/
-	/*opc: 'listar_detalle' entrega listado de gastos*/
-	public static function ProcesaGastosCobro($sesion,$id_cobro,$opc = array('listar_detalle'),$soloegreso=false)
-	{
+	/* Replica el calculo de cobro_total_gastos y cobro_base_gastos en GuardarCobro */
+	/* opc: 'listar_detalle' entrega listado de gastos */
+
+	public static function ProcesaGastosCobro($sesion, $id_cobro, $opc = array('listar_detalle'), $soloegreso = false) {
 		#GASTOS del Cobro
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 
-	//Tipo de cambios del cobro de (cobro_moneda)
-	$cobro_moneda = new CobroMoneda($sesion);
-	$cobro_moneda->Load($id_cobro);
+		//Tipo de cambios del cobro de (cobro_moneda)
+		$cobro_moneda = new CobroMoneda($sesion);
+		$cobro_moneda->Load($id_cobro);
 
-	$moneda_base = Utiles::MonedaBase($sesion);
-
-	$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
-					cta_corriente.descripcion,
-					cta_corriente.fecha,
-					cta_corriente.id_moneda,
-					cta_corriente.egreso,
-					cta_corriente.monto_cobrable,
-					cta_corriente.ingreso,
-					cta_corriente.id_movimiento,
-					cta_corriente.codigo_asunto,
-					cta_corriente.con_impuesto,
-					cta_corriente.numero_documento,
-					prm_cta_corriente_tipo.glosa AS tipo_gasto,
-					IF(descripcion like 'Saldo aprovisionado%','SI','NO') as es_liquido_provision
-				FROM cta_corriente
-					LEFT JOIN asunto USING(codigo_asunto)
-				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-				WHERE cta_corriente.id_cobro='". $id_cobro . "'";
-		$query.=$soloegreso ? ' AND egreso>0 ': ' AND (egreso > 0 OR ingreso > 0) ';
-					
-					$query.="AND cta_corriente.incluir_en_cobro = 'SI'
-					AND cta_corriente.cobrable = 1
-				ORDER BY cta_corriente.fecha ASC";
+		$moneda_base = Utiles::MonedaBase($sesion);
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
@@ -1617,26 +1451,25 @@ HTML;
 				FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-				WHERE cta_corriente.id_cobro='". $id_cobro . "'";
-		$query.=$soloegreso ? ' AND egreso>0 ': ' AND (egreso > 0 OR ingreso > 0) ';
-					
-					$query.="AND cta_corriente.incluir_en_cobro = 'SI'
+				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
+		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
+
+		$query.="AND cta_corriente.incluir_en_cobro = 'SI'
 					AND cta_corriente.cobrable = 1
 				ORDER BY cta_corriente.fecha ASC";
 
-		$lista_gastos = new ListaGastos($sesion,'',$query);
+		$lista_gastos = new ListaGastos($sesion, '', $query);
 
-	$cobro_total_gasto = 0;
-	$cobro_base_gastos = 0;
-	$subtotal_gastos_con_impuestos = 0;
-	$subtotal_gastos_sin_impuestos = 0;
-	$subtotal_gastos_solo_provision = 0;
-	$subtotal_gastos_sin_provision = 0;
+		$cobro_total_gasto = 0;
+		$cobro_base_gastos = 0;
+		$subtotal_gastos_con_impuestos = 0;
+		$subtotal_gastos_sin_impuestos = 0;
+		$subtotal_gastos_solo_provision = 0;
+		$subtotal_gastos_sin_provision = 0;
 
-	$lista = array();
+		$lista = array();
 
-		for( $v=0; $v<$lista_gastos->num; $v++ )
-		{
+		for ($v = 0; $v < $lista_gastos->num; $v++) {
 			$gasto = $lista_gastos->Get($v);
 			$suma_a_base = 0;
 			$suma_a_original = 0;
@@ -1652,8 +1485,8 @@ HTML;
 								, $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales']//decimales fin
 				);
-                                $suma_a_original += $gasto->fields['monto_cobrable'];
-				$suma_a_base += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
+				$suma_a_original += $gasto->fields['monto_cobrable'];
+				$suma_a_base += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio']; #revisar 15-05-09
 				$suma_fila = UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable']//monto_moneda_l
 								, $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 								, $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales']//decimales ini
@@ -1668,7 +1501,7 @@ HTML;
 								, $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales']//decimales fin
 				);
 				$suma_a_original -= $gasto->fields['monto_cobrable'];
-				$suma_a_base -= $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
+				$suma_a_base -= $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio']; #revisar 15-05-09
 				$suma_fila = (-1) * UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable']//monto_moneda_l
 								, $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 								, $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales']//decimales ini
@@ -1677,26 +1510,25 @@ HTML;
 				);
 			}
 
-			if($gasto->fields['con_impuesto'] == 'SI'){
-				$suma_total_impuesto = $suma_a_total * ($cobro->fields['porcentaje_impuesto_gastos']/100);
+			if ($gasto->fields['con_impuesto'] == 'SI') {
+				$suma_total_impuesto = $suma_a_total * ($cobro->fields['porcentaje_impuesto_gastos'] / 100);
 				$subtotal_gastos_con_impuestos += $suma_fila;
 			} else {
 				$subtotal_gastos_sin_impuestos += $suma_fila;
 			}
 
-			if($gasto->fields['es_liquido_provision'] == 'SI'){
+			if ($gasto->fields['es_liquido_provision'] == 'SI') {
 				$subtotal_gastos_solo_provision += $suma_fila;
 			} else {
 				$subtotal_gastos_sin_provision += $suma_fila;
 			}
 
-	    $cobro_base_gastos += $suma_a_base;
-	    $cobro_total_gasto += $suma_a_total;
+			$cobro_base_gastos += $suma_a_base;
+			$cobro_total_gasto += $suma_a_total;
 
-	    $cobro_total_gasto_impuestos += $suma_total_impuesto;
+			$cobro_total_gasto_impuestos += $suma_total_impuesto;
 
-			if(in_array('listar_detalle',$opc))
-			{
+			if (in_array('listar_detalle', $opc)) {
 				$id_gasto = $gasto->fields['id_movimiento'];
 				$lista[$v]['id_movimiento'] = $id_gasto;
 				$lista[$v]['monto_total'] = $suma_a_total;
@@ -1728,8 +1560,7 @@ HTML;
 		return $resultados;
 	}
 
-	function obtener_navegador()
-	{
+	function obtener_navegador() {
 		$iexp = $_SERVER[HTTP_USER_AGENT];
 		if (strstr($iexp, "MSIE")) {
 			$xnavegador_usado = 'IE';
@@ -1740,9 +1571,8 @@ HTML;
 		return $xnavegador_usado;
 	}
 
-	function glosaHora2Minuto($glosa_hora)
-	{
-		list($xhh,$xmm)=split(":",$glosa_hora);
+	function glosaHora2Minuto($glosa_hora) {
+		list($xhh, $xmm) = split(":", $glosa_hora);
 		//validar  hora y min que senan positivos
 		$m = (int) $xmm;
 		$h = (int) $xhh;
@@ -1755,51 +1585,60 @@ HTML;
 		//pasar la hora a minutos
 		$horaEnMim = $h * 60;
 		//sumo los minutos
-		$total_min = $horaEnMim+$m;
+		$total_min = $horaEnMim + $m;
 		//retorno suma
 		return $total_min;
 	}
-	if ($h < 0) {
-	    $h = $h * (-1);
-	}
-	//pasar la hora a minutos
-	$horaEnMim = $h * 60;
-	//sumo los minutos
-	$total_min = $horaEnMim + $m;
-	//retorno suma
-	return $total_min;
-    }
 
-
-
-	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual)
-    {
-    	$actual=split('\?',$url_actual);
-    	$url_actual=$actual[0];
-        $bitmodfactura=UtilesApp::GetConf($sesion,'NuevoModuloFactura');
-    	switch( $url_actual ) {
-    		case '/app/interfaces/agregar_tarifa.php': 														$url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1'; break;
-    		case '/app/interfaces/tarifas_tramites.php': 													$url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1'; break;
-    		case '/app/interfaces/agregar_cliente.php': 													$url_actual = '/app/interfaces/clientes.php'; break;
-    		case '/app/interfaces/agregar_asunto.php': 														$url_actual = '/app/interfaces/asuntos.php'; break;
-    		case '/app/usuarios/usuario_paso2.php': 															$url_actual = '/app/usuarios/usuario_paso1.php'; break;
-    		case '/app/interfaces/reportes_asuntos.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/resumen_cliente.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_facturacion_pendiente.php':  $url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_cobros_por_area.php': 				$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_resumen_cobranza.php': 			$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_morosidad.php': 							$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/resumen_abogado.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reportes_usuarios.php': 												$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reportes_horas.php': 														$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas.php': 																$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/olap.php': 																			$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_avanzado.php': 													$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_financiero.php': 												$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_costos.php': 														$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/planillas/planilla_participacion_abogado.php': 	$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/app/interfaces/reporte_consolidado.php': 											$url_actual = '/app/interfaces/reportes_especificos.php'; break;
-    		case '/fw/tablas/agregar_campo.php':																	$url_actual = '/fw/tablas/mantencion_tablas.php'; break;
+	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
+		$actual = split('\?', $url_actual);
+		$url_actual = $actual[0];
+		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
+		switch ($url_actual) {
+			case '/app/interfaces/agregar_tarifa.php': $url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
+				break;
+			case '/app/interfaces/tarifas_tramites.php': $url_actual = '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=1';
+				break;
+			case '/app/interfaces/agregar_cliente.php': $url_actual = '/app/interfaces/clientes.php';
+				break;
+			case '/app/interfaces/agregar_asunto.php': $url_actual = '/app/interfaces/asuntos.php';
+				break;
+			case '/app/usuarios/usuario_paso2.php': $url_actual = '/app/usuarios/usuario_paso1.php';
+				break;
+			case '/app/interfaces/reportes_asuntos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/resumen_cliente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_facturacion_pendiente.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_cobros_por_area.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_resumen_cobranza.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_morosidad.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/resumen_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reportes_usuarios.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reportes_horas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/olap.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_avanzado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_financiero.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_costos.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/planillas/planilla_participacion_abogado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/app/interfaces/reporte_consolidado.php': $url_actual = '/app/interfaces/reportes_especificos.php';
+				break;
+			case '/fw/tablas/agregar_campo.php': $url_actual = '/fw/tablas/mantencion_tablas.php';
+				break;
 		}
 		$lista_menu_permiso = Html::ListaMenuPermiso($sesion);
 		$query = "SELECT codigo_padre FROM menu WHERE url='$url_actual'";
@@ -1809,25 +1648,20 @@ HTML;
 		$menu_html .= <<<HTML
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
-    	$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso')  and bitmodfactura<=$bitmodfactura ORDER BY orden";//Tipo=1 significa menu principal
-      $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-      for($i=0; $row = mysql_fetch_assoc($resp);$i++)
-      {
-		$glosa_menu=$row['glosa'];
-		if( $codigo==$row['codigo'] )
-		{
+		$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso')  and bitmodfactura<=$bitmodfactura ORDER BY orden"; //Tipo=1 significa menu principal
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
+			$glosa_menu = $row['glosa'];
+			if ($codigo == $row['codigo']) {
 				$active = 'active=true';
 				$estilo_con_margin = 'style="margin:0 4px 0 10px;"';
 				$estilo = 'style="color:#FFFFFF; align:center;"';
-			if(UtilesApp::obtener_navegador() == 'IE')
-			{
-				$active = 'active=false';
-				$estilo_con_margin = 'style="margin:0 4px 0 10px;"';
-				$estilo = 'style="color:#FFFFFF; align:center;"';
+				if (UtilesApp::obtener_navegador() == 'IE') {
+					$active = 'active=false';
+					$estilo_con_margin = 'style="margin:0 4px 0 10px;"';
+					$estilo = 'style="color:#FFFFFF; align:center;"';
 				}
-		}
-		else
-		{
+			} else {
 				$estilo_con_margin = 'style="margin: 0 4px 0 10px;"';
 				$active = 'active=false';
 				$estilo = 'style="align:center;"';
@@ -1899,8 +1733,8 @@ HTML;
      </div>
 HTML;
 
-	$menu_html.="<!-- End Menu Section--> \n";
-	return $menu_html;
+		$menu_html.="<!-- End Menu Section--> \n";
+		return $menu_html;
 	}
 
 }
