@@ -335,7 +335,7 @@
 		$join_extra = "";
 		if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
 			$selecciona_extra = ",usuario_emisor.username as iniciales_emisor";
-			$join_extra = " LEFT JOIN usuario usuario_emisor ON ( cobro.id_ultimo_emisor = usuario.id_usuario )";
+			$join_extra = " LEFT JOIN usuario usuario_emisor ON ( cobro.id_ultimo_emisor = usuario_emisor.id_usuario )";
 		}
 		$filas +=4;
 		$tabla_creada=false;
