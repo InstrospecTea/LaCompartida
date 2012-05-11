@@ -437,7 +437,14 @@ class Documento extends Objeto
 				$nombre = (empty($es_adelanto) ? __('Documento #') : __('Adelanto #')).$id;
 				
 				if( $modulo_fact && !$es_adelanto ) {
-					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>".$nombre."</td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td><td>&nbsp;</td></tr>";
+					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>";
+					if($this->sesion->usuario->fields['rut']=='99511620'):
+					//FFF: Lemontech puede editar los pagos con la interfaz vieja, solo para debug
+						$out.="<a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(".$id.")\" title=\"Editar Pago\">".$nombre."</a>";
+					else:
+						$out.=$nombre;
+					endif;
+					$out.="</td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td><td>&nbsp;</td></tr>";
 				} else {
 					$out .= "<tr><td style='white-space: nowrap;text-align:left;'><a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(".$id.")\" title=\"Editar Pago\">".$nombre."</a></td><td align = right style=\"color: #333333; font-size: 10px;\"> ".$honorarios.' '.$gastos." </td> <td><a target=_parent href='javascript:void(0)' onclick=\"EliminaDocumento($id)\" ><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 title=Eliminar></a></td></tr>";
 				}
