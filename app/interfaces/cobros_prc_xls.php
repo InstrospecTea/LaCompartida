@@ -114,6 +114,13 @@ $formato_tiempo_total_tabla = & $wb->addFormat(array('Size' => 8,
 			'Top' => '1',
 			'Color' => 'black',
 			'NumFormat' => '[h]:mm'));
+$formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 8,
+			'VAlign' => 'top',
+			'Align' => 'center',
+			'Bold' => '1',
+			'Top' => '1',
+			'Color' => 'black',
+			'NumFormat' => '[h]:mm'));
 $formato_total = & $wb->addFormat(array('Size' => 10,
 			'VAlign' => 'top',
 			'Bold' => 1,
@@ -432,9 +439,16 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				'Bold' => '1',
 				'Color' => 'black',
 				'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales_total"));
-        $formato_moneda_tabla = & $wb->addFormat(array('Size' => 8,
+       $formato_moneda_tabla = & $wb->addFormat(array('Size' => 8,
 				'VAlign' => 'middle',
 				'Align' => 'right',
+				'Top' => '1',
+				'Bold' => '1',
+				'Color' => 'black',
+				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+	   $formato_moneda_tabla_centrado = & $wb->addFormat(array('Size' => 8,
+				'VAlign' => 'middle',
+				'Align' => 'center',
 				'Top' => '1',
 				'Bold' => '1',
 				'Color' => 'black',
@@ -670,27 +684,27 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 4);
-		$ws->write($filas, $columna_categoria, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado);
-		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
-		$ws->write($filas, $columna_hora, '', $formato_encabezado);
-		$ws->write($filas, $columna_tarifa, '', $formato_encabezado);
-		$ws->write($filas, $columna_importe, '', $formato_encabezado);
+		$ws->write($filas, $columna_categoria, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
+		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
+		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
+		$ws->write($filas, $columna_importe, '', $formato_encabezado_center);
 		$filas += 2;
 		$ws->write($filas, $columna_inicial, __('Cliente: ') . $Cliente->fields['glosa_cliente'], $formato_encabezado);
 		$filas += 3;
 
-		$ws->write($filas, $columna_abogado, __('Abogado'), $letra_encabezado_lista);
-		$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
-		$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
+		$ws->write($filas, $columna_abogado, __('Abogado'), $letra_encabezado_lista_centrado);
+		$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista_centrado);
+		$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista_centrado);
 
 		// Cuando muestre tarifa proporcional no muestro horas tarificadas
 		if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 			($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
-			$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista);
+			$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista_centrado);
 		}
 
-		$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
-		$ws->write($filas, $columna_importe, __('Importe ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista);
+		$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista_centrado);
+		$ws->write($filas, $columna_importe, __('Importe ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista_centrado);
 		$filas += 1;
 		$ws->freezePanes(array($filas, 0));
 
@@ -774,14 +788,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$nombre = $trabajo->fields['usr_nombre'];
 				}
 
-				$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista);
+				$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista_centrado);
 				$categoria_usuario = '';
 				if ($trabajo->fields['id_categoria_usuario'] && $Cobro->fields['opc_ver_profesional_categoria'] == 1) {
 					$query_categoria_usuario = "SELECT glosa_categoria FROM prm_categoria_usuario WHERE id_categoria_usuario = " . $trabajo->fields['id_categoria_usuario'];
 					$resp_query_categoria_usuario = mysql_query($query_categoria_usuario, $Sesion->dbh) or Utiles::errorSQL($query_categoria_usuario, __FILE__, __LINE__, $Sesion->dbh);
 					list($categoria_usuario) = mysql_fetch_array($resp_query_categoria_usuario);
 				}
-				$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista);
+				$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista_centrado);
 
 				/*
 				 * Tarifa del abogado
@@ -792,12 +806,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_abogado *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda2);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda2_centrado);
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
 				list($h, $m) = split(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
-				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2);
+				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
 				// Cuando muestre tarifa proporcional no muestro horas tarificadas
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
@@ -805,21 +819,21 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
 					list($ht, $mt) = split(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $m / (24 * 60);
-					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2);
+					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
 
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
 
 				$filas += 1;
 			}
 			$filas += 1;
-			$ws->writeFormula($filas, $columna_hora, "=SUM($col_formula_hora" . ($fila_inicial + 1) . ":$col_formula_hora" . ($filas) . ")", $formato_tiempo_total_tabla);
+			$ws->writeFormula($filas, $columna_hora, "=SUM($col_formula_hora" . ($fila_inicial + 1) . ":$col_formula_hora" . ($filas) . ")", $formato_tiempo_total_tabla_centrado );
 			// Cuando muestre tarifa proporcional no muestro horas tarificadas
 			if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 				($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
-				$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada" . ($fila_inicial + 1) . ":$col_formula_hora_tarificada" . ($filas) . ")", $formato_tiempo_total_tabla);
+				$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada" . ($fila_inicial + 1) . ":$col_formula_hora_tarificada" . ($filas) . ")", $formato_tiempo_total_tabla_centrado );
 			}
-			$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe" . ($fila_inicial + 1) . ":$col_formula_importe" . ($filas) . ")", $formato_moneda_tabla);
+			$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe" . ($fila_inicial + 1) . ":$col_formula_importe" . ($filas) . ")", $formato_moneda_tabla_centrado );
 		}
 		//seteamos el ancho y columnas ocultas segun corresponda
 
@@ -1120,7 +1134,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 		$fecha_ini_titulo = '';
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
-			$fecha_ini_titulo = __('del ') . $Cobro->fields['fecha_ini'];
+			$fecha_ini_titulo = __(' del ') . $Cobro->fields['fecha_ini'];
 		}
 
 		$ws->mergeCells($filas, 0, $filas, 3);
