@@ -63,7 +63,81 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|Estado 
 
 
 
+    $retorno= '<tr style="height: 26px;">
+						<td title="Documento de Cobro '.$documento_cobro->fields['id_documento'].'" colspan=3 align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;">
+							<img src="'.Conf::ImgDir().'/coins_16.png" border="0" alt="Imprimir"/> ';
+    $retorno.= __('Pago');
+    $retorno.= '</td>		</tr>';
 
+								
+				if ($cobro->fields['incluye_honorarios'] == 1) {
+					if ($documento_cobro->fields['honorarios_pagados'] == 'SI') {
+										
+						$retorno.= '<tr>	<td align="left" title="Pago de Honorarios Completo" colspan="3" >';
+                                                $retorno.= __('Pago de Honorarios Completo');
+                                                $retorno.= '&nbsp;&nbsp;</td>	</tr>';
+
+                                        } else {
+                                                $retorno.= '<tr><td align="left" title="Saldo Pendiente Honorarios" colspan="3" >';
+                                                $retorno.= __('Saldo Pendiente Honorarios');
+                                                $retorno.= ':&nbsp;&nbsp;</td></tr>	<tr><td align=right colspan="3" >';
+                                                $retorno.= $moneda_documento->fields['simbolo'].'&nbsp;';
+                                                $retorno.= ($documento_cobro->fields['saldo_honorarios'] > 0) ? $x_resultados['saldo_honorarios'][$moneda_documento->fields['id_moneda']] : '0' ;
+                                                $retorno.= '</td></tr>';
+                                        }
+                                }
+				if ($cobro->fields['incluye_gastos'] == 1) {
+					if ($documento_cobro->fields['gastos_pagados'] == 'SI') {
+						$retorno.= '<tr><td  align="left" title="Pago de Gastos Completo" colspan="3" >';
+                                                $retorno.= __('Pago de Gastos Completo');
+                                                $retorno.= '&nbsp;&nbsp;</td>	</tr>';
+                                } else {
+                                                $retorno.= '<tr><td align="left" title="Saldo Pendiente Gastos" colspan="3" >';
+                                                $retorno.= __('Saldo Pendiente Gastos');
+                                                $retorno.= ':&nbsp;&nbsp; </td>	</tr>	<tr> <td align=right colspan="3" >';
+                                                $retorno.= $moneda_documento->fields['simbolo'] .'&nbsp;';
+                                                $retorno.= ($documento_cobro->fields['saldo_gastos'] > 0)? $x_resultados['saldo_gastos'][$moneda_documento->fields['id_moneda']] : '0';
+                                                $retorno.= '	</td>	</tr>';
+				}
+			}
+			$retorno.= '<tr><td  colspan="3"><hr></td>	</tr>';
+			$lista_pagos = $documento_cobro->ListaPagos();
+			if ($lista_pagos) {
+						
+                            $retorno.= '<tr><td align="left" title="Documentos de Pago" colspan="3">';
+                            $retorno.= __("Lista de Documentos de Pago");
+                            $retorno.= ':	<input type="hidden" id="hay_pagos" value="si"/></td></tr>';
+                            $retorno.= $lista_pagos ;
+                            $retorno.= '<tr><td colspan="3"><hr></td></tr>';
+
+                            } else { 
+						$retorno.= '<input type="hidden" id="hay_pagos" value="no"/>';
+			    } 
+                            
+ $retorno.= '<tr><td colspan="3" align=center><img src="'.Conf::ImgDir().'/money_16.gif" border=0> <a href="javascript:void(0)" onclick="MostrarTipoCambio()" title="'. __('Tipo de Cambio del Documento de Cobro al ser pagado.') .'">'. __('Actualizar Tipo de Cambio') .'</a></td>	</tr>	<tr>	<td colspan="3" align=center>	&nbsp;	</td>	</tr>';
+
+					
+					$faltan_pagos = $cobro->fields['estado'] != 'INCOBRABLE' && ( $documento_cobro->fields['honorarios_pagados'] == 'NO' || $documento_cobro->fields['gastos_pagados'] == 'NO' );
+					$hay_adelantos = false;
+					if($faltan_pagos && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura')){
+						$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
+						$pago_gastos = $documento_cobro->fields['saldo_gastos'] != 0 ? 1 : 0;
+						$hay_adelantos = $documento_cobro->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $cobro->fields['id_contrato'], $pago_honorarios, $pago_gastos) > 0;
+					
+					
+					$retorno.= '	<tr>	<td colspan="3"><hr>	</td>		</tr><tr><td colspan="3" align=center>	';
+					 if($hay_adelantos) 	$retorno.= '<img src="'. Conf::ImgDir() .'/agregar.gif" border=0 /> <a href="javascript:void(0)" onclick="UsarAdelanto('.$pago_honorarios.','.$pago_gastos.')" title="'. __('Usar Adelanto') .'">'. __('Usar Adelanto') .'</a><br/><br/>';
+					$retorno.= '<img src="'. Conf::ImgDir() .'/agregar.gif" border=0 /> <a href="javascript:void(0)" onclick="AgregarPago()" title="'. __('Agregar Pago') .'">'. __('Agregar Pago') .'</a>';
+								
+					$retorno.= '</td></tr><tr><td colspan="3" align=center>&nbsp;	</td>	</tr>';
+					 } 
+                            
+                            
+                            
+			
+                     
+                            echo $retorno;
+    
 } else if ($opc == 'guardar' && ($opc_informar_contabilidad == 'parainfo' OR $opc_informar_contabilidad == 'parainfoyfacturar')) {
 
 	if($cobro->fields['estado_contabilidad']=='INFORMADO' && $opc_informar_contabilidad == 'parainfo' && $confirma==0) {

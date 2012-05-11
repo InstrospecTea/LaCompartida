@@ -958,8 +958,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-<?php} ?>
-                    <?php if ($usuario_responsable_obligatorio) { ?>
+<?php }  
+               if ($usuario_responsable_obligatorio) { ?>
                     if ($('id_usuario_responsable').value == '-1' && $('cobro_independiente').checked)
                     {
                         alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
@@ -1251,40 +1251,32 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 								<textarea name=descripcion_asunto cols="50"><?php echo $asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
-								<?php
-								if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
-									?>
-							<tr>
-								<td align=right>
-									<?php echo __('Usuario encargado') ?>
-								</td>
-								<td align=left>
-	<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+						<?php 	if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
+									
+							echo '<tr><td align=right>';
+							echo __('Usuario encargado');
+                                                        echo '</td><td align=left>';
+echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "  ", "Seleccione", "200"); ?>
-<?php if ( isset($encargado_obligatorio) && $encargado_obligatorio ): ?>
-	<?php echo $obligatorio ?>
-<?php endif; ?>
-								</td>
-							</tr>
-								<?php } 
-								IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') ) { ?>
-						<tr>
-							<td align=right>
-			<?=__('Encargado 2')?>
-		</td>
-		<td align=left>
-			<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "  ", "Seleccione", "200"); 
+ if ( isset($encargado_obligatorio) && $encargado_obligatorio ): 
+	echo $obligatorio;
+ endif; 
+					echo '</td></tr>';
+								} 
+					IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') ) { 
+		echo '<tr><td align=right>'.__('Encargado 2');
+		echo '</td><td align=left>';
+		echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
 																				ORDER BY usuario.apellido1","id_encargado2",
-									$asunto->fields['id_encargado2'], "","Seleccione","200"); ?>
-		</td>
-	</tr>
-		<?php } ?>
+									$asunto->fields['id_encargado2'], "","Seleccione","200");  
+		echo '</td></tr>';
+		 } ?>
 	<tr>
 		<td align=right>
 <?php echo __('Contacto solicitante') ?>
@@ -1380,7 +1372,7 @@ else
 				<br>
 				<div  id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
 					
-<?phprequire_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
+<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
 					
 					
 				</div>

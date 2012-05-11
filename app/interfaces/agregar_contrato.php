@@ -1,3 +1,4 @@
+
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
@@ -1645,8 +1646,8 @@ var EncargadoSecundario=<?php echo (UtilesApp::GetConf($sesion, "EncargadoSecund
 
 		if($('hito_fecha_'+num).disabled) return true;
 		if(permitirVacio && !fecha && !desc && !monto) return true;
-
-		if(fecha && !(new Date(fecha.replace(/(\d+)-(\d+)-(\d+)/, '$3-$2-$1')).getTime() > new Date().getTime())){
+		if(fecha && !(new Date(fecha.replace(/(\d+)-(\d+)-(\d+)/, '$2/$1/$3')).getTime() > new Date().getTime())){
+			
 			alert('Ingrese una fecha válida para el hito');
 			$('hito_fecha_'+num).focus();
 			return false;

@@ -143,17 +143,17 @@
 		
 		
 		
-		  $resp = mysql_query($query, $sesion->dbh);
-		  $rows=mysql_num_rows($resp);
+		  $resp = mysql_unbuffered_query($query, $sesion->dbh);
+		//  $rows=mysql_num_rows($resp);
 		
 	$i=0;
 		
         
-        echo '{"sEcho": 1,
-             "iTotalRecords":"'.$rows.'",
+        
+             /*"iTotalRecords":"'.$rows.'",
              "iTotalDisplayRecords":"'.$rows.'",    
-             "aaData": [';    
-             
+             echo '{"sEcho": 1, "aaData": [';   */ 
+             echo '{ "aaData": [';
 		while($fila = mysql_fetch_array($resp)) {
 		     
 		if ($i!=0) echo ',';

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -120,9 +120,21 @@
                     if( round(10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','')) != 10*number_format(str_replace(',','.',$duracion_cobrada),6,'.','') ) 
                         $pagina->AddError(__("Solo se permite ingresar un decimal en el campo ").' <b>'.__('Duración Cobrable').'</b>');
                 }
-                if($duracion == '00:00:00' )  {
+				if($duracion == '00:00:00' )  {
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
+				if($codigo_asunto ==''){
+					$pagina->AddError("Debe seleccionar un asunto");
+				}
+				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && ( $id_area_trabajo == '')){
+						$pagina->AddError("Debe seleccionar una area de trabajo");
+				}	
+				if($descripcion == ''){
+					$pagina->AddError("Debe Agregar una descripcion");
+				}
+				if($codigo_cliente == ''){
+					$pagina->AddError("Debe seleccionar un cliente");
+				}
                 $errores = $pagina->GetErrors();
             
                 if( empty($errores) )
@@ -259,7 +271,7 @@
                                                     //window.close();
                                             }*/
                                     </script>
-    <?
+    <?php
                             }
                     }
                     else
@@ -292,7 +304,7 @@
 					window.close();
 				}
 			</script>
-<?
+<?php
 		}
 	}
 	else if($opcion == "eliminar") #ELIMINAR TRABAJO
@@ -308,7 +320,7 @@
 					if(window.opener)
 						window.opener.Refrescar();
 				</script>
-<?
+<?php
 			}
 		unset($t);
 		unset($codigo_asunto_secundario);
@@ -349,7 +361,7 @@
 			if(window.opener)
 				window.opener.Refrescar();
 		</script>
-<?
+<?php
 		
 		$pagina->AddInfo(__('Tarifas').' '.__('guardado con éxito'));
 	}
@@ -419,7 +431,7 @@ function Confirmar(form)
 
 function Validar(form)
 {
-<?
+<?php
 			if(UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
 				echo "if(!form.codigo_asunto_secundario.value){";
@@ -430,7 +442,7 @@ function Validar(form)
 			}
 ?>
 			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
-<?
+<?php
 			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
 			{
 				echo "form.codigo_asunto_secundario.focus();";
@@ -438,10 +450,12 @@ function Validar(form)
 			else
 			{
 				echo "form.codigo_asunto.focus();";
-			}
-?>
-			return false;
-    }
+
+				}
+
+			echo 'return false;';echo '}';
+    
+	?>
     if(!form.fecha.value)
     {
         alert("<?php echo __('Debe ingresar una fecha.')?>");
@@ -474,7 +488,7 @@ function Validar(form)
 			return false;
 		}
 	}
- <?
+ <?php
 	//Revisa el Conf si esta permitido y la función existe
 	if($tipo_ingreso=='decimal')
 	{
@@ -495,7 +509,7 @@ function Validar(form)
 				form.duracion.focus();
 				return false;
 			}
-<?
+<?php
 	}
 ?>
     if(!form.descripcion.value)
@@ -521,7 +535,7 @@ function Validar(form)
 	//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
 	if(form.id_cobro.value != '' && $('id_trabajo').value != '')
 	{
-	<?
+	<?php
 		if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) 
 			{ ?>
 				if(ActualizaCobro(form.codigo_asunto_secundario.value))
@@ -560,7 +574,7 @@ function Validar(form)
 		form.solicitante.focus();
 		return false;
 	}
-<?
+<?php
 	}
 	//Se pasa todo a mayúscula por conf
 	if( UtilesApp::GetConf($sesion,'TodoMayuscula') )
@@ -600,7 +614,7 @@ function Validar(form)
 		$('fecha').focus;
 		return false;
 	}
-<?
+<?php
 	}
 	//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
 	if(isset($t) && $t->Loaded() && $opcion != 'nuevo')
@@ -610,7 +624,7 @@ function Validar(form)
 	if(string.search('/trabajo.php') > 0)//revisa que esté en la página de ingreso de trabajo
 		if(!confirm('Está modificando un trabajo, desea continuar?'))
 			return false;
-<?
+<?php
 	}
 ?>
 
@@ -1009,7 +1023,7 @@ function CheckVisible()
 	{
 		<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
 			$('chkVisible').checked=false;
-		<?
+		<?php
 			}
 			else
 			{

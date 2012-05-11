@@ -202,8 +202,14 @@
 			$resp_usuarioresponsable = mysql_query($query_usuarioresponsable,$sesion->dbh) or Utiles::errorSQL($query_usuarioresponsable,__FILE__,__LINE__,$sesion->dbh);
                         list($id_usuario_responsable) = mysql_fetch_array($resp_usuarioresponsable);
 		 
-                       if (!$cobro->fields['fecha_emision']) $cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
-			$cobro->Edit('estado','EMITIDO');
+						$timeemision=strtotime($cobro->fields['fecha_emision']);
+						
+                       if ($timeemision<=0) {
+						   $nuevafechaemision=date('Y-m-d H:i:s');
+						   $cobro->Edit('fecha_emision', $nuevafechaemision);
+						   
+					   }
+			
 			
 			if(isset($cobro->fields['id_ultimo_emisor'])) 	$cobro->Edit('id_ultimo_emisor',$sesion->usuario->fields['id_usuario']);
 			if(isset($cobro->fields['id_usuario_responsable'])) $cobro->Edit('id_usuario_responsable',$id_usuario_responsable);
@@ -219,7 +225,7 @@
 				$cobro->CambiarEstadoSegunFacturas();
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1&opc=guardar");
-			}
+			}  
 		}
 		elseif($accion == 'imprimir' && $ret == '' ) 	#################### IMPRESION #####################
 		{

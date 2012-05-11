@@ -370,7 +370,7 @@ if ($opc == 'guardar') {
 		$cambiar_estado = true;
 	}
        
-	$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
+	if($fecha_emision) $cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 	$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
 	$cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
 	$cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
@@ -392,8 +392,8 @@ if ($opc == 'guardar') {
 	$cobro->Edit('forma_envio', $forma_envio);
 
 	if (!UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
-		$cobro->Edit('documento', $documentocobro->fields['id_documento']);
-
+		//$cobro->Edit('documento', $documentocobro->fields['id_documento']); Se comenta esta linea, se vuelve a como estaba en la revision 7215
+                $cobro->Edit('documento', $documento);
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra')) {
 			$cobro->Edit('nota_cobro', $nota_cobro);
 		}

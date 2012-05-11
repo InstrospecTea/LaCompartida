@@ -922,15 +922,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										
 										
 											
-					if($cobro->fields['monto_thh_estandar'] > 0) {
-					    $factor_valor_flat = number_format($cobro->fields['monto_trabajos'] / $cobro->fields['monto_thh_estandar'], 6, '.', '');
-					} else if ($cobro->fields['monto_thh'] > 0) {
-					    $factor_valor_flat = number_format($cobro->fields['monto_trabajos'] / $cobro->fields['monto_thh'], 6, '.', '');
-					} else {
-					    $factor_valor_flat = number_format(60 * $cobro->fields['monto_trabajos'] / $cobro->fields['total_minutos'], 6, '.', '');
-					}
+                                                        if($cobro->fields['monto_thh_estandar'] > 0) {
+                                                            $factor_valor_flat = number_format($cobro->fields['monto_trabajos'] / $cobro->fields['monto_thh_estandar'], 6, '.', '');
+                                                        } else if ($cobro->fields['monto_thh'] > 0) {
+                                                            $factor_valor_flat = number_format($cobro->fields['monto_trabajos'] / $cobro->fields['monto_thh'], 6, '.', '');
+                                                        } else {
+                                                            $factor_valor_flat = number_format(60 * $cobro->fields['monto_trabajos'] / $cobro->fields['total_minutos'], 6, '.', '');
+                                                        }
 									if( $cobro->fields['retainer_horas'] > 0 ) {
-										$factor_valor_retainer = number_format( ( $cobro->fields['monto_contrato'] * ( $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] ) ) / $cobro->fields['retainer_horas'],6,'.','');
+										$factor_valor_retainer = number_format( ( $cobro->fields['monto_contrato'] * ( $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] ) ) / (min($cobro->fields['total_minutos']%60,$cobro->fields['retainer_horas'])),6,'.','');
 									} else {
 										$factor_valor_retainer = 1;
 									}
@@ -944,7 +944,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										
 										
 										if( $cobro->fields['retainer_horas'] > 0 ) {
-											$factor_valor_retainer = number_format( ( $cobro->fields['monto_contrato'] * ( $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] ) ) / $cobro->fields['retainer_horas'],6,'.','');
+											$factor_valor_retainer = number_format( ( $cobro->fields['monto_contrato'] * ( $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] ) ) / (min($cobro->fields['total_minutos']/60,$cobro->fields['retainer_horas'])),6,'.','');
 										} else {
 											$factor_valor_retainer = 1;
 										}
@@ -1120,10 +1120,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 								}
 						// Si se ven los asuntos por separado avanza al proximo
 						// Si no salga del while
-						if( $opc_ver_asuntos_separados )
+						if( $opc_ver_asuntos_separados ) {
+                                                   
 							$cont_asuntos++;
-						else
+                                                        //FFF guardo la fila de los subtotales, la voy a necesitar al final de la planilla
+                                                         $lineas_total_asunto[$cont_asuntos] = $filas-1;
+                                                } else {
 							break;
+                                                }
 					}
 
 	if (count($cobro->asuntos) == 0 || !$cobro_tiene_trabajos) {
@@ -1163,7 +1167,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('Write off / Mark up:'), $formato_resumen_rentabilidad);
 						$ws->write($filas, $col_valor_trabajo, '', $formato_resumen_rentabilidad);
-						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=100*(($col_formula_valor_trabajo_flat_fee".($filas-1)."/$col_formula_valor_trabajo_flat_fee$filas)-1)", $formato_porcentaje_rentabilidad);
+						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=100*($col_formula_valor_trabajo_flat_fee".($filas-1)."/$col_formula_valor_trabajo_flat_fee$filas)-100", $formato_porcentaje_rentabilidad);
 					
 						$filas += 2;
 					}

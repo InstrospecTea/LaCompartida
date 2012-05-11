@@ -16,6 +16,7 @@
     $pagina = new Pagina( $sesion );
 
 		set_time_limit(500);
+                ini_set('memory_limit','256M');
     #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
     $wb = new Spreadsheet_Excel_Writer();
@@ -300,7 +301,7 @@
 		$total_balance_egreso = 0;
 		$total_balance_ingreso = 0;
 
-		$query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
+		$query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE  cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
 					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.codigo_asunto, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
 					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_tipo_documento_asociado.glosa as tipo_doc_asoc, 

@@ -262,6 +262,8 @@ if ($borradores) {
 				$ws->setMargins(0.01);
 				if( UtilesApp::GetConf($sesion, 'ImprimirExcelCobrosUnaPagina') ){
 					$ws->fitToPages(1,1);
+				} else {
+					$ws->fitToPages(1,0);
 				}
 
 				// Seteamas el ancho de las columnas, se definen en la tabla prm_excel_cobro >>>>>>>>>>>>>>>>>

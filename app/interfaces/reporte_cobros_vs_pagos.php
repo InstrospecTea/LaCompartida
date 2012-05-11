@@ -1,4 +1,4 @@
-cd ht<?php
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -47,7 +47,8 @@ jQuery(document).ready(function() {
   var Fechaf=jQuery('#fechaf').val();
   var Todo=jQuery('#todo').is(':checked');
   var Idmoneda=jQuery('#id_moneda').val();
-  var laFuente="ajax/ajax_cobros_vs_pagos.php?fechaicobro="+Fechai+"&fechafcobro="+Fechaf+"&todo="+Todo+"&id_moneda="+Idmoneda;
+  var Estado=jQuery('#estado').val();
+  var laFuente="ajax/ajax_cobros_vs_pagos.php?fechaicobro="+Fechai+"&fechafcobro="+Fechaf+"&todo="+Todo+"&id_moneda="+Idmoneda+"&estado="+Estado;
 	if(typeof(console)!==undefined) console.log(laFuente);
 	jQuery('#diffs').dataTable({ "bDestroy":true});
 	
@@ -99,10 +100,10 @@ jQuery(document).ready(function() {
  
 </script>	
 
-<div style="margin:auto;padding:10px;border:1px solid #CCC;">Buscar <?php echo __('Cobros emitidos');?> en estado <?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', $cobro->fields['estado'], ' ', '', 150); ?> con diferencias entre el monto Emitido y el monto Pagado<br/><br/>
+<div style="margin:auto;padding:10px;border:1px solid #CCC;">Buscar <?php echo __('Cobros emitidos');?> en estado <?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', 'PAGADO', ' ', '', 150); ?> con diferencias entre el monto Emitido y el monto Pagado<br/><br/>
     Emitidos entre el    <input type="text" class="fechadiff" id="fechaicobro" style="width:100px;">     &nbsp;y el&nbsp;     <input class="fechadiff" type="text" id="fechafcobro" style="width:100px;"> 
     y desplegar los montos en&nbsp;
-    <?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
+    <?php echo Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
      <br/><input id="buscar" value="buscar" type="button"/>&nbsp;&nbsp;<input type="checkbox" id="todo" name="todo"> Incluir todas  las liquidaciones (Gran cantidad de datos)
    
 <br/>	<br/>
