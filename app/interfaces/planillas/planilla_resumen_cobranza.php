@@ -413,7 +413,8 @@
 							GROUP BY cobro.id_cobro 
 							ORDER BY cliente.glosa_cliente,
 								cobro.fecha_creacion";
-		// Obtener los asuntos de cada cobro
+mail('ffigueroa@lemontech.cl','Planilla Cobranza',$query)		;
+// Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
 							GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos,
                                                         GROUP_CONCAT(distinct asunto.codigo_asunto SEPARATOR '\n') as codigos_asuntos
@@ -802,7 +803,7 @@
 			}
 			
 			if( UtilesApp::GetConf($sesion, 'MostrarColumnaSecretaria') ) {
-				$ws1->write($filas, $col_secretaria, $cobro["iniciales_emisor"], $txt_opcion);
+				$ws1->write($filas, $col_secretaria, $cobro['iniciales_emisor'], $txt_opcion);
 			}
 			
 			$tabla_creada=true;
