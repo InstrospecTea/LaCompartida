@@ -38,6 +38,6 @@ while($fila= mysql_fetch_row($resptarifas)) {
        echo mysql_error().'<br>';
    }
 }
- 
+ echo 'Se insertaron '.$i.' tarifas';
 
 ?>

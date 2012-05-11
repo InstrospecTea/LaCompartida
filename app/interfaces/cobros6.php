@@ -2,10 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-
 require_once Conf::ServerDir() . '/classes/PaginaCobro.php';
-
-
 require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/classes/Cobro.php';
 require_once Conf::ServerDir() . '/classes/CobroMoneda.php';
@@ -19,10 +16,6 @@ require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/../app/classes/FacturaPdfDatos.php';
 
-
-
-	//PhpConsole::start(true, true, dirname(__FILE__));
-
 $sesion = new Sesion(array('COB'));
 $pagina = new PaginaCobro($sesion);
 if(!isset($opc))$opc='';
@@ -33,7 +26,8 @@ $factura = new Factura($sesion);
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 
 //Asumo que solo quiero refrescar cuando gardo el cobro
-if ($refrescar && ($opc == 'guardar_cobro')) {
+// Aparentemente "guardar cobro" no existe. Es sólo "guardar"
+if ($refrescar && ($opc == 'guardar_cobro' || $opc == 'guardar')) {
 	?>
 	<script type="text/javascript">
 		if (window.opener !== undefined && window.opener.Refrescar) {
@@ -58,6 +52,12 @@ if ($opc == 'eliminar_pago') {
 if (!$cobro->Load($id_cobro)) {
 	$pagina->FatalError(__('Cobro inválido'));
 }
+
+if($opc == 'descargar_ledes'){
+	include dirname(__FILE__) . '/ledes.php';
+	exit;
+}
+
 if ($opc == "eliminar_documento") {
 	$documento_eliminado = new Documento($sesion);
 	$documento_eliminado->Load($id_documento_eliminado);
@@ -181,12 +181,13 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 				$numero_documento = $documento;
 			}
 			$factura->Edit('numero', $numero_documento);
-		}
-	} else {
-	    
-	    if(!$documento) $documento=$documento_cobro->fields['id_documento'];
-		$factura->Edit('numero', $documento);
-	}
+		
+                        } else {
+
+                            if(!$documento) $documento=$documento_cobro->fields['id_documento'];
+
+                            $factura->Edit('numero', $documento);
+                        }
 
 	$factura->Edit('fecha', date('Y-m-d'));
 	$factura->Edit('cliente', $contrato->fields['factura_razon_social']);
@@ -209,8 +210,9 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 	$estado = 'FACTURADO';
 	$cambiar_estado = false;
 
-	if ($cobro->fields['estado'] != 'FACTURADO') {
-		$cambiar_estado = true;
+	//if ($cobro->fields['estado'] != 'FACTURADO') {
+	if ($cobro->fields['estado'] == 'FACTURADO') {
+		 $cambiar_estado = true;
 	}
 	$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
 	$cobro->Edit('facturado', 1);
@@ -232,12 +234,15 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		$resp_lista_docLegalesActivos = mysql_query($query_lista_docLegalesActivos, $sesion->dbh) or Utiles::errorSQL($resp_lista_docLegalesActivos, __FILE__, __LINE__, $sesion->dbh);
 		list($lista_facturasActivas, $lista_NotaCreditoActivas) = mysql_fetch_array($resp_lista_docLegalesActivos);
 		$cobro->Edit('documento', $lista_facturasActivas);
-		$estado = 'FACTURADO';
+		
 		$cambiar_estado = false;
 
-		if ($cobro->fields['estado'] != 'FACTURADO') {
-			$cambiar_estado = true;
+		//if ($cobro->fields['estado'] != 'FACTURADO') // en vez de comparar si es distinto, comprueba si es un estado previo a Facturado
+		if (UtilesApp::ComparaEstadoCobro($sesion,$cobro->fields['estado'],'<','FACTURADO')) {
+		$estado = 'FACTURADO';
+		$cambiar_estado = true;
 		}
+		
 
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra')) {
 			$cobro->Edit('nota_cobro', $lista_NotaCreditoActivas);
@@ -323,7 +328,7 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 				$factura->fields['subtotal'],
 				$factura->fields['iva'],
 				$documento->fields['id_moneda'],
-				$documento->fieñds['id_moneda']
+				$documento->fields['id_moneda']
 			);
 
 			$query = "DELETE FROM factura_cobro WHERE id_factura = '" . $factura->fields['id_factura'] . "' AND id_cobro = '" . $id_cobro . "' ";
@@ -336,10 +341,12 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 	}
 
 	$id_factura = $factura->fields['id_factura'];
+    }
 }
 
 if ($opc == 'guardar') {
 	if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+		if(!$estado) $estado = $cobro->fields['estado'];
 		if ($facturado == 1) {
 			if (!$cobro->fields['fecha_facturacion']) {
 				$cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s'));
@@ -362,24 +369,30 @@ if ($opc == 'guardar') {
 	if ($estado != $cobro->fields['estado']) {
 		$cambiar_estado = true;
 	}
-
+       
 	$cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
 	$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
 	$cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
 	$cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
 	$cobro->Edit('fecha_facturacion', $fecha_facturacion ? Utiles::fecha2sql($fecha_facturacion) : '');
-
-	$cobro->SetPagos($honorarios_pagados, $gastos_pagados);
-
+	
+	//al guardar el cobro verifica si hay que dejarlo como pagado, en concordancia al documento de deuda que lo respalda
+	$documentocobro = new Documento($sesion);
+	$documentocobro->LoadByCobro($cobro->fields['id_cobro']);
+	$honorarios_pagados=($documentocobro->fields['honorarios_pagados']=='SI')? true:false;
+	$gastos_pagados=($documentocobro->fields['gastos_pagados']=='SI')? true:false;
+	$setpagos=$cobro->SetPagos($honorarios_pagados, $gastos_pagados);
+	//echo 'Honorarios: '.$honorarios_pagados.' y gastos'. $gastos_pagados;
 	// Ahora hay que revisar que no se haya pasado a PAGADO, cambiando estado a PAGADO (por Historial).
 	if ($estado == 'PAGADO' && $cobro->fields['estado'] == 'PAGADO') {
 		$cambiar_estado = false;
 	}
-
+	if($setpagos) $estado='PAGADO';
+	
 	$cobro->Edit('forma_envio', $forma_envio);
 
 	if (!UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
-		$cobro->Edit('documento', $documento);
+		$cobro->Edit('documento', $documentocobro->fields['id_documento']);
 
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra')) {
 			$cobro->Edit('nota_cobro', $nota_cobro);
@@ -426,7 +439,7 @@ if ($cambiar_estado) {
 		$cobro->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 	}
 
-	$cobro->Edit('estado', $estado);
+	if($estado) $cobro->Edit('estado', $estado);
 	$cobro->Write();
 
 	// Se ingresa la anotación en el historial
@@ -721,7 +734,7 @@ if ($cobro->fields['id_contrato'] != '') {
 
     function Refrescar()
     {
-        self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&id_cobro=<?php echo $id_cobro; ?>';
+        self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&opc=guardar&id_cobro=<?php echo $id_cobro; ?>';
     }
 
     function MostrarTipoCambio()
@@ -915,8 +928,9 @@ if ($cobro->fields['id_contrato'] != '') {
         }
 
         // No se puede avanzar a PAGADO por aqui. Debe ser mediante Agregar Pago.
-        if (form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && (!form.existe_pago.value || form.existe_pago.value == 0)) {
-            alert('<?php echo __("No puede definir ") . __("el Cobro") . __(" como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente."); ?>');
+        if (form.todopagado.value=='NO' && form.estado.value == 'PAGADO' && form.estado_original.value != 'PAGADO' && (!form.existe_pago.value || form.existe_pago.value == 0)) {
+            
+	    alert('<?php echo __("No puede definir ") . __("el Cobro") . __(" como \"PAGADO\". Debe ingresar un documento de pago completo por el saldo pendiente."); ?>');
             return false;
         }
 
@@ -1049,6 +1063,13 @@ if ($cobro->fields['id_contrato'] != '') {
         return true;
     }
 
+    function DescargarLedes(form)
+    {
+		form.opc.value = 'descargar_ledes';
+        form.submit();
+        return true;
+    }
+
     function UpdateCobro(valor, accion)
     {
         var form = $('cambio_estado');
@@ -1091,7 +1112,7 @@ if ($cobro->fields['id_contrato'] != '') {
                 return false;
             }
 
-            if ($('existe_pago').value == 1) {
+            if ($('existe_pago').value == 1 || jQuery('#todopagado').val()=='SI') {
                 return true;
             }
 
@@ -1252,8 +1273,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
             <input type="hidden" name="honorarios_pagados_original" value="<?php echo $cobro->fields['honorarios_pagados'] ?>" />
             <input type="hidden" name="gastos_pagados_original" value="<?php echo $cobro->fields['gastos_pagados'] ?>" />
             <input type="hidden" name="eliminar_pago" id="eliminar_pago" value="" />
-            <input type=hidden name=opc id=opc>
-            <input type=hidden name=opc_informar_contabilidad id=opc_informar_contabilidad>
+            <input type="hidden" name="opc" id="opc"/>
+            <input type="hidden" name="opc_informar_contabilidad" id="opc_informar_contabilidad"/>
+<input type="hidden" name="todopagado" value="<?php echo ($documento_cobro->fields['honorarios_pagados'] == 'SI' && $documento_cobro->fields['honorarios_pagados'] == 'SI')?'SI':'NO';?>" id="todopagado">
 
             <div id="tablacabecera"  style="float:left;width:78%;margin:0 5px; text-align:left;min-width: 785px;">
                 <!-- Calendario DIV -->
@@ -2250,6 +2272,10 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 							<?php if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') { ?>
 								<input type="submit" class="btn" value="<?php echo __('Descargar Excel Cobro') ?>" onclick="return DescargarExcel(this.form, 'especial');" />
 <?php } ?>
+							<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
+								<br />
+								<input type="submit" class="btn" value="<?php echo __('Descargar LEDES') ?>" onclick="return DescargarLedes(this.form);" />
+							<?php } ?>
                         </td>
                     </tr>
                 </table>

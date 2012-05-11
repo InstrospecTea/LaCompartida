@@ -148,16 +148,23 @@
 		
 	$i=0;
 		
+        
+        echo '{"sEcho": 1,
+             "iTotalRecords":"'.$rows.'",
+             "iTotalDisplayRecords":"'.$rows.'",    
+             "aaData": [';    
+             
 		while($fila = mysql_fetch_array($resp)) {
 		     
-		
-		    
-		    $stringarray[]=array(
+		if ($i!=0) echo ',';
+                $i++;
+		   
+		    $stringarray=array(
 			date('d-m-Y',strtotime($fila['fecha'])),
-			$fila['glosa_cliente']? $fila['glosa_cliente']:' ',
-			$fila['glosa_asunto']? $fila['glosa_asunto']:' ',
-			    $fila['tipo']? $fila['tipo']:' ',
-			    $fila['descripcion']? $fila['descripcion']:' ',
+			$fila['glosa_cliente']? removeBOM($fila['glosa_cliente']):' - ',
+			$fila['glosa_asunto']? removeBOM($fila['glosa_asunto']):' - ',
+			    $fila['tipo']? $fila['tipo']:' - ',
+			    $fila['descripcion']? removeBOM($fila['descripcion']):' ',
 	($fila['egreso']? $fila['simbolo'].' '.$fila['egreso']:' '),
 			   $fila['ingreso']? $fila['simbolo'].' '.$fila['ingreso']:' ',
 			   $fila['con_impuesto']? $fila['con_impuesto']:' ',
@@ -168,20 +175,21 @@
 			   $fila['id_movimiento']);
 			
 			    
-		    
+		 
+                         echo json_encode($stringarray);    
 	    }
 		
-	 
+	 echo "] }";
 	
-	$arrayfinal=array(
-	  "iEcho"=>3,
+	/*$arrayfinal=array(
+	  "iEcho"=>1,
 	   "iTotalRecords"=>$rows,
 	  "iTotalDisplayRecords"=>$rows, 
 	    "aaData" => $stringarray
 	);
 	
-	 echo json_encode($arrayfinal);
-		 
+	 echo json_encode($arrayfinal);*/
+        
 		function Monto(& $fila)
 		{
 			global $sesion;

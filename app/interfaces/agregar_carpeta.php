@@ -244,24 +244,13 @@ return true;
 			<?php echo  Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_carpeta ORDER BY glosa_tipo_carpeta","id_tipo_carpeta", $id_tipo_carpeta ? $id_tipo_carpeta : $carpeta->fields['id_tipo_carpeta'],"onchange='cambia_bodega(this.value)'","","120"); ?>
 		</td>
 	</tr>
-	<?php if ( UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) { 
-				if( strlen($carpeta->fields['link_carpeta']) > 0 ) {
-					if(substr($carpeta->fields['link_carpeta'], 0, 7) == 'http://' || substr($carpeta->fields['link_carpeta'], 0, 6) == 'ftp://') {
-						$_enlace_tmp = $carpeta->fields['link_carpeta'];
-					} else {
-						$_enlace_tmp = "http://" . $carpeta->fields['link_carpeta'];
-					}
-				} else {
-					$_enlace_tmp = "javascript:;";
-				}
-			
-		?>
+	<?php if ( UtilesApp::GetConf($sesion, 'MostrarLinkCarpeta') ) { ?>
 	<tr>
 		<td align=right>
 			<?php echo __('Link')?>
 		</td>
 		<td align=left >
-			<input name='link_carpeta' size='75' value="<?php echo  $carpeta->fields['link_carpeta'] ?>" onkeyup="actualiza_link(this.value);" /> <a href="<?php echo $_enlace_tmp; ?>" id="enlace_carpeta" target="_blank" title="Abrir link en una ventana nueva"><img  alt="" src="<?php echo Conf::ImgDir()?>/ver_16.gif" /></a>
+			<input name='link_carpeta' size='80' value="<?php echo  $carpeta->fields['link_carpeta'] ?>" />
 		</td>
 	</tr>
 	<?php } ?>

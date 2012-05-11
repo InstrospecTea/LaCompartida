@@ -1,5 +1,5 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
+<?php 
+ 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -264,8 +264,8 @@ function CrearTarifa( from, id )
 
 	<table width='95%' border="0" cellpadding="0" cellspacing="0">
 		<tr>
-<?
-	$colspan=3;
+<?php 
+ 	$colspan=3;
 	
 	if($tarifa->fields['id_tarifa'])
 	{
@@ -273,8 +273,8 @@ function CrearTarifa( from, id )
 ?>
 			<td style="text-align:left;vertical-align: middle;"><?php echo __('Tarifa')?>:&nbsp;</td>
 			<td style="text-align:left;vertical-align: middle;"><?php echo  Html::SelectQuery($sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa","id_tarifa", $tarifa->fields['id_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
-<?
-	} 
+<?php 
+ 	} 
 ?>
 			<td style="text-align:left;vertical-align: middle;" colspan="2"> <?php echo __('Nombre')?>: <input style="width:200px;" type=text name="glosa_tarifa" value='<?php echo $tarifa->fields['glosa_tarifa']?>' <?php echo $active?>> </td>
 			
@@ -298,8 +298,8 @@ function CrearTarifa( from, id )
 			</td>
 		</tr>
 		<tr>
-			<?
-	$colspan=3;
+			<?php 
+ 	$colspan=3;
 	
 			if($tarifa->fields['id_tarifa'])
 			{
@@ -315,8 +315,8 @@ function CrearTarifa( from, id )
 	
 	
 	
-<?
-/* self.location.href= */
+<?php 
+ /* self.location.href= */
 	######## MONEDAS #########
 	$lista_monedas = new ListaObjetos($sesion,'',"SELECT * from prm_moneda Order by id_moneda ASC");
 	$td_moneda = '';

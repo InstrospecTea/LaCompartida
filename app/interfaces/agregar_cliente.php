@@ -989,6 +989,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
                 OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
 											?>
 									<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+<?php if(UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto')==0): ?>
 									<tr>
 										<td align="right">
 <?php echo  __('Usuario encargado') ?>
@@ -1002,6 +1003,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 												, "id_usuario_encargado", $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '', '', 'Vacio', 'width="170"') ?>
 										</td>
 									</tr>
+<?php endif; ?>
 									<?php } ?>
 									
 									<tr>
@@ -1010,7 +1012,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 											 
 										</td>
 										<td align="left">
-											<input name="glosa_cliente" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
+											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
 										</td>
 									</tr>
 									

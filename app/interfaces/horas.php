@@ -1,4 +1,4 @@
-<?
+<?php 
     require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -127,7 +127,7 @@
 //<div style="width:100%;height:100%;border: 0 none;" id="divhoras">&nbsp;</div><iframe name='trabajos'  id='trabajos' frameborder=0 width=100% height=100px></iframe>
 </script>
 
-<?
+<?php
 echo "<iframe name=trabajos onload=\"calcHeight(this.id, 'pagina_body');\" id='trabajos' src='".$url_iframe."' frameborder=0 width=100% height=2000px></iframe>";
 $pagina->PrintBottom();
 ?>

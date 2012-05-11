@@ -17,13 +17,13 @@
 		{
 			if(isset($opcion_hidden[$id]))
 				$opcion_hidden[$id] = 1;
-			$query = "UPDATE configuracion SET valor_opcion='$valor' WHERE id='$id'";
+			$query = "UPDATE configuracion SET valor_opcion='".trim(str_replace("\n",'',utf8_decode($valor)))."' WHERE id='$id'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		}
 		foreach($opcion_hidden as $id => $valor)
 			if($valor==0)
 			{
-				$query = "UPDATE configuracion SET valor_opcion='$valor' WHERE id='$id'";
+				$query = "UPDATE configuracion SET valor_opcion='".utf8_decode($valor)."' WHERE id='$id'";
 				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			}
 

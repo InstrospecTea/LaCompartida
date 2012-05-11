@@ -1097,7 +1097,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
         if($p_revisor->fields['permitido'])
 			$desc_colspan=5;
 		//$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-        $html .= "<td><strong>Desc.</strong></td><td colspan='".($desc_colspan+1)."' align=left>".LinkAlTrabajo($trabajo,'#'.$trabajo->fields['id_trabajo'])."&nbsp;".stripslashes($trabajo->fields['descripcion'])."</td>";
+        $html .= "<td><strong>Desc.</strong></td><td colspan='".($desc_colspan+1)."' align=left>".Opciones($trabajo,'#'.$trabajo->fields['id_trabajo'])."&nbsp;".stripslashes($trabajo->fields['descripcion'])."</td>";
 
 		if( $p_revisor->fields['permitido'])
 		{

@@ -43,6 +43,7 @@ $validaciones_segun_config = UtilesApp::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 $usuario_responsable_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto');
+$encargado_obligatorio = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto') == 1;
 
 $contrato = new Contrato($sesion);
 $cliente = new Cliente($sesion);
@@ -713,7 +714,7 @@ $pagina->PrintTop($popup);
 <script type="text/javascript">
 	function Volver(form)
 	{
-		window.opener.location = 'agregar_cliente.php?id_cliente=<?= $cliente->fields['id_cliente'] ?>';
+		window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $cliente->fields['id_cliente'] ?>';
 		window.close();
 	}
 
@@ -728,8 +729,17 @@ $pagina->PrintTop($popup);
 
 	function Validar(form)
 	{
-		if(!form)
+		if(!form) {
 			var form = $('formulario');
+		}
+
+		<?php if ( UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto') == 1 ): ?>
+			if ( form.id_encargado && ! form.id_encargado.value ) {
+				alert('<?php echo 'Debe ingresar '. __('Usuario encargado') ?>');
+				form.id_encargado.focus();
+				return false;
+			}
+		<?php endif; ?>
 
 		if(!form.glosa_asunto.value)
 		{
@@ -755,18 +765,18 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 				if(!form.codigo_asunto_secundario.value)
 				{
-					alert("<?= __('Debe ingresar el código secundario del asunto') ?>");
+					alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
 					form.codigo_asunto_secundario.focus();
 					return false;
 				}
 				if(form.codigo_asunto_secundario.value.length!=4)
 				{
-					alert("<?= __('El código secundario del asunto debe tener 4 dígitos') ?>");
+					alert("<?php echo __('El código secundario del asunto debe tener 4 dígitos') ?>");
 					form.codigo_asunto_secundario.focus();
 					return false;
 				}
-	<?
-} else {
+	<?php
+ } else {
 	?>
 			if(!form.codigo_cliente.value)
 			{
@@ -774,17 +784,17 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				form.codigo_cliente.focus();
 				return false;
 			}
-	<?
-}
+	<?php
+ }
 ?>
 
 		if( document.getElementById('cobro_independiente').checked ) {
-<? if ($validaciones_segun_config) { ?>
+<?php if ($validaciones_segun_config) { ?>
 				// DATOS FACTURACION
 
 				if(!form.factura_rut.value)
 				{
-					alert("<?= __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
+					alert("<?php echo __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_rut.focus();
 					return false;
@@ -792,7 +802,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.factura_razon_social.value)
 				{
-					alert("<?= __('Debe ingresar la razón social del cliente') ?>");
+					alert("<?php echo __('Debe ingresar la razón social del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_razon_social.focus();
 					return false;
@@ -800,7 +810,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.factura_giro.value)
 				{
-					alert("<?= __('Debe ingresar el giro del cliente') ?>");
+					alert("<?php echo __('Debe ingresar el giro del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_giro.focus();
 					return false;
@@ -808,7 +818,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.factura_direccion.value)
 				{
-					alert("<?= __('Debe ingresar la dirección del cliente') ?>");
+					alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_direccion.focus();
 					return false;
@@ -816,7 +826,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(form.id_pais.options[0].selected == true)
 				{
-					alert("<?= __('Debe ingresar el pais del cliente') ?>");
+					alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.id_pais.focus();
 					return false;
@@ -824,7 +834,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.cod_factura_telefono.value)
 				{
-					alert("<?= __('Debe ingresar el codigo de area del teléfono') ?>");
+					alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.cod_factura_telefono.focus();
 					return false;
@@ -832,7 +842,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.factura_telefono.value)
 				{
-					alert("<?= __('Debe ingresar el número de telefono') ?>");
+					alert("<?php echo __('Debe ingresar el número de telefono') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_telefono.focus();
 					return false;
@@ -841,7 +851,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				// SOLICITANTE
 				if(form.titulo_contacto.options[0].selected == true)
 				{
-					alert("<?= __('Debe ingresar el titulo del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.titulo_contacto.focus();
 					return false;
@@ -849,7 +859,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.nombre_contacto.value)
 				{
-					alert("<?= __('Debe ingresar el nombre del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.nombre_contacto.focus();
 					return false;
@@ -857,7 +867,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.apellido_contacto.value)
 				{
-					alert("<?= __('Debe ingresar el apellido del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar el apellido del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.apellido_contacto.focus();
 					return false;
@@ -865,7 +875,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.fono_contacto_contrato.value)
 				{
-					alert("<?= __('Debe ingresar el teléfono del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.fono_contacto_contrato.focus();
 					return false;
@@ -873,7 +883,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.email_contacto_contrato.value)
 				{
-					alert("<?= __('Debe ingresar el email del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar el email del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.email_contacto_contrato.focus();
 					return false;
@@ -881,7 +891,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.direccion_contacto_contrato.value)
 				{
-					alert("<?= __('Debe ingresar la dirección de envío del solicitante') ?>");
+					alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
 					form.direccion_contacto_contrato.focus();
 					return false;
@@ -890,7 +900,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				// DATOS DE TARIFICACION
 				if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
 				{
-					alert("<?= __('Debe seleccionar un tipo de tarifa') ?>");
+					alert("<?php echo __('Debe seleccionar un tipo de tarifa') ?>");
 					MuestraPorValidacion('datos_cobranza');
 					form.tipo_tarifa[0].focus();
 					return false;
@@ -900,7 +910,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
 				{
-					alert("<?= __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
+					alert("<?php echo __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
 					MuestraPorValidacion('datos_cobranza');
 					form.tarifa_flat.focus();
 					return false;
@@ -908,7 +918,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				/*if(!form.id_moneda.options[0].selected == true)
 		{
-			alert("<?= __('Debe seleccionar una moneda para la tarifa') ?>");
+			alert("<?php echo __('Debe seleccionar una moneda para la tarifa') ?>");
 			MuestraPorValidacion('datos_cobranza');
 			form.id_moneda.focus();
 			return false;
@@ -916,7 +926,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!$$('[name="forma_cobro"]').any(function(elem){return elem.checked;}))
 				{
-					alert("<?= __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
+					alert("<?php echo __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
 					form.forma_cobro[0].focus();
 					return false;
 				}
@@ -926,7 +936,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						return false;
 					}
 					if(!$$('[id^="hito_monto_"]').any(function(elem){return Number(elem.value)>0;})){
-						alert("<?= __('Debe ingresar al menos un hito válido') ?>");
+						alert("<?php echo __('Debe ingresar al menos un hito válido') ?>");
 						$('hito_descripcion_1').focus();
 						return false;
 					}
@@ -934,7 +944,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				/*
 		if(!form.opc_moneda_total.value)
 		{
-			alert("<?= __('Debe seleccionar una moneda para mostrar el total') ?>");
+			alert("<?php echo __('Debe seleccionar una moneda para mostrar el total') ?>");
 			MuestraPorValidacion('datos_cobranza');
 			form.opc_moneda_total.focus();
 			return false;
@@ -942,13 +952,13 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				if(!form.observaciones.value)
 				{
-					alert("<?= __('Debe ingresar un detalle para la cobranza') ?>");
+					alert("<?php echo __('Debe ingresar un detalle para la cobranza') ?>");
 					MuestraPorValidacion('datos_cobranza');
 					form.observaciones.focus();
 					return false;
 				}
 
-<? } ?>
+<?php} ?>
                     <?php if ($usuario_responsable_obligatorio) { ?>
                     if ($('id_usuario_responsable').value == '-1' && $('cobro_independiente').checked)
                     {
@@ -1032,7 +1042,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				{
 					if(response.indexOf('NO') != -1)
 					{
-						alert("<?= __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
+						alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
 						campo.value = "";
 						campo.focus();
 					}
@@ -1141,7 +1151,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		if(!form)
 			var form = $('formulario');
 
-		if(confirm('<?= __("¿Ud. desea copiar los datos del cliente?") ?>'))
+		if(confirm('<?php echo __("¿Ud. desea copiar los datos del cliente?") ?>'))
 		{
 			form.opc_copiar.value = true;
 			form.submit();
@@ -1153,19 +1163,19 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 <form name=formulario id=formulario method=post>
 	<input type=hidden name=opcion value="guardar" />
 	<input type=hidden name=opc_copiar value="" />
-	<input type=hidden name=id_asunto value="<?= $asunto->fields['id_asunto'] ?>" />
+	<input type=hidden name=id_asunto value="<?php echo $asunto->fields['id_asunto'] ?>" />
 	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
 	<table width="90%"><tr><td align="center">
 				<fieldset class="border_plomo tb_base">
-					<legend><?= __('Datos generales') ?></legend>
+					<legend><?php echo __('Datos generales') ?></legend>
 					<table>
 						<tr>
 							<td align=right>
-<?= __('Código') ?>
+<?php echo __('Código') ?>
 							</td>
 							<td align=left>
-								<input id=codigo_asunto name=codigo_asunto <?= $codigo_obligatorio ? 'readonly="readonly"' : '' ?> size=10 maxlength=10 value="<?= $asunto->fields['codigo_asunto'] ?>" onchange="this.value=this.value.toUpperCase();<? if (!$asunto->Loaded())
+								<input id=codigo_asunto name=codigo_asunto <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> size=10 maxlength=10 value="<?php echo $asunto->fields['codigo_asunto'] ?>" onchange="this.value=this.value.toUpperCase();<?php if (!$asunto->Loaded())
 	echo "CheckCodigo();"; ?>"/>
 								&nbsp;&nbsp;&nbsp;
 <?php
@@ -1178,8 +1188,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 ?>
                                                                 
           <div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>                                                      
-<?
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+<?php
+ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
 	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='5' value='" . substr($asunto->fields['codigo_asunto_secundario'], -4) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
 						<span style='color:#FF0000; font-size:10px'>*</span>";
 } else {
@@ -1193,20 +1203,20 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 						</tr>
 						<tr>
 							<td align=right>
-<?= __('Título') ?>
+<?php echo __('Título') ?>
 							</td>
 							<td align=left>
-								<input name=glosa_asunto size=45 value="<?= $asunto->fields['glosa_asunto'] ?>" />
+								<input name=glosa_asunto size=45 value="<?php echo $asunto->fields['glosa_asunto'] ?>" />
 								<span style="color:#FF0000; font-size:10px">*</span>
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-								<?= __('Cliente') ?>
+								<?php echo __('Cliente') ?>
 							</td>
 							<td align=left>
-<?
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+<?php
+ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
 	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "  ", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
 } else {
 	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value);" );
@@ -1217,28 +1227,28 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 						</tr>
 						<tr>
 							<td align=right>
-								<?= __('Idioma') ?>
+								<?php echo __('Idioma') ?>
 							</td>
 							<td align=left>
-								<?= Html::SelectQuery($sesion, "SELECT * FROM prm_idioma", "id_idioma", $asunto->fields['id_idioma'] ? $asunto->fields['id_idioma'] : $id_idioma_default, "", "", "80"); ?>&nbsp;&nbsp;
-								<?= __('Categoría de asunto') ?>
-<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto", "id_tipo_asunto", $asunto->fields['id_tipo_asunto'], ""); ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_idioma", "id_idioma", $asunto->fields['id_idioma'] ? $asunto->fields['id_idioma'] : $id_idioma_default, "", "", "80"); ?>&nbsp;&nbsp;
+								<?php echo __('Categoría de asunto') ?>
+<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto", "id_tipo_asunto", $asunto->fields['id_tipo_asunto'], ""); ?>
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-<?= __('Área') . ' ' . __('asunto') ?>
+<?php echo __('Área') . ' ' . __('asunto') ?>
 							</td>
 							<td align=left>
-<?= Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden", "id_area_proyecto", $asunto->fields['id_area_proyecto'], "", "", ""); ?>&nbsp;&nbsp;
+<?php echo Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden", "id_area_proyecto", $asunto->fields['id_area_proyecto'], "", "", ""); ?>&nbsp;&nbsp;
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-								<?= __('Descripción') ?>
+								<?php echo __('Descripción') ?>
 							</td>
 							<td align=left>
-								<textarea name=descripcion_asunto cols="50"><?= $asunto->fields['descripcion_asunto'] ?></textarea>
+								<textarea name=descripcion_asunto cols="50"><?php echo $asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
 								<?php
@@ -1246,14 +1256,17 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 									?>
 							<tr>
 								<td align=right>
-									<?= __('Usuario encargado') ?>
+									<?php echo __('Usuario encargado') ?>
 								</td>
 								<td align=left>
-	<?= Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+	<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], " class='combox' ", "Seleccione", "200"); ?>
+																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "  ", "Seleccione", "200"); ?>
+<?php if ( isset($encargado_obligatorio) && $encargado_obligatorio ): ?>
+	<?php echo $obligatorio ?>
+<?php endif; ?>
 								</td>
 							</tr>
 								<?php } 
@@ -1263,7 +1276,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 			<?=__('Encargado 2')?>
 		</td>
 		<td align=left>
-			<?= Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+			<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
@@ -1274,35 +1287,35 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 		<?php } ?>
 	<tr>
 		<td align=right>
-<?= __('Contacto solicitante') ?>
+<?php echo __('Contacto solicitante') ?>
 							</td>
 							<td align=left>
-								<input name=asunto_contacto size=30 value="<?= $asunto->fields[contacto] ?>" />
+								<input name=asunto_contacto size=30 value="<?php echo $asunto->fields[contacto] ?>" />
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-<?= __('Teléfono Contacto') ?>
+<?php echo __('Teléfono Contacto') ?>
 							</td>
 							<td align=left>
-								<input name=fono_contacto value="<?= $asunto->fields[fono_contacto] ?>" />
+								<input name=fono_contacto value="<?php echo $asunto->fields[fono_contacto] ?>" />
 								&nbsp;&nbsp;&nbsp;
-<?= __('E-mail contacto') ?>
-								<input name=email_contacto value="<?= $asunto->fields[email_contacto] ?>" />
+<?php echo __('E-mail contacto') ?>
+								<input name=email_contacto value="<?php echo $asunto->fields[email_contacto] ?>" />
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-								<label for="activo"><?= __('Activo') ?></label>
+								<label for="activo"><?php echo __('Activo') ?></label>
 							</td>
 							<td align=left>
-								<input type=checkbox name=activo id=activo value="1" <?= $asunto->fields['activo'] == 1 ? "checked" : "" ?> <?= !$asunto->Loaded() ? 'checked' : '' ?> />
+								<input type=checkbox name=activo id=activo value="1" <?php echo $asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo !$asunto->Loaded() ? 'checked' : '' ?> />
 								&nbsp;&nbsp;&nbsp;
-								<label for="cobrable"><?= __('Cobrable') ?></label>
-								<input  type=checkbox name=cobrable id=cobrable value="1" <?= $asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?= !$asunto->Loaded() ? 'checked' : '' ?>  />
+								<label for="cobrable"><?php echo __('Cobrable') ?></label>
+								<input  type=checkbox name=cobrable id=cobrable value="1" <?php echo $asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo !$asunto->Loaded() ? 'checked' : '' ?>  />
 								&nbsp;&nbsp;&nbsp;
-								<label for="actividades_obligatorias"><?= __('Actividades obligatorias') ?></label>
-								<input type=checkbox id=actividades_obligatorias name=actividades_obligatorias value="1" <?= $asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
+								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
+								<input type=checkbox id=actividades_obligatorias name=actividades_obligatorias value="1" <?php echo $asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
 							</td>
 						</tr>
 					</table>
@@ -1316,15 +1329,15 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							Razón Social
 						</td>
 						<td align=left>
-							<input name=razon_social value="<?= $asunto->fields[razon_social] ?>" />
+							<input name=razon_social value="<?php echo $asunto->fields[razon_social] ?>" />
 						</td>
 					</tr>
 					<tr>
 						<td align=right>
-<?= __('RUT') ?>
+<?php echo __('RUT') ?>
 						</td>
 						<td align=left>
-							<input name=rut value="<?= $asunto->fields[rut] ?>" />
+							<input name=rut value="<?php echo $asunto->fields[rut] ?>" />
 						</td>
 					</tr>
 					<tr>
@@ -1332,7 +1345,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							Dirección
 						</td>
 						<td align=left>
-							<input name=direccion_contacto value="<?= $asunto->fields[direccion_contacto] ?>" />
+							<input name=direccion_contacto value="<?php echo $asunto->fields[direccion_contacto] ?>" />
 						</td>
 					</tr>
 					<tr>
@@ -1340,15 +1353,15 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							Giro
 						</td>
 						<td align=left>
-							<input name=giro value="<?= $asunto->fields[giro] ?>" />
+							<input name=giro value="<?php echo $asunto->fields[giro] ?>" />
 						</td>
 					</tr>
 					</table>
 					</fieldset>
 				-->
 				<br>
-<?
-if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) )
+<?php
+ if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) )
 	$checked = 'checked';
 else
 	$checked = '';
@@ -1356,52 +1369,52 @@ else
 				<table width='100%' cellspacing='0' cellpadding='0'>
 					<tr>
 						<td>
-							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?= $checked ?> >&nbsp;&nbsp;
-							<label for="cobro_independiente"><?= __('Se cobrará de forma independiente') ?></label>
+							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
+							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
-						<td id='tbl_copiar_datos' style='display:<?= $checked != '' ? 'inline' : 'none' ?>;'>
+						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
 							<input type="button" name='copiar_datos' id='copiar_datos' onclick="CopiarDatosCliente(this.form)" value='Copiar datos de Cliente'>&nbsp;&nbsp;
 						</td>
 					</tr>
 				</table>
 				<br>
-				<div  id='tbl_contrato' style="display:<?= $checked != '' ? 'inline-table' : 'none' ?>;">
+				<div  id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
 					
-<? require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
+<?phprequire_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
 					
 					
 				</div>
 				<br>
 				<fieldset class="border_plomo tb_base">
-					<legend><?= __('Alertas').' '.__('Asunto') ?></legend>
-					<p>&nbsp;<?= __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
+					<legend><?php echo __('Alertas').' '.__('Asunto') ?></legend>
+					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
 					<table>
 						<tr>
 							<td align=right>
-								<input name="asunto_limite_hh" value="<?= $asunto->fields['limite_hh'] ? $asunto->fields['limite_hh'] : '0' ?>" title="<?= __('Total de Horas') ?>" size=5 />
+								<input name="asunto_limite_hh" value="<?php echo $asunto->fields['limite_hh'] ? $asunto->fields['limite_hh'] : '0' ?>" title="<?php echo __('Total de Horas') ?>" size=5 />
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?= __('Total de Horas') ?>"><?= __('Límite de horas') ?></span>
+								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
 							</td>
 							<td align=right>
-								<input name="asunto_limite_monto" value="<?= $asunto->fields['limite_monto'] ? $asunto->fields['limite_monto'] : '0' ?>" title="<?= __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
+								<input name="asunto_limite_monto" value="<?php echo $asunto->fields['limite_monto'] ? $asunto->fields['limite_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?= __('Valor Total según Tarifa Hora Hombre') ?>"><?= __('Límite de monto') ?></span>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
 							</td>
 						</tr>
 						<tr>
 							<td align=right>
-								<input name="asunto_alerta_hh" value="<?= $asunto->fields['alerta_hh'] ? $asunto->fields['alerta_hh'] : '0' ?>" title="<?= __('Total de Horas en trabajos no cobrados') ?>" size=5 />
+								<input name="asunto_alerta_hh" value="<?php echo $asunto->fields['alerta_hh'] ? $asunto->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?= __('Total de Horas en trabajos no cobrados') ?>"><?= __('horas no cobradas') ?></span>
+								<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
 							</td>
 							<td align=right>
-								<input name="asunto_alerta_monto" value="<?= $asunto->fields['alerta_monto'] ? $asunto->fields['alerta_monto'] : '0' ?>" title="<?= __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
+								<input name="asunto_alerta_monto" value="<?php echo $asunto->fields['alerta_monto'] ? $asunto->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
 							</td>
 							<td colspan=3 align=left>
-								<span title="<?= __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?= __('monto según horas no cobradas') ?></span>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?></span>
 							</td>
 						</tr>
 					</table>
@@ -1409,34 +1422,34 @@ else
 				<br>
 				<!-- GUARDAR -->
 				<fieldset class="border_plomo tb_base">
-					<legend><?= __('Guardar datos') ?></legend>
+					<legend><?php echo __('Guardar datos') ?></legend>
 					<table>
 						<tr>
 							<td colspan=6 align="center">
 <?php
 if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RevisarTarifas')) {
 	?>
-									<input type=button class=btn value=<?= __('Guardar') ?> onclick="return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);" />
-	<?
-} else {
+									<input type=button class=btn value=<?php echo __('Guardar') ?> onclick="return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);" />
+	<?php
+ } else {
 	?>
-										   <input type='button' class='btn' value="<?= __('Guardar') ?>" onclick="return Validar(this.form);" />
+										   <input type='button' class='btn' value="<?php echo __('Guardar') ?>" onclick="return Validar(this.form);" />
 	<?php
 }
 ?>
 							</td>
 						</tr>
-<?
-if ($motivo == "agregar_proyecto") {
+<?php
+ if ($motivo == "agregar_proyecto") {
 	?>
 						<!--  <tr>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-									<td width="680" align=right><img src="<?= Conf::ImgDir() ?>/volver.gif" border="0" /> <a href="#" onclick="Volver();" title="Volver">Volver Atr&aacute;s</a></td>
+									<td width="680" align=right><img src="<?php echo Conf::ImgDir() ?>/volver.gif" border="0" /> <a href="#" onclick="Volver();" title="Volver">Volver Atr&aacute;s</a></td>
 							</tr>
 							-->
-	<?
-}
+	<?php
+ }
 ?>
 					</table>
 				</fieldset>
@@ -1446,16 +1459,39 @@ if ($motivo == "agregar_proyecto") {
 
 <script>
     
-	//Contratos('<?= $asunto->fields['codigo_cliente']; ?>','<?= $asunto->fields['id_contrato']; ?>');
+	//Contratos('<?php echo $asunto->fields['codigo_cliente']; ?>','<?php echo $asunto->fields['id_contrato']; ?>');
 	var form = $('formulario');
 	ShowContrato(form, 'cobro_independiente');
 	
+	jQuery('document').ready(function() {
+	   
+	   jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function() {
+	       CambioEncargadoSegunCliente(jQuery(this).val());
+	   });
+	});
+function CambioEncargadoSegunCliente(idcliente) {
+    var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
+    jQuery('#id_usuario_secundario').attr({'disabled':''});
+    jQuery('#id_usuario_responsable').attr({'disabled':''});
+    jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
+	if(window.console ) console.debug(data);
+	jQuery('#id_usuario_secundario').attr({'disabled':''}).val(data);
+	jQuery('#id_usuario_responsable').attr({'disabled':''}).val(data);
+	if(CopiarEncargadoAlAsunto) {
+		jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
+		jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
+	   }
+	
+	   
+	});
+	 
+}
 	
 </script>
-<?= InputId::Javascript($sesion) ?>
+<?php echo InputId::Javascript($sesion) ?>
 
-<?
-$pagina->PrintBottom($popup);
+<?php
+ $pagina->PrintBottom($popup);
 
 function EnviarEmail($asunto) {
 	global $sesion;
