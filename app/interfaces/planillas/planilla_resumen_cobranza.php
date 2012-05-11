@@ -387,7 +387,6 @@
 								documento.gastos,
 								documento.saldo_honorarios,
 								documento.saldo_gastos
-								$selecciona_extra
 								FROM cobro
 								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'
 								
