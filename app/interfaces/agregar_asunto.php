@@ -497,13 +497,14 @@ if ($opcion == "guardar") {
 			}
 			else {
 				#CONTRATO
-				if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato'])
+				if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
 					$contrato->Load($asunto->fields['id_contrato']);
-				else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato']))
+					
+				} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
 					$contrato->Load($asunto->fields['id_contrato_indep']);
-				else
+				} else {
 					$contrato = new Contrato($sesion);
-
+				}
 				if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 					$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
 					$val = true;
@@ -1206,9 +1207,9 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							<td align=left>
 <?
 if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
+	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "  ", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
 } else {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "", "CambioEncargadoSegunCliente(this.value)");
+	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value);" );
 }
 ?>
 								<span style="color:#FF0000; font-size:10px">*</span>
@@ -1252,7 +1253,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "", "Seleccione", "200"); ?>
+																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], " class='combox' ", "Seleccione", "200"); ?>
 								</td>
 							</tr>
 								<?php } 
@@ -1364,7 +1365,7 @@ else
 					</tr>
 				</table>
 				<br>
-				<div  id='tbl_contrato' style="display:<?= $checked != '' ? 'block' : 'none' ?>;">
+				<div  id='tbl_contrato' style="display:<?= $checked != '' ? 'inline-table' : 'none' ?>;">
 					
 <? require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
 					
@@ -1444,9 +1445,12 @@ if ($motivo == "agregar_proyecto") {
 </form>
 
 <script>
+    
 	//Contratos('<?= $asunto->fields['codigo_cliente']; ?>','<?= $asunto->fields['id_contrato']; ?>');
 	var form = $('formulario');
 	ShowContrato(form, 'cobro_independiente');
+	
+	
 </script>
 <?= InputId::Javascript($sesion) ?>
 

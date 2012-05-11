@@ -1,4 +1,4 @@
-cd ht<?php
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -30,12 +30,12 @@ foreach($currency as $key=>$value) {
 ?>
     <style type="text/css">
       @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
-  
+      @import "https://estaticos.thetimebilling.com/tabletools/css/TableTools.css";
     </style>
    <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
+	<!-- 	<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
-
+  	<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/ZeroClipboard.js"></script>-->
    
    
 <script type="text/javascript">	
@@ -93,9 +93,9 @@ jQuery(document).ready(function() {
 	    "iDisplayLength": 25,
 	    "aLengthMenu": [[25, 50, 100,200, -1], [25, 50, 100,200, "Todo"]],
 	    "sPaginationType": "full_numbers",
-	    "sDom":  'T<"top"lp>rt<"bottom"i>',
-	    "oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy", "print" ]        }
-	  ,"aaSorting": [[ 2, "asc" ]]
+	    "sDom":  '<"top"lp>rt<"bottom"i>',
+	   // "oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy", "print" ]        }
+	//  ,"aaSorting": [[ 2, "asc" ]]
 	     }).show();
     });
 });
@@ -127,9 +127,9 @@ jQuery('.fechadiff').datepicker( {
 	<thead>
 		<tr>
 		
-			<th width="80px"><?php echo __('Cobro');?></th>
+			<th width="85px"><?php echo __('Cobro');?></th>
 			<th width="95px">Fecha Emitido</th>    <th width="0px">idcontrato</th>
-			<th width="330px" style="overflow:hidden;">Cliente</th>
+			<th width="330px" style="white-space:nowrap;overflow:hidden;">Cliente</th>
 			<th width="90px">$ Emitido</th>
 			<th width="90px">$ Facturado</th>
 			<th width="85px">Diferencia</th>

@@ -98,6 +98,11 @@ $formato_tiempo2 = & $wb->addFormat(array('Size' => 8,
 			'VAlign' => 'top',
 			'Color' => 'black',
 			'NumFormat' => '[h]:mm'));
+$formato_tiempo2_centrado = & $wb->addFormat(array('Size' => 8,
+			'VAlign' => 'top',
+			'Align' => 'center',
+			'Color' => 'black',
+			'NumFormat' => '[h]:mm'));
 $formato_tiempo_total = & $wb->addFormat(array('Size' => 8,
 			'VAlign' => 'top',
 			'Bold' => '1',
@@ -181,7 +186,19 @@ $letra_datos_lista = &$wb->addFormat(array(
 			'Align' => 'left',
 			'TextWrap' => 1
 		));
-
+$letra_encabezado_lista_centrado = &$wb->addFormat(array(
+			'Size' => 8,
+			'Valign' => 'top',
+			'Align' => 'center',
+			'FgColor' => '55',
+			'Bold' => 1
+		));
+$letra_datos_lista_centrado = &$wb->addFormat(array(
+			'Size' => 8,
+			'Valign' => 'top',
+			'Align' => 'center',
+			'TextWrap' => 1
+		));
 //Retorna el timestamp excel de la fecha
 function fecha_valor($fecha) {
 	$fecha = explode('-', $fecha);
@@ -403,6 +420,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				'Align' => 'right',
 				'Color' => 'black',
 				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+		$formato_moneda2_centrado = & $wb->addFormat(array('Size' => 8,
+				'VAlign' => 'middle',
+		    'Align' => 'center',
+				
+				'Color' => 'black',
+				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 	$formato_moneda_total = & $wb->addFormat(array('Size' => 8,
 				'VAlign' => 'middle',
 				'Align' => 'right',
@@ -537,15 +560,19 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	    $simbolo_moneda = "EUR";
 	}
 	
+	if($x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']]>0) {
 	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($Sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_chica_underline);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
 	$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
+		}
 	$fila_honorario = $filas + 1;
 	$filas += 3;
-
+	
+	if($x_gastos['subtotal_gastos_con_impuestos']>0) {
 	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($Sesion, 'gastos', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_chica_underline);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
 	$ws->writeNumber($filas, 4, $x_gastos['subtotal_gastos_con_impuestos'], $formato_total);
+		}
 	$fila_gasto = $filas + 1;
 	$filas += 3;
 	
@@ -851,23 +878,27 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$columna_importe = $col++;
 		$col_formula_importe = Utiles::NumToColumnaExcel($columna_importe);
 
-		$ws->mergeCells($filas, 0, $filas, 6);
-		$ws->write($filas, $columna_categoria, __('DETALLE DE SERVICIOS PRESTADOS'), $formato_encabezado_center);
+		
+		$ws->write($filas, $columna_fecha, __('DETALLE DE SERVICIOS PRESTADOS'), $formato_encabezado_center);
+		$ws->write($filas, $columna_categoria, '', $formato_encabezado);
 		$ws->write($filas, $columna_sigla, '', $formato_encabezado);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
 		$ws->write($filas, $columna_descripcion, '', $formato_encabezado);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado);
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
+		$ws->mergeCells($filas, 0, $filas, 7);
 		$filas += 1;
-		$ws->mergeCells($filas, 0, $filas, 6);
-		$ws->write($filas, $columna_categoria, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		
+		$ws->write($filas, $columna_fecha, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_categoria, '', $formato_encabezado);
 		$ws->write($filas, $columna_sigla, '', $formato_encabezado);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
 		$ws->write($filas, $columna_descripcion, '', $formato_encabezado);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado);
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
+		$ws->mergeCells($filas, 0, $filas, 7);
 		$filas += 2;
 		$ws->write($filas, $columna_inicial, __('Cliente: ') . $Cliente->fields['glosa_cliente'], $formato_encabezado);
 		$filas += 3;
@@ -958,20 +989,20 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, 2, $trabajo->fields['glosa_asunto'], $formato_encabezado);
 					$filas += 2;
 					
-					$ws->write($filas, $columna_fecha, __('Fecha'), $letra_encabezado_lista);
-					$ws->write($filas, $columna_sigla, __('Siglas'), $letra_encabezado_lista);
-					$ws->write($filas, $columna_abogado, __('Nombre'), $letra_encabezado_lista);
-					$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista);
+					$ws->write($filas, $columna_fecha, __('Fecha'), $letra_encabezado_lista_centrado);
+					$ws->write($filas, $columna_sigla, __('Siglas'), $letra_encabezado_lista_centrado);
+					$ws->write($filas, $columna_abogado, __('Nombre'), $letra_encabezado_lista_centrado);
+					$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista_centrado);
 					$ws->write($filas, $columna_descripcion, __('Descripción de Servicio'), $letra_encabezado_lista);
-					$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista);
+					$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista_centrado);
 
 					// Cuando muestre tarifa proporcional no muestro horas tarificadas
 					if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 						($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
-						$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista);
+						$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista_centrado);
 					}
-					$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista);
-					$ws->write($filas, $columna_importe, __('Importe ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista);
+					$ws->write($filas, $columna_tarifa, __('Tarifa'), $letra_encabezado_lista_centrado);
+					$ws->write($filas, $columna_importe, __('Importe ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo']), $letra_encabezado_lista_centrado);
 					$filas += 1;
 					
 					$fila_inicial_asunto = $filas;
@@ -985,15 +1016,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$nombre = $trabajo->fields['nombre'] . ' ' . $trabajo->fields['apellido1'] . ' ' . $trabajo->fields['apellido2'];
                                 
                                 fecha_excel($ws, $filas,  $columna_fecha, $trabajo->fields['fecha'], $formato_fecha);
-				$ws->write($filas, $columna_sigla, $siglas, $letra_datos_lista);
-				$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista);
+				$ws->write($filas, $columna_sigla, $siglas, $letra_datos_lista_centrado);
+				$ws->write($filas, $columna_abogado, $nombre, $letra_datos_lista_centrado);
 				$categoria_usuario = '';
 				if ($trabajo->fields['id_categoria_usuario'] && $Cobro->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 					$query_categoria_usuario = "SELECT glosa_categoria FROM prm_categoria_usuario WHERE id_categoria_usuario = {$trabajo->fields['id_categoria_usuario']}";
 					$resp_query_categoria_usuario = mysql_query($query_categoria_usuario, $Sesion->dbh) or Utiles::errorSQL($query_categoria_usuario, __FILE__, __LINE__, $Sesion->dbh);
 					list($categoria_usuario) = mysql_fetch_array($resp_query_categoria_usuario);
 				}
-				$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista);
+				$ws->write($filas, $columna_categoria, $categoria_usuario, $letra_datos_lista_centrado);
 				$ws->write($filas, $columna_descripcion, $trabajo->fields['descripcion'], $letra_datos_lista);
 
 				/*
@@ -1005,13 +1036,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_trabajo *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda2);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda2_centrado);
 
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
 				list($h, $m) = split(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
-				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2);
+				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
 				// Cuando muestre tarifa proporcional no muestro horas tarificadas
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
@@ -1019,11 +1050,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
 					list($ht, $mt) = split(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $mt / (24 * 60);
-					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2);
+					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
 
 				// La multiplicación por 24 es para transformarlos a minutos cobrables (es por día)
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
 
 				$filas += 1;
 			}

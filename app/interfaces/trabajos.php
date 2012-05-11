@@ -917,6 +917,45 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 
 		return $opc_html;
 	}
+	function LinkAlTrabajo(& $trabajo,$texto='')
+	{
+		$img_dir = Conf::ImgDir();
+		global $motivo;
+		$id_cobro = $trabajo->fields['id_cobro'];
+		global $sesion;
+		global $p_profesional;
+		global $p_revisor;
+
+		$cobro = new Cobro($sesion);
+		$cobro->Load($id_cobro);
+
+		 
+		if($p_revisor->fields['permitido'])
+		{
+			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
+				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+			else
+				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\">".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
+
+		}
+		elseif($p_profesional->fields['permitido'])
+		{
+			if($trabajo->Estado()== 'Revisado')
+				$opc_html .= "<span title='".__('Este trabajo ya ha sido revisado')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";
+			else
+			{
+				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+				else
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" >".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
+			}
+		}
+		else
+		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";	
+                    
+
+		return $opc_html;
+	}
 	function SplitDuracion($time)
 	{
 		list($h,$m,$s) = split(":",$time);
@@ -1058,7 +1097,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
         if($p_revisor->fields['permitido'])
 			$desc_colspan=5;
 		//$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-        $html .= "<td><strong>Desc.</strong></td><td colspan='".($desc_colspan+1)."' align=left>".Opciones($trabajo,'#'.$trabajo->fields['id_trabajo'])."&nbsp;".stripslashes($trabajo->fields['descripcion'])."</td>";
+        $html .= "<td><strong>Desc.</strong></td><td colspan='".($desc_colspan+1)."' align=left>".LinkAlTrabajo($trabajo,'#'.$trabajo->fields['id_trabajo'])."&nbsp;".stripslashes($trabajo->fields['descripcion'])."</td>";
 
 		if( $p_revisor->fields['permitido'])
 		{

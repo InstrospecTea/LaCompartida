@@ -37,7 +37,7 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
 }
 
-set_time_limit(0);
+//set_time_limit(0);
 
 if ($codigo_cliente_secundario) {
 	$cliente = new Cliente($Sesion);
@@ -224,7 +224,7 @@ if ($print) {
 				GROUP BY contrato.id_contrato";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	//cobros solo gastos
-	if ($gastos) {
+	if ($gastos) { // desde genera_cobros.php estoy forzando que solamente incluya gastos
 		while ($contra = mysql_fetch_array($resp)) {
 			set_time_limit(100);
 			//Mala documentaciÃ³n!!! Que significa $contra? Que hace GeneraProceso??? ICC
@@ -239,7 +239,25 @@ if ($print) {
 				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
 			}
 
-			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, false, true, false);
+			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, true, true, false);
+		}
+		//fin gastos
+	} if ($solohh) { // desde genera_cobros.php estoy forzando que solamente incluya honorarios
+		while ($contra = mysql_fetch_array($resp)) {
+			set_time_limit(100);
+			//Mala documentaciÃ³n!!! Que significa $contra? Que hace GeneraProceso??? ICC
+				// por lo que logré entender : $contra = contrato, y GeneraProceso es la que genera un cobro nuevo vacío y devuelve el id, para ingresar los valores (ESM )
+			$Cobro = new Cobro($Sesion);
+			if (!$id_proceso_nuevo) {
+				$id_proceso_nuevo = $Cobro->GeneraProceso();
+			}
+			//Por conf se permite el uso de la fecha desde
+			$fecha_ini_cobro = "";
+			if (UtilesApp::GetConf($Sesion, 'UsaFechaDesdeCobranza') && $fecha_ini) {
+				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
+			}
+
+			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
 		}
 		//fin gastos
 	} /* else if ($programados) {

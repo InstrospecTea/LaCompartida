@@ -457,7 +457,10 @@ function CambiarAgrupador(num)
 
 	ActualizarNuevoReporte();
 }
-
+function iframelista() {
+    jQuery('.divloading').remove();
+    jQuery('#planilla').show();
+}
 function ResizeIframe(width, height)
 {
 	currentfr = document.getElementById('planilla'); 
@@ -1522,6 +1525,8 @@ if(!$popup)
 					</div>
 				</td>
 			</tr>
+		
+			
 			<? } ?>
 			<tr valign=top>
 				<td align=right>
@@ -1541,6 +1546,22 @@ if(!$popup)
 								<option value="<?=$ec?>" <? if($estado_cobro) if( in_array($ec,$estado_cobro) ) echo "selected";?> ><?=__($ec)?></option>
 							<?}?>
 						</select>
+					</div>
+				</td>
+			</tr>
+					<tr valign=top>
+				<td align=right>
+					<input type="checkbox" name="check_moneda_contrato" id="check_moneda_contrato" value="1" onchange="$$('.moneda_contrato_full').invoke('toggle')" <?= $check_moneda_contrato? 'checked':''?> />
+					<label for="check_moneda_contrato">
+					<b><?=__('Moneda del Contrato')?>:&nbsp;&nbsp;</b>
+					</label>
+				</td>
+				<td align=left>
+					<div class = 'moneda_contrato_full' style='width:200px;<?=$check_moneda_contrato? "display:none;":""?>'>
+						<label for="check_moneda_contrato" style="cursor:pointer;" ><hr></label>
+					</div>
+					<div class = 'moneda_contrato_full' style="<?=$check_moneda_contrato? "":"display:none;"?>" >
+						<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda","moneda_contrato[]",$moneda_contrato,"class=\"selectMultiple\" multiple size=5 ","","200"); ?>
 					</div>
 				</td>
 			</tr>
@@ -1938,7 +1959,7 @@ if(!$popup)
 	$url_iframe .= "&vista=".$vista;
 	$url_iframe .= "&id_moneda=".$id_moneda;
 	$url_iframe .= "&prop=".$proporcionalidad;
-
+	
 	if($limitar)
 		$url_iframe .= "&limite=".$limite;
 	if($agrupar)
@@ -1959,6 +1980,9 @@ if(!$popup)
 		if($check_tipo_asunto)
 			if(is_array($tipos_asunto))
 				$url_iframe .= "&tipos_asunto=".implode(',',$tipos_asunto);
+		if($check_moneda_contrato)
+			if(is_array($moneda_contrato))
+				$url_iframe .= "&moneda_contrato=".implode(',',$moneda_contrato);
 
 		if($check_area_prof)
 			if(is_array($areas))
@@ -1998,7 +2022,9 @@ if(!$popup)
 	<?
 	if($opc && $opc != 'nuevo_reporte' && $opc != 'eliminar_reporte'):
 	?>
-		 <iframe name=planilla id=planilla src='<?=$url_iframe ?>' frameborder=0 width=730px height=<?=$alto?>px></iframe>
+<div class="divloading">&nbsp;</div>
+		 <iframe onload="iframelista();" name="planilla" id="planilla" src='<?php echo $url_iframe; ?>' frameborder="0" style="display:none;width:730px;height:<?php echo $alto; ?>px;"></iframe>
+		
 	<? endif; ?>
 
 <script>

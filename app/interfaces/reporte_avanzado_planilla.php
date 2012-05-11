@@ -206,6 +206,14 @@ span.indefinido { color: #550000; }
 		if($usuario)
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
 	
+	/*USUARIOS*/
+	$monedascontrato = explode(",",$moneda_contrato);
+	if(!is_array($monedascontrato))	
+		$monedascontrato = array($monedascontrato);
+	foreach($monedascontrato as $monedacontrato)
+		if($monedacontrato)
+			$reporte->addFiltro('contrato','id_moneda',$monedacontrato);
+		
 	/*ENCARGADOS*/
 	$encargados = explode(",",$en_com);
 	if(!is_array($encargados))	
@@ -213,13 +221,7 @@ span.indefinido { color: #550000; }
 	foreach($encargados as $encargado)
 		if($encargado)
 			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado);
-	/*ESTADOS*/
-	$estados = explode(",",$es_cob);
-	if(!is_array($estados))	
-		$estados = array($estados);
-	foreach($estados as $estado)
-		if($estado)
-			$reporte->addFiltro('cobro','estado',$estado);
+	
 
 	/*CLIENTES*/
 	$clients = explode(",",$clientes);
@@ -260,6 +262,7 @@ span.indefinido { color: #550000; }
 	foreach($categorias_usuario as $categoria_usuario)
 		if($categoria_usuario)
 			$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
+	
 
 	$reporte->id_moneda = $id_moneda;	
 
@@ -278,10 +281,27 @@ span.indefinido { color: #550000; }
 	if($campo_fecha)
 		$reporte->setCampoFecha($campo_fecha);
 
-	$reporte->setTipoDato($tipo_dato);
+	
 	$reporte->setVista($vista);
 	$reporte->setProporcionalidad($prop);
 
+	/*ESTADOS*/
+	$estados = explode(",",$es_cob);
+	if(!is_array($estados))	
+		$estados = array($estados);
+	
+	$reporte_c=$reporte;
+	
+	
+	
+	
+	
+	$reporte->setTipoDato($tipo_dato);
+	foreach($estados as $estado)
+		if($estado)
+			$reporte->addFiltro('cobro','estado',$estado);
+		
+	
 	$reporte->Query();
 	$r = $reporte->toArray();
 
@@ -289,16 +309,20 @@ span.indefinido { color: #550000; }
 
 	if($tipo_dato_comparado)
 	{
-		$reporte->setTipoDato($tipo_dato_comparado);
-	
-		$reporte->Query();
-		$r_c = $reporte->toArray();
-
+		$reporte_c->setTipoDato($tipo_dato_comparado);
+	foreach($estados as $estado)
+		if($estado)
+			$reporte_c->addFiltro('cobro','estado',$estado);
+		
+		$reporte_c->Query();
+		$r_c = $reporte_c->toArray();
 		//Se añaden datos faltantes en cada arreglo:
 		$r = $reporte->fixArray($r,$r_c);
 		$r_c = $reporte->fixArray($r_c,$r);
+	
+		
 	}
-
+	
 	if($tipo_dato_comparado)
 		$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' vs. '.__($tipo_dato_comparado).' '.__('en vista por').' '.__($agrupadores[0]);
 	else
@@ -309,7 +333,9 @@ span.indefinido { color: #550000; }
 		$titulo_reporte = __('No se encontraron datos con el tipo específicado en el período.');
 	}
 ?>
+ 
 <script>
+  
 	function Resize()
 	{
 			height = $('tabla_planilla').offsetHeight + $('tabla_planilla_2').offsetHeight;
@@ -318,7 +344,9 @@ span.indefinido { color: #550000; }
 				width = 694;
 			parent.ResizeIframe(width+4, height+25);
 	}
+	
 </script>
+   
 
 	<div id='print_link' align=right>
 		<a href='javascript:void(0)' onclick='window.print()'>
@@ -339,7 +367,8 @@ span.indefinido { color: #550000; }
 						<?=__('Total').' '.__($tipo_dato)?>:
 					</td>
 					<td align="right" style=''>
-						<?=$r['total']?>
+						
+					    <?php echo    Reporte::FormatoValor($sesion,$r['total'],$tipo_dato,'',$formato_valor); ?>
 					</td>
 					<td style='' align=right>
 						<?=(Reporte::requiereMoneda($tipo_dato))? __(Reporte::simboloTipoDato($tipo_dato,$sesion,$id_moneda)):"&nbsp;" ?>
@@ -352,9 +381,9 @@ span.indefinido { color: #550000; }
 						<?=__('Total').' '.__($tipo_dato_comparado)?>:
 					</td>
 					<td align="right" style='white-space:nowrap;'>
-						<?= $r_c['total'] ?>
+						<?php echo    Reporte::FormatoValor($sesion,$r_c['total'],$tipo_dato_comparado,'',$formato_valor); ?>
 					</td>
-					<td>
+					<td style='' align=right>
 						<?=(Reporte::requiereMoneda($tipo_dato_comparado))? __(Reporte::simboloTipoDato($tipo_dato_comparado,$sesion,$id_moneda)):"&nbsp;" ?>
 					</td>
 				</tr>
@@ -418,7 +447,7 @@ span.indefinido { color: #550000; }
 				if($email)
 					$s .= ' '.$email_style[$orden]['secundario'].' ';
 				$s .= " > ";
-				$s .= url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$tipo_dato_comparado,'',$formato_valor),$filtros,$email);
+				$s .= url(Reporte::FormatoValor($sesion,$valor_comparado['valor'],$comparado,'',$formato_valor),$filtros,$email);
 				$s .= "</td> </tr> </table>";
 			}
 			else

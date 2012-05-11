@@ -251,11 +251,11 @@ $pagina->PrintTop();
 
 	if(desde == 'genera')
 	{
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br></span>";
-			text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?php echo __('Antes de generar los borradores, asegúrese de haber actualizado los tipos de cambio.') ?></span>';
-			text_window += '<br><br><span style="font-size:12px; text-align:center;font-weight:bold"><?php echo __('Cambios actuales') ?></span><br>';
-			text_window += '<table align="center" style="margin:auto;border:1px dotted #000" width=40%><tr><td><b><?php echo __('Moneda') ?></b></td><td><b><?php echo __('Cambio') ?></b></td></tr>';
-			text_window += '<?php while ($monedas = mysql_fetch_array($resp_moneda)) { ?><tr><td><?php echo $monedas[glosa_moneda] ?></td><td><?php echo $monedas[tipo_cambio] ?></td></tr><?php } ?>';
+		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br></span>";
+		text_window += '<span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Antes de generar los borradores, asegúrese de haber actualizado los tipos de cambio.')?></span>';
+		text_window += '<br><br><span style="font-size:12px; text-align:center;font-weight:bold"><?=__('Cambios actuales')?></span><br>';
+		text_window += '<table align="center" style="margin:auto;border:1px dotted #000" width=40%><tr><td><b><?=__('Moneda')?></b></td><td><b><?=__('Cambio')?></b></td></tr>';
+		text_window += '<? while($monedas = mysql_fetch_array($resp_moneda)){ ?><tr><td><?=$monedas[glosa_moneda]?></td><td><?=$monedas[tipo_cambio]?></td></tr><? }?>';
 		text_window += '</table><br>';
 			text_window += '<br><br><span style="font-size:12px; text-align:center; color:#FF0000;"><?php echo __('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos') ?></span><br>';
 			text_window += '<br><span style="font-size:12px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br><br>';
@@ -268,6 +268,11 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') )
 	<?php
 }
 ?>
+		if(jQuery('#tipo_liquidacion').val()=='') text_window += '<input type="radio" name="radio_generacion" id="radio_gastos" /><?= __('Sólo Gastos.')?><br>';
+		if(jQuery('#tipo_liquidacion').val()=='') text_window += '<input type="radio" name="radio_generacion" id="radio_honorarios" /><?= __(' Sólo Honorarios.')?><br>';
+<?
+		}
+?>
 		text_window += '<br>';
 
 		Dialog.confirm(text_window,
@@ -279,9 +284,11 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') )
 <?php
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') ) || ( method_exists('Conf', 'SoloGastos') && Conf::SoloGastos() )) {
 	?>
-				if($('radio_gastos').checked==true)
+				if($('radio_gastos').checked==true) {
 					form.action = 'genera_cobros_guarda.php?gastos=1';
-				else
+				} else if($('radio_honorarios').checked==true) {
+					form.action = 'genera_cobros_guarda.php?solohh=1';
+				}
 	<?php
 }
 ?>
@@ -368,12 +375,12 @@ Impresión de cobros
 			{
 				if(alerta)
 				{
-						var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-						text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?php echo __('A continuación se generarán los borradores del periodo que ha seleccionado.') ?><br><br><?php echo __('¿Desea descargar los cobros del periodo?') ?></span><br><br>';
+					var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
+					text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?=__('A continuación se generarán los borradores del periodo que ha seleccionado.')?><br><br><?=__('¿Desea descargar los cobros del periodo?')?></span><br><br>';
 					text_window += '<span style="text-align:center; "> <input type="checkbox" name="cartas" id="cartas" checked="checked" /> Incluir cartas </span> ';
 					Dialog.confirm(text_window,
 					{
-							top:150, left:290, width:400, okLabel: "<?php echo __('Descargar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
+						top:150, left:290, width:400, okLabel: "<?=__('Descargar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 						id: "myDialogId",
 						cancel:function(win){ return false; },
 						ok:function(win){ var cartas = $('cartas'); if(cartas.checked) ImpresionCobros(false,'cartas'); else ImpresionCobros(false,'');
@@ -406,12 +413,12 @@ Impresión de cobros
 
 	if(alerta)
 	{
-			var text_window = "<img src='<?php echo Conf::ImgDir() ?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA") ?></u><br><br>";
-			text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?php echo __('A continuación se generarán los borradores del periodo que ha seleccionado.') ?><br><br><?php echo __('¿Desea descargar los cobros del periodo?') ?></span><br><br>';
+		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "> <?=__('A continuación se generarán los borradores del periodo que ha seleccionado.')?><br><br><?=__('¿Desea descargar los cobros del periodo?')?></span><br><br>';
 		text_window += '<span style="text-align:center; "> <input type="checkbox" name="cartas" id="cartas" checked="checked" /> Incluir cartas </span> ';
 		Dialog.confirm(text_window,
 		{
-				top:150, left:290, width:400, okLabel: "<?php echo __('Descargar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
+			top:150, left:290, width:400, okLabel: "<?=__('Descargar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 			id: "myDialogId",
 			cancel:function(win){ return false; },
 			ok:function(win){ var cartas = $('cartas'); if(cartas.checked) ImpresionCobros(false,'cartas'); else ImpresionCobros(false,'');
@@ -611,8 +618,7 @@ else
 								echo Html::SelectArray(array(
 					array('1', __('Sólo Honorarios')),
 					array('2', __('Sólo Gastos')),
-									array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))
-								?>
+					array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $tipo_liquidacion, ' id="tipo_liquidacion" ', __('Todas'))?>
 			</td>
 		</tr>
 						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
@@ -723,11 +729,11 @@ else
 		</tr>
 		<tr>
 			<td align="center" colspan="2">
-					<input type="button" value="<?php echo __('Asuntos por') . ' ' . __('cobrar'); ?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
-					<input type="button" value="<?php echo __('Generar borradores') ?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
-					<input type="button" value="<?php echo __('Excel borradores') ?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
-					<input type="button" value="<?php echo __('Descargar borradores') ?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
-					<input type="button" value="<?php echo __('Emitir cobros') ?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
+				<input type="button" value="<?php echo  __('Asuntos por') .' '.__('cobrar');?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
+				<input type="button" value="<?=__('Generar borradores')?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
+				<input type="button" value="<?=__('Excel borradores')?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
+				<input type="button" value="<?=__('Descargar borradores')?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
+				<input type="button" value="<?=__('Emitir cobros')?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
 			</td>
 		</tr>
 	</table>

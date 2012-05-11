@@ -322,8 +322,7 @@
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 					WHERE $where";
-		$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($query, $sesion)."'";
-        	$respt = mysql_query($testimonio, $sesion);
+		
 		$lista_gastos = new ListaGastos($sesion,'',$query);
 		$moneda_unica = true; #para verificar en el ciclo si es la moneda única
 		$id_moneda_check = 0; #igual que el de arriba

@@ -39,15 +39,21 @@
 	{
 		if($cobros->Load($id_cobro_hide))
 		{
+		    $documento_cobro = new Documento($sesion);
+		    $documento_cobro->LoadByCobro($id_cobro_hide);
+		    $lista_pagos = $documento_cobro->ListaPagos();
+			 
+			    
+			/*FFF: cambio esta query para usar clase Documento    
 			$query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($cont_documentos) = mysql_fetch_array($resp);
+			list($cont_documentos) = mysql_fetch_array($resp);*/
 
 			$query = "SELECT count(*) FROM factura WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($cont_facturas) = mysql_fetch_array($resp);
 
-			if( $cont_documentos > 0 )
+			if ($lista_pagos)
 			{
 				$pagina->AddError(__('El cobro N°').$cobros->fields['id_cobro'].__(' no se puede borrar porque tiene un pago asociado.'));
 			}

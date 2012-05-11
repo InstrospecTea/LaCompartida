@@ -49,9 +49,22 @@
 									$costo = NumberFormatToInt( $costo );
 									$query = "REPLACE INTO usuario_costo(id_usuario, fecha, costo) VALUES('".$id_usuario."', '".sprintf("%04d-%02d-01", $fecha_a, $mes)."', '".$costo."')";
                                     mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-                                }
+                               
+				$querycosto="replace delayed into `usuario_costo_hh` (id_usuario, yearmonth, costo_hh)
+			    (SELECT t.id_usuario, date_format( uc.fecha, '%Y%m' ),costo *3600 / sum( time_to_sec( duracion ) )
+			    FROM trabajo t
+			    JOIN usuario_costo uc ON t.id_usuario = uc.id_usuario
+			    AND date_format( uc.fecha, '%Y%m%d' ) = concat( extract(
+			    YEAR_MONTH FROM t.fecha ) , '01' )
+			    where date_format(t.fecha,'%Y-%m')='".sprintf("%04d-%02d", $fecha_a, $mes)."'
+			    and t.id_usuario='".$id_usuario."' 
+			    GROUP BY id_usuario, uc.fecha)";
+				mysql_query($querycosto, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			
+				 }
 			}
 		}
+		
 	}
 	
 	function NumberFormatToInt( $string ) {

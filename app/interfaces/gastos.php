@@ -362,6 +362,12 @@
 }
 
 ?>
+    <style type="text/css">
+      @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
+  
+    </style>
+   <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
 function Preparar_Cobro(form)
 {
@@ -491,6 +497,90 @@ function BuscarGastos( form, from )
 	jQuery.post('ajax/estimar_datos.php',jQuery('#form_gastos').serialize(),function(data) {
 	    alert('Su consulta recorre '+data+' registros');
 	});
+	return false;
+	} else if(from =='datatables') {
+
+	
+
+      
+ jQuery('#tablon').dataTable({
+		  "bDestroy":true,
+               
+		 		"oLanguage": {   
+		    "sProcessing":   "Procesando..." ,
+		    "sLengthMenu":   "Mostrar _MENU_ registros",
+		    "sZeroRecords":  "No se encontraron resultados",
+		    "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
+		    "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",
+		    "sInfoFiltered": "(filtrado de _MAX_ registros en total)",
+		    "sInfoPostFix":  "",
+		    "sSearch":       "Buscar:",
+		    "sUrl":          "",
+		    "oPaginate": {
+			"sFirst":    "Primero",
+			"sPrevious": "Anterior",
+			"sNext":     "Siguiente",
+			"sLast":     "Último"
+		 }
+	 },
+	 "bFilter": false,
+	 
+
+		  
+		     "bProcessing": true,
+	   /* "bServerSide": true,
+	     "sServerMethod": "POST",*/
+	    "sAjaxSource": "ajax/gastos_ajax.php",
+		     "bJQueryUI": true,
+		     "bDeferRender": true,
+		    
+		"sServerParams": jQuery('#form_gastos').serialize(),
+	 
+	  "aoColumnDefs": [
+	       {  "sClass": "alignleft",    "aTargets": [ 1,2,3,4 ]   },
+	       
+	       {  "sClass": "tablagastos",    "aTargets": [ 0,1,2,3,4,5,6,7,8,9,10,11,12 ]   },
+	         {  "sWidth": "30px",    "aTargets": [ 12 ]   },
+		 {  "sWidth": "50px",    "aTargets": [0,5,6 ]   },
+		  {  "bSortable":false,    "aTargets": [3,4,5,6,7,9,10,11, 12 ]   },
+		     <?php 
+		     //if ( !UtilesApp::GetConf($sesion,'NumeroGasto') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
+//if ( !UtilesApp::GetConf($sesion,'NumeroOT') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
+//if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
+
+if ( !UtilesApp::GetConf($sesion,'UsarImpuestoPorGastos') ) echo ' { "bVisible": false, "aTargets": [ 7 ] },';
+if ( !UtilesApp::GetConf($sesion,'TipoGasto') ) echo ' { "bVisible": false, "aTargets": [ 3 ] },';
+if ( !UtilesApp::GetConf($sesion,'UsarGastosCobrable') ) echo ' { "bVisible": false, "aTargets": [ 11 ] },';?>    
+	{  "fnRender": function ( o, val ) {
+          return "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[12]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='<?php echo Conf::ImgDir()?>/editar_on.gif'></a><a style='float:left;display:inline;' onclick='parent.EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='<?php echo Conf::ImgDir()?>/cruz_roja_nuevo.gif'></a>";
+        },    "aTargets": [ 12 ]   },
+	{  "fnRender": function ( o, val ) {
+          return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
+        },    "aTargets": [ 8 ]   },
+	
+	{  "fnRender": function ( o, val ) {
+          return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
+        },    "aTargets": [ 8 ]   }
+	
+   
+    
+    ],
+   
+	    "iDisplayLength": 25,
+	    "aLengthMenu": [[25, 50, 100,200, -1], [25, 50, 100,200, "Todo"]],
+	    "sPaginationType": "full_numbers",
+	    "sDom":  'T<"top"lp>rt<"bottom"i>',
+	    "oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy", "print" ]        }
+	  ,"aaSorting": [[ 2, "asc" ]]
+	     }).show();
+
+
+
+		
+		
+		
+		
+	
 	return false;
 	} else {
 	    	return false;
@@ -658,6 +748,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) ||
 			<input name="boton_xls_resumen" type="button" value="<?=__('Descargar Resumen Excel')?>" onclick="BuscarGastos(this.form,'excel_resumen')" class="btn" />
 			
 			<input id="boton_xls_estimar" name="boton_xls_estimar" type="button" value="<?=__('Estimar Cantidad de Datos')?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
+			<input id="boton_datatables" name="boton_datatables" type="button" value="<?=__('DataTables')?>" onclick="BuscarGastos(this.form,'datatables')" class="btn" />
 		</td>
 		<td width='40%' align=right>
 			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?=__('Agregar provisión')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -702,7 +793,27 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php 
+	echo '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tablon" style="width:920px;display:none;">
+	<thead>
+		<tr class="encabezadolight">
+		<th >Fecha</th>
+<th>Cliente</th>
+<th>Asunto</th>
+<th>Tipo</th>
+<th>Descripción</th>
+<th>Egreso</th>
+<th>Ingreso</th>
+<th>Impuesto</th>
+<th>Cobro</th>
+<th>Estado Cobro</th>
+<th>Cobrable</th>
+<th>Contrato Activo</th>
+<th>Opción</th></tr>
+	</thead>
+	<tbody>
+		
+	</tbody></table>';
 	if($opc == 'buscar')
 	{
 		echo($total_cta ? "<table width=90%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta gastos: '.Moneda::GetSimboloMoneda($sesion,Moneda::GetMonedaBase($sesion)))." ".$total_cta."</b></span></td></tr></table>":"");

@@ -142,6 +142,21 @@
 	$active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 ?>
 <script>
+    jQuery('document').ready(function() {
+	jQuery('#fix_tarifas').click(function() {
+
+	   jQuery.ajax({
+	      type: "POST",
+	      url: 'ajax/completar_tarifas.php',
+	      data: { accion: "completartarifas" },
+	      success: function(msg) {
+		  jQuery('.info td').first().html(msg);
+		}
+	      });
+		
+	});
+    });
+    
 function foco(elemento)
 {
 	elemento.style.border = "2px solid #000000";
@@ -155,36 +170,36 @@ function no_foco(elemento)
 function cambia_tarifa(valor)
 {
 	var popup = $('popup').value;
-	if( confirm('<?=__('Confirma cambio de tarifa?')?>') )
+	if( confirm('<?php echo __('Confirma cambio de tarifa?')?>') )
 		self.location.href = 'agregar_tarifa.php?id_tarifa_edicion=' +valor+ '&popup=' +popup;
 }
 function Eliminar()
 {
 	var http = getXMLHTTP();
-	http.open('get', 'ajax.php?accion=obtener_tarifa_defecto&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+	http.open('get', 'ajax.php?accion=obtener_tarifa_defecto&id_tarifa=<?php echo $id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
 	http.send(null);
 	tarifa_defecto_en_bd = http.responseText;
 	
-	if( tarifa_defecto_en_bd != <?=$id_tarifa_edicion ? $id_tarifa_edicion : ( $id_tarifa_previa ? $id_tarifa_previa : '0' ) ?> ){
+	if( tarifa_defecto_en_bd != <?php echo $id_tarifa_edicion ? $id_tarifa_edicion : ( $id_tarifa_previa ? $id_tarifa_previa : '0' ) ?> ){
 		var http = getXMLHTTP();
-		http.open('get', 'ajax.php?accion=contratos_con_esta_tarifa&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+		http.open('get', 'ajax.php?accion=contratos_con_esta_tarifa&id_tarifa=<?php echo $id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
 		http.send(null);
 		num_contratos = http.responseText;
 
 		if( num_contratos > 0 ) {
 			respuesta_num_pagos = confirm('<?php echo  __('La tarifa posee'); ?> ' + num_contratos + ' <?php echo __('contratos asociados. \nSi continua se le asignará la tarifa estándar a los contratos afectados.\n¿Está seguro de continuar?.'); ?>');
 			if( respuesta_num_pagos ) {
-				http.open('get', 'ajax.php?accion=cambiar_a_tarifa_por_defecto&id_tarifa=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
+				http.open('get', 'ajax.php?accion=cambiar_a_tarifa_por_defecto&id_tarifa=<?php echo $id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>', false);  //debe ser syncrono para que devuelva el valor antes de continuar
 				http.send(null);
 				num_contratos = http.responseText;
 
-				location.href="agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_eliminar=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
+				location.href="agregar_tarifa.php?popup=<?php echo $popup?>&id_tarifa_eliminar=<?php echo $id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
 			} else {
 				return false;
 			}					   
 		} else {
-			if (confirm('¿<?=__('Está seguro de eliminar la')." ".__('tarifa')?>?')) {
-				location.href="agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_eliminar=<?=$id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
+			if (confirm('¿<?php echo __('Está seguro de eliminar la')." ".__('tarifa')?>?')) {
+				location.href="agregar_tarifa.php?popup=<?php echo $popup?>&id_tarifa_eliminar=<?php echo $id_tarifa_edicion ? $id_tarifa_edicion : $id_tarifa_previa ?>&opc=eliminar";
 			}
 		}
 	} else {
@@ -199,7 +214,7 @@ function ActualizarTarifaUsuario(glosa_categoria,valor,glosa_moneda,vacio)
 	
 	//alert(clase);
 	
-	if(!vacio || confirm('<?=__('Confirma cambio de tarifa para todos los usuarios de esta categoria?')?>')==true )
+	if(!vacio || confirm('<?php echo __('Confirma cambio de tarifa para todos los usuarios de esta categoria?')?>')==true )
 	{
 	$$(clase).each(								// Para el cambio del tarifa de la categoria cambia todos los tarifas de usuarios 
 			function(item)						// que pertenecen a este categoria.
@@ -214,10 +229,10 @@ function CrearTarifa( from, id )
 {
 	if(document.getElementById('usar_tarifa_previa').checked)
 		{	
-			self.location.href='agregar_tarifa.php?popup=<?=$popup?>&id_tarifa_previa=' + id;
+			self.location.href='agregar_tarifa.php?popup=<?php echo $popup?>&id_tarifa_previa=' + id;
 		}
 	else { 
-		self.location.href='agregar_tarifa.php?popup=<?=$popup?>';
+		self.location.href='agregar_tarifa.php?popup=<?php echo $popup?>';
 		}
 }
 
@@ -243,9 +258,9 @@ function CrearTarifa( from, id )
 <? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
 		echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">"; ?>
 <form name=formulario id=formulario method=post action='' autocomplete="off">
-	<input type=hidden name='id_tarifa_edicion' value='<?=$tarifa->fields['id_tarifa']?>'>
+	<input type=hidden name='id_tarifa_edicion' value='<?php echo $tarifa->fields['id_tarifa']?>'>
 	<input type=hidden name='opc' value='guardar'>
-	<input type=hidden name='popup' id='popup' value='<?=$popup ?>'>
+	<input type=hidden name='popup' id='popup' value='<?php echo $popup ?>'>
 
 	<table width='95%' border="0" cellpadding="0" cellspacing="0">
 		<tr>
@@ -256,39 +271,43 @@ function CrearTarifa( from, id )
 	{
 		$colspan=5;
 ?>
-			<td align=right><?=__('Tarifa')?>:&nbsp;</td>
-			<td align=left><?= Html::SelectQuery($sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa","id_tarifa", $tarifa->fields['id_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
+			<td style="text-align:left;vertical-align: middle;"><?php echo __('Tarifa')?>:&nbsp;</td>
+			<td style="text-align:left;vertical-align: middle;"><?php echo  Html::SelectQuery($sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa","id_tarifa", $tarifa->fields['id_tarifa'],"onchange='cambia_tarifa(this.value)'","","120"); ?></td>
 <?
 	} 
 ?>
-			<td> <?=__('Nombre')?>: <input type=text name=glosa_tarifa value='<?=$tarifa->fields['glosa_tarifa']?>' <?=$active?>> </td>
-			<td></td>
-			<td align=right> <?=__('Defecto')?>: <input type=checkbox name=tarifa_defecto value='1' <?=$tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
-		</tr>
-		<tr>
-			<td colspan=<?=$colspan?> align=right>&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan="<?=$colspan?>" align="right" style="text-align:right;" >
-				<input type=submit value='<?=__('Guardar') ?>' class=btn > &nbsp;
+			<td style="text-align:left;vertical-align: middle;" colspan="2"> <?php echo __('Nombre')?>: <input style="width:200px;" type=text name="glosa_tarifa" value='<?php echo $tarifa->fields['glosa_tarifa']?>' <?php echo $active?>> </td>
 			
-				<input type=button onclick="CrearTarifa( this.form , <?=$id_tarifa_edicion ?> );" value='<?=__('Crear nueva tarifa') ?>' class=btn >
-				<input type=button onclick="self.location.href='tarifas_xls.php?id_tarifa_edicion=<?=$id_tarifa_edicion ?>&glosa=<?=$tarifa->fields['glosa_tarifa'] ?>'" value='<?=__('Imprimir tarifas') ?>' class='btn' >
-				<input type=button onclick="self.location.href='tarifas_xls.php?id_tarifa_edicion=0&glosa=todas_las_tarifas'" value='<?=__('Imprimir Todas') ?>' class='btn' >
-				<input type=button onclick="Eliminar();" value='<?=__('Eliminar Tarifa') ?>' class="btn_rojo" >
+			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto')?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
+		</tr>
+		<tr>
+			<td colspan="<?php echo $colspan?>" align=right>&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="<?php echo $colspan-1?>" align="right" style="text-align:right;" >
+				<input type=submit value='<?php echo __('Guardar') ?>' class=btn > &nbsp;
+			
+				
+<input type="button" id="fix_tarifas" value='<?php echo __('Completar Tarifas') ?>' class='btn' title="Esta función completará las tarifas faltantes de los profesionales basándose en su categoría, para todas las tarifas" />
+				
+				<input type="button" onclick="self.location.href='tarifas_xls.php?id_tarifa_edicion=<?php echo $id_tarifa_edicion ?>&glosa=<?php echo $tarifa->fields['glosa_tarifa'] ?>'" value='<?php echo __('Imprimir tarifas') ?>' class='btn' >				
+				<input type="button" onclick="self.location.href='tarifas_clientes.php'" value='<?php echo __('Imprimir Todas') ?>' class='btn' title="Exporta todas las tarifas a un excel. Incluye qué contratos estan afectos a cada una" >
+			</td><td  style="text-align:left;vertical-align: middle;width:202px;" >
+			    <input type="button" onclick="CrearTarifa( this.form , <?php echo $id_tarifa_edicion ?> );" value='<?php echo __('Crear nueva tarifa') ?>' class=btn title="Crea una nueva tarifa. Active el checkbox inferior para basarse en los datos de la actual">
+				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Tarifa') ?>' class="btn_rojo" >
 			</td>
 		</tr>
 		<tr>
 			<?
-	$colspan=2;
+	$colspan=3;
 	
 			if($tarifa->fields['id_tarifa'])
 			{
 			$colspan=4;
 			} 
 			?>
-			<td colspan=<?=$colspan?>></td><td align=left>
-				<input type=checkbox id=usar_tarifa_previa value='1' <? $usar_tarifa_previa ? 'checked' : '' ?> />Copiar Datos
+			<td colspan="<?php echo $colspan?>"></td><td  align=left>
+				<input type=checkbox id=usar_tarifa_previa value='1' <? $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual 
 			</td>
 		</tr>
 	</table>
@@ -471,19 +490,19 @@ function CrearTarifa( from, id )
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 <table width='95%' border="1px solid #BDBDBD" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 	<tr bgcolor=#A3D55C>
-		<td align=left class="border_plomo"><b><?=__("Categoría")?></b></td>
-		<?=$td_moneda?>
+		<td align=left class="border_plomo"><b><?php echo __("Categoría")?></b></td>
+		<?php echo $td_moneda?>
 	</tr>
-	<?=$td_categoria_tarifas ?>
+	<?php echo $td_categoria_tarifas ?>
 </table>
 <br>
 
 <table width='95%' border="1px solid #BDBDBD" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 	<tr bgcolor=#A3D55C>
-		<td align=left class="border_plomo"><b><?=__("Profesional")?></b></td>
-		<?=$td_moneda?>
+		<td align=left class="border_plomo"><b><?php echo __("Profesional")?></b></td>
+		<?php echo $td_moneda?>
 	</tr>
-	<?=$td_tarifas ?>
+	<?php echo $td_tarifas ?>
 </table>
 </form>
 <? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
@@ -494,24 +513,25 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 	 { ?>
 <table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 	<tr bgcolor=#6CA522>
-		<td align=left><b><?=__("Categoría")?></b></td>
-		<?=$td_moneda?>
+		<td align=left><b><?php echo __("Categoría")?></b></td>
+		<?php echo $td_moneda?>
 	</tr>
-	<?=$td_categoria_tarifas ?>
+	<?php echo $td_categoria_tarifas ?>
 </table>
 <br>
 
 <table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
 	<tr bgcolor=#6CA522>
-		<td align=left><b><?=__("Profesional")?></b></td>
-		<?=$td_moneda?>
+		<td align=left><b><?php echo __("Profesional")?></b></td>
+		<?php echo $td_moneda?>
 	</tr>
-	<?=$td_tarifas ?>
+	<?php echo $td_tarifas ?>
 </table>
 </form>
 <? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) 
 			echo "</td></tr></table>"; ?>
 <br>
 <? } 
+include('ajax/tarifas_duplicadas.php');
 	$pagina->PrintBottom($popup);
 ?>

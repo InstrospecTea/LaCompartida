@@ -57,7 +57,8 @@ $tarifa_permitido = ($cantidad_permisos > 0);
 $validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 
-if ($popup && !$motivo) {
+if (!defined('HEADERLOADED')) $addheaderandbottom=true;
+if ($addheaderandbottom || ($popup && !$motivo)) {
 	$pagina = new Pagina($sesion);
 	$show = 'inline';
 
@@ -360,7 +361,7 @@ if (empty($tarifa_flat) && !empty($contrato->fields['id_tarifa'])) {
 	$valor_tarifa_flat = $tarifa_flat;
 }
 
-if ($popup && !$motivo) {
+if ($addheaderandbottom || ($popup && !$motivo)) {
 	$pagina->PrintTop($popup);
 }
 
@@ -1604,30 +1605,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		?>
 	}
 
-	function CambioEncargadoSegunCliente(codigo_cliente){
-		var http = getXMLHTTP();
-		var url = 'ajax.php?accion=cargar_encargado_segun_cliente&codigo_cliente_consulta=' + codigo_cliente;
-
-		http.open('get', url);
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-				if( response == "~noexiste" )
-					alert( "no se encontró el usuario" );
-				else
-				{
-					$('id_usuario_responsable').value=response;
-					<?php if( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente ) : ?>
-					$('id_usuario_responsable_disabled').value=response;
-					<?php endif ?>
-				}
-			}
-		};
-		http.send(null);
-	}
-	
 	function agregarHito(){
 		if(!validarHito($('fila_hito_1'))) return false;
 
@@ -1813,20 +1790,31 @@ if (!$contrato->loaded()) {
                 <?php if ($usuario_responsable_obligatorio) echo $obligatorio; ?>
 				</td>
 				<td align="left" width = '70%'>
+				<?php if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()){ ?>
+					<?= Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200"); ?>
+					<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
 				<?php 
-					$id_usuario_responsable_loaded = null;
-					if ( $contrato_defecto->Loaded() && !$contrato->Loaded()){ 
-						$id_usuario_responsable_loaded = $contrato_defecto->fields['id_usuario_responsable'];
-					} else if ( $contrato_defecto->Loaded() && $contrato->Loaded()){ 
-						$id_usuario_responsable_loaded = $contrato->fields['id_usuario_responsable'];
-					}
-
-					if( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente ) {
-						echo Html::SelectQuery($sesion, $query, "id_usuario_responsable_disabled", $id_usuario_responsable_loaded ? $id_usuario_responsable_loaded : '' , 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
-						echo "<input type=\"hidden\" value=\"$id_usuario_responsable_loaded\" name=\"id_usuario_responsable\" id=\"id_usuario_responsable\" />";
-					} else {
-						echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $id_usuario_responsable_loaded ? $id_usuario_responsable_loaded : '', '', "Vacio", "200");
-					}
+					} else { 
+						if ( $contrato_defecto->Loaded() && $contrato->Loaded()){ 							
+							if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && !$desde_agrega_cliente ) {
+								echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
+				?>
+								<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php
+							} else {
+								echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
+								if ($contrato_defecto->fields["id_contrato"] != $contrato->fields["id_contrato"]) { 
+				?>
+								<input type="hidden" value="<?php echo $contrato_defecto->fields['id_usuario_responsable'] ?>" name="id_usuario_responsable" />
+				<?php 								
+								}
+							}
+						 } else if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && $desde_agrega_cliente ) {
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
+						 } else {
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', '', "Vacio", "200");
+						 }
+					} 
 				?>
 				</td>
 			</tr>            
@@ -3005,8 +2993,26 @@ function YoucangonowMichael() {
 	);});
 	$$('tr.esconder').each(function(item){item.hide()});
 	actualizarMoneda();
+
+	<?php 
+		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && !$desde_agrega_cliente) {
+			if ( UtilesApp::GetConf( $sesion, 'EncargadoSecundario') ) {
+	?>
+		$('id_usuario_secundario').disabled = "disabled";
+	<?php 
+			} else {
+	?>
+		 $('id_usuario_encargado').disabled = "disabled";
+	<?php 			
+			}
+		}
+	?>
+					
+				
 					
 </script>
 <?
 echo(InputId::Javascript($sesion));
+
+if ($addheaderandbottom || ($popup && !$motivo)) $pagina->PrintBottom($popup);
 ?>

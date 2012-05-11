@@ -7,6 +7,8 @@
 		require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
 	require_once Conf::ServerDir().'/classes/Cobro.php';
+	require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
+
 /*
 Valores necesarios:
 fecha_ini
@@ -19,7 +21,7 @@ if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die($argv[
 
 $sesion = new Sesion( null, true );
 if( method_exists('Conf','EsAmbientePrueba') && Conf::EsAmbientePrueba() )
- 	{
+	{
 
 if( method_exists('Conf','GetConf') )
 {
@@ -294,7 +296,7 @@ if( date("w",$fecha) != 0 && date("w",$fecha) != 6 )
 		        
 		            $query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario)
 		                    VALUES(2,'$fecha_trabajo','$asunto','$descripcion_trabajo','$duracion','$duracion_cobrada',$usuario)";
-		            
+		            echo $query.'<br>';
 		            if( Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia,$duracion)) < $horas_maximas )
 			            {
 			            	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -563,7 +565,8 @@ list($id_usuario_cobro) = mysql_fetch_array($resp_usuario);
 
 echo '<br>---------Ingreso finalizado!--------<br>';
 } else {
-    echo '<!-- Denegado '.Conf::EsAmbientePrueba().'_'.BACKUP.'-->';
     
+        echo '<!-- Denegado '.Conf::EsAmbientePrueba().'_'.BACKUP.'-->';
+
 }
 ?>

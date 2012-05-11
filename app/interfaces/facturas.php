@@ -160,8 +160,7 @@
 								, numero
 								, factura.serie_documento_legal
 								, factura.codigo_cliente 
-								, cliente.glosa_cliente
-								, factura.codigo_cliente 
+								, cliente.glosa_cliente, contrato.id_contrato as idcontrato
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
 											factura.cliente,
 											IF( contrato.factura_razon_social IN ('',' '),
@@ -234,7 +233,7 @@
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
 		$b->AgregarFuncion(__('N° Factura'), "NumeroFactura", "align='right' width='30px'");
 		$b->AgregarEncabezado("factura_rsocial",__('Cliente'),"align=left width=40px");
-		$b->AgregarEncabezado("glosa_asunto",__('Asunto'),"align=left width=40px");
+		$b->AgregarEncabezado("idcontrato",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
 		$b->AgregarEncabezado("descripcion",__('Descripción'),"align=left width=50px");
 		$b->AgregarEncabezado("estado",__('Estado'),"align=center");
