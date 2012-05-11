@@ -320,13 +320,9 @@ $tini=time();
                 $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
                 $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
                 $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
-                   $update3A=  "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
-                    $update3B="update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
                 $resp = mysql_query($update1, $sesion->dbh);
                 $resp = mysql_query($update2, $sesion->dbh);
                 $resp = mysql_query($update3, $sesion->dbh);
-                 $resp = mysql_query($update3A, $sesion->dbh);
-                  $resp = mysql_query($update3B, $sesion->dbh);
 		list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( MAX( fecha_modificacion ) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
 		
 		$update4="replace delayed into olap_liquidaciones (SELECT
@@ -348,7 +344,7 @@ $tini=time();
 								contrato.id_moneda as id_moneda_contrato,
 								contrato.opc_moneda_total as id_moneda_total,
                                                               
-															  movs.*,0
+															  movs.*
 								FROM  asunto JOIN contrato  using (id_contrato)
 								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								join
@@ -378,53 +374,6 @@ $tini=time();
 
 								"; // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
 		$resp = mysql_query($update4, $sesion->dbh);
-		
-		
-		$update5="truncate table trabajos_por_actualizar;";
-		$update6="replace into trabajos_por_actualizar (
-		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
-		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
-		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
-		$resp = mysql_query($update5, $sesion->dbh);
-		$resp = mysql_query($update6, $sesion->dbh);
-		
-		$update7="replace delayed into olap_liquidaciones (SELECT
-                                                                asunto.codigo_asunto as codigos_asuntos,
-                                                                asunto.codigo_asunto_secundario, 
-								  contrato.id_usuario_responsable,
-								   asunto.glosa_asunto as asuntos,
-								   (asunto.cobrable+1) as asuntos_cobrables,
-								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
-								
-								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
-								ec.username as username_encargado_comercial,
-								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
-								es.username as username_encargado_secundario,
-								contrato.id_contrato,
-                                                                contrato.monto, 
-								contrato.forma_cobro,
-								contrato.retainer_horas,
-								contrato.id_moneda as id_moneda_contrato,
-								contrato.opc_moneda_total as id_moneda_total,
-                                                              
-															  movs.*,0
-								FROM  asunto JOIN contrato  using (id_contrato)
-								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-								join
-								(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
-								 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
-								 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
-								,fecha_modificacion from  trabajo tr where  id_trabajo in (select id_trabajo from trabajos_por_actualizar)  
-
-								 
-
-								 
-								) movs on movs.codigo_asunto=asunto.codigo_asunto
-								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
-															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
-
-								"; 
-		$resp = mysql_query($update7, $sesion->dbh);
 		
 		$query = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
@@ -477,7 +426,6 @@ $tini=time();
                 
                                 $reportecontrato = new ReporteContrato($sesion,false, $separar_asuntos, $fecha1, $fecha2);
                                 $ultimocobro=$reportecontrato->arrayultimocobro;
-                                //echo '<pre>';print_r($ultimocobro);echo '</pre>';                                die();
 				$arrayolap=$reportecontrato->arrayolap;
 				
 								
@@ -559,22 +507,10 @@ $tini=time();
 				$ws1->write($filas, $col_monto_gastos, $monto_estimado_gastos, $formatos_moneda[$id_moneda_gastos]);
                                 $ws1->write($filas, $col_monto_gastos_mb, $monto_estimado_gastos_monedabase, $formatos_moneda[$moneda_base['id_moneda']]);
                         }
-                        if( !$ocultar_ultimo_cobro ) {
-                            if($separar_asuntos) :
-                             $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$cobro['codigo_asunto']]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$cobro['codigo_asunto']]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
-                            else:
-                              $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto); 
-                            endif;
-                        }
-                           
-			if( !$ocultar_estado_ultimo_cobro ) {
-                            if($separar_asuntos) :
-                              $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$cobro['codigo_asunto']]['estado'] != '' ? $ultimocobro[$cobro['codigo_asunto']]['estado'] : '', $formato_texto);
-                            else:
-                               $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
-                            endif;
-                        }
-                           
+                        if( !$ocultar_ultimo_cobro )
+                            $ws1->write($filas, $col_ultimo_cobro,$ultimocobro[$id_contrato]['fecha_fin'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_fin'], $formato_fecha, "-") : '', $formato_texto);
+			if( !$ocultar_estado_ultimo_cobro )
+                            $ws1->write($filas, $col_estado_ultimo_cobro,$ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
 			if( UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal' ) {
                             $ws1->write($filas, $col_horas_trabajadas, number_format($horas_no_cobradas,1,'.',''), $fdd);
                         } else {
@@ -743,7 +679,7 @@ $tini=time();
                  $tfin=time();
                $ws1->write(3,3,"demora ". ($tfin-$tini)." segundos",$formato_texto);
                 $ws1->write(3,4,"desde ". $fecha1." a ".$fecha2,$formato_texto);
-		$wb->send("Planilla horas por facturar.xls");
+		$wb->send("Planilla horas por facturar_turbo.xls");
 		$wb->close();
                 
              //   mail('ffigueroa@lemontech.cl','gen reporte',"Demoró mas o menos ".($tfin-$tini)." segundos y esta es la query \n".$query);
@@ -768,7 +704,7 @@ $tini=time();
     }
     
 </script>
-<form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
+<form method=post name=formulario action="planilla_facturacion_pendiente_turbo.php?xls=1">
     <input type="hidden" name="reporte" value="generar" />
 	<table class="border_plomo tb_base" style="width:350px;">
 		<tr>
