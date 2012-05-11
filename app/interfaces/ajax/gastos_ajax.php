@@ -145,45 +145,43 @@
 		
 		  $resp = mysql_query($query, $sesion->dbh);
 		  $rows=mysql_num_rows($resp);
-		echo '{ "iEcho": 3,
-			"iTotalRecords":'.$rows.',
-			"iTotalDisplayRecords":'.$rows.',
-			"aaData": [';
-	echo "\n";
+		
 	$i=0;
 		
 		while($fila = mysql_fetch_array($resp)) {
-		    if($i++>0) echo ',';
+		     
 		
-		   //$string=  '["'.implode('","',$fila). '"]';
-		   $string='["'.date('d-m-Y',strtotime($fila['fecha'])).'","'
-			   .htmlspecialchars($fila['glosa_cliente']? $fila['glosa_cliente']:' ').'","'
-			   .htmlspecialchars($fila['glosa_asunto']? $fila['glosa_asunto']:' ')   .'","'
-			   .htmlspecialchars($fila['tipo']? $fila['tipo']:' ').'","'
-			   .htmlspecialchars($fila['descripcion']? $fila['descripcion']:' ' ).'","'
-			   .($fila['egreso']? $fila['simbolo'].' '.$fila['egreso']:' ') .'","'
-			   .($fila['ingreso']? $fila['simbolo'].' '.$fila['ingreso']:' ') .'","'
-			   .($fila['con_impuesto']? $fila['con_impuesto']:' ').'","'
-			   .($fila['id_cobro']? $fila['id_cobro']:' ').'","'
-			   .($fila['estado']? $fila['estado']:' ').'","'
-			   .($fila['cobrable']? $fila['cobrable']:' ').'","'
-			   .($fila['contrato_activo']? $fila['contrato_activo']:' ').'","'
-			   .$fila['id_movimiento'].'"]';
-		   echo preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $string);
-		   //echo $string;
+		    
+		    $stringarray[]=array(
+			date('d-m-Y',strtotime($fila['fecha'])),
+			$fila['glosa_cliente']? $fila['glosa_cliente']:' ',
+			$fila['glosa_asunto']? $fila['glosa_asunto']:' ',
+			    $fila['tipo']? $fila['tipo']:' ',
+			    $fila['descripcion']? $fila['descripcion']:' ',
+	($fila['egreso']? $fila['simbolo'].' '.$fila['egreso']:' '),
+			   $fila['ingreso']? $fila['simbolo'].' '.$fila['ingreso']:' ',
+			   $fila['con_impuesto']? $fila['con_impuesto']:' ',
+			   $fila['id_cobro']? $fila['id_cobro']:' ',
+			   $fila['estado']? $fila['estado']:' ',
+			   $fila['cobrable']? $fila['cobrable']:' ',
+			   $fila['contrato_activo']? $fila['contrato_activo']:' ',
+			   $fila['id_movimiento']);
+			
+			    
+		    
 	    }
 		
-	 echo "] }";
+	 
 	
-	/*$arrayfinal=array(
-	  "iEcho"=>1,
+	$arrayfinal=array(
+	  "iEcho"=>3,
 	   "iTotalRecords"=>$rows,
 	  "iTotalDisplayRecords"=>$rows, 
 	    "aaData" => $stringarray
 	);
 	
-	 echo json_encode($arrayfinal);*/
-        
+	 echo json_encode($arrayfinal);
+		 
 		function Monto(& $fila)
 		{
 			global $sesion;

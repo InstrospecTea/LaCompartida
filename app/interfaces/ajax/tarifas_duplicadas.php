@@ -45,7 +45,7 @@ HAVING cant >1"		;
 		endwhile;
 		$link='/'.ROOTDIR.'/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=';
 
-		if(sizeof($arraytarifas>0)) {
+		if(sizeof($arraytarifas>1)) {
 		    echo 'Las siguientes tarifas están duplicadas entre sí:';
 		    foreach($arraytarifas as $tarifa) {
 			echo '<br/> - ';
