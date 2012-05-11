@@ -80,6 +80,10 @@
 	
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		$url_iframe .= "&glosa_actividad=".$glosa_actividad;
+		if( isset($sin_actividad_definida) && $sin_actividad_definida) {
+			$url_iframe .= "&sin_actividad_definida==1";
+	}
+		
 	}
 
 	

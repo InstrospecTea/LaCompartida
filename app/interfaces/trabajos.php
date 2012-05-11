@@ -245,7 +245,11 @@
 		# Filtro para Actividades si están activos
 		
 		if( isset( $glosa_actividad ) && $glosa_actividad != '' ) {
+			if( isset($sin_actividad_definida) && $sin_actividad_definida ) {
+				$where .= " AND ( trabajo.codigo_actividad IS NULL OR trabajo.codigo_actividad = '' OR trabajo.codigo_actividad = 0 ) ";
+			} else {
 			$where .= " AND actividad.glosa_actividad = '$glosa_actividad'";
+		}
 		}
 	
 		#TOTAL HORAS
