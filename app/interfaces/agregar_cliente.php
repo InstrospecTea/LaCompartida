@@ -192,6 +192,9 @@ if ($opcion == "guardar") {
         if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1')) {
             $pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
         }
+        /*if ($usuario_encargado_obligatorio && (empty($id_usuario_encargado) or $id_usuario_encargado == '-1')) {
+            $pagina->AddError(__("Debe ingresar el") . " " . __('Usuario Encargado'));
+        }*/
 
         if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
             $pagina->AddError( __("Debe ingresar el") . " " . __('Encargado Secundario'));
@@ -947,8 +950,8 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 									</tr>
 									<tr>
 										<td align="right">
-											<?php echo  __('Nombre') ?>
-											<span class="req">*</span>
+<?php echo  __('Nombre') ?>
+											<span style="color:#FF0000; font-size:10px">*</span>
 										</td>
 										<td align="left">
 											<input name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo  $cliente->fields['glosa_cliente'] ?>"  />
@@ -958,59 +961,48 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 										<td align="right">
 											<?php echo  __('Grupo') ?>
 										</td>
-										<td align="left">
+										<td align="left">&nbsp;
 											<?php echo  Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno')) ?>
 										</td>
 									</tr>
-									<?php if( UtilesApp::GetConf($sesion,'ClienteReferencia') ): ?>
+									<?php 
+										if( UtilesApp::GetConf($sesion,'ClienteReferencia') ) {
+									?>
 										<tr>
 											<td align="right">
 												<?php echo  __('Referencia') ?>
 												<?php if ($validaciones_segun_config)
 													echo $obligatorio ?>
 											</td>
-											<td align="left">
+											<td align="left">&nbsp;
 												<?php echo Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', '', "Vacio")?>
 											</td>
 										</tr>
-									<?php endif; ?>
-
-<?php										
-$params_array['lista_permisos'] = array('REV'); // permisos de consultor jefe
-$permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
-
-if ($permisos->fields['permitido']) {
-	$where = 1;
-} else {
-	$where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "' OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
-}
-
-$query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) AS nombre FROM usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional WHERE $where AND usuario.activo=1 AND usuario.visible=1 GROUP BY id_usuario ORDER BY nombre";
-
-
-?>
-
-<?php if ( UtilesApp::GetConf($sesion, 'VerCampoUsuarioEncargado') != 1): ?>
-	<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')): ?>										
-		<?php if(UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto')==0): ?>
-			<tr>
-				<td align="right">
-					<?php echo  __('Usuario encargado'); ?>
-					<?php if ($validaciones_segun_config): ?>
-						<?php echo $obligatorio; ?>
-					<?php endif; ?>
-				</td>
-				<td align="left">
-					<?php
-						$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '';
-
-						echo Html::SelectQuery($sesion, $query, "id_usuario_encargado", $id_default, '', 'Vacio', 'width="170"');
-					?>
-				</td>
-			</tr>
-		<?php endif; ?>
-	<?php endif; ?>
-<?php endif; ?>
+									<?php
+										}
+											$params_array['lista_permisos'] = array('REV'); // permisos de consultor jefe
+											$permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
+											if ($permisos->fields['permitido'])
+												$where = 1;
+											else
+												$where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "'
+                OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
+											?>
+									<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+									<tr>
+										<td align="right">
+<?php echo  __('Usuario encargado') ?>
+											<?php if ($validaciones_segun_config)
+												echo $obligatorio ?>
+										</td>
+										<td align="left">&nbsp;<?php echo  Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM
+				usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
+				WHERE $where AND usuario.activo=1 AND usuario.visible=1
+					GROUP BY id_usuario ORDER BY nombre"
+												, "id_usuario_encargado", $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '', '', 'Vacio', 'width="170"') ?>
+										</td>
+									</tr>
+									<?php } ?>
 									
 									<tr>
 										<td align="right">
@@ -1018,13 +1010,13 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 											 
 										</td>
 										<td align="left">
-											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  ($cliente->fields['fecha_creacion'])? date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])):date('d-m-Y',time() ); ?>"  />
+											<input name="glosa_cliente" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
 										</td>
 									</tr>
 									
 									<tr>
 										<td align="right">
-											<?php echo  __('Activo') ?>
+									<?php echo  __('Activo') ?>
 										</td>
 										<td align="left">
 											<input type='checkbox' name='activo' value='1' <?php echo  $cliente->fields['activo'] == 1 ? 'checked="checked"' : !$id_cliente ? 'checked="checked"' : ''  ?>>
@@ -1036,7 +1028,7 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 							<table width='100%' cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
-										<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
+<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
 									</td>
 								</tr>
 							</table>

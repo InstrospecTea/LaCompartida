@@ -1,8 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/classes/PaginaCobro.php';
 require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
+
+require_once Conf::ServerDir() . '/classes/PaginaCobro.php';
+
+
 require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/classes/Cobro.php';
 require_once Conf::ServerDir() . '/classes/CobroMoneda.php';
@@ -16,9 +19,13 @@ require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/../app/classes/FacturaPdfDatos.php';
 
+
+
+	//PhpConsole::start(true, true, dirname(__FILE__));
+
 $sesion = new Sesion(array('COB'));
 $pagina = new PaginaCobro($sesion);
-
+if(!isset($opc))$opc='';
 $cobro = new Cobro($sesion);
 $contrato = new Contrato($sesion);
 $documento_cobro = new Documento($sesion);
@@ -130,6 +137,8 @@ if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVI
 }
 
 if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+
+    
 	if ($factura->LoadByCobro($id_cobro)) {
 
 		if ($opc == 'anular_factura') {
@@ -174,6 +183,8 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			$factura->Edit('numero', $numero_documento);
 		}
 	} else {
+	    
+	    if(!$documento) $documento=$documento_cobro->fields['id_documento'];
 		$factura->Edit('numero', $documento);
 	}
 
@@ -316,11 +327,11 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			);
 
 			$query = "DELETE FROM factura_cobro WHERE id_factura = '" . $factura->fields['id_factura'] . "' AND id_cobro = '" . $id_cobro . "' ";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			$resp = mysql_query($query, $sesion->dbh) or   Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 			$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
                                                             VALUES ('" . implode("','", $valores) . "')";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			$resp = mysql_query($query, $sesion->dbh) or  Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
 	}
 
@@ -456,8 +467,9 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
-	// Opciones especificos para Vial Olivares
+       	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
+
+// Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
 	$cobro->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
@@ -1125,7 +1137,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 }
 
 $query = "SELECT id_documento_legal, codigo FROM prm_documento_legal";
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+$resp = mysql_query($query, $sesion->dbh) or  Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 $id_tipo_documento = array();
 
 while (list($id, $codigo) = mysql_fetch_array($resp)) {
@@ -1216,7 +1228,7 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
 <?php
 $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
 $query = "SELECT count(*) FROM factura_cobro WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "'";
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+$resp = mysql_query($query, $sesion->dbh) or  Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 list($numero_facturas_asociados) = mysql_fetch_array($resp);
 
 $existe_factura = ($numero_facturas_asociados > 0) ? 1 : 0;
@@ -1773,53 +1785,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 														<img src="<?php echo Conf::ImgDir() ?>/cobro.png" border="0" alt="Imprimir"/> <?php echo __('Emisión') ?>
 													</td>
 												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_gastos" id="opc_ver_gastos" value="1" <?= $cobro->fields['opc_ver_gastos'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_gastos"><?= __('Mostrar gastos del cobro') ?></label></td>
-												</tr>
-                                                                                                <?php if( UtilesApp::GetConf($sesion,'PrmGastos') ) { ?>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_concepto_gastos" id="opc_ver_concepto_gastos" value="1" <?=$cobro->fields['opc_ver_concepto_gastos']=='1'?'checked':''?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_concepto_gastos"><?=__('Mostrar concepto de gastos')?></label></td>
-												</tr>
-                                                                                                <?php } ?>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_morosidad" id="opc_ver_morosidad" value="1" <?= $cobro->fields['opc_ver_morosidad'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_morosidad"><?= __('Mostrar saldo adeudado') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_adelantos" id="opc_ver_adelantos" value="1" <?= $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_adelantos"><?= __('Mostrar adelantos que han amortizado el cobro') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_descuento" id="opc_ver_descuento" value="1" <?= $cobro->fields['opc_ver_descuento'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_descuento"><?= __('Mostrar el descuento del cobro') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_tipo_cambio" id="opc_ver_tipo_cambio" value="1" <?= $cobro->fields['opc_ver_tipo_cambio'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_tipo_cambio"><?= __('Mostrar tipos de cambio') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_numpag" id="opc_ver_numpag" value="1" <?= $cobro->fields['opc_ver_numpag'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?= __('Mostrar números de página') ?></label></td>
-												</tr>
-                                        <tr>        
-						<td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?=$cobro->fields['opc_ver_columna_cobrable']=='1'?'checked':''?>></td>
-						<td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?=__('Mostrar columna cobrable')?></label></td>
-					</tr> <!-- Andres Oestemer -->
-<?php
-if (UtilesApp::GetConf($sesion, 'OrdenadoPor')) 
-        $solicitante = UtilesApp::GetConf($sesion, 'OrdenadoPor');
-else
-	$solicitante = 2;
-
-if ($solicitante == 0) {  // no mostrar
-	
-	echo '<input type="hidden" name="opc_ver_solicitante" id="opc_ver_solicitante" value="0" />';
-	
-}
-elseif ($solicitante == 1) { // obligatorio
-	?>
+														<?php if ($cobro->fields['solo_gastos'] == 0) { ?>
 													<tr>
 														<td colspan=2 align=left>
 		<?php echo __('Monto Honorarios') ?>:
@@ -1894,19 +1860,8 @@ elseif ($solicitante == 1) { // obligatorio
 													</td>
 												</tr>
 												<tr>
-													<td align="right"><input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?= $cobro->fields['opc_ver_carta'] == '1' ? 'checked' : '' ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="opc_ver_carta"><?= __('Mostrar Carta') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right"><input type="checkbox" name="modalidad_calculo" id="modalidad_calculo" value="1"  <?php echo $cobro->fields['modalidad_calculo'] == '1' ? ' checked="checked" ' : ''; ?>></td>
-													<td align="left" style="font-size: 10px;"><label for="modalidad_calculo"><?= __('Desglose Extendido') ?></label></td>
-												</tr>
-												<tr>
-													<td align="right">&nbsp;</td>
-													<td align="left" style="font-size: 10px;">
-<?= __('Formato de Carta Cobro') ?>:
-<?= Html::SelectQuery($sesion, "SELECT carta.id_carta, carta.descripcion
-																							FROM carta ORDER BY id_carta", "id_carta", $cobro->fields['id_carta'] ? $cobro->fields['id_carta'] : $contrato->fields['id_carta'], ($cobro->fields['opc_ver_carta'] == '1' ? '' : 'disabled') . ' class="wide"'); ?>
+													<td colspan=2 align=right>
+	<?php echo $cobro->fields['forma_cobro']; ?>
 													</td>
 												</tr>
 											</table>
@@ -2022,7 +1977,7 @@ elseif ($solicitante == 1) { // obligatorio
                 <!-- Fin FORM unica -->
             </div> <!-- FIN TABLA CABECERA (la que tiene el avance del cobro, la lista de facturas, etc) -->
 
-            <div style="float:left;width:19%;background-color: white;">
+            <div style="float:right;margin-right:10px;width:19%;background-color: white;">
                 <!-- Imprimir -->
                 <table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;width:100%;height:100px;">
                     <tr>
@@ -2211,6 +2166,10 @@ elseif ($solicitante == 1) { // obligatorio
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?php echo __('Mostrar valor HH en caso de flat fee') ?></label></td>
                                     </tr>
                                     <tr>
+                                        <td align="right"><input type="checkbox" name="modalidad_calculo" id="modalidad_calculo" value="1"  <?php echo $cobro->fields['modalidad_calculo'] == '1' ? 'checked="checked"' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="modalidad_calculo" title="Activa etiquetas avanzadas (adelantos, pagos, hitos)"><?php echo  __('Desglose Extendido'); ?></label></td>
+                                    </tr>
+                                    <tr>
                                         <td align="right"><input type="checkbox" name="opc_ver_carta" id="opc_ver_carta" value="1" onclick="ActivaCarta(this.checked)" <?php echo $cobro->fields['opc_ver_carta'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_carta"><?php echo __('Mostrar Carta') ?></label></td>
                                     </tr>
@@ -2319,7 +2278,7 @@ elseif ($solicitante == 1) { // obligatorio
                     </tr>
                     <tr>
                         <td colspan=2 align=right>
-                            <input type="text" name="email_cliente" id="email_cliente" size="35" maxlength="50" value = <?php echo $contrato->fields['email_contacto'] ?> />
+                            <input type="text" name="email_cliente" id="email_cliente" style="width:98%;" maxlength="50" value = <?php echo $contrato->fields['email_contacto'] ?> />
                         </td>
                     </tr>
                 </table>
@@ -2338,7 +2297,7 @@ elseif ($solicitante == 1) { // obligatorio
 <div style="width:100%"><hr /></div>
 
 <div style="width:100%;clear:both;margin:auto;">
-    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
+    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>"  style="width:600px;height:450px;border: none;" frameborder=0></iframe>
 </div>
 
 <div id="TipoCambioDocumento" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">

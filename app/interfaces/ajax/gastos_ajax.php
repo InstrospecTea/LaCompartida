@@ -157,17 +157,17 @@
 		
 		   //$string=  '["'.implode('","',$fila). '"]';
 		   $string='["'.date('d-m-Y',strtotime($fila['fecha'])).'","'
-			   .htmlspecialchars($fila['glosa_cliente']?:' ').'","'
-			   .htmlspecialchars($fila['glosa_asunto']?:' ')   .'","'
-			   .htmlspecialchars($fila['tipo']?:' ').'","'
-			   .htmlspecialchars($fila['descripcion']?:' ' ).'","'
+			   .htmlspecialchars($fila['glosa_cliente']? $fila['glosa_cliente']:' ').'","'
+			   .htmlspecialchars($fila['glosa_asunto']? $fila['glosa_asunto']:' ')   .'","'
+			   .htmlspecialchars($fila['tipo']? $fila['tipo']:' ').'","'
+			   .htmlspecialchars($fila['descripcion']? $fila['descripcion']:' ' ).'","'
 			   .($fila['egreso']? $fila['simbolo'].' '.$fila['egreso']:' ') .'","'
 			   .($fila['ingreso']? $fila['simbolo'].' '.$fila['ingreso']:' ') .'","'
-			   .($fila['con_impuesto']?:' ').'","'
-			   .($fila['id_cobro']?:' ').'","'
-			   .($fila['estado']?:' ').'","'
-			   .($fila['cobrable']?:' ').'","'
-			   .($fila['contrato_activo']?:' ').'","'
+			   .($fila['con_impuesto']? $fila['con_impuesto']:' ').'","'
+			   .($fila['id_cobro']? $fila['id_cobro']:' ').'","'
+			   .($fila['estado']? $fila['estado']:' ').'","'
+			   .($fila['cobrable']? $fila['cobrable']:' ').'","'
+			   .($fila['contrato_activo']? $fila['contrato_activo']:' ').'","'
 			   .$fila['id_movimiento'].'"]';
 		   echo preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $string);
 		   //echo $string;

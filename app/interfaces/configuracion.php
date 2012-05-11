@@ -129,12 +129,15 @@ function AgregarAsunto( numero , valor_hidden )
 	tr_elemento_nuevo.style.display = 'table-row';
 }
 </script>
-
+<div id="flechaverde" style="background:url('https://estaticos.thetimebilling.com/graphics/arrowleft.gif') 0 0 no-repeat;display:block;width:41px;height:20px;display:none;position:absolute;"></div>
 
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
-<div id="configuracion"	>
+
+<div id="buscacampos">Buscar un campo en particular:&nbsp;&nbsp;&nbsp;</div>
+
+<div id="configuracion" class="tabs"	>
     
 <ul id="tabs">
 		
@@ -156,6 +159,8 @@ function AgregarAsunto( numero , valor_hidden )
 	
 	while(list($id, $glosa_opcion, $valor_opcion, $comentario, $valores_posibles, $id_categoria, $glosa_categoria, $orden) = mysql_fetch_array($resp))
 	{
+	    $arrayopciones[]=array($id,$glosa_opcion,$id_categoria);
+	    
 		if( $id_categoria != $id_categoria_anterior ):
 			
 			if( !$id_categoria_anterior ) {
@@ -168,7 +173,7 @@ function AgregarAsunto( numero , valor_hidden )
 		endif;
 			
 		$tooltip = $comentario?Html::Tooltip($comentario):'';
-		echo "<tr><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
+		echo "<tr class='filasx' id='fila_$id'><td align=left width=50%>" . __($glosa_opcion) . "</td><td align=left $tooltip width=50%>";
 		$valores = explode(';', $valores_posibles);
 		switch($valores[0])
 		{
@@ -219,6 +224,9 @@ function AgregarAsunto( numero , valor_hidden )
 		echo "</td></tr>\n";
 		$id_categoria_anterior = $id_categoria;
 	}
+	echo '<select id="buscacampo" class="combox" width="300px;" ><option value="0-0"></option>';
+	foreach ($arrayopciones as $opcion) echo '<option  value="'.$opcion[0].'-'.$opcion[2].'">'.$opcion[1].'</option>';
+	echo '</select>';
 ?>
 	</table>
 
@@ -248,8 +256,30 @@ function AgregarAsunto( numero , valor_hidden )
 	</table>
 </form>
 </div>
+
 <script language="javascript" type="text/javascript">
 jQuery(document).ready(function() {
+    
+    jQuery('#buscacampos').append(jQuery('#buscacampo'));
+    
+    jQuery('#buscacampo').change(function() {
+	var clave=jQuery('#buscacampo').val().split('-')
+	jQuery('#configuracion').tabs("select",clave[1]-1);
+	jQuery('#fila_'+clave[0]).css('background-color','#FF9');
+	var pos=jQuery('#fila_'+clave[0]).offset();
+	
+	jQuery('#flechaverde').show().offset({top:pos.top,left:pos.left});
+    });
+    jQuery('.ui-corner-all').live('click',function() {
+	var clave=jQuery('#buscacampo').val().split('-')
+	jQuery('#configuracion').tabs("select",clave[1]-1);
+	jQuery('.filasx').css('background-color','#FFF');
+	jQuery('#fila_'+clave[0]).css('background-color','#FF9');
+	var pos=jQuery('#fila_'+clave[0]).offset();
+	jQuery(window).scrollTop(pos.top-100);
+	jQuery('#flechaverde').show().css('z-index',500).offset({top:pos.top,left:pos.left-60});
+    });
+    
     jQuery('#enviarconf').click(function() {
 	jQuery.post('configuracion.php',jQuery('#formulario').serialize(),function(data) {
 	   jQuery('#mensaje').delay(1000).html('');
@@ -289,10 +319,7 @@ Calendar.setup(
 	}
 
 );
-function YoucangonowMichael() {
-    jQuery( "#configuracion" ).tabs();
-    
-}
+
 </script>
 <?
 	$pagina->PrintBottom($popup);

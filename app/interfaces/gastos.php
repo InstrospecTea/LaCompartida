@@ -500,7 +500,7 @@ function BuscarGastos( form, from )
 	return false;
 	} else if(from =='datatables') {
 
-	
+	jQuery('#gran_tabla_gastos').remove();
 
       
  jQuery('#tablon').dataTable({
@@ -613,7 +613,7 @@ function Refrescar()
 }
 </script>
 <? echo(Autocompletador::CSS()); ?>
-<table width="90%"><tr><td>
+<table  width="90%"><tr><td>
 <form method='post' name="form_gastos" action='' id="form_gastos">
 <input type='hidden' name='opc' id='opc' value=buscar>
 <!-- Calendario DIV -->
@@ -748,7 +748,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) ||
 			<input name="boton_xls_resumen" type="button" value="<?=__('Descargar Resumen Excel')?>" onclick="BuscarGastos(this.form,'excel_resumen')" class="btn" />
 			
 			<input id="boton_xls_estimar" name="boton_xls_estimar" type="button" value="<?=__('Estimar Cantidad de Datos')?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
-			<input id="boton_datatables" name="boton_datatables" type="button" value="<?=__('DataTables')?>" onclick="BuscarGastos(this.form,'datatables')" class="btn" />
+			<input id="boton_datatables" name="boton_datatables" type="button" value="<?=__('Tabla Interactiva')?>" onclick="BuscarGastos(this.form,'datatables')" class="btn" />
 		</td>
 		<td width='40%' align=right>
 			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?=__('Agregar provisión')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -763,7 +763,7 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoGasto') ) ||
 if($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario !=''))
 {
 	?>
-	<table width="100%">
+	<table id="gran_tabla_gastos" width="100%">
 		<tr>
 			<td align="right">
 				<input type="button" value="Generar borrador" class="btn" name="boton" onclick="Preparar_Cobro( this.form )">

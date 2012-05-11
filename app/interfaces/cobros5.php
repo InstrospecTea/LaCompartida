@@ -205,8 +205,9 @@
                        if (!$cobro->fields['fecha_emision']) $cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 			$cobro->Edit('estado','EMITIDO');
 			
-			if(isset($cobro->fields['id_ultimo_emisor'])) 	$cobro->Edit('id_ultimo_emisor',$sesion->usuario->fields['id_usuario']);
-			if(isset($cobro->fields['id_usuario_responsable'])) $cobro->Edit('id_usuario_responsable',$id_usuario_responsable);
+			
+			$cobro->Edit('id_ultimo_emisor',$sesion->usuario->fields['id_usuario']);
+			$cobro->Edit('id_usuario_responsable',$id_usuario_responsable);
 			
 			
 			if($cobro->Write())
