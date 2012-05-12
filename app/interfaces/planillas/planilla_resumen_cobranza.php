@@ -413,7 +413,6 @@
 							GROUP BY cobro.id_cobro 
 							ORDER BY cliente.glosa_cliente,
 								cobro.fecha_creacion";
-mail('ffigueroa@lemontech.cl','Planilla Cobranza',$query)		;
 // Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
 							GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos,
