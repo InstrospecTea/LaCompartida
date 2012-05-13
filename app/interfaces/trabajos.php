@@ -196,7 +196,7 @@
 			$where .= " AND trabajo.fecha <= '".$fecha_fin."' ";
                         $where_gastos .= " AND cta_corriente.fecha <= '".$fecha_fin."' ";
                 }
-	
+                
 		if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
 		{
 			$cobro->LoadAsuntos();
@@ -212,7 +212,21 @@
 				$where .= " AND trabajo.id_cobro = '$id_cobro'";
                                 $where_gastos .= " AND cta_corriente.id_cobro = '$id_cobro'";
                         }
-		}
+		} else if ($query_asuntos) { // FFF si viene seteado el codigo de asunto, lo mantengo
+                    $where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
+                        $where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
+			//$where .= " AND trabajo.cobrable = 1";
+			
+                        if($id_cobro) {
+				$where .= " AND (cobro.estado IS NULL OR trabajo.id_cobro = '$id_cobro')";
+                                $where_gastos.= " AND (cobro.estado IS NULL OR cta_corriente.id_cobro = '$id_cobro')";
+                        }
+			else {
+				$where .= " AND cobro.estado IS NULL";
+                                $where_gastos .= " AND cobro.estado IS NULL";
+                        }
+                    
+                }
 		//para tema de los gastos que se preseleccionaran para cobro4.php
 		$codigo_cliente = $cobro->fields['codigo_cliente'];
 		$where_gasto .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
@@ -265,7 +279,7 @@
 	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
 		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
 		          WHERE $where ";
-               // echo $query;
+                // echo $query;
 	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
 	
@@ -649,6 +663,10 @@ function EditarTodosLosArchivos()
 <input type='hidden' name='popup' id='popup' value='<?php echo $popup?>'>
 <input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo?>'>
 <input type='hidden' name='id_usuario' id='id_usuario' value='<?php echo $id_usuario?>'>
+<?php 
+if($query_asuntos) echo '<input type="hidden" name="query_asuntos" id="query_asuntos" value="'.$query_asuntos.'"/>';
+if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.$id_cobro.'"/>';
+?>
 <input type='hidden' name='check_trabajo' id='check_trabajo' value=''>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -684,7 +702,7 @@ function EditarTodosLosArchivos()
            
                  
                 if($motivo=='horas'):
-                    echo '&nbsp;<div style="float:left;text-align:left;width:60px;">'.__('Cobro')." &nbsp;&nbsp;</div><input type='text' style='float:left;width:80px;' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
+                    echo '&nbsp;<div style="float:left;text-align:left;width:60px;">'.__('Cobro')." &nbsp;&nbsp;</div><input id='id_cobro' type='text' style='float:left;width:80px;' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
                 else:
                     echo "<input type='hidden' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
                 
