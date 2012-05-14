@@ -1802,8 +1802,7 @@ if (!$contrato->loaded()) {
 					} 
 				?>
 				</td>
-			</tr>            
-            <?php endif; ?>
+			</tr>
 			<?php
 			if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
 				$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
