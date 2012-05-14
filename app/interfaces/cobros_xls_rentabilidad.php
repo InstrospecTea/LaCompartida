@@ -746,7 +746,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$resp_cont_tramites = mysql_query($query_cont_tramites,$sesion->dbh) or Utiles::errorSQL($query_cont_tramites,__FILE__,__LINE__,$sesion->dbh);
 						list($cont_tramites) = mysql_fetch_array($resp_cont_tramites);
 
-							// Si el asunto tiene trabajos y/o trámites imprime su resumen
+						// Si el asunto tiene trabajos y/o trámites imprime su resumen
 		if (($cont_trabajos + $cont_tramites) > 0) {
 									$cobro_tiene_trabajos = true;
 			if ($opc_ver_asuntos_separados) {
@@ -983,7 +983,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									// Guardar ultima linea para tener esta información por el resumen profesional
 									$ultima_fila_ultimo_asunto = $filas-1;
 									
-									$lineas_total_asunto[$cont_asuntos] = $filas+1;
+									//$lineas_total_asunto["'".($filas+1)."'"]  = $filas+1;
 									// Totales de la tabla de trámites
 									$ws->write($filas, $col_fecha, __('Total'), $formato_total);
 									$ws->write($filas, $col_descripcion, '', $formato_total);
@@ -1124,7 +1124,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
                                                    
 							$cont_asuntos++;
                                                         //FFF guardo la fila de los subtotales, la voy a necesitar al final de la planilla
-                                                         $lineas_total_asunto[$cont_asuntos] = $filas-1;
+                                                         $lineas_total_asunto[ $asunto->fields['glosa_asunto'] ] = array($filas-1,$cont_trabajos);
+                                                         	
+                                                         $ws->write($$filas-1, 15, ' SUBTOTAL', $formato_resumen_rentabilidad);
                                                 } else {
 							break;
                                                 }
@@ -1132,37 +1134,37 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	if (count($cobro->asuntos) == 0 || !$cobro_tiene_trabajos) {
 						$ws->write($filas++,$col_descripcion,'No existen trabajos asociados a este cobro.',$formato_instrucciones10);
-						$filas += 2;
+						
+                                                $filas += 2;
+                                                
 					} else {
 						// Construir formula para sumar totales de asuntos ...
-						
-						foreach($lineas_total_asunto as $cont => $linea_asunto) {
-							if( $cont == 0 ) {
-								$formula_total_hh = "=$col_formula_valor_trabajo".$lineas_total_asunto[$cont];
-								$formula_total_ff = "=$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$cont];
-							} else {
-								if( $linea_asunto > 0 ) {
-									$formula_total_hh .= "+$col_formula_valor_trabajo".$lineas_total_asunto[$cont];
-									$formula_total_ff .= "+$col_formula_valor_trabajo_flat_fee".$lineas_total_asunto[$cont];
-								}
-							}
-						}
+                                            $arraytemporal=array();      
+                                            $formula_total_hh=array();
+                                             $formula_total_ff=array();
+                                                foreach($lineas_total_asunto as $label=>$numfila):
+                                                   if($numfila[1]) $formula_total_hh[] = $col_formula_valor_trabajo.$numfila[0];
+                                                   if($numfila[1]) $formula_total_ff[] = $col_formula_valor_trabajo_flat_fee.$numfila[0];
+                                                   
+                                                endforeach;
+                                                 
+                                                
 						if( $cobro->fields['forma_cobro'] == "TASA" ) {
-							$x = $formula_total_hh;
+							$$arraytemporal = $formula_total_hh;
 							$formula_total_hh = $formula_total_ff;
-							$formula_total_ff = $x;
+							$formula_total_ff = $$arraytemporal;
 						}
 						
 						$filas += 2;
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('TOTAL POR PACTO:'), $formato_resumen_rentabilidad);
 						$ws->write($filas, $col_valor_trabajo, '', $formato_resumen_rentabilidad);
-						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, $formula_total_ff, $formato_rentabilidad_moneda_total);
+						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '='.implode('+',$formula_total_ff), $formato_rentabilidad_moneda_total);
 						$filas++;
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('TOTAL POR HORAS:'), $formato_resumen_rentabilidad);
 						$ws->write($filas, $col_valor_trabajo, '', $formato_resumen_rentabilidad);
-						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, $formula_total_hh, $formato_rentabilidad_moneda_total);
+						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '='.implode('+',$formula_total_hh), $formato_rentabilidad_moneda_total);
 						$filas++;
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('Write off / Mark up:'), $formato_resumen_rentabilidad);
