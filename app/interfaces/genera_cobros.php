@@ -268,11 +268,6 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') )
 	<?php
 }
 ?>
-		if(jQuery('#tipo_liquidacion').val()=='') text_window += '<input type="radio" name="radio_generacion" id="radio_gastos" /><?= __('Sólo Gastos.')?><br>';
-		if(jQuery('#tipo_liquidacion').val()=='') text_window += '<input type="radio" name="radio_generacion" id="radio_honorarios" /><?= __(' Sólo Honorarios.')?><br>';
-<?
-		}
-?>
 		text_window += '<br>';
 
 		Dialog.confirm(text_window,
