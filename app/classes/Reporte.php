@@ -777,10 +777,7 @@ class Reporte
 			}
 			
 		}
-		    $s .= ' as '.$this->tipo_dato;
-		} else {
-		    $s .= '1 as tipodato '; 
-		}
+		$s .= ' as '.$this->tipo_dato;
 		return $s;
 	}
 
