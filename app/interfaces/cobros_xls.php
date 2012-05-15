@@ -582,7 +582,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->setMargins(0.01);
 				if( UtilesApp::GetConf($sesion, 'ImprimirExcelCobrosUnaPagina') ){
 					$ws->fitToPages(1,1);
-				}
+				} else {
+                                    	$ws->fitToPages(1,0);
+                                }
 
 				// Seteamas el ancho de las columnas >>>>>>>>>>>>>>>>>
 				$ws->setColumn($col_id_trabajo, $col_id_trabajo, Utiles::GlosaMult($sesion, 'id_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
