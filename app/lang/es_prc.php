@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once dirname(__FILE__) . '/es.php';
+require_once dirname(__FILE__) . '/es_liquidaciones.php';
 
 $_LANG['ROL/RUT'] = 'RUC';
 $_LANG['RUT/NIT'] = 'RUC';

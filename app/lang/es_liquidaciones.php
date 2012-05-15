@@ -1,4 +1,7 @@
 <?php
+ require_once dirname(__FILE__).'/../conf.php';
+ require_once dirname(__FILE__).'/es_facturacion.php';
+ 
  	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
 	$_LANG['Seguimiento Cobros'] = "Seguimiento Liquidaciones";
 	$_LANG['Seguimiento de cobros'] = "Seguimiento de Liquidaciones";
