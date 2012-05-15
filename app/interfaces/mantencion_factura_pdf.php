@@ -58,7 +58,7 @@
 var Filas=new Array;
      var Actual=0;
     
-     var staticpath='https://estaticos.thetimebilling.com/';
+     var staticpath='https://static.thetimebilling.com/';
 
 	var factorx=1;
         var factory=1;
@@ -433,7 +433,7 @@ function pizarron() {
 function YoucangonowMichael() {
   Id_documento_legal=jQuery('#select_id_documento_legal').val();
    Id_categoria=jQuery('#select_id_factura_pdf_datos_categoria').val();
-   staticpath='https://estaticos.thetimebilling.com/';
+   staticpath='https://static.thetimebilling.com/';
 	     //if (typeof(console)!==undefined) console.log('cargando...'+Id_documento_legal);
 	 jQuery.post('ajax/mantencion_factura_pdf_ajax.php',{opc: 'dibuja_tabla', id_documento_legal:Id_documento_legal},function(data) { 
 		jQuery("#tabla_coordenadas").html(data);  
@@ -530,20 +530,23 @@ function YoucangonowMichael() {
         </table>
  <div id="cambio_tipo_doc" style="display:none;">&nbsp;</div>
 			<div id="uploadify" style="display:none;height:22px;width:24px;overflow:hidden;margin:2px 0 0 5px; ">
-			<img id="uploading" src="https://estaticos.thetimebilling.com/images/uploading.gif"  height="20" width="20" style="border:0;text-decoration:none;display:none;"/>
+			<img id="uploading" src="https://static.thetimebilling.com/images/uploading.gif"  height="20" width="20" style="border:0;text-decoration:none;display:none;"/>
 			<div id="fotela" style="width:20px;overflow:hidden;"></div>
 			<a style="display:none;" href="#" id="cambio" rel="" >
-			<img  src="https://estaticos.thetimebilling.com/images/delete-icon.gif"  height="19" width="19" style="border:0;text-decoration:none;"/>
+			<img  src="https://static.thetimebilling.com/images/delete-icon.gif"  height="19" width="19" style="border:0;text-decoration:none;"/>
 			</a>
 			</div>
 
 <?php
+if(defined('SUBDOMAIN')&&defined('ROOTDIR')) {
+$underscan=SUBDOMAIN.'/'.ROOTDIR;    
+} else {
 $fffurl=parse_url('http://'.$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']);
 $rootbeer=explode('/',$fffurl['path']);
 define('CURHOST',$fffurl['host']);
 define('CURROOTDIR',$rootbeer[1]);
 $underscan=CURHOST.'/'.CURROOTDIR;
-
+}
 	
 	echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
 	echo '<input type="hidden" value="'. $underscan .'" name="underscan" id="underscan"/>';
