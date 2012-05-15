@@ -488,43 +488,14 @@ class Factura extends Objeto {
 					$i++;
 				}
 
-				$mostrar_honorarios = true;
-				$array_docs_ocultar = explode(';;', UtilesApp::GetConf($this->sesion, 'EsconderValoresFacturaEnCero'));
-				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
-						$mostrar_honorarios = ( number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					} else {
-						$mostrar_honorarios = ( number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					}
-				}
-				/* $subtotal_gastos_con_impuesto
-				  $subtotal_gastos_sin_impuesto */
 
-				$mostrar_gastos_con_impuesto = true;
-				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
-						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					} else {
-						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					}
-				}
-
-				$mostrar_gastos_sin_impuesto = true;
-				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
-						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					} else {
-						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
-					}
-				}
-
-				if( UtilesApp::GetConf($this->sesion, 'CalculacionCYC') ) {
+				if( UtilesApp::GetConf($this->sesion, 'CalculacionCyC') ) {
 					/* esto habría que mejorarlo en el caso de que se les ocurriera facturar en más de 1 documento */
 					$query_cyc = "SELECT 
 									subtotal_honorarios,
 									subtotal_sin_descuento,
 									descuento_honorarios,
-									honorarios
+									honorarios, 
 									impuesto,
 									subtotal_gastos,
 									subtotal_gastos_sin_impuesto,
@@ -537,10 +508,52 @@ class Factura extends Objeto {
 
 					//echo $query_cyc; exit;
 					$resp_cyc = mysql_query($query_cyc, $this->sesion->dbh) or Utiles::errorSQL($query_cyc, __FILE__, __LINE__, $this->sesion->dbh);
-					list( $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios_con_descuento_con_impuesto, $impuesto_factura, $subtotal_gastos, $monto_gastos, $subtotal_gastos_sin_impuesto, $subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
+					list( $monto_subtotal, 
+                                              $monto_subtotal_sin_descuento, 
+                                              $descuento_honorarios, 
+                                              $honorarios_con_descuento_con_impuesto, 
+                                              $impuesto_factura, 
+                                              $subtotal_gastos,  
+                                              $subtotal_gastos_sin_impuesto,
+                                              $subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
+                                        $monto_gastos=$subtotal_gastos;
+                                        $subtotal_gastos_con_impuesto=$subtotal_gastos;
+					$honorarios=$monto_subtotal;
 					/* Fin de lo que hay que mejorar */
 				}
 
+                                
+                                
+				$mostrar_honorarios = true;
+				$array_docs_ocultar = explode(';;', UtilesApp::GetConf($this->sesion, 'EsconderValoresFacturaEnCero'));
+				if (in_array($tipo_dl, $array_docs_ocultar)) {
+					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+						$mostrar_honorarios = ( number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					} else {
+						$mostrar_honorarios = ( number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					}
+				}
+				/* $subtotal_gastos_con_impuesto
+				  $subtotal_gastos_sin_impuesto */
+
+				$mostrar_gastos_con_impuesto = true;
+				if (in_array($tipo_dl, $array_docs_ocultar)) {
+					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					} else {
+						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					}
+				}
+
+				$mostrar_gastos_sin_impuesto = true;
+				if (in_array($tipo_dl, $array_docs_ocultar)) {
+					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					} else {
+						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
+					}
+				}
+                                
 				if ($descuento_honorarios > 0)
 					$html2 = str_replace('%tr_descuento%', '<tr>
 												<td align="left" class="descripcion" colspan="3">%descuento_glosa%</td>
@@ -571,7 +584,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
 					else
 						$html2 = str_replace('%<br><br>%', '<br><br><br><br>', $html2);
-					if ($mostrar_honorarios) {
+					if ($mostrar_honorarios || $mostrar_gastos_con_impuesto || $mostrar_gastos_sin_impuesto ) {
 						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion_separado), $html2);
 							$html2 = str_replace('%servicios_periodo%', strtoupper('Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%'), $html2);
@@ -743,7 +756,7 @@ class Factura extends Objeto {
 				
 				
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
 					
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%monto_honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
