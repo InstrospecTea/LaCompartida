@@ -904,7 +904,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->mergeCells($filas, 0, $filas, 7);
 		$filas += 1;
 		
-		$ws->write($filas, $columna_fecha, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_fecha, __('Período') .' '. $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
 		$ws->write($filas, $columna_categoria, '', $formato_encabezado);
 		$ws->write($filas, $columna_sigla, '', $formato_encabezado);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
