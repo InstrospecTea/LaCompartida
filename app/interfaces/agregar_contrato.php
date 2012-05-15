@@ -1456,7 +1456,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			}
 		}
 
-		if( ejecutar ) // cant::lista
+		if( ejecutar && jQuery('#cobro_independiente').is(':checked')) // cant::lista
 		{
 			var text_window = "";
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
