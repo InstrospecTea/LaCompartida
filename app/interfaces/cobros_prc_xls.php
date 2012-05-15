@@ -684,7 +684,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 4);
-		$ws->write($filas, $columna_categoria, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_categoria, __('Período') .' '. $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
@@ -1007,7 +1007,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, $columna_sigla, __('Siglas'), $letra_encabezado_lista_centrado);
 					$ws->write($filas, $columna_abogado, __('Nombre'), $letra_encabezado_lista_centrado);
 					$ws->write($filas, $columna_categoria, __('Categoría'), $letra_encabezado_lista_centrado);
-					$ws->write($filas, $columna_descripcion, __('Descripción de Servicio'), $letra_encabezado_lista);
+					$ws->write($filas, $columna_descripcion, __('Descripción de Servicio'), $letra_encabezado_lista_centrado);
 					$ws->write($filas, $columna_hora, __('Horas'), $letra_encabezado_lista_centrado);
 
 					// Cuando muestre tarifa proporcional no muestro horas tarificadas
@@ -1144,7 +1144,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 3);
 		$ws->write($filas, $columna_gastos_fecha, '', $formato_encabezado);
-		$ws->write($filas, $columna_gastos_descripcion, __('Período') . $fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_gastos_descripcion, __('Período') . ' '.$fecha_ini_titulo . __(' al ') . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
 		$ws->write($filas, $columna_gastos_montos, '', $formato_encabezado);
 		$filas += 2;
 		$ws->write($filas, $columna_inicial, __('Cliente: ') . $Cliente->fields['glosa_cliente'], $formato_encabezado);
