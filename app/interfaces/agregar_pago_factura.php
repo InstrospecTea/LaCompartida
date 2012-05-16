@@ -952,11 +952,9 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 				elem.disabled = 'disabled';
 			});
 <?php 
-		if ($pago->fields['id_factura_pago']) {
-?>
-			$('btn_imprimir_voucher').disabled = false;
-<?php
-		}
+		if ($pago->fields['id_factura_pago']) { 
+ 			echo "jQuery('#btn_imprimir_voucher').attr('disabled','').removeAttr('disabled');";
+ 		}
 	} 
 ?>
 
