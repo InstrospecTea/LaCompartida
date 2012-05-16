@@ -729,6 +729,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			enviado = 0;
 			function Validar(form)
 			{
+			var msgerror='';
 				<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
 				if(!Validar_Rut())
 					return false;
@@ -771,12 +772,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 <?php
 if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	?>
-					if(form.descripcion_honorarios_legales.value == "")
-					{
-						alert('<?php echo  __('Debe ingresar una descripción para los honorarios') ?>');
-						form.descripcion_honorarios_legales.focus();
-						return false;
-					}
+					
 					if(form.monto_honorarios_legales.value == "")
 					{
 						alert('<?php echo  __('Debe ingresar un monto para los honorarios') ?>');
@@ -801,12 +797,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 						form.monto_iva_honorarios_legales.focus();
 						return false;
 					}
-					if(form.descripcion_gastos_con_iva.value == "")
-					{
-						alert('<?php echo  __('Debe ingresar una descripción para los gastos c/ IVA') ?>');
-						form.descripcion_gastos_con_iva.focus();
-						return false;
-					}
+					
 					if(form.monto_gastos_con_iva.value == "")
 					{
 						alert('<?php echo  __('Debe ingresar un monto para los gastos c/ IVA') ?>');
@@ -869,12 +860,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	<?php
 	if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1'))) {
 		?>
-							if(form.descripcion_gastos_sin_iva.value == "")
-							{
-								alert('<?php echo  __('Debe ingresar una descripción para los gastos s/ IVA') ?>');
-								form.descripcion_gastos_con_iva.focus();
-								return false;
-							}
+							
 							if(form.monto_gastos_sin_iva.value == "")
 							{
 								alert('<?php echo  __('Debe ingresar un monto para los gastos s/ IVA') ?>');
@@ -887,8 +873,17 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 								form.monto_gastos_sin_iva.focus();
 								return false;
 							}
+					if(form.descripcion_gastos_sin_iva.value == "" &&  form.descripcion_honorarios_legales.value == "" &&  form.descripcion_gastos_con_iva.value == "")
+					{
+						alert('<?php echo  __('Debe ingresar una descripción para los honorarios y/o  gastos') ?>');
+						form.descripcion_gastos_con_iva.focus();
+						 return false;
+					}
+					
 		<?php
 	}
+	
+	
 } else {
 	?>
 					if(form.descripcion.value == "")
