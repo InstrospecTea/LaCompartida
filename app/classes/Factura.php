@@ -564,27 +564,44 @@ class Factura extends Objeto {
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto) , $html2);
 
 				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
+					
 					// Lo separo en lineas
 					$factura_descripcion_separado = explode("\n", __($factura_descripcion));
 					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
-					if (intval($subtotal_gastos_con_impuesto) > 0)
-						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
-					if (intval($subtotal_gastos_sin_impuesto) > 0)
-						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
-				} else {
-					$factura_descripcion_separado = __($factura_descripcion);
-					if (intval($subtotal_gastos_con_impuesto) > 0)
-						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
-					if (intval($subtotal_gastos_sin_impuesto) > 0)
-						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
-				}
 				
+					if ( $mostrar_gastos_con_impuesto )
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
+					if ($mostrar_gastos_sin_impuesto)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
+ 				} else {
+					$factura_descripcion_separado = __($factura_descripcion);
+					if ( $subtotal_gastos_con_impuesto )
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
+					if ($mostrar_gastos_sin_impuesto)
+						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
+ 				}
+				// FFF soporta 3 nuevas glosas para separar HH, Gasto c y sin
+				if ($mostrar_honorarios	)	{
+					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion_separado, $html2);
+				} else {
+					$html2 = str_replace('%honorarios_periodo%', '', $html2);
+				}
+				if ($subtotal_gastos_con_impuesto) {
+					$html2 = str_replace('%gastos_con_impuesto_periodo%', "<br/><br/>" . __($descripcion_subtotal_gastos), $html2);
+				} else {
+					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
+				}
+				if ($mostrar_gastos_sin_impuesto) 	{
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%', "<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto), $html2);
+				} else {
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%',  '', $html2);
+				}
 				if ($lang == 'es') {
 					if ($descuento_honorarios > 0)
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
 					else
 						$html2 = str_replace('%<br><br>%', '<br><br><br><br>', $html2);
-					if ($mostrar_honorarios || $mostrar_gastos_con_impuesto || $mostrar_gastos_sin_impuesto ) {
+					if ($mostrar_honorarios ) {
 						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion_separado), $html2);
 							$html2 = str_replace('%servicios_periodo%', strtoupper('Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%'), $html2);
