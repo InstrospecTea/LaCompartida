@@ -1,4 +1,3 @@
-
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
@@ -1435,6 +1434,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
 	{
 		var ejecutar = true;
+                
 		if ( !desde_combo )
 		{
 			radio_tarifas = document.getElementsByName('tipo_tarifa');
@@ -1809,6 +1809,7 @@ if (!$contrato->loaded()) {
 				FROM usuario
 				WHERE activo = 1 OR id_usuario = '" . $contrato->fields['id_usuario_secundario'] . "'
 				ORDER BY apellido1";
+                                
 				?>
 				<tr>
 					<td align="left" width='30%'>
@@ -2982,9 +2983,9 @@ function YoucangonowMichael() {
 		if (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") && !$desde_agrega_cliente) {
 			if ( UtilesApp::GetConf( $sesion, 'EncargadoSecundario') ) {
 		echo "if(jQuery('#id_usuario_secundario').length>0) jQuery('#id_usuario_secundario').attr('disabled','disabled');";
-			} else {
+			} 
 		 echo "if(jQuery('#id_usuario_encargado').length>0) jQuery('#id_usuario_encargado').attr('disabled','disabled');";
-			}
+			
 		}
 	?>
 					
