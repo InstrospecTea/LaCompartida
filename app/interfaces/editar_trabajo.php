@@ -123,16 +123,16 @@
 				if($duracion == '00:00:00' )  {
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
-				if($codigo_asunto ==''){
+				if(!$codigo_asunto || $codigo_asunto ==''){
 					$pagina->AddError("Debe seleccionar un asunto");
 				}
-				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && ( $id_area_trabajo == '')){
+				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && (! $id_area_trabajo || $id_area_trabajo == '')){
 						$pagina->AddError("Debe seleccionar una area de trabajo");
 				}	
-				if($descripcion == ''){
+				if(!$descripcion || $descripcion == ''){
 					$pagina->AddError("Debe Agregar una descripcion");
 				}
-				if($codigo_cliente == ''){
+				if(!$codigo_cliente || $codigo_cliente == ''){
 					$pagina->AddError("Debe seleccionar un cliente");
 				}
                 $errores = $pagina->GetErrors();
