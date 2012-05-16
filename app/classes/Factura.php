@@ -22,7 +22,7 @@ class Factura extends Objeto {
 		$this->log_update = true;
 	}
 
-	function Id($id=null) {
+	function Id($id = null) {
 		if ($id) {
 			$this->fields[$this->campo_id] = $id;
 		}
@@ -177,15 +177,15 @@ class Factura extends Objeto {
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);
 			$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, 2);
-                        $xmlData = UtilesApp::TemplateFacturaXML($this->sesion, 2);
-                         $xmlBit = UtilesApp::TemplateBitXML($this->sesion,2);
+			$xmlData = UtilesApp::TemplateFacturaXML($this->sesion, 2);
+			$xmlBit = UtilesApp::TemplateBitXML($this->sesion, 2);
 		} else {
 			if ($id_formato_factura != null) {
 				$templateData = UtilesApp::TemplateFactura($this->sesion, $id_formato_factura);
 				$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, $id_formato_factura);
-			         $xmlData = UtilesApp::TemplateFacturaXML($this->sesion,$id_formato_factura);
-                                  $xmlBit = UtilesApp::TemplateBitXML($this->sesion,$id_formato_factura);
-                        } else {
+				$xmlData = UtilesApp::TemplateFacturaXML($this->sesion, $id_formato_factura);
+				$xmlBit = UtilesApp::TemplateBitXML($this->sesion, $id_formato_factura);
+			} else {
 				// verificar el tipo de documento legal, y mostrar ese formato, sino mostrar por defecto
 				$query = "";
 				if ($this->fields['id_documento_legal'] > 0) {
@@ -198,22 +198,22 @@ class Factura extends Objeto {
 				if ($id_formato_factura > 0) {
 					$templateData = UtilesApp::TemplateFactura($this->sesion, $id_formato_factura);
 					$cssData = UtilesApp::TemplateFacturaCSS($this->sesion, $id_formato_factura);
-		                        $xmlData = UtilesApp::TemplateFacturaXML($this->sesion,$id_formato_factura);
-                                        $xmlBit = UtilesApp::TemplateBitXML($this->sesion,$id_formato_factura);
-                                } else {
+					$xmlData = UtilesApp::TemplateFacturaXML($this->sesion, $id_formato_factura);
+					$xmlBit = UtilesApp::TemplateBitXML($this->sesion, $id_formato_factura);
+				} else {
 					$templateData = UtilesApp::TemplateFactura($this->sesion);
 					$cssData = UtilesApp::TemplateFacturaCSS($this->sesion);
-                                          $xmlData = UtilesApp::TemplateFacturaXML($this->sesion);
-                                          $xmlBit = UtilesApp::TemplateBitXML($this->sesion);
+					$xmlData = UtilesApp::TemplateFacturaXML($this->sesion);
+					$xmlBit = UtilesApp::TemplateBitXML($this->sesion);
 				}
 			}
 		}
-                                                          
 
-               
+
+
 		$templateData = $this->ReemplazarMargenes($templateData);
 		$parser = new TemplateParser($templateData);
-             //echo '<pre>';print_r($parser);echo '<pre>';die();
+		//echo '<pre>';print_r($parser);echo '<pre>';die();
 		$query = "SELECT cobro.codigo_idioma
 							FROM factura
 							LEFT JOIN cobro ON factura.id_cobro=cobro.id_cobro
@@ -244,18 +244,18 @@ class Factura extends Objeto {
 		}
 
 		$html = $this->GenerarDocumento($parser, 'CARTA_FACTURA', $lang);
-          
+
 		$html_css = array();
 		$html_css['html'] = $html;
-		$html_css['css'] = $cssData;               
-		$html_css['xmlbit']=$xmlBit;
-                if($xmlBit) {
-                    $xml = $this->GenerarDocumento($xmlData, 'ENCABEZADO', $lang, true);
-                    $xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
-                    $xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
-                     $html_css['xml'] = str_replace(array('UTF-8','&nbsp;','<br>','<br/>',"<br />\n",'<br />','<v:shape '),array('ISO-8859-1','&#160;','&#xD;','&#xD;','</w:t></w:r></w:p><w:p><w:r><w:t>','</w:t></w:r></w:p><w:p><w:r><w:t>', '<v:shape filled="f" stroked="f" '),$xml);
-                }
-                return $html_css;
+		$html_css['css'] = $cssData;
+		$html_css['xmlbit'] = $xmlBit;
+		if ($xmlBit) {
+			$xml = $this->GenerarDocumento($xmlData, 'ENCABEZADO', $lang, true);
+			$xml = $this->GenerarDocumento($xml, 'DATOS_FACTURA', $lang, true);
+			$xml = $this->GenerarDocumento($xml, 'BOTTOM', $lang, true);
+			$html_css['xml'] = str_replace(array('UTF-8', '&nbsp;', '<br>', '<br/>', "<br />\n", '<br />', '<v:shape '), array('ISO-8859-1', '&#160;', '&#xD;', '&#xD;', '</w:t></w:r></w:p><w:p><w:r><w:t>', '</w:t></w:r></w:p><w:p><w:r><w:t>', '<v:shape filled="f" stroked="f" '), $xml);
+		}
+		return $html_css;
 	}
 
 	function ReemplazarMargenes($html) {
@@ -281,7 +281,7 @@ class Factura extends Objeto {
 		return $html;
 	}
 
-	function GenerarDocumento($parser_factura, $theTag='', $lang='es',$xml=false) {
+	function GenerarDocumento($parser_factura, $theTag = '', $lang = 'es', $xml = false) {
 		if (!$xml && !isset($parser_factura->tags[$theTag])) {
 			return;
 		}
@@ -301,8 +301,8 @@ class Factura extends Objeto {
 
 		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 
-		$html2 = ($xml)? $parser_factura : $parser_factura->tags[$theTag];
-
+		$html2 = ($xml) ? $parser_factura : $parser_factura->tags[$theTag];
+ 
 		switch ($theTag) {
 			case 'CARTA_FACTURA':
 				$html2 = str_replace('%ENCABEZADO%', $this->GenerarDocumento($parser_factura, 'ENCABEZADO', $lang), $html2);
@@ -426,7 +426,7 @@ class Factura extends Objeto {
 			case 'DATOS_FACTURA':
 
 				$select_col = "";
-				if ( UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura') ) {
+				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					$select_col = ",
 									factura.descripcion_subtotal_gastos,
 									factura.descripcion_subtotal_gastos_sin_impuesto,
@@ -462,7 +462,7 @@ class Factura extends Objeto {
 
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-				if ( UtilesApp::GetConf($this->sesion,'NuevoModuloFactura') ) {
+				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total, $descripcion_subtotal_gastos, $descripcion_subtotal_gastos_sin_impuesto, $subtotal_gastos_con_impuesto, $subtotal_gastos_sin_impuesto) = mysql_fetch_array($resp);
 				} else {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total) = mysql_fetch_array($resp);
@@ -560,8 +560,8 @@ class Factura extends Objeto {
 												<td class="monto_normal" align="right">%descuento_honorarios%</td></tr>', $html2);
 				else
 					$html2 = str_replace('%tr_descuento%', '', $html2);
-				
-				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto) , $html2);
+
+				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto), $html2);
 
 				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 					
@@ -581,18 +581,25 @@ class Factura extends Objeto {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
  				}
 				// FFF soporta 3 nuevas glosas para separar HH, Gasto c y sin
+				$descripcion_subtotal_gastos="<br/><br/>" . __($descripcion_subtotal_gastos);
+				$descripcion_subtotal_gastos_sin_impuesto="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
+				if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas'))  {
+					$factura_descripcion_separado=strtoupper($factura_descripcion_separado);
+					$descripcion_subtotal_gastos=strtoupper($descripcion_subtotal_gastos);
+					$descripcion_subtotal_gastos_sin_impuesto=strtoupper($descripcion_subtotal_gastos_sin_impuesto);
+				}
 				if ($mostrar_honorarios	)	{
 					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion_separado, $html2);
 				} else {
 					$html2 = str_replace('%honorarios_periodo%', '', $html2);
 				}
 				if ($subtotal_gastos_con_impuesto) {
-					$html2 = str_replace('%gastos_con_impuesto_periodo%', "<br/><br/>" . __($descripcion_subtotal_gastos), $html2);
+					$html2 = str_replace('%gastos_con_impuesto_periodo%',  $descripcion_subtotal_gastos, $html2);
 				} else {
 					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
 				}
 				if ($mostrar_gastos_sin_impuesto) 	{
-					$html2 = str_replace('%gastos_sin_impuesto_periodo%', "<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto), $html2);
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
 				} else {
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%',  '', $html2);
 				}
@@ -680,7 +687,7 @@ class Factura extends Objeto {
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
 					}
-
+					
 					$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
 					$html2 = str_replace('%texto_gastos%', 'EXPENSES', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Expenses incurred in this case.', $html2);
@@ -770,8 +777,8 @@ class Factura extends Objeto {
 
 				$monto_gastos_sin_impuesto = $monto_gastos / ( 1 + ( $porcentaje_impuesto / 100 ) );
 				$impuesto_gastos = $monto_gastos - $monto_gastos_sin_impuesto;
-				
-				
+
+
 
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
 					
@@ -823,7 +830,7 @@ class Factura extends Objeto {
 					}
 				}
 
-				/* 
+				/*
 				 * Montos Especiales de Vouga y Olmedo (o Paraguay en general )
 				 * 
 				 * anchors:
@@ -844,7 +851,7 @@ class Factura extends Objeto {
 				 * %iva_diez% total de iva de la sumatoria de montos con iva
 				 * %total_iva% iva de lo que lleva iva
 				 */
-				
+
 				$subtotal_exentos = 0;
 				$subtotal_diez = 0;
 				$subtotal_completo = 0;
@@ -855,27 +862,27 @@ class Factura extends Objeto {
 				$monto_impuesto_honorarios = 0;
 				$monto_impuesto_gastos = 0;
 				$glosa_banco = "";
-				
-				if( isset( $cobro ) && $cobro->loaded() ){
-					
-					if( $cobro->fields['porcentaje_impuesto'] > 0 ){
-						
-						$honorarios_con_impuesto = $this->fields['honorarios'] * ( 1 + ( $cobro->fields['porcentaje_impuesto'] / 100) ) ;
-						$monto_impuesto_honorarios = $this->fields['honorarios'] * ( $cobro->fields['porcentaje_impuesto'] / 100) ;					
+
+				if (isset($cobro) && $cobro->loaded()) {
+
+					if ($cobro->fields['porcentaje_impuesto'] > 0) {
+
+						$honorarios_con_impuesto = $this->fields['honorarios'] * ( 1 + ( $cobro->fields['porcentaje_impuesto'] / 100) );
+						$monto_impuesto_honorarios = $this->fields['honorarios'] * ( $cobro->fields['porcentaje_impuesto'] / 100);
 					} else {
-						
+
 						$honorarios_sin_impuesto = $this->fields['honorarios'];
 						$gastos_sin_impuestos = $this->fields['subtotal_gastos_sin_impuesto'];
 					}
-					
-					$gastos_con_impuesto = $this->fields['subtotal_gastos'] * ( 1 + ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ) ;
-					$monto_impuesto_gastos = $this->fields['subtotal_gastos'] * ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) ;
-					
+
+					$gastos_con_impuesto = $this->fields['subtotal_gastos'] * ( 1 + ( $cobro->fields['porcentaje_impuesto_gastos'] / 100) );
+					$monto_impuesto_gastos = $this->fields['subtotal_gastos'] * ( $cobro->fields['porcentaje_impuesto_gastos'] / 100);
+
 					$gastos_sin_impuesto = $this->fields['subtotal_gastos_sin_impuesto'];
-					
-					$subtotal_diez = number_format( $honorarios_con_impuesto + $gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '' );
-					$subtotal_exentos = number_format( $honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '' );
-					
+
+					$subtotal_diez = number_format($honorarios_con_impuesto + $gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '');
+					$subtotal_exentos = number_format($honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '');
+
 					$subtotal_completo = $honorarios_con_impuesto + $gastos_con_impuesto + $honorarios_sin_impuesto + $gastos_sin_impuesto;
 					$query_glosa_banco = " SELECT cb.glosa 
 												FROM cuenta_banco cb 
@@ -886,62 +893,62 @@ class Factura extends Objeto {
 					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
 					list($glosa_banco) = mysql_fetch_array($resu_glosa);
 				}
-				
+
 				if ($mostrar_honorarios) {
-					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '%simbolo_honorarios%', $html2); 
-					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '%simbolo_honorarios%', $html2); 
-					
-					
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '%simbolo_honorarios%', $html2);
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '%simbolo_honorarios%', $html2);
+
+
 					/* debe mostrar ceros en los espacios que sea 0 */
 					$html2 = str_replace('%monto_honorarios_sin_impuesto%', number_format($honorarios_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					$html2 = str_replace('%monto_honorarios_con_impuesto%', number_format($honorarios_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
-					
-					/* 
+
+					/*
 					 * se reemplazan por '', por que si se pone &nbsp; se corre todo para abajo y dejaria un espacio,
 					 *  al no tener nada html esconde la fila 
 					 */
-					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '', $html2); 
-					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '', $html2); 
-					
+					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '', $html2);
+					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '', $html2);
+
 					$html2 = str_replace('%monto_honorarios_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%monto_honorarios_con_impuesto%', '', $html2);
 				}
-				
+
 				if ($gastos_con_impuesto > 0) {
-					 
+
 					$html2 = str_replace('%subtotal_gasto_con_impuesto%', number_format($gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
-					
+
 					$html2 = str_replace('%simbolo_subtotal_gastos_con_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_con_impuesto%', '', $html2);
 				}
-				
+
 				if ($gastos_sin_impuesto > 0) {
-					 
+
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', number_format($gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
-					
+
 					$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%subtotal_gasto_sin_impuesto%', '', $html2);
 				}
-				
+
 				$html2 = str_replace('%glosa_banco%', $glosa_banco, $html2);
 				$html2 = str_replace('%total_exentos%', number_format($subtotal_exentos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_diez%', number_format($subtotal_diez, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%total_paraguay%', number_format($subtotal_completo, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%ceros%', number_format(0, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				
+
 				$html2 = str_replace('%iva_diez%', number_format($monto_impuesto_honorarios + $monto_impuesto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				
+
 				$html2 = str_replace('%total_iva%', number_format($monto_impuesto_honorarios + $monto_impuesto_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				
-				
+
+
 				/*
 				  Montos Rebaza-alcazar
 				 */
 
-				if ( UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura') ) {
+				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					
 					
 					if ($mostrar_honorarios) {
@@ -949,7 +956,7 @@ class Factura extends Objeto {
 					} else {
 						$html2 = str_replace('%honorarios%', '', $html2);
 					}
-					
+
 					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 						$descripcion_subtotal_gastos_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos));
 						$descripcion_subtotal_gastos_sin_impuesto_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos_sin_impuesto));
@@ -1081,7 +1088,7 @@ class Factura extends Objeto {
 
 		return $html2;
 	}
-       
+
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		if ($this->Loaded()) {
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
@@ -1211,7 +1218,7 @@ class Factura extends Objeto {
 		return true;
 	}
 
-	function GetUltimoPagoSoyFactura($id=null) {
+	function GetUltimoPagoSoyFactura($id = null) {
 		if (!$id) {
 			$id = $this->Id();
 			$where = " WHERE ccfm2.id_factura =  '" . $id . "'";
@@ -1231,7 +1238,7 @@ class Factura extends Objeto {
 		return $ultimo_id_factura_pago;
 	}
 
-	function GetPagosSoyFactura($id=null, $doc_cobro=null) {
+	function GetPagosSoyFactura($id = null, $doc_cobro = null) {
 		if (!$id) {
 			$id = $this->Id();
 		}
@@ -1276,7 +1283,7 @@ class Factura extends Objeto {
 		}
 
 		$numero += 1;
-		if ( $this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie) || UtilesApp::GetConf($this->sesion,'InformarContabilidad') ) {
+		if ($this->ExisteNumeroDocLegal($tipo_documento_legal, $numero, $serie) || UtilesApp::GetConf($this->sesion, 'InformarContabilidad')) {
 			$numero = $this->MaxNumeroDocLegal($tipo_documento_legal, $serie) + 1;
 		}
 
@@ -1290,7 +1297,7 @@ class Factura extends Objeto {
 		return true;
 	}
 
-	function CambiarEstado($codigo_estado, $id_factura=null) {
+	function CambiarEstado($codigo_estado, $id_factura = null) {
 		if (!$id_factura) {
 			$id_factura = $this->fields[$this->campo_id];
 		}
@@ -1300,7 +1307,7 @@ class Factura extends Objeto {
 		return true;
 	}
 
-	function GetCodigoEstado($id_factura=null) {
+	function GetCodigoEstado($id_factura = null) {
 		if (!$id_factura)
 			$id_factura = $this->fields[$this->campo_id];
 
@@ -1382,14 +1389,14 @@ class Factura extends Objeto {
 			$neteos = array(array($this->fields['id_factura'], $monto_moneda_cobro, $monto_pago));
 			$ccf->AgregarNeteos($mvto_pago, $neteos);
 			$saldo_fact -= $monto_moneda_cobro;
-			
+
 			//aqui deberia agregar la descripcion del pago
 			$factura_pago = new FacturaPago($this->sesion);
 			$facturas_asociadas = $factura_pago->GetListaFacturasSoyPago($id_pago, 'id_factura_pago', 'numero');
 			$facturas_array = explode(",", $facturas_asociadas);
-			$facturas_asociadas = "#" . join( ", #", $facturas_array);
+			$facturas_asociadas = "#" . join(", #", $facturas_array);
 			$factura_pago->Load($id_pago);
-			$descripcion_pago = explode( " :: ", $factura_pago->fields['descripcion']);
+			$descripcion_pago = explode(" :: ", $factura_pago->fields['descripcion']);
 			$factura_pago->Edit('descripcion', $descripcion_pago[0] . " :: Facturas: " . $facturas_asociadas);
 			$factura_pago->Write();
 		}
