@@ -415,7 +415,7 @@ if ($factura->fields['total'] > 0) {
 	$descripcion_subtotal_gastos_sin_impuesto = $factura->fields['descripcion_subtotal_gastos_sin_impuesto'];
 	$monto_subtotal_gastos_sin_impuesto = $factura->fields['subtotal_gastos_sin_impuesto'];
 
-	if ($descripcion_honorario == '') {
+	if ($descripcion_honorario == '' && $monto_honorario>0) {
 		$descripcion_honorario = __('Honorarios Legales');
 		if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 			$descripcion_honorario .= "\n" . implode(', ', $cobro_->AsuntosNombreCodigo($id_cobro));
