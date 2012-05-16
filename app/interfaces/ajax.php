@@ -541,20 +541,27 @@
 	}
 	else if ($accion == 'cargar_datos_cliente')
 	{
-		$join = "";
-		$and = "";
-		if( isset($_REQUEST['id_cobro']) && $_REQUEST['id_cobro'] != '' && $_REQUEST['id_cobro'] != 'NULL' ){
-			$join = " JOIN cobro ON ( contrato.id_contrato = cobro.id_contrato ) ";
-			$and = " AND cobro.id_cobro = {$_REQUEST['id_cobro']}";
-		}
-		$query_clientes = "SELECT 
-								contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
-							FROM contrato
-								$join
-							WHERE contrato.codigo_cliente=$codigo_cliente 
-								$and
-							LIMIT 1";
+		$query_clientes = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
+												FROM contrato
+												WHERE contrato.codigo_cliente=$codigo_cliente LIMIT 1";
 		$resp = mysql_query($query_clientes, $sesion->dbh) or Utiles::errorSQL($query_clientes,__FILE__,__LINE__,$sesion->dbh);
+
+		for($i = 0; $fila = mysql_fetch_assoc($resp); $i++)
+		{
+			if($i > 0)
+				echo("~");
+			echo(join("|",$fila));
+		}
+		if($i == 0)
+			echo("VACIO|");
+
+	}
+        else if ($accion == 'cargar_datos_contrato')
+	{
+		$query_contrato = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
+												FROM contrato
+												WHERE contrato.id_contrato=$id_contrato LIMIT 1";
+		$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato,__FILE__,__LINE__,$sesion->dbh);
 
 		for($i = 0; $fila = mysql_fetch_assoc($resp); $i++)
 		{
@@ -775,12 +782,12 @@
 		
 		$query_usuarios_profesionales = "SELECT CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo FROM usuario as u 
 			JOIN usuario_permiso as up USING( id_usuario ) 
-			WHERE up.codigo_permiso = 'PRO' AND u.activo=1 ";
+			WHERE up.codigo_permiso = 'PRO'";
 		$resp_usuarios_profesionales = mysql_query($query_usuarios_profesionales, $sesion->dbh) or Utiles::errorSQL($query_usuarios_profesionales,__FILE__,__LINE__,$sesion->dbh);
 		$tup = mysql_num_rows( $resp_usuarios_profesionales ); // tup = total de usuarios con permisos PROfesional
 		$query_usarios_sin_tarifa = "SELECT CONCAT( apellido1,' ', apellido2, ', ', nombre) as nombre_completo FROM usuario as u 
 			JOIN usuario_permiso as up USING( id_usuario ) 
-			WHERE up.codigo_permiso = 'PRO' AND u.activo=1 AND u.id_usuario NOT IN ( 
+			WHERE up.codigo_permiso = 'PRO' AND u.id_usuario NOT IN ( 
 				SELECT ut.id_usuario FROM usuario_tarifa as ut WHERE ut.id_moneda=" . $id_moneda . " AND ut.id_tarifa = '" . $id_tarifa . "' 
 			)";
 		$resp_usuarios_sin_tarifa = mysql_query($query_usarios_sin_tarifa, $sesion->dbh) or Utiles::errorSQL($query_usarios_sin_tarifa,__FILE__,__LINE__,$sesion->dbh);
@@ -818,17 +825,6 @@
 			$tipos_cambio[$tipo[0]] = $tipo[1];
 		}
 		echo $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda, $tipos_cambio);
-	}	
-	else if($accion == 'cargar_encargado_segun_cliente')
-	{
-		$saldo=0;
-		if($codigo_cliente_consulta){
-			$query = "SELECT id_usuario_responsable FROM contrato JOIN cliente ON ( contrato.id_contrato = cliente.id_contrato ) WHERE cliente.codigo_cliente = '$codigo_cliente_consulta' LIMIT 1";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($id_usuario_responsable_ajax) = mysql_fetch_array($resp);
-		}
-		
-		echo $id_usuario_responsable_ajax;
 	}
 	else
 		echo("ERROR AJAX. Acción: $accion");
