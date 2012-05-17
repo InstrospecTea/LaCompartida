@@ -139,9 +139,9 @@
 		</style>
 	</head>
 	<body style="margin-top: <?php echo $margin_body; ?>pt;">
+		<?php     if ( isset($pdf) )    { ?>
 		<script type="text/php">
-		   if ( isset($pdf) )
-		   {
+		/* <![CDATA[   */
 			$anchodoc = $pdf->get_width();
 			$header = $pdf->open_object(); 
 			if( '<?php echo $img_archivo; ?>' != '&nbsp;' )
@@ -167,8 +167,10 @@
 				$pdf->add_object($header, 'all'); 
 			}
 		   }
+		   /* ]]> */
 		   </script>
-		   <?php     echo $html; ?>
+		   <?php   }
+		   echo $html; ?>
 	</body>
 </html>
 <?php
