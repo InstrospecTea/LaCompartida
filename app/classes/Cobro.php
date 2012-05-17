@@ -42,22 +42,27 @@ class Cobro extends Objeto {
 			$ingreso_historial = true;
 			//mail('ffigueroa@lemontech.cl','Cambio estado','De '.$this->fields['estado'].' a '.$this->valor_antiguo['estado']);
 		}
-		if( parent::Write() ) {
-			if( $ingreso_historial ) {
-				// Esa linea es necesaria para que el estado no se guardará dos veces
-				$this->valor_antiguo['estado'] = $this->fields['estado'];
-				
-				$his = new Observacion($this->sesion);
-				$his->Edit('fecha', date('Y-m-d H:i:s'));
-				$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
-				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-				$his->Edit('id_cobro', $this->fields['id_cobro']);
-				$his->Write();
-			}
-			return true;
-		}
-	}
+                    if( parent::Write() ) {
+                            if( $ingreso_historial ) {
+                                    // Esa linea es necesaria para que el estado no se guardará dos veces
+                                    $this->valor_antiguo['estado'] = $this->fields['estado'];
 
+                                $his = new Observacion($this->sesion);
+
+                                if($ultimaobservacion=$his->UltimaObservacion()) {
+                                        if($ultimaobservacion['comentario']!=__("COBRO {$this->fields['estado']}")) {
+                                            $his->Edit('fecha', date('Y-m-d H:i:s'));
+                                            $his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+                                            $his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+                                            $his->Edit('id_cobro', $this->fields['id_cobro']);
+                                            $his->Write();
+                                        }
+                                }
+                         
+                    }
+                       return true;
+              }
+        }
 	//Guarda los pagos que pudo haber hecho un documento
 	function SetPagos($pago_honorarios, $pago_gastos, $id_documento=null) {
 		$nuevo_pago = false;
@@ -524,6 +529,7 @@ class Cobro extends Objeto {
 		$query = "UPDATE trabajo SET fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
+		$this->Edit('estado_anterior', $this->fields['estado']);
 		$this->Edit('estado', $estado);
 		$this->Edit('id_doc_pago_honorarios', 'NULL');
 		$this->Edit('id_doc_pago_gastos', 'NULL');
@@ -7543,6 +7549,19 @@ class Cobro extends Objeto {
                     
                      	case 'INFORME':
 				#INSERTANDO CARTA
+                                 $html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
+                                 $html = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html);
+                                  $html = str_replace('%xfecha_mes_dia_ano%',date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
+				setlocale(LC_ALL,"es_ES");
+				$fechacabecera=($this->fields['fecha_emision']=='NULL' || $this->fields['fecha_emision']=='0000-00-00' || $this->fields['fecha_emision']=="")? time() :strtotime( $this->fields['fecha_emision']);
+								  $html = str_replace('%xfecha_mespalabra_dia_ano%',strftime("%B %e, %Y", $fechacabecera), $html);
+				 
+                                
+                                $html = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html);
+				$html = str_replace('%xnombre_cliente%', $contrato->fields['factura_razon_social'], $html);
+                                $html = str_replace('%xglosa_cliente%', $contrato->fields['factura_razon_social'], $html);
+				$html = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html);
+				$html = str_replace('%xrut%', $contrato->fields['rut'], $html);
 				$html = str_replace('%COBRO_CARTA%', $this->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html);
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
@@ -8209,7 +8228,6 @@ class Cobro extends Objeto {
 						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
 
 			    	
-				//mail('ffigueroa@lemontech.cl','Query ACL',$query_desglose_asuntos);
 				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				$row_tmpl = $html;
 				$html='';
