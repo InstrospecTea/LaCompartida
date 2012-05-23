@@ -57,13 +57,16 @@
 			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
 		</td>
 		<td align="left" nowrap>
-			<?php if ( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='Cédula' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='Cédula' ) )
-			        || ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='CNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='CNI' ) ) 
-					|| ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NombreIdentificador')=='DNI' ) || ( method_exists('Conf','NombreIdentificador') && Conf::NombreIdentificador()=='DNI' ) )) { ?>
-				<input type="text" name="rut" value="" size="17">
-			<?php } else { ?>
+			<?php
+				$identificador = UtilesApp::Getconf($sesion, 'NombreIdentificador');
+				if( strtolower($identificador) == 'rut' ) {
+			?>
 				<input type="text" name="rut" value="" size="10">-<input type="text"  name="dvrut" value="" size="1">
-			<? } ?>
+			<?php
+				} else {
+			?>
+				<input type="text" name="rut" value="" size="17">
+			<?php } ?>
 				<br>
 		</td>
 	</tr>
