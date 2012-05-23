@@ -2,6 +2,7 @@
 	require_once dirname(__FILE__).'/app/conf.php';
 	require_once dirname(__FILE__).'/fw/classes/Sesion.php';
 	require_once dirname(__FILE__).'/fw/classes/Pagina.php';
+	require_once dirname(__FILE__).'/app/classes/UtilesApp.php';
  
 	$sesion = new Sesion(null, true);
 	
