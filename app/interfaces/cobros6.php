@@ -25,6 +25,9 @@ $documento_cobro = new Documento($sesion);
 $factura = new Factura($sesion);
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 
+
+
+
 //Asumo que solo quiero refrescar cuando gardo el cobro
 // Aparentemente "guardar cobro" no existe. Es sólo "guardar"
 if ($refrescar && ($opc == 'guardar_cobro' || $opc == 'guardar')) {
@@ -182,12 +185,12 @@ if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 			}
 			$factura->Edit('numero', $numero_documento);
 		
-                        } else {
+		} else {
 
-                            if(!$documento) $documento=$documento_cobro->fields['id_documento'];
+			if(!$documento) $documento=$documento_cobro->fields['id_documento'];
 
-                            $factura->Edit('numero', $documento);
-                        }
+			$factura->Edit('numero', $documento);
+		}
 
 	$factura->Edit('fecha', date('Y-m-d'));
 	$factura->Edit('cliente', $contrato->fields['factura_razon_social']);
@@ -371,10 +374,10 @@ if ($opc == 'guardar') {
 	}
        
 	if($fecha_emision) $cobro->Edit('fecha_emision', $fecha_emision ? Utiles::fecha2sql($fecha_emision) : '');
-	$cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
-	$cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
-	$cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
-	$cobro->Edit('fecha_facturacion', $fecha_facturacion ? Utiles::fecha2sql($fecha_facturacion) : '');
+	if(isset($fecha_envio)) $cobro->Edit('fecha_enviado_cliente', $fecha_envio ? Utiles::fecha2sql($fecha_envio) : '');
+	if(isset($fecha_pago)) $cobro->Edit('fecha_cobro', $fecha_pago ? Utiles::fecha2sql($fecha_pago) : '');
+	if(isset($fecha_pago_parcial)) $cobro->Edit('fecha_pago_parcial', $fecha_pago_parcial ? Utiles::fecha2sql($fecha_pago_parcial) : '');
+	if(isset($fecha_facturacion)) $cobro->Edit('fecha_facturacion', $fecha_facturacion ? Utiles::fecha2sql($fecha_facturacion) : '');
 	
 	//al guardar el cobro verifica si hay que dejarlo como pagado, en concordancia al documento de deuda que lo respalda
 	$documentocobro = new Documento($sesion);
@@ -393,7 +396,7 @@ if ($opc == 'guardar') {
 
 	if (!UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 		//$cobro->Edit('documento', $documentocobro->fields['id_documento']); Se comenta esta linea, se vuelve a como estaba en la revision 7215
-                $cobro->Edit('documento', $documento);
+		$cobro->Edit('documento', $documento);
 		if (UtilesApp::GetConf($sesion, 'NotaCobroExtra')) {
 			$cobro->Edit('nota_cobro', $nota_cobro);
 		}
@@ -416,7 +419,7 @@ if ($opc == 'guardar') {
 }
 
 
-if ($cambiar_estado) {
+if ($cambiar_estado && $estado!='') {
 	$estado_anterior = $cobro->fields['estado'];
 
 	if ($estado == 'EMITIDO' && !$cobro->fields['fecha_emision']) {
@@ -441,17 +444,24 @@ if ($cambiar_estado) {
 
 	if($estado) $cobro->Edit('estado', $estado);
 	$cobro->Write();
-
 	// Se ingresa la anotación en el historial
-	if ($estado_anterior != $estado) {
+	if ($estado_anterior != $estado && $estado) { // no ingresa historial si no se recibe explícitamente un nuevo estado
 		$his = new Observacion($sesion);
-		$his->Edit('fecha', date('Y-m-d H:i:s'));
-		$his->Edit('comentario', __("COBRO $estado"));
-		$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-		$his->Edit('id_cobro', $cobro->fields['id_cobro']);
-		if ($his->Write()) {
-			$pagina->AddInfo(__('Historial ingresado'));
-		}
+                
+                if($ultimaobservacion=$his->UltimaObservacion($cobro->fields['id_cobro'])) {
+                   // mail('ffigueroa@lemontech.cl',"Cambiando De $estado_anterior a $estado",json_encode($ultimaobservacion));
+                
+                    if($ultimaobservacion['comentario']!=__("COBRO $estado")) {
+                        $his->Edit('fecha', date('Y-m-d H:i:s'));
+                        $his->Edit('comentario', __("COBRO $estado"));
+                        $his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+                        $his->Edit('id_cobro', $cobro->fields['id_cobro']);
+
+                        if ($his->Write()) {
+                                $pagina->AddInfo(__('Historial ingresado'));
+                        }
+                    }
+                }
 	}
 }
 
@@ -649,6 +659,7 @@ if ($cobro->fields['id_contrato'] != '') {
             var Opcic = jQuery(this).attr('id');
             var Confirma = 0;
         
+       
             if (estado == 'INFORMADO' && Opcic == 'parainfo') { 
                 if (!confirm('El Cobro ya ha sido informado a Contabilidad. ¿Está seguro que quiere actualizar el número de Nota de venta?')) {
                     return false;
@@ -903,7 +914,7 @@ if ($cobro->fields['id_contrato'] != '') {
             if (form.existe_pago.value == 1) {
                 var texto = '¡Este cobro tiene pagos asociados! ';
             } else if (form.existe_factura.value == 1) {
-                var texto = '¡Este cobro tiene facturas esociados! ';
+                var texto = '¡Este cobro tiene facturas asociadas! ';
             }
         
             if (!confirm(texto + '<?php echo __("¿Está seguro que requiere anular la emisión de este cobro?"); ?>')) {
@@ -972,7 +983,7 @@ if ($cobro->fields['id_contrato'] != '') {
     {
         $('VerDocumentosPagos_' + id_factura).hide();
     }
-
+ 
     function ValidarFactura(form, id_factura, opcion)
     {
 <?php if (UtilesApp::GetConf($sesion, 'PermitirFactura')) { ?>
@@ -1037,6 +1048,7 @@ if ($cobro->fields['id_contrato'] != '') {
 
     function VerDetalles(form)
     {
+        if(window.console) console.log(form);
         form.opc.value = 'grabar_documento';
         form.submit();
         return true;
@@ -1287,7 +1299,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 
 				function TArriba($celda, $estado) {
 					if (($celda == 'BORRADOR' && ($estado == 'CREADO' || $estado == 'EN REVISION')) || $celda == $estado) {
-						return "<td rowspan = 3 style=\"text-align:center; vertical-align: middle; border: 1px solid #5bde5b; background: #fefeaa ; font-size: 12px;\"> " . $estado . " </td>";
+						return "<td rowspan = '3' style=\"text-align:center; vertical-align: middle; border: 1px solid #5bde5b; background: #fefeaa ; font-size: 12px;\"> " . $estado . " </td>";
 					} else {
 						return "<td> </td>";
 					}
@@ -1471,7 +1483,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                 <table id="tablafacturas" style="width:100%">
                     <tr>
                         <!-- Facturas -->
-                        <td id="tdfacturas">
+                        <td id="tdfacturas" colspan="2">
 								<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 								<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;">
 									<?php
@@ -1656,7 +1668,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 																			<table style='border-collapse:collapse;' cellpadding='3'>
 																				<tr>
 																					<td colspan=<?php echo $num_monedas ?> align=center>
-																						<input type=button onclick="CancelarVerDocumentosPagos(<?php echo $id_factura ?>)" value="<?php echo __('Cancelar') ?>" />
+																						<input type="button" onclick="CancelarVerDocumentosPagos(<?php echo $id_factura ?>)" value="<?php echo __('Cancelar') ?>" />
 																					</td>
 																				</tr>
 																			</table>
@@ -1933,9 +1945,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 		<?php } else if (UtilesApp::GetConf($sesion, 'PermitirFactura')) { ?>
 														<tr>
 															<td align="center" colspan=3>
-																<input type=button class=btn value="<?php echo __('Descargar'); ?>" onclick="ValidarFactura(this.form,<?php echo $id_factura ?>,'imprimir');">
+																<input type="button" class="btn" value="<?php echo __('Descargar'); ?>" onclick="ValidarFactura(this.form,<?php echo $id_factura ?>,'imprimir');">
 																<?php if ($factura->fields['anulado'] == 0) { ?>
-																	<input type=button class=btn value="<?php echo __('Anular Factura') ?>" onclick="AnularFactura(this.form,'anular');">
+																	<input type="button" class="btn" value="<?php echo __('Anular Factura') ?>" onclick="AnularFactura(this.form,'anular');">
 														<?php } ?>
 															</td>
 														</tr>
@@ -1986,14 +1998,16 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                     </td>
                                 </tr>
                             </table>
-                        </td>
+                        </td><td style="text-align:center;vertical-align: center;">
+							 <br /><br /><div id="retorno" style="display:none;" >Caja Respuesta</div>
+                            <a href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="ValidarTodo(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
+						</td>
                     </tr>
                     <tr>
                         <!-- Submit -->
-                        <td colspan="2" align=center style="vertical-align: bottom; height:50px;">
-                            <div id="retorno" style="display:none;" >Caja Respuesta</div>
-                            <input type=button id="enviar" class=btn value="<?php echo __('Guardar Cambios') ?>" onclick="ValidarTodo(this.form); ">
-                        </td>
+                        <td   colspan="2" style="width:100%;" ><div style="width:100%;clear:both;margin:auto;">
+    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>&popup=1"  style="width:800px;height:450px;border: none;" frameborder=0></iframe>
+</div></td>
                     </tr>
                 </table>
                 <!-- Fin FORM unica -->
@@ -2253,28 +2267,25 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                         <td align="center" colspan="2">
 							<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
                             <br />
-<?php if (UtilesApp::GetConf($sesion, 'MostrarBotonCobroPDF')) { ?>
-								<input type="submit" class="btn" value="<?php echo __('Descargar Archivo') ?> Word" onclick="return VerDetalles(this.form);" />
-								<br />
-								<input type="submit" class="btn" value="<?php echo __('Descargar Archivo') ?> PDF" onclick="return VerDetallesPDF(this.form);" />
-							<?php } else { ?>
-								<input type="submit" class="btn" value="<?php echo __('Descargar Archivo') ?>" onclick="return VerDetalles(this.form);" />
+                                                        <br />    <a class="btn botonizame" icon="ui-icon-doc" setwidth="195" onclick="return VerDetalles(jQuery('#todo_cobro').get(0));" ><?php echo __('Descargar Archivo') ?> Word</a>
+                                                        <?php if (UtilesApp::GetConf($sesion, 'MostrarBotonCobroPDF')) { ?>
+								<br class="clearfix vpx" /><a class="btn botonizame"  icon="ui-icon-pdf"  setwidth="195" onclick="return VerDetallesPDF(jQuery('#todo_cobro').get(0));"><?php echo __('Descargar Archivo') ?> PDF</a>
 							<?php } ?>
-                            <br />
+                             
 							<?php if (!UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable')) { ?>
-								<input type="submit" class="btn" value="<?php echo __('descargar_excel_modificable') ?>" onclick="return DescargarExcel(this.form);" />
-								<br />
+								<br class="clearfix vpx"/><a class="btn botonizame" icon="xls" setwidth="195" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0)); "><?php echo __('descargar_excel_modificable') ?></a>
+								
 <?php } ?>
 							<?php if (UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee')) { ?>
-								<input type="submit" class="btn" value="<?php echo __('Excel rentabilidad') ?>" onclick="return DescargarExcel(this.form, 'rentabilidad');" />
-								<br />
+								<br class="clearfix vpx" /><a class="btn botonizame" icon="xls" setwidth="195" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); "><?php echo __('Excel rentabilidad') ?> </a>
+								
 							<?php } ?>
 							<?php if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') { ?>
-								<input type="submit" class="btn" value="<?php echo __('Descargar Excel Cobro') ?>" onclick="return DescargarExcel(this.form, 'especial');" />
+                                                             <br class="clearfix vpx" /><a class="btn botonizame" icon="xls" setwidth="195" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');"><?php echo __('Descargar Excel Cobro') ?></a>
+								
 <?php } ?>
 							<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
-								<br />
-								<input type="submit" class="btn" value="<?php echo __('Descargar LEDES') ?>" onclick="return DescargarLedes(this.form);" />
+								 <br class="clearfix vpx" /><a class="btn botonizame"   setwidth="195" onclick="return DescargarLedes(jQuery('#todo_cobro').get(0));"><?php echo __('Descargar LEDES') ?> </a>
 							<?php } ?>
                         </td>
                     </tr>
@@ -2320,11 +2331,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
     </div>
 </div>
 
-<div style="width:100%"><hr /></div>
+ 
 
-<div style="width:100%;clear:both;margin:auto;">
-    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>"  style="width:600px;height:450px;border: none;" frameborder=0></iframe>
-</div>
 
 <div id="TipoCambioDocumento" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
     <fieldset style="background-color:white;">
@@ -2353,8 +2361,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 				?>
                 <tr>
                     <td colspan=<?php echo $num_monedas ?> align=center>
-                        <input type=button onclick="ActualizarDocumentoMoneda($('todo_cobro'))" value="<?php echo __('Guardar') ?>" />
-                        <input type=button onclick="CancelarDocumentoMoneda()" value="<?php echo __('Cancelar') ?>" />
+                        <input type="button" onclick="ActualizarDocumentoMoneda($('todo_cobro'))" value="<?php echo __('Guardar') ?>" />
+                        <input type="button" onclick="CancelarDocumentoMoneda()" value="<?php echo __('Cancelar') ?>" />
                         <input type=hidden id="ids_monedas_documento" value="<?php echo implode(',', $ids_monedas) ?>"/>
                     </td>
                 </tr>

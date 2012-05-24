@@ -1,4 +1,4 @@
-<?php 
+ <?php 
 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -222,7 +222,13 @@
 					$documento->LoadByCobro($id_cobro);
 					$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento']);
 				}
-				$cobro->CambiarEstadoSegunFacturas();
+				if(empty($cobro->fields['estado_anterior']) || in_array($cobro->fields['estado_anterior'], array('CREADO', 'EN REVISION'))){
+					$cobro->CambiarEstadoSegunFacturas();
+				}
+				else{
+					$cobro->Edit('estado', $cobro->fields['estado_anterior']);
+					$cobro->Write();
+				}
 				$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(".$id_foco.");</script>";
 				$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true&refrescar=1&opc=guardar");
 			}  
@@ -537,6 +543,7 @@ function VolverACreado( form )
 
 function Emitir(form)
 {
+	jQuery('#btn_emitir_cobro').attr("disabled","disabled");
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
 		http.onreadystatechange = function()
@@ -607,7 +614,7 @@ if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
 				{
 					top:150, left:290, width:400, okLabel: "<?php echo __('Continuar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 					id: "myDialogId",
-					cancel:function(win){ return false; },
+					cancel:function(win){ jQuery('#btn_emitir_cobro').removeAttr("disabled"); return false; },
 					ok:function(win){
 								if( !AgregarParametros( form ) )
 									return false;
@@ -629,6 +636,7 @@ if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
       }
 		};
 	  http.send(null);
+	  jQuery('#btn_emitir_cobro').removeAttr("disabled");
 }
 
 function DefinirTarifas()
@@ -1180,14 +1188,14 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 			if($cobro->fields['estado'] == 'CREADO')
 				{ ?>
 				<input type="button" class=btn value="<?php echo __('Revisar Cobro')?>" onclick="EnRevision(this.form);">
-		<?  }
+		<?php  }
 			else if($cobro->fields['estado'] == 'EN REVISION')
 				{ ?>
 					En Revisión. &nbsp;&nbsp;
 					<input type="button" class=btn value="<?php echo __('Volver al estado CREADO')?>" onclick="VolverACreado(this.form);">
-		<?	}
+		<?php	}
 ?>
-			<input type="button" class=btn value="<?php echo __('Emitir Cobro')?>" onclick="Emitir(this.form);">
+			<input type="button" class=btn id="btn_emitir_cobro" value="<?php echo __('Emitir Cobro')?>" onclick="Emitir(this.form);">
 		</td>
 	</tr>
 </table>
@@ -1351,12 +1359,12 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									</td>
 									<!-- Incluiremos un multiselect de usuarios para definir los usuarios de quienes se 
 											 desuentan las horas con preferencia -->
-									<? if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RetainerUsuarios') ) { ?>
+									<?php if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'RetainerUsuarios') ) { ?>
 										<td id="td_retainer_usuarios" align="left" style="display:inline; background-color:#F8FBBD; padding-left:20px">
 											&nbsp;<?php echo __('Usuarios')?>
 											&nbsp;<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer,  TTip($tip_retainer_usuarios)." class=\"selectMultiple\" multiple size=3 ","","160"); ?> 
 										</td>
-									<? } ?>
+									<?php } ?>
 								</tr>
 							</table>
             </div>
@@ -1637,7 +1645,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				$cifras_decimales_moneda_total = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['opc_moneda_total']]['cifras_decimales'];
 				?>
 
-			<? if( UtilesApp::GetConf($sesion,'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos']))
+			<?php if( UtilesApp::GetConf($sesion,'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos']))
 			{ ?>
 			<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
 				<tr>
@@ -1679,7 +1687,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				</tr>
 			</table>
 			<br />
-			<? } ?>
+			<?php } ?>
 
 			<!--Agregar un resumen en moneda total para mejor indicacion de esta,
 					Versiones anteriores quedan comentado por sia caso que volvemos a estas mas tarde-->
@@ -1755,7 +1763,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				</tr>
 			</table>
     </td>
- <? /*
+ <?php /*
     <td align="center">
     	<table width="270" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=center>
 				<?php 
@@ -1983,7 +1991,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									<td align="right"><input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" <?php echo $cobro->fields['opc_ver_cobrable']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles')?></label></td>
 								</tr>
-						<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) )
+						<?php if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ResumenProfesionalVial') ) || ( method_exists('Conf','ResumenProfesionalVial') && Conf::ResumenProfesionalVial() ) )
 								{ ?>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_restar_retainer" id="opc_restar_retainer" value="1" <?php echo $cobro->fields['opc_restar_retainer']=='1'?'checked="checked"':''?> ></td>
@@ -1993,7 +2001,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 									<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" id="opc_ver_detalle_retainer" value="1" <?php echo $cobro->fields['opc_ver_detalle_retainer']=='1'?'checked="checked"':''?> ></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_detalle_retainer"><?php echo __('Mostrar detalle retainer')?></td>
 								</tr>
-					<?		}  ?>
+						<?php }  ?>
 								<tr>
 									<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" id="opc_ver_valor_hh_flat_fee" value="1" <?php echo $cobro->fields['opc_ver_valor_hh_flat_fee']=='1'?'checked':''?>></td>
 									<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_valor_hh_flat_fee"><?php echo __('Mostrar tarifa proporcional en base a HH')?></label></td>
@@ -2124,7 +2132,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 									<input type="button" class="btn" value="<?php echo __('Descargar Excel Cobro')?>" onclick="ImprimirExcel(this.form, 'especial');" />
 								</td>
 							</tr>
-							<? } 
+							<?php } 
 							} ?>
 						</table>
 					</td>
@@ -2169,7 +2177,7 @@ if( form )
 		ShowMonto(true, false);
 	/*else if( form.cobro_forma_cobro[5].checked )
 		HideMonto();*/
-}
+	}
 }
 
 function ActivaCarta(check)

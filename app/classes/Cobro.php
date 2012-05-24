@@ -37,10 +37,10 @@ class Cobro extends Objeto {
 	
 	function Write() {
 		$ingreso_historial = false;
+		
 		if( $this->fields['estado'] != $this->valor_antiguo['estado'] && 
 				!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado']) ) {
 			$ingreso_historial = true;
-			//mail('ffigueroa@lemontech.cl','Cambio estado','De '.$this->fields['estado'].' a '.$this->valor_antiguo['estado']);
 		}
                     if( parent::Write() ) {
                             if( $ingreso_historial ) {
@@ -49,7 +49,7 @@ class Cobro extends Objeto {
 
                                 $his = new Observacion($this->sesion);
 
-                                if($ultimaobservacion=$his->UltimaObservacion()) {
+                                if($ultimaobservacion=$his->UltimaObservacion($this->fields['id_cobro'])) {
                                         if($ultimaobservacion['comentario']!=__("COBRO {$this->fields['estado']}")) {
                                             $his->Edit('fecha', date('Y-m-d H:i:s'));
                                             $his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
@@ -529,7 +529,7 @@ class Cobro extends Objeto {
 		$query = "UPDATE trabajo SET fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		$this->Edit('estado_anterior', $this->fields['estado']);
+		if(array_key_exists('estado_anterior',$this->fields ))  $this->Edit('estado_anterior', $this->fields['estado']);
 		$this->Edit('estado', $estado);
 		$this->Edit('id_doc_pago_honorarios', 'NULL');
 		$this->Edit('id_doc_pago_gastos', 'NULL');
@@ -1201,7 +1201,7 @@ class Cobro extends Objeto {
 		}
 		$cobro_total_gastos=$cobro_total_gastos_egreso - $cobro_total_gastos_provision;
 		$cobro_base_gastos=$cobro_base_gastos_egreso - $cobro_base_gastos_provision;
-
+		
 		/* Si las Provisiones superan al Gasto, se debe generar un Gasto por esa cantidad, de modo que total_gastos quede en 0, y se debe crear una provisión igual a ese gasto, para incluir en cobro futuro */
 		if ($cobro_total_gastos < 0) {
 		    
@@ -1209,7 +1209,7 @@ class Cobro extends Objeto {
 			$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 			$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
 			$monto_provision_restante = number_format(0.00 - $cobro_total_gastos, $moneda_total->fields['cifras_decimales'], '.', '');
-
+			
 			
 			if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 			   /* require('PhpConsole.php');
@@ -1237,25 +1237,25 @@ class Cobro extends Objeto {
 			 $cobro_base_gastos = $cobro_base_gastos_egreso;
 			} else {
 				//METODO VIEJO: SE NETEA CON DOS MOVIMIENTOS IMAGINARIOS
-			$cobro_total_gastos = 0;
-			$cobro_base_gastos = 0;
-			$gas = new Gasto($this->sesion);
+				$cobro_total_gastos = 0;
+				$cobro_base_gastos = 0;
+				    $gas = new Gasto($this->sesion);
 			    if ($this->fields['id_gasto_generado'])    $gas->Load($this->fields['id_gasto_generado']);
 
-			$gas->Edit('id_moneda', $this->fields['opc_moneda_total']);
-			$gas->Edit('codigo_asunto', $codigo_asunto_cualquiera);
-			$gas->Edit('egreso', $monto_provision_restante);
-			$gas->Edit('monto_cobrable', $monto_provision_restante);
-			$gas->Edit('ingreso', 0);
-			$gas->Edit('id_cobro', $this->fields['id_cobro']);
-			$gas->Edit('codigo_cliente', $this->fields['codigo_cliente']);
-			$gas->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
-			$gas->Edit('incluir_en_cobro', 'SI');
-			$gas->Edit('fecha', date('Y-m-d 00:00:00'));
-			$gas->Write();
-			$this->Edit('id_gasto_generado', $gas->fields['id_movimiento']);
+			    $gas->Edit('id_moneda', $this->fields['opc_moneda_total']);
+			    $gas->Edit('codigo_asunto', $codigo_asunto_cualquiera);
+			    $gas->Edit('egreso', $monto_provision_restante);
+			    $gas->Edit('monto_cobrable', $monto_provision_restante);
+			    $gas->Edit('ingreso', 0);
+			    $gas->Edit('id_cobro', $this->fields['id_cobro']);
+			    $gas->Edit('codigo_cliente', $this->fields['codigo_cliente']);
+			    $gas->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
+			    $gas->Edit('incluir_en_cobro', 'SI');
+			    $gas->Edit('fecha', date('Y-m-d 00:00:00'));
+				$gas->Write();
+				$this->Edit('id_gasto_generado', $gas->fields['id_movimiento']);
 			}
-
+			
 			
 
 			$provision = new Gasto($this->sesion);
@@ -1359,7 +1359,7 @@ class Cobro extends Objeto {
 		$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
 		$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
 		$this->Edit('total_minutos', $cobro_total_minutos);
-
+		
 		
 		if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 		    $this->Edit('saldo_final_gastos', number_format($saldo_final_gastos_egreso, 6, ".", ""));
@@ -1417,8 +1417,8 @@ class Cobro extends Objeto {
 			    $x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'],array(),0,true,true);
 			    $x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'],array('listar_detalle'),true);
 			} else {
-				$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
-				$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+			    $x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+			   $x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
 			   
 			}	
 
@@ -1446,7 +1446,7 @@ class Cobro extends Objeto {
 				
 			    }
 			
-				//Documentos
+			    //Documentos
 				$documento = new Documento($this->sesion, '', '');
 				$documento->Edit('id_tipo_documento', '2');
 				$documento->Edit('codigo_cliente', $this->fields['codigo_cliente']);
@@ -4034,8 +4034,8 @@ class Cobro extends Objeto {
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
 					if ($asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0   || UtilesApp::GetConf($this->sesion,'MostrarAsuntosSinTrabajosGastosTramites')) {
-						$html .= $row;
-				}
+					    $html .= $row;
+					} 
 				}
 				break;
 
@@ -6633,6 +6633,10 @@ class Cobro extends Objeto {
                                  $html2 = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html2);
                                  $html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html2);
 				 
+                                $html2 = str_replace(array('%xnombre_cliente%','%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
+				
+				$html2 = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html2);
+				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%FECHA%', $this->GenerarDocumentoCarta2($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCarta2($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%DETALLE%', $this->GenerarDocumentoCarta2($parser_carta, 'DETALLE', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
@@ -6829,7 +6833,7 @@ class Cobro extends Objeto {
                                 
                                 } else if ($this->fields['monto_gastos'] == 0 && $this->fields['monto_subtotal'] > 0) {
 				
-					$html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo_solo_honorarios%'), $html2);
+                                    $html2 = str_replace('%detalle_ebmo%', __('%detalle_ebmo_solo_honorarios%'), $html2);
                                     $html2 = str_replace('%monto_gastos_cuando_hay%', '', $html2);
                                     $html2 = str_replace('%concepto_gastos_cuando_hay%', '', $html2);
                                     $html2 = str_replace('%monto_honorarios_cuando_hay%','%monto_sin_gasto%', $html2);
@@ -6841,7 +6845,7 @@ class Cobro extends Objeto {
                                         $html2 = str_replace('%concepto_honorarios_cuando_hay%', __('por_concepto_de_honorarios').' y ', $html2);
                                         $html2 = str_replace('%monto_gastos_cuando_hay%',   '%monto_gasto%', $html2);
                                         $html2 = str_replace('%concepto_gastos_cuando_hay%', __('por_concepto_de_gastos'), $html2);
-
+                                
                                 }
 				/* Datos detalle */
 				if (method_exists('Conf', 'GetConf')) {
@@ -7284,7 +7288,7 @@ class Cobro extends Objeto {
 						if( substr(trim($documentos_asociados[0]), 0, 2) == 'FA' ) {
 							$_doc_tmp = str_replace('FA', '', trim($documentos_asociados[0]) );
 							$html2 = str_replace('%num_letter_rebaza_especial%', __('la factura N°') . ' ' . $_doc_tmp, $html2);
-				} else {
+						} else {
 							$html2 = str_replace('%num_letter_rebaza_especial%', __('el cobro N°') . ' ' . $this->fields['id_cobro'], $html2);
 						}
 					} else if ( sizeof($documentos_asociados ) > 1 ) {
@@ -7606,7 +7610,7 @@ class Cobro extends Objeto {
 					$fecha_lang = date('F d, Y');
 				$fecha_mes_del_cobro = strtotime($this->fields['fecha_fin']);
 				$fecha_mes_del_cobro = strftime("%B %Y", mktime(0, 0, 0, date("m", $fecha_mes_del_cobro), date("d", $fecha_mes_del_cobro) - 5, date("Y", $fecha_mes_del_cobro)));
-
+                                
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 					$codigo_cliente = $cliente->CodigoACodigoSecundario($this->fields['codigo_cliente']);
