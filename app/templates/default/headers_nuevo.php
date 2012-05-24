@@ -26,11 +26,7 @@ define('HEADERLOADED',1);
             _sf_async_config.domain = "<?php echo $maindomain; ?>"; 
             _sf_async_config.path = "<?php echo $elpath; ?>";
             <?php   if(defined('APPDOMAIN') && substr(APPDOMAIN,0,5)=='https') echo '_sf_async_config.pathseguro="'.$pathseguro.'";'; ?>
-	var beacons=['app6'
-            //,'app2','app3','app4','app5','app1'
-                    ];
-        var beacon=beacons[Math.floor(Math.random()*beacons.length)];
-        var baseurl= '<?php echo base64_encode($laurl);?>';
+	var baseurl= '<?php echo base64_encode($laurl);?>';
         var mementomori= '<?php echo base64_encode(time());?>';
         var root_dir = '<?php echo Conf::RootDir();?>';
 	var img_dir = '<?php echo Conf::ImgDir()?>';
@@ -46,10 +42,10 @@ define('HEADERLOADED',1);
 	<!--<![endif]-->
 	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
         <link rel="shortcut icon" href="https://estaticos.thetimebilling.com/favicon.ico" />
-
-
+<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/jquery-ui.css" />
 	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+ 	
         <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
         <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
 		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jshashtable-2.1.js"></script>
@@ -74,6 +70,11 @@ define('HEADERLOADED',1);
 .encabezadolight th { font-style: normal;color: white;background-color: #A3D55C;height: 20px;font-size: 11px;vertical-align: middle;text-align: center;}
 #tablon td {padding:3px 2px !important}
 .nowrap {white-space: nowrap;}
+.clearfix:after {visibility: hidden;	display: block;	font-size: 0;	content: " ";	clear: both;	height: 0;	}
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+.vpx {display:block;height:5px;content:' ';}
+.loadingbar {color:transparent;background: url('https://static.thetimebilling.com/images/loading_bar.gif') 0 0; -webkit-appearance: none;}
 </style>
 
 
