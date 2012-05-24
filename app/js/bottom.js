@@ -1,6 +1,6 @@
-jQuery("head").append("<link id='uicss' />");
+ 
 
-jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', dataType: 'script', success: function() {     
+jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/jquery-ui.min.js', dataType: 'script', success: function() {     
    jQuery.datepicker.regional['es'] = {
 		closeText: 'Cerrar',
 		prevText: '&#x3c;Ant',
@@ -19,8 +19,7 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-   jQuery.when(jQuery("#uicss").attr({ rel:  "stylesheet", type: "text/css",  href: "https://estaticos.thetimebilling.com/jquery-ui.css"   }) )
-		.then(function() {
+    
 		
 		(function( jQuery ) {
 		jQuery.widget( "ui.combobox", {
@@ -149,7 +148,7 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 			    }
 		    }).attr('rel','activomodal').append(DivLoading).append('<iframe id="soymodal" rel="inactivo" style="display:none;height:100%;width:100%" frameborder="0"></iframe>');
 		     }
-	      if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
+	     
 	
 	jQuery('.combox').combobox();
 	jQuery('.tabs' ).tabs();
@@ -158,8 +157,19 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 			buttonImage: "https://estaticos.thetimebilling.com/images/calendario.png",
 			buttonImageOnly: true
     }); 
-	  
-    });  
+	   
+          jQuery('.botonizame').each(function() {
+            //console.log(jQuery(this).attr('icon'));
+             jQuery(this).button({  icons: {
+                     primary: jQuery(this).attr('icon')	
+                     ,secondary: jQuery(this).attr('icon2')
+                 }                   });
+                if(jQuery(this).attr('setwidth')>0) jQuery(this).css({'width':jQuery(this).attr('setwidth')+'px', 'text-align':'left'});
+           }); 
+           jQuery( ".buttonset").buttonset();
+           jQuery('.sortable').sortable();
+            if(typeof  YoucangonowMichael == 'function')      YoucangonowMichael(); 
+  
    }});
 
 
