@@ -1,4 +1,4 @@
- <?php 
+<?php 
 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -169,7 +169,7 @@
 		$cobro->Edit('codigo_idioma',$lang);
 		$cobro->Edit('se_esta_cobrando',$se_esta_cobrando);
                 $cobro->Edit("opc_ver_columna_cobrable",$opc_ver_columna_cobrable); 
-		@$cobro->Write();//Se guarda porque despues se necesita para recalcular los datos del cobro
+		$cobro->Write();//Se guarda porque despues se necesita para recalcular los datos del cobro
 		################### DESCUENTOS #####################
 		if($tipo_descuento == 'PORCENTAJE')
 		{
