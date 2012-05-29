@@ -395,35 +395,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
                 if(!form)
 			var form = $('formulario');
 
-		/*var seleccionado = false;
-	for( var i=0; actual = form.elements.id_moneda[i]; i++ )
-	{
-		if(form.elements.id_moneda[i].checked)
-		{
-			seleccionado = true;
-			break;
-		}
-	}
-	if(!seleccionado)
-	{
-		alert('<?php echo  __("Debe seleccionar una Moneda") ?>');
-		return false;
-	}
-
-	seleccionado = false;
-	for( var i=0; actual = form.elements.forma_cobro[i]; i++ )
-	{
-		if(form.elements.forma_cobro[i].checked)
-		{
-			seleccionado = true;
-			break;
-		}
-	}
-	if(!seleccionado)
-	{
-		alert('<?php echo  __("Debe seleccionar una forma de cobro") ?>');
-		return false;
-	}*/
+		 
 <?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 		if (!validar_doc_legales(true)){
 			return false;
@@ -1594,21 +1566,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		 
 		 
 		} else { 
-		 
 			if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
-				if(confirm('¿Desea cambiar también el <?php echo  __('Encargado Secundario') ?>?')){
-					if(EncargadoSecundario)  {
-						$('id_usuario_secundario').value = $('id_usuario_responsable').value;
-					} else { 
-						$('id_usuario_encargado').value = $('id_usuario_responsable').value;
-					} 
-				} else{
-					mismoEncargado = false;
+					if(confirm('¿Desea cambiar también el <?php echo  __('Encargado Secundario'); ?> ?')){
+						if(EncargadoSecundario)  {
+							$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+						} else { 
+							$('id_usuario_encargado').value = $('id_usuario_responsable').value;
+						} 
+					} else {
+						mismoEncargado = false;
+					}
 				}
-			}
+			
 		 	
 		} 
 		 
+	}
 	}
 
 	function agregarHito(){
