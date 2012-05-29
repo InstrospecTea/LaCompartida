@@ -44,7 +44,7 @@
 <script type="text/javascript">
     jQuery(document).ready(function() {
        
-       jQuery("#losadelantos").load('lista_adelantos.php?ajax=1', function() {
+       jQuery("#losadelantos").load('ajax/lista_adelantos_ajax.php?ajax=1', function() {
            jQuery('.pagination ul li a').each(function() {
               valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
               jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
@@ -55,7 +55,7 @@
             //alert(multi);
             valrel=multi*(jQuery(this).attr('rel')-1);
             jQuery('#xdesde').val(valrel);
-            jQuery.post('lista_adelantos.php?ajax=1', { xdesde: valrel },
+            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: valrel },
                 function(data) {
                 jQuery("#losadelantos").html(data);
                 
@@ -68,7 +68,7 @@
         });
         jQuery("#boton_buscar").click(function() {
            // alert('buscando...');
-            jQuery.post('lista_adelantos.php?ajax=1', jQuery('#form_adelantos').serialize(),
+            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', jQuery('#form_adelantos').serialize(),
                         function(data) {
                         jQuery("#losadelantos").html(data);
 
@@ -94,7 +94,7 @@
 
     function Refrescarse() {
                 var desdepg=jQuery('#xdesde').val();
-                jQuery.post('lista_adelantos.php?ajax=1', { xdesde: desdepg },
+                jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: desdepg },
                 function(data) {
                 jQuery("#losadelantos").html(data);
                 
@@ -111,10 +111,10 @@
 		if (UtilesApp::GetConf($sesion,'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente_secundario;
-		<? } else { ?>
+		<?php } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
 			var url_extension = "&codigo_cliente=" + codigo_cliente;
-		<? } ?>
+		<?php } ?>
 		if(tipo == 'adelanto')
 		{
 			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
@@ -125,7 +125,7 @@
 	}
 	function Refrescar()
 	{
-	<?
+	<?php
 		if($desde)
 			echo "var pagina_desde = '&desde=".$desde."';";
 		else
