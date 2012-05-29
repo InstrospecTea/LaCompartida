@@ -9,7 +9,7 @@ require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
 
 	$desde=$_POST['xdesde'];
         
-
+$filtros=$_REQUEST;
       
 
 $query = "SELECT
