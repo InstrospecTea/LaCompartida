@@ -690,7 +690,7 @@ class UtilesApp extends Utiles {
 	// Asumiendo que el logo no cambia durante la ejecución, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
 	var $altura_logo_excel;
 
-	function AlturaLogoExcel() {
+	function AlturaLogoExcel($sesion) {
 		if (isset($altura_logo_excel))
 			return $altura_logo_excel;
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
