@@ -38,6 +38,30 @@ class UtilesApp extends Utiles {
 	public static function EstadoPosteriorA($sesion, $tabla, $estado) {
 		
 	}
+	
+	
+	public static function existecampo($campo,$tabla,$dbh) { 
+    
+    $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
+    if(!$existencampos):
+		return false;
+    elseif(mysql_num_rows($existencampos)>0): 
+		return true;
+    endif;
+        return false;
+	}
+
+	public static function cuentaregistros($tabla,$dbh) { 
+
+		$registros = mysql_query("select count(*)  from $tabla", $dbh);
+		if(!$registros):
+		return 0;
+		elseif ($cantidad=mysql_fetch_field($registros)):
+		return $cantidad;
+		endif;
+		return 0;
+
+	}
 
 	public static function printRadio($idbuttonset = '', $valores, $actual, $ancho = '') {
 		echo "<div " . ($ancho ? $ancho : '' ) . " id='$idbuttonset'>";
@@ -670,7 +694,9 @@ class UtilesApp extends Utiles {
 		if (isset($altura_logo_excel))
 			return $altura_logo_excel;
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
-		$bitmap = Conf::LogoExcel();
+		//$bitmap = Conf::LogoExcel();
+		 
+			$bitmap=	self::GetConf($sesion,'LogoExcel');
 		// Open file.
 		$bmp_fd = @fopen($bitmap, "rb");
 		if (!$bmp_fd)
