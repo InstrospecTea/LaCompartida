@@ -696,7 +696,7 @@ class UtilesApp extends Utiles {
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
 		//$bitmap = Conf::LogoExcel();
 		 
-			$bitmap=	UtilesApp::GetConf($sesion, 'LogoExcel');  
+			$bitmap=	self::GetConf($sesion, 'LogoExcel');  
 			mail('ffigueroa@lemontech.cl','LOGO XLS',$bitmap);
 			
 		// Open file.
