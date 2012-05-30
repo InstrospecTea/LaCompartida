@@ -9,7 +9,7 @@
 
 
     
-		
+		if($_POST['motivo']=='gastos') {
 
 		########################### SQL INFORME DE GASTOS #########################
 		$where = 1;
@@ -82,7 +82,20 @@
 					WHERE $where";
 		
 		
-		
+                } elseif($_POST['motivo']=='horas') {
+                    $where = base64_decode($_POST['where']);
+                    $query = "SELECT count(*)
+							FROM trabajo
+							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+		          LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
+		          LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
+		          LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
+		          LEFT JOIN contrato ON asunto.id_contrato =contrato.id_contrato
+	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
+		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+		          WHERE $where ";
+                  
+                }
 		
 		$resultado=mysql_query($query,$sesion->dbh) or die(mysql_error($sesion->dbh));
 		
