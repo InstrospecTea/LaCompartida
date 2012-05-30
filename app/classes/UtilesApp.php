@@ -697,6 +697,7 @@ class UtilesApp extends Utiles {
 		//$bitmap = Conf::LogoExcel();
 		 
 			$bitmap=	UtilesApp::GetConf($sesion, 'LogoExcel');  
+			mail('ffigueroa@lemontech.cl','LOGO XLS',$bitmap);
 			
 		// Open file.
 		$bmp_fd = @fopen($bitmap, "rb");
