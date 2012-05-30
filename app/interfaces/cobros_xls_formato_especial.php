@@ -229,10 +229,10 @@
 
 	// Escribir encabezado
 	// Agregar la imagen del logo
-	if(method_exists('Conf', 'LogoExcel'))
+	if(UtilesApp::GetConf($sesion, 'LogoExcel'))
 	{
-		$ws->setRow($filas, UtilesApp::AlturaLogoExcel());
-		$ws->insertBitmap($filas, $col_asunto, Conf::LogoExcel(), 0, 0, 1, 1);
+		$ws->setRow($filas, UtilesApp::AlturaLogoExcel($sesion));
+		$ws->insertBitmap($filas, $col_asunto, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1);
 	}
 	$filas += 3;
 	$ws->write($filas, $col_asunto, __('Cliente'), $formato_encabezado);

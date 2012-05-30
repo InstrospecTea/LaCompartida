@@ -493,9 +493,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0, 1);
 
 				// Agregar la imagen del logo
-	if (method_exists('Conf', 'LogoExcel')) {
-					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel());
-					$ws->insertBitmap(0, 0, Conf::LogoExcel(), 0, 0, .8, .8);
+	if (UtilesApp::GetConf($sesion, 'LogoExcel')) {
+					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel($sesion));
+					$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, .8, .8);
 				}
 
 				// Es necesario setear estos valores para que la emisión masiva funcione.
