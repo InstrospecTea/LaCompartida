@@ -625,7 +625,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				}
 				// Agregar la imagen del logo
 	if (UtilesApp::GetConf($sesion, 'LogoExcel')) {
-					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel());
+					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel($sesion));
 					$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, .8, .8);
 				}
 
