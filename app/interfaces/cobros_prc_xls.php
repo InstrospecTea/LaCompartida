@@ -1174,7 +1174,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									cta_corriente.egreso, 
 									ifnull(cta_corriente.codigo_asunto,'0') codigo_asunto, 
 									cta_corriente.monto_cobrable, 
-									cta_corriente.fecha, 
+									cast(ifnull(cta_corriente.fecha_factura, cta_corriente.fecha) as DATE) as fecha,
+
 									cta_corriente.id_moneda, 
 									cta_corriente.descripcion, 
 									ifnull(asunto.glosa_asunto,'Sin Asunto') glosa_asunto 
