@@ -5,6 +5,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/classes/Factura.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
+        require_once Conf::ServerDir() . '/classes/Contrato.php';
 	
 	class FacturaPdfDatos extends Objeto
 	{
@@ -78,7 +79,10 @@
 			
 			$cobro = new Cobro($this->sesion);
 			$cobro->Load($factura->fields['id_cobro']);
-			
+                        
+			$contrato = new Contrato($this->sesion);
+                        $contrato->Load($cobro->fields['id_contrato']);
+                        
 			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
 			
@@ -88,6 +92,7 @@
 			switch( $tipo_dato ) {
 				case 'razon_social': 			$glosa_dato = $factura->fields['cliente']; break;
 				case 'rut': 				$glosa_dato = $factura->fields['RUT_cliente']; break;
+                                case 'telefono': 			$glosa_dato = $contrato->fields['factura_telefono']; break;
 				case 'fecha_dia': 	 		$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_mes':			$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
@@ -127,6 +132,11 @@
 			$cobro = new Cobro($this->sesion);
 			$cobro->Load($factura->fields['id_cobro']);
 			
+			$contrato = new Contrato($this->sesion);
+                        $contrato->Load($cobro->fields['id_contrato']);
+                        
+                        
+                        
 			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
 			
@@ -136,7 +146,8 @@
 			
 				$fila['razon_social']= $factura->fields['cliente']; 
 				$fila[ 'rut']= 				$factura->fields['RUT_cliente'];
-				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
+				$fila[ 'telefono']=  $contrato->fields['factura_telefono']; 
+                                $fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
 				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1); 
