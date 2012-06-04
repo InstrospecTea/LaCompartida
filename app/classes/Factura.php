@@ -518,7 +518,7 @@ class Factura extends Objeto {
                                               $subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
                                         $monto_gastos=$subtotal_gastos;
                                         $subtotal_gastos_con_impuesto=$subtotal_gastos;
-					$honorarios=$monto_subtotal;
+					if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura'))  $honorarios=$monto_subtotal;
 					/* Fin de lo que hay que mejorar */
 				}
 
@@ -589,7 +589,7 @@ class Factura extends Objeto {
 					$descripcion_subtotal_gastos_sin_impuesto=strtoupper($descripcion_subtotal_gastos_sin_impuesto);
 				}
 				if ($mostrar_honorarios	)	{
-					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion_separado, $html2);
+					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion, $html2);
 				} else {
 					$html2 = str_replace('%honorarios_periodo%', '', $html2);
 				}
@@ -634,10 +634,12 @@ class Factura extends Objeto {
 					}
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%texto_honorarios%', 'HONORARIOS', $html2);
+							$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
+						$html2 = str_replace('%glosa_honorarios%','', $html2);
 					}
-					$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
+				
 					$html2 = str_replace('%texto_gastos%', 'GASTOS', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Gastos incurridos en su caso, según relación adjunta.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total servicios profesionales y gastos incurridos', $html2);
@@ -684,11 +686,13 @@ class Factura extends Objeto {
 
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%texto_honorarios%', 'LEGAL SERVICES', $html2);
+						$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
+						$html2 = str_replace('%glosa_honorarios%',  '', $html2);
 					}
 					
-					$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
+					
 					$html2 = str_replace('%texto_gastos%', 'EXPENSES', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Expenses incurred in this case.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total legal services and expenses', $html2);
