@@ -148,12 +148,16 @@ $slimttb->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->vi
 		
 			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
 			
-			
-		
-	   $queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo
-                            FROM usuario u JOIN prm_categoria_usuario p 
+			if(existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
+				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo, u.activo_juicio
+			               FROM usuario u left JOIN prm_categoria_usuario p 
                             ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
-			
+			} else {
+		
+				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo
+			               FROM usuario u left JOIN prm_categoria_usuario p 
+                            ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
+			}
 			$respuser=mysql_query($queryuser, $sesion->dbh) or die(mysql_error());
 			
 			
@@ -358,6 +362,15 @@ $slimttb->map('/CargarTrabajo(/:callback)', 'CargarTrabajo')->via('GET', 'POST')
 }
 
 
-
+function existecampo($campo,$tabla,$dbh) { 
+    
+    $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
+    if(!$existencampos):
+	return false;
+    elseif(mysql_num_rows($existencampos)>0): 
+	return true;
+    endif;
+        return false;
+}
 
 $slimttb->run();
