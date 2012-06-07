@@ -317,16 +317,7 @@ $tini=time();
 			$codigos_asuntos_secundarios = "";
 			$codigo_asunto_secundario_sep = "";
 		}
-                $update1="update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
-                $update2="update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
-                $update3="update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
-                   $update3A=  "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
-                    $update3B="update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
-                $resp = mysql_query($update1, $sesion->dbh);
-                $resp = mysql_query($update2, $sesion->dbh);
-                $resp = mysql_query($update3, $sesion->dbh);
-                 $resp = mysql_query($update3A, $sesion->dbh);
-                  $resp = mysql_query($update3B, $sesion->dbh);
+
 		//list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( MAX( fecha_modificacion ) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
 		//FFF: fix para traer movimientos de todo el mes anterior con o sin fecha touch
 				   list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add( MAX(fecha_modificacion ) , interval -3 DAY),  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones ", $sesion->dbh));
@@ -382,13 +373,7 @@ $tini=time();
 		$resp = mysql_query($update4, $sesion->dbh);
 		
 		
-		$update5="truncate table trabajos_por_actualizar;";
-		$update6="replace into trabajos_por_actualizar (
-		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
-		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
-		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
-		$resp = mysql_query($update5, $sesion->dbh);
-		$resp = mysql_query($update6, $sesion->dbh);
+	
 		
 		$update7="replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
@@ -838,7 +823,27 @@ $tini=time();
 		</tr>
 	</table>
 </form>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
+	                $update1="update LOW_PRIORITY trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
+                $update2="update LOW_PRIORITY  cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
+                $update3="update LOW_PRIORITY  tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+                   $update3A=  "update  LOW_PRIORITY  olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
+                    $update3B="update  LOW_PRIORITY  olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
+					$update3C="update  LOW_PRIORITY  olap_liquidaciones ol left jointramite tra on ol.id_entry=tra.id_tramite set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null";
+                $resp = mysql_query($update1, $sesion->dbh);
+                $resp = mysql_query($update2, $sesion->dbh);
+                $resp = mysql_query($update3, $sesion->dbh);
+                 $resp = mysql_query($update3A, $sesion->dbh);
+                  $resp = mysql_query($update3B, $sesion->dbh);
+				   $resp = mysql_query($update3C, $sesion->dbh);
+				   
+		$update5="truncate table trabajos_por_actualizar;";
+		$update6="replace delayed into trabajos_por_actualizar (
+		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
+		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
+		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
+		$resp = mysql_query($update5, $sesion->dbh);
+		$resp = mysql_query($update6, $sesion->dbh);
 ?>
