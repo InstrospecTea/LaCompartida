@@ -468,7 +468,7 @@ $tini=time();
 														AND $where_gasto ) > 0 )
 							GROUP BY $group_by ";
                 
-		if($_POST['enviamail']) mail('implementacion@lemontech.cl','Primera Query',$query);
+		if($enviamail) mail('ffigueroa@lemontech.cl','Primera Query',$query);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 		$fila_inicial = $filas+2;
