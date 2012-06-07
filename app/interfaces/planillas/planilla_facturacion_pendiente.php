@@ -826,6 +826,13 @@ $tini=time();
 <?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
+	$update5="truncate table trabajos_por_actualizar;";
+		$update6="insert delayed into trabajos_por_actualizar (
+		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
+		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
+		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
+		$resp = mysql_query($update5, $sesion->dbh);
+		$resp = mysql_query($update6, $sesion->dbh);
 	                $update1="update LOW_PRIORITY trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
                 $update2="update LOW_PRIORITY  cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
                 $update3="update LOW_PRIORITY  tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
@@ -839,11 +846,5 @@ $tini=time();
                   $resp = mysql_query($update3B, $sesion->dbh);
 				   $resp = mysql_query($update3C, $sesion->dbh);
 				   
-		$update5="truncate table trabajos_por_actualizar;";
-		$update6="replace delayed into trabajos_por_actualizar (
-		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
-		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
-		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
-		$resp = mysql_query($update5, $sesion->dbh);
-		$resp = mysql_query($update6, $sesion->dbh);
+		
 ?>
