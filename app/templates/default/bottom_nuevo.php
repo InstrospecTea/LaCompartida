@@ -18,8 +18,7 @@
         droplinemenu.buildmenu("droplinetabs1");
 	}
     });
-    
- 
+     
 jQuery.ajax({async: false,cache:true,type: "GET", url: root_dir+'/app/js/bottom.js', dataType: 'script' });
 
 
