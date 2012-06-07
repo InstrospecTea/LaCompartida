@@ -468,7 +468,7 @@ $tini=time();
 														AND $where_gasto ) > 0 )
 							GROUP BY $group_by ";
                 
-		//mail('ffigueroa@lemontech.cl','Primera Query',$query);
+		mail('ffigueroa@lemontech.cl','Primera Query',$query);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 		$fila_inicial = $filas+2;
@@ -630,14 +630,19 @@ $tini=time();
 			else {
 				$valor_estimado = $monto_estimado_trabajos;
                         }
-			// Aplicar descuentos del contrato al valor estimado
+					// Aplicar descuentos del contrato al valor estimado
 			if( $cobro['porcentaje_descuento'] > 0 )
 				{
-					$valor_estimado *= ( 1 - $cobro['porcentaje_descuento']/100 );
+					$valor_descuento=$valor_estimado*$cobro['porcentaje_descuento'];
+					$valor_estimado = $valor_estimado - $valor_descuento;
+											 if($valor_descuento>0)  $ws1->writeNote($filas,$col_valor_estimado,'Incluye descuento por '.$arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'].' '.$valor_descuento);
+
 				}
 			else if( $valor_descuento > 0 )
 				{
 					$valor_estimado = $valor_estimado - $valor_descuento;
+			 if($valor_descuento>0)  $ws1->writeNote($filas,$col_valor_estimado,'Incluye descuento por '.$arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'].' '.$valor_descuento);
+
 					if( $valor_estimado < 0 )
 						{
 							$valor_descuento =  abs($valor_estimado);
@@ -798,6 +803,7 @@ $tini=time();
 			<td align=left colspan="2">
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?=$separar_asuntos ? 'checked' : ''?> /><?=__('Separar Asuntos')?><br/>
                                 &nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?=$desglosar_moneda ? 'checked' : ''?> /><?=__('Desglosar monto por monedas')?><br/>
+								<?php  if($sesion->usuario->fields['rut']=='99511620')  echo '<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
                 <tr>
