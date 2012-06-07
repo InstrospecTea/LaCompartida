@@ -28,6 +28,19 @@ jQuery.ajax({async: false,cache:true,type: "GET", url: root_dir+'/app/js/bottom.
    jQuery("head").append("<link id='zenboxcss' />");
     jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" });
      
+
+    
+  if (_sf_async_config.pathseguro!==undefined) {
+         if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
+                jQuery('#ultimocontenedor').css({'width':'335px'});
+                if ("https:" == document.location.protocol) {
+                   __dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
+                } else {
+                         jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+_sf_async_config.pathseguro+'"><img src="https://estaticos.thetimebilling.com/images/no_ssl_cifrado.png" style="text-decoration:none;vertical-align:top;border: 0 none;margin-top:0;position:relative;top:0;right:0;" /></a>');
+                }
+            }
+    }
+    if (!Modernizr.borderradius) {
     jQuery.ajax({async: false,cache:true, type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/curvycorners.js', 
 	dataType: 'script',
 	complete: function() {
@@ -42,19 +55,7 @@ jQuery.ajax({async: false,cache:true,type: "GET", url: root_dir+'/app/js/bottom.
             curvyCorners(settings, divObj); 
 	    }
         });            
-
-    
-  if (_sf_async_config.pathseguro!==undefined) {
-         if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
-                jQuery('#ultimocontenedor').css({'width':'335px'});
-                if ("https:" == document.location.protocol) {
-                   __dcid.push(["DigiCertClickID_iIR9fwBQ", "3", "s", "black", "iIR9fwBQ"]);(function(){var cid=document.createElement("script");cid.type="text/javascript";cid.async=true;cid.src=("https:" === document.location.protocol ? "https://" : "http://")+"seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
-                } else {
-                         jQuery('#DigiCertClickID_iIR9fwBQ').html('<a style="border:0;text-decoration:none;" href="'+_sf_async_config.pathseguro+'"><img src="https://estaticos.thetimebilling.com/images/no_ssl_cifrado.png" style="text-decoration:none;vertical-align:top;border: 0 none;margin-top:0;position:relative;top:0;right:0;" /></a>');
-                }
-            }
-    }
-    
+	  }
 
    
         jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', 
