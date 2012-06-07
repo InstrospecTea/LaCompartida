@@ -9,6 +9,7 @@
     
 </div>
 <div id="dialogomodal" style="display:none;text-align:center" > </div> 
+<div id="dialog-confirm" style="display:none;" ></div>  
 <script type="text/javascript">
 /* <![CDATA[   */
     jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/droplinemenu.js'	, 

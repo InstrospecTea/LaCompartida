@@ -2,6 +2,7 @@
 </tr>
 </table>
 <div id="dialogomodal" style="display:none;" ></div>  
+<div id="dialog-confirm" style="display:none;" ></div>  
 <script type="text/javascript">
 /* <![CDATA[   */
 jQuery.ajax({async: false,cache:true,type: "GET", url: root_dir+'/app/js/bottom.js', dataType: 'script' });
