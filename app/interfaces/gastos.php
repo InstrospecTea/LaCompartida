@@ -416,7 +416,7 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			
 				if(parseInt(data)>20000)	{
 					var formated=data/1000;
-				jQuery('#dialog-confirm').attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado ycon funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
+				jQuery('#dialog-confirm').attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado ycon funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
 				jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
 				jQuery( "#dialog-confirm" ).dialog({
 						resizable: false,						autoOpen:true,						height:200,						width:450,
