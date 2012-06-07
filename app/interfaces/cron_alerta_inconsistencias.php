@@ -98,18 +98,23 @@ left join documento dp ON dp.id_documento=nd.id_documento_pago and dp.tipo_doc!=
 $querys[]="ALTER TABLE  `netdos` ADD INDEX (  `id_cobro` );";
 $querys[]="ALTER TABLE  `netdos` ADD INDEX (  `iddoccobro` );";
 	foreach ($querys as $q) mysql_query($q, $sesion->dbh);
-$query ="select netdos.iddoccobro, netdos.iddocpago, netdos.id_cobro from netdos left join netres on netdos.id_cobro=netres.id_cobro
-and netdos.iddoccobro=netres.iddoccobro where netres.id_cobro is null;";
+$query ="select netdos.iddoccobro, netdos.iddocpago, netdos.id_cobro  from netdos left join netres on netdos.id_cobro=netres.id_cobro
+and netdos.iddoccobro=netres.iddoccobro 
+where  netres.id_cobro is null
+union 
+select netres.iddoccobro, netres.iddocpago, netres.id_cobro  from netdos right join netres on netdos.id_cobro=netres.id_cobro
+and netres.iddocpago=netdos.iddocpago
+where  netdos.id_cobro is null and netres.iddocpago is not null";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	
 	$enviar = false;
-	$mensaje = "Se han observado inconistencias en los siguientes documentos  de pago del cliente ".Conf::dbUser().":<br/><br/>";
+	$mensaje = "Se han observado inconsistencias en los siguientes documentos  de pago del cliente ".Conf::dbUser().":<br/><br/>";
 	while( list($iddoccobro, $iddocpago, $id_cobro) = mysql_fetch_array($resp) ) {
 		$mensaje .= "Documento Cobro: $iddoccobro Cobro: $id_cobro  Documento Pago: $iddocpago <br/>";
 		$enviar = true;
 	}
 	if( $enviar ) {
-		Utiles::Insertar($sesion, "Inconsistencia datos ".Conf::dbUser(), $mensaje, "ffigueroa@lemontech.cl,gtigre@lemontech.cl", "Soporte");
+		Utiles::Insertar($sesion, "Inconsistencia documentos pago ".Conf::dbUser(), $mensaje, "ffigueroa@lemontech.cl,gtigre@lemontech.cl", "Soporte");
 	}
 	
 	
