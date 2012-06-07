@@ -205,7 +205,7 @@ if ($opc == 'buscar') {
     }
 
     function CobroFila(& $fila) {
-        $html_cobro .= "&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1&contitulo=true');\" title='" . __('Ver ') . __('Cobro asociado') . "'>" . $fila->fields['id_cobro'] . "</a>&nbsp;";
+        $html_cobro .= "&nbsp;<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1&contitulo=true');\" title='" . __('Ver ') . __('Cobro asociado') . "'>" . $fila->fields['id_cobro'] . "</a>&nbsp;";
         return $html_cobro;
     }
 
@@ -347,75 +347,28 @@ if ($preparar_cobro == 1) {
 	
     function EliminaGasto(id)
     {
-        var form = document.getElementById('form_gastos'); <? if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) { ?>
-                    var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente_secundario').value+'&codigo_asunto='+$('codigo_asunto_secundario').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?= ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() ) ) ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
-<? } else {
+        var form = document.getElementById('form_gastos'); <?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) { ?>
+                    var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente_secundario').value+'&codigo_asunto='+$('codigo_asunto_secundario').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?php echo  ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() ) ) ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
+<?php } else {
     ?>
-                    var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente').value+'&codigo_asunto='+$('codigo_asunto').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?= ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() ) ) ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
-<? } ?>
+                    var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente').value+'&codigo_asunto='+$('codigo_asunto').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?php echo  ( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() ) ) ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
+<?php } ?>
                 if(parseInt(id) > 0 && confirm('¿Desea eliminar el gasto seleccionado?') == true)
                     self.location.href = acc;
             }
 
-            /*
-function change_height(iframe)
-{
-    if(document.getElementById && !(document.all))  //Mozillla
-        {
-                body = iframe.contentDocument.body;
-    }
-    else if(document.all) //Explorer
-        {
-                body = iframe.document.body;
-    }
-        height = body.scrollHeight + (body.offsetHeight - body.clientHeight);
-        iframe.style.height = height + "px";//height;
-}
-
-function VerClientesProyectos (form)
-{
-    var cliente  = document.getElementById('cliente');
-                var proyecto = document.getElementById('proyecto');
-    if(form.general.checked == true)
-    {
-        cliente.style['display']  = "inline";
-                proyecto.style['display'] = "inline";
-    }
-    else
-    {
-      cliente.style['display']  = "none";
-      proyecto.style['display'] = "none";
-        }
-}
-
-var getFFVersion = navigator.userAgent.substring(navigator.userAgent.indexOf("Firefox")).split("/")[1];
-var FFextraHeight = parseFloat(getFFVersion)>=0.1? 16 : 0 //extra height in px to add to iframe in FireFox 1.0+ browsers
-
-function resizeIframe(frameid)
-{
-        var currentfr = document.getElementById(frameid)
-        if (currentfr && !window.opera)
-        {
-                if (currentfr.contentDocument && currentfr.contentDocument.body.offsetHeight) //ns6 syntax
-                        currentfr.style.height = currentfr.contentDocument.body.offsetHeight + FFextraHeight + "px";
-                else if (currentfr.Document && currentfr.Document.body.scrollHeight) //ie5+ syntax
-                        currentfr.style.height = currentfr.Document.body.scrollHeight;
-        }
-}
-             */
-
             function AgregarNuevo(tipo)
             {
-<? if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) { ?>
+<?php if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) { ?>
                     var codigo_cliente = $('codigo_cliente_secundario').value;
                     var codigo_asunto = $('codigo_asunto_secundario').value;
                     var url_extension = "&codigo_cliente_secundario="+codigo_cliente+"&codigo_asunto_secundario="+codigo_asunto;
-<? } else {
+<?php } else {
     ?>
                     var codigo_cliente = $('codigo_cliente').value;
                     var codigo_asunto = $('codigo_asunto').value;
                     var url_extension = "&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto;
-<? } ?>
+<?php } ?>
 
         if(tipo == 'provision')
         {
@@ -436,35 +389,77 @@ function resizeIframe(frameid)
                        
         
     }
+jQuery('document').ready(function() {
+	
 
-    function BuscarGastos( form, from )
-    {
-<?
-$pagina_excel = "form.action = 'gastos_xls.php';";
+
+   jQuery('.buscargastos').click(function()     {
+	   
+   var form=jQuery('#form_gastos');
+   var from=jQuery(this).attr('rel');
+   jQuery(this).attr('disabled','disabled');
+<?php $pagina_excel = " jQuery('#form_gastos').attr('action','gastos_xls.php').submit();";
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ExcelGastosSeparado') ) || ( method_exists('Conf', 'ExcelGastosSeparado') && Conf::ExcelGastosSeparado() )) {
-    $pagina_excel = "form.action = 'gastos_xls_separado.php';";
+    $pagina_excel = "jQuery('#form_gastos').attr('action','gastos_xls_separado.php').submit();";
 }
 if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
-    $pagina_excel = "form.action = 'gastos_xls_por_encargado.php';";
+    $pagina_excel = "jQuery('#form_gastos').attr('action','gastos_xls_por_encargado.php').submit();  ";
 }
 ?>
-
-
-                if(!form)
-                    var form = $('form_gastos');
+ 
                 if(from == 'buscar') {
-                    form.action = 'gastos.php?buscar=1';
+                     jQuery('#form_gastos').attr('action','gastos.php?buscar=1').submit();
                 } else if(from == 'excel') {
-<?= $pagina_excel ?>
-                        } else if(from == 'excel_resumen') {
-                            form.action = 'gastos_xls_resumen.php';
-                        } else if(from =='estimar_datos') {
+					 jQuery('#boton_excel').attr('disabled','disabled');
+					 jQuery.post('ajax/estimar_datos.php',jQuery('#form_gastos').serialize(),function(data) {
+                              
+			
+				if(parseInt(data)>20000)	{
+					var formated=data/1000;
+				jQuery('#dialog-confirm').attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificado ycon funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
+				jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
+				jQuery( "#dialog-confirm" ).dialog({
+						resizable: false,						autoOpen:true,						height:200,						width:450,
+						modal: true,
+						close:function(ev,ui) {
+							jQuery(this).html('');
+						},
+						buttons: {
+										"<?php echo __('Entiendo y acepto')?>": function() {
+											 jQuery('#boton_excel').removeAttr('disabled');
+											 jQuery('#form_gastos').attr('action','ajax/csv_gastos.php').submit();
+												jQuery( this ).dialog( "close" );
+												
+												return true;
+												},
 
-                            jQuery.post('ajax/estimar_datos.php',jQuery('#form_gastos').serialize(),function(data) {
-                                alert('Su consulta recorre '+data+' registros');
-                            });
-                            return false;
-                        } else if(from =='datatables') {
+										"<?php echo __('Cancelar')?>": function() {
+											jQuery('#boton_excel').removeAttr('disabled');
+											jQuery( this ).dialog( "close" );
+												
+															return false;
+															
+										}
+									}
+						});
+						} else {
+						jQuery('#boton_excel').removeAttr('disabled');
+						<?php echo  $pagina_excel ?>
+					
+						
+					 
+						return true;
+						}		
+								
+                  });
+			
+			
+							return true;
+                        } else if(from == 'excel_resumen') {
+                            jQuery('#form_gastos').attr('action','ajax/csv_gastos.php').submit();
+							
+							return true;
+                        }   else if(from =='datatables') {
   
 
                             jQuery('#gran_tabla_gastos').hide();
@@ -473,22 +468,10 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
                             jQuery('#tablon').dataTable({
                                 "bDestroy":true,
                
-                                "oLanguage": {   
-                                    "sProcessing":   "Procesando..." ,
-                                    "sLengthMenu":   "Mostrar _MENU_ registros",
-                                    "sZeroRecords":  "No se encontraron resultados",
-                                    "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-                                    "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",
-                                    "sInfoFiltered": "(filtrado de _MAX_ registros en total)",
-                                    "sInfoPostFix":  "",
-                                    "sSearch":       "Buscar:",
-                                    "sUrl":          "",
-                                    "oPaginate": {
-                                        "sFirst":    "Primero",
-                                        "sPrevious": "Anterior",
-                                        "sNext":     "Siguiente",
-                                        "sLast":     "Último"
-                                    }
+                                "oLanguage": {    "sProcessing":   "Procesando..." ,   "sLengthMenu":   "Mostrar _MENU_ registros","sZeroRecords":  "No se encontraron resultados",  "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
+                                    "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",  "sInfoFiltered": "(filtrado de _MAX_ registros en total)",   "sInfoPostFix":  "",  "sSearch":       "Buscar:",
+                                    "sUrl":          "", 
+									"oPaginate": {           "sFirst":    "Primero",   "sPrevious": "Anterior",   "sNext":     "Siguiente", "sLast":     "Último"}
                                 },
                                 "bFilter": false,
                                 "bProcessing": true,
@@ -511,22 +494,19 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 //if ( !UtilesApp::GetConf($sesion,'NumeroOT') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 //if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
-if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos'))
-    echo ' { "bVisible": false, "aTargets": [ 7 ] },';
-if (!UtilesApp::GetConf($sesion, 'TipoGasto'))
-    echo ' { "bVisible": false, "aTargets": [ 3 ] },';
-if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))
-    echo ' { "bVisible": false, "aTargets": [ 11 ] },';
+if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos'))     echo ' { "bVisible": false, "aTargets": [ 7 ] },';
+if (!UtilesApp::GetConf($sesion, 'TipoGasto'))     echo ' { "bVisible": false, "aTargets": [ 3 ] },';
+if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible": false, "aTargets": [ 11 ] },';
 ?>    
                     {  "fnRender": function ( o, val ) {
                             return "<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[12]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='<?php echo Conf::ImgDir() ?>/editar_on.gif'></a><a style='float:left;display:inline;' onclick='parent.EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='<?php echo Conf::ImgDir() ?>/cruz_roja_nuevo.gif'></a>";
                         },    "aTargets": [ 12 ]   },
                     {  "fnRender": function ( o, val ) {
-                            return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
+                            return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
                         },    "aTargets": [ 8 ]   },
 	
                     {  "fnRender": function ( o, val ) {
-                            return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',810,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
+                            return "<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+o.aData[8]+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+o.aData[8]+"</a>";
                         },    "aTargets": [ 8 ]   }
 	         ],
    
@@ -538,24 +518,19 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))
                 ,"aaSorting": [[ 2, "asc" ]]
             }).show();
 
-
-
-            console.log(jQuery('#tablon'))	;
-		
-		
+ 
 		
 	
             return false;
         } else {
-            return false;
+		 return false;
         }
-        form.submit();
-        return true;
-    }
+        
+    });
+});	
     function Refrescar()
     {
-<?
-if ($desde)
+<?php if ($desde)
     echo "var pagina_desde = '&desde=" . $desde . "';";
 else
     echo "var pagina_desde = '';";
@@ -576,10 +551,11 @@ else
 
     }
 </script>
-<? echo(Autocompletador::CSS()); ?>
+<?php echo(Autocompletador::CSS()); ?>
 <table  width="90%"><tr><td>
             <form method='post' name="form_gastos" action='' id="form_gastos">
                 <input type='hidden' name='opc' id='opc' value=buscar>
+                 <input type='hidden' name='motivo' id='motivo' value='gastos'/>
                 <!-- Calendario DIV -->
                 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
                     <div class="floating" id="calendar"></div>
@@ -587,27 +563,26 @@ else
                 <!-- Fin calendario DIV -->
 
                 <fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-                    <legend><?= __('Filtros') ?></legend>
+                    <legend><?php echo  __('Filtros') ?></legend>
                     <table style="border: 0px solid black" width='720px'>
                         <tr>
                             <td align=right>
-<?= __('Cobrado') ?>
+<?php echo  __('Cobrado') ?>
                             </td>
                             <td align='left'>
-<?= Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", $cobrado, '', 'Todos', '60') ?>
+<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", $cobrado, '', 'Todos', '60') ?>
                             </td>
                             <td align="left" nowrap>
-<?= __('id_cobro') ?>&nbsp;
-                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_cobro" id="id_cobro" value="<?= $id_cobro ?>">
+<?php echo  __('id_cobro') ?>&nbsp;
+                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_cobro" id="id_cobro" value="<?php echo  $id_cobro ?>">
                             </td>
                         </tr>
                         <tr>
                             <td align=right width='30%'>
-<?= __('Nombre Cliente') ?>
+<?php echo  __('Nombre Cliente') ?>
                             </td>
                             <td nowrap colspan=3 align=left>
-<?
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
+<?php if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
     if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
         echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
     else
@@ -624,11 +599,10 @@ else {
                         </tr>
                         <tr>
                             <td align=right>
-                                <?= __('Asunto') ?>
+                                <?php echo  __('Asunto') ?>
                             </td>
                             <td nowrap colspan=3 align=left>
-                                <?
-                                if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )))
+                                <?php                                 if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )))
                                     echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
                                 else
                                     echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
@@ -637,52 +611,50 @@ else {
                         </tr>
                         <tr>
                             <td nowrap colspan=4 align=center style='font-size:9px;'>
-                                <?= __('Si Ud. selecciona el') . ' ' . __('asunto') . ' ' . __('mostrará los gastos de todos los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.') ?>
+                                <?php echo  __('Si Ud. selecciona el') . ' ' . __('asunto') . ' ' . __('mostrará los gastos de todos los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.') ?>
                             </td>
                         </tr>
                         <tr>
                             <td align=right>
-                                <?= __('Fecha Desde') ?>
+                                <?php echo  __('Fecha Desde') ?>
                             </td>
                             <td nowrap align=left>
-                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?= $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-                                <img src="<?= Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+                                <img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
                             </td>
                             <td nowrap align=left colspan=2>
-                                <?= __('Fecha Hasta') ?>
-                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?= $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-                                <img src="<?= Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+                                <?php echo  __('Fecha Hasta') ?>
+                                <input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+                                <img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
                             </td>
                         </tr>
                         <tr>
-                            <td align=right><?= __('Encargado comercial') ?>&nbsp;</td>
-                            <td colspan=2 align=left><?= Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre", "id_usuario_responsable", $id_usuario_responsable, '', __('Cualquiera'), '200') ?>
+                            <td align=right><?php echo  __('Encargado comercial') ?>&nbsp;</td>
+                            <td colspan=2 align=left><?php echo  Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre", "id_usuario_responsable", $id_usuario_responsable, '', __('Cualquiera'), '200') ?>
                         </tr>
                         <tr>
                             <td align=right>
-                                <?= __('Ordenado por') ?>
+                                <?php echo  __('Ordenado por') ?>
                             </td>
                             <td align=left colspan=3>
-                                <?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ', apellido1,apellido2,',',nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $id_usuario_orden, "", __('Ninguno'), '200'); ?>
+                                <?php echo  Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ', apellido1,apellido2,',',nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $id_usuario_orden, "", __('Ninguno'), '200'); ?>
                             </td>
                         </tr>
-<?
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() )) {
+<?php if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) || ( method_exists('Conf', 'TipoGasto') && Conf::TipoGasto() )) {
     ?>
                             <tr>
                                 <td align=right>
-    <?= __('Tipo de Gasto') ?>
+    <?php echo  __('Tipo de Gasto') ?>
                                 </td>
                                 <td align=left colspan=3>
-                                    <?= Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo ORDER BY glosa", "id_tipo", $id_tipo, "", __('Cualquiera'), '200'); ?>
+                                    <?php echo  Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo ORDER BY glosa", "id_tipo", $id_tipo, "", __('Cualquiera'), '200'); ?>
                                 </td>
                             </tr>
-    <?
-}
+    <?php }
 ?>
                         <tr>
                             <td align=right>
-<?= __('Clientes activos') ?>
+<?php echo  __('Clientes activos') ?>
                             </td>
                             <td colspan="2" align="left">
                                 <select name='clientes_activos' id='clientes_activos' style='width: 120px;'>
@@ -695,33 +667,31 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoGasto') ) 
                         </tr>
                         <tr>
                             <td align=right>
-                                <?= __('Moneda') ?>
+                                <?php echo  __('Moneda') ?>
                             </td>
                             <td colspan="2" align="left">
-                        <?= Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'), ''); ?>
+                        <?php echo  Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'), ''); ?>
                             </td>
                             <td></td>
                         </tr>
                         <tr>
                             <td></td>
                             <td colspan=2 align=left>
-                                <input name=boton_buscar id='boton_buscar' type=button value="<?= __('Buscar') ?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
-                                <input name=boton_xls type=button value="<?= __('Descargar Excel') ?>" onclick="BuscarGastos(this.form,'excel')" class=btn>
-                                <input name="boton_xls_resumen" type="button" value="<?= __('Descargar Resumen Excel') ?>" onclick="BuscarGastos(this.form,'excel_resumen')" class="btn" />
-
-                                <input id="boton_xls_estimar" name="boton_xls_estimar" type="button" value="<?= __('Estimar Cantidad de Datos') ?>" onclick="BuscarGastos(this.form,'estimar_datos')" class="btn" />
-                                <input id="boton_datatables" name="boton_datatables" type="button" value="<?= __('Tabla Interactiva') ?>" onclick="BuscarGastos(this.form,'datatables')" class="btn" />
+                                <input name=boton_buscar id='boton_buscar' type="button" value="<?php echo  __('Buscar') ?>"   rel="buscar" class=" btn buscargastos">
+                                <input name=boton_xls id="boton_excel" type="button" value="<?php echo  __('Descargar Excel') ?>"   rel="excel" class=" btn buscargastos">
+                                <input name="boton_xls_resumen" type="button" value="<?php echo  __('Descargar Resumen Excel') ?>"   rel="excel_resumen" class=" btn buscargastos" />
+                                <input name="boton_datatables" id="boton_datatables" type="button" value="<?php echo  __('Tabla Interactiva') ?>" rel="datatables" class=" btn buscargastos" />
+                                
                             </td>
                             <td width='40%' align=right>
-                                <img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?= __('Agregar provisión') ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                                <img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?= __('Agregar') ?> <?= __('gasto') ?></a>
+                                <img src="<?php echo  Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo  __('Agregar provisión') ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <img src="<?php echo  Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo  __('Agregar') ?> <?php echo  __('gasto') ?></a>
                             </td>
                         </tr>
                     </table>
                 </fieldset>
                 <br>
-<?
-if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')) {
+<?php if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')) {
     ?>
                     <table id="gran_tabla_gastos" width="100%">
                         <tr>
@@ -730,8 +700,7 @@ if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')
                             </td>
                         </tr>
                     </table>
-                                    <?
-                                }
+                                    <?php                                 }
                                 ?>
             </form>
         </td></tr></table>
