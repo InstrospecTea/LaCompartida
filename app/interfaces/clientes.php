@@ -1,5 +1,4 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
+<?php  	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -50,13 +49,13 @@ function Validar(form)
 {
 	if(!form.codigo_cliente.value)
 	{
-		alert("<?=__('Debe ingresar un codigo de cliente')?>");
+		alert("<?php echo __('Debe ingresar un codigo de cliente')?>");
 		form.codigo_cliente.focus();
 		return false;
 	}
 	if(!form.glosa_cliente.value)
 	{
-		alert("<?=__('Debe ingresar el nombre del cliente')?>");
+		alert("<?php echo __('Debe ingresar el nombre del cliente')?>");
 		form.glosa_cliente.focus();
 		return false;
 	}
@@ -85,97 +84,92 @@ function DescargarIncompletos(form)
 //funcion java para eliminar
 function EliminaCliente(id_cliente)
 {
-	var desde = <?=($desde)? $desde : '0'?>;
+	var desde = <?php echo ($desde)? $desde : '0'?>;
 	form = document.getElementById('form_cliente');
 	self.location.href = "clientes.php?id_cliente="+id_cliente+"&accion=eliminar&buscar=1&desde="+desde;
 	return true;
 }
 </script>
-<?
-	echo Autocompletador::CSS();
+<?php  	echo Autocompletador::CSS();
 ?>
-<form method=post action="<?= $_SERVER[PHP_SELF] ?>" name="form_cliente" id="form_cliente">
+<form method=post action="<?php echo  $_SERVER[PHP_SELF] ?>" name="form_cliente" id="form_cliente">
 <!--<input type=hidden name=opcion value="Buscar" />-->
-<input type=hidden name=id_cliente value="<?= $cliente->fields['id_cliente'] ?>" />
-<?
-	if($p_admin)
+<input type=hidden name=id_cliente value="<?php echo  $cliente->fields['id_cliente'] ?>" />
+<?php  	if($p_admin)
 	{
 ?>
 	<table width='720px' cellspacing=3 cellpadding=3>
 		<tr>
 			<td></td>
 			<td align=right>
-				<a href="agregar_cliente.php"><img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <?=__('Nuevo Cliente')?></a>
+				<a href="agregar_cliente.php"><img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <?php echo __('Nuevo Cliente')?></a>
 			</td>
 		</tr>
 	</table>
-<?
-	}
+<?php  	}
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
-	<table width="90%"><tr><td> <? }
+	<table width="90%"><tr><td> <?php  }
 else { ?>
-	<table width="100%"><tr><td> <? } ?>
+	<table width="100%"><tr><td> <?php  } ?>
 	<fieldset width="100%" class="tb_base">
-		<legend><?=__('Filtros')?></legend>
+		<legend><?php echo __('Filtros')?></legend>
 		<table width='720px' cellspacing=3 cellpadding=3>
 			<tr>
 				<td align=right width=35% class=cvs>
-					<?=__('Nombre Cliente')?>
+					<?php echo __('Nombre Cliente')?>
 				</td>
 				<td align=left>
-					<input type="text" name="glosa_cliente" id="glosa_cliente" size="35" value="<?=$glosa_cliente?>">
+					<input type="text" name="glosa_cliente" id="glosa_cliente" size="35" value="<?php echo $glosa_cliente?>">
 					<span id="indicador_glosa_cliente" style="display: none;">
-					<img src=<?=Conf::ImgDir()."/ajax_loader.gif"?> alt=<?=__('Trabajando')?>."..." />
+					<img src=<?php echo Conf::ImgDir()."/ajax_loader.gif"?> alt=<?php echo __('Trabajando')?>."..." />
 					</span>
 					<div id="sugerencias_glosa_cliente" class="autocomplete" style="display:none; z-index:100;"></div>
 				</td>
 			</tr>
 			<tr>
 				<td align=right class=cvs>
-					<?=__('Código')?>
+					<?php echo __('Código')?>
 				</td>
 				<td align=left>
-					<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="codigo" size="20" value="<?=$codigo?>">
+					<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="codigo" size="20" value="<?php echo $codigo?>">
 				</td>
 			</tr>
 			<tr>
 				<td align=right class=cvs>
-					<?=__('Grupo')?>
+					<?php echo __('Grupo')?>
 				</td>
 				<td align=left>
-					<?= Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno","width=100px")  ?>
+					<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno","width=100px")  ?>
 				</td>
 			</tr>
 			<tr>
 				<td align=right class=cvs>
-					<?=__('Fecha Desde')?>
+					<?php echo __('Fecha Desde')?>
 				</td>
 				<td nowrap align=left class=cvs>
-					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
-					&nbsp;&nbsp;<?=__('Fecha Hasta')?>
-					<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
-				</td>
+					<input class="fechadiff" onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+ 					&nbsp;&nbsp;<?php echo __('Fecha Hasta')?>
+					<input class="fechadiff"  onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+ 				</td>
 			</tr>
 			<tr>
 				<td align=right class=cvs>
-					<?=__('Solo Activos')?>
+					<?php echo __('Solo Activos')?>
 				</td>
 				<td align=left>
-				<input type="checkbox" name=solo_activos id=solo_activos value=1 <?=$solo_activos ? "checked" : "" ?>>
+				<input type="checkbox" name=solo_activos id=solo_activos value=1 <?php echo $solo_activos ? "checked" : "" ?>>
 				</td>
 			</tr>
 			<tr>
 				<td></td>
 				<td align=left>
-					<input type=button class=btn name=buscar value=<?=__('Buscar')?> onclick="Listar(this.form, 'buscar')">
-					<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="Listar(this.form, 'xls')" >
+					<input type=button class=btn name=buscar value=<?php echo __('Buscar')?> onclick="Listar(this.form, 'buscar')">
+					<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="Listar(this.form, 'xls')" >
 <?php
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente') )
 	{
 ?>
-					<input type=button class=btn value="<?=__('Descargar listado clientes datos incompletos')?>" onclick="DescargarIncompletos(this.form);" >
+					<input type=button class=btn value="<?php echo __('Descargar listado clientes datos incompletos')?>" onclick="DescargarIncompletos(this.form);" >
 <?php
 	}
 ?>
@@ -185,34 +179,16 @@ else { ?>
 	</fieldset>
 </td></tr></table>
 </form>
+ <script>
+google.load("scriptaculous", "1.9.0");
+</script>
 <script type="text/javascript">
     
-	       
-		if(typeof(Prototype)=="undefined")    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js", dataType: "script" });
-		    
-		    if(typeof(Effect)=="undefined")    {
-		    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.2/effects.js", dataType: "script" });
-		    jQuery.ajax({async: false, cache:true, type: "GET", url: "http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.2/controls.js", dataType: "script" });
-		    }
-		
+ 
 Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cliente", "ajax_seleccionar_cliente.php", {minChars: 1, indicator: 'indicador_glosa_cliente'});
-Calendar.setup(
-	{
-		inputField	: "fecha1",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha1"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha2",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha2"		// ID of the button
-	}
-);
+
 </script>
-<?
-	if($buscar)
+<?php  	if($buscar)
 	{
 		$where = '1';
 		if($glosa_cliente != '')

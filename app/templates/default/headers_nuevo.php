@@ -48,7 +48,12 @@ define('HEADERLOADED',1);
 <link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/jquery-ui.css" />
 	
 
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+
+<script src='https://www.google.com/jsapi'></script>
+<script>
+google.load("jquery","1.7");
+
+</script>
  		<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
 
         <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>

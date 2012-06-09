@@ -14,12 +14,12 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 		dayNamesShort: ['Dom','Lun','Mar','Mi&eacute;','Juv','Vie','S&aacute;b'],
 		dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','S&aacute;'],
 		weekHeader: 'Sm',
-		dateFormat: 'dd/mm/yy',
+		dateFormat: 'dd-mm-yy',
 		firstDay: 1,
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-    
+    jQuery.datepicker.setDefaults(jQuery.datepicker.regional['es']);
 		
 		(function( jQuery ) {
 		jQuery.widget( "ui.combobox", {
@@ -154,12 +154,12 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 	jQuery('.tabs' ).tabs();
 	jQuery('.fechadiff').datepicker( {
 			showOn: "both",
-			buttonImage: "https://estaticos.thetimebilling.com/images/calendario.png",
+			buttonImage: "https://static.thetimebilling.com/images/calendar.gif",
 			buttonImageOnly: true
     }); 
 	   
           jQuery('.botonizame').each(function() {
-            //console.log(jQuery(this).attr('icon'));
+        
              jQuery(this).button({  icons: {
                      primary: jQuery(this).attr('icon')	
                      ,secondary: jQuery(this).attr('icon2')
