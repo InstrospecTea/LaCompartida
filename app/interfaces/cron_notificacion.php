@@ -703,6 +703,8 @@ if (date("N") < 6) { //Lunes a Viernes
 
 //Mail diario: septimo componente: Alertas de Tareas
 //Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
+//FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
+if(!UtilesApp::ExisteCampo($sesion,'alerta','tarea')) mysql_query("ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad` ;",$sesion->dbh) ;
 $query = "SELECT cliente.glosa_cliente,
 					asunto.glosa_asunto,
 					CONCAT_WS(' ',e.nombre, e.apellido1, LEFT(e.apellido2,1)) AS nombre_encargado,
