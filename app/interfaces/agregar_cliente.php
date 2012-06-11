@@ -807,12 +807,6 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				form.codigo_cliente_secundario.focus();
 				return false;
 			}
-			if(form.codigo_cliente_secundario.value.length!=4)
-			{
-				alert("<?php echo  __('El código secundario del cliente debe tener 4 dígitos') ?>");
-				form.codigo_cliente_secundario.focus();
-				return false;
-			}
 	<?php
 }
 ?>
@@ -1008,11 +1002,20 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 									
 									<tr>
 										<td align="right">
-								    <?php echo  __('Fecha Creación') ?>
+								    <?php echo  __('Fecha Creación') ;
+									$intfechacreacion=intval( date('Ymd',strtotime($cliente->fields['fecha_creacion'])));
+									if($intfechacreacion>19990101) {
+										$fecha_creacion=date('d-m-Y',strtotime($cliente->fields['fecha_creacion']));
+									} else {
+										$fecha_creacion=date('d-m-Y');
+									}
+									
+									?>
 											 
 										</td>
 										<td align="left">
-											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  date('d-m-Y',strtotime($cliente->fields['fecha_creacion'])); ?>"  />
+											<!--<?php echo $intfechacreacion.' vs '.$fecha_creacion  ; ?>-->
+											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  $fecha_creacion; ?>"  />
 										</td>
 									</tr>
 									
