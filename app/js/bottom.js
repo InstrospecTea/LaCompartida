@@ -155,7 +155,9 @@ jQuery.ajax({async: false, cache:true, type: "GET", url: 'https://ajax.googleapi
 	jQuery('.fechadiff').datepicker( {
 			showOn: "both",
 			buttonImage: "https://static.thetimebilling.com/images/calendar.gif",
-			buttonImageOnly: true
+			buttonImageOnly: true,
+			changeMonth: true,
+			changeYear: true
     }); 
 	   
           jQuery('.botonizame').each(function() {
