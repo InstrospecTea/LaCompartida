@@ -2116,7 +2116,7 @@ else
 					$usuarios_retainer = explode(',',$contrato->fields['retainer_usuarios']);
 ?>
 						<td align="left" style="font-size:10pt;">
-							<div id="div_cobro">
+							<div id="div_cobro" class="buttonset">
 								<input <?php echo  TTip($tip_tasa) ?> class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo  $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
 								<label for="fc1">Tasas/HH</label>&nbsp;
 								<input <?php echo  TTip($tip_retainer) ?> class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo  $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
@@ -2934,7 +2934,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
      
 
 function YoucangonowMichael() {
-    jQuery( "#div_cobro" ).buttonset();
+   
     <?php 	if ($contrato->fields['id_cuenta']) echo "SetBanco('id_cuenta','id_banco');"; ?>
 }
 	
