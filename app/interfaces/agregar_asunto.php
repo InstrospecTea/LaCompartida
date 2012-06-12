@@ -16,7 +16,7 @@ require_once Conf::ServerDir() . '/../app/classes/ContratoDocumentoLegal.php';
 require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
-$sesion = new Sesion(array('DAT'));
+$sesion = new Sesion(array('DAT', 'SASU'));
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
@@ -752,9 +752,7 @@ $pagina->PrintTop($popup);
 if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 	echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
 }
-?>
-
-<?php
+ 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	?>
 				if(!form.codigo_cliente_secundario.value)
@@ -766,12 +764,6 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if(!form.codigo_asunto_secundario.value)
 				{
 					alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
-					form.codigo_asunto_secundario.focus();
-					return false;
-				}
-				if(form.codigo_asunto_secundario.value.length!=4)
-				{
-					alert("<?php echo __('El código secundario del asunto debe tener 4 dígitos') ?>");
 					form.codigo_asunto_secundario.focus();
 					return false;
 				}
@@ -1251,12 +1243,12 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 								<textarea name=descripcion_asunto cols="50"><?php echo $asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
-						<?php 	if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
+						<?php 	//if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
 									
-							echo '<tr><td align=right>';
-							echo __('Usuario encargado');
-                                                        echo '</td><td align=left>';
-echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+                                                                                    echo '<tr><td align=right>';
+                                                                                    echo __('Usuario responsable');
+                                                                                    echo '</td><td align=left>';
+                                                                                    echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
@@ -1265,7 +1257,7 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 	echo $obligatorio;
  endif; 
 					echo '</td></tr>';
-								} 
+								//} 
 					IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') ) { 
 		echo '<tr><td align=right>'.__('Encargado 2');
 		echo '</td><td align=left>';
@@ -1353,15 +1345,23 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				-->
 				<br>
 <?php
- if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) )
+if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) ) {
 	$checked = 'checked';
-else
+} else {
 	$checked = '';
+}
+ 
+$hide_areas = '';
+$params_asuntos_array['codigo_permiso'] = 'SASU';
+$permisos_asuntos = $sesion->usuario->permisos->Find('FindPermiso', $params_asuntos_array); #tiene permiso de admin de asuntos
+if ($permisos_asuntos->fields['permitido']) {
+	$hide_areas = 'style="display: none;"';
+}
 ?>
 				<table width='100%' cellspacing='0' cellpadding='0'>
 					<tr>
-						<td>
-							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
+						<td  <?php echo $hide_areas; ?> >
+							<input type="checkbox" name='cobro_independiente'id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
@@ -1372,7 +1372,7 @@ else
 				<br>
 				<div  id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
 					
-<?php require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; ?>
+<?php if (!$permisos_asuntos->fields['permitido']) { require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; } ?>
 					
 					
 				</div>
@@ -1463,20 +1463,33 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RevisarTarifas')
 	});
 function CambioEncargadoSegunCliente(idcliente) {
     var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
-    jQuery('#id_usuario_secundario').attr({'disabled':''});
-    jQuery('#id_usuario_responsable').attr({'disabled':''});
+    var UsuarioSecundario=<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario')? '1':'0' );?>;
+    var ObligatorioEncargadoSecundarioAsunto=<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto')? '1':'0' );?>;
+    jQuery('#id_usuario_secundario').removeAttr('disabled');
+    jQuery('#id_usuario_responsable').removeAttr('disabled');
     jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
 	if(window.console ) console.debug(data);
-	jQuery('#id_usuario_secundario').attr({'disabled':''}).val(data);
-	jQuery('#id_usuario_responsable').attr({'disabled':''}).val(data);
-	if(CopiarEncargadoAlAsunto) {
-		jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
-		jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
-	   }
+        var ladata=data.split('|');
+	jQuery('#id_usuario_responsable').removeAttr('disabled').val(ladata[0]);
+        if(ladata[1] && jQuery('#id_usuario_secundario option[value='+ladata[1]+']').length>0) {
+            if(UsuarioSecundario) jQuery('#id_usuario_secundario').removeAttr('disabled').val(ladata[1]);
+        } else {
+          if(ladata[2])  jQuery('#id_usuario_secundario').append('<option value="'+ladata[1]+'" selected="selected">'+ladata[2]+'</option>').attr({'disabled':''}).val(ladata[1]);;
+        }
+        
+          jQuery('#id_usuario_responsable').removeAttr('disabled');
+        if(CopiarEncargadoAlAsunto) {
+        	jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
+                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
+	   } else if(ObligatorioEncargadoSecundarioAsunto) {
+             
+                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
+           }
 	
 	   
+           jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
 	});
-	 
+	 jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
 }
 	
 </script>
