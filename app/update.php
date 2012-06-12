@@ -8596,6 +8596,17 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						}
 				}
 				break;
+			
+			case 6.05:
+				$query=array();
+				$query[]="ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'J' COMMENT  'J justifica, tb puede ser R C o L';";
+				
+				foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+								throw new Exception($q . "---" . mysql_error());
+						}
+				}
+				break;
 	}
 				
 }
