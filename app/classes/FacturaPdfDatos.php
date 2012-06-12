@@ -238,8 +238,7 @@
 				
                                if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
                                         $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0, 'L');
-                                } 
-				if( $datos['mayuscula'] == 'may' ) {
+                                } else if( $datos['mayuscula'] == 'may' ) {
 					$pdf->Write(4, strtoupper($datos['dato_letra']));
 				} else if( $datos['mayuscula'] == 'min' ) {
 					$pdf->Write(4, strtolower($datos['dato_letra']));
