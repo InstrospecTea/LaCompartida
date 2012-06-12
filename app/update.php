@@ -8599,7 +8599,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			
 			case 6.05:
 				$query=array();
-				if(!ExisteCampo('align','factura_pdf_datos',$dbh))  $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'J' COMMENT  'J justifica, tb puede ser R C o L';";
+				if(!ExisteCampo('align','factura_pdf_datos',$dbh))  $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';";
 				
 				foreach ($query as $q) {
 						if (!($res = mysql_query($q, $dbh) )) {
