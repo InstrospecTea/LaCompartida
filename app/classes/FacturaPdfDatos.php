@@ -31,7 +31,7 @@
 						font, 
 						style, 
 						mayuscula, 
-						tamano 
+						tamano , align
 					FROM factura_pdf_datos 
                                         JOIN factura_pdf_tipo_datos USING( id_tipo_dato ) 
 					WHERE activo = 1 AND id_documento_legal = '$id_documento_legal' ";
@@ -237,7 +237,7 @@
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 				
                                if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
-                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0, 'L');
+                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']?:'L') );
                                 } else if( $datos['mayuscula'] == 'may' ) {
 					$pdf->Write(4, strtoupper($datos['dato_letra']));
 				} else if( $datos['mayuscula'] == 'min' ) {
