@@ -1155,7 +1155,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$filas++;
 		if( !$Cobro->fields['opc_ver_asuntos_separados'] ) {
 			$ws->write($filas, $columna_gastos_fecha, Utiles::GlosaMult($Sesion, 'fecha', 'Listado de gastos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_encabezado_lista);
-			$ws->mergeCells($filas, 1, $filas, 2);
+			
 			$ws->write($filas, $columna_gastos_descripcion, __('Concepto'), $letra_encabezado_lista);
 			$ws->write($filas, $columna_gastos_montos, Utiles::GlosaMult($Sesion, 'monto', 'Listado de gastos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_encabezado_lista);
 			++$filas;
@@ -1199,6 +1199,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				
 				$ws->write($filas, 0, $gasto->fields['codigo_asunto'], $formato_encabezado);
 				$ws->write($filas, 1, $gasto->fields['glosa_asunto'], $formato_encabezado_center);
+				$ws->mergeCells($filas, 1, $filas, 2);
 				$filas += 2;
 					
 				$ws->write($filas, $columna_gastos_fecha, Utiles::GlosaMult($Sesion, 'fecha', 'Listado de gastos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_encabezado_lista);
