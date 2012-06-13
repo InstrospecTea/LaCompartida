@@ -162,7 +162,10 @@ $slimttb->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->vi
 			
 			
 			while($fila=mysql_fetch_assoc($respuser )) {
-			$usuarios[]=$fila;
+			$fila['nombre']=utf8_encode($fila['nombre']);
+			$fila['apellido1']=utf8_encode($fila['apellido1']);
+			$fila['apellido2']=utf8_encode($fila['apellido2']);
+				$usuarios[]=$fila;
 			}
 		
 	 echo json_encode($usuarios);
