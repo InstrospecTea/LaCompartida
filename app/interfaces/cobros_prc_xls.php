@@ -1148,12 +1148,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_gastos_montos, '', $formato_encabezado);
 		$filas += 2;
 		$ws->write($filas, $columna_inicial, __('Cliente: ') . $Cliente->fields['glosa_cliente'], $formato_encabezado);
+		$ws->mergeCells($filas, 1, $filas, 2);
 		$filas += 3;
 
 		// Encabezado de la tabla de gastos
 		$filas++;
 		if( !$Cobro->fields['opc_ver_asuntos_separados'] ) {
 			$ws->write($filas, $columna_gastos_fecha, Utiles::GlosaMult($Sesion, 'fecha', 'Listado de gastos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_encabezado_lista);
+			$ws->mergeCells($filas, 1, $filas, 2);
 			$ws->write($filas, $columna_gastos_descripcion, __('Concepto'), $letra_encabezado_lista);
 			$ws->write($filas, $columna_gastos_montos, Utiles::GlosaMult($Sesion, 'monto', 'Listado de gastos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $letra_encabezado_lista);
 			++$filas;
@@ -1174,7 +1176,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									cta_corriente.egreso, 
 									ifnull(cta_corriente.codigo_asunto,'0') codigo_asunto, 
 									cta_corriente.monto_cobrable, 
-									cast(ifnull(cta_corriente.fecha_factura, cta_corriente.fecha) as DATE) as fecha,
+										cast(if(fecha_factura is null or cta_corriente.fecha_factura='' or  cta_corriente.fecha_factura=00000000, cta_corriente.fecha_creacion, cta_corriente.fecha_factura) as DATE) as fecha,
 
 									cta_corriente.id_moneda, 
 									cta_corriente.descripcion, 
