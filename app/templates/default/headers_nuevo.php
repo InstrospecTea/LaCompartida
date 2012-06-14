@@ -1,7 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE HTML>
 <?php
-/*error_reporting(E_ALL ^ E_NOTICE);
-ini_set('display_errors','On');*/
+/*error_reporting(E_ALL ^ E_NOTICE);*/
+ini_set('display_errors','On');
 date_default_timezone_set('America/New_York');
 $laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
 $punto=strpos($laurl,'.'); 
@@ -102,6 +102,7 @@ google.load("jquery","1.7");
 #colmask {width:955px;overflow:hidden;clear:both;margin:auto;}
 #historial {margin:5px 0 0 -10px;width:700px;float:left;}
 .z10 {position:relative;z-index:10;}
+
 </style>
 
 
