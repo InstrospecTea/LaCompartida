@@ -61,7 +61,9 @@ google.load("jquery","1.7");
 		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jshashtable-2.1.js"></script>
 		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
 		
-	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
+	<?php
+	require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; 
+	?>
 
    	
 <style type="text/css">
@@ -99,7 +101,7 @@ google.load("jquery","1.7");
 #cobro6colderecha {    float:left;margin: 5px -10px 0 35px;width:230px;;background-color: white;}
 #colmask {width:955px;overflow:hidden;clear:both;margin:auto;}
 #historial {margin:5px 0 0 -10px;width:700px;float:left;}
-
+.z10 {position:relative;z-index:10;}
 </style>
 
 
