@@ -640,6 +640,16 @@ if ($cobro->fields['id_contrato'] != '') {
     
     var ciclo = self.setInterval("refrescaestado('estado_contabilidad')", 15000);
     jQuery(document).ready(function() {
+		
+		jQuery('#tablafacturas').mouseover(function() {
+			jQuery(this).addClass('z10');
+			jQuery('#colderecha').removeClass('z10');
+		});
+		jQuery('#colderecha').mouseover(function() {
+			jQuery(this).addClass('z10');
+			jQuery('#tablafacturas').removeClass('z10');
+		});
+		
         var Elidcobro = jQuery("#elidcobro").val();
         jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'}, function(data) {
             jQuery("#lista_pagos").html(data);
@@ -2013,7 +2023,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                 <!-- Fin FORM unica -->
             </div> <!-- FIN TABLA CABECERA (la que tiene el avance del cobro, la lista de facturas, etc) -->
 
-            <div style="float:right;margin-right:10px;width:19%;background-color: white;">
+            <div id="colderecha" style="float:right;margin-right:10px;width:19%;background-color: white;">
                 <!-- Imprimir -->
                 <table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;width:100%;height:100px;">
                     <tr>
