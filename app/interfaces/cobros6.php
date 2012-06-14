@@ -641,13 +641,13 @@ if ($cobro->fields['id_contrato'] != '') {
     var ciclo = self.setInterval("refrescaestado('estado_contabilidad')", 15000);
     jQuery(document).ready(function() {
 		
-		jQuery('#tablafacturas').mouseover(function() {
+		jQuery('#tdfacturas').mouseover(function() {
 			jQuery(this).addClass('z10');
 			jQuery('#colderecha').removeClass('z10');
 		});
 		jQuery('#colderecha').mouseover(function() {
 			jQuery(this).addClass('z10');
-			jQuery('#tablafacturas').removeClass('z10');
+			jQuery('#tdfacturas').removeClass('z10');
 		});
 		
         var Elidcobro = jQuery("#elidcobro").val();
