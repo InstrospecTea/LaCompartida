@@ -87,7 +87,7 @@
 	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $sesion, $cobro->fields['id_carta']);
 	
 	// margenes 1.5, 2.0, 2.0, 2.0
-	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang);
+	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang,$sesion);
 	$valor_unico=substr(time(),-3);
 
         
