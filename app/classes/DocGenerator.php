@@ -163,6 +163,10 @@ class DocGenerator {
 						$this->atualPageWidth = LETTER_WIDTH * One_Cent;
 						$this->atualPageHeight = LETTER_HEIGHT * One_Cent;
 						break;
+					case 'PRC' :
+						$this->atualPageWidth = PRC_WIDTH * One_Cent;
+						$this->atualPageHeight = PRC_HEIGHT * One_Cent;
+						break;
 					case 'LEGAL' :
 						$this->atualPageWidth = LEGAL_WIDTH * One_Cent;
 						$this->atualPageHeight = LEGAL_HEIGHT * One_Cent;
@@ -260,7 +264,7 @@ class DocGenerator {
 		$this->formatBuffer .= "}\r\n";
 		$this->formatBuffer .= "div.$sessionName\r\n";
 		$this->formatBuffer .= "  {page: $sessionName;}\r\n\r\n";
-
+		$this->formatBuffer = str_replace('https','http',$this->formatBuffer);
 		$this->documentBuffer .= "<div class=\"$sessionName\">\r\n";
 		$this->documentBuffer .= $html;
 
