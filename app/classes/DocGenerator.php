@@ -258,13 +258,14 @@ class DocGenerator {
 			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') h1;\r\n";
 			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') f1;\r\n";
 		} else {
-			if ($html_header) $this->formatBuffer .= str_replace('https','http',"   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina$id_formato.css') h1;\r\n");
-			if ($html_pie) $this->formatBuffer .= str_replace('https','http',"   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina".$id_formato."_".$this->lang.".css') f1;\r\n");
+			if ($html_header) $this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
+			if ($html_pie) $this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
 		}
 		$this->formatBuffer .= "}\r\n";
 		$this->formatBuffer .= "div.$sessionName\r\n";
 		$this->formatBuffer .= "  {page: $sessionName;}\r\n\r\n";
-		$this->formatBuffer = str_replace('https','http',$this->formatBuffer);
+		$this->formatBuffer=str_replace('https','http',$this->formatBuffer);
+		
 		$this->documentBuffer .= "<div class=\"$sessionName\">\r\n";
 		$this->documentBuffer .= $html;
 
