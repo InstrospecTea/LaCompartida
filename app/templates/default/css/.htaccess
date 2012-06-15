@@ -1,0 +1,9 @@
+
+
+ 
+RewriteEngine On
+RewriteCond %{REQUEST_URI} (.+)/app/(.*)$
+RewriteRule ^(.*)pie_de_pagina(\d+)_?(.*)?\.css$  %1/app/templates/default/css/pie_de_pagina.php?id_formato=$2&lang=$3 [L]
+ 
+
+ 
