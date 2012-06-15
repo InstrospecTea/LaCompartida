@@ -152,6 +152,7 @@ class UtilesApp extends Utiles {
 		if(UtilesApp::ExisteCampo('papel','factura_rtf', $sesion->dbh)  ) {
 			$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina, papel FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
 		} else {
+			mysql_query("ALTER TABLE  `factura_rtf` ADD  `papel` VARCHAR( 32 ) NOT NULL DEFAULT  'LETTER'", $sesion->dbh);
 			$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
 		}
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
