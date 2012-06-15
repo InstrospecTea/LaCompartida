@@ -169,6 +169,10 @@ class DocGenerator
 						$this->atualPageWidth = LEGAL_WIDTH * One_Cent;
 						$this->atualPageHeight = LEGAL_HEIGHT * One_Cent;
 						break;
+					case 'PRC' :
+						$this->atualPageWidth = PRC_WIDTH * One_Cent;
+						$this->atualPageHeight = PRC_HEIGHT * One_Cent;
+						break;
 					default:
 						die("ERROR: PAGE TYPE ($pageType) IS NOT DEFINED");
 				}
