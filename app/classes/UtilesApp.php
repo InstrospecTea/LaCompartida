@@ -7,17 +7,55 @@ require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 require_once Conf::ServerDir() . '/../app/classes/DocumentoMoneda.php';
-
+require_once Conf::ServerDir() . '/classes/Autocompletador.php';
+require_once Conf::ServerDir() . '/classes/InputId.php';
+ 
+ 
 class UtilesApp extends Utiles {
 
-	public static function GetConf($sesion, $conf) {
-		if (method_exists('Conf', $conf))
-			return Conf::$conf();
-		if (method_exists('Conf', 'GetConf'))
-			return Conf::GetConf($sesion, $conf);
-		return false;
-	}
 
+    public static function GetConf($sesion, $conf) 
+    {
+        if (method_exists('Conf', 'GetConf')) {
+            return Conf::GetConf($sesion, $conf);
+        }
+
+        if (method_exists('Conf', $conf)) {
+            return Conf::$conf();
+        }
+        return false;
+    }
+	public static function GetSimboloMonedaBase($sesion) {
+			 $querypreparar="select simbolo from prm_moneda where moneda_base=1 limit 0,1";
+			 $query =$sesion->pdodbh->prepare($querypreparar);
+		     $query->execute();
+			$result = $query->fetch(PDO::FETCH_LAZY);
+			return $result['simbolo'];
+	}
+	
+	public static function CampoCliente($sesion,$codigo_cliente=null,$codigo_cliente_secundario=null,$codigo_asunto=null,$codigo_asunto_secundario=null) {
+		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) {
+			if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario);
+			} else {
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+			}
+		} else {
+			if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
+				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, " class='combox' ", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
+			} else {
+				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+			}
+		}
+	}
+	
+	public static function CampoAsunto($sesion,$codigo_cliente=null,$codigo_cliente_secundario=null,$codigo_asunto=null,$codigo_asunto_secundario=null) {
+	 if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
+                                    echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
+								} else {
+                                    echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
+								} 
+	}
 	public static function ComparaEstadoCobro($sesion, $estadoactual, $operador = '=', $estado) {
 		//Pregunta si $estadoactual es un estado previo a $estado en el cobro o factura
 		$estado = strtoupper($estado);
@@ -111,7 +149,11 @@ class UtilesApp extends Utiles {
 
 	function ObtenerMargenesFactura($sesion, $id_template) {
 		$margenes = array();
-		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
+		if(UtilesApp::ExisteCampo('papel','factura_rtf', $sesion->dbh)  ) {
+			$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina, papel FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
+		} else {
+			$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
+		}
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (mysql_num_rows($resp) > 0) {
 			$margenes = mysql_fetch_array($resp);
@@ -396,7 +438,7 @@ class UtilesApp extends Utiles {
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
-
+//mail('ffigueroa@lemontech.cl','totalcta',$query);
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while (list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp)) {
 			if ($ingreso > 0)
@@ -1441,6 +1483,8 @@ HTML;
 			$arr_resultado['monto_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 			$arr_resultado['saldo_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['saldo_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 			$arr_resultado['monto_iva'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['monto_iva_hh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			$arr_resultado['monto_iva_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 			$arr_resultado['monto_total_cobro'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
 			$arr_resultado['monto_total_cobro_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_thh'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
 			$arr_resultado['monto_cobro_original'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
@@ -1465,6 +1509,8 @@ HTML;
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
+                                                                                          prm_proveedor.glosa as glosa_proveedor,
+                                                                                          prm_proveedor.id_proveedor as id_proveedor,
 					cta_corriente.fecha,
 					cta_corriente.id_moneda,
 					cta_corriente.egreso,
@@ -1479,6 +1525,7 @@ HTML;
 				FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
+                                                                        LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
 				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
 		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
 
@@ -1566,6 +1613,8 @@ HTML;
 				$lista[$v]['monto_total_impuesto'] = $suma_total_impuesto;
 				$lista[$v]['monto_total_mas_impuesto'] = $suma_total_impuesto + $suma_a_total;
 				$lista[$v]['descripcion'] = $gasto->fields['descripcion'];
+                                                                        $lista[$v]['id_proveedor'] = $gasto->fields['id_proveedor'];
+                                                                        $lista[$v]['glosa_proveedor'] = $gasto->fields['glosa_proveedor'];
 				$lista[$v]['codigo_asunto'] = $gasto->fields['codigo_asunto'];
 				$lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
 				$lista[$v]['fecha'] = $gasto->fields['fecha'];
@@ -1575,6 +1624,7 @@ HTML;
 			}
 		}
 		$resultados = array(
+                                                
 			'gasto_total' => $cobro_total_gasto,
 			'gasto_base' => $cobro_base_gastos,
 			'gasto_impuesto' => $cobro_total_gasto_impuestos,
