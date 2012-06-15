@@ -47,7 +47,7 @@ $configuracion['desactivar_clave_rtf'] = $desactivar_clave_rtf;
 list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer,$papel) = UtilesApp::ObtenerMargenesFactura($sesion, $factura->fields['id_documento_legal']);
 
 //echo $docm_top . "<br />" . $docm_right . "<br />" . $docm_bottom . "<br />" . $docm_left . "<br />" . $docm_header . "<br />" . $docm_footer; exit;
-
+if(!$papel || $papel='') $papel='LETTER';
 $doc = new DocGenerator($html, $cssData, $papel, false, 'PORTRAIT', $docm_top, $docm_right, $docm_bottom, $docm_left, 'EMITIDO', '', $configuracion, $docm_header, $docm_footer);
 $valor_unico = substr(time(), -3);
 
