@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -177,6 +177,11 @@
 		if(is_array($usuarios))
 			$query_usuarios = " AND usuario.id_usuario IN (".implode(',',$usuarios).") ";
 
+		
+		//FFF se quita esto de la query:
+		//,ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
+		// no hay que redondear en la moneda origen!
+		
 		$filas +=4;
 		$query ="SELECT		asunto.id_area_proyecto
 							,cobro.fecha_creacion
@@ -199,7 +204,7 @@
 							,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
 							,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
 							,ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) AS monto_proporcional
-							,ROUND(ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
+							,ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base 
 							FROM cobro
 							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
@@ -370,59 +375,59 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 <table width="90%"><tr><td>
 	<fieldset class="border_plomo tb_base">
 	<legend>
-	<?=__('Filtros')?>
+	<?php echo __('Filtros')?>
 	</legend>
 	<table style=" width: 90%;" cellpadding="4">
 		<tr>
 			<td align=right >
-				<?=__('Fecha desde')?>:
+				<?php echo __('Fecha desde')?>:
 			</td>
 			<td align=left>
-				<!--/<?= Html::PrintCalendar("fecha1", "$fecha1"); ?>-->
-				<input type="text" name="fecha1" value="<?= date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha1" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+				<!--/<?php echo  Html::PrintCalendar("fecha1", "$fecha1"); ?>-->
+				<input type="text" name="fecha1" value="<?php echo  date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha1" size="11" maxlength="10" />
+					<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
 			</td>
 		</tr>
 		<tr>
 			<td align=right >
-				<?=__('Fecha hasta')?>:
+				<?php echo __('Fecha hasta')?>:
 			</td>
 			<td align=left>
-				<!--<?= Html::PrintCalendar("fecha2", "$fecha2"); ?>-->
-				<input type="text" name="fecha2" value="<?= date("d-m-Y",strtotime("$hoy")) ?>" id="fecha2" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+				<!--<?php echo  Html::PrintCalendar("fecha2", "$fecha2"); ?>-->
+				<input type="text" name="fecha2" value="<?php echo  date("d-m-Y",strtotime("$hoy")) ?>" id="fecha2" size="11" maxlength="10" />
+					<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
 			</td>
 		</tr>
 		<tr>
 			<td align=right >
-				<?=__('Estado del Cobro')?>:
+				<?php echo __('Estado del Cobro')?>:
 			</td>
 			<td align=left>
 				<select name="estado" id="estado" >
-					<option value="todos" ><?=__('Todos') ?></option>
-					<option value="creado" ><?=__('Creado') ?></option>
-					<option value="en_revision" ><?=__('En Revisión') ?></option>
-					<option value="emitido" ><?=__('Emitido') ?></option>
-					<option value="facturado"><?=__('Facturado') ?></option>
-					<!--<option value="enviado"><?=__('Facturado') ?></option>-->
-					<option value="enviado" ><?=__('Enviado al Cliente') ?></option>
-					<option value="pago_parcial"><?=__('Pago Parcial') ?></option>
-					<option value="pagado" ><?=__('Pagado') ?></option>
+					<option value="todos" ><?php echo __('Todos') ?></option>
+					<option value="creado" ><?php echo __('Creado') ?></option>
+					<option value="en_revision" ><?php echo __('En Revisión') ?></option>
+					<option value="emitido" ><?php echo __('Emitido') ?></option>
+					<option value="facturado"><?php echo __('Facturado') ?></option>
+					<!--<option value="enviado"><?php echo __('Facturado') ?></option>-->
+					<option value="enviado" ><?php echo __('Enviado al Cliente') ?></option>
+					<option value="pago_parcial"><?php echo __('Pago Parcial') ?></option>
+					<option value="pagado" ><?php echo __('Pagado') ?></option>
 				</select>
 			</td>
 		</tr>
 
 		<tr>
 			<td align=right>
-				<?=__("Encargado")?>:
+				<?php echo __("Encargado")?>:
 			</td>
 			<td align=left>
-				<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+				<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=center colspan=2>
-				<input type="submit" class=btn value="<?=__('Generar reporte')?>" name="btn_reporte">
+				<input type="submit" class=btn value="<?php echo __('Generar reporte')?>" name="btn_reporte">
 			</td>
 		</tr>
 	</table>
@@ -447,6 +452,6 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 		}
 	);
 	</script>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>
