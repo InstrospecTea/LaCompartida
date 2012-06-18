@@ -1244,6 +1244,12 @@ if ($buscar_padre) {
 				<td align=left colspan=3><?php echo  Html::SelectQuery($sesion, $query_padre, 'id_factura_padre', $factura->fields['id_factura_padre'], '', '--', '160') ?></td>
 			</tr>
 <? } ?>
+<?php
+$zona_horaria = UtilesApp::GetConf($sesion, 'ZonaHoraria');
+if ($zona_horaria) {
+	date_default_timezone_set($zona_horaria);
+}
+?>
 		<tr>
 			<td align=right><?php echo  __('Fecha') ?></td>
 			<td align=left colspan=2><input type="text" name="fecha" value="<?php echo  $factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />

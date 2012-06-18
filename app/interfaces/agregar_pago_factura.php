@@ -52,7 +52,11 @@ if ($desde_webservice) {
 		$pago->Load($id_factura_pago);
 		$id_moneda = $pago->fields['id_moneda'];
 		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
+		if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
+		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago,'id_factura_pago','numero');
+		} else {
+		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);	
+		}
 		$arreglo_facturas = explode(',', $lista_facturas);
 		if ($id_factura) {
 			if (empty($lista_facturas)) {
