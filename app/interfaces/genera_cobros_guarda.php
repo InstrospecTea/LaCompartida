@@ -16,6 +16,7 @@ require_once Conf::ServerDir() . '/../app/classes/TemplateParser.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/../app/classes/Observacion.php';
 require_once Conf::ServerDir() . '/../app/classes/Cliente.php';
+	require_once Conf::ServerDir().'/../app/classes/NotaCobro.php';
 
 $Sesion = new Sesion(array('COB', 'DAT'));
 
@@ -85,6 +86,10 @@ if ($print || $emitir) {
 	if ($tipo_liquidacion) {
 		$where .= " AND cobro.incluye_gastos = '$incluye_gastos' AND cobro.incluye_honorarios = '$incluye_honorarios' ";
 	}
+	
+	if( UtilesApp::GetConf($Sesion, 'OcultarCobrosTotalCeroGeneracion') ) {
+		$where .= " AND ( cobro.total_minutos > 0 OR cobro.forma_cobro != 'TASA' ) ";
+	}
 
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 			"&fecha_fin=$fecha_fin&opc=buscar&rango=$rango&fecha_anio=$fecha_anio&fecha_mes=$fecha_mes&fecha_periodo_ini=$fecha_periodo_ini" .
@@ -93,33 +98,35 @@ if ($print || $emitir) {
 ####### END #########
 # IMPRESION
 if ($print) {
+	$NotaCobro=new NotaCobro($Sesion);
+	
 	$query = "SELECT cobro.id_cobro, cobro.id_usuario, cobro.codigo_cliente, cobro.id_contrato, contrato.id_carta, cobro.estado, cobro.opc_papel
 								FROM cobro
 								JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 								LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
 								WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )
 								ORDER BY cliente.glosa_cliente";
-
+	//echo $query; exit;
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	if (count(mysql_num_rows($resp)) > 0) {
 		while ($cob = mysql_fetch_array($resp)) {
 			set_time_limit(100);
-			if ($Cobro->Load($cob['id_cobro'])) {
-				$Cobro->GuardarCobro();
-				$lang = $Cobro->fields['codigo_idioma'] == '' ? 'es' : $Cobro->fields['codigo_idioma'];
+			if ($NotaCobro->Load($cob['id_cobro'])) {
+				$NotaCobro->GuardarCobro();
+				$lang = $NotaCobro->fields['codigo_idioma'] == '' ? 'es' : $NotaCobro->fields['codigo_idioma'];
 				require Conf::ServerDir() . "/lang/$lang.php";
 				if ($opcion != 'cartas')
-					$Cobro->fields['id_carta'] = null;
-				$html .= $Cobro->GeneraHTMLCobro(true);
+					$NotaCobro->fields['id_carta'] = null;
+				$html .= $NotaCobro->GeneraHTMLCobro(true);
 				$html .= "<br size=\"1\" class=\"divisor\">";
 			}
 			$opc_papel = $cob['opc_papel'];
 			$id_carta = $cob['id_carta'];
-			$cssData .= UtilesApp::TemplateCartaCSS($Sesion, $Cobro->fields['id_carta']);
+			$cssData .= UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
 		}
 		if ($html) {
 			$cssData .= UtilesApp::CSSCobro($Sesion);
-			$doc = new DocGenerator($html, $cssData, 'LETTER', 1, 'PORTRAIT', 1.5, 2.0, 2.0, 2.0, $Cobro->fields['estado']);
+			$doc = new DocGenerator($html, $cssData, 'LETTER', 1, 'PORTRAIT', 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
 			$doc->output("cobro_masivo.doc");
 		}
 	}
@@ -313,10 +320,10 @@ if ($print) {
 	#fin cobros wip
 
 	$Contrato->SetIncluirEnCierre($Sesion);
-	$Pagina->Redirect(
+/*	$Pagina->Redirect(
 			"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 			"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
 			"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
-	);
+	);*/
 }
 ?>
