@@ -121,14 +121,15 @@ if ($opc == 'asuntos_liquidar') {
 						LEFT JOIN prm_moneda as moneda_monto ON moneda_monto.id_moneda=contrato.id_moneda_monto
 						WHERE $where
 						GROUP BY contrato.id_contrato";
-		###### BUSCADOR ######
-		$link = __('Opción'); #__('Opción')." <br /><a href='javascript:void(0)' onclick='SeleccionaTodos(document.form_busca.opc, this.checked);'>".__('Todos');
-		$x_pag = 20;
-		$orden = 'cliente.glosa_cliente, asunto_lista';
-		$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
-		$b->mensaje_error_fecha = "N/A";
-		$b->nombre = "busc_gastos";
-		$b->titulo = __('Proceso masivo de emisión de cobros');
+	###### BUSCADOR ######
+	
+	$link = __('Opción'); #__('Opción')." <br /><a href='javascript:void(0)' onclick='SeleccionaTodos(document.form_busca.opc, this.checked);'>".__('Todos');
+	$x_pag = 20;
+	$orden = 'cliente.glosa_cliente, asunto_lista';
+	$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
+	$b->mensaje_error_fecha = "N/A";
+	$b->nombre = "busc_gastos";
+	$b->titulo = __('Proceso masivo de emisión de cobros');
 	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "", "", "SplitDuracion");
 	$b->AgregarEncabezado("asuntos", __('Asunto'), "align=left nowrap");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Último Cobro'), "align=left nowrap");
@@ -144,13 +145,14 @@ $pagina->PrintTop();
 <script type="text/javascript">
 	function ToggleDiv(divId)
 	{
-	var divObj = document.getElementById(divId);
-	if(divObj)
-	{
-		if(divObj.style.display == 'none')
-			divObj.style.display = 'block';
-		else
-			divObj.style.display = 'none';
+		var divObj = document.getElementById(divId);
+		if(divObj)
+		{
+			if(divObj.style.display == 'none')
+				divObj.style.display = 'table-cell';
+			else
+				divObj.style.display = 'none';
+		}
 	}
 	}
 
@@ -679,18 +681,18 @@ else
 	<?php
 	if ($opc == 'buscar') {
 		?>
-	<table width="720px">
-		<tr>
-			<td align="right" width="580px">
+		<table width="820">
+			<tr>
+				<td align="right" width="680">
 					<a href="javascript:void(0);" style="color: #990000; font-size: 9px; font-weight: normal;" onclick="ToggleDiv('opciones_excel');"><?php echo __('opciones excel') ?></a>
 			</td>
 			<td align="right" nowrap>
 					<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
-			</td>
-		</tr>
-		<tr>
-			<td align="right" id="opciones_excel" style="display: none; font-size: 10px;">
-				<input type="checkbox" name="opc_ver_horas_trabajadas" id="opc_ver_horas_trabajadas" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<td align="center" id="opciones_excel" colspan="2" style="display: none; font-size: 10px;">
+					<input type="checkbox" name="opc_ver_horas_trabajadas" id="opc_ver_horas_trabajadas" value="1" />
 					<label for="opc_ver_horas_trabajadas"><?php echo __('Mostrar horas trabajadas') ?></label>
 				<input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" />
 					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
@@ -719,19 +721,18 @@ else
 						<?php
 				}
 					?>
-				</tr>
-			</td>
-		</tr>
-		<tr>
-			<td align="center" colspan="2">
-				<input type="button" value="<?php echo  __('Asuntos por') .' '.__('cobrar');?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
-				<input type="button" value="<?=__('Generar borradores')?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
-				<input type="button" value="<?=__('Excel borradores')?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
-				<input type="button" value="<?=__('Descargar borradores')?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
-				<input type="button" value="<?=__('Emitir cobros')?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
-			</td>
-		</tr>
-	</table>
+				</td>
+			</tr>			
+			<tr>
+				<td align="center" colspan="2">
+					<input type="button" value="<?php echo __('Asuntos por') . ' ' . __('cobrar'); ?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form, 'asuntos_liquidar',false)">
+					<input type="button" value="<?php echo __('Generar borradores') ?>" class="btn" name="boton2" onclick="GeneraCobros(this.form, 'genera',false)">
+					<input type="button" value="<?php echo __('Excel borradores') ?>" class="btn" name="boton_xls" onclick="GeneraCobros(this.form, 'excel',false)">
+					<input type="button" value="<?php echo __('Descargar borradores') ?>" class="btn" name="boton_print" onclick="ImpresionCobros(true,false)">
+					<input type="button" value="<?php echo __('Emitir cobros') ?>" class="btn" name="boton_emitir" onclick="GeneraCobros(this.form,'emitir',false)">
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 	?>
