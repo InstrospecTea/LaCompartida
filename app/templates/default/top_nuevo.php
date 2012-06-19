@@ -31,12 +31,12 @@ if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
    
 
 		<div  class="tb_facebook">
-                    <div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;"><a href="<?php echo Conf::RootDir().'/app/usuarios/index.php';?>" style="border:0 none;text-decoration:none;">
+                    <div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;"><a style="border:0 none;" href="<?php echo Conf::RootDir().'/app/usuarios/index.php';?>" style="border:0 none;text-decoration:none;">
 			<?php 
 			if(defined('ROOTDIR')&& ROOTDIR=='tt2'):
-			    echo '<img src="https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png" />';
+			    echo '<img  style="border:0 none;"  src="https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png" />';
 			    else:
-			    echo '<img src="'. Conf::ImgDir().'/logo_top.png" rel="'.ROOTDIR.'"/>';
+			    echo '<img  style="border:0 none;" src="'. Conf::ImgDir().'/logo_top.png" rel="'.ROOTDIR.'"/>';
                             
                             echo '<script>';
                             echo "var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;";
@@ -73,7 +73,7 @@ if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
     if (UtilesApp::GetConf($sesion, 'BeaconTimer')) {
         $beaconleft=UtilesApp::GetConf($sesion, 'BeaconTimer')-time();
         if ($beaconleft<0) {
-        echo 'Versi&oacute;n expirada del software';  
+           //echo 'Versi&oacute;n expirada del software';  
         } else {
             echo '<!--Beaconleft:'.$beaconleft.'-->';
         }
