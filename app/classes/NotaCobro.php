@@ -1,6 +1,5 @@
 <?php
 
-
 class NotaCobro extends Cobro {
 
 	var $asuntos = array();
