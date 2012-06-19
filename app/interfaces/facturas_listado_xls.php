@@ -248,7 +248,7 @@
 	for($i=0; $i<$col_num; ++$i)
 	{
 		// ocultar celdas con PHP
-		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','id_factura','mostrar_diferencia_razon_social')) ) {
+		if(in_array($col_name[$i],array('simbolo','cifras_decimales','id_moneda','id_factura','mostrar_diferencia_razon_social', 'estado')) ) {
 			$arr_col[$col_name[$i]]['hidden'] = 'SI'; }
 		else { $arr_col[$col_name[$i]]['celda'] = $col++; }
 
@@ -310,6 +310,8 @@
 			$arr_col[$col_name[$i]]['titulo'] = __('Pagos'.' '.$simbolo_moneda_base); }
 		else if(in_array($col_name[$i],array('fecha_ultimo_pago')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __('Fecha último pago'); }
+		else if(in_array($col_name[$i],array('estado_glosa')) ) {
+			$arr_col[$col_name[$i]]['titulo'] = __('Estado'); }
 		else if(in_array($col_name[$i],array('numeracion_excel')) ) {
 			$arr_col[$col_name[$i]]['titulo'] = __(''); }
 		else { $arr_col[$col_name[$i]]['titulo'] = str_replace('_',' ',$col_name[$i]); }
@@ -384,11 +386,11 @@
 		$proc->fields['tipo_cambio'] /= $tipo_cambio_moneda_base;
 		
 		for($i=0; $i<$col_num; $i++) {
-	        if($arr_col[$col_name[$i]]['hidden'] != 'SI') {
-
+	        if( !isset( $arr_col[$col_name[$i]]['hidden'] ) || $arr_col[$col_name[$i]]['hidden'] != 'SI') {
+				
 
 				$subtotal = $proc->fields['honorarios'] + $proc->fields['subtotal_gastos'] + $proc->fields['subtotal_gastos_sin_impuesto'];
-
+				$nombrecolumna = $col_name[$i];
 				if($col_name[$i] == 'total' || $col_name[$i] == 'iva') {
 					if( strtoupper( $proc->fields['estado'] ) == 'A' ){
 						$ws1->writeNumber($fila, $arr_col[$col_name[$i]]['celda'], '0', $formatos_moneda[$proc->fields['id_moneda']]);
@@ -480,8 +482,7 @@
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], Utiles::sql2fecha($ultima_fecha_pago, $formato_fechas, "-"), $arr_col[$col_name[$i]]['css']);
 				}
 				else if($col_name[$i] == 'estado_glosa') {
-
-					$ws1->writeNote($fila, $arr_col['estado']['celda'], $proc->fields[$col_name[$i]]);
+					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
 				}
 				else if($col_name[$i] == 'numeracion_excel') {
 
@@ -506,8 +507,8 @@
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 		else if(in_array($col_name[$i],array('fecha_ultimo_pago')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 11); }
-		else if(in_array($col_name[$i],array('tipo','estado')) ) {
-			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 6); }
+		else if(in_array($col_name[$i],array('tipo','estado_glosa')) ) {
+			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 10); }
 		else if(in_array($col_name[$i],array('glosa_cliente','glosa_asunto','cliente_facturable')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 20); }
 		else if(in_array($col_name[$i],array('encargado_comercial','codigo_asunto')) ) {
@@ -515,7 +516,7 @@
 		else { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 12); }
 
 		// ancho celdas ocultos
-		if(in_array($col_name[$i],array('numeracion_excel','estado_glosa','honorarios','subtotal_gastos','subtotal_gastos_sin_impuesto','total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
+		if(in_array($col_name[$i],array('numeracion_excel','honorarios','subtotal_gastos','subtotal_gastos_sin_impuesto','total','id_cobro','monto_pagos_moneda_base','saldo_moneda_base','tipo_cambio','codigo_asunto')) ) {
 			$ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 0,0,1); }
 
 	}

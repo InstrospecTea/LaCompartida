@@ -1,4 +1,4 @@
-<?
+<?php 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
@@ -10,7 +10,7 @@ require_once Conf::ServerDir() . '/classes/InputId.php';
 require_once Conf::ServerDir() . '/classes/CobroAsunto.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
-$sesion = new Sesion(array('DAT', 'COB'));
+$sesion = new Sesion(array('DAT', 'COB', 'SASU'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
@@ -33,6 +33,13 @@ if ($permisos->fields['permitido'] && $accion == "eliminar") {
 	}
 }
 
+$hide_areas = '';
+$params_asuntos_array['codigo_permiso'] = 'SASU';
+$permisos_asuntos = $sesion->usuario->permisos->Find('FindPermiso', $params_asuntos_array); #tiene permiso de admin de datos
+if ($permisos_asuntos->fields['permitido']) {
+	$hide_areas = 'style="display: none;"';
+}
+
 $pagina->titulo = __('Listado de') . ' ' . __('Asuntos');
 $pagina->PrintTop($popup);
 ?>
@@ -43,7 +50,7 @@ $pagina->PrintTop($popup);
         jQuery("#agregar_asunto").click(function() {
            var CODCLIENTE='<?php echo $codigo_cliente; ?>';
            if (CODCLIENTE=='') {CODCLIENTE=jQuery("#campo_codigo_cliente").val();}
-           nuovaFinestra('Agregar_Asunto',800,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
+           nuovaFinestra('Agregar_Asunto',850,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
         });
     });
 
@@ -95,8 +102,7 @@ $pagina->PrintTop($popup);
 
 	function EliminaAsunto(from,id_asunto)
 	{
-<?
-if ($codigo_cliente)
+<?php if ($codigo_cliente)
 	echo "var codigo_cliente = '&codigo_cliente=" . $codigo_cliente . "';";
 else
 	echo "var codigo_cliente = '';";
@@ -127,41 +133,39 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 	<!-- Fin calendario DIV -->
 
 
-<?
-if ($id_cobro == "") {
+<?php if ($id_cobro == "") {
+	
 	?>
 		<table style="border: 0px solid black" width='100%'>
 			<tr>
 				<td></td>
 				<td colspan="3" align="right">
-                                    <a href="#" id="agregar_asunto" title="<?= __('Agregar Asunto') ?>"><img src="<?= Conf::ImgDir() ?>/agregar.gif" border=0><?= __('Agregar') . ' ' . __('Asunto') ?></a>
+					<a href="#" id="agregar_asunto" title="<?php echo  __('Agregar Asunto') ?>"><img src="<?php echo  Conf::ImgDir() ?>/agregar.gif" border=0><?php echo  __('Agregar') . ' ' . __('Asunto') ?></a>
 				</td>
 			</tr>
 		</table>
-		<?
-	}
+		<?php 	}
 	?>
-<?
-if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
+<?php if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 	?>
 		<table width="90%"><tr><td>
 					<fieldset class="tb_base" width="100%">
-						<legend><?= __('Filtros') ?></legend>	
+						<legend><?php echo  __('Filtros') ?></legend>	
 						<table style="border: 0px solid black" width='100%'>
 							<tr>
 								<td colspan=4>&nbsp;</td>
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-		<?= __('Activo') ?> 
+		<?php echo  __('Activo') ?> 
 								</td>
 								<td align=left colspan=3>
-	<?= Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "activo", $activo, '', 'Todos', '60') ?>
+	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "activo", $activo, '', 'Todos', '60') ?>
 								</td>
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-	<?= __('Cliente') ?>
+	<?php echo  __('Cliente') ?>
 								</td>
 								<td nowrap align=left colspan=3>
 									<?php
@@ -193,7 +197,7 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 							</tr>
 							<tr>
 								<td width=25% align=right style="font-weight:bold;">
-									<?= __('C&oacute;digo asunto') ?>
+									<?php echo  __('C&oacute;digo asunto') ?>
 								</td>
 								<td nowrap align=left colspan=4>
 									<?php
@@ -205,10 +209,10 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 									}
 									else {
 										?>
-										<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?= $codigo_asunto ?>" onchange="this.value=this.value.toUpperCase();">
+										<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo  $codigo_asunto ?>" onchange="this.value=this.value.toUpperCase();">
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<b><?= __('T&iacute;tulo asunto') ?></b>
-										<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?= $glosa_asunto ?>">
+										<b><?php echo  __('T&iacute;tulo asunto') ?></b>
+										<input onkeydown="if(event.keyCode==13)Listar(this.form, 'buscar');" type="text" name="glosa_asunto" size="30" value="<?php echo  $glosa_asunto ?>">
 										<?php
 									}
 									?>
@@ -216,39 +220,39 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-									<?= __('Fecha creaci&oacute;n') ?> 
+									<?php echo  __('Fecha creaci&oacute;n') ?> 
 								</td>
 								<td nowrap align=left colspan= 3>
-									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" value="<?= $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-									<img src="<?= Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+									<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<?= __('Hasta') ?>
-									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha2" value="<?= $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-									<img src="<?= Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+									<?php echo  __('Hasta') ?>
+									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha2" value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+									<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
 								</td>
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-									<?= __('Usuario') ?>
+									<?php echo  __('Usuario') ?>
 								</td>
 								<td align=left colspan=3>
-	<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario", "id_usuario", $id_usuario, '', 'Todos', '200') ?>
+	<?php echo  Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario", "id_usuario", $id_usuario, '', 'Todos', '200') ?>
 								</td>
 							<tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
-	<?= __('&Aacute;rea') ?>
+	<?php echo  __('&Aacute;rea') ?>
 								</td>
 								<td align=left colspan=3>
-									<?= Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden ASC", "id_area_proyecto", $id_area_proyecto, '', 'Todos', '200') ?>
+									<?php echo  Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden ASC", "id_area_proyecto", $id_area_proyecto, '', 'Todos', '200') ?>
 								</td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
 								<td align=left colspan=3>
-									<input type="button" class=btn name="buscar" value="<?= __('Buscar') ?>" onclick="Listar( this.form, 'buscar')">
-									<input type="button" class=btn value="<?= __('Descargar listado a Excel') ?>" onclick="Listar(this.form, 'xls')" >
-									<input type="button" class=btn value="<?= __('Descargar Informaci&oacute;n Comercial a Excel') ?>" onclick="Listar(this.form,'facturacion_xls')" >
+									<input type="button" class=btn name="buscar" value="<?php echo  __('Buscar') ?>" onclick="Listar( this.form, 'buscar')">
+									<input type="button" <?php echo $hide_areas; ?> class=btn value="<?php echo  __('Descargar listado a Excel') ?>" onclick="Listar(this.form, 'xls')" >
+									<input type="button" <?php echo $hide_areas; ?> class=btn value="<?php echo  __('Descargar Informaci&oacute;n Comercial a Excel') ?>" onclick="Listar(this.form,'facturacion_xls')" >
 								</td>
 							</tr>
 						</table>
@@ -270,12 +274,10 @@ if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
 		}
 	);
 	</script>
-<?
-}
+<?php }
 ?>
 	</form>
-<?
-if ($busqueda)
+<?php if ($busqueda)
 	$link = "Opciones";
 else
 	$link = __('Cobrar') . " <br /><a href='asuntos.php?codigo_cliente=" . $codigo_cliente . "&opc=entregar_asunto&id_cobro=" . $id_cobro . "&popup=1&motivo=cobros&checkall=1'>" . __('Todos') . "</a>";
@@ -384,7 +386,8 @@ if ($buscar || $opc == "entregar_asunto") {
 	#		$b->AgregarEncabezado("horas_no_cobradas","Horas no cobradas","","","SplitDuracion");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
 	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creación"'));
-	if ($permisos->fields['permitido'])
+	
+	if ($permisos->fields['permitido'] || $permisos_asuntos->fields['permitido'])
 		$b->AgregarFuncion("$link", 'Opciones', "align=center nowrap");
 	$b->color_mouse_over = "#bcff5c";
 	#		if($motivo == "cobros")
@@ -424,6 +427,7 @@ function Opciones(& $fila) {
 	global $sesion;
 	global $checkall;
 	global $motivo, $from;
+	global $permisos_asuntos;
 
 
 	if ($motivo == 'cobros') {
@@ -431,11 +435,19 @@ function Opciones(& $fila) {
 	}
 	$id_asunto = $fila->fields['id_asunto'];
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
-		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
+		if ($permisos_asuntos->fields['permitido']) {
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>";
+		} else {
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
 				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+		}
 	} else {
-		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
+		if ($permisos_asuntos->fields['permitido']) {
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>";
+		} else {
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
 				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
+		}
 	}
 }
 

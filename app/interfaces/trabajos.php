@@ -1165,26 +1165,28 @@ jQuery(document).ready(function() {
            jQuery.post('ajax/estimar_datos.php',{where:Where,id_cobro:Idcobro,motivo:Motivo},function(data) {
               if(parseInt(data)>15000) {
 				var formated=data/1000;
-				jQuery('#dialog-confirm').attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificadoy con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
+				var dialogoconfirma=top.window.jQuery( "#dialog-confirm" );
+				dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificadoy con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
 				jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
-				jQuery( "#dialog-confirm" ).dialog({
+				
+				dialogoconfirma.dialog({
 						resizable: false,						autoOpen:true,						height:200,						width:450,
 						modal: true,
 						close:function(ev,ui) {
-							jQuery(this).html('');
+							dialogoconfirma.html('');
 						},
 						buttons: {
 										"<?php echo __('Entiendo y acepto')?>": function() {
 											 jQuery('#descargapro').removeAttr('disabled');
 											 window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&excel=1&simplificado=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>');
-												jQuery( this ).dialog( "close" );
+												dialogoconfirma.dialog( "close" );
 												
 												return true;
 												},
 
 										"<?php echo __('Cancelar')?>": function() {
 											jQuery('#descargapro').removeAttr('disabled');
-											jQuery( this ).dialog( "close" );
+											dialogoconfirma.dialog( "close" );
 												
 															return false;
 															

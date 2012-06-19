@@ -1019,42 +1019,39 @@ function UpdateTipoCambio( form )
 
 /* Ajax guarda tipo de cambio en cobro_moneda */
 function GuardaTipoCambio( id_moneda, tipo_cambio )
-{
-	var form = $('form_cobro5');
-	var msg_cambio = $('msg_cambio');
-	if(!parseFloat(tipo_cambio) || parseFloat(tipo_cambio) == 0)
 	{
-		alert('<?php echo __("El monto ingresado del tipo de cambio es incorrecto")?>');
-		var tipo_cambio = 'cobro_tipo_cambio_'+id_moneda;
-		var tipo_cambio_id = $(tipo_cambio);
-		tipo_cambio_id.value = 1;
-		tipo_cambio_id.focus();
-		return false;
-	}
-	else
-	{
-		var id_cobro = $('id_cobro').value;
-		tipo_cambio = tipo_cambio.replace(',','.');
-
-		var http = getXMLHTTP();
-		http.open('get', 'ajax_grabar_campo.php?accion=guardar_tipo_cambio&id_cobro='+id_cobro+'&id_moneda='+id_moneda+'&tipo_cambio='+tipo_cambio);
-		http.onreadystatechange = function()
+		var form = jQuery('#form_cobro5');
+		var msg_cambio = $('msg_cambio');
+	
+		if(!parseFloat(tipo_cambio) || parseFloat(tipo_cambio) == 0)
 		{
-			if(http.readyState == 4)
-		  	{
-				var response = http.responseText;
-				if(response)
-				{
-					msg_cambio.style.display = 'inline';
-					return true;
-				}
-				else
-					return false;
-			}
-		};
-		http.send(null);
-		ActualizarSaldoAdelantos();
+			alert('<?php echo __("El monto ingresado del tipo de cambio es incorrecto")?>');
+			var field_tipo_cambio = 'cobro_tipo_cambio_'+id_moneda;
+			var tipo_cambio_id = $(field_tipo_cambio);
+			tipo_cambio_id.value = 1;
+			tipo_cambio_id.focus();
+			return false;
+		} 	else 	{
+			var id_cobro = $('id_cobro').value;
+			tipo_cambio = tipo_cambio.replace(',','.');
+	if(window.console) console.log(id_moneda+' tipo cambio es'+tipo_cambio);
+			
+			
+		jQuery.get('ajax_grabar_campo.php?accion=guardar_tipo_cambio&id_cobro='+id_cobro+'&id_moneda='+id_moneda+'&tipo_cambio='+tipo_cambio,function(data) {
+			
+			if(data=='OK')		{
+						msg_cambio.style.display = 'inline';
+						return true;
+					} else {
+						return false;
+					}
+		});
+		
+					
+			
+	}
 }
+
 
 function ActualizarSaldoAdelantos(){
 		var tipos_cambio = [];
@@ -1079,7 +1076,7 @@ function ActualizarSaldoAdelantos(){
 		};
 		http.send(null);
 	}
-}
+
 
 /*CANCELA UPDATE CAP*/
 function CancelaUpdateCap()
@@ -1277,7 +1274,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 					$tipo = $tipo_cambio_cobro[$moneda->fields['id_moneda']];
 			?>
 					<td align='center' style='padding-left:10px; padding-right:10px'>
-						<input type="text" size="8" name="cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda']?>" id="cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda']?>" value="<?php echo $tipo > 0 ? number_format($tipo,$moneda->fields['cifras_decimales'],'.','') : number_format($moneda->fields['tipo_cambio'],$moneda->fields['cifras_decimales'],'.','')?>" onchange="GuardaTipoCambio(<?php echo $moneda->fields['id_moneda']?>,this.value)">
+						<input type="text" size="8" name="cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda']?>" id="cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda']?>" value="<?php echo $tipo > 0 ? number_format($tipo,max($moneda->fields['cifras_decimales'],7),'.','') : number_format($moneda->fields['tipo_cambio'],max($moneda->fields['cifras_decimales'],7),'.','')?>" onchange="GuardaTipoCambio(<?php echo $moneda->fields['id_moneda']?>,this.value)">
 					</td>
 			<?php 
 				}
@@ -2194,14 +2191,14 @@ function ActivaCarta(check)
 for( $i=0; $i<$monedas->num; $i++ )
 {
 	$moneda = $monedas->Get($i);
-	$cf = $moneda->fields['cifras_decimales'];
+	$cf = max($moneda->fields['cifras_decimales'],7);
 	if( $cf > 0 ) { $dec = "."; while( $cf-- > 0 ){ $dec .= "0"; } }
 ?>
 	jQuery("#cobro_tipo_cambio_<?php echo $moneda->fields['id_moneda']?>").blur(function(){
 	   var str = jQuery(this).val();
 	   jQuery(this).val( str.replace(',','.') );
-	   jQuery(this).parseNumber({format:"#<?php echo $dec?>", locale:"us"});
-	   jQuery(this).formatNumber({format:"#<?php echo $dec?>", locale:"us"});
+	   jQuery(this).parseNumber({format:"#.0000000", locale:"us"});
+	   jQuery(this).formatNumber({format:"#.0000000", locale:"us"});
 	});
 <?php
 }

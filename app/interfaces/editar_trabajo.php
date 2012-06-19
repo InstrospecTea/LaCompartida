@@ -124,7 +124,7 @@
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
 				if(!$codigo_asunto || $codigo_asunto ==''){
-					$pagina->AddError("Debe seleccionar un asunto");
+					$pagina->AddError("Debe seleccionar un ".__('Asunto'));
 				}
 				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && (! $id_area_trabajo || $id_area_trabajo == '')){
 						$pagina->AddError("Debe seleccionar una area de trabajo");
@@ -255,7 +255,8 @@
                                     $t->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
                             if(!$t->fields['costo_hh'])
                                     $t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
-
+							
+							if($t->fields['cobrable']==0) $t->fields['duracion_cobrada']='00:00:00';
                             if($t->Write())
                             {
                                     if( $actualizar_trabajo_tarifa )
@@ -400,6 +401,30 @@ if(top.Refrescar!==undefined) top.Refrescar();
 
 <script type="text/javascript">
 
+jQuery('document').ready(function() {
+	jQuery('#chkCobrable').click(function() {
+		if(jQuery(this).is(':checked')) {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
+			jQuery('#divVisible').hide();
+			jQuery('.seccioncobrable').show();
+		} else {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#divVisible').show();
+			jQuery('.seccioncobrable').hide();
+		}
+	});
+	if(jQuery(this).is(':checked')) {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
+			jQuery('#divVisible').hide();
+			jQuery('.seccioncobrable').show();
+		} else {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#divVisible').show();
+			jQuery('.seccioncobrable').hide();
+		}
+}) ;
+
+	
 function MostrarTrabajoTarifas()
 {
 	$('TarifaTrabajo').show();
@@ -979,7 +1004,7 @@ function ActualizaCobro(valor)
 	{
 		var text_window = "<img src='<?php echo Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA")?></u><br><br>";
 		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
-		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
+		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo '. __('asunto') .'en caso de que exista')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,
@@ -1374,7 +1399,7 @@ echo '</td>';
 	if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable'))
 	{
 
-		echo '<td>&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td>';
+		echo '<td class="seccioncobrable">&nbsp;&nbsp;'. __('Duración Cobrable') .'</td><td  class="seccioncobrable">';
 
 		if($tipo_ingreso=='selector')
 		{
@@ -1406,7 +1431,7 @@ echo '</td>';
     </tr>
     <tr>
         <td colspan="2" align=right>
-        	<?
+        	<?php
 		if (method_exists('Conf','GetConf'))
 		{
 			$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
@@ -1447,23 +1472,23 @@ echo '</td>';
 
     </tr>
 			<tr>
-				<?
+				<?php
 					$mostrar_cobrable=true;
 					if(!UtilesApp::GetConf($sesion,'PermitirCampoCobrableAProfesional') && $permiso_profesional->fields['permitido'] && !$permiso_revisor->fields['permitido'] && !UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
 						$mostrar_cobrable=false;
 					}
 				?>
 				<td colspan="2" align=right>
-					<?	if($mostrar_cobrable) { ?>
+					<?php	if($mostrar_cobrable) { ?>
 					<?php echo __('Cobrable')?><br/>
 					<?php } ?>
 				</td>
 				<td align=left>
-					<?	if($mostrar_cobrable) { ?>
-					<input type=checkbox name=cobrable value=1 <?php echo  $t->fields['cobrable'] == 1 ? "checked" : "" ?> id="chkCobrable" onClick="CheckVisible();">
-					<?php } 
-					else {?>
-					<input type=hidden name=cobrable id="chkCobrable" value=1 >
+					<?php  if($mostrar_cobrable) { 		 ?>
+					
+					<input type="checkbox" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
+					<?php } 	else { ?>
+					<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
 					<?php } ?>
 					&nbsp;&nbsp;
 					<div id=divVisible <?php if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
@@ -1609,17 +1634,7 @@ echo '</td>';
     }
 ?>
 <script language="javascript" type="text/javascript">
-$('chkCobrable').observe('click',
-	function(evento){
-		if(!this.checked)
-		{
-			$('divVisible').style['display']="inline";
-		}
-		else
-		{
-			$('divVisible').style['display']="none";
-		}
-	});
+
 var formObj = $('form_editar_trabajo');
 <?
 if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -1672,7 +1687,9 @@ Calendar.setup(
 			descripcion_textarea.value = actividad_seleccionada.text + '\n' + descripcion_textarea.value;
 		}
 	});
+	
 <?php
 	}
 ?>
+//	jQuery('#chkCobrable').click();
 </script>
