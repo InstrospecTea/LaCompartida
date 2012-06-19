@@ -11,7 +11,8 @@ require_once 'Asunto.php';
 require_once 'CobroMoneda.php';
 require_once 'MontoEnPalabra.php';
 require_once 'UtilesApp.php';
-require_once 'NotaCobro.php';
+require_once Conf::ServerDir() . '/../app/classes/NotaCobro.php';
+ 
 
 class Factura extends Objeto {
 
