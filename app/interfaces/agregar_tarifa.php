@@ -16,37 +16,6 @@
 
 	$tarifa = new Tarifa($sesion);
 	
-	/**
-	 * Fix
-	 * El script siempre considera que existe el id_tarifa = 1 y que este es el 
-	 * por defecto. Ahora se realiza la comprobacion si el parametro id_tarifa_edicion
-	 * es valido, sino se le asigna el id_tarifa mas pequeño de las tarifas por
-	 * defecto que existan.
-	 */
-	
-	try {
-		$query			= sprintf('SELECT MIN(id_tarifa) FROM tarifa WHERE tarifa_defecto = 1');
-		$tarifa_defecto = array_shift(mysql_fetch_row(mysql_query($query, $sesion->dbh)));
-	} catch(Exception $e) {
-		$tarifa_defecto = null;
-	}
-	
-	if ( isset($_GET['id_tarifa_edicion']) && is_numeric($_GET['id_tarifa_edicion']) ) 
-	{
-		if ( $_GET['id_tarifa_edicion'] == $tarifa_defecto ) {
-			$id_tarifa_edicion = $tarifa_defecto;
-		} else {
-			$query = sprintf('SELECT COUNT(*) FROM tarifa WHERE id_tarifa = %s', $_GET['id_tarifa_edicion']);
-			try {
-				$existe = array_shift(mysql_fetch_row(mysql_query($query, $sesion->dbh)));
-				if ( ! $existe ) {
-					$id_tarifa_edicion = $tarifa_defecto;
-				}
-			} catch(Exception $e) {
-			}
-		}
-	}
-	
 	if($opc == 'eliminar')
 	{
 		$tarifa_eliminar = new Tarifa($sesion);
