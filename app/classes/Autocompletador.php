@@ -1,4 +1,5 @@
-<?php  require_once dirname(__FILE__).'/../conf.php';
+<?
+require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
@@ -7,13 +8,13 @@ class Autocompletador
 {
 	function ImprimirSelector($sesion, $codigo_cliente="", $codigo_cliente_secundario="", $mas_recientes=false, $width='', $oncambio='')
 	{
-		$output = ' <script>google.load("scriptaculous", "1.9.0");	</script>';
+		$output = "<script src=\"".Conf::RootDir()."/fw/js/prototype.js\" type=\"text/javascript\"></script>";
+		$output = "<script src=\"".Conf::RootDir()."/fw/js/src/scriptaculous.js?load=effects,controls\" type=\"text/javascript\"></script>";
 	
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			$output .= "<input type=\"hidden\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente\" class=\"codigo_cliente\" name=\"codigo_cliente\" onChange=\"CargarGlosaCliente(); $oncambio\" value=\"".$codigo_cliente."\" />
-						<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente_secundario\" class=\"codigo_cliente\" name=\"codigo_cliente_secundario\" onChange=\"CargarGlosaCliente(); $oncambio\" value=\"".$codigo_cliente_secundario."\" />";
+			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente_secundario\" name=\"codigo_cliente_secundario\" onChange=\"CargarGlosaCliente(); $oncambio\" value=\"".$codigo_cliente_secundario."\" />";
 		else
-			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente\" class=\"codigo_cliente\" name=\"codigo_cliente\" onChange=\"CargarGlosaCliente(); $oncambio\" value=\"".$codigo_cliente."\" />";
+			$output .= "<input type=\"text\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente\" name=\"codigo_cliente\" onChange=\"CargarGlosaCliente(); $oncambio\" value=\"".$codigo_cliente."\" />";
 	
 		$glosa_cliente = '';
 		if($codigo_cliente || $codigo_cliente_secundario)
@@ -86,10 +87,9 @@ class Autocompletador
 	{
 		$output = "
 		<script type=\"text/javascript\">
- 		  id_usuario_original = ".$id_usuario." 
-			Autocompletador = new Ajax.Autocompleter(\"glosa_cliente\", \"sugerencias_glosa_cliente\", \"".Conf::RootDir()."/app/interfaces/ajax_seleccionar_cliente.php\", {minChars: 3, indicator: 'indicador_glosa_cliente', afterUpdateElement : getSelectionId})
+			id_usuario_original = ".$id_usuario." 
+			Autocompletador = new Ajax.Autocompleter(\"glosa_cliente\", \"sugerencias_glosa_cliente\", \"ajax_seleccionar_cliente.php\", {minChars: 3, indicator: 'indicador_glosa_cliente', afterUpdateElement : getSelectionId})
 	
-
 			function getSelectionId(text, li) 
 			{
 				// El valor 'cualquiera' es retornado cuando la consulta ajax no tiene resultados que mostrar.
