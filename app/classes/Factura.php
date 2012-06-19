@@ -11,6 +11,7 @@ require_once 'Asunto.php';
 require_once 'CobroMoneda.php';
 require_once 'MontoEnPalabra.php';
 require_once 'UtilesApp.php';
+require_once 'NotaCobro.php';
 
 class Factura extends Objeto {
 
@@ -293,7 +294,7 @@ class Factura extends Objeto {
 		$cobro_moneda = new CobroMoneda($this->sesion);
 		$cobro_moneda->Load($this->fields['id_cobro']);
 
-		$cobro = new Cobro($this->sesion);
+		$cobro = new NotaCobro($this->sesion);
 		$cobro->Load($this->fields['id_cobro']);
 		$cobro->LoadAsuntos();
 
