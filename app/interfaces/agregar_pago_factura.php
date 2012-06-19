@@ -20,7 +20,6 @@ require_once Conf::ServerDir() . '/classes/CtaCteFact.php';
 require_once Conf::ServerDir() . '/classes/CtaCteFactMvto.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/Cliente.php';
-
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
@@ -52,11 +51,8 @@ if ($desde_webservice) {
 		$pago->Load($id_factura_pago);
 		$id_moneda = $pago->fields['id_moneda'];
 		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
-		if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago,'id_factura_pago','numero');
-		} else {
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);	
-		}
+		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
+		$numeros_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago, 'id_factura_pago', 'numero');
 		$arreglo_facturas = explode(',', $lista_facturas);
 		if ($id_factura) {
 			if (empty($lista_facturas)) {
@@ -64,8 +60,20 @@ if ($desde_webservice) {
 			} else if (!in_array($id_factura, $arreglo_facturas)) {
 				$lista_facturas = $lista_facturas . ',' . $id_factura;
 			}
+			$arreglo_facturas = explode(',', $lista_facturas);
 		}
 		$codigo_cliente = $pago->fields['codigo_cliente'];
+	} else {
+		$numeros_facturas_tmp = array();
+		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
+		$resunf = mysql_query($query_num_facturas,$sesion->dbh) or Utiles::errorSQL($query_num_facturas,__FILE__,__LINE__, $sesion->dbh); 
+		if( mysql_num_rows($resunf) > 0 ) {			
+			while( $numfact = mysql_fetch_array($resunf)) {
+				array_push($numeros_facturas_tmp, $numfact['numero']);
+			}
+			$numeros_facturas = implode( ',', $numeros_facturas_tmp );
+		}
+		
 	}
 }
 $moneda_pago = new Moneda($sesion);
@@ -770,8 +778,8 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				<textarea name=glosa_documento cols="45" rows="3"><?php
 				if ($pago->fields['descripcion'])
 					echo $pago->fields['descripcion'];
-				else if ($id_cobro) {
-					echo "Pago de Factura # " . $lista_facturas;
+				else if ($id_cobro) {					
+					echo "Pago de Factura # " . $numeros_facturas;
 				}
 				?></textarea>
 			</td>
@@ -956,9 +964,11 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 				elem.disabled = 'disabled';
 			});
 <?php 
-		if ($pago->fields['id_factura_pago']) { 
- 			echo "jQuery('#btn_imprimir_voucher').attr('disabled','').removeAttr('disabled');";
- 		}
+		if ($pago->fields['id_factura_pago']) {
+?>
+			$('btn_imprimir_voucher').disabled = false;
+<?php
+		}
 	} 
 ?>
 
