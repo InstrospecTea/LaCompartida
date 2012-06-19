@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -104,6 +104,7 @@
 			$col_encargado_secundario = $indice_columnas++;
 		$col_fecha_emision = $indice_columnas++;
 		$col_fecha_envio = $indice_columnas++;
+		$col_fecha_facturacion = $indice_columnas++;
 		$col_cobro = $indice_columnas++;
 		$col_factura = $indice_columnas++;
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -126,6 +127,7 @@
 		$ws1->setColumn($col_total_pesos, $col_total_pesos, 17);
 		$ws1->setColumn($col_fecha_emision, $col_fecha_emision, 17);
 		$ws1->setColumn($col_fecha_envio, $col_fecha_envio, 14);
+		$ws1->setColumn($col_fecha_facturacion, $col_fecha_facturacion, 20);
 		$ws1->setColumn($col_cobro, $col_cobro, 14);
 		if( $mostrar_columna_codigo_asunto ) 
 			$ws1->setColumn($col_codigo_asuntos, $col_codigo_asuntos, 30);
@@ -213,6 +215,7 @@
 		$query = "SELECT
 					cobro.fecha_enviado_cliente,
 					cobro.fecha_emision,
+					cobro.fecha_facturacion, 
 					cliente.glosa_cliente,
 					cobro.documento,
 					CONCAT(usuario.nombre, ' ', usuario.apellido1) AS nombre,
@@ -306,6 +309,7 @@
 					$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 				$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+				$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 				$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 				$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 				if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -351,6 +355,7 @@
 						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -398,6 +403,7 @@
 						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -449,6 +455,7 @@
 						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 					$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
@@ -488,6 +495,7 @@
 						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -534,6 +542,7 @@
 						$ws1->write($filas, $col_encargado_secundario, __('Encargado Secundario'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_emision, __('Fecha Emision'), $titulo_filas);
 					$ws1->write($filas, $col_fecha_envio, __('Fecha Envio'), $titulo_filas);
+					$ws1->write($filas, $col_fecha_facturacion, __('Fecha Facturación'), $titulo_filas);
 					$ws1->write($filas, $col_cobro, __('Cobro'), $titulo_filas);
 					$ws1->write($filas, $col_factura, __('Factura'), $titulo_filas);
 					if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
@@ -614,7 +623,9 @@
 
 			$ws1->write($filas, $col_fecha_emision, Utiles::sql2fecha($cobro['fecha_emision'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_fecha_envio, Utiles::sql2fecha($cobro['fecha_enviado_cliente'], $formato_fecha, "-"), $fecha);
+			$ws1->write($filas, $col_fecha_facturacion,  Utiles::sql2fecha($cobro['fecha_facturacion'], $formato_fecha, "-"), $fecha);
 			$ws1->write($filas, $col_cobro, $cobro['id_cobro'], $txt_centro);
+			
 			if( $mostrar_columna_codigo_asunto )
 				$ws1->write($filas, $col_codigo_asuntos, $codigo_asuntos[$cobro['id_cobro']], $txt_izquierda);
 			$ws1->write($filas, $col_asuntos, $glosa_asuntos[$cobro['id_cobro']], $txt_izquierda);
@@ -692,67 +703,67 @@
 <table class="border_plomo tb_base" width="250px" align="center">
 	<tr valign=top>
 		<td align=left>
-			<b><?=__('Clientes')?>:</b>
+			<b><?php echo __('Clientes')?>:</b>
 		</td>
 	</tr>
 	<tr valign=top>
 		<td align=center>
-			<?=Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
 		</td>
 	</tr>
 	<tr valign=top>
 		<td align=left>
-			<b><?=__('Grupos Clientes')?>:</b>
+			<b><?php echo __('Grupos Clientes')?>:</b>
 		</td>
 	</tr>
 	<tr valign=top>
 		<td align=center>
-			<?=Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos, "class=\"selectMultiple\" multiple size=4 ", "", "200"); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos, "class=\"selectMultiple\" multiple size=4 ", "", "200"); ?>
 		</td>
 	</tr>
 	<tr valign=top>
 		<td align=left>
-			<b><?=__('Encargados Comerciales')?>:</b>
+			<b><?php echo __('Encargados Comerciales')?>:</b>
 		</td>
 	</tr>
 	<tr>
 		<td align=center>
-			<?=Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2, ', ', nombre)
+			<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2, ', ', nombre)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
 				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align=left>
-			<b><?=__('Monedas') ?>:</b>
+			<b><?php echo __('Monedas') ?>:</b>
 		</td>
 	</tr>
 	<tr>
 		<td align=center>
-			<?=Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "monedas[]", $monedas, "class=\"selectMultiple\" multiple size=4 ", "", "200"); ?>
+			<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "monedas[]", $monedas, "class=\"selectMultiple\" multiple size=4 ", "", "200"); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align=left>
-			<input type="checkbox" value="1" name="desglosar_por_moneda" id="desglosar_por_moneda" <?=$desglosar_por_moneda ? 'checked' : ''?> />
-			<label for="desglosar_por_moneda"><?=__('Desglosar por moneda')?></label>
+			<input type="checkbox" value="1" name="desglosar_por_moneda" id="desglosar_por_moneda" <?php echo $desglosar_por_moneda ? 'checked' : ''?> />
+			<label for="desglosar_por_moneda"><?php echo __('Desglosar por moneda')?></label>
 		</td>
 	</tr>
 	<tr>
 		<td align=left>
-			<input type="checkbox" value="1" name="desglosar_por_encargado" id="desglosar_por_encargado" <?=$desglosar_por_encargado ? 'checked' : ''?>>
-			<label for="desglosar_por_encargado"><?=__('Desglosar por encargado comercial')?></label>
+			<input type="checkbox" value="1" name="desglosar_por_encargado" id="desglosar_por_encargado" <?php echo $desglosar_por_encargado ? 'checked' : ''?>>
+			<label for="desglosar_por_encargado"><?php echo __('Desglosar por encargado comercial')?></label>
 		</td>
 	</tr>
 	<tr>
 		<td align=left>
-			<input type="checkbox" name="periodo" value="1" <?=$periodo ? 'checked' : '' ?> onclick='' title='<?=__('Periodo del Cobro')?>' />&nbsp;
-			<b><?=__('Periodo') ?>:</b>
+			<input type="checkbox" name="periodo" value="1" <?php echo $periodo ? 'checked' : '' ?> onclick='' title='<?php echo __('Periodo del Cobro')?>' />&nbsp;
+			<b><?php echo __('Periodo') ?>:</b>
 			<div id=periodo_rango style='align:center'>
 				&nbsp;&nbsp;&nbsp;
-				<?=__('Emitido desde')?>
-				<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime('-1 year')) ?>" id="fecha_ini" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+				<?php echo __('Emitido desde')?>
+				<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y",strtotime('-1 year')) ?>" id="fecha_ini" size="11" maxlength="10" />
+				<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
 				</div>
 			</td>
 	</tr>
@@ -763,7 +774,7 @@
 	</tr>
 	<tr>
 		<td align=right>
-			<input type=submit class=btn value="<?=__('Generar planilla')?>" />
+			<input type=submit class=btn value="<?php echo __('Generar planilla')?>" />
 		</td>
 	</tr>
 </table>
@@ -779,7 +790,7 @@ Calendar.setup(
 );
 </script>
 
-<?
+<?php 
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>
