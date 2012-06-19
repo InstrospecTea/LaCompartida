@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Usuario.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
@@ -418,6 +418,107 @@ class UsuarioExt extends Usuario
 			$lista[] = $codigo;
 		}
 		return $lista;
+	}
+	
+	function TablaHistorial($usuario_historial) {
+	
+		
+			echo '<table id="historial_tabla" style="display:none;" width="780px">
+				<tr>
+					<td colspan="3" style="font-size:11px;"><b>Fecha creación:</b> ';
+			echo Utiles::sql2date($usuario->fields['fecha_creacion']);
+		   echo '</td>
+				</tr>
+				<tr>
+					<td colspan="3" style="font-size:11px; font-weight:bold">Lista de modificaciones realizadas</td>
+				</tr>
+				<tr style="border:1px solid #454545">
+					<td width="80px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fecha</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Dato modificado</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor actual</td>
+					<td width="200px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Valor anterior</td>
+					<td width="250px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Modificado por</td>
+				</tr>';
+if( !empty($usuario_historial) ):
+	
+
+		foreach($usuario_historial as $k => $historia):
+						if( trim($historia['nombre_dato']) == 'categoría'  ) {
+							$glosa_actual = (!empty($historia['valor_actual'])) ? Utiles::Glosa($this->sesion, $historia['valor_actual'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+							$glosa_origen = (!empty($historia['valor_original'])) ? Utiles::Glosa($this->sesion, $historia['valor_original'], 'glosa_categoria', 'prm_categoria_usuario','id_categoria_usuario') : 'sin asignación';
+						} else if( trim($historia['nombre_dato']) == 'área usuario'  ) {
+							$glosa_actual = (!empty($historia['valor_actual'])) ? Utiles::Glosa($this->sesion, $historia['valor_actual'], 'glosa', 'prm_area_usuario','id') : 'sin asignación';
+							$glosa_origen = (!empty($historia['valor_original'])) ? Utiles::Glosa($this->sesion, $historia['valor_original'], 'glosa', 'prm_area_usuario','id') : 'sin asignación';
+						} else if( trim($historia['nombre_dato']) == 'permisos' ) {
+							$_permisos_anteriores = explode(",", $historia['valor_original']);
+							$_permisos_nuevos = explode(",", $historia['valor_actual']);
+
+							$_permisos_agregados = array_diff($_permisos_nuevos, $_permisos_anteriores);
+							$_permisos_quitados = array_diff($_permisos_anteriores, $_permisos_nuevos);
+
+							$_permisos_agregados_texto = "";
+							foreach ( $_permisos_agregados as $llave => $codigo ) {
+								if( strlen( $_permisos_agregados_texto ) > 0 ){
+									$_permisos_agregados_texto .= ", ";
+								}
+								$_permisos_agregados_texto .=  Utiles::Glosa($this->sesion, $codigo, 'glosa', 'prm_permisos','codigo_permiso') ;
+							}
+							if( strlen( $_permisos_agregados_texto) > 0 ) {
+								$_permisos_agregados_texto = "Se agregó: " . $_permisos_agregados_texto . "<br />";
+							}
+
+							$_permisos_quitados_texto = "";
+							foreach ( $_permisos_quitados as $llave => $codigo ) {
+								if( strlen( $_permisos_quitados_texto ) > 0 ){
+									$_permisos_quitados_texto .= ", ";
+								}
+								$_permisos_quitados_texto .=  Utiles::Glosa($this->sesion, $codigo, 'glosa', 'prm_permisos','codigo_permiso') ;
+							}
+							if( strlen( $_permisos_quitados_texto) > 0 ) {
+													$_permisos_quitados_texto = "Se eliminó: " . $_permisos_quitados_texto;
+							}
+
+							$glosa_origen = " - ";
+							$glosa_actual = $_permisos_agregados_texto . $_permisos_quitados_texto;
+						} else if( trim($historia['nombre_dato']) == 'usuario secretario de' || trim($historia['nombre_dato']) == 'usuario revisor de'  ) {
+
+							$_sde_actual = explode( ",", $historia['valor_actual'] );
+							$_sde_original = explode( ",", $historia['valor_original'] );
+
+							$_arr_sde_actual = array();
+							$_arr_sde_original = array();
+
+							foreach( $_sde_actual as $key => $id_actual ) {
+								$_arr_sde_actual[] = Utiles::Glosa($this->sesion, $id_actual, 'CONCAT_WS(" ", nombre, apellido1, apellido2) as nombre_completo', 'usuario','id_usuario');
+							}
+
+							foreach( $_sde_original as $key => $id_original ) {
+								$_arr_sde_original[] = Utiles::Glosa($this->sesion, $id_original, 'CONCAT_WS(" ", nombre, apellido1, apellido2) as nombre_completo', 'usuario','id_usuario');
+							}
+
+							$glosa_actual = (sizeof( $_arr_sde_actual) ? implode("<br />", $_arr_sde_actual) : '');
+							$glosa_origen = (sizeof( $_arr_sde_original) ? implode("<br />", $_arr_sde_original) : '');
+
+						} else if ( trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria' 
+								|| trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados' )  {
+							$glosa_actual = (!empty($historia['valor_actual'])) ? 'activo' : 'inactivo';
+							$glosa_origen = (!empty($historia['valor_original'])) ? 'activo' : 'inactivo';
+						} else {
+							$glosa_actual = $historia["valor_actual"];
+							$glosa_origen = $historia["valor_original"];
+						}
+
+					echo '	<tr>
+							<td style="border:1px solid #ccc; text-align:center;">'. $historia['fecha'].'</td>
+							<td style="border:1px solid #ccc; text-align:center;">'. $historia['nombre_dato'].'</td>
+							<td style="border:1px solid #ccc; text-align: center">'. $glosa_actual.'</td>
+							<td style="border:1px solid #ccc; text-align: center">'.   $glosa_origen.'</td>
+							<td style="border:1px solid #ccc; text-align: left">'.   $historia['nombre'].' '.$historia['ap_paterno'].' '.$historia['ap_materno'].'</td>
+						</tr>';
+		endforeach;  
+endif;  
+				echo '</table>';
+				
 	}
 	
 	/**

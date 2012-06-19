@@ -87,7 +87,7 @@ class Ledes extends Objeto {
 			FROM trabajo t
 			JOIN usuario u ON t.id_usuario = u.id_usuario
 			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
-			WHERE t.id_cobro = $id_cobro";
+			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($trabajo = mysql_fetch_assoc($resp)) {
@@ -153,7 +153,7 @@ class Ledes extends Objeto {
 			}
 
 			$horas = $tramite['horas'] > 0 ? $tramite['horas'] : 1;
-			$monto = $tramite['cobrable'] == '1' && empty($tramite['tarifa_tramite']) ? $tramite['tarifa_tramite'] : 0;
+			$monto = $tramite['cobrable'] == '1' && !empty($tramite['tarifa_tramite']) ? $tramite['tarifa_tramite'] : 0;
 			$monto *= $cambios[$tramite['id_moneda_tramite']];
 			$tarifa = $tramite['tarifa_tramite'] * $cambios[$tramite['id_moneda_tramite']];
 			$fila = array(
@@ -180,6 +180,19 @@ class Ledes extends Objeto {
 			$filas[] = $fila;
 		}
 
+		$query = "SELECT g.id_movimiento,
+				CONCAT(u.apellido1, ', ', u.nombre) as nombre_usuario,
+				c.id_categoria_lemontech
+			FROM cta_corriente g
+			JOIN usuario u ON g.id_usuario = u.id_usuario
+			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
+			WHERE g.id_cobro = $id_cobro";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$usuarios_gastos = array();
+		while ($gasto = mysql_fetch_assoc($resp)) {
+			$usuarios_gastos[$gasto['id_movimiento']] = $gasto;
+		}
+		
 		foreach ($gastos['gasto_detalle'] as $gasto) {
 			if ($fecha_min > $gasto['fecha']) {
 				$fecha_min = $gasto['fecha'];
@@ -202,8 +215,8 @@ class Ledes extends Objeto {
 				'TIMEKEEPER_ID' => '',
 				'LINE_ITEM_DESCRIPTION' => $gasto['descripcion'],
 				'LINE_ITEM_UNIT_COST' => $gasto['monto_total'] * $cambios[$gasto['id_moneda']],
-				'TIMEKEEPER_NAME' => '',
-				'TIMEKEEPER_CLASSIFICATION' => '',
+				'TIMEKEEPER_NAME' => $usuarios_gastos[$gasto['id_movimiento']]['nombre_usuario'],
+				'TIMEKEEPER_CLASSIFICATION' => $categorias[$usuarios_gastos[$gasto['id_movimiento']]['id_categoria_lemontech']],
 				'CLIENT_MATTER_ID' => ''
 			);
 
@@ -293,15 +306,15 @@ class Ledes extends Objeto {
 			'INVOICE_NUMBER' => 20,
 			'CLIENT_ID' => 20,
 			'LAW_FIRM_MATTER_ID' => 20,
-			'INVOICE_TOTAL' => '%.4f',
+			'INVOICE_TOTAL' => 'N.4',
 			'BILLING_START_DATE' => 'date',
 			'BILLING_END_DATE' => 'date',
 			'INVOICE_DESCRIPTION' => 15000,
 			'LINE_ITEM_NUMBER' => 20,
 			'EXP/FEE/INV_ADJ_TYPE' => 2,
-			'LINE_ITEM_NUMBER_OF_UNITS' => '%.4f',
-			'LINE_ITEM_ADJUSTMENT_AMOUNT' => '%.4f',
-			'LINE_ITEM_TOTAL' => '%.4f',
+			'LINE_ITEM_NUMBER_OF_UNITS' => 'N.4',
+			'LINE_ITEM_ADJUSTMENT_AMOUNT' => 'N.4',
+			'LINE_ITEM_TOTAL' => 'N.4',
 			'LINE_ITEM_DATE' => 'date',
 			'LINE_ITEM_TASK_CODE' => 20,
 			'LINE_ITEM_EXPENSE_CODE' => 20,
@@ -309,7 +322,7 @@ class Ledes extends Objeto {
 			'TIMEKEEPER_ID' => 20,
 			'LINE_ITEM_DESCRIPTION' => 15000,
 			'LAW_FIRM_ID' => 20,
-			'LINE_ITEM_UNIT_COST' => '%.4f',
+			'LINE_ITEM_UNIT_COST' => 'N.4',
 			'TIMEKEEPER_NAME' => 30,
 			'TIMEKEEPER_CLASSIFICATION' => 10,
 			'CLIENT_MATTER_ID' => 20
@@ -337,7 +350,8 @@ class Ledes extends Objeto {
 							$valor = substr($valor, 0, $formato);
 						}
 					} else if ($formato) {
-						$valor = sprintf($formato, $valor);
+						list(,$decimales) = explode('.', $formato);
+						$valor = number_format($valor, $decimales, '.', '');
 					}
 				}
 

@@ -13,6 +13,7 @@ class Reporte
 
 	// Arreglos con filtros
 	var $filtros = array();
+	var $filtros_especiales = array();
 	var $rango = array();
 
 	//Arreglo de datos
@@ -113,6 +114,18 @@ class Reporte
 			case "horas_castigadas":
 			{
 				$this->addFiltro('trabajo','cobrable','1');
+				break;
+			}
+			case "horas_spot":
+			{
+				$this->addFiltro('trabajo','cobrable','1');
+				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND ( cobro.forma_cobro IN ('TASA','CAP') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('TASA','CAP') OR contrato.forma_cobro IS NULL ) ) ";
+				break;
+			}
+			case "horas_convenio":
+			{
+				$this->addFiltro('trabajo','cobrable','1');
+				$this->filtros_especiales[] = " ( cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' AND  ( cobro.forma_cobro IN ('FLAT FEE','RETAINER') )) OR ( (cobro.estado IS NULL OR cobro.estado IN ('CREADO','EN REVISION')) AND (contrato.forma_cobro IN ('FLAT FEE','RETAINER') ) )";
 				break;
 			}
 			case "horas_no_cobrables":
@@ -232,7 +245,9 @@ class Reporte
 			case "glosa_cliente_asunto":
 				$this->id_agrupador[] = "codigo_asunto";
 				break;
-			
+			case "area_trabajo":
+				$this->id_agrupador[] = "trabajo.id_area_trabajo";
+				break;
 				
 			default:
 				$this->id_agrupador[] = $s;
@@ -244,6 +259,9 @@ class Reporte
 			case "mes_reporte": 
 			case "dia_reporte":
 				$this->orden_agrupador[] = "fecha_final";
+				break;
+			case "area_trabajo":
+				$this->orden_agrupador[] = "trabajo.id_area_trabajo";
 				break;
 			default:
 				$this->orden_agrupador[] = $s;
@@ -343,12 +361,12 @@ class Reporte
 			
 
 
-				CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto, 
-				asunto.glosa_asunto,
-				CONCAT(asunto.codigo_asunto,\': \',asunto.glosa_asunto) as glosa_asunto_con_codigo,
+					\' - \' as glosa_cliente_asunto, 
+				\' - \' as glosa_asunto,
+				\' - \' glosa_asunto_con_codigo,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
-				asunto.codigo_asunto,
+				\' - \' as codigo_asunto,
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
@@ -601,6 +619,9 @@ class Reporte
 			$s .= " IFNULL( NULLIF( IFNULL( actividad.glosa_actividad, 'Indefinido' ), ' ' ), 'Indefinido' ) as glosa_actividad, ";
 		}
 		
+		if( in_array('area_trabajo', $this->agrupador ) ){
+			$s.= " IFNULL( prm_area_trabajo.glosa, 'Indefinido' ) as area_trabajo, ";
+		}
 		if(in_array('id_trabajo',$this->agrupador))
 			$s.= ' trabajo.id_trabajo, ';				
 
@@ -835,6 +856,10 @@ class Reporte
 		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
 			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
 		}
+		
+		if( in_array('area_trabajo', $this->agrupador ) ){			
+			$s .= " LEFT JOIN prm_area_trabajo ON ( trabajo.id_area_trabajo = prm_area_trabajo.id_area_trabajo ) ";
+		}
 		return $s;
 	}
 
@@ -890,7 +915,11 @@ class Reporte
 		/* Si se filtra el periodo por cobro, los trabajos sin cobro emitido (y posteriores) no se ven */
 		if( ($campo_fecha == 'cobro.fecha_fin' || $campo_fecha == 'cobro.fecha_emision') && $from == 'trabajo')
 			$s .= " AND cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO') ";
-
+		
+		foreach ($this->filtros_especiales as $fe ) {
+			$s .= " AND (".$fe.") ";
+		}
+		
 		return $s;
 	}
 
@@ -1087,7 +1116,22 @@ class Reporte
 		else
 		$a['valor'] = number_format($a['valor']/$a['valor_divisor'],2,".","");
 	}
-
+	
+	/*Entrega el label a usar para un agrupador*/
+	function label($agrupador)
+	{
+		switch($agrupador)
+		{
+			case 'id_usuario_responsable':
+				return 'nombre_usuario_responsable';
+			case 'id_usuario_secundario':
+				return 'nombre_usuario_secundario';
+			case 'prm_area_proyecto_glosa':
+				return 'glosa';
+		}
+		return $agrupador;
+	}
+	
 	/*Constructor de Arreglo Cruzado: Sólo vista Cliente o Profesional*/
 	function toCross()
 	{
@@ -1471,6 +1515,8 @@ class Reporte
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_visibles":
+			case "horas_spot":
+			case "horas_convenio":
 			case "horas_castigadas":
 			case "horas_por_cobrar":
 			case "horas_pagadas":
@@ -1515,6 +1561,8 @@ class Reporte
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_visibles":
+			case "horas_spot":
+			case "horas_convenio":
 			case "horas_castigadas":
 			case "horas_por_cobrar":
 			case "horas_pagadas":

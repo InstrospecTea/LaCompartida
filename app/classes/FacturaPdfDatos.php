@@ -198,7 +198,7 @@
                  if(count($this->papel)) {
                         $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
 							$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
-							$pdf->SetAutoPageBreak(true,2*$margin);
+							$pdf->SetAutoPageBreak(true,$margin);
                 } else {
 			// P: hoja vertical
 			// mm: todo se mide en milímetros
@@ -234,13 +234,12 @@
 			}
 			 
 			foreach( $this->datos as $tipo_dato => $datos ) {
-			    
-			  
+			    			  
 				$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 				
                                if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
-                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']?:'L') );
+                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
                                 } else if( $datos['mayuscula'] == 'may' ) {
 					$pdf->Write(4, strtoupper($datos['dato_letra']));
 				} else if( $datos['mayuscula'] == 'min' ) {

@@ -34,6 +34,8 @@ class ReporteContrato extends Contrato
 		$this->separar_asuntos=$separar_asuntos;
 		$this->ArrayOlap($emitido, $separar_asuntos, $fecha_ini, $fecha_fin);
 		$this->UltimosCobros($separar_asuntos);
+				$this->Descuentos($separar_asuntos);
+
 	}
 
 	/*
@@ -270,6 +272,34 @@ class ReporteContrato extends Contrato
 		while($listacobro=mysql_fetch_array($resp)):
 		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2]);
                 endwhile;
+                
+        }
+			function Descuentos($separar_asuntos) {
+          
+            if(!$this->separar_asuntos && !$separar_asuntos ) {
+            $querydescuentos = "select  cob.id_contrato, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio)  descuento
+								from cobro  cob join contrato con using (id_contrato)
+								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
+								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
+								
+								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION') 
+								group by cob.id_contrato  
+                           ";
+            } else {
+              $querydescuentos = "select ca.codigo_asunto, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio) / ca2.divisor, cob.id_contrato
+								from cobro  cob join contrato con using (id_contrato)
+								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
+								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
+								join cobro_asunto ca on ca.id_cobro=cob.id_cobro
+								join (select id_cobro, count(*) divisor from cobro_asunto group by id_cobro) as ca2 on ca2.id_cobro=cob.id_cobro
+								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION') 
+								group by cob.id_contrato , ca.codigo_asunto                        "; 
+            }
+             
+            $respdescuentos = mysql_query($querydescuentos,$this->sesion->dbh) or Utiles::errorSQL($querydescuentos,__FILE__,__LINE__,$this->sesion->dbh);
+		while($listadescuentos=mysql_fetch_array($respdescuentos)):
+			$this->arraydescuentos[$listadescuentos[0]]=$listadescuentos[1];
+         endwhile;
                 
         }
         

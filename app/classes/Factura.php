@@ -59,7 +59,7 @@ class Factura extends Objeto {
 					FROM cta_cte_fact_mvto ccfm 
 						JOIN factura f USING ( id_factura )
                                                 JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado 
-						JOIN factura fp ON ( fp.id_factura = IF( f.id_factura_padre IS NULL, f.id_factura, f.id_factura_padre ) )
+						JOIN factura fp ON ( fp.id_factura = IF( ( f.id_factura_padre IS NULL OR f.id_factura_padre = 0)	, f.id_factura, f.id_factura_padre ) )
 						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto 
 							AND ccfm.id_moneda = ccfmm.id_moneda )
 						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto 
@@ -76,7 +76,7 @@ class Factura extends Objeto {
 	}
 
 	function ObtenerIdsDocumentos($id_factura) {
-		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', ccfm.id_factura ) as bloque 
+		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', f.numero) as bloque 
 					FROM cta_cte_fact_mvto ccfm 
 						JOIN factura f USING ( id_factura ) 
 					WHERE f.id_factura_padre =  '$id_factura';";
@@ -302,7 +302,7 @@ class Factura extends Objeto {
 		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 
 		$html2 = ($xml) ? $parser_factura : $parser_factura->tags[$theTag];
- 
+
 		switch ($theTag) {
 			case 'CARTA_FACTURA':
 				$html2 = str_replace('%ENCABEZADO%', $this->GenerarDocumento($parser_factura, 'ENCABEZADO', $lang), $html2);
@@ -310,37 +310,27 @@ class Factura extends Objeto {
 				$html2 = str_replace('%BOTTOM%', $this->GenerarDocumento($parser_factura, 'BOTTOM', $lang), $html2);
 				$html2 = str_replace('%BOTTOM_COPIA%', $this->GenerarDocumento($parser_factura, 'BOTTOM_COPIA', $lang), $html2);
 				if ($cobro->fields['modalidad_calculo'] == 1) {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento2($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento2($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento2($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento2($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento2($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento2($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento2($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento2($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento2($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento2($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				} else {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3,  $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumento($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumento($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				}
 				break;
 
 			case 'ENCABEZADO':
-				if (method_exists('Conf', 'GetConf')) {
-					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
-					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
-					$PdfLinea3 = Conf::GetConf($this->sesion, 'PdfLinea3');
-					$CiudadSignatura = Conf::GetConf($this->sesion, 'CiudadSignatura');
-					$logo_doc = Conf::GetConf($this->sesion, 'LogoDoc');
-				} else {
-					if (method_exists('Conf', 'PdfLinea1'))
-						$PdfLinea1 = Conf::PdfLinea1();
-					if (method_exists('Conf', 'PdfLinea2'))
-						$PdfLinea2 = Conf::PdfLinea2();
-					if (method_exists('Conf', 'PdfLinea3'))
-						$PdfLinea3 = Conf::PdfLinea3();
-					if (method_exists('Conf', 'FicheroLogoDoc'))
-						$logo_doc = Conf::FicheroLogoDoc();
-				}
+				$PdfLinea1 = UtilesApp::GetConf($this->sesion, 'PdfLinea1');
+				$PdfLinea2 = UtilesApp::GetConf($this->sesion, 'PdfLinea2');
+				$PdfLinea3 = UtilesApp::GetConf($this->sesion, 'PdfLinea3');
+				$CiudadSignatura = UtilesApp::GetConf($this->sesion, 'CiudadSignatura');
+				$logo_doc = UtilesApp::GetConf($this->sesion, 'LogoDoc');
+
 				$html2 = str_replace('%linea1%', $PdfLinea1, $html2);
 				$html2 = str_replace('%linea2%', $PdfLinea2, $html2);
 				$html2 = str_replace('%linea3%', $PdfLinea3, $html2);
@@ -371,8 +361,10 @@ class Factura extends Objeto {
 					$html2 = str_replace('%Senores%', 'Messrs', $html2);
 				}
 				$html2 = str_replace('%subtitulo%', '', $html2);
-				if (method_exists('Conf', 'Server') && method_exists('Conf', 'ImgDir'))
+
+				if (method_exists('Conf', 'Server') && method_exists('Conf', 'ImgDir')) {
 					$html2 = str_replace('%logo_cobro%', Conf::Server() . Conf::ImgDir(), $html2);
+				}
 
 				$fecha_factura = $this->fields['fecha'];
 
@@ -489,7 +481,7 @@ class Factura extends Objeto {
 				}
 
 
-				if( UtilesApp::GetConf($this->sesion, 'CalculacionCyC') ) {
+				if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
 					/* esto habría que mejorarlo en el caso de que se les ocurriera facturar en más de 1 documento */
 					$query_cyc = "SELECT 
 									subtotal_honorarios,
@@ -508,26 +500,26 @@ class Factura extends Objeto {
 
 					//echo $query_cyc; exit;
 					$resp_cyc = mysql_query($query_cyc, $this->sesion->dbh) or Utiles::errorSQL($query_cyc, __FILE__, __LINE__, $this->sesion->dbh);
-					list( $monto_subtotal, 
-                                              $monto_subtotal_sin_descuento, 
-                                              $descuento_honorarios, 
-                                              $honorarios_con_descuento_con_impuesto, 
-                                              $impuesto_factura, 
-                                              $subtotal_gastos,  
-                                              $subtotal_gastos_sin_impuesto,
-                                              $subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
-                                        $monto_gastos=$subtotal_gastos;
-                                        $subtotal_gastos_con_impuesto=$subtotal_gastos;
-					if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura'))  $honorarios=$monto_subtotal;
+					list( $monto_subtotal,
+						$monto_subtotal_sin_descuento,
+						$descuento_honorarios,
+						$honorarios_con_descuento_con_impuesto,
+						$impuesto_factura,
+						$subtotal_gastos,
+						$subtotal_gastos_sin_impuesto,
+						$subtotal_sin_descuento) = mysql_fetch_array($resp_cyc);
+					$monto_gastos = $subtotal_gastos;
+					$subtotal_gastos_con_impuesto = $subtotal_gastos;
+					if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
+						$honorarios = $monto_subtotal;
+					}
 					/* Fin de lo que hay que mejorar */
 				}
 
-                                
-                                
 				$mostrar_honorarios = true;
 				$array_docs_ocultar = explode(';;', UtilesApp::GetConf($this->sesion, 'EsconderValoresFacturaEnCero'));
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_honorarios = ( number_format($honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_honorarios = ( number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
@@ -538,7 +530,7 @@ class Factura extends Objeto {
 
 				$mostrar_gastos_con_impuesto = true;
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_gastos_con_impuesto = ( number_format($subtotal_gastos_con_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
@@ -547,68 +539,77 @@ class Factura extends Objeto {
 
 				$mostrar_gastos_sin_impuesto = true;
 				if (in_array($tipo_dl, $array_docs_ocultar)) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
+					if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
 						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					} else {
 						$mostrar_gastos_sin_impuesto = ( number_format($subtotal_gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) > 0 ? true : false );
 					}
 				}
-                                
-				if ($descuento_honorarios > 0)
+
+				if ($descuento_honorarios > 0) {
 					$html2 = str_replace('%tr_descuento%', '<tr>
 												<td align="left" class="descripcion" colspan="3">%descuento_glosa%</td>
 												<td class="monto_normal" align="right">%descuento_honorarios%</td></tr>', $html2);
-				else
+				} else {
 					$html2 = str_replace('%tr_descuento%', '', $html2);
+				}
 
 				$html2 = str_replace('%porcentaje_impuesto_sin_simbolo%', (int) ($porcentaje_impuesto), $html2);
 
 				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
-					
+
 					// Lo separo en lineas
 					$factura_descripcion_separado = explode("\n", __($factura_descripcion));
 					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
-				
-					if ( $mostrar_gastos_con_impuesto )
+
+					if ($mostrar_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
-					if ($mostrar_gastos_sin_impuesto)
+					}
+					if ($mostrar_gastos_sin_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
- 				} else {
+					}
+				} else {
 					$factura_descripcion_separado = __($factura_descripcion);
-					if ( $subtotal_gastos_con_impuesto )
+					if ($subtotal_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
-					if ($mostrar_gastos_sin_impuesto)
+					}
+					if ($mostrar_gastos_sin_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
- 				}
-				// FFF soporta 3 nuevas glosas para separar HH, Gasto c y sin
-				$descripcion_subtotal_gastos="<br/><br/>" . __($descripcion_subtotal_gastos);
-				$descripcion_subtotal_gastos_sin_impuesto="<br/><br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
-				if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas'))  {
-					$factura_descripcion_separado=strtoupper($factura_descripcion_separado);
-					$descripcion_subtotal_gastos=strtoupper($descripcion_subtotal_gastos);
-					$descripcion_subtotal_gastos_sin_impuesto=strtoupper($descripcion_subtotal_gastos_sin_impuesto);
+					}
 				}
-				if ($mostrar_honorarios	)	{
-					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion, $html2);
+				// FFF soporta 3 nuevas glosas para separar HH, Gasto c y sin
+				// honorarios_periodo no incluye gastos
+				// servicios_periodo es la concatenacion de hh, gasto con y gasto sin
+				// como se imprimen en lineas separadas, llevan 1 salto de linea en vez de 2
+				$descripcion_subtotal_gastos = "<br/>" . __($descripcion_subtotal_gastos);
+				$descripcion_subtotal_gastos_sin_impuesto = "<br/>" . __($descripcion_subtotal_gastos_sin_impuesto);
+				if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
+					$factura_descripcion_separado = strtoupper($factura_descripcion_separado);
+					$descripcion_subtotal_gastos = strtoupper($descripcion_subtotal_gastos);
+					$descripcion_subtotal_gastos_sin_impuesto = strtoupper($descripcion_subtotal_gastos_sin_impuesto);
+				}
+				if ($mostrar_honorarios) {
+					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion_separado, $html2);
 				} else {
 					$html2 = str_replace('%honorarios_periodo%', '', $html2);
 				}
 				if ($subtotal_gastos_con_impuesto) {
-					$html2 = str_replace('%gastos_con_impuesto_periodo%',  $descripcion_subtotal_gastos, $html2);
+					$html2 = str_replace('%gastos_con_impuesto_periodo%', $descripcion_subtotal_gastos, $html2);
 				} else {
 					$html2 = str_replace('%gastos_con_impuesto_periodo%', '', $html2);
 				}
-				if ($mostrar_gastos_sin_impuesto) 	{
+				if ($mostrar_gastos_sin_impuesto) {
 					$html2 = str_replace('%gastos_sin_impuesto_periodo%', $descripcion_subtotal_gastos_sin_impuesto, $html2);
 				} else {
-					$html2 = str_replace('%gastos_sin_impuesto_periodo%',  '', $html2);
+					$html2 = str_replace('%gastos_sin_impuesto_periodo%', '', $html2);
 				}
 				if ($lang == 'es') {
-					if ($descuento_honorarios > 0)
+					if ($descuento_honorarios > 0) {
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
-					else
+					} else {
 						$html2 = str_replace('%<br><br>%', '<br><br><br><br>', $html2);
-					if ($mostrar_honorarios ) {
+					}
+					if ($mostrar_honorarios) {
 						if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
 							$html2 = str_replace('%servicios_periodo%', strtoupper($factura_descripcion_separado), $html2);
 							$html2 = str_replace('%servicios_periodo%', strtoupper('Honorarios por servicios profesionales prestados %fecha_ini% %fecha_fin%'), $html2);
@@ -634,25 +635,25 @@ class Factura extends Objeto {
 					}
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%texto_honorarios%', 'HONORARIOS', $html2);
-							$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
+						$html2 = str_replace('%glosa_honorarios%', $factura_descripcion_separado, $html2);
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
-						$html2 = str_replace('%glosa_honorarios%','', $html2);
+						$html2 = str_replace('%glosa_honorarios%', '', $html2);
 					}
-				
+
 					$html2 = str_replace('%texto_gastos%', 'GASTOS', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Gastos incurridos en su caso, según relación adjunta.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total servicios profesionales y gastos incurridos', $html2);
 					$html2 = str_replace('%pje_impuesto%', $porcentaje_impuesto . '%', $html2);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ))) {
+					if (UtilesApp::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
 						if (method_exists('Conf', 'GetConf')) {
 							$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . Conf::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
 						} else if (method_exists('Conf', 'ValorImpuesto')) {
 							$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . $porcentaje_impuesto . '%)', $html2);
 						}
-					}
-					else
+					} else {
 						$html2 = str_replace('%texto_impuesto%', '', $html2);
+					}
 					$html2 = str_replace('%descripcion%', '', $html2);
 					$html2 = str_replace('%texto_total%', 'Total ', $html2);
 					$html2 = str_replace('%firma%', 'Firma', $html2);
@@ -664,11 +665,12 @@ class Factura extends Objeto {
 						$html2 = str_replace('%descuento_glosa%', '', $html2);
 					}
 				} else if ($lang == 'en') {
-				    $html2 = str_replace('%firma%', 'Signature', $html2);
-					if ($descuento_honorarios > 0)
+					$html2 = str_replace('%firma%', 'Signature', $html2);
+					if ($descuento_honorarios > 0) {
 						$html2 = str_replace('%<br><br>%', '', $html2);
-					else
+					} else {
 						$html2 = str_replace('%<br><br>%', '<br><br>', $html2);
+					}
 					$html2 = str_replace('%servicios_periodo%', $factura_descripcion_separado, $html2);
 					$html2 = str_replace('%servicios_periodo%', 'For legal services rendered %fecha_ini% %fecha_fin%', $html2);
 					$meses_org = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
@@ -686,22 +688,18 @@ class Factura extends Objeto {
 
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%texto_honorarios%', 'LEGAL SERVICES', $html2);
-						$html2 = str_replace('%glosa_honorarios%', __($factura_descripcion), $html2);
+						$html2 = str_replace('%glosa_honorarios%', $factura_descripcion_separado, $html2);
 					} else {
 						$html2 = str_replace('%texto_honorarios%', '', $html2);
-						$html2 = str_replace('%glosa_honorarios%',  '', $html2);
+						$html2 = str_replace('%glosa_honorarios%', '', $html2);
 					}
-					
-					
+
+
 					$html2 = str_replace('%texto_gastos%', 'EXPENSES', $html2);
 					$html2 = str_replace('%texto_descripcion_gastos%', 'Expenses incurred in this case.', $html2);
 					$html2 = str_replace('%total_honorarios_y_gastos%', 'Total legal services and expenses', $html2);
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ))) {
-						if (method_exists('Conf', 'GetConf')) {
-							$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . Conf::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
-						} else if (method_exists('Conf', 'ValorImpuesto')) {
-							$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . Conf::ValorImpuesto() . '%)', $html2);
-						}
+					if (UtilesApp::GetConf($this->sesion, 'UsarImpuestoSeparado')) {
+						$html2 = str_replace('%texto_impuesto%', __('IVA') . ' (' . UtilesApp::GetConf($this->sesion, 'ValorImpuesto') . '%)', $html2);
 					} else {
 						$html2 = str_replace('%texto_impuesto%', '', $html2);
 					}
@@ -736,7 +734,7 @@ class Factura extends Objeto {
 						foreach ($factura_descripcion_con_asuntos as $linea) {
 							if (strlen($linea) > $max_caracter_por_linea) {
 								$lineas_factura_descripcion = array_merge(
-										$lineas_factura_descripcion, str_split($linea, $max_caracter_por_linea)
+									$lineas_factura_descripcion, str_split($linea, $max_caracter_por_linea)
 								);
 							} else {
 								$lineas_factura_descripcion[] = $linea;
@@ -784,8 +782,8 @@ class Factura extends Objeto {
 
 
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCyC') ) || ( method_exists('Conf', 'CalculacionCyC') && Conf::CalculacionCyC() ))) {
-					
+				if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
+
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%monto_honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -870,11 +868,9 @@ class Factura extends Objeto {
 				if (isset($cobro) && $cobro->loaded()) {
 
 					if ($cobro->fields['porcentaje_impuesto'] > 0) {
-
 						$honorarios_con_impuesto = $this->fields['honorarios'] * ( 1 + ( $cobro->fields['porcentaje_impuesto'] / 100) );
 						$monto_impuesto_honorarios = $this->fields['honorarios'] * ( $cobro->fields['porcentaje_impuesto'] / 100);
 					} else {
-
 						$honorarios_sin_impuesto = $this->fields['honorarios'];
 						$gastos_sin_impuestos = $this->fields['subtotal_gastos_sin_impuesto'];
 					}
@@ -953,8 +949,8 @@ class Factura extends Objeto {
 				 */
 
 				if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
-					
-					
+
+
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -983,7 +979,7 @@ class Factura extends Objeto {
 						$html2 = str_replace('%subtotal_gastos_con_impuesto%', '&nbsp;', $html2);
 					}
 
-					if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($this->sesion, 'UsarGastosConSinImpuesto') == '1'))) {
+					if (UtilesApp::GetConf($this->sesion, 'UsarGastosConSinImpuesto')) {
 						if ($mostrar_gastos_sin_impuesto) {
 							$html2 = str_replace('%simbolo_subtotal_gastos_sin_impuesto%', $simbolo, $html2);
 							if (UtilesApp::GetConf($this->sesion, 'UsarGlosaFacturaMayusculas')) {
@@ -1015,7 +1011,7 @@ class Factura extends Objeto {
 					$monto_subtotal_honorario_y_gastos = $monto_subtotal + $subtotal_gastos + $subtotal_gastos_sin_impuesto;
 					$html2 = str_replace('%monto_subtotal_honorario_y_gastos%', number_format($monto_subtotal_honorario_y_gastos, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				} else {
-					
+
 					if ($mostrar_honorarios) {
 						$html2 = str_replace('%honorarios%', number_format($monto_subtotal, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 					} else {
@@ -1098,16 +1094,16 @@ class Factura extends Objeto {
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 				$serie = empty($this->fields['serie_documento_legal']) ? '001' : $this->fields['serie_documento_legal'];
 				$n = str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
-			}
-			else
+			} else {
 				$n = $this->fields['numero'];
+			}
 
-			if ($mostrar_comprobante && $this->fields['comprobante_erp'])
+			if ($mostrar_comprobante && $this->fields['comprobante_erp']) {
 				$n = '<span title="' . __('Comprobante') . ': ' . $this->fields['comprobante_erp'] . '"><b>' . $n . '</b></span>';
+			}
 
 			return $n;
-		}
-		elseif (!empty($id_factura)) {
+		} else if (!empty($id_factura)) {
 			$query = "SELECT serie_documento_legal, numero FROM factura WHERE id_factura = " . $id_factura;
 			$serie_numero = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($serie, $numero) = mysql_fetch_array($serie_numero);
@@ -1116,7 +1112,7 @@ class Factura extends Objeto {
 				return str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero;
 			}
 			return $numero;
-		} elseif (!empty($numero)) {
+		} else if (!empty($numero)) {
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
 				$serie = empty($serie) ? '001' : $serie;
 				return str_pad($serie, 3, '0', STR_PAD_LEFT) . '-' . $numero;
@@ -1136,37 +1132,34 @@ class Factura extends Objeto {
 		}
 
 		$where_max = " 1 ";
-		if ($max_numero_factura > 0)
+		if ($max_numero_factura > 0) {
 			$where_max .= " AND numero <= " . $max_numero_factura;
+		}
 
 		$query = "SELECT MAX(numero) FROM factura WHERE $where_max";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($max_numero_documento) = mysql_fetch_array($resp);
 
-		if ($max_numero_documento < $min_numero_factura)
+		if ($max_numero_documento < $min_numero_factura) {
 			return $min_numero_factura;
-		else
+		} else {
 			return $max_numero_documento + 1;
+		}
 	}
 
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
 
-		if (method_exists('Conf', 'GetConf')) {
-			$min_numero_factura = Conf::GetConf($this->sesion, 'NumeracionDesde');
-			$max_numero_factura = Conf::GetConf($this->sesion, 'NumeracionHasta');
-		} else if (method_exists('Conf', 'NumeracionDesde')) {
+		$min_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionDesde');
+		$max_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionHasta');
 
-
-
-			$min_numero_factura = Conf::NumeracionDesde();
-			$max_numero_factura = Conf::NumeracionHasta();
-		}
 		$where_max = " 1 ";
-		if ($max_numero_factura > 0)
+		if ($max_numero_factura > 0) {
 			$where_max .= " AND numero <= " . $max_numero_factura;
-		if ($tipo_documento_legal > 0)
+		}
+		if ($tipo_documento_legal > 0) {
 			$where_max .= " AND f.id_documento_legal = " . $tipo_documento_legal;
+		}
 
 		$query = "SELECT IF(MAX(f.numero)>pdl.numero_inicial,MAX(f.numero),pdl.numero_inicial) as numero_actual 
 					FROM factura f 
@@ -1176,10 +1169,11 @@ class Factura extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($max_numero_documento) = mysql_fetch_array($resp);
 
-		if ($max_numero_documento < $min_numero_factura)
+		if ($max_numero_documento < $min_numero_factura) {
 			return $min_numero_factura;
-		else
+		} else {
 			return $max_numero_documento + 1;
+		}
 	}
 
 	function ObtenerNumeroDocLegal($tipo_documento_legal, $serie = null) {
@@ -1312,8 +1306,9 @@ class Factura extends Objeto {
 	}
 
 	function GetCodigoEstado($id_factura = null) {
-		if (!$id_factura)
+		if (!$id_factura) {
 			$id_factura = $this->fields[$this->campo_id];
+		}
 
 		$query = "SELECT e.codigo FROM prm_estado_factura e JOIN factura f ON e.id_estado = f.id_estado WHERE f.id_factura = '$id_factura'";
 		$respuesta = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1340,8 +1335,9 @@ class Factura extends Objeto {
 		if ($numero) {
 			$where .= " AND f.numero = '" . $numero . "'";
 		}
-		if ($serie)
+		if ($serie) {
 			$where .= " AND f.serie_documento_legal = '" . $serie . "'";
+		}
 		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f " . $where . " GROUP BY grupo";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($lista_cobros, $grupo) = mysql_fetch_array($resp);
@@ -1385,8 +1381,9 @@ class Factura extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while (list($id_pago, $saldo_pago, $saldo_moneda_cobro) = mysql_fetch_array($resp)) {
-			if ($saldo_fact <= 0)
+			if ($saldo_fact <= 0) {
 				break;
+			}
 			$mvto_pago->LoadByPago($id_pago);
 			$monto_moneda_cobro = min($saldo_moneda_cobro, $saldo_fact);
 			$monto_pago = $monto_moneda_cobro * $saldo_pago / $saldo_moneda_cobro;

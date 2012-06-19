@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -21,18 +21,19 @@ class CobroMoneda extends Objeto
 	
 	function Load($id_cobro)
   {
-    $query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo 
+    $query = "SELECT cobro_moneda.id_moneda, cobro_moneda.tipo_cambio, prm_moneda.cifras_decimales,prm_moneda.glosa_moneda, prm_moneda.simbolo, prm_moneda.codigo, prm_moneda.glosa_moneda_plural 
     					FROM cobro_moneda 
     					JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
 					    WHERE id_cobro ='$id_cobro'";
     $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-    while( list($id_moneda, $tipo_cambio, $cifras_decimales,$glosa_moneda, $simbolo, $codigo) = mysql_fetch_array($resp) )
+    while( list($id_moneda, $tipo_cambio, $cifras_decimales,$glosa_moneda, $simbolo, $codigo,$glosa_moneda_plural) = mysql_fetch_array($resp) )
     {
     	$this->moneda[$id_moneda]['tipo_cambio'] 	= $tipo_cambio;
     	$this->moneda[$id_moneda]['glosa_moneda'] 	= $glosa_moneda;
     	$this->moneda[$id_moneda]['cifras_decimales'] 		= $cifras_decimales;
     	$this->moneda[$id_moneda]['simbolo'] 			= $simbolo;
 		$this->moneda[$id_moneda]['codigo'] 			= $codigo;
+		$this->moneda[$id_moneda]['glosa_moneda_plural'] 			= $glosa_moneda_plural;
     }
 
     $query = "SELECT opc_moneda_total FROM cobro WHERE id_cobro ='$id_cobro'";

@@ -1,7 +1,9 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
+require_once Conf::ServerDir().'/../fw/classes/Html.php';
+
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class InputId //Es cuando uno quiere unir un codigo con un selectbox

@@ -1320,7 +1320,9 @@ class Cobro extends Objeto {
 			$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - $cobro_descuento;
 			$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 			$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
-			$this->Edit('descuento', number_format($cobro_descuento, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], ".", ""));
+			//FFF: no redondear descuento, trae problemas con la moneda UF -> CLP
+			//$this->Edit('descuento', number_format($cobro_descuento, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], ".", ""));
+			$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
 		} else {
 			$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
 			$cobro_total = ($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
@@ -1980,11 +1982,431 @@ class Cobro extends Objeto {
 		return number_format((float) $str, 0, ',', '.');
 	}
 
+		/*
+	  GeneraProceso, obtiene un id de proceso para cada generacion de cobros.
+	 */
+
+	function EsCobrado() {
+		if (!$this->fields['estado'] || $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION')
+			return false;
+		else
+			return true;
+	}
+
+	function GeneraProceso() {
+		$query = "INSERT INTO cobro_proceso SET fecha=NOW(), id_usuario = '" . $this->sesion->usuario->fields['id_usuario'] . "' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		return mysql_insert_id($this->sesion->dbh);
+	}
+
+	/*
+	  Obtiene un id_cobro para un asunto y trabajo que se encuentre en el periodo
+	 */
+
+	function ObtieneCobroByCodigoAsunto($codigo_asunto, $fecha_trabajo) {
+		$query = "SELECT cobro.id_cobro FROM cobro
+								JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
+								WHERE cobro_asunto.codigo_asunto = '$codigo_asunto'
+								AND cobro.estado IN ('CREADO','EN REVISION')
+								AND cobro.incluye_honorarios = 1
+								AND if(fecha_ini != '0000-00-00' OR fecha_ini IS NOT NULL, cobro.fecha_ini <= '$fecha_trabajo' AND cobro.fecha_fin >= '$fecha_trabajo', cobro.fecha_fin >= '$fecha_trabajo')
+								ORDER BY id_cobro DESC LIMIT 1";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($id_cobro) = mysql_fetch_array($resp);
+		if ($id_cobro)
+			return $id_cobro;
+		else
+			return false;
+	}
+
+	/*
+	  Calcula el saldo inicial de la cta. corriente
+	  considera todos cobros <> creado excluyendo el cobro actual.
+	  todos los cobros con fecha emision inferior a la del cobro actual
+	  id_contrato igual al del cobro actual
+	  Devuelve valor en Moneda de Vista
+	 */
+
+	function SaldoInicialCuentaCorriente() {
+		#El tipo de moneda de la vista de este cobro
+		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda->Load($this->fields['opc_moneda_total']);
+
+		$query = "SELECT opc_moneda_total,saldo_final_gastos FROM cobro
+							WHERE estado <> 'CREADO' AND estado <> 'EN REVISION' AND id_cobro <> '" . $this->fields['id_cobro'] . "'
+							AND codigo_cliente = '" . $this->fields['codigo_cliente'] . "'
+							AND fecha_emision < '" . $this->fields['fecha_emision'] . "'
+							AND id_contrato = '" . $this->fields['id_contrato'] . "' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$lista_cobros = new ListaCobros($this->sesion, '', $query);
+		$saldo_inicial_gastos = 0;
+		for ($i = 0; $i < $lista_cobros->num; $i++) {
+			$cobro_list = $lista_cobros->Get($i);
+			$moneda_cobro = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+			$moneda_cobro->Load($cobro_list->fields['opc_moneda_total']);
+
+			$saldo_inicial_gastos += $cobro_list->fields['saldo_final_gastos'] * $moneda_cobro->fields['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 12
+		}
+		return $saldo_inicial_gastos ? $saldo_inicial_gastos : 0;
+	}
+
+	/*
+	  Calcula el saldo_final_gastos, este corresponde al saldo_inicial - saldo_cobro (suma de gastos - provisiones)
+	 */
+
+	function SaldoFinalCuentaCorriente() {
+		//Moneda del cobro
+		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda->Load($this->fields['opc_moneda_total']);
+
+		$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
+							WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND (egreso > 0 OR ingreso > 0) AND cta_corriente.incluir_en_cobro = 'SI'
+							ORDER BY fecha ASC";
+		$lista_gastos = new ListaGastos($this->sesion, '', $query);
+		$saldo_gastos = 0;
+		for ($i = 0; $i < $lista_gastos->num; $i++) {
+			$gasto = $lista_gastos->Get($i);
+			//sacamos el valor del tipo de cambio usado en el cobro
+			$query = "SELECT cobro_moneda.id_cobro, cobro_moneda.id_moneda, cobro_moneda.tipo_cambio
+							FROM cobro_moneda
+							WHERE cobro_moneda.id_cobro=" . $this->fields['id_cobro'] . "
+								AND cobro_moneda.id_moneda=" . $gasto->fields['id_moneda'];
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			$cobro_moneda = mysql_fetch_array($resp);
+			if ($gasto->fields['egreso'] > 0)
+				$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 14
+			elseif ($gasto->fields['ingreso'] > 0)
+				$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 15
+		}
+		$saldo_inicial = 0;
+		$saldo_inicial = $this->SaldoInicialCuentaCorriente();
+		$saldo_final_gastos = $saldo_inicial - $saldo_gastos;
+		return $saldo_final_gastos;
+	}
+
+	
+	function TienePagosAdelantos() {
+		$query = "
+			SELECT COUNT(*) AS nro_pagos
+			FROM documento AS doc_pago
+			JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
+			JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
+			WHERE doc.id_cobro = " . $this->fields['id_cobro'];
+		$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$nro_pagos = mysql_fetch_assoc($pagos);
+		return $nro_pagos['nro_pagos'] > 0;
+	}
+
+	function DetalleProfesional() {
+		global $contrato;
+		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorTarifa') ) || ( method_exists('Conf', 'OrdenarPorTarifa') && Conf::OrdenarPorTarifa() )))
+			$order_categoria = "t.tarifa_hh DESC, ";
+		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() )))
+			$order_categoria = "u.id_categoria_usuario, u.nombre, u.apellido1, u.id_usuario, ";
+		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )))
+			$order_categoria = "cu.orden, u.id_usuario, ";
+		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() )))
+			$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
+		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() )))
+			$order_categoria = "u.id_categoria_usuario DESC, ";
+		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() )))
+			$order_categoria = "t.fecha, u.id_categoria_usuario, u.id_usuario, ";
+		else
+			$order_categoria = "";
+
+		$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) FROM trabajo WHERE cobrable = 1 AND id_cobro = '" . $this->fields['id_cobro'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($total_horas_cobro) = mysql_fetch_array($resp);
+
+		if (!method_exists('Conf', 'MostrarHorasCero') && !( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'MostrarHorasCero') )) {
+			if ($this->fields['opc_ver_horas_trabajadas']) {
+				$where_horas_cero = " AND t.duracion > '0000-00-00 00:00:00' ";
+			} else {
+				$where_horas_cero = " AND t.duracion_cobrada > '0000-00-00 00:00:00' ";
+			}
+		}
+
+		if( UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC') ) {
+			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
+												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
+												 AND t2.id_usuario = u.id_usuario
+												 AND t2.cobrable = 1";
+		} else {
+			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada)  ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada)  )
+												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
+												 AND t2.id_usuario = u.id_usuario
+												 AND t2.cobrable = 1";
+		}
+		
+		$query = "	SELECT
+										t.id_usuario as id_usuario,
+										t.codigo_asunto as codigo_asunto,
+										cu.id_categoria_usuario as id_categoria_usuario,
+										cu.glosa_categoria as glosa_categoria,
+										u.username as username,
+										CONCAT_WS(' ',u.nombre,u.apellido1) as nombre_usuario,
+										SUM( TIME_TO_SEC(duracion_cobrada)/3600 ) as duracion_cobrada,
+										SUM( TIME_TO_SEC(duracion)/3600 ) as duracion_trabajada,
+										SUM( (TIME_TO_SEC(duracion)-TIME_TO_SEC(duracion_cobrada))/3600 ) as duracion_descontada,
+										SUM( TIME_TO_SEC( duracion_retainer )/3600 ) as duracion_retainer,
+										(
+											$query_tarifa
+										) as tarifa,
+										SUM(t.monto_cobrado) as monto_cobrado_escalonada
+									FROM trabajo as t
+									JOIN usuario as u ON u.id_usuario=t.id_usuario
+									LEFT JOIN prm_categoria_usuario as cu ON u.id_categoria_usuario=cu.id_categoria_usuario
+									WHERE t.id_cobro = '" . $this->fields['id_cobro'] . "'
+										AND t.visible = 1
+										AND t.id_tramite = 0
+										$where_horas_cero
+									GROUP BY t.codigo_asunto, t.id_usuario
+									ORDER BY $order_categoria t.fecha ASC, t.descripcion ";
+		//echo $query; exit;
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+		$contrato_horas = $this->fields['retainer_horas'];
+
+		if ($total_horas_cobro > 0)
+			$factor_proporcional = ( $total_horas_cobro - $contrato_horas ) / $total_horas_cobro;
+		else
+			$factor_proporcional = 1;
+		if ($factor_proporcional < 0)
+			$factor_proporcional = 0;
+		$array_profesionales = array();
+		$array_resumen_profesionales = array();
+		while ($row = mysql_fetch_assoc($resp)) {
+			$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
+									FROM trabajo
+								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
+								 	 AND visible = 1
+								 	 AND cobrable = 0
+								 	 AND id_tramite = 0
+								 	 AND id_usuario = '" . $row['id_usuario'] . "'
+								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'";
+			$resp2 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($row['duracion_incobrables']) = mysql_fetch_array($resp2);
+
+			if (!is_array($array_resumen_profesionales[$row['id_usuario']])) {
+				$array_resumen_profesionales[$row['id_usuario']]['id_categoria_usuario'] = $row['id_categoria_usuario'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_categoria'] = $row['glosa_categoria'];
+				$array_resumen_profesionales[$row['id_usuario']]['nombre_usuario'] = $row['nombre_usuario'];
+				$array_resumen_profesionales[$row['id_usuario']]['username'] = $row['username'];
+				$array_resumen_profesionales[$row['id_usuario']]['tarifa'] = $row['tarifa'];
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada'] = $row['duracion_cobrada'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada'] = $row['duracion_trabajada'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_descontada'] = $row['duracion_descontada'] + $row['duracion_incobrables'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_descontada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables'] = $row['duracion_incobrables'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] = $row['duracion_retainer'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
+
+				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = 0;
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = '0:00';
+					$array_resumen_profesionales[$row['id_usuario']]['valor_tarificada'] = 0;
+					$array_resumen_profesionales[$row['id_usuario']]['flatfee'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['flatfee']);
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
+				} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+					$array_resumen_profesionales[$row['id_usuario']]['monto_cobrado_escalonada'] = $row['monto_cobrado_escalonada'];
+				} else if ($this->fields['forma_cobro'] == 'RETAINER') {
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
+					if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
+						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
+					} else {
+						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+					}
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				} else {
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				}
+			} else {
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada'] += $row['duracion_cobrada'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada'] += $row['duracion_trabajada'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_descontada'] += $row['duracion_descontada'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_descontada']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables'] += $row['duracion_incobrables'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables']);
+				$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] += $row['duracion_retainer'];
+				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
+
+				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
+					$array_resumen_profesionales[$row['id_usuario']]['flatfee'] += $row['duracion_cobrada'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['flatfee']);
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GLosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
+				} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+					$array_resumen_profesionales[$row['id_usuario']]['monto_cobrado_escalonada'] += $row['monto_cobrado_escalonada'];
+				} else if ($this->fields['forma_cobro'] == 'RETAINER') {
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
+					if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
+						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
+					} else {
+						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+					}
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				} else {
+					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += $row['duracion_cobrada'] - $row['duracion_incobrables'];
+					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
+				}
+			}
+
+			$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
+									FROM trabajo
+								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
+								 	 AND visible = 1
+								 	 AND cobrable = 0
+								 	 AND id_tramite = 0
+								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'
+								 	 AND id_usuario = '" . $row['id_usuario'] . "'";
+			$resp3 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($row['duracion_incobrables']) = mysql_fetch_array($resp3);
+
+			$total_horas += $row['duracion_cobrada'];
+			$array_profesional_usuario = array();
+			$array_profesional_usuario['id_categoria_usuario'] = $row['id_categoria_usuario'];
+			$array_profesional_usuario['glosa_categoria'] = $row['glosa_categoria'];
+			$array_profesional_usuario['nombre_usuario'] = $row['nombre_usuario'];
+			$array_profesional_usuario['username'] = $row['username'];
+			$array_profesional_usuario['duracion_cobrada'] = $row['duracion_cobrada'];
+			$array_profesional_usuario['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_cobrada']);
+			$array_profesional_usuario['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_cobrada']);
+			$array_profesional_usuario['duracion_trabajada'] = $row['duracion_trabajada'];
+			$array_profesional_usuario['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_trabajada']);
+			$array_profesional_usuario['duracion_trabajada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_trabajada']);
+			$array_profesional_usuario['duracion_descontada'] = $row['duracion_descontada'] + $row['duracion_incobrables'];
+			$array_profesional_usuario['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_descontada']);
+			$array_profesional_usuario['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_descontada']);
+			$array_profesional_usuario['duracion_incobrables'] = $row['duracion_incobrables'];
+			$array_profesional_usuario['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_incobrables']);
+			$array_profesional_usuario['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_incobrables']);
+			$array_profesional_usuario['duracion_retainer'] = $row['duracion_retainer'];
+			$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
+			$array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
+			$array_profesional_usuario['tarifa'] = $row['tarifa'];
+
+			if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
+				$array_profesional_usuario['duracion_tarificada'] = 0;
+				$array_profesional_usuario['glosa_duracion_tarificada'] = '0:00';
+				$array_profesional_usuario['valor_tarificada'] = 0;
+				$array_profesional_usuario['flatfee'] = $row['duracion_cobrada'];
+				$array_profesional_usuario['duracion_retainer'] = $row['duracion_cobrada'];
+				$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
+				$array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
+			} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+				$array_profesional_usuario['monto_cobrado_escalonada'] = $row['monto_cobrado_escalonada'];
+			} else if ($this->fields['forma_cobro'] == 'RETAINER') {
+				$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
+				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
+				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
+				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
+			} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
+				$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
+				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
+				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
+			} else {
+				$array_profesional_usuario['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
+				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
+				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
+				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
+			}
+			if (!is_array($array_profesionales[$row['codigo_asunto']]))
+				$array_profesionales[$row['codigo_asunto']] = array();
+			$array_profesionales[$row['codigo_asunto']][$row['id_usuario']] = $array_profesional_usuario;
+		}
+
+		$resumen_valor_hh = 0;
+		foreach ($array_resumen_profesionales as $id_usuario => $data) {
+			$array_resumen_profesionales[$id_usuario]['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_cobrada']);
+			$array_resumen_profesionales[$id_usuario]['duracion_trabajada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_trabajada']);
+			$array_resumen_profesionales[$id_usuario]['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_descontada']);
+			$array_resumen_profesionales[$id_usuario]['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_incobrables']);
+			$array_resumen_profesionales[$id_usuario]['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_retainer']);
+			if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['opc_ver_valor_hh_flat_fee'])
+				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_cobrada'] - $array_resumen_profesional[$id_usuario]['duracion_incobrables'];
+			else
+				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_tarificada']);
+			$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
+
+			$resumen_valor_hh += $data['duracion_cobrada'] * $data['tarifa'];
+		}
+		if ($resumen_valor_hh > 0) {
+			$factor_ajuste = $this->fields['monto_subtotal'] / $resumen_valor_hh;
+		} else {
+			$factor_ajuste = 1;
+		}
+
+		return array($array_profesionales, $array_resumen_profesionales, $factor_ajuste);
+	}
+
+	function MontoFacturado() {
+		$query = "SELECT if(f.id_documento_legal IN (1,3,4),'INGRESO','EGRESO') as modo
+						,f.total
+						,m1.cifras_decimales as cifras_decimales_ini
+						,m1.tipo_cambio as tipo_cambio_ini
+						,m2.cifras_decimales as cifras_decimales_fin
+						,m2.tipo_cambio as tipo_cambio_fin
+					FROM factura f
+					LEFT JOIN prm_moneda m1 ON m1.id_moneda = f.id_moneda
+					LEFT JOIN prm_moneda m2 ON m2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
+					WHERE f.id_estado NOT IN (3,5)
+					AND f.id_cobro = '" . $this->fields['id_cobro'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$ingreso = 0;
+		$egrso = 0;
+		$monto_facturado = 0;
+		while ($row = mysql_fetch_assoc($resp)) {
+			$total = UtilesApp::CambiarMoneda($row['total'], $row['tipo_cambio_ini'], $row['cifras_decimales_ini'], $row['tipo_cambio_fin'], $row['cifras_decimales_fin'], false);
+			if ($row['modo'] == 'INGRESO') {
+				$ingreso += $total;
+			} else {
+				$egreso += $total;
+			}
+		}
+		$monto_facturado = $ingreso - $egreso;
+		return $monto_facturado;
+	}
+
+	function DiferenciaCobroConFactura() {
+		$calculos_cobro = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+		$monto_cobrado = $calculos_cobro['monto_total_cobro'][$calculos_cobro['opc_moneda_total']];
+		$monto_facturado = $this->MontoFacturado();
+		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
+		$idioma->Load($this->fields['codigo_idioma']);
+		$monto_cobrado = number_format($monto_cobrado, $calculos_cobro['cifras_decimales_opc_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$monto_facturado = number_format($monto_facturado, $calculos_cobro['cifras_decimales_opc_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
+		$mensaje = '';
+		if ($monto_cobrado != $monto_facturado) {
+			$moneda = new Moneda($this->sesion);
+			$moneda->Load($this->fields['opc_moneda_total']);
+			$simbolo = $moneda->fields['simbolo'];
+			$mensaje = __('El monto liquidado') . ' (' . $simbolo . ' ' . $monto_cobrado . ') ' . __('no coincide con el monto facturado ') . '(' . $simbolo . ' ' . $monto_facturado . ')';
+		}
+		return $mensaje;
+	}
+
+	/*
+	 *  EMPIEZA A IMPLEMENTAR FUNCION PROCESACOBROIDMONEDA
+	 */
 	/*
 	  Generacion de DOC COBRO
 	 */
 
-	function GeneraHTMLCobro($masivo=false, $id_formato='', $funcion='') {
+	function xGeneraHTMLCobro($masivo=false, $id_formato='', $funcion='') {
 		// Para mostrar un resumen de horas de cada profesional al principio del documento.
 		global $resumen_profesional_id_usuario;
 		global $resumen_profesional_nombre;
@@ -2120,7 +2542,7 @@ class Cobro extends Objeto {
 		return $html;
 	}
 
-	function GenerarDocumentoCarta($parser_carta, $theTag='', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
+	function xGenerarDocumentoCarta($parser_carta, $theTag='', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
 		global $id_carta;
 		global $contrato;
 		global $cobro_moneda;
@@ -3041,7 +3463,7 @@ class Cobro extends Objeto {
 	  Generación de DOCUMENTO COBRO (VERSION VIEJA, PERO SE SIGUE USANDO)
 	 */
 
-	function GenerarDocumento($parser, $theTag='INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
+	function xGenerarDocumento($parser, $theTag='INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, & $idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
 		global $contrato;
 		global $cobro_moneda;
 		//global $moneda_total;
@@ -4153,7 +4575,7 @@ class Cobro extends Objeto {
 				else
 					$html = str_replace('%cobrable%', '', $html);
 
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
+				if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario') ) {
 					$query = "SELECT cat.glosa_categoria
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
@@ -4166,7 +4588,7 @@ class Cobro extends Objeto {
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($categoria) = mysql_fetch_array($resp);
 					$html = str_replace('%categoria_abogado%', __($categoria), $html);
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'SepararPorUsuario') ) {				
 					$query = "SELECT CONCAT(usuario.nombre,' ',usuario.apellido1),trabajo.tarifa_hh
 									FROM trabajo
 									JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
@@ -4330,23 +4752,23 @@ class Cobro extends Objeto {
 				$where_horas_cero = '';
 
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() ))) {
+				if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
-				} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'SepararPorUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional') ) {				
 					$select_categoria = "";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
@@ -4776,19 +5198,19 @@ class Cobro extends Objeto {
 				$where_horas_cero = '';
 
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() ))) {
+				if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
-				} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaDetalleProfesional') ) {
 					$select_categoria = "";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() ))) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorFechaCategoria') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "tramite.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
@@ -4887,7 +5309,7 @@ class Cobro extends Objeto {
 						$row = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ' ' . number_format($saldo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
 
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
+					if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario') ) {
 						$tramite_siguiente = $lista_tramites->Get($i + 1);
 						if (!empty($tramite_siguiente->fields['id_categoria_usuario'])) {
 							if ($tramite->fields['id_categoria_usuario'] != $tramite_siguiente->fields['id_categoria_usuario']) {
@@ -6482,113 +6904,9 @@ class Cobro extends Objeto {
 		return $html;
 	}
 
-	/*
-	  GeneraProceso, obtiene un id de proceso para cada generacion de cobros.
-	 */
 
-	function EsCobrado() {
-		if (!$this->fields['estado'] || $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION')
-			return false;
-		else
-			return true;
-	}
 
-	function GeneraProceso() {
-		$query = "INSERT INTO cobro_proceso SET fecha=NOW(), id_usuario = '" . $this->sesion->usuario->fields['id_usuario'] . "' ";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		return mysql_insert_id($this->sesion->dbh);
-	}
-
-	/*
-	  Obtiene un id_cobro para un asunto y trabajo que se encuentre en el periodo
-	 */
-
-	function ObtieneCobroByCodigoAsunto($codigo_asunto, $fecha_trabajo) {
-		$query = "SELECT cobro.id_cobro FROM cobro
-								JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
-								WHERE cobro_asunto.codigo_asunto = '$codigo_asunto'
-								AND cobro.estado IN ('CREADO','EN REVISION')
-								AND cobro.incluye_honorarios = 1
-								AND if(fecha_ini != '0000-00-00' OR fecha_ini IS NOT NULL, cobro.fecha_ini <= '$fecha_trabajo' AND cobro.fecha_fin >= '$fecha_trabajo', cobro.fecha_fin >= '$fecha_trabajo')
-								ORDER BY id_cobro DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id_cobro) = mysql_fetch_array($resp);
-		if ($id_cobro)
-			return $id_cobro;
-		else
-			return false;
-	}
-
-	/*
-	  Calcula el saldo inicial de la cta. corriente
-	  considera todos cobros <> creado excluyendo el cobro actual.
-	  todos los cobros con fecha emision inferior a la del cobro actual
-	  id_contrato igual al del cobro actual
-	  Devuelve valor en Moneda de Vista
-	 */
-
-	function SaldoInicialCuentaCorriente() {
-		#El tipo de moneda de la vista de este cobro
-		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda->Load($this->fields['opc_moneda_total']);
-
-		$query = "SELECT opc_moneda_total,saldo_final_gastos FROM cobro
-							WHERE estado <> 'CREADO' AND estado <> 'EN REVISION' AND id_cobro <> '" . $this->fields['id_cobro'] . "'
-							AND codigo_cliente = '" . $this->fields['codigo_cliente'] . "'
-							AND fecha_emision < '" . $this->fields['fecha_emision'] . "'
-							AND id_contrato = '" . $this->fields['id_contrato'] . "' ";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$lista_cobros = new ListaCobros($this->sesion, '', $query);
-		$saldo_inicial_gastos = 0;
-		for ($i = 0; $i < $lista_cobros->num; $i++) {
-			$cobro_list = $lista_cobros->Get($i);
-			$moneda_cobro = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-			$moneda_cobro->Load($cobro_list->fields['opc_moneda_total']);
-
-			$saldo_inicial_gastos += $cobro_list->fields['saldo_final_gastos'] * $moneda_cobro->fields['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 12
-		}
-		return $saldo_inicial_gastos ? $saldo_inicial_gastos : 0;
-	}
-
-	/*
-	  Calcula el saldo_final_gastos, este corresponde al saldo_inicial - saldo_cobro (suma de gastos - provisiones)
-	 */
-
-	function SaldoFinalCuentaCorriente() {
-		//Moneda del cobro
-		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda->Load($this->fields['opc_moneda_total']);
-
-		$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
-							WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND (egreso > 0 OR ingreso > 0) AND cta_corriente.incluir_en_cobro = 'SI'
-							ORDER BY fecha ASC";
-		$lista_gastos = new ListaGastos($this->sesion, '', $query);
-		$saldo_gastos = 0;
-		for ($i = 0; $i < $lista_gastos->num; $i++) {
-			$gasto = $lista_gastos->Get($i);
-			//sacamos el valor del tipo de cambio usado en el cobro
-			$query = "SELECT cobro_moneda.id_cobro, cobro_moneda.id_moneda, cobro_moneda.tipo_cambio
-							FROM cobro_moneda
-							WHERE cobro_moneda.id_cobro=" . $this->fields['id_cobro'] . "
-								AND cobro_moneda.id_moneda=" . $gasto->fields['id_moneda'];
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			$cobro_moneda = mysql_fetch_array($resp);
-			if ($gasto->fields['egreso'] > 0)
-				$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 14
-			elseif ($gasto->fields['ingreso'] > 0)
-				$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 15
-		}
-		$saldo_inicial = 0;
-		$saldo_inicial = $this->SaldoInicialCuentaCorriente();
-		$saldo_final_gastos = $saldo_inicial - $saldo_gastos;
-		return $saldo_final_gastos;
-	}
-
-	/*
-	 *  EMPIEZA A IMPLEMENTAR FUNCION PROCESACOBROIDMONEDA
-	 */
-
-	function GenerarDocumentoCarta2($parser_carta, $theTag='', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
+	function xGenerarDocumentoCarta2($parser_carta, $theTag='', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
 		global $id_carta;
 		global $contrato;
 		global $cobro_moneda;
@@ -6785,7 +7103,11 @@ class Cobro extends Objeto {
 				break;
 
 			case 'DETALLE':
-
+				if ( isset($contrato->fields['glosa_contrato']) ) {
+					$html2 = str_replace('%glosa_contrato%', $contrato->fields['glosa_contrato'], $html2);
+				} else {
+					$html2 = str_replace('%glosa_contrato%', '', $html2);
+				}	
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
@@ -7529,7 +7851,7 @@ class Cobro extends Objeto {
 	  Generación de DOCUMENTO COBRO
 	 */
 
-	function GenerarDocumento2($parser, $theTag='INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  &$idioma, & $cliente, $moneda, $moneda_base, $trabajo,  & $profesionales, $gasto,  & $totales, $tipo_cambio_moneda_total, $asunto) {
+	function xGenerarDocumento2($parser, $theTag='INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  &$idioma, & $cliente, $moneda, $moneda_base, $trabajo,  & $profesionales, $gasto,  & $totales, $tipo_cambio_moneda_total, $asunto) {
 		global $contrato;
 		global $cobro_moneda;
 		//global $moneda_total;
@@ -7728,6 +8050,10 @@ class Cobro extends Objeto {
 				} else {
 					$html = str_replace('%RESUMEN_PROFESIONAL%', $this->GenerarDocumento2($parser, 'RESUMEN_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				}
+				
+				$html = str_replace('%ENDOSO%', $this->GenerarDocumento2($parser,'ENDOSO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				
+				
 				if ($masi) {
 					$html = str_replace('%SALTO_PAGINA%', $this->GenerarDocumento2($parser, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
@@ -7738,7 +8064,18 @@ class Cobro extends Objeto {
 				$html = str_replace('%DESGLOSE_POR_ASUNTO_DETALLE%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_DETALLE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%DESGLOSE_POR_ASUNTO_TOTALES%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_TOTALES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				
-				
+				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+				$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
+								FROM factura
+								WHERE id_cobro =" . $this->fields['id_cobro'];
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				list($numero_factura) = mysql_fetch_array($resp);
+
+
+				$html = str_replace('%numero_factura%',$numero_factura, $html);
+				} else {
+				$html = str_replace('%numero_factura%', '', $html);
+				}
 				
 				break;
 
@@ -8190,7 +8527,11 @@ class Cobro extends Objeto {
 				}
 
 				$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
-				$html = str_replace('%nota_disclaimer%', __('Nota Disclaimer'), $html);
+				if($this->fields['id_carta']==3) {
+					$html = str_replace('%nota_disclaimer%', __('Nota Disclaimer'), $html);
+				} else {
+					$html = str_replace('%nota_disclaimer%',' ', $html);
+				}
 				if ($this->fields['opc_ver_morosidad']) {
 
 					$html = str_replace('%DETALLES_PAGOS%', $this->GenerarDocumento2($parser, 'DETALLES_PAGOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -9127,20 +9468,20 @@ class Cobro extends Objeto {
 				$html = '';
 				$where_horas_cero = '';
 
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() )) {
+				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuarioe s true se ordena por categoria
+				if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} else if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() )) {
+				} elseif ( UtilesApp::GetConf($this->sesion, 'SepararPorUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} elseif (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() )) {
+				} elseif ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional') ) {
 					$select_categoria = "";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() )) {
+				} elseif ( UtilesApp::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria') ) {
 					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
 				} else {
@@ -9573,19 +9914,19 @@ class Cobro extends Objeto {
 				$where_horas_cero = '';
 
 				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() )) {
+				if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaNombreUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} else if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() )) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaDetalleProfesional') ) { 
 					$select_categoria = "";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() )) {
+				} else if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorFechaCategoria') ) {
 					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 					$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
 					$order_categoria = "tramite.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
@@ -9686,7 +10027,7 @@ class Cobro extends Objeto {
 						$row = str_replace('%valor_tramites%', $this->moneda[$moneda_total->fields['id_moneda']]['simbolo'] . ' ' . number_format($saldo, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
 
-					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )) {
+					if ( UtilesApp::GetConf($this->sesion, 'TramitesOrdenarPorCategoriaUsuario') ) {
 						$tramite_siguiente = $lista_tramites->Get($i + 1);
 						if (!empty($tramite_siguiente->fields['id_categoria_usuario'])) {
 							if ($tramite->fields['id_categoria_usuario'] != $tramite_siguiente->fields['id_categoria_usuario']) {
@@ -10307,7 +10648,7 @@ class Cobro extends Objeto {
 							$row = str_replace('%nombre_siglas%', $data['nombre_usuario'], $row);
 						$row = str_replace('%nombre%', $data['nombre_usuario'], $row);
 						$row = str_replace('%username%', $data['username'], $row);
-
+									
 						if (!$asunto->fields['cobrable']) {
 							$row = str_replace('%hrs_retainer%', '', $row);
 							$row = str_replace('%hrs_descontadas%', '', $row);
@@ -11370,8 +11711,16 @@ class Cobro extends Objeto {
 				list($cantidad_gastos_en_otra_moneda) = mysql_fetch_array($resp);
 
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
-				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
+                $html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
+                
+				
+				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
+				$html = str_replace('%proveedor%',__('Proveedor'), $html);
+				} else {
+					$html = str_replace('%proveedor%','', $html);
+				}
+				
 				$html = str_replace('%num_doc%', __('N° Documento'), $html);
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -11434,6 +11783,7 @@ class Cobro extends Objeto {
 				if ($lista_gastos->num == 0) {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', '&nbsp;', $row);
+                                         $row = str_replace('%proveedor%', '&nbsp;' , $row);
 					$row = str_replace('%descripcion%', __('No hay gastos en este cobro'), $row);
 					$row = str_replace('%descripcion_b%', '(' . __('No hay gastos en este cobro') . ')', $row);
 					$row = str_replace('%monto_original%', '&nbsp;', $row);
@@ -11475,7 +11825,7 @@ class Cobro extends Objeto {
 				$monto_gastos_neto_por_asunto = 0;
 				$monto_gastos_impuesto_por_asunto = 0;
 				$monto_gastos_bruto_por_asunto = 0;
-				
+				//var_dump ($x_cobro_gastos['gasto_detalle']);
 				foreach ($x_cobro_gastos['gasto_detalle'] as $id_gasto => $detalle) {
 					if( UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') && $asunto->separar_asuntos && !empty($asunto->fields['codigo_asunto']) && $asunto->fields['codigo_asunto'] != $detalle['codigo_asunto'] ) {
 						continue;
@@ -11484,6 +11834,14 @@ class Cobro extends Objeto {
 					$row = str_replace('%fecha%', Utiles::sql2fecha($detalle['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $detalle['tipo_gasto'], $row);
+ 
+ if(UtilesApp::GetConf($this->sesion,'MostrarProveedorenGastos')) {
+	 $row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
+ } else {
+	 $row = str_replace('%proveedor%', '' , $row);
+ }
+ 
+ 
 					if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
 						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
 						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
@@ -11922,325 +12280,39 @@ class Cobro extends Objeto {
 														Swift code:  BCHICLRM', $html);
 				break;
 
+				case 'ENDOSO':
+						
+				//Necesario para moestrar numero de cuenta.
+				 
+				$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI
+								FROM cuenta_banco cb
+								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
+								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci) = mysql_fetch_array($resp);
+					$html = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html);
+					$html = str_replace('%glosa_banco_contrato%', $glosa_banco, $html);
+					$html = str_replace('%codigo_swift%', $codigo_swift, $html);
+					$html = str_replace('%codigo_cci%', $codigo_cci, $html);
+				
+				// Necesario para mostrar tipo monera 
+				if ($cobro_moneda->moneda[$this->fields['opc_moneda_total']]['codigo'] == 'USD') {
+					
+					$html = str_replace('%tipo_gbp_segun_moneda%', __('USD'), $html);
+				} else {
+					
+					$html = str_replace('%tipo_gbp_segun_moneda%', __('Colones'), $html);
+				}
+				//ELEMENTO TEST 
+				$html = str_replace('%numero_cuenta%',__('Numero Cuenta.'), $html);
+				break;
+				
+				
 			case 'SALTO_PAGINA':
 				//no borrarle al css el BR.divisor
 				break;
 		}
 		return $html;
-	}
-
-	function TienePagosAdelantos() {
-		$query = "
-			SELECT COUNT(*) AS nro_pagos
-			FROM documento AS doc_pago
-			JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
-			JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
-			WHERE doc.id_cobro = " . $this->fields['id_cobro'];
-		$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$nro_pagos = mysql_fetch_assoc($pagos);
-		return $nro_pagos['nro_pagos'] > 0;
-	}
-
-	function DetalleProfesional() {
-		global $contrato;
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorTarifa') ) || ( method_exists('Conf', 'OrdenarPorTarifa') && Conf::OrdenarPorTarifa() )))
-			$order_categoria = "t.tarifa_hh DESC, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() )))
-			$order_categoria = "u.id_categoria_usuario, u.nombre, u.apellido1, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )))
-			$order_categoria = "cu.orden, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() )))
-			$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() )))
-			$order_categoria = "u.id_categoria_usuario DESC, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() )))
-			$order_categoria = "t.fecha, u.id_categoria_usuario, u.id_usuario, ";
-		else
-			$order_categoria = "";
-
-		$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) FROM trabajo WHERE cobrable = 1 AND id_cobro = '" . $this->fields['id_cobro'] . "'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($total_horas_cobro) = mysql_fetch_array($resp);
-
-		if (!method_exists('Conf', 'MostrarHorasCero') && !( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'MostrarHorasCero') )) {
-			if ($this->fields['opc_ver_horas_trabajadas']) {
-				$where_horas_cero = " AND t.duracion > '0000-00-00 00:00:00' ";
-			} else {
-				$where_horas_cero = " AND t.duracion_cobrada > '0000-00-00 00:00:00' ";
-			}
-		}
-
-		if( UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC') ) {
-			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
-												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
-												 AND t2.id_usuario = u.id_usuario
-												 AND t2.cobrable = 1";
-		} else {
-			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada)  ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada)  )
-												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
-												 AND t2.id_usuario = u.id_usuario
-												 AND t2.cobrable = 1";
-		}
-		
-		$query = "	SELECT
-										t.id_usuario as id_usuario,
-										t.codigo_asunto as codigo_asunto,
-										cu.id_categoria_usuario as id_categoria_usuario,
-										cu.glosa_categoria as glosa_categoria,
-										u.username as username,
-										CONCAT_WS(' ',u.nombre,u.apellido1) as nombre_usuario,
-										SUM( TIME_TO_SEC(duracion_cobrada)/3600 ) as duracion_cobrada,
-										SUM( TIME_TO_SEC(duracion)/3600 ) as duracion_trabajada,
-										SUM( (TIME_TO_SEC(duracion)-TIME_TO_SEC(duracion_cobrada))/3600 ) as duracion_descontada,
-										SUM( TIME_TO_SEC( duracion_retainer )/3600 ) as duracion_retainer,
-										(
-											$query_tarifa
-										) as tarifa,
-										SUM(t.monto_cobrado) as monto_cobrado_escalonada
-									FROM trabajo as t
-									JOIN usuario as u ON u.id_usuario=t.id_usuario
-									LEFT JOIN prm_categoria_usuario as cu ON u.id_categoria_usuario=cu.id_categoria_usuario
-									WHERE t.id_cobro = '" . $this->fields['id_cobro'] . "'
-										AND t.visible = 1
-										AND t.id_tramite = 0
-										$where_horas_cero
-									GROUP BY t.codigo_asunto, t.id_usuario
-									ORDER BY $order_categoria t.fecha ASC, t.descripcion ";
-		//echo $query; exit;
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-		$contrato_horas = $this->fields['retainer_horas'];
-
-		if ($total_horas_cobro > 0)
-			$factor_proporcional = ( $total_horas_cobro - $contrato_horas ) / $total_horas_cobro;
-		else
-			$factor_proporcional = 1;
-		if ($factor_proporcional < 0)
-			$factor_proporcional = 0;
-		$array_profesionales = array();
-		$array_resumen_profesionales = array();
-		while ($row = mysql_fetch_assoc($resp)) {
-			$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
-									FROM trabajo
-								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
-								 	 AND visible = 1
-								 	 AND cobrable = 0
-								 	 AND id_tramite = 0
-								 	 AND id_usuario = '" . $row['id_usuario'] . "'
-								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'";
-			$resp2 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($row['duracion_incobrables']) = mysql_fetch_array($resp2);
-
-			if (!is_array($array_resumen_profesionales[$row['id_usuario']])) {
-				$array_resumen_profesionales[$row['id_usuario']]['id_categoria_usuario'] = $row['id_categoria_usuario'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_categoria'] = $row['glosa_categoria'];
-				$array_resumen_profesionales[$row['id_usuario']]['nombre_usuario'] = $row['nombre_usuario'];
-				$array_resumen_profesionales[$row['id_usuario']]['username'] = $row['username'];
-				$array_resumen_profesionales[$row['id_usuario']]['tarifa'] = $row['tarifa'];
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada'] = $row['duracion_cobrada'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada'] = $row['duracion_trabajada'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_descontada'] = $row['duracion_descontada'] + $row['duracion_incobrables'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_descontada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables'] = $row['duracion_incobrables'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] = $row['duracion_retainer'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
-
-				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = 0;
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = '0:00';
-					$array_resumen_profesionales[$row['id_usuario']]['valor_tarificada'] = 0;
-					$array_resumen_profesionales[$row['id_usuario']]['flatfee'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['flatfee']);
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
-				} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-					$array_resumen_profesionales[$row['id_usuario']]['monto_cobrado_escalonada'] = $row['monto_cobrado_escalonada'];
-				} else if ($this->fields['forma_cobro'] == 'RETAINER') {
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
-					if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
-						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
-					} else {
-						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
-					}
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				} else {
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				}
-			} else {
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada'] += $row['duracion_cobrada'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_cobrada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada'] += $row['duracion_trabajada'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_trabajada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_descontada'] += $row['duracion_descontada'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_descontada']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables'] += $row['duracion_incobrables'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_incobrables']);
-				$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] += $row['duracion_retainer'];
-				$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
-
-				if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
-					$array_resumen_profesionales[$row['id_usuario']]['flatfee'] += $row['duracion_cobrada'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['flatfee']);
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_retainer'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_retainer'] = Utiles::Decimal2GLosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_retainer']);
-				} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-					$array_resumen_profesionales[$row['id_usuario']]['monto_cobrado_escalonada'] += $row['monto_cobrado_escalonada'];
-				} else if ($this->fields['forma_cobro'] == 'RETAINER') {
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
-					if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
-						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
-					} else {
-						$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
-					}
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				} else {
-					$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += $row['duracion_cobrada'] - $row['duracion_incobrables'];
-					$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
-				}
-			}
-
-			$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) as duracion_incobrables
-									FROM trabajo
-								 WHERE id_cobro = '" . $this->fields['id_cobro'] . "'
-								 	 AND visible = 1
-								 	 AND cobrable = 0
-								 	 AND id_tramite = 0
-								 	 AND codigo_asunto = '" . $row['codigo_asunto'] . "'
-								 	 AND id_usuario = '" . $row['id_usuario'] . "'";
-			$resp3 = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($row['duracion_incobrables']) = mysql_fetch_array($resp3);
-
-			$total_horas += $row['duracion_cobrada'];
-			$array_profesional_usuario = array();
-			$array_profesional_usuario['id_categoria_usuario'] = $row['id_categoria_usuario'];
-			$array_profesional_usuario['glosa_categoria'] = $row['glosa_categoria'];
-			$array_profesional_usuario['nombre_usuario'] = $row['nombre_usuario'];
-			$array_profesional_usuario['username'] = $row['username'];
-			$array_profesional_usuario['duracion_cobrada'] = $row['duracion_cobrada'];
-			$array_profesional_usuario['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_cobrada']);
-			$array_profesional_usuario['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_cobrada']);
-			$array_profesional_usuario['duracion_trabajada'] = $row['duracion_trabajada'];
-			$array_profesional_usuario['glosa_duracion_trabajada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_trabajada']);
-			$array_profesional_usuario['duracion_trabajada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_trabajada']);
-			$array_profesional_usuario['duracion_descontada'] = $row['duracion_descontada'] + $row['duracion_incobrables'];
-			$array_profesional_usuario['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_descontada']);
-			$array_profesional_usuario['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_descontada']);
-			$array_profesional_usuario['duracion_incobrables'] = $row['duracion_incobrables'];
-			$array_profesional_usuario['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_incobrables']);
-			$array_profesional_usuario['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_incobrables']);
-			$array_profesional_usuario['duracion_retainer'] = $row['duracion_retainer'];
-			$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
-			$array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
-			$array_profesional_usuario['tarifa'] = $row['tarifa'];
-
-			if ($this->fields['forma_cobro'] == 'FLAT FEE' && !$this->fields['opc_ver_valor_hh_flat_fee']) {
-				$array_profesional_usuario['duracion_tarificada'] = 0;
-				$array_profesional_usuario['glosa_duracion_tarificada'] = '0:00';
-				$array_profesional_usuario['valor_tarificada'] = 0;
-				$array_profesional_usuario['flatfee'] = $row['duracion_cobrada'];
-				$array_profesional_usuario['duracion_retainer'] = $row['duracion_cobrada'];
-				$array_profesional_usuario['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_retainer']);
-				$array_profesional_usuario['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_retainer']);
-			} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
-				$array_profesional_usuario['monto_cobrado_escalonada'] = $row['monto_cobrado_escalonada'];
-			} else if ($this->fields['forma_cobro'] == 'RETAINER') {
-				$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
-				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
-				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
-				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
-			} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
-				$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
-				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
-				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
-				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
-			} else {
-				$array_profesional_usuario['duracion_tarificada'] = $row['duracion_cobrada'] - $row['duracion_incobrables'];
-				$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
-				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
-				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
-			}
-			if (!is_array($array_profesionales[$row['codigo_asunto']]))
-				$array_profesionales[$row['codigo_asunto']] = array();
-			$array_profesionales[$row['codigo_asunto']][$row['id_usuario']] = $array_profesional_usuario;
-		}
-
-		$resumen_valor_hh = 0;
-		foreach ($array_resumen_profesionales as $id_usuario => $data) {
-			$array_resumen_profesionales[$id_usuario]['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_cobrada']);
-			$array_resumen_profesionales[$id_usuario]['duracion_trabajada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_trabajada']);
-			$array_resumen_profesionales[$id_usuario]['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_descontada']);
-			$array_resumen_profesionales[$id_usuario]['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_incobrables']);
-			$array_resumen_profesionales[$id_usuario]['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_retainer']);
-			if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['opc_ver_valor_hh_flat_fee'])
-				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_cobrada'] - $array_resumen_profesional[$id_usuario]['duracion_incobrables'];
-			else
-				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_tarificada']);
-			$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
-
-			$resumen_valor_hh += $data['duracion_cobrada'] * $data['tarifa'];
-		}
-		if ($resumen_valor_hh > 0) {
-			$factor_ajuste = $this->fields['monto_subtotal'] / $resumen_valor_hh;
-		} else {
-			$factor_ajuste = 1;
-		}
-
-		return array($array_profesionales, $array_resumen_profesionales, $factor_ajuste);
-	}
-
-	function MontoFacturado() {
-		$query = "SELECT if(f.id_documento_legal IN (1,3,4),'INGRESO','EGRESO') as modo
-						,f.total
-						,m1.cifras_decimales as cifras_decimales_ini
-						,m1.tipo_cambio as tipo_cambio_ini
-						,m2.cifras_decimales as cifras_decimales_fin
-						,m2.tipo_cambio as tipo_cambio_fin
-					FROM factura f
-					LEFT JOIN prm_moneda m1 ON m1.id_moneda = f.id_moneda
-					LEFT JOIN prm_moneda m2 ON m2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
-					WHERE f.id_estado NOT IN (3,5)
-					AND f.id_cobro = '" . $this->fields['id_cobro'] . "'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$ingreso = 0;
-		$egrso = 0;
-		$monto_facturado = 0;
-		while ($row = mysql_fetch_assoc($resp)) {
-			$total = UtilesApp::CambiarMoneda($row['total'], $row['tipo_cambio_ini'], $row['cifras_decimales_ini'], $row['tipo_cambio_fin'], $row['cifras_decimales_fin'], false);
-			if ($row['modo'] == 'INGRESO') {
-				$ingreso += $total;
-			} else {
-				$egreso += $total;
-			}
-		}
-		$monto_facturado = $ingreso - $egreso;
-		return $monto_facturado;
-	}
-
-	function DiferenciaCobroConFactura() {
-		$calculos_cobro = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
-		$monto_cobrado = $calculos_cobro['monto_total_cobro'][$calculos_cobro['opc_moneda_total']];
-		$monto_facturado = $this->MontoFacturado();
-		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
-		$idioma->Load($this->fields['codigo_idioma']);
-		$monto_cobrado = number_format($monto_cobrado, $calculos_cobro['cifras_decimales_opc_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-		$monto_facturado = number_format($monto_facturado, $calculos_cobro['cifras_decimales_opc_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-		$mensaje = '';
-		if ($monto_cobrado != $monto_facturado) {
-			$moneda = new Moneda($this->sesion);
-			$moneda->Load($this->fields['opc_moneda_total']);
-			$simbolo = $moneda->fields['simbolo'];
-			$mensaje = __('El monto liquidado') . ' (' . $simbolo . ' ' . $monto_cobrado . ') ' . __('no coincide con el monto facturado ') . '(' . $simbolo . ' ' . $monto_facturado . ')';
-		}
-		return $mensaje;
 	}
 
 }
