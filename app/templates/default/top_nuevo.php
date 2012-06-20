@@ -19,7 +19,7 @@
 <?php  
 
 
-if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
+if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
 	echo "<div style='display:block;margin:auto;text-align:center;'><h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora aproximadamente 10 a 15 minutos ...";
 	 
 	    
