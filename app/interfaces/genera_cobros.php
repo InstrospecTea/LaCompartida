@@ -154,7 +154,7 @@ $pagina->PrintTop();
 				divObj.style.display = 'none';
 		}
 	}
-	}
+	
 
 	function SubirExcel()
 	{
