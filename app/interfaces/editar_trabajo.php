@@ -1491,7 +1491,7 @@ echo '</td>';
 					<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
 					<?php } ?>
 					&nbsp;&nbsp;
-					<div id=divVisible <?php if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
+					<div id="divVisible" style="display:inline-block;">
 					<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { 
 						echo __('Visible');
 						echo "<input type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
