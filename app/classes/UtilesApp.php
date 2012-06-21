@@ -825,7 +825,7 @@ class UtilesApp extends Utiles {
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
 
-
+if(!$bitmodfactura) $bitmodfactura='0';
 
 		$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso') and bitmodfactura<=$bitmodfactura  ORDER BY orden"; //Tipo=1 significa menu principal
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -1261,9 +1261,24 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
-					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+					
+					
+					 
+					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), 
+							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
+							, $cifras_decimales_actual
+							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+							, $cifras_decimales_actual);
+					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], 
+							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
+							, $cifras_decimales_actual
+							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+							, $cifras_decimales_actual);
+					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], 
+							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
+							, $cifras_decimales_actual
+							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
+							, $cifras_decimales_actual);
 				}
 				$hacer_calculo_normal++;
 			}
@@ -1733,7 +1748,7 @@ HTML;
 	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
 		$actual = split('\?', $url_actual);
 		$url_actual = $actual[0];
-		$bitmodfactura = UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
+		$bitmodfactura =UtilesApp::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {
 			case '/app/interfaces/agregar_tarifa.php': $url_actual = '/app/interfaces/agregar_tarifa.php?id_tarifa_edicion=1';
 				break;
@@ -1788,6 +1803,7 @@ HTML;
 		$menu_html .= <<<HTML
     		<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
+		if(!$bitmodfactura) $bitmodfactura='0';
 		$query = "SELECT * from menu WHERE tipo=1 and codigo in ('$lista_menu_permiso')  and bitmodfactura<=$bitmodfactura ORDER BY orden"; //Tipo=1 significa menu principal
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {

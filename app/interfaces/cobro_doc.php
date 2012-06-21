@@ -1,5 +1,6 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
+	
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../app/classes/Funciones.php';
@@ -13,14 +14,14 @@
 	require_once Conf::ServerDir().'/../app/classes/Gasto.php';
 	require_once Conf::ServerDir().'/../app/classes/DocGenerator.php';
 	require_once Conf::ServerDir().'/../app/classes/TemplateParser.php';
+	require_once Conf::ServerDir().'/../app/classes/NotaCobro.php';
 
 
-
-	$sesion = new Sesion(array('COB'));
-	$pagina = new Pagina($sesion);
+	$Sesion = new Sesion(array('COB'));
+	$pagina = new Pagina($Sesion);
 
 	// Carga de datos del cobro
-	$cobro = new Cobro($sesion);
+	$cobro = new NotaCobro($Sesion);
 	//$cobro->Load(this->fields['id_cobro'];
 
 	if(!$cobro->Load($id_cobro))
@@ -46,7 +47,7 @@
 	for($k=0;$k<count($cobro->asuntos);$k++)
 	{
 	
-		$asunto = new Asunto($sesion);
+		$asunto = new Asunto($Sesion);
 		$asunto->LoadByCodigo($cobro->asuntos[$k]);
 		$query = "SELECT SUM(TIME_TO_SEC(duracion))
 							FROM trabajo AS t2
@@ -54,7 +55,7 @@
 							WHERE t2.cobrable = 1
 							AND t2.codigo_asunto='".$asunto->fields['codigo_asunto']."'
 							AND cobro.id_cobro='".$cobro->fields['id_cobro']."'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$Sesion->dbh);
 		list($total_monto_trabajado) = mysql_fetch_array($resp);
 		if( $asunto->fields['trabajos_total_duracion'] > 0 )
 		{
@@ -63,7 +64,7 @@
 	}
 	if( method_exists('Conf','GetConf') )
 	{
-		if($solo_gastos && Conf::GetConf($sesion,'CSSSoloGastos'))
+		if($solo_gastos && Conf::GetConf($Sesion,'CSSSoloGastos'))
 			$css_cobro=2;
 	}
 	else if (method_exists('Conf','CSSSoloGastos'))
@@ -82,12 +83,12 @@
 
 	$html .= $cobro->GeneraHTMLCobro(false,$id_formato);
 	//echo $html; exit;
-	$cssData = UtilesApp::TemplateCartaCSS($sesion,$cobro->fields['id_carta']);
-	$cssData .= UtilesApp::CSSCobro($sesion,$id_formato);
-	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $sesion, $cobro->fields['id_carta']);
+	$cssData = UtilesApp::TemplateCartaCSS($Sesion,$cobro->fields['id_carta']);
+	$cssData .= UtilesApp::CSSCobro($Sesion,$id_formato);
+	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $Sesion, $cobro->fields['id_carta']);
 	
 	// margenes 1.5, 2.0, 2.0, 2.0
-	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang,$sesion);
+	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang,$Sesion);
 	$valor_unico=substr(time(),-3);
 
         
@@ -104,14 +105,14 @@
 		if( $cobro->fields['id_formato'] )
 		{
 			$query = "SELECT pdf_encabezado_imagen, pdf_encabezado_texto FROM cobro_rtf WHERE id_formato=". $cobro->fields['id_formato']; 
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
+			$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$Sesion->dbh); 
 			list($encabezado_imagen, $encabezado_texto) = mysql_fetch_array($resp); 
 			
 			$img_dir = "../templates/".Conf::Templates()."/img/";
 			list($img_archivo, $img_formato, $img_ancho, $img_alto, $img_x, $img_y) = explode( "::", $encabezado_imagen);
 			list($texto_texto, $texto_tipografia, $texto_estilo,$texto_size, $texto_color, $texto_x, $texto_y) = explode("::", $encabezado_texto);
 		}
-		
+		if(substr($img_archivo,0,4)=='http') $img_dir='';
 		ob_start();
 		if( isset($pdf))
 		{
@@ -139,8 +140,9 @@
 		</style>
 	</head>
 	<body style="margin-top: <?php echo $margin_body; ?>pt;">
-		<?php     if ( isset($pdf) )    { ?>
+		
 		<script type="text/php">
+			<?php     if ( isset($pdf) )    { ?>
 		/* <![CDATA[   */
 			$anchodoc = $pdf->get_width();
 			$header = $pdf->open_object(); 
@@ -168,15 +170,18 @@
 			}
 		   }
 		   /* ]]> */
+		   <?php   }  ?>
 		   </script>
-		   <?php   }
-		   echo $html; ?>
+		   
+		  <?php echo $html; ?>
 	</body>
 </html>
 <?php
 		$cambio_html = array("<br size=\"1\" class=\"separador_vacio_salto\">" => '<div style="page-break-after: always;"></div>');
+		
 		$html = ob_get_clean(); 
 		$html = strtr($html, $cambio_html);
+		mail('ffigueroa@lemontech.cl','HTML PDF',$html);
 		$dompdf->load_html($html);
 		$dompdf->set_paper(strtolower($cobro->fields['opc_papel']), 'portrait'); //letter, landscape
 		$dompdf->render();
@@ -186,6 +191,7 @@
 	else
 	{
 		$doc->output('cobro_'.$id_cobro.'_'.$valor_unico.'.doc');
+		//$doc->outputxml($xml, 'cobro_'.$id_cobro.'_' . $valor_unico . '.xml');
 	}
 	exit;
 

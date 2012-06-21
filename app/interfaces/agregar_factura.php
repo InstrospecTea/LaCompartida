@@ -294,7 +294,7 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 				<script type='text/javascript'>
 					window.open("agregar_factura.php?opc=generar_factura&id_factura=<?php echo  $factura->fields['id_factura'] ?>","Factura",'width=500,height=500,toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,copyhistory=yes,resizable=yes');
 				</script>
-				<?
+				<?php 
 			}*/
 		}
 
@@ -734,7 +734,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 				if(!Validar_Rut())
 					return false;
 				<?php } ?>
-<?
+<?php 
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
 	?>
 				if( form.glosa_cliente.value == "" )
@@ -743,7 +743,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 					form.glosa_cliente.focus();
 					return false;
 				}
-<?
+<?php 
 } else if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
 	?>
 				if( form.codigo_cliente_secundario.value == "" )
@@ -752,7 +752,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 					form.codigo_cliente_secundario.focus();
 					return false;
 				}
-<?
+<?php 
 } else {
 	?>
 				if( form.codigo_cliente.value == "" )
@@ -761,7 +761,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 					form.codigo_cliente.focus();
 					return false;
 				}
-<? } ?>
+<?php  } ?>
 
 		if( form.cliente.value == "" )
 		{
@@ -842,14 +842,16 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 		?>
 						ValidaSaldoPendienteCobro(form);
 						if((form.id_documento_legal.value!=2) && (saltar_validacion_saldo==0) && (
-						form.monto_honorarios_legales.value > form.honorario_disp.value ||
-							form.monto_gastos_con_iva.value > form.gastos_con_impuestos_disp.value)){
+						(form.monto_honorarios_legales.value+form.monto_gastos_con_iva.value+form.monto_gastos_sin_iva.value) > (form.honorario_disp.value + form.gastos_con_impuestos_disp.value+form.gastos_sin_impuestos_disp.value))) {
 							if(!confirm('<?php echo  __("Los montos ingresados superan el saldo a facturar") ?>')){
 								if(form.monto_honorarios_legales.value > form.honorario_disp.value) {
 									form.monto_honorarios_legales.focus();
 								}
 								else if(form.monto_gastos_con_iva.value > form.gastos_con_impuestos_disp.value) {
 									form.monto_gastos_con_iva.focus();
+								}
+								else if(form.monto_gastos_sin_iva.value > form.gastos_sin_impuestos_disp.value) {
+									form.monto_gastos_sin_iva.focus();
 								}
 								return false;
 							}
@@ -1139,7 +1141,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 	}
 
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php  echo Autocompletador::CSS(); ?>
 
 <form method=post id="form_facturas" name="form_facturas">
 	<input type=hidden name=opcion value="" />
@@ -1181,7 +1183,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 		</tr>
 	</table>
 	<table class="border_plomo" style="background-color:#FFFFFF;" width='90%'>
-                <?
+                <?php 
                 $numero_documento = '';
                 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaNumeracionAutomatica') ) || ( method_exists('Conf', 'UsaNumeracionAutomatica') && Conf::UsaNumeracionAutomatica() )) {
                         $numero_documento = $factura->ObtieneNumeroFactura();
@@ -1216,7 +1218,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
                     <td align=right><?php echo  __('Estado') ?></td>
                     <td align=left><?php echo  Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', '', "160"); ?></td>
 		</tr>
-<?
+<?php 
 //Se debe elegir un documento legal padre si:
 $buscar_padre = false;
 
@@ -1243,7 +1245,7 @@ if ($buscar_padre) {
 				<td align=right><?php echo  __('Para Documento Tributario:') ?></td>
 				<td align=left colspan=3><?php echo  Html::SelectQuery($sesion, $query_padre, 'id_factura_padre', $factura->fields['id_factura_padre'], '', '--', '160') ?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 <?php
 $zona_horaria = UtilesApp::GetConf($sesion, 'ZonaHoraria');
 if ($zona_horaria) {
@@ -1262,7 +1264,7 @@ if ($zona_horaria) {
 		</tr>
 		<tr>
 			<td align=right><?php echo  __('Cliente') ?></td>
-			<td align=left colspan=3><?
+			<td align=left colspan=3><?php 
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, '');
@@ -1465,7 +1467,7 @@ if ($zona_horaria) {
 						<div id="contenedor_tipo_cambio">
 							<table style='border-collapse:collapse;' cellpadding='3'>
 								<tr>
-<?
+<?php 
 if ($factura->fields['id_factura']) {
 	$query = "SELECT count(*)
 													FROM cta_cte_fact_mvto_moneda
@@ -1501,7 +1503,7 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 	<?php echo  $glosa_moneda ?>
 												</b></span><br>
 											<input type='text' size=9 id='factura_moneda_<?php echo  $id_moneda ?>' name='factura_moneda_<?php echo  $id_moneda ?>' value='<?php echo  $tipo_cambio ?>' /></td>
-	<?
+	<?php 
 	$num_monedas++;
 	$ids_monedas[] = $id_moneda;
 	$tipo_cambios[] = $tipo_cambio;
@@ -1524,9 +1526,9 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 		<tr>
 			<td align=left><input type=button class=btn value="<?php echo  __('Guardar') ?>" onclick='return Validar(this.form);' />
 				<input type=button class=btn value="<?php echo  __('Cerrar') ?>" onclick="Cerrar();" />
-<? if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
+<?php  if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
 					<input type=button class=btn value="<?php echo  __('Restaurar') ?>" onclick="return Cambiar(this.form,'restaurar');" />
-		<? } ?></td>
+		<?php  } ?></td>
 		</tr>
 	</table>
 </form>
@@ -1599,14 +1601,14 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 		}
 
 </script>
-<?
+<?php 
 if ($codigo_cliente || $codigo_cliente_secundario) {
 	if (empty($id_factura)) {
 		?>
 		<script type="text/javascript">
 			CargarDatosCliente();
 		</script>
-		<?
+		<?php 
 	}
 }
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {

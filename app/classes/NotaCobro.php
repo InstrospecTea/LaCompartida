@@ -1,5 +1,9 @@
 <?php
+	require_once dirname(__FILE__).'/../conf.php';
 
+	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
+
+if(!class_exists('NotaCobro')) {
 class NotaCobro extends Cobro {
 
 	var $asuntos = array();
@@ -1273,7 +1277,10 @@ class NotaCobro extends Cobro {
 					$html2 = str_replace('%nombre_pais%', '', $html2);
 					$html2 = str_replace('%nombre_pais_mayuscula%', '', $html2);
 				}
-
+								
+/*fecha PEB*/	$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('correspondientes al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
+				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);
+												
 				break;
 
 			case 'DETALLE':
@@ -1528,6 +1535,8 @@ class NotaCobro extends Cobro {
 					$texto_fecha_en = __('until') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 
 				if ($lang == 'es') {
+					
+/*fecha PEB*/		$fecha_mes = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('realizados el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B'));
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
@@ -1647,6 +1656,11 @@ class NotaCobro extends Cobro {
 				$html2 = str_replace('%fecha_primer_trabajo%', $fecha_primer_trabajo, $html2);
 				$html2 = str_replace('%fecha_primer_trabajo_de%', $fecha_primer_trabajo_de, $html2);
 				$html2 = str_replace('%fecha%', $fecha_diff, $html2);
+				
+				
+/*fecha PEB*/	$html2 = str_replace('%fecha_mes%', $fecha_mes, $html2);
+				
+							
 				$html2 = str_replace('%fecha_al%', $fecha_al, $html2);
 				$html2 = str_replace('%fecha_al_minuscula%', strtolower($fecha_al), $html2);
 				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);				
@@ -13271,4 +13285,4 @@ class NotaCobro extends Cobro {
 
 }
 
- 
+}

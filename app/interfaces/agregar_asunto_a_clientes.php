@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/Cliente.php';
@@ -51,7 +51,7 @@
 					
 					foreach($contrato_cliente->fields as $key => $val)
 					{
-						if( $key == 'id_usuario_responsable' )
+						if( $key == 'id_usuario_responsable' || $key=='id_usuario_secundario' || $key=='id_moneda' || $key=='codigo_cliente' )
 							$contra->Edit($key, !empty($val) ? $val : "NULL" );
 						else if( $key != "id_contrato" )
 							$contra->Edit($key, $val);
@@ -115,6 +115,6 @@
 				</td>
 		</table>
 	</form>
-<?
+<?php
 $pagina->PrintBottom(true);
 ?>
