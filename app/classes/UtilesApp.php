@@ -1141,15 +1141,15 @@ HTML;
 						}
 						$arr_resultado[$arr_monto[$xtabla][$a]][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+										, 6//$cobro_moneda->moneda[$id_moneda_original]['cifras_decimales'] decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+										, 6 //$cobro_moneda->moneda[$id_moneda_original]['cifras_decimales'] //$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
 					}
 					$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
 											, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-											, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+											,6// $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 									)
@@ -1157,7 +1157,7 @@ HTML;
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
 											, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-											, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+											,6// $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 									)
@@ -1168,19 +1168,19 @@ HTML;
 							, $cifras_decimales_actual);
 					$arr_resultado[$campo[$xtabla]['monto_trabajos']][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields[$campo[$xtabla]['monto_contrato']]//monto_moneda_l
 									, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+									,6 // $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									,6// $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									,6// $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
@@ -1209,7 +1209,7 @@ HTML;
 						}
 						$arr_resultado[$arr_monto[$xtabla][$a]][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+										,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 										, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
@@ -1224,7 +1224,7 @@ HTML;
 						$arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 										UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
 												, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-												, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+												,6 // $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 												, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 												, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 										)
@@ -1242,7 +1242,7 @@ HTML;
 						;
 						$arr_resultado[$campo[$xtabla]['monto_trabajos']][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
 										, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-										, $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
+										,6 // $arr_resultado['cifras_decimales_id_moneda_monto']//decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 										, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
@@ -1251,13 +1251,13 @@ HTML;
 					}
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									, 6 //$arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									, 6 //$arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
@@ -1266,17 +1266,17 @@ HTML;
 					 
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), 
 							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-							, $cifras_decimales_actual
+							, 6 //$cifras_decimales_actual
 							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 							, $cifras_decimales_actual);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], 
 							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-							, $cifras_decimales_actual
+							,6 // $cifras_decimales_actual
 							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 							, $cifras_decimales_actual);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], 
 							 $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-							, $cifras_decimales_actual
+							,6 //$cifras_decimales_actual
 							, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 							, $cifras_decimales_actual);
 				}
@@ -1301,7 +1301,7 @@ HTML;
 						}
 						$arr_resultado[$arr_monto[$xtabla][$a]][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+										,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 										, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
@@ -1309,7 +1309,7 @@ HTML;
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
 									UtilesApp::CambiarMoneda($cobro->fields['monto_contrato']//monto_moneda_l
 											, $arr_resultado['tipo_cambio_id_moneda_monto']//tipo de cambio ini
-											, $arr_resultado['cifras_decimales_id_moneda_monto']//deciimales ini
+											,6 // $arr_resultado['cifras_decimales_id_moneda_monto']//deciimales ini
 											, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 											, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 									)
@@ -1317,31 +1317,31 @@ HTML;
 					;
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 									, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100)
 						, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 							, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
 							, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
-									, $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
+									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
@@ -1390,9 +1390,9 @@ HTML;
 						}
 						$arr_resultado[$arr_monto[$xtabla][$a]][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+										,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-										, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+										,6 // $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 						);
 					}
 					$id_moneda_original = $cobro->fields['id_moneda'];
@@ -1405,13 +1405,13 @@ HTML;
 					);
 					$arr_resultado['monto_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+									,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+									, 6 //$cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
@@ -1423,25 +1423,25 @@ HTML;
 					}
 					$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+								,6 // $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100)
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6 // $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+								,6 // $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
@@ -1461,7 +1461,7 @@ HTML;
 					}
 					$arr_resultado[$arr_monto['cobro'][$a]][$id_moneda] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+									,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 					);
@@ -1469,31 +1469,31 @@ HTML;
 
 				$arr_resultado['monto_honorarios'][$id_moneda] = UtilesApp::CambiarMoneda($suma_monto_honorario_moneda_tarifa//monto_moneda_l
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['monto_thh'][$id_moneda] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh']//monto_moneda_l
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['monto_thh_estandar'][$id_moneda] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['impuesto'][$id_moneda] = UtilesApp::CambiarMoneda(($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda]) * ($cobro->fields['porcentaje_impuesto'] / 100)
 						, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['monto'][$id_moneda] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual] - $arr_resultado['descuento'][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual]
 						, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
@@ -1560,8 +1560,10 @@ HTML;
 			$arr_resultado['monto_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['subtotal_gastos'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 			$arr_resultado['saldo_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['saldo_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 			$arr_resultado['monto_iva'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual] + $arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-			$arr_resultado['monto_iva_hh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
-			$arr_resultado['monto_iva_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
+			
+			$arr_resultado['monto_iva_hh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto'][$id_moneda_actual], '', 6, '', $cifras_decimales_actual);
+			$arr_resultado['monto_iva_gastos'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['impuesto_gastos'][$id_moneda_actual], '', 6, '', $cifras_decimales_actual);
+			
 			$arr_resultado['monto_total_cobro'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
 			$arr_resultado['monto_total_cobro_thh'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_thh'][$id_moneda_actual] + $arr_resultado['monto_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual); //monto_total_cobro: monto(moneda_tarifa)+monto_gastos(moneda_total)
 			$arr_resultado['monto_cobro_original'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_honorarios'][$id_moneda_actual] + $arr_resultado['subtotal_gastos'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
