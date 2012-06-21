@@ -3,7 +3,7 @@
 
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 
-if(!class_exists('NotaCobro')) {
+
 class NotaCobro extends Cobro {
 
 	var $asuntos = array();
@@ -10001,6 +10001,7 @@ class NotaCobro extends Cobro {
 				if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '')
 					$rut_split = split('-', $contrato->fields['rut'], 2);
 
+				$html = str_replace('%valor_rut_sin_formato%', $contrato->fields['rut'], $html);
 				$html = str_replace('%valor_rut%', $rut_split[0] ? $this->StrToNumber($rut_split[0]) . "-" . $rut_split[1] : __(''), $html);
 				$html = str_replace('%giro_factura%', __('Giro'), $html);
 				$html = str_replace('%giro_factura_valor%', $contrato->fields['factura_giro'], $html);
@@ -13282,7 +13283,5 @@ class NotaCobro extends Cobro {
 	}
 
 
-
-}
 
 }
