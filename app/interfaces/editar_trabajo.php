@@ -413,7 +413,7 @@ jQuery('document').ready(function() {
 			jQuery('.seccioncobrable').hide();
 		}
 	});
-	if(jQuery(this).is(':checked')) {
+	if(jQuery('#chkCobrable').is(':checked')) {
 			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
