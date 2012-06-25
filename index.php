@@ -41,18 +41,18 @@
 	<tr>
 		<td align="center" style="padding: 8px;">
 <table width="100%" cellspacing="2" cellpadding="2">
- <form action="app/usuarios/login.php" method="post">
+ <form action="<?php if(defined('APPDOMAIN')) echo APPDOMAIN; ?>app/usuarios/login.php" method="post">
 	<tr>
 		<td align="right" rowspan="3">
 			<?php 
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists( 'Conf', 'UsaDisenoNuevo' ) && Conf::UsaDisenoNuevo() ) ) 
-				{ ?>
-					<img src="<?php echo Conf::ImgDir()?>/logo_lemontech_ttb.jpg" width="175" height="70" />
-		<?php	}
-			else 
-				{ ?>
-					<img src="<?= Conf::Logo() ?>" /> 
-		<?php	} ?>
+		if(UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) 		{ 
+		echo "	<img src='https://estaticos.thetimebilling.com/images/logo_top_new_tt2.png' />";
+			} 	else 	{ 
+				echo "	<img src='.  Conf::Logo().' /> ";
+		 	} ?>
+		</td>
+		<td align="right">
+			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
 		</td>
 		<td align="right">
 			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
