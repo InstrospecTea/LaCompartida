@@ -1021,11 +1021,17 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 								}
 										$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $formato_descripcion);
 										// Se guarda el nombre en una variable porque se usa en el detalle profesional.
-										if( UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+										if($cobro->fields['opc_ver_detalles_por_hora_iniciales'] ||  UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
 											$nombre = $trabajo->fields['username'];
 										} else {
 											$nombre = $trabajo->fields['nombre_usuario'];
 										}
+										if($cobro->fields['opc_ver_profesional_iniciales'] ||  UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+											$nombreresumen = $trabajo->fields['username'];
+										} else {
+											$nombreresumen = $trabajo->fields['nombre_usuario'];
+										}
+										
 										$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 					//if ($cobro->fields['opc_ver_solicitante']) {
 											$ws->write($filas, $col_solicitante, $trabajo->fields['solicitante'], $formato_normal);
@@ -1093,7 +1099,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					if ($opc_ver_profesional || $cobro->fields['opc_ver_profesional']) {
 						if ($trabajo->fields['cobrable'] > 0 && !isset($detalle_profesional[$trabajo->fields['id_usuario']])) {
 													$detalle_profesional[$trabajo->fields['id_usuario']]['tarifa'] = $trabajo->fields['tarifa_hh'];
-													$detalle_profesional[$trabajo->fields['id_usuario']]['nombre'] = $nombre;
+													$detalle_profesional[$trabajo->fields['id_usuario']]['nombre'] = $nombreresumen;
 												}
 										}
 										++$filas;
@@ -1259,7 +1265,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 													$ws->write($filas,$col_fecha_anyo,$f[0],$formato_normal);
 
 													//$ws->write($filas, $col_fecha, Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
-													if( UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
+													if( $cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
 														$nombre = $trabajo->fields['username'];
 													} else {
 														$nombre = $trabajo->fields['nombre_usuario'];
@@ -1958,4 +1964,3 @@ if (isset($ws)) {
 
 	}
 $wb->close();
-?>
