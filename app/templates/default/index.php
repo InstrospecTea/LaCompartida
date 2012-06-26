@@ -59,7 +59,8 @@ HTML;
 	<?php    if($sesion->usuario->fields['rut']=='99511620') {
 		/* querys que regularizan datos que puedan faltar*/
 		mysql_query("insert ignore into usuario_permiso (select id_usuario, 'ALL' as codigo_permiso from usuario where activo=1);", $sesion->dbh);
-              
+                            $sesion->pdodbh->exec("update usuario set username=concat(left(nombre,1), left(apellido1,1), left(apellido2,1)) where username is null or username=''");
+
 	  echo '<br>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/app/interfaces/configuracion.php"/>Configuracion</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/web_services/phpminiadmin.php"/>MySQL</a>';
