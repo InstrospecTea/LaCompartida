@@ -68,7 +68,7 @@
 	
 	$where = 1;
 	if ($activo == 1 || $_GET['act']==1)
-		$where .= " AND u.activo = $activo ";
+		$where .= " AND u.activo = 1 ";
 	if( $nombre != "" )
 		$where .= " AND (nombre LIKE '%$nombre%' OR apellido1 LIKE '%$nombre%' OR apellido2 LIKE '%$nombre%')";
   
