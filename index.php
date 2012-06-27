@@ -51,9 +51,7 @@
 				echo "	<img src='.  Conf::Logo().' /> ";
 		 	} ?>
 		</td>
-		<td align="right">
-			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
-		</td>
+		
 		<td align="right">
 			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
 		</td>
