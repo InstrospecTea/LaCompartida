@@ -524,6 +524,7 @@ if ($opcion == "guardar") {
 
 				$contrato->Edit("glosa_contrato", $glosa_contrato);
 				$contrato->Edit("id_pais", $id_pais);
+				$contrato->Edit("id_cuenta", $id_cuenta);
 				$contrato->Edit("codigo_cliente", $codigo_cliente);
 				$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL");
 				$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
