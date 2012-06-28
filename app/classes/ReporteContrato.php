@@ -258,19 +258,19 @@ class ReporteContrato extends Contrato
 	function UltimosCobros($separar_asuntos) {
           
             if(!$this->separar_asuntos && !$separar_asuntos ) {
-            $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin 
+            $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision
 			    from cobro c join
 			    (select id_contrato, max(fecha_fin) as maxfecha from cobro group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_fin=maxfechas.maxfecha
 			    group by id_contrato
 			    having id_cobro=max(id_cobro)
                            ";
             } else {
-              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
+              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
             }
             //mail('ffigueroa@lemontech.cl','UltimosCobros',$querycobros);
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
 		while($listacobro=mysql_fetch_array($resp)):
-		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2]);
+		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2],'fecha_emision'=>$listacobro[4]);
                 endwhile;
                 
         }
