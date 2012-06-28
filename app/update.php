@@ -6,7 +6,8 @@
 
 /* IMPORTANTE:
 	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
-function ExisteCampo($campo,$tabla,$dbh) { 
+if(!function_exists('ExisteCampo')) {
+ function ExisteCampo($campo,$tabla,$dbh) { 
     
     $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
     if(!$existencampos):
@@ -15,6 +16,7 @@ function ExisteCampo($campo,$tabla,$dbh) {
 	return true;
     endif;
         return false;
+}
 }
 function ExisteIndex($indice,$tabla,$dbh) { 
     $ExisteIndex = mysql_query("SHOW INDEX FROM   $tabla where key_name = '$campo'", $dbh);
@@ -40,7 +42,7 @@ function cuentaregistros($tabla,$dbh) {
 
 function ExisteLlaveForanea($tabla, $columna, $tabla_referenciada, $columna_referenciada, $dbh) {
 if(!DEFINED('DBNAME')) define('DBNAME',Conf::dbName());
-	$foraneaquery="SELECT constraint_name  FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '".DBNAME."'AND REFERENCED_TABLE_NAME='$tabla_referenciada' 
+	$foraneaquery="SELECT constraint_name  FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '".DBNAME."' AND REFERENCED_TABLE_NAME='$tabla_referenciada' 
 AND table_name='$tabla' AND referenced_column_name ='$columna_referenciada'  and column_name='$columna'";
 //echo '<pre>';echo $foraneaquery;echo '</pre>';
 	$ExisteLlaveForanea= mysql_query($foraneaquery, $dbh);
@@ -8596,8 +8598,8 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						}
 				}
 				break;
-			
-			case 6.05:
+				
+				case 6.05:
 				$query=array();
 				if(!ExisteCampo('align','factura_pdf_datos',$dbh))  $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';";
 				
@@ -8615,8 +8617,8 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-$min_update=1;
-$max_update=5.99;
+$min_update=2; //FFF: del 2 hacia atrás no tienen soporte
+$max_update=6.05;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
@@ -8728,4 +8730,3 @@ if(isset($_GET['lastver']))  {
 		throw new Exception($query ."---".mysql_error());
 }
 	
-?>
