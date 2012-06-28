@@ -483,9 +483,10 @@ if ($opcion == "guardar") {
 		else
 			$pagina->AddError($cliente->error);
 	}
-		 
+		if (method_exists('Conf', 'GetConf'))
 			$asuntos = explode(';', UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
-		
+		else
+			$asuntos = Conf::AgregarAsuntosPorDefecto();
 	if ( $asuntos[0] == "true" && $loadasuntos ) {
 		
 		for ($i = 1; $i < count($asuntos); $i++) { 

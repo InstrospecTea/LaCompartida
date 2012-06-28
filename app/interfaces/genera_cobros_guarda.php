@@ -320,10 +320,10 @@ if ($print) {
 	#fin cobros wip
 
 	$Contrato->SetIncluirEnCierre($Sesion);
-/*	$Pagina->Redirect(
+	$Pagina->Redirect(
 			"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
 			"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
 			"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
-	);*/
+	);
 }
 ?>

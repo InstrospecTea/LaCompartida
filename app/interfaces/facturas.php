@@ -1,4 +1,4 @@
-<?php
+<?
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -94,14 +94,10 @@
 			if($tipo_documento_legal_buscado)
 				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
 
-/*			if($codigo_cliente)
+			if($codigo_cliente)
 				{
 					//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
 					$where .= " AND cobro.codigo_cliente='".$codigo_cliente."' ";
-				}
-*/			if($codigo_cliente)
-				{
-				$where .= " AND cobro.codigo_cliente='".$codigo_cliente."' ";
 				}
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario)
 				{
@@ -109,7 +105,7 @@
 					$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
 					$id_contrato = $asunto->fields['id_contrato'];
 				}
-			if($codigo_asunto) //ICC opino que se deberia de cambiar a cobro_asunto para ver si cuenta con el asunto en cuestión
+			if($codigo_asunto)
 				{
 					$asunto = new Asunto($sesion);
 					$asunto->LoadByCodigo($codigo_asunto);

@@ -90,34 +90,15 @@ td.sorting_1 {background:transparent !important;}
 	?>
 		
     jQuery(document).ready(function() {
-       
-       jQuery("#losadelantos").load('ajax/lista_adelantos_ajax.php?ajax=1', function() {
-           jQuery('.pagination ul li a').each(function() {
-              valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-              jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-           });
-        });
-        jQuery('.printlinkpage').live('click',function() {
-            multi=jQuery("input[name=x_pag]").val();
-            //alert(multi);
-            valrel=multi*(jQuery(this).attr('rel')-1);
-            jQuery('#xdesde').val(valrel);
-            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: valrel },
-                function(data) {
-                jQuery("#losadelantos").html(data);
-                
-                jQuery('.pagination ul li a').each(function() {
-                valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-                jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-                });
-            });
-	     jQuery("#losadelantos").html(DivLoading);
-        });
-        jQuery("#boton_buscar").click(function() {
-           // alert('buscando...');
-            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', jQuery('#form_adelantos').serialize(),
-                        function(data) {
-                        jQuery("#losadelantos").html(data);
+     
+	 
+	 jQuery('.noborraradelanto').live('click',function() {
+	 		 jQuery('#mensaje').html('No se puede borrar el adelanto, ha sido utilizado en al menos <?php echo __('un cobro'); ?>...');  
+			 
+	 });
+	 
+	 jQuery('.borraradelanto').live('click',function() {
+	 var laID=jQuery(this).attr('id').replace('borra_','');
 
 	if(confirm('Confirma eliminar adelanto #'+laID+'?')) {
 		jQuery.post('ajax/ajax_adelantos.php?accion=borraadelanto',{id_documento:laID},function(data) {
@@ -214,10 +195,6 @@ td.sorting_1 {background:transparent !important;}
 });
 
     function Refrescarse() {
-                var desdepg=jQuery('#xdesde').val();
-                jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: desdepg },
-                function(data) {
-                jQuery("#losadelantos").html(data);
                 
              jQuery('#boton_buscar').click();
     }
@@ -239,25 +216,8 @@ td.sorting_1 {background:transparent !important;}
                 }
     
 	}
-	function Refrescar()
-	{
-	<?php
-		if($desde)
-			echo "var pagina_desde = '&desde=".$desde."';";
-		else
-			echo "var pagina_desde = '';";
-		if($orden)
-			echo "var orden = '&orden=".$orden."';";
-		else
-			echo "var orden = '';";
-	?>
-		var opc= $('opc').value;
-		var codigo_cliente = $('codigo_cliente').value;
-		var fecha1 = $('fecha1').value;
-		var fecha2 = $('fecha2').value;
-		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+pagina_desde+"&buscar=1"+($F('tiene_saldo') ? '&tiene_saldo=1' : '');
-		self.location.href= url;
-	}
+ 
+ 
         
 </script>
 

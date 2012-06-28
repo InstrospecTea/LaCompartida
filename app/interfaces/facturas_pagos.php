@@ -635,7 +635,7 @@ function funcionTR(& $fila) {
 				<td align=left>
 					<?php 
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
-							echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="4" onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "190"); 
+							echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "190"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "150"); 
 						}
@@ -675,7 +675,7 @@ function funcionTR(& $fila) {
 				<td align=left>
 					<?php 
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
-							echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="4" ', 'Cualquiera', "190"); 
+							echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', 'Cualquiera', "190"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', 'Cualquiera', "150"); 
 						}
@@ -702,7 +702,7 @@ function funcionTR(& $fila) {
 				<td align=left>
 					<?php 
 						if ( UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago') ) {
-							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="4" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', 'Cualquiera', "190"); 
+							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="5" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', 'Cualquiera', "190"); 
 						} else {
 							echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, ' onchange="CargarCuenta(\'id_banco\',\'id_cuenta\', false);"', 'Cualquiera', "190"); 
 						}
