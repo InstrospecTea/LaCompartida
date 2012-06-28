@@ -93,7 +93,16 @@ jQuery(document).ready(function() {
 	     }).show();
     });
 });
- 
+function YoucangonowMichael() {
+
+
+jQuery('.fechadiff').datepicker( {
+			showOn: "both",
+			buttonImage: "https://static.thetimebilling.com/images/calendario.png",
+			buttonImageOnly: true
+    }); 
+}
+
 </script>	
 
 <div style="margin:auto;padding:10px;border:1px solid #CCC;">Buscar <?php echo __('Cobros emitidos');?> con diferencias entre el monto Emitido y el Facturado<br/><br/>
@@ -102,7 +111,7 @@ jQuery(document).ready(function() {
     &nbsp;y el&nbsp; 
     <input class="fechadiff" type="text" id="fechaf" style="width:100px;"> 
     y desplegar los montos en&nbsp;
-    <?php echo Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
+    <?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
      <br/><input id="buscar" value="buscar" type="button"/>&nbsp;&nbsp;<input type="checkbox" id="todo" name="todo"> Incluir liquidaciones saldadas (Gran cantidad de datos)
    
 <br/>	<br/>

@@ -543,7 +543,7 @@ function VolverACreado( form )
 
 function Emitir(form)
 {
-	jQuery('#btn_emitir_cobro').attr("disabled","disabled");
+	jQuery('#btn_emitir_cobro').attr("disabled","disabled");	
 		var http = getXMLHTTP();
 		http.open('get', 'ajax.php?accion=num_abogados_sin_tarifa&id_cobro='+document.getElementById('id_cobro').value);
 		http.onreadystatechange = function()
@@ -636,7 +636,7 @@ if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
       }
 		};
 	  http.send(null);
-	  jQuery('#btn_emitir_cobro').removeAttr("disabled");
+	  //jQuery('#btn_emitir_cobro').removeAttr("disabled");
 }
 
 function DefinirTarifas()

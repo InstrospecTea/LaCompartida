@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -360,31 +360,31 @@ function GrabarCampo(accion,id_tramite,cobro,valor)
 
 function Refrescar()
 {
-	<? 
+	<?php  
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{ ?>
 					var codigo_cliente = '&codigo_cliente_secundario='+document.getElementById('codigo_cliente_secundario').value;
-		<?	}
+		<?php 	}
 			else
 				{ ?>
 					var codigo_cliente = '&codigo_cliente_secundario='+document.getElementById('campo_codigo_cliente_secundario').value;
-		<?	} ?>
+		<?php 	} ?>
 			var codigo_asunto = '&codigo_asunto_secundario='+document.getElementById('campo_codigo_cliente_secundario').value;
-<?	}
+<?php 	}
 	else
 		{ 
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{ ?>
 					var codigo_cliente = '&codigo_cliente='+document.getElementById('codigo_cliente').value;
-		<?	}
+		<?php 	}
 			else
 				{ ?>
 					var codigo_cliente = '&codigo_cliente='+document.getElementById('campo_codigo_cliente').value;
-		<?	} ?>
+		<?php 	} ?>
 			var codigo_asunto = '&codigo_asunto='+document.getElementById('campo_codigo_asunto').value;
-<? } 
+<?php  } 
 ?>
 	var usuario = '&id_usuario='+document.getElementById('id_usuario').value;
 	var fecha_ini = '&fecha_ini='+document.getElementById('fecha_ini').value;
@@ -398,18 +398,18 @@ function Refrescar()
 function AgregarNuevo( name )
 {
 	var usuario = document.getElementById('id_usuario').value;
-	<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) )
+	<?php  if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) )
 			{ ?>
 			var cliente = document.getElementById('codigo_cliente_secundario').value;
 			var asunto = document.getElementById('codigo_asunto_secundario').value;
 			urlo='ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' +usuario;
-	<?	}
+	<?php 	}
 		else
 			{ ?>
 			var cliente = document.getElementById('codigo_cliente').value;
 			var asunto = document.getElementById('codigo_asunto').value;
 			urlo='ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' +usuario;
-	<?	} ?>
+	<?php 	} ?>
 	nuovaFinestra('Agregar_Tramite',750,470,urlo,'top=100, left=125');
 }
 
@@ -444,52 +444,7 @@ function GuardarCampoTrabajo(id,campo,valor)
     http.send(null);
 }
 
-	/*
-		Event.observe(window, 'load', init, false);
-		function init() {
-			// Over ride some of the default options.
-			EditInPlace.defaults['type'] = 'text';
-			EditInPlace.defaults['save_url'] = 'edit.php';
-
-			// Basic example.
-			//EditInPlace.makeEditable({ id: 'desc' });
-
-			// Double click and selected text example.
-			EditInPlace.makeEditable({
-				id: 'twoclicks',
-				click: 'dblclick',
-				select_text: true,
-				ajax_data: {
-					db_id: 12345,
-					username: 'devnull'
-				}
-			});
-			// Example that starts out as an empty string and will cancel
-			// the form when clicked away from.
-			EditInPlace.makeEditable({ id: 'desc', on_blur: 'cancel' });
-
-			// Select / Option list example.
-			EditInPlace.makeEditable({
-				id: 'desc',
-				type: 'select',
-				on_clic : this.value,
-				save_url: 'optionedit.php',
-				options: {
-					white: 'White',
-					black: 'Black',
-					green: 'Green',
-					darkgreen: 'Dark Green',
-					lightgreen: 'Light Green',
-					pink: 'Pink',
-					1: 'Yes',
-					2: 'No'
-				}
-			});
-
-
-			// Textarea example.
-			//EditInPlace.makeEditable({ id: 'desc', type: 'textarea', on_blur: 'cancel' });
-	}*/
+	
 
 // Basado en http://snipplr.com/view/1696/get-elements-by-class-name/
 function getElementsByClassName(classname)
@@ -550,18 +505,18 @@ function editarMultiplesArchivos()
 		alert('Debe seleccionar por lo menos un trabajo para editar.');
 }
 </script>
-<? echo(Autocompletador::CSS()); ?>
+<?php  echo(Autocompletador::CSS()); ?>
 <form method='get' name="form_tramites" id="form_tramites">
 <input type='hidden' name='opc' id='opc' value='buscar'>
-<input type='hidden' name='id_cobro' id='id_cobro' value='<?=$id_cobro ?>'>
-<input type='hidden' name='popup' id='popup' value='<?=$popup?>'>
-<input type='hidden' name='motivo' id='motivo' value='<?=$motivo?>'>
+<input type='hidden' name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>'>
+<input type='hidden' name='popup' id='popup' value='<?php echo $popup?>'>
+<input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo?>'>
 <input type='hidden' name='check_tramite' id='check_tramite' value=''>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
-<?
+<?php 
 	if($motivo != "cobros")
 	{
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
@@ -571,11 +526,11 @@ function editarMultiplesArchivos()
 ?>
 <!-- Fin calendario DIV -->
 <center>
-<table <?=$width_tabla?>><tr><td>
+<table <?php echo $width_tabla?>><tr><td>
 <fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
-<legend><?=__('Filtros')?></legend>
+<legend><?php echo __('Filtros')?></legend>
 <table style="border: 0px solid black;" >
-<?
+<?php 
 
 
 		if( $p_revisor->fields['permitido'])
@@ -583,21 +538,21 @@ function editarMultiplesArchivos()
  ?>
 	<tr>
 		<td align=right>
-			<?=__('Trabajo')?>
+			<?php echo __('Trabajo')?>
 		</td>
 		<td align='left'> 
-			<?=Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no","trabajo_si_no",$trabajo_si_no,'','Todos','60')  ?>
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no ORDER BY id_codigo_si_no","trabajo_si_no",$trabajo_si_no,'','Todos','60')  ?>
 			</td>
 	</tr>
-<? 
+<?php  
 		}
 ?>
    	<tr>
         <td align=right>
-            <?=__('Nombre Cliente')?>
+            <?php echo __('Nombre Cliente')?>
         </td>
         <td nowrap align='left' colspan=3>
-<?
+<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -617,10 +572,10 @@ function editarMultiplesArchivos()
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Asunto')?>
+			<?php echo __('Asunto')?>
 		</td>
 		<td nowrap align='left' colspan=3>
-<?
+<?php 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
 					else
@@ -628,19 +583,19 @@ function editarMultiplesArchivos()
 ?>
 		</td>
 	</tr>
-<?
+<?php 
 		if(strlen($select_usuario) > 164) // Depende de que no cambie la funciÃ³n Html::SelectQuery(...)
 		{
 ?>
 	<tr>
 		<td align=right>
-			<?=__('Usuario')?>
+			<?php echo __('Usuario')?>
 		</td>
 		<td align='left' colspan=3>
-			<?=$select_usuario?>
+			<?php echo $select_usuario?>
 		</td>
 	</tr>
-<?
+<?php 
 		}
 	
   	### Validando fecha
@@ -650,33 +605,31 @@ function editarMultiplesArchivos()
 ?>
 		<tr>
 			<td align=right colspan=1>
-					<?=__('Fecha desde')?>:
+					<?php echo __('Fecha desde')?>:
 			</td>
 			<td align=left colspan=3>
-				<input type="text" name="fecha_ini" value="<?=$fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />&nbsp;&nbsp;&nbsp;&nbsp;
-				<?=__('Fecha hasta')?>:&nbsp;
-				<input type="text" name="fecha_fin" value="<?=$fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
-				<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
-			</td>
+				<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
+ 				<?php echo __('Fecha hasta')?>:&nbsp;
+				<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
+ 			</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td colspan='3'  align=left>
-				<input name='boton_buscar' id='boton_buscar' type='submit' class=btn onclick="this.form.check_tramite.value=1"  value=<?=__('Buscar')?>>
+				<input name='boton_buscar' id='boton_buscar' type='submit' class=btn onclick="this.form.check_tramite.value=1"  value=<?php echo __('Buscar')?>>
 			</td>
-			<td> <img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?=__('Agregar')?> <?=__('trámite')?></a> </td>
+			<td> <img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo __('Agregar')?> <?php echo __('trámite')?></a> </td>
 		</tr>
 </table>
 </fieldset>
 </td></tr></table>
 </center>
-<?
+<?php 
 }
 ?>
 </form>
 
-<?
+<?php 
 	if(isset($cobro) || $opc == 'buscar')
 	{
 		echo "<center>";
@@ -689,14 +642,14 @@ function editarMultiplesArchivos()
 		<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trámites">Editar seleccionados</a>
 		<br />
 
-		<a href="#" onclick="nuovaFinestra('Editar_listado_trámites',700,450,'editar_multiples_tramites.php?ids=<?=$ids_listado_tramites ?>&popup=1&listado_completo=1','');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+		<a href="#" onclick="nuovaFinestra('Editar_listado_trámites',700,450,'editar_multiples_tramites.php?ids=<?php echo $ids_listado_tramites ?>&popup=1&listado_completo=1','');" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 		 
 		<br /> 
-		<input type=button class=btn value="<?=__('Descargar listado a Excel')?>" onclick="window.open('listar_tramites.php?id_cobro=<?=$id_cobro?>&excel=1&motivo=<?=$motivo?>&where=<?=urlencode(base64_encode($where))?>')">
+		<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="window.open('listar_tramites.php?id_cobro=<?php echo $id_cobro?>&excel=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">
 		<br />
 	</center>
-		<!--<input type=button class=btn value="<?=__('Descargar Archivo a Word')?>" onclick="window.open('trabajos.php?id_cobro=<?=$id_cobro?>&word=1&motivo=<?=$motivo?>&where=<?=urlencode(base64_encode($where))?>')">-->
-<? 
+		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word')?>" onclick="window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&word=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">-->
+<?php  
 	}
 	function Cobrable(& $fila)
 	{
@@ -930,7 +883,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo(Autocompletador::Javascript($sesion));

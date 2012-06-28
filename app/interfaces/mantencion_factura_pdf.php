@@ -230,7 +230,7 @@ var Filas=new Array;
         var factorx=ancho/pgx;
         var factory=alto/pgy;
         var Width=parseInt(factorx*jQuery('#fac_cellW_'+ID).val());
-        var Height=parseInt(factory*jQuery('#fac_cellW_'+ID).val());
+        var Height=parseInt(factory*jQuery('#fac_cellH_'+ID).val());
         jQuery('#caja_'+ID).css({width:Width,height: Height});
     });
     
@@ -505,19 +505,19 @@ function YoucangonowMichael() {
         <table width="80%" >
             <tr>
                 <td style="text-align:right;vertical-align: middle;" >
-                    <? echo __('Tipo documento legal:') ?>
+                    <?php echo __('Tipo documento legal:') ?>
                     &nbsp;
                 </td>
                 <td  align="left">
-                    <? echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", "select_id_documento_legal", $id_documento_legal, " "); ?>
+                    <?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", "select_id_documento_legal", $id_documento_legal, " "); ?>
                 </td>
             
                 <td style="text-align:right;vertical-align: middle;">&nbsp;&nbsp;
-                    <? echo __('Tipo dato:') ?>
+                    <?php echo __('Tipo dato:') ?>
                     &nbsp;
                 </td>
                 <td width="25%" align="left">
-                    <? echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $id_factura_pdf_datos_categoria, "  "); ?>
+                    <?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $id_factura_pdf_datos_categoria, "  "); ?>
                 </td>
                 <td >
                 

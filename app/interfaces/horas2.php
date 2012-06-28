@@ -44,12 +44,12 @@
         $estado = "abiertos";
     
     if($from == 'cliente')
-    	$url_iframe = 'trabajos.php?popup=1&id_usuario='.$id_usuario.'&'.$codigo_cliente_url.'='.$codigo_cliente.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin).'&id_grupo='.$id_grupo.'&clientes='.$clientes.'&usuarios='.$usuarios;
+    	$url_iframe = 'trabajos2.php?popup=1&id_usuario='.$id_usuario.'&'.$codigo_cliente_url.'='.$codigo_cliente.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin).'&id_grupo='.$id_grupo.'&clientes='.$clientes.'&usuarios='.$usuarios;
     elseif($from == 'asunto')
-    	$url_iframe = 'trabajos.php?popup=1&id_usuario='.$id_usuario.'&'.$codigo_cliente_url.'='.$codigo_cliente.'&'.$codigo_asunto_url.'='.$codigo_asunto.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin);
+    	$url_iframe = 'trabajos2.php?popup=1&id_usuario='.$id_usuario.'&'.$codigo_cliente_url.'='.$codigo_cliente.'&'.$codigo_asunto_url.'='.$codigo_asunto.'&opc=buscar&fecha_ini='.Utiles::sql2date($fecha_ini).'&fecha_fin='.Utiles::sql2date($fecha_fin);
 	elseif($from == 'reporte')
 	{
-    	$url_iframe = 'trabajos.php?popup=1&opc=buscar&from=reporte';
+    	$url_iframe = 'trabajos2.php?popup=1&opc=buscar&from=reporte';
 		$url_iframe .= $id_usuario? "&id_usuario=".$id_usuario:'';
 		$url_iframe .= $usuarios? "&usuarios=".$usuarios:'';
 		$url_iframe .= $fecha_ini? "&fecha_ini=".$fecha_ini:'';
@@ -70,12 +70,12 @@
     elseif($from == 'horas')
     {
     	$id_usuario = $sesion->usuario->fields['id_usuario'];
-    	$url_iframe = "trabajos.php?popup=1&id_usuario=".$id_usuario."&codigo_cliente=".$codigo_cliente."&opc=buscar";
+    	$url_iframe = "trabajos2.php?popup=1&id_usuario=".$id_usuario."&codigo_cliente=".$codigo_cliente."&opc=buscar";
     }
 	else
 	{
     	$id_usuario = $sesion->usuario->fields['id_usuario'];
-    	$url_iframe = "trabajos.php?popup=1&id_usuario=".$id_usuario."&motivo=horas";
+    	$url_iframe = "trabajos2.php?popup=1&id_usuario=".$id_usuario."&motivo=horas";
     }
 	
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {

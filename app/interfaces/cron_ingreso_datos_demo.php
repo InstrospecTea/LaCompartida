@@ -16,7 +16,7 @@ fecha_fin
 max_dia
 porcentaje */
 
-if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die('Error '.$argv[1].$_GET['ambienteprueba']);
+if( $argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba']) )	die($argv[1].$_GET['ambienteprueba']);
 	
 
 $sesion = new Sesion( null, true );

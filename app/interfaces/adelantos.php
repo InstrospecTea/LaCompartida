@@ -16,7 +16,7 @@
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
-	$sesion = new Sesion(array('COB'));
+	$sesion = new Sesion(array('OFI','COB','SEC'));	
 	$pagina = new Pagina($sesion);
 	$documento = new Documento($sesion);
 	$cliente = new Cliente($sesion);
@@ -39,71 +39,164 @@
 	$pagina->PrintTop();
 	
 	$codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario) : $codigo_cliente;
+	
+	$params_array['codigo_permiso'] = 'COB';
+	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	
+
+	
+	
+		
 ?>
+<style type="text/css">
+    @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
+ #tablon {border-spacing:0;border-collapse:collapse;}
+	  #tablon th {font-size:10px;}
+  .dataTables_paginate {clear: both; margin: -20px 350px 15px 0;width:390px;vertical-align:middle;}
+  .dttnombres, .dttactivo {text-align:left;font-size:10px;white-space: nowrap;}
+.dataTables_paginate .last, dataTables_paginate .first,  .DataTables_sort_icon {display:none;}
+ .activo, .usuarioinactivo, .usuarioactivo {float:left;display:inline;}
+ .inactivo {opacity:0.4;}
+ .inactivo td {background:#F0F0F0;}
+ /*th.dttpermisos {-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg); filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);}*/
+ #contienefiltro {display:inline-block;margin-bottom:-8px;}
+ #tablon_paginate .fg-button {padding:0 5px;}
+ #tablon_paginate .first, #tablon_paginate .last {display:none;}
+#tablon  tbody tr.odd {background-color: #fff !important;}
+#tablon  tbody tr.even {background-color: #EFE !important;}
+td.sorting_1 {background:transparent !important;}
+.tipodescripcion {font-size:8pt;clear:left;overflow:visible;position:relative;margin:3px 0;}
+.marginleft {margin-left: 3px;}
+.eligegasto {float:left;margin-top: 0 !important;}
+#totalcta {float: left;position: relative;top: 15px;}
+#losadelantos {margin-top:10px;clear:both;}
+
+</style>
+<script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">
+	var MonedaArray= new Array();
+	<?php 
+		$currency=array();
+		$querycurrency="select * from prm_moneda";
+		$respcurrency = mysql_query($querycurrency, $sesion->dbh);
+		$i=0;
+		while($fila= mysql_fetch_assoc($respcurrency)) {
+			$currency[++$i]=$fila;
+			echo 'MonedaArray['.$i.'] = "'.$currency[$i]['simbolo'].'"'."\n";
+		}
+		  echo 'var PERMISOCOBRANZA = '.($p_cobranza->fields['permitido'] ? 1 : 0) .';';
+	?>
+		
     jQuery(document).ready(function() {
-       
-       jQuery("#losadelantos").load('ajax/lista_adelantos_ajax.php?ajax=1', function() {
-           jQuery('.pagination ul li a').each(function() {
-              valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-              jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-           });
-        });
-        jQuery('.printlinkpage').live('click',function() {
-            multi=jQuery("input[name=x_pag]").val();
-            //alert(multi);
-            valrel=multi*(jQuery(this).attr('rel')-1);
-            jQuery('#xdesde').val(valrel);
-            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: valrel },
-                function(data) {
-                jQuery("#losadelantos").html(data);
-                
-                jQuery('.pagination ul li a').each(function() {
-                valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-                jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-                });
-            });
-	     jQuery("#losadelantos").html(DivLoading);
-        });
-        jQuery("#boton_buscar").click(function() {
-           // alert('buscando...');
-            jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', jQuery('#form_adelantos').serialize(),
-                        function(data) {
-                        jQuery("#losadelantos").html(data);
+     
+	 
+	 jQuery('.noborraradelanto').live('click',function() {
+	 		 jQuery('#mensaje').html('No se puede borrar el adelanto, ha sido utilizado en al menos <?php echo __('un cobro'); ?>...');  
+			 
+	 });
+	 
+	 jQuery('.borraradelanto').live('click',function() {
+	 var laID=jQuery(this).attr('id').replace('borra_','');
 
-                        jQuery('.pagination ul li a').each(function() {
-                        valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-                        jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-                        });
-                    });
-		    jQuery("#losadelantos").html(DivLoading);
-		    
-        });
-        jQuery('#codigo_cliente').change(function(){
-            jQuery('#loading').remove();
-            jQuery('#xdesde').val(0);
-        });
-        jQuery('#campo_codigo_cliente').change(function(){
-            jQuery('#loading').remove();
-            jQuery('#xdesde').val(0);
-        });
-    
-    });
-    
+	if(confirm('Confirma eliminar adelanto #'+laID+'?')) {
+		jQuery.post('ajax/ajax_adelantos.php?accion=borraadelanto',{id_documento:laID},function(data) {
+															if(window.console) console.log(data);
+														},'jsonp');
+														} else {
+															return false;
+														}
+	});
+ 
+		
+		jQuery('#boton_buscar').click(function() {
+			var tablagastos=   jQuery('#tablon').hide().dataTable({
+                                 "fnPreDrawCallback": function( oSettings ) {
+									jQuery('#tablon').fadeTo('fast',0.1);
+									
+								},
+								 
+								"bDestroy":true,	
+                                "oLanguage": {    "sProcessing":   "Procesando..." ,   "sLengthMenu":   "Mostrar _MENU_ registros","sZeroRecords":  "No se encontraron resultados",  "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
+                                    "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",  "sInfoFiltered": "(filtrado de _MAX_ registros en total)",   "sInfoPostFix":  "",  "sSearch":       "Filtrar:",
+                                    "sUrl":          "", 	"oPaginate": {            "sPrevious": "Anterior",   "sNext":     "Siguiente"}
+                                },
+                                "bFilter": false,    "bProcessing": true,
+                                "sAjaxSource": "ajax/ajax_adelantos.php?accion=listaadelanto&where=1&"+jQuery('#form_adelantos').serialize(),
+                                "bJQueryUI": true,
+                                "bDeferRender": true,
+							 
+								"fnServerData": function ( sSource, aoData, fnCallback ) {
+									jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData, 
+										"success": fnCallback,
+										"complete" :function() {
+											jQuery('#tablon').fadeTo(0, 1);
+										}
+									})
+								},
+							
+                                "aoColumnDefs": [
+                               {  "sClass": "alignleft",    "aTargets": [ 1,3 ]   },
+							   {  "sClass": "alignright",    "aTargets": [ 4,5 ]   },
+							     {  "sClass": "aligncenter",    "aTargets": [ 7 ]   },
+									 {  "sClass": "marginleft",    "aTargets": [ 1,3 ]   },
+                                    
+                                    
+                                    {  "sWidth": "60px",    "aTargets": [0,2,5,4,5 ]   },
+                                   
+									  { "bVisible": false, "aTargets": [ 7 ] },
+									  
+			    {  "fnRender": function ( o, val ) {
+							 return   o.aData[6]+'<br>'+ o.aData[3];
+                        },    "aTargets": [ 3 ]   } ,
+                     
+					 {  "fnRender": function ( o, val ) {
+							 return   MonedaArray[+o.aData[7]] +' '+o.aData[4]
+                        },    "aTargets": [ 4 ]   } ,
+					 {  "fnRender": function ( o, val ) {
+							 return   MonedaArray[+o.aData[7]] +' '+o.aData[5]
+                        },    "aTargets": [ 5]   } ,
+					
+					
+					 {  "fnRender": function ( o, val ) {
+							
+							var respuesta="<a href=\"javascript:void(0)\"  style=\"float:right;display:inline;margin-right:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
+							
+							if (o.aData[4]!=o.aData[5]) {
+								respuesta+="<a href=\"javascript:void(0)\"    class='noborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
+								} else {
+								respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
+								}
+							
+							if(PERMISOCOBRANZA==1) {
+								return   respuesta;
+							} else {
+								return   '-';
+							}
+                        },    "aTargets": [ 6 ]   } 
+					 	
+						
+						
+                    
+	         ],
+			 "aaSorting": [[0,'desc']],
+                "iDisplayLength": 25,
+                "aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
+                "sPaginationType": "full_numbers",
+                "sDom":  'T<"top"ip>rt<"bottom">'
+                ,"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy" ]     }
+				
+               
+			  
+            }).show();
+		});
+		 
+});
 
     function Refrescarse() {
-                var desdepg=jQuery('#xdesde').val();
-                jQuery.post('ajax/lista_adelantos_ajax.php?ajax=1', { xdesde: desdepg },
-                function(data) {
-                jQuery("#losadelantos").html(data);
                 
-                jQuery('.pagination ul li a').each(function() {
-                valrel=jQuery(this).attr('href').replace("javascript:PrintLinkPage('",'').replace("');", '');
-                jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
-                });
-            });
-	     jQuery("#losadelantos").html(DivLoading);
+             jQuery('#boton_buscar').click();
     }
 	function AgregarNuevo(tipo)
 	{
@@ -123,29 +216,15 @@
                 }
     
 	}
-	function Refrescar()
-	{
-	<?php
-		if($desde)
-			echo "var pagina_desde = '&desde=".$desde."';";
-		else
-			echo "var pagina_desde = '';";
-		if($orden)
-			echo "var orden = '&orden=".$orden."';";
-		else
-			echo "var orden = '';";
-	?>
-		var opc= $('opc').value;
-		var codigo_cliente = $('codigo_cliente').value;
-		var fecha1 = $('fecha1').value;
-		var fecha2 = $('fecha2').value;
-		var url = "adelantos.php?opc="+opc+"&codigo_cliente="+codigo_cliente+orden+"&fecha1="+fecha1+"&fecha2="+fecha2+pagina_desde+"&buscar=1"+($F('tiene_saldo') ? '&tiene_saldo=1' : '');
-		self.location.href= url;
-	}
+ 
+ 
         
 </script>
 
-<?php echo Autocompletador::CSS(); ?>
+<?php 
+echo Autocompletador::CSS();
+ 
+	?>
 
 <table width="90%">
 	<tr>
@@ -159,7 +238,7 @@
 				</div>
 				<!-- Fin calendario DIV -->
 				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-					<legend><?=__('Filtros')?></legend>
+					<legend><?php echo __('Filtros')?></legend>
 					<table style="border: 0px solid black" width='720px'>
 						<tr>
 							<td align="right"><label for="id_documento">N° Adelanto</laber>
@@ -170,33 +249,27 @@
 						<tr>
 	    					<td align="right" width="30%"><?php echo __('Nombre Cliente') ?></td>
 	    					<td colspan="3" align="left">
-							<?php
-							if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
-									if (UtilesApp::GetConf($sesion,'CodigoSecundario') ):
-										echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-									else:
-										echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-                                                                        endif;
-								} else {
-									if(UtilesApp::GetConf($sesion,'CodigoSecundario') ):
-										echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
-									else:
-										echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-                                                                        endif;
-								}
-							?>
+							<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+
+	  						</td>
+						</tr>
+						<tr>
+	    					<td align="right" width="30%"><?php echo __('Asunto') ?></td>
+	    					<td colspan="3" align="left">
+                                <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+
 	  						</td>
 						</tr>
 						<tr>
 							<td align=right><?php echo __('Fecha Desde') ?></td>
 							<td align="left">
-								<input type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+								<input type="text" name="fecha1" class="fechadiff" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+								
 							</td>
 							<td align="left" colspan="2">
 								<?php echo __('Fecha Hasta')?>
-								<input type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-								<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+								<input type="text" name="fecha2" class="fechadiff" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+								
 							</td>
 						</tr>
 						<tr>
@@ -204,7 +277,7 @@
 								<?php echo __('Moneda') ?>
 							</td>
 							<td colspan="2" align="left">
-								<?= Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_adelanto", $moneda_adelanto, "", __('Todas'),''); ?>
+								<?php echo  Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_adelanto", $moneda_adelanto, "", __('Todas'),''); ?>
 							</td>
 							<td></td>
 						</tr>
@@ -213,7 +286,7 @@
 								<?php echo __('Sólo Adelantos con Saldo') ?>
 							</td>
 							<td colspan="2" align="left">
-								<input type="checkbox" id="tiene_saldo" name="tiene_saldo" value="1" <?=$tiene_saldo ? 'checked' : ''?>/>
+								<input type="checkbox" id="tiene_saldo" name="tiene_saldo" value="1" <?php echo $tiene_saldo ? 'checked' : ''?>/>
 							</td>
 							<td></td>
 						</tr>
@@ -224,7 +297,9 @@
                                                                 
 							</td>
 							<td width='40%' align="right">
-								<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?=__('Agregar')?> <?php echo __('adelanto') ?></a>
+								<?php if($p_cobranza) {				?>
+								<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?php echo __('Agregar')?> <?php echo __('adelanto') ?></a>
+							<?php } ?>
 							</td>
 						</tr>
 					</table>
@@ -232,12 +307,32 @@
 			</form>
 		</td>
 	</tr>
-</table><div id="losadelantos">
-<?php
-	//Lista de adelantos
-	//include("lista_adelantos.php");
-       echo '</div>';
+</table>
 
+<div id="losadelantos">
+	<div id="mensaje"></div>
+	   <table cellpadding="0" cellspacing="0" border="0" class="display" id="tablon" style="width:920px;display:none;">
+	<thead>
+		<tr class="encabezadolight">
+		<th >ID Adelanto</th>
+<th width="200"><?php echo __('Cliente') ;?></th>
+<th>Fecha</th>
+<th width="250">Descripción<br><small>(<?php echo __('Asunto') ;?>)</small></th>
+
+
+<th>Monto</th>
+<th>Saldo</th>
+<th width="60">Acciones</th>
+		<th >idcobro</th></tr>
+	</thead>
+	<tbody>
+		
+	</tbody></table>
+</div>
+<?php
+
+	
+	
 	if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	{
 		echo(Autocompletador::Javascript($sesion));
@@ -245,7 +340,4 @@
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>
-<script type="text/javascript">
-Calendar.setup({ inputField	: "fecha1", ifFormat : "%d-%m-%Y", button : "img_fecha1" });
-Calendar.setup({ inputField	: "fecha2", ifFormat : "%d-%m-%Y", button : "img_fecha2" });
-</script>
+

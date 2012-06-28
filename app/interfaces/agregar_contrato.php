@@ -975,7 +975,7 @@ function SetFormatoRut()
 	{
 		var form = $('formulario');
 		if(opcion)
-			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
+			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1', '' );
 		else
 		{
 			var id_tramite_tarifa = form.id_tramite_tarifa.value;
@@ -1430,7 +1430,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			}
 		}
 
-		if( ejecutar && ( jQuery('#desde').val() == 'agregar_cliente' || jQuery('#desde').val() == 'agregar_contrato' || ( jQuery('#desde').val() == 'agregar_asunto' && jQuery('#cobro_independiente').is(':checked') ) ) ) // cant::lista
+		if( ejecutar && jQuery('#cobro_independiente').is(':checked')) // cant::lista
 		{
 			var text_window = "";
 			var respuesta = RevisarTarifasRequest(tarifa, moneda);
@@ -2053,7 +2053,7 @@ if (!$opc_moneda_total)
 if (!$opc_moneda_total)
 	$opc_moneda_total = Moneda::GetMonedaBase($sesion);
 
-$config_validar_tarifa = ( UtilesApp::GetConf($sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
+$config_validar_tarifa = ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RevisarTarifas') ? ' RevisarTarifas( \'id_tarifa\', \'id_moneda\', this.form, true);' : '' );
 ?>
 
 		<!-- COBRANZA -->

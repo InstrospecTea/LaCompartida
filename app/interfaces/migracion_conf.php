@@ -1,71 +1,81 @@
-<?
-	class ConfMigracion 
-	{
-		function dbHost() { return 'db1.ccvvg39btzna.us-east-1.rds.amazonaws.com'; }
-		function dbName() { return 'Payet_dbo'; }
-		function dbUser() { return 'admin'; }
-		function dbPass() { return 'admin1awdx'; }
-		
-		function QueriesModificacionesAntes() 
-		{
-			$queries = array();
-			$queries[] = "ALTER TABLE `trabajo` DROP FOREIGN KEY  `trabajo_ibfk_4` ;";
-			$queries[] = "ALTER TABLE `cta_corriente` DROP FOREIGN KEY `cta_corriente_ibfk_7`;";
-			$queries[] = "ALTER TABLE `cobro` ADD `id_estado_factura` INT( 11 ) NULL ;";
-			$queries[] = "ALTER TABLE `cobro` ADD  `estado_real` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;";
-			$queries[] = "ALTER TABLE `cobro` ADD  `factura_rut` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+<?php
+
+class ConfMigracion {
+
+	function dbHost() {
+		return 'db1.ccvvg39btzna.us-east-1.rds.amazonaws.com';
+	}
+
+	function dbName() {
+		return 'Payet_dbo';
+	}
+
+	function dbUser() {
+		return 'admin';
+	}
+
+	function dbPass() {
+		return 'admin1awdx';
+	}
+
+	function QueriesModificacionesAntes() {
+		$queries = array();
+		$queries[] = "ALTER TABLE `trabajo` DROP FOREIGN KEY  `trabajo_ibfk_4` ;";
+		$queries[] = "ALTER TABLE `cta_corriente` DROP FOREIGN KEY `cta_corriente_ibfk_7`;";
+		$queries[] = "ALTER TABLE `cobro` ADD `id_estado_factura` INT( 11 ) NULL ;";
+		$queries[] = "ALTER TABLE `cobro` ADD  `estado_real` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;";
+		$queries[] = "ALTER TABLE `cobro` ADD  `factura_rut` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 											ADD `factura_razon_social` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;";
-			
-			return $queries;
-		}
-		
-		function QueriesModificacionesDespues()
-		{
-			$queries = array();
-			$queries[] = "UPDATE trabajo LEFT JOIN cobro USING( id_cobro ) SET trabajo.id_cobro = NULL WHERE cobro.id_cobro IS NULL";
-			$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
-			$queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
-			$queries[] = "ALTER TABLE `cobro`
+
+		return $queries;
+	}
+
+	function QueriesModificacionesDespues() {
+		$queries = array();
+		$queries[] = "UPDATE trabajo LEFT JOIN cobro USING( id_cobro ) SET trabajo.id_cobro = NULL WHERE cobro.id_cobro IS NULL";
+		$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+		$queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+		$queries[] = "ALTER TABLE `cobro`
 												  DROP `id_estado_factura`,
 												  DROP `estado_real`;";
-			$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
-			$queries[] = "UPDATE cobro SET estado = 'FACTURADO' WHERE ( SELECT count(*) FROM factura WHERE factura.id_cobro = cobro.id_cobro ) > 0 AND estado IN ('CREADO','EN REVISION','EMISION');";
-			$queries[] = "UPDATE cobro 
+		$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
+		$queries[] = "UPDATE cobro SET estado = 'FACTURADO' WHERE ( SELECT count(*) FROM factura WHERE factura.id_cobro = cobro.id_cobro ) > 0 AND estado IN ('CREADO','EN REVISION','EMISION');";
+		$queries[] = "UPDATE cobro 
 											JOIN factura USING( id_cobro ) 
 											JOIN cta_cte_fact_mvto USING( id_factura ) 
 											JOIN cta_cte_fact_mvto_neteo ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_neteo.id_mvto_deuda 
 											SET cobro.estado = 'PAGO PARCIAL';";
-			$queries[] = "UPDATE cobro 
+		$queries[] = "UPDATE cobro 
 											JOIN factura USING( id_cobro ) 
 											JOIN cta_cte_fact_mvto USING( id_factura ) 
 											SET cobro.estado = 'PAGADO' 
 											WHERE cta_cte_fact_mvto.saldo = 0;";
-			return $queries;
-		}
-		
-		function DatosPrm() { return array( 'prm_categoria_usuario' => array( 
-																					'campo_glosa' 					=> 'glosa_categoria', 
-																				  'campo_id'            	=> 'id_categoria_usuario', 
-																				  'datos'              	  => array('Administrativo','Asistente','Asociado','Asociado Junior','Asociado Senior','Practicante','Secretaria','Socio','NT','Procurador')),
-																				'prm_area_usuario'      => array( 
-																					'campo_glosa' 					=> 'glosa',           
-																				  'campo_id'            	=> 'id',                   
-																				  'datos'              	  => array('Administración','Corporativo','Laboral','Procesal','Regulatorio','Tributario')),
-																				'grupo_cliente'         => array( 
-																					'campo_glosa' 					=> 'glosa_grupo_cliente', 
-																				  'campo_id'            	=> 'id_grupo_cliente',
-																				  'datos'               	=> array('GRUPO BACKUS','GRUPO VALE','GRUPO SCOTIA','GRUPO AMOV','GRUPO CHINALCO','GRUPO AC CAPITALES','GRUPO GOLD',
-																				  																 'GRUPO WWG','GRUPO BBVA','GRUPO ENDESA','GRUPO BREADT','FAMILIA SARFATY','GRUPO ILASA','GRUPO BNP','GRUPO URÍA','GRUPO GOURMET')),
-																				'prm_area_proyecto'     => array( 
-																					'campo_glosa' 					=> 'glosa', 
-																				  'campo_id'            	=> 'id_area_proyecto',
-																				  'datos'               	=> array('Corporativo','Finanzas','Laboral','Mercado de Valores','Procesal','Regulatorio','Tributario'))
-																			); 
-		}
-		
-		function QueryUsuario() 
-		{
-			return "SELECT 
+		return $queries;
+	}
+
+	function DatosPrm() {
+		return array('prm_categoria_usuario' => array(
+				'campo_glosa' => 'glosa_categoria',
+				'campo_id' => 'id_categoria_usuario',
+				'datos' => array('Administrativo', 'Asistente', 'Asociado', 'Asociado Junior', 'Asociado Senior', 'Practicante', 'Secretaria', 'Socio', 'NT', 'Procurador')),
+			'prm_area_usuario' => array(
+				'campo_glosa' => 'glosa',
+				'campo_id' => 'id',
+				'datos' => array('Administración', 'Corporativo', 'Laboral', 'Procesal', 'Regulatorio', 'Tributario')),
+			'grupo_cliente' => array(
+				'campo_glosa' => 'glosa_grupo_cliente',
+				'campo_id' => 'id_grupo_cliente',
+				'datos' => array('GRUPO BACKUS', 'GRUPO VALE', 'GRUPO SCOTIA', 'GRUPO AMOV', 'GRUPO CHINALCO', 'GRUPO AC CAPITALES', 'GRUPO GOLD',
+					'GRUPO WWG', 'GRUPO BBVA', 'GRUPO ENDESA', 'GRUPO BREADT', 'FAMILIA SARFATY', 'GRUPO ILASA', 'GRUPO BNP', 'GRUPO URÍA', 'GRUPO GOURMET')),
+			'prm_area_proyecto' => array(
+				'campo_glosa' => 'glosa',
+				'campo_id' => 'id_area_proyecto',
+				'datos' => array('Corporativo', 'Finanzas', 'Laboral', 'Mercado de Valores', 'Procesal', 'Regulatorio', 'Tributario'))
+		);
+	}
+
+	function QueryUsuario() {
+		return "SELECT 
 								Empleado.CodigoEmpleado 																				as usuario_FFF_id_usuario,
 								Empleado.Nombres 																								as usuario_FFF_nombre,
 								Empleado.ApellidoPaterno 																				as usuario_FFF_apellido1,
@@ -83,12 +93,11 @@
 								IF(Empleado.moneda='D','2','1') 																as usuario_FFF_id_moneda_costo
 							FROM Empleado
 							LEFT JOIN TbCategoriaEmpleados ON Empleado.Categoria = TbCategoriaEmpleados.CodigoCategoria 
-							AND Empleado.TipoEmpleado = TbCategoriaEmpleados.TipoEmpleado"; 
-		}
-		
-		function QueryCliente() 
-		{ 
-			return "SELECT 
+							AND Empleado.TipoEmpleado = TbCategoriaEmpleados.TipoEmpleado";
+	}
+
+	function QueryCliente() {
+		return "SELECT 
 								Cliente.CodigoCliente 																																			as cliente_FFF_codigo_cliente, 
 								Cliente.NombreCliente																																				as cliente_FFF_glosa_cliente,
 								Cliente.NombreCliente																																				as cliente_FFF_rsocial,
@@ -126,10 +135,10 @@
 							FROM Cliente 
 							LEFT JOIN ContactosCliente ON Cliente.CodigoCliente = ContactosCliente.CodigoCliente 
 							GROUP BY Cliente.CodigoCliente";
-		}
-		function QueryAsunto() 
-		{ 
-			return "SELECT 
+	}
+
+	function QueryAsunto() {
+		return "SELECT 
 								Cliente.Cobrador 																														as asunto_FFF_id_cobrador,
 								CONCAT(SUBSTRING(OrdenFacturacion.NumeroOrdenFact,1,4),'-',SUBSTRING(OrdenFacturacion.NumeroOrdenFact,-3)) 	as asunto_FFF_codigo_asunto,
 								OrdenFacturacion.CodigoCliente 																							as asunto_FFF_codigo_cliente,
@@ -173,10 +182,10 @@
 							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
 							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
 							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente";
-		} 
-		function QueryHoras() 
-		{ 
-			return "SELECT
+	}
+
+	function QueryHoras() {
+		return "SELECT
 								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
 								,hta.FechaFacturable																																					as fecha 
 								,hta.HoraInicio 																																							as hora_inicio
@@ -196,10 +205,10 @@
 								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
 								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid 
 								LEFT JOIN Factura ON Factura.NumeroFactura = hta.NumeroFactura";
-		} 
-		function QueryGastos() 
-		{ 
-			return "SELECT
+	}
+
+	function QueryGastos() {
+		return "SELECT
 									IdGastoLemontech																																	as gasto_FFF_id_movimiento,
 									rucproveedor																																			as gasto_FFF_proveedor_ruc,
 									razonsocialproveedor																															as gasto_FFF_proveedor_rsocial,
@@ -224,14 +233,14 @@
 									FROM Gastos
 									LEFT JOIN Empleado ON TRIM(Empleado.Siglas) = TRIM(Gastos.Creadopor)
 									LEFT JOIN Factura ON Gastos.NumeroFactura = Factura.NumeroFactura";
-		}
-		function QueryMonedaHistorial() 
-		{
-			return "SELECT * FROM TipoDeCambio";
-		}
-		function QueryCobros() 
-		{
-			return "SELECT 
+	}
+
+	function QueryMonedaHistorial() {
+		return "SELECT * FROM TipoDeCambio";
+	}
+
+	function QueryCobros() {
+		return "SELECT 
 									Factura.NumeroFactura 																					as cobro_FFF_id_cobro,
 									Factura.FechaGeneracion 																				as cobro_FFF_fecha_creacion,
 									Factura.CodigoFacturaBoleta 																		as cobro_FFF_documento,
@@ -260,11 +269,10 @@
 								FROM Factura
 								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
 								LEFT JOIN Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
+	}
 
-		}
-		function QueryFacturas()
-		{
-			return "SELECT 
+	function QueryFacturas() {
+		return "SELECT 
 									Factura.NumeroFactura 																					as factura_FFF_id_cobro,
 									Factura.NumeroFactura 																					as factura_FFF_id_factura,
 									Factura.NumeroFactura																						as factura_FFF_numero,
@@ -277,19 +285,19 @@
 									Factura.PorcentajeImpuesto 																			as factura_FFF_porcentaje_impuesto
 								FROM Factura
 								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
-								WHERE Factura.CodigoFacturaBoleta IS NOT NULL"; 
-		}
-		function QueryTarifas() 
-		{ 
-			return "SELECT 
+								WHERE Factura.CodigoFacturaBoleta IS NOT NULL";
+	}
+
+	function QueryTarifas() {
+		return "SELECT 
 									CodigoTarifaCliente as id_tarifa 
 									,Descripcion as glosa_tarifa 
 									,'1' as guardado 
-									FROM TbTarifaCliente"; 
-		}
-		function QueryUsuariosTarifas() 
-		{ 
-			return "SELECT 
+									FROM TbTarifaCliente";
+	}
+
+	function QueryUsuariosTarifas() {
+		return "SELECT 
 								T1.id_usuario_tarifa_LMT as id_usuario_tarifa 
 								, T1.CodigoEmpleado AS id_usuario 
 								, if(T1.moneda='D' ,'2',if(T1.moneda = 'E','3',if(T1.moneda = 'S','1','0'))) AS id_moneda 
@@ -301,11 +309,11 @@
 										FROM TbTarifaCategoria as T2 
 										WHERE T2.CodigoEmpleado = T1.CodigoEmpleado 
 											AND T2.CodigoTarifaCliente = T1.CodigoTarifaCliente 
-											AND T2.moneda = T1.moneda )"; 
-		}
-		function QueryPagos()
-		{
-			return "SELECT 
+											AND T2.moneda = T1.moneda )";
+	}
+
+	function QueryPagos() {
+		return "SELECT 
 								P.NumeroFactura 																			as documento_FFF_id_cobro,
 								P.NumeroFactura 																			as factura_FFF_id_factura,
 								P.FechaDePago																					as factura_FFF_fecha,
@@ -340,6 +348,8 @@
 							FROM PagosRecibidos P 
 							LEFT JOIN Factura ON Factura.NumeroFactura = P.NumeroFactura 
 							LEFT JOIN TbBancos ON TbBancos.CodigoBanco = P.CodigoBanco";
-		}
 	}
+
+}
+
 ?>

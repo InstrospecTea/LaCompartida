@@ -359,7 +359,7 @@ for ($i = 0; $i < $col_num; ++$i) {
 	}
 
 		// ancho celdas ocultos
-	$para_ocultar = array('id_moneda_factura_pago', 'descripcion', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'honorarios');
+	$para_ocultar = array('id_moneda_factura_pago', 'descripcion', 'encargado_comercial', 'id_cobro', 'monto_pagos_moneda_base', 'saldo_moneda_base', 'tipo_cambio', 'codigo_asunto', 'honorarios');
 	
 	//FacturaPagoSubtotalIva
 	if( !UtilesApp::GetConf($Sesion, 'FacturaPagoSubtotalIva') )

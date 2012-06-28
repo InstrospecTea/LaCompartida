@@ -53,13 +53,26 @@
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$fecha =& $wb->addFormat(array('Size' => 11,
+		$nCobro =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$numeros =& $wb->addFormat(array('Size' => 11,
+		$factura =& $wb->addFormat(array('Size' => 11,
+									'Valign' => 'top',
+									'Align' => 'center',
+									'Border' => 1,
+									'Color' => 'black',
+									'TextWrap' => 1));
+		$fecha =& $wb->addFormat(array('Size' => 11,
+									'Valign' => 'top',
+									'Align' => 'center',
+									'Border' => 1,
+									'Color' => 'black',
+									'NumFormat' => 'dd-mm-yyyy',
+									'TextWrap' => 1));	
+		$numerost =& $wb->addFormat(array('Size' => 11,
 									'VAlign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
@@ -699,19 +712,22 @@
 						$facturas .= "\n";
 						$clientes_factura .= "\n";
 					}
-					$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " .  str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero_factura : " "  );
+					//$facturas .= ( strlen( $numero_factura ) > 0 ? $codigo_legal_factura . " " .  str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $numero_factura : " "  );
+			
+					
+					$facturas .= $numero_factura;
 					$clientes_factura .= ( strlen( $cliente_factura ) > 0 ? $cliente_factura : " "  );
 				}
 			}
 			
-			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $fecha);
+			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $nCobro);
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
 			{
-				$ws1->write($filas, $col_nota_cobro, !empty($cobro['nota_venta_contabilidad']) ? $cobro['nota_venta_contabilidad'] : $cobro['nota_cobro'], $fecha);
+				$ws1->write($filas, $col_nota_cobro, !empty($cobro['nota_venta_contabilidad']) ? $cobro['nota_venta_contabilidad'] : $cobro['nota_cobro'], $factura);
 			}
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 			{
-				$ws1->write($filas, $col_factura, $facturas, $fecha);
+				$ws1->write($filas, $col_factura, $facturas, $factura);
 			}
 			else
 			{

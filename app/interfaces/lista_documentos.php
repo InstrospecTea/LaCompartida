@@ -1,5 +1,4 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
+<?php 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -539,13 +538,12 @@
 
 function EliminaDocumento(id_documento, codigo_cliente)
 {
-	<?
-	if($desde)
+	<?php 	if($desde)
 			$pagina_desde = '"&desde='.$desde.'"';
 	else
 			$pagina_desde = '""';
 	?>
-	var desde = <?=$pagina_desde ?>;
+	var desde = <?php echo $pagina_desde ?>;
 	var form = $('form_documentos');
 	if(parseInt(id_documento) > 0 && confirm('¿Desea eliminar el documento seleccionado?') == true)
 		self.location.href = 'lista_documentos.php?id_documento='+id_documento+desde+'&codigo_cliente='+codigo_cliente+'&accion=eliminar';
@@ -559,15 +557,15 @@ function BuscarGastos( form, from )
 
 	var fecha1 = $('fecha1').value;
 	var fecha2 = $('fecha2').value;
-	<? 
+	<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	 { ?>
 		var codigo_cliente = '&codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
-<? } 
+<?php } 
 	else
 	 { ?>
 		var codigo_cliente = '&codigo_cliente='+$('codigo_cliente').value;
-<? } ?>
+<?php } ?>
 
 	if(fecha1)
 		fecha1 = '&fecha1='+fecha1;
@@ -605,8 +603,7 @@ function AgregarNuevo(tipo)
 function Refrescar()
 {
 
-	<?
-		$pagina_desde = '';
+	<?php 		$pagina_desde = '';
 		$fecha_ini = '';
 		$fecha_fin = '';
 		if($desde)
@@ -630,7 +627,7 @@ function MostrarOcultarExcel(value)
 }
 
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php echo Autocompletador::CSS(); ?>
 <form method=post name="form_documentos" id="form_documentos">
 <input type=hidden name=opc value=buscar>
 <!-- Calendario DIV -->
@@ -641,12 +638,12 @@ function MostrarOcultarExcel(value)
 
 <table width="90%"><tr><td>
 <fieldset class="tb_base" width="100%" style="border: 1px solid #BDBDBD;">
-<legend><?=__('Filtros')?></legend>
+<legend><?php echo __('Filtros')?></legend>
 <table style="border: 0px solid black" width='720px'>
 	<tr>
-		<td align=right width='30%'><b><?=__('Cliente ')?></b></td>
+		<td align=right width='30%'><b><?php echo __('Cliente ')?></b></td>
 		<td colspan=3 align=left>
-			<? 
+			<?php 
 	 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -665,34 +662,34 @@ function MostrarOcultarExcel(value)
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Con Fecha posterior a:')?>
+			<?php echo __('Con Fecha posterior a:')?>
 		</td>
 		<td nowrap align=center width='100px'>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?=$fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
 		</td>
 		<td align=left width='80px'>
-			<?=__(' y anterior a:')?>
+			<?php echo __(' y anterior a:')?>
 		</td>
 		<td nowrap align=left>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?=$fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
 		</td>
 	</tr>
 	<tr>
 		<td></td>
 		<td colspan=2 align=center>
-			<input name=boton_buscar type=button value="<?=__('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
-			<span id="mostrar_bajar_excel" style="display:<?=$codigo_cliente?'inline':'none' ?>;">
-				<input name="boton_xls" type="button" value="<?=__('Descargar Excel del cliente')?>" onclick="BuscarGastos(this.form,'excel_uno')" class="btn">
+			<input name=boton_buscar type=button value="<?php echo __('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
+			<span id="mostrar_bajar_excel" style="display:<?php echo $codigo_cliente?'inline':'none' ?>;">
+				<input name="boton_xls" type="button" value="<?php echo __('Descargar Excel del cliente')?>" onclick="BuscarGastos(this.form,'excel_uno')" class="btn">
 			</span>
-			<input name="boton_xls" type="button" value="<?=__('Descargar Excel de todos los clientes')?>" onclick="BuscarGastos(this.form,'excel_todos')" class="btn">
+			<input name="boton_xls" type="button" value="<?php echo __('Descargar Excel de todos los clientes')?>" onclick="BuscarGastos(this.form,'excel_todos')" class="btn">
 		</td>
 		<td align=right>
-			<? if($opc == 'buscar'): ?>
-			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('ingreso')" title="Agregar Ingreso"><?=__('Agregar Pago')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
-			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('egreso')" title="Agregar Egreso"><?=__('Agregar Cobro')?></a>
-			<? endif; ?>
+			<?php if($opc == 'buscar'): ?>
+			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('ingreso')" title="Agregar Ingreso"><?php echo __('Agregar Pago')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('egreso')" title="Agregar Egreso"><?php echo __('Agregar Cobro')?></a>
+			<?php endif; ?>
 		</td>
 	</tr>
 </table>
@@ -716,8 +713,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
-	if($opc == 'buscar')
+<?php 	if($opc == 'buscar')
 	{
 		echo($total_cta ? "<table width=100%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta corriente').": ".$simbolo_moneda." ".number_format($total_cta,$cifras_decimales,',','.')."</b></span></td></tr></table>":"");
 		$b->Imprimir();

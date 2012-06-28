@@ -122,8 +122,11 @@
                                    if( parent.window.Refrescar ) parent.window.Refrescar();
                                     parent.window.jQuery('#dialogomodal').dialog('option','title','Datos ingresados con éxito');
                                 }			*/
-								if( window.opener.Refrescar ) 
-									window.opener.Refrescar();
+							  if( window.opener.Refrescarse ) {
+                                            window.opener.Refrescarse(); 
+                                   } else if( window.opener.Refrescar ) {
+                                       window.opener.Refrescar(); 
+                                       }
 			</script>
 		<?php if($nuevo && $id_documento) {	
 			
@@ -132,7 +135,7 @@
                         ?>
 			<script type="text/javascript">
                             
-				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '&id_documento=<?=$id_documento?>';
+				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '&id_documento=<?php echo $id_documento?>';
 			</script>
 		<?php }
 		$documento->Load($id_documento);
@@ -250,7 +253,7 @@ function Validar(form)
        // alert(monto);
         if(isNaN(monto) || monto == '')
 	{
-		alert('<?=__('Debe ingresar un monto para el pago')?>');
+		alert('<?php echo __('Debe ingresar un monto para el pago')?>');
 		$('monto').focus();
 		return false;
 	}
@@ -270,19 +273,19 @@ function Validar(form)
 	<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
             if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ):		 ?>
                             var cod_cli_seg = document.getElementById('codigo_cliente_secundario');
-            <?      else: ?>
+            <?php       else: ?>
                             var cod_cli_seg = document.getElementById('campo_codigo_cliente_secundario');
-            <?	endif;	?>
+            <?php 	endif;	?>
                 if (cod_cli_seg == '-1' || cod_cli_seg == "") {
-		alert('<?=__('Debe ingresar un cliente')?>');
+		alert('<?php echo __('Debe ingresar un cliente')?>');
 		return false;
 	}
 	<?php } else {
             if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador'):	 ?>
 			var cod_cli = document.getElementById('codigo_cliente');
-            <?  else: ?>
+            <?php   else: ?>
 			var cod_cli = document.getElementById('campo_codigo_cliente');
-            <?	endif;	?>	
+            <?php 	endif;	?>	
                 if (cod_cli == '-1' || cod_cli == "") {
 		alert('<?php echo __('Debe ingresar un cliente') ?>');
 		return false;
@@ -293,14 +296,14 @@ function Validar(form)
 	
 	if(monto <= 0 || (jQuery('#montoadelanto').length==0 && monto_pagos_real<=0))
 	{
-		alert('<?=__('El monto de un pago debe ser siempre mayor a 0')?>');
+		alert('<?php echo __('El monto de un pago debe ser siempre mayor a 0')?>');
 		$('monto').focus();
 		return false;
 	}
 
 	if(form.glosa_documento.value == "")
 	{
-		alert('<?=__('Debe ingresar una descripción')?>');
+		alert('<?php echo __('Debe ingresar una descripción')?>');
 		form.glosa_documento.focus();
 		return false;
 	}
@@ -491,24 +494,24 @@ jQuery('#monto').live('change',function(){
         
             if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ):		 ?>
                             var codigo_cliente_secundario = document.getElementById('codigo_cliente_secundario');
-            <?      else: ?>
+            <?php       else: ?>
                             var codigo_cliente_secundario = document.getElementById('campo_codigo_cliente_secundario');
-            <?	endif;	?>
+            <?php 	endif;	?>
                     var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente_secundario=' + codigo_cliente_secundario.value+'&id_cobro='+id_cobro;     
 
-       <?  else:
+       <?php   else:
 	 
             if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ):		 ?>
 			var codigo_cliente = document.getElementById('codigo_cliente');
-            <?  else: ?>
+            <?php   else: ?>
 			var codigo_cliente = document.getElementById('campo_codigo_cliente');
-            <?	endif;	?>
+            <?php 	endif;	?>
 		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente=' + codigo_cliente.value+'&id_cobro='+id_cobro;     
  
-     <? endif;	?>
+     <?php  endif;	?>
         
        if(actualizar)
-		url += ''<? if(!empty($cambios_en_saldo_honorarios)) echo "+'&c_hon=".implode(',',$cambios_en_saldo_honorarios)."'"; if(!empty($cambios_en_saldo_gastos)) echo "+'&c_gas=".implode(',',$cambios_en_saldo_gastos)."'";?>;
+		url += ''<?php  if(!empty($cambios_en_saldo_honorarios)) echo "+'&c_hon=".implode(',',$cambios_en_saldo_honorarios)."'"; if(!empty($cambios_en_saldo_gastos)) echo "+'&c_gas=".implode(',',$cambios_en_saldo_gastos)."'";?>;
 
          if(id_documento || id_cobro){       
         jQuery('#codigo_cliente').attr('readonly',true);
@@ -737,7 +740,7 @@ function SetMontoPagos()
                   
                  jQuery('#saldo_pago').val(saldopagomaximo-monto_tmp);
                 }
-	<? if(!$documento->Loaded()){?>
+	<?php  if(!$documento->Loaded()){?>
 		var monto_pagos = document.getElementById('monto_pagos');
 		var monto = document.getElementById('monto');
 		if(jQuery('#monto_pagos'))
@@ -745,7 +748,7 @@ function SetMontoPagos()
 			jQuery('#monto').val(Math.round(jQuery('#monto_pagos').val() * 100) / 100);
                          jQuery('#monto_aux').val(jQuery('#monto').val());
 		}
-	<?}
+	<?php }
 	else if($documento->fields['es_adelanto']=='1'){?>
 		$('saldo_pago').value = anterior+((Math.round($F('saldo_pago_aux')-$F('monto')) * 100) / 100);
 	<?php } ?>
@@ -762,7 +765,7 @@ function ActualizarDocumentoMoneda(id_documento)
 	var tc = new Array();
 	for(var i = 0; i< arreglo_ids.length; i++)
 			tc[i] = $('documento_'+id_documento+'_moneda_'+arreglo_ids[i]).value;
-	$('tabla_pagos').innerHTML = "<img src='<?=Conf::ImgDir()?>/ajax_loader.gif'/>";
+	$('tabla_pagos').innerHTML = "<img src='<?php echo Conf::ImgDir()?>/ajax_loader.gif'/>";
 	var http = getXMLHTTP();
 	var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_documento_moneda&id_documento='+id_documento+'&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');	
 	http.open('get', url);
@@ -803,9 +806,9 @@ function ActualizarDocumentoMonedaPago()
 			for(var i = 0; i< arreglo_ids.length; i++)
 					tc[i] = $('documento_moneda_'+arreglo_ids[i]).value;
 			$('contenedor_tipo_load').innerHTML = 
-			"<table width=510px><tr><td align=center><br><br><img src='<?=Conf::ImgDir()?>/ajax_loader.gif'/><br><br></td></tr></table>";
+			"<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir()?>/ajax_loader.gif'/><br><br></td></tr></table>";
 			var http = getXMLHTTP();
-			var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_documento_moneda&id_documento=<?=$documento->fields['id_documento']?>&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');	
+			var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_documento_moneda&id_documento=<?php echo $documento->fields['id_documento']?>&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');	
 			http.open('get', url);
 			http.onreadystatechange = function()
 			{
@@ -840,29 +843,29 @@ function CargarContratos(){
 	http.send(null);
 }
 </script>
-<? echo Autocompletador::CSS(); ?>
-<form method='post' action="<?= $SERVER[PHP_SELF] ?>" id="form_documentos" autocomplete='off'>
+<?php  echo Autocompletador::CSS(); ?>
+<form method='post' action="<?php echo  $SERVER[PHP_SELF] ?>" id="form_documentos" autocomplete='off'>
 <input type='hidden' name='opcion' value="guardar" />
-<input type='hidden' name='id_documento' id ='id_documento' value="<?= $documento->fields['id_documento']? $documento->fields['id_documento']:''  ?>" />
-<input type='hidden' name='pago' value='<?=$pago?>'>
-<input type='hidden' name='id_doc_cobro' id='id_doc_cobro' value='<?=$id_doc_cobro?>' />
-<input type='hidden'  name='cifras_decimales' id='cifras_decimales' value='<?=($cifras_decimales)?$cifras_decimales:2;?>' />
-<input type='hidden' name='cobro' value='<?=$id_cobro?>'>
+<input type='hidden' name='id_documento' id ='id_documento' value="<?php echo  $documento->fields['id_documento']? $documento->fields['id_documento']:''  ?>" />
+<input type='hidden' name='pago' value='<?php echo $pago?>'>
+<input type='hidden' name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro?>' />
+<input type='hidden'  name='cifras_decimales' id='cifras_decimales' value='<?php echo ($cifras_decimales)?$cifras_decimales:2;?>' />
+<input type='hidden' name='cobro' value='<?php echo $id_cobro?>'>
 <input type='hidden' name='elimina_ingreso' id='elimina_ingreso' value=''>
 
-<input type='text' class="oculto" style="display:none;"  name='pago_honorarios' id='acepta_honorarios' value='<?=$id_documento ? $documento->fields['pago_honorarios'] : '1'?>'/>
-<input type='text' class="oculto" style="display:none;"   name='pago_gastos' id='acepta_gastos' value='<?=$id_documento ? $documento->fields['pago_gastos'] : '1'?>'/>
+<input type='text' class="oculto" style="display:none;"  name='pago_honorarios' id='acepta_honorarios' value='<?php echo $id_documento ? $documento->fields['pago_honorarios'] : '1'?>'/>
+<input type='text' class="oculto" style="display:none;"   name='pago_gastos' id='acepta_gastos' value='<?php echo $id_documento ? $documento->fields['pago_gastos'] : '1'?>'/>
 <?php if(!$adelanto){ ?>
-<input type='hidden' name='es_adelanto' id='es_adelanto' value='<?=$id_documento ? $documento->fields['es_adelanto'] : ''?>'/>
-<input type='hidden' name='id_contrato' id='id_contrato' value='<?=$id_documento ? $documento->fields['id_contrato'] : ''?>'/>
+<input type='hidden' name='es_adelanto' id='es_adelanto' value='<?php echo $id_documento ? $documento->fields['es_adelanto'] : ''?>'/>
+<input type='hidden' name='id_contrato' id='id_contrato' value='<?php echo $id_documento ? $documento->fields['id_contrato'] : ''?>'/>
 <?php } ?>
 <?php if($id_documento && $documento->fields['es_adelanto'] == '1'){ ?>
 <input type='text'  class="oculto" style="display:none;"  name='montoadelanto' id="montoadelanto" value='<?php echo $documento->fields['monto']; ?>'/>
 <?php }
 
 if(empty($adelanto)){ ?>
-<input type='hidden'  class="oculto" style="display:none;"  name='codigo_cliente_adelanto' value='<?=$documento->fields['codigo_cliente']?>'/>
-<input type='hidden' class="oculto" style="display:none;"   name='id_moneda' value='<?=$documento->fields['id_moneda']?>'/>
+<input type='hidden'  class="oculto" style="display:none;"  name='codigo_cliente_adelanto' value='<?php echo $documento->fields['codigo_cliente']?>'/>
+<input type='hidden' class="oculto" style="display:none;"   name='id_moneda' value='<?php echo $documento->fields['id_moneda']?>'/>
 <?php }
 if ($id_documento || $_GET['id_documento']):
     if ($_GET['adelanto']==1) { 
@@ -898,7 +901,7 @@ endif;
 <br>
 <table width='90%' id="txt_pagina">
 	<tr>
-		<td align=left><b><?=$txt_pagina ?></b></td>
+		<td align=left><b><?php echo $txt_pagina ?></b></td>
 	</tr>
 </table>
 <br>
@@ -906,7 +909,7 @@ endif;
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left width="50%">
-			<b><?=__('Información de Documento') ?> </b>
+			<b><?php echo __('Información de Documento') ?> </b>
 		</td>
 		<td align=right width="50%">
 <?php
@@ -915,7 +918,7 @@ endif;
 	list( $existe_pago_retencion ) = mysql_fetch_array($resp);
 	if( !$existe_pago_retencion && $id_cobro && UtilesApp::GetConf($sesion,'PagoRetencionImpuesto') && (!$id_documento || $documento->fields['es_adelanto'] != '1')) { ?>
 		
-			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?=$pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?=__('Pago retención impuestos')?>&nbsp;
+			<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?php echo $pago_retencion ? "checked='checked'" : "" ?> />&nbsp;<?php echo __('Pago retención impuestos')?>&nbsp;
 <?php }
 if($id_cobro){
 	$pago_honorarios = $documento_cobro->fields['saldo_honorarios'] != 0 ? 1 : 0;
@@ -934,15 +937,15 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 <table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right>
-			<?=__('Fecha')?>
+			<?php echo __('Fecha')?>
 		</td>
 		<td align=left>
-			<input type="text" name="fecha" value="<?=$documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+			<input type="text" name="fecha" value="<?php echo $documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
 		</td>
 	</tr>
 	<tr>
-		<td align="right" width="20%"><?=__('Cliente ')?></td>
+		<td align="right" width="20%"><?php echo __('Cliente ')?></td>
 		<td colspan="3" align="left">
 			<?php      
                          /* voy a poner nuevo metodo de select cliente, acorde a agregar_pago_factura*/ 
@@ -991,22 +994,22 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 	<?php } ?>
 		<tr>
 			<td align=right>
-				<?=__('Monto')?>
+				<?php echo __('Monto')?>
 			</td>
 			<td align=left> 
-				<? if($id_cobro && !$adelanto)
+				<?php  if($id_cobro && !$adelanto)
 				   {
 					//	$disabled_monto = ' readonly onclick="alert(\''.__('Modifique los Pagos individuales').'\')" ';
 				   $disabled_monto ='class="actualizador"';
                                     
                                    }
 				?>
-				<input name="monto" <?=$disabled_monto?> id="monto" size=10 value="<? echo str_replace("-","",$documento->fields['monto']);  ?>" />
-				<input name="monto_aux"  class="oculto" style="display:none;"   type="text" id="monto_aux" size=10 value="<? echo abs($documento->fields['monto']);  ?>" />
+				<input name="monto" <?php echo $disabled_monto?> id="monto" size=10 value="<?php  echo str_replace("-","",$documento->fields['monto']);  ?>" />
+				<input name="monto_aux"  class="oculto" style="display:none;"   type="text" id="monto_aux" size=10 value="<?php  echo abs($documento->fields['monto']);  ?>" />
 
                                 <span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<?=__('Moneda')?>&nbsp;
-				<?
+				<?php echo __('Moneda')?>&nbsp;
+				<?php 
 					if($documento->fields['id_documento'])
 						$moneda_usada = $documento->fields['id_moneda'];
 					else if($id_cobro)
@@ -1014,8 +1017,8 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 					else
 						$moneda_usada = '';
 					?>
-				<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $moneda_usada, '','',"80"); ?>
-				<input type="hidden" name="id_moneda_aux" id="moneda_aux" value='<?=$moneda_usada?>'/>
+				<?php echo  Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $moneda_usada, '','',"80"); ?>
+				<input type="hidden" name="id_moneda_aux" id="moneda_aux" value='<?php echo $moneda_usada?>'/>
 
                                 <span style="color:#FF0000; font-size:10px">*</span>
                                 
@@ -1024,53 +1027,53 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 		<?php if($id_documento && $documento->fields['es_adelanto']=='1'){ ?>
 		<tr>
 			<td align=right>
-				<?=__('Saldo Adelanto')?>
+				<?php echo __('Saldo Adelanto')?>
 			</td>
 			<td align=left>
-				<input type="text" name="saldo_pago" id="saldo_pago" size=10 value="<? echo str_replace("-","",$documento->fields['saldo_pago']); ?>" disabled="disabled"/>
-                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<? echo abs($documento->fields['saldo_pago']); ?>" disabled="disabled"/>			
+				<input type="text" name="saldo_pago" id="saldo_pago" size=10 value="<?php  echo str_replace("-","",$documento->fields['saldo_pago']); ?>" disabled="disabled"/>
+                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php  echo abs($documento->fields['saldo_pago']); ?>" disabled="disabled"/>			
                         </td>
 		</tr>
 		<?php } ?>
 		<tr>
 			<td align=right>
-				<?=__('Número Documento:')?>
+				<?php echo __('Número Documento:')?>
 			</td>
 			<td align=left>
-				<input name="numero_doc" id="numero_doc" size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
-						<?=__('Tipo:')?>&nbsp;
+				<input name="numero_doc" id="numero_doc" size=20 value="<?php  echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
+						<?php echo __('Tipo:')?>&nbsp;
 				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;'>
-				<? if($documento->fields['tipo_doc']=='E' || $documento->fields['tipo_doc']=='' || $documento->fields['tipo_doc']=='N' ) { ?>
+				<?php  if($documento->fields['tipo_doc']=='E' || $documento->fields['tipo_doc']=='' || $documento->fields['tipo_doc']=='N' ) { ?>
 					<option value='E' selected>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='C') { ?>
+				<?php  } if($documento->fields['tipo_doc']=='C') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C' selected>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='T') { ?>
+				<?php  } if($documento->fields['tipo_doc']=='T') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T' selected>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='O') { ?>
+				<?php  } if($documento->fields['tipo_doc']=='O') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O' selected>Otro</option>
-				<? } ?>
+				<?php  } ?>
 					</select>
 			</td>
 		</tr>
 
 	<tr>
 		<td align=right>
-			<?=__('Descripción')?>
+			<?php echo __('Descripción')?>
 		</td>
 		<td align=left>
-			<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?
+			<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?php 
 				if($documento->fields['glosa_documento'])
 					echo $documento->fields['glosa_documento'];
 				else if($id_cobro)
@@ -1086,10 +1089,10 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 	?>
 	<tr>
 		<td align=right>
-			<?=__('Banco')?>
+			<?php echo __('Banco')?>
 		</td>
 		<td align=left>
-			<?=InputId::Imprimir($sesion,"prm_banco","id_banco","nombre", "id_banco", $id_banco,"","CargarSelect('id_banco','id_cuenta','cargar_cuenta_banco');", 125, $id_cuenta);?>
+			<?php echo InputId::Imprimir($sesion,"prm_banco","id_banco","nombre", "id_banco", $id_banco,"","CargarSelect('id_banco','id_cuenta','cargar_cuenta_banco');", 125, $id_cuenta);?>
 		</td>
 	</tr>
 	<?php
@@ -1101,28 +1104,28 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 	?>
 	<tr>
 		<td align=right>
-			<?=__('N° Cuenta')?>
+			<?php echo __('N° Cuenta')?>
 		</td>
 		<td align=left>
-			<?=InputId::Imprimir($sesion,"cuenta_banco","id_cuenta","numero", "id_cuenta", $id_cuenta,"","", 125, "", "", "", !empty($id_banco) ? $id_banco : "no_existe" );?>
+			<?php echo InputId::Imprimir($sesion,"cuenta_banco","id_cuenta","numero", "id_cuenta", $id_cuenta,"","", 125, "", "", "", !empty($id_banco) ? $id_banco : "no_existe" );?>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('N° Operación')?>
+			<?php echo __('N° Operación')?>
 		</td>
 		<td align=left>
-			<input name=numero_operacion id=numero_operacion size=15 value="<? echo $documento->fields['numero_operacion'];  ?>" />
+			<input name=numero_operacion id=numero_operacion size=15 value="<?php  echo $documento->fields['numero_operacion'];  ?>" />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<?=__('N° Cheque')?>&nbsp;
-				<input name=numero_cheque id=numero_cheque size=15 value="<? echo $documento->fields['numero_cheque'];  ?>" />
+				<?php echo __('N° Cheque')?>&nbsp;
+				<input name=numero_cheque id=numero_cheque size=15 value="<?php  echo $documento->fields['numero_cheque'];  ?>" />
 		</td>
 	</tr>
 	
 	<?php if (empty($adelanto)) { ?>
 	<tr>
 		<td colspan="2" align='center' id='overlaytipocambio'> 
-			<img src="<?=Conf::ImgDir()?>/money_16.gif" border=0> <a  href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?=__('Tipo de Cambio del Documento de Pago al ser pagado.')?>"><?=__('Actualizar Tipo de Cambio')?></a>
+			<img src="<?php echo Conf::ImgDir()?>/money_16.gif" border=0> <a  href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo __('Tipo de Cambio del Documento de Pago al ser pagado.')?>"><?php echo __('Actualizar Tipo de Cambio')?></a>
 		</td>
 	</tr>
 	<tr>
@@ -1134,13 +1137,13 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 		<td align=right colspan="2">
 			<div id="TipoCambioDocumentoPago" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
 				<fieldset style="background-color:white;">
-				<legend><?=__('Tipo de Cambio Documento de Pago')?></legend>
+				<legend><?php echo __('Tipo de Cambio Documento de Pago')?></legend>
 				<div id="contenedor_tipo_load">&nbsp;</div>
 				<div id="contenedor_tipo_cambio">
-				<div style="padding-top:5px; padding-bottom:5px;">&nbsp;<img src="<?=Conf::ImgDir()?>/alerta_16.gif" title="Alerta" />&nbsp;&nbsp;<?=__('Este tipo de cambio sólo afecta al Documento de Pago en los Reportes. No modifica la Carta de') .  " " . __('Cobro') . "."?></div>
+				<div style="padding-top:5px; padding-bottom:5px;">&nbsp;<img src="<?php echo Conf::ImgDir()?>/alerta_16.gif" title="Alerta" />&nbsp;&nbsp;<?php echo __('Este tipo de cambio sólo afecta al Documento de Pago en los Reportes. No modifica la Carta de') .  " " . __('Cobro') . "."?></div>
 				<table style='border-collapse:collapse;' cellpadding='3'>
 					<tr>
-						<?
+						<?php 
 						if( $documento->fields['id_documento'] )
 							{
 								$query = "SELECT count(*) FROM documento_moneda WHERE id_documento = '".$documento->fields['id_documento']."'";
@@ -1172,21 +1175,21 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 						{
 						?>
 							<td>
-									<span><b><?=$glosa_moneda?></b></span><br>
-									<input type='text' size=9 id='documento_moneda_<?=$id_moneda?>' name='documento_moneda_<?=$id_moneda?>' value='<?=$tipo_cambio?>' />
+									<span><b><?php echo $glosa_moneda?></b></span><br>
+									<input type='text' size=9 id='documento_moneda_<?php echo $id_moneda?>' name='documento_moneda_<?php echo $id_moneda?>' value='<?php echo $tipo_cambio?>' />
 							</td>
-						<?
+						<?php 
 							$num_monedas++;
 							$ids_monedas[] = $id_moneda;
 							$tipo_cambios[] = $tipo_cambio;
 						}
 						?>
 					<tr>
-						<td colspan=<?=$num_monedas?> align=center>
-							<input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?=__('Guardar')?>" />
-							<input type=button onclick="CancelarDocumentoMonedaPago()" value="<?=__('Cancelar')?>" />
-							<input type=hidden id="tipo_cambios_documento" name="tipo_cambios_documento" value="<?=implode(',',$tipo_cambios)?>" />
-							<input type=hidden id="ids_monedas_documento" name="ids_monedas_documento" value="<?=implode(',',$ids_monedas)?>" />
+						<td colspan=<?php echo $num_monedas?> align=center>
+							<input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?php echo __('Guardar')?>" />
+							<input type=button onclick="CancelarDocumentoMonedaPago()" value="<?php echo __('Cancelar')?>" />
+							<input type=hidden id="tipo_cambios_documento" name="tipo_cambios_documento" value="<?php echo implode(',',$tipo_cambios)?>" />
+							<input type=hidden id="ids_monedas_documento" name="ids_monedas_documento" value="<?php echo implode(',',$ids_monedas)?>" />
 						</td>
 					</tr>
 			</table>
@@ -1221,7 +1224,7 @@ if(!$adelanto && $hay_adelantos && !$ocultar_boton_adelantos){
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left>
-			<input type=submit class=btn value="<?=__('Guardar')?>" onclick='return Validar(this.form);' /> <input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
+			<input type=submit class=btn value="<?php echo __('Guardar')?>" onclick='return Validar(this.form);' /> <input type=button class=btn value="<?php echo __('Cerrar')?>" onclick="Cerrar();" />
 		</td>
 	</tr>
 </table>
@@ -1258,7 +1261,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php 
 	if(UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )
 	{
 		echo Autocompletador::Javascript($sesion,false,'CargarContratos(); CargarTabla(1);');

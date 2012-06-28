@@ -279,7 +279,6 @@
 	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
 		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
 		          WHERE $where ";
-                
                 // echo $query;
 	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
@@ -289,7 +288,7 @@
 		  $select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	  }
 		#BUSCAR
-		$query = "SELECT  SQL_CALC_FOUND_ROWS 
+		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
                                         trabajo.id_trabajo,
 												trabajo.id_cobro,
 												trabajo.revisado, 
@@ -342,17 +341,7 @@
 		              LEFT JOIN tramite ON trabajo.id_tramite=tramite.id_tramite
 		              LEFT JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 		              WHERE $where ";
-		
-                        if($excel && $simplificado) {
-                            $query=str_replace('SELECT  SQL_CALC_FOUND_ROWS','SELECT  SQL_BIG_RESULT SQL_NO_CACHE  ',$query);
-							 $query=str_replace('WHERE 1',' join tarifa  on tarifa.tarifa_defecto=1 left join usuario_tarifa ut on  ut.id_moneda=contrato.id_moneda and ut.id_usuario=trabajo.id_usuario and ut.id_tarifa=ifnull(contrato.id_tarifa, tarifa.id_tarifa) WHERE 1  ',$query);
-							$query=str_replace('FROM trabajo',' ,ut.tarifa as tarifa2 FROM trabajo  ',$query);							
-							 
-							 
-                            require('ajax/cobros3.simplificado.xls.php');
-                         exit();   
-                        }            
-                if($check_trabajo == 1 && isset($cobro) && !$excel)	//Check_trabajo vale 1 cuando aprietan boton buscar
+		if($check_trabajo == 1 && isset($cobro) && !$excel)	//Check_trabajo vale 1 cuando aprietan boton buscar
 		{
 			$query2 = "UPDATE trabajo SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
 			$resp = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
@@ -441,11 +430,7 @@
 		if($p_cobranza->fields['permitido'] && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CobranzaExcel') ) || ( method_exists('Conf','CobranzaExcel') && Conf::CobranzaExcel() ) ) )
 			require_once('cobros_generales.xls.php');
 		else
-			if($simplificado==1) {
-                            require_once('ajax/cobros3.simplificado.xls.php');
-                        } else {
-                            require_once('cobros3.xls.php');
-                        }
+			require_once('cobros3_html.xls.php');
 		exit;
 	}
 
@@ -521,7 +506,7 @@ function Refrescar()
 	var cobrado = $('cobrado').value;
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
-	var url = "trabajos.php?from=horas&id_usuario="+usuario+"&cobrable="+cobrable+"&motivo=horas&revisado="+revisado+"&cobrado="+cobrado+"&"+asunto+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&popup=1&opc=buscar"+pagina_desde+orden+"&"+cliente;
+	var url = "trabajos2.php?from=horas&id_usuario="+usuario+"&cobrable="+cobrable+"&motivo=horas&revisado="+revisado+"&cobrado="+cobrado+"&"+asunto+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&popup=1&opc=buscar"+pagina_desde+orden+"&"+cliente;
 <?php 
 	}
 	elseif ($motivo == "cobros")
@@ -529,7 +514,7 @@ function Refrescar()
 ?>
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
-	var url = "trabajos.php?id_cobro=<?php echo $id_cobro?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
+	var url = "trabajos2.php?id_cobro=<?php echo $id_cobro?>&motivo=cobros&popup=1&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+pagina_desde+orden;
 
 <?php 	}?>
 
@@ -657,10 +642,10 @@ function getIdTrabajosSeleccionados()
 function editarMultiplesArchivos()
 {
 	// Los id de los trabajos seleccionados están en un solo string separados por el caracter 't'.
-	// La página editar_multiples_trabajos.php se encarga de parsear este string.
+	// La página editar_multiples_trabajos2.php se encarga de parsear este string.
 	var ids = getIdTrabajosSeleccionados();
 	if(ids != '')
-		nuovaFinestra('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos.php?ids='+ids+'&popup=1','');
+		nuovaFinestra('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos2.php?ids='+ids+'&popup=1','');
 	else
 		alert('Debe seleccionar por lo menos un trabajo para editar.');
 }
@@ -668,14 +653,11 @@ function editarMultiplesArchivos()
 function EditarTodosLosArchivos()
 {
 	var where = $('where_query_listado_completo').value;
-	nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&listado='+where, '');
+	nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos2.php?popup=1&listado='+where, '');
 }
-
-
 </script>
 <?php  echo(Autocompletador::CSS()); ?>
 <form method='get' name="form_trabajos" id="form_trabajos">
-    
 <input type='hidden' name='opc' id='opc' value='buscar'>
 <input type='hidden' name='buscar' id='id_cobro' value='1'>
 <input type='hidden' name='popup' id='popup' value='<?php echo $popup?>'>
@@ -869,13 +851,10 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where))?>'>
 		<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
 		<br />
-		
-                
-                <input type="button" class="btn" id="descargapro" value="<?php echo __('Descargar listado a Excel') ; ?>" />
-               
+		<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="window.open('trabajos2.php?id_cobro=<?php echo $id_cobro?>&excel=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">
 		<br />
 	</center>
-		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word')?>" onclick="window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&word=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">-->
+		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word')?>" onclick="window.open('trabajos2.php?id_cobro=<?php echo $id_cobro?>&word=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">-->
 <?php 
 
 	}
@@ -933,7 +912,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo2.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 			else
 				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\">".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 
@@ -945,7 +924,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			else
 			{
 				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo2.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 				else
 					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" >".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 			}
@@ -972,7 +951,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+				$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo2.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 			else
 				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\">".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 
@@ -984,7 +963,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			else
 			{
 				if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
-					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
+					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo2.php?id_cobro=".$id_cobro."&id_trabajo=".$trabajo->fields[id_trabajo]."&popup=1','');\" title=".__('Editar').">".(($texto=='')? "<img src=$img_dir/editar_on.gif border=0>": $texto)."</a>";
 				else
 					$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('".__('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.')."');\" title=\"".__('Cobro ya Emitido al Cliente')."\" >".(($texto=='')? "<img src=$img_dir/editar_off.gif border=0>": $texto)."</a>";
 			}
@@ -1157,52 +1136,6 @@ jQuery(document).ready(function() {
         jQuery('#cobrable').buttonset();
         jQuery('#revisado').buttonset();
     });*/
-      jQuery('#descargapro').click(function() {
-           jQuery('#descargapro').attr('disabled','disabled');
-          var Where='<?php echo base64_encode($where)?>';
-          var Idcobro='<?php echo $id_cobro; ?>';
-          var Motivo='<?php echo $motivo; ?>';
-           jQuery.post('ajax/estimar_datos.php',{where:Where,id_cobro:Idcobro,motivo:Motivo},function(data) {
-              if(parseInt(data)>15000) {
-				var formated=data/1000;
-				var dialogoconfirma=top.window.jQuery( "#dialog-confirm" );
-				dialogoconfirma.attr('title','Advertencia').append('<p style="text-align:center;padding:10px;">Su consulta retorna '+formated.toFixed(3)+' datos, por lo que el sistema s&oacute;lo puede exportar a un excel simplificadoy con funcionalidades limitadas.<br /><br /> Le advertimos que la descarga puede demorar varios minutos y pesar varios MB</p>');
-				jQuery( "#dialog:ui-dialog" ).dialog( "destroy" );
-				
-				dialogoconfirma.dialog({
-						resizable: false,						autoOpen:true,						height:200,						width:450,
-						modal: true,
-						close:function(ev,ui) {
-							dialogoconfirma.html('');
-						},
-						buttons: {
-										"<?php echo __('Entiendo y acepto')?>": function() {
-											 jQuery('#descargapro').removeAttr('disabled');
-											 window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&excel=1&simplificado=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>');
-												dialogoconfirma.dialog( "close" );
-												
-												return true;
-												},
-
-										"<?php echo __('Cancelar')?>": function() {
-											jQuery('#descargapro').removeAttr('disabled');
-											dialogoconfirma.dialog( "close" );
-												
-															return false;
-															
-										}
-									}
-						});
-						} else {
-                jQuery('#descargapro').removeAttr('disabled');  
-                window.open('trabajos.php?id_cobro=<?php echo $id_cobro?>&excel=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>');
-                return true;
-                }
-           });
-           
-     jQuery('#descargapro').removeAttr('disabled');  
-    });    
-        
 });
 Calendar.setup(
 	{

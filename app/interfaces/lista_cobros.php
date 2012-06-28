@@ -254,7 +254,7 @@ document.observe('dom:loaded', function() {
 		print_r($flia->fields);
 		$id_cobro = $fila->fields['id_cobro'];
 		$tmp = $fila->fields['etapa_cobro']*1 +1;
-		return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',820,690,'cobros$tmp.php?id_cobro=$id_cobro&popup=1');\" title='Detalle'><img src='".Conf::ImgDir()."/ver_16.gif' border=0 alt='Ver detalle'/></a>"
+		return "<a href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1024,690,'cobros$tmp.php?id_cobro=$id_cobro&popup=1');\" title='Detalle'><img src='".Conf::ImgDir()."/ver_16.gif' border=0 alt='Ver detalle'/></a>"
      . "&nbsp;&nbsp;&nbsp;<a onclick=\"return confirm('".__('¿Está seguro de eliminar el cobro?')."')\" href=?id_cobro=$id_cobro&opc=eliminar&desde=$desde title='" . __("Eliminar cobro") . "'><img src='".Conf::ImgDir()."/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
   }
 ?>

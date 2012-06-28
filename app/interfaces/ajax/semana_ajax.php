@@ -129,8 +129,8 @@
     
 
 <?php
-echo '<input style="text-indent: -100px;position: absolute;right:0;height: 50%;width: 70px;top: 18px;  border:0 none;" type="text" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" title="'.Utiles::sql3fecha($semana_siguiente,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
-      <input style="text-indent: -100px;position: absolute;height: 50%;width: 70px;top: 18px; border:0 none;" type="text" value="'.$semana_anterior.'" id="hiddensemanaanterior" title="'.Utiles::sql3fecha($semana_anterior,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
+echo '<input type="hidden" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
+      <input type="hidden" value="'.$semana_anterior.'" id="hiddensemanaanterior" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
 
 
 echo("<table style='width:600px'>");

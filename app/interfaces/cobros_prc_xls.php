@@ -623,18 +623,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	}
 
 	$iva = $total * ( $Cobro->fields['porcentaje_impuesto']/100 );
-	$ws->write($filas, $col_id_trabajo, "IGV Honorarios  ".$Cobro->fields['porcentaje_impuesto']."%", $letra_chica_bold);
+	$ws->write($filas, $col_id_trabajo, "IGV  ".$Cobro->fields['porcentaje_impuesto']."%", $letra_chica_bold);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
-	$ws->writeNumber($filas, 4, $x_resultados['monto_iva_hh'][$Cobro->fields['opc_moneda_total']], $formato_total);
+	$ws->writeNumber($filas, 4, $x_resultados['monto_iva'][$Cobro->fields['opc_moneda_total']], $formato_total);
 	$filas += 1;
-	
-	
-	$ivagastos = $total * ( $Cobro->fields['porcentaje_impuesto_gastos']/100 );
-	$ws->write($filas, $col_id_trabajo, "IGV Gastos ".$Cobro->fields['porcentaje_impuesto_gastos']."%", $letra_chica_bold);
-	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
-	$ws->writeNumber($filas, 4, $x_resultados['monto_iva_gastos'][$Cobro->fields['opc_moneda_total']], $formato_total);
-	$filas += 1;
-	
+
 	$ws->write($filas, $col_id_trabajo, "Total", $letra_chica_bold);
 	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
 	$ws->writeNumber($filas, 4, $x_resultados['monto_total_cobro'][$Cobro->fields['opc_moneda_total']], $formato_total);

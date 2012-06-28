@@ -109,7 +109,7 @@ function AgregarAsunto( numero , valor_hidden )
   	{
   		if( input_elemento.value == array_asuntos[i] )
   			{
-  				alert( 'EL asunto indicado ya existe.' );
+  				alert( 'El asunto indicado ya existe.' );
   				input_elemento.focus();
   				return false;
   			}
@@ -145,7 +145,7 @@ function AgregarAsunto( numero , valor_hidden )
 	<div id="tabs-1">    
 <form name="formulario" id="formulario" method="post" action='' autocomplete="off" onsubmit="return validar_doc_legales(true)">
 	<input type=hidden name='opc' value='guardar'>
-<?
+<?php
 	if( $sesion->usuario->fields['rut'] != '99511620' ) 
 		$where_orden = " WHERE orden > -1 ";
 	else 
@@ -231,24 +231,19 @@ function AgregarAsunto( numero , valor_hidden )
 	</table>
 
 </div>
-<?
-//if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') ) {
-?>
-<!-- ASOCIAR DOC LEGALES -->
+ 
 <div class="grupoconf" id="caja20" rel="Documentos Legales" >
 
-		    <p><center>Ingrese los documentos legales que desea generar en el proceso de facturación</center></p>
+		    <p><center>Ingrese los documentos legales que desea generar en el proceso de facturación<br>(solamente aplica al nuevo módulo de facturación)</center></p>
 		    <?php include dirname(__FILE__) . '/agregar_doc_legales.php'; ?>
 	    
 </div>
-<!-- ASOCIAR DOC LEGALES -->
-<? 
-//} 
-?>
+
+ 
 
 	<table>
 	<tr><td>&nbsp;</td>
-	    <td><input type="button" id="enviarconf" value="<?=__('Guardar') ?>" class="btn" /></td>
+	    <td><input type="button" id="enviarconf" value="<?php echo __('Guardar') ?>" class="btn" /></td>
 	</tr>
 	<tr><td colspan="2" id="mensaje">&nbsp;</td>
 	    
@@ -321,6 +316,6 @@ Calendar.setup(
 );
 
 </script>
-<?
+<?php
 	$pagina->PrintBottom($popup);
 ?>

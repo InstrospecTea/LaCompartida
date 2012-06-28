@@ -18,6 +18,7 @@ if ($_GET['popup'] || $_GET['ajax'])
       
 	$pagina->PrintTop($_GET['popup']);
 }
+$filtros=$_POST;
 
 $query = "
 SELECT
@@ -65,6 +66,8 @@ if (isset($filtros['fecha_fin']) and !empty($filtros['fecha_fin']))
 if (isset($filtros['moneda']) and !empty($filtros['moneda']))
 {
 	$query .= " AND documento.id_moneda = " . $filtros['moneda'];
+} else if (isset($filtros['moneda_adelanto']) and !empty($filtros['moneda_adelanto'])) {
+	$query .= " AND documento.id_moneda = " . $filtros['moneda_adelanto'];
 }
 if(isset($filtros['pago_honorarios']) && isset($filtros['pago_gastos'])){
 	$query .= " AND (documento.pago_honorarios = 1 OR documento.pago_gastos = 1)";
@@ -85,6 +88,7 @@ if($elegir_para_pago || isset($filtros['tiene_saldo'])){
 if(isset($filtros['id_contrato'])){
 	$query .= " AND (documento.id_contrato = '".$filtros['id_contrato']."' OR documento.id_contrato IS NULL)";
 }
+ 
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'documento.fecha_creacion DESC' : $orden);
 $buscador->nombre = "buscador_adelantos";
 $buscador->titulo = "Adelantos";

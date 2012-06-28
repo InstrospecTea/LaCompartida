@@ -1,4 +1,4 @@
-<?php
+<?
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -25,7 +25,7 @@ if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 		echo 'Movimientos borrados.<br>';
 		
 		/* Query para borrar los neteos de documentos */
-		$query = "DELETE FROM neteo_documento WHERE id_usuario in (select id_usuario from usuario where id_sitante>0)";
+		$query = "DELETE FROM neteo_documento WHERE 1";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		echo 'Neteos borrado.<br>';
 		
@@ -91,8 +91,8 @@ if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 				/* Modifica encargados en asuntos y contrato que tiene relacion con un visitante para poder borrarlos despues */
 				$query = "UPDATE asunto 
 										JOIN usuario AS u ON u.id_usuario=asunto.id_usuario 
-										left JOIN usuario AS encargado ON encargado.id_usuario=asunto.id_encargado 
-										left JOIN usuario AS cobrador ON cobrador.id_usuario=asunto.id_cobrador 
+										JOIN usuario AS encargado ON encargado.id_usuario=asunto.id_encargado 
+										JOIN usuario AS cobrador ON cobrador.id_usuario=asunto.id_cobrador 
 										 SET asunto.id_usuario = ".$id_usuario.", 
 										 		 asunto.id_encargado = ".$id_usuario.", 
 										 		 asunto.id_cobrador = ".$id_usuario." 

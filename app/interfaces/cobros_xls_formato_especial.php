@@ -231,7 +231,7 @@
 	// Agregar la imagen del logo
 	if(UtilesApp::GetConf($sesion, 'LogoExcel'))
 	{
-		$ws->setRow($filas, UtilesApp::AlturaLogoExcel($sesion));
+		$ws->setRow($filas, UtilesApp::AlturaLogoExcel());
 		$ws->insertBitmap($filas, $col_asunto, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1);
 	}
 	$filas += 3;

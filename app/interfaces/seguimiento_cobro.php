@@ -228,7 +228,7 @@
 		$x_pag = 20;
 		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
 		
-             //   echo $query;
+               
                 
                 $b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 		$b->mensaje_error_fecha = "N/A";

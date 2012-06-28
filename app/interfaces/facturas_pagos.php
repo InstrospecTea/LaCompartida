@@ -361,7 +361,7 @@ function Opciones(& $fila) {
 }
 
 function Cobro(& $fila) {
-	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',1024,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a>";
+	return "<a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',950,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a>";
 }
 
 function GlosaCliente(& $fila) {
@@ -403,7 +403,7 @@ function funcionTR(& $fila) {
 		$html .= "<td align=center>" . $fila->fields['estado'] . "</td>";
 	else
 		$html .= "<td align=center>" . $fila->fields['anulado'] . "</td>";
-	$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',1024,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a></td>";
+	$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',750,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a></td>";
 
 	$html .= "<td align=right >" . RetencionImpuestoPago(& $fila, $Sesion) . "</td>";
 	$html .= "<td align=right >" . ConceptoPago(& $fila, $Sesion) . "</td>";

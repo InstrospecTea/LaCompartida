@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -18,6 +18,9 @@
 	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
 	
+	/*echo '<pre>';
+	print_r($_REQUEST);
+	echo '</pre>';*/
 	$tramite = new Tramite($sesion);
 	if ($id_tramite > 0) {
 		$tramite->Load($id_tramite);
@@ -290,7 +293,7 @@
 				$t->Eliminar();
 			}
 	
-	if( !$como_trabajo ) { 		
+	if( !$como_trabajo && $es_tramite_nuevo) { 		
 		$guardados = 0;
 		for($i = 1; $i <= $multiplicador; $i++) {
 			$tramite->fields['id_tramite'] = null;
@@ -397,7 +400,7 @@
 					window.close();
 				}
 			</script>
-<?
+<?php 
 		}
 	} 
 	else if($opcion == "eliminar")  #ELIMINAR TRABAJO
@@ -418,7 +421,7 @@
 					window.opener.Refrescar( 'edit' );
 				}
 		</script>
-<?
+<?php 
 		$tramite = new Tramite($sesion);
 		if($como_trabajo==1) {
  		$t = new Trabajo($sesion);
@@ -639,7 +642,7 @@ function Validar(form)
 ?>
 	if(!form.codigo_asunto_secundario.value)
 	{
-		alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
+		alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
 		form.codigo_asunto_secundario.focus();
 		return false;
 	}
@@ -650,7 +653,7 @@ function Validar(form)
 ?>
 	if(!form.codigo_asunto.value)
 	{
-		alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
+		alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
 		form.codigo_asunto.focus();
 		return false;
 	}
@@ -660,14 +663,14 @@ function Validar(form)
 	
 	if(!form.fecha.value)
 	{
-		alert("<?=__('Debe ingresar una fecha.')?>");
+		alert("<?php echo __('Debe ingresar una fecha.')?>");
 		form.fecha.focus();
 		return false;
 	}
 	
 	if(!form.lista_tramite.value)
 	{
-		alert("<?=__('Debe seleccionar un Tipo Trámite')?>");
+		alert("<?php echo __('Debe seleccionar un Tipo Trámite')?>");
 		form.lista_tramite.focus();
 		return false;
 	}
@@ -682,14 +685,14 @@ function Validar(form)
 		var dur=form.duracion.value.replace(",",".");
 		if(isNaN(dur))
 		{
-			alert("<?=__('Solo se aceptan valores numéricos')?>");
+			alert("<?php echo __('Solo se aceptan valores numéricos')?>");
 			form.duracion.focus();
 			return false;
 		}
 		var decimales=dur.split(".");
 		if(decimales[1].length > 1)
 		{
-			alert("<?=__('Solo se permite ingresar un decimal')?>");
+			alert("<?php echo __('Solo se permite ingresar un decimal')?>");
 			form.duracion.focus();
 			return false;
 		}
@@ -747,7 +750,7 @@ function Validar(form)
 ?> 
 	if(form.solicitante.value=='')
 	{
-		alert("<?=__('Debe ingresar la persona que solicitó el tramite')?>");
+		alert("<?php echo __('Debe ingresar la persona que solicitó el tramite')?>");
 		form.solicitante.focus();
 		return false;
 	}
@@ -788,10 +791,10 @@ function Validar(form)
 	temp = $('fecha').value.split("-");
 	fecha = new Date(temp[2]+'//'+temp[1]+'//'+temp[0]);
 	hoy = new Date();
-	fecha_tope = new Date(hoy.getTime()-(<?=($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
+	fecha_tope = new Date(hoy.getTime()-(<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
 	if (fecha_tope > fecha)
 	{
-		alert("No se pueden ingresar trámites anteriores a <?=date('d-m-Y',mktime(0,0,0,date('m'),date('d')-$dias,date('Y')))?>");
+		alert("No se pueden ingresar trámites anteriores a <?php echo date('d-m-Y',mktime(0,0,0,date('m'),date('d')-$dias,date('Y')))?>");
 		$('fecha').focus;
 		return false;
 	}
@@ -846,12 +849,12 @@ function DivClear(div, dvimg)
 	if( div == 'tr_cliente' )
 	{
 		var img = document.getElementById( 'img_asunto' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
 	}
 	else
 	{
 		var img = document.getElementById( 'img_historial' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
 	}
 }
 
@@ -871,7 +874,7 @@ function ShowDiv(div, valor, dvimg)
 	if( div == 'tr_asunto' && codigo == '')
 	{
 		tr.style['display'] = 'none';
-		alert("<?=__('Debe seleccionar un cliente')?>");
+		alert("<?php echo __('Debe seleccionar un cliente')?>");
 		form.codigo_cliente.focus();
 		return false;
 	}
@@ -903,12 +906,12 @@ function ShowDiv(div, valor, dvimg)
 	{
 		WCH.Apply('tr_asunto');
 		WCH.Apply('tr_cliente');
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
 	}
 	else
 	{
 		WCH.Discard(div);
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
 	}
 }
 
@@ -928,7 +931,7 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_cliente.value = codigo;
 		SetSelectInputId('campo_codigo_cliente','codigo_cliente');
-<?
+<?php 
 		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 		{
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
@@ -943,10 +946,10 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_asunto.value = codigo;
 		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+<?php  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 	 { ?>
 		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
-<? }?>
+<?php  }?>
 	}
 
 	var http = getXMLHTTP();
@@ -989,7 +992,7 @@ function CargaIdioma( codigo )
 			{
 				var response = http.responseText;
 				var idio = response.split("|");
-<?
+<?php 
 		if (method_exists('Conf','GetConf'))
 		{
 			$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
@@ -1007,7 +1010,7 @@ function CargaIdioma( codigo )
 		{
 ?>
 				txt_span.innerHTML = idio[1];
-<?
+<?php 
 		}
 		else
 		{
@@ -1018,7 +1021,7 @@ function CargaIdioma( codigo )
 					googie2.setCurrentLanguage('es');
 				if(idio[1]=='Inglés')
 					googie2.setCurrentLanguage('en');
-<?
+<?php 
 		}
 ?>
 			}
@@ -1038,14 +1041,14 @@ function ActualizaCobro(valor)
 
 	if(codigo_asunto_hide != valor && id_cobro && id_trabajo)
 	{
-		var text_window = "<img src='<?=Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?=__("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?=__('Ud. está modificando un trabajo que pertenece') . " " . __('al cobro')?>:'+id_cobro+' ';
-		text_window += '<?=__('. Si acepta, el trabajo se desvinculará de') . " " . __('este cobro') . " " . __('y eventualmente se vinculará a') . " " . __('un cobro') . " " . __('pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
+		var text_window = "<img src='<?php echo Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA")?></u><br><br>";
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece') . " " . __('al cobro')?>:'+id_cobro+' ';
+		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de') . " " . __('este cobro') . " " . __('y eventualmente se vinculará a') . " " . __('un cobro') . " " . __('pendiente para el nuevo asunto en caso de que exista')?>.</span><br>';
 		text_window += '<br><table><tr>';
 		text_window += '</table>';
 		Dialog.confirm(text_window,
 		{
-			top:100, left:80, width:400, okLabel: "<?=__('Aceptar')?>", cancelLabel: "<?=__('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+			top:100, left:80, width:400, okLabel: "<?php echo __('Aceptar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
 			id: "myDialogId",
 			cancel:function(win){ return false; },
 			ok:function(win){ if(ActualizarCobroAsunto(valor)) form.submit(); return true; }
@@ -1079,13 +1082,13 @@ function ActualizarCobroAsunto(valor)
 
 function AgregarNuevo(tipo)
 {
-<? if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )){?>
+<?php  if(( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )){?>
 	var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 	var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-<? } else { ?>
+<?php  } else { ?>
 	var codigo_cliente = $('codigo_cliente').value;
 	var codigo_asunto = $('codigo_asunto').value;
-<? } ?>
+<?php  } ?>
 	if(tipo == 'tramite')
 	{
 		var urlo = "ingreso_tramite.php?popup=1";
@@ -1100,7 +1103,7 @@ A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<? echo(Autocompletador::CSS()); ?>
+<?php  echo(Autocompletador::CSS()); ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -1121,42 +1124,42 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	</tr>
 </table>
 	
-<form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?=$_SERVER[PHP_SELF]?>">
+<form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?php echo $_SERVER[PHP_SELF]?>">
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type=hidden name=max_hora id=max_hora value=14 />
-<input type=hidden name='codigo_asunto_hide' id=codigo_asunto_hide value="<?=$tramite->fields['codigo_asunto']?>" />
-<input type=hidden name='monto_modificar' id='monto_modificar' value="<?=$monto_modificar ?>" />
-<?
+<input type=hidden name='codigo_asunto_hide' id=codigo_asunto_hide value="<?php echo $tramite->fields['codigo_asunto']?>" />
+<input type=hidden name='monto_modificar' id='monto_modificar' value="<?php echo $monto_modificar ?>" />
+<?php 
 	if( $opcion != 'nuevo' )
 	{
 ?>
-<input type=hidden name='id_tramite' value="<?= $tramite->fields['id_tramite'] ?>" id='id_tramite' />
-<input type=hidden name='id_trabajo' value="<?= $t->fields['id_trabajo'] ?>" id='id_trabajo' />
-<input type=hidden name='edit' value="<?= $opcion == 'edit' || $edit==1 ? 1 : '' ?>" id='edit' />
-<input type=hidden name='fecha_tramite_hide' value="<?= $tramite->fields['fecha'] ?>" id='fecha_trabajo_hide' />
-<?
+<input type=hidden name='id_tramite' value="<?php echo  $tramite->fields['id_tramite'] ?>" id='id_tramite' />
+<input type=hidden name='id_trabajo' value="<?php echo  $t->fields['id_trabajo'] ?>" id='id_trabajo' />
+<input type=hidden name='edit' value="<?php echo  $opcion == 'edit' || $edit==1 ? 1 : '' ?>" id='edit' />
+<input type=hidden name='fecha_tramite_hide' value="<?php echo  $tramite->fields['fecha'] ?>" id='fecha_trabajo_hide' />
+<?php 
 	}
 	if($id_trabajo == NULL) // si no tenemos id de trabajo es porque se estÃ¡ agregando uno nuevo.
 	{
 ?>
 <input type=hidden name='nuevo' value="1" id='nuevo' />
-<?
+<?php 
 	}
 ?>
-<input type=hidden name=id_cobro id=id_cobro value="<?=$tramite->fields['id_cobro'] !='NULL' ? $tramite->fields['id_cobro'] : '' ?>" />
-<input type=hidden name=popup value='<?=$popup?>' id="popup">
+<input type=hidden name=id_cobro id=id_cobro value="<?php echo $tramite->fields['id_cobro'] !='NULL' ? $tramite->fields['id_cobro'] : '' ?>" />
+<input type=hidden name=popup value='<?php echo $popup?>' id="popup">
 
-	<? if($id_tramite > 0) { ?>
-<table style='border:0px solid black' <?=$txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
+	<?php  if($id_tramite > 0) { ?>
+<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
 	<tr>
 		<td width='40%' align=right>
-			<img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Ingresar Tramite"><u>Ingresar nuevo Trámite</u></a>
+			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Ingresar Tramite"><u>Ingresar nuevo Trámite</u></a>
 		</td>
 	</tr>
 </table>
-	<? } ?>
+	<?php  } ?>
 
 
 <!-- TABLA HISTORIAL -->
@@ -1167,7 +1170,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <tr>
     	<td class="td_transparente">&nbsp;</td>
         <td class="td_transparente" colspan="5" align="right">
-        	<img style="filter:alpha(opacity=100);" src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
+        	<img style="filter:alpha(opacity=100);" src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
         </td>
         <td class="td_transparente">&nbsp;</td>
     </tr>
@@ -1175,7 +1178,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         <td width="5%" class="td_transparente">&nbsp;</td>
         <td width="30%" id="leftcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Cliente') ?>
+                <?php echo __('Cliente') ?>
             </div>
             <div id="left_data" class="span_data"></div>
         </td>
@@ -1183,7 +1186,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="30%" id="content" class="box_historial">
             <div id="titulos">
-                <?=__('Asunto') ?>
+                <?php echo __('Asunto') ?>
             </div>
             <div id="content_data" class="span_data"></div>
         </td>
@@ -1191,7 +1194,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="30%" id="rightcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Trámite') ?>
+                <?php echo __('Trámite') ?>
             </div>
             <div id="right_data" class="span_data"></div>
         </td>
@@ -1209,7 +1212,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <tr>
         <td class="td_transparente">&nbsp;</td>
         <td align="right" colspan="4" class="td_transparente">
-            <img src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
+            <img src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
         </td>
         <td class="td_transparente">&nbsp;</td>
     </tr>
@@ -1217,7 +1220,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         <td width="5%" class="td_transparente">&nbsp;</td>
         <td width="45%" id="content" class="box_historial">
             <div id="titulos">
-                <?=__('Asunto') ?>
+                <?php echo __('Asunto') ?>
             </div>
             <div id="content_data2" class="span_data"></div>
         </td>
@@ -1225,7 +1228,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         </td>
         <td width="45%" id="rightcolumn" class="box_historial">
             <div id="titulos">
-                <?=__('Trámite') ?>
+                <?php echo __('Trámite') ?>
             </div>
             <div id="right_data2" class="span_data"></div>
         </td>
@@ -1238,9 +1241,9 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     </tr>
 </table>
 
-<table style='border:0px solid black' <?=$txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
+<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width='90%'>
 	<tr>
-		<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?=$txt_opcion?></span>
+		<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?php echo $txt_opcion?></span>
 		</td>
 	</tr>
 </table>
@@ -1250,10 +1253,10 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <table class="border_plomo" id="tbl_trabajo" width=90%>
     <tr>
         <td align=right>
-			<?=__('Cliente')?>
+			<?php echo __('Cliente')?>
         </td>
         <td align=left width="440" nowrap>
-<?
+<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -1277,10 +1280,10 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
      </tr>
      <tr>
         <td align='right'>
-             <?=__('Asunto')?>
+             <?php echo __('Asunto')?>
         </td>
         <td align=left width="440" nowrap>
-<?
+<?php 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarMonedaContrato();CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
@@ -1293,27 +1296,26 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 ?>
        </td>
     </tr>
-<?
+<?php 
     $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
     ?>
     <tr nowrap>
     	<td align=right nowrap>Tipo Trámite </td><td width="440" align=left id='seleccion_tramite_text_2'>
-    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
+    		<?php echo Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
 			</td>
 		</tr>
-  	<?
+  	<?php 
     if($fecha == '')
     	$fecha = date('d-m-Y');
     ?>
     <tr>
         <td align=right>
-            <?=__('Fecha')?>
+            <?php echo __('Fecha')?>
         </td>
         <td align=left valign="top">
-            <!--<?= Html::PrintCalendar("fecha", $tramite->fields[fecha] ? $tramite->fields[fecha] : $fecha); ?>-->
-            <input type="text" name="fecha" value="<?=$tramite->fields['fecha'] ? Utiles::sql2date($tramite->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
-		        <img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
-<?
+            <!--<?php echo  Html::PrintCalendar("fecha", $tramite->fields[fecha] ? $tramite->fields[fecha] : $fecha); ?>-->
+            <input type="text" class="fechadiff" name="fecha" value="<?php echo $tramite->fields['fecha'] ? Utiles::sql2date($tramite->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
+ <?php 
 						if (method_exists('Conf','GetConf'))
 						{
 							$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -1331,17 +1333,17 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 						{
 ?>
 						&nbsp;
-						<?=__('Ordenado por')?>
+						<?php echo __('Ordenado por')?>
 						&nbsp;
-						<input type="text" name="solicitante" value="<?=$t->fields['solicitante'] ? $t->fields['solicitante'] : $solicitante?>" id="solicitante" size="32" />
-<?
+						<input type="text" name="solicitante" value="<?php echo $t->fields['solicitante'] ? $t->fields['solicitante'] : $solicitante?>" id="solicitante" size="32" />
+<?php 
 						} //   
 ?>
         </td>
     </tr>
     <tr>
     	<td></td>
-    	<td> <?
+    	<td> <?php 
 		//echo 'el field es '.$tramite->fields['trabajo_si_no'].' y como_trabajo es '.$como_trabajo;
     		if( !isset($tramite->fields['id_tramite'] ) ) {
 					$query = "SELECT trabajo_si_no_defecto FROM tramite_tipo ORDER BY glosa_tramite LIMIT 1";
@@ -1350,15 +1352,15 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 					}
 		 ?>
 		
-    		<input type=checkbox name=como_trabajo id="como_trabajo" value="1" onClick="ShowTime(); ToggleCantidad(this.checked);" <?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? 'checked' : '' ?> >Ingresar como trabajo
+    		<input type=checkbox name=como_trabajo id="como_trabajo" value="1" onClick="ShowTime(); ToggleCantidad(this.checked);" <?php echo $tramite->fields['trabajo_si_no'] || $como_trabajo ? 'checked' : '' ?> >Ingresar como trabajo
     	</td>
     </tr>
-			<tr id="time_tr" style='display:<?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? '' :'none' ?>;'>
+			<tr id="time_tr" style='display:<?php echo $tramite->fields['trabajo_si_no'] || $como_trabajo ? '' :'none' ?>;'>
         <td align=right>
-            <?=__('Duración')?>
+            <?php echo __('Duración')?>
         </td>
         <td align=left>
-    <?
+    <?php 
     if($tramite->fields['id_tramite_tipo'])
     	{
     		$query = "SELECT duracion_defecto FROM tramite_tipo WHERE id_tramite_tipo=".$tramite->fields['id_tramite_tipo'];
@@ -1370,12 +1372,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     		$query = "SELECT duracion_defecto FROM tramite_tipo ORDER BY glosa_tramite LIMIT 1";
     		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
     		list($duracion)=mysql_fetch_array($resp);
-    	} // id="tb_time" style='display:<?=$tramite->fields['trabajo_si_no'] || $como_trabajo ? '' : 'none' ? >' 
+    	} // id="tb_time" style='display:<?php echo $tramite->fields['trabajo_si_no'] || $como_trabajo ? '' : 'none' ? >' 
     ?>
 			<table>
 			  <tr>
 				<td>
-<?
+<?php 
 	//Revisa el Conf si esta permitido y la función existe
 	if( method_exists('Conf','GetConf') )
 	{
@@ -1387,8 +1389,8 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		else if( Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' )
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
-<?
+					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?php echo  ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?php echo $como_trabajo==1 ? '' : 'readonly' ?> />
+<?php 
 		}
 		else if( Conf::GetConf( $sesion,'TipoIngresoHoras')=='java' )
 		{
@@ -1405,8 +1407,8 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		else if(Conf::TipoIngresoHoras()=='decimal')
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?= ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?=$como_trabajo==1 ? '' : 'readonly' ?> />
-<?
+					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion) ?>" id="duracion" size="6" maxlength=4 <?php echo  ( !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ) || !$permisos->fields['permitido'] ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');" <?php echo $como_trabajo==1 ? '' : 'readonly' ?> />
+<?php 
 		}
 		else if(Conf::TipoIngresoHoras()=='java')
 		{
@@ -1420,7 +1422,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 
 ?>		
 			</td>
-<?
+<?php 
 	if($permisos->fields['permitido'])
 		$where = " usuario_permiso.codigo_permiso='PRO' ";
 	else
@@ -1470,35 +1472,35 @@ else
         </td>
     </tr>
     <tr id="filamultiplicador" style="display: <?php echo ( isset($id_tramite) || $como_trabajo == 1 ) ? 'none' : 'table-row'; ?>">
-    	<td align="right"> <?=__('Cantidad de repeticiones')?> 	</td>
+    	<td align="right"> <?php echo __('Cantidad de repeticiones')?> 	</td>
     	<td align="left">
     		<input type="text" size="6" name="multiplicador" id="multiplicador" onkeyup="validaCantidad(this.value, 'validandoinput');"   value="<?php echo isset($tramite->fields['multiplicador'])  ? $tramite->fields['multiplicador']  : $multiplicador ?>" />
     	</td>
     </tr>
     <tr>
     	<td align="right">
-    		<?=__('Valor según tarifa')?>
+    		<?php echo __('Valor según tarifa')?>
     	</td>
     	<td align="left">
-    		<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?=$tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'?>" />
-    		<input type="text" size="2" id="simbolo_moneda_contrato" disabled style="background-color: white; display: inline; border: 0px;" value="<?=$simbolo_moneda_tramite_contrato != '' ? $simbolo_moneda_tramite_contrato : ''?>" />
-     		<img id="modificar_monto" <?=$display_buton_modificar_monto ?> src="<?=Conf::ImgDir().'/editar_on.gif'?>" title="<?=__('Modificar Monto')?>" border=0 style="cursor:pointer" onclick="ModificarMonto('modificar');CargarMonedaContrato();">
-			  <img id="usar_monto_original" <?=$display_buton_usar_monto_original ?> src="<?=Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?=__('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="ModificarMonto('cancelar');CargarMonedaContrato();"/>
+    		<input type="text" size="6" name="tarifa_tramite" id="tarifa_tramite" disabled value="<?php echo $tarifa_tramite_contrato > 0 ? $tarifa_tramite_contrato : '0'?>" />
+    		<input type="text" size="2" id="simbolo_moneda_contrato" disabled style="background-color: white; display: inline; border: 0px;" value="<?php echo $simbolo_moneda_tramite_contrato != '' ? $simbolo_moneda_tramite_contrato : ''?>" />
+     		<img id="modificar_monto" <?php echo $display_buton_modificar_monto ?> src="<?php echo Conf::ImgDir().'/editar_on.gif'?>" title="<?php echo __('Modificar Monto')?>" border=0 style="cursor:pointer" onclick="ModificarMonto('modificar');CargarMonedaContrato();">
+			  <img id="usar_monto_original" <?php echo $display_buton_usar_monto_original ?> src="<?php echo Conf::ImgDir().'/cruz_roja_nuevo.gif'?>" title="<?php echo __('Usar Monto Original')?>" border=0 style='cursor:pointer' onclick="ModificarMonto('cancelar');CargarMonedaContrato();"/>
 			</td>
     </tr>
-    <tr id="tr_tarifa_mod" <?=$display_tr_mod ?>>
+    <tr id="tr_tarifa_mod" <?php echo $display_tr_mod ?>>
     	<td align="right">
-    		<?=__('Tarifa modificado')?>
+    		<?php echo __('Tarifa modificado')?>
     	</td>
     	<td align="left">
-    		<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?=$tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'?>" />
-    		<?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda","id_moneda_tramite_individual",$tramite->fields['id_moneda_tramite_individual'] ? $tramite->fields['id_moneda_tramite_individual'] : '0','','','70')?>
+    		<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?php echo $tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'?>" />
+    		<?php echo Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda","id_moneda_tramite_individual",$tramite->fields['id_moneda_tramite_individual'] ? $tramite->fields['id_moneda_tramite_individual'] : '0','','','70')?>
        </td>
     </tr>
     <input type="hidden" name="id_moneda_contrato" id="id_moneda_contrato" value="1" />
     <tr>
         <td align=right>
-        	<?
+        	<?php 
 		if (method_exists('Conf','GetConf'))
 		{
 			$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
@@ -1515,19 +1517,19 @@ else
 		if($IdiomaGrande)
 		{
 ?>
-				<?=__('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
-<?
+				<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
+<?php 
 		}
 		else
 		{
 ?>
-			<?=__('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
-<?
+			<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
+<?php 
 		}
 ?>
         </td>
         <td align=left>
-            <textarea id="descripcion" cols=45 rows=4 name=descripcion><?=$tramite->fields['descripcion'] ? stripslashes($tramite->fields['descripcion']) : $descripcion ?></textarea></td>
+            <textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo $tramite->fields['descripcion'] ? stripslashes($tramite->fields['descripcion']) : $descripcion ?></textarea></td>
 
 		<script type="text/javascript">
 			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
@@ -1539,11 +1541,11 @@ else
 
     </tr>
 			<tr>
-				<td align="right"><?=__('Cobrable')?></td>
+				<td align="right"><?php echo __('Cobrable')?></td>
 				<td align="left">
-				<input type="checkbox" name="cobrable" valor="1" <?=$tramite->fields['cobrable'] || $cobrable ? 'checked' : '' ?> /> &nbsp;&nbsp;
+				<input type="checkbox" name="cobrable" valor="1" <?php echo $tramite->fields['cobrable'] || $cobrable ? 'checked' : '' ?> /> &nbsp;&nbsp;
 					
-<?
+<?php 
 	if(strlen($select_usuario) > 164) // Depende de que no cambie la función Html::SelectQuery(...)
 	{
 		echo(__('Usuario'));;
@@ -1552,7 +1554,7 @@ else
 ?>
         </td>
     </tr>
-<?
+<?php 
     if(isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo')
     {
 			echo("<tr><td colspan=4 align=center>");
@@ -1562,20 +1564,20 @@ else
 ?>
     <tr>
         <td colspan='2' align='right'>
-        	<? if ($id_tramite > 0)
+        	<?php  if ($id_tramite > 0)
         			{ ?>
-					<input type=submit class=btn value=<?=__('Guardar')?> onclick="return Confirmar(this.form,'<?=$id_trabajo ?>')" />
-				  <?  }
+					<input type=submit class=btn value=<?php echo __('Guardar')?> onclick="return Confirmar(this.form,'<?php echo $id_trabajo ?>')" />
+				  <?php   }
 				  	 else
 				  	 	{ ?>
-				  <input type=submit class=btn value=<?=__('Guardar')?> onclick="return Validar(this.form)" />
-				  	<?	} ?>
+				  <input type=submit class=btn value=<?php echo __('Guardar')?> onclick="return Validar(this.form)" />
+				  	<?php 	} ?>
 				</td>
     </tr>
 </table>
 </form>
 
-<? 
+<?php  
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo(Autocompletador::Javascript($sesion));
@@ -1597,24 +1599,11 @@ else
     } 
 ?>
 <script language="javascript" type="text/javascript">
-<?
+<?php 
 if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 	echo "CargaIdioma('".$codigo_asunto_secundario."');";
 else
 	echo "CargaIdioma('".$t->fields['codigo_asunto']."');";
 ?>
-//datepicker Fecha
-Calendar.setup(
-	{
-		inputField	: "fecha",				// ID of the input field
-		ifFormat	: "%d-%m-%Y",			// the date format
-<?php
-	if (!$permiso_cobranza->fields['permitido'])
-	{
-		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";
-	}
-?>
-		button			: "img_fecha"	;	// ID of the button
-	}
-);
+ 
 </script>

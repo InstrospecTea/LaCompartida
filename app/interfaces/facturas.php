@@ -231,7 +231,8 @@
 		$b->titulo = "Documentos Tributarios <br />".$glosa_monto_saldo_total;
 		$b->AgregarEncabezado("fecha",__('Fecha'),"width=60px ");
 		$b->AgregarEncabezado("tipo",__('Tipo'),"align=center width=40px");
-		$b->AgregarFuncion(__('N° Factura'), "NumeroFactura", "align='right' width='30px'");
+		$b->AgregarEncabezado("numero",__('N° Factura'),"align=center width=30px");
+/* arosales	$b->AgregarFuncion(__('N° Factura'), "NumeroFactura", "align='right' width='30px'");  ESTATICA*/
 		$b->AgregarEncabezado("factura_rsocial",__('Cliente'),"align=left width=40px");
 		$b->AgregarEncabezado("idcontrato",__('Asunto'),"align=left width=40px");
 		$b->AgregarEncabezado("encargado_comercial",__('Abogado'),"align=left width=20px");
@@ -376,7 +377,8 @@
 		$html .= "<tr id=\"t".$fila->fields['id_factura']."\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 		$html .= "<td align=left>".Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas)."</td>";
 		$html .= "<td align=left>".$fila->fields['tipo']."</td>";
-		$html .= "<td align=right>#" . NumeroFactura(& $fila, $sesion) . "&nbsp;</td>";
+		$html .= "<td align=left>".$fila->fields['numero']."</td>";
+/* arosales 	$html .= "<td align=right>#" . NumeroFactura(& $fila, $sesion) . "&nbsp;</td>"; ESTATICA*/
 		if( UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
 			$html .= "<td align=left>".$fila->fields['factura_rsocial']."</td>";
 		else

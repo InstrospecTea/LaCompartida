@@ -1,4 +1,4 @@
-<?php 
+<?
     require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -43,7 +43,7 @@ $pagina->PrintTop();
     });
 }
 </script>
-<?php 
+<?
 
     if ($estado == "") {
         $estado = "abiertos";
@@ -77,7 +77,7 @@ $pagina->PrintTop();
     }
 
 ?>
-<iframe name=tramites id=tramites onload="calcHeight(this.id, 'pagina_body');" src='<?php echo $url_iframe ?>' frameborder=0 width=100% height=2000px></iframe>
-<?php 
+<iframe name=tramites id=tramites onload="calcHeight(this.id, 'pagina_body');" src='<?=$url_iframe ?>' frameborder=0 width=100% height=2000px></iframe>
+<?
     $pagina->PrintBottom();
 ?>

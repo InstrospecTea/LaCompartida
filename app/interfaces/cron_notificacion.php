@@ -818,7 +818,6 @@ if (UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoCliente') == 1) {
 	$email = $email ? $email : 'soporte@lemontech.cl';
 
 	$column = 'c.id_cliente, c.fecha_creacion';
-        $query_count  = sprintf($query, 'COUNT(*) AS cant');
 
 	$query = 'SELECT %s FROM cliente c, usuario u ';
 	$query .= 'WHERE c.id_usuario_encargado = u.id_usuario ';

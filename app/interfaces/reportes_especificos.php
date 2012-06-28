@@ -1,4 +1,4 @@
-<?
+<?php 
     require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -29,7 +29,7 @@
       	<td width="50%">
       		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
       			<tr>
-      <?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+      <?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/usuarios_32_nuevo.gif" alt=''/></td>
 		<?php } else { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/usuarios_32.gif" alt=''/></td>
@@ -52,7 +52,7 @@
 		<td width="50%">
 			<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="100px" class="tb_base">
 				<tr>
-		 <?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+		 <?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/contact_32_nuevo.gif" alt=''/></td>
 		<?php } else { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/contact_32.gif" alt=''/></td>
@@ -84,7 +84,7 @@
     	<td>
     		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
     			<tr>
-    	<?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+    	<?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 			<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/coins_32_nuevo.gif" alt=''/></td>
 			<?php } else { ?>
      	<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/coins_32.gif" alt=''/></td>
@@ -113,7 +113,7 @@
 <td>
 	<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="140px" class="tb_base">
 		<tr>
-		<?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+		<?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32_nuevo.gif" alt=''/></td>
 		<?php } else { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32.gif" alt=''/></td>
@@ -137,7 +137,7 @@
 		<br/>
 		</td>
 	</tr>
-<?
+<?php 
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanzados') ) || ( method_exists('Conf','ReportesAvanzados') && Conf::ReportesAvanzados() ) ) )
 	{
 		?>
@@ -145,7 +145,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
     	<td>
     		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 		<tr>
-		<?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+		<?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32_nuevo.gif" alt=''/></td>
 		<?php } else { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32.gif" alt=''/></td>
@@ -176,7 +176,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 			<td>
     		<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
 		<tr>
-		<?	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+		<?php 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32_nuevo.gif" alt=''/></td>
 		<?php } else { ?>
 		<td rowspan="2" width=15%><img src="<?php echo Conf::ImgDir()?>/proyectos_32.gif" alt=''/></td>
@@ -199,7 +199,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 		<br/>
     	</td>
     </tr>
-  <?
+  <?php 
 	}
 	else
 		$pagina->AddInfo(__('Hay un error con ese reporte por favor comunicarse con soporte.')); ?>
@@ -210,6 +210,6 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 </tbody>
 </table>
 </form>
-<?
+<?php 
     $pagina->PrintBottom();
 ?>

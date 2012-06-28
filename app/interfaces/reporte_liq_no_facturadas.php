@@ -99,7 +99,15 @@ jQuery(document).ready(function() {
 	     }).show();
     });
 });
- 
+function YoucangonowMichael() {
+
+
+jQuery('.fechadiff').datepicker( {
+			showOn: "both",
+			buttonImage: "https://static.thetimebilling.com/images/calendario.png",
+			buttonImageOnly: true
+    }); 
+}
 
 </script>	
 

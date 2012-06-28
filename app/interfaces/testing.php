@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/classes/PaginaCobro.php';
@@ -45,7 +45,7 @@ table.main td,th
     padding: 4px;
 }
 </style>
-<?
+<?php 
 	$z=0;
 	$arr_montos=array();	
 	$arr_montos[$z]='monto';
@@ -79,7 +79,7 @@ table.main td,th
 	<tr>
 		<td colspan="6">Id Cobro: <input type="text" name="id_cobro" value="<?php echo $id_cobro; ?>" />&nbsp;<input type="submit" name="enviar" /></td></tr>
 	<tr><td>&nbsp;</td></tr>
-<?
+<?php 
 	if($id_cobro)
 	{
 		$resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $id_cobro);
@@ -92,15 +92,15 @@ table.main td,th
 			<table class='main'  width="100%" >
 				<tr>
 					<td>Tabla</td>
-					<td><?=$resultados['tabla']; ?></td>
+					<td><?php echo $resultados['tabla']; ?></td>
 				</tr>
 				<tr>
 					<td>Forma de cobro</td>
-					<td><?=$resultados['forma_cobro']; ?></td>
+					<td><?php echo $resultados['forma_cobro']; ?></td>
 				</tr>
 				<tr>
 					<td>Estado Cobro</td>
-					<td><?=$cobro->fields['estado']; ?></td>
+					<td><?php echo $cobro->fields['estado']; ?></td>
 				</tr>
 			</table>
 			<table class='main'  width="100%" >	
@@ -112,21 +112,21 @@ table.main td,th
 				</tr>	
 				<tr>
 					<td>id_moneda</td>
-					<td><?=$resultados['id_moneda']; ?></td>
-					<td><?=$resultados['tipo_cambio_id_moneda']; ?></td>
-					<td><?=$resultados['cifras_decimales_id_moneda']; ?></td>
+					<td><?php echo $resultados['id_moneda']; ?></td>
+					<td><?php echo $resultados['tipo_cambio_id_moneda']; ?></td>
+					<td><?php echo $resultados['cifras_decimales_id_moneda']; ?></td>
 				</tr>
 				<tr>
 					<td>id_moneda_monto</td>
-					<td><?=$resultados['id_moneda_monto']; ?></td>
-					<td><?=$resultados['tipo_cambio_id_moneda_monto']; ?></td>
-					<td><?=$resultados['cifras_decimales_id_moneda_monto']; ?></td>
+					<td><?php echo $resultados['id_moneda_monto']; ?></td>
+					<td><?php echo $resultados['tipo_cambio_id_moneda_monto']; ?></td>
+					<td><?php echo $resultados['cifras_decimales_id_moneda_monto']; ?></td>
 				</tr>
 				<tr>
 					<td>opc_moneda_total</td>
-					<td><?=$resultados['opc_moneda_total']; ?></td>
-					<td><?=$resultados['tipo_cambio_opc_moneda_total']; ?></td>
-					<td><?=$resultados['cifras_decimales_opc_moneda_total']; ?></td>
+					<td><?php echo $resultados['opc_moneda_total']; ?></td>
+					<td><?php echo $resultados['tipo_cambio_opc_moneda_total']; ?></td>
+					<td><?php echo $resultados['cifras_decimales_opc_moneda_total']; ?></td>
 				</tr>
 			</table>
 		</td>
@@ -134,7 +134,7 @@ table.main td,th
 	</table>
 	<table class='main'  width="100%" >
 		<tr>
-			<th>Resultado <?=$glosa_moneda ?></th>
+			<th>Resultado <?php echo $glosa_moneda ?></th>
 			<?php
 			for($e=1;$e<7;$e++)
 			{	
@@ -145,17 +145,17 @@ table.main td,th
 			?>
 		</tr>
 		</tr>
-		<?
+		<?php
 		for($i=0;$i < count($arr_montos);$i++)
 		{
 		?>
 		<tr>
-			<td><?=$arr_montos[$i]; ?></td>
+			<td><?php echo $arr_montos[$i]; ?></td>
 			<?php
 			for($e=1;$e<7;$e++)
 			{
 			?>
-				<td><?=$resultados[$arr_montos[$i]][$e]; ?></td>
+				<td><?php echo $resultados[$arr_montos[$i]][$e]; ?></td>
 			<?php
 			}
 			?>
@@ -169,6 +169,6 @@ table.main td,th
 }
 ?>
 </form>
-<?
+<?php
 	$pagina->PrintBottom();
 ?> 
