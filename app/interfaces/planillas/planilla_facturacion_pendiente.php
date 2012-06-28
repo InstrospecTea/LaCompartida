@@ -25,7 +25,7 @@ $AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloA
 set_time_limit(3600);
 
 if ($xls) {
-		$fecha1=date('Y-m-d',strtotime($fecha1));
+	$fecha1=date('Y-m-d',strtotime($fecha1));
 	$fecha2=date('Y-m-d',strtotime($fecha2));
 	$moneda = new Moneda($sesion);
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
@@ -338,13 +338,13 @@ if ($xls) {
 		$group_by = "contrato.id_contrato";
 	}
 
-		if( UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
-			$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
-			$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
-		} else {
-			$codigos_asuntos_secundarios = "";
-			$codigo_asunto_secundario_sep = "";
-		}
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		$codigos_asuntos_secundarios = "GROUP_CONCAT( asunto.codigo_asunto_secundario ) as codigos_asuntos_secundarios, ";
+		$codigo_asunto_secundario_sep = "asunto.codigo_asunto_secundario, ";
+	} else {
+		$codigos_asuntos_secundarios = "";
+		$codigo_asunto_secundario_sep = "";
+	}
 
 
 	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion->dbh))
@@ -460,7 +460,7 @@ if($fechactual-$maxolaptime>2) {
 
 								";
 	$resp = mysql_query($update7, $sesion->dbh);
-	}
+}
 
 	$querycobros = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
@@ -506,9 +506,6 @@ if($fechactual-$maxolaptime>2) {
                                                                                                                 AND cta_corriente.monto_cobrable > 0 
 														AND $where_gasto ) > 0 )
 							GROUP BY $group_by ";
-                
-		if($enviamail) mail('ffigueroa@lemontech.cl','Primera Query',$query);
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 	$fila_inicial = $filas + 2;
 	$tiempomatriz = array();
@@ -640,6 +637,7 @@ if($fechactual-$maxolaptime>2) {
 		//		$valor_descuento = $reportecontrato->arraydescuentos[$cobro['id_contrato']];
 
 		$valor_estimado = $monto_estimado_trabajos;
+
 
 
 
@@ -879,7 +877,6 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 <?php if ($sesion->usuario->fields['rut'] == '99511620') echo '<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
-								<?php  if($sesion->usuario->fields['rut']=='99511620')  echo '<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
 		<tr>
@@ -894,25 +891,4 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 <?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
-	$update5="truncate table trabajos_por_actualizar;";
-		$update6="insert delayed into trabajos_por_actualizar (
-		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
-		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
-		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
-		$resp = mysql_query($update5, $sesion->dbh);
-		$resp = mysql_query($update6, $sesion->dbh);
-	                $update1="update LOW_PRIORITY trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
-                $update2="update LOW_PRIORITY  cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
-                $update3="update LOW_PRIORITY  tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
-                   $update3A=  "update  LOW_PRIORITY  olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
-                    $update3B="update  LOW_PRIORITY  olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
-					$update3C="update  LOW_PRIORITY  olap_liquidaciones ol left jointramite tra on ol.id_entry=tra.id_tramite set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null";
-                $resp = mysql_query($update1, $sesion->dbh);
-                $resp = mysql_query($update2, $sesion->dbh);
-                $resp = mysql_query($update3, $sesion->dbh);
-                 $resp = mysql_query($update3A, $sesion->dbh);
-                  $resp = mysql_query($update3B, $sesion->dbh);
-				   $resp = mysql_query($update3C, $sesion->dbh);
-				   
-		
 ?>
