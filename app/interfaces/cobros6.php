@@ -698,6 +698,7 @@ if ($cobro->fields['id_contrato'] != '') {
         jQuery.post('ajax/cobros7.php', {id_cobro: Elidcobro, opc: 'listapagos'}, function(data) {
             jQuery("#lista_pagos").html(data);
         });
+		Refrescar();
     }
 
     function refrescaestado(id) 
