@@ -1,4 +1,4 @@
-<?
+<?php
 require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -442,6 +442,12 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 			if(!($resp_codigo = mysql_query($query_codigo, $sesion->dbh) ))
 				return new soap_fault('Client', '',mysql_error(),'');
 			list($codigo_asunto) = mysql_fetch_array($resp_codigo);
+		}  
+		$query_asunto="SELECT codigo_asunto FROM `asunto` WHERE codigos_alternativos like '%$codigo_asunto%' and codigo_asunto not in (select codigo_asunto from asunto where codigo_asunto='$codigo_asunto') ";
+		if($resp_asunto = mysql_query($query_asunto, $sesion->dbh)) {
+			if($asunto_corregido=mysql_fetch_row($resp_asunto)) {
+				$codigo_asunto=$asunto_corregido[0];
+			}
 		}
 		
 		$query = "SELECT contrato.id_moneda, asunto.cobrable FROM contrato JOIN asunto on asunto.id_contrato = contrato.id_contrato WHERE codigo_asunto='$codigo_asunto'";

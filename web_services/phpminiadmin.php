@@ -12,6 +12,10 @@ include '../app/conf.php';
  #DEFAULT db connection settings
  # --- WARNING! --- if you set defaults - always recommended to set $ACCESS_PWD to protect your db!
  	
+
+	
+	
+	
  $DBDEF=array(
  'user'=>DBUSER,#required
  'pwd'=>DBPASS, #required
