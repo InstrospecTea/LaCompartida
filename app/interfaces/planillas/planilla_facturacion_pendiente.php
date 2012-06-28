@@ -1,5 +1,6 @@
 <?php
 $tini = time();
+$fechactual=date('Ymd');
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
@@ -24,6 +25,8 @@ $AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloA
 set_time_limit(3600);
 
 if ($xls) {
+		$fecha1=date('Y-m-d',strtotime($fecha1));
+	$fecha2=date('Y-m-d',strtotime($fecha2));
 	$moneda = new Moneda($sesion);
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
 	$id_moneda_base = $moneda->GetMonedaBase($sesion);
@@ -343,11 +346,25 @@ if ($xls) {
 			$codigo_asunto_secundario_sep = "";
 		}
 
-		//list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( MAX( fecha_modificacion ) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
-		//FFF: fix para traer movimientos de todo el mes anterior con o sin fecha touch
-				   list($maxolaptime)=mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add( MAX(fecha_modificacion ) , interval -3 DAY),  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones ", $sesion->dbh));
-				  
-		$update4="replace delayed into olap_liquidaciones (SELECT
+
+	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion->dbh))
+		mysql_query("ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'", $sesion->dbh);
+
+
+
+	$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
+	$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
+	$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+	$update3A = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
+	$update3B = "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
+	$resp = mysql_query($update1, $sesion->dbh);
+	$resp = mysql_query($update2, $sesion->dbh);
+	$resp = mysql_query($update3, $sesion->dbh);
+	$resp = mysql_query($update3A, $sesion->dbh);
+	$resp = mysql_query($update3B, $sesion->dbh);
+	list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -1 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
+
+	$update4 = "replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
                                                                 asunto.codigo_asunto_secundario, 
 								  contrato.id_usuario_responsable,
@@ -395,12 +412,18 @@ if ($xls) {
 															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
 
 								"; // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
-		$resp = mysql_query($update4, $sesion->dbh);
-		
-		
-	
-		
-		$update7="replace delayed into olap_liquidaciones (SELECT
+	$resp = mysql_query($update4, $sesion->dbh);
+
+if($fechactual-$maxolaptime>2) {
+	$update5 = "truncate table trabajos_por_actualizar;";
+	$update6 = "replace into trabajos_por_actualizar (
+		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
+		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
+		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
+	$resp = mysql_query($update5, $sesion->dbh);
+	$resp = mysql_query($update6, $sesion->dbh);
+
+	$update7 = "replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
                                                                 asunto.codigo_asunto_secundario, 
 								  contrato.id_usuario_responsable,
@@ -437,6 +460,7 @@ if ($xls) {
 
 								";
 	$resp = mysql_query($update7, $sesion->dbh);
+	}
 
 	$querycobros = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
@@ -619,7 +643,6 @@ if ($xls) {
 
 
 
-
 		if ($cobro['forma_cobro'] == 'CAP') {
 			if ($separar_asuntos) {
 				$cobro_aux = new Cobro($sesion);
@@ -635,44 +658,19 @@ if ($xls) {
 					} else {
 						$factor = number_format(1 / $cantidad_asuntos, 6, '.', '');
 					}
-					else
-						$valor_estimado = $monto_estimado_trabajos;
-                            } else {
-					$cobro_aux = new Cobro($sesion);
-					$usado = $cobro_aux->TotalCobrosCap($id_contrato); //Llevamos lo cobrado en el CAP a la moneda TOTAL
-					if($monto_estimado_trabajos+$usado > $cobro['monto'] )
-					{
-						$valor_estimado = $cobro['monto'] - $usado;
-						if($valor_estimado < 0)
-							$valor_estimado = 0;
-					}
-					else
-						$valor_estimado = $monto_estimado_trabajos;
-                            }
-			}
-			else {
-				$valor_estimado = $monto_estimado_trabajos;
-                        }
-					// Aplicar descuentos del contrato al valor estimado
-			if( $cobro['porcentaje_descuento'] > 0 )
-				{
-					$valor_descuento=$valor_estimado*$cobro['porcentaje_descuento'];
-					$valor_estimado = $valor_estimado - $valor_descuento;
-											 if($valor_descuento>0)  $ws1->writeNote($filas,$col_valor_estimado,'Incluye descuento por '.$arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'].' '.$valor_descuento);
-
+					$valor_estimado = ( $cobro['monto'] - $usado ) * $factor;
+					if ($valor_estimado < 0)
+						$valor_estimado = 0;
 				}
-			else if( $valor_descuento > 0 )
-				{
-					$valor_estimado = $valor_estimado - $valor_descuento;
-			 if($valor_descuento>0)  $ws1->writeNote($filas,$col_valor_estimado,'Incluye descuento por '.$arreglo_monedas[$cobro['id_moneda_contrato']]['simbolo'].' '.$valor_descuento);
-
-					if( $valor_estimado < 0 )
-						{
-							$valor_descuento =  abs($valor_estimado);
-							$valor_estimado = 0;
-						}
-					else
-						$valor_descuento = 0;
+				else
+					$valor_estimado = $monto_estimado_trabajos;
+			} else {
+				$cobro_aux = new Cobro($sesion);
+				$usado = $cobro_aux->TotalCobrosCap($id_contrato); //Llevamos lo cobrado en el CAP a la moneda TOTAL
+				if ($monto_estimado_trabajos + $usado > $cobro['monto']) {
+					$valor_estimado = $cobro['monto'] - $usado;
+					if ($valor_estimado < 0)
+						$valor_estimado = 0;
 				}
 				else
 					$valor_estimado = $monto_estimado_trabajos;
@@ -842,7 +840,8 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				<td>&nbsp;</td><td style="text-align:center;" colspan="2">
 	<?php echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
 	echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
+					FROM usuario JOIN usuario_permiso USING(id_usuario)
+					WHERE codigo_permiso='SOC' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
 	?>
 				</td>
 				<?php } ?>
