@@ -1,0 +1,4 @@
+<IfModule php5_module>
+    php_flag newrelic.enabled off
+  </IfModule>
+
