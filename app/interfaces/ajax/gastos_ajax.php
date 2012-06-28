@@ -4,14 +4,42 @@
 	
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	 require_once Conf::ServerDir().'/classes/UtilesApp.php';
-         require_once Conf::ServerDir().'/classes/Cliente.php';
+require_once Conf::ServerDir().'/classes/Asunto.php';
  
+ 	
 	$sesion = new Sesion(array('ADM'));
 
+  
+	$limitdesde=$_REQUEST['iDisplayStart'];
+	$limitcantidad=$_REQUEST['iDisplayLength'];
+	$arrayorden=array( 0 => 'fecha', 1 =>'glosa_cliente',5 =>'egreso',6 => 'ingreso',7 =>'con_impuesto', 8 =>'estado',10 =>'cobrable');
+	$orden = $arrayorden[intval($_REQUEST['iSortCol_0'])]. " ".$_REQUEST['sSortDir_0'];
+	
+    if($where=='') $where=1;
+	if($_REQUEST['opc']=='actualizagastos') {
+		
+		$whereclause=base64_decode($_POST['whereclause']);
+		$querypreparar="update cta_corriente 
+							join asunto using(codigo_asunto) 
+							join contrato on contrato.id_contrato=asunto.id_contrato
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente ";
+							
+		$setclause=' set cta_corriente.fecha_touch=now() ';
+		if($_POST['montocastigar']) $setclause.=', cta_corriente.monto_cobrable=0';
+ 		if($_POST['id_proveedor']) $setclause.=', cta_corriente.id_proveedor='.intval($_POST['id_proveedor']);
+		if($_POST['codigo_asunto']) $setclause.=", cta_corriente.codigo_asunto='{$_POST['codigo_asunto']}'";
+		if($_POST['codigo_asunto_secundario']) $setclause.=", cta_corriente.codigo_asunto='{$_POST['codigo_asunto_secundario']}'";
+		
+		
+		$querypreparar.=$setclause.' WHERE '.$whereclause;
+		
+			
+			$query =$sesion->pdodbh->prepare($querypreparar);
 
-		if($orden == "")
-			$orden = "fecha DESC";
-
+				$query->execute();
+				echo "jQuery('#boton_buscar').click();";
+		die();
+	} else if($_REQUEST['opc']=='buscar' || ($_GET['opclistado']=='listado' && $_GET['selectodos']==1) || $_GET['totalctacorriente']==1) {
 		if($where != '')
 		{
 			$where = 1;
@@ -21,8 +49,7 @@
 					if( $codigo_cliente_secundario )
 					{
 							$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
-							$cliente = new Cliente($sesion);
-							$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
+							
 						if($codigo_asunto_secundario)
 						{
 							$asunto = new Asunto($sesion);
@@ -43,8 +70,7 @@
 					if( $codigo_cliente )
 					{
 							$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
-							$cliente = new Cliente($sesion);
-							$cliente->LoadByCodigo($codigo_cliente);
+							
 						if($codigo_asunto)
 						{
 							$asunto = new Asunto($sesion);
@@ -66,7 +92,7 @@
 			if($cobrado == 'NO')
 				$where .= " AND cta_corriente.id_cobro is null ";
 			if($cobrado == 'SI')
-				$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
+				$where .= " AND cta_corriente.id_cobro is not null AND cta_corriente.estadocobro in ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL','PAGADO', 'ENVIADO AL CLIENTE' ,'INCOBRABLE') ";
 			if($codigo_asunto && $lista_asuntos)
 				$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 			if($codigo_asunto_secundario && $lista_asuntos_secundario)
@@ -94,22 +120,132 @@
 			if ($moneda_gasto != '') 	$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
 		} else {
 			$where = base64_decode($where);
-                }
-             if($where=='') $where=1;
+        }
                
 		$idioma_default = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 		$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 		
-		$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles']);
+		
 
 		
 		$col_select =",'Si' as esCobrable ";
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
-		{
+		if ( UtilesApp::GetConf($sesion,'UsarGastosCobrable') )		{
 			$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 		}
+	}
+		
+				
+		$cobrosnoeditables=array(); 
+		if($_GET['totalctacorriente']) {
+			echo '<b>'.__('Balance cuenta gastos').': '. UtilesApp::GetSimboloMonedaBase($sesion) . " "   ; 
+			echo number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles']).'</b>';
+		if($codigo_cliente_secundario || $codigo_cliente) {
+			echo '<input type="hidden" id="codcliente" name="codcliente" value="1"/>';
+		} else {
+			echo '<input type="hidden" id="codcliente" name="codcliente" value="0"/>';
+		}
+			die();
+			
+		} else if($_GET['opclistado']=='listado') {
+		//	$pagina->PrintTop(1);
+ 			echo '<form id="form_edita_gastos_masivos"><table id="overlayeditargastos">';
+			
+		if($_GET['selectodos']==1) {
+				$where.="  AND estadocobro in ('SIN COBRO','CREADO','EN REVISION')";
+		} else {
+			$arraygasto=explode(';',($_GET['movimientos']));
+			if(sizeof($arraygasto)>0) {
+				$where="estadocobro in ('SIN COBRO','CREADO','EN REVISION') and id_movimiento in (".implode(',',$arraygasto).")";
+		
+			}
+		}
+		
+		$querypreparar="update cta_corriente 
+							join asunto using(codigo_asunto) 
+							join contrato on contrato.id_contrato=asunto.id_contrato
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente 
+										set fecha_touch=now()
+								WHERE $where";
+		/*	echo '<tr>  <td align=right width="30%">';
+				echo   __('Nombre Cliente') ;
+             echo '    </td>     <td nowrap colspan=3 align=left>';
+ UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); 
+                            echo '</td>     </tr>         <tr>         <td align=right>';
+                                 echo   __('Asunto');
+                            echo '</td>                            <td nowrap colspan=3 align=left>';
+                                   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); 
+								
+								
+                         echo ' </td>        </tr>';*/
+						 
+				  if (UtilesApp::GetConf($sesion, 'TipoGasto') && $prov == 'false') { ?>
+			<tr>
+				<td align=right>
+					<?php echo __('Tipo de Gasto') ?>
+				</td>
+				<td align=left>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo", "id_cta_corriente_tipo", '1', '', '', "160"); ?>
+				</td>
+			</tr>
+		<?php } ?>		 
+		<tr>
+			<td align=right>
+				<?php echo __('Proveedor') ?>
+			</td>
+			<td align=left>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_proveedor, glosa FROM prm_proveedor ORDER BY glosa", "id_proveedor",  '0', '', 'Cualquiera', "160"); ?>
+				
+			</td>
+		<tr>
+			<td align=right>
+				<?php echo 'Castigar '.__('Monto') ?>
+			</td>
+			<td align=left>
+				<input name="montocastigar" id="montocastigar" type="checkbox"   value="0" />
+				<span style="color:#777; font-size:10px"> (Al activar se baja el monto <?php echo __('cobrable');?> a cero para todos los gastos seleccionados)</span>
+			</td>
+		</tr>
 
-		$query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE 
+		<?php if (UtilesApp::GetConf($sesion, 'ComisionGastos') && $prov == 'false') { ?>
+			<tr>
+				<td align="right">
+					<?php echo __('Porcentaje comisión') ?>
+				</td>
+				<td align="left">
+					<input name="porcentajeComision" size="10"  value="<?php echo method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'ComisionGastos') : Conf::ComisionGastos() ?>" /> %
+				</td>
+			</tr>
+		<?php } ?>
+		<?php if ($prov == 'false' && UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) { ?>
+			<tr>
+				<td align=right>
+					<?php echo __('Monto cobrable') ?>&nbsp;
+				</td>
+				<td align=left>
+					<input name="monto_cobrable" id="monto_cobrable" size=10 value="" />
+				</td>
+			</tr>
+		<?php }  		 
+						
+								echo '<tr>  <td colspan="2">';
+								
+								echo '<input type="hidden" size="100" id="whereclause" name="whereclause" value="'.base64_encode($where).'"/>';
+								echo '<p>S&oacute;lo se modificar&aacute; los gastos que no pertenezcan a '.__('Cobros emitidos').'</p>';
+								
+								echo '</td></tr>';
+			echo '</table></form>';
+		
+		  //echo(Autocompletador::CSS());  
+
+		//	echo(Autocompletador::Javascript($sesion));
+			// echo(InputId::Javascript($sesion));
+			 
+			//	$pagina->PrintBottom(1);
+			die();
+		} else if($_REQUEST['opc']=='buscar') {
+		
+		
+		$query = "SELECT  SQL_CALC_FOUND_ROWS 
 									cta_corriente.id_movimiento,
 									cta_corriente.fecha,
 									cta_corriente.egreso, 
@@ -120,40 +256,48 @@
 									cta_corriente.numero_ot,
 									ifnull(cta_corriente.descripcion,'-') descripcion,
 									cta_corriente.id_cobro,
-									ifnull(asunto.glosa_asunto,'-') glosa_asunto,
+									ifnull(concat_ws(' - ',asunto.codigo_asunto,asunto.glosa_asunto),'-') glosa_asunto,
 									ifnull(cliente.glosa_cliente,'-') glosa_cliente, 
 									prm_moneda.simbolo,
 									prm_moneda.cifras_decimales,
 									prm_cta_corriente_tipo.glosa as tipo, 
-									cobro.estado, 
+									cta_corriente.estadocobro as estado, 
 									cta_corriente.con_impuesto,
 									prm_idioma.codigo_idioma,
-                                                                        contrato.activo AS contrato_activo, 1 as opcion
+                                    contrato.activo AS contrato_activo, 
+									1 as opcion
 									$col_select
 								FROM cta_corriente
-								LEFT JOIN asunto USING(codigo_asunto)
+								JOIN asunto USING(codigo_asunto)
+								
+								JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+								JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+								
+                
 								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
-								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
-								WHERE $where ";
+								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario 
+								WHERE
+								$where 
+								order by $orden 
+								limit $limitdesde,$limitcantidad ";
 		
-		
-		
-		  $resp = mysql_unbuffered_query($query, $sesion->dbh);
-		//  $rows=mysql_num_rows($resp);
+		//echo $query;
+		 
+								
+						 
+		  $resp = mysql_query($query, $sesion->dbh);
+		  $rows=mysql_fetch_row(mysql_query('SELECT FOUND_ROWS()', $sesion->dbh));
 		
 	$i=0;
 		
         
         
-             /*"iTotalRecords":"'.$rows.'",
-             "iTotalDisplayRecords":"'.$rows.'",    
-             echo '{"sEcho": 1, "aaData": [';   */ 
-             echo '{ "aaData": [';
+            echo '   {"iTotalRecords":"'.$rows[0].'",
+             "iTotalDisplayRecords":"'.$rows[0].'",    
+              "aaData": [';   
+          
 		while($fila = mysql_fetch_array($resp)) {
 		     
 		if ($i!=0) echo ',';
@@ -161,16 +305,16 @@
 		   
 		    $stringarray=array(
 			date('d-m-Y',strtotime($fila['fecha'])),
-			$fila['glosa_cliente']? removeBOM($fila['glosa_cliente']):' - ',
-			$fila['glosa_asunto']? removeBOM($fila['glosa_asunto']):' - ',
+			$fila['glosa_cliente']? utf8_encode($fila['glosa_cliente']):' - ',
+			$fila['glosa_asunto']? utf8_encode($fila['glosa_asunto']):' - ',
 			    $fila['tipo']? $fila['tipo']:' - ',
-			    $fila['descripcion']? removeBOM($fila['descripcion']):' ',
+			    $fila['descripcion']? utf8_encode($fila['descripcion']):' ',
 	($fila['egreso']? $fila['simbolo'].' '.$fila['egreso']:' '),
 			   $fila['ingreso']? $fila['simbolo'].' '.$fila['ingreso']:' ',
 			   $fila['con_impuesto']? $fila['con_impuesto']:' ',
 			   $fila['id_cobro']? $fila['id_cobro']:' ',
 			   $fila['estado']? $fila['estado']:' ',
-			   $fila['cobrable']? $fila['cobrable']:' ',
+			   $fila['esCobrable']? $fila['esCobrable']:'No',
 			   $fila['contrato_activo']? $fila['contrato_activo']:' ',
 			   $fila['id_movimiento']);
 			
@@ -180,15 +324,8 @@
 	    }
 		
 	 echo "] }";
-	
-	/*$arrayfinal=array(
-	  "iEcho"=>1,
-	   "iTotalRecords"=>$rows,
-	  "iTotalDisplayRecords"=>$rows, 
-	    "aaData" => $stringarray
-	);
-	
-	 echo json_encode($arrayfinal);*/
+	}  
+
         
 		function Monto(& $fila)
 		{

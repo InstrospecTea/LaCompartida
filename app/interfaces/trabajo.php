@@ -202,13 +202,18 @@ $where .= " AND usuario.visible=1";
             if (dia.length==1) dia='0'+dia;
             var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;
             var usuario= jQuery('#id_usuario').val();
-       
-
-
+		 
+			
+ 
             jQuery('.cambiasemana').click(function() {
                 var semana=jQuery(this).val(); 
                 var usuario= jQuery('#id_usuario').val();
-                Refrescasemana(semana,usuario);
+				if(jQuery(this).attr('id')=='antsemana') {
+					Refrescasemana(semana,usuario,null, 'left');
+				} else {
+					Refrescasemana(semana,usuario,null,'right');
+				}
+                
             });
         
             jQuery('#versemana').click(function() {
@@ -251,30 +256,59 @@ $where .= " AND usuario.visible=1";
 
 
             jQuery(window).load(function() {
-                Refrescasemana(semana,usuario);    
+				jQuery('#divsemana').html(DivLoading);
+                Refrescasemana(semana,usuario); 
+					
+				
             });
         });
-        function Refrescasemana(semana,usuario) {
+        function Refrescasemana(semana,usuario,eldiv,slide) {
             var dias=0;    
             var diaplus=dias+1;
             var fecha='';
-            jQuery.get('ajax/semana_ajax.php?popup=1&semana='+semana+'&id_usuario='+usuario, function(data) {
-                jQuery('#divsemana').html(data).slideDown();
-                jQuery("#proxsemana").val(jQuery("#hiddensemanasiguiente").val());
-                jQuery("#antsemana").val(jQuery("#hiddensemanaanterior").val());
-                calendario(semana);
-                menues();
+		 var divsemana= eldiv ? jQuery('#'+eldiv) : jQuery('#divsemana');
+		 
+            jQuery.get('ajax/semana_ajax.php?popup=1&semana='+semana+'&id_usuario='+usuario, function(datos) {
+               if(!slide) { 
+				   data=datos ;
+				   divsemana.html(data);
+			   } else if(slide=='left') {
+				   divsemana.css('left','-1150px');
+				   data=jQuery('#lastweek').html();
+				   divsemana.html(data).animate({left:0},1000);
+			   } else if (slide=='right') {
+				    divsemana.css({'left':'1150px'});
+				   data=jQuery('#nextweek').html();
+				   divsemana.html(data).animate({left:0},1000);
+			   }
+			   
+					var nextweek=jQuery("#hiddensemanasiguiente").val();
+					var lastweek=jQuery("#hiddensemanaanterior").val();
+					 
+               if(!eldiv) {
+				   
+				  jQuery("#proxsemana").val(nextweek);
+			  	 jQuery("#antsemana").val(lastweek);
+               
 
-                jQuery("#celdastrabajo td").each(function() {
-                    dias++;
-                    fecha=jQuery('#dia'+(dias-1)).val();
-                    jQuery(this).attr({'id':'celda'+dias, 'class':'celdadias','rel':fecha});
-                });
-                for (diaplus=dias+1;diaplus<=7;diaplus=diaplus+1)             {
-                    fecha=jQuery('#dia'+(diaplus-1)).val();
-                    jQuery("#celdastrabajo").append('<td class="celdadias" width="14%" id="celda'+diaplus+'" rel="'+fecha+'"></td>');
-                }
-                jQuery('.trabajoabierto').draggable({cursor:'move', containment:'#celdastrabajo', revert:'true', helper:'clone'});
+					jQuery("#celdastrabajo td").each(function() {
+						dias++;
+						fecha=jQuery('#dia'+(dias-1)).val();
+						jQuery(this).attr({'id':'celda'+dias, 'class':'celdadias','rel':fecha});
+					});
+					for (diaplus=dias+1;diaplus<=7;diaplus=diaplus+1)             {
+						fecha=jQuery('#dia'+(diaplus-1)).val();
+						jQuery("#celdastrabajo").append('<td class="celdadias" width="14%" id="celda'+diaplus+'" rel="'+fecha+'"></td>');
+					
+				
+				}
+						var nextweek=jQuery("#hiddensemanasiguiente").val();
+					var lastweek=jQuery("#hiddensemanaanterior").val();
+				Refrescasemana(nextweek,usuario,'nextweek');  
+				Refrescasemana(lastweek,usuario,'lastweek');
+				 calendario(semana);
+                menues();
+                jQuery('.trabajoabierto').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'});
                 jQuery('.trabajoabierto').dblclick(function() {
                     var idtrabajo=jQuery(this).attr('id') ;
                     OpcionesTrabajo(idtrabajo,'','');
@@ -290,11 +324,58 @@ $where .= " AND usuario.visible=1";
                             //Refrescasemana(arreglo[1],usuario);
 		   
                         });
+						
                     }
+					
                 });
-              
+				if(!eldiv) {
+				jQuery('#hiddensemanasiguiente').droppable({ accept:'.cajatrabajo', addClasses:'false',
+                  hoverClass: "ui-state-active",
+				  drop: function (event,ui) {
+                        var  cuando=jQuery(this).attr('title');
+                        var  idtrabajo= ui.draggable.attr('id');
+                        jQuery(ui.draggable).children('span').remove();
+                        
+						  
+                        jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
+                            var arreglo=data.split('|');
+                        console.log(arreglo);
+						 jQuery('#divsemana #celdastrabajo td').first().append(ui.draggable);
+						 jQuery('#proxsemana').click();
+                        });
+						
+						
+                    }
+					 });
+					 jQuery('#hiddensemanaanterior').droppable({ accept:'.cajatrabajo', addClasses:'false',
+					 hoverClass: "ui-state-active",
+					 
+                    drop: function (event,ui) {
+                       var  cuando=jQuery(this).attr('title');
+                        var  idtrabajo= ui.draggable.attr('id');
+                        jQuery(ui.draggable).children('span').remove();
+                      
+                        jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
+                            var arreglo=data.split('|');
+                           console.log(arreglo);
+						     jQuery('#divsemana #celdastrabajo td').first().append(ui.draggable);
+							  jQuery('#antsemana').click();
+                        });
+						
+						   
+						
+                    }
+					 });
+				}
+				
+				 
+            }
+				          /*  jQuery('#lastweek').load('ajax/semana_ajax.php?popup=1&semana='+jQuery("#antsemana").val()+'&id_usuario='+usuario );
+							 jQuery('#nextweek').load('ajax/semana_ajax.php?popup=1&semana='+jQuery("#proxsemana").val()+'&id_usuario='+usuario );*/
+				 
+			
             });
-            jQuery('#divsemana').html(DivLoading);
+            
         }
 
         function Refrescar() {
@@ -428,10 +509,14 @@ if ($p_revisor->fields['permitido']) {
         </tr>
         <tr><td style="text-align:center;font-weight:bold;padding:10px;">Haga click con el botón derecho sobre algún trabajo para modificarlo</td></tr>
         <tr>
-            <td align=center>
-                <div class="tb_base" id="divsemana" style="width: 750px;">
+            <td style="text-align:center;">
+				<div id="contienehoras" style="margin:auto;position:relative;width:750px;overflow-x: hidden;">
+				<div class="tb_base" id="divsemana" style="width: 750px;position:relative;right:0;left:0;">
                     <div class="divloading">&nbsp;</div>
                 </div>
+				<div class="tb_base" id="nextweek" style=" position:absolute; right:-550px;top:0px;display:none;"></div>
+				 <div class="tb_base" id="lastweek" style="position:absolute;left:-550px;top:0px;display:none;"></div>
+				</div>
             </td>
         </tr>
     </table>

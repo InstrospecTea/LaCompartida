@@ -1,4 +1,4 @@
-<?
+<?php
    	require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -61,10 +61,10 @@
     $pagina->PrintTop(1);
 ?>
 
-<table width=100%>
+<table   width="100%">
        <tr>
 			<td colspan=4>
-<?
+<?php
     $buscador = new Buscador($sesion, $query, "Observacion", $desde, $x_pag, $orden);
     $buscador->color_mouse_over = "#ADFF2F";
     $buscador->titulo = "<strong>Historial</strong>";
@@ -82,7 +82,7 @@ function Validar(form)
 {
 	if(form.observacion_obs.value == '')
 	{
-		alert("<?=__('Debe ingresar observación')?>");
+		alert("<?php echo __('Debe ingresar observación')?>");
 		return false;
 	}
 	form.opc.value='guardar';
@@ -94,33 +94,33 @@ function Validar(form)
 <input type="hidden" name="opc" id="opcion">
 <input type="hidden" name="id_persona" value="<?=$id_persona?>">
 <input type="hidden" name="id_proceso" value="<?=$id_proceso?>">
-<table width=100%>
+<table width="100%">
 <tr>
     <td>
-        <img src="<?=Conf::ImgDir()?>/pix.gif">
+        <img src="https://static.thetimebilling.com/images/pix.gif" />
     </td>
 </tr>
 <tr>
 	<td colspan=4>
-		<strong><img src="<?=Conf::ImgDir()?>/agregar.gif"> <?=__('Agregar historial')?></strong>
+		<strong><img src="<?=Conf::ImgDir()?>/agregar.gif"> <?php echo __('Agregar historial')?></strong>
 	</td>
 </tr>
 <tr>
     <td>
-        <img src="<?=Conf::ImgDir()?>/pix.gif">
+        <img src="https://static.thetimebilling.com/images/pix.gif" />
     </td>
 </tr>
 <tr>
 	<td class="cvs">
-		<?=__('Fecha')?>
+		 <?php echo __('Fecha')?>
 	</td>
 	<td>
-        <?= Html::PrintCalendar('fecha_obs',''); ?>	
+        <?php echo  Html::PrintCalendar('fecha_obs',''); ?>	
 	</td>
 </tr>
 <tr>
     <td class="cvs">
-        <?=__('Observaciones')?>
+        <?php echo __('Observaciones')?>
     </td>
     <td>
 		<textarea id="historial_observaciones" cols="50" rows="4" name="observacion_obs"></textarea>
@@ -128,10 +128,10 @@ function Validar(form)
 </tr>
 <tr>
     <td class="cvs">
-        <?=__('Usuario ingreso')?>
+         <?php echo __('Usuario ingreso')?>
     </td>
     <td>
-		<?=Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) FROM usuario WHERE id_usuario <> -1 ORDER BY apellido1",'usuario_ingreso_obs',$sesion->usuario->fields['id_usuario'])?>
+		 <?php echo Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) FROM usuario WHERE id_usuario <> -1 ORDER BY apellido1",'usuario_ingreso_obs',$sesion->usuario->fields['id_usuario'])?>
     </td>
 </tr>
 <tr>
@@ -141,7 +141,7 @@ function Validar(form)
 </tr>
 </table>
 </form>
-<?
+<?php
     $pagina->PrintBottom(1);
 ?>
 

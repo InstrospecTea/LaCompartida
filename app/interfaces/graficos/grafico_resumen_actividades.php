@@ -78,6 +78,4 @@ $c->setData($data, $labels);
 
 // output the chart
 header("Content-type: image/png");
-
 print($c->makeChart2(PNG));
-?>

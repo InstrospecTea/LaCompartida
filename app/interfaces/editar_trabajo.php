@@ -18,7 +18,7 @@
 
 	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
-
+//ini_set('display_errors','On');
 	$t = new Trabajo($sesion);
 	$params_array['codigo_permiso'] = 'REV';
 	$permiso_revisor = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
@@ -338,7 +338,6 @@
 		$valores = array();
 		foreach($_POST as $index => $valor) {
 			list( $key1, $key2, $id_moneda ) = split('_',$index);
-			// echo $key1 . " - " . $key2 . " - " . $id_moneda . "<br /> ---- <br />";
 			if( $key1 == 'trabajo' && $key2 == 'tarifa' && $id_moneda > 0 ) {
 				if( empty($valor) ) $valor = "0";
 				$t->ActualizarTrabajoTarifa($id_moneda,$valor);
@@ -576,7 +575,7 @@ function Validar(form)
 					return false;
 	<?php } ?>
 	}
-<?
+<?php 
 	if (method_exists('Conf','GetConf'))
 	{
 		$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -837,7 +836,7 @@ function Lista(accion, div, codigo, div_post)
 		form.campo_codigo_cliente.value = codigo;
 		SetSelectInputId('campo_codigo_cliente','codigo_cliente');	
 		<?php } ?>
-<?
+<?php 
 		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 		{
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
@@ -954,7 +953,7 @@ function CargaIdioma( codigo )
 			{
 				var response = http.responseText;
 				var idio = response.split("|");
-<?
+<?php 
 				if (method_exists('Conf','GetConf'))
 				{
 					$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
@@ -972,13 +971,13 @@ function CargaIdioma( codigo )
 				{
 ?>
 						txt_span.innerHTML = idio[1];
-<?
+<?php 
 				}
 				else
 				{
 ?>
 				txt_span.innerHTML = 'Idioma: '+idio[1];
-<?
+<?php 
 				}
 ?>
 				if(idio[1]=='Español')
@@ -1054,7 +1053,7 @@ function CheckVisible()
 			{
 		?>
 			$('hiddenVisible').value=0;
-		<?}?>
+		<?php }?>
 	}
 }
 
@@ -1093,20 +1092,20 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 <input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type="hidden" name="max_hora" id="max_hora" value=<?php echo UtilesApp::GetConf($sesion,'MaxDuracionTrabajo')?> />
 <input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo $t->fields['codigo_asunto']?>" />
-<?
+<?php 
 	if( $opcion != 'nuevo' )
 	{
 ?>
 <input type="hidden" name='id_trabajo' value="<?php echo  $t->fields['id_trabajo'] ?>" id='id_trabajo' />
 <input type="hidden" name='edit' value="<?php echo  $opcion == 'edit' ? 1 : '' ?>" id='edit' />
 <input type="hidden" name='fecha_trabajo_hide' value="<?php echo  $t->fields['fecha'] ?>" id='fecha_trabajo_hide' />
-<?
+<?php 
 	}
 	if($id_trabajo == NULL) // si no tenemos id de trabajo es porque se estÃ¡ agregando uno nuevo.
 	{
 ?>
 <input type="hidden" name='nuevo' value="1" id='nuevo' />
-<?
+<?php 
 	}
 ?>
 <input type="hidden" name=id_cobro id=id_cobro value="<?php echo $t->fields['id_cobro'] !='NULL' ? $t->fields['id_cobro'] : '' ?>" />
@@ -1219,7 +1218,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			<?php echo __('Cliente')?>
         </td>
         <td align=left width="440" nowrap>
-<?
+<?php 
 	if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )
 	{
 		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
@@ -1245,7 +1244,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
              <?php echo __('Asunto')?>
         </td>
         <td align=left width="440" nowrap>
-<?
+<?php 
 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
@@ -1294,8 +1293,12 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <?php }
     if($fecha == '')
     {
-			$date = new DateTime();
-			$fecha=date('d-m-Y',mktime(0,0,0,$date->format('m'),$date->format('d'),$date->format('Y')));
+		$zona_horaria = UtilesApp::GetConf($sesion, 'ZonaHoraria');
+		if ($zona_horaria) {
+			date_default_timezone_set($zona_horaria);
+		}
+		$date = new DateTime();
+		$fecha=date('d-m-Y',mktime(0,0,0,$date->format('m'),$date->format('d'),$date->format('Y')));
     }
     ?>
     <tr>
@@ -1306,7 +1309,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
             <!--<?php echo  Html::PrintCalendar("fecha", $t->fields[fecha] ? $t->fields[fecha] : $fecha); ?>-->
             <input type="text" name="fecha" value="<?php echo $t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
 		        <img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
-<?
+<?php 
 						if (method_exists('Conf','GetConf'))
 						{
 							$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
@@ -1327,7 +1330,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 						<?php echo __('Ordenado por')?>
 						&nbsp;
 						<input type="text" name="solicitante" value="<?php echo $t->fields['solicitante'] ? $t->fields['solicitante'] : ''?>" id="solicitante" size="32" />
-<?
+<?php 
 						}
 ?>
         </td>
@@ -1337,14 +1340,14 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
             <?php echo __('Duración')?>
         </td>
         <td align=left>
-    <?
+    <?php 
     $duracion = '';
     $duracion_cobrada = '';
     ?>
 			<table>
 			  <tr>
 				<td>
-<?
+<?php 
 	$duracion_editable = $nuevo || $sesion->usuario->fields['id_usuario']==$id_usuario;
 	if(!$duracion_editable){
 		$usuario = new UsuarioExt($sesion);
@@ -1360,7 +1363,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 	{
 ?>
 		<input type="text" name="duracion" value="<?php echo $t->fields['duracion'] ? UtilesApp::Time2Decimal($t->fields['duracion']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$duracion_editable ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?
+<?php 
 	}
 	else if( $tipo_ingreso=='java')
 	{
@@ -1410,7 +1413,7 @@ echo '</td>';
 		{
 ?>
 			<input type="text" name="duracion_cobrada" value="<?php echo $t->fields['duracion_cobrada'] ? UtilesApp::Time2Decimal($t->fields['duracion_cobrada']) : $duracion_cobrada ?>" id="duracion_cobrada" size="6" maxlength=4 />
-<?
+<?php 
 		}
 		else if($tipo_ingreso=='java')
 		{
@@ -1422,7 +1425,7 @@ echo '</td>';
 		}
 ?>
 		</td>
-<?
+<?php 
 	}
 ?>
 			</tr>
@@ -1449,13 +1452,13 @@ echo '</td>';
 		{
 ?>
 				<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
-<?
+<?php 
 		}
 		else
 		{
 ?>
 			<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
-<?
+<?php 
 		}
 ?>
         </td>
@@ -1513,7 +1516,7 @@ echo '</td>';
 ?>
 			</td>
 		</tr>
-<?
+<?php 
 		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') && $permiso_revisor->fields['permitido'] ) {
 			if( $t->fields['id_trabajo'] > 0 ) {
 				if( $t->fields['id_cobro'] > 0 ) {
@@ -1553,7 +1556,7 @@ echo '</td>';
 				<div id="contenedor_tipo_cambio">
 				<table style='border-collapse:collapse;' cellpadding='3'>
 					<tr>
-						<?
+						<?php 
 						$query = "SELECT 
 													prm_moneda.id_moneda, 
 													glosa_moneda, 
@@ -1569,7 +1572,7 @@ echo '</td>';
 									<span><b><?php echo $glosa_moneda?></b></span><br>
 									<input type='text' size=9 id='trabajo_tarifa_<?php echo $id_moneda?>' name='trabajo_tarifa_<?php echo $id_moneda?>' onkeyup="MontoValido(this.id);" value='<?php echo $valor?>' />
 							</td>
-						<?
+						<?php 
 							$num_monedas++;
 						}
 						?>
@@ -1605,14 +1608,14 @@ echo '</td>';
 						else
 							{ ?>
 					<input type=submit class=btn value=<?php echo __('Guardar')?> onclick="return Validar(this.form)" />
-						<?	} ?>
+						<?php 	} ?>
 				</td>
 		</tr>
 </table>
 </center>
 </form>
 
-<?
+<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 		{
 			echo(Autocompletador::Javascript($sesion));
@@ -1636,7 +1639,7 @@ echo '</td>';
 <script language="javascript" type="text/javascript">
 
 var formObj = $('form_editar_trabajo');
-<?
+<?php 
 if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 {
 	echo "CargaIdioma('".$codigo_asunto_secundario."');";
@@ -1651,13 +1654,9 @@ Calendar.setup(
 	{
 		inputField	: "fecha",				// ID of the input field
 		ifFormat	: "%d-%m-%Y",			// the date format
-<?php
-	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0)
-	{
-		echo "minDate			: \"".date('Y-m-d',mktime(0,0,0,date('m'),date('d')-$sesion->usuario->fields['dias_ingreso_trabajo'],date('Y')))."\",\n";
-	}
-?>
-		button			: "img_fecha"		// ID of the button
+				button			: "img_fecha"		// ID of the button
+<?php 	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) 	echo ', minDate			: "'.date('Y-m-d',mktime(0,0,0,date('m'), date('d') - $sesion->usuario->fields['dias_ingreso_trabajo'] ,date('Y'))).'"'; ?>
+
 	}
 );
 

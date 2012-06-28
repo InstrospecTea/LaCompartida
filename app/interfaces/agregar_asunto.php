@@ -1465,25 +1465,25 @@ function CambioEncargadoSegunCliente(idcliente) {
     var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
     var UsuarioSecundario=<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario')? '1':'0' );?>;
     var ObligatorioEncargadoSecundarioAsunto=<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto')? '1':'0' );?>;
-    jQuery('#id_usuario_secundario').removeAttr('disabled');
-    jQuery('#id_usuario_responsable').removeAttr('disabled');
+    jQuery('#id_usuario_secundario').attr({'disabled':''});
+    jQuery('#id_usuario_responsable').attr({'disabled':''});
     jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
 	if(window.console ) console.debug(data);
         var ladata=data.split('|');
-	jQuery('#id_usuario_responsable').removeAttr('disabled').val(ladata[0]);
+	jQuery('#id_usuario_responsable').attr({'disabled':''}).val(ladata[0]);
         if(ladata[1] && jQuery('#id_usuario_secundario option[value='+ladata[1]+']').length>0) {
-            if(UsuarioSecundario) jQuery('#id_usuario_secundario').removeAttr('disabled').val(ladata[1]);
+            if(UsuarioSecundario) jQuery('#id_usuario_secundario').attr({'disabled':''}).val(ladata[1]);
         } else {
           if(ladata[2])  jQuery('#id_usuario_secundario').append('<option value="'+ladata[1]+'" selected="selected">'+ladata[2]+'</option>').attr({'disabled':''}).val(ladata[1]);;
         }
         
-          jQuery('#id_usuario_responsable').removeAttr('disabled');
+          jQuery('#id_usuario_responsable').attr({'disabled':''});
         if(CopiarEncargadoAlAsunto) {
         	jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
                 if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
 	   } else if(ObligatorioEncargadoSecundarioAsunto) {
              
-                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
+                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':''});
            }
 	
 	   

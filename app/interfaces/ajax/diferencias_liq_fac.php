@@ -4,7 +4,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	
 function formatofecha($fechasucia) {
-    $fechasucia=explode('/',$fechasucia);
+    $fechasucia=explode('-',str_replace('/','-',$fechasucia));
     $fechalimpia=intval($fechasucia[2].$fechasucia[1].$fechasucia[0]);
     return $fechalimpia;
 }

@@ -2,15 +2,15 @@
 
 	require_once dirname(__FILE__).'/../../conf.php';
 	
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/classes/UtilesApp.php';
+	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+	 require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion(array('ADM'));
-
 
     
 		if($_POST['motivo']=='gastos') {
 
+   
 		########################### SQL INFORME DE GASTOS #########################
 		$where = 1;
 		if($cobrado == 'NO')
