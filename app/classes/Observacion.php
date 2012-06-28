@@ -1,4 +1,4 @@
-<?php
+<?
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -44,5 +44,3 @@ class ListaObservaciones extends Lista
         $this->Lista($sesion, 'Observacion', $params, $query);
     }
 }
-
-?>

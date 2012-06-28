@@ -409,14 +409,14 @@ class Documento extends Objeto
 		$query = "	 SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
 							FROM neteo_documento
 							JOIN documento ON documento.id_documento=neteo_documento.id_documento_pago 
-							WHERE neteo_documento.id_documento_cobro = '".$this->fields['id_documento']."'
-				 UNION
+							WHERE neteo_documento.id_documento_cobro ='".$this->fields['id_documento']."'
+			 UNION 
 				 SELECT id_documento AS id, honorarios, subtotal_gastos AS gastos, pago_retencion, es_adelanto
 				FROM documento left join neteo_documento on  documento.id_documento=neteo_documento.id_documento_pago 
-				WHERE tipo_doc !=  'N'
+				WHERE  tipo_doc !=  'N'
         and neteo_documento.id_neteo_documento is null 
-				AND id_cobro = '".$this->fields['id_cobro']."'";
-
+         AND id_cobro ='".$this->fields['id_cobro']."'";
+				
 						 
 
 		$resp = mysql_query ($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -450,8 +450,8 @@ class Documento extends Objeto
 				}
 				if( $pago_retencion ) {
 					$out .= "<tr><td style='text-align:left;' colspan=2> ( Pago retención impuestos ) </td></tr>";
+				}	
 			}
-		}
 		}
 		return $out;
 	}

@@ -733,15 +733,23 @@ class UtilesApp extends Utiles {
 	// Asumiendo que el logo no cambia durante la ejecución, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
 	var $altura_logo_excel;
 
-	function AlturaLogoExcel($sesion) {
+	function AlturaLogoExcel() {
+	global $sesion;
 		if (isset($altura_logo_excel))
 			return $altura_logo_excel;
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
-		//$bitmap = Conf::LogoExcel();
-		 
+		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
+		
+		if(!self::existecampo('LogoExcel','configuracion',$sesion->dbh)) {
+			$querypreparar="INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
+								VALUES ( 'LogoExcel',  '/var/www/virtual/',  'Ruta absoluta (no URL) al logo en BMP para las planillas',  'string',  '10',  '-1' );";
+			
+			$preparacion = $sesion->pdodbh->prepare($querypreparar);
+			$preparacion->execute();
+			 
+		}
+		
 			$bitmap=	self::GetConf($sesion, 'LogoExcel');  
-			
-			
 		// Open file.
 		$bmp_fd = @fopen($bitmap, "rb");
 		if (!$bmp_fd)
@@ -1337,7 +1345,7 @@ HTML;
 							, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
 									,6 // $arr_resultado['cifras_decimales_opc_moneda_total']//deciimales ini
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
-									, 6//$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
+									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
 							, $arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio ini
@@ -1437,7 +1445,7 @@ HTML;
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-								,6// $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
 							, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
@@ -1463,7 +1471,7 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 									,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 									, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-									, 6//$cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+									, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 					);
 				}
 
@@ -1495,11 +1503,11 @@ HTML;
 						, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 								,6// $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-								,6// $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
+								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);
 				$arr_resultado['saldo_honorarios'][$id_moneda] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual]
 						, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-								, 6 //$cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+								, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 				);

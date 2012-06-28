@@ -563,7 +563,8 @@ class Factura extends Objeto {
 					// Lo separo en lineas
 					$factura_descripcion_separado = explode("\n", __($factura_descripcion));
 					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
-
+					$honorarios_descripcion = $factura_descripcion_separado;
+					
 					if ($mostrar_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
 					}
@@ -572,6 +573,8 @@ class Factura extends Objeto {
 					}
 				} else {
 					$factura_descripcion_separado = __($factura_descripcion);
+					$honorarios_descripcion = $factura_descripcion_separado;
+					
 					if ($subtotal_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
 					}
@@ -591,7 +594,7 @@ class Factura extends Objeto {
 					$descripcion_subtotal_gastos_sin_impuesto = strtoupper($descripcion_subtotal_gastos_sin_impuesto);
 				}
 				if ($mostrar_honorarios) {
-					$html2 = str_replace('%honorarios_periodo%', $factura_descripcion_separado, $html2);
+					$html2 = str_replace('%honorarios_periodo%', $honorarios_descripcion, $html2);
 				} else {
 					$html2 = str_replace('%honorarios_periodo%', '', $html2);
 				}

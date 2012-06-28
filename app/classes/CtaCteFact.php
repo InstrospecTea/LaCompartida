@@ -53,7 +53,6 @@ class CtaCteFact extends Objeto
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$moneda = new Moneda($this->sesion);
 		$moneda->Load($id_moneda);
-
 		if($id_factura){
 			$mvto->LoadByFactura($id_factura);	//Intento cargar el movimiento
 			$mvto->Edit('id_factura',$id_factura);
