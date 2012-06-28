@@ -749,8 +749,8 @@ if ($cobro->fields['id_contrato'] != '') {
 
     function Refrescar()
     {
-        self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&opc=guardar&id_cobro=<?php echo $id_cobro; ?>';
-    }
+self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&opc=guardar&id_cobro=<?php echo $id_cobro; ?>&facturado=<?php echo intval($cobro->fields['facturado']); ?>';    
+}
 
     function MostrarTipoCambio()
     {
