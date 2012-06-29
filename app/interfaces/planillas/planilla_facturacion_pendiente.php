@@ -510,7 +510,9 @@ if($fechactual-$maxolaptime>2) {
 	$fila_inicial = $filas + 2;
 	$tiempomatriz = array();
 
-
+	if($enviamail) mail('ffigueroa@lemontech.cl','Horas por Facturar '.Conf::AppName(),$querycobros);
+	
+	
 	$reportecontrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2);
 	$ultimocobro = $reportecontrato->arrayultimocobro;
 	//echo '<pre>';print_r($ultimocobro);echo '</pre>';                                die();
@@ -603,6 +605,10 @@ if($fechactual-$maxolaptime>2) {
 			else:
 				$ws1->write($filas, $col_ultimo_cobro, $ultimocobro[$id_contrato]['fecha_emision'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_emision'], $formato_fecha, "-") : '', $formato_texto);
 			endif;
+		}  else {
+			 
+				$ws1->write($filas, $col_estado_ultimo_cobro,$ocultar_estado_ultimo_cobro, $formato_texto);
+			 
 		}
 
 		if (!$ocultar_estado_ultimo_cobro) {
@@ -611,7 +617,7 @@ if($fechactual-$maxolaptime>2) {
 			else:
 				$ws1->write($filas, $col_estado_ultimo_cobro, $ultimocobro[$id_contrato]['estado'] != '' ? $ultimocobro[$id_contrato]['estado'] : '', $formato_texto);
 			endif;
-		}
+		} 
 		
 		if (!$ocultar_fecha_corte) {
 			if ($separar_asuntos) :
@@ -839,7 +845,7 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 	<?php echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
 	echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='SOC' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
+					WHERE codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
 	?>
 				</td>
 				<?php } ?>
@@ -869,14 +875,14 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				$ocultar_estado_ultimo_cobro = UtilesApp::GetConf($sesion, 'OcultarColumnasHorasPorFacturar');
 			}
 			?>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked' : '' ?> /><?php echo __('Ocultar columna estado') . ' ' . __('ultimo cobro') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
-				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
-<?php if ($sesion->usuario->fields['rut'] == '99511620') echo '<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna estado') . ' ' . __('ultimo cobro') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked="checked"' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
+<?php if ($sesion->usuario->fields['rut'] == '99511620') echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
 		<tr>
