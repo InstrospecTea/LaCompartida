@@ -62,17 +62,27 @@ class Funciones {
 
 	function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
 		if ($id_tarifa == "") {
-			$query = "SELECT contrato.id_tarifa FROM asunto JOIN contrato on asunto.id_contrato = contrato.id_contrato WHERE asunto.codigo_asunto = '$codigo_asunto' ";
+			$query = "SELECT 
+						contrato.id_tarifa 
+					FROM asunto 
+					JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+					WHERE asunto.codigo_asunto = '$codigo_asunto' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			list($id_tarifa) = mysql_fetch_array($resp);
 		}
 
-		$query = "SELECT tarifa FROM usuario_tarifa JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa) 
-							WHERE id_usuario='$id_usuario' AND id_moneda='$id_moneda' AND usuario_tarifa.id_tarifa = '$id_tarifa'";
+		$query = "SELECT 
+					tarifa 
+				FROM usuario_tarifa 
+				JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa) 
+				WHERE 
+					id_usuario = '$id_usuario' AND 
+					id_moneda = '$id_moneda' AND 
+					usuario_tarifa.id_tarifa = '$id_tarifa'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$arreglo = mysql_fetch_array($resp);
 
-		return $arreglo[tarifa];
+		return $arreglo['tarifa'];
 	}
 
 	function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {

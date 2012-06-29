@@ -483,10 +483,9 @@ if ($opcion == "guardar") {
 		else
 			$pagina->AddError($cliente->error);
 	}
-		if (method_exists('Conf', 'GetConf'))
+		 
 			$asuntos = explode(';', UtilesApp::GetConf($sesion, 'AgregarAsuntosPorDefecto'));
-		else
-			$asuntos = Conf::AgregarAsuntosPorDefecto();
+		
 	if ( $asuntos[0] == "true" && $loadasuntos ) {
 		
 		for ($i = 1; $i < count($asuntos); $i++) { 
@@ -1095,17 +1094,16 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'AlertaCliente'
 									<td colspan="2" align="center">
 <?php
 if ($cant_encargados > 0) {
-	if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RevisarTarifas')) {
-		?>
-												<input type='button' class='btn' value="<?php echo  __('Guardar') ?>" onclick="return RevisarTarifas( 'id_tarifa', 'id_moneda', this.form, false);" />
-		<?php
+	if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
+		$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
 	} else {
-		?>
-												<input type='button' class='btn' value="<?php echo  __('Guardar') ?>" onclick="return Validar(this.form);" />
-		<?php
+		$funcion_validar = "return Validar(this.form);";
 	}
+?>
+								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
+<?php
 } else {
-	?>
+?>
 											<span style="font-size:10px;background-color:#C6DEAD"><?php echo  __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
 										<?php } ?>
 									</td>

@@ -620,7 +620,7 @@ else
 						</tr>
 						<!-- <?php echo __('Incluir Asuntos sin cobros pendientes') ?> <input type="checkbox" name=sin_cobro_pendiente value=1 <?php echo $sin_cobro_pendiente ? 'checked' : '' ?>> -->
 						<tr>
-							<?php if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaFechaDesdeCobranza') ) || ( method_exists('Conf', 'UsaFechaDesdeCobranza') && Conf::UsaFechaDesdeCobranza() )) {
+							<?php if (UtilesApp::GetConf($sesion, 'UsaFechaDesdeCobranza')) {
 								?>
 								<td align=right><b><?php echo __('Fecha desde') ?>&nbsp;</b></td>
 								<td align=left>

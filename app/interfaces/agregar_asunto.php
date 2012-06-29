@@ -1420,16 +1420,13 @@ if ($permisos_asuntos->fields['permitido']) {
 						<tr>
 							<td colspan=6 align="center">
 <?php
-if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RevisarTarifas')) {
-	?>
-									<input type=button class=btn value=<?php echo __('Guardar') ?> onclick="return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);" />
-	<?php
- } else {
-	?>
-										   <input type='button' class='btn' value="<?php echo __('Guardar') ?>" onclick="return Validar(this.form);" />
-	<?php
+if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
+	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
+} else {
+	$funcion_validar = "return Validar(this.form);";
 }
 ?>
+								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
 							</td>
 						</tr>
 <?php
