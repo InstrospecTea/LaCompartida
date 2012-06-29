@@ -220,7 +220,7 @@ class Alerta {
 		
 	function enviarAvisoCobrosProgramados( $mensajes, $sesion )
 	{
-		$from = Conf::AppName();
+			$from =  html_entity_decode(Conf::AppName());
 
 		if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MailAdmin') != '' )
 		{
