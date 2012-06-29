@@ -1,4 +1,4 @@
-<?
+<?php 
 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
@@ -124,7 +124,7 @@ class Alerta {
 			$mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : "") . "Alerta: $mensaje";
 		}
 
-		$from = Conf::AppName();
+		$from =  html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
 
