@@ -8609,6 +8609,14 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						}
 				}
 				break;
+				
+				case 6.06:
+				$q = "INSERT IGNORE INTO `configuracion` (`glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) 
+						VALUES ('MostrarTarifaAlProfesional', '0', 'Le permite al profesional ver la tarifa para el contrato del trabajo ingresado en revisión de horas (para FAYCA)', 'boolean', '10', '-1');";
+					if ( ! ($res = mysql_query($q, $dbh)) ) {
+						throw new Exception($q . "---" . mysql_error());
+					}
+				break;
 	}
 				
 }
@@ -8618,7 +8626,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update=6.05;
+$max_update=6.06;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
