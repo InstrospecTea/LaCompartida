@@ -820,13 +820,13 @@ $pagina->PrintTop();
 			<td  >
 <?php echo __('Fecha desde') ?>
 			</td> <td   colspan="2">
-				<input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo $fecha1; ?>"/>			</td>
+				<input type="text" class="fechadiff" name="fecha1" id="fecha1" value="<?php echo ($fecha1?$fecha1:date('d-m-Y',strtotime('-1 year'))); ?>"/>			</td>
 			<td>&nbsp;</td>
 		</tr><tr><td>&nbsp;</td>
 			<td   >
 <?php echo __('Fecha hasta') ?>
 			</td> <td   colspan="2">
-				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo $fecha2; ?>"/>
+				<input type="text" class="fechadiff" name="fecha2" id="fecha2" value="<?php echo ($fecha2?$fecha2:date('d-m-Y')); ?>"/>
 			</td><td>&nbsp;</td>
 		</tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 		<tr>
