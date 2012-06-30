@@ -1,5 +1,4 @@
 <?php
-	require_once dirname(__FILE__).'/app/conf.php';
 	require_once dirname(__FILE__).'/fw/classes/Sesion.php';
 	require_once dirname(__FILE__).'/fw/classes/Pagina.php';
 	require_once dirname(__FILE__).'/app/classes/UtilesApp.php';
@@ -13,15 +12,6 @@
 	$_SESSION['ERROR'] = '';
 
 	$pagina->PrintHeaders();
-	
-	if ( !Conf::GetConf($sesion,'ActualizacionTerminado') ) {
-		echo "<h2>Estimado cliente, </h2>&nbsp;&nbsp;Estamos actualizando su sistema. El proceso de actualización se demora approximadamente 10 a 15 minutos ...";
-		?>
-		<br/><br/>
-		<img src="<?php echo Conf::ImgDir();?>/logo_lemon.png" />
-		<?php
-		exit; 
-	}
 ?>
 
 <table width="100%" height="100%">
@@ -41,17 +31,19 @@
 	<tr>
 		<td align="center" style="padding: 8px;">
 <table width="100%" cellspacing="2" cellpadding="2">
- <form action="<?php if(defined('APPDOMAIN')) echo APPDOMAIN; ?>app/usuarios/login.php" method="post">
+ <form action="<?php if(defined('APPDOMAIN')) echo str_replace(array('http:','https:'),'',APPDOMAIN); ?>app/usuarios/login.php" method="post">
 	<tr>
 		<td align="right" rowspan="3">
 			<?php 
-		if(UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) 		{ 
-		echo "	<img src='https://estaticos.thetimebilling.com/images/logo_top_new_tt2.png' />";
-			} 	else 	{ 
-				echo "	<img src='.  Conf::Logo().' /> ";
-		 	} ?>
+			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists( 'Conf', 'UsaDisenoNuevo' ) && Conf::UsaDisenoNuevo() ) ) 
+				{ ?>
+					<img src="<?php echo Conf::ImgDir()?>/logo_lemontech_ttb.jpg" width="175" height="70" />
+		<?php	}
+			else 
+				{ ?>
+					<img src="<?php echo  Conf::Logo() ?>" /> 
+		<?php	} ?>
 		</td>
-		
 		<td align="right">
 			<?php echo ( method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'NombreIdentificador') : Conf::NombreIdentificador() )?>:
 		</td>
@@ -131,7 +123,7 @@
 <table width="80%" class="alerta">
 	<tr>
 		<td valign="top" align="left" style="font-size: 12px;">
-			<?=$sesion->error_msg?>
+			<?php echo $sesion->error_msg ?>
 		</td>
 	</tr>
 </table>
@@ -149,4 +141,4 @@
 </table>
 
 		
-<?php $pagina->PrintBottom(true);?>
+<?php $pagina->PrintBottom(true); ?>
