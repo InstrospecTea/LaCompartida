@@ -1578,13 +1578,10 @@ else
 </form>
 
 <?php  
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		echo(Autocompletador::Javascript($sesion));
-	}
+ 
 		echo(SelectorHoras::Javascript());
-    echo(InputId::Javascript($sesion));
-    $pagina->PrintBottom($popup);
+    
+ 
     function SplitDuracion($time)
     {
         list($h,$m,$s) = split(":",$time);
@@ -1607,3 +1604,10 @@ else
 ?>
  
 </script>
+
+<?php
+if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
+	echo Autocompletador::Javascript($sesion);
+}
+echo InputId::Javascript($sesion);
+$pagina->PrintBottom($popup);
