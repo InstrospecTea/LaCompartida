@@ -3013,6 +3013,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%abogado%', __('Abogado'), $html);
 				$html = str_replace('%duracion_cobrable%', __('Duración cobrable'), $html);
 				$html = str_replace('%monto_total%', __('Monto total'), $html);
+/*VOUGA*/		$html = str_replace('%Total%', __('Total'), $html);
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Tarifa<br>Hora'), $html);
+					
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
+/*VOUGA*/		}				
 				$html = str_replace('%horas%', __('Horas'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 
@@ -3355,6 +3364,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					}
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 					$row = str_replace('%profesional%', $trabajo->fields['nombre_usuario'], $row);
+/*VOUGA*/			$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
@@ -4914,7 +4924,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%glosa_gasto%', __('EXPENSES'), $html);
+/*VOUGA*/		}	
 				$html = str_replace('%GASTOS_ENCABEZADO%', $this->GenerarDocumento($parser, 'GASTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GASTOS_FILAS%', $this->GenerarDocumento($parser, 'GASTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumento($parser, 'GASTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -4929,7 +4943,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto_original%', __('Monto'), $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('Matter<br>ID'), $html);
+/*VOUGA*/		}
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
@@ -4990,6 +5008,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$totales['total_moneda_cobro'] += $saldo;
 
 					$row = $row_tmpl;
+/*VOUGA*/			$row = str_replace('%valor_codigo_asunto%', $gasto->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $gasto->fields['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $gasto->fields['tipo_gasto'], $row);
@@ -5021,7 +5040,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			case 'GASTOS_TOTAL':
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total gastos'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total for expenses'), $html);
+/*VOUGA*/		}	
 				$cobro_moneda = new CobroMoneda($this->sesion);
 				$cobro_moneda->Load($this->fields['id_cobro']);
 
@@ -6720,6 +6743,16 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%td_solicitante%', '', $html);
 				}
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
+				/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Tarifa<br>Hora'), $html);
+					
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
+/*VOUGA*/		}
+/*VOUGA*/		$html = str_replace('%importe%', __('Importe'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Tarifa Hora'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%ordenado_por_jjr%', $this->fields['opc_ver_solicitante'] ? __('Solicitado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -7022,6 +7055,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$categoria_valor+=$trabajo->fields['monto_cobrado'];
 
 					$row = $row_tmpl;
+/*VOUGA*/			$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);					
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
@@ -8562,6 +8596,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 					$html = "<br /><span class=\"subtitulo_seccion\">%glosa_profesional%</span><br>";
 					$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
+					
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			} else {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			}
 
 					$esc = 1;
 					while ( $esc <= $cantidad_escalonadas ) {
@@ -9007,6 +9047,13 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html3 = str_replace('%total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_trabajos'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 				}
 				$resumen_fila_total = $html3;
+				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
+
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			} else {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			}
 
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
@@ -9172,6 +9219,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				    return '';
 				$html=str_replace('%separador%','<hr size="2" class="separador">',$html);
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%glosa_gasto%', __('EXPENSES'), $html);
+/*VOUGA*/		}	
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
 
@@ -9191,7 +9243,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
                 $html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
-                
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('Matter<br>ID'), $html);
+/*VOUGA*/		}                
 				
 				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
 				$html = str_replace('%proveedor%',__('Proveedor'), $html);
@@ -9268,6 +9324,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$row = str_replace('%monto%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', '&nbsp;', $row);
+/*VOUGA*/			 $row = str_replace('%valor_codigo_asunto%', $detalle->fields['codigo_asunto'], $row);
 					/*
 					 * Implementación Gastos con IVA y sin IVA
 					 * acordados en la reunión del 4/02/2011
@@ -9393,7 +9450,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td>&nbsp;</td>', $html);
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total gastos'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total for expenses'), $html);
+/*VOUGA*/		}	
 				#$html = str_replace('%valor_total%', ''/*$cobro_moneda->fields['simbolo'].' '.number_format($totales['total_moneda_cobro'],$cobro_moneda->fields['cifras_decimales']*/,$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']), $html);
 
 				/* pegar lo que hice pal otro caso */
@@ -9958,6 +10019,21 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				list($glosa_cliente) = mysql_fetch_array($resp);
 				$html = str_replace('%nombre_cliente%', $glosa_cliente, $html);
 				
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%factura%', __('Factura'), $html);
+/*VOUGA*/		$html = str_replace('%fecha_liquidacion%', __('Fecha Liquidación'), $html);
+/*VOUGA*/		$html = str_replace('%cliente_corporativo%', __('Cliente Corporativo'), $html);
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
+					
+				} else {
+					/*VOUGA*/		$html = str_replace('%factura%', __('Factura'), $html);
+/*VOUGA*/		$html = str_replace('%fecha_liquidacion%', __('Invoice Date'), $html);
+/*VOUGA*/		$html = str_replace('%cliente_corporativo%', __('Corporate Customer '), $html);
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('Matter ID'), $html);
+				}				
+				
+/*VOUGA*/       $html = str_replace('%codigo_cliente%', $contrato->fields['codigo_cliente'], $html);
+/*VOUGA*/		$html = str_replace('%fecha_emision%', ($this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == '' || $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $html);							
 				$html = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%direccion%', __('Dirección'), $html);
 				$html = str_replace('%valor_direccion%', $contrato->fields['factura_direccion'], $html);
@@ -9967,7 +10043,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%rut_minuscula%', __('Rut'), $html);
 				if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '')
 					$rut_split = split('-', $contrato->fields['rut'], 2);
-
+				
+				$html = str_replace('%valor_rut_sin_formato%', $contrato->fields['rut'], $html);
 				$html = str_replace('%valor_rut%', $rut_split[0] ? $this->StrToNumber($rut_split[0]) . "-" . $rut_split[1] : __(''), $html);
 				$html = str_replace('%giro_factura%', __('Giro'), $html);
 				$html = str_replace('%giro_factura_valor%', $contrato->fields['factura_giro'], $html);
@@ -10022,6 +10099,22 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%codigo_cci%', $codigo_cci, $html);
 				
 				
+					$html = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '', $html);
+					$html = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '', $html);
+					$html = str_replace('%monto_total_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+					
+					$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
+/*VOUGA*/			if ($lang == 'es') {
+
+/*VOUGA*/			$html = str_replace('%total_sin_impuesto%', __('TOTAL SIN IMPUESTOS'), $html);
+/*VOUGA*/			$html = str_replace('%impuesto%', __('I.V.A. (10%)'), $html);
+/*VOUGA*/			$html = str_replace('%total_factura%', __('TOTAL FACTURA'), $html);
+/*VOUGA*/			} else {
+/*VOUGA*/			$html = str_replace('%total_sin_impuesto%', __('TOTAL BEFORE TAXES'), $html);
+/*VOUGA*/			$html = str_replace('%impuesto%', __('V.A.T. (10%)'), $html);
+/*VOUGA*/			$html = str_replace('%total_factura%', __('TOTAL FACTURA'), $html);
+					}
 					
 					$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
 				 
@@ -10908,6 +11001,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%td_solicitante%', '', $html);
 				}
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Tarifa<br>Hora'), $html);
+					
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%id_asunto%', __('Matter <br> ID'), $html);
+/*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Hourly<br> Rate'), $html);
+/*VOUGA*/		}
+				
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%ordenado_por_jjr%', $this->fields['opc_ver_solicitante'] ? __('Solicitado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -11259,6 +11361,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 						$row = str_replace('%tarifa_ajustada%', number_format($trabajo->fields['tarifa_hh'] * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
 					$row = $row_tmpl;
+/*VOUGA*/			$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
@@ -12656,7 +12759,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 						$html3 = str_replace('%total%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 				}
 				$resumen_fila_total = $html3;
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			} else {
+/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			}
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $resumen_filas, $html);
@@ -12820,6 +12927,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en ingl?s
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%factura%', __('Factura'), $html);
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%factura%', __('Factura'), $html);
+/*VOUGA*/		}
 				$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
 
 				$html = str_replace('%GASTOS_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'GASTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -12836,7 +12948,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto_original%', __('Monto'), $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%asunto_id%', __('Matter<br>ID'), $html);
+/*VOUGA*/		}
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
@@ -12872,6 +12988,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$row = str_replace('%monto%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', '&nbsp;', $row);
+/*VOUGA*/			$row = str_replace('%valor_codigo_asunto%', $gasto->fields['codigo_asunto'], $row);
 					$html .= $row;
 				}
 
@@ -12928,7 +13045,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			case 'GASTOS_TOTAL':
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
-
+/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total gastos'), $html);		
+/*VOUGA*/		} else {
+/*VOUGA*/		$html = str_replace('%sub_total_gastos%', __('Sub total for expenses'), $html);
+/*VOUGA*/		}	
 				$cobro_moneda = new CobroMoneda($this->sesion);
 				$cobro_moneda->Load($this->fields['id_cobro']);
 
