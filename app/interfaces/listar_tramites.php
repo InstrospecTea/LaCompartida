@@ -866,28 +866,12 @@ function editarMultiplesArchivos()
         $i++;
         return $html;
 	}
-?>
-<script type="text/javascript">
-Calendar.setup(
-	{
-		inputField	: "fecha_ini",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_ini"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_fin",			//id of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_fin"		// ID of the button
-	}
-);
-</script>
-<?php 
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		echo(Autocompletador::Javascript($sesion));
-	}
-	echo(InputId::Javascript($sesion));
-	$pagina->PrintBottom($popup);
-?>
+
+
+
+if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
+	echo Autocompletador::Javascript($sesion);
+}
+echo InputId::Javascript($sesion);
+$pagina->PrintBottom($popup);
+
