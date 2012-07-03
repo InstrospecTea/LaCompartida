@@ -8660,7 +8660,7 @@ for ($version = max($min_update,2); $version <= $max_update; $version += 0.01) {
 if(isset($_GET['lastver']))  {
     $lastver=array_pop($VERSIONES);
     echo $lastver;
-   die();
+  
 } else {
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
