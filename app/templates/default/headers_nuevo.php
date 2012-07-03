@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <?php
 /*error_reporting(E_ALL ^ E_NOTICE);*/
-ini_set('display_errors','On');
+//ini_set('display_errors','On');
 date_default_timezone_set('America/New_York');
 $laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
 $punto=strpos($laurl,'.'); 
@@ -70,6 +70,8 @@ google.load("jquery","1.7");
 .non_popup {background: url(https://estaticos.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
 .alignleft {text-align:left;font-size:10px;}
+.alignright {text-align:right;font-size:10px;}
+.aligncenter {display:block;text-align:center;margin:auto;}
 #zenbox_tab {overflow: hidden; border: 0 none !important;}
 #mainttb {background:white;padding: 30px 0 5px ;width: 960px;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;}
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
@@ -91,11 +93,11 @@ google.load("jquery","1.7");
 .droplinetabs UL LI UL A:hover {padding-bottom:7px !important;display:block;background:#119011 !important;text-decoration:none !important;}
 .droplinetabs UL LI UL {margin-left:4px;}
 .droplinetabs ul li ul li a {padding-right:11px !important;padding-left:8px !important}
-.mini_input {height: 12px; margin: -1px 0 0 -1px;font-size:10px;}
+.mini_input {height: 18px; margin: -1px 0 0 -1px;font-size:10px;}
 .updown {position: relative;margin: -2px 0 0 0px;left: 260px;top: -20px;}
  #colleft { width:950px;}
  #cajafacturas  { width:950px;margin-left:-3px;}
-#cajafacturas td {font-size:8pt !important; border-collapse:collapse;border:1px solid #F9F9F9;}
+#cajafacturas td, #cajafacturas th {font-size:8pt !important; border-collapse:collapse;border:1px solid #F9F9F9;}
 #cobro6colderecha {    float:left;margin: 5px -10px 0 35px;width:230px;;background-color: white;}
 #colmask {width:955px;overflow:hidden;clear:both;margin:auto;}
 #historial {margin:5px 0 0 -10px;width:700px;float:left;}
