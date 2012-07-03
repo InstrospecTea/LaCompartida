@@ -7,16 +7,16 @@
 /* IMPORTANTE:
 	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
 if(!function_exists('ExisteCampo')) {
- function ExisteCampo($campo,$tabla,$dbh) { 
-    
-    $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
-    if(!$existencampos):
-	return false;
-    elseif(mysql_num_rows($existencampos)>0): 
-	return true;
-    endif;
-        return false;
-}
+	function ExisteCampo($campo,$tabla,$dbh) { 
+
+		$existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
+		if(!$existencampos):
+		return false;
+		elseif(mysql_num_rows($existencampos)>0): 
+		return true;
+		endif;
+			return false;
+	}
 }
 function ExisteIndex($indice,$tabla,$dbh) { 
     $ExisteIndex = mysql_query("SHOW INDEX FROM   $tabla where key_name = '$campo'", $dbh);
@@ -8617,6 +8617,29 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						throw new Exception($q . "---" . mysql_error());
 					}
 				break;
+				
+				case 6.07:
+					$query = array();
+					$query[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
+						VALUES (NULL, 'FormatoNotaCobroMTA', '0', 'formato de cobro especial de Muñoz Tamayo y Asociados', 'boolean', '10', '-1');";
+					
+					foreach ($query as $q) {
+						if (!($res = mysql_query($q, $dbh) )) {
+								throw new Exception($q . "---" . mysql_error());
+						}
+					}
+					break;
+					case 6.08:
+							$query = array();
+					$query[] ="ALTER TABLE  `version_db` DROP PRIMARY KEY;";
+					$query[] ="ALTER TABLE  `version_db` ADD PRIMARY KEY (  `version` ,  `version_ct` );";
+
+					$query[] ="ALTER TABLE  `version_db` CHANGE  `version`  `version` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
+					$query[] ="ALTER TABLE  `version_db` CHANGE  `version_ct`  `version_ct` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
+					if ( ! ($res = mysql_query($q, $dbh)) ) {
+						throw new Exception($q . "---" . mysql_error());
+					}
+				break;
 	}
 				
 }
@@ -8626,7 +8649,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update=6.06;
+$max_update=6.08;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
@@ -8637,7 +8660,7 @@ for ($version = max($min_update,2); $version <= $max_update; $version += 0.01) {
 if(isset($_GET['lastver']))  {
     $lastver=array_pop($VERSIONES);
     echo $lastver;
-   
+   die();
 } else {
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
 
@@ -8711,7 +8734,12 @@ if(isset($_GET['lastver']))  {
 	function GuardarVersion( $versionFileName, $new_version,$sesion )
 	{
        
-            mysql_query("CREATE TABLE IF NOT EXISTS version_db (  version decimal(3,2) NOT NULL DEFAULT '1.00',  version_ct decimal(3,2) NOT NULL DEFAULT '1.00',  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  PRIMARY KEY (version)) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
+            mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
+  `version` decimal(3,2) NOT NULL DEFAULT '0.00',
+  `version_ct` decimal(3,2) NOT NULL DEFAULT '0.00',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`version`,`version_ct`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1; ", $sesion->dbh);
             mysql_query("insert ignore INTO version_db (version) values (".number_format($new_version,2,'.','').");", $sesion->dbh);
                 $data = '<?php	$VERSION = '.number_format($new_version,2,'.','').' ; if( $_GET[\'show\'] == 1 ) echo \'Ver. \'.$VERSION; ?>';
 		//file_put_contents( $versionFileName, $data );
