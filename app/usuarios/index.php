@@ -15,7 +15,7 @@
 
 	$pagina->PrintTop();
 	
-	
+       
        
         
 	// Si existe 'ColumnaNotificacion' en Conf demonstra una ventana con noticias del sistema

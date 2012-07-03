@@ -111,129 +111,11 @@ require_once dirname(__FILE__).'/../conf.php';
 	$pagina->PrintTop();
 	$tooltip_text = __('Para agregar un nuevo usuario ingresa su '.UtilesApp::GetConf($sesion,'NombreIdentificador').' aquí.');
 ?>
-    <style type="text/css">
-      @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
-  #tablapermiso {border-spacing:0;border-collapse:collapse;}
-	  #tablapermiso th {font-size:10px;}
-  .dataTables_paginate {clear: both; margin: -20px 350px 15px 0;width:370px;vertical-align:middle;}
-  .dttnombres, .dttactivo {text-align:left;font-size:10px;white-space: nowrap;}
- .dttpermisos .DataTables_sort_icon, .dttactivo .DataTables_sort_icon {display:none;}
- .activo, .usuarioinactivo, .usuarioactivo {float:left;display:inline;}
- .inactivo {opacity:0.4;}
- .inactivo td {background:#F0F0F0;}
- /*th.dttpermisos {-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg); filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);}*/
- #contienefiltro {display:inline-block;margin-bottom:-8px;}
- #tablapermiso_paginate .fg-button {padding:0 5px;}
- #tablapermiso_paginate .first, #tablapermiso_paginate .last {display:none;}
-#tablapermiso  tbody tr.odd {background-color: #fff !important;}
-#tablapermiso  tbody tr.even {background-color: #EFE !important;}
-td.sorting_1 {background:transparent !important;}
-    </style>
-   <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
-		
 
- 
-	  var oTable=jQuery('#tablapermiso').dataTable( {
-		
-		 
-	  "bJQueryUI": true,
-		     "bDeferRender": true,
-"bDestroy":true,
-               
-		 		"oLanguage": {   
-		    "sProcessing":   "Procesando..." ,
-		    "sLengthMenu":   "Mostrar _MENU_ registros",
-		    "sZeroRecords":  "No se encontraron resultados",
-		    "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-		    "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",
-		    "sInfoFiltered": "(filtrado de _MAX_ registros en total)",
-		    "sInfoPostFix":  "",
-		    "sSearch":       "<b>Buscar Nombre</b>",
-		    "sUrl":          "",
-		    "oPaginate": {
-			 
-			"sPrevious": "anterior",
-			"sNext":     "siguiente"
-			 
-		 }
-	 },
-	 "bFilter": true,
-	 		 "aoColumns": [
-				 	{ "mDataProp": "rut" }, 
-				 	{ "mDataProp": "id_usuario" }, 
-			{ "mDataProp": "nombrecompleto" }, 
-			 
-				{ "mDataProp": "ADM" },
-				{ "mDataProp": "DAT" },
-			
-			     { "mDataProp": "COB" },
-				
-				{ "mDataProp": "EDI" },
-				{ "mDataProp": "LEE" },
-				{ "mDataProp": "OFI" },
-				{ "mDataProp": "PRO" },
-				{ "mDataProp": "REP" },
-				{ "mDataProp": "REV" },
-				{ "mDataProp": "SEC" },
-				{ "mDataProp": "SOC" },
-				{ "mDataProp": "TAR" },
-				{ "mDataProp": "ACT" } 
-	 
-		],   
-		   "aoColumnDefs": [
-			    { "sClass": "dttnombres", "aTargets": [ 2  ] },
-		 
-		
-	{  "fnRender": function ( o, val ) {
-				var botones='';
-				botones+= "<div style='float:left;display:inline;' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'>";
-				if(val==1) {
-					botones+="<input class='permiso usuarioactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb.png' alt='ACTIVO' title='Usuario Activo'";
-				} else {
-    			
-				 botones+= "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
-				}
-			   		return botones+" rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>&nbsp;<a style='float:right;display:inline;' href='usuario_paso2.php?rut="+o.aData['rut']+"' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
-	},   "sClass": "dttactivo", "bUseRendered": false, "aTargets": [ 15 ]   }  ,
-	{  "fnRender": function ( o, val ) {
-			   	if(val==1) {
-					return "<div class='permiso on' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'><input class='permiso' type='image' src='https://static.thetimebilling.com/images/check_nuevo.gif' alt='OK' rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>";
-				} else {
-    				return "<div class='permiso off' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'><input class='permiso'  type='image' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif' rel='"+o.aData['id_usuario']+';'+o.mDataProp+"' alt='NO' /></div>";
-				}
-	}, "bUseRendered": false, "sClass": "dttpermisos",  "aTargets": [3,4,5,6,7,8,9,10,11,12,13,14   ]   }  ,
-	 { "bVisible": false, "aTargets": [ 0,1 ] }
-	
-    
-    ],
-	"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-        if ( aData['ACT'] == "0" )        jQuery(nRow).addClass('inactivo').attr('title','Usuario Inactivo');
-         },
-	  "sAjaxSource": "../interfaces/ajax/usuarios_ajax.php",
-		 "iDisplayLength": 25,
-		       "sDom":  '<"top"flp>t<"bottom"i>',
-	    "aLengthMenu": [[25, 50, 100,200, -1], [25, 50, 100,200, "Todo"]],
-	    "sPaginationType": "full_numbers",
-	   
-	    "aaSorting": [[ 2, "asc" ]]
-		
-	     });
-		  jQuery('#contienefiltro').append(jQuery('#tablapermiso_filter'));
-		 /*jQuery('#tablapermiso_filter').append(' S&oacute;lo activos');*/
-		 
-		 oTable.fnFilter( '1',15 );
-	 	
-		 jQuery('#activo').click(function() {
-			if(jQuery(this).is(':checked')) {
-				 oTable.fnFilter( '1',15,0,1 );
-			} else {
-				 oTable.fnFilter('',15,0,1  );
-			}
-		 });
-jQuery('.permiso').live('click',function() {
+jQuery('.permiso').click(function() {
    var Objeto=jQuery(this);
    var Dato=jQuery(this).attr('rel').split(';');
   
@@ -243,25 +125,17 @@ jQuery('.permiso').live('click',function() {
     if(Act=='OK') {
 	Accion='revocar';
 	jQuery(this).attr('alt','NO');
-    } else if (Act=='NO') {
+    } else {
 	Accion='conceder';
 	jQuery(this).attr('alt','OK');
 	
-    } else if (Act=='ACTIVO') {
-		Accion='desactivar';
-	jQuery(this).attr('alt','INACTIVO');
-	jQuery(this).closest('tr').addClass('inactivo');
-	} else {
-		Accion='activar';
-	jQuery(this).attr('alt','ACTIVO');
-	jQuery(this).closest('tr').removeClass('inactivo');
-	}
+    }
      jQuery.post('../interfaces/ajax/permiso_ajax.php',{accion:Accion,userid:Dato[0], permiso:Dato[1]},function(data) {
 		
 		Objeto.attr('src',data);
 		 
 	    });
-            Objeto.attr('src','https://static.thetimebilling.com/images/ico_loading.gif');
+            Objeto.attr('src','https://estaticos.thetimebilling.com/images/ico_loading.gif');
 	    return false;
   
 });
@@ -511,7 +385,7 @@ function Listar( form, from )
 		{ ?>
 			<form action="usuario_paso2.php" method="post">
 <?php  } ?>
-</table>
+
 <table width=100% class="tb_base">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="2">
@@ -542,7 +416,6 @@ function Listar( form, from )
 	</tr>
 </table>
 <br/>
-<table width=100% class="tb_base">
 </form>
 				</td>
 		</tr>
@@ -683,25 +556,26 @@ function Listar( form, from )
 						<hr class="subtitulo_linea_plomo"/>
 				</td>
 		</tr>
-		
+		<tr>
+				<td colspan=2>
+				<?php echo __('Para buscar ingresa el nombre del usuario o parte de él.')?>
+				</td>
+		</tr>
 		<tr>
 				<td valign="top" align="left" colspan="2"><img src="https://files.thetimebilling.com/templates/default/img/pix.gif" border="0" width="1" height="10"></td>
 		</tr>
 		<tr>
 				<td valign="top" align="center" style="white-space:nowrap">
 			<form name="act"  method="post">
-					  	 
-						
-						<input type="checkbox" name="activo"  id="activo" <?php if(!$activo) echo 'value="1" checked="checked"'; ?> />s&oacute;lo activos &nbsp;&nbsp;&nbsp;
-						<span id="contienefiltro"></span>
+					  <input type="checkbox" name="activo"  id="activo" <?php if($activo) echo 'value="1" checked="checked"'; ?> />s&oacute;lo activos &nbsp;&nbsp;&nbsp;
+						<strong>Nombre</strong>
+						<input onkeydown="if(event.keyCode==13)Listar(this.form,'buscar')" type="text" name="nombre" id="nombre" value="<?php echo $nombre?>" size="20" />
 						&nbsp;&nbsp; 
 						
-						&nbsp; <a href="#" id="btnbuscar" style="display:none;" class="u1 botonizame"  icon="ui-icon-search" rel="buscar">Buscar</a>
-						
+						&nbsp; <a href="#" id="btnbuscar"  class="u1 botonizame"  icon="ui-icon-search" rel="buscar">Buscar</a>
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel"   rel="xls">Descargar Listado</a>
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_vacacion">Descargar Vacaciones</a>
 						&nbsp; <a href="#" class="u1 descargaxls botonizame" icon="ui-icon-excel" rel="xls_modificaciones">Descargar Modificaciones</a>
-					
 						
 			</form>
 				    
@@ -709,40 +583,33 @@ function Listar( form, from )
 		</tr>
 		<tr>
 				<td colspan=2>
-				<br /><?php echo __('Para buscar ingrese el nombre del usuario o parte de él.')?>
-				</td>
-		</tr>
-		<tr>
-				<td colspan=2>
 		<br />
-<table id="tablapermiso">
-	<thead><tr><td class="encabezado">RUT</td>
-		<th>ID</th>
-				<th>Nombre</th>
-			
-				<th>Admin</th>
-				<th>Admin<br>Datos</th><th width="23">Cobranza</th>
-					<th>Editar<br/>Biblioteca</th>
-				
-				
-				
-				<th>Lectura</th>
-				<th>Oficina</th>
-				<th>Profesional</th>
-				<th>Reportes</th>
-				<th>Revisión</th>
-				<th>Secretaría</th>
-				<th>Socio</th>
-				<th>Tarifa</th>
-				<th width="25">Activo</th>
-			 
-		</tr></thead>
-	<tbody></tbody>
-		
-	
-	
-	
-</table>
+<?php 		$query = "SELECT * FROM prm_permisos WHERE codigo_permiso<>'ALL' ORDER BY glosa";
+		$permisos = new ListaObjetos($sesion,"",$query);
+
+		if($activo)
+			$activo="activo=1";
+		else
+			$activo="1";
+
+		echo "<center>";
+		$query = "SELECT SQL_CALC_FOUND_ROWS * FROM usuario WHERE $activo AND (nombre LIKE '%$nombre%' OR apellido1 LIKE '%$nombre%' OR apellido2 LIKE '%$nombre%') ";
+ 
+		$b = new Buscador($sesion, $query, "Objeto", $desde, $x_pag, $orden);
+		$b->AgregarEncabezado("apellido1",__('Apellido Paterno'),"align=left");
+		$b->AgregarEncabezado("apellido2",__('Apellido Materno'),"align=left");
+		$b->AgregarEncabezado("nombre",__('Nombre'),"align=left");
+		$b->AgregarFuncion("Activo","PrintActivo","align=center");
+		for($i = 0; $i < $permisos->num; $i++)
+		{
+			$perm = $permisos->Get($i);
+			$b->AgregarFuncion($perm->fields[glosa],"PrintCheck","align=center");
+		}
+		$b->AgregarFuncion("",'Opciones',"align=center");
+		$b->color_mouse_over = "#bcff5c";
+		$b->Imprimir();
+		echo "</center>";
+?>
 				</td>
 		</tr>
 </table>
@@ -769,7 +636,6 @@ function Listar( form, from )
 		<tr><td colspan="2">&nbsp;</td></tr>
 </table>
 
-
 <?php 	function Opciones(& $fila)
 	{
 			global $sesion;
@@ -782,7 +648,7 @@ function Listar( form, from )
 					return "<a href=usuario_paso2.php?rut=".$fila->fields[rut]." title='Editar usuario'><img border=0 src=".Conf::ImgDir()."/ver_persona.gif alt='Editar' /></a>";
 				}
 	}
-	function PrintCheck(& $fila)
+	/*function PrintCheck(& $fila)
 	{
 		global $sesion, $permisos;
 		static $i = 0;
@@ -827,6 +693,6 @@ function Listar( form, from )
 				else
 					return "<img src=".Conf::ImgDir()."/cruz_roja.gif alt='NO' />";
 			}
-	}
+	}*/
 	$pagina->PrintBottom();
 ?>
