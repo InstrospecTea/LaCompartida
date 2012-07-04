@@ -26,9 +26,7 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
 
  function downloadJSAtOnload() {
    
-   jQuery("head").append("<link id='zenboxcss' />");
-    jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" });
-     
+
 
     
   if (_sf_async_config.pathseguro!==undefined) {
@@ -61,7 +59,9 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
    
    /*     jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', 
 	dataType: 'script'}) .done(function() {
-	 
+	    jQuery("head").append("<link id='zenboxcss' />");
+    jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" });
+     
 		if (typeof(window.Zenbox) !== "undefined") {
 			Zenbox.init({
 				dropboxID:   "20042787",
