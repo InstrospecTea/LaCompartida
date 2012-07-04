@@ -62,7 +62,7 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
         jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', 
 	dataType: 'script'})
 	 .fail(function() {
-	  jQuery.ajax({async: false,cache:true, type: "GET", url: 'https:/static.thetimebilling.com/zenbox.js'});  
+	  jQuery.ajax({async: false,cache:true, type: "GET", url: 'https://static.thetimebilling.com/zenbox.js'});  
 	}).always(function() {
 	 
 		if (typeof(window.Zenbox) !== "undefined") {
