@@ -7,13 +7,13 @@
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/../fw/classes/SelectorHoras.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
+	
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Tramite.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+	
 
 	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
@@ -863,7 +863,7 @@ function ShowDiv(div, valor, dvimg)
 	var div_id = document.getElementById(div);
 	var img = document.getElementById(dvimg);
 	var form = document.getElementById('form_editar_trabajo');
-	var codigo = document.getElementById('campo_codigo_cliente').value;
+	var codigo = jQuery('#campo_codigo_cliente').val();
 	var tr = document.getElementById('tr_cliente');
 	var tr2 = document.getElementById('tr_asunto');
 	var al = document.getElementById('al');
@@ -1103,7 +1103,7 @@ A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<?php  echo(Autocompletador::CSS()); ?>
+
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -1256,26 +1256,8 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 			<?php echo __('Cliente')?>
         </td>
         <td align=left width="440" nowrap>
-<?php 
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario);
-		else
-			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-	}
-	else
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,""           ,"CargarMonedaContrato();CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-		}
-		else
-		{
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarMonedaContrato();CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
-		}
-	}
-?>
+<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+
         </td>
      </tr>
      <tr>
@@ -1283,17 +1265,8 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
              <?php echo __('Asunto')?>
         </td>
         <td align=left width="440" nowrap>
-<?php 
-					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarMonedaContrato();CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
-					}
-					else
-					{
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $tramite->fields['codigo_asunto'] ? $tramite->fields['codigo_asunto'] : $codigo_asunto ,"","CargarMonedaContrato();CargaIdioma(this.value); CargarSelectCliente(this.value);", 320,$codigo_cliente);
-					}
+                                <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
 
-?>
        </td>
     </tr>
 <?php 
@@ -1429,6 +1402,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 		$where = " (usuario_secretario.id_secretario = '".$sesion->usuario->fields['id_usuario']."'
 							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "') OR usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
 	$where .= " AND usuario.visible=1";
+	
 	$select_usuario = Html::SelectQuery($sesion,
 		"SELECT usuario.id_usuario,
 			CONCAT_WS(' ', apellido1, apellido2,',',nombre)
@@ -1606,8 +1580,5 @@ else
 </script>
 
 <?php
-if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-	echo Autocompletador::Javascript($sesion);
-}
-echo InputId::Javascript($sesion);
+
 $pagina->PrintBottom($popup);

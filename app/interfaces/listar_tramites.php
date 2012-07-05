@@ -10,7 +10,6 @@
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Cobro.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
 
 	$sesion = new Sesion(array('PRO','REV','ADM','COB','SEC'));
@@ -365,30 +364,30 @@ function Refrescar()
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{ ?>
-					var codigo_cliente = '&codigo_cliente_secundario='+document.getElementById('codigo_cliente_secundario').value;
+					var codigo_cliente = '&codigo_cliente_secundario='+jQuery('#codigo_cliente_secundario').val();
 		<?php 	}
 			else
 				{ ?>
-					var codigo_cliente = '&codigo_cliente_secundario='+document.getElementById('campo_codigo_cliente_secundario').value;
+					var codigo_cliente = '&codigo_cliente_secundario='+jQuery('#campo_codigo_cliente_secundario').val();
 		<?php 	} ?>
-			var codigo_asunto = '&codigo_asunto_secundario='+document.getElementById('campo_codigo_cliente_secundario').value;
+			var codigo_asunto = '&codigo_asunto_secundario='+jQuery('#campo_codigo_cliente_secundario').val();
 <?php 	}
 	else
 		{ 
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{ ?>
-					var codigo_cliente = '&codigo_cliente='+document.getElementById('codigo_cliente').value;
+					var codigo_cliente = '&codigo_cliente='+jQuery('#codigo_cliente').val();
 		<?php 	}
 			else
 				{ ?>
-					var codigo_cliente = '&codigo_cliente='+document.getElementById('campo_codigo_cliente').value;
+					var codigo_cliente = '&codigo_cliente='+jQuery('#campo_codigo_cliente').val();
 		<?php 	} ?>
-			var codigo_asunto = '&codigo_asunto='+document.getElementById('campo_codigo_asunto').value;
+			var codigo_asunto = '&codigo_asunto='+jQuery('#campo_codigo_asunto').val();
 <?php  } 
 ?>
-	var usuario = '&id_usuario='+document.getElementById('id_usuario').value;
-	var fecha_ini = '&fecha_ini='+document.getElementById('fecha_ini').value;
-	var fecha_fin = '&fecah_fin='+document.getElementById('fecha_fin').value;
+	var usuario = '&id_usuario='+jQuery('#id_usuario').val();
+	var fecha_ini = '&fecha_ini='+jQuery('#fecha_ini').val();
+	var fecha_fin = '&fecah_fin='+jQuery('#fecha_fin').val();
 	
 	var url = "listar_tramites.php?popup=1&opc=buscar&accion=refrescar"+codigo_cliente+codigo_asunto+usuario+fecha_ini+fecha_fin;
 	self.location.href = url;
@@ -397,17 +396,17 @@ function Refrescar()
 
 function AgregarNuevo( name )
 {
-	var usuario = document.getElementById('id_usuario').value;
+	var usuario = jQuery('#id_usuario').length>0?   jQuery('#id_usuario').val() : <?php echo $sesion->usuario->fields[id_usuario];?> ;
 	<?php  if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) )
 			{ ?>
-			var cliente = document.getElementById('codigo_cliente_secundario').value;
-			var asunto = document.getElementById('codigo_asunto_secundario').value;
+			var cliente = jQuery('#codigo_cliente_secundario').val();
+			var asunto = jQuery('#codigo_asunto_secundario').val();
 			urlo='ingreso_tramite.php?popup=1&codigo_cliente_secundario=' + cliente + '&codigo_asunto_secundario=' + asunto + '&id_usuario=' +usuario;
 	<?php 	}
 		else
 			{ ?>
-			var cliente = document.getElementById('codigo_cliente').value;
-			var asunto = document.getElementById('codigo_asunto').value;
+			var cliente = jQuery('#codigo_cliente').val();
+			var asunto = jQuery('#codigo_asunto').val();
 			urlo='ingreso_tramite.php?popup=1&codigo_cliente=' + cliente + '&codigo_asunto=' + asunto + '&id_usuario=' +usuario;
 	<?php 	} ?>
 	nuovaFinestra('Agregar_Tramite',750,470,urlo,'top=100, left=125');
@@ -505,7 +504,7 @@ function editarMultiplesArchivos()
 		alert('Debe seleccionar por lo menos un trabajo para editar.');
 }
 </script>
-<?php  echo(Autocompletador::CSS()); ?>
+
 <form method='get' name="form_tramites" id="form_tramites">
 <input type='hidden' name='opc' id='opc' value='buscar'>
 <input type='hidden' name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>'>
@@ -552,22 +551,8 @@ function editarMultiplesArchivos()
             <?php echo __('Nombre Cliente')?>
         </td>
         <td nowrap align='left' colspan=3>
-<?php 
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo Autocompletador::ImprimirSelector($sesion, '',$codigo_cliente_secundario);
-		else
-			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-	}
-	else
-	{
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario,"","CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto);
-		else
-			echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-	}
-?>
+<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+
 				</td>
 	</tr>
 	<tr>
@@ -575,12 +560,8 @@ function editarMultiplesArchivos()
 			<?php echo __('Asunto')?>
 		</td>
 		<td nowrap align='left' colspan=3>
-<?php 
-					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
-					else
-						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto,"", "CargarSelectCliente(this.value);", 320,$codigo_cliente);
-?>
+                                <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+
 		</td>
 	</tr>
 <?php 
@@ -869,9 +850,5 @@ function editarMultiplesArchivos()
 
 
 
-if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-	echo Autocompletador::Javascript($sesion);
-}
-echo InputId::Javascript($sesion);
-$pagina->PrintBottom($popup);
+	$pagina->PrintBottom($popup);
 
