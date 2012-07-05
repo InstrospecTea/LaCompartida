@@ -65,16 +65,16 @@ if ($semana == "") {
     $sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL -  WEEKDAY(CURDATE())  DAY ) AS semana_inicio";
     $resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
     list($semana_actual) = mysql_fetch_array($resp);
-    $semana_anterior = date("Y-m-d", strtotime("$semana_actual-7 days"));
-    $semana_siguiente = date("Y-m-d", strtotime("$semana_actual+7 days"));
+    $semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
+    $semana_siguiente = date("d-m-Y", strtotime("$semana_actual+7 days"));
 } else {
     $semana2 = "'$semana'";
     $sql_f = "SELECT DATE_ADD( '" . $semana . "', INTERVAL - WEEKDAY('" . $semana . "')  DAY ) AS semana_inicio";
 
     $resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
     list($semana_actual) = mysql_fetch_array($resp);
-    $semana_anterior = date("Y-m-d", strtotime("$semana_actual-7 days"));
-    $semana_siguiente = date("Y-m-d", strtotime("$semana_actual+7 days"));
+    $semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
+    $semana_siguiente = date("d-m-Y", strtotime("$semana_actual+7 days"));
 }
 if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
     $select_codigo = "(SELECT c2.codigo_cliente_secundario FROM cliente as c2 WHERE c2.codigo_cliente=asunto.codigo_cliente) as codigo_cliente,asunto.codigo_asunto_secundario as codigo_asunto,";
@@ -192,7 +192,7 @@ $where .= " AND usuario.visible=1";
 
 
         jQuery(document).ready(function() {
-            var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
+          /*  var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
             if (mes<=9) {
                 var mestext='0'+mes.toString();
             } else {
@@ -200,7 +200,8 @@ $where .= " AND usuario.visible=1";
             }
             var dia=jQuery('#semana_Day_ID').val();
             if (dia.length==1) dia='0'+dia;
-            var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;
+            var semana= jQuery('#semana').val()+'-'+mestext+'-'+dia;*/
+			  var semana= jQuery('#semanactual').val();
             var usuario= jQuery('#id_usuario').val();
 		 
 			
@@ -217,7 +218,7 @@ $where .= " AND usuario.visible=1";
             });
         
             jQuery('#versemana').click(function() {
-                var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
+          /*      var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
                 if (mes<=9) {
                     var mestext='0'+mes.toString();
                 } else {
@@ -225,12 +226,13 @@ $where .= " AND usuario.visible=1";
                 }
                 var dia=jQuery('#semana_Day_ID').val();
                 if (dia.length==1) dia='0'+dia;
-                var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;
+               var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;*/
+		  var semana= jQuery('#semanactual').val();
                 var usuario= jQuery('#id_usuario').val();
                 Refrescasemana(semana,usuario);
             });
             jQuery('#id_usuario').change(function() {
-                var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
+             /*   var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
                 if (mes<=9) {
                     var mestext='0'+mes.toString();
                 } else {
@@ -238,7 +240,8 @@ $where .= " AND usuario.visible=1";
                 }
                 var dia=jQuery('#semana_Day_ID').val();
                 if (dia.length==1) dia='0'+dia;
-                var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;
+           var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;*/
+				  var semana= jQuery('#semanactual').val();
                 var usuario= jQuery('#id_usuario').val();
                 Refrescasemana(semana,usuario);
             });
@@ -263,7 +266,10 @@ $where .= " AND usuario.visible=1";
             });
         });
         function Refrescasemana(semana,usuario,eldiv,slide) {
-            var dias=0;    
+         if(window.console) console.log(semana);
+		 semanaplus=semana.split('-');
+		 semana=semanaplus[2]+'-'+semanaplus[1]+'-'+semanaplus[0];
+	   var dias=0;    
             var diaplus=dias+1;
             var fecha='';
 		 var divsemana= eldiv ? jQuery('#'+eldiv) : jQuery('#divsemana');
@@ -339,7 +345,7 @@ $where .= " AND usuario.visible=1";
 						  
                         jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
                             var arreglo=data.split('|');
-                        console.log(arreglo);
+                       if(window.console) console.log(arreglo);
 						 jQuery('#divsemana #celdastrabajo td').first().append(ui.draggable);
 						 jQuery('#proxsemana').click();
                         });
@@ -357,7 +363,7 @@ $where .= " AND usuario.visible=1";
                       
                         jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
                             var arreglo=data.split('|');
-                           console.log(arreglo);
+                          if(window.console)  console.log(arreglo);
 						     jQuery('#divsemana #celdastrabajo td').first().append(ui.draggable);
 							  jQuery('#antsemana').click();
                         });
@@ -388,6 +394,7 @@ $where .= " AND usuario.visible=1";
             jQuery('#semana_Year_ID').val(arreglo[0]);
             jQuery('#semana_Day_ID').val(parseInt(arreglo[2]));
             jQuery('#semana_Month_ID').val(parseInt(arreglo[1])-1).change();
+			jQuery('#semanactual').val(arreglo[2]+'-'+arreglo[1]+'-'+arreglo[0]);
         }
 
         function menues() {
@@ -486,7 +493,7 @@ if ($p_revisor->fields['permitido']) {
 ?>
                             </td>
                             <td align='right' id="printcalendar">
-                                <?php echo Html::PrintCalendar('semana', $semana); ?>
+                                <input type="text" class="fechadiff" value="<?php echo ( $semana ? $semana : date('d-m-Y')); ?>" name="semana" id="semanactual" />
                             </td>
                             <td align ='left' width='19%'>
                                 <input type='button' class='btn' value="Ver semana" id="versemana" >

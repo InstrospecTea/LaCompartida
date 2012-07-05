@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -151,7 +151,7 @@ function Validar(form, desde, ids)
 
 	if(!form.glosa_tramite.value)
 	{
-		alert("<?=__('Debe ingresar un nombre del trámite')?>");
+		alert("<?php echo __('Debe ingresar un nombre del trámite')?>");
 		form.glosa_tramite.focus();
 		return false;
 	}
@@ -171,7 +171,7 @@ function Validar(form, desde, ids)
 	{
 		if(!form.duracion.value )
 		{
-			alert("<?=__('Debe ingresar la duracion')?>");
+			alert("<?php echo __('Debe ingresar la duracion')?>");
 			form.duracion.focus();
 			return false;
 		}
@@ -310,7 +310,7 @@ function Listar( form, from )
 //funcion java para eliminar
 function EliminaTramite(id_tramite_tipo)
 {
-	var desde = <?=($desde)? $desde : '0'?>;
+	var desde = <?php echo ($desde)? $desde : '0'?>;
 	form = document.getElementById('form_tramite');
 	self.location.href = "tramites.php?id_tramite_tipo="+id_tramite_tipo+"&accion=eliminar&buscar=1&desde="+desde;
 	return true;
@@ -339,11 +339,11 @@ function Refrescar()
 
 <form method=post name="form_tramite" id="form_tramite">
 <!--<input type=hidden name=opcion value="Buscar" />-->
-<input type=hidden name=id_tramite_tipo value="<?=$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $id_tramite_tipo ?>" />
+<input type=hidden name=id_tramite_tipo value="<?php echo $tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $id_tramite_tipo ?>" />
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type=hidden name=max_hora id=max_hora value=14 />
-<?
+<?php 
 	if($p_admin)
 	{
 ?>
@@ -351,11 +351,11 @@ function Refrescar()
 		<tr>
 			<td></td>
 			<td align=right>
-				<a href="tramites.php"><img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <?=__('Nuevo Trámite')?></a>
+				<a href="tramites.php"><img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <?php echo __('Nuevo Trámite')?></a>
 			</td>
 		</tr>
 	</table>
-<?
+<?php 
 	}
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 	{
@@ -374,33 +374,33 @@ function Refrescar()
 		$width_table = 'width=100%';
 	}
 	?>
-	<table <?=$width_table ?>><tr><td>
-	<fieldset <?=$clase_fieldset ?> width="100%">
-		<legend><?=$opcion=='agregar' ? __('Agregar Trámite') : __('Trámites')?></legend>
+	<table <?php echo $width_table ?>><tr><td>
+	<fieldset <?php echo $clase_fieldset ?> width="100%">
+		<legend><?php echo $opcion=='agregar' ? __('Agregar Trámite') : __('Trámites')?></legend>
 		<table width='90%' cellspacing=3 cellpadding=3>
 			<tr>
 				<td colspan="2" align=right width=35% class=cvs>
-					<?=__('Nombre Trámite')?>
+					<?php echo __('Nombre Trámite')?>
 				</td>
 				<td colspan="4" align=left>
-					<input type="text" name="glosa_tramite" id="glosa_tramite" size="35" value="<?=$tramite->fields['glosa_tramite'] ? $tramite->fields['glosa_tramite'] : $glosa_tramite ?>">
+					<input type="text" name="glosa_tramite" id="glosa_tramite" size="35" value="<?php echo $tramite->fields['glosa_tramite'] ? $tramite->fields['glosa_tramite'] : $glosa_tramite ?>">
 				</td>
 			</tr>
-			<?
+			<?php 
 			if( $opcion == 'agregar' || $opcion == 'editar' ) {
 			?>
 			<tr>
 				<td colspan="2"></td>
 				<td colspan="4" align="left">
-					<input type="checkbox" name=trabajo_si_no_defecto id="trabajo_si_no_defecto" value="1" <?=$tramite->fields['trabajo_si_no_defecto'] || $trabajo_si_no_defecto ? 'checked' : '' ?> onClick="ShowTime(this.form, this)" >Ingresar como trabajo
+					<input type="checkbox" name=trabajo_si_no_defecto id="trabajo_si_no_defecto" value="1" <?php echo $tramite->fields['trabajo_si_no_defecto'] || $trabajo_si_no_defecto ? 'checked' : '' ?> onClick="ShowTime(this.form, this)" >Ingresar como trabajo
 				</td>
 			</tr>
-    <tr id="time" style='display:<?=$tramite->fields['trabajo_si_no_defecto'] || $trabajo_si_no_defecto ? '' : 'none' ?>;' >
+    <tr id="time" style='display:<?php echo $tramite->fields['trabajo_si_no_defecto'] || $trabajo_si_no_defecto ? '' : 'none' ?>;' >
         <td colspan="2" align=right width="35%" class=cvs>
-            <?=__('Duración')?>
+            <?php echo __('Duración')?>
         </td>
         <td colspan="4" align=left>
-    <?
+    <?php 
     
      
 	//Revisa el Conf si esta permitido y la función existe
@@ -409,8 +409,8 @@ function Refrescar()
 		if(Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal')
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?
+					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
+<?php 
 		}
 		else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
 		{
@@ -427,8 +427,8 @@ function Refrescar()
 		if(Conf::TipoIngresoHoras()=='decimal')
 		{
 ?>
-					<input type="text" name="duracion" value="<?=$tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?= !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?
+					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
+<?php 
 		}
 		else if(Conf::TipoIngresoHoras()=='java')
 		{
@@ -448,10 +448,10 @@ function Refrescar()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><b><?=__('Valores Tarifa Standard:')?></b></td><td colspan="4"></td>
+				<td colspan="2"><b><?php echo __('Valores Tarifa Standard:')?></b></td><td colspan="4"></td>
 			</tr>
 			<tr>
-					<?
+					<?php 
 					$query = "SELECT count(*) FROM prm_moneda";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					list($cont_monedas)=mysql_fetch_array($resp);
@@ -479,33 +479,33 @@ function Refrescar()
 					$ids=implode(',',$ids);
 					?>
 			</tr>
-		<? } 
+		<?php  } 
 			else
 			{ ?>
 				<tr>
 					<td colspan="2" align="right" class=cvs>
-			<?=__('Tarifa en')?>&nbsp;
+			<?php echo __('Tarifa en')?>&nbsp;
 					</td><td colspan="4" align="left">
-			<?=Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$id_moneda, '','',"80");?>
+			<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda",$id_moneda, '','',"80");?>
 					</td>
 				</tr>
-			<? } ?>
+			<?php  } ?>
 			<tr>
 				<td colspan="2"></td>
 				<td colspan="2" align=left>
-					<? 
+					<?php  
 					if( $opcion != 'agregar' && $opcion != 'editar' ) { ?>
-					<input type=button class=btn name=buscar value=<?=__('Buscar')?> onclick="Listar(this.form, 'buscar')">
-			<?	}	else { 
+					<input type=button class=btn name=buscar value=<?php echo __('Buscar')?> onclick="Listar(this.form, 'buscar')">
+			<?php 	}	else { 
 					 if( $opcion == 'agregar' )  {?>
-					<input type=button class=btn value="<?=__('Guardar')?>" onclick="Validar(this.form, 'agregar', '<?=$ids ?>')" >
-				<? } else if( $opcion == 'editar' ) { ?>
-					<input type=button class=btn value="<?=__('Guardar')?>" onclick="Validar(this.form, 'editar', '<?=$ids ?>')" >
-				<? } } ?>
+					<input type=button class=btn value="<?php echo __('Guardar')?>" onclick="Validar(this.form, 'agregar', '<?php echo $ids ?>')" >
+				<?php  } else if( $opcion == 'editar' ) { ?>
+					<input type=button class=btn value="<?php echo __('Guardar')?>" onclick="Validar(this.form, 'editar', '<?php echo $ids ?>')" >
+				<?php  } } ?>
 				</td> 
-		<?	if( !($opcion=='agregar') || $accion=='guardar' )  { ?>
-				<td colspan="2" align="right"> <img src="<?=Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?=$opcion=='editar' || $accion=='guardar' ? __('Nuevo') : __('Agregar')?> <?=__('trámite')?></a></td>
-		<?	} ?>
+		<?php 	if( !($opcion=='agregar') || $accion=='guardar' )  { ?>
+				<td colspan="2" align="right"> <img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo $opcion=='editar' || $accion=='guardar' ? __('Nuevo') : __('Agregar')?> <?php echo __('trámite')?></a></td>
+		<?php 	} ?>
 			</tr>
 		</table>
 	</fieldset>
@@ -513,7 +513,7 @@ function Refrescar()
 </form>
 
 
-<?
+<?php 
 	if($buscar)
 	{
 		if(!$id_moneda) $id_moneda=1;
@@ -563,7 +563,7 @@ function Refrescar()
 			<script language='javascript'>
 				window.opener.Refrescar();
 			</script>
-<?} 
+<?php } 
 echo SelectorHoras::Javascript();
 $pagina->PrintBottom($popup);
 ?>

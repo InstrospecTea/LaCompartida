@@ -390,7 +390,9 @@
 <script type="text/javascript">
 var str_url = new String(top.location);
 if(str_url.search('/trabajo.php') > 0) {//Si la página está siendo llamada desde trabajo.php
-	if(top.frames.semana!==undefined)     top.frames.semana.location.reload();
+	// if(top.frames.semana!==undefined)     top.frames.semana.location.reload();
+
+top.window.jQuery('#versemana').click();
 }
 if(top.Refrescar!==undefined) top.Refrescar();
 	</script>
@@ -651,7 +653,7 @@ function Validar(form)
 <?php
 	}
 ?>
-
+top.window.jQuery('#semanactual').val(jQuery('#fecha').val());
 	return true;
 }
 
@@ -1303,12 +1305,16 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     ?>
     <tr>
         <td colspan="2" align=right>
-            <?php echo __('Fecha')?>
+            <?php echo __('Fecha');
+			if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) 	{
+	$fechamin=date('d-m-Y',mktime(0,0,0,date('m'), date('d') - $sesion->usuario->fields['dias_ingreso_trabajo'] ,date('Y')));
+	 }
+			?>
         </td>
         <td align=left valign="top">
-            <!--<?php echo  Html::PrintCalendar("fecha", $t->fields[fecha] ? $t->fields[fecha] : $fecha); ?>-->
-            <input type="text" name="fecha" value="<?php echo $t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
-		        <img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+             
+            <input type="text" name="fecha" class="fechadiff" <?php echo $fechamin ?  "minDate='$fechamin'":""; ?> value="<?php echo $t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
+		        
 <?php 
 						if (method_exists('Conf','GetConf'))
 						{
@@ -1616,13 +1622,7 @@ echo '</td>';
 </form>
 
 <?php 
-	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-		{
-			echo(Autocompletador::Javascript($sesion));
-		}
-		echo(InputId::Javascript($sesion));
-    echo(SelectorHoras::Javascript());
-    $pagina->PrintBottom($popup);
+
     function SplitDuracion($time)
     {
         list($h,$m,$s) = split(":",$time);
@@ -1648,19 +1648,8 @@ else
 {
 	echo "CargaIdioma('".$t->fields['codigo_asunto']."');";
 }
-?>
-//datepicker Fecha
-Calendar.setup(
-	{
-		inputField	: "fecha",				// ID of the input field
-		ifFormat	: "%d-%m-%Y",			// the date format
-				button			: "img_fecha"		// ID of the button
-<?php 	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) 	echo ', minDate			: "'.date('Y-m-d',mktime(0,0,0,date('m'), date('d') - $sesion->usuario->fields['dias_ingreso_trabajo'] ,date('Y'))).'"'; ?>
-
-	}
-);
-
-<?php if(empty($id_trabajo) &&
+  	
+ if(empty($id_trabajo) &&
 	(( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'LimpiarTrabajo') ) ||
 	( method_exists('Conf','LimpiarTrabajo') && Conf::LimpiarTrabajo() )) ) { ?>
 
@@ -1692,3 +1681,10 @@ Calendar.setup(
 ?>
 //	jQuery('#chkCobrable').click();
 </script>
+<?php	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
+		{
+			echo(Autocompletador::Javascript($sesion));
+		}
+		echo(InputId::Javascript($sesion));
+    echo(SelectorHoras::Javascript());
+    $pagina->PrintBottom($popup);
