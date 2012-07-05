@@ -66,8 +66,8 @@
 		$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL -  WEEKDAY(CURDATE())  DAY ) AS semana_inicio";
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
-		$semana_siguiente = date("Y-m-d",strtotime("$semana_actual+7 days"));
+		$semana_anterior = date("d-m-Y",strtotime("$semana_actual-7 days"));
+		$semana_siguiente = date("d-m-Y",strtotime("$semana_actual+7 days"));
 	}
 	else
 	{
@@ -76,8 +76,8 @@
 		
                 $resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
-		$semana_siguiente = date("Y-m-d",strtotime("$semana_actual+7 days"));
+		$semana_anterior = date("d-m-Y",strtotime("$semana_actual-7 days"));
+		$semana_siguiente = date("d-m-Y",strtotime("$semana_actual+7 days"));
 	}
 	if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 	{
@@ -129,8 +129,8 @@
     
 
 <?php
-echo '<input style="text-indent: -100px;position: absolute;right:0;height: 50%;width: 70px;top: 18px;  border:0 none;" type="text" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" title="'.Utiles::sql3fecha($semana_siguiente,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
-      <input style="text-indent: -100px;position: absolute;height: 50%;width: 70px;top: 18px; border:0 none;" type="text" value="'.$semana_anterior.'" id="hiddensemanaanterior" title="'.Utiles::sql3fecha($semana_anterior,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
+echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0;height: 50%;width: 70px;top: 18px;  border:0 none;" type="text" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" title="'.Utiles::sql3fecha($semana_siguiente,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
+      <input style="text-indent: -10000px;color:white;position: absolute;height: 50%;width: 70px;left:0;top: 18px; border:0 none;" type="text" value="'.$semana_anterior.'" id="hiddensemanaanterior" title="'.Utiles::sql3fecha($semana_anterior,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
 
 
 echo("<table style='width:600px'>");
