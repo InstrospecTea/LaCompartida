@@ -63,6 +63,55 @@
                     
                 break;
             
+				
+	 case 'actualiza_plugins':
+                     
+                    $maxid=$_POST['cantidad'];
+                    $orden=0;
+                        $query=array();
+						$query[]="CREATE TABLE IF NOT EXISTS `prm_plugin` (
+						`id_plugin` smallint(3) NOT NULL AUTO_INCREMENT,
+						`archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'plugin.php' ,
+						`orden` smallint(3) NOT NULL DEFAULT '1',
+						`activo` tinyint(1) NOT NULL,
+						PRIMARY KEY (`id_lang`),
+						UNIQUE KEY `archivo_nombre` (`archivo_nombre`)
+						) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
+                        $archivos=array();
+                    foreach($_POST as $llave=>$datorecibido):
+                        if(strpos($llave,'_php')) {
+                            $archivonombre=str_replace('_php','.php',$llave);
+                            $query[]="insert into prm_plugin (archivo_nombre,orden,activo) values ('".$archivonombre."',".++$orden.",1) on duplicate key update  orden=$orden, activo=1; ";
+                            $archivos[]=$archivonombre;
+                        } 
+                      endforeach;
+                      $query[]="update prm_plugin set orden=$maxid, activo=0 where archivo_nombre not in ('".implode("','",$archivos)."');";
+                foreach($query as $q)  mysql_query($q,$sesion->dbh);
+                
+                
+                $queryrespuesta='select * from prm_plugin order by orden ASC';
+                $resultado=mysql_query($queryrespuesta,$sesion->dbh);
+                    $maxid=0;
+                    $orden=0;
+                     $archivos=array();
+                    while($archivo=mysql_fetch_array($resultado)) :
+                        $maxid=$archivo[0];
+                        $orden=$archivo[2];
+                        
+                            $archivos[$archivo[1]]=$archivo[1];
+                        echo '<li > <input type="checkbox" class="checkbox"  id="'.$archivo[0].'_'.$archivo[1].'" name="'.$archivo[1].'" value="1" '.(($archivo[3]==1)? 'checked="checked"':'').' /><label for="'.$archivo[0].'_'.$archivo[1].'">'.$archivo[1].'</label> <span class="ui-icon ui-icon-arrowthick-2-n-s"></span></li>';
+                    endwhile;
+                    
+                    $myDirectory = opendir( Conf::ServerDir().'/lang/');
+
+                    while($entryName = readdir($myDirectory)) {
+                            if(!array_key_exists($entryName, $archivos) && is_file(Conf::ServerDir().'/plugins/'.$entryName)) echo '<li > <input type="checkbox" class="checkbox"  id="'.++$maxid.'_'.$entryName.'" name="'.$entryName.'" value="1" /><label for="'.$maxid.'_'.$entryName.'">'.$entryName.'</label> <span class="ui-icon ui-icon-arrowthick-2-n-s"></span></li>';
+                    }
+
+                    closedir($myDirectory); 
+                    
+                break;
+				
                 case 'actualiza_beacon':
 					 mysql_query("ALTER TABLE `configuracion_categoria` ADD UNIQUE (`glosa_configuracion_categoria`); ",$sesion->dbh);
                     mysql_query("insert ignore INTO  `configuracion_categoria` (	'`glosa_configuracion_categoria`	) VALUES ( 'Plugins - Hooks');",$sesion->dbh);
@@ -70,7 +119,7 @@
                      list($cat_id)=mysql_fetch_row($resp);
                     $beaconleft=  intval(base64_decode($_POST['beaconleft']));
                     mysql_query("replace INTO configuracion (glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
-                                        VALUES('BeaconTimer', '{$beaconleft}', 'numero','Tiempo Disponible de Uso del Programa', {$cat_id[0]}, -1)",$sesion->dbh);
+                                        VALUES('BeaconTimer', '{$beaconleft}', 'numero','Tiempo Disponible de Uso del Programa', {$cat_id}, -1)",$sesion->dbh);
                                     
 					 echo '<!--'.$beaconleft.'-->';
 				break;

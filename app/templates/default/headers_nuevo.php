@@ -28,7 +28,6 @@ define('HEADERLOADED',1);
             _sf_async_config.path = "<?php echo $elpath; ?>";
             <?php   if(defined('APPDOMAIN') && substr(APPDOMAIN,0,5)=='https') echo '_sf_async_config.pathseguro="'.$pathseguro.'";'; ?>
 	var baseurl= '<?php echo base64_encode($laurl);?>';
-        var mementomori= '<?php echo base64_encode(time());?>';
         var root_dir = '<?php echo Conf::RootDir();?>';
 	var img_dir = '<?php echo Conf::ImgDir()?>';
     </script>

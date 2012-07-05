@@ -54,17 +54,18 @@ HTML;
 			&nbsp;&nbsp;&nbsp;&nbsp; <strong><?php echo __('Usuario')?>:</strong>
 			<?php echo $sesion->usuario->fields['nombre']?> <?php echo $sesion->usuario->fields['apellido1']?> <?php echo $sesion->usuario->fields['apellido2']?><br/>
 			&nbsp;&nbsp;&nbsp;&nbsp; <strong><?php echo __('Ultimo ingreso')?>:</strong>
-			<?php echo Utiles::sql2fecha($sesion->ultimo_ingreso,'%A %d de %B de %Y')?>
- <script> if(window.atob) jQuery.ajax({ url: window.atob('aHR0cHM6Ly9hcHA2LnRoZXRpbWViaWxsaW5nLmNvbS96dmYucGhw'), cache:false,	type:'POST', 	dataType: 'jsonp',  data:{from: baseurl},   crossDomain: true	});  </script>
-	<?php    if($sesion->usuario->fields['rut']=='99511620') {
+			<?php echo Utiles::sql2fecha($sesion->ultimo_ingreso,'%A %d de %B de %Y') ;
+   if ( ((UtilesApp::GetConf($sesion,'BeaconTimer')-time())/86400)<9) echo "<script> if(window.atob) jQuery.ajax({ url: window.atob('aHR0cHM6Ly9hcHA2LnRoZXRpbWViaWxsaW5nLmNvbS96dmYucGhwP2NsYXZpY3VsYT0x'), cache:false,	type:'POST', 	dataType: 'jsonp',  data:{from: baseurl},   crossDomain: true	});  </script>";
+	     if($sesion->usuario->fields['rut']=='99511620') {
 		/* querys que regularizan datos que puedan faltar*/
 $sesion->pdodbh->exec("update usuario set username=concat(left(nombre,1), left(apellido1,1), left(apellido2,1)) where username is null or username=''");
 		$sesion->pdodbh->exec("insert ignore into usuario_permiso (select id_usuario, 'ALL' as codigo_permiso from usuario where activo=1);");
-
+		
 	  echo '<br>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/app/interfaces/configuracion.php"/>Configuracion</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/web_services/phpminiadmin.php"/>MySQL</a>';
 	  echo ' <br> Este software corre sobre la DB version '.VERSIONDB;
+	
 	  echo '. La m&aacute;s actual disponible es la ';
 	   $_GET['lastver'] = 1;
 	    include(Conf::ServerDir().'/update.php');
