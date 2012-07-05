@@ -79,7 +79,7 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
 				
 
 		});
-	});*/
+	});
  }
 
 if (window.addEventListener)
