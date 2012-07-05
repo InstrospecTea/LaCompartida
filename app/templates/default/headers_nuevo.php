@@ -33,19 +33,19 @@ define('HEADERLOADED',1);
     </script>
 	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
 	<!-- <?php echo Conf::TimestampDeployCSS()?> -->
-	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
 	
 	
 	<!--[if IE]>
-	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_ie_only.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_ie_only.css" />
 	<![endif]-->
 	<!--[if !IE]><!-->
-	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 	<!--<![endif]-->
-	<link rel="stylesheet" type="text/css" href="https://estaticos.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-        <link rel="shortcut icon" href="https://estaticos.thetimebilling.com/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
+        <link rel="shortcut icon" href="https://static.thetimebilling.com/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/jquery-ui.css" />
-	
+	<link id='zenboxcss' />
 
 
 <script src='https://www.google.com/jsapi'></script>
@@ -55,18 +55,18 @@ google.load("jquery","1.7");
 </script>
  		<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
 
-        <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
-        <script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
-		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jshashtable-2.1.js"></script>
-		<script language="JavaScript" type="text/javascript" src="https://estaticos.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
+		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
+		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
 		
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	
 <style type="text/css">
-.divloading {display:block;width:100%;height:120px;text-align:center;margin:50px auto;background:url('https://estaticos.thetimebilling.com/templates/cargando.gif') 50% 50% no-repeat;}
-.tb_facebook {	background: url(https://estaticos.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
-.non_popup {background: url(https://estaticos.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
+.divloading {display:block;width:100%;height:120px;text-align:center;margin:50px auto;background:url('https://static.thetimebilling.com/templates/cargando.gif') 50% 50% no-repeat;}
+.tb_facebook {	background: url(https://static.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
+.non_popup {background: url(https://static.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
 .alignleft {text-align:left;font-size:10px;}
 .alignright {text-align:right;font-size:10px;}
@@ -76,7 +76,7 @@ google.load("jquery","1.7");
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
 .cont_tabla {padding:0 20px; background-color: #FFFFFF;text-align:center;margin:5px auto;}
 .cont_tabla table {margin-left:auto;margin-right:auto;}
-.iconzip {background: url(https://estaticos.thetimebilling.com/images/icon-zip.gif) no-repeat;height:20px;padding-left:25px;}
+.iconzip {background: url(https://static.thetimebilling.com/images/icon-zip.gif) no-repeat;height:20px;padding-left:25px;}
 .encabezadolight th { font-style: normal;color: white;background-color: #A3D55C;height: 20px;font-size: 11px;vertical-align: middle;text-align: center;}
 #tablon td {padding:3px 2px !important}
 .nowrap {white-space: nowrap;}

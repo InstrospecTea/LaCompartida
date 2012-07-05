@@ -26,6 +26,9 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
 
  function downloadJSAtOnload() {
    
+   
+    jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://assets.zendesk.com/external/zenbox/v2.4/zenbox.css" });
+     
 
 
     
@@ -56,26 +59,26 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
         });            
 	  }
 
-   
-   /*     jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.js', 
-	dataType: 'script'}) .done(function() {
-	    jQuery("head").append("<link id='zenboxcss' />");
-    jQuery("#zenboxcss").attr({rel:  "stylesheet", type: "text/css", href: "https://asset0.zendesk.com/external/zenbox/v2.4/zenbox.css" });
-     
-		if (typeof(window.Zenbox) !== "undefined") {
-			Zenbox.init({
-				dropboxID:   "20042787",
-				url:         "https://lemontech.zendesk.com",
-				tabID:       "support", 
-				tabImageURL: "https://static.thetimebilling.com/templates/default/img/tag_soporte3.png",
-				tabColor:    "transparent",
-				tabPosition: "Right"
-			    });
-			}          		
-              jQuery('#zenbox_tab').hide();
-              jQuery('#zenbox_tab').css({'right':'-35', 'border':'0 none !important'})                                                                                                                                                                                                                                                  
-              jQuery('#zenbox_tab').show().animate({'right':'0'},3000);
-	
+   jQuery("#zenboxcss").load(function() {
+			jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://assets.zendesk.com/external/zenbox/v2.4/zenbox.js', 
+		dataType: 'script'})
+		.fail(function() {
+		jQuery.ajax({async: false,cache:true, type: "GET", url: 'https:/static.thetimebilling.com/zenbox.js'});  
+		}).always(function() {
+
+			if (typeof(window.Zenbox) !== "undefined") {
+				Zenbox.init({
+					dropboxID:   "20042787",
+					url:         "http://soporte.thetimebilling.com",
+					tabID:       "support", 
+					tabImageURL: "https://static.thetimebilling.com/templates/default/img/tag_soporte3.png",
+					tabColor:    "transparent",
+					tabPosition: "Right"
+					});
+				}          		
+				
+
+		});
 	});*/
  }
 
