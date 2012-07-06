@@ -351,6 +351,11 @@ if ($opcion == "guardar") {
 					$contrato->Edit("direccion_contacto", $contra_clie->fields['direccion_contacto']);	
 					$contrato->Edit("id_pais", $id_pais);
 					$contrato->Edit("id_cuenta", $id_cuenta);
+	
+					if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+						$contrato->Edit("id_cuenta2", $id_cuenta2);
+					}
+			
 					$contrato->Edit("es_periodico", $contra_clie->fields['es_periodico']);
 					$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 					$contrato->Edit("usa_impuesto_separado", $contra_clie->fields['usa_impuesto_separado']);
@@ -525,6 +530,13 @@ if ($opcion == "guardar") {
 				$contrato->Edit("glosa_contrato", $glosa_contrato);
 				$contrato->Edit("id_pais", $id_pais);				
 				$contrato->Edit("id_cuenta", $id_cuenta);
+	
+				if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+					$contrato->Edit("id_cuenta2", $id_cuenta2);
+				}
+	
+	
+			
 				$contrato->Edit("codigo_cliente", $codigo_cliente);
 				$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL");
 				$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
@@ -1447,7 +1459,7 @@ if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
 	<br>
 </form>
 
-<script>
+<script> 
     
 	//Contratos('<?php echo $asunto->fields['codigo_cliente']; ?>','<?php echo $asunto->fields['id_contrato']; ?>');
 	var form = $('formulario');
@@ -1463,8 +1475,8 @@ function CambioEncargadoSegunCliente(idcliente) {
     var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
     var UsuarioSecundario=<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario')? '1':'0' );?>;
     var ObligatorioEncargadoSecundarioAsunto=<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto')? '1':'0' );?>;
-    jQuery('#id_usuario_secundario').attr({'disabled':''});
-    jQuery('#id_usuario_responsable').attr({'disabled':''});
+    jQuery('#id_usuario_secundario').removeAttr('disabled');
+    jQuery('#id_usuario_responsable').removeAttr('disabled');
     jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
 	if(window.console ) console.debug(data);
         var ladata=data.split('|');
@@ -1475,13 +1487,13 @@ function CambioEncargadoSegunCliente(idcliente) {
           if(ladata[2])  jQuery('#id_usuario_secundario').append('<option value="'+ladata[1]+'" selected="selected">'+ladata[2]+'</option>').attr({'disabled':''}).val(ladata[1]);;
         }
         
-          jQuery('#id_usuario_responsable').attr({'disabled':''});
+          jQuery('#id_usuario_responsable').removeAttr('disabled');
         if(CopiarEncargadoAlAsunto) {
         	jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
                 if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
 	   } else if(ObligatorioEncargadoSecundarioAsunto) {
              
-                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':''});
+                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
            }
 	
 	   
