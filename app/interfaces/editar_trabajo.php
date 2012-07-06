@@ -414,7 +414,7 @@ jQuery('document').ready(function() {
 			jQuery('.seccioncobrable').hide();
 		}
 	});
-	if(jQuery(this).is(':checked')) {
+	if(jQuery('#chkCobrable').is(':checked')) {
 			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
@@ -1495,15 +1495,15 @@ echo '</td>';
 				<td align=left>
 					<?php  if($mostrar_cobrable) { 		 ?>
 					
-					<input type="checkbox" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
+					<input type="checkbox" style="display:inline;" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
 					<?php } 	else { ?>
 					<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
 					<?php } ?>
 					&nbsp;&nbsp;
-					<div id=divVisible <?php if($t->fields['cobrable'] == 1) echo 'style="display:none"'; else echo 'style="display:inline"'?>>
+					<div id=divVisible style="display:inline">
 					<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { 
 						echo __('Visible');
-						echo "<input type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
+						echo "<input  style=\"display:inline;\" type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
 					 } else {
 					
 						echo "<input type=\"hidden\" name=\"visible\" value=\"". (($t->fields['visible']) ? $t->fields['visible'] : 1) ."\" id=\"hiddenVisible\" />";
