@@ -152,6 +152,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
 	$contrato->Edit("id_pais", $id_pais);
 	$contrato->Edit("id_cuenta", $id_cuenta);
+	
+	if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+		$contrato->Edit("id_cuenta2", $id_cuenta2);
+	}
+	
 	$contrato->Edit("es_periodico", $es_periodico);
 	$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 	$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0');
@@ -1913,22 +1918,61 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 					<td align="right" colspan="1">
                         <?php echo  __('Banco') ?>
 					</td>
-					<td align="left" colspan="5">
+					<td align="left" colspan="2">
 						<?php echo  Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco",  $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
 					</td>
-				</tr>
-				<tr>
+				
 					<td align="right" colspan="1">
                         <?php echo  __('Cuenta') ?>
 					</td>
-					<td align="left" colspan="5">
+					<td align="left" colspan="2">
                         <?php
                             $query_cuenta_banco = "SELECT cuenta_banco.id_cuenta , CONCAT( cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO FROM cuenta_banco LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda " . $where_banco;
                         ?>
 						<?php echo  Html::SelectQuery($sesion, $query_cuenta_banco, "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, '', $tiene_banco ? "" : "Cualquiera", "150") ?>
 					</td>
 				</tr>
+<?php
+	if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) { 
+		 $id_banco = false;
+		if( $contrato->fields['id_cuenta2'] && is_numeric($contrato->fields['id_cuenta2']) )  {
+			$query_banco = "SELECT b.* FROM cuenta_banco c, prm_banco b WHERE b.id_banco = c.id_banco AND c.id_cuenta = '{$contrato->fields['id_cuenta2']}'";
+			$result = mysql_query($query_banco, $sesion->dbh);
 
+			if ( ! $result ) {
+			} else {
+				$result = mysql_fetch_object($result);
+				$id_banco2 = $result->id_banco;
+			}
+		}
+
+		if ( $id_banco2 ) {
+			$where_banco2 = " WHERE cuenta_banco.id_banco = '$id_banco2' ";
+		} else {
+			$where_banco2 = " WHERE 1=2 ";
+		}
+?>
+				<tr>
+					<td align="right" colspan="1">
+                        <?php echo  __('Banco Secundario') ?>
+					</td>
+					<td align="left" colspan="2">
+						<?php echo  Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco2",  $id_banco2, 'onchange="CargarCuenta(\'id_banco2\',\'id_cuenta2\');"', "Cualquiera", "150") ?>
+					</td>
+					
+					<td align="right" colspan="1">
+                        <?php echo  __('Cuenta Secundaria') ?>
+					</td>
+					<td align="left" colspan="2">
+                        <?php
+                            $query_cuenta_banco = "SELECT cuenta_banco.id_cuenta , CONCAT( cuenta_banco.numero, IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO FROM cuenta_banco LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda " . $where_banco2;
+                        ?>
+						<?php echo  Html::SelectQuery($sesion, $query_cuenta_banco, "id_cuenta2", $contrato->fields['id_cuenta2'] ? $contrato->fields['id_cuenta2'] : $id_cuenta2, '', $tiene_banco ? "" : "Cualquiera", "150") ?>
+					</td>
+				</tr>
+<?php
+	} 
+?>
 			</table>
 						
 		</fieldset>

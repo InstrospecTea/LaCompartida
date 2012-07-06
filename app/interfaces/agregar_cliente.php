@@ -303,6 +303,12 @@ if ($opcion == "guardar") {
 			$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
 			$contrato->Edit("id_pais", $id_pais);
 			$contrato->Edit("id_cuenta", $id_cuenta);
+	
+			if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+				$contrato->Edit("id_cuenta2", $id_cuenta2);
+			}
+	
+	
 			$contrato->Edit("es_periodico", $es_periodico);
 			$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 			$contrato->Edit("periodo_fecha_inicio", Utiles::fecha2sql($periodo_fecha_inicio));

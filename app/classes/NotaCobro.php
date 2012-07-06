@@ -875,6 +875,7 @@ class NotaCobro extends Cobro {
 		global $moneda_total;
 		global $x_resultados;
 		global $x_cobro_gastos;
+		global $moneda_cobro;
 
 		if (!isset($parser_carta->tags[$theTag]))
 			return;
@@ -928,6 +929,17 @@ class NotaCobro extends Cobro {
 			
 
 			case 'DETALLE':
+				
+				if (strpos($html2, '%cuenta_banco%')) {
+					if ($contrato->fields['id_cuenta']) {
+						$query_banco = "SELECT glosa FROM cuenta_banco WHERE id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
+						$resp = mysql_query($query_banco, $this->sesion->dbh) or Utiles::errorSQL($query_banco, __FILE__, __LINE__, $this->sesion->dbh);
+						list($glosa_cuenta) = mysql_fetch_array($resp);
+					}
+					else
+						$glosa_cuenta = '';
+					$html2 = str_replace('%cuenta_banco%', $glosa_cuenta, $html2);
+				}
 				if ( isset($contrato->fields['glosa_contrato']) ) {
 					$html2 = str_replace('%glosa_contrato%', $contrato->fields['glosa_contrato'], $html2);
 				} else {
@@ -964,6 +976,11 @@ class NotaCobro extends Cobro {
 				}
 				$lista_asuntos .= "</ul>";
 				$html2 = str_replace('%lista_asuntos%', $lista_asuntos, $html2);
+
+				$lista_asuntos_guion = implode(" - ", $this->glosa_asuntos );
+				$html2 = str_replace('%lista_asuntos_guion%', $lista_asuntos_guion, $html2);
+				
+				$html2 = str_replace('%FILAS_ASUNTOS_RESUMEN%', $this->GenerarDocumentoCarta2($parser_carta, 'FILAS_ASUNTOS_RESUMEN', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 
 				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
@@ -1607,25 +1624,136 @@ class NotaCobro extends Cobro {
 				$html2 = str_replace('%simbolo_opc_moneda_totall%', $simbolo_opc_moneda_total, $html2);
 
 				if ($contrato->fields['id_cuenta'] > 0) {
-					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI
+					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa
 								FROM cuenta_banco cb
 								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci) = mysql_fetch_array($resp);
+					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
+					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
 					$html2 = str_replace('%codigo_swift%', $codigo_swift, $html2);
 					$html2 = str_replace('%codigo_cci%', $codigo_cci, $html2);
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
+					$html2 = str_replace('%glosa_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%codigo_swift%', '', $html2);
 					$html2 = str_replace('%codigo_cci%', '', $html2);
 				}
 
+				if( UtilesApp::GetConf($this->sesion, 'SegundaCuentaBancaria')) {
+					if ($contrato->fields['id_cuenta2'] > 0) {
+						$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa
+									FROM cuenta_banco cb
+									LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
+									WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta2'] . "'";
+						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+						list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
+						$html2 = str_replace('%numero_cuenta_contrato2%', $numero_cuenta, $html2);
+						$html2 = str_replace('%glosa_banco_contrato2%', $glosa_banco, $html2);
+						$html2 = str_replace('%glosa_cuenta_contrato2%', $glosa_cuenta, $html2);
+						$html2 = str_replace('%codigo_swift2%', $codigo_swift, $html2);
+						$html2 = str_replace('%codigo_cci2%', $codigo_cci, $html2);
+					} else {
+						$html2 = str_replace('%numero_cuenta_contrato2%', '', $html2);
+						$html2 = str_replace('%glosa_banco_contrato2%', '', $html2);
+						$html2 = str_replace('%glosa_cuenta_contrato2%', '', $html2);
+						$html2 = str_replace('%codigo_swift2%', '', $html2);
+						$html2 = str_replace('%codigo_cci2%', '', $html2);
+					}
+				}
+
 				break;
 
+			case 'FILAS_ASUNTOS_RESUMEN':
+				/**
+				 *Esto se hizo para Mu?oz Tamayo y Asociados. (ESM) 
+				 */
+				global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales;
+			
+			    $query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
+						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
+						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),4) pthhac
+						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
+						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
+						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
+						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
+  					            ,c.monto_trabajos
+						    ,c.monto_thh
+						    ,c.monto_thh_estandar
+						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos  
+						    ,kant.kant 
+
+						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
+						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
+						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
+						    join prm_moneda pm on pm.id_moneda=c.id_moneda
+						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
+						    FROM trabajo
+
+						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
+						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
+						    from cta_corriente where cobrable=1
+						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
+						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
+
+			    	
+				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+				$moneda_actual = $this->fields['id_cobro'];
+				$row_tmpl = $html2;
+				$html2='';
+				$filas = 1;
+				while($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
+					list($subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
+					$row = $row_tmpl;
+					
+					
+					// _mi = moneda seleccionada para descargar el documento
+					$subtotal_hh_mi = ( $subtotal_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$subtotal_gasto_mi = ( $subtotal_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$impuesto_hh_mi = ( $impuesto_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$impuesto_gasto_mi = ( $impuesto_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$simbolo_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
+					$cifras_decimales_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'];
+					
+					list($pthh, $pg) = array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
+					$row = str_replace('%glosa_asunto%',$rowdesglose['glosa_asunto'], $row);
+					$row = str_replace('%simbolo%',$simbolo, $row);
+					$row = str_replace('%honorarios_asunto%',round($rowdesglose['monto_trabajos']*$rowdesglose['pthh'],$cifras_decimales), $row);
+					$row = str_replace('%gastos_asunto%',round($rowdesglose['subtotal_gastos']*$rowdesglose['pg'],$cifras_decimales), $row);
+
+					$row = str_replace('%total_asunto%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($impuesto_hh)+floatval($impuesto_gasto),$cifras_decimales), $row);
+					
+					$row = str_replace('%simbolo_mi%',$simbolo_mi, $row);
+					$row = str_replace('%honorarios_asunto_mi%',round($subtotal_hh_mi*$rowdesglose['pthh'],$cifras_decimales_mi), $row);
+					$row = str_replace('%gastos_asunto_mi%',round($subtotal_gasto_mi*$rowdesglose['pg'],$cifras_decimales_mi), $row);
+
+					//var_dump( $cobro_moneda ); exit;
+					$total_asunto_mi = round(floatval($subtotal_hh_mi)+floatval($subtotal_gasto_mi)+floatval($impuesto_hh_mi)+floatval($impuesto_gasto_mi),$cifras_decimales_mi);
+					$row = str_replace('%total_asunto_mi%', number_format($total_asunto_mi, $cifras_decimales_mi, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) , $row);
+					
+					$fecha_mta_emision = $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d/%m/%Y') : '';
+					$fecha_mta_facturacion = $this->fields['fecha_facturacion'] ? Utiles::sql2fecha($this->fields['fecha_facturacion'], '%d/%m/%Y') : $fecha_mta_emision;
+					list($fecha_mta_dia, $fecha_mta_mes, $fecha_mta_agno) = explode("/", $fecha_mta_facturacion);
+
+					
+					if( $filas > 1 ) {
+						$row = str_replace('%num_letter%', '', $row);
+						$row = str_replace('%num_factura%', ''                                                                                                                                                                                             , $row);
+						$row = str_replace('%fecha_mta%', '', $row);
+					} else {
+						$row = str_replace('%num_letter%', $this->fields['id_cobro'], $row);
+						$row = str_replace('%num_factura%', $this->fields['documento'], $row);
+						$row = str_replace('%fecha_mta%', $fecha_mta_facturacion, $row);
+		}
+					$html2 .= $row;
+					$filas++;
+				}
+
+					
+			    break;
 		}
 
 		return $html2;
@@ -2293,6 +2421,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%honorarios_totales%', __('Honorarios'), $html);
 				$html = str_replace('%honorarios_mta%', __('Honorarios totales'), $html);
 				$html = str_replace('%valor_honorarios_totales%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				//$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo']
+				$html = str_replace('%valor_honorarios_totales_moneda_total%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%fees%', __('%fees%'), $html); //en vez de Legal Fee es Legal Fees en inglés
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
@@ -2669,6 +2799,9 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 			case 'DETALLE_COBRO_DESCUENTO':
+				/*var_dump( $moneda_cobro );
+				echo " ---- ";
+				var_dump( $cobro_moneda ); exit;*/
 				if ($this->fields['descuento'] == 0) {
 					if (UtilesApp::GetConf($this->sesion, 'FormatoNotaCobroMTA') ) {
 						$html = str_replace('%honorarios%', __('Subtotal Honorarios'), $html);
@@ -4173,9 +4306,19 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%total%', '', $html);
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%honorarios%', __('Honorarios'), $html);
-				$html = str_replace('%profesional%', __('Profesional'), $html);
+				
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%nombre_profesional%', __('Nombre Profesional'), $html);
+				if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Profesional'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Trarifa Hora'), $html);
+				
+				} else {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Biller'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Hourly Rate'), $html);
+				}
+				
+				
 				break;
 
 			case 'IMPUESTO':
@@ -5800,7 +5943,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%honorarios_totales%', __('Honorarios'), $html);
 				
 				$html = str_replace('%honorarios_mta%', __('Honorarios totales'), $html);
-				$html = str_replace('%valor_honorarios_totales%', $x_resultados['monto'][$this->fields['id_moneda']], $html);
+				$html = str_replace('%valor_honorarios_totales%', $x_resultados['monto'][$this->fields['id_moneda']], $html);				
+				//$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo']
+				
+				$html = str_replace('%valor_honorarios_totales_moneda_total%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['monto_thh'][$this->fields['opc_moneda_total']] +$x_resultados['impuesto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				//$html = str_replace('%valor_honorarios_totales_moneda_total%', $x_resultados['monto'][$this->fields['opc_moneda_total']], $html);
+				
 				$html = str_replace('%fees%', __('%fees%'), $html); //en vez de Legal Fee es Legal Fees en inglés
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
@@ -6014,7 +6162,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 			//FFF Esto se hizo para Aguilar Castillo Love. Reparte HH y Gasto por asunto
 			case 'DESGLOSE_POR_ASUNTO_DETALLE':
-			global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales;
+			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
 			    $query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
 						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
@@ -6023,36 +6171,48 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
 						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
 						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
-  					            ,c.monto_trabajos
+							,if(@rownum=kant,@sumat3:=(1.0000-@sumat3), round(ifnull(tramites.tramites/monto_tramites,0),4))  pt
+						    ,@sumat3:=@sumat3+round(ifnull(tramites.tramites/monto_tramites,0),4) ptac
+  					        ,c.monto_trabajos
 						    ,c.monto_thh
 						    ,c.monto_thh_estandar
-						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos  
+						    ,c.subtotal_gastos 
+							,c.monto_tramites
+							,c.impuesto
+							,c.impuesto_gastos  
+							, (c.monto_tramites * c.porcentaje_impuesto / 100) as impuesto_tramites
 						    ,kant.kant 
 
 						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
 						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
-						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
+						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0, @sumat3:=0) fff
 						    join prm_moneda pm on pm.id_moneda=c.id_moneda
 						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
-						    FROM trabajo
-
+						    FROM trabajo  WHERE trabajo.id_tramite is null
 						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
+							
 						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
 						    from cta_corriente where cobrable=1
 						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
+							
+							left join (SELECT id_cobro, codigo_asunto, SUM( IFNULL(tarifa_tramite,0)) AS tramites
+						    FROM tramite
+							GROUP BY codigo_asunto,id_cobro) tramites on tramites.id_cobro=c.id_cobro and tramites.codigo_asunto=ca.codigo_asunto
+
 						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
 
-			    	
-				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			    //echo $query_desglose_asuntos; exit;
+				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
 				$row_tmpl = $html;
 				$html='';
 					while($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
-					list($subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
+					list($subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['monto_tramites'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'] ,$rowdesglose['impuesto_tramites'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
 						$row = $row_tmpl;
 						$row = str_replace('%glosa_asunto%',$rowdesglose['glosa_asunto'], $row);
 						$row = str_replace('%simbolo%',$simbolo, $row);
 						$row = str_replace('%honorarios_asunto%',round($rowdesglose['monto_trabajos']*$rowdesglose['pthh'],$cifras_decimales), $row);
 						$row = str_replace('%gastos_asunto%',round($rowdesglose['subtotal_gastos']*$rowdesglose['pg'],$cifras_decimales), $row);
+						$row = str_replace('%tramites_asunto%',round($rowdesglose['monto_tramites']*$rowdesglose['pt'],$cifras_decimales), $row);
 						
 					$html .= $row;
 					
@@ -6062,14 +6222,16 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			    break;
 			//FFF Esto se hizo para Aguilar Castillo Love
 			case 'DESGLOSE_POR_ASUNTO_TOTALES':
-			global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto,$simbolo,$cifras_decimales;
+			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
 			    $html = str_replace('%simbolo%',$simbolo, $html);    
 			    $html = str_replace('%desglose_subtotal_hh%', round($subtotal_hh,$cifras_decimales), $html);
 			    $html = str_replace('%desglose_subtotal_gasto%', round($subtotal_gasto,$cifras_decimales), $html);
+				$html = str_replace('%desglose_subtotal_tramite%', round($subtotal_tramite,$cifras_decimales), $html);
 			    $html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($impuesto_hh)+floatval($impuesto_gasto),$cifras_decimales), $html);
+			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);				
+			    $html = str_replace('%desglose_impuesto_tramite%', round($impuesto_tramite,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($subtotal_tramite)+floatval($impuesto_hh)+floatval($impuesto_gasto)+floatval(impuesto_tramites),$cifras_decimales), $html);
 			    
 			    break;
 				    
@@ -6402,14 +6564,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 			case 'DETALLE_COBRO_DESCUENTO':
-				
+				/* $cobro_moneda array de monedas al tiempo de emitir/generar el cobro*/
 				if ($this->fields['descuento'] == 0) {
 					if (UtilesApp::GetConf($this->sesion, 'FormatoNotaCobroMTA') ) {
 						$html = str_replace('%honorarios%', __('Subtotal Honorarios'), $html);
+						$valor_honorarios = number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 						if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))){
-							$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+							$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $valor_honorarios, $html);							
 						} else {
-							$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto_subtotal'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+							$html = str_replace('%valor_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . $valor_honorarios, $html);	
 						}
 						$html = str_replace('%valor_descuento%', '', $html);
 						$html = str_replace('%porcentaje_descuento%', '', $html);
@@ -6743,7 +6906,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%td_solicitante%', '', $html);
 				}
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
-				/*VOUGA*/		if ($lang == 'es') {
+/*VOUGA*/		if ($lang == 'es') {
 /*VOUGA*/		$html = str_replace('%id_asunto%', __('ID Asunto'), $html);
 /*VOUGA*/		$html = str_replace('%tarifa_hora%', __('Tarifa<br>Hora'), $html);
 					
@@ -8003,7 +8166,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%honorarios%', __('Honorarios'), $html);
-				$html = str_replace('%profesional%', __('Profesional'), $html);
+				
 				if ($this->fields['opc_ver_profesional_categoria'] == 1)
 					$html = str_replace('%categoria%', __('CATEGORÍA'), $html);
 				else
@@ -8011,6 +8174,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%valor_siempre%', __('Valor'), $html);
 				$html = str_replace('%nombre_profesional%', __('Nombre Profesional'), $html);
+				
+				if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Profesional'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Trarifa<br>Hora'), $html);
+				
+				} else {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Biller'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Hourly<br>Rate'), $html);
+				}
 				break;
 
 			case 'IMPUESTO':
@@ -8598,9 +8770,9 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 					
 /*VOUGA*/		if ($lang == 'es') {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('Resumen Detalle Profesional'), $html);
 /*VOUGA*/			} else {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('TIMEKEEPER SUMMARY'), $html);
 /*VOUGA*/			}
 
 					$esc = 1;
@@ -9050,9 +9222,9 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 
 /*VOUGA*/		if ($lang == 'es') {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('Resumen Detalle Profesional'), $html);
 /*VOUGA*/			} else {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('TIMEKEEPER SUMMARY'), $html);
 /*VOUGA*/			}
 
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
@@ -10016,9 +10188,10 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$query = "SELECT glosa_cliente FROM cliente 
 									WHERE codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($glosa_cliente) = mysql_fetch_array($resp);
+				list($glosa_cliente) = mysql_fetch_array($resp);				
 				$html = str_replace('%nombre_cliente%', $glosa_cliente, $html);
 				
+				$html = str_replace('%factura_razon_social_o_nombre_cliente%', ( isset($contrato->fields['factura_razon_social']) && $contrato->fields['factura_razon_social'] != '') ? $contrato->fields['factura_razon_social'] : $glosa_cliente , $html);
 /*VOUGA*/		if ($lang == 'es') {
 /*VOUGA*/		$html = str_replace('%factura%', __('Factura'), $html);
 /*VOUGA*/		$html = str_replace('%fecha_liquidacion%', __('Fecha Liquidación'), $html);
@@ -10079,6 +10252,18 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%numero_factura%',$numero_factura, $html);
 				} else {
 				$html = str_replace('%numero_factura%', '', $html);
+				}
+				
+/*VOUGA*/		if ($contrato->fields['id_pais'] > 0) {
+/*VOUGA*/			$query = "SELECT nombre FROM prm_pais
+										WHERE id_pais=" . $contrato->fields['id_pais'];
+/*VOUGA*/			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+/*VOUGA*/			list($nombre_pais) = mysql_fetch_array($resp);
+/*VOUGA*/			$html = str_replace('%nombre_pais%', $nombre_pais, $html);
+/*VOUGA*/			$html = str_replace('%nombre_pais_mayuscula%', strtoupper($nombre_pais), $html);
+/*VOUGA*/		} else {
+/*VOUGA*/			$html = str_replace('%nombre_pais%', '', $html);
+/*VOUGA*/			$html = str_replace('%nombre_pais_mayuscula%', '', $html);
 				}
 				
 				break;
@@ -10298,6 +10483,9 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%honorarios_totales%', __('Honorarios'), $html);
 				$html = str_replace('%honorarios_mta%', __('Honorarios totales'), $html);
 				$html = str_replace('%valor_honorarios_totales%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				//$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo']
+				$html = str_replace('%valor_honorarios_totales_moneda_total%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($this->fields['monto'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				
 				$html = str_replace('%fees%', __('%fees%'), $html); //en vez de Legal Fee es Legal Fees en inglés
 				$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
 				$html = str_replace('%total_honorarios%', __('Total Honorarios'), $html);
@@ -12024,7 +12212,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%hrs_mins_trabajadas%', $columna_hrs_trabajadas_categoria ? __('Hrs.:Mins. Trabajadas') : '', $html);
 				$html = str_replace('%hrs_mins_descontadas%', $columna_hrs_descontadas_categoria ? __('Hrs.:Mins. Descontadas') : '', $html);
 			// El resto se llena igual que PROFESIONAL_ENCABEZADO, pero tiene otra estructura, no debe tener 'break;'.
-			case 'PROFESIONAL_ENCABEZADO':
+			
+				case 'PROFESIONAL_ENCABEZADO':
 				global $columna_hrs_trabajadas;
 				global $columna_hrs_retainer;
 				global $columna_hrs_descontadas;
@@ -12182,6 +12371,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%profesional%', __('Profesional'), $html);
 				$html = str_replace('%staff%', __('Staff'), $html);
 				$html = str_replace('%nombre_profesional%', __('Nombre Profesional'), $html);
+				if ($lang == 'es') {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Profesional'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Trarifa<br>Hora'), $html);
+				
+				} else {
+/*VOUGA*/		$html = str_replace('%profesional%', __('Biller'), $html);
+/*VOUGA*/		$html = str_replace('%hora_tarificada%', __('Hourly<br>Rate'), $html);
+				}
+				
 				break;
 
 			case 'IMPUESTO':
@@ -12760,9 +12958,9 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				$resumen_fila_total = $html3;
 /*VOUGA*/		if ($lang == 'es') {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('Resumen Detalle Professional'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('Resumen Detalle Profesional'), $html);
 /*VOUGA*/			} else {
-/*VOUGA*/			$html = str_replace('%resumen_professional%', __('TIMEKEEPER SUMMARY'), $html);
+/*VOUGA*/			$html = str_replace('%resumen_profesional%', __('TIMEKEEPER SUMMARY'), $html);
 /*VOUGA*/			}
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);

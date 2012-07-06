@@ -78,10 +78,8 @@
 		$id_formato = $cobro->fields['id_formato'];
 	}
 
-	#$cobro->GuardarCobro();
-
+		
 	$html .= $cobro->GeneraHTMLCobro(false,$id_formato);
-	//echo $html; exit;
 	$cssData = UtilesApp::TemplateCartaCSS($Sesion,$cobro->fields['id_carta']);
 	$cssData .= UtilesApp::CSSCobro($Sesion,$id_formato);
 	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $Sesion, $cobro->fields['id_carta']);

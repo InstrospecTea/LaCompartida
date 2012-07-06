@@ -8629,17 +8629,33 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						}
 					}
 					break;
-					case 6.08:
-							$query = array();
+				case 6.08:
+					$query = array();
 					$query[] ="ALTER TABLE  `version_db` DROP PRIMARY KEY;";
 					$query[] ="ALTER TABLE  `version_db` ADD PRIMARY KEY (  `version` ,  `version_ct` );";
 
 					$query[] ="ALTER TABLE  `version_db` CHANGE  `version`  `version` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
 					$query[] ="ALTER TABLE  `version_db` CHANGE  `version_ct`  `version_ct` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
-					if ( ! ($res = mysql_query($q, $dbh)) ) {
-						throw new Exception($q . "---" . mysql_error());
+					foreach ($query as $q) {
+						if ( ! ($res = mysql_query($q, $dbh)) ) {
+							throw new Exception($q . "---" . mysql_error());
+						}
 					}
-				break;
+					break;
+				
+				case 6.09 :
+					$query = array();
+					$query[] ="INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
+								VALUES ( 'SegundaCuentaBancaria', '0', 'Segunda cuenta bancaria, esto nace por petición de Muñoz Tamayo y Asociados', 'boolean', '10', '-1' );";
+					if(!ExisteCampo('id_cuenta2','contrato',$dbh)) {
+						$query[] ="ALTER TABLE `contrato` ADD `id_cuenta2` INT NULL AFTER `id_cuenta` ;";
+					}
+					foreach ($query as $q) {
+						if ( ! ($res = mysql_query($q, $dbh)) ) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}
+					break;
 	}
 				
 }
@@ -8649,7 +8665,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update=6.08;
+$max_update=6.09;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
