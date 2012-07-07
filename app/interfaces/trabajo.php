@@ -108,9 +108,12 @@ else
 							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
 $where .= " AND usuario.visible=1";
 ?>
+	<script src="https://static.thetimebilling.com/contextmenu/jquery.contextMenu.js" type="text/javascript"></script>
+		<link  href="https://static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
-        var arr_trabajosabiertos = new Array();
-        var arr_trabajoscerrados = new Array();
+		
+		
+    
         function calcHeight(idIframe, idMainElm){
             ifr = $(idIframe);
             the_size = ifr.$(idMainElm).offsetHeight + 20;
@@ -120,88 +123,79 @@ $where .= " AND usuario.visible=1";
                 duration: 0.2
             });
         }
-        var MenuDias = [
-            {
-                name: 'Nueva hora',
-                className: 'new', 
-                callback: function(e) {
-                    var fecha = e.target.id.split('_',2);
-                    var fecha_id = fecha[0]+''+fecha[1];
-                    var f_dia = $F(fecha_id);
-                      
-                    OpcionesTrabajo('','',f_dia);
-                }
-            }
-        ];
+ 
                 
+ 
 
-        var myMenuItems = [
-            {
-                name: 'Ingresar como nueva hora',
-                className: 'new', 
-                callback: function(e) {
-                    OpcionesTrabajo(e.target.id,'nuevo','');
-                }
-            },{
-                name: 'Editar',
-                className: 'edit', 
-                callback: function(e) {
-                    OpcionesTrabajo(e.target.id,'','')
-                }
-            },{	    
-                name: 'Eliminar',
-                disabled: false,
-                className: 'delete',
-                callback: function(e) {
-                    if( confirm('<?php echo __("¿Desea eliminar este trabajo?") ?>') )
-                    OpcionesTrabajo(e.target.id,'eliminar','');
-                }
-            },{
-                separator: true
-            },{
-                name: 'Cancelar',
-                className: 'cancel',
-                callback: function(e) {
-                    OpcionesTrabajo('','cancelar');
-                }
-            }
-        ];
-       
-        var myClosedMenuItems = [
-            {
-                name: 'Ingresar como nueva hora',
-                className: 'new', 
-                callback: function(e) {
-                    OpcionesTrabajo(e.target.id,'nuevo','');
-                }
-            },{
-                separator: true
-            },{
-                name: 'Cancelar',
-                className: 'cancel',
-                callback: function(e) {
-                    OpcionesTrabajo('','cancelar');
-                }
-            }
-        ];
-        
 	
 
 
-		
+		var diaid=0;
+		var trabajoid=0;
 
 
         jQuery(document).ready(function() {
-          /*  var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
-            if (mes<=9) {
-                var mestext='0'+mes.toString();
-            } else {
-                var  mestext=mes.toString();
-            }
-            var dia=jQuery('#semana_Day_ID').val();
-            if (dia.length==1) dia='0'+dia;
-            var semana= jQuery('#semana').val()+'-'+mestext+'-'+dia;*/
-			  var semana= jQuery('#semanactual').val();
+			 
+		jQuery.contextMenu({
+			selector: '.trabajoabierto', events: {
+				show: function(opt) {
+					 var $this = this;
+					 trabajoid=$this.attr('id');
+					}}, 
+			callback: function(key, options) {		},
+			items: {
+				"edit": {	name: "Editar", 		icon: "edit"	, callback: function(key, options) {			OpcionesTrabajo(trabajoid,'','')			}	},
+ 				"paste": {name: "Ingresar como nueva hora", icon: "paste", callback: function(key, options) {		 OpcionesTrabajo(trabajoid,'nuevo','');		}	},
+				"delete": {name: "Eliminar", icon: "delete", callback: function(key, options) {  
+						    if( confirm('<?php echo __("¿Desea eliminar este trabajo?") ?>') ) OpcionesTrabajo(trabajoid,'eliminar','');
+						}	},
+				"sep1": "---------",
+				"quit": {name: "Cancelar", icon: "quit"}
+			}
+		});
+					 
+		jQuery.contextMenu({
+			selector: '.trabajoacerrado', 
+			events: {		
+				show: function(opt) {		 var $this = this;		 trabajoid=$this.attr('id');		}}, 
+				callback: function(key, options) {		},	
+				items: {
+				
+ 				"paste": {name: "Ingresar como nueva hora", icon: "paste", callback: function(key, options) { 	 OpcionesTrabajo(trabajoid,'nuevo','');			}	},
+				"sep1": "---------",
+				"quit": {name: "Cancelar", icon: "quit"}
+			}
+		});
+		
+			jQuery.contextMenu({
+			selector: '#cabecera_dias td', 
+			events: {
+				show: function(opt) {
+					 var $this = this;
+					 diaid=$this.attr('id');
+					}}, 
+			callback: function(key, options) {
+				var m = "global: " + key;
+				 console.log(options);
+					var iddia=diaid.replace('_','');
+					console.log(iddia);
+					 var fechadia=jQuery('#'+iddia);
+					 var f_dia=jQuery(fechadia).val();
+					OpcionesTrabajo('','',f_dia);
+				},
+			items: {
+				"add": {
+					name: "Nueva  hora", 
+					icon: "add"
+					
+					
+				} 
+			}
+		});
+		
+		 
+
+	  var semana= jQuery('#semanactual').val();
             var usuario= jQuery('#id_usuario').val();
 		 
 			
@@ -218,30 +212,12 @@ $where .= " AND usuario.visible=1";
             });
         
             jQuery('#versemana').click(function() {
-          /*      var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
-                if (mes<=9) {
-                    var mestext='0'+mes.toString();
-                } else {
-                    var  mestext=mes.toString();
-                }
-                var dia=jQuery('#semana_Day_ID').val();
-                if (dia.length==1) dia='0'+dia;
-               var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;*/
-		  var semana= jQuery('#semanactual').val();
+               var semana= jQuery('#semanactual').val();
                 var usuario= jQuery('#id_usuario').val();
                 Refrescasemana(semana,usuario);
             });
             jQuery('#id_usuario').change(function() {
-             /*   var mes=parseInt(jQuery('#semana_Month_ID').val())+1;
-                if (mes<=9) {
-                    var mestext='0'+mes.toString();
-                } else {
-                    var  mestext=mes.toString();
-                }
-                var dia=jQuery('#semana_Day_ID').val();
-                if (dia.length==1) dia='0'+dia;
-           var semana= jQuery('#semana_Year_ID').val()+'-'+mestext+'-'+dia;*/
-				  var semana= jQuery('#semanactual').val();
+           			  var semana= jQuery('#semanactual').val();
                 var usuario= jQuery('#id_usuario').val();
                 Refrescasemana(semana,usuario);
             });
@@ -313,11 +289,12 @@ $where .= " AND usuario.visible=1";
 				Refrescasemana(nextweek,usuario,'nextweek');  
 				Refrescasemana(lastweek,usuario,'lastweek');
 				 calendario(semana);
-                menues();
+               
                 jQuery('.trabajoabierto').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'});
                 jQuery('.trabajoabierto').dblclick(function() {
                     var idtrabajo=jQuery(this).attr('id') ;
                     OpcionesTrabajo(idtrabajo,'','');
+					 
                 });
                 jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false',
                     drop: function (event,ui) {
@@ -391,54 +368,7 @@ $where .= " AND usuario.visible=1";
     
             var arreglo=semana.split('-');
     
-            jQuery('#semana_Year_ID').val(arreglo[0]);
-            jQuery('#semana_Day_ID').val(parseInt(arreglo[2]));
-            jQuery('#semana_Month_ID').val(parseInt(arreglo[1])-1).change();
 			jQuery('#semanactual').val(arreglo[2]+'-'+arreglo[1]+'-'+arreglo[0]);
-        }
-
-        function menues() {
-            var indiceabierto=0;
-            var indicecerrado=0;
-    
-            var arr_trabajosabiertos = new Array();
-            var arr_trabajoscerrados = new Array();
-    
-            jQuery('.trabajoabierto').each(function() {
-                arr_trabajosabiertos[indiceabierto]=jQuery(this).attr('id');
-                indiceabierto++;
-            });
-            jQuery('.trabajocerrado').each(function() {
-                arr_trabajoscerrados[indicecerrado]=jQuery(this).attr('id');
-                indicecerrado++;
-            });
-            // console.log(arr_trabajosabiertos);
-            // console.log(arr_trabajoscerrados);
-            for(i=0;i<indiceabierto;i++)
-            {
-                new Proto.Menu({
-                    selector: '#'+arr_trabajosabiertos[i], // context menu will be shown when element with id of "contextArea" is clicked
-                    className: 'menu desktop',
-                    menuItems: myMenuItems
-                })
-            }
-            for(i=0;i<indicecerrado;i++)
-            {
-                new Proto.Menu({
-                    selector: '#'+arr_trabajoscerrados[i], // context menu will be shown when element with id of "contextArea" is clicked
-                    className: 'menu desktop',
-                    menuItems: myClosedMenuItems
-                })
-            }
-            for(i=0;i<7;i++)
-            {
-                new Proto.Menu({
-                    selector: '#dia_'+i, // context menu will be shown when element with id of "contextArea" is clicked
-                    className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
-                    menuItems: MenuDias // array of menu items
-                })
-            }
-    
         }
 
         function OpcionesTrabajo(id_trabajo, opcion, f_dia ) {
@@ -527,6 +457,7 @@ if ($p_revisor->fields['permitido']) {
             </td>
         </tr>
     </table>
+	
+ 
 <?php
 $pagina->PrintBottom();
-?>
