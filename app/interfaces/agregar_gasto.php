@@ -23,13 +23,6 @@ $gasto = new Gasto($sesion);
 
 $ingreso = new Gasto($sesion);
 
-if ($prov == 'false') {
-	$txt_pagina = $id_gasto ? __('Edición de Gastos') : __('Ingreso de Gastos');
-	$txt_tipo = __('Gasto');
-} else {
-	$txt_pagina = $id_gasto ? __('Edición de Provisión') : __('Ingreso de Provisión');
-	$txt_tipo = __('Provisión');
-}
 
 if ($id_gasto != "") {
 	$gasto->Load($id_gasto);
@@ -40,6 +33,16 @@ if ($id_gasto != "") {
 	if ($codigo_asunto != $gasto->fields['codigo_asunto']) { //revisar para codigo secundario
 		$cambio_asunto = true;
 	}
+}
+
+if ( ( $gasto->Loaded() && $gasto->fields['egreso'] > 0 ) || $prov == 'false') {
+	$txt_pagina = $id_gasto ? __('Edición de Gastos') : __('Ingreso de Gastos');
+	$txt_tipo = __('Gasto');
+	$prov = 'false';
+} else {
+	$txt_pagina = $id_gasto ? __('Edición de Provisión') : __('Ingreso de Provisión');
+	$txt_tipo = __('Provisión');
+	$prov = 'true';
 }
 
 if ($opcion == "guardar") {
