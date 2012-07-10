@@ -8,13 +8,15 @@
 class NotaCobro extends Cobro {
 
 	var $asuntos = array();
-
+	var $x_resultados=array();
+	
 	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
 		$this->campo_id = "id_cobro";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
+		$this->x_resultados = array();
 		$this->guardar_fecha = true;
 	}
 	
@@ -69,6 +71,9 @@ class NotaCobro extends Cobro {
 		list( $x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste ) = $this->DetalleProfesional();
 		global $x_resultados;
 		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+		$this->x_resultados=$x_resultados;
+		 
+		 
 		global $x_cobro_gastos;
 		$x_cobro_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
 
@@ -91,7 +96,7 @@ class NotaCobro extends Cobro {
 
 		if ($lang == '')
 			$lang = 'es';
-
+		
 		/*
 		  require_once Conf::ServerDir()."/lang/$lang.php";
 		 */
@@ -5739,8 +5744,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				
 				
-				$html = str_replace('%DESGLOSE_POR_ASUNTO_DETALLE%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_DETALLE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%DESGLOSE_POR_ASUNTO_TOTALES%', $this->GenerarDocumento2($parser, 'DESGLOSE_POR_ASUNTO_TOTALES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%DESGLOSE_POR_ASUNTO_DETALLE%', $this->GenerarDocumentoComun($parser, 'DESGLOSE_POR_ASUNTO_DETALLE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%DESGLOSE_POR_ASUNTO_TOTALES%', $this->GenerarDocumentoComun($parser, 'DESGLOSE_POR_ASUNTO_TOTALES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				
 				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
 				$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
@@ -6160,81 +6165,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				//Adelantos
 				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
-			//FFF Esto se hizo para Aguilar Castillo Love. Reparte HH y Gasto por asunto
-			case 'DESGLOSE_POR_ASUNTO_DETALLE':
-			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
-			    $query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
-						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
-						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),4) pthhac
-						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
-						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
-						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
-						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
-							,if(@rownum=kant,@sumat3:=(1.0000-@sumat3), round(ifnull(tramites.tramites/monto_tramites,0),4))  pt
-						    ,@sumat3:=@sumat3+round(ifnull(tramites.tramites/monto_tramites,0),4) ptac
-  					        ,c.monto_trabajos
-						    ,c.monto_thh
-						    ,c.monto_thh_estandar
-						    ,c.subtotal_gastos 
-							,c.monto_tramites
-							,c.impuesto
-							,c.impuesto_gastos  
-							, (c.monto_tramites * c.porcentaje_impuesto / 100) as impuesto_tramites
-						    ,kant.kant 
-
-						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
-						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
-						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0, @sumat3:=0) fff
-						    join prm_moneda pm on pm.id_moneda=c.id_moneda
-						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
-						    FROM trabajo  WHERE trabajo.id_tramite is null
-						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
-							
-						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
-						    from cta_corriente where cobrable=1
-						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
-							
-							left join (SELECT id_cobro, codigo_asunto, SUM( IFNULL(tarifa_tramite,0)) AS tramites
-						    FROM tramite
-							GROUP BY codigo_asunto,id_cobro) tramites on tramites.id_cobro=c.id_cobro and tramites.codigo_asunto=ca.codigo_asunto
-
-						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
-
-			    //echo $query_desglose_asuntos; exit;
-				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
-				$row_tmpl = $html;
-				$html='';
-					while($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
-					list($subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['monto_tramites'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'] ,$rowdesglose['impuesto_tramites'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
-						$row = $row_tmpl;
-						$row = str_replace('%glosa_asunto%',$rowdesglose['glosa_asunto'], $row);
-						$row = str_replace('%simbolo%',$simbolo, $row);
-						$row = str_replace('%honorarios_asunto%',round($rowdesglose['monto_trabajos']*$rowdesglose['pthh'],$cifras_decimales), $row);
-						$row = str_replace('%gastos_asunto%',round($rowdesglose['subtotal_gastos']*$rowdesglose['pg'],$cifras_decimales), $row);
-						$row = str_replace('%tramites_asunto%',round($rowdesglose['monto_tramites']*$rowdesglose['pt'],$cifras_decimales), $row);
-						
-					$html .= $row;
-					
-					}
-					
-					
-			    break;
-			//FFF Esto se hizo para Aguilar Castillo Love
-			case 'DESGLOSE_POR_ASUNTO_TOTALES':
-			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
-			    $html = str_replace('%simbolo%',$simbolo, $html);    
-			    $html = str_replace('%desglose_subtotal_hh%', round($subtotal_hh,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_subtotal_gasto%', round($subtotal_gasto,$cifras_decimales), $html);
-				$html = str_replace('%desglose_subtotal_tramite%', round($subtotal_tramite,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);				
-			    $html = str_replace('%desglose_impuesto_tramite%', round($impuesto_tramite,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($subtotal_tramite)+floatval($impuesto_hh)+floatval($impuesto_gasto)+floatval(impuesto_tramites),$cifras_decimales), $html);
-			    
-			    break;
-				    
 			case 'DETALLES_PAGOS':
 				$fila = $html;
 				$monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
@@ -10704,6 +10636,94 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
+				//FFF Esto se hizo para Aguilar Castillo Love. Reparte HH y Gasto por asunto
+			case 'DESGLOSE_POR_ASUNTO_DETALLE':
+			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
+			
+			/*	echo '<pre>';
+				print_r($this->x_resultados);
+				echo '</pre>';
+				die();*/
+				
+			    $query_desglose_asuntos = "SELECT    pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
+						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),8)) pthh
+						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),8) pthhac
+						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
+						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),8) pthheac
+						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),8))  pg
+						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),8) pgac
+							,if(@rownum=kant,@sumat3:=(1.0000-@sumat3), round(ifnull(tramites.tramites/monto_tramites,0),8))  pt
+						    ,@sumat3:=@sumat3+round(ifnull(tramites.tramites/monto_tramites,0),8) ptac
+  					        ,c.monto_trabajos
+						    ,c.monto_thh
+						    ,c.monto_thh_estandar
+						    ,c.subtotal_gastos 
+							,c.monto_tramites
+							,c.impuesto
+							,c.impuesto_gastos  
+							, (c.monto_tramites * c.porcentaje_impuesto / 100) as impuesto_tramites
+						    ,kant.kant 
+
+						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
+						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
+						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0, @sumat3:=0) fff
+						    join prm_moneda pm on pm.id_moneda=c.id_moneda
+						join prm_moneda doc_moneda on doc_moneda .id_moneda=c.opc_moneda_total 
+	
+						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
+						    FROM trabajo  WHERE trabajo.id_tramite is null
+						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
+							
+						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
+						    from cta_corriente where cobrable=1
+						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
+							
+							left join (SELECT id_cobro, codigo_asunto, SUM( IFNULL(tarifa_tramite,0)) AS tramites
+						    FROM tramite
+							GROUP BY codigo_asunto,id_cobro) tramites on tramites.id_cobro=c.id_cobro and tramites.codigo_asunto=ca.codigo_asunto
+
+						    WHERE ca.id_cobro=".$this->fields['id_cobro'];
+
+			    //echo $query_desglose_asuntos; exit;
+				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+				$row_tmpl = $html;
+				
+				$html='';
+					while($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
+					list($subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales)=array($rowdesglose['monto_trabajos'],$rowdesglose['subtotal_gastos'],$rowdesglose['monto_tramites'],$rowdesglose['impuesto'],$rowdesglose['impuesto_gastos'] ,$rowdesglose['impuesto_tramites'],$rowdesglose['simbolo'],$rowdesglose['cifras_decimales']);
+				//	$subtotal_tramite=$this->CalculaMontoTramites();
+				//	$subtotal_gasto=$this->CalculaMontoGastos();
+					$row = $row_tmpl;
+						
+						$row = str_replace('%glosa_asunto%',$rowdesglose['glosa_asunto'], $row);
+						$row = str_replace('%simbolo%',$simbolo, $row);
+						$row = str_replace('%honorarios_asunto%',round($rowdesglose['monto_trabajos']*$rowdesglose['pthh'],$cifras_decimales), $row);
+						$row = str_replace('%gastos_asunto%',round($rowdesglose['subtotal_gastos']*$rowdesglose['pg'],$cifras_decimales), $row);
+						$row = str_replace('%tramites_asunto%',round($rowdesglose['monto_tramites']*$rowdesglose['pt'],$cifras_decimales), $row);
+						
+					$html .= $row;
+					
+					}
+					
+					
+			    break;
+			//FFF Esto se hizo para Aguilar Castillo Love
+			case 'DESGLOSE_POR_ASUNTO_TOTALES':
+			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
+			
+			    $html = str_replace('%simbolo%',$simbolo, $html);    
+			    $html = str_replace('%desglose_subtotal_hh%', round($subtotal_hh,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_subtotal_gasto%', round($subtotal_gasto,$cifras_decimales), $html);
+				$html = str_replace('%desglose_subtotal_tramite%', round($subtotal_tramite,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);				
+			    $html = str_replace('%desglose_impuesto_tramite%', round($impuesto_tramite,$cifras_decimales), $html);
+			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($tipocambiodoc*$subtotal_gasto)+floatval($subtotal_tramite)+floatval($impuesto_hh)+floatval($impuesto_gasto)+floatval($impuesto_tramites),$cifras_decimales), $html);
+			    
+			    break;
+				    
+				
+				
 			case 'RESTAR_RETAINER':
 				if ($columna_hrs_retainer || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
 					$html = str_replace('%retainer%', __('Retainer'), $html);
