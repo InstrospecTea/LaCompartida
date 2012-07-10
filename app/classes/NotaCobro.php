@@ -10012,7 +10012,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 				$html = str_replace('%fax%', __('TELEFAX'), $html);
-
+	if($this->fields['documento']) {
+				$html = str_replace('%xcorrelativoaguilar%', 'DN-'. date("Ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'] , $html);
+				} else {
+					$html = str_replace('%xcorrelativoaguilar%', 'N/A' , $html);
+				}
+							
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 					$codigo_cliente = $cliente->CodigoACodigoSecundario($this->fields['codigo_cliente']);
