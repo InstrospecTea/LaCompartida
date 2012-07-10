@@ -4,7 +4,7 @@
 	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/MontoEnPalabra.php';
 
-
+ 
 class NotaCobro extends Cobro {
 
 	var $asuntos = array();
@@ -5761,7 +5761,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				} else if( UtilesApp::GetConf($this->sesion, 'PermitirFactura')) {
 						$html = str_replace('%numero_factura%', $this->fields['documento'], $html);
 				} else {
-				$html = str_replace('%numero_factura%', '', $html);
+				$html = str_replace('%numero_factura%',  $this->fields['documento'], $html);
 				}
 				
 				break;
