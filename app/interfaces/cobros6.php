@@ -749,8 +749,8 @@ if ($cobro->fields['id_contrato'] != '') {
 
     function Refrescar()
     {
-self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&opc=guardar&id_cobro=<?php echo $id_cobro; ?>&facturado=<?php echo intval($cobro->fields['facturado']); ?>';    
-}
+        self.location.href = 'cobros6.php?popup=<?php echo $_GET['popup']; ?>&opc=guardar&id_cobro=<?php echo $id_cobro; ?>&facturado=<?php echo intval($cobro->fields['facturado']); ?>';
+    }
 
     function MostrarTipoCambio()
     {
@@ -1276,7 +1276,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 
 <!-- Estado del Cobro -->
 <div id="colmask"  >
-    <div id="colleft" style="float:left;">
+    <div id="colleft"  >
         <form name="todo_cobro" id='todo_cobro' method="post" action="">
             <input type="hidden" name="existe_factura" id="existe_factura" value="<?php echo $existe_factura ?>" />
             <input type="hidden" name="existe_pago" id="existe_pago" value="<?php echo $existe_pago ?>" />
@@ -1290,7 +1290,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
             <input type="hidden" name="opc_informar_contabilidad" id="opc_informar_contabilidad"/>
 <input type="hidden" name="todopagado" value="<?php echo ($documento_cobro->fields['honorarios_pagados'] == 'SI' && $documento_cobro->fields['honorarios_pagados'] == 'SI')?'SI':'NO';?>" id="todopagado">
 
-            <div id="tablacabecera"  style="float:left;width:78%;margin:0 5px; text-align:left;min-width: 785px;">
+            <div id="tablacabecera"  style="width: 950px;">
                 <!-- Calendario DIV -->
                 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
                     <div class="floating" id="calendar"></div>
@@ -1322,12 +1322,13 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 					}
 				}
 				?>
-                <table cellspacing="0" cellpadding="1" bgcolor="#dfdfdf" style="border: 1px solid #bfbfcf;" width="100%" height="30">
+                <table id="estadoscobro">
                     <tr style="height: 26px;  vertical-align: middle;" >
-                        <td style="height: 26px;  vertical-align: top;" align=right nowrap>
+                        <td style="height: 26px;  vertical-align: top;" align=left nowrap>
                             <br />
-							<?php echo __('Avance del Cobro'); ?>:&nbsp;&nbsp;
-                            <!-- <br/><br/><?php echo __('Forma de cobro') ?>: <?php echo $cobro->fields['forma_cobro'] ?> -->
+							<?php echo'Estado '. __('Cobro') ?>:
+                          <br /> <br/><?php echo __('Forma Cobro') ?>
+		      <br/><?php echo $cobro->fields['forma_cobro'] ?> 
                         </td>
                         <td align="left" style="font-size: 11px; font-weight: bold;" >
                             <table cellpadding="3">
@@ -1426,8 +1427,8 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                         </td>
                    
                         <td align=left style="vertical-align: middle;" colspan="2">
-                            <div style="float:left;text-align:center;width:180px;">
-								<?php echo __('Cambiar a') ?>:&nbsp;&nbsp;
+                            <div style="float:left;text-align:center;width:150px;">
+								<?php echo __('Cambiar a') ?>:
 								<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", 'estado', $cobro->fields['estado'], 'onchange="RevisarPagado(this.value);"', '', 150); ?>
                                 <input type="hidden" id="estado_motivo" name="estado_motivo" />
                             </div>
@@ -1480,107 +1481,51 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                 <!-- Fin del Estado del cobro -->
 
                 <!-- Fin Cabecera -->
-                <table id="tablafacturas" >
-                    <tr>
-                        <!-- Facturas -->
-                        <td id="tdfacturas" colspan="2">
-						<?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
-								<table id="cajafacturas" border="0" cellspacing="0" cellpadding="1" style="border: 1px solid #bfbfcf;">
+              
+								<table id="cajafacturas" >
 								 
 								</table>
-								
-						<?php } else { // no hay mod facturacion   ?>
-								<table w  border="0" cellspacing="0" cellpadding="2" style="border: 0px solid #bfbfcf;">
+						
+                       </div>
+<br class="clearfix"/>
+<div id="historial">
+                            <table cellspacing="0" cellpadding="3" style='width:670px;'>
+                                <tr>
+                                    <td width="220px"  >
+                                        <span style="background:#EEE;padding:4px;display:block;font-weight: bold; font-size: 11px;"><?php echo __('Se está cobrando:') ?></span>
+                                    
+										<?php
+										$se_esta_cobrando = __('Periodo');
+										$se_esta_cobrando .=': ';
+										if ($cobro->fields['fecha_ini'] != '0000-00-00') {
+											$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
+											$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini . ' ';
+										}
+										if ($cobro->fields['fecha_fin'] != '0000-00-00') {
+											$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
+											$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
+										}
+
+										if ($cobro->fields['se_esta_cobrando']) {
+											$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
+										}
+
+										if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
+											$lineas = 'rows="6"';
+											$columnas = 'cols="25"';
+										} else {
+											$lineas = 'rows="3"';
+											$columnas = "";
+										}
+										?>
+                                        <textarea style="width:220px;" name="se_esta_cobrando" <?php echo $lineas . ' ' . $columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
+                                    </td>
+                             <td style="text-align:center;">
+                         <?php if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
+						
+								<table     cellspacing="0" cellpadding="2" style="text-align:center;margin:auto; border: 0px solid #bfbfcf;">
 									<tr id="nofac1row">
-										<td width="50%">
-											<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="220" height=100>
-												<tr style="height: 26px; ">
-													<td colspan=2 align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;">
-														<img src="<?php echo Conf::ImgDir() ?>/cobro.png" border="0" alt="Imprimir"/> <?php echo __('Emisión') ?>
-													</td>
-												</tr>
-														<?php if ($cobro->fields['solo_gastos'] == 0) { ?>
-													<tr>
-														<td colspan=2 align=left>
-		<?php echo __('Monto Honorarios') ?>:
-														</td>
-													</tr>
-													<tr>
-														<td align=right colspan="2" >
-															<?php
-															if ($cobro->fields['modalidad_calculo'] == 1) {
-																$honorarios_corregidos = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-															} else {
-																if ($cobro->fields['porcentaje_impuesto'] > 0) {
-																	$honorarios_original = $cobro->fields['monto_subtotal'] - $cobro->fields['descuento'];
-																} else {
-																	$honorarios_original = $cobro->fields['monto'];
-																}
-																$aproximacion_monto = number_format($honorarios_original, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
-																$honorarios_corregidos = $aproximacion_monto * ($cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']);
-
-																//Caso retainer menor de un valor y distinta tarifa (diferencia por decimales)
-																if ((($cobro->fields['total_minutos'] / 60) < $cobro->fields['retainer_horas']) && ($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL') && $cobro->fields['id_moneda'] != $cobro->fields['id_moneda_monto']) {
-																	$honorarios_corregidos = $honorarios_original * ($cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']);
-																}
-
-																//Caso flat fee
-																if ($cobro->fields['forma_cobro'] == 'FLAT FEE' && $cobro->fields['id_moneda'] != $cobro->fields['id_moneda_monto'] && $cobro->fields['id_moneda_monto'] == $cobro->fields['opc_moneda_total'] && empty($cobro->fields['descuento']) && empty($cobro->fields['monto_tramites'])) {
-																	$honorarios_corregidos = $cobro->fields['monto_contrato'];
-																}
-															}
-															?>
-													<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<?php echo $honorarios_corregidos > 0 ? number_format($honorarios_corregidos, $moneda_documento->fields['cifras_decimales'], '.', '') : '0' ?>
-														</td>
-													</tr>
-														<?php } ?>
-												<tr>
-													<td colspan=2 align=left>
-	<?php echo __('Monto Gastos') ?>:
-													</td>
-												</tr>
-												<tr>
-													<td align=right colspan="2" >
-														<?php
-														if ($cobro->fields['modalidad_calculo'] == 1) {
-															echo $moneda_documento->fields['simbolo'] . ' ' . ( $x_resultados['subtotal_gastos'][$moneda_documento->fields['id_moneda']] > 0 ? $x_resultados['subtotal_gastos'][$moneda_documento->fields['id_moneda']] : "0" );
-														} else {
-															echo $moneda_documento->fields['simbolo'] . ' ' . ( $documento_cobro->fields['subtotal_gastos'] + $documento_cobro->fields['subtotal_gastos_sin_impuesto'] > 0 ? $documento_cobro->fields['subtotal_gastos'] + $documento_cobro->fields['subtotal_gastos_sin_impuesto'] : "0" );
-														}
-														?>
-													</td>
-												</tr>
-														<?php if ($cobro->fields['porcentaje_impuesto'] > 0 || $cobro->fields['porcentaje_impuesto_gastos'] > 0) { ?>
-													<tr>
-														<td colspan=2 align=left >
-		<?php echo __('Impuesto') ?>:
-														</td>
-													</tr>
-													<tr>
-														<td align=right colspan="2" >
-															<?php
-															if ($cobro->fields['modalidad_calculo'] == 1) {
-																echo $moneda_documento->fields['simbolo'] . ' ' . ( $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']] > 0 ? $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']] : "0");
-															} else {
-																echo $moneda_documento->fields['simbolo'] . ' ' . ( $documento_cobro->fields['impuesto'] > 0 ? $documento_cobro->fields['impuesto'] : "0" );
-															}
-															?>
-														</td>
-													</tr>
-														<?php } ?>
-												<tr>
-													<td colspan=2 align=left>
-	<?php echo __('Forma de cobro') ?>:
-													</td>
-												</tr>
-												<tr>
-													<td colspan=2 align=right>
-	<?php echo $cobro->fields['forma_cobro']; ?>
-													</td>
-												</tr>
-											</table>
-											<br />
-										</td>
+										
 										<td align="center" id="Ver Factura">
 	<?php if (!UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 												<table border="0" cellspacing="0" cellpadding="2" style="border: 1px solid #bfbfcf;" width="220" height=100>
@@ -1638,47 +1583,6 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 									</tr>                                                     
 								</table>
 <?php } ?>
-                        </td><!-- Fin Factura -->
-                    </tr>
-				</table></div>
-<br class="clearfix"/>
-<div id="historial">
-                            <table cellspacing="0" cellpadding="3" style='width:670px;'>
-                                <tr>
-                                    <td width="220px"  bgcolor="#dfdfdf">
-                                        <span style="font-weight: bold; font-size: 11px;"><?php echo __('Se está cobrando:') ?></span>
-                                    </td><td width="450px" ></td>
-                                </tr>
-                                <tr>
-                                    <td>
-										<?php
-										$se_esta_cobrando = __('Periodo');
-										$se_esta_cobrando .=': ';
-										if ($cobro->fields['fecha_ini'] != '0000-00-00') {
-											$se_esta_cobrando_fecha_ini = Utiles::sql2date($cobro->fields['fecha_ini']);
-											$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini . ' ';
-										}
-										if ($cobro->fields['fecha_fin'] != '0000-00-00') {
-											$se_esta_cobrando_fecha_fin = Utiles::sql2date($cobro->fields['fecha_fin']);
-											$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin;
-										}
-
-										if ($cobro->fields['se_esta_cobrando']) {
-											$se_esta_cobrando = $cobro->fields['se_esta_cobrando'];
-										}
-
-										if (UtilesApp::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
-											$lineas = 'rows="6"';
-											$columnas = 'cols="25"';
-										} else {
-											$lineas = 'rows="3"';
-											$columnas = "";
-										}
-										?>
-                                        <textarea style="width:220px;" name="se_esta_cobrando" <?php echo $lineas . ' ' . $columnas; ?> id="se_esta_cobrando"><?php echo $se_esta_cobrando; ?></textarea>
-                                    </td>
-                             <td style="text-align:center;">
-                         
 							 <br /><br /><div id="retorno" style="display:none;" >Caja Respuesta</div>
                             <a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="ValidarTodo(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
 							 </td>

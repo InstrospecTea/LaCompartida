@@ -94,14 +94,14 @@ google.load("jquery","1.7");
 .droplinetabs ul li ul li a {padding-right:11px !important;padding-left:8px !important}
 .mini_input {height: 18px; margin: -1px 0 0 -1px;font-size:10px;}
 .updown {position: relative;margin: -2px 0 0 0px;left: 260px;top: -20px;}
- #colleft { width:950px;}
- #cajafacturas  { width:950px;margin-left:-3px;}
+ #colleft { overflow-x: hidden;margin: auto;width:950x;}
+ #cajafacturas  { width:950px;border: 1px solid #bfbfcf;}
 #cajafacturas td, #cajafacturas th {font-size:8pt !important; border-collapse:collapse;border:1px solid #F9F9F9;}
-#cobro6colderecha {    float:left;margin: 5px -10px 0 35px;width:230px;;background-color: white;}
+#cobro6colderecha {   float: right;margin: 5px  0px 0 25px;width: 230px;background-color: white;position: relative;right: 2px;}
 #colmask {width:955px;overflow:hidden;clear:both;margin:auto;}
 #historial {margin:5px 0 0 -10px;width:700px;float:left;}
 .z10 {position:relative;z-index:10;background:white;}
-
+#estadoscobro { border: 1px solid #CCC; background:#EEE;height:35px;width:950px;position:relative;margin:0px -2px 5px -2px;}
 </style>
 
 
