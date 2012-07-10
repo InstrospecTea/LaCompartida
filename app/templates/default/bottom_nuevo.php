@@ -20,7 +20,7 @@
     });
     
  
-jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebilling.com/bottom.js', dataType: 'script' });
+jQuery.ajax({async: false,cache:false,type: "GET", url:'https://static.thetimebilling.com/bottom.js?v2', dataType: 'script' });
 
 
 
