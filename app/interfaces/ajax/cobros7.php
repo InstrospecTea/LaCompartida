@@ -250,7 +250,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 	echo '<tr style="height: 26px;">
 										<td colspan="12" align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;" colspan=2>
 											<img src="'. Conf::ImgDir().'/imprimir_16.gif" border="0" alt="Imprimir"/> '.  __('Documentos Tributarios') ;
-											  if ($cobro->DiferenciaCobroConFactura() != '') { 
+											  if ( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') &&  $cobro->DiferenciaCobroConFactura() != '') { 
 												echo '<span style="border: 1px solid #bfbfcf; color: #ffffff; background-color: #ff0000; float: right; padding: 2px">'. $cobro->DiferenciaCobroConFactura() .'</span>';
 												} ?>
 										</td>
@@ -270,7 +270,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 												<th>Agregar Pago</th>
 												<th>Acciones</th></tr>
 											
-													<tr bgcolor="#aaffaa">
+													<tr style="background:#EFE;">
 														<td>Liquidación</td>
 														
 										<td>'. $cobro->fields['id_cobro'] .'</td>
@@ -295,6 +295,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 echo '<td>	<b>'. $moneda_documento->fields['simbolo'] . '&nbsp;' . number_format($saldo_honorarios + $saldo_gastos_con_impuestos + $saldo_gastos_sin_impuestos + $x_resultados['monto_iva'][$moneda_documento->fields['id_moneda']], $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) .'</b>';
 echo '		</td>					<td/>						<td/>						<td/>				<td/>											</tr>';
 
+if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 													//documentos existentes. usar funcion magica (???)
 													$query = "SELECT
                 factura.id_factura,
@@ -524,7 +525,7 @@ echo '		</td>					<td/>						<td/>						<td/>				<td/>											</tr>';
 	
 }
 
-
+}
 die();
 
 
