@@ -5622,6 +5622,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$fecha_mes_del_cobro = strtotime($this->fields['fecha_fin']);
 				$fecha_mes_del_cobro = strftime("%B %Y", mktime(0, 0, 0, date("m", $fecha_mes_del_cobro), date("d", $fecha_mes_del_cobro) - 5, date("Y", $fecha_mes_del_cobro)));
                                 
+				
+				if($this->fields['documento']) {
+				$html = str_replace('%xcorrelativoaguilar%', 'DN-'. date("Ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'] , $html);
+				} else {
+					$html = str_replace('%xcorrelativoaguilar%', 'N/A' , $html);
+				}
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 					$codigo_cliente = $cliente->CodigoACodigoSecundario($this->fields['codigo_cliente']);
