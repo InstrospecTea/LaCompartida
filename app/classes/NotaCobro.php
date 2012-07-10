@@ -1805,8 +1805,16 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
 				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
-                                $html2 = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html2);
-                                 $html2 = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html2);
+				
+				if(date("y", strtotime($this->fields['fecha_emision']))=='69') {
+					   $html2 = str_replace('%xfecha_mes_dos_digitos%',  'N/A', $html2);
+                                 $html2 = str_replace('%xfecha_ano_dos_digitos%','', $html2);
+				} else {
+					   $html2 = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html2);
+                                 $html2 = str_replace('%xfecha_ano_dos_digitos%','DN-'.date("y", strtotime($this->fields['fecha_emision'])), $html2);
+				}
+				
+                             
                                  $html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html2);
 				 
                                 $html2 = str_replace(array('%xnombre_cliente%','%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
