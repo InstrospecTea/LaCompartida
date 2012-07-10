@@ -1806,7 +1806,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
 				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
 				
-				if(date("y", strtotime($this->fields['fecha_emision']))=='69') {
+				if ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL')  {
 					   $html2 = str_replace('%xfecha_mes_dos_digitos%',  'N/A', $html2);
                                  $html2 = str_replace('%xfecha_ano_dos_digitos%','', $html2);
 				} else {
