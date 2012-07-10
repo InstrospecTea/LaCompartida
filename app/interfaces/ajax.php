@@ -360,10 +360,12 @@
 		}
 		$query = "SELECT codigo_idioma, glosa_idioma FROM asunto LEFT JOIN prm_idioma USING (id_idioma) WHERE $where";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		if(list($codigo, $glosa) = mysql_fetch_array($resp))
+		if(list($codigo, $glosa) = mysql_fetch_array($resp)) {
+			$glosa = mb_convert_encoding($glosa, "UTF-8", "ISO-8859-1");
 			echo($codigo.'|'.$glosa);
-		else
+		} else {
 			echo("VACIO");
+		}
 	}
 	else if($accion == "get_tarifa")
 	{

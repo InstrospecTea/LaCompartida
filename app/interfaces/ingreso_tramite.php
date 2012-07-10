@@ -395,7 +395,7 @@
 		{
 ?>
 			<script>
-				if(window.opener && window.opener.document.form_semana.submit() )
+				if(window.opener && ( window.opener.document.form_semana && window.opener.document.form_semana.submit() ) )
 				{
 					window.close();
 				}
@@ -985,48 +985,48 @@ function CargaIdioma( codigo )
 	{
 		var accion = 'idioma';
 		var http = getXMLHTTP();
-		http.open('get','ajax.php?accion='+accion+'&codigo_asunto='+codigo, true);
-		http.onreadystatechange = function()
+		http.open('GET','ajax.php?accion='+accion+'&codigo_asunto='+codigo, true);
+		http.onreadystatechange = revisaidioma;
+		http.setRequestHeader("Content-Type","application/x-www-form-urlencoded;charset=UTF-8");
+	    http.send(null);
+	}
+	
+	function revisaidioma()
+	{
+		if(http.readyState == 4)
 		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
+			var response = http.responseText;
+			if( response.length > 0 ) {
 				var idio = response.split("|");
 <?php 
-		if (method_exists('Conf','GetConf'))
-		{
-			$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
-		}
-		else if(method_exists('Conf','IdiomaGrande'))
-		{
-			$IdiomaGrande = Conf::IdiomaGrande();
-		}
-		else
-		{
+		if( UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
+			$IdiomaGrande = UtilesApp::GetConf($sesion, 'IdiomaGrande');
+		} else {
 			$IdiomaGrande = false;
 		}
 
 		if($IdiomaGrande)
 		{
 ?>
-				txt_span.innerHTML = idio[1];
+					txt_span.innerHTML = idio[1];
 <?php 
 		}
 		else
 		{
 ?>
-			txt_span.innerHTML = 'Idioma: '+idio[1];
+					txt_span.innerHTML = 'Idioma: '+idio[1];
 
-				if(idio[1]=='Español')
-					googie2.setCurrentLanguage('es');
-				if(idio[1]=='Inglés')
-					googie2.setCurrentLanguage('en');
+					if(idio[1]=='Español') {
+						googie2.setCurrentLanguage('es');
+					}
+					if(idio[1]=='Inglés') {}
+						googie2.setCurrentLanguage('en');
+					}
 <?php 
 		}
 ?>
 			}
-		};
-	    http.send(null);
+		}
 	}
 }
 
@@ -1569,7 +1569,7 @@ else
             return $string;
     } 
 ?>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 <?php 
 if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 	echo "CargaIdioma('".$codigo_asunto_secundario."');";
