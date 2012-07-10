@@ -917,13 +917,7 @@ class NotaCobro extends Cobro {
 				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
                                 $html2 = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html2);
                                  $html2 = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html2);
-                                  $html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html2);
-				if($this->fields['documento']) {
-				$html2 = str_replace('%xcorrelativoaguilar%', 'DN-'. date("Ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'] , $html2);
-				} else {
-					$html2 = str_replace('%xcorrelativoaguilar%', 'N/A' , $html2);
-				}
-								
+                                 $html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html2);
 				 
                                 $html2 = str_replace(array('%xnombre_cliente%','%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
 				
@@ -5622,12 +5616,6 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$fecha_mes_del_cobro = strtotime($this->fields['fecha_fin']);
 				$fecha_mes_del_cobro = strftime("%B %Y", mktime(0, 0, 0, date("m", $fecha_mes_del_cobro), date("d", $fecha_mes_del_cobro) - 5, date("Y", $fecha_mes_del_cobro)));
                                 
-				
-				if($this->fields['documento']) {
-				$html = str_replace('%xcorrelativoaguilar%', 'DN-'. date("Ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'] , $html);
-				} else {
-					$html = str_replace('%xcorrelativoaguilar%', 'N/A' , $html);
-				}
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 					$codigo_cliente = $cliente->CodigoACodigoSecundario($this->fields['codigo_cliente']);
@@ -5760,14 +5748,18 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%DESGLOSE_POR_ASUNTO_TOTALES%', $this->GenerarDocumentoComun($parser, 'DESGLOSE_POR_ASUNTO_TOTALES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				
 				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
-				$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
-								FROM factura
-								WHERE id_cobro =" . $this->fields['id_cobro'];
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($numero_factura) = mysql_fetch_array($resp);
+					$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
+									FROM factura
+									WHERE id_cobro =" . $this->fields['id_cobro'];
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					list($numero_factura) = mysql_fetch_array($resp);
 
-
-				$html = str_replace('%numero_factura%',$numero_factura, $html);
+					if(!$numero_factura) {
+						$numero_factura='';
+					}
+					$html = str_replace('%numero_factura%',$numero_factura, $html);
+				} else if( UtilesApp::GetConf($this->sesion, 'PermitirFactura')) {
+						$html = str_replace('%numero_factura%', $this->fields['documento'], $html);
 				} else {
 				$html = str_replace('%numero_factura%', '', $html);
 				}
@@ -10018,12 +10010,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 				$html = str_replace('%fax%', __('TELEFAX'), $html);
-	if($this->fields['documento']) {
-				$html = str_replace('%xcorrelativoaguilar%', 'DN-'. date("Ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'] , $html);
-				} else {
-					$html = str_replace('%xcorrelativoaguilar%', 'N/A' , $html);
-				}
-							
+
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
 					$codigo_cliente = $cliente->CodigoACodigoSecundario($this->fields['codigo_cliente']);
@@ -10190,15 +10177,19 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%atte%', empty($contrato->fields['contacto']) ? '' : '(' . __('Atte') . ')', $html);
 				$html = str_replace('%telefono%', empty($contrato->fields['fono_contacto']) ? '' : __('Teléfono'), $html);
 				$html = str_replace('%valor_telefono%', empty($contrato->fields['fono_contacto']) ? '' : $contrato->fields['fono_contacto'], $html);
-					if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
-				$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
-								FROM factura
-								WHERE id_cobro =" . $this->fields['id_cobro'];
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($numero_factura) = mysql_fetch_array($resp);
+				if(UtilesApp::GetConf($this->sesion,'NuevoModuloFactura')) {
+					$query = "SELECT CAST( GROUP_CONCAT( numero ) AS CHAR ) AS numeros
+									FROM factura
+									WHERE id_cobro =" . $this->fields['id_cobro'];
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					list($numero_factura) = mysql_fetch_array($resp);
 
-				if(!$numero_factura) $numero_factura='';
-				$html = str_replace('%numero_factura%',$numero_factura, $html);
+					if(!$numero_factura) {
+						$numero_factura='';
+					}
+					$html = str_replace('%numero_factura%',$numero_factura, $html);
+				} else if( UtilesApp::GetConf($this->sesion, 'PermitirFactura')) {
+						$html = str_replace('%numero_factura%', $this->fields['documento'], $html);
 				} else {
 				$html = str_replace('%numero_factura%', '', $html);
 				}
