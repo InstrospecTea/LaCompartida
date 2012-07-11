@@ -150,6 +150,8 @@
 				$fila['razon_social']= $factura->fields['cliente']; 
 				$fila[ 'rut']= 				$factura->fields['RUT_cliente'];
 				$fila[ 'telefono']=  $contrato->fields['factura_telefono']; 
+			$fila[ 'comuna']=	 		  $factura->fields['comuna_cliente']; 
+			$fila[ 'ciudad']=	 		  $factura->fields['ciudad_cliente'];  
                                 $fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
