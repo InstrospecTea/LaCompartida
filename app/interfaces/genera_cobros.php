@@ -122,7 +122,7 @@ if ($opc == 'asuntos_liquidar') {
 						WHERE $where
 						GROUP BY contrato.id_contrato";
 	###### BUSCADOR ######
-	
+	//echo $query;
 	$link = __('Opción'); #__('Opción')." <br /><a href='javascript:void(0)' onclick='SeleccionaTodos(document.form_busca.opc, this.checked);'>".__('Todos');
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente, asunto_lista';
@@ -528,7 +528,9 @@ else
 			});
 		}
 </script>
-<?php echo Autocompletador::CSS(); ?>
+<?php echo Autocompletador::CSS();
+//print_r($_POST);
+?>
 <form name='form_busca' id='form_busca' action='' method=post>
 	<input type=hidden name=opc id='opc' value=''>
 	<!-- Calendario DIV -->
@@ -636,42 +638,25 @@ else
 								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
 							</td>
 							<?php
-							if (!$activo) {
+							if (isset($_POST['activo']) && $_POST['activo']==1) {
+								
+								$chk = 'checked="checked"';
+							} 	else {
 								$chk = '';
-							} elseif ($activo == 1) {
-								$chk = 'checked';
 							}
-							else
-								$chk = '';
 							?>
 							<td>
 							</td>
 						</tr>
-						<!--<tr>
-							<td align=right valign=center><b><?php echo __('Cobros Pendientes') ?>&nbsp;</b></td>
-							<td align=left colspan=2 ><input type="checkbox" name=pendientes id=pendientes value=1 <?php echo $pendientes ? 'checked' : '' ?>>
-								&nbsp;<?php echo __('Hasta') ?>:&nbsp;
-								<input type="text" name="fecha_pendiente" value="<?php echo $fecha_pendiente ? $fecha_pendiente : date("d-m-Y") ?>" id="fecha_pendiente" size="11" maxlength="10" />
-								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_pendiente" style="cursor:pointer" />
-							</td>
-						</tr>--> <!--
-						<?php if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaFechaDesdeCobranza') ) || ( method_exists('Conf', 'UsaFechaDesdeCobranza') && Conf::UsaFechaDesdeCobranza() )) { ?>
-								<tr>
-									<td align=right><b><?php echo __('Fecha hasta') ?>&nbsp;</b></td>
-									<td align=left>
-										<input type="text" name="fecha_fin" value="<?php echo!$fecha_fin ? date('d-m-Y') : $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
-										<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
-									</td>
-								</tr>
-						<?php } ?>  Comentado por SM 28.01.2011 el conf nunca se usa -->
+						 
 						<tr>
 							<td align=right><b><?php echo __('Activo') ?>&nbsp;</b></td>
-							<td align=left><input type="checkbox" name='activo' id='activo' value=1 <?php echo (!isset($boton_buscar)) ? 'checked' : $chk ?>></td>
+							<td align=left><input type="checkbox" name='activo' id='activo' value="1" <?php echo (!isset($_POST['opc'])) ? 'checked="checked"' : $chk ?>></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td align=left>
-								<input type="button" value="Buscar" class=btn name='boton' id='boton_buscar' onclick="GeneraCobros(this.form, '',false)">
+								<input type="button" value="Buscar" class=btn name='boton_buscar' id='boton_buscar' onclick="GeneraCobros(this.form, '',false)">
 							</td>
 						</tr>
 					</table>
