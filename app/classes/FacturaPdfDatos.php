@@ -50,6 +50,7 @@
 					}
 				}
 			}
+			
 			/*$factura = new Factura($this->sesion);
 			$factura->Load($id_factura);
 		
@@ -91,7 +92,6 @@
 			
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
-			
 			switch( $tipo_dato ) {
 				case 'razon_social': 			$glosa_dato = $factura->fields['cliente']; break;
 				case 'rut': 				$glosa_dato = $factura->fields['RUT_cliente']; break;
@@ -101,6 +101,8 @@
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_ano_ultima_cifra':		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
+				case 'comuna':			$glosa_dato = $factura->fields['comuna_cliente']; break;
+				case 'ciudad':			$glosa_dato = $factura->fields['ciudad_cliente']; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
 				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
 				case 'descripcion_gastos_sin_iva':	$glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto']; break;
@@ -127,7 +129,7 @@
 			return $glosa_dato;
 		}
 		
-                function CargarFilaDato( $id_factura )
+        function CargarFilaDato( $id_factura )
 		{
 			$factura = new Factura($this->sesion);
 			$factura->Load($id_factura);
@@ -137,8 +139,6 @@
 			
 			$contrato = new Contrato($this->sesion);
                         $contrato->Load($cobro->fields['id_contrato']);
-                        
-                        
                         
 			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
@@ -188,13 +188,13 @@
 				echo "<html><head><title>Error</title></head><body><p>No se encuentra la factura $id_factura.</p></body></html>";
 				return;
 			}
-                        
-                        $query = " SELECT id_documento_legal, codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
+            
+           $query = " SELECT id_documento_legal, codigo, glosa FROM prm_documento_legal WHERE id_documento_legal = '".$factura->fields['id_documento_legal']."' ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			list( $id_documento_legal, $codigo_documento_legal, $glosa_documento_legal) = mysql_fetch_array($resp);
 	
 			$this->CargarDatos( $id_factura, $id_documento_legal ); // esto trae la posicion, tamaño y glosa de todos los campos más los datos del papel en la variable $this->papel;
-		 	
+		 	 
                  if(count($this->papel)) {
                         $pdf = new FPDF($orientacion, 'mm', array($this->papel['cellW'],$this->papel['cellH']));
 							$pdf->SetMargins($this->papel['coordinateX'],$this->papel['coordinateY']);
@@ -217,27 +217,28 @@
 			$datos['dato_letra']=str_replace(array("<br>\n","<br/>\n","<br />\n" ),"\n",$datos['dato_letra']);
 			
 			//echo '<pre>';print_r($this->datos);echo '</pre>';
-			if (intval($this->datos['monto_honorarios']['dato_letra'])===0) {
+			if (isset($this->datos['monto_honorarios']['dato_letra']) && intval($this->datos['monto_honorarios']['dato_letra'])===0) {
 			    unset($this->datos['monto_honorarios']);
 			    unset($this->datos['moneda_honorarios']);
 			    unset($this->datos['descripcion_honorarios']);
 			}
-			if (intval($this->datos['monto_gastos_con_iva']['dato_letra'])===0) {
+			if (isset($this->datos['monto_gastos_con_iva']['dato_letra']) && intval($this->datos['monto_gastos_con_iva']['dato_letra'])===0) {
 			    unset($this->datos['monto_gastos_con_iva']);
 			    unset($this->datos['moneda_gastos_con_iva']);
 			    unset($this->datos['descripcion_gastos_con_iva']);
 			}
-			if (intval($this->datos['monto_gastos_sin_iva']['dato_letra'])===0) {
+			if (isset($this->datos['monto_gastos_sin_iva']['dato_letra'])  && intval($this->datos['monto_gastos_sin_iva']['dato_letra'])===0) {
 			    unset($this->datos['monto_gastos_sin_iva']);
 			    unset($this->datos['moneda_gastos_sin_iva']);
 			    unset($this->datos['descripcion_gastos_sin_iva']);
 			}
-			 
+			//echo '<pre>';print_r($this->datos);echo '</pre>';die();
 			foreach( $this->datos as $tipo_dato => $datos ) {
-			    			  
+			
+			
 				$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
-				
+			 
                                if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
                                         $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
                                 } else if( $datos['mayuscula'] == 'may' ) {
@@ -247,8 +248,8 @@
 				} else {
 					$pdf->Write(4, $datos['dato_letra']);
 				}
-			}
 			
+			}
                         if( $mantencion ) {
                          //   $pdf->Output("../../pdf/factura.pdf","F");
                         } else {
