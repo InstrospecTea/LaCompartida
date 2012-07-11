@@ -6395,7 +6395,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 											), (
 											NULL ,  'AltoFacturaPdf',  '279', NULL ,  'numero',  '6',  '-1'
 											);";
-$query[] = "DROP TABLE if exists `factura_pdf_datos` ";
+								$query[] = "DROP TABLE if exists `factura_pdf_datos` ";
                                 $query[] = "CREATE TABLE if not exists `factura_pdf_datos` (
 										  `id_tipo_dato` int(11) NOT NULL auto_increment,
 										  `tipo_dato` varchar(30) NOT NULL default '',
@@ -8656,6 +8656,54 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						}
 					}
 					break;
+				case 6.10 :
+					$query = array();
+					
+					
+                            $query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` 
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) 
+								VALUES (2, 'ciudad', 'Ciudad') on duplicate key update glosa_tipo_dato='Ciudad';"; 
+
+                             
+                            $query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`) 
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+							
+							  $query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` 
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) 
+								VALUES (2, 'comuna', 'Comuna') on duplicate key update glosa_tipo_dato='Comuna';"; 
+			
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`) 
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+                             
+                          
+					
+					if(!ExisteCampo('factura_comuna','contrato',$dbh)) {
+						$query[] ="ALTER TABLE  `contrato` ADD  `factura_comuna` VARCHAR( 100 ) NULL AFTER  `factura_direccion`";
+					}
+					if(!ExisteCampo('factura_ciudad','contrato',$dbh)) {
+						$query[] ="ALTER TABLE  `contrato` ADD  `factura_ciudad` VARCHAR( 100 ) NULL AFTER  `factura_comuna`";
+					}
+					 
+					if(!ExisteCampo('comuna_cliente','factura',$dbh)) {
+						$query[] ="ALTER TABLE  `factura` ADD  `comuna_cliente` VARCHAR( 100 ) NULL AFTER  `direccion_cliente`";
+					}
+					if(!ExisteCampo('ciudad_cliente','factura',$dbh)) {
+						$query[] ="ALTER TABLE  `factura` ADD  `ciudad_cliente` VARCHAR( 100 ) NULL AFTER  `comuna_cliente`";
+					}
+					if(!ExisteCampo('id_cuenta2','contrato',$dbh)) {
+						$query[] ="ALTER TABLE `contrato` ADD `id_cuenta2` INT NULL AFTER `id_cuenta` ;";
+					}
+				 
+					foreach ($query as $q) {
+						if ( ! ($res = mysql_query($q, $dbh)) ) {
+							throw new Exception($q . "---" . mysql_error());
+						}
+					}
+					break;
 	}
 				
 }
@@ -8665,7 +8713,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update=6.09;
+$max_update=6.10;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);
@@ -8675,7 +8723,7 @@ for ($version = max($min_update,2); $version <= $max_update; $version += 0.01) {
 }
 if(isset($_GET['lastver']))  {
     $lastver=array_pop($VERSIONES);
-    echo $lastver;
+    echo number_format($lastver,2,'.','');
   
 } else {
 /* LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA */
