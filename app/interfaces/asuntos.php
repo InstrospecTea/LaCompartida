@@ -165,6 +165,14 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 							</tr>
 							<tr>
 								<td align=right style="font-weight:bold;">
+		<?php echo  __('Cobrable') ?> 
+								</td>
+								<td align=left colspan=3>
+	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, '', 'Todos', '60') ?>
+								</td>
+							</tr>
+							<tr>
+								<td align=right style="font-weight:bold;">
 	<?php echo  __('Cliente') ?>
 								</td>
 								<td nowrap align=left colspan=3>
@@ -295,6 +303,11 @@ if ($buscar || $opc == "entregar_asunto") {
 		else
 			$activo = 0;
 		$where .= " AND a1.activo = $activo ";
+	}
+	if ($_POST['cobrable']=='SI') {
+				$where .= " AND a1.cobrable=1  ";
+	} else {
+			$where .= " AND a1.cobrable=0 ";
 	}
 
 	if ($codigo_asunto != "") {
