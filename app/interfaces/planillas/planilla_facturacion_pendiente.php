@@ -328,6 +328,13 @@ if ($xls) {
 		$lista_socios = join("','", $socios);
 		$where .= " AND contrato.id_usuario_responsable IN ('$lista_socios')";
 	}
+	if(isset($_POST['cobrable'])) {
+		if($_POST['cobrable']==1) {
+			$where .= " AND asunto.cobrable=1 ";
+		} else if($_POST['cobrable']==0) {
+			$where .= " AND asunto.cobrable=0 ";
+		} 
+	}
 	if (is_array($encargados)) {
 		$lista_encargados = join("','", $encargados);
 		$where .= " AND asunto.id_encargado IN ('$lista_encargados')";
@@ -605,11 +612,8 @@ if($fechactual-$maxolaptime>2) {
 			else:
 				$ws1->write($filas, $col_ultimo_cobro, $ultimocobro[$id_contrato]['fecha_emision'] != '' ? Utiles::sql2fecha($ultimocobro[$id_contrato]['fecha_emision'], $formato_fecha, "-") : '', $formato_texto);
 			endif;
-		}  else {
-			 
-				$ws1->write($filas, $col_estado_ultimo_cobro,$ocultar_estado_ultimo_cobro, $formato_texto);
-			 
-		}
+		}  
+			
 
 		if (!$ocultar_estado_ultimo_cobro) {
 			if ($separar_asuntos) :
@@ -855,7 +859,14 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				<div class="formwidth"> &nbsp;&nbsp;&nbsp;
 					<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 					&nbsp;&nbsp;&nbsp;
-					<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/></div>
+					<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mostrar
+					<select name="cobrable" id="cobrable" style="width:210px;"> 
+						<option value=""><?php echo __('Asuntos').' '. __('Cobrables').' y No '. __('Cobrables'); ?></option>
+					<option value="0">Sólo <?php echo __('Asuntos').' No  '. __('Cobrables'); ?></option>
+					<option value="1">Sólo  <?php echo __('Asuntos').' '. __('Cobrables'); ?></option>
+					</select>
+				</div>
 			</td>
 		</tr>
 
