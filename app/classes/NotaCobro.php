@@ -5766,12 +5766,11 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				
 				
-				if ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL')  {
-					   $html2 = str_replace('%xcorrelativo_aguilar%',  'N/A', $html2);
-                              
+				if ($this->fields['fecha_emision'] == '0000-00-00 00:00:00' or $this->fields['fecha_emision'] == '' or $this->fields['fecha_emision'] == 'NULL') {
+					$html = str_replace('%xcorrelativo_aguilar%', 'N/A', $html2);
 				} else {
-					   
-                                 $html2 = str_replace('%xcorrelativo_aguilar%','DN-'.date("ym", strtotime($this->fields['fecha_emision'])).'-'.$this->fields['documento'], $html2);
+
+					$html = str_replace('%xcorrelativo_aguilar%', 'DN-' . date("ym", strtotime($this->fields['fecha_emision'])) . '-' . $this->fields['documento'], $html2);
 				}
 				
 				
