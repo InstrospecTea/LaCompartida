@@ -381,7 +381,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	else
 		$x_pag = 10;
 	
-	echo $query;
+	//echo $query;
 	$b = new Buscador($sesion, $query, "Asunto", $desde, $x_pag, $orden);
 	$b->formato_fecha = "$formato_fecha";
 	$b->mensaje_error_fecha = "N/A";
