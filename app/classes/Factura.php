@@ -372,6 +372,12 @@ class Factura extends Objeto {
 
 				$glosa_cliente = $this->fields['cliente'];
 				$direccion_cliente = $this->fields['direccion_cliente'];
+				if( UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion->dbh)) {
+					$ciudad_cliente = $this->fields['ciudad_cliente'];
+				}
+				if( UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion->dbh)) {
+				$comuna_cliente = $this->fields['comuna_cliente'];
+				}
 
 				$MAX = UtilesApp::GetConf($this->sesion, 'AnchoMaximoGlosaCliente');
 
@@ -397,6 +403,8 @@ class Factura extends Objeto {
 				$html2 = str_replace('%nombre_encargado%', strtoupper($titulo_contacto . ' ' . $contacto . ' ' . $apellido_contacto), $html2);
 				$html2 = str_replace('%direccion_cliente%', $direccion_cliente, $html2);
 				$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($direccion_cliente), $html2);
+				$html2 = str_replace('%comuna_cliente%', $comuna_cliente, $html2);
+				$html2 = str_replace('%ciudad_cliente%', $ciudad_cliente, $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);

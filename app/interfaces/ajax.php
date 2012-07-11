@@ -548,9 +548,16 @@
 			echo("VACIO|");
 
 	}
-        else if ($accion == 'cargar_datos_contrato')
+    else if ($accion == 'cargar_datos_contrato')
 	{
-		$query_contrato = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut
+		$campos_extra = '';
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+			$campos_extra .= ', contrato.factura_comuna';
+		}
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+			$campos_extra .= ', contrato.factura_ciudad';
+		}
+		$query_contrato = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut $campos_extra
 												FROM contrato
 												WHERE contrato.id_contrato=$id_contrato LIMIT 1";
 		$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato,__FILE__,__LINE__,$sesion->dbh);

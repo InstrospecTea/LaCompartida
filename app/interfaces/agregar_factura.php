@@ -163,6 +163,12 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "NULL");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "NULL");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "NULL");
+		if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {
+			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "NULL");
+		}
+		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {
+			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
+		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
@@ -474,7 +480,15 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 				var rut = document.getElementById('RUT_cliente');
 				var cliente = document.getElementById('cliente');;
 				var direccion_cliente = document.getElementById('direccion_cliente');
-                                var id_contrato = jQuery('#id_contrato').val();
+				var id_contrato = jQuery('#id_contrato').val();
+				<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {	?>
+				var comuna_cliente = document.getElementById('comuna_cliente');
+				<?php
+					}
+					if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {	
+				?>
+				var ciudad_cliente = document.getElementById('ciudad_cliente');
+				<?php } ?>
 
 <?php
 if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
@@ -521,6 +535,8 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 								rut.value = '';
 								direccion_cliente.value = '';
 								cliente.value = '';
+								comuna_cliente.value = '';
+								ciudad_cliente.value = '';
 
 								select_destino.options.length = 1;
 								offLoading();
@@ -535,7 +551,14 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 									var option = new Option();
 									option.value = valores[0];
 									option.text = valores[1];
+									
 
+									if(valores[4] != '') {
+										ciudad_cliente.value = valores[4];
+									}
+									if(valores[3] != '') {
+										comuna_cliente.value = valores[3];
+									}
 									if(valores[2] != '')
 										rut.value = valores[2];
 									else
@@ -1300,9 +1323,24 @@ if ($zona_horaria) {
 			<td align=left colspan=3><input type="text" name="cliente" value="<?php echo  $factura->fields['cliente'] ?>" id="cliente" size="70"/></td>
 		</tr>
 		<tr>
-			<td align=right><?php echo  __('Dirección Cliente') ?></td>
+			<td align=right><?php echo  __('Direcci&oacute;n Cliente') ?></td>
 			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?php echo  $factura->fields['direccion_cliente'] ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
 		</tr>
+		<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {	?>
+		<tr>
+			<td align=right><?php echo  __('Comuna') ?></td>
+			<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo  $factura->fields['comuna_cliente'] ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
+		</tr>
+		<?php 
+			}
+			
+			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {
+		?>			
+		<tr>
+			<td align="right"><?php echo __('Ciudad'); ?></td>
+			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  $factura->fields['ciudad_cliente'] ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
+		</tr>
+		<?php } ?>
 		<tr>
 			<td align=right><?php echo  __('Condición de Pago') ?></td>
 			<td align=left colspan=3>

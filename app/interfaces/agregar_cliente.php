@@ -105,6 +105,16 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese el giro de la factura"));
 		if (empty($factura_direccion))
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
+		
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+			if (empty($factura_ciudad))
+			$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
+		}
+		
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+			if (empty($factura_comuna))
+			$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
+		}
 		if (empty($factura_telefono))
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		if ( UtilesApp::GetConf($sesion,'ClienteReferencia') && ( empty($id_cliente_referencia) || $id_cliente_referencia == '-1' ) )
@@ -337,6 +347,15 @@ if ($opcion == "guardar") {
 			$contrato->Edit("factura_razon_social", $factura_razon_social);
 			$contrato->Edit("factura_giro", $factura_giro);
 			$contrato->Edit("factura_direccion", $factura_direccion);
+			
+			if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+				$contrato->Edit("factura_ciudad", $factura_ciudad);
+			}
+			
+			if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+				$contrato->Edit("factura_comuna", $factura_comuna);
+			}
+			
 			$contrato->Edit("factura_telefono", $factura_telefono);
 			$contrato->Edit("cod_factura_telefono", $cod_factura_telefono);
 
@@ -648,7 +667,26 @@ $pagina->PrintTop();
 				form.factura_direccion.focus();
 				return false;
 			}
-
+			<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
+				if(!form.factura_ciudad.value)
+			{
+				alert("<?php echo  __('Debe ingresar la ciudad del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_ciudad.focus();
+				return false;
+				}
+			<?php } ?>
+			
+			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				if(!form.factura_comuna.value)
+			{
+				alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_comuna.focus();
+				return false;
+			}
+			<?php } ?>
+			
 			if(form.id_pais.options[0].selected == true)
 			{
 				alert("<?php echo  __('Debe ingresar el pais del cliente') ?>");

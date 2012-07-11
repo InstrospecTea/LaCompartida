@@ -188,6 +188,15 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("factura_razon_social", $factura_razon_social);
 	$contrato->Edit("factura_giro", $factura_giro);
 	$contrato->Edit("factura_direccion", $factura_direccion);
+	
+	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+		$contrato->Edit("factura_ciudad", $factura_cuidad);
+	}
+	
+	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+		$contrato->Edit("factura_comuna", $factura_comuna);
+	}
+	
 	$contrato->Edit("factura_telefono", $factura_telefono);
 	$contrato->Edit("cod_factura_telefono", $cod_factura_telefono);
 	// Opc contrato
@@ -437,6 +446,23 @@ list($cant_encargados) = mysql_fetch_array($resp);
 					form.factura_direccion.focus();
 					return false;
 				}
+				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
+				if(!form.factura_ciudad.value)
+				{
+					alert("<?php echo  __('Debe ingresar la cuidad del cliente') ?>");
+					form.factura_cuidad.focus();
+					return false;
+				}
+				<?php } ?>
+				
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				if(!form.factura_comuna.value)
+				{
+					alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
+					form.factura_comuna.focus();
+					return false;
+				}
+				<?php } ?>
 
 				if(form.id_pais.options[0].selected == true)
 				{
@@ -1864,9 +1890,35 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 	echo $obligatorio ?>
 					</td>
 					<td align="left" colspan="5">
-						<textarea name='factura_direccion' rows=4 cols="55" ><?php echo  $contrato->fields['factura_direccion'] ?></textarea>
+						<textarea name='factura_direccion' rows=3 cols="55" ><?php echo  $contrato->fields['factura_direccion'] ?></textarea>
 					</td>
 				</tr>
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				<tr>
+					<td align="right" colspan="1">
+<?php echo  __('Comuna') ?>
+<?php if ($validaciones_segun_config)
+	echo $obligatorio ?>
+					</td>
+					<td align="left" colspan="5">
+						<input name='factura_comuna' size=50 value="<?php echo  $contrato->fields['factura_comuna'] ?>"  />
+					</td>
+				</tr>
+				<?php
+				}
+				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {						
+				?>
+				<tr>
+					<td align="right" colspan="1">
+<?php echo  __('Ciudad') ?>
+<?php if ($validaciones_segun_config)
+	echo $obligatorio ?>
+					</td>
+					<td align="left" colspan="5">
+						<input name='factura_ciudad' size=50 value="<?php echo  $contrato->fields['factura_ciudad'] ?>"  />
+					</td>
+				</tr>
+				<?php } ?>
 				<tr>
 					<td align="right" colspan="1">
 <?php echo  __('País') ?>
