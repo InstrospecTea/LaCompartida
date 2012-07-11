@@ -267,17 +267,17 @@ class ReporteContrato extends Contrato
             } else {
               $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
             }
-            //mail('ffigueroa@lemontech.cl','UltimosCobros',$querycobros);
+            
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
 		while($listacobro=mysql_fetch_array($resp)):
 		$this->arrayultimocobro[$listacobro[0]]=array('fecha_fin'=>$listacobro[3],'estado'=>$listacobro[2],'fecha_emision'=>$listacobro[4]);
                 endwhile;
-                
+                //mail('ffigueroa@lemontech.cl','UltimosCobros',json_encode($this->arrayultimocobro));
         }
 			function Descuentos($separar_asuntos) {
           
             if(!$this->separar_asuntos && !$separar_asuntos ) {
-            $querydescuentos = "sselect  cob.id_contrato, sum(cob.descuento*pmcob.tipo_cambio/pmcon.tipo_cambio)  descuento 
+            $querydescuentos = "select  cob.id_contrato, sum(cob.descuento*pmcob.tipo_cambio/pmcon.tipo_cambio)  descuento 
 								from cobro  cob  
 								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
 								join prm_moneda pmcon on pmcon.id_moneda=cob.opc_moneda_total
