@@ -426,6 +426,8 @@
 							GROUP BY cobro.id_cobro 
 							ORDER BY cliente.glosa_cliente,
 								cobro.fecha_creacion";
+
+
 // Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
 							GROUP_CONCAT(distinct asunto.glosa_asunto SEPARATOR '\n') as glosas_asuntos,
@@ -510,7 +512,7 @@
 				
 				$tabla_creada=true;
 			}
-			$query_trabajos = "SELECT SUM(TIME_TO_SEC(duracion)),SUM(TIME_TO_SEC(duracion_cobrada))
+			$query_trabajos = "SELECT SUM(TIME_TO_SEC(duracion)),SUM(if(cobrable=1,TIME_TO_SEC(duracion_cobrada),0))
 								FROM trabajo
 								WHERE id_cobro=".$cobro['id_cobro'];
 			$resp2 = mysql_query($query_trabajos, $sesion->dbh) or Utiles::errorSQL($query_trabajos, __FILE__, __LINE__, $sesion->dbh);
