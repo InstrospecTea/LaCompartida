@@ -823,8 +823,12 @@ if ($cobro->fields['id_contrato'] != '') {
             }
         });
         lista_facturas = lista_facturas.substr(1);
-        var codigo_cliente = '<?php echo $cobro->fields['codigo_cliente']; ?>';
-        nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?php echo $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');
+		if (lista_facturas) {
+			var codigo_cliente = '<?php echo $cobro->fields['codigo_cliente']; ?>';
+			nuevaVentana('Agregar_Pago', 630, 520, 'agregar_pago_factura.php?lista_facturas='+lista_facturas+'&id_moneda='+$('opc_moneda_total').value+'&monto_pago='+monto+'&codigo_cliente='+codigo_cliente+'&id_cobro=<?php echo $cobro->fields['id_cobro'] ?>&popup=1', 'top=100, left=155, scrollbars=yes');			
+		} else {
+			alert('Seleccione almenos un documento.');
+		}
     }
 
     function showOpcionDetalle(id, bloqueDetalle)
