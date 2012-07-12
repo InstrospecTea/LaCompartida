@@ -574,12 +574,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 									if(valores[3] != '') {
 									if(window.comuna_cliente)	comuna_cliente.value = valores[3];
 									}
-									if(valores[4] != '') {
-										ciudad_cliente.value = valores[4];
-									}
-									if(valores[3] != '') {
-										comuna_cliente.value = valores[3];
-									}
+									
 									if(valores[2] != '')
 										rut.value = valores[2];
 									else
