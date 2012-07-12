@@ -861,8 +861,8 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 					&nbsp;&nbsp;&nbsp;
 					<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mostrar
-					<select name="cobrable" id="cobrable" style="width:210px;"> 
-						<option value=""><?php echo __('Asuntos').' '. __('Cobrables').' y No '. __('Cobrables'); ?></option>
+				<select name="cobrable" id="cobrable" style="width:210px;"> 
+						<option value="-1" selected="selected"><?php echo __('Asuntos').' '. __('Cobrables').' y No '. __('Cobrables'); ?></option>
 					<option value="0">Sólo <?php echo __('Asuntos').' No  '. __('Cobrables'); ?></option>
 					<option value="1">Sólo  <?php echo __('Asuntos').' '. __('Cobrables'); ?></option>
 					</select>
