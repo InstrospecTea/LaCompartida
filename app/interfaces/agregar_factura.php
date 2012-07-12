@@ -449,7 +449,22 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
  */
 ?>
 <script type="text/javascript">
+		function aproximarDecimales(input) {
 
+			formulario.monto_honorarios_legales.value = Number(formulario.monto_honorarios_legales.value).toFixed(cantidad_decimales);
+
+			formulario.monto_gastos_con_iva.value = Number(formulario.monto_gastos_con_iva.value).toFixed(cantidad_decimales);
+
+			formulario.monto_neto.value = Number(formulario.monto_neto.value).toFixed(cantidad_decimales);
+
+			formulario.monto_iva_honorarios_legales.value = Number(formulario.monto_iva_honorarios_legales.value).toFixed(cantidad_decimales);
+
+			formulario.monto_iva_gastos_con_iva.value = Number(formulario.monto_iva_gastos_con_iva.value).toFixed(cantidad_decimales);
+
+			formulario.iva.value = Number(formulario.iva.value).toFixed(cantidad_decimales);
+
+			formulario.total.value = Number(formulario.total.value).toFixed(cantidad_decimales);
+		}
     jQuery(document).ready(function() {
         
         jQuery('#RUT_cliente').blur(function() {
@@ -552,7 +567,13 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 									option.value = valores[0];
 									option.text = valores[1];
 									
-
+									
+									if(valores[4] != '') {
+									if(window.ciudad_cliente)	ciudad_cliente.value = valores[4];
+									}
+									if(valores[3] != '') {
+									if(window.comuna_cliente)	comuna_cliente.value = valores[3];
+									}
 									if(valores[4] != '') {
 										ciudad_cliente.value = valores[4];
 									}
@@ -974,7 +995,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 				var monto_gasto_con_impuesto = 0;
 				var monto_gasto_sin_impuesto = 0;
 				var monto_neto_suma = 0;
-				var decimales = <?php echo $cifras_decimales_opc_moneda_total; ?>;
+				var decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
 <?php
 if ($id_cobro > 0) {
 	$cobro = new Cobro($sesion);
@@ -1017,7 +1038,7 @@ if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosCon
 
 <?php if (method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura') != '-1')) { ?>
 			// Si esta la configuración, los redondeo después de cada cálculo
-			aproximarDecimales();
+			if(typeof(window.aproximarDecimales()=='function')) aproximarDecimales();
 <?php } ?>
 	}
 
@@ -1603,22 +1624,7 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 		$(formulario.monto_honorarios_legales).observe('change', aproximarDecimales);
 		$(formulario.monto_gastos_con_iva).observe('change', aproximarDecimales);
 
-		function aproximarDecimales(input) {
 
-			formulario.monto_honorarios_legales.value = Number(formulario.monto_honorarios_legales.value).toFixed(cantidad_decimales);
-
-			formulario.monto_gastos_con_iva.value = Number(formulario.monto_gastos_con_iva.value).toFixed(cantidad_decimales);
-
-			formulario.monto_neto.value = Number(formulario.monto_neto.value).toFixed(cantidad_decimales);
-
-			formulario.monto_iva_honorarios_legales.value = Number(formulario.monto_iva_honorarios_legales.value).toFixed(cantidad_decimales);
-
-			formulario.monto_iva_gastos_con_iva.value = Number(formulario.monto_iva_gastos_con_iva.value).toFixed(cantidad_decimales);
-
-			formulario.iva.value = Number(formulario.iva.value).toFixed(cantidad_decimales);
-
-			formulario.total.value = Number(formulario.total.value).toFixed(cantidad_decimales);
-		}
 
 		$(document).observe('dom:loaded', aproximarDecimales);
 
