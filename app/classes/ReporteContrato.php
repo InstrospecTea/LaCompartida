@@ -260,12 +260,15 @@ class ReporteContrato extends Contrato
             if(!$this->separar_asuntos && !$separar_asuntos ) {
             $querycobros = "select c.id_contrato, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision
 			    from cobro c join
-			    (select id_contrato, max(fecha_fin) as maxfecha from cobro group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_fin=maxfechas.maxfecha
+			    (select id_contrato, max(fecha_emision) as maxfecha from cobro where fecha_emision>=19690000 group by id_contrato)  maxfechas on c.id_contrato=maxfechas.id_contrato and c.fecha_emision=maxfechas.maxfecha
+ 
 			    group by id_contrato
 			    having id_cobro=max(id_cobro)
                            ";
             } else {
-              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision from (select codigo_asunto, max(id_cobro) as id_cobro from trabajo group by codigo_asunto) maxasunto left join cobro c  on c.id_cobro=maxasunto.id_cobro                           "; 
+              $querycobros = "select maxasunto.codigo_asunto, c.id_cobro, c.estado, c.fecha_fin, c.fecha_emision from 
+(select codigo_asunto, max(id_cobro) as id_cobro from cobro_asunto join cobro c using (id_cobro) where c.fecha_emision>19690000 group by codigo_asunto) maxasunto
+  join cobro c  on c.id_cobro=maxasunto.id_cobro                       "; 
             }
             
             $resp = mysql_query($querycobros,$this->sesion->dbh) or Utiles::errorSQL($querycobros,__FILE__,__LINE__,$this->sesion->dbh);
@@ -274,13 +277,14 @@ class ReporteContrato extends Contrato
                 endwhile;
                 //mail('ffigueroa@lemontech.cl','UltimosCobros',json_encode($this->arrayultimocobro));
         }
-			function Descuentos($separar_asuntos) {
+	
+function Descuentos($separar_asuntos) {
           
             if(!$this->separar_asuntos && !$separar_asuntos ) {
             $querydescuentos = "select  cob.id_contrato, sum(cob.descuento*pmcob.tipo_cambio/pmcon.tipo_cambio)  descuento 
 								from cobro  cob  
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
-								join prm_moneda pmcon on pmcon.id_moneda=cob.opc_moneda_total
+								join  cobro_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto and pmcob.id_cobro=cob.id_cobro
+								join  cobro_moneda pmcon on pmcon.id_moneda=cob.opc_moneda_total and pmcon.id_cobro=cob.id_cobro
 								
 								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION') 
 								group by   cob.id_contrato 
@@ -288,8 +292,8 @@ class ReporteContrato extends Contrato
             } else {
               $querydescuentos = "select ca.codigo_asunto, sum(cob.descuento*pmcob.tipo_cambio/pmcon.tipo_cambio) / ca2.divisor, cob.id_contrato
 								from cobro  cob  
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
-								join prm_moneda pmcon on pmcon.id_moneda=cob.opc_moneda_total
+								join  cobro_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto and pmcob.id_cobro=cob.id_cobro
+								join  cobro_moneda pmcon on pmcon.id_moneda=cob.opc_moneda_total and pmcon.id_cobro=cob.id_cobro
 								join cobro_asunto ca on ca.id_cobro=cob.id_cobro
 								join (select id_cobro, count(*) divisor from cobro_asunto group by id_cobro) as ca2 on ca2.id_cobro=cob.id_cobro
 								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION') 
@@ -932,7 +936,7 @@ GROUP BY  $bagrupador";
 	    
 	    		$respolap = mysql_query($bquerygastos,$this->sesion->dbh) or Utiles::errorSQL($bquerygastos,__FILE__,__LINE__,$this->sesion->dbh);
 
-			//mail('ffigueroa@lemontech.cl','Querygastos',$bquerygastos);
+			mail('ffigueroa@lemontech.cl','Querygastos',$bquerygastos);
 			while($filagasto=mysql_fetch_array($respolap)):
 			    $this->arrayolap[$filagasto[0]]=array($filagasto[1],$filagasto[2],$filagasto[3],$filagasto[4],$filagasto[5],$filagasto[6]);
 			endwhile;
