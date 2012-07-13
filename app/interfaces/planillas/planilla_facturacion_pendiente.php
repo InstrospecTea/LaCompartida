@@ -21,6 +21,16 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+if($AtacheSecundarioSoloAsunto) {
+	
+	$regularizacion=$sesion->pdodbh->prepare("update contrato join cliente using (codigo_cliente)
+										set contrato.id_usuario_secundario=cliente.id_usuario_encargado 
+										where contrato.id_usuario_secundario is null and cliente.id_usuario_encargado is not null and cliente.id_usuario_encargado >0;
+										update asunto join contrato using (id_contrato) set id_encargado=contrato.id_usuario_secundario where id_encargado is null;");
+	
+	$regularizacion->execute();
+	
+}
 
 set_time_limit(3600);
 
@@ -152,10 +162,7 @@ if ($xls) {
 	if ($mostrar_encargado_secundario && !$ocultar_encargado) {
 		$col_usuario_encargado_secundario = ++$col;
 	}
-	if ($AtacheSecundarioSoloAsunto && !$ocultar_encargado) {
-		$col_encargado_asunto = ++$col;
-		$ws1->setColumn($col_encargado_asunto, $col_encargado_asunto, 40);
-	}
+	 
 	if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
 		$col_codigo_asunto = ++$col;
 	}
@@ -263,11 +270,14 @@ if ($xls) {
 	$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
 	if (!$ocultar_encargado) {
 		$ws1->write($filas, $col_usuario_encargado, __('Encargado Comercial'), $formato_titulo);
-		if ($mostrar_encargado_secundario) {
-			$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
-		}
-		if ($AtacheSecundarioSoloAsunto) {
-			$ws1->write($filas, $col_encargado_asunto, __('Encargado Secundario') . ' ' . __('Asunto'), $formato_titulo);
+	
+		if ($mostrar_encargado_secundario) { 
+			if ($AtacheSecundarioSoloAsunto) {
+				$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario') . ' ' . __('Asunto'), $formato_titulo);
+			} else {
+
+				$ws1->write($filas, $col_usuario_encargado_secundario, __('Encargado Secundario'), $formato_titulo);
+			}	
 		}
 	}
 	if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
@@ -415,10 +425,13 @@ if ($xls) {
 								,fecha_modificacion from tramite tram where fecha_touch>=$maxolaptime
 
 								) movs on movs.codigo_asunto=asunto.codigo_asunto
-								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
-															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
-
-								"; // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
+								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+	if($AtacheSecundarioSoloAsunto) {
+						$update4.="LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado) ";
+	}	else {
+						$update4.="LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+	}
+								 // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
 	$resp = mysql_query($update4, $sesion->dbh);
 
 if($fechactual-$maxolaptime>2) {
@@ -462,10 +475,15 @@ if($fechactual-$maxolaptime>2) {
 
 								 
 								) movs on movs.codigo_asunto=asunto.codigo_asunto
-								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
-															LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario)
+								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+		if($AtacheSecundarioSoloAsunto) {
+						$update7.=" LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado)";
+	}	else {
+						$update7.=" LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+	}
+															
 
-								";
+								
 	$resp = mysql_query($update7, $sesion->dbh);
 }
 
@@ -483,8 +501,7 @@ if($fechactual-$maxolaptime>2) {
 								ec.username as username_encargado_comercial,
 								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
 								es.username as username_encargado_secundario,
-								CONCAT_WS( encargado_asunto.nombre, encargado_asunto.apellido1, encargado_asunto.apellido2 ) as nombre_encargado_asunto,
-								encargado_asunto.username as username_encargado_asunto,
+							
 								contrato.id_contrato,
                                                                 contrato.monto, 
 								contrato.forma_cobro,
@@ -493,9 +510,15 @@ if($fechactual-$maxolaptime>2) {
 							FROM asunto
 							LEFT JOIN contrato USING( id_contrato )
 							LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-							LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable
-							LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario
-							left join usuario as encargado_asunto on encargado_asunto.id_usuario=asunto.id_encargado 
+							LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+						
+						if ($AtacheSecundarioSoloAsunto) {
+		$querycobros.="  	LEFT JOIN usuario as es ON es.id_usuario =asunto.id_encargado";
+	} else {
+		$querycobros.=" 	LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario ";
+	}
+					
+						$querycobros.=" 
 							WHERE $where
 								AND ( ( SELECT count(*)
 													FROM trabajo
@@ -574,19 +597,14 @@ if($fechactual-$maxolaptime>2) {
 		if (!$ocultar_encargado) {
 			if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 				$ws1->write($filas, $col_usuario_encargado, $cobro['username_encargado_comercial'], $formato_texto);
-				if ($mostrar_encargado_secundario)
+				if ($mostrar_encargado_secundario) {
 					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['username_encargado_secundario'], $formato_texto);
-
-				if ($AtacheSecundarioSoloAsunto)
-					$ws1->write($filas, $col_encargado_asunto, $cobro['username_encargado_asunto'], $formato_texto);
-			}
-			else {
+				}
+			} else {
 				$ws1->write($filas, $col_usuario_encargado, $cobro['nombre_encargado_comercial'], $formato_texto);
-				if ($mostrar_encargado_secundario)
+				if ($mostrar_encargado_secundario) {
 					$ws1->write($filas, $col_usuario_encargado_secundario, $cobro['nombre_encargado_secundario'], $formato_texto);
-
-				if ($AtacheSecundarioSoloAsunto)
-					$ws1->write($filas, $col_encargado_asunto, $cobro['nombre_encargado_asunto'], $formato_texto);
+				}
 			}
 		}
 		if (UtilesApp::GetConf($sesion, 'MostrarColumnaCodigoAsuntoHorasPorFacturar')) {
