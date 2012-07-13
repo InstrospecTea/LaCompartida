@@ -8631,11 +8631,14 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 					break;
 				case 6.08:
 					$query = array();
-					$query[] ="ALTER TABLE  `version_db` DROP PRIMARY KEY;";
-					$query[] ="ALTER TABLE  `version_db` ADD PRIMARY KEY (  `version` ,  `version_ct` );";
-
-					$query[] ="ALTER TABLE  `version_db` CHANGE  `version`  `version` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
-					$query[] ="ALTER TABLE  `version_db` CHANGE  `version_ct`  `version_ct` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
+					if(!ExisteCampo('version_ct','version_db',$dbh))  $query[] ="ALTER TABLE  `version_db` ADD  `version_ct` decimal(3,2) NOT NULL DEFAULT '0.00'";
+					if(ExisteIndex('PRIMARY','version_db',$dbh)) {
+						$query[] ="ALTER TABLE  `version_db` DROP PRIMARY KEY;";
+					}
+						$query[] ="ALTER TABLE  `version_db` ADD PRIMARY KEY (  `version` ,  `version_ct` );";
+					
+					if(!ExisteCampo('version','version_db',$dbh)) $query[] ="ALTER TABLE  `version_db` CHANGE  `version`  `version` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
+					if(!ExisteCampo('version_ct','version_db',$dbh)) $query[] ="ALTER TABLE  `version_db` CHANGE  `version_ct`  `version_ct` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
 					foreach ($query as $q) {
 						if ( ! ($res = mysql_query($q, $dbh)) ) {
 							throw new Exception($q . "---" . mysql_error());
