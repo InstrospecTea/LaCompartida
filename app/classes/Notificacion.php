@@ -1,4 +1,4 @@
-<?
+<?php 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 require_once Conf::ServerDir().'/../app/classes/Asunto.php';
@@ -432,12 +432,12 @@ class Notificacion
 			{
 				$enviar = false;
 				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
-				if($alertas['alerta_propia'])
+				if(isset($alertas['alerta_propia']) && $alertas['alerta_propia'])
 				{
 					$mensaje .= str_replace('%TXT',$alertas['alerta_propia'],$estructura['tr_propio']);
 					$enviar = true;
 				}
-				if($alertas['alerta_revisados'])
+				if(isset($alertas['alerta_revisados']) && $alertas['alerta_revisados'])
 					if(is_array($alertas['alerta_revisados']))
 					{
 						$i = 0;
@@ -476,7 +476,7 @@ class Notificacion
 			{
 				$enviar = false;
 				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
-				if($alertas['asunto_excedido'])
+				if(isset($alertas['asunto_excedido']) && $alertas['asunto_excedido'])
 					if(is_array($alertas['asunto_excedido']))
 					{
 						$filas = '';
@@ -506,7 +506,7 @@ class Notificacion
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
-				if($alertas['cliente_excedido'])
+				if(isset($alertas['cliente_excedido']) && $alertas['cliente_excedido'])
 					if(is_array($alertas['cliente_excedido']))
 					{
 						$filas = '';
@@ -536,7 +536,7 @@ class Notificacion
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
-				if($alertas['contrato_excedido'])
+				if(isset($alertas['contrato_excedido']) && $alertas['contrato_excedido'])
 					if(is_array($alertas['contrato_excedido']))
 					{
 						$filas = '';
@@ -576,7 +576,7 @@ class Notificacion
 				//ALERTAS
 
 				$filas_alertas = '';
-				if($alertas['fin_de_mes'])
+				if(isset($alertas['fin_de_mes']) && $alertas['fin_de_mes'])
 				{
 						$tabla = $estructura['tr_fin_de_mes'];
 						$filas_alertas .= $tabla;
@@ -598,7 +598,7 @@ class Notificacion
 						$filas_alertas .= $tabla;
 						$enviar = true;
 				}
-				if($alertas['restriccion_mensual'])
+				if(isset($alertas['restriccion_mensual']) && $alertas['restriccion_mensual'])
 				{
 					$meses = array('','','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 					$mes = date('n');
@@ -609,13 +609,13 @@ class Notificacion
 					$filas_alertas .= str_replace('%MES',$mes,$txt);
 					$enviar = true;
 				}
-				if($filas_alertas)
+				if(isset($filas_alertas) && $filas_alertas)
 				{
 					$mensaje .= str_replace('%ALERTAS',$filas_alertas,$estructura['alertas']);
 				}
 
 
-				if($alertas['modificacion_contrato'])
+				if(isset($alertas['modificacion_contrato']) && $alertas['modificacion_contrato'])
 					if(is_array($alertas['modificacion_contrato']))
 					{
 						$filas = '';
@@ -638,7 +638,7 @@ class Notificacion
 						$enviar = true;
 					}
 				
-				if($alertas['tarea_alerta'])
+				if(isset($alertas['tarea_alerta']) && $alertas['tarea_alerta'])
 					if(is_array($alertas['tarea_alerta']))
 					{
 						$filas = '';
@@ -660,7 +660,7 @@ class Notificacion
 						$enviar = true;
 					}
 						
-				if($alertas['horas_mensuales'])
+				if(isset($alertas['horas_mensuales']) && $alertas['horas_mensuales'])
 				{
 					$mensaje .= str_replace('%HORAS', $alertas['horas_mensuales'], $estructura['tr_horas_mensuales']);
 				}

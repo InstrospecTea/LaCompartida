@@ -82,7 +82,7 @@ class UtilesApp extends Utiles {
 	}
 	
 	
-	public static function existecampo($campo,$tabla,$dbh) { 
+	public static function ExisteCampo($campo,$tabla,$dbh) { 
     
     $existencampos = mysql_query("show columns  from $tabla like '$campo'", $dbh);
     if(!$existencampos):
@@ -679,7 +679,7 @@ class UtilesApp extends Utiles {
 
 	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
 	// Las posibilidades de segundo día hábil son M2, W2, J2, V2, L4, M4 y M3.
-	function esSegundoDiaHabilDelMes() {
+	public static function esSegundoDiaHabilDelMes() {
 		$dia = date('N'); // día entre 1 y 7
 		switch (date('j')) {
 			case 2:
@@ -716,7 +716,7 @@ class UtilesApp extends Utiles {
 	}
 
 	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
-	function esUltimoDiaHabilDelMes($timestamp = '') {
+	public static function esUltimoDiaHabilDelMes($timestamp = '') {
 		if ($timestamp == '') {
 			$dia_semana = date('N'); // día entre 1 y 7
 			$dia_mes = date('j');  // día entre 1 y 31
@@ -939,7 +939,7 @@ HTML;
 	 *    @param $origin_tz; If null the servers current timezone is used as the origin.
 	 *    @return int;
 	 */
-	function get_timezone_offset($remote_tz, $origin_tz = null) {
+	public static function get_timezone_offset($remote_tz, $origin_tz = null) {
 		if ($origin_tz === null) {
 			if (!is_string($origin_tz = date_default_timezone_get())) {
 				return false; // A UTC timestamp was returned -- bail out!
@@ -953,7 +953,7 @@ HTML;
 		return $offset;
 	}
 
-	function get_utc_offset($tz = 'America/Santiago') {
+	public static function get_utc_offset($tz = 'America/Santiago') {
 		$offset = self::get_timezone_offset($tz, 'UTC') / 3600;
 		switch ($tz) {
 			case 'America/Bogota': $offset = 5;
@@ -964,7 +964,7 @@ HTML;
 		return $offset;
 	}
 
-	function get_offset_os_utc() {
+	public static function get_offset_os_utc() {
 		return self::get_timezone_offset('UTC', @date("T")) / 3600;
 	}
 
@@ -1536,8 +1536,10 @@ HTML;
 
 		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
-                                                                                          prm_proveedor.glosa as glosa_proveedor,
-                                                                                          prm_proveedor.id_proveedor as id_proveedor,
+					prm_proveedor.id_proveedor as id_proveedor,
+					prm_proveedor.glosa as glosa_proveedor,
+					usuario.username as id_usuario,
+					usuario.username as username,
 					cta_corriente.fecha,
 					cta_corriente.id_moneda,
 					cta_corriente.egreso,
@@ -1552,7 +1554,8 @@ HTML;
 				FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-                                                                        LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+				LEFT JOIN usuario ON cta_corriente.id_usuario_orden = usuario.id_usuario
 				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
 		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
 
@@ -1570,7 +1573,7 @@ HTML;
 		$subtotal_gastos_sin_provision = 0;
 
 		$lista = array();
-
+		
 		for ($v = 0; $v < $lista_gastos->num; $v++) {
 			$gasto = $lista_gastos->Get($v);
 			$suma_a_base = 0;
@@ -1640,8 +1643,10 @@ HTML;
 				$lista[$v]['monto_total_impuesto'] = $suma_total_impuesto;
 				$lista[$v]['monto_total_mas_impuesto'] = $suma_total_impuesto + $suma_a_total;
 				$lista[$v]['descripcion'] = $gasto->fields['descripcion'];
-                                                                        $lista[$v]['id_proveedor'] = $gasto->fields['id_proveedor'];
-                                                                        $lista[$v]['glosa_proveedor'] = $gasto->fields['glosa_proveedor'];
+				$lista[$v]['id_proveedor'] = $gasto->fields['id_proveedor'];
+				$lista[$v]['glosa_proveedor'] = $gasto->fields['glosa_proveedor'];
+				$lista[$v]['id_usuario'] = $gasto->fields['id_usuario'];
+				$lista[$v]['username'] = $gasto->fields['username'];
 				$lista[$v]['codigo_asunto'] = $gasto->fields['codigo_asunto'];
 				$lista[$v]['id_moneda'] = $gasto->fields['id_moneda'];
 				$lista[$v]['fecha'] = $gasto->fields['fecha'];

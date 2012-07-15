@@ -1,13 +1,23 @@
 <?php 
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once dirname(__FILE__).'/../classes/AlertaCron.php';
+	
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+	include_once dirname(__FILE__).'/../classes/AlertaCron.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
 	$sesion = new Sesion (null, true);
+	 
+	$sesion->phpConsole();
+	
+	$sesion->debug('abri sesión');
+	
+$sesion->debug('incluyo alertacron');
 	$alerta = new Alerta ($sesion);
+$sesion->debug('instancio $alerta');
+$encolados=0;
+$enviados=0;
+
 
 	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -21,7 +31,8 @@
 		
 			if( validEmail($adress))  array_push($correos,$correo);
 		}
-		
+		array_push($correos,'cron_correo@thetimebilling.com');
+		$encolados++;
 		
 		
 		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,true,$id_archivo_anexo))
@@ -29,9 +40,14 @@
                     
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=".$id;
 			$resp2 = mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
+				$enviados++;
 		}
 	}
-	
+$sesion->debug('recorri log correo where enviado = 0');	
+
+echo '<br>Se ha detectado '.$encolados.' correos pendientes';
+echo '<br>Se ha  enviado '.$enviados.' correos pendientes';
+
 	/**
 Validate an email address.
 Provide email address (raw input)

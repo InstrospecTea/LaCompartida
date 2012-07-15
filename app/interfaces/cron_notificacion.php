@@ -25,7 +25,8 @@ $sesion = new Sesion(null, true);
 $alerta = new Alerta($sesion);
 
 set_time_limit(300);
-
+$sesion->phpConsole();
+$sesion->debug('empieza el cron notificacion');
 $timezone_offset = UtilesApp::get_offset_os_utc() - UtilesApp::get_utc_offset(Conf::GetConf($sesion, 'ZonaHoraria'));
 
 if (method_exists('Conf', 'GetConf')) {
@@ -61,7 +62,7 @@ if (method_exists('Conf', 'GetConf')) {
 	$DiaMailSemanal = Conf::DiaMailSemanal();
 }
 
-if (date("D") == $DiaMailSemanal || $forzar_semanal == 'aefgaeddfesdg23k1h3kk1') {
+if (date("D") == $DiaMailSemanal || (isset($forzar_semanal) && $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
 	// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
 	$ids_usuarios_profesionales = '';
 	$query = "SELECT usuario.id_usuario,
@@ -182,7 +183,7 @@ foreach ($mensajes as $id_usuario => $mensaje) {
 		$alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $sesion, false);
 	}
 }
-if ($desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+if (isset($desplegar_correo) && $desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 	var_dump($dato_semanal);
 	echo implode('<br><br><br>', $mensajes);
 }
@@ -265,7 +266,7 @@ $query_asuntos =
 $result_asuntos = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
 while (list($codigo_asunto, $id_usuario, $nombre_usuario, $glosa_cliente) = mysql_fetch_array($result_asuntos)) {
 	$asunto = new Asunto($sesion);
-	$cobro = new Cobro($sesion);
+	//$cobro = new Cobro($sesion);
 	$asunto->LoadByCodigo($codigo_asunto);
 
 	$dato_diario[$id_usuario]['nombre_pila'] = $nombre_usuario;
@@ -273,17 +274,25 @@ while (list($codigo_asunto, $id_usuario, $nombre_usuario, $glosa_cliente) = mysq
 	/* Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. */
 	if ($asunto->fields['limite_monto'] > 0) {
 		list($total_monto, $moneda_total_monto) = $asunto->TotalMonto();
+	} else {
+		list($total_monto, $moneda_total_monto) =array(0,1);
 	}
 	if ($asunto->fields['limite_hh'] > 0) {
 		$total_horas_trabajadas = $asunto->TotalHoras();
+	} else {
+		$total_horas_trabajadas = 0;
 	}
 	//Alerta de limite de horas no emitidas
 	if ($asunto->fields['alerta_hh'] > 0) {
 		$total_horas_ult_cobro = $asunto->TotalHoras(false);
+	} else {
+		$total_horas_ult_cobro=0;
 	}
 	//Significa que se requiere alerta por monto no emitido
 	if ($asunto->fields['alerta_monto'] > 0) {
 		list($total_monto_ult_cobro, $moneda_desde_ult_cobro) = $asunto->TotalMonto(false);
+	} else {
+		list($total_monto_ult_cobro, $moneda_desde_ult_cobro)  = array(0,1);
 	}
 
 	//Notificacion "Límite de monto"
@@ -356,7 +365,7 @@ $query_contratos =
 $result_contratos = mysql_query($query_contratos, $sesion->dbh) or Utiles::errorSQL($query_contratos, __FILE__, __LINE__, $sesion->dbh);
 while (list($id_contrato, $id_usuario, $nombre_usuario, $id_usuario_secundario, $nombre_usuario_secundario, $glosa_cliente, $asuntos) = mysql_fetch_array($result_contratos)) {
 	$contrato = new Contrato($sesion);
-	$cobro = new Cobro($sesion);
+	//$cobro = new Cobro($sesion);
 	$contrato->Load($id_contrato);
 
 	// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
@@ -463,6 +472,7 @@ while (list($id_contrato, $id_usuario, $nombre_usuario, $id_usuario_secundario, 
 		if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
 			echo $contrato->fields['id_usuario_secundario'] . "\n";
 			$dato_diario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $nombre_usuario_secundario;
+			if(!isset($dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'])) $dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido']=array();
 			$dato_diario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_ultimo_cobro'] = $contrato_excedido;
 		}
 
@@ -633,6 +643,7 @@ while (list($id_usuario, $username, $restriccion_mensual) = mysql_fetch_array($r
 	}
 }
 
+################################################################
 // Mail Diario: Sexto componente: Alertas de ingreso de horas
 if (date("N") < 6) { //Lunes a Viernes
 	$opc = 'mail_retrasos';
@@ -704,7 +715,7 @@ if (date("N") < 6) { //Lunes a Viernes
 //Mail diario: septimo componente: Alertas de Tareas
 //Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
 //FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
-if(!UtilesApp::ExisteCampo($sesion,'alerta','tarea')) mysql_query("ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad` ;",$sesion->dbh) ;
+if(!UtilesApp::ExisteCampo('alerta','tarea',$sesion->dbh)) mysql_query("ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad` ;",$sesion->dbh) ;
 $query = "SELECT cliente.glosa_cliente,
 					asunto.glosa_asunto,
 					CONCAT_WS(' ',e.nombre, e.apellido1, LEFT(e.apellido2,1)) AS nombre_encargado,
@@ -797,7 +808,7 @@ foreach ($mensajes as $id_usuario => $mensaje) {
 	}
 }
 
-if ($desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+if (isset($desplegar_correo) && $desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 	var_dump($dato_diario);
 	echo implode('<br><br><br>', $mensajes);
 }
@@ -846,7 +857,7 @@ if (UtilesApp::GetConf($sesion, 'UsoPagoComisionNuevoCliente') == 1) {
 				$message = 'El usuario "%s" deja de recibir comision por concepto de captacion del cliente "%s"';
 
 				while ($row = mysql_fetch_object($r)) {
-					$from = Conf::AppName();
+						$from =  html_entity_decode(Conf::AppName());
 
 					$m = sprintf($message, $row->usuario, $row->glosa_cliente);
 					Utiles::Insertar($sesion, __("Alerta de facturación de tiempos") . " $from", $m, $email, false);
