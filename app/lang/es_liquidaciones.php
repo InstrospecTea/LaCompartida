@@ -68,8 +68,10 @@
 	
 	$_LANG['%reference_no%'] = "Liquidación N°";
 	$_LANG['Debe especificar un cliente o cobro'] = "Debe especificar un cliente o liquidación";
-	$_LANG['Ud. a seleccionado forma de cobro:'] = "Ud. a seleccionado forma de liquidación:";
+	$_LANG['Ud. ha seleccionado forma de cobro:'] = "Ud. a seleccionado forma de liquidación:";
 	$_LANG['Carta de cobro'] = "Carta de liquidación";
+		$_LANG['Ud. ha seleccionado forma de cobro:'] = "Ud. ha seleccionado forma de liquidación:";
+
 	$_LANG['El valor de este cobro ha excedido al <u>CAP</u> acordado, para igualar al <u>CAP</u> se debe realizar un descuento de'] = "El valor de esta liquidación ha excedido al <u>CAP</u> acordado, para igualar al <u>CAP</u> se debe realizar un descuento de";
 	$_LANG['Proceso masivo de emisión de cobros'] = "Proceso masivo de planillón y Pre-Liquidaciones";
 	$_LANG['Cobros pendientes'] = "Liquidaciónes pendientes";
@@ -87,8 +89,8 @@
 	$_LANG['Revisar cobros'] = "Revisar liquidaciones";
 	$_LANG['Cobro eliminado con éxito'] = "Liquidaciones eliminado con éxito";
 	$_LANG['Listado de cobros'] = "Listado de liquidaciones";
-	$_LANG['Forma de cobro'] = "Forma de liquidaciones";
-	$_LANG['Forma de Cobro'] = "Forma de Liquidaciones";
+	$_LANG['Forma de cobro'] = "Forma de liquidación";
+	$_LANG['Forma de Cobro'] = "Forma de Liquidación";
 	$_LANG['Resumen final del Cobro'] = "Resumen final de la liquidación";
 	$_LANG['Emitir Cobro'] = "Emitir Liquidación";
 	$_LANG['Emitir cobros'] = "Emisión de Liquidaciones";

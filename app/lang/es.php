@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once dirname(__FILE__).'/../../fw/funciones/funciones.php';
 
@@ -196,6 +196,7 @@ $_LANG['Siguiente'] = "Siguiente";
 $_LANG['Cancelar'] = "Cancelar";
 $_LANG['Aceptar'] = "Aceptar";
 $_LANG['Imprimir'] = "Imprimir";
+$_LANG['Descargar'] = "Descargar";
 $_LANG['Cambiar Contraseña"'] = "Cambiar Contraseña";
 $_LANG['Guardar tarifa'] = "Guardar tarifa";
 $_LANG['Desplegar'] = "Desplegar";
@@ -264,7 +265,7 @@ $_LANG['Tarifa en'] = "Tarifa en";
 $_LANG['¿Ud. desea emitir los cobros?'] = "¿Ud. desea emitir los cobros?";
 $_LANG['¿Ud. desea generar este cobro individualmente?'] = "¿Ud. desea generar este cobro individualmente?";
 $_LANG['¿Ud. desea copiar los datos del cliente?'] = "¿Ud. desea copiar los datos del cliente?";
-$_LANG['A continuación se imprimirán los cobros pendientes del periodo, si Ud. desea imprimir todos los cobros deberá chequear la opción correspondiente'] = "A continuación se imprimirán los cobros pendientes del periodo, si Ud. desea imprimir todos los cobros deberá chequear la opción correspondiente";
+$_LANG['A continuación se imprimirán los cobros pendientes del periodo, si Ud. desea imprimir todos los cobros deberá chequear la opción correspondiente'] = "A continuación se generarán los cobros pendientes del periodo, si Ud. desea imprimir todos los cobros deberá chequear la opción correspondiente";
 $_LANG['ALERTA'] = "ALERTA";
 $_LANG['Ver cobro asociado'] = "Ver cobro asociado";
 $_LANG['Código secundario'] = "Código secundario";
@@ -813,6 +814,12 @@ $_LANG['%nombre_contacto_mb%'] = "%sr%<br>%NombreContacto%";
 $_LANG['%asunto_mb%'] = "Ref.:";
 $_LANG['%saludo_mb%'] = "De mi consideración:";
 $_LANG['%despedida_mb%'] = "Quedando a su disposición para cualquier comentario sobre el particular, saluda muy atentamente a ustedes,";
+
+#Carta JJR
+$_LANG['Nota Disclaimer'] = "";
+$_LANG['Nota Disclaimer2'] = "";
+
+
 #Carta MB Chile
 $_LANG['%detalle_mb%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
 $_LANG['%detalle_mb_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%.";
