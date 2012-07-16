@@ -8,7 +8,7 @@ require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
 require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
 require_once Conf::ServerDir() . '/classes/Observacion.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
+//require_once Conf::ServerDir() . '/classes/Cobro.php';
 //require_once Conf::ServerDir().'/classes/Alerta.php';
 require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';

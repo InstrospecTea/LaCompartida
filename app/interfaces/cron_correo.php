@@ -6,6 +6,8 @@
 	include_once dirname(__FILE__).'/../classes/AlertaCron.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
 
+	
+	set_time_limit(180);
 	$sesion = new Sesion (null, true);
 	 
 	$sesion->phpConsole();
@@ -19,7 +21,7 @@ $encolados=0;
 $enviados=0;
 
 
-	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0";
+	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0 limit 0,60";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 	while(list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo )=mysql_fetch_array($resp))
@@ -29,19 +31,24 @@ $enviados=0;
 		foreach($adresses as $adress) {
 			$correo=array( 'nombre' => $nombre, 'mail' => trim($adress) );
 		
-			if( validEmail($adress))  array_push($correos,$correo);
+			if( validEmail($adress)) {
+			$sesion->debug('correo encolado: '.$adress);
+			array_push($correos,$correo);
+			} else {
+			$sesion->debug('no válido '.$adress);
+			}
 		}
-		array_push($correos,'cron_correo@thetimebilling.com');
+		
 		$encolados++;
 		
 		
-		if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,true,$id_archivo_anexo))
+		 if(Utiles::EnviarMail($sesion,$correos,$subject,$mensaje,false,$id_archivo_anexo))
 		{
                     
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=".$id;
 			$resp2 = mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 				$enviados++;
-		}
+		} 
 	}
 $sesion->debug('recorri log correo where enviado = 0');	
 

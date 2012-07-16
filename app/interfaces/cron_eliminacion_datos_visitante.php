@@ -4,8 +4,6 @@
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-
 
 $sesion = new Sesion( null, true );
 
@@ -25,7 +23,7 @@ if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 		echo 'Movimientos borrados.<br>';
 		
 		/* Query para borrar los neteos de documentos */
-		$query = "DELETE FROM neteo_documento WHERE id_usuario in (select id_usuario from usuario where id_sitante>0)";
+		$query = "DELETE FROM neteo_documento WHERE id_usuario in (select id_usuario from usuario where id_visitante>0)";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		echo 'Neteos borrado.<br>';
 		
@@ -117,6 +115,9 @@ if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 				$query = "DELETE FROM usuario WHERE id_visitante > 0";
 				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 				echo 'Todos los visitantes borrado de la tabla de usuarios dentro del sistema';
+				$query = "update usuario set activo=0 WHERE id_visitante > 0";
+				mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+				echo 'Todos los visitantes desactivados de la tabla de usuarios dentro del sistema';  // por si alguno no se pudo borrar
 	  	}
   	
 		if( method_exists('Conf','BorrarDatosAdministracion') && Conf::BorrarDatosAdministracion() )
