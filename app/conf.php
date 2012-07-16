@@ -94,3 +94,5 @@ ini_set('error_log','/var/www/error_logs/'.DBUSER.'_error_log.log');
 
 require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
 
+require_once Conf::ServerDir().'/../app/lang/es.php';		//Para que cargue el idioma por defecto
+require_once Conf::ServerDir().'/../app/lang/abogado.php';	//Por si hay palabras especificas relacionadas con el rubro
