@@ -1,11 +1,10 @@
 <?php 
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
+//require_once Conf::ServerDir() . '/classes/Cobro.php';
+require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-
+ 
 class Alerta {
 
 	var $sesion = null;
