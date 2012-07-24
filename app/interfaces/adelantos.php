@@ -296,7 +296,7 @@ td.sorting_1 {background:transparent !important;}
                                                                 
 							</td>
 							<td width='40%' align="right">
-								<?php if($p_cobranza) {				?>
+								<?php if($p_cobranza->fields['permitido']) {				?>
 								<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('adelanto')" title="Agregar Adelanto"><?php echo __('Agregar')?> <?php echo __('adelanto') ?></a>
 							<?php } ?>
 							</td>
@@ -340,5 +340,4 @@ td.sorting_1 {background:transparent !important;}
 	 */
 	//echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
-?>
-
+ 
