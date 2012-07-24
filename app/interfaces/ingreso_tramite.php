@@ -189,7 +189,7 @@ if ($opcion == "guardar") {
 		}
 		$tramite->Edit('revisado', 1);
 	}
-		
+
 			if($t) {
 				$t->Edit('descripcion',$descripcion);
 				$t->Edit('fecha',Utiles::fecha2sql($fecha));
@@ -977,7 +977,8 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 			http.setRequestHeader("Content-Type","application/x-www-form-urlencoded;charset=UTF-8");
 			http.send(null);
 		}
-	}	
+	}
+		
 		function revisaidioma()
 		{
 			if(http.readyState == 4)
@@ -1014,8 +1015,6 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 ?>
 				}
 			}
-		
-	
 
 
 	function ActualizaCobro(valor)
@@ -1255,87 +1254,51 @@ if ($id_trabajo == NULL) { // si no tenemos id de trabajo es porque se est√° agr
 			</td>
 		</tr>
 <?php
-$query = "SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
+
+if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
+    <tr>
+        <td align=right>
+            <?php echo __('Actividad'); ?>
+        </td>
+        <td align=left width="440" nowrap>
+            <?php echo InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $tramite->fields['codigo_actividad']); ?>
+        </td>
+    </tr>
+	<tr>
+		<td align=right>
+			<?php echo __('CÛdigo UTBMS'); ?>
+		</td>
+		<td align=left width="440" nowrap>
+			<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $tramite->fields['codigo_tarea']); ?>
+		</td>
+	</tr>
+    <?php }
+    $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
+    ?>
+    <tr nowrap>
+    	<td align=right nowrap>Tipo Tr·mite </td><td width="440" align=left id='seleccion_tramite_text_2'>
+    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
+			</td>
+		</tr>
+<?php
+if ($fecha == '')
+	$fecha = date('d-m-Y');
 ?>
-		<tr nowrap>
-			<td align=right nowrap>Tipo Tr·mite </td><td width="440" align=left id='seleccion_tramite_text_2'>
-<?php echo Html::SelectQuery($sesion, $query, 'lista_tramite', $tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite, 'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"', '', 320); ?>
-       </td>
-    </tr>
-	<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
-    <tr>
-        <td align=right>
-            <?php echo __('Actividad'); ?>
-        </td>
-        <td align=left width="440" nowrap>
-            <?php echo InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $tramite->fields['codigo_actividad']); ?>
-        </td>
-    </tr>
-	<tr>
-		<td align=right>
-			<?php echo __('CÛdigo UTBMS'); ?>
-		</td>
-		<td align=left width="440" nowrap>
-			<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $tramite->fields['codigo_tarea']); ?>
-		</td>
-	</tr>
-    <?php }
-    $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
-    ?>
-    <tr nowrap>
-    	<td align=right nowrap>Tipo Tr·mite </td><td width="440" align=left id='seleccion_tramite_text_2'>
-    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
+		<tr>
+			<td align=right>
+<?php echo __('Fecha') ?>
 			</td>
-		</tr>
-	<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
-    <tr>
-        <td align=right>
-            <?php echo __('Actividad'); ?>
-        </td>
-        <td align=left width="440" nowrap>
-            <?php echo InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $tramite->fields['codigo_actividad']); ?>
-        </td>
-    </tr>
-	<tr>
-		<td align=right>
-			<?php echo __('CÛdigo UTBMS'); ?>
-		</td>
-		<td align=left width="440" nowrap>
-			<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $tramite->fields['codigo_tarea']); ?>
-		</td>
-	</tr>
-    <?php }
-    $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
-    ?>
-    <tr nowrap>
-    	<td align=right nowrap>Tipo Tr·mite </td><td width="440" align=left id='seleccion_tramite_text_2'>
-    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
-			</td>
-		</tr>
-  	<?php 
-    if($fecha == '')
-    	$fecha = date('d-m-Y');
-    ?>
-    <tr>
-        <td align=right>
-            <?php echo __('Fecha')?>
-        </td>
-        <td align=left valign="top">
-            <!--<?php echo  Html::PrintCalendar("fecha", $tramite->fields[fecha] ? $tramite->fields[fecha] : $fecha); ?>-->
-            <input type="text" class="fechadiff" name="fecha" value="<?php echo $tramite->fields['fecha'] ? Utiles::sql2date($tramite->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
- <?php 
-						if (method_exists('Conf','GetConf'))
-						{
-							$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-						}
-						else if(method_exists('Conf','Ordenado_por'))
-						{
-							$Ordenado_por = Conf::Ordenado_por();
-						}
-						else
-						{
-							$Ordenado_por = 0;
-						}
+			<td align=left valign="top">
+				<!--<?php echo Html::PrintCalendar("fecha", $tramite->fields[fecha] ? $tramite->fields[fecha] : $fecha); ?>-->
+				<input type="text" class="fechadiff" name="fecha" value="<?php echo $tramite->fields['fecha'] ? Utiles::sql2date($tramite->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
+<?php
+if (method_exists('Conf', 'GetConf')) {
+	$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
+} else if (method_exists('Conf', 'Ordenado_por')) {
+	$Ordenado_por = Conf::Ordenado_por();
+} else {
+	$Ordenado_por = 0;
+}
 
 if ($Ordenado_por == 1 || $Ordenado_por == 2) {
 	?>
