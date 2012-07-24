@@ -10,11 +10,14 @@ require_once $filename;
 	
 	
  	$sesion = new Sesion(array('ADM'));
- 	$pagina = new Pagina($sesion);
-	$pagina->titulo = __('Administración de Base de Datos');
+		 $pagina = new Pagina($sesion);
+		 $pagina->titulo = __('Administración de Base de Datos');
 	$pagina->PrintTop();
-	
-	echo '<p>Sólo el superadmin puede ver esto</p>';
+	   if($sesion->usuario->fields['rut']!='99511620') {
+		die('No Autorizado');
+	   }  
+		   
+	 
  //$ACCESS_PWD='lockerbie'; #!!!IMPORTANT!!! this is script access password, SET IT if you want to protect you DB from public access
 
  #DEFAULT db connection settings
@@ -347,20 +350,29 @@ function print_screen(){
  global $out_message, $SQLq, $err_msg, $reccount, $time_all, $sqldr, $page, $MAX_ROWS_PER_PAGE, $is_limited_sql;
 
  print_header();
-
+if(isset($_GET['qry'])) $SQLq=base64_decode($_GET['qry']);
 ?>
 
 <div class="dot" style="padding:0 0 5px 20px">
 SQL-query (or multiple queries separated by ";"):<br />
-<textarea name="q" cols="70" rows="10" style="width:98%"><?php echo $SQLq?></textarea><br/>
+<textarea name="q" id="textoquery" cols="70" rows="10" style="width:98%"><?php echo $SQLq?></textarea><br/>
 <input type=submit name="GoSQL" value="Go" onclick="return chksql()" style="width:100px">&nbsp;&nbsp;
 <input type=button name="Clear" value=" Clear " onClick="document.DF.q.value=''" style="width:100px">
 </div>
 
 <div class="dot" style="padding:5px 0 5px 20px">
 Records: <b><?php echo $reccount?></b> in <b><?php echo $time_all?></b> sec<br />
-<b><?php echo $out_message?></b>
+<b><?php 
+echo $out_message;
+
+if(isset($_POST['GoSQL']) && $_POST['GoSQL']=='Go') {
+	echo '<script>';
+	echo 'jQuery(".inv").append("| <a href=\"phpminiadmin.php?qry='.base64_encode($SQLq).'\">Link a esta query</a>");';
+	echo '</script>';
+}
+?></b>
 </div>
+
 <div class="sqldr">
 <?php
  if ($is_limited_sql && ($page || $reccount>=$MAX_ROWS_PER_PAGE) ){
@@ -399,6 +411,7 @@ Password: <input type="password" name="pwd" value="">
 </div>
 </center>
 <?php
+
  print_footer();
 }
 
@@ -421,6 +434,7 @@ Charset: <select name="v[chset]"><option value="">- default -</option><?php echo
 </div>
 </center>
 <?php
+
  print_footer();
 }
 
@@ -1032,8 +1046,7 @@ function get_rand_str($len){
 function check_xss(){
  global $self;
  if ($_SESSION['XSS']!=trim($_REQUEST['XSS'])){
-  echo "XSS error. <a href='$self?XSS=".$_SESSION['XSS']."'>relogin to ppm</a>";
-  exit;
+  //echo " <a href='$self?XSS=".$_SESSION['XSS']."'>Pinche para iniciar PHPMiniAdmin</a>";  exit;
  }
 }
 

@@ -1,6 +1,4 @@
-</td>
-</tr>
-</table>
+</div>
 <div id="dialogomodal" style="display:none;" ></div>  
 <div id="dialog-confirm" style="display:none;" ></div>  
 <script type="text/javascript">

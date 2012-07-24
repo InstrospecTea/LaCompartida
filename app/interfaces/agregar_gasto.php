@@ -122,6 +122,7 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_moneda", $id_moneda);
 		$gasto->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "NULL");
 		$gasto->Edit("codigo_asunto", $codigo_asunto ? $codigo_asunto : "NULL");
+		$gasto->Edit("codigo_gasto",$codigo_gasto ? $codigo_gasto : "NULL");
 		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
@@ -559,6 +560,16 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
 		</tr>
+		<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
+		<tr>
+			<td align=right>
+				<?php echo __('Código UTBMS'); ?>
+			</td>
+			<td align=left width="440" nowrap>
+				<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_EXPENSE', "codigo_gasto", $gasto->fields['codigo_gasto']); ?>
+			</td>
+		</tr>
+		<?php } ?>
 		<?php if (UtilesApp::GetConf($sesion, 'TipoGasto') && $prov == 'false') { ?>
 			<tr>
 				<td align=right>

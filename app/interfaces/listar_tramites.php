@@ -841,7 +841,7 @@ function editarMultiplesArchivos()
 					//$html .= '<td>Rev.'.Revisado(& $tramite).'</td>';
 					$html .= "<td align=center><strong>".__('Tarifa')."</strong><br>".$moneda_tramite->fields['simbolo']." ".number_format($tarifa, $moneda_tramite->fields['cifras_decimales'], $idioma->fields['separador_decimales'],$idioma->fields['separador_miles'])."</td>";
 					}
-		$html .= '<td align=center nowrap>'.Opciones(& $tramite).'</td>';
+		$html .= '<td align=center nowrap>'.Opciones($tramite).'</td>';
         $html .= "</tr>";
         
         $i++;

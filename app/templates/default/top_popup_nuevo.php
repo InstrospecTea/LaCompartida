@@ -1,15 +1,13 @@
-<?
+<?php
     require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 ?>
 <body id="pagina_body" onload="SetFocoPrimerElemento();">
-<table cellspacing=0 cellpadding=0 width=100%>
-	<tr>
-		<td style="background-color: #FFFFFF;" align="center">
+	<div id="mainttb" >
 
-<?
+<?php
 	if($this->num_infos > 0)
 	{
 ?>
@@ -17,14 +15,14 @@
 <table width="90%" class="info">
 	<tr>
 		<td valign="top" align="left" style="font-size: 12px;">
-			<?=$this->GetInfos()?>
+			<?php echo $this->GetInfos(); ?>
 		</td>
 	</tr>
 </table>
 
 			<br/><br/>
 
-<?
+<?php
 	}
 	if($this->num_errors > 0)
 	{
@@ -34,12 +32,12 @@
 	<tr>
 		<td valign="top" align="left" style="font-size: 12px;">
 			<strong>Se han encontrado los siguientes errores:</strong><br/>
-			<?=$this->GetErrors()?>
+			<?php echo $this->GetErrors(); ?>
 		</td>
 	</tr>
 </table>
 			<br/><br/>
 
-<?
+<?php
 }
 ?>

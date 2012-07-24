@@ -217,8 +217,12 @@
                             }
                             $t->Edit('fecha',Utiles::fecha2sql($fecha));
                             #$t->Edit('fecha',$fecha);
-                            if($codigo_actividad)
-                                    $t->Edit('codigo_actividad',$codigo_actividad);
+                            if(isset($codigo_actividad)) {
+								$t->Edit('codigo_actividad', $codigo_actividad ? $codigo_actividad : 'NULL');
+							}
+							if(isset($codigo_tarea)) {
+								$t->Edit('codigo_tarea', $codigo_tarea ? $codigo_tarea : 'NULL');
+							}
                             if($revisado)
                                     $t->Edit('revisado',1);
 
@@ -1292,7 +1296,18 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <?php }else{ ?>
     <input type="hidden" name="codigo_actividad" id="codigo_actividad">
     <input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-    <?php }
+<?php }
+	// Mostrar este campo solo cuando sea un revisor
+	if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $permiso_revisor->fields['permitido']) { ?>
+	<tr>
+		<td colspan="2" align=right>
+			<?php echo __('Código UTBMS'); ?>
+		</td>
+		<td align=left width="440" nowrap>
+			<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $t->fields['codigo_tarea']); ?>
+		</td>
+	</tr>
+<?php }
     if($fecha == '')
     {
 		$zona_horaria = UtilesApp::GetConf($sesion, 'ZonaHoraria');

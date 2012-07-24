@@ -40,10 +40,14 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				$where .= " AND 1=0";
 		}
 
-		if($tabla == "cliente")
-			if(!$usa_inactivo)
-				$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
+		if($tabla == "cliente" && !$usa_inactivo){
+			$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
+		}
 
+		if($tabla == 'prm_codigo'){
+			$where = " WHERE grupo = '$otro_filtro' ";
+		}
+			
 		/*if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) 
 			|| ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) ) )
 			$oncambio='';
@@ -73,6 +77,24 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
+	/**
+	 * saca los datos de la tabla prm_codigo, filtrando por un grupo
+	 * @param type $sesion
+	 * @param type $name
+	 * @param type $grupo
+	 * @param type $selected
+	 * @param type $opciones
+	 * @param type $onchange
+	 * @param type $width
+	 * @param type $usa_inactivo
+	 * @param type $desde
+	 * @param type $filtro_banco
+	 * @return type 
+	 */
+	function ImprimirCodigo($sesion, $grupo, $name, $selected="", $opciones="", $onchange="",$width=320, $usa_inactivo=false, $desde = "", $filtro_banco = ""){
+		return self::Imprimir($sesion, 'prm_codigo', 'codigo', 'glosa', $name, $selected, $opciones, $onchange, $width, $grupo, $usa_inactivo, $desde, $filtro_banco);
+	}
+	
 	function ImprimirSinCualquiera($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "", $desde = "")
 	{
 		$join = '';

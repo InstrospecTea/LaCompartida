@@ -450,6 +450,10 @@ if ($opcion == "guardar") {
 
 			$contrato->Edit("separar_liquidaciones", $separar_liquidaciones);
 
+			if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+				$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+			}
+			
 			if ($contrato->Write()) {
 				#cobros pendientes
 				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
@@ -676,7 +680,7 @@ $pagina->PrintTop();
 				return false;
 				}
 			<?php } ?>
-			
+
 			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
 				if(!form.factura_comuna.value)
 			{
@@ -1058,7 +1062,7 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 									} else {
 										$fecha_creacion=date('d-m-Y');
 									}
-									
+											 
 									?>
 											 
 										</td>
@@ -1143,11 +1147,11 @@ if ($cant_encargados > 0) {
 	} else {
 		$funcion_validar = "return Validar(this.form);";
 	}
-?>
+		?>
 								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
-<?php
+		<?php
 } else {
-?>
+	?>
 											<span style="font-size:10px;background-color:#C6DEAD"><?php echo  __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
 										<?php } ?>
 									</td>

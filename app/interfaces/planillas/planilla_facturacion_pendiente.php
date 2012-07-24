@@ -364,22 +364,26 @@ if ($xls) {
 	}
 
 
-	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion->dbh))
+	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion))
 		mysql_query("ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'", $sesion->dbh);
 
 
-
-	$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch >= trabajo.fecha_touch ;";
-	$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >= cta_corriente.fecha_touch;";
-	$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
+$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
+$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+$resp = mysql_query($update1, $sesion->dbh);
+$resp = mysql_query($update2, $sesion->dbh);
+$resp = mysql_query($update3, $sesion->dbh);
+	
 	$update3A = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
 	$update3B = "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
-	$resp = mysql_query($update1, $sesion->dbh);
-	$resp = mysql_query($update2, $sesion->dbh);
-	$resp = mysql_query($update3, $sesion->dbh);
+	$update3C = "update olap_liquidaciones ol left join tramite tra on ol.id_entry=tra.id_tramite  set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null";
+	
 	$resp = mysql_query($update3A, $sesion->dbh);
 	$resp = mysql_query($update3B, $sesion->dbh);
-	list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -1 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
+	$resp = mysql_query($update3C, $sesion->dbh);
+	
+	list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -2 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
 
 	$update4 = "replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
@@ -432,6 +436,7 @@ if ($xls) {
 						$update4.="LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
 	}
 								 // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
+ 
 	$resp = mysql_query($update4, $sesion->dbh);
 
 if($fechactual-$maxolaptime>2) {
@@ -656,14 +661,21 @@ if($fechactual-$maxolaptime>2) {
 		}
 		$ws1->write($filas, $col_forma_cobro, $cobro['forma_cobro'], $formato_texto);
 
-		// En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
+	/*	//Esto se depreco: traer los descuentos a nivel de contrato
+	 * // En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual
 		if ($id_contrato != $id_contrato_anterior)
-		//FFF la siguiente linea trae los descuentos a nivel de contrato
-			$valor_descuento = $cobro['valor_descuento'];
+			$valor_descuento = $cobro['valor_descuento']; */
 
-		//FFF: la siguiente trae los descuentos hechos en los cobros no emitidos	(no es lo mismo que a nivel de contrato)
-		//		$valor_descuento = $reportecontrato->arraydescuentos[$cobro['id_contrato']];
-
+		//FFF: lo siguiente trae los descuentos hechos en los cobros no emitidos	(no es lo mismo que a nivel de contrato)
+		 	if($separar_asuntos) {
+				$valor_descuento = $reportecontrato->arraydescuentos[$cobro['codigo_asunto']];  
+			} else 	if( $cobro['id_contrato'] != $id_contrato_anterior ) {
+				// En el primer asunto de un contrato hay que actualizar el valor descuento al contrato actual. Sin esta condición se aplica N veces el mismo descuento.
+			 	$valor_descuento = $reportecontrato->arraydescuentos[$cobro['id_contrato']];
+				} else {
+				$valor_descuento =0;
+				}
+		
 		$valor_estimado = $monto_estimado_trabajos;
 
 
@@ -866,8 +878,8 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				<td>&nbsp;</td><td style="text-align:center;" colspan="2">
 	<?php echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
 	echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
+					FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
+					WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
 	?>
 				</td>
 				<?php } ?>
@@ -926,4 +938,4 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 <?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
-?>
+ 

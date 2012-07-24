@@ -55,6 +55,22 @@ AND table_name='$tabla' AND referenced_column_name ='$columna_referenciada'  and
 }
 
 
+/**
+ * recibe una lista de queries (o una), las va ejecutando y si falla tira una excepcion con el error
+ * @param mixed $queries
+ * @throws Exception 
+ */
+function ejecutar($queries, $dbh){
+	if(!is_array($queries)){
+		$queries = array($queries);
+	}
+	foreach ($queries as $q) {
+		if (!($res = mysql_query($q, $dbh) )) {
+			throw new Exception($q . "---" . mysql_error());
+		}
+	}
+}
+
 function Actualizaciones( &$dbh, $new_version )
 {
 	global $sesion;
@@ -8541,11 +8557,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				$query[]="INSERT IGNORE INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` ) VALUES ('SASU',  'Sólo Asuntos');"; 				
 				$query[]="INSERT IGNORE INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('SASU',  'ADMIN_SIS' );";
 				$query[]="INSERT IGNORE INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('SASU',  'ASUN' );";
-				foreach ($query as $q) {
-						if (!($res = mysql_query($q, $dbh) )) {
-								throw new Exception($q . "---" . mysql_error());
-						}
-				}
+				ejecutar($query, $dbh);
 				break;
 				
 			case 6.01:
@@ -8571,11 +8583,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				$query[] = "INSERT IGNORE INTO  `configuracion` ( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) 
 VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cliente_facturable,glosa_asunto,codigo_asunto,encargado_comercial,descripcion,id_cobro,iva,total,monto_real,observaciones,saldo_pagos,saldo,fecha_ultimo_pago,estado_glosa', 'Lista colmunas a mostrar en reporte facturacion',  'text',  '10',  '-1');";
 				
-				foreach ($query as $q) {
-						if (!($res = mysql_query($q, $dbh) )) {
-								throw new Exception($q . "---" . mysql_error());
-						}
-				}
+				ejecutar($query, $dbh);
 				break;
 			case 6.04:
 				$query = array ();
@@ -8592,22 +8600,14 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 							( 'TramitesOrdenarPorCategoriaDetalleProfesional', '0', 'Ordenar Listado de Trámites por Nombre de Categoría de usuario', 'radio;ordentramite', '4', '706'), 
 							( 'TramitesOrdenarPorFechaCategoria', '1', 'Ordenar por fecha del trámite y luego categoría de usuario', 'radio;ordentramite', '4', '707' );";
 				
-				foreach ($query as $q) {
-						if (!($res = mysql_query($q, $dbh) )) {
-								throw new Exception($q . "---" . mysql_error());
-						}
-				}
+				ejecutar($query, $dbh);
 				break;
 				
 				case 6.05:
 				$query=array();
 				if(!ExisteCampo('align','factura_pdf_datos',$dbh))  $query[]="ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';";
 				
-				foreach ($query as $q) {
-						if (!($res = mysql_query($q, $dbh) )) {
-								throw new Exception($q . "---" . mysql_error());
-						}
-				}
+				ejecutar($query, $dbh);
 				break;
 				
 				case 6.06:
@@ -8623,12 +8623,9 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 					$query[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) 
 						VALUES (NULL, 'FormatoNotaCobroMTA', '0', 'formato de cobro especial de Muñoz Tamayo y Asociados', 'boolean', '10', '-1');";
 					
-					foreach ($query as $q) {
-						if (!($res = mysql_query($q, $dbh) )) {
-								throw new Exception($q . "---" . mysql_error());
-						}
-					}
+					ejecutar($query, $dbh);
 					break;
+				
 				case 6.08:
 					$query = array();
 					if(!ExisteCampo('version_ct','version_db',$dbh))  $query[] ="ALTER TABLE  `version_db` ADD  `version_ct` decimal(3,2) NOT NULL DEFAULT '0.00'";
@@ -8639,11 +8636,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 					
 					if(!ExisteCampo('version','version_db',$dbh)) $query[] ="ALTER TABLE  `version_db` CHANGE  `version`  `version` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
 					if(!ExisteCampo('version_ct','version_db',$dbh)) $query[] ="ALTER TABLE  `version_db` CHANGE  `version_ct`  `version_ct` DECIMAL( 3, 2 ) NULL DEFAULT NULL;";
-					foreach ($query as $q) {
-						if ( ! ($res = mysql_query($q, $dbh)) ) {
-							throw new Exception($q . "---" . mysql_error());
-						}
-					}
+					ejecutar($query, $dbh);
 					break;
 				
 				case 6.09 :
@@ -8653,12 +8646,9 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 					if(!ExisteCampo('id_cuenta2','contrato',$dbh)) {
 						$query[] ="ALTER TABLE `contrato` ADD `id_cuenta2` INT NULL AFTER `id_cuenta` ;";
 					}
-					foreach ($query as $q) {
-						if ( ! ($res = mysql_query($q, $dbh)) ) {
-							throw new Exception($q . "---" . mysql_error());
-						}
-					}
+					ejecutar($query, $dbh);
 					break;
+					
 				case 6.10 :
 					$query = array();
 					
@@ -8701,14 +8691,144 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 						$query[] ="ALTER TABLE `contrato` ADD `id_cuenta2` INT NULL AFTER `id_cuenta` ;";
 					}
 				 
-					foreach ($query as $q) {
-						if ( ! ($res = mysql_query($q, $dbh)) ) {
-							throw new Exception($q . "---" . mysql_error());
-						}
-					}
+					ejecutar($query, $dbh);
 					break;
-	}
+					
+					case 6.11:
+					$query = array();
+					
+					$query[]  = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+						VALUES ('MensajeAlertaProfessionalDiaria', '', 'Contenido del mail que es enviado al processional. Diariamente', 'text', '3', '-1');";
+					
+					$query[]  = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+						VALUES ('MensajeAlertaProfessionalSemanal', '', 'Contenido del mail que es enviado al processional. semanalmente', 'Text', '3', '-1');";						
+					ejecutar($query, $dbh);
+				break;
 				
+					case 6.12:
+					$query = array();
+					// mejora el performance de olap liquidaciones
+					if(!ExisteIndex('id_entry','olap_liquidaciones',$dbh)) $query[]  = "ALTER TABLE `olap_liquidaciones` ADD INDEX ( `id_entry` );";
+					if(!ExisteIndex('fecha_modificacion','olap_liquidaciones',$dbh)) $query[]  = "ALTER TABLE `olap_liquidaciones` ADD INDEX ( `fecha_modificacion` );";
+					if(!ExisteIndex('tipo','olap_liquidaciones',$dbh)) $query[]  = "ALTER TABLE `olap_liquidaciones` ADD INDEX ( `tipo` );";
+					if(!ExisteIndex('id_cobro','olap_liquidaciones',$dbh)) $query[]  = "ALTER TABLE `olap_liquidaciones` ADD INDEX ( `id_cobro` );";
+					 					
+					ejecutar($query, $dbh);
+				break;
+				case 6.13:
+					$query = array();
+					if(ExisteCampo('id_tipo_asunto','asunto',$dbh)) $query[]  = "ALTER TABLE  `asunto` CHANGE  `id_tipo_asunto`  `id_tipo_asunto` INT( 11 ) NULL;";
+					if(ExisteCampo('id_area_proyecto','asunto',$dbh)) $query[]  = " ALTER TABLE  `asunto` CHANGE  `id_area_proyecto`  `id_area_proyecto` INT( 11 ) NULL;";
+					ejecutar($query, $dbh);
+				break;
+
+				case 6.14:
+					$queries = array(
+						"ALTER TABLE `contrato` ADD `exportacion_ledes` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'Define si las liquidaciones del contrato se podrán exportar a LEDES'"
+						,
+						"ALTER TABLE `asunto` ADD `codigo_homologacion` VARCHAR( 100 ) NULL COMMENT 'codigo que usa internamente el cliente en su propio sistema. requerido para generar archivos LEDES' AFTER `glosa_asunto` "
+						,
+						"ALTER TABLE `trabajo` ADD `codigo_tarea` VARCHAR( 100 ) NULL COMMENT 'codigo del tipo de tarea, necesario para generar archivos LEDES (TASK_CODE)' AFTER `codigo_actividad` "
+						,
+						"ALTER TABLE `tramite` ADD `codigo_actividad` VARCHAR( 5 ) NULL COMMENT 'codigo del tipo de actividad, necesario para generar archivos LEDES (ACTIVITY_CODE)' AFTER `id_tramite_tipo` ,
+							ADD `codigo_tarea` VARCHAR( 100 ) NULL COMMENT 'codigo del tipo de tarea, necesario para generar archivos LEDES (TASK_CODE)' AFTER `codigo_actividad` "
+						,
+						"ALTER TABLE `tramite` ADD INDEX ( `codigo_actividad` ) "
+						,
+						"ALTER TABLE `tramite` ADD FOREIGN KEY ( `codigo_actividad` ) REFERENCES `actividad` (`codigo_actividad`) ON DELETE RESTRICT ON UPDATE CASCADE ;"
+						,
+						"ALTER TABLE `cta_corriente` ADD `codigo_gasto` VARCHAR( 100 ) NULL COMMENT 'codigo del tipo de gasto, necesario para generar archivos LEDES (EXPENSE_CODE)' AFTER `codigo_asunto` "
+						,
+						"CREATE TABLE IF NOT EXISTS `prm_codigo` (
+							`id_codigo` int(11) NOT NULL AUTO_INCREMENT,
+							`grupo` varchar(20) NOT NULL COMMENT 'listado al que pertenece este item',
+							`codigo` varchar(100) NOT NULL,
+							`glosa` varchar(200) NOT NULL,
+							PRIMARY KEY (`id_codigo`),
+							UNIQUE KEY `grupo` (`grupo`,`codigo`)
+						) ENGINE=InnoDB COMMENT='pares de codigo-glosa para listados parametricos en general' AUTO_INCREMENT=1 ;"
+						,
+						"INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES
+							('UTBMS_TASK', 'L110', 'Fact Investigation/Development'),
+							('UTBMS_TASK', 'L120', 'Analysis/Strategy'),
+							('UTBMS_TASK', 'L130', 'Experts/Consultants'),
+							('UTBMS_TASK', 'L140', 'Document/File Management'),
+							('UTBMS_TASK', 'L150', 'Budgeting'),
+							('UTBMS_TASK', 'L160', 'Settlement/Non-Binding ADR'),
+							('UTBMS_TASK', 'L190', 'Other Case Assessment, Development and Administration'),
+							('UTBMS_TASK', 'L210', 'Pleadings'),
+							('UTBMS_TASK', 'L220', 'Preliminary Injunctions/Provisional Remedies'),
+							('UTBMS_TASK', 'L230', 'Court Mandated Conferences'),
+							('UTBMS_TASK', 'L240', 'Dispositive Motions'),
+							('UTBMS_TASK', 'L250', 'Other Written Motions and Submissions'),
+							('UTBMS_TASK', 'L260', 'Class Action Certification and Notice'),
+							('UTBMS_TASK', 'L310', 'Written Discovery'),
+							('UTBMS_TASK', 'L320', 'Document Production'),
+							('UTBMS_TASK', 'L330', 'Depositions'),
+							('UTBMS_TASK', 'L340', 'Expert Discovery'),
+							('UTBMS_TASK', 'L350', 'Discovery Motions'),
+							('UTBMS_TASK', 'L390', 'Other Discovery'),
+							('UTBMS_TASK', 'L410', 'Fact Witnesses'),
+							('UTBMS_TASK', 'L420', 'Expert Witnesses'),
+							('UTBMS_TASK', 'L430', 'Written Motions and Submissions'),
+							('UTBMS_TASK', 'L440', 'Other Trial Preparation and Support'),
+							('UTBMS_TASK', 'L450', 'Trial and Hearing Attendance'),
+							('UTBMS_TASK', 'L460', 'Post-Trial Motions and Submissions'),
+							('UTBMS_TASK', 'L470', 'Enforcement'),
+							('UTBMS_TASK', 'L510', 'Appellate Motions and Submissions'),
+							('UTBMS_TASK', 'L520', 'Appellate Briefs'),
+							('UTBMS_TASK', 'L530', 'Oral Argument'),
+							('UTBMS_ACTIVITY', 'A101', 'Plan and prepare for'),
+							('UTBMS_ACTIVITY', 'A102', 'Research'),
+							('UTBMS_ACTIVITY', 'A103', 'Draft/revise'),
+							('UTBMS_ACTIVITY', 'A104', 'Review/analyze'),
+							('UTBMS_ACTIVITY', 'A105', 'Communicate (in firm)'),
+							('UTBMS_ACTIVITY', 'A106', 'Communicate (with client)'),
+							('UTBMS_ACTIVITY', 'A107', 'Communicate (other outside counsel)'),
+							('UTBMS_ACTIVITY', 'A108', 'Communicate (other external)'),
+							('UTBMS_ACTIVITY', 'A109', 'Appear for/attend'),
+							('UTBMS_ACTIVITY', 'A110', 'Manage data/files'),
+							('UTBMS_ACTIVITY', 'A111', 'Other'),
+							('UTBMS_EXPENSE', 'E101', 'Copying'),
+							('UTBMS_EXPENSE', 'E102', 'Outside printing'),
+							('UTBMS_EXPENSE', 'E103', 'Word processing'),
+							('UTBMS_EXPENSE', 'E104', 'Facsimile'),
+							('UTBMS_EXPENSE', 'E105', 'Telephone'),
+							('UTBMS_EXPENSE', 'E106', 'Online research'),
+							('UTBMS_EXPENSE', 'E107', 'Delivery services/messengers'),
+							('UTBMS_EXPENSE', 'E108', 'Postage'),
+							('UTBMS_EXPENSE', 'E109', 'Local travel'),
+							('UTBMS_EXPENSE', 'E110', 'Out-of-town travel'),
+							('UTBMS_EXPENSE', 'E111', 'Meals'),
+							('UTBMS_EXPENSE', 'E112', 'Court fees'),
+							('UTBMS_EXPENSE', 'E113', 'Subpoena fees'),
+							('UTBMS_EXPENSE', 'E114', 'Witness fees'),
+							('UTBMS_EXPENSE', 'E115', 'Deposition transcripts'),
+							('UTBMS_EXPENSE', 'E116', 'Trial transcripts'),
+							('UTBMS_EXPENSE', 'E117', 'Trial exhibits'),
+							('UTBMS_EXPENSE', 'E118', 'Litigation support vendors'),
+							('UTBMS_EXPENSE', 'E119', 'Experts'),
+							('UTBMS_EXPENSE', 'E120', 'Private investigators'),
+							('UTBMS_EXPENSE', 'E121', 'Arbitrators/mediators'),
+							('UTBMS_EXPENSE', 'E122', 'Local counsel'),
+							('UTBMS_EXPENSE', 'E123', 'Other professionals'),
+							('UTBMS_EXPENSE', 'E124', 'Other')"
+						,
+						"INSERT INTO `configuracion` (
+							`id` ,
+							`glosa_opcion` ,
+							`valor_opcion` ,
+							`comentario` ,
+							`valores_posibles` ,
+							`id_configuracion_categoria` ,
+							`orden`
+							)
+						VALUES (NULL , 'IdentificadorEstudio', '', 'Código identificador del estudio, por ejemplo el número de cédula jurídica. Este es el LAW_FIRM_ID para LEDES', 'string', '1', '-1');"
+					);
+
+					ejecutar($queries, $dbh);
+				break;
+	}
 }
 
 /* PASO 2: Agregar el numero de version al arreglo VERSIONES.
@@ -8716,7 +8836,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update=6.10;
+$max_update=6.14;
 $force=0;
 if(isset($_GET['maxupdate'])) $max_update=round($_GET['maxupdate'],2);
 if(isset($_GET['minupdate'])) $min_update=round($_GET['minupdate'],2);

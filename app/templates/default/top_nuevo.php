@@ -27,7 +27,8 @@ if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
 	 if($_SESSION['RUT']='99511620') echo '<br><h3>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a></h3>';
 	exit; 
 	  echo '</div>';
-		} ?>
+		}
+		?>
    
 
 		<div  class="tb_facebook">
@@ -52,8 +53,8 @@ if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
 								<?php if ($_SESSION['ACTIVO_JUICIO'] && method_exists('Conf','HostJuicios') ){?> 
 										| <a style="color: white;" href="<?php echo Conf::HostJuicios()?>" onClick="irIntranet('/fw/usuarios/index.php');">Gestión de Causas</a>
 								<?php }?> 
-                                                        | <a style="color: white;" href="http://lemontech.zendesk.com/home" target="_blank" >Soporte</a> 
-							 
+                                                        | <a style="color: white;" href="http://soporte.thetimebilling.com" target="_blank" >Soporte</a> 
+							 <?php if ($_SESSION['switchuser']) echo '| <a  style="color: white;" style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?endswitch=1">Volver a Modo Admin</a> '; ?>
 							| <a href="#" style="color: white;" onClick="irIntranet('/fw/usuarios/logout.php?salir=true');">Salir</a></span></td>
 			  </div>
                 </div>
@@ -66,7 +67,7 @@ if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
     </div>
 
     
-     <div id="mainttb">
+     <div id="mainttb" style="width:960px;position:relative;left:-10px; ">
             
     <div class="titulo_sec"  >
     <?php 
@@ -112,4 +113,6 @@ if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
 			</table>
 						<br/><br/>
 			
-			<?php endif; 	?>
+			<?php endif; 	 
+			
+		

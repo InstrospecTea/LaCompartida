@@ -63,6 +63,18 @@ class Cobro extends Objeto {
                        return true;
               }
         }
+	 function BotoneraCobro() {
+		echo "<br /><br />    <a class=\"btn botonizame\" icon=\"ui-icon-doc\" setwidth=\"185\" onclick=\"return VerDetalles(jQuery('#todo_cobro').get(0));\" >".  __('Descargar Archivo') ." Word</a>";
+
+							if (UtilesApp::GetConf($this->sesion, 'MostrarBotonCobroPDF')) echo  "<br class=\"clearfix vpx\" /><a class=\"btn botonizame\"  icon=\"ui-icon-pdf\"  setwidth=\"185\" onclick=\"return VerDetallesPDF(jQuery('#todo_cobro').get(0));\">". __('Descargar Archivo') ." PDF</a>";
+
+							if (!UtilesApp::GetConf($this->sesion, 'EsconderExcelCobroModificable')) echo "<br class=\"clearfix vpx\"/><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0)); \">". __('descargar_excel_modificable') ." </a>";
+
+							if (UtilesApp::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) echo "	<br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); \">". __('Excel rentabilidad')."  </a>	";
+
+							if (UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') echo "  <br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');\">". __('Descargar Excel Cobro') ." </a>";
+
+	}
 	//Guarda los pagos que pudo haber hecho un documento
 	function SetPagos($pago_honorarios, $pago_gastos, $id_documento=null) {
 		$nuevo_pago = false;

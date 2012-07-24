@@ -19,7 +19,7 @@ class Conf
 	function ServerIP() { return SUBDOMAIN.'.thetimebilling.com'; }
 	
 	
-function logoutRedirect() { return Conf::RootDir().'/index.php?logout'; }
+public static function logoutRedirect() { return Conf::RootDir().'/index.php?logout'; }
 	public static function Hash() { return 'c85ef9997e6a30032a765a20ee69630b'; }
 	
 	public static function Logo($fullPath=false) { return ($fullPath?Conf::Server():'').Conf::ImgDir().'/logo_tt.jpg'; }
@@ -80,7 +80,7 @@ public static       function UsuarioWS()  {           return defined('USERWS')? 
 
 
 }
-defined('ROOTDIR') || define('ROOTDIR',Conf::RootDir());
+defined('ROOTDIR') || define('ROOTDIR',str_replace('//','/','/'.Conf::RootDir()));
 defined('DBUSER') || define('DBUSER',Conf::dbUser());
 defined('DBHOST') || define('DBHOST',Conf::dbHost());
 defined('DBNAME') || define('DBNAME',Conf::dbName());

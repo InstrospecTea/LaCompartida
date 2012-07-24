@@ -48,7 +48,12 @@ $dato_diario = array();
 
 /* Mensajes */
 $warning = '<span style="color:#CC2233;">Alerta:</span>';
-$msg['horas_minimas_propio'] = $warning . " s&oacute;lo ha ingresado %HORAS horas de un m&iacute;nimo de %MINIMO.";
+if (Conf::GetConf($sesion, 'MensajeAlertaProfessionalSemanal') && Conf::GetConf($sesion, 'MensajeAlertaProfessionalSemanal') != ''){
+    $msg['horas_minimas_propio'] = Conf::GetConf($sesion, 'MensajeAlertaProfessionalSemanal');
+}else{
+$msg['horas_minimas_propio'] = $warning . " s&oacute;lo ha ingresado %HORAS horas de un m&iacute;nimo de %MINIMO.";    
+}
+
 $msg['horas_maximas_propio'] = $warning . " ha ingresado %HORAS horas, superando su m&aacute;ximo de %MAXIMO.";
 $msg['horas_minimas_revisado'] = $warning . " no alcanza su m&iacute;nimo de %MINIMO horas.";
 $msg['horas_maximas_revisado'] = $warning . " supera su m&aacute;ximo de %MAXIMO horas.";
@@ -771,12 +776,70 @@ while (list($cliente, $asunto, $nombre_encargado, $nombre_revisor, $id_encargado
 }
 
 // refresca los cobros pagados ayer
-$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS ) ;";
-$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estado_cobro=c.estado  where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS );";
-$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estado_cobro=c.estado where c.fecha_modificacion >= DATE_ADD( NOW( ) , INTERVAL -1 DAYS ) ;";
+$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
+$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
+$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
 $resp = mysql_query($update1, $sesion->dbh);
 $resp = mysql_query($update2, $sesion->dbh);
 $resp = mysql_query($update3, $sesion->dbh);
+$AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+
+
+
+$updategastos="update olap_liquidaciones ol join cta_corriente cc on ol.id_unico=(20000000+cc.id_movimiento)
+set
+ol.id_usuario_entry=cc.id_usuario_orden,
+ol.codigo_asunto= cc.codigo_asunto,
+ol.cobrable=cc.cobrable,
+ol.incluir_en_cobro= if(cc.incluir_en_cobro='SI',2,1) ,
+ol.duracion_cobrada_segs=0,
+ol.monto_cobrable=IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable,
+ol.id_moneda_entry= cc.id_moneda,
+ol.fechaentry=cc.fecha,
+ol.id_cobro=cc.id_cobro,
+ol.estadocobro=cc.estadocobro,
+ol.fecha_modificacion=cc.fecha_touch
+where ol.tipo='GAS' and cc.fecha_touch>ol.fecha_modificacion";
+
+$updatetrabajos="update olap_liquidaciones ol join trabajo tr on ol.id_unico=(10000000 + tr.id_trabajo)
+set
+  
+ol.id_usuario_entry=tr.id_usuario,
+ol.codigo_asunto=tr.codigo_asunto,
+ol.cobrable=tr.cobrable,
+ ol.duracion_cobrada_segs=TIME_TO_SEC( duracion_cobrada ),
+ ol.monto_thh=TIME_TO_SEC( duracion_cobrada ) * tarifa_hh,
+ol.monto_thh_estandar=TIME_TO_SEC( duracion_cobrada ) * tarifa_hh_estandar,
+ol.id_moneda_entry= tr.id_moneda,
+ol.fechaentry=tr.fecha,
+ol.id_cobro=tr.id_cobro,
+ol.estadocobro=tr.estadocobro,
+ol.fecha_modificacion=tr.fecha_touch
+where ol.tipo='TRB'
+AND tr.fecha_touch> ol.fecha_modificacion ";
+
+$updatetramite="update olap_liquidaciones ol join tramite tram on ol.id_unico=( 30000000 + tram.id_tramite)
+set
+ol.id_usuario_entry=tram.id_usuario,
+ol.codigo_asunto=tram.codigo_asunto,
+ol.cobrable=tram.cobrable,
+ol.incluir_en_cobro=2,
+ol.duracion_cobrada_segs=TIME_TO_SEC(duracion) ,
+ol.monto_cobrable=tram.tarifa_tramite,
+ol.id_moneda_entry=tram.id_moneda_tramite,
+ol.fechaentry=tram.fecha,
+ol.id_cobro=tram.id_cobro,
+ol.estadocobro=tram.estadocobro ,
+ol.fecha_modificacion=tram.fecha_touch
+where ol.tipo='TRA'
+
+ and tram.fecha_touch>ol.fecha_modificacion";
+ 	
+ 
+	$resp = mysql_query($updategastos, $sesion->dbh);
+	$resp = mysql_query($updatetrabajos, $sesion->dbh);
+	$resp = mysql_query($updatetramite, $sesion->dbh);
+	
 
 
 //Correo Hitos

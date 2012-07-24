@@ -54,9 +54,9 @@
 		
             $query = "SELECT id_factura FROM factura WHERE id_documento_legal = '$id_documento_legal' ORDER BY id_factura DESC LIMIT 1";
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-        list($id_factura) = mysql_fetch_array($resp);
+			list($id_factura) = mysql_fetch_array($resp);
             
-	$factura_pdf_datos = new FacturaPdfDatos($sesion);
+			$factura_pdf_datos = new FacturaPdfDatos($sesion);
 	
 	
 	

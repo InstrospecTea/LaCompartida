@@ -15,7 +15,6 @@ require_once Conf::ServerDir() . '/classes/Moneda.php';
 require_once Conf::ServerDir() . '/classes/Cliente.php';
 require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 #require_once Conf::ServerDir().'/classes/GastoGeneral.php';
 
 $sesion = new Sesion(array('OFI'));
@@ -283,7 +282,7 @@ td.sorting_1 {background:transparent !important;}
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
-  
+  var tablagastos=null;
     function Preparar_Cobro(form)
     {
         form.action = 'gastos.php?preparar_cobro=1';
@@ -399,8 +398,8 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 							return true;
                        }   else if(from =='datatables' || from == 'buscar') {
 					
-					jQuery('#totalcta').load('ajax/gastos_ajax.php?totalctacorriente=1&'+jQuery('#form_gastos').serialize());
-					var tablagastos=   jQuery('#tablon').hide().dataTable({
+					jQuery('#totalcta').load('ajax/ajax_gastos.php?totalctacorriente=1&'+jQuery('#form_gastos').serialize());
+		   tablagastos=   jQuery('#tablon').dataTable({
                                  "fnPreDrawCallback": function( oSettings ) {
 									jQuery('#tablon').fadeTo('fast',0.1);
 									
@@ -412,7 +411,7 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
                                     "sUrl":          "", 	"oPaginate": {            "sPrevious": "Anterior",   "sNext":     "Siguiente"}
                                 },
                                 "bFilter": false,    "bProcessing": true,
-                                "sAjaxSource": "ajax/gastos_ajax.php?where=1&"+jQuery('#form_gastos').serialize(),
+                                "sAjaxSource": "ajax/ajax_gastos.php?where=1&"+jQuery('#form_gastos').serialize(),
                                 "bJQueryUI": true,
                                 "bDeferRender": true,
 								"sServerParams": jQuery('#form_gastos').serialize(),
@@ -465,6 +464,9 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible":
 							return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
 					}, "aTargets": [2] },
 					{"fnRender": function (o,val) {
+							if(o.aData[5]) 	return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
+					}, "aTargets": [5] },
+					{"fnRender": function (o,val) {
 							var activo=(o.aData[11]='SI')? 'activo' :'inactivo';
 							return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
 					}, "aTargets": [1] }
@@ -475,14 +477,14 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible":
                 "aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
                 "sPaginationType": "full_numbers",
                 "sDom":  'T<"top"ip>rt<"bottom">',
-                "oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy", {
+                "oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [  {
                     "sExtends":    "text",
                     "sButtonText": "Editar Seleccionados",
 					 "fnClick": function ( nButton, oConfig, oFlash ) {
                       top.window.jQuery('#dialogomodal .divloading').hide();
 					  
 					 if(jQuery('#selectodos').is(':checked')) {
-						 var url='ajax/gastos_ajax.php?opclistado=listado&selectodos=1&'+jQuery('#form_gastos').serialize();
+						 var url='ajax/ajax_gastos.php?opclistado=listado&selectodos=1&'+jQuery('#form_gastos').serialize();
 					 } else {
 						var arrayseleccionados=new Array();
 					    jQuery('.eligegasto:checked').each(function() {
@@ -491,13 +493,13 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible":
 						});
 						if(arrayseleccionados.length==0) return false;
 						jQuery('#serializacion').val(arrayseleccionados);
-						var url='ajax/gastos_ajax.php?opclistado=listado&movimientos='+jQuery('#serializacion').val().replace(',',';');
+						var url='ajax/ajax_gastos.php?opclistado=listado&movimientos='+jQuery('#serializacion').val().replace(',',';');
 					 }
 					 
 					   top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option','title',' Editar Gastos Masivamente ').dialog( "option", 
 					   "buttons", { 
 													"Modificar": function() { 
-														jQuery.post('ajax/gastos_ajax.php?opc=actualizagastos',jQuery('#form_edita_gastos_masivos').serialize(),function(data) {
+														jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos',jQuery('#form_edita_gastos_masivos').serialize(),function(data) {
 															if(window.console) console.log(data);
 														},'jsonp');
 														
@@ -520,7 +522,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible":
 						if(jQuery('#codcliente').val()==1) {
 							jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').attr('readonly','readonly');
 							jQuery('#overlayeditargastos').prepend(jQuery('#selectclienteasunto'));
-							}
+							} 
 						});
                     }
                 } ]     
@@ -542,11 +544,13 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable'))     echo ' { "bVisible":
 	<?php if ($opc == 'buscar' || isset($_GET['buscar'])) echo "jQuery('#boton_buscar').click();"; ?>
 });	
 function Refrescarse() {
-	if(window.tablagastos && tablagastos.fnReloadAjax) tablagastos.fnReloadAjax();
+	if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw();
 }
-    function Refrescar()    {    }
+    function Refrescar()    { 
+ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw();
+}
 </script>
-<?php echo(Autocompletador::CSS()); ?>
+ 
 <table  width="90%"><tr><td><input type="hidden" name="serializacion" id="serializacion" size="70"/>
             <form method='post' name="form_gastos" action='' id="form_gastos">
 				
@@ -567,7 +571,7 @@ function Refrescarse() {
 <?php echo  __('Cobrado') ?>
                             </td>
                             <td align='left'>
-<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", 'NO', '', 'Todos', '60') ?>
+<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado)? $cobrado:'NO', '', 'Todos', '60') ?>
                             </td>
                             <td align="left" nowrap>
 <?php echo  __('id_cobro') ?>&nbsp;
@@ -637,7 +641,7 @@ function Refrescarse() {
 <?php echo  __('Clientes activos') ?>
                             </td>
                             <td colspan="2" align="left">
-                                <select name='clientes_activos' id='clientes_activos' style='width: 120px;'>
+                                <select name='clientes_activos' id='clientes_activos' style='width: 140px;'>
                                     <option value=''> Todos </option>
                                     <option value='activos' selected="selected"> S&oacute;lo activos </option>
                                     <option value='inactivos'> S&oacute;lo inactivos </option>
@@ -645,6 +649,19 @@ function Refrescarse() {
                             </td>
                             <td></td>
                         </tr>
+						
+<tr>
+                            <td align="right"> <?php echo __('Gastos');?>  y  <?php echo __('Provisiones');?>                        </td>
+                            <td colspan="2" align="left">
+                                <select name="egresooingreso" id="egresooingreso" style="width: 140px;">
+                                    <option value=""  selected="selected"> <?php echo __('Gastos');?>  y  <?php echo __('Provisiones');?>  </option>
+                                    <option value="soloingreso"> Sólo <?php echo __('provisiones');?></option>
+                                    <option value="sologastos"> Sólo <?php echo __('gastos');?> </option>
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>						
+						
                         <tr>
                             <td align=right>
                                 <?php echo  __('Moneda') ?>
@@ -703,7 +720,7 @@ function Refrescarse() {
 <th width="250"><?php echo __('Asunto') ;?><br><small>(descripcion)</small></th>
 <th>Tipo</th>
 <th>Descripción</th>
-<th>Egreso</th>
+<th>Egreso<br/><small>(<?php echo __('cobrable'); ?>)</small></th>
 <th>Ingreso</th>
 <th><?php echo __('Impuesto'); ?></th>
 <th><?php echo __('Cobro'); ?><br/><small>(estado)</small></th>
@@ -716,9 +733,6 @@ function Refrescarse() {
 		
 	</tbody></table>
                <?php
-                if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) {
-                    echo(Autocompletador::Javascript($sesion));
-                }
-                echo(InputId::Javascript($sesion));
+ 
                 $pagina->PrintBottom();
-?>
+ 

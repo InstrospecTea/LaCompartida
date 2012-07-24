@@ -308,6 +308,7 @@ if ($opcion == "guardar") {
 		}
 		$asunto->Edit("glosa_asunto", $glosa_asunto);
 		$asunto->Edit("codigo_cliente", $codigo_cliente);
+		$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto);
 		$asunto->Edit("id_area_proyecto", $id_area_proyecto);
 		$asunto->Edit("id_idioma", $id_idioma);
@@ -456,6 +457,10 @@ if ($opcion == "guardar") {
 
 					$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
 
+					if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+						$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+					}
+					
 					if ($contrato->Write()) {
 						#cobros pendientes
 						CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
@@ -540,7 +545,7 @@ if ($opcion == "guardar") {
 				}
 
 				$contrato->Edit("glosa_contrato", $glosa_contrato);
-				$contrato->Edit("id_pais", $id_pais);				
+				$contrato->Edit("id_pais", $id_pais);
 				$contrato->Edit("id_cuenta", $id_cuenta);
 	
 				if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
@@ -625,8 +630,12 @@ if ($opcion == "guardar") {
 				$contrato->Edit("limite_hh", $limite_hh);
 				$contrato->Edit("limite_monto", $limite_monto);
 
-                                $contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
-                                
+				$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
+                            
+				if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+					$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+				}
+				
 				// Editar notificaciones
 				$contrato->Edit('notificar_encargado_principal', $notificar_encargado_principal);
 				if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
@@ -783,7 +792,7 @@ $pagina->PrintTop($popup);
 if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 	echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
 }
- 
+
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	?>
 				if(!form.codigo_cliente_secundario.value)
@@ -855,7 +864,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 				<?php } ?>
-				
+
 				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
 				if(!form.factura_ciudad.value)
 				{
@@ -1243,6 +1252,16 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 ?>
 							</td>
 						</tr>
+						<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
+						<tr>
+							<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+								<?php echo __('Código de homologación'); ?>
+							</td>
+							<td align=left>
+								<input name="codigo_homologacion" size="45" value="<?php echo $asunto->fields['codigo_homologacion']; ?>" />
+							</td>
+						</tr>
+						<?php } ?>
 						<tr>
 							<td align=right>
 <?php echo __('Título') ?>
@@ -1295,10 +1314,10 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						</tr>
 						<?php 	//if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
 									
-                                                                                    echo '<tr><td align=right>';
+							echo '<tr><td align=right>';
                                                                                     echo __('Usuario responsable');
-                                                                                    echo '</td><td align=left>';
-                                                                                    echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+                                                        echo '</td><td align=left>';
+echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
@@ -1411,7 +1430,7 @@ if ($permisos_asuntos->fields['permitido']) {
 				<table width='100%' cellspacing='0' cellpadding='0'>
 					<tr>
 						<td  <?php echo $hide_areas; ?> >
-							<input type="checkbox" name='cobro_independiente'id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
+							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
@@ -1471,7 +1490,7 @@ if ($permisos_asuntos->fields['permitido']) {
 <?php
 if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
 	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
-} else {
+ } else {
 	$funcion_validar = "return Validar(this.form);";
 }
 ?>
@@ -1496,7 +1515,7 @@ if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
 	<br>
 </form>
 
-<script> 
+<script>
     
 	//Contratos('<?php echo $asunto->fields['codigo_cliente']; ?>','<?php echo $asunto->fields['id_contrato']; ?>');
 	var form = $('formulario');
@@ -1525,13 +1544,13 @@ function CambioEncargadoSegunCliente(idcliente) {
         }
         
           jQuery('#id_usuario_responsable').removeAttr('disabled');
-        if(CopiarEncargadoAlAsunto) {
-        	jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
+	if(CopiarEncargadoAlAsunto) {
+		jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
                 if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
 	   } else if(ObligatorioEncargadoSecundarioAsunto) {
              
                 if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
-           }
+	   }
 	
 	   
            jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');

@@ -6,15 +6,14 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
+ 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
 	require_once Conf::ServerDir().'/classes/Documento.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
+ 
 
 	$sesion = new Sesion(array('OFI','COB','SEC'));	
 	$pagina = new Pagina($sesion);
@@ -73,7 +72,7 @@ td.sorting_1 {background:transparent !important;}
 
 </style>
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
+<script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 
 <script type="text/javascript">
 	var MonedaArray= new Array();
@@ -222,7 +221,7 @@ td.sorting_1 {background:transparent !important;}
 </script>
 
 <?php 
-echo Autocompletador::CSS();
+//echo Autocompletador::CSS();
  
 	?>
 
@@ -249,7 +248,7 @@ echo Autocompletador::CSS();
 						<tr>
 	    					<td align="right" width="30%"><?php echo __('Nombre Cliente') ?></td>
 	    					<td colspan="3" align="left">
-							<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+				<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
 
 	  						</td>
 						</tr>
@@ -333,11 +332,13 @@ echo Autocompletador::CSS();
 
 	
 	
-	if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
+	/*if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	{
 		echo(Autocompletador::Javascript($sesion));
 	}
-	echo(InputId::Javascript($sesion));
+	 * 
+	 */
+	//echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>
 

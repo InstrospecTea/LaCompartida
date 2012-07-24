@@ -6,12 +6,10 @@ require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
 require_once Conf::ServerDir() . '/../fw/classes/Html.php';
 require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
 require_once Conf::ServerDir() . '/classes/Funciones.php';
 require_once Conf::ServerDir() . '/classes/Moneda.php';
 require_once Conf::ServerDir() . '/classes/Factura.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $Sesion = new Sesion(array('COB'));
@@ -541,7 +539,7 @@ function funcionTR(& $fila) {
 	}
 </script>
 
-<?php echo Autocompletador::CSS(); ?>
+ 
 <form method='post' name="form_facturas" id="form_facturas">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
 	<!-- Calendario DIV -->
@@ -549,7 +547,7 @@ function funcionTR(& $fila) {
 		<div class="floating" id="calendar"></div>
 	</div>
 	<!-- Fin calendario DIV -->
-	<?
+	<?php 
 	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
 		echo "<table width=\"90%\"><tr><td>";
 		$class_diseno = 'class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;"';
@@ -565,22 +563,7 @@ function funcionTR(& $fila) {
 <?php echo  __('Cliente') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-					<?
-					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
-							echo Autocompletador::ImprimirSelector($Sesion, '', $codigo_cliente_secundario);
-						else
-							echo Autocompletador::ImprimirSelector($Sesion, $codigo_cliente);
-					}
-					else {
-						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-							echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
-						}
-						else {
-							echo InputId::Imprimir($Sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-						}
-					}
-					?>
+				<?php UtilesApp::CampoCliente($Sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
 				</td>
 			</tr>
 			<tr>
@@ -588,14 +571,7 @@ function funcionTR(& $fila) {
 	<?php echo  __('Asunto') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-					<?
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-						echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
-					}
-					else {
-						echo InputId::Imprimir($Sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
-					}
-					?>
+					<?php   UtilesApp::CampoAsunto($Sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
 				</td>
 			</tr>
 			<tr>
@@ -659,7 +635,7 @@ function funcionTR(& $fila) {
 					<?php echo Html::SelectQuery($Sesion, $series_documento->SeriesQuery(), "serie", $serie, '', "Vacio", 60); ?>
 					<span style="vertical-align: center;">-</span>
 					<?php } ?>
-					<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?= $numero ?>" onchange="this.value=this.value.toUpperCase();">
+					<input onkeydown="if(event.keyCode==13)BuscarFacturas(this.form,'buscar');" type="text" id="numero" name="numero" size="15" value="<?php echo $numero ?>" onchange="this.value=this.value.toUpperCase();">
 				</td>
 				<td alignelement=right width="18%">
 <?php echo  __('N° Cobro') ?>
@@ -739,15 +715,15 @@ function funcionTR(& $fila) {
 					<?php echo  __('Fecha inicio pago') ?>
 				</td>
 				<td nowrap align=left>
-					<input type="text" id="fecha1" name="fecha1" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-					<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+					<input type="text" id="fecha1" class="fechadiff" name="fecha1" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+					 
 				</td>
 				<td align=right>
 					<?php echo  __('Fecha fin pago') ?>
 				</td>
 				<td nowrap align=left>
-					<input type="text" id="fecha2" name="fecha2" value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-					<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+					<input type="text" id="fecha2" class="fechadiff"  name="fecha2" value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+				 
 				</td>
 			</tr>
 			<tr>
@@ -759,25 +735,10 @@ function funcionTR(& $fila) {
 				</td>
 			</tr>
 		</table>
-	</fieldset><?
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-	echo "</td></tr></table>";
-?>
+	</fieldset>
+	<?php if (UtilesApp::GetConf($Sesion, 'UsaDisenoNuevo') )  	echo "</td></tr></table>";  ?>
 </form>
-<!--table style="border: 0px solid black" width='94%'>
-	<tr>
-		<td > &nbsp;</td>
-		<td width=220px align="right" style='border: 1px solid #BDBDBD'>
-			<b><?php echo  __('Nueva') ?>:</b>&nbsp;
-					<?php echo  Html::SelectQuery($Sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal', '', '', '', 150); ?>
-			<br>
-			<span onclick="CrearNuevoDocumentoLegal()" >
-				<img src="<?php echo  Conf::ImgDir() ?>/mas_16.gif" /><a href="javascript:void(0)"><?php echo  __('Agregar Documento Tributario') ?></a>
-				<br>&nbsp;
-			</span>
-		</td>
-	</tr>
-</table-->
+
 <script type="text/javascript">
 	function CrearNuevoDocumentoLegal()
 	{
@@ -793,29 +754,12 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'UsaDisenoNue
 	}
 
 
-	Calendar.setup(
-	{
-		inputField	: "fecha1",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha1"		// ID of the button
-	}
-);
-	Calendar.setup(
-	{
-		inputField	: "fecha2",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha2"		// ID of the button
-	}
-);
 </script>
-<?
+<?php
 if ($opc == 'buscar') {
 	$b->Imprimir();
 }
 
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-	echo(Autocompletador::Javascript($Sesion));
-}
-echo(InputId::Javascript($Sesion));
+
 $pagina->PrintBottom();
-?>
+

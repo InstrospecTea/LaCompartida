@@ -15,6 +15,7 @@ require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
 require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/../app/classes/FacturaPdfDatos.php';
+require_once Conf::ServerDir() . '/../app/classes/Ledes.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new PaginaCobro($sesion);
@@ -635,6 +636,14 @@ if ($cobro->fields['id_contrato'] != '') {
 	$contrato = new Contrato($sesion);
 	$contrato->Load($cobro->fields['id_contrato']);
 }
+
+if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) {
+	$Ledes = new Ledes($sesion);
+	$errores_ledes = json_encode($Ledes->ValidarDatos($id_cobro));
+} else {
+	$errores_ledes = 'null';
+}
+
 ?>
 <script type="text/javascript">
     
@@ -1085,6 +1094,19 @@ if ($cobro->fields['id_contrato'] != '') {
 
     function DescargarLedes(form)
     {
+		//si al archivo le faltarian algunos datos obligatorios para ledes, avisa para q los rellenen
+		var errores = <?php echo $errores_ledes; ?>;
+		var mensaje = '';
+		jQuery.each(errores, function(error, valores){
+			if(valores && valores.length){
+				mensaje += error + ':\n\t- ' + valores.join('\n\t- ') + '\n';
+			}
+		});
+		if(mensaje){
+			alert('<?php echo __('No se puede descargar el archivo porque algunos datos se encuentran incompletos:\n'); ?>' + mensaje);
+			return false;
+		}
+		//todo: generar un warning para los asuntos sin codigo q no aparecen en este cobro?
 		form.opc.value = 'descargar_ledes';
         form.submit();
         return true;
@@ -1853,24 +1875,18 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                     </tr>
                     <tr>
                         <td align="center" colspan="2">
-							<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
-                            <br />
-                                                        <br />    <a class="btn botonizame" icon="ui-icon-doc" setwidth="185" onclick="return VerDetalles(jQuery('#todo_cobro').get(0));" ><?php echo __('Descargar Archivo') ?> Word</a>
-<?php if (UtilesApp::GetConf($sesion, 'MostrarBotonCobroPDF')) { ?>
-								<br class="clearfix vpx" /><a class="btn botonizame"  icon="ui-icon-pdf"  setwidth="185" onclick="return VerDetallesPDF(jQuery('#todo_cobro').get(0));"><?php echo __('Descargar Archivo') ?> PDF</a>
-<?php }  
-if (!UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable')) { ?>
-								<br class="clearfix vpx"/><a class="btn botonizame" icon="xls" setwidth="185" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0)); "><?php echo __('descargar_excel_modificable') ?></a>
-<?php }  
-if (UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee')) { ?>
-								<br class="clearfix vpx" /><a class="btn botonizame" icon="xls" setwidth="185" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); "><?php echo __('Excel rentabilidad') ?> </a>							
-<?php } 
-if (UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') { ?>
-                                                             <br class="clearfix vpx" /><a class="btn botonizame" icon="xls" setwidth="185" onclick="return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');"><?php echo __('Descargar Excel Cobro') ?></a>
-<?php } 
-if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
-								 <br class="clearfix vpx" /><a class="btn botonizame"   setwidth="185" onclick="return DescargarLedes(jQuery('#todo_cobro').get(0));"><?php echo __('Descargar LEDES') ?> </a>
-							<?php } ?>
+							<?php echo __('Idioma') .':'. Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80);  
+                            
+                                                       
+							 
+							 $cobro->BotoneraCobro();
+							 
+							 // Tuve que dejar afuera este botón porque necesita de un dato de esta pantalla
+							 if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) { 
+								 echo " <br class=\"clearfix vpx\" /><a class=\"btn botonizame\"   setwidth=\"185\" onclick=\"return DescargarLedes(jQuery('#todo_cobro').get(0));\">". __('Descargar LEDES') ." </a>";
+							 }
+							 ?>
+							
                         </td>
                     </tr>
                 </table>

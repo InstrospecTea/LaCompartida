@@ -1889,8 +1889,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	}
 }
 
-// FFF bloque de hitos, requerimiento PRC		
-			
+/* FFF bloque de hitos, requerimiento PRC		
+			echo 'El cobro es ';
+			echo '<pre>';
+			print_r($cobro->fields);
+			echo '</pre>';
+			die();*/
 			$query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_contrato=" . $cobro->fields['id_contrato'] ;
 			$resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query_hitos, __FILE__, __LINE__, $sesion->dbh);
 			list($cont_hitos) = mysql_fetch_array($resp_hitos);
@@ -1914,44 +1918,57 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->write($filas, $col_descripcion, 'Descripcion', $formato_titulo_vcentrado);
 				
 				
-				$ws->write($filas, $col_descripcion+3, 'Estado',$formato_titulo_vcentrado);	
-				
-				
-				$ws->write($filas, $col_descripcion+2, 'Valor real en Horas',$formato_titulo_vcentrado);
-				$ws->write($filas, $col_descripcion+1, 'Monto del Hito', $formato_titulo_vcentrado);
-				//$ws->write($filas, $col_descripcion+1, '',$formato_titulo_vcentrado);	
+				$ws->write($filas, $col_descripcion+1, 'Estado',$formato_titulo_vcentrado);	
+				 $ws->write($filas, $col_descripcion+2, __('Fecha de Emisión'),$formato_titulo_vcentrado);
+				 $ws->write($filas, $col_descripcion+3, __('Número de Horas'),$formato_titulo_vcentrado);
+				$ws->write($filas, $col_descripcion+4, 'Monto del Hito', $formato_titulo_vcentrado);
+									$ws->write($filas, $col_descripcion+5, __('Valor Real Actualizado'),$formato_titulo_vcentrado);
+
 					
 				
 				
 $totalhito=0;
 $totalthh=0;
+$totalminutos=0;
 			 while($fila_hitos=mysql_fetch_array($resp_hitos) ) {
 				$totalhito+=floatval($fila_hitos['monto_estimado']);
 				$totalthh+=floatval($fila_hitos['monto_thh']);	 
 				  $monto_thh = ($fila_hitos['monto_thh']==0)? '-':$fila_hitos['monto_thh'];
 				  $fecha_hito=($fila_hitos['fecha_hito']=='00/00/00')? '-':$fila_hitos['fecha_hito'];
 				$filas++;
-			//	$ws->write($filas, $col_descripcion-$offsetcolumna-1, $fecha_hito, $formato_normal);
+			 
 				$ws->write($filas, $col_descripcion, $fila_hitos['descripcion'], $formato_normal);
 				//$ws->write($filas, $col_descripcion+1,  '',$formato_normal); 
-				$ws->write($filas, $col_descripcion+3, ucwords($fila_hitos['estado']),$formato_normal); 
-				
-				
-				$ws->write($filas, $col_descripcion+2, $monto_thh,$formato_moneda);
-					$ws->write($filas, $col_descripcion+1, $fila_hitos['monto_estimado'], $formato_moneda);
-					
+				$ws->write($filas, $col_descripcion+1, ucwords($fila_hitos['estado']),$formato_normal); 
+				 	$ws->write($filas, $col_descripcion+2, $fecha_hito, $formato_normal);
+							
 
+				$totalminutos += $fila_hitos['total_minutos'];
+					$horas_cobrables = floor( $fila_hitos['total_minutos']/60);
+							$minutos_cobrables = sprintf("%02d", $fila_hitos['total_minutos']%60);
+							
+								$ws->write($filas, $col_descripcion+3, "$horas_cobrables:$minutos_cobrables",$formato_normal); 
+							
+					$ws->write($filas, $col_descripcion+4, $fila_hitos['monto_estimado'], $formato_moneda);
+					$ws->write($filas, $col_descripcion+5, $monto_thh,$formato_moneda);
+					
 					
 					
 				 }
 				 $filas++;
 		//$ws->write($filas, $col_descripcion-$offsetcolumna-1, 'Total', $formato_total);
 		$ws->write($filas, $col_descripcion, 'Total ', $formato_total);
+			$ws->write($filas, $col_descripcion+1,'', $formato_total);
+				$ws->write($filas, $col_descripcion+2, ' ', $formato_total);
+						$horas_cobrables = floor($totalminutos/60);
+							$minutos_cobrables = sprintf("%02d", $totalminutos%60);
+							
+								$ws->write($filas, $col_descripcion+3, "$horas_cobrables:$minutos_cobrables",$formato_total); 
     	//$ws->write($filas, $col_descripcion+1, ' ',$formato_total); 
-		$ws->write($filas, $col_descripcion+3, ' ',$formato_total); 
+		
     	
-		$ws->write($filas, $col_descripcion+2, intval($totalthh),$formato_moneda_total);
-	$ws->write($filas, $col_descripcion+1, $totalhito, $formato_moneda_total);
+		$ws->write($filas, $col_descripcion+5, intval($totalthh),$formato_moneda_total);
+	$ws->write($filas, $col_descripcion+4, $totalhito, $formato_moneda_total);
 					
 			}
 

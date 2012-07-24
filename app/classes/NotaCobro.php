@@ -1,7 +1,7 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
 
-	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
+	require_once  dirname(__FILE__).'/Cobro.php';
 	require_once Conf::ServerDir().'/../app/classes/MontoEnPalabra.php';
 
  
@@ -187,7 +187,7 @@ class NotaCobro extends Cobro {
 		$html2 = $parser_carta->tags[$theTag];
 
 		switch ($theTag) {
-			case 'CARTA':
+			case 'CARTA': //GenerarDocumentoCarta
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
@@ -225,7 +225,7 @@ class NotaCobro extends Cobro {
 
 			
 
-			case 'DETALLE':
+			case 'DETALLE': //GenerarDocumentoCarta
 				/* DICTIONARIO
 				 * %saludo_mb%               --- Dear %sr% %ApellidoContacto%: / De mi consideración:
 				 * %detalle_mb%              --- Frase especial Morales y Bezas
@@ -888,7 +888,7 @@ class NotaCobro extends Cobro {
 		$html2 = $parser_carta->tags[$theTag];
 
 		switch ($theTag) {
-			case 'CARTA':
+			case 'CARTA': //GenerarDocumentoCarta2
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
@@ -933,7 +933,7 @@ class NotaCobro extends Cobro {
 
 			
 
-			case 'DETALLE':
+			case 'DETALLE': //GenerarDocumentoCarta2
 				
 				if (strpos($html2, '%cuenta_banco%')) {
 					if ($contrato->fields['id_cuenta']) {
@@ -1193,16 +1193,16 @@ class NotaCobro extends Cobro {
 				/*
 				  Mostrando fecha según idioma
 				 */
-				if ($this->fields['fecha_ini'] != '' && $this->fields['fecha_ini'] != '0000-00-00')
+				if ($this->fields['fecha_ini'] != '' && $this->fields['fecha_ini'] != '0000-00-00') {
 					$texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_ini'], '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
-				else
-					$texto_fecha_es = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y')));
-
-				if ($this->fields['fecha_ini'] != '' && $this->fields['fecha_ini'] != '0000-00-00')
+					$texto_fecha_es_durante = __('durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_ini'], '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$texto_fecha_en = __('between') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_ini']))) . ' ' . __('and') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
-				else
+				} else {
+					$texto_fecha_es = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y')));
+					$texto_fecha_es_durante = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y')));
 					$texto_fecha_en = __('until') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
-
+				}
+				
 				if ($lang == 'es') {
 					
 					$fecha_mes = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('realizados el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B'));
@@ -1210,10 +1210,12 @@ class NotaCobro extends Cobro {
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 					$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
 					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? __('prestada ') . $texto_fecha_es : __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
+					$fecha_diff_prestada_durante = $datediff > 0 && $datediff < 12 ?$texto_fecha_es_durante : __('prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B %Y'));
 				} else {
 					$fecha_diff = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('to') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
+					$fecha_diff_prestada_durante = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 				}
 
 				if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
@@ -1221,6 +1223,7 @@ class NotaCobro extends Cobro {
 					$fecha_al = __('al mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_diff_con_de = __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
 					$fecha_diff_prestada = __('prestada en el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B de %Y'));
+					$fecha_diff_prestada_durante =  __('prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 				}
 
 				//Se saca la fecha inicial según el primer trabajo
@@ -1270,60 +1273,68 @@ class NotaCobro extends Cobro {
 				  Mostrando fecha según idioma
 				 */
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
-					if ($lang == 'es')
+					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
-					else
+					} else {
 						$fecha_diff_periodo_exacto = __('from') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
+					}
+					
 					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($this->fields['fecha_fin'], '%Y')) {
 						$texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
 						$texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+						$texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
 					} else {
 						$texto_fecha_es = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
 						$texto_fecha_es_de = __('entre los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+						$texto_fecha_es_durante = __('prestados durante los meses de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%B %Y')) . ' ' . __('y') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
 					}
 				} else {
 					$texto_fecha_es = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y')));
 					$texto_fecha_es_de = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y')));
+					$texto_fecha_es_durante = __('hasta el mes de') . ' ' . ucfirst(ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y')));
 				}
 
-				if ($lang == 'es')
+				if ($lang == 'es') {
 					$fecha_diff_periodo_exacto .= __('hasta el día') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
-				else
+				} else {
 					$fecha_diff_periodo_exacto .= __('until') . ' ' . Utiles::sql3fecha($this->fields['fecha_fin'], '%d-%m-%Y');
+				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
-					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%Y'))
+					if (Utiles::sql3fecha($fecha_inicial_primer_trabajo, '%Y') == Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%Y')) {
 						$texto_fecha_en = __('between') . ' ' . ucfirst(date('F', strtotime($fecha_inicial_primer_trabajo))) . ' ' . __('and') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
-					else
+					} else {
 						$texto_fecha_en = __('between') . ' ' . ucfirst(date('F Y', strtotime($fecha_inicial_primer_trabajo))) . ' ' . __('and') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
-				}
-				else
+					}
+				} else {
 					$texto_fecha_en = __('until') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
+				}
 
-				if ($lang == 'es')
+				if ($lang == 'es') {
 					$fecha_primer_trabajo = $datediff > 0 && $datediff < 48 ? $texto_fecha_es : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B %Y'));
-				else
-					$fecha_primer_trabajo = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
-
-				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == es)
-					$fecha_primer_trabajo = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
-
-				if ($lang == 'es')
 					$fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __('durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
-				else
+					$fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_es_de : __(' prestados durante el mes de') . ' ' . ucfirst(Utiles::sql3fecha($fecha_final_ultimo_trabajo, '%B de %Y'));
+				} else {
+					$fecha_primer_trabajo = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
 					$fecha_primer_trabajo_de = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
+					$fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
+				}
+				
+				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == es) {
+					$fecha_primer_trabajo = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
+					$fecha_primer_trabajo_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));					
+					$fecha_primer_trabajo_durante = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
+				}
 
-				if ($fecha_primer_trabajo_de == 'No existe fecha' && $lang == es)
-					$fecha_primer_trabajo_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
-
-
-				if ($this->fields['id_moneda'] != $this->fields['opc_moneda_total'])
+				if ($this->fields['id_moneda'] != $this->fields['opc_moneda_total']) {
 					$html2 = str_replace('%equivalente_dolm%', ' que ascienden a %monto%', $html2);
-				else
+				} else {
 					$html2 = str_replace('%equivalente_dolm%', '', $html2);
+				}
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				$html2 = str_replace('%fecha_primer_trabajo%', $fecha_primer_trabajo, $html2);
 				$html2 = str_replace('%fecha_primer_trabajo_de%', $fecha_primer_trabajo_de, $html2);
+				$html2 = str_replace('%fecha_primer_trabajo_durante%', $fecha_primer_trabajo_durante, $html2);
 				$html2 = str_replace('%fecha%', $fecha_diff, $html2);
 				
 				
@@ -1336,14 +1347,17 @@ class NotaCobro extends Cobro {
 						$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ' (' . Conf::GetConf($this->sesion, 'PaisEstudio') . '), ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 					}
 				} else {
-					if ($lang == 'es')
+					if ($lang == 'es') {
 						$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
-					else
+					} else {
 						$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
+					}
 				}
 				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
+				$fecha_lang_mta = str_replace('Bogota,', 'Bogotá, D.C.,', $fecha_lang);
+				$html2 = str_replace('%fecha_especial_mta%', $fecha_lang_mta, $html2);
 							
 				$html2 = str_replace('%fecha_al%', $fecha_al, $html2);
 				$html2 = str_replace('%fecha_al_minuscula%', strtolower($fecha_al), $html2);
@@ -1351,6 +1365,9 @@ class NotaCobro extends Cobro {
 				$html2 = str_replace('%fecha_con_prestada%', $fecha_diff_prestada, $html2);				
 				$html2 = str_replace('%fecha_con_prestada_mayuscula%', mb_strtoupper($fecha_diff_prestada), $html2);
 				$html2 = str_replace('%fecha_con_prestada_minusculas%', strtolower($fecha_diff_prestada), $html2);
+				$html2 = str_replace('%fecha_diff_prestada_durante%', $fecha_diff_prestada_durante, $html2);
+				$html2 = str_replace('%fecha_diff_prestada_durante_mayuscula%', mb_strtoupper($fecha_diff_prestada_durante), $html2);
+				$html2 = str_replace('%fecha_diff_prestada_durante_minusculas%', strtolower($fecha_diff_prestada_durante), $html2);
 				$html2 = str_replace('%fecha_emision%', $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d de %B') : '', $html2);
 				
 				$fecha_mta_emision = $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d/%m/%Y') : '';
@@ -1398,7 +1415,8 @@ class NotaCobro extends Cobro {
 				$glosa_moneda_lang = __($cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda']);
 				$glosa_moneda_plural_lang = __($cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural']);
 				$cobro_id_moneda = $this->fields['opc_moneda_total'];
-				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				
+				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
 				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_mta, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
 				
 				$html2 = str_replace('%monto_en_palabras%', __($monto_total_palabra), $html2);
@@ -1672,7 +1690,7 @@ class NotaCobro extends Cobro {
 
 				break;
 
-			case 'FILAS_ASUNTOS_RESUMEN':
+			case 'FILAS_ASUNTOS_RESUMEN': //GenerarDocumentoCarta2
 				/**
 				 *Esto se hizo para Mu?oz Tamayo y Asociados. (ESM) 
 				 */
@@ -1778,7 +1796,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 		$html2 = $parser_carta->tags[$theTag];
 
 		switch ($theTag) {
-			case 'CARTA':
+			case 'CARTA': //GenerarDocumentoCartaComun
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
@@ -1822,7 +1840,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				break;
 
-			case 'FECHA':
+			case 'FECHA': //GenerarDocumentoCartaComun
 				#formato especial
 				if (method_exists('Conf', 'GetConf')) {
 					if ($lang == 'es') {
@@ -1840,8 +1858,6 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_espanol%', $fecha_espanol, $html2);
-
-				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 
 				#formato normal
 				if ($lang == 'es') {
@@ -1886,7 +1902,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 				break;
 
-			case 'ENVIO_DIRECCION':
+			case 'ENVIO_DIRECCION': //GenerarDocumentoCartaComun
 				$query = "SELECT glosa_cliente FROM cliente
 									WHERE codigo_cliente=" . $contrato->fields['codigo_cliente'];
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1989,11 +2005,18 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('correspondientes al mes de') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
 				$html2 = str_replace('%fecha_con_de%', $fecha_diff_con_de, $html2);
 
+				//%factura_desc_mta%
+				if( strtolower($nombre_pais) != 'colombia') {
+					$html2 = str_replace('%factura_desc_mta%', 'cuenta de cobro', $html2);
+				} else {
+					$html2 = str_replace('%factura_desc_mta%', 'factura', $html2);
+				}
+				
 				break;
 
 			
 
-			case 'ADJ':
+			case 'ADJ': //GenerarDocumentoCartaComun
 				#firma careyallende
 				$html2 = str_replace('%firma_careyallende%', __('%firma_careyallende%'), $html2);
 
@@ -2013,7 +2036,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html2 = str_replace('%cliente_fax%', $contrato->fields['fono_contacto'], $html2);
 				break;
 
-			case 'PIE':
+			case 'PIE': //GenerarDocumentoCartaComun
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea3');
@@ -2031,7 +2054,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html2 = str_replace('%direccion%', $pie_pagina, $html2);
 				break;
 
-			case 'DATOS_CLIENTE':
+			case 'DATOS_CLIENTE': //GenerarDocumentoCartaComun
 
 				/* Datos detalle */
 				if (!empty($contrato->fields['titulo_contacto']) && $contrato->fields['titulo_contacto'] != '-1') {
@@ -2104,7 +2127,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 		$html = $parser->tags[$theTag];
 
 		switch ($theTag) {
-			case 'INFORME':
+			case 'INFORME': //GenerarDocumento
 				#INSERTANDO CARTA
 				$html = str_replace('%COBRO_CARTA%', $this->GenerarDocumentoCarta($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html);
 				if (method_exists('Conf', 'GetConf')) {
@@ -2251,7 +2274,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 			 
 
-			case 'DETALLE_COBRO':
+			case 'DETALLE_COBRO': //GenerarDocumento
 				if ($this->fields['opc_ver_resumen_cobro'] == 0)
 					return '';
 				#se cargan los nombres de los asuntos
@@ -2647,7 +2670,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'RESTAR_RETAINER':
+			case 'RESTAR_RETAINER': //GenerarDocumento
 				if ($columna_hrs_retainer || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
 					$html = str_replace('%retainer%', __('Retainer'), $html);
 				else
@@ -2662,7 +2685,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_retainer%', '', $html);
 				break;
 
-			case 'DETALLE_COBRO_RETAINER':
+			case 'DETALLE_COBRO_RETAINER': //GenerarDocumento
 				$monto_contrato_moneda_tarifa = number_format($this->fields['monto_contrato'] * $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$monto_cobro_menos_monto_contrato_moneda_tarifa = number_format($this->fields['monto'] - ($this->fields['monto_contrato'] * $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 
@@ -2676,7 +2699,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valor_honorarios_adicionales%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_TARIFA_ADICIONAL':
+			case 'DETALLE_TARIFA_ADICIONAL': //GenerarDocumento
 				$tarifas_adicionales = $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . " ";
 
 				$query = "SELECT DISTINCT tarifa_hh FROM trabajo WHERE id_cobro = '" . $this->fields['id_cobro'] . "' ORDER BY tarifa_hh DESC";
@@ -2695,15 +2718,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valores_tarifa_adicionales%', $tarifas_adicionales, $html);
 				break;
 
-			case 'FACTURA_NUMERO':
+			case 'FACTURA_NUMERO': //GenerarDocumento
 				$html = str_replace('%factura_nro%', __('Factura') . ' ' . __('N°'), $html);
 				break;
 
-			case 'NUMERO_FACTURA':
+			case 'NUMERO_FACTURA': //GenerarDocumento
 				$html = str_replace('%nro_factura%', $this->fields['documento'], $html);
 				break;
 
-			case 'DETALLE_HONORARIOS':
+			case 'DETALLE_HONORARIOS': //GenerarDocumento
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 				$html = str_replace('%horas%', __('Total Horas'), $html);
@@ -2717,7 +2740,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumento($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'DETALLE_GASTOS':
+			case 'DETALLE_GASTOS': //GenerarDocumento
 				$html = str_replace('%gastos%', __('Gastos'), $html);
 				$query = "SELECT SQL_CALC_FOUND_ROWS *
 								FROM cta_corriente
@@ -2747,7 +2770,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_TRAMITES':
+			case 'DETALLE_TRAMITES': //GenerarDocumento
 				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$aproximacion_tramites = number_format($this->fields['monto_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
@@ -2755,7 +2778,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL':
+			case 'DETALLE_COBRO_MONEDA_TOTAL': //GenerarDocumento
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -2804,7 +2827,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_COBRO_DESCUENTO':
+			case 'DETALLE_COBRO_DESCUENTO': //GenerarDocumento
 				/*var_dump( $moneda_cobro );
 				echo " ---- ";
 				var_dump( $cobro_moneda ); exit;*/
@@ -2872,7 +2895,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'RESUMEN_CAP':
+			case 'RESUMEN_CAP': //GenerarDocumento
 				$monto_restante = $this->fields['monto_contrato'] - ( $this->TotalCobrosCap() + ($this->fields['monto_trabajos'] - $this->fields['descuento']) * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['tipo_cambio'] );
 
 				$html = str_replace('%cap%', __('Total CAP'), $html);
@@ -2888,7 +2911,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'COBROS_DEL_CAP':
+			case 'COBROS_DEL_CAP': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 
@@ -2913,7 +2936,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'ASUNTOS':
+			case 'ASUNTOS': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 
@@ -3046,7 +3069,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES':
+			case 'TRAMITES': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 				for ($k = 0; $k < count($this->asuntos); $k++) {
@@ -3127,7 +3150,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRABAJOS_ENCABEZADO':
+			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -3278,7 +3301,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 				break;
 
-			case 'TRAMITES_ENCABEZADO':
+			case 'TRAMITES_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -3324,7 +3347,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 				break;
 
-			case 'TRABAJOS_FILAS':
+			case 'TRABAJOS_FILAS': //GenerarDocumento
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -3783,7 +3806,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES_FILAS':
+			case 'TRAMITES_FILAS': //GenerarDocumento
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -3979,7 +4002,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 
-			case 'TRABAJOS_TOTAL':
+			case 'TRABAJOS_TOTAL': //GenerarDocumento
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -4097,7 +4120,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TRAMITES_TOTAL':
+			case 'TRAMITES_TOTAL': //GenerarDocumento
 				$horas_cobrables_tramites = floor(($asunto->fields['tramites_total_duracion_trabajado']) / 60);
 				$minutos_cobrables_tramites = sprintf("%02d", $asunto->fields['tramites_total_duracion_trabajado'] % 60);
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada']) / 60);
@@ -4120,7 +4143,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_PROFESIONAL':
+			case 'DETALLE_PROFESIONAL': //GenerarDocumento
 
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
@@ -4140,7 +4163,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'RESUMEN_PROFESIONAL_ENCABEZADO':
+			case 'RESUMEN_PROFESIONAL_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%nombre%', __('categoria_usuario'), $html);
 				global $columna_hrs_trabajadas_categoria;
 				global $columna_hrs_retainer_categoria;
@@ -4157,7 +4180,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%hrs_mins_trabajadas%', $columna_hrs_trabajadas_categoria ? __('Hrs.:Mins. Trabajadas') : '', $html);
 				$html = str_replace('%hrs_mins_descontadas%', $columna_hrs_descontadas_categoria ? __('Hrs.:Mins. Descontadas') : '', $html);
 			// El resto se llena igual que PROFESIONAL_ENCABEZADO, pero tiene otra estructura, no debe tener 'break;'.
-			case 'PROFESIONAL_ENCABEZADO':
+			case 'PROFESIONAL_ENCABEZADO': //GenerarDocumento
 				global $columna_hrs_trabajadas;
 				global $columna_hrs_retainer;
 				global $columna_hrs_descontadas;
@@ -4327,7 +4350,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 				break;
 
-			case 'IMPUESTO':
+			case 'IMPUESTO': //GenerarDocumento
 				$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
 				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% )', $html); 
 
@@ -4350,7 +4373,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'PROFESIONAL_FILAS':
+			case 'PROFESIONAL_FILAS': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 				if (is_array($profesionales)) {
@@ -4593,7 +4616,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'PROFESIONAL_TOTAL':
+			case 'PROFESIONAL_TOTAL': //GenerarDocumento
 				$retainer = false;
 				$descontado = false;
 				$flatfee = false;
@@ -4722,12 +4745,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%horas%', number_format($duracion_decimal, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_PROFESIONAL_RETAINER':
+			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumento
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO':
+			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO': //GenerarDocumento
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -4743,7 +4766,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;
 
-			case 'RESUMEN_PROFESIONAL':
+			case 'RESUMEN_PROFESIONAL': //GenerarDocumento
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
 				global $resumen_profesional_nombre;
@@ -4915,7 +4938,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
 				break;
 
-			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA':
+			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
 				global $resumen_profesional_nombre;
@@ -5066,7 +5089,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			/*
 			  GASTOS -> esto s?lo lista los gastos agregados al cobro obteniendo un total
 			 */
-			case 'GASTOS':
+			case 'GASTOS': //GenerarDocumento
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
 
@@ -5083,7 +5106,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumento($parser, 'GASTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'GASTOS_ENCABEZADO':
+			case 'GASTOS_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -5091,6 +5114,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto_original%', __('Monto'), $html);
+				$html = str_replace('%ordenado_por%', __('Ordenado<br>Por'), $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 /*VOUGA*/		if ($lang == 'es') {
 /*VOUGA*/		$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);		
@@ -5100,9 +5124,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
+				
+				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
+				$html = str_replace('%proveedor%',__('Proveedor'), $html);
+				} else {
+					$html = str_replace('%proveedor%','', $html);
+				}
 				break;
 
-			case 'GASTOS_FILAS':
+			case 'GASTOS_FILAS': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 				if (method_exists('Conf', 'SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto()) {
@@ -5184,9 +5214,23 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
-				break;
+				
+				if(UtilesApp::GetConf($this->sesion,'MostrarProveedorenGastos')) {
+						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
+					} else {
+						$row = str_replace('%proveedor%', '' , $row);
+					}
+				
+				
+				
+				if ($this->fields['opc_ver_solicitante']) {
+						$row = str_replace('%solicitante%', $detalle['username'], $row);
+					} else {
+						$row = str_replace('%solicitante%', '' , $row);
+					}
+			break;
 
-			case 'GASTOS_TOTAL':
+			case 'GASTOS_TOTAL': //GenerarDocumento
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
 /*VOUGA*/		if ($lang == 'es') {
@@ -5247,7 +5291,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
 			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
 			 */
-			case 'CTA_CORRIENTE':
+			case 'CTA_CORRIENTE': //GenerarDocumento
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
 
@@ -5262,7 +5306,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumento($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_INICIAL':
+			case 'CTA_CORRIENTE_SALDO_INICIAL': //GenerarDocumento
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 
 				$html = str_replace('%saldo_inicial_cuenta%', __('Saldo inicial'), $html);
@@ -5272,7 +5316,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_inicial_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_inicial, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%movimientos%', __('Movimientos del periodo'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -5280,7 +5324,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%ingreso%', __('Ingreso') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
@@ -5332,7 +5376,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL': //GenerarDocumento
 				$html = str_replace('%total%', __('Total'), $html);
 				$gastos_moneda_total = $totales['total'];
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
@@ -5348,7 +5392,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_FINAL':
+			case 'CTA_CORRIENTE_SALDO_FINAL': //GenerarDocumento
 				#Total de gastos en moneda que se muestra el cobro.
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 				$gastos_moneda_total = $totales['total'];
@@ -5361,7 +5405,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_final_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_final, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TIPO_CAMBIO':
+			case 'TIPO_CAMBIO': //GenerarDocumento
 				if ($this->fields['opc_ver_tipo_cambio'] == 0)
 					return '';
 				//Tipos de Cambio
@@ -5374,7 +5418,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 			//facturas morosas
-			case 'MOROSIDAD':
+			case 'MOROSIDAD': //GenerarDocumento
 				if ($this->fields['opc_ver_morosidad'] == 0)
 					return '';
 				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
@@ -5385,7 +5429,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%MOROSIDAD_TOTAL%', $this->GenerarDocumento($parser, 'MOROSIDAD_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'MOROSIDAD_ENCABEZADO':
+			case 'MOROSIDAD_ENCABEZADO': //GenerarDocumento
 				$html = str_replace('%numero_nota_cobro%', __('Folio Carta'), $html);
 				$html = str_replace('%numero_factura%', __('Factura'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -5393,7 +5437,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%monto_moroso%', __('Monto'), $html);
 				break;
 
-			case 'MOROSIDAD_FILAS':
+			case 'MOROSIDAD_FILAS': //GenerarDocumento
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT cobro.id_cobro,cobro.documento, cobro.fecha_enviado_cliente,cobro.fecha_emision,
@@ -5467,7 +5511,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_HONORARIOS_TOTAL':
+			case 'MOROSIDAD_HONORARIOS_TOTAL': //GenerarDocumento
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -5481,7 +5525,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_GASTOS':
+			case 'MOROSIDAD_GASTOS': //GenerarDocumento
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -5495,7 +5539,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_TOTAL':
+			case 'MOROSIDAD_TOTAL': //GenerarDocumento
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -5510,7 +5554,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
 				break;
 
-			case 'GLOSA_ESPECIAL':
+			case 'GLOSA_ESPECIAL': //GenerarDocumento
 				if ($this->fields['codigo_idioma'] != 'en')
 					$html = str_replace('%glosa_especial%', 'Emitir cheque/transferencia a nombre de<br />
 														TORO Y COMPAÑÍA LIMITADA<br />
@@ -5557,7 +5601,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 		switch ($theTag) {
                     
-                     	case 'INFORME':
+                     	case 'INFORME': //GenerarDocumento2
 				#INSERTANDO CARTA
                                  $html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
                                  $html = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html);
@@ -5779,7 +5823,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 			
 
-			case 'DETALLE_COBRO':
+			case 'DETALLE_COBRO': //GenerarDocumento2
 				if ($this->fields['opc_ver_resumen_cobro'] == 0)
 					return '';
 				#se cargan los nombres de los asuntos
@@ -6182,7 +6226,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 			
 			
-			case 'DETALLES_PAGOS':
+			case 'DETALLES_PAGOS': //GenerarDocumento2
 				$fila = $html;
 				$monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
 				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
@@ -6239,20 +6283,20 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = $fila_adelantos;
 				break;
 
-			case 'ADELANTOS':
+			case 'ADELANTOS': //GenerarDocumento2
 				$html = str_replace('%titulo_adelantos%', __('Adelantos por asignar'), $html);
 				$html = str_replace('%ADELANTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'ADELANTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%ADELANTOS_FILAS_TOTAL%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'COBROS_ADEUDADOS':
+			case 'COBROS_ADEUDADOS': //GenerarDocumento2
 				$html = str_replace('%titulo_adelantos%', __('Saldo anterior'), $html);
 				$html = str_replace('%ADELANTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'ADELANTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%COBROS_ADEUDADOS_FILAS_TOTAL%', $this->GenerarDocumento2($parser, 'COBROS_ADEUDADOS_FILAS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 			    
 			    //FFF DESGLOSE DE HITOS		
-			case 'HITOS_ENCABEZADO':
+			case 'HITOS_ENCABEZADO': //GenerarDocumento2
 			    global $total_hitos,$estehito,$cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -6260,7 +6304,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;
 
-			case 'HITOS_FILAS':
+			case 'HITOS_FILAS': //GenerarDocumento2
 				global $total_hitos,$estehito,$cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
 				$query_hitos = "select * from (select  (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid, round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,  ifnull(cp.fecha_cobro,0) as fecha_cobro, cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  FROM `cobro_pendiente` cp join  contrato c using (id_contrato) join prm_moneda pm using (id_moneda) join cobro cbr using(id_contrato)  join (select @a:=0) FFF
 					where cp.hito=1 and cbr.id_cobro=".$this->fields['id_cobro'].") hitos where hitos.thisid!=0 ";
@@ -6284,7 +6328,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 				break;
 
-			case 'HITOS_TOTAL':
+			case 'HITOS_TOTAL': //GenerarDocumento2
 				global $total_hitos,$estehito,$cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
 				
 				$html = str_replace('%total%', __('Total'), $html);
@@ -6292,14 +6336,14 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;	
 
-			case 'ADELANTOS_ENCABEZADO':
+			case 'ADELANTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto%', __('Monto'), $html);
 				$html = str_replace('%saldo%', __('Saldo'), $html);
 				break;
 
-			case 'ADELANTOS_FILAS_TOTAL':
+			case 'ADELANTOS_FILAS_TOTAL': //GenerarDocumento2
 				$saldo = 0;
 				$monto_total = 0;
 				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
@@ -6339,7 +6383,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = $fila_adelantos;
 				break;
 
-			case 'COBROS_ADEUDADOS_FILAS_TOTAL':
+			case 'COBROS_ADEUDADOS_FILAS_TOTAL': //GenerarDocumento2
 				$saldo = 0;
 				$monto_total = 0;
 				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
@@ -6386,7 +6430,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = $fila_adelantos;
 				break;
 
-			case 'RESTAR_RETAINER':
+			case 'RESTAR_RETAINER': //GenerarDocumento2
 				if ($columna_hrs_retainer || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
 					$html = str_replace('%retainer%', __('Retainer'), $html);
 				else
@@ -6401,7 +6445,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_retainer%', '', $html);
 				break;
 
-			case 'DETALLE_COBRO_RETAINER':
+			case 'DETALLE_COBRO_RETAINER': //GenerarDocumento2
 				$html = str_replace('%horas_retainer%', 'Horas retainer', $html);
 				$html = str_replace('%valor_horas_retainer%', Utiles::horaDecimal2HoraMinuto($this->fields['retainer_horas']), $html);
 				$html = str_replace('%horas_adicionales%', 'Horas adicionales', $html);
@@ -6412,7 +6456,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valor_honorarios_adicionales%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . ($x_resultados['monto'][$this->fields['id_moneda']] - $x_resultados['monto_contrato'][$this->fields['id_moneda']]), $html);
 				break;
 
-			case 'DETALLE_TARIFA_ADICIONAL':
+			case 'DETALLE_TARIFA_ADICIONAL': //GenerarDocumento2
 				$tarifas_adicionales = $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . " ";
 
 				$query = "SELECT DISTINCT tarifa_hh FROM trabajo WHERE id_cobro = '" . $this->fields['id_cobro'] . "' ORDER BY tarifa_hh DESC";
@@ -6431,15 +6475,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valores_tarifa_adicionales%', $tarifas_adicionales, $html);
 				break;
 
-			case 'FACTURA_NUMERO':
+			case 'FACTURA_NUMERO': //GenerarDocumento2
 				$html = str_replace('%factura_nro%', __('Factura') . ' ' . __('N°'), $html);
 				break;
 
-			case 'NUMERO_FACTURA':
+			case 'NUMERO_FACTURA': //GenerarDocumento2
 				$html = str_replace('%nro_factura%', $this->fields['documento'], $html);
 				break;
 
-			case 'DETALLE_HONORARIOS':
+			case 'DETALLE_HONORARIOS': //GenerarDocumento2
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 				$duracion_cobrable_decimal = number_format($horas_cobrables + $minutos_cobrables / 60, 1, ',', '');
@@ -6458,13 +6502,13 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'DETALLE_TRAMITES':
+			case 'DETALLE_TRAMITES': //GenerarDocumento2
 				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$valor_tramites = $x_resultados['monto_tramites'][$this->fields['opc_moneda_total']];
 				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_GASTOS':
+			case 'DETALLE_GASTOS': //GenerarDocumento2
 				$html = str_replace('%gastos%', __('Gastos'), $html);
 				$total_gastos_moneda = 0;
 				$impuestos_total_gastos_moneda = 0;
@@ -6481,7 +6525,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL':
+			case 'DETALLE_COBRO_MONEDA_TOTAL': //GenerarDocumento2
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -6510,7 +6554,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_COBRO_DESCUENTO':
+			case 'DETALLE_COBRO_DESCUENTO': //GenerarDocumento2
 				/* $cobro_moneda array de monedas al tiempo de emitir/generar el cobro*/
 				if ($this->fields['descuento'] == 0) {
 					if (UtilesApp::GetConf($this->sesion, 'FormatoNotaCobroMTA') ) {
@@ -6578,7 +6622,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'RESUMEN_CAP':
+			case 'RESUMEN_CAP': //GenerarDocumento2
 				$monto_trabajo_con_descuento = $x_resultados['monto_trabajo_con_descuento'][$this->fields['id_moneda_monto']];
 
 				$monto_restante = $this->fields['monto_contrato'] - ( $this->TotalCobrosCap() + ($this->fields['monto_trabajos'] - $this->fields['descuento']) * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['tipo_cambio'] );
@@ -6597,7 +6641,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'COBROS_DEL_CAP':
+			case 'COBROS_DEL_CAP': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 
@@ -6622,7 +6666,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'ASUNTOS':
+			case 'ASUNTOS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 
@@ -6779,7 +6823,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES':
+			case 'TRAMITES': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				for ($k = 0; $k < count($this->asuntos); $k++) {
@@ -6846,7 +6890,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRABAJOS_ENCABEZADO':
+			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento2
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -7019,7 +7063,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%importe%', __('Importe'), $html);
 				break;
 
-			case 'TRAMITES_ENCABEZADO':
+			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -7064,7 +7108,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 				break;
 
-			case 'TRABAJOS_FILAS':
+			case 'TRABAJOS_FILAS': //GenerarDocumento2
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -7510,7 +7554,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES_FILAS':
+			case 'TRAMITES_FILAS': //GenerarDocumento2
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -7707,7 +7751,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 
-			case 'TRABAJOS_TOTAL':
+			case 'TRABAJOS_TOTAL': //GenerarDocumento2
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -7850,7 +7894,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TRAMITES_TOTAL':
+			case 'TRAMITES_TOTAL': //GenerarDocumento2
 				$horas_cobrables_tramites = floor(($asunto->fields['tramites_total_duracion_trabajado']) / 60);
 				$minutos_cobrables_tramites = sprintf("%02d", $asunto->fields['tramites_total_duracion_trabajado'] % 60);
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada']) / 60);
@@ -7873,7 +7917,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_PROFESIONAL':
+			case 'DETALLE_PROFESIONAL': //GenerarDocumento2
 				global $columna_hrs_retainer;
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
@@ -7894,7 +7938,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'RESUMEN_PROFESIONAL_ENCABEZADO':
+			case 'RESUMEN_PROFESIONAL_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%nombre%', __('Categoría profesional'), $html);
 				global $columna_hrs_trabajadas_categoria;
 				global $columna_hrs_retainer_categoria;
@@ -7913,7 +7957,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%hrs_mins_descontadas%', $columna_hrs_descontadas_categoria ? __('Hrs.:Mins. Descontadas') : '', $html);
 			// El resto se llena igual que PROFESIONAL_ENCABEZADO, pero tiene otra estructura, no debe tener 'break;'.
 
-			case 'PROFESIONAL_ENCABEZADO':
+			case 'PROFESIONAL_ENCABEZADO': //GenerarDocumento2
 				global $columna_hrs_trabajadas;
 				global $columna_hrs_retainer;
 				global $columna_hrs_descontadas;
@@ -8132,7 +8176,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'IMPUESTO':
+			case 'IMPUESTO': //GenerarDocumento2
 				if ($this->fields['porcentaje_impuesto'] > 0 && $this->fields['porcentaje_impuesto_gastos'] > 0 && $this->fields['porcentaje_impuesto'] != $this->fields['porcentaje_impuesto_gastos'])
 					$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% / ' . $this->fields['porcentaje_impuesto_gastos'] . '% )', $html);
 				else if ($this->fields['porcentaje_impuesto'] > 0)
@@ -8159,7 +8203,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'ADELANTOS_FILAS':
+			case 'ADELANTOS_FILAS': //GenerarDocumento2
 				$saldo = 0;
 				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
 
@@ -8216,7 +8260,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = $fila_adelantos;
 				break;
 
-			case 'PROFESIONAL_FILAS':
+			case 'PROFESIONAL_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				if (is_array($x_detalle_profesional[$asunto->fields['codigo_asunto']])) {
@@ -8451,7 +8495,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'PROFESIONAL_TOTAL':
+			case 'PROFESIONAL_TOTAL': //GenerarDocumento2
 				$retainer = false;
 				$descontado = false;
 				$flatfee = false;
@@ -8645,12 +8689,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%horas%', number_format($duracion_decimal, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_PROFESIONAL_RETAINER':
+			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumento2
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO':
+			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO': //GenerarDocumento2
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -8667,7 +8711,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 				
-			case 'RESUMEN_PROFESIONAL':
+			case 'RESUMEN_PROFESIONAL': //GenerarDocumento2
 				if( $this->fields['forma_cobro'] == 'ESCALONADA' ) {
 					$cobro_valores = array();
 	
@@ -9180,7 +9224,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
 			break;
 
-			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA':
+			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento2
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
 
@@ -9332,7 +9376,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			/*
 			  GASTOS -> esto sólo lista los gastos agregados al cobro obteniendo un total
 			 */
-			case 'GASTOS':
+			case 'GASTOS': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0)
 				
 				    return '';
@@ -9352,7 +9396,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;
 
-			case 'GASTOS_ENCABEZADO':
+			case 'GASTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td align="center" width="80">%monto_original%</td>', $html);
 
 				$query = "SELECT count(*) FROM cta_corriente WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND id_moneda != '" . $this->fields['opc_moneda_total'] . "' ";
@@ -9374,6 +9418,13 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%proveedor%','', $html);
 				}
 				
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
+				} else {
+					$html = str_replace('%td_solicitante%', '', $html);
+				}
+				
+				$html = str_replace('%solicitante%', __('Ordenado<br>Por'), $html);
 				$html = str_replace('%num_doc%', __('N° Documento'), $html);
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -9408,7 +9459,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'GASTOS_FILAS':
+			case 'GASTOS_FILAS':  //GenerarDocumento2
 				$html = str_replace('%td_monto_original%', $moneda_total->fields['id_moneda'] == $this->fields['id_moneda_base'] ? '' : '<td align="center">%monto_original%</td>', $html);
 
 				$row_tmpl = $html;
@@ -9436,13 +9487,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				if ($lista_gastos->num == 0) {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', '&nbsp;', $row);
-                                         $row = str_replace('%proveedor%', '&nbsp;' , $row);
+					$row = str_replace('%proveedor%', '&nbsp;' , $row);
+					$row = str_replace('%solicitante%', '&nbsp;' , $row);
 					$row = str_replace('%descripcion%', __('No hay gastos en este cobro'), $row);
 					$row = str_replace('%descripcion_b%', '(' . __('No hay gastos en este cobro') . ')', $row);
 					$row = str_replace('%monto_original%', '&nbsp;', $row);
 					$row = str_replace('%monto%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', '&nbsp;', $row);
+					
 /*VOUGA*/			 $row = str_replace('%valor_codigo_asunto%', $detalle->fields['codigo_asunto'], $row);
 					/*
 					 * Implementación Gastos con IVA y sin IVA
@@ -9479,7 +9532,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$monto_gastos_neto_por_asunto = 0;
 				$monto_gastos_impuesto_por_asunto = 0;
 				$monto_gastos_bruto_por_asunto = 0;
-				//var_dump ($x_cobro_gastos['gasto_detalle']);
+				
 				foreach ($x_cobro_gastos['gasto_detalle'] as $id_gasto => $detalle) {
 					if( UtilesApp::GetConf($this->sesion,'SepararGastosPorAsunto') && $asunto->separar_asuntos && !empty($asunto->fields['codigo_asunto']) && $asunto->fields['codigo_asunto'] != $detalle['codigo_asunto'] ) {
 						continue;
@@ -9488,14 +9541,19 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$row = str_replace('%fecha%', Utiles::sql2fecha($detalle['fecha'], $idioma->fields['formato_fecha']), $row);
 					$row = str_replace('%num_doc%', $detalle['numero_documento'], $row);
 					$row = str_replace('%tipo_gasto%', $detalle['tipo_gasto'], $row);
- 
- if(UtilesApp::GetConf($this->sesion,'MostrarProveedorenGastos')) {
-	 $row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
- } else {
-	 $row = str_replace('%proveedor%', '' , $row);
- }
- 
- 
+ 					
+					if(UtilesApp::GetConf($this->sesion,'MostrarProveedorenGastos')) {
+						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
+					} else {
+						$row = str_replace('%proveedor%', '' , $row);
+					}
+					
+					if ($this->fields['opc_ver_solicitante']) {
+						$row = str_replace('%solicitante%', $detalle['username'], $row);
+					} else {
+						$row = str_replace('%solicitante%', '' , $row);
+					}
+ 										
 					if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
 						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
 						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
@@ -9561,7 +9619,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'GASTOS_TOTAL':
+			case 'GASTOS_TOTAL': //GenerarDocumento2
 				global $monto_gastos_neto_por_asunto;
 				global $monto_gastos_impuesto_por_asunto;
 				global $monto_gastos_bruto_por_asunto;
@@ -9656,7 +9714,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
 			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
 			 */
-			case 'CTA_CORRIENTE':
+			case 'CTA_CORRIENTE': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
 
@@ -9671,7 +9729,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumento2($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_INICIAL':
+			case 'CTA_CORRIENTE_SALDO_INICIAL': //GenerarDocumento2
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 
 				$html = str_replace('%saldo_inicial_cuenta%', __('Saldo inicial'), $html);
@@ -9681,7 +9739,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_inicial_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_inicial, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%movimientos%', __('Movimientos del periodo'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -9689,7 +9747,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%ingreso%', __('Ingreso') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
@@ -9741,7 +9799,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL': //GenerarDocumento2
 				$html = str_replace('%total%', __('Total'), $html);
 				$gastos_moneda_total = $totales['total'];
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
@@ -9757,7 +9815,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_FINAL':
+			case 'CTA_CORRIENTE_SALDO_FINAL': //GenerarDocumento2
 				#Total de gastos en moneda que se muestra el cobro.
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 				$gastos_moneda_total = $totales['total'];
@@ -9770,7 +9828,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_final_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_final, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TIPO_CAMBIO':
+			case 'TIPO_CAMBIO': //GenerarDocumento2
 				if ($this->fields['opc_ver_tipo_cambio'] == 0)
 					return '';
 				//Tipos de Cambio
@@ -9783,7 +9841,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 			//facturas morosas
-			case 'MOROSIDAD':
+			case 'MOROSIDAD': //GenerarDocumento2
 				if ($this->fields['opc_ver_morosidad'] == 0)
 					return '';
 				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
@@ -9794,7 +9852,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%MOROSIDAD_TOTAL%', $this->GenerarDocumento2($parser, 'MOROSIDAD_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'MOROSIDAD_ENCABEZADO':
+			case 'MOROSIDAD_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', __('Folio Carta'), $html);
 				$html = str_replace('%numero_factura%', __('Factura'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -9802,7 +9860,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%monto_moroso%', __('Monto'), $html);
 				break;
 
-			case 'MOROSIDAD_FILAS':
+			case 'MOROSIDAD_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT cobro.id_cobro,cobro.documento, cobro.fecha_enviado_cliente,cobro.fecha_emision,
@@ -9876,7 +9934,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_HONORARIOS_TOTAL':
+			case 'MOROSIDAD_HONORARIOS_TOTAL': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -9890,7 +9948,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_GASTOS':
+			case 'MOROSIDAD_GASTOS': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -9904,7 +9962,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_TOTAL':
+			case 'MOROSIDAD_TOTAL': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -9917,9 +9975,10 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%monto_moroso%', $totales['simbolo_moneda_total'] . '&nbsp;' . number_format(($totales['gasto_adeudado'] + $totales['adeudado']), $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
+	
 				break;
 
-			case 'GLOSA_ESPECIAL':
+			case 'GLOSA_ESPECIAL': //GenerarDocumento2
 				if ($this->fields['codigo_idioma'] != 'en')
 					$html = str_replace('%glosa_especial%', 'Emitir cheque/transferencia a nombre de<br />
 														TORO Y COMPAÑÍA LIMITADA<br />
@@ -9964,7 +10023,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 		$html = $parser->tags[$theTag];
 
 		switch ($theTag) {
-			case 'INFORME':
+			case 'INFORME': //GenerarDocumento2
 				#INSERTANDO CARTA
 				$html = str_replace('%COBRO_CARTA%', $this->GenerarDocumentoComunCarta($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli,  $idioma, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html);
 				if (method_exists('Conf', 'GetConf')) {
@@ -10109,7 +10168,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CLIENTE':
+			case 'CLIENTE': //GenerarDocumento2
 
 				#se carga el primer asunto del cobro (solo usar con clientes que usan un contrato por cada asunto)
 				$asunto = new Asunto($this->sesion);
@@ -10219,7 +10278,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 				break;
 				
-				case 'ENDOSO':
+				case 'ENDOSO': //GenerarDocumento2
 						
 				//Necesario para moestrar numero de cuenta.
 				 
@@ -10258,7 +10317,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%numero_cuenta%',__('Numero Cuenta.'), $html);
 				break;
 			
-			case 'DETALLE_COBRO':
+			case 'DETALLE_COBRO': //GenerarDocumento2
 				if ($this->fields['opc_ver_resumen_cobro'] == 0)
 					return '';
 				#se cargan los nombres de los asuntos
@@ -10656,7 +10715,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 				//FFF Esto se hizo para Aguilar Castillo Love. Reparte HH y Gasto por asunto
-			case 'DESGLOSE_POR_ASUNTO_DETALLE':
+			case 'DESGLOSE_POR_ASUNTO_DETALLE': //GenerarDocumento2
 			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
 			/*	echo '<pre>';
@@ -10727,7 +10786,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					
 			    break;
 			//FFF Esto se hizo para Aguilar Castillo Love
-			case 'DESGLOSE_POR_ASUNTO_TOTALES':
+			case 'DESGLOSE_POR_ASUNTO_TOTALES': //GenerarDocumento2
 			global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo,$cifras_decimales;
 			
 			    $html = str_replace('%simbolo%',$simbolo, $html);    
@@ -10758,7 +10817,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_retainer%', '', $html);
 				break;
 
-			case 'DETALLE_COBRO_RETAINER':
+			case 'DETALLE_COBRO_RETAINER': //GenerarDocumento2
 				$monto_contrato_moneda_tarifa = number_format($this->fields['monto_contrato'] * $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$monto_cobro_menos_monto_contrato_moneda_tarifa = number_format($this->fields['monto'] - ($this->fields['monto_contrato'] * $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio']), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 
@@ -10772,7 +10831,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valor_honorarios_adicionales%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . number_format($monto_cobro_menos_monto_contrato_moneda_tarifa, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_TARIFA_ADICIONAL':
+			case 'DETALLE_TARIFA_ADICIONAL': //GenerarDocumento2
 				$tarifas_adicionales = $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . " ";
 
 				$query = "SELECT DISTINCT tarifa_hh FROM trabajo WHERE id_cobro = '" . $this->fields['id_cobro'] . "' ORDER BY tarifa_hh DESC";
@@ -10791,15 +10850,15 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%valores_tarifa_adicionales%', $tarifas_adicionales, $html);
 				break;
 
-			case 'FACTURA_NUMERO':
+			case 'FACTURA_NUMERO': //GenerarDocumento2
 				$html = str_replace('%factura_nro%', __('Factura') . ' ' . __('N°'), $html);
 				break;
 
-			case 'NUMERO_FACTURA':
+			case 'NUMERO_FACTURA': //GenerarDocumento2
 				$html = str_replace('%nro_factura%', $this->fields['documento'], $html);
 				break;
 
-			case 'DETALLE_HONORARIOS':
+			case 'DETALLE_HONORARIOS': //GenerarDocumento2
 				$horas_cobrables = floor(($this->fields['total_minutos']) / 60);
 				$minutos_cobrables = sprintf("%02d", $this->fields['total_minutos'] % 60);
 				$html = str_replace('%horas%', __('Total Horas'), $html);
@@ -10813,7 +10872,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'DETALLE_GASTOS':
+			case 'DETALLE_GASTOS': //GenerarDocumento2
 				$html = str_replace('%gastos%', __('Gastos'), $html);
 				$query = "SELECT SQL_CALC_FOUND_ROWS *
 								FROM cta_corriente
@@ -10843,7 +10902,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_TRAMITES':
+			case 'DETALLE_TRAMITES': //GenerarDocumento2
 				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$aproximacion_tramites = number_format($this->fields['monto_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
@@ -10851,7 +10910,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL':
+			case 'DETALLE_COBRO_MONEDA_TOTAL': //GenerarDocumento2
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -10900,7 +10959,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_COBRO_DESCUENTO':
+			case 'DETALLE_COBRO_DESCUENTO': //GenerarDocumento2
 				
 				if ($this->fields['descuento'] == 0) {
 					if (UtilesApp::GetConf($this->sesion, 'FormatoNotaCobroMTA') ) {
@@ -10966,7 +11025,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_honorarios_con_descuento%', $moneda->fields['simbolo'] . ' ' . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'RESUMEN_CAP':
+			case 'RESUMEN_CAP': //GenerarDocumento2
 				$monto_restante = $this->fields['monto_contrato'] - ( $this->TotalCobrosCap() + ($this->fields['monto_trabajos'] - $this->fields['descuento']) * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['tipo_cambio'] );
 
 				$html = str_replace('%cap%', __('Total CAP'), $html);
@@ -10982,7 +11041,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'COBROS_DEL_CAP':
+			case 'COBROS_DEL_CAP': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 
@@ -11007,7 +11066,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'ASUNTOS':
+			case 'ASUNTOS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 
@@ -11140,7 +11199,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES':
+			case 'TRAMITES': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				for ($k = 0; $k < count($this->asuntos); $k++) {
@@ -11221,7 +11280,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRABAJOS_ENCABEZADO':
+			case 'TRABAJOS_ENCABEZADO': //GenerarDocumento2
 				if ($this->fields['opc_ver_solicitante']) {
 					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
 				} else {
@@ -11372,7 +11431,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 				break;
 
-			case 'TRAMITES_ENCABEZADO':
+			case 'TRAMITES_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ($this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
@@ -11418,7 +11477,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%tarifa_fee%', __('%tarifa_fee%'), $html);
 				break;
 
-			case 'TRABAJOS_FILAS':
+			case 'TRABAJOS_FILAS': //GenerarDocumento2
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -11877,7 +11936,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'TRAMITES_FILAS':
+			case 'TRAMITES_FILAS': //GenerarDocumento2
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
 				global $categoria_valor;
@@ -12073,7 +12132,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 
-			case 'TRABAJOS_TOTAL':
+			case 'TRABAJOS_TOTAL': //GenerarDocumento2
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -12191,7 +12250,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . ' ' . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TRAMITES_TOTAL':
+			case 'TRAMITES_TOTAL': //GenerarDocumento2
 				$horas_cobrables_tramites = floor(($asunto->fields['tramites_total_duracion_trabajado']) / 60);
 				$minutos_cobrables_tramites = sprintf("%02d", $asunto->fields['tramites_total_duracion_trabajado'] % 60);
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada']) / 60);
@@ -12214,7 +12273,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'DETALLE_PROFESIONAL':
+			case 'DETALLE_PROFESIONAL': //GenerarDocumento2
 
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
@@ -12234,7 +12293,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'RESUMEN_PROFESIONAL_ENCABEZADO':
+			case 'RESUMEN_PROFESIONAL_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%nombre%', __('categoria_usuario'), $html);
 				global $columna_hrs_trabajadas_categoria;
 				global $columna_hrs_retainer_categoria;
@@ -12252,7 +12311,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%hrs_mins_descontadas%', $columna_hrs_descontadas_categoria ? __('Hrs.:Mins. Descontadas') : '', $html);
 			// El resto se llena igual que PROFESIONAL_ENCABEZADO, pero tiene otra estructura, no debe tener 'break;'.
 			
-				case 'PROFESIONAL_ENCABEZADO':
+				case 'PROFESIONAL_ENCABEZADO': //GenerarDocumento2
 				global $columna_hrs_trabajadas;
 				global $columna_hrs_retainer;
 				global $columna_hrs_descontadas;
@@ -12421,7 +12480,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				
 				break;
 
-			case 'IMPUESTO':
+			case 'IMPUESTO': //GenerarDocumento2
 				$html = str_replace('%impuesto%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '%)', $html);
 				$html = str_replace('%impuesto_mta%', __('Impuesto') . ' (' . $this->fields['porcentaje_impuesto'] . '% )', $html); 
 
@@ -12444,7 +12503,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_impuesto_honorarios%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . '&nbsp;' . number_format($impuesto_solo_honorarios, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'PROFESIONAL_FILAS':
+			case 'PROFESIONAL_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				if (is_array($profesionales)) {
@@ -12687,7 +12746,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'PROFESIONAL_TOTAL':
+			case 'PROFESIONAL_TOTAL': //GenerarDocumento2
 				$retainer = false;
 				$descontado = false;
 				$flatfee = false;
@@ -12816,12 +12875,12 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%horas%', number_format($duracion_decimal, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_PROFESIONAL_RETAINER':
+			case 'DETALLE_PROFESIONAL_RETAINER': //GenerarDocumento2
 				$html = str_replace('%retainer%', __('Retainer'), $html);
 				$html = str_replace('%valor_retainer%', $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['simbolo'] . ' ' . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$this->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO':
+			case 'DETALLE_COBRO_MONEDA_TOTAL_POR_ASUNTO': //GenerarDocumento2
 				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda'])
 					return '';
 
@@ -12837,7 +12896,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				break;
 
-			case 'RESUMEN_PROFESIONAL':
+			case 'RESUMEN_PROFESIONAL': //GenerarDocumento2
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
 				global $resumen_profesional_nombre;
@@ -13007,7 +13066,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $resumen_fila_total, $html);
 				break;
 
-			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA':
+			case 'RESUMEN_PROFESIONAL_POR_CATEGORIA': //GenerarDocumento2
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
 				global $resumen_profesional_nombre;
@@ -13158,7 +13217,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			/*
 			  GASTOS -> esto s?lo lista los gastos agregados al cobro obteniendo un total
 			 */
-			case 'GASTOS':
+			case 'GASTOS': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
 
@@ -13176,7 +13235,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumentoComun($parser, 'GASTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'GASTOS_ENCABEZADO':
+			case 'GASTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -13185,6 +13244,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto_original%', __('Monto'), $html);
 				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				$html = str_replace('%ordenado_por%', __('Ordenado<br>Por'), $html);
 /*VOUGA*/		if ($lang == 'es') {
 /*VOUGA*/		$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);		
 /*VOUGA*/		} else {
@@ -13193,9 +13253,16 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
+				
+				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
+				$html = str_replace('%proveedor%',__('Proveedor'), $html);
+				} else {
+					$html = str_replace('%proveedor%','', $html);
+				}
+				
 				break;
 
-			case 'GASTOS_FILAS':
+			case 'GASTOS_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				if (method_exists('Conf', 'SepararGastosPorAsunto') && Conf::SepararGastosPorAsunto()) {
@@ -13277,9 +13344,22 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
+				
+				if(UtilesApp::GetConf($this->sesion,'MostrarProveedorenGastos')) {
+						$row = str_replace('%proveedor%', $detalle['glosa_proveedor'], $row);
+					} else {
+						$row = str_replace('%proveedor%', '' , $row);
+					}
+					
+					if ($this->fields['opc_ver_solicitante']) {
+						$row = str_replace('%solicitante%', $detalle['username'], $row);
+					} else {
+						$row = str_replace('%solicitante%', '' , $row);
+					}
+					
 				break;
 
-			case 'GASTOS_TOTAL':
+			case 'GASTOS_TOTAL': //GenerarDocumento2
 				$html = str_replace('%total%', __('Total'), $html);
 				$html = str_replace('%glosa_total%', __('Total Gastos'), $html);
 /*VOUGA*/		if ($lang == 'es') {
@@ -13340,7 +13420,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
 			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
 			 */
-			case 'CTA_CORRIENTE':
+			case 'CTA_CORRIENTE': //GenerarDocumento2
 				if ($this->fields['opc_ver_gastos'] == 0)
 					return '';
 
@@ -13355,7 +13435,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumentoComun($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_INICIAL':
+			case 'CTA_CORRIENTE_SALDO_INICIAL': //GenerarDocumento2
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 
 				$html = str_replace('%saldo_inicial_cuenta%', __('Saldo inicial'), $html);
@@ -13365,7 +13445,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_inicial_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_inicial, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%movimientos%', __('Movimientos del periodo'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
@@ -13373,7 +13453,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%ingreso%', __('Ingreso') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
@@ -13425,7 +13505,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL':
+			case 'CTA_CORRIENTE_MOVIMIENTOS_TOTAL': //GenerarDocumento2
 				$html = str_replace('%total%', __('Total'), $html);
 				$gastos_moneda_total = $totales['total'];
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() ))) {
@@ -13441,7 +13521,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'CTA_CORRIENTE_SALDO_FINAL':
+			case 'CTA_CORRIENTE_SALDO_FINAL': //GenerarDocumento2
 				#Total de gastos en moneda que se muestra el cobro.
 				$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 				$gastos_moneda_total = $totales['total'];
@@ -13454,7 +13534,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					$html = str_replace('%valor_saldo_final_cuenta%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_final, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				break;
 
-			case 'TIPO_CAMBIO':
+			case 'TIPO_CAMBIO': //GenerarDocumento2
 				if ($this->fields['opc_ver_tipo_cambio'] == 0)
 					return '';
 				//Tipos de Cambio
@@ -13467,7 +13547,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				break;
 
 			//facturas morosas
-			case 'MOROSIDAD':
+			case 'MOROSIDAD': //GenerarDocumento2
 				if ($this->fields['opc_ver_morosidad'] == 0)
 					return '';
 				$html = str_replace('%titulo_morosidad%', __('Saldo Adeudado'), $html);
@@ -13478,7 +13558,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%MOROSIDAD_TOTAL%', $this->GenerarDocumentoComun($parser, 'MOROSIDAD_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma,  $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'MOROSIDAD_ENCABEZADO':
+			case 'MOROSIDAD_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', __('Folio Carta'), $html);
 				$html = str_replace('%numero_factura%', __('Factura'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
@@ -13486,7 +13566,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%monto_moroso%', __('Monto'), $html);
 				break;
 
-			case 'MOROSIDAD_FILAS':
+			case 'MOROSIDAD_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
 				$query = "SELECT cobro.id_cobro,cobro.documento, cobro.fecha_enviado_cliente,cobro.fecha_emision,
@@ -13560,7 +13640,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_HONORARIOS_TOTAL':
+			case 'MOROSIDAD_HONORARIOS_TOTAL': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -13574,7 +13654,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_GASTOS':
+			case 'MOROSIDAD_GASTOS': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -13588,7 +13668,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				break;
 
-			case 'MOROSIDAD_TOTAL':
+			case 'MOROSIDAD_TOTAL': //GenerarDocumento2
 				$html = str_replace('%numero_nota_cobro%', '', $html);
 				$html = str_replace('%numero_factura%', '', $html);
 				$html = str_replace('%fecha%', '', $html);
@@ -13603,7 +13683,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				$html = str_replace('%nota%', __('Nota: Si al recibo de esta carta su cuenta se encuentra al día, por favor dejar sin efecto.'), $html);
 				break;
 
-			case 'GLOSA_ESPECIAL':
+			case 'GLOSA_ESPECIAL': //GenerarDocumento2
 				if ($this->fields['codigo_idioma'] != 'en')
 					$html = str_replace('%glosa_especial%', 'Emitir cheque/transferencia a nombre de<br />
 														TORO Y COMPAÑÍA LIMITADA<br />
@@ -13624,7 +13704,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 				
 				
-			case 'SALTO_PAGINA':
+			case 'SALTO_PAGINA': //GenerarDocumento2
 				//no borrarle al css el BR.divisor
 				break;
 		}

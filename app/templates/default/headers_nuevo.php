@@ -55,16 +55,16 @@ google.load("jquery","1.7");
 </script>
  		<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
 
-        <script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
-        <script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
-		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
-		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
+        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
+        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
+		<script  type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
+		<script  type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
 		
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	
 <style type="text/css">
-.divloading {display:block;width:100%;height:120px;text-align:center;margin:50px auto;background:url('https://static.thetimebilling.com/templates/cargando.gif') 50% 50% no-repeat;}
+.divloading {display:block;width:100%;height:120px;text-align:center;margin:50px auto;background:url('https://estaticos.thetimebilling.com/templates/cargando.gif') 50% 50% no-repeat;}
 .tb_facebook {	background: url(https://static.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
 .non_popup {background: url(https://static.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
@@ -72,7 +72,7 @@ google.load("jquery","1.7");
 .alignright {text-align:right;font-size:10px;}
 .aligncenter {display:block;text-align:center;margin:auto;}
 #zenbox_tab {overflow: hidden; border: 0 none !important;}
-#mainttb {background:white;padding: 30px 0 5px ;width: 960px;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;}
+#mainttb {background:white;padding: 30px 0 5px ;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;text-align:center;}
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
 .cont_tabla {padding:0 20px; background-color: #FFFFFF;text-align:center;margin:5px auto;}
 .cont_tabla table {margin-left:auto;margin-right:auto;}
@@ -85,7 +85,7 @@ google.load("jquery","1.7");
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
 .vpx {display:block;height:5px;content:' ';}
 .loadingbar {color:transparent;background: url('https://static.thetimebilling.com/images/loading_bar.gif') 0 0; -webkit-appearance: none;}
-.droplinetabs a {margin-bottom:-3px !important;font-size:11px !important;} 
+.droplinetabs a {margin-bottom:-3px !important;font-size:11px !important;border-radius: 5px 5px 0 0;} 
 .droplinetabs ul > li {display:inline-block !important;margin-left:-3px;}
 .droplinetabs ul li a {display:inline-block !important;text-decoration:none;}
 .barra_fija, #fd_menu_grey {width:960px;border-bottom-left-radius:0;border-bottom-right-radius:0;height:28px !important;overflow:hidden;}
@@ -94,14 +94,17 @@ google.load("jquery","1.7");
 .droplinetabs ul li ul li a {padding-right:11px !important;padding-left:8px !important}
 .mini_input {height: 18px; margin: -1px 0 0 -1px;font-size:10px;}
 .updown {position: relative;margin: -2px 0 0 0px;left: 260px;top: -20px;}
- #colleft { overflow-x: hidden;margin: auto;width:950x;}
- #cajafacturas  { width:950px;border: 1px solid #bfbfcf;}
+ #colleft { overflow-x: hidden;margin: auto;width:945px;}
+ #cajafacturas  {width: 945px;
+border: 1px solid #BFBFCF;
+margin: 0;}
 #cajafacturas td, #cajafacturas th {font-size:8pt !important; border-collapse:collapse;border:1px solid #F9F9F9;}
 #cobro6colderecha {   float: right;margin: 5px  0px 0 25px;width: 230px;background-color: white;position: relative;right: 2px;}
-#colmask {width:955px;overflow:hidden;clear:both;margin:auto;}
-#historial {margin:5px 0 0 -10px;width:700px;float:left;}
+#colmask {width:945px;overflow:hidden;clear:both;margin:auto;position:relative;left:-10px;}
+#historial {margin:5px 0 0 0px;width:680px;float:left;}
 .z10 {position:relative;z-index:10;background:white;}
-#estadoscobro { border: 1px solid #CCC; background:#EEE;height:35px;width:950px;position:relative;margin:0px -2px 5px -2px;}
+#estadoscobro {border: 1px solid #CCC;background: #EEE;height: 35px;width: 945px;position: relative;margin: 0px -2px 5px 0px;}
+
 </style>
 
 

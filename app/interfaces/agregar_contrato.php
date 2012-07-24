@@ -300,6 +300,10 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit('notificar_otros_correos', $notificar_otros_correos);
 
 	$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0': '1');
+	
+	if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+		$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+	}
 
 	if ($contrato->Write()) {
 		// cobros pendientes
@@ -409,7 +413,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
                 if(!form)
 			var form = $('formulario');
 
-		 
+
 <?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
 		if (!validar_doc_legales(true)){
 			return false;
@@ -454,7 +458,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 					return false;
 				}
 				<?php } ?>
-				
+
 				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
 				if(!form.factura_comuna.value)
 				{
@@ -1573,10 +1577,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	}
 
 	var mismoEncargado = <?php echo  UtilesApp::GetConf($sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
-	var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") )?'1':'0';?>;	
-	var EncargadoSecundario=<?php echo (UtilesApp::GetConf($sesion, "EncargadoSecundario") )?'1':'0';?>;	
+var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") )?'1':'0';?>;	
+var EncargadoSecundario=<?php echo (UtilesApp::GetConf($sesion, "EncargadoSecundario") )?'1':'0';?>;	
     var DesdeAgregaCliente=<?php echo ($desde_agrega_cliente )?'1':'0';?>;	
-	
+			
 	function CambioEncargado(elemento){
 
 	
@@ -1594,20 +1598,20 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				$('id_usuario_encargado').value = $('id_usuario_responsable').value;
 				if(jQuery('#id_usuario_encargado').length>0) jQuery('#id_usuario_encargado').attr('disabled','disabled');
 			 }  
-		 
+		
 		 
 		} else { 
-			if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
+		if(mismoEncargado && $('id_usuario_secundario').value == '-1' ){			
 					if(confirm('¿Desea cambiar también el <?php echo  __('Encargado Secundario'); ?> ?')){
 						if(EncargadoSecundario)  {
-							$('id_usuario_secundario').value = $('id_usuario_responsable').value;
+					$('id_usuario_secundario').value = $('id_usuario_responsable').value;
 						} else { 
-							$('id_usuario_encargado').value = $('id_usuario_responsable').value;
-						} 
+					$('id_usuario_encargado').value = $('id_usuario_responsable').value;
+			}
 					} else {
-						mismoEncargado = false;
-					}
-				}
+				mismoEncargado = false;
+			}
+		}
 			
 		 	
 		} 
@@ -1628,7 +1632,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		});
 		var btn = nuevo.down('[src$="mas.gif"]');
 		btn.src = btn.src.replace('mas.gif', 'eliminar.gif');
-		
+
 		/*   btn.onclick=eliminarHito(this); */
 		var onclick = btn.getAttribute("onclick");  
 				
@@ -1766,13 +1770,13 @@ if (!$contrato->loaded()) {
 				</tr>
 					<?php
 				}
-	if( $contrato->Loaded()) {
-		$separar_liquidaciones = $contrato->fields['separar_liquidaciones'];
-        }
-				else if( UtilesApp::GetConf($sesion,'SepararLiquidacionesPorDefecto') ) {
+
+				if ($contrato->Loaded()) {
+					$separar_liquidaciones = $contrato->fields['separar_liquidaciones'];
+					$exportacion_ledes = $contrato->fields['exportacion_ledes'];
+				} else if( UtilesApp::GetConf($sesion,'SepararLiquidacionesPorDefecto') ) {
 					$separar_liquidaciones = '1';
-				}
-				else {
+				} else {
 					$separar_liquidaciones = '0';
 				}
 				?>
@@ -1794,30 +1798,30 @@ if (!$contrato->loaded()) {
 									 ?>
 				</td>
 				<td align="left" width = '70%'>
-<?php 
+				<?php 
 if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
 	echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 	echo '(Se copia del contrato principal)';
 	echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
-} else {
-	if ($contrato_defecto->Loaded() && $contrato->Loaded()) {
-		if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente) {
-			echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
+					} else { 
+						if ( $contrato_defecto->Loaded() && $contrato->Loaded()){ 							
+							if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && !$desde_agrega_cliente ) {
+								echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 			echo '<input type="hidden" value="' . $contrato_defecto->fields['id_usuario_responsable'] . '" name="id_usuario_responsable" />';
 			echo '(Se copia del contrato principal)';
-		} else {
+							} else {
 			//FFF si estoy agregando o editando un asunto que se cobra por separado
 			echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
-		}
-	} else if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
+								}
+						 } else if ( UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto')  && $desde_agrega_cliente ) {
 		// Estoy creando un cliente (y su contrato por defecto). 
-		echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
-	} else {
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", 'onchange="CambioEncargado(this)"', "Vacio", "200");
+						 } else {
 
-		echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', '', "Vacio", "200");
-	}
-}
-?>
+							 echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : '', '', "Vacio", "200");
+						 }
+					} 
+				?>
 				</td>
 			</tr>
 			<?php
@@ -1837,7 +1841,17 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 						<?php echo  Html::SelectQuery($sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', "", "Vacio", "200"); ?>
 					</td>
 				</tr>
-					<?php } ?>
+			<?php } ?>
+			<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
+				<tr>
+					<td align="left">
+						<?php echo __('Usa exportación LEDES'); ?>
+					</td>
+					<td align="left">
+						<input id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo  $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
+					</td>
+				</tr>
+			<?php } ?>
 		</table>
 		<br><br>
 		<!-- FIN RESPONSABLE -->
@@ -1968,7 +1982,7 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 ?>                
 				<tr>
 					<td align="right" colspan="1">
-                        <?php echo  __('Banco') ?>
+<?php echo  __('Banco') ?>
 					</td>
 					<td align="left" colspan="2">
 						<?php echo  Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco",  $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
@@ -1984,7 +1998,7 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 						<?php echo  Html::SelectQuery($sesion, $query_cuenta_banco, "id_cuenta", $contrato->fields['id_cuenta'] ? $contrato->fields['id_cuenta'] : $id_cuenta, '', $tiene_banco ? "" : "Cualquiera", "150") ?>
 					</td>
 				</tr>
-<?php
+<?php 
 	if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) { 
 		 $id_banco = false;
 		if( $contrato->fields['id_cuenta2'] && is_numeric($contrato->fields['id_cuenta2']) )  {
@@ -1992,10 +2006,10 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 			$result = mysql_query($query_banco, $sesion->dbh);
 
 			if ( ! $result ) {
-			} else {
+	} else {
 				$result = mysql_fetch_object($result);
 				$id_banco2 = $result->id_banco;
-			}
+	}
 		}
 
 		if ( $id_banco2 ) {

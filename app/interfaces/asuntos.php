@@ -304,6 +304,8 @@ if ($buscar || $opc == "entregar_asunto") {
 			$activo = 0;
 		$where .= " AND a1.activo = $activo ";
 	}
+	
+	
 	if ($_POST['cobrable']=='SI') {
 				$where .= " AND a1.cobrable=1  ";
 	} else if  ($_POST['cobrable']=='NO') {
@@ -381,7 +383,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	else
 		$x_pag = 10;
 	
-	//echo $query;
+	//echo $query; 
 	$b = new Buscador($sesion, $query, "Asunto", $desde, $x_pag, $orden);
 	$b->formato_fecha = "$formato_fecha";
 	$b->mensaje_error_fecha = "N/A";

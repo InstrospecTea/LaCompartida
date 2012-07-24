@@ -213,22 +213,32 @@
 			if(($Ordenado_por==1 || $Ordenado_por==2) && $t){
 				$t->Edit('solicitante',$solicitante);
 			}
-
+		
 			if($t) {
-			$t->Edit('descripcion',$descripcion);
-			$t->Edit('fecha',Utiles::fecha2sql($fecha));
+				$t->Edit('descripcion',$descripcion);
+				$t->Edit('fecha',Utiles::fecha2sql($fecha));
 			}
 			$tramite->Edit('descripcion',$descripcion);
 			$tramite->Edit('fecha',Utiles::fecha2sql($fecha));			
 			#$t->Edit('fecha',$fecha);
-			if($codigo_actividad && $t)
-				$t->Edit('codigo_actividad',$codigo_actividad);
+			if(isset($codigo_actividad)){
+				$tramite->Edit('codigo_actividad', $codigo_actividad ? $codigo_actividad : 'NULL');
+				if($t){
+					$t->Edit('codigo_actividad', $codigo_actividad ? $codigo_actividad : 'NULL');
+				}
+			}
+			if(isset($codigo_tarea)){
+				$tramite->Edit('codigo_tarea', $codigo_tarea ? $codigo_tarea : 'NULL');
+				if($t){
+					$t->Edit('codigo_tarea', $codigo_tarea ? $codigo_tarea : 'NULL');
+				}
+			}
 			if($revisado) {
 				if($t) {
-				$t->Edit('revisado',1);
+					$t->Edit('revisado',1);
 				}
 				$tramite->Edit('revisado',1);
-				}
+			}
 		
 			if(!$cobrable) {
 				$tramite->Edit('cobrable','0');
@@ -1275,6 +1285,31 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
     <tr nowrap>
     	<td align=right nowrap>Tipo Trámite </td><td width="440" align=left id='seleccion_tramite_text_2'>
     		<?php echo Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
+			</td>
+		</tr>
+	<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
+    <tr>
+        <td align=right>
+            <?php echo __('Actividad'); ?>
+        </td>
+        <td align=left width="440" nowrap>
+            <?php echo InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $tramite->fields['codigo_actividad']); ?>
+        </td>
+    </tr>
+	<tr>
+		<td align=right>
+			<?php echo __('Código UTBMS'); ?>
+		</td>
+		<td align=left width="440" nowrap>
+			<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_TASK', "codigo_tarea", $tramite->fields['codigo_tarea']); ?>
+		</td>
+	</tr>
+    <?php }
+    $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
+    ?>
+    <tr nowrap>
+    	<td align=right nowrap>Tipo Trámite </td><td width="440" align=left id='seleccion_tramite_text_2'>
+    		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
 			</td>
 		</tr>
   	<?php 
