@@ -196,7 +196,7 @@ td.sorting_1 {background:transparent !important;}
     			
 				 botones+= "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
 				}
-			   		return botones+" rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>&nbsp;<a style='float:right;display:inline;' href='usuario_paso2.php?rut="+o.aData['rut']+"' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
+			   		return botones+" rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut="+o.aData['rut']+"' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
 	},   "sClass": "dttactivo", "bUseRendered": false, "aTargets": [ 15 ]   }  ,
 	{  "fnRender": function ( o, val ) {
 			   	if(val==1) {
@@ -512,7 +512,9 @@ function Listar( form, from )
 			<form action="usuario_paso2.php" method="post">
 <?php  } ?>
 </table>
-<table width=100% class="tb_base">
+<br class="clearfix"/>
+<br>
+<table  width="100%" class="tb_base">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="2">
 			<?php echo __('Ingrese ') . UtilesApp::GetConf($sesion,'NombreIdentificador') . __(' del usuario')?>:
@@ -537,11 +539,9 @@ function Listar( form, from )
 			?>
 		</td>
 	</tr>
-	<tr>
-		<td valign="top"><img src="https://files.thetimebilling.com/templates/default/img/pix.gif" border="0" width="1" height="5" alt='' /></td>
-	</tr>
+	 
 </table>
-<br/>
+<br class="clearfix"/>
 <table width=100% class="tb_base">
 </form>
 				</td>
