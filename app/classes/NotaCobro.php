@@ -2,8 +2,8 @@
 	require_once dirname(__FILE__).'/../conf.php';
 
 	require_once  dirname(__FILE__).'/Cobro.php';
-	require_once Conf::ServerDir().'/../app/classes/MontoEnPalabra.php';
-
+	require_once('Numbers/Words.php');
+	
  
 class NotaCobro extends Cobro {
 
@@ -1354,10 +1354,13 @@ class NotaCobro extends Cobro {
 					}
 				}
 				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
-
+				
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
-				$fecha_lang_mta = str_replace('Bogota,', 'Bogotá, D.C.,', $fecha_lang);
+				$fecha_lang_mta = 'Bogotá, D.C.,' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y') );
+				$actual_locale = setlocale(LC_ALL, 0);
+				$fecha_lang_mta_en = (setlocale(LC_ALL, 'en_US.UTF-8')) ? "Bogotá, " . strftime('%B %e, %Y') : $fecha_lang_mta ; setlocale(LC_ALL, "$actual_locale");
 				$html2 = str_replace('%fecha_especial_mta%', $fecha_lang_mta, $html2);
+				$html2 = str_replace('%fecha_especial_mta_en%', $fecha_lang_mta_en, $html2);
 							
 				$html2 = str_replace('%fecha_al%', $fecha_al, $html2);
 				$html2 = str_replace('%fecha_al_minuscula%', strtolower($fecha_al), $html2);
@@ -1377,10 +1380,11 @@ class NotaCobro extends Cobro {
 				$html2 = str_replace('%fecha_mta%', $fecha_mta_facturacion, $html2);
 				$html2 = str_replace('%fecha_mta_dia%', $fecha_mta_dia, $html2);
 				$html2 = str_replace('%fecha_mta_mes%', $fecha_mta_mes, $html2);
-				$html2 = str_replace('%fecha_mta_agno%', $fecha_mta_agno, $html2);		
+				$html2 = str_replace('%fecha_mta_agno%', $fecha_mta_agno, $html2);
 				
-				
-				
+				$fecha_facturacion_carta = $this->fields['fecha_facturacion'] ? Utiles::fecha2sql($this->fields['fecha_facturacion'], '%d de %B de %Y') : $fecha_facturacion_carta;
+				$html2 = str_replace('%fecha_facturacion%', $fecha_facturacion_carta, $html2);
+								
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
 				$html2 = str_replace('%fecha_dia_carta%', $fecha_dia_carta, $html2);
@@ -1417,9 +1421,19 @@ class NotaCobro extends Cobro {
 				$cobro_id_moneda = $this->fields['opc_moneda_total'];
 				
 				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
-				$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_mta, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
-				
-				$html2 = str_replace('%monto_en_palabras%', __($monto_total_palabra), $html2);
+				$decimales_monto = $total_mta - (int)$total_mta;
+				$monto_total_palabra = Numbers_Words::toWords( (int)$total_mta,"es") . ' ' .  ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " con $decimales_monto/100" : '' );
+				//$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_mta, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+				$monto_total_palabra_en = Numbers_Words::toWords( (int)$total_mta,"en_US") . ' ' .  ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " and $decimales_monto/100" : '' );
+				$cambio_monedas_texto_en = array(
+													'dólar' => 'dollar', 'Dólar' => 'Dolar', 'DÓLAR' => 'DOLLAR', 
+													'dólares' => 'dollars', 'Dólares' => 'Dollars', 'DÓLARES' => 'DOLLARS', 
+													'libra' => 'pound', 'Libra' => 'Pound', 'LIBRA' => 'POUND',
+													'libras' => 'pounds', 'Libras' => 'Pounds', 'LIBRAS' => 'POUNDS'
+				);
+				$monto_total_palabra_en = strtr($monto_total_palabra_en, $cambio_monedas_texto_en);
+				$html2 = str_replace('%monto_en_palabras%', __(strtoupper($monto_total_palabra)), $html2);
+				$html2 = str_replace('%monto_en_palabras_en%', __(strtoupper($monto_total_palabra_en)), $html2);
 				
 				$moneda_opc_total = new Moneda($this->sesion);
 				$moneda_opc_total->Load($this->fields['opc_moneda_total']);
@@ -7305,7 +7319,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 						$row = str_replace('%duracion_decimal_trabajada%', '', $row);
 						$row = str_replace('%duracion_trabajada%', '', $row);
-						$row = str_replace('%duracion_decimal_descontada%', '', $row);
+						$row = str_replace('%duracion_decduracion_trabajadaimal_descontada%', '', $row);
 						$row = str_replace('%duracion_descontada%', '', $row);
 
 						if (!$this->fields['opc_ver_horas_trabajadas']) {
