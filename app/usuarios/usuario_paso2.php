@@ -738,6 +738,8 @@ if (!empty($usuario_vacaciones)) {
 		</fieldset>
 	</form>
 	<?php
+	if($sesion->usuario->fields['rut']=='99511620')  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
+	
 }
 
 function CargarPermisos() {
@@ -845,4 +847,4 @@ function CargarPermisos() {
 </script>
 <?php
 $pagina->PrintBottom();
-?>
+
