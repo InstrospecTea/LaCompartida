@@ -979,43 +979,38 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 		}
 	}
 		
-		function revisaidioma()
+	function revisaidioma()
+	{
+		var IdiomaGrande=<?php echo UtilesApp::GetConf($sesion, 'IdiomaGrande'); ?>;
+		if(http.readyState == 4)
 		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-				if( response.length > 0 ) {
-					var idio = response.split("|");
-<?php 
-		if( UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
-			$IdiomaGrande = UtilesApp::GetConf($sesion, 'IdiomaGrande');
-		} else {
-			$IdiomaGrande = false;
-		}
-
-		if($IdiomaGrande)
-		{
-?>
+			var response = http.responseText;
+			if( response.length > 0 ) {
+				var idio = response.split("|");
+				
+				
+				if(IdiomaGrande)
+				{
+					
 					txt_span.innerHTML = idio[1];
-<?php 
-		}
-		else
-		{
-?>
+					
+				}
+				else
+				{
+					
 					txt_span.innerHTML = 'Idioma: '+idio[1];
-
+					
 					if(idio[1]=='Español') {
 						googie2.setCurrentLanguage('es');
-					}
-					if(idio[1]=='Inglés') {}
+					} else 	if(idio[1]=='Inglés') {
 						googie2.setCurrentLanguage('en');
 					}
-<?php 
-		}
-?>
+					
 				}
+				
 			}
-
+		}
+	}
 
 	function ActualizaCobro(valor)
 	{
