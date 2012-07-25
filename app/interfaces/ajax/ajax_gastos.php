@@ -15,14 +15,14 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 	$arrayorden=array( 0 => 'fecha', 1 =>'glosa_cliente',5 =>'egreso',6 => 'ingreso',7 =>'con_impuesto', 8 =>'estado',10 =>'cobrable');
 	$orden = $arrayorden[intval($_REQUEST['iSortCol_0'])]. " ".$_REQUEST['sSortDir_0'];
 	
-    if($where=='') $where=1;
+    if(!isset($where) || (isset($where) && $where=='')) $where=1;
 	if($_REQUEST['opc']=='actualizagastos') {
-		
+		$sesion->phpConsole(1);
 		$whereclause=base64_decode($_POST['whereclause']);
-		$querypreparar="update cta_corriente ";
-							/*join asunto using(codigo_asunto) 
+		$querypreparar="update cta_corriente 
+							join asunto using(codigo_asunto) 
 							join contrato on contrato.id_contrato=asunto.id_contrato
-							join cliente on contrato.codigo_cliente=asunto.codigo_cliente ";*/
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente ";
 							
 		$setclause=' set cta_corriente.fecha_touch=now() ';
 		if(isset($_POST['montocastigar'])) $setclause.=', cta_corriente.monto_cobrable=0';
@@ -35,7 +35,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		
 		
 		$querypreparar.=$setclause.' WHERE '.$whereclause;
-		echo $querypreparar;
+		
 			
 			$query =$sesion->pdodbh->prepare($querypreparar);
 
@@ -98,7 +98,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 				$where .= " AND cta_corriente.egreso>0";
 			}
 			if($cobrado == 'NO')
-				$where .= " AND cta_corriente.id_cobro is null ";
+				$where .= " AND (cta_corriente.id_cobro is null OR  cta_corriente.estadocobro  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
 			if($cobrado == 'SI')
 				$where .= " AND cta_corriente.id_cobro is not null AND cta_corriente.estadocobro in ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL','PAGADO', 'ENVIADO AL CLIENTE' ,'INCOBRABLE') ";
 			if($codigo_asunto && $lista_asuntos)
