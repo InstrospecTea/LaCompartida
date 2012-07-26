@@ -112,7 +112,7 @@ $query = "SELECT cliente.glosa_cliente
 						, prm_documento_legal.codigo as tipo
 						, $numero_factura";
 if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-	$query .= "			, cliente as cliente_facturable";
+	$query .= "			, cliente as cliente_facturable, rut_cliente";
 }
 $query .= "			, '' glosa_asunto
 						, '' codigo_asunto
@@ -236,7 +236,7 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 if (UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion')) {
 	$columnas = explode(',', UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion'));
 } else {
-	$columnas = array('glosa_cliente', 'fecha', 'tipo', 'numero', 'cliente_facturable', 'glosa_asunto', 'codigo_asunto', 'encargado_comercial',
+	$columnas = array('glosa_cliente', 'fecha', 'tipo', 'numero', 'cliente_facturable', 'rut_cliente','glosa_asunto', 'codigo_asunto', 'encargado_comercial',
 		'descripcion', 'id_cobro','iva', 'total', 'monto_real', 'observaciones', 'saldo_pagos', 'saldo', 'fecha_ultimo_pago', 'estado_glosa');
 }
 // Crear worksheet
