@@ -1,4 +1,6 @@
-<?
+<?php
+	set_time_limit(300);
+
 	require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -13,12 +15,6 @@
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('REV','ADM') );
-	
-   set_time_limit(150);
-
-    $pagina = new Pagina( $sesion );
-
-    #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
     $wb = new Spreadsheet_Excel_Writer();
 
