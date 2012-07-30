@@ -1,4 +1,6 @@
-<?
+<?php
+	ini_set('max_execution_time', 300);
+	
 	require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -13,11 +15,7 @@
     require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('REV','ADM') );
-
-    $pagina = new Pagina( $sesion );
-
-    #$key = substr(md5(microtime().posix_getpid()), 0, 8);
-
+	
     $wb = new Spreadsheet_Excel_Writer();
 
     $wb->send('Planilla_Asuntos_Factura.xls');
