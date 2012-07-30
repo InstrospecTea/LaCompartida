@@ -1,4 +1,6 @@
-<?php 
+<?php
+	ini_set('max_execution_time', 300);
+	
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
