@@ -221,9 +221,16 @@
 		</tr>
 		<tr>
 			<td align=center colspan="2">
-				<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='SOC' ORDER BY apellido1", "usuarios[]", $usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+				<?=Html::SelectQuery($sesion,	"SELECT 
+													usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+												FROM 
+													usuario JOIN usuario_permiso USING(id_usuario)
+												WHERE
+													codigo_permiso='SOC' 
+												AND 
+													usuario.activo = 1
+												ORDER BY 
+													apellido1", "usuarios[]", $usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
 			</td>
 		</tr>
 		<tr>

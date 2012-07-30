@@ -1,4 +1,4 @@
-<?
+<?php
     require_once 'Spreadsheet/Excel/Writer.php';
     require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -23,8 +23,8 @@
 	{
 		$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
 		$fecha_m = ''.$fecha_mes;
-		$fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
-		$fecha_ini = "01-".$fecha_m."-".$fecha_anio;	
+		/*$fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
+		$fecha_ini = "01-".$fecha_m."-".$fecha_anio;*/	
 	}
 	else
 	{
