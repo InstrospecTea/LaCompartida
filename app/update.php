@@ -73,21 +73,7 @@ function ejecutar($queries, $dbh) {
 	}
 }
 
-/**
- * recibe una lista de queries (o una), las va ejecutando y si falla tira una excepcion con el error
- * @param mixed $queries
- * @throws Exception 
- */
-function ejecutar($queries, $dbh){
-	if(!is_array($queries)){
-		$queries = array($queries);
-	}
-	foreach ($queries as $q) {
-		if (!($res = mysql_query($q, $dbh) )) {
-			throw new Exception($q . "---" . mysql_error());
-		}
-	}
-}
+
 
 function Actualizaciones( &$dbh, $new_version )
 {
