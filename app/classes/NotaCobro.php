@@ -1053,6 +1053,7 @@ class NotaCobro extends Cobro {
 					$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 					$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 				}
+				$html2 = str_replace('%email_contacto%', $contrato->fields['email_contacto'], $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				if (strtolower($contrato->fields['titulo_contacto']) == 'sra.' || strtolower($contrato->fields['titulo_contacto']) == 'srta.')
 					$html2 = str_replace('%estimado%', __('Estimada'), $html2);
