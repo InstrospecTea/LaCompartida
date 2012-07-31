@@ -23,7 +23,7 @@
 		$root = Conf::RootDir();
 		for($j=0; $row = mysql_fetch_assoc($resp2);$j++)
 		{
-			$home_html.= ' <a id="'.  $row['codigo'] .'" href="/'.ROOTDIR. $row['url'].'" style="color: #000; text-decoration: none;">- '.$row['glosa'].'</a><br/>';
+			$home_html.= ' <a id="'.  $row['codigo'] .'" href="'.$root. $row['url'].'" style="color: #000; text-decoration: none;">- '.$row['glosa'].'</a><br/>';
 		}
 		$home_html.=" </td></tr></table>		</td>	</tr>	</table></td>";
 		$ind =$i+1;
