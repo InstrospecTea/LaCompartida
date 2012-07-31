@@ -67,9 +67,10 @@
 	   $_GET['lastver'] = 1;
 	    include(Conf::ServerDir().'/update.php');
 		
-	    } 
-		
+			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../../') .'</b><br>';
 		if(function_exists('svn_status')) print_r(svn_status( dirname(__FILE__)  ));
+	    } 
+	
 		
 		
 		
