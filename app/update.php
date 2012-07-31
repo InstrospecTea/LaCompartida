@@ -9447,6 +9447,7 @@ if (isset($_GET['lastver'])) {
 
 	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1])
 		die('Credenciales inválidas.');
+	$sesion = new Sesion();
 
  $versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
 			 $dato=$versiondb->fetch();
@@ -9456,7 +9457,7 @@ if (isset($_GET['lastver'])) {
 	if (!isset($VERSION) or $VERSION < 0.01)
 		die('Error en la versión del software.');
 
-	$sesion = new Sesion();
+	
 
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
