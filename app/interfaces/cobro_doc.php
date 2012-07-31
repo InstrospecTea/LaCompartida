@@ -56,8 +56,7 @@
 							AND cobro.id_cobro='".$cobro->fields['id_cobro']."'";
 		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$Sesion->dbh);
 		list($total_monto_trabajado) = mysql_fetch_array($resp);
-		if( $asunto->fields['trabajos_total_duracion'] > 0 )
-		{
+		if( $asunto->fields['trabajos_total_duracion'] > 0 )		{
 			$solo_gastos=false;
 		}
 	}
@@ -78,18 +77,27 @@
 		$id_formato = $cobro->fields['id_formato'];
 	}
 
-		
+
 	$html .= $cobro->GeneraHTMLCobro(false,$id_formato);
 	$cssData = UtilesApp::TemplateCartaCSS($Sesion,$cobro->fields['id_carta']);
 	$cssData .= UtilesApp::CSSCobro($Sesion,$id_formato);
 	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $Sesion, $cobro->fields['id_carta']);
 	
+	if( UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != 0 && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != $id_formato ) {
+		$nuevo_id = UtilesApp::GetConf($Sesion, 'SegundaNotaCobro');
+		$html2 .= $cobro->GeneraHTMLCobro(false,$nuevo_id);
+		$cssData2 = UtilesApp::TemplateCartaCSS($Sesion,$cobro->fields['id_carta']);
+		$cssData2 .= UtilesApp::CSSCobro($Sesion,$nuevo_id);
+		$html .= '<div style="page-break-after: always;"></div>';
+		$html .= $html2;
+		$cssData .= $cssData2;
+	}
 	// margenes 1.5, 2.0, 2.0, 2.0
 	$doc = new DocGenerator( $html, $cssData, $cobro->fields['opc_papel'], $cobro->fields['opc_ver_numpag'] ,'PORTRAIT',$docm_top,$docm_right,$docm_bottom,$docm_left,$cobro->fields['estado'], $id_formato, '',$docm_header, $docm_footer, $lang,$Sesion);
 	$valor_unico=substr(time(),-3);
-
-        
-	//echo '<style>'.$cssData.'</style>'.$html;
+	
+	
+    //echo '<style>'.$cssData.'</style>'.$html;
 	//exit;
 
 
@@ -161,12 +169,5 @@
 		//$doc->outputxml($xml, 'cobro_'.$id_cobro.'_' . $valor_unico . '.xml');
 	}
 	exit;
-
-
-
-
-
-
-?>
 
 
