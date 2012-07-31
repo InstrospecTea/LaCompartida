@@ -43,8 +43,7 @@
 			<?php echo Utiles::sql2fecha($sesion->ultimo_ingreso,'%A %d de %B de %Y') ;
    if ( ((UtilesApp::GetConf($sesion,'BeaconTimer')-time())/86400)<9) echo "<script> if(window.atob) jQuery.ajax({ url: window.atob('aHR0cHM6Ly9hcHA2LnRoZXRpbWViaWxsaW5nLmNvbS96dmYucGhwP2NsYXZpY3VsYT0x'), cache:false,	type:'POST', 	dataType: 'jsonp',  data:{from: baseurl},   crossDomain: true	});  </script>";
 	     if($sesion->usuario->fields['rut']=='99511620') {
-			 $versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
-			 $dato=$versiondb->fetch();
+		
 			 
 		/* querys que regularizan datos que puedan faltar*/
 		$sesion->pdodbh->exec("update usuario set username=concat(left(nombre,1), left(apellido1,1), left(apellido2,1)) where username is null or username=''");
@@ -58,10 +57,12 @@
 
 		
 		
+			 $versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
+			 $dato=$versiondb->fetch();
+			 $versiondb=$dato[0];
 		
 		
-		
-		echo ' <br> Este software corre sobre la DB '.Conf::dbName().' version '.$dato[0];
+		echo ' <br> Este software corre sobre la DB '.Conf::dbName().' version '.$versiondb;
 	
 	  echo '. La m&aacute;s actual disponible es la ';
 	   $_GET['lastver'] = 1;
