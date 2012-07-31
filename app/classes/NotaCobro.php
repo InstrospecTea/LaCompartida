@@ -164,7 +164,7 @@ class NotaCobro extends Cobro {
 			if($this->fields['codigo_idioma']=='es') {
 					setlocale(LC_ALL,"es_ES");
 				} else if($this->fields['codigo_idioma']=='en') {
-					setlocale(LC_ALL,"en_EN");
+					setlocale(LC_ALL, 'en_US.UTF-8');
 				}
 		if ($funcion == 2) {
 			$html = $this->GenerarDocumento2($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto);
