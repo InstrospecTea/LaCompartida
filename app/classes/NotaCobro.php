@@ -1421,7 +1421,8 @@ class NotaCobro extends Cobro {
 				$cobro_id_moneda = $this->fields['opc_moneda_total'];
 				
 				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
-				$decimales_monto = $total_mta - (int)$total_mta;
+				$decimales_monto = number_format(($total_mta - (int)$total_mta),  2);
+				$decimales_monto = number_format(($decimales_monto * 100), 0);
 				$monto_total_palabra = Numbers_Words::toWords( (int)$total_mta,"es") . ' ' .  ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " con $decimales_monto/100" : '' );
 				//$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total_mta, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
 				$monto_total_palabra_en = Numbers_Words::toWords( (int)$total_mta,"en_US") . ' ' .  ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " and $decimales_monto/100" : '' );
@@ -5620,9 +5621,14 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
                                  $html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
                                  $html = str_replace('%xfecha_ano_dos_digitos%',date("y", strtotime($this->fields['fecha_emision'])), $html);
                                   $html = str_replace('%xfecha_mes_dia_ano%',date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
-				setlocale(LC_ALL,"es_ES");
+				
 				$fechacabecera=($this->fields['fecha_emision']=='NULL' || $this->fields['fecha_emision']=='0000-00-00' || $this->fields['fecha_emision']=="")? time() :strtotime( $this->fields['fecha_emision']);
-								  $html = str_replace('%xfecha_mespalabra_dia_ano%',strftime("%B %e, %Y", $fechacabecera), $html);
+				if($this->fields['codigo_idioma']=='es') {
+					setlocale(LC_ALL,"es_ES");
+				} else if($this->fields['codigo_idioma']=='en') {
+					setlocale(LC_ALL,"en_EN");
+				}
+				$html = str_replace('%xfecha_mespalabra_dia_ano%',strftime("%B %e, %Y", $fechacabecera), $html);
 				 
                                 
                                 $html = str_replace('%xnro_factura%', $this->fields['id_cobro'] , $html);
