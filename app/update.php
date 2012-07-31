@@ -9448,22 +9448,9 @@ if (isset($_GET['lastver'])) {
 	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1])
 		die('Credenciales inválidas.');
 
-	$versionfiledb = dirname(__FILE__) . '/../app/version_db.php';
-	$versionFileName = dirname(__FILE__) . '/../app/version.php';
-
-
-
-	if (file_exists($versionfiledb)) {
-		if (file_exists($versionFileName))
-			require_once $versionFileName;
-		require_once $versionfiledb;
-	} else {
-		if (!file_exists($versionFileName))
-			die('Error, el archivo de versión no se encuentra.');
-		if (!is_writable($versionFileName))
-			die('Error, el archivo de versión no se puede escribir.');
-		require_once $versionFileName;
-	}
+ $versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
+			 $dato=$versiondb->fetch();
+			 $VERSION=$dato[0];
 
 
 	if (!isset($VERSION) or $VERSION < 0.01)
