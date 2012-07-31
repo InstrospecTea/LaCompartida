@@ -161,6 +161,11 @@ class NotaCobro extends Cobro {
 		 * $this->fields['modalidad_calculo'] == 1, hacer calculo de forma nueva con la funcion ProcesaCobroIdMoneda
 		 * $this->fields['modalidad_calculo'] == 0, hacer calculo de forma antigua
 		 */
+			if($this->fields['codigo_idioma']=='es') {
+					setlocale(LC_ALL,"es_ES");
+				} else if($this->fields['codigo_idioma']=='en') {
+					setlocale(LC_ALL,"en_EN");
+				}
 		if ($funcion == 2) {
 			$html = $this->GenerarDocumento2($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto);
 		} else if ($funcion == 1) {
