@@ -48,7 +48,7 @@
 		/* querys que regularizan datos que puedan faltar*/
 		$sesion->pdodbh->exec("update usuario set username=concat(left(nombre,1), left(apellido1,1), left(apellido2,1)) where username is null or username=''");
 		$sesion->pdodbh->exec("insert ignore into usuario_permiso (select id_usuario, 'ALL' as codigo_permiso from usuario where activo=1);");
-		$sesion->pdodbh->exec("INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)  VALUES ('lifetime', '7200', 'duración de la sesión en segundos', 'numero', '10', '-1');");
+		//$sesion->pdodbh->exec("INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)  VALUES ('lifetime', '7200', 'duración de la sesión en segundos', 'numero', '10', '-1');");
 		
 	  echo '<br>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/app/interfaces/configuracion.php"/>Configuracion</a>';
