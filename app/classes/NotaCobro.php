@@ -161,7 +161,7 @@ class NotaCobro extends Cobro {
 		 * $this->fields['modalidad_calculo'] == 1, hacer calculo de forma nueva con la funcion ProcesaCobroIdMoneda
 		 * $this->fields['modalidad_calculo'] == 0, hacer calculo de forma antigua
 		 */
-			if($this->fields['codigo_idioma']=='es') {
+		if($this->fields['codigo_idioma']=='es') {
 					setlocale(LC_ALL,"es_ES");
 				} else if($this->fields['codigo_idioma']=='en') {
 					setlocale(LC_ALL, 'en_US.UTF-8');
@@ -5629,11 +5629,7 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
                                   $html = str_replace('%xfecha_mes_dia_ano%',date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
 				
 				$fechacabecera=($this->fields['fecha_emision']=='NULL' || $this->fields['fecha_emision']=='0000-00-00' || $this->fields['fecha_emision']=="")? time() :strtotime( $this->fields['fecha_emision']);
-				if($this->fields['codigo_idioma']=='es') {
-					setlocale(LC_ALL,"es_ES");
-				} else if($this->fields['codigo_idioma']=='en') {
-					setlocale(LC_ALL,"en_EN");
-				}
+			
 				$html = str_replace('%xfecha_mespalabra_dia_ano%',strftime("%B %e, %Y", $fechacabecera), $html);
 				 
                                 
@@ -5842,13 +5838,16 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 					$html = str_replace('%xcorrelativo_aguilar%', 'DN-' . date("ym", strtotime($this->fields['fecha_emision'])) . '-' . $this->fields['documento'], $html);
 				}
-				
+                                
+                                if ($lang == 'es') {
+					$html = str_replace('%honorarios_vouga%', __('HONORARIOS'), $html);
+				} else {
+					$html = str_replace('%honorarios_vouga%', __('FEES'), $html);
+				}
 				
 				break;
 
 				
-			
-
 			case 'DETALLE_COBRO': //GenerarDocumento2
 				if ($this->fields['opc_ver_resumen_cobro'] == 0)
 					return '';
@@ -7778,6 +7777,13 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento2
+                            
+                                if ($lang == 'es') {
+					$html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
+				} else {
+					$html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
+				}
+                            
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
@@ -10209,7 +10215,10 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				}
 				$html = str_replace('%materia%', __('Materia'), $html);
 				$html = str_replace('%glosa_asunto_sin_codigo%', $asunto->fields['glosa_asunto'], $html);
+                                $html = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $html);
 				$html = str_replace('%glosa_asuntos_sin_codigo%', $asuntos, $html);
+				
+				$html = str_replace('%glosa_numero_cobro%',  __($this->fields['codigo_idioma'].'_numero_cobro'), $html);
 				$html = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html);
 
 				$html = str_replace('%servicios_prestados%', __('POR SERVICIOS PROFESIONALES PRESTADOS'), $html);
@@ -10312,32 +10321,36 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 								FROM cuenta_banco cb
 								LEFT JOIN prm_banco b ON b.id_banco = cb.id_banco
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci) = mysql_fetch_array($resp);
-					$html = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html);
-					$html = str_replace('%glosa_banco_contrato%', $glosa_banco, $html);
-					$html = str_replace('%codigo_swift%', $codigo_swift, $html);
-					$html = str_replace('%codigo_cci%', $codigo_cci, $html);
-				
-				
-					$html = str_replace('%monto_gastos_sin_iva%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['subtotal_gastos_sin_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '', $html);
-					$html = str_replace('%monto_gastos_con_iva%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['subtotal_gastos_con_impuestos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '', $html);
-					$html = str_replace('%monto_total_demo%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($monto_moneda_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+                                $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+                                list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci) = mysql_fetch_array($resp);
+                                $html = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html);
+                                $html = str_replace('%glosa_banco_contrato%', $glosa_banco, $html);
+                                $html = str_replace('%codigo_swift%', $codigo_swift, $html);
+                                $html = str_replace('%codigo_cci%', $codigo_cci, $html);
 
+				$html = str_replace('%valor_total_sin_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['monto_cobro_original'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['impuesto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_total_con_impuesto%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					
-					$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
-/*VOUGA*/			if ($lang == 'es') {
+                                $html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
 
-/*VOUGA*/			$html = str_replace('%total_sin_impuesto%', __('TOTAL SIN IMPUESTOS'), $html);
-/*VOUGA*/			$html = str_replace('%impuesto%', __('I.V.A. (10%)'), $html);
-/*VOUGA*/			$html = str_replace('%total_factura%', __('TOTAL FACTURA'), $html);
-/*VOUGA*/			} else {
-/*VOUGA*/			$html = str_replace('%total_sin_impuesto%', __('TOTAL BEFORE TAXES'), $html);
-/*VOUGA*/			$html = str_replace('%impuesto%', __('V.A.T. (10%)'), $html);
-/*VOUGA*/			$html = str_replace('%total_factura%', __('TOTAL FACTURA'), $html);
-					}
+      
+				if ($lang == 'es') {
+
+					$html = str_replace('%total_sin_impuesto%', __('TOTAL SIN IMPUESTOS'), $html);
+					$html = str_replace('%impuesto%', __('I.V.A. (10%)'), $html);
+					$html = str_replace('%total_factura%', __('TOTAL FACTURA'), $html);
+					$html = str_replace('%instrucciones_deposito%', __('INSTRUCCIONES DE TRANSFERENCIA BANCARIA A VOUGA & OLMEDO ABOGADOS'), $html);
+					$html = str_replace('%solicitud%', __('FAVOR INCLUIR NOMBRE DE LA EMPRESA Y NÚMERO DE FACTURA.'), $html);
+				} else {
+					$html = str_replace('%total_sin_impuesto%', __('TOTAL BEFORE TAXES'), $html);
+					$html = str_replace('%impuesto%', __('V.A.T. (10%)'), $html);
+					$html = str_replace('%total_factura%', __('TOTAL INVOICE'), $html);
+					$html = str_replace('%instrucciones_deposito%', __('INSTRUCTIONS FOR PAYMENTS TO VOUGA & OLMEDO ABOGADOS:<br>ELECTRONIC TRANSFER VIA SWIFT MT103 MESSAGE:'), $html);
+					$html = str_replace('%solicitud%', __('CORPORATE NAME AND INVOICE # MUST BE INCLUDED.'), $html);
+				}                          
 					
-					$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
+				$html = str_replace('%tipo_gbp_segun_moneda%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural'], $html);
 				 
 				//ELEMENTO TEST 
 				$html = str_replace('%numero_cuenta%',__('Numero Cuenta.'), $html);
@@ -10822,7 +10835,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 			    $html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh,$cifras_decimales), $html);
 			    $html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto,$cifras_decimales), $html);				
 			    $html = str_replace('%desglose_impuesto_tramite%', round($impuesto_tramite,$cifras_decimales), $html);
-			    $html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($tipocambiodoc*$subtotal_gasto)+floatval($subtotal_tramite)+floatval($impuesto_hh)+floatval($impuesto_gasto)+floatval($impuesto_tramites),$cifras_decimales), $html);
+			  
+				$html = str_replace('%desglose_grantotal%',  round(floatval($subtotal_hh)+floatval($subtotal_gasto)+floatval($subtotal_tramite)+floatval($impuesto_hh)+floatval($impuesto_gasto)+floatval($impuesto_tramites),$cifras_decimales), $html);
 			    
 			    break;
 				    
@@ -12159,6 +12173,13 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 
 
 			case 'TRABAJOS_TOTAL': //GenerarDocumento2
+                            
+                                if ($lang == 'es') {
+					$html = str_replace('%sub_total_fees%', __('Sub-total honorarios'), $html);
+				} else {
+					$html = str_replace('%sub_total_fees%', __('Sub-total for fees'), $html);
+				}
+                            
 				if (method_exists('Conf', 'GetConf'))
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 				else if (method_exists('Conf', 'ImprimirDuracionTrabajada'))
