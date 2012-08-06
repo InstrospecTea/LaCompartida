@@ -677,8 +677,9 @@ $_LANG['glosa_grupo_cliente'] = "Group";
 $_LANG['glosa_cliente'] = "Client";
 $_LANG['glosa_asunto'] = "Project";
 $_LANG['glosa_asunto_con_codigo'] = "Project";
-$_LANG['id_cobro'] = "Invoice N°";
-$_LANG['Resumen cobro'] = "Invoice summary";
+$_LANG['id_cobro'] = "Invoice N°";$_LANG['Total Cobro'] = "Invoice Total";
+$_LANG['Total Cobro:'] = "Invoice Total:";
+$_LANG['Total Nota de Cobro'] = "Invoice Total";
 $_LANG['Tipo de Honorarios:'] = "Type of fee:";
 $_LANG['forma_cobro'] = "Type of Fee Agreement";
 $_LANG['cliente'] = "Client";
@@ -771,4 +772,28 @@ $_LANG['Hrs. Castigadas'] = "Non Billable Hours";
 $_LANG['Honorarios Legales'] = 'Legal Fees';
 $_LANG['Gastos c/ IVA'] = 'Expenses (plus VAT)';
 $_LANG['Gastos s/ IVA'] = 'Expenses (without VAT)';
-?>
+
+
+
+
+/* Especiales AGUILAR CASTILLO LOVE */
+$_LANG['Resumen Nota de Cobro ACL'] = 'Debit Note Summary';
+$_LANG['Nota de Cobro ACL'] = 'Debit Note';
+$_LANG['Otros'] = 'Others';
+$_LANG['Gastos ACL'] = 'Expenses';
+$_LANG['Servicios'] = 'Services';
+$_LANG['reference no acl'] = "Reference N&ordm;";
+
+$_LANG['Subtotal'] = "Subtotals";
+$_LANG['Impuesto'] = "Taxes";
+$_LANG['Total Adeudado'] = "Total Amount Due";
+$_LANG['Instrucciones Depósito'] = "WIRE INSTRUCTIONS";
+$_LANG['Titular'] = "Beneficiary";
+$_LANG['Banco'] = "Bank";
+$_LANG['Dirección'] = "Dirección";
+$_LANG['Cuenta'] = "Account";
+
+
+$_LANG['Categoría'] = "Category";
+
+$_LANG['Factura ACL'] = "Reference";

@@ -1029,4 +1029,40 @@ $_LANG['codigo']= "Codigo";
 $_LANG['glosa']= "Glosa";
 $_LANG['numero_inicial']= "Número inicial";
 
-?>
+$_LANG['es_IMPORTE']='IMPORTE';
+$_LANG['en_IMPORTE']='FEE';
+$_LANG['es_Importe']='Importe';
+$_LANG['en_Importe']='Fee';
+
+$_LANG['es_CATEGORÍA']='CATEGORÍA';
+$_LANG['en_CATEGORÍA']='CATEGORY';
+$_LANG['es_Categoría']='Categoría';
+$_LANG['en_Categoría']='Category';
+
+
+$_LANG['es_pagos_liquidacion']='Pagos Realizados';
+$_LANG['en_pagos_liquidacion']='Invoice Payments';
+
+$_LANG['es_adelantos_sin_asignar']='Adelantos no asignados';
+$_LANG['en_adelantos_sin_asignar']='Unused Advance Payments';
+
+
+
+
+/* Especiales para Aguilar Castillo Love */
+$_LANG['Resumen Nota de Cobro ACL'] = 'Resumen Nota de Cobro';
+$_LANG['Nota de Cobro ACL'] = 'Nota de Cobro';
+$_LANG['Otros'] = 'Trámites';
+$_LANG['Gastos ACL'] = 'Gastos';
+$_LANG['Servicios'] = 'Servicios Prestados';
+$_LANG['reference no acl'] = "Factura N&ordm;";
+$_LANG['Subtotal'] = "Subtotal";
+$_LANG['Impuesto'] = "Impuesto";
+$_LANG['Total Adeudado'] = "Monto Total Adeudado";
+$_LANG['Instrucciones Depósito'] = "Datos Depósito";
+$_LANG['Titular'] = "Titular";
+$_LANG['Banco'] = "Banco";
+$_LANG['Dirección'] = "Dirección";
+$_LANG['Cuenta'] = "Cuenta";
+
+$_LANG['Factura ACL'] = "Factura";
