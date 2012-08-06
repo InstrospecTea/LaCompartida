@@ -1,6 +1,5 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once dirname(__FILE__).'/../../fw/funciones/funciones.php';
+<?php
+	
 
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
@@ -1022,4 +1021,7 @@ $_LANG['numero_inicial']= "Número inicial";
 
 $_LANG['costo'] = "Costo";
 $_LANG['costo_hh'] = "Costo HH";
-?>
+
+
+$_LANG['es_numero_cobro']="Estado de Cuenta";
+$_LANG['en_numero_cobro']="Statement";
