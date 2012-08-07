@@ -125,8 +125,9 @@
 			if($codigo_cliente)
 				$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 			if($estado)
-				$where .= " AND cobro.estado = '$estado' ";
+				$where .= " AND cobro.estado in ('".implode("','",$estado)."') ";
 		}
+		 
 		/*if($id_concepto)
 		{
 			$factura_pago = new FacturaPago($sesion);
@@ -232,7 +233,7 @@
 		$x_pag = 20;
 		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
 		
-        //echo $query;
+   
                 
                 $b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 		$b->mensaje_error_fecha = "N/A";
@@ -559,9 +560,9 @@ function Refrescar(id_foco)
 <!-- Fin calendario DIV -->
 
 <table width="90%"><tr><td>
-<fieldset class="tb_base" style="width: 100%; border: 1px solid #BDBDBD;">
+<fieldset class="tb_base" style="width: 100%; ">
 <legend><?php echo 'Filtros'?></legend>
-	<table  style="width:720px;border:1px dotted #999999">
+	<table  style="width:720px;">
 		<tr>
 			<td align=right width='30%'><b><?php echo __('Cobro')?></b></td>
 			<td colspan=2 align=left>
@@ -587,44 +588,17 @@ function Refrescar(id_foco)
 		<?php 
 		}
 		?>
-		<tr>
-			<td align=right width='30%'><b><?php echo __('Cliente')?></b></td>
-			<td colspan=2 align=left>
-			<?php 
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
-			{
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-					echo Autocompletador::ImprimirSelector($sesion,'',$codigo_cliente_secundario, true);
-				else
-					echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente,'', true);
-			}
-			else
-			{
-				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-					echo InputId::Imprimir($sesion,"cliente","codigo_cliente_secundario","glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "","CargarSelect('campo_codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320,$codigo_asunto_secundario);
-				else
-					echo InputId::Imprimir($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente,"","CargarSelect('campo_codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320,$codigo_asunto);
-			}
-			?>
-			</td>
-		</tr>
-		<tr>
-			<td align=right style="font-weight:bold;">
-				<?php echo __('Asunto')?>
-			</td>
-			<td nowrap align=left colspan=2>
-			<?php
-			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
-			{
-				echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
-			}
-			else
-			{
-				echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
-			}
-			?>
-			</td>
-		</tr>
+	<tbody id="selectclienteasunto">
+                        <tr >
+                            <td align="right" width='30%'><?php echo '<b>'. __('Nombre Cliente').'</b>'; ?> </td>
+                            <td nowrap colspan="3" align="left"><?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>    </td>
+                        </tr>
+                        <tr>
+                            <td align="right"> <?php echo '<b>'. __('Asunto').'</b>'; ?> </td>
+			<td nowrap colspan="3" align="left"> <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?> </td>
+                        </tr>
+	</tbody>
+						
 		<tr>
 			<td align=right><b><?php echo __('Encargado comercial')?>&nbsp;</b></td>
 			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario,"id_usuario",$id_usuario,'',__('Cualquiera'),'width="200"')?>
@@ -632,7 +606,7 @@ function Refrescar(id_foco)
 		<?php if(UtilesApp::GetConf($sesion, 'EncargadoSecundario')){ ?>
 		<tr>
 			<td align=right><b><?php echo __('Encargado Secundario')?>&nbsp;</b></td>
-			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario_activo,"id_usuario_secundario",$id_usuario_secundario, '',__('Cualquiera'),'width="200"')?>
+			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario_activo,"id_usuario_secundario",$id_usuario_secundario, '',__('Cualquiera'),'200')?>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso?>' >
 			</td>
@@ -641,7 +615,7 @@ function Refrescar(id_foco)
 		<tr>
 			<td align=right><b><?php echo __('Forma de Tarificación')?>&nbsp;</b></td>
 			<td colspan=2 align=left>
-				<?php echo Html::SelectQuery($sesion,$query_forma_cobro,"forma_cobro",$forma_cobro,'',__('Cualquiera'),'width="200"')?>
+				<?php echo Html::SelectQuery($sesion,$query_forma_cobro,"forma_cobro",$forma_cobro,'',__('Cualquiera'),'200')?>
 			</td>
 		</tr>
 		<tr>
@@ -701,17 +675,17 @@ function Refrescar(id_foco)
 		<tr>
 			<td align=right><b><?php echo __('Estado') ?></b></td>
 			<td align=left colspan=2>
-				<?php echo Html::SelectQuery($sesion,"SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden","estado",$estado,'',__('Cualquiera'),'width="100"')?>
+				<?php echo Html::SelectQuery($sesion,"SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden","estado[]",$estado,'multiple="multiple" size="7"',__('Cualquiera'),'150')?>
 			</td>
 		</tr>
 <tr>
 			 
-			<td align=left colspan="3" style="text-align:center;">
-			<input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios');?>&nbsp;&nbsp;
-			<input type="checkbox" name="tienegastociva"   value="1" id="tienegastociva"  <?php if (isset($_POST['tienegastociva'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos c/ IVA');?>&nbsp;&nbsp;
-			<input type="checkbox" name="tienegastosiva"   value="1" id="tienegastosiva"  <?php if (isset($_POST['tienegastosiva'])) echo 'checked="checked"' ; ?>/> Tiene <?php echo __('Gastos s/ IVA');?>&nbsp;&nbsp;
-			<input type="checkbox"  name="tienetramite"  value="1"   id="tienetramite" <?php if (isset($_POST['tienetramite'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites');?> 
-			</td>
+			<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
+			<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios');?>
+			<br/><input type="checkbox" name="tienegastociva"   value="1" id="tienegastociva"  <?php if (isset($_POST['tienegastociva'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos c/ IVA');?>
+			<br/><input type="checkbox" name="tienegastosiva"   value="1" id="tienegastosiva"  <?php if (isset($_POST['tienegastosiva'])) echo 'checked="checked"' ; ?>/> Tiene <?php echo __('Gastos s/ IVA');?>
+			<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites');?> 
+			</div>
 		</tr>
 
 
@@ -827,4 +801,4 @@ if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectClient
 	echo(Autocompletador::Javascript($sesion,true));
 }
 $pagina->PrintBottom($popup);
-?>
+
