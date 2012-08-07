@@ -617,7 +617,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$nombre_pagina .= substr($cliente->fields['glosa_cliente'], 0, 24).'...';
 				else
 					$nombre_pagina .= $cliente->fields['glosa_cliente'];
-
+				$nombre_pagina=str_replace(array('/','&','\\'),'',$nombre_pagina);
 				$ws =& $wb->addWorksheet($nombre_pagina);
 				$ws->setPaper(1);
 				$ws->hideScreenGridlines();
@@ -1537,16 +1537,26 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 
 							// Contenido de gastos
-							$query = "SELECT cta_corriente.ingreso, cta_corriente.egreso, cta_corriente.monto_cobrable,
-							cast(if(fecha_factura is null or cta_corriente.fecha_factura='' or cta_corriente.fecha_factura=00000000, cta_corriente.fecha_creacion, 
-							cta_corriente.fecha_factura) as DATE) as fecha, cta_corriente.id_moneda,
-							asunto.codigo_asunto,asunto.glosa_asunto,
-											cta_corriente.descripcion
-											$_columnas_adicionales
-										FROM cta_corriente join asunto using (codigo_asunto) 
-											$_joins
-										WHERE id_cobro='".$cobro->fields['id_cobro']."'
-										$order";
+							$query = "SELECT 
+										cta_corriente.ingreso, 
+										cta_corriente.egreso, 
+										cta_corriente.monto_cobrable,
+
+										CAST( IF( fecha_factura IS NULL OR 
+												cta_corriente.fecha_factura = '' OR 
+												cta_corriente.fecha_factura = 00000000, 
+											cta_corriente.fecha, 
+											cta_corriente.fecha_factura) as DATE) as fecha, 
+
+										cta_corriente.id_moneda,
+										asunto.codigo_asunto,
+										asunto.glosa_asunto,
+										cta_corriente.descripcion
+										$_columnas_adicionales
+									FROM cta_corriente join asunto using (codigo_asunto) 
+										$_joins
+									WHERE id_cobro='".$cobro->fields['id_cobro']."'
+									$order";
 
 						$lista_gastos = new ListaGastos($sesion, '', $query);
 						$columna_gastos_fecha=$col_descripcion-$offsetcolumna-1;		
