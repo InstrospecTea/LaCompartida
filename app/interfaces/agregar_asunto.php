@@ -135,13 +135,13 @@ if ($opcion == "guardar") {
 		if (empty($factura_direccion)) {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		}
-		if( UtilesApp::existecampo('facura_comuna', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 			if (empty($factura_comuna)) {
 				$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
 			}
 		}
 		
-		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 			if (empty($factura_ciudad)) {
 				$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
 			}
@@ -308,7 +308,9 @@ if ($opcion == "guardar") {
 		}
 		$asunto->Edit("glosa_asunto", $glosa_asunto);
 		$asunto->Edit("codigo_cliente", $codigo_cliente);
-		$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
+		if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+			$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
+		}
 		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto);
 		$asunto->Edit("id_area_proyecto", $id_area_proyecto);
 		$asunto->Edit("id_idioma", $id_idioma);
@@ -594,10 +596,10 @@ if ($opcion == "guardar") {
 				$contrato->Edit("factura_razon_social", $factura_razon_social);
 				$contrato->Edit("factura_giro", $factura_giro);
 				$contrato->Edit("factura_direccion", $factura_direccion);
-				if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+				if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 					$contrato->Edit("factura_comuna", $factura_comuna);
 				}
-				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 					$contrato->Edit("factura_ciudad", $factura_ciudad);
 				}
 				$contrato->Edit("factura_telefono", $factura_telefono);
@@ -855,7 +857,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					form.factura_direccion.focus();
 					return false;
 				}
-				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
 				if(!form.factura_comuna.value)
 				{
 					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
@@ -865,7 +867,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 				<?php } ?>
 
-				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
 				if(!form.factura_ciudad.value)
 				{
 					alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");

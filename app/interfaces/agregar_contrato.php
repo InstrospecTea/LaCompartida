@@ -132,44 +132,44 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
             $val = true;
         }
 
-	$contrato->Edit("glosa_contrato", $glosa_contrato);
-	$contrato->Edit("codigo_cliente", $codigo_cliente);
-	$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL");
+	$contrato->Edit("glosa_contrato", $glosa_contrato,true);
+	$contrato->Edit("codigo_cliente", $codigo_cliente,true);
+	$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL",true);
 	if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
 		$id_usuario_secundario = $id_usuario_responsable;
 	}
-	$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
+	$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL",true);
 	$contrato->Edit("observaciones", $observaciones);
 	if (UtilesApp::GetConf($sesion, 'TituloContacto')) {
 		$contrato->Edit("titulo_contacto", $titulo_contacto);
 		$contrato->Edit("contacto", $nombre_contacto);
 		$contrato->Edit("apellido_contacto", $apellido_contacto);
 	} else {
-		$contrato->Edit("contacto", $contacto);
+		$contrato->Edit("contacto", $contacto,true);
 	}
 	$contrato->Edit("fono_contacto", $fono_contacto_contrato);
-	$contrato->Edit("email_contacto", $email_contacto_contrato);
+	$contrato->Edit("email_contacto", $email_contacto_contrato,true);
 	$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
-	$contrato->Edit("id_pais", $id_pais);
-	$contrato->Edit("id_cuenta", $id_cuenta);
+	$contrato->Edit("id_pais", $id_pais,true);
+	$contrato->Edit("id_cuenta", $id_cuenta,true);
 	
 	if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
-		$contrato->Edit("id_cuenta2", $id_cuenta2);
+		$contrato->Edit("id_cuenta2", $id_cuenta2,true);
 	}
 	
-	$contrato->Edit("es_periodico", $es_periodico);
-	$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
-	$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0');
-	$contrato->Edit("usa_impuesto_gastos", $impuesto_gastos ? '1' : '0');
-	$contrato->Edit("periodo_fecha_inicio", $periodo_fecha_inicio);
-	$contrato->Edit("periodo_repeticiones", $periodo_repeticiones);
-	$contrato->Edit("periodo_intervalo", $periodo_intervalo);
+	$contrato->Edit("es_periodico", $es_periodico,true);
+	$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO',true);
+	$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0',true);
+	$contrato->Edit("usa_impuesto_gastos", $impuesto_gastos ? '1' : '0',true);
+	$contrato->Edit("periodo_fecha_inicio", $periodo_fecha_inicio,true);
+	$contrato->Edit("periodo_repeticiones", $periodo_repeticiones,true);
+	$contrato->Edit("periodo_intervalo", $periodo_intervalo,true);
 	$contrato->Edit("periodo_unidad", $codigo_unidad);
 	$monto = str_replace(',', '.', $monto); //en caso de usar comas en vez de puntos
-	$contrato->Edit("monto", $monto);
-	$contrato->Edit("id_moneda", $id_moneda);
-	$contrato->Edit("id_moneda_tramite", $id_moneda_tramite);
-	$contrato->Edit("forma_cobro", $forma_cobro);
+	$contrato->Edit("monto", $monto,true);
+	$contrato->Edit("id_moneda", $id_moneda,true);
+	$contrato->Edit("id_moneda_tramite", $id_moneda_tramite,true);
+	$contrato->Edit("forma_cobro", $forma_cobro,true);
 	$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 	$retainer_horas = str_replace(',', '.', $retainer_horas); //en caso de usar comas en vez de puntos
 	$contrato->Edit("retainer_horas", $retainer_horas);
@@ -189,11 +189,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("factura_giro", $factura_giro);
 	$contrato->Edit("factura_direccion", $factura_direccion);
 	
-	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 		$contrato->Edit("factura_ciudad", $factura_cuidad);
 	}
 	
-	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+	if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 		$contrato->Edit("factura_comuna", $factura_comuna);
 	}
 	
@@ -450,7 +450,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 					form.factura_direccion.focus();
 					return false;
 				}
-				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
 				if(!form.factura_ciudad.value)
 				{
 					alert("<?php echo  __('Debe ingresar la cuidad del cliente') ?>");
@@ -459,7 +459,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 				}
 				<?php } ?>
 
-				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
 				if(!form.factura_comuna.value)
 				{
 					alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
@@ -1006,13 +1006,56 @@ function SetFormatoRut()
 		}
 	}
 
+	function ActualizarTarifaTramiteDesdePopup() {
+		//document.getElementById('id_tramite_tarifa_holder').innerHtml = "<select name='' id=''><option>me los cagué a todos</option></select>";
+		var http = getXMLHTTP();
+		var url = 'ajax.php?accion=cargar_tarifas_tramites';
+		var destino = 'id_tramite_tarifa';
+		loading("Actualizando campo");
+		http.open('get', url);
+		http.onreadystatechange = function()
+		{
+			if(http.readyState == 4)
+			{
+				var response = http.responseText;
+				if( response == "~noexiste" ) {
+					$(destino).options.length = 0;
+				} else {
+					$(destino).options.length = 0;
+					cuentas = response.split('//');
+
+					for(var i=0;i<cuentas.length;i++)
+					{
+						valores = cuentas[i].split('|');
+
+						var option = new Option();
+						if( valores[0] == "Vacio") {
+							option.value = '';
+						} else {
+							option.value = valores[0];
+						}
+						option.text = valores[1];
+
+						try {
+							$(destino).add(option);
+						} 
+						catch(err) {
+							$(destino).add(option,null);
+						}
+					}
+				}
+				offLoading();
+			}
+		};
+		http.send(null);
+	}
+	
 	function CreaTramiteTarifa(form, opcion)
 	{
 		var form = $('formulario');
-		if(opcion)
-			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
-		else
-		{
+		if(opcion) {
+			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'agregar_tarifa_tramite.php?popup=1&crear=1', '' );
+		} else {
 			var id_tramite_tarifa = form.id_tramite_tarifa.value;
 			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
 		}
@@ -1907,7 +1950,7 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 						<textarea name='factura_direccion' rows=3 cols="55" ><?php echo  $contrato->fields['factura_direccion'] ?></textarea>
 					</td>
 				</tr>
-				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
 				<tr>
 					<td align="right" colspan="1">
 <?php echo  __('Comuna') ?>
@@ -1920,7 +1963,7 @@ if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto-
 				</tr>
 				<?php
 				}
-				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {						
+				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {						
 				?>
 				<tr>
 					<td align="right" colspan="1">

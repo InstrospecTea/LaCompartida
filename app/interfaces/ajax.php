@@ -278,6 +278,24 @@
 				echo $respuesta; 
 			}
 		}
+		else if( $accion == "cargar_tarifas_tramites" )
+		{
+			$respuesta = "~noexiste";
+			$query = "SELECT tramite_tarifa.id_tramite_tarifa, tramite_tarifa.glosa_tramite_tarifa FROM tramite_tarifa ORDER BY tramite_tarifa.glosa_tramite_tarifa";
+			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__LIFE__,__LINE__,$sesion->dbh);
+			
+			$cont=1;
+			while( list($id_tramite_tarifa, $glosa_tramite_tarifa ) = mysql_fetch_array($resp) )
+			{
+				if($cont==1)
+					$respuesta = "$id_tramite_tarifa|$glosa_tramite_tarifa";
+				else
+					$respuesta .= "//$id_tramite_tarifa|$glosa_tramite_tarifa";
+				$cont++;
+			}
+			
+			echo $respuesta; 
+		}
 		else if( $accion == "num_abogados_sin_tarifa" )
 		{
 			$query = "SELECT DISTINCT u.id_usuario, 
@@ -551,10 +569,10 @@
     else if ($accion == 'cargar_datos_contrato')
 	{
 		$campos_extra = '';
-		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 			$campos_extra .= ', contrato.factura_comuna';
 		}
-		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 			$campos_extra .= ', contrato.factura_ciudad';
 		}
 		$query_contrato = "SELECT contrato.factura_razon_social, contrato.factura_direccion, contrato.rut $campos_extra

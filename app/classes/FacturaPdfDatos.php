@@ -22,7 +22,7 @@
 		function CargarDatos( $id_factura, $id_documento_legal ) 
 		{
 			
-			if(!UtilesApp::ExisteCampo('align','factura_pdf_datos',$this->sesion->dbh))  mysql_query("ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';",$this->sesion->dbh);
+			if(!UtilesApp::ExisteCampo('align','factura_pdf_datos',$this->sesion))  mysql_query("ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';",$this->sesion->dbh);
 				
 			$query = "SELECT 
 						codigo_tipo_dato, 

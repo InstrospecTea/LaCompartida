@@ -163,10 +163,10 @@ $serienumero_documento = new DocumentoLegalNumero($sesion);
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "NULL");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "NULL");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "NULL");
-		if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {
+		if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
 			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "NULL");
 		}
-		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {
+		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
 		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
@@ -496,11 +496,11 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 				var cliente = document.getElementById('cliente');;
 				var direccion_cliente = document.getElementById('direccion_cliente');
 				var id_contrato = jQuery('#id_contrato').val();
-				<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {	?>
+				<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
 				var comuna_cliente = document.getElementById('comuna_cliente');
 				<?php
 					}
-					if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {	
+					if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {	
 				?>
 				var ciudad_cliente = document.getElementById('ciudad_cliente');
 				<?php } ?>
@@ -880,9 +880,25 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 	if (!$factura->loaded() && ($id_documento_legal != 2)) {	
 		?>
 						ValidaSaldoPendienteCobro(form);
+						<?php
+							if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1'))) {
+						?>								
+								var monto_gastos_sin_iva_validacion = form.monto_gastos_sin_iva.value;
+								var gastos_sin_impuestos_disp_validacion = form.gastos_sin_impuestos_disp.value;
+						<?php
+							} else {
+						?>
+								var monto_gastos_sin_iva_validacion = 0;
+								var gastos_sin_impuestos_disp_validacion = 0;
+						<?php
+							}
+						?>
 						if((form.id_documento_legal.value!=2) && (saltar_validacion_saldo==0) && (
-						(form.monto_honorarios_legales.value+form.monto_gastos_con_iva.value+form.monto_gastos_sin_iva.value) > (form.honorario_disp.value + form.gastos_con_impuestos_disp.value+form.gastos_sin_impuestos_disp.value))) {
-							if(!confirm('<?php echo  __("Los montos ingresados superan el saldo a facturar") ?>')){
+						(form.monto_honorarios_legales.value+form.monto_gastos_con_iva.value+monto_gastos_sin_iva_validacion) > (form.honorario_disp.value + form.gastos_con_impuestos_disp.value+gastos_sin_impuestos_disp_validacion))) {
+							if(!confirm('<?php echo  __("Los montos ingresados superan el saldo a facturar") ?>')){								
+						<?php
+							if ( (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') ) {
+						?>	
 								if(form.monto_honorarios_legales.value > form.honorario_disp.value) {
 									form.monto_honorarios_legales.focus();
 								}
@@ -892,6 +908,18 @@ if ( UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) {
 								else if(form.monto_gastos_sin_iva.value > form.gastos_sin_impuestos_disp.value) {
 									form.monto_gastos_sin_iva.focus();
 								}
+						<?php
+							} else {
+						?>
+								if(form.monto_honorarios_legales.value > form.honorario_disp.value) {
+									form.monto_honorarios_legales.focus();
+								}
+								else if(form.monto_gastos_con_iva.value > form.gastos_con_impuestos_disp.value) {
+									form.monto_gastos_con_iva.focus();
+								}
+						<?php
+							}
+						?>
 								return false;
 							}
 						}
@@ -1342,7 +1370,7 @@ if ($zona_horaria) {
 			<td align=right><?php echo  __('Direcci&oacute;n Cliente') ?></td>
 			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?php echo  $factura->fields['direccion_cliente'] ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
 		</tr>
-		<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion->dbh)) {	?>
+		<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align=right><?php echo  __('Comuna') ?></td>
 			<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo  $factura->fields['comuna_cliente'] ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
@@ -1350,7 +1378,7 @@ if ($zona_horaria) {
 		<?php 
 			}
 			
-			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion->dbh)) {
+			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 		?>			
 		<tr>
 			<td align="right"><?php echo __('Ciudad'); ?></td>

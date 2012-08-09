@@ -372,10 +372,10 @@ class Factura extends Objeto {
 
 				$glosa_cliente = $this->fields['cliente'];
 				$direccion_cliente = $this->fields['direccion_cliente'];
-				if( UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion->dbh)) {
+				if( UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
 					$ciudad_cliente = $this->fields['ciudad_cliente'];
 				}
-				if( UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion->dbh)) {
+				if( UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion)) {
 				$comuna_cliente = $this->fields['comuna_cliente'];
 				}
 

@@ -106,12 +106,12 @@ if ($opcion == "guardar") {
 		if (empty($factura_direccion))
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		
-		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 			if (empty($factura_ciudad))
 			$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
 		}
 		
-		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 			if (empty($factura_comuna))
 			$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
 		}
@@ -348,11 +348,11 @@ if ($opcion == "guardar") {
 			$contrato->Edit("factura_giro", $factura_giro);
 			$contrato->Edit("factura_direccion", $factura_direccion);
 			
-			if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {
+			if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 				$contrato->Edit("factura_ciudad", $factura_ciudad);
 			}
 			
-			if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {
+			if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 				$contrato->Edit("factura_comuna", $factura_comuna);
 			}
 			
@@ -671,7 +671,7 @@ $pagina->PrintTop();
 				form.factura_direccion.focus();
 				return false;
 			}
-			<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion->dbh)) {	?>
+			<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
 				if(!form.factura_ciudad.value)
 			{
 				alert("<?php echo  __('Debe ingresar la ciudad del cliente') ?>");
@@ -681,7 +681,7 @@ $pagina->PrintTop();
 				}
 			<?php } ?>
 
-			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion->dbh)) {	?>
+			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
 				if(!form.factura_comuna.value)
 			{
 				alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
