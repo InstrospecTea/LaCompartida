@@ -10,6 +10,9 @@ require_once Conf::ServerDir() . '/classes/S3.php';
 	
 	
 	$sesion = new Sesion(array('ADM'));
+	
+	
+	
 if(defined('SUBDOMAIN') || define('SUBDOMAIN','aguilarcastillolove') ) {
 	$bucketName='ttbackup'.SUBDOMAIN;
 	

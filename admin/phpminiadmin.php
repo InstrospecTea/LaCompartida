@@ -1,16 +1,24 @@
 <?php
 
 $filename= realpath(dirname(__FILE__).'/../app/conf.php');
-require_once $filename;
-	function autocargafw($class_name) {    require  Conf::ServerDir().'/../fw/classes/'.$class_name . '.php';	}
-	function autocargaapp($class_name) {    require  Conf::ServerDir().'/classes/'.$class_name . '.php';	}
-	spl_autoload_register('autocargafw'); 
-	spl_autoload_register('autocargaapp'); 
-	
-	
+ require($filename);
+function autocargaapp($class_name) {
+	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
+		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
+	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
+		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
+	} else {
+		   $file =Conf::ServerDir() . '/../fw/classes/' . str_replace('_', DIRECTORY_SEPARATOR, substr($class,5)) . '.php';
+			if ( file_exists($file) ) {
+				require $file;
+			}
+	}
+}
+
+spl_autoload_register('autocargaapp');	
 	
  	$sesion = new Sesion(array('ADM'));
-		 $pagina = new Pagina($sesion);
+ 		 $pagina = new Pagina($sesion);
 		 $pagina->titulo = __('Administración de Base de Datos');
 	$pagina->PrintTop();
 	   if($sesion->usuario->fields['rut']!='99511620') {
@@ -19,16 +27,17 @@ require_once $filename;
 		   
 	 
  //$ACCESS_PWD='lockerbie'; #!!!IMPORTANT!!! this is script access password, SET IT if you want to protect you DB from public access
-
  #DEFAULT db connection settings
  # --- WARNING! --- if you set defaults - always recommended to set $ACCESS_PWD to protect your db!
- define('DBHOST',Conf::dbHost() );
- define('DBUSER',Conf::dbUser() );
- define('DBNAME',Conf::dbName() );
- define('DBPASS',Conf::dbPass() );
+ 
+defined('DBUSER') || define('DBUSER',Conf::dbUser());
+defined('DBHOST') || define('DBHOST',Conf::dbHost());
+defined('DBPASS') || define('DBPASS',Conf::dbPass());
+ 
+ 
   $DBDEF=array(
  'user'=>DBUSER,#required
- 'pwd'=>DBPASS, #required
+ 'pwd'=> Conf::dbPass(), #required
  'db'=>DBNAME,  #optional, default DB
  'host'=>DBHOST,#optional
  'port'=>3306,#optional
@@ -47,6 +56,8 @@ require_once $filename;
  $self=$_SERVER['PHP_SELF'];
 
  session_start();
+ if(is_array($_SESSION['queryhistoria'])) $_SESSION['queryhistoria']=array();
+ if(isset($_POST['q'])) $_SESSION['queryhistoria'][base64_encode($_POST['q'])]=$_POST['q'];
  if (!isset($_SESSION['XSS'])) $_SESSION['XSS']=get_rand_str(16);
  $xurl='XSS='.$_SESSION['XSS'];
 
@@ -350,6 +361,7 @@ function print_screen(){
  global $out_message, $SQLq, $err_msg, $reccount, $time_all, $sqldr, $page, $MAX_ROWS_PER_PAGE, $is_limited_sql;
 
  print_header();
+ 
 if(isset($_GET['qry'])) $SQLq=base64_decode($_GET['qry']);
 ?>
 
@@ -382,8 +394,15 @@ if(isset($_POST['GoSQL']) && $_POST['GoSQL']=='Go') {
 
  echo $sqldr?>
 </div>
+
 <?php
+
  print_footer();
+echo '<h4>Querys anteriores</h4>';
+ foreach($_SESSION['queryhistoria'] as $queryhistoria) {
+	echo '<input type="text" style="width:800px;;" value="'.$queryhistoria.'"/><br><br>';
+}
+ 
 }
 
 function print_footer(){
@@ -1055,4 +1074,4 @@ function rw($s){#for debug
 }
 
 	$pagina->PrintBottom();
-?>
+ 
