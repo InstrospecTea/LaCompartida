@@ -23,7 +23,7 @@ $pagina = new Pagina($sesion);
 	
 		$identificador = UtilesApp::Getconf($sesion, 'NombreIdentificador');
 		if( strtolower($identificador) == 'rut' ) $usadv=1;  // debiese haber un conf para definir si usa DV o no.
-		echo $identificador;
+		
 		
 		
 	if($_POST['accion']=='cargausuarios'  ) {
@@ -65,8 +65,8 @@ $pagina = new Pagina($sesion);
 				$campo++;
 		    $cadena.="<td><input  style='width:10px;'type='checkbox' id='esadmin' name='esadmin[]' ".(($fila[$campo]=='1' || strtolower(trim($fila[$campo]))=='si')? 'value="1" checked="checked"':'value="0" '  )."/></td>";
 		  
-		$select_cats = Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria from prm_categoria_usuario","select_cats[]",$fila[$campo++],'',' ','110');
-		    $select_areas = Html::SelectQuery($sesion,"SELECT id, glosa from prm_area_usuario","select_areas[]",$fila[$campo++],'',' ','110');
+		$select_cats = superselectquery($sesion,"SELECT id_categoria_usuario, glosa_categoria from prm_categoria_usuario","select_cats[]",$fila[$campo++],'',' ','110');
+		    $select_areas =superselectquery($sesion,"SELECT id, glosa from prm_area_usuario","select_areas[]",$fila[$campo++],'',' ','110');
 			
 		$cadena.="<td style='width:90px;'>".$select_cats."</td>";
 		     $cadena.="<td style='width:90px;'>".$select_areas."</td>";
@@ -197,7 +197,6 @@ $pagina = new Pagina($sesion);
 </form>
 <a href="ejemplo_carga.xls">¿Qué debo pegar en el recuadro? (descarga ejemplo)</a>
 <?php
-echo superselectquery($sesion,"SELECT id_categoria_usuario, glosa_categoria from prm_categoria_usuario",'select_cats[]','Procurador',110) ;
 
 	}
 	?>
