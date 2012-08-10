@@ -4,7 +4,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 	clientes:null,//ToolbarDemo.stores.clienteStore,
 	asuntos:null,//ToolbarDemo.stores.asuntoStore,
 	duracion:null,
-	timeInterval:{interval:false,},
+	timeInterval:{interval:false},
 	tiempo:0,
 	caller:null,
 	reloj:false,
@@ -27,7 +27,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 						//},
 						//hidden: 'true',
 						handler: this.onClockAction,
-						scope:this,
+						scope:this
 					};		
 		
 		iconoReloj =	{
@@ -50,16 +50,16 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 							padding: ".8em 0em 0em 0em",
 							//"background-image": "-webkit-linear-gradient(white, white 100%, white)",
 							opacity:"1",
-							"z-index": "10",
+							"z-index": "10"
 						},
 						handler: function(){
 							Ext.dispatch({
 								controller: 'Home',
 								action    : 'timer',
-								value		  : {minute:0,hour:0},
+								value		  : {minute:0,hour:0}
 							});						
 						},
-						scope:this,
+						scope:this
 					};	
 		
 		var overlayTb = new Ext.Toolbar({
@@ -115,7 +115,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 		var cancel2 = {
             text: 'cancel',
 			//cls: 'x-list-header',
-            ui: 'myBack',
+            ui: 'myBack'
             //handler: this.onCancelAction
         };
 		
@@ -133,7 +133,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
             id: 'Titlebar',
             xtype: 'toolbar',
 			id:'toolbarForm',
-			cls: 'logoLemon',
+			cls: 'logoLemon'
             //title: 'Lemon',
             //items: [ cancel ]
         };
@@ -146,7 +146,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			title: 'Nuevo',
 			//titleCls:'x-list-header2',
 			//style: 'height:50%'
-            items: [cancel, {xtype: 'spacer'},reloj],
+            items: [cancel, {xtype: 'spacer'},reloj]
         };
 		
 		sendButton = {
@@ -190,7 +190,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			listeners:{
 				check: function(){this.duracion.disable();},//this.onClockAction()},
 				uncheck: function(){this.duracion.enable()},
-				scope:this,
+				scope:this
 			}
             //ui: 'confirm',
             //handler: this.onClockAction,
@@ -207,7 +207,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			hourTo: 18,			
 			value: {
 				hour: (new Date().getHours())%24,
-				minute: (new Date().getMinutes()),
+				minute: (new Date().getMinutes())
 			}
 		});
 
@@ -221,7 +221,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			hourTo: 18,		
 			value: {
 				hour: (new Date().getHours())%24,
-				minute: (new Date().getMinutes())+1,
+				minute: (new Date().getMinutes())+1
 			}
 		});
 		
@@ -230,10 +230,10 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			xtype: 'timepickerfield',
 			name : 'duracion',
 			id: 'duracion',
-			label: 'duracion',
+			label: 'duraci&oacute;n',
 			button: 'button',
 			minuteScale: 1,
-			picker: { hourTo: 99 },
+			picker: { hourTo: 99 }
 			//hourFrom: 8,
 			//hourTo: 18,
 			//labelWidth: '42%',
@@ -252,7 +252,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 			//width: '200%',
 			style: {
 					left: '-34px',
-					width: '128%',					
+					width: '128%'
                 },
             instructions: this.defaultInstructions,
             defaults: {
@@ -278,10 +278,10 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 						displayField: 'glosa',						
 						valueField: 'codigo',
 						//valueField: 'glosa',
-						placeHolder:'No hay cliente',
+						placeHolder:'No hay cliente'
 					},{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'clientes',
+                    fieldname: 'clientes'
 					},{
 						xtype: 'selectfield',
 						name: 'tareas',
@@ -292,10 +292,10 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 						displayField: 'glosa',
 						valueField: 'codigo',
 						//valueField: 'glosa',
-						placeHolder:'No hay asunto',	
+						placeHolder:'No hay asunto'
 					},{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'tareas',
+                    fieldname: 'tareas'
 					},
 						this.duracion
 					,{
@@ -320,38 +320,38 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 						xtype: 'textfield',
 						name: 'ordenado_por',
 						id: 'ordenado_por',
-						label: 'ordenado por',
+						label: 'ordenado por'
 					},{
 						xtype: 'textareafield',
 						name: 'descripcion',
 						id: 'descripcion',							
 						label: 'descripcion',
 						maxLength : 1000,
-						maxRows : 6,					
+						maxRows : 6		
 					}//,
 					//]
 				//}
 				,{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'ordenado_por',
+                    fieldname: 'ordenado_por'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'descripcion',
+                    fieldname: 'descripcion'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'fecha',
+                    fieldname: 'fecha'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'inicio',
+                    fieldname: 'inicio'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'fin',
+                    fieldname: 'fin'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'duracion',
+                    fieldname: 'duracion'
                 },{
                     xtype: 'ToolbarDemo.views.ErrorField',
-                    fieldname: 'reloj',
+                    fieldname: 'reloj'
                 }]
         };	
 							
@@ -368,7 +368,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 							style: {
 								//width: '3%',
 								padding: '0em'
-							},
+							}
 							//align: 'stretch',
 							//align: 'vertical'							
 						},
@@ -406,9 +406,9 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 				listeners: {
 						beforeorientationchange:function(panel, orientation, width, height ){
 							//return false;
-						},
-				},
-            },
+						}
+				}
+            }
 				
 			
 			
@@ -509,7 +509,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 		Ext.dispatch({
 			controller: 'Home',
             action    : 'timer',
-			value		  : {minute:minute,hour:hour},
+			value		  : {minute:minute,hour:hour}
         });
 	},
 	
@@ -696,7 +696,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
         Ext.dispatch({
             controller: 'Home',
             action: 'index',
-			data: this.getValues(),
+			data: this.getValues()
         });
     },
 	
@@ -717,7 +717,17 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 				ToolbarDemo.views.timer.detenerTimer();
 			}else{
 				ToolbarDemo.views.timer.stop();
-			}		
+			}			
+			
+			if( ToolbarDemo.views.usersForm.down('#duracion').value == '00:00' ) {
+				Ext.Msg.alert("AVISO", "Debe ingresar la duraci&oacute;n del trabajo.");
+				return false;
+			}
+			
+			if( ToolbarDemo.views.usersForm.down('#descripcion').getValue().length == 0 ) {
+				Ext.Msg.alert("AVISO", "Debe ingresar la descripci&oacute;n del trabajo.") ;
+				return false;
+			}
 			
 			Ext.dispatch({
 				controller: 'Home',
@@ -784,7 +794,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 		 Ext.dispatch({
                     controller: 'Home',
                     action    : 'setClientesAsuntos',
-                    clientes    : clientes,
+                    clientes    : clientes
                 });
 		
 		
@@ -798,7 +808,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 		 Ext.dispatch({
                     controller: 'Home',
                     action    : 'setClientesAsuntos',
-                    asuntos    : asuntos,
+                    asuntos    : asuntos
                 });
 		
 		
@@ -857,7 +867,7 @@ ToolbarDemo.views.UsersForm = Ext.extend(Ext.form.FormPanel, {
 		
 		yo.down('#clientes').enable();
 	
-	},
+	}
 	//prueba:function(id)
 	//{
 		//var listaC = ToolbarDemo.views.usersForm.down('#clientes').store;
