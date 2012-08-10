@@ -45,14 +45,14 @@ if ($id_tramite > 0) {
 		$t->Load($id_trabajo);
 	}
 	if ($tramite->Estado() == 'Cobrado' && $opcion != 'nuevo') {
-		$pagina->AddError(__('Trámite ya cobrado'));
+		$pagina->AddError(__(__('Trámite').' ya cobrado'));
 		$pagina->PrintTop($popup);
 		$pagina->PrintBottom($popup);
 		exit;
 	}
 	if ($tramite->Estado() == 'Revisado' && $opcion != 'nuevo') {
 		if (!$permisos->fields['permitido']) {
-			$pagina->AddError(__('Trámite ya revisado'));
+			$pagina->AddError(__(__('Trámite').' ya revisado'));
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
 			exit;
@@ -316,7 +316,7 @@ if ($opcion == "guardar") {
 			if ($tramite->Write()) {
 				$guardados++;
 			} else {
-				$pagina->AddError(__("Error al guardar") . ' ' . ( $multplicador > 1 ? __('los trámites') : __('el trámite') ));
+				$pagina->AddError(__("Error al guardar") . ' ' . ( $multplicador > 1 ? 'los '.__('trámites') : 'el '.__('trámite') ));
 				$i = $multiplicador + 1;
 			}
 		}
@@ -443,9 +443,9 @@ if ($opcion == "guardar") {
 
 // Título opcion 
 if ($opcion == '' && $id_tramite > 0)
-	$txt_opcion = __('Modificación de Trámite');
+	$txt_opcion = __('Modificación de '.__('Trámite'));
 else if ($id_tramite == NULL) // si no tenemos id de trabajo es porque se está agregando uno nuevo.
-	$txt_opcion = __('Agregando nuevo Trámite');
+	$txt_opcion = __('Agregando nuevo '.__('Trámite'));
 else if ($opcion == '')
 	$txt_opcion = '';
 
@@ -464,7 +464,7 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-
+var langtramite='<?php echo __('trámite');?>';
 	function ShowTime()
 	{
 		var check = $('como_trabajo');
@@ -491,7 +491,7 @@ $pagina->PrintTop($popup);
 
 	function validaCantidad(cantidad, desdedonde ) {
 		if( cantidad > 99 ) {
-			alert('La cantidad de repetición del trámite no puede superar las 99 veces.');		
+			alert('La cantidad de repeticiones de un '+langtramite+' no puede superar las 99 veces.');		
 			if( desdedonde == 'validandoform') {
 				return false;
 			}
@@ -520,13 +520,13 @@ $pagina->PrintTop($popup);
 
 	function Confirmar(form, id_trab)
 	{
-		var r=confirm("Está modificando un trámite, desea continuar?");
+		var r=confirm( 'Está modificando un '+langtramite+', desea continuar?');
 		if(r==true)
 		{
 			var como_trab=$('como_trabajo').checked;
 			if( como_trab==false && id_trab != '' )
 			{
-				if( confirm("Se va a borrar el trabajo correspondiente al trámite, desea continuar?"))
+				if( confirm('Se va a borrar el trabajo correspondiente al '+langtramite+', desea continuar?'))
 				{
 					Validar(form);
 				}
@@ -587,7 +587,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	{
 		if( ( tarifa_valor == 0 || tarifa_valor == '' ) && $('monto_modificar').value != 1 ) {
 			$('tr_contenedor_alerta').style.background = 'red';
-			$('tr_contenedor_alerta').innerHTML = 'La tarifa de este trámite no está definida.';
+			$('tr_contenedor_alerta').innerHTML = 'La tarifa de este '+langtramite+' no está definida.';
 		}
 		else {
 			$('tr_contenedor_alerta').style.background = 'white';
@@ -677,7 +677,7 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 	
 		if(!form.lista_tramite.value)
 		{
-			alert("<?php echo __('Debe seleccionar un Tipo Trámite') ?>");
+			alert("<?php echo __('Debe seleccionar un Tipo de  '+langtramite) ?>");
 			form.lista_tramite.focus();
 			return false;
 		}
@@ -785,7 +785,7 @@ if (!$permiso_cobranza->fields['permitido']) {
 			fecha_tope = new Date(hoy.getTime()-(<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?>*24*60*60*1000));
 			if (fecha_tope > fecha)
 			{
-				alert("No se pueden ingresar trámites anteriores a <?php echo date('d-m-Y', mktime(0, 0, 0, date('m'), date('d') - $dias, date('Y'))) ?>");
+				alert('No se puede ingresar '+langtramite+' anterior a <?php echo date('d-m-Y', mktime(0, 0, 0, date('m'), date('d') - $dias, date('Y'))) ?>');
 				$('fecha').focus;
 				return false;
 			}
@@ -797,7 +797,7 @@ if (isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo') {
 	?>
 			var string = new String(top.location);
 			/*if(string.search('/ingreso_tramite.php') > 0)//revisa que esté en la página de ingreso de trámites
-			if(!confirm('Está modificando un trámite, desea continuar?'))
+			if(!confirm('Está modificando un '+langtramite+', desea continuar?'))
 				return false;*/
 	<?php
 }
@@ -1134,7 +1134,7 @@ if ($id_trabajo == NULL) { // si no tenemos id de trabajo es porque se estÃ¡ agr
 		<table style='border:0px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none' ?> width='90%'>
 			<tr>
 				<td width='40%' align=right>
-					<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Ingresar Tramite"><u>Ingresar nuevo Trámite</u></a>
+					<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Ingresar Tramite"><u>Ingresar nuevo <?php __('Trámite');?></u></a>
 				</td>
 			</tr>
 		</table>
@@ -1271,7 +1271,7 @@ if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
     $query="SELECT id_tramite_tipo, glosa_tramite FROM tramite_tipo ORDER BY glosa_tramite";
     ?>
     <tr nowrap>
-    	<td align=right nowrap>Tipo Trámite </td><td width="440" align=left id='seleccion_tramite_text_2'>
+    	<td align=right nowrap>Tipo <?php echo __('Trámite'); ?> </td><td width="440" align=left id='seleccion_tramite_text_2'>
     		<?=Html::SelectQuery( $sesion, $query, 'lista_tramite',$tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $lista_tramite,'onChange="CargarMonedaContrato();SetDuracionDefecto(this.form);" id="lista_tramite"','',320);?>
 			</td>
 		</tr>
@@ -1495,7 +1495,7 @@ if (method_exists('Conf', 'GetConf')) {
 						<?php
 						if (isset($tramite) && $tramite->Loaded() && $opcion != 'nuevo') {
 							echo("<tr><td colspan=4 align=center>");
-							echo("<a onclick=\"return confirm('" . __('¿Desea eliminar este trámite?') . "')\" href=?opcion=eliminar&id_tramite=" . $tramite->fields['id_tramite'] . "&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este trámite&nbsp;</span></a>");
+							echo("<a onclick=\"return confirm('" . __('¿Desea eliminar este '.__('trámite').'?') . "')\" href=?opcion=eliminar&id_tramite=" . $tramite->fields['id_tramite'] . "&popup=$popup><span style=\"border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar este ".__('trámite')."&nbsp;</span></a>");
 							echo("</td></tr>");
 						}
 						?>
