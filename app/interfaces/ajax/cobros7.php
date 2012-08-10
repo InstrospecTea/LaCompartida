@@ -210,10 +210,24 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	$contrato->Load($cobro->fields['id_contrato']);
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
-		 
+		
 									if ($cobro->fields['modalidad_calculo'] == 1) {
 										$saldo_honorarios = $x_resultados['subtotal_honorarios'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
-									} else {
+								
+										$saldo_disponible_trabajos =  $saldo_trabajos =  $x_resultados['monto_trabajos'][$cobro->fields['opc_moneda_total']] - $x_resultados['descuento_honorarios'][$cobro->fields['opc_moneda_total']];
+										if($saldo_disponible_trabajos<0) {
+											$saldo_disponible_tramites = $saldo_tramites =  $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']]+$saldo_disponible_trabajos;
+											$saldo_disponible_trabajos = 0;
+										} else {
+											$saldo_disponible_tramites = $saldo_tramites =  $x_resultados['monto_tramites'][$cobro->fields['opc_moneda_total']];
+										}
+										
+										
+									 
+										
+										
+										
+										} else {
 										if ($cobro->fields['porcentaje_impuesto'] > 0) {
 											$honorarios_original = $cobro->fields['monto_subtotal'] - $cobro->fields['descuento'];
 										} else {
@@ -256,22 +270,24 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 										</td>
 									</tr>
 									<tr>
-												<th>Tipo Documento</th>
-												<th>Número</td>
-													<th style="white-space:nowrap; width:78px;">Fecha</th>
-												<th>Honorarios</th>
-									<?php echo				'			<th>'. __('Gasto c/IVA') .'</th>
-												<th>'.  __('Gasto s/IVA') .'</th>
-												<th>Impuesto</th>
+									<?php echo			
+												'<th>'.__('Tipo').__('Documento').'</th>
+												<th>'.__('Número').'</th>
+												<th style="white-space:nowrap; width:78px;">'.__('Fecha').'</th>';
+									
+									echo			'<th>'.__('Honorarios').'</th>
+												<th>'. __('Gasto ').__('c/IVA') .'</th>
+												<th>'.  __('Gasto ').__('s/IVA') .'</th>';
+									echo			'<th>Impuesto</th>
 												<th>Total</th>
 												<th>Estado</th>
 												
-												<th>Saldo por pagar</th>
-												<th>Agregar Pago</th>
+												<th>Saldo<br>por pagar</th>
+												<th>'.__('Agregar Pago').'</th>
 												<th>Acciones</th></tr>
 											
 													<tr style="background:#EFE;">
-														<td>Liquidación</td>
+														<td>'.__('Cobro').'</td>
 														
 										<td>'. $cobro->fields['id_cobro'] .'</td>
 														<td style="width:78px;">'. date('d-m-Y',strtotime($cobro->fields['fecha_emision'])).'</td>
@@ -362,10 +378,10 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 																<input type="hidden" name="cifras_decimales_factura_<?php echo $id_factura ?>" id="cifras_decimales_factura_<?php echo $id_factura ?>" value="<?php echo $cifras_decimales_factura ?>" />
 															</td>
 															<td align="center">
-																<input type="checkbox" name="pagar_factura_<?php echo $id_factura ?>" id="pagar_factura_<?php echo $id_factura ?>" value="<?php echo $saldo ?>" />
+																<input type="checkbox" name="pagar_factura_<?php echo $id_factura ?>" id="pagar_factura_<?php echo $id_factura ?>" value="<?php echo $saldo ?>"   class="tooltip" alt="Active esta casilla y luego pinche en 'Pagar' para añadir pagos" />
 															</td>
 															<td style="white-space:nowrap;cursor:pointer;">
-																<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 730, 580, 'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1&id_cobro=<?php echo $id_cobro ?>', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border="0" title="Editar"/></a>
+																<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura', 800, 600, 'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1&id_cobro=<?php echo $id_cobro ?>', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border="0" title="Editar"/></a>
 																<?php if (UtilesApp::GetConf($sesion, 'ImprimirFacturaDoc')) { ?>
 																	<a href='javascript:void(0)' onclick="ValidarFactura('', <?php echo $id_factura ?>, 'imprimir');" ><img src='<?php echo Conf::ImgDir() ?>/doc.gif' border="0" title="Descargar Word"/></a>
 																<?php } ?>
@@ -504,8 +520,10 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 		<?php echo $moneda_documento->fields['simbolo'] ?>&nbsp;<input type="text" id="gastos_sin_impuestos_0" class="mini_input"  value="<?php echo number_format($saldo_gastos_sin_impuestos, $moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], '') ?>" size="8" onkeydown="MontoValido( this.id );"/>
 															</td>
 															<td align="center">
-																<button type="button" onclick="AgregarFactura(0)" ><?php echo __('Emitir') ?></button>
-															<input type="hidden" id="honorarios_disponibles" value="<?php echo $saldo_disponible_honorarios ?>"/>
+																<button type="button"  onclick="AgregarFactura(0)" ><?php echo __('Emitir') ?></button>
+ 															<input type="hidden" id="honorarios_disponibles" value="<?php echo floatval($saldo_disponible_honorarios) ?>"/>
+																<input type="hidden" id="trabajos_disponibles" value="<?php echo floatval($saldo_disponible_trabajos) ?>"/>
+																	<input type="hidden" id="tramites_disponibles" value="<?php echo floatval($saldo_disponible_tramites) ?>"/>
 								<input type="hidden" id="gastos_con_iva_disponibles" value="<?php echo $saldo_disponible_gastos_con_impuestos ?>"/>
 								<input type="hidden" id="gastos_sin_iva_disponibles" value="<?php echo $saldo_disponible_gastos_sin_impuestos ?>"/>
 															</td>
@@ -528,5 +546,4 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 }
 die();
 
-
-?>
+ 

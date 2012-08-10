@@ -230,8 +230,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario 
 								WHERE
 								$where 
-								order by $orden 
-								limit $limitdesde,$limitcantidad ";
+								 ";
 		$query = "SELECT  
 									cta_corriente.id_movimiento,
 									cta_corriente.fecha,
@@ -254,7 +253,11 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
                                     contrato.activo AS contrato_activo, 
 									1 as opcion
 									$col_select
-								$selectfrom";
+								$selectfrom 
+								order by $orden 
+								limit $limitdesde,$limitcantidad";
+		
+		
 		$selectcount="SELECT COUNT(*) $selectfrom ";
 		$rows= $sesion->pdodbh->query($selectcount)->fetch();
 		 
@@ -283,7 +286,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		   
 		    $stringarray=array(
 			date('d-m-Y',strtotime($fila['fecha'])),
-			$fila['glosa_cliente']? utf8_encode($fila['glosa_cliente']):' - ',
+			$fila['glosa_cliente']? mb_convert_case ($fila['glosa_cliente'],MB_CASE_TITLE):' - ',
 			$fila['glosa_asunto']? utf8_encode($fila['glosa_asunto']):' - ',
 			    $fila['tipo']? $fila['tipo']:' - ',
 			    $fila['descripcion']? utf8_encode($fila['descripcion']):' ',
