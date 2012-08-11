@@ -28,7 +28,7 @@
                 $pagina->AddError($t->error);
     }
 
-    $pagina->titulo = __('Revisar trámites');
+    $pagina->titulo = __('Revisar '.__('trámites'));
 $pagina->PrintTop();
 
    ?>
