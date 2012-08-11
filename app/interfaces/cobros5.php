@@ -1760,55 +1760,7 @@ echo $documento->SaldoAdelantosDisponibles($cobro->fields['codigo_cliente'], $co
 				</tr>
 			</table>
     </td>
- <?php /*
-    <td align="center">
-    	<table width="270" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=center>
-				<?php 
-		$moneda_total = new Moneda($sesion);
-		$moneda_total->Load($cobro->fields['opc_moneda_total']);
-		$cobro_moneda_tipo_cambio = new CobroMoneda($sesion);
-		$cobro_moneda_tipo_cambio->Load($id_cobro);
 
-		$monto_honorario=(round($cobro->CalculaMontoTrabajos( $cobro->fields['id_cobro'] ),2)*round($cobro_moneda_tipo_cambio->moneda[$moneda_cobro->fields['id_moneda']]['tipo_cambio'],2))/round($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio'],2);
-
-			if( $cobro->fields['solo_gastos'] == 0 )
-				{ ?>
-				<tr>
-					<td>
-						Resumen Trabajos:
-					</td>
-				</tr>
-
-				<tr>
-					<td align="right">
-						<?php echo $moneda_total->fields['simbolo']?>&nbsp;<?php echo /*$documento_cobro->fields['honorarios']* /round($monto_honorario,$moneda_total->fields['cifras_decimales']) ?>
-					</td>
-				</tr>
-				<tr>
-    			<td align="left">
-    				Resumen Trámites:
-    			</td>
-    		</tr>
-    		<tr>
-    			<td align="right">
-    				<?php echo  $moneda_total->fields['simbolo']?>&nbsp;<?php echo round(round($cobro->CalculaMontoTramites( $cobro->fields['id_cobro'] ))/round($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio'],2),2) ?>
-    			</td>
-    		</tr>
-				<?php 
-			}
-			?>
-    		<tr>
-    			<td align="left">
-    				Resumen Gastos:
-    			</td>
-    		</tr>
-    		<tr>
-    			<td align="right">
-    				<?php echo  $moneda_total->fields['simbolo']?>&nbsp;<?php echo round(round($cobro->CalculaMontoGastos( $cobro->fields['id_cobro'] ))/round($cobro_moneda_tipo_cambio->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio'],2),2) ?>
-    			</td>
-    		</tr>
-    	</table>
-    </td> */ ?>
     <td align="center">
 			<!-- OPCIONES IMPRESION -->
 			<table width="270" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=right>
@@ -2087,50 +2039,41 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							</tr>	
 							<tr>
 								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?php echo __('Descargar Archivo')?>" onclick="ImprimirCobro(this.form);" />
-								</td>
-							</tr>
+									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-doc"  setwidth="185"  onclick="return ImprimirCobro(jQuery('#form_cobro5').get(0));" /><?php echo __('Descargar Archivo')?></a>
+								 
 							<?php
+							
 							if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarBotonCobroPDF') )
 							{
 							?>
-							<tr>
-								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?php echo __('Descargar Archivo')?> PDF" onclick="return ImprimirCobroPDF(this.form);" />
-								</td>
-							</tr>
+							 
+									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-pdf"  setwidth="185"   onclick="return ImprimirCobroPDF(jQuery('#form_cobro5').get(0));" /><?php echo __('Descargar Archivo')?> PDF</a>
+								 
 							<?php
 							}
 							
 							if( !UtilesApp::GetConf($sesion, 'EsconderExcelCobroModificable') ) {
 							?>
-							<tr>
-								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?php echo __('descargar_excel_modificable')?>" onclick="ImprimirExcel(this.form);" />
-								</td>
-							</tr>
+							 
+									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"   onclick="ImprimirExcel(jQuery('#form_cobro5').get(0));" /><?php echo __('descargar_excel_modificable')?></a>
+								 
 							<?php
 							}
 							
 							if( UtilesApp::GetConf($sesion, 'ExcelRentabilidadFlatFee') ) { 
 							?>
-							<tr>
-								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?php echo __('Excel rentabilidad')?>" onclick="ImprimirExcel(this.form, 'rentabilidad');" />
-								</td>
-							</tr>
+							 
+									<br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185"  onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'rentabilidad');" /><?php echo __('Excel rentabilidad')?></a>
+								 
 							<?php
 							}
 							
-							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador') ) {
-								if( UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
-							<tr>
-								<td colspan="2" align="center">
-									<input type="button" class="btn" value="<?php echo __('Descargar Excel Cobro')?>" onclick="ImprimirExcel(this.form, 'especial');" />
-								</td>
+							if( !UtilesApp::GetConf($sesion,'EsconderDescargarLiquidacionEnBorrador')  && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != '' && UtilesApp::GetConf($sesion, 'XLSFormatoEspecial' ) != 'cobros_xls.php' ) { ?>
+							 <br class="clearfix vpx" />	<a  class="btn botonizame"  icon="ui-icon-xls"  setwidth="185" onclick="ImprimirExcel(jQuery('#form_cobro5').get(0), 'especial');" /><?php echo __('Descargar Excel Cobro')?></a>
+								
+							<?php } 			 ?>
+								 </td>
 							</tr>
-							<?php } 
-							} ?>
 						</table>
 					</td>
 				</tr>
@@ -2143,7 +2086,11 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 <table width="100%">
 	<tr>
 		<td align='center'>
-			<input type='button' name='btno' value='<?php echo __('Guardar cobro')?>' onclick='GuardaCobro(this.form)' class='btn'>
+			 
+			
+                            <a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="GuardaCobro(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
+			
+			
 		</td>
 	</tr>
 	<tr>

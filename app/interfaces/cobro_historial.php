@@ -1,4 +1,4 @@
-<? 
+<?php  
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -75,18 +75,18 @@ echo(Autocompletador::CSS());
 	<table width="90%" style="border: 1px solid #BDBDBD;">
 		<tr>
 			<td align="right" width="20%">
-				<?=__('ID') . " " . __('cobro')?>
+				<?php echo __('ID') . " " . __('cobro')?>
 			</td>
 			<td align="left" width="80%" colspan="3">
-				<input type="text" size="3" name="id_cobro" name="id_cobro" value="<?=$id_cobro?>" />
+				<input type="text" size="3" name="id_cobro" name="id_cobro" value="<?php echo $id_cobro?>" />
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<?=__('Cliente')?>
+				<?php echo __('Cliente')?>
 			</td>
 			<td nowrap align="left" colspan="3">
-				<?
+				<?php 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -106,43 +106,43 @@ echo(Autocompletador::CSS());
 			</tr>
 			<tr>
 				<td align="right" width="20%">
-			<?=__('Fecha desde')?>
+			<?php echo __('Fecha desde')?>
 		</td>
 		<td align="left" width="20%">
-			<input type="text" size="10" id="fecha_desde" name="fecha_desde" value="<?=$fecha_desde?>" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
+			<input type="text" size="10" id="fecha_desde" name="fecha_desde" value="<?php echo $fecha_desde?>" />
+			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
 		</td>
 		<td align="right" width="20%">
-			<?=__('Fecha hasta')?>
+			<?php echo __('Fecha hasta')?>
 		</td>
 		<td align="left" width="40%"> 
-			<input type="text" size="10" id="fecha_hasta" name="fecha_hasta" value="<?=$fecha_hasta?>" /> 
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
+			<input type="text" size="10" id="fecha_hasta" name="fecha_hasta" value="<?php echo $fecha_hasta?>" /> 
+			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
 		</td>
 	</tr>
 	<tr>
 		<td align="right" width="20%">
-			<?=__('Acción')?>
+			<?php echo __('Acción')?>
 		</td>
 		<td align="left" colspan="3">
 			<select name="comentario" id="comentario" width="150">
 				<option value=''></option>
-				<option value='COBRO CREADO' <?=$comentario=='COBRO CREADO'?'selected':''?>><?=__('COBRO CREADO') ?></option>
-				<option value='COBRO EMITIDO' <?=$comentario=='COBRO EMITIDO'?'selected':''?>><?=__('COBRO EMITIDO') ?></option>
-				<option value='COBRO FACTURADO' <?=$comentario=='COBRO FACTURADO'?'selected':''?>><?=__('COBRO FACTURADO') ?></option>
-				<option value='COBRO ANULADO' <?=$comentario=='COBRO ANULADO'?'selected':''?>><?=__('COBRO ANULADO') ?></option>
-				<option value='COBRO PAGO PARCIAL' <?=$comentario=='COBRO PAGO PARCIAL'?'selected':''?>><?=__('COBRO PAGO PARCIAL') ?></option>
-				<option value='COBRO PAGADO' <?=$comentario=='COBRO PAGADO'?'selected':''?>><?=__('COBRO PAGADO') ?></option>
-				<option value='COBRO EN REVISION' <?=$comentario=='COBRO EN REVISION'?'selected':''?>><?=__('COBRO EN REVISION') ?></option>
+				<option value='COBRO CREADO' <?php echo $comentario=='COBRO CREADO'?'selected':''?>><?php echo __('COBRO CREADO') ?></option>
+				<option value='COBRO EMITIDO' <?php echo $comentario=='COBRO EMITIDO'?'selected':''?>><?php echo __('COBRO EMITIDO') ?></option>
+				<option value='COBRO FACTURADO' <?php echo $comentario=='COBRO FACTURADO'?'selected':''?>><?php echo __('COBRO FACTURADO') ?></option>
+				<option value='COBRO ANULADO' <?php echo $comentario=='COBRO ANULADO'?'selected':''?>><?php echo __('COBRO ANULADO') ?></option>
+				<option value='COBRO PAGO PARCIAL' <?php echo $comentario=='COBRO PAGO PARCIAL'?'selected':''?>><?php echo __('COBRO PAGO PARCIAL') ?></option>
+				<option value='COBRO PAGADO' <?php echo $comentario=='COBRO PAGADO'?'selected':''?>><?php echo __('COBRO PAGADO') ?></option>
+				<option value='COBRO EN REVISION' <?php echo $comentario=='COBRO EN REVISION'?'selected':''?>><?php echo __('COBRO EN REVISION') ?></option>
 			</select>
 	<tr>
 		<td align="center" colspan="4">
-			<input type="submit" value="<?=__('Buscar')?>" />
+			<input type="submit" value="<?php echo __('Buscar')?>" />
 		</td>
 	</tr>
 </table>
 </form>
-<?
+<?php 
 if($buscar==1)
 {
 	echo "<center>";

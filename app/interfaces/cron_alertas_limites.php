@@ -1,20 +1,21 @@
-<?
+<?php 
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once dirname(__FILE__).'/../classes/AlertaCron.php';
+ 
+		require_once Conf::ServerDir().'/../app/classes/AlertaCron.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Usuario.php';
 	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-	require_once Conf::ServerDir().'/classes/Observacion.php';
-	require_once Conf::ServerDir().'/classes/Cobro.php';
+	require_once Conf::ServerDir().'/../app/classes/Observacion.php';
+	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 	//require_once Conf::ServerDir().'/classes/Alerta.php';
-	require_once Conf::ServerDir().'/classes/Asunto.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Contrato.php';
-	require_once Conf::ServerDir().'/classes/Reporte.php';
-	require_once Conf::ServerDir().'/classes/Notificacion.php';
-	require_once Conf::ServerDir().'/classes/Tarea.php';
+	require_once Conf::ServerDir().'/../app//classes/Asunto.php';
+	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+	require_once Conf::ServerDir().'/../app/classes/Contrato.php';
+	require_once Conf::ServerDir().'/../app/classes/Reporte.php';
+	require_once Conf::ServerDir().'/../app/classes/Notificacion.php';
+	require_once Conf::ServerDir().'/../app/classes/Tarea.php';
 	//require_once Conf::ServerDir().'/interfaces/graficos/Grafico.php';
 	
 	//$dbh = mysql_connect(Conf::dbHost(), Conf::dbUser(), Conf::dbPass());

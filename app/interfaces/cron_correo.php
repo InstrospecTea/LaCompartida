@@ -10,8 +10,7 @@
 	set_time_limit(180);
 	$sesion = new Sesion (null, true);
 	 
-	$sesion->phpConsole();
-	
+
 	$sesion->debug('abri sesión');
 	
 $sesion->debug('incluyo alertacron');

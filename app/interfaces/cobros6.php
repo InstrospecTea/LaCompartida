@@ -32,13 +32,13 @@ $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 //Asumo que solo quiero refrescar cuando gardo el cobro
 // Aparentemente "guardar cobro" no existe. Es sólo "guardar"
 if ($refrescar && ($opc == 'guardar_cobro' || $opc == 'guardar')) {
-	?>
-	<script type="text/javascript">
+	
+	echo '<script type="text/javascript">
 		if (window.opener !== undefined && window.opener.Refrescar) {
 			window.opener.Refrescar();        
 		}
-	</script>
-	<?php
+	</script>';
+	
 }
 
 $factura_pago = new FacturaPago($sesion);
@@ -467,6 +467,7 @@ if ($cambiar_estado && $estado!='') {
 }
 
 if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_documento_pdf') {
+//	print_r($_REQUEST);
 	$cobro->Edit("opc_ver_detalles_por_hora", $opc_ver_detalles_por_hora);
 	$cobro->Edit("opc_ver_modalidad", $opc_ver_modalidad);
 	$cobro->Edit("opc_ver_profesional", $opc_ver_profesional);
@@ -492,7 +493,7 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
        	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
-
+	
 // Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
@@ -574,7 +575,7 @@ $cobro->Write();
 $moneda->Load($cobro->fields['id_moneda']);
 
 $pagina->titulo = __('Imprimir') . ' ' . __('Cobro') . ' #' . $id_cobro . ' ' . __('para') . " " . Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'], 'glosa_cliente', 'cliente', 'codigo_cliente');
-$pagina->PrintTop($popup);
+$pagina->PrintTop($popup,'#FFF','#073');
 
 if ($popup) {
 	$cobro->LoadAsuntos();
@@ -606,10 +607,11 @@ if ($popup) {
 
 	$glosa_asunto_titulo = $separador_inicio . $glosa_asunto_titulo;
 	// $glosa_asunto_titulo = Utiles::Glosa($sesion, $cobro->LoadAsuntos());
+	
 	?>
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
-			<td valign="top" align="left" class="titulo" bgcolor="<?php echo UtilesApp::GetConf($sesion, 'ColorTituloPagina'); ?>">
+			<td   class="titulo" style="vertical-align:top;text-align:left;background:<?php echo UtilesApp::GetConf($sesion, 'ColorTituloPagina'); ?>; ">
 				<span title="<?php echo $glosa_asunto_alt; ?>"><?php echo __('Imprimir') . ' ' . __('Cobro') . ' #' . $id_cobro . ' ' . __('para') . " " . Utiles::Glosa($sesion, $cobro->fields['codigo_cliente'], 'glosa_cliente', 'cliente', 'codigo_cliente') . " " . $glosa_asunto_titulo; ?></span>
 			</td>
 		</tr>
@@ -1010,7 +1012,7 @@ if (UtilesApp::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['export
 
 			if (opcion == 'imprimir') {
 	<?php if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf') && !UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
-						nuovaFinestra('Imprimir_Factura',730,580,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500');
+						nuovaFinestra('Imprimir_Factura',800,600,'agregar_factura.php?opc=generar_factura&id_cobro=<?php echo $id_cobro ?>&id_factura='+id_factura, 'top=500, left=500');
 						//ValidarTodo(form);
 	<?php } else { ?>
 						form.opc.value='grabar_documento_factura';
@@ -1213,16 +1215,20 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
         var gastos_sin_impuestos = jQuery('#gastos_sin_impuestos_' + idx).val()*1; 
 
         var honorarios_disp = jQuery('#honorarios_disponibles').val()*1;
+	var trabajos_disp = jQuery('#trabajos_disponibles').val()*1;
+	var tramites_disp = jQuery('#tramites_disponibles').val()*1;
+	
         var gastos_con_impuestos_disp = jQuery('#gastos_con_iva_disponibles').val()*1; 
         var gastos_sin_impuestos_disp = jQuery('#gastos_sin_iva_disponibles').val()*1; 
 
         var honorarios_total = jQuery('#honorarios_total').val()*1;  
         var gastos_con_impuestos_total =jQuery('#gastos_con_iva_total').val()*1;  
         var gastos_sin_impuestos_total =jQuery('#gastos_sin_iva_total').val()*1;   
+		
 
-        var esCredito = $F('tipo_documento_legal_'+idx) == <?php echo!empty($id_tipo_documento['NC']) ? $id_tipo_documento['NC'] : 0; ?>;
-        var esFactura = $F('tipo_documento_legal_'+idx) == <?php echo!empty($id_tipo_documento['FA']) ? $id_tipo_documento['FA'] : 1; ?>;
-        var esDebito = $F('tipo_documento_legal_'+idx) == <?php echo!empty($id_tipo_documento['ND']) ? $id_tipo_documento['ND'] : 0; ?>;
+        var esCredito = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['NC']) ? $id_tipo_documento['NC'] : 0; ?>;
+        var esFactura = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['FA']) ? $id_tipo_documento['FA'] : 1; ?>;
+        var esDebito = jQuery('#tipo_documento_legal_'+idx).val() == <?php echo !empty($id_tipo_documento['ND']) ? $id_tipo_documento['ND'] : 0; ?>;
 
         if (!honorarios && !gastos_con_impuestos && !gastos_sin_impuestos || 
             honorarios < 0 || gastos_con_impuestos < 0 || gastos_sin_impuestos < 0) {
@@ -1236,18 +1242,18 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
        
             if (!confirm('<?php echo __("Los montos ingresados superan el saldo a facturar") ?>')) {
                 if (honorarios > honorarios_disp) {
-                    $('honorarios_' + idx).focus();
+                    jQuery('#honorarios_' + idx).focus();
                 } else if (gastos_con_impuestos > gastos_con_impuestos_disp) {
-                    $('gastos_con_impuestos_' + idx).focus();
+                    jQuery('#gastos_con_impuestos_' + idx).focus();
                 } else if (gastos_sin_impuestos > gastos_sin_impuestos_disp) {
-                    $('gastos_sin_impuestos_' + idx).focus();
+                    jQuery('#gastos_sin_impuestos_' + idx).focus();
                 }
             
                 return false;
             }
         }
 
-        nuovaFinestra('Agregar_Factura', 730, 580, '<?php echo $url_agregar_factura; ?>' +
+        nuovaFinestra('Agregar_Factura',800, 600, '<?php echo $url_agregar_factura; ?>' +
             '&honorario=' + honorarios +
             '&gastos_con_iva=' + gastos_con_impuestos +
             '&gastos_sin_iva=' + gastos_sin_impuestos +
@@ -1257,7 +1263,9 @@ while (list($id, $codigo) = mysql_fetch_array($resp)) {
             '&honorario_total=' + honorarios_total +
             '&gastos_con_impuestos_total=' + gastos_con_impuestos_total +
             '&gastos_sin_impuestos_total=' + gastos_sin_impuestos_total +
-            '&id_documento_legal=' + $F('tipo_documento_legal_' + idx), 'top=100, left=155');
+	  '&trabajos_disponibles=' + trabajos_disp +
+            '&tramites_disponibles=' + tramites_disp +		
+            '&id_documento_legal=' + jQuery('#tipo_documento_legal_' + idx).val(), 'top=100, left=155');
     }
 
     function Numero(texto) {
@@ -1405,34 +1413,34 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                 </tr>
                                 <tr>
                                     <td>
-                                        <input type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_creacion']) ?>" size="11" disabled />
+                                        <input style="margin: 3px 0 0 0;" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_creacion']) ?>" size="11" disabled="disabled" />
                                     </td>
                                     <td nowrap>
-                                        <input type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_emision" style="cursor:pointer" />
+                                        <input class="fechadiff" type="text" value="<?php echo Utiles::sql2date($cobro->fields['fecha_emision']) ?>" name="fecha_emision" id="fecha_emision" size="11" maxlength="10" />
+                                       
                                     </td>
 								<?php if (UtilesApp::GetConf($sesion, 'EnviarAlClienteAntesDeFacturar')) { ?>
                                     <td nowrap>
-                                        <input type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_envio" style="cursor:pointer" />
+                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+                                         
                                     </td>
                                     <td nowrap>
-                                        <input type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_facturado" style="cursor:pointer" />
+                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+                                         
                                     </td>
 								<?php } else { ?>
 									<td nowrap>
-                                        <input type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_facturado" style="cursor:pointer" />
+                                        <input class="fechadiff"  type="text" name="fecha_facturacion" value="<?php echo Utiles::sql2date($cobro->fields['fecha_facturacion']); ?>" id="fecha_facturacion" size="11" maxlength="10" />
+                                       
                                     </td>
                                     <td nowrap>
-                                        <input type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_envio" style="cursor:pointer" />
+                                        <input class="fechadiff"  type="text" name="fecha_envio" value="<?php echo Utiles::sql2date($cobro->fields['fecha_enviado_cliente']); ?>" id="fecha_envio" size="11" maxlength="10" />
+                                        
                                     </td>
 								<?php } ?>
                                     <td nowrap>
-                                        <input type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
-                                        <img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_pago_parcial" style="cursor:pointer" />
+                                        <input class="fechadiff"  type="text" name="fecha_pago_parcial" value="<?php echo Utiles::sql2date($cobro->fields['fecha_pago_parcial']) ?>" id="fecha_pago_parcial" size="11" maxlength="10" />
+                                        
                                     </td>
                                     <td nowrap>
 										<?php
@@ -1574,15 +1582,15 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 															<?php } ?>
 													<tr>
 														<td align="left" colspan=3>
-															<?php if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) { ?>
-																<?php echo __('Factura N°') ?>: <input name='documento' size='5' value='<?php echo $cobro->fields['documento'] ?>'>
-																<?php if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
-																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',730,580,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
-																	<?php } ?>
-																<?php } else { ?>
-																<?php echo __('Factura N°') ?>: <input name='documento' size='5' value='<?php echo $cobro->fields['documento'] ?>'>
-																<?php if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
-																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',730,580,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
+															<?php if (UtilesApp::GetConf($sesion, 'UsaNumeracionAutomatica')) {  
+																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
+																  if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
+																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
+																	<?php }  
+																 } else { 
+																  echo __('Factura N°') .": <input name='documento' size='5' value='". $cobro->fields['documento'] ."'>";
+																  if (UtilesApp::GetConf($sesion, 'PermitirFactura') && !empty($id_factura)) { ?>
+																	<a href='javascript:void(0)' onclick="nuovaFinestra('Editar_Factura',800,600,'agregar_factura.php?id_factura=<?php echo $id_factura ?>&popup=1', 'top=100, left=155');" ><img src='<?php echo Conf::ImgDir() ?>/editar_on.gif' border=0 title=Editar></a>
 			<?php } ?>
 													<?php } ?>
 														</td>
@@ -1613,13 +1621,13 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                             <a style="margin:auto;display:block;" href="#" id="enviar" class="btn botonizame" icon="ui-icon-save"  setwidth="220" onclick="ValidarTodo(jQuery(this).closest('form').get(0)); "><?php echo __('Guardar Cambios') ?></a>
 							 </td>
                       </tr>
-                              <tr>
+                               </table>
                         <!-- Submit -->
-                        <td   colspan="2"   ><div style=" clear:both;margin:auto;">
-    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>&popup=1"  style="width:100%;height:450px;border: none;" frameborder=0></iframe>
-</div></td>
-                    </tr>
-                </table>
+                       <div style=" clear:both;margin:auto;">
+    <iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro ?>&popup=1"  class="iframeinterno" style="width:100%;height:550px;border: none;" frameborder="0"></iframe>
+</div> 
+                     
+               
                 <!-- Fin FORM unica -->
             </div> <!-- FIN TABLA CABECERA (la que tiene el avance del cobro, la lista de facturas, etc) -->
 
@@ -1979,36 +1987,9 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 </div>
 
 <!-- Fin Tipo Cambio -->
+<div id="clip" style="background:url('https://static.thetimebilling.com/images/clip.png') no-repeat;position:absolute;top:250px;left:500px;display:none;height: 200px;width: 250px;"></div>
 <script type="text/javascript">
-    Calendar.setup({
-        inputField  : "fecha_pago",     // ID of the input field
-        ifFormat    : "%d-%m-%Y",       // the date format
-        button      : "img_fecha_pago"  // ID of the button
-    });
-    
-    Calendar.setup({
-        inputField  : "fecha_emision",      // ID of the input field
-        ifFormat    : "%d-%m-%Y",           // the date format
-        button      : "img_fecha_emision"   // ID of the button
-    });
-    
-    Calendar.setup({
-        inputField  : "fecha_facturacion",  // ID of the input field
-        ifFormat    : "%d-%m-%Y",           // the date format
-        button      : "img_fecha_facturado" // ID of the button
-    });
-    
-    Calendar.setup({
-        inputField  : "fecha_envio",    // ID of the input field
-        ifFormat    : "%d-%m-%Y",       // the date format
-        button      : "img_fecha_envio" // ID of the button
-    });
-    
-    Calendar.setup({
-        inputField  : "fecha_pago_parcial",     // ID of the input field
-        ifFormat    : "%d-%m-%Y",               // the date format
-        button      : "img_fecha_pago_parcial"  // ID of the button
-    });
+   
 
 <?php if ($cobro->fields['estado'] == "PAGADO" && UtilesApp::GetConf($sesion, "ObservacionReversarCobroPagado")) { ?>
 		$("estado").value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
@@ -2016,7 +1997,19 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 			this.value == "EN REVISION" ? $("estado_motivo").show() : $("estado_motivo").hide();
 		});
 <?php } ?>
+	jQuery('.iframeinterno').load(function() {
+		console.log(jQuery('.iframeinterno'));
+		
+		
+		
+	});
+	
+	// var t=setTimeout("jQuery('#clip').fadeIn(1000);",6000);
+
+	
 </script>
+
 <?php
 $pagina->PrintBottom($popup);
 
+ 
