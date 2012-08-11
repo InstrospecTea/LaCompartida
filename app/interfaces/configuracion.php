@@ -13,12 +13,14 @@
 	$pagina->PrintTop();
 	if($opc=='guardar')
 	{
+		$sesion->pdodbh->exec("update configuracion set id_configuracion_categoria=10 where glosa_opcion='BeaconTimer'");
 		foreach($opcion as $id => $valor)
 		{
 			if(isset($opcion_hidden[$id]))
 				$opcion_hidden[$id] = 1;
 			$query = "UPDATE configuracion SET valor_opcion='".trim(str_replace("\n",'',utf8_decode($valor)))."' WHERE id='$id'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			
 		}
 		foreach($opcion_hidden as $id => $valor)
 			if($valor==0)
@@ -129,7 +131,7 @@ function AgregarAsunto( numero , valor_hidden )
 	tr_elemento_nuevo.style.display = 'table-row';
 }
 </script>
-<div id="flechaverde" style="background:url('https://estaticos.thetimebilling.com/graphics/arrowleft.gif') 0 0 no-repeat;display:block;width:41px;height:20px;display:none;position:absolute;"></div>
+<div id="flechaverde" style="background:url('https://static.thetimebilling.com/images/arrowleft.png') 0 -5px no-repeat;display:block;width:41px;height:20px;display:none;position:absolute;"></div>
 
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -238,7 +240,29 @@ function AgregarAsunto( numero , valor_hidden )
 		    <?php include dirname(__FILE__) . '/agregar_doc_legales.php'; ?>
 	    
 </div>
+<div class="grupoconf" id="caja21" rel="Lang" >
+<p><center>Active y Ordene los archivos de lang a cargar. La primera fila se carga en primer lugar, y puede ser sobreescrita por las siguientes (y así sucesivamente)</center></p>
+<?php			if(file_exists('../../admin/archivos_lang.php')) {
+		include_once  '../../admin/archivos_lang.php';  
+	}  ?>
+	    
+<br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardalangs"  setwidth="200">Guardar</a>
 
+ </div>
+<div class="grupoconf" id="caja22" rel="Plugins" >
+
+		    <p>En esta pantalla se activan o desactivan los plugins. No toque nada si no sabe para qué sirve</p> 
+	<?php  	 
+ 
+	if(file_exists('../../admin/archivos_plugins.php')) {
+		include_once  '../../admin/archivos_plugins.php';  
+	}
+	    ?>
+ <br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardaplugins"  setwidth="200">Guardar</a> </div> 
+
+
+	    
+</div>
  
 
 	<table>
@@ -254,7 +278,26 @@ function AgregarAsunto( numero , valor_hidden )
 
 <script language="javascript" type="text/javascript">
 jQuery(document).ready(function() {
-    
+     jQuery('#guardalangs').click(function() {
+       console.log(jQuery('#formlangs').serialize());
+       jQuery.post('../ajax.php',jQuery('#formlangs').serialize(),function(data) {
+           jQuery('#langs li').remove();
+           jQuery('#langs').append(data);
+           jQuery(".buttonset").buttonset();
+           jQuery('.sortable').sortable();
+       });
+    });
+	
+	    jQuery('#guardaplugins').click(function() {
+       console.log(jQuery('#formplugins').serialize());
+       jQuery.post('../ajax.php',jQuery('#formplugins').serialize(),function(data) {
+           jQuery('#plugins li').remove();
+           jQuery('#plugins').append(data);
+           jQuery(".buttonset").buttonset();
+           jQuery('.sortable').sortable();
+       });
+    });
+	
     jQuery('#buscacampos').append(jQuery('#buscacampo'));
     
     jQuery('#buscacampo').change(function() {
@@ -318,4 +361,4 @@ Calendar.setup(
 </script>
 <?php
 	$pagina->PrintBottom($popup);
-?>
+ 
