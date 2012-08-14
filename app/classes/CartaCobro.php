@@ -1479,18 +1479,26 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%detalle_cuenta_gastos%', $detalle_cuenta_gastos, $html2);
 				$html2 = str_replace('%detalle_cuenta_gastos2%', $detalle_cuenta_gastos2, $html2);
 
-				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado
+				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_encargado, IFNULL( prm_categoria_usuario.glosa_categoria, ' ' ) as categoria_usuario
 										FROM usuario
 										JOIN contrato ON usuario.id_usuario=contrato.id_usuario_responsable
 									 	JOIN cobro ON contrato.id_contrato=cobro.id_contrato
+										LEFT JOIN prm_categoria_usuario ON ( usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario AND usuario.id_categoria_usuario != 0 ) 
 									 WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
+				
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($nombre_encargado) = mysql_fetch_array($resp);
+				list($nombre_encargado, $categoria_usuario) = mysql_fetch_array($resp);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
 				$html2 = str_replace('%encargado_comercial_uc%', ucwords(strtolower($nombre_encargado)), $html2);
 				$simbolo_opc_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
 				$html2 = str_replace('%simbolo_opc_moneda_totall%', $simbolo_opc_moneda_total, $html2);
+				$html2 = str_replace('%categoria_encargado_comercial%', __($categoria_usuario), $html2);
+				$html2 = str_replace('%categoria_encargado_comercial_mayusculas%', mb_strtoupper(__($categoria_usuario)), $html2);
 
+				
+				$nombre_contacto_partes = explode(' ', $contrato->fields['contacto'] );
+				$html2 = str_replace('%SoloNombreContacto%', $nombre_contacto_partes[0], $html2);
+				
 				if ($contrato->fields['id_cuenta'] > 0) {
 					$query = "	SELECT b.nombre, cb.numero, cb.cod_swift, cb.CCI, cb.glosa
 								FROM cuenta_banco cb
@@ -1498,18 +1506,31 @@ class CartaCobro extends NotaCobro {
 								WHERE cb.id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($glosa_banco, $numero_cuenta, $codigo_swift, $codigo_cci, $glosa_cuenta) = mysql_fetch_array($resp);
+					
+					if( strpos($glosa_banco, 'Ah') ) {
+						$glosa_banco = str_replace(' Ah', '', $glosa_banco);
+						$tipo_cuenta = 'Cuenta Ahorros';					
+					} else if ( strpos($glosa_banco, 'Cte') ) {
+						$glosa_banco = str_replace(' Cte', '', $glosa_banco);
+						$tipo_cuenta = 'Cuenta Corriente';	
+					}
+					
 					$html2 = str_replace('%numero_cuenta_contrato%', $numero_cuenta, $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', $glosa_banco, $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', $glosa_cuenta, $html2);
 					$html2 = str_replace('%codigo_swift%', $codigo_swift, $html2);
 					$html2 = str_replace('%codigo_cci%', $codigo_cci, $html2);
+					$html2 = str_replace('%tipo_cuenta%', $tipo_cuenta, $html2);
 				} else {
 					$html2 = str_replace('%numero_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_banco_contrato%', '', $html2);
 					$html2 = str_replace('%glosa_cuenta_contrato%', '', $html2);
 					$html2 = str_replace('%codigo_swift%', '', $html2);
 					$html2 = str_replace('%codigo_cci%', '', $html2);
+					$html2 = str_replace('%tipo_cuenta%', '', $html2);
 				}
+				
+					
 
 				if( UtilesApp::GetConf($this->sesion, 'SegundaCuentaBancaria')) {
 					if ($contrato->fields['id_cuenta2'] > 0) {
@@ -1856,6 +1877,8 @@ function GenerarDocumentoCartaComun($parser_carta, $theTag='', $lang, $moneda_cl
 				} else {
 					$html2 = str_replace('%factura_desc_mta%', 'factura', $html2);
 				}
+				
+				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
 				
 				break;
 

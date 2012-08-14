@@ -792,8 +792,10 @@ $_LANG['Titular'] = "Beneficiary";
 $_LANG['Banco'] = "Bank";
 $_LANG['Dirección'] = "Dirección";
 $_LANG['Cuenta'] = "Account";
-
-
-$_LANG['Categoría'] = "Category";
-
 $_LANG['Factura ACL'] = "Reference";
+
+/* Olvidados */
+$_LANG['Categoría'] = "Category";
+$_LANG['Dirección'] = 'Address';
+$_LANG['Importe'] = 'Fees';
+$_LANG['Importes'] = 'Fees';
