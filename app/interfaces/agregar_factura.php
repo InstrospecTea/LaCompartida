@@ -523,7 +523,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 		<tbody>
 		<tr>
 			<td id="controles_factura"colspan="4" align=center>
-				 <a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo  __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo  __('Actualizar Tipo de Cambio') ?>	</a></td>
+				</td>
 		</tr>
 	</tbody>
                 <?php 
@@ -862,8 +862,10 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 }
 ?>
 								<tr>
-									<td colspan=<?php echo  $num_monedas ?> align=center><input type=button onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))" value="<?php echo  __('Guardar') ?>" />
-										<input type=button onclick="CancelarDocumentoMonedaPago()" value="<?php echo  __('Cancelar') ?>" />
+									<td colspan=<?php echo  $num_monedas ?> align=center>
+										<a href="javascript:void();" icon="ui-icon-save" onclick="ActualizarDocumentoMonedaPago($('todo_cobro'))"><?php echo  __('Guardar') ?></a>
+										<a href="javascript:void();" icon="ui-icon-exitl" onclick="CancelarDocumentoMonedaPago()"><?php echo  __('Cancelar') ?></a>
+										 
 										<input type=hidden id="tipo_cambios_factura" name="tipo_cambios_factura" value="<?php echo  implode(',', $tipo_cambios) ?>" />
 										<input type=hidden id="ids_monedas_factura" name="ids_monedas_factura" value="<?php echo  implode(',', $ids_monedas) ?>" /></td>
 								</tr>
@@ -876,11 +878,16 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 	<br>
 	<table style="border: 0px solid #666;" width='95%'>
 		<tr>
-			<td align=left><input type=button class=btn value="<?php echo  __('Guardar') ?>" onclick='return Validar(this.form);' />
-				<input type=button class=btn value="<?php echo  __('Cerrar') ?>" onclick="Cerrar();" />
-<?php  if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
-					<input type=button class=btn value="<?php echo  __('Restaurar') ?>" onclick="return Cambiar(this.form,'restaurar');" />
-		<?php  } ?></td>
+			<td align=left>
+					<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick='return Validar(this.form);'><?php echo  __('Guardar') ?></a>
+				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo  __('Cancelar') ?></a>
+				<?php  if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
+
+				<a class="btn botonizame" href="javascript:void();" icon="ui-icon-restore" onclick="return Cambiar(this.form,'restaurar');"><?php echo  __('Restaurar') ?></a>
+									 
+				 
+		<?php  } ?>
+			 <a class="btn botonizame" icon="ui-icon-money" href='javascript:void(0)' onclick="MostrarTipoCambioPago()" title="<?php echo  __('Tipo de Cambio del Documento de Pago al ser pagado.') ?>"><?php echo  __('Actualizar Tipo de Cambio') ?>	</a></td>
 		</tr>
 	</table>
 </form>

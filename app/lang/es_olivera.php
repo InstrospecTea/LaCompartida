@@ -6,6 +6,13 @@ $_LANG['Trámites'] = 'Honorarios Notariales';
 $_LANG['TRÁMITE'] = 'HONORARIO NOTARIAL';
 $_LANG['TRÁMITES'] = 'HONORARIOS NOTARIALES';
 
+ 
+$_LANG['Trabajos']='Honorarios profesionales';
+$_LANG['Honorarios legales']='Honorarios profesionales';
+$_LANG['Honorarios Legales']='Honorarios Profesionales';
+$_LANG['honorarios legales']='honorarios profesionales';
+
+
 
 $_LANG[ 'es_Asociado Senior']='Asociado Senior';
 $_LANG[ 'es_Asociado Junior']='Asociado Junior';
@@ -24,5 +31,6 @@ $_LANG[ 'en_Socio Senior']='Senior Partner';
 $_LANG[ 'en_Socio Junior']='Junior Partner';
 $_LANG[ 'en_Escribano']='Assistant';
  
-$_LANG[ 'es_Honorarios']='Honorarios Legales';
+$_LANG[ 'es_Honorarios']='Honorarios Profesionales';
 $_LANG[ 'en_Honorarios']='Legal Fees';
+
