@@ -879,7 +879,7 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 	<table style="border: 0px solid #666;" width='95%'>
 		<tr>
 			<td align=left>
-					<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick='return Validar(this.form);'><?php echo  __('Guardar') ?></a>
+					<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_facturas').get(0));"><?php echo  __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="Cerrar();" ><?php echo  __('Cancelar') ?></a>
 				<?php  if ($factura->loaded() && $factura->fields['anulado'] == 1) { ?>
 
@@ -1154,6 +1154,8 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			enviado = 0;
 			function Validar(form)
 			{
+				
+			 
 			var msgerror='';
 				<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
 				if(!Validar_Rut())
