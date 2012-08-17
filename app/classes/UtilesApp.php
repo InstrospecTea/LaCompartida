@@ -33,31 +33,46 @@ class UtilesApp extends Utiles {
 			return $result['simbolo'];
 	}
 	
-	public static function CampoCliente($sesion,$codigo_cliente=null,$codigo_cliente_secundario=null,$codigo_asunto=null,$codigo_asunto_secundario=null) {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes=false, $width=320, $oncambio='') {
 			echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) {
 			echo Autocompletador::CSS();
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario);
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width , $oncambio );
 			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width , $oncambio );
 			}
 			echo Autocompletador::Javascript($sesion);
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
-				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, " class='combox' ", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
+				if ($oncambio=='') {
+					$oncambio="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio.="CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);";
+				}
+				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "  ", $oncambio, $width, $codigo_asunto_secundario);
 			} else {
-				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+				if ($oncambio=='') {
+					$oncambio="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio.="CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);";
 			}
-		
+				echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", $oncambio, $width, $codigo_asunto);
 		}
 	}
+	}
 	
-	public static function CampoAsunto($sesion,$codigo_cliente=null,$codigo_cliente_secundario=null,$codigo_asunto=null,$codigo_asunto_secundario=null) {
+	public static function CampoAsunto($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null, $width=320, $oncambio='') {
+			if ($oncambio=='') {
+					$oncambio="CargarSelectCliente(this.value);";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio.="CargarSelectCliente(this.value);";
+				}
+		
 	 if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
-                                    echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
+			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
 								} else {
-                                    echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
+			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
 								} 
 	}
 	public static function ComparaEstadoCobro($sesion, $estadoactual, $operador = '=', $estado) {

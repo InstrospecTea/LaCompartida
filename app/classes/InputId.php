@@ -177,18 +177,12 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				var select_origen = document.getElementById(id_origen);
 				var select_destino = document.getElementById(id_destino);
 				
-				var http = getXMLHTTP();
+			 
 				var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value ;
-				//prompt(url,url);
 
-				loading(\"Actualizando opciones\");
-				cargando = true;
-				http.open('get', url, true);
-				http.onreadystatechange = function()
+				jQuery.get(url, function(response) 
 				{
-					if(http.readyState == 4)
-					{
-						var response = http.responseText;
+						
 						
 						if(response.indexOf('|') != -1)
 						{
@@ -211,17 +205,18 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 								if( accion == \"cargar_asuntos_desde_campo\" )
 									{
 									alert('".__('El código ingresado no existe')."');
-									select_origen.value = \"\";
-									select_destino.value = \"\";
+									jQuery('#'+id_origen).val('');
+									jQuery('#'+id_destino).val('');
+									
 									}
-								else if( select_origen.value != '' )
+								else if( jQuery('#'+id_origen).val() != '' )
 									alert('".$mje_error."');
 							}
 							else
 							{
 								if(response.indexOf('noexiste') != -1 )
 									alert('".__('El código ingresado no existe')."');
-								//select_destino.length = 1;
+								jQuery('#'+id_destino).length = 1;
 								for(i = 0; i < campos.length; i++)
 								{
 									valores = campos[i].split('|');
@@ -235,10 +230,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 										if(i == 0)
 										{
 											select_destino.options.length = 1;
-											/*var option2 = new Option();
-											option2.value = '';
-											option2.text = 'Cualquiera';
-											select_destino.add(option2);*/
+											 
 										}
 										try
 										{
@@ -268,92 +260,60 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							else
 								alert(response);
 						}
-					}
-					cargando = false;
+					});
 				};
-				http.send(null);
-			}
-			function CargarSelectCliente(codigo)
-{
+				 
+			 
+
+
+
+		function CargarSelectCliente(codigo)  {
 			if(codigo!='')
 			{
 			";
-			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-				{
+			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )  		{
 				$output .= "
-				var http = getXMLHTTP();
-				var url = root_dir + '/app/ajax.php?accion=veriguar_codigo_cliente&id=' + codigo ;
-				//prompt(url,url);
 
-				cargando = true;
-				http.open('get', url, true);
+				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 				
-				http.onreadystatechange = function()
-				{
-					if(http.readyState == 4)
-					{
-						var response = http.responseText;
-						if(response)
-						{
+
+				jQuery.get(url, function(response) {  		
 								";
-						if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()==1 ) ) )
-						{
+				if( $desde != 'iframe' && (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  )		{
 								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
 								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;
 								if( $('codigo_cliente_secundario')) $('codigo_cliente_secundario').onchange();";
-						}
-						else
-						{
+						} 	else		{
 								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
 								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;";
 						}
-						$output .= "
+						$output .= "}); ";
 						}
-					}
-					cargando = false;
-				};
-				http.send(null);
-";
-	}
 	else
 	{
 		$output .= "
-						var codigo_cliente=codigo.substring(0,4);
+						//var array_cliente=codigo.split('-');
 						
-				var http = getXMLHTTP();
-				var url = root_dir + '/app/ajax.php?accion=veriguar_codigo_cliente&id=' + codigo_cliente ;
-				//prompt(url,url);
+						 
+						//var codigo_cliente=array_cliente[0];
 
-				cargando = true;
-				http.open('get', url, true);
-				http.onreadystatechange = function()
-				{
-					if(http.readyState == 4)
-					{
-						var response = http.responseText;
+				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 						
-						if(response)
-						{
-								";
-						if( $desde != 'iframe' && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente()==1 ) ) )
-						{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=codigo_cliente;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=codigo_cliente;
+
+					jQuery.get(url, function(response) {	
+					console.log(response);	";
+						if( $desde != 'iframe' && ( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) )		{
+								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
+								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;
 								if( $('codigo_cliente')) $('codigo_cliente').onchange();";
 						}
 						else
 						{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=codigo_cliente;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=codigo_cliente;";
+								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
+								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;";
 						}
-						$output .= "
+						$output .= "});";
 						}
-					}
-					cargando = false;
-				};
-				http.send(null);
-";
-}
 $output .= "
 			}
 }
@@ -392,5 +352,12 @@ function RevisarConsistenciaClienteAsunto( form ) {
 ";
 		return $output;
 		}
+		
+		
+		
+		
+		
+		 
+		
 }
 ?>

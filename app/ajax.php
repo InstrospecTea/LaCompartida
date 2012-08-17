@@ -74,7 +74,7 @@
 						`archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'plugin.php' ,
 						`orden` smallint(3) NOT NULL DEFAULT '1',
 						`activo` tinyint(1) NOT NULL,
-						PRIMARY KEY (`id_lang`),
+						PRIMARY KEY (`id_plugin`),
 						UNIQUE KEY `archivo_nombre` (`archivo_nombre`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
                         $archivos=array();
@@ -280,6 +280,7 @@
 			else	
 				$vacio = true;
  	  	list($accion,$codigo_cli) = split("//",$accion);
+		
     	if( $accion == "cargar_asuntos_desde_campo" && ( ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) || ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) ) )
     	{
     		$query = "SELECT codigo_cliente_secundario 
@@ -335,11 +336,41 @@
 	  	echo("~noexiste");
 		if($i == 0)
 			echo("VACIO|");
+		//echo $query;
 	break;
+	case  'averiguar_codigo_cliente':
+		
+		if(UtilesApp::GetConf($sesion, 'CodigoSecundario') )  		{
+			// asumo que recibí un codigo asunto secundario (más vale) 
+			
+ 			$cliente=$sesion->pdodbh->query("SELECT cliente.codigo_cliente_secundario  FROM cliente
+								JOIN asunto ON cliente.codigo_cliente=asunto.codigo_cliente
+								WHERE asunto.codigo_asunto_secundario='$id'");
+			  
+			if($dato= $cliente->fetch()) {
+				echo $dato['codigo_cliente_secundario'];
+			} else {
+				echo false;
+			}
+		}
+		else
+		{
+			$cliente=$sesion->pdodbh->query("SELECT cliente.codigo_cliente   FROM cliente
+								JOIN asunto ON cliente.codigo_cliente=asunto.codigo_cliente
+								WHERE asunto.codigo_asunto ='$id'");
+			  
+			if($dato= $cliente->fetch()) {
+				echo $dato['codigo_cliente'];
+			} else {
+				echo false;
+			}
+		}
+	break;
+	
 		case  'veriguar_codigo_cliente':
 		
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-		{
+		if(UtilesApp::GetConf($sesion, 'CodigoSecundario') )  		{
+			// asumo que recibí un codigo asunto secundario (más vale) 
 			$query = "SELECT codigo_cliente_secundario FROM cliente
 								JOIN asunto ON cliente.codigo_cliente=asunto.codigo_cliente
 								WHERE asunto.codigo_asunto_secundario='$id'";
