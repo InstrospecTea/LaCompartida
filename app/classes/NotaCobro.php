@@ -4335,6 +4335,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
+					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
 					$html = str_replace('%duracion_trabajada%', __('Duración trabajada'), $html);
 					$html = str_replace('%duracion%', __('Duración cobrable'), $html);
@@ -4347,6 +4348,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%duracion_trabajada_bmahj%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%duracion_bmahj%', __('Hrs. Tarificadas'), $html);
 					$html = str_replace('%duracion_descontada_bmahj%', __('Hrs. Castigadas'), $html);
+					$html = str_replace('%duracion_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 
 					$html = str_replace('%duracion_trabajada%', __('Duración trabajada'), $html);
 					$html = str_replace('%duracion%', __('Duración cobrable'), $html);
@@ -10200,9 +10202,11 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%nombre%', __('Nombre'), $html);
 				
 				if ($this->fields['opc_ver_horas_trabajadas']) {
-						$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
+						$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs.:Mins. Descontadas') . '</td>', $html);
+						$html = str_Replace('%td_hrs_mins_descontadas_real%', '<td align="center">' . __('Hrs.:Mins. Descontadas') . '</td>', $html);
 					}else{
 						$html = str_replace('%fayca_hrs_descontadas%', '', $html);
+						$html = str_Replace('%td_hrs_mins_descontadas_real%', '', $html);
 				}
 				
 				if ($descontado || $retainer || $flatfee) {
@@ -10215,11 +10219,13 @@ class NotaCobro extends Cobro {
 						$html = str_Replace('%hrs_descontadas_real%', __('Hrs. Descontadas'), $html);
 						$html = str_replace('%hrs_mins_trabajadas_real%', __('Hrs.:Mins. Trabajadas'), $html);
 						$html = str_Replace('%hrs_mins_descontadas_real%', __('Hrs.:Mins. Descontadas'), $html);
+						
 					} else {
 						$html = str_replace('%hrs_trabajadas_real%', '', $html);
 						$html = str_Replace('%hrs_descontadas_real%', '', $html);
 						$html = str_replace('%hrs_mins_trabajadas_real%', '', $html);
 						$html = str_Replace('%hrs_mins_descontadas_real%', '', $html);
+						
 					}
 				} else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%hrs_trabajadas_real%', __('Hrs. Trabajadas'), $html);
@@ -10280,7 +10286,7 @@ class NotaCobro extends Cobro {
 						$html = str_replace('%hh_cobrable%', '', $html);
 					} if ($descontado) {
 						$html = str_replace('%td_descontada%', '<td align=\'center\' width=\'80\'>%hh_descontada%</td>', $html);
-						$html = str_replace('%hh_descontada%', __('Hrs Castigadas'), $html);
+						$html = str_replace('%hh_descontada%', __('Hrs.:Mins. Descontadas'), $html);
 					} else {
 						$html = str_replace('%td_descontada%', '', $html);
 						$html = str_replace('%hh_descontada%', '', $html);
