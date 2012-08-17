@@ -9706,6 +9706,13 @@ class NotaCobro extends Cobro {
 				}
 
 				$html = str_replace('%nombre%', __('Nombre'), $html);
+
+				if ($this->fields['opc_ver_horas_trabajadas']) {
+						$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
+					}else{
+						$html = str_replace('%fayca_hrs_descontadas%', '', $html);
+				}
+				
 				if ($descontado || $retainer || $flatfee) {
 					$html = str_replace('%hrs_trabajadas%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%hrs_mins_trabajadas%', __('Hrs.:Mins. Trabajadas'), $html);
