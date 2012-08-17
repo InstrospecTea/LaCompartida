@@ -384,7 +384,7 @@ $resp = mysql_query($update3, $sesion->dbh);
 	$resp = mysql_query($update3C, $sesion->dbh);
 	
 	list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -2 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
-
+if(!$maxolaptime) $maxolaptime=0;
 	$update4 = "replace delayed into olap_liquidaciones (SELECT
                                                                 asunto.codigo_asunto as codigos_asuntos,
                                                                 asunto.codigo_asunto_secundario, 
