@@ -1,6 +1,5 @@
 <?php
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once dirname(__FILE__).'/../../fw/funciones/funciones.php';
+
 
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
@@ -1069,4 +1068,4 @@ $_LANG['Factura ACL'] = "Factura";
 
 $_LANG['es_Hrs Trabajadas']="Hrs Trabajadas";
 $_LANG['en_Hrs Trabajadas']="Worked Hours";
- 
+

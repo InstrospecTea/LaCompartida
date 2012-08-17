@@ -275,6 +275,7 @@ $_LANG['Cambiar a'] = "Cambiar a";
 $_LANG['Director proyecto'] = "Project Manager";
 $_LANG['Factura'] = "Invoice";
 $_LANG['Boleta'] = "Invoice Ref.";
+$_LANG['Hrs Trabajadas'] = "Worked Hrs";
 $_LANG['Facturación'] = "Facturación";
 $_LANG['Ver Factura'] = "View Invoice";
 $_LANG['Cobro Periodico'] = "Cobro Periodico";
