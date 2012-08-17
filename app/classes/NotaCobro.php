@@ -9612,7 +9612,7 @@ class NotaCobro extends Cobro {
 					foreach ($x_resumen_profesional as $prof => $data) {
 						if ($data['duracion_retainer'] > 0 && ( $this->fields['forma_cobro'] != 'FLAT FEE' || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) ))
 							$retainer = true;
-						if ($data['duracion_descontada'] > 0)
+						//if ($data['duracion_descontada'] > 0)
 							$descontado = true;
 						if ($data['flatfee'] > 0)
 							$flatfee = true;
