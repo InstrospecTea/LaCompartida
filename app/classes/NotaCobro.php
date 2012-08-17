@@ -10202,8 +10202,8 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%nombre%', __('Nombre'), $html);
 				
 				if ($this->fields['opc_ver_horas_trabajadas']) {
-						$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs.:Mins. Descontadas') . '</td>', $html);
-						$html = str_Replace('%td_hrs_mins_descontadas_real%', '<td align="center">' . __('Hrs.:Mins. Descontadas') . '</td>', $html);
+						$html = str_replace('%fayca_hrs_descontadas%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
+						$html = str_Replace('%td_hrs_mins_descontadas_real%', '<td align="center">' . __('Hrs. Descontadas') . '</td>', $html);
 					}else{
 						$html = str_replace('%fayca_hrs_descontadas%', '', $html);
 						$html = str_Replace('%td_hrs_mins_descontadas_real%', '', $html);
