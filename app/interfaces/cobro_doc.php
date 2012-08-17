@@ -83,6 +83,11 @@
 	$cssData .= UtilesApp::CSSCobro($Sesion,$id_formato);
 	list($docm_top, $docm_right, $docm_bottom, $docm_left, $docm_header, $docm_footer) = UtilesApp::ObtenerMargenesCarta( $Sesion, $cobro->fields['id_carta']);
 	
+	if( isset($_GET['notacobro'])) {
+		echo $html;
+		die();
+	}
+	
 	if( UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != 0 && UtilesApp::GetConf($Sesion, 'SegundaNotaCobro') != $id_formato ) {
 		$nuevo_id = UtilesApp::GetConf($Sesion, 'SegundaNotaCobro');
 		$html2 .= $cobro->GeneraHTMLCobro(false,$nuevo_id);
