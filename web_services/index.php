@@ -6,33 +6,39 @@ require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+require_once Conf::ServerDir().'/../app/classes/Funciones.php';
 $sesion = new Sesion();
 header('Content-Type: text/javascript; charset=utf8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Max-Age: 3628800');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Methods: GET, POST');
 
-require 'Slim/Slim.php';
+ 
 
-$slimttb = new Slim();
-$slimttb->config('debug', false);
+$Slim=Slim::getInstance('default',true);
+$Slim->config('debug', false);
 
 
-$slimttb->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
+$Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
 	function EntregarListaClientes($callback='') {
             global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
-				$timestamp=$esteslim->request()->post('timestamp');
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
+				$Slim=Slim::getInstance('default',true);
+				$usuario= $Slim->request()->post('usuario');
+				$password= $Slim->request()->post('password');
+				$timestamp=$Slim->request()->post('timestamp');
+		
+				if ($usuario == "" || $password == "") {
+					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+ 				}
+				
 				
 			
 			$lista_clientes = array();
                         
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
-				if ( UtilesApp::GetConf($sesion,'CodigoSecundario') )
+ 				if ( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 				{
 					$select_codigo="codigo_cliente_secundario as codigo_cliente";
 				} 	else	{
@@ -58,19 +64,24 @@ $slimttb->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->vi
 			
 	}
 
-$slimttb->map('/EntregarListaAsuntos(/:callback)', 'EntregarListaAsuntos')->via('GET', 'POST');
+$Slim->map('/EntregarListaAsuntos(/:callback)', 'EntregarListaAsuntos')->via('GET', 'POST');
 
 	function EntregarListaAsuntos($callback='') {
             global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
-				$timestamp=$esteslim->request()->post('timestamp');
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
+				$Slim=Slim::getInstance('default',true);
+				$usuario= $Slim->request()->post('usuario');
+				$password= $Slim->request()->post('password');
+				$timestamp=$Slim->request()->post('timestamp');
+				
+				if ($usuario == "" || $password == "") {
+					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+ 				}
+				
 				
 			
-			$lista_asuntos = array();
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
+	$lista_asuntos = array();
 				if ( UtilesApp::GetConf($sesion,'CodigoSecundario') )
 				{
 					$select_codigo="asunto.codigo_asunto_secundario,cliente.codigo_cliente_secundario";
@@ -107,46 +118,59 @@ $slimttb->map('/EntregarListaAsuntos(/:callback)', 'EntregarListaAsuntos')->via(
 
 
 //POST route
-$slimttb->map('/EntregarDatos(/:callback)', 'EntregarDatos')->via('GET', 'POST');
+$Slim->map('/EntregarDatos(/:callback)', 'EntregarDatos')->via('GET', 'POST');
 
     function EntregarDatos($callback='') {
 		 global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
-				$timestamp=$esteslim->request()->post('timestamp');
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
+				$Slim=Slim::getInstance('default',true);
+				$usuario= $Slim->request()->post('usuario');
+				$password= $Slim->request()->post('password');
+				$timestamp=$Slim->request()->post('timestamp');
+		
+				if ($usuario == "" || $password == "") {
+					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+ 				}
 				
 			
-			$lista_asuntos = array();
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
+			
 			
 			$queryuser="select id_usuario, nombre, apellido1 from usuario where rut='$usuario'";
 		
 			 list($idusuario,$nombre,$apellido) = mysql_fetch_row(mysql_query($queryuser, $sesion->dbh) );
 			
+			 
 			
 	if($callback!='') {
-		echo $callback.' ('.json_encode(array($idusuario,$nombre,$apellido,UtilesApp::GetConf($sesion,'Intervalo'),Conf::AppName() )).');';
+		echo $callback.' ('.json_encode(array($idusuario,$nombre,$apellido,UtilesApp::GetConf($sesion,'Intervalo'),UtilesApp::GetConf($sesion,'NombreEmpresa') )).');';
 		} else {
-		echo json_encode( array($idusuario,$nombre,$apellido,UtilesApp::GetConf($sesion,'Intervalo'),Conf::AppName() )  );
+		echo json_encode( array($idusuario,$nombre,$apellido,UtilesApp::GetConf($sesion,'Intervalo'),UtilesApp::GetConf($sesion,'NombreEmpresa') )  );
 		}
 }
 
 //POST route
-$slimttb->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('GET', 'POST');
+$Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('GET', 'POST');
 
     function EntregarDatosClientes($callback='') {
 		 global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
+				$Slim=Slim::getInstance('default',true);
+				$usuario= $Slim->request()->post('usuario');
+				$password= $Slim->request()->post('password');
 				 
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
+		
+				if ($usuario == "" || $password == "") {
+					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+ 				}
+				
+				
+			
 				
 			$usuarios=array();
 		
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
+			 
 			
 			if(existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
 				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo, u.activo_juicio
@@ -173,20 +197,26 @@ $slimttb->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->vi
 
 
 //POST route
-$slimttb->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
+$Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 
     function DatosPanel($callback='') {
 		 global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
+				$Slim=Slim::getInstance('default',true);
+				$usuario= $Slim->request()->post('usuario');
+				$password= $Slim->request()->post('password');
 			 
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
+	
+				if ($usuario == "" || $password == "") {
+					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+ 				}
+				
+			
 				
 			
 			$lista_datos = array();
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
-			
+ 			
 			$querydatos="select * from
 
 (select count(*) as gastos from cta_corriente) cc,
@@ -217,153 +247,140 @@ date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) f
 }
 
 
-$slimttb->map('/CargarTrabajo(/:callback)', 'CargarTrabajo')->via('GET', 'POST');
+$Slim->map('/CargarTrabajo(/:callback)', 'CargarTrabajo')->via('GET', 'POST');
 
-    function CargarTrabajo($callback='') {
-		 global $sesion;
-				$esteslim=Slim::getInstance();
-				$usuario= $esteslim->request()->post('usuario');
-				$password= $esteslim->request()->post('password');
-				$starttimer=$esteslim->request()->post('starttimer');
-				$idescritorio=$esteslim->request()->post('idescritorio');
-				$codigo_asunto=$esteslim->request()->post('codigoasunto');
-				$duracion=intval($esteslim->request()->post('duracion'));
-				$descripcion=utf8_decode($esteslim->request()->post('descripcion'));
-				$ordenado_por=$esteslim->request()->post('userid');
-				$fecha=date('Y-m-d',strtotime($starttimer/1000)+86400);
-				$id_trabajo_local=$ordenado_por.$starttimer;
-				$codigo_actividad = "";
-				$id_moneda = "";
-			
-				
-		if($usuario == "" || $password == "") die('["Debe entregar el usuario y el password."]');  
-				
-			
-			
-			if(!$sesion->VerificarPassword($usuario,$password)) die('["Usuario o Password incorrectos"]'); 
-			
-		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-		{
-			$query_codigo="SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo_asunto'";
-			if(!($resp_codigo = mysql_query($query_codigo, $sesion->dbh) ))				die(mysql_error());
-			list($codigo_asunto) = mysql_fetch_array($resp_codigo);
+    function CargarTrabajo($callback = '') {
+	global $sesion;
+	$Slim = Slim::getInstance();
+	$usuario = $Slim->request()->post('usuario');
+	$password = $Slim->request()->post('password');
+	$starttimer = $Slim->request()->post('starttimer'); // timestamp local del cliente de escritorio
+	$idescritorio = $Slim->request()->post('idescritorio'); // opcional, puede venir en cero, el webservice le responde al cliente con su idescritorio definitivo
+	$codigo_asunto = $Slim->request()->post('codigoasunto');
+	$duracion = intval($Slim->request()->post('duracion'));
+	$descripcion =  utf8_decode($Slim->request()->post('descripcion'));
+	$ordenado_por = $Slim->request()->post('userid');  // opcional, puede venir vacio, NO Cero
+	$codigo_actividad = $Slim->request()->post('codigo_actividad');  // opcional, puede venir vacio, NO Cero
+	$area_trabajo = $Slim->request()->post('area_trabajo');  // opcional, puede venir vacio, NO Cero
+	$fecha = date('Y-m-d',strtotime($Slim->request()->post('fecha')));  // opcional, puede venir vacio, NO Cero
+	if ($fecha == "")		$fecha = date('Y-m-d', strtotime($starttimer / 1000) + 86400);
+
+	
+
+
+
+
+	if ($usuario == "" || $password == "") {
+		
+		  $Slim->halt(401, '["Debe entregar el usuario y el password."]');
+	} else if (!$sesion->VerificarPassword($usuario, $password)) {
+		 
+		  $Slim->halt(401, '["Usuario o Password incorrectos"]');
+	}
+	if (!isset($id_usuario) || !$id_usuario) $id_usuario=$sesion->usuario->fields['id_usuario'];
+
+	$trabajo = new Trabajo($sesion);
+	
+	 
+	$trabajo->Edit("id_usuario", $id_usuario);
+	$trabajo->Edit('id_cobro', 'NULL');
+	$trabajo->Edit('id_trabajo_local', $id_usuario . $starttimer);  // esto equivale a hacerlo único
+
+
+	$asunto = new Asunto($sesion);
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
+		$codigo_asunto = $asunto->fields['codigo_asunto'];
+	} else {
+		$asunto->LoadByCodigo($codigo_asunto);
+	}
+	$trabajo->Edit('codigo_asunto', $codigo_asunto);
+$trabajo->Edit('descripcion', $descripcion);
+
+	if ($asunto->fields['cobrable'] == 0) {
+		$trabajo->Edit("cobrable", '0');
+		$trabajo->Edit("visible", '0');
+	} else {
+		$trabajo->Edit("cobrable", '1');
+		$trabajo->Edit("visible", '1');
+	}
+	$contrato = new Contrato($sesion);
+	$contrato->Load($asunto->fields['id_contrato']);
+
+	$trabajo->Edit('tarifa_hh', Funciones::Tarifa($sesion, $id_usuario, $contrato->fields['id_moneda'], $codigo_asunto));
+
+	$trabajo->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
+
+
+
+	$trabajo->Edit("id_moneda", $contrato->fields['id_moneda']);
+
+
+	$minutos = $duracion / 60;
+	$min = intval($minutos % 60);
+	$hora = intval(($minutos - $min) / 60);
+	$min = $min < 10 ? "0" . $min : $min;
+	$hora = $hora < 10 ? "0" . $hora : $hora;
+	$trabajo->Edit("duracion", "$hora:$min:00");
+	if ($trabajo->fields['cobrable'] == 0) {
+		$trabajo->Edit('duracion_cobrada', '00:00:00');
+	} else {
+		$trabajo->Edit("duracion_cobrada", "$hora:$min:00");
+	}
+
+	$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
+	if (!($resp = mysql_query($query, $sesion->dbh) ))
+		die(mysql_error());
+	list($id_usuario, $id_categoria_usuario, $dias_ingreso_trabajo) = mysql_fetch_array($resp);
+
+	$trabajo->Edit("id_usuario", $id_usuario);
+	$trabajo->Edit("id_categoria_usuario", $id_categoria_usuario);
+
+
+	if ($codigo_actividad == "")
+		$codigo_actividad = "NULL";
+	$trabajo->Edit("codigo_actividad", $codigo_actividad);
+	$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : "NULL";
+	$trabajo->Edit("id_area_trabajo", $id_area_trabajo);
+
+
+	//Todo a mayusculas segun conf
+	if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
+		$descripcion = strtoupper($descripcion);
+		$ordenado_por = strtoupper($ordenado_por);
+	}
+	$trabajo->Edit("solicitante", $descripcion);
+	$trabajo->Edit("id_moneda", $ordenado_por);
+
+	$fecha_antigua = $fecha;
+	if ($dias_ingreso_trabajo > 0) {
+		if (strtotime($fecha) < mktime(0, 0, 0, date("m"), date("d") - $dias_ingreso_trabajo, date("Y")))
+			$fecha = date("Y-m-d");
+	}
+	$trabajo->Edit("fecha", $fecha); // si intenta ingresar un trabajo con fecha más antigua que su límite, lo ingresa con fecha de hoy 
+	//$trabajo->Edit('fecha_creacion', date('Y-m-d H:i:s')); // el sistema le añade NOW de por si, mala cosa.
+
+
+	if ($trabajo->Write()) {
+
+		$trabajo->InsertarTrabajoTarifa();
+
+
+		try {
+		$sesion->pdodbh->exec("UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'");
+		} catch (Exception $e) {
+			 $Slim->halt(401, $e->getMessage());
 		}
-		
-		$query = "SELECT contrato.id_moneda, asunto.cobrable FROM contrato JOIN asunto on asunto.id_contrato = contrato.id_contrato WHERE codigo_asunto='$codigo_asunto'";
-		if(!($resp = mysql_query($query, $sesion->dbh) ))			die(mysql_error());
-		list($id_moneda, $cobrable) = mysql_fetch_array($resp);
+	} else {
+		  $Slim->halt(401, '["No se ha podido insertar el trabajo."]');
+	}
 
-		$minutos = $duracion / 60;
-		$min = intval($minutos % 60);
-		$hora = intval(($minutos - $min) / 60);
-		$min = $min < 10 ? "0".$min : $min; 
-		$hora = $hora < 10 ? "0".$hora : $hora; 
-
-		$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
-		if(!($resp = mysql_query($query, $sesion->dbh) )) die(mysql_error());
-			
-		list($id_usuario, $id_categoria_usuario, $dias_ingreso_trabajo) = mysql_fetch_array($resp);
-
-		if($codigo_actividad == "")
-			$codigo_actividad = "NULL";
-		else
-			$codigo_actividad = "'$codigo_actividad'";
-
-		if($id_moneda == "")
-			$id_moneda = "1";
-		else
-			$id_moneda = "'$id_moneda'";
-		//Todo a mayusculas segun conf
-		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TodoMayuscula') ) || ( method_exists('Conf','TodoMayuscula') && Conf::TodoMayuscula() ) )
-		{
-			$descripcion = strtoupper($descripcion);
-			$ordenado_por = strtoupper($ordenado_por);
-		}
-
-		$fecha_antigua=$fecha;
-		if( $dias_ingreso_trabajo > 0 ) if(strtotime($fecha) < mktime(0,0,0,date("m"),date("d")-$dias_ingreso_trabajo,date("Y")))	$fecha=date("Y-m-d");
-
-		$id_area_trabajo = !empty($area_trabajo) ? "'$area_trabajo'" : "NULL";
-			
-		$descripcion=addslashes($descripcion);
-		$ordenado_por=addslashes($ordenado_por);
-		$query = "INSERT INTO trabajo SET 
-								id_usuario='$id_usuario',
-                                                                id_categoria_usuario='$id_categoria_usuario',
-								id_trabajo_local='$id_trabajo_local',
-								codigo_asunto='$codigo_asunto',
-								codigo_actividad=$codigo_actividad,
-								descripcion='$descripcion',
-								solicitante='$ordenado_por',
-								id_moneda=$id_moneda,
-								cobrable='$cobrable',
-								fecha_creacion=NOW(),
-								fecha='$fecha',
-								duracion='$hora:$min:00',
-						duracion_cobrada='$hora:$min:00',
-						id_area_trabajo = $id_area_trabajo
-							";
-		//die($duracion.' '. $query);
-		if(!($resp = mysql_query($query, $sesion->dbh) )) die(mysql_error());
-		else {
-		    $id_trabajo=mysql_insert_id( $sesion->dbh );
-		    
-			$trabajo = new Trabajo( $sesion );
-			
-			$trabajo->Load($id_trabajo );
-			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
-						mysql_query($query,$sesion->dbh) or die(mysql_error());
-
-			
-				
-		
-		
-		$dbh = $sesion->dbh;
-		
-		$contrato = new Contrato($sesion);
-		$contrato->LoadByCodigoAsunto($codigo_asunto);
-		
-		
-		
-		$query = "SELECT 
-									prm_moneda.id_moneda, 
-									( SELECT usuario_tarifa.tarifa 
-											FROM usuario_tarifa 
-											LEFT JOIN contrato ON contrato.id_tarifa = usuario_tarifa.id_tarifa 
-											LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato 
-										WHERE usuario_tarifa.id_usuario = '$id_usuario' AND 
-													asunto.codigo_asunto = '$codigo_asunto' 
-													AND usuario_tarifa.id_moneda = prm_moneda.id_moneda)
-								FROM prm_moneda";
-		    $resp = mysql_query($query, $dbh) or die(mysql_error());
-
-		    while( list( $id_moneda, $valor ) = mysql_fetch_array($resp) )
-		    {
-			    if( empty($valor) ) $valor = 0;
-			    $query_insert = "INSERT trabajo_tarifa 
-													    SET id_trabajo = '$id_trabajo',
-															    id_moneda = '$id_moneda',
-															    valor = '$valor' 
-												    ON DUPLICATE KEY UPDATE valor = '$valor' ";
-			    mysql_query($query_insert, $dbh)  or die(mysql_error());
-
-			    if( $contrato->fields['id_moneda'] == $id_moneda ) {
-				$queryfinal = "UPDATE trabajo SET tarifa_hh = $valor WHERE id_trabajo = '$id_trabajo'";
-				 mysql_query($queryfinal, $dbh)  or die(mysql_error());
-			    }
-		    }
-			
-			
-		}
-			
-			
-	if($callback!='') {
-		echo $callback.' ('.json_encode(array($idescritorio, $id_trabajo)).');';
-		} else {
-		echo json_encode(array($idescritorio, $id_trabajo));
-		}
+	if ($callback != '') {
+		echo $callback . ' (' . json_encode(array($idescritorio, $trabajo->fields['id_trabajo'])) . ');';
+	} else {
+		echo json_encode(array($idescritorio, $trabajo->fields['id_trabajo']));
+	}
 }
-
 
 function existecampo($campo,$tabla,$dbh) { 
     
@@ -376,4 +393,4 @@ function existecampo($campo,$tabla,$dbh) {
         return false;
 }
 
-$slimttb->run();
+$Slim->run();
