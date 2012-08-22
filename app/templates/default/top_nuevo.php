@@ -63,7 +63,7 @@ if ( !UtilesApp::GetConf($sesion,'ActualizacionTerminado') ) {
     </div>
 
     
-     <div id="mainttb" style="width:960px;position:relative;left:-10px; ">
+     <div id="mainttb" style="padding: 30px 0 5px ;width:960px;position:relative;left:-10px; ">
             
     <div class="titulo_sec"  >
     <?php 

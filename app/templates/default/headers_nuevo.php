@@ -59,7 +59,7 @@ google.load("jquery","1.7");
         <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
 		<script  type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
 		<script  type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
-		
+
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	
@@ -72,7 +72,7 @@ google.load("jquery","1.7");
 .alignright {text-align:right;font-size:10px;}
 .aligncenter {display:block;text-align:center;margin:auto;}
 #zenbox_tab {overflow: hidden; border: 0 none !important;}
-#mainttb {background:white;padding: 30px 0 5px ;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;text-align:center;}
+#mainttb {background:white;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;text-align:center;}
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
 .cont_tabla {padding:0 20px; background-color: #FFFFFF;text-align:center;margin:5px auto;}
 .cont_tabla table {margin-left:auto;margin-right:auto;}
@@ -104,7 +104,28 @@ margin: 0;}
 #historial {margin:5px 0 0 0px;width:680px;float:left;}
 .z10 {position:relative;z-index:10;background:white;}
 #estadoscobro {border: 1px solid #CCC;background: #EEE;height: 35px;width: 945px;position: relative;margin: 0px -2px 5px 0px;}
-
+#plugins {width:290px;}
+#langs { list-style-type: none; margin: 0; padding: 0; width: 340px;margin:auto; }
+  #langs li { list-style:none; margin: 0 2px 1px 3px; padding: 0.3em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+#plugins li {padding:5px;}        
+#plugins li .ui-state-default {width:240px;}
+#plugins li .ui-state-active {width:230px;}
+#langs li .ui-state-default {width: 200px;height: 20px;padding-left:15px;text-align:left;}
+#langs li label span {height:20px;}
+#plugins li span.ui-icon ,   #langs li span.ui-icon {position:relative;margin: 2px 0 0 -20px;}
+  #lttooltip {
+position:absolute;
+display:none;
+float: left;
+width: auto!important;
+border-right: 1px solid #EFC3A3;
+padding: 0 6px 0 15px;
+height: 31px;
+line-height: 31px;
+background: url(//static.thetimebilling.com/images/input_bg_tooltip.gif) -1279px 0;
+font-size: 11px;
+color: black;
+}
 </style>
 
 

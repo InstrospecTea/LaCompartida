@@ -27,13 +27,13 @@
 			}
 			?>
 			<td align="right" style="font-size: 10px; vertical-align: middle;">
-				<a href="<?=$url?>">
-					<img src="<?=Conf::ImgDir().'/paso'.$p.'_'.($paso==$p ? 'on' : 'off').$sufimg.'.gif'?>" border="0">
+				<a href="<?php echo $url?>">
+					<img src="<?php echo Conf::ImgDir().'/paso'.$p.'_'.($paso==$p ? 'on' : 'off').$sufimg.'.gif'?>" border="0">
 				</a>
 			</td>
 			<td align="left" style="font-size: 10px; vertical-align: middle;">
-				<a style="text-decoration:<?=$textdec?>;font-size:11px; color:<?=$paso==$p ? '#000000':'#CCCCCC'?>" href="<?=$url?>">
-					<?=$paginas[$p][1]?>
+				<a style="text-decoration:<?php echo $textdec?>;font-size:11px; color:<?php echo $paso==$p ? '#000000':'#CCCCCC'?>" href="<?php echo $url?>">
+					<?php echo $paginas[$p][1]?>
 				</a>
 			</td>
 		<?php } ?>

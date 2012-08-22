@@ -10,6 +10,7 @@
 </div>
 <div id="dialogomodal" style="display:none;text-align:center" > </div> 
 <div id="dialog-confirm" style="display:none;" ></div>  
+<div id="lttooltip"></div>
 <script type="text/javascript">
 /* <![CDATA[   */
     jQuery.ajax({async: true,cache:true, type: "GET", url: 'https://static.thetimebilling.com/fw/js/droplinemenu.js'	, 
@@ -22,7 +23,8 @@
  
 jQuery.ajax({async: false,cache:false,type: "GET", url:'https://static.thetimebilling.com/bottom.js?v2', dataType: 'script' });
 
-
+<?php   $Slim=Slim::getInstance('default',true);  
+$Slim->applyHook('hook_cobro_factura_pago'); ?>
 
  function downloadJSAtOnload() {
    

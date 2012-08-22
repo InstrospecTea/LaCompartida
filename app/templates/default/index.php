@@ -50,10 +50,14 @@
 		$sesion->pdodbh->exec("insert ignore into usuario_permiso (select id_usuario, 'ALL' as codigo_permiso from usuario where activo=1);");
 		//$sesion->pdodbh->exec("INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)  VALUES ('lifetime', '7200', 'duración de la sesión en segundos', 'numero', '10', '-1');");
 		
+		
+		$sesion->pdodbh->exec("delete from usuario_permiso where id_usuario=".$sesion->usuario->fields['id_usuario']." and codigo_permiso in ('SEC','PRO','SOC')");
+		
 	  echo '<br>&nbsp;&nbsp;&nbsp; <a href="'.Conf::RootDir().'/app/update.php?hash='.Conf::Hash().'"/>Update</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/app/interfaces/configuracion.php"/>Configuracion</a>';
 	  echo ' | <a href="'.Conf::RootDir().'/admin/phpminiadmin.php"/>MySQL</a>';
 	    echo ' | <a href="'.Conf::RootDir().'/admin/error_log.php"/>Error Log</a>';
+		 echo ' | <a href="'.Conf::RootDir().'/admin/respaldos.php"/>Respaldos</a>';
 
 		
 		
@@ -62,13 +66,14 @@
 			 $versiondb=$dato[0];
 		
 		
-		echo ' <br> Este software corre sobre la DB '.Conf::dbName().' version '.$versiondb;
+		
+		echo ' <br><br> Este software corre sobre la DB '. Conf::dbHost() .' <b>'. Conf::dbName().'</b> version '.$dato[0] ;
 	
 	  echo '. La m&aacute;s actual disponible es la ';
 	   $_GET['lastver'] = 1;
 	    include(Conf::ServerDir().'/update.php');
 		
-			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../../') .'</b><br>';
+			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../') .'</b><br>';
 		if(function_exists('svn_status')) print_r(svn_status( dirname(__FILE__)  ));
 	    } 
 	

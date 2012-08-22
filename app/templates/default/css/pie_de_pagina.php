@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../../../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 
@@ -45,13 +45,14 @@ xmlns="http://www.w3.org/TR/REC-html40">
 </div>
 
 <div style='mso-element:header' id=h1>
-<? 
+<?php
 // Busca html de header y pie de pagina 
 if( $id_formato != '' )
 	$where = " WHERE id_formato = '$id_formato' ";
 else
 	$where = " WHERE 1=2";
 $query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
+
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
 list($html_header, $html_pie) = mysql_fetch_array($resp); 
 
@@ -68,7 +69,7 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 ?> 
 
 <p class=MsoHeader align=center style='text-align:center'> 
-	<? echo $html_header; ?> 
+	<?php echo $html_header; ?> 
 </p> 
 
 </div> 
@@ -95,12 +96,12 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 
 <div style='mso-element:footer' id=f1>
 
-<?
+<?php
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 ?>
 <div class=MsoFooter align=center style='text-align:center'>
 	<span style='mso-no-proof:yes;'>
-		<? echo $html_pie; ?>
+		<?php echo $html_pie; ?>
 	</span>
 </div>
 

@@ -5,7 +5,7 @@
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 ?>
 <body id="pagina_body" onload="SetFocoPrimerElemento();">
-	<div id="mainttb" >
+	<div id="mainttb" style="padding: 10px 0 5px ;" >
 
 <?php
 	if($this->num_infos > 0)
@@ -40,4 +40,3 @@
 
 <?php
 }
-?>
