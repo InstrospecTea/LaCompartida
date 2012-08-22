@@ -1,5 +1,8 @@
 <?php
 
+require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
+
+ 
 
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
@@ -1051,7 +1054,7 @@ $_LANG['en_adelantos_sin_asignar']='Unused Advance Payments';
 /* Especiales para Aguilar Castillo Love */
 $_LANG['Resumen Nota de Cobro ACL'] = 'Resumen Nota de Cobro';
 $_LANG['Nota de Cobro ACL'] = 'Nota de Cobro';
-$_LANG['Otros'] = 'Trámites';
+//$_LANG['Otros'] = 'Trámites';
 $_LANG['Gastos ACL'] = 'Gastos';
 $_LANG['Servicios'] = 'Servicios Prestados';
 $_LANG['reference no acl'] = "Factura N&ordm;";
