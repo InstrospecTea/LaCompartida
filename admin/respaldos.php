@@ -1,160 +1,163 @@
 <?php
-
 require_once dirname(__FILE__).'/../app/conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/classes/S3.php';
+
+function autocargaapp($class_name) {
+	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
+		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
+	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
+		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
+	}
+}
+
+spl_autoload_register('autocargaapp');	
+	
+ 	$sesion = new Sesion(array('ADM'));
+
+
+$S3 = new AmazonS3(array('key' => 'AKIAIQYFL5PYVQKORTBA',
+			'secret' => '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'
+			, 'default_cache_config' => '/var/www/virtual/cache/'));
 
 
  
-	
-	
-	$sesion = new Sesion(array('ADM'));
-	
-	
-	
-if(defined('SUBDOMAIN') || define('SUBDOMAIN','aguilarcastillolove') ) {
-	$bucketName='ttbackup'.SUBDOMAIN;
-	
-	
- $s3 = new S3("AKIAIQYFL5PYVQKORTBA", "q5dgekDyR9DgGVX7/Zp0OhgrMjiI0KgQMAWRNZwn");	 
-	
-	
-     $mensajedr='';   
 
-	if($_GET['dropname']) {
-    $consumerKey = '5jys56prote7pyq';
-$consumerSecret = 'dmv6lidqcm039wc';
- require_once Conf::ServerDir().'/../admin/Dropbox/autoload.php';
- 
- if (isset($_SESSION['dropstate'])) {
-    $dropstate = $_SESSION['dropstate'];
+if (!defined('SUBDOMAIN')) {
+	die('Error: contacte a soporte para obtener su dirección de subdominio');
 } else {
-    $dropstate = 1;
+	$bucketName = 'ttbackup' . SUBDOMAIN;
 }
-$thisurl='https://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
-switch($dropstate) {
 
-    /* In this phase we grab the initial request tokens
-       and redirect the user to the 'authorize' page hosted
-       on dropbox */
-    case 1 :
-        //echo "Step 1: Acquire request tokens\n";
-        $tokens = $oauth->getRequestToken();
-        //print_r($tokens);
-
-        // Note that if you want the user to automatically redirect back, you can
-        // add the 'callback' argument to getAuthorizeUrl.
-       // echo "Step 2: You must now redirect the user to:\n";
-       
-        $_SESSION['dropstate'] = 2;
-        $_SESSION['oauth_tokens'] = $tokens;
-	 header('Location: '.$oauth->getAuthorizeUrl($thisurl));
-       die();
-
-    /* In this phase, the user just came back from authorizing
-       and we're going to fetch the real access tokens */
-    case 2 :
-        
-        $oauth->setToken($_SESSION['oauth_tokens']);
-        try {
-		$tokens = $oauth->getAccessToken($thisurl);
-		} catch (Exception $e) {
-		 $_SESSION['dropstate'] = 1;
-		 header('Location:'.$thisurl);
+	if ($_POST['filename']) {
+		$filename = $_POST['filename'];
+		$curl_url = $S3->get_object_url($bucketName, $filename, "+12 hours", array('https' => true, 'returnCurlHandle' => true));
+		$ch = curl_init($curl_url);
+		header('Content-type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="' . $filename . '"');
+		$data = curl_exec($ch);
+		curl_close($ch);
 		die();
-		}
-       
-        $_SESSION['dropstate'] = 3;
-        $_SESSION['oauth_tokens'] = $tokens;
-        // There is no break here, intentional
-
-    /* This part gets called if the authentication process
-       already succeeded. We can use our stored tokens and the api 
-       should work. Store these tokens somewhere, like a database */
-    case 3 :
-        
-        $oauth->setToken($_SESSION['oauth_tokens']);
-        break;
-}
-
-$dropbox2 = new Dropbox_API($oauth);
-$link=  $s3->getAuthenticatedURL ($bucketName,$_GET['dropname'], 7200);
-
- try {
-$info=$dropbox2->getAccountInfo();
-$stream = fopen($link, 'r');
-$path_parts = pathinfo($path);
-$mensajedr= 'Busque el archivo '.$_GET['dropname'].' dentro de unos minutos en su carpeta dropbox /Apps/TheTimeBilling/';
-   
-
-$put = $dropbox2->putStream($stream,$_GET['dropname']);
-
-// Close the stream
-fclose($stream);
-
-} catch (Exception $e) {
-		 $_SESSION['dropstate'] = 1;
-		 header('Location :'.$thisurl);
+	} else if ($_POST['dropname']) {
+		$sesion->phpConsole();
+		$dropname = $_POST['dropname'];
+		$consumerKey = '5jys56prote7pyq';
+		$consumerSecret = 'dmv6lidqcm039wc';
+		require_once Conf::ServerDir() . '/classes/Dropbox.php';
 		
-		
-		}
- 
-}
- 	$pagina = new Pagina($sesion);
+	try {
+			
+			$path_parts = pathinfo($path);
+			$mensajedr = '<div class="alert alert-success">Busque el archivo <b>' . $dropname. '</b> dentro de unos minutos en su carpeta dropbox <i>/Apps/TheTimeBilling/</i></div>';
 
-	 
+			$fp = fopen('php://temp', 'rw');
+			$curl_url = $S3->get_object_url($bucketName, $dropname, "2 hours", array('https' => true, 'returnCurlHandle' => true));
+			$ch = curl_init($curl_url);
+
+			
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION , 0);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_BUFFERSIZE, 256);
+			
+			curl_setopt($ch, CURLOPT_FILE, $fp);    // Data will be sent to our stream ;-)
+
+			curl_exec($ch);
+			$put = $dropbox->putStream($fp, $dropname);
+			
+			curl_close($ch);
+
+		// Don't forget to close the "file" / stream
+			fclose($fp);
+			
+			 
+		} catch (Exception $e) {
+			debug($e->getTraceAsString(), 'Exception!');
+		}
+	}
+	ini_set('display_errors', 'Off');
+	$pagina = new Pagina($sesion);
+
+
 
 	$pagina->titulo = __('Descarga de Respaldos');
 	$pagina->PrintTop();
 
+
+	if (!defined('BACKUPDIR'))
+		die('Consulte con soporte para acceder a sus respaldos mediante esta pantalla');
+	echo $mensajedr;
+	?>
+
+	<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
+	<?php
+echo '<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"></script>';
+echo '<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" />';
+	echo '<form id="form_respaldo" method="post"><input type="hidden" id="dropname"/></form>';
 	
-if(!defined('BACKUPDIR')) die('Consulte con soporte para acceder a sus respaldos mediante esta pantalla');
-echo $mensajedr;
+	 echo '<div class="container-fluid">  
+		 <div class="row-fluid"> ';
+		  
+	echo '<table width="750px"  class="table  table-hover table-bordered table-striped">';
+	echo "<thead><tr>
+		<th>Archivo</th>
+		
+		<th>Tama&ntilde;o</th>
+		<th>Fecha Modificaci&oacute;n</th>
+		<th style='width: 90px;'>Torrent</th>
+		<th style='width: 45px;'>Dropbox</th> 
+		</tr></thead>\n<tbody>";
 
 
 
+	if (($bucket = $S3->list_objects($bucketName)) !== false) {
 
+		foreach ($bucket->body as $object) {
+			 
+			if ($object->Size >= 20000) {
 
-?>
-	
-<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas
-<?php
-
-
-// print 'em
-echo '<table width="800px" border="1" style="border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none" cellpadding="3" cellspacing="3">';
-print("<TR><TH>Archivo</TH> <th>Tama&ntilde;o (MB)</th><th>Fecha Modificaci&oacute;n</th></TR>\n");
-
-    
-
-   if (($contents = $s3->getBucket($bucketName)) !== false) {
-        foreach ($contents as $object) {
-   /*   echo '<pre>';	  print_r($object);	  echo'</pre>';*/
-		if($object['size']>=20000) {
-			
-			
-			$link=$s3->getAuthenticatedURL ($bucketName,$object['name'], 7200);
-			$droplink=base64_encode($link);
-			$dropname=$object['name'];
-			echo "<TR><TD><a class='iconzip' style='padding:3px 3px 3px 20px; float:left;font-size:14px;' href=\"$link\">$dropname</a> &nbsp;&nbsp;";
-			//echo "<a style='float:right;border:0 none;text-decoration:none;' href=\"?dropname=$dropname\"><img src='https://static.thetimebilling.com/images/Dropbox_Icon.png'/></a>";
-			echo "</td>";
-
-				print("<td>");
-				echo round($object['size']/(1024*1024),2).' MB';
-				print("</td>");
-						echo '<td>'.date('d-m-Y',$object['time']).'</td>';
-				print("</TR>\n");		  
+				$dropname = $object->Key;
+				$torrent = $S3->get_object_url($bucketName, $dropname, "+2 days", array('torrent' => true));
+				echo "<tr><td><a class='iconzip' rel='$dropname' style='  float:left;font-size:14px;' href=\"javascript::void();\">$dropname</a> &nbsp;  &nbsp;&nbsp; </td>";
+				echo "<td>";
+				echo round($object->Size / (1024 * 1024), 2) . ' MB';
+				echo "</td>";
+				echo '<td>' . date('d-m-Y', strtotime($object->LastModified)) . '</td>';
+				echo "<td><a setwidth='65' class='btn botonizame' icon='ui-icon-torrent' href='$torrent'>torrent</a></td>";
+				echo "<td><a   class='dropbox' rel='$dropname'   href=\"javascript::void();\"><img src='https://static.thetimebilling.com/cartas/img/dropbox_ico.png'/></a></td>";
+				echo "</tr>\n";
+			}
 		}
-        }
-    }
-
+	
 }
 
- 
 
-print("</TABLE>\n");
 
-	$pagina->PrintBottom();
+echo "</tbody></table>\n";
+echo '</div>  </div>';
 ?>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery('.iconzip').click(function() {
+			jQuery('#dropname').attr('name','filename').val(jQuery(this).attr('rel'));
+			console.log(jQuery('#form_respaldo'));
+			jQuery('#form_respaldo').submit();
+		});
+		jQuery('.dropbox').click(function() {
+			jQuery('#dropname').attr('name','dropname').val(jQuery(this).attr('rel'));
+			console.log(jQuery('#form_respaldo'));
+			jQuery('#form_respaldo').submit();
+		});
+	});
+</script>
+<?php
+$pagina->PrintBottom();
+
+function readCallback($curl, $stream, $maxRead) {
+	// read the data from the ftp stream
+	$read = fgets($stream, $maxRead);
+
+	// echo the contents just read to the client which contributes to their total download
+	echo $read;
+
+	// return the read data so the function continues to operate
+	return $read;
+}
