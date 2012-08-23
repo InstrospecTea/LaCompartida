@@ -2708,6 +2708,12 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%monto_impuesto_total%', '', $html);
 				$html = str_replace('%monto_moneda_total_con_impuesto%', '', $html);
 
+				if ($this->fields['opc_ver_solicitante']) {
+					$html = str_replace('%solicitante%', __('Ordenado<br>Por'), $html);
+				} else {
+					$html = str_replace('%solicitante%', '', $html);
+				}
+				
 				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
 					$html = str_replace('%proveedor%', __('Proveedor'), $html);
 				} else {
@@ -2803,8 +2809,6 @@ class NotaCobro extends Cobro {
 				} else {
 					$row = str_replace('%proveedor%', '', $row);
 				}
-
-
 
 				if ($this->fields['opc_ver_solicitante']) {
 					$row = str_replace('%solicitante%', $detalle['username'], $row);
@@ -5279,7 +5283,7 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%tarifa_horas_demo%', '', $row);
 						}
 						if ($this->fields['opc_ver_profesional_importe'] == 1) {
-							$row = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $row);
+							$row = str_replace('%td_importe%', '<td align="center">%total_horas_demo%</td>', $row);
 							$row = str_replace('%total_horas_demo%', number_format($data['valor_tarificada'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 						} else {
 							$row = str_replace('%td_importe%', '', $row);
@@ -5659,13 +5663,17 @@ class NotaCobro extends Cobro {
 
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
-				$html = str_replace('%fecha%', __('Fecha'), $html);
-				/* VOUGA */ if ($lang == 'es') {
-					/* VOUGA */ $html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);
-					/* VOUGA */
+				$html = str_replace('%descripcion%', __('Descripción'), $html);
+				$html = str_replace('%fecha%', __('Fecha'), $html);			
+				$html = str_replace('%num_doc%', __('N° Documento'), $html);
+				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
+				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				
+				if ($lang == 'es') {
+					$html = str_replace('%asunto_id%', __('ID<br>Asunto'), $html);
 				} else {
-					/* VOUGA */ $html = str_replace('%asunto_id%', __('Matter<br>ID'), $html);
-					/* VOUGA */
+					$html = str_replace('%asunto_id%', __('Matter<br>ID'), $html);
 				}
 
 				if (UtilesApp::GetConf($this->sesion, 'MostrarProveedorenGastos')) {
@@ -5675,22 +5683,17 @@ class NotaCobro extends Cobro {
 				}
 
 				if ($this->fields['opc_ver_solicitante']) {
-					$html = str_replace('%td_solicitante%', '<td width="16%" align="left">%solicitante%</td>', $html);
+					$html = str_replace('%solicitante%', __('Ordenado<br>Por'), $html);
 				} else {
-					$html = str_replace('%td_solicitante%', '', $html);
+					$html = str_replace('%solicitante%', '', $html);
 				}
 
-				$html = str_replace('%solicitante%', __('Ordenado<br>Por'), $html);
-				$html = str_replace('%num_doc%', __('N° Documento'), $html);
-				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
-				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				if ($cantidad_gastos_en_otra_moneda > 0 || !( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta') )) {
 					$html = str_replace('%monto_original%', __('Monto'), $html);
 				} else {
 					$html = str_replace('%monto_original%', '', $html);
 				}
-				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
-				$html = str_replace('%monto_moneda_total%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
+				
 				/*
 				 * Implementación Gastos con IVA y sin IVA
 				 * acordados en la reunión del 4/02/2011
@@ -5749,20 +5752,16 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%monto%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total%', '&nbsp;', $row);
 					$row = str_replace('%monto_moneda_total_sin_simbolo%', '&nbsp;', $row);
-
-					/* VOUGA */ $row = str_replace('%valor_codigo_asunto%', $detalle->fields['codigo_asunto'], $row);
+					$row = str_replace('%valor_codigo_asunto%', $detalle->fields['codigo_asunto'], $row);
+					
 					/*
 					 * Implementación Gastos con IVA y sin IVA
 					 * acordados en la reunión del 4/02/2011
 					 * JMBT
 					 */
 					if ($this->fields['porcentaje_impuesto_gastos'] > 0) {
-
-
 						//  $row = str_replace('%td_monto_impuesto_total%', '<td style="text-align:center;">%monto_impuesto_total%</a>', $row);
 						// $row = str_replace('%td_monto_moneda_total_con_impuesto%', '<td style="text-align:center;">%monto_moneda_total_con_impuesto%</a>', $row);
-
-
 						$row = str_replace('%monto_impuesto_total%', '&nbsp;', $row);
 						$row = str_replace('%monto_moneda_total_con_impuesto%', '&nbsp;', $row);
 						//si no hay impuesto para los gastos, no dibujo esas celdas
@@ -6672,9 +6671,9 @@ class NotaCobro extends Cobro {
 
 					$row = str_replace('%glosa_asunto%', $rowdesglose['glosa_asunto'], $row);
 					$row = str_replace('%simbolo%', $simbolo, $row);
-					$row = str_replace('%honorarios_asunto%', round($rowdesglose['monto_trabajos'] * $rowdesglose['pthh'], $cifras_decimales), $row);
-					$row = str_replace('%gastos_asunto%', round($rowdesglose['subtotal_gastos'] * $rowdesglose['pg'], $cifras_decimales), $row);
-					$row = str_replace('%tramites_asunto%', round($rowdesglose['monto_tramites'] * $rowdesglose['pt'], $cifras_decimales), $row);
+					$row = str_replace('%honorarios_asunto%', number_format(round($rowdesglose['monto_trabajos'] * $rowdesglose['pthh'], $cifras_decimales),2), $row);
+					$row = str_replace('%gastos_asunto%', number_format(round($rowdesglose['subtotal_gastos'] * $rowdesglose['pg'], $cifras_decimales),2), $row);
+					$row = str_replace('%tramites_asunto%', number_format(round($rowdesglose['monto_tramites'] * $rowdesglose['pt'], $cifras_decimales),2), $row);
 
 					$html .= $row;
 				}
@@ -6686,14 +6685,14 @@ class NotaCobro extends Cobro {
 				global $subtotal_hh, $subtotal_gasto, $subtotal_tramite, $impuesto_hh, $impuesto_gasto, $impuesto_tramite, $simbolo, $cifras_decimales;
 
 				$html = str_replace('%simbolo%', $simbolo, $html);
-				$html = str_replace('%desglose_subtotal_hh%', round($subtotal_hh, $cifras_decimales), $html);
-				$html = str_replace('%desglose_subtotal_gasto%', round($subtotal_gasto, $cifras_decimales), $html);
-				$html = str_replace('%desglose_subtotal_tramite%', round($subtotal_tramite, $cifras_decimales), $html);
-				$html = str_replace('%desglose_impuesto_hh%', round($impuesto_hh, $cifras_decimales), $html);
-				$html = str_replace('%desglose_impuesto_gasto%', round($impuesto_gasto, $cifras_decimales), $html);
-				$html = str_replace('%desglose_impuesto_tramite%', round($impuesto_tramite, $cifras_decimales), $html);
+				$html = str_replace('%desglose_subtotal_hh%', number_format(round($subtotal_hh, $cifras_decimales),2), $html);
+				$html = str_replace('%desglose_subtotal_gasto%', number_format(round($subtotal_gasto, $cifras_decimales),2), $html);
+				$html = str_replace('%desglose_subtotal_tramite%', number_format(round($subtotal_tramite, $cifras_decimales),2), $html);
+				$html = str_replace('%desglose_impuesto_hh%', number_format(round($impuesto_hh, $cifras_decimales),2), $html);
+				$html = str_replace('%desglose_impuesto_gasto%', number_format(round($impuesto_gasto, $cifras_decimales),2), $html);
+				$html = str_replace('%desglose_impuesto_tramite%', number_format(round($impuesto_tramite, $cifras_decimales),2), $html);
 
-				$html = str_replace('%desglose_grantotal%', round(floatval($subtotal_hh) + floatval($subtotal_gasto) + floatval($subtotal_tramite) + floatval($impuesto_hh) + floatval($impuesto_gasto) + floatval($impuesto_tramites), $cifras_decimales), $html);
+				$html = str_replace('%desglose_grantotal%', number_format(round(floatval($subtotal_hh) + floatval($subtotal_gasto) + floatval($subtotal_tramite) + floatval($impuesto_hh) + floatval($impuesto_gasto) + floatval($impuesto_tramites), $cifras_decimales),2), $html);
 
 				$html = str_replace('%subtotales%', __('Subtotal'), $html);
 				$html = str_replace('%impuestos%', __('Impuesto'), $html);
@@ -10278,8 +10277,10 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%hrs_trabajadas_previo%', '', $html);
 				$html = str_replace('%hrs_mins_trabajadas_previo%', '', $html);
 				$html = str_replace('%abogados%', __('Abogados que trabajaron'), $html);
+				
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%hh_trabajada%', __($this->fields['codigo_idioma'].'_Hrs Trabajadas'), $html);
+					$html = str_replace('%td_descontada%', '<td align=\'center\' width=\'80\'>Hrs. Descontadas</td>', $html);
 					if ($retainer || $flatfee) {
 						$html = str_replace('%hh_cobrable%', __('Hrs Cobradas'), $html);
 					} else {
@@ -10312,12 +10313,14 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%hh_cobrable%', '', $html);
 					$html = str_replace('%hh_retainer%', '', $html);
 				}
+				
 				$html = str_replace('%hh%', __('Hrs. Tarificadas'), $html);
 				$html = str_replace('%hh_mins%', __('Hrs.:Mins. Tarificadas'), $html);
 				$html = str_replace('%horas%', $retainer ? __('Hrs. Tarificadas') : __('Horas'), $html);
 				$html = str_replace('%horas_retainer%', $retainer ? __('Hrs. Retainer') : '', $html);
 				$html = str_replace('%horas_mins%', $retainer ? __('Hrs.:Mins. Tarificadas') : __('Horas'), $html);
 				$html = str_replace('%horas_mins_retainer%', $retainer ? __('Hrs.:Mins. Retainer') : '', $html);
+				
 				if ($this->fields['opc_ver_profesional_tarifa'] == 1) {
 					$html = str_replace('%td_tarifa%', '<td align="center" width="60">%valor_hh%</td>', $html);
 					$html = str_replace('%valor_horas%', $flatfee ? '' : __('Tarifa'), $html);
@@ -10333,7 +10336,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%simbolo_moneda%', $flatfee ? '' : ' (' . $moneda->fields['simbolo'] . ')', $html);
 
 				if ($this->fields['opc_ver_profesional_importe'] == 1) {
-					$html = str_replace('%td_importe%', '<td align="center" width="70">%importe%</td>', $html);
+					$html = str_replace('%td_importe%', '<td align="right" width="70">%importe%</td>', $html);
 					$html = str_replace('%td_importe_ajustado%', '<td align="center" width="70">%importe_ajustado%</td>', $html);
 					$html = str_replace('%importe%', __($this->fields['codigo_idioma'] . '_IMPORTE'), $html);
 					$html = str_replace('%importe_ajustado%', __($this->fields['codigo_idioma'] . '_IMPORTE'), $html);
@@ -10355,11 +10358,11 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%nombre_profesional%', __('Nombre Profesional'), $html);
 
 				if ($lang == 'es') {
-					/* VOUGA */ $html = str_replace('%profesional%', __('Profesional'), $html);
-					/* VOUGA */ $html = str_replace('%hora_tarificada%', __('Trarifa<br>Hora'), $html);
+					 $html = str_replace('%profesional%', __('Profesional'), $html);
+					 $html = str_replace('%hora_tarificada%', __('Trarifa<br>Hora'), $html);
 				} else {
-					/* VOUGA */ $html = str_replace('%profesional%', __('Biller'), $html);
-					/* VOUGA */ $html = str_replace('%hora_tarificada%', __('Hourly<br>Rate'), $html);
+					$html = str_replace('%profesional%', __('Biller'), $html);
+					$html = str_replace('%hora_tarificada%', __('Hourly<br>Rate'), $html);
 				}
 				break;
 
