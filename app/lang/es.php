@@ -1053,11 +1053,11 @@ $_LANG['en_adelantos_sin_asignar']='Unused Advance Payments';
 
 /* Especiales para Aguilar Castillo Love */
 $_LANG['Resumen Nota de Cobro ACL'] = 'Resumen Nota de Cobro';
-$_LANG['Nota de Cobro ACL'] = 'Nota de Cobro';
+$_LANG['Nota de Cobro ACL'] = 'Nota de Debito';
 //$_LANG['Otros'] = 'Trámites';
 $_LANG['Gastos ACL'] = 'Gastos';
 $_LANG['Servicios'] = 'Servicios Prestados';
-$_LANG['reference no acl'] = "Factura N&ordm;";
+$_LANG['reference no acl'] = "Referencia";
 $_LANG['Subtotal'] = "Subtotal";
 $_LANG['Impuesto'] = "Impuesto";
 $_LANG['Total Adeudado'] = "Monto Total Adeudado";
