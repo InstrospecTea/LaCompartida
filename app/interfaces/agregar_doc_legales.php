@@ -49,8 +49,8 @@ var fila_doc_legal = <?php echo $nro_docs_legales ?>;
 	</table>
 	</center>
 <br />
-<center><input type="button" class="btn" value="<?php echo __('Asociar nuevo documento legal') ?>" id="asociar_doc_legal" /></center>
-
+<center><a href="javascript:void(0)"   class="btn botonizame"  id="asociar_doc_legal" /><?php echo __('Asociar nuevo documento legal') ?></a></center>
+<br /><br />
 <script type="text/javascript">
 	var checks = new Array('honorario', 'gastos_con_iva', 'gastos_sin_iva');
 

@@ -683,9 +683,26 @@
 		{
 			echo 0;
 		}
-	}
-	else if($accion == 'existe_rut_cliente')
-	{
+	} 	else if($accion == 'existe_codigo_cliente_secundario_cliente') 	{
+		$where = "";
+		if($id_cliente)
+		{
+			$where = " AND id_cliente != '".$id_cliente."'";
+		}
+		$query = "select id_cliente, codigo_cliente, codigo_cliente_secundario, glosa_cliente FROM cliente WHERE codigo_cliente_secundario = '".$dato_cliente."'  ".$where;
+		try {
+			$resp = $sesion->pdodbh->query($query);
+			$datacliente=$resp->fetch();
+			$datacliente['glosa_cliente']=utf8_encode($datacliente['glosa_cliente']);
+			$datacliente['codigo_cliente']=utf8_encode($datacliente['codigo_cliente']);
+			$datacliente['codigo_cliente_secundario']=utf8_encode($datacliente['codigo_cliente_secundario']);
+			echo json_encode($datacliente);
+		} catch (PDOException $e) {
+			Utiles::errorSQL($query, "", "",  NULL,"",$e );
+			echo '0';
+		}
+         
+	}	else if($accion == 'existe_rut_cliente') 	{
 		$where = "";
 		if($id_cliente)
 		{
