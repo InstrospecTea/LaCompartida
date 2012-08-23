@@ -1,6 +1,8 @@
 <?php
-require_once dirname(__FILE__).'/../app/conf.php';
+require_once dirname(__FILE__) . '/../app/conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+
+ 
 
 function autocargaapp($class_name) {
 	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
@@ -11,16 +13,14 @@ function autocargaapp($class_name) {
 }
 
 spl_autoload_register('autocargaapp');	
-	
- 	$sesion = new Sesion(array('ADM'));
-
 
 $S3 = new AmazonS3(array('key' => 'AKIAIQYFL5PYVQKORTBA',
 			'secret' => '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'
 			, 'default_cache_config' => '/var/www/virtual/cache/'));
 
 
- 
+$sesion = new Sesion(array('ADM'));
+
 
 if (!defined('SUBDOMAIN')) {
 	die('Error: contacte a soporte para obtener su dirección de subdominio');
@@ -81,6 +81,10 @@ if (!defined('SUBDOMAIN')) {
 	$pagina->titulo = __('Descarga de Respaldos');
 	$pagina->PrintTop();
 
+	if (!defined('BACKUPDIR'))
+		die('Consulte con soporte para acceder a sus respaldos mediante esta pantalla');
+	echo $mensajedr;
+	?>
 
 	if (!defined('BACKUPDIR'))
 		die('Consulte con soporte para acceder a sus respaldos mediante esta pantalla');
@@ -89,10 +93,12 @@ if (!defined('SUBDOMAIN')) {
 
 	<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
 	<?php
-echo '<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"></script>';
-echo '<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" />';
+echo '<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>';
+echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap-combined.min.css" />';
 	echo '<form id="form_respaldo" method="post"><input type="hidden" id="dropname"/></form>';
 	
+
+
 	 echo '<div class="container-fluid">  
 		 <div class="row-fluid"> ';
 		  
@@ -121,7 +127,7 @@ echo '<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2
 				echo round($object->Size / (1024 * 1024), 2) . ' MB';
 				echo "</td>";
 				echo '<td>' . date('d-m-Y', strtotime($object->LastModified)) . '</td>';
-				echo "<td><a setwidth='65' class='btn botonizame' icon='ui-icon-torrent' href='$torrent'>torrent</a></td>";
+				echo "<td><a setwidth='60' class='btn botonizame' icon='ui-icon-torrent' href='$torrent'>torrent</a></td>";
 				echo "<td><a   class='dropbox' rel='$dropname'   href=\"javascript::void();\"><img src='https://static.thetimebilling.com/cartas/img/dropbox_ico.png'/></a></td>";
 				echo "</tr>\n";
 			}
@@ -161,3 +167,4 @@ function readCallback($curl, $stream, $maxRead) {
 	// return the read data so the function continues to operate
 	return $read;
 }
+ 
