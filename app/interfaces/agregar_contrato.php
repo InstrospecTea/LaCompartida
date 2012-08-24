@@ -1734,24 +1734,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	
 </script>
 <?php if ($popup && !$motivo) { ?>
-<style>
-	.span12{width:940px;}
-.span11{width:860px;}
-.span10{width:780px;}
-.span9{width:700px;}
-.span8{width:620px;}
-.span7{width:540px;}
-.span6{width:460px;}
-.span5{width:380px;}
-.span4{width:300px;}
-.span3{width:220px;}
-.span2{width:140px;}
-.span1{width:60px;}
-.row{margin-left:-20px;*zoom:1;}.row:before,.row:after{display:table;content:"";line-height:0;}
-.row:after{clear:both;}
 
-.controls-row [class*="span"]+[class*="span"]{margin-left:20px;}
-</style>
 	<form name='formulario' id='formulario' method=post>
 		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
 		<input type=hidden name=opcion_contrato value="guardar_contrato" />
@@ -1771,7 +1754,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- RESPONSABLE -->
 		<table id="responsable">
 			<tr   class="controls controls-row ">
-				<td><div class="span4">
+				<td class="al"><div class="span4">
 				<?php echo __('Activo') ?>
 				</div>
 				<?php
@@ -1780,14 +1763,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$chk = 'checked="checked"';
 				}
 				?>
-				</td><td> 
-					<input type=checkbox class="span1"name=activo_contrato id=activo_contrato value=1 <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick=InactivaContrato(this.checked) />
-					&nbsp;<span class="inline-help"><?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></span>
+				 </td>
+				<td class="al"> 
+					<label for="activo_contrato" class="inline-help"><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick=InactivaContrato(this.checked) />
+					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
 				 </td>
 			</tr>
 		<?php if (UtilesApp::GetConf($sesion, 'UsarImpuestoSeparado')) { ?>
 				<tr   class="controls controls-row ">
-					<td><div class="span4">
+					<td class="al">
+						<div class="span4">
 						<?php echo __('Usa impuesto a honorario') ?>
 					</div>
 					<?php
@@ -1801,7 +1786,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							$chk = 'checked="checked"';
 						}
 					?>
-					</td><td>
+					</td><td class="al">
 						<input class="span1" type="checkbox" name="impuesto_separado" id="impuesto_separado" value="1" <?php echo $chk ?> />
 					</td>
 				</tr>
@@ -1809,7 +1794,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				if (UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
 				?>
 				<tr   class="controls controls-row ">
-					<td><div class="span4">
+					<td class="al"><div class="span4">
 					<?php echo __('Usa impuesto a gastos') ?>
 					</div>
 					<?php
@@ -1823,7 +1808,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						$chk_gastos = 'checked="checked"';
 					}
 					?>
-					</td><td>
+					</td><td class="al">
 						<input class="span1"  type="checkbox" name="impuesto_gastos" id="impuesto_gastos" value="1" <?php echo $chk_gastos ?> />
 					</td>
 				</tr>
@@ -1839,8 +1824,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				$separar_liquidaciones = '0';
 			}
 			?>
-			<tr   class="controls controls-row "><td>
-				<div class="span4">	<?php echo __('Liquidar por separado (honorario y gastos)') ?></div></td><td>
+			<tr   class="controls controls-row ">
+				<td class="al">
+				<div class="span4">	<?php echo __('Liquidar por separado (honorario y gastos)') ?></div></td>
+				<td class="al">
 				<div class="span1"><input  class="span1" id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?php echo $separar_liquidaciones == '1' ? 'checked="checked"' : '' ?>  /></div>
 			</td></tr>
 			<?php
@@ -1849,7 +1836,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				WHERE codigo_permiso='SOC' ORDER BY apellido1";
 			?>
 			<tr   class="controls controls-row ">
-				<td><div class="span4">
+				<td class="al"><div class="span4">
 					<?php
 					echo __('Encargado Comercial');
 
@@ -1858,7 +1845,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					//print_r($contrato_defecto);
 					?>
 				</div></td>
-<td>
+<td class="al">
 				<?php
 				if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
 					echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], ' class="span3" onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
@@ -2259,7 +2246,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TituloContacto
 						<div id='datos_cobranza' style='display:<?php echo $show ?>' width="98%">
 							<table width="100%" >
 								<tr id="divthh">
-									<td align="left" width="20%" style="font-size:10pt;">
+									<td  class="ar "  >
 													<?php echo __('Tarifa horas') ?>
 													<?php if ($validaciones_segun_config)
 														echo $obligatorio
@@ -2303,7 +2290,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TituloContacto
 									</td>
 								</tr>
 								<tr>
-									<td align="left" style="font-size:10pt;">
+									<td  class="ar ">
 <?php echo __('Forma de cobro') ?>
 <?php if ($validaciones_segun_config)
 	echo $obligatorio
@@ -2581,8 +2568,9 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 										</table>
 									</td>
 								</tr>
+								<tr><td colspan="2">&nbsp;</td></tr>
 								<tr>
-									<td align="left" style="font-size:10pt;">
+									<td class="ar " >
 <?php echo __('Mostrar total en') ?>:
 <?php if ($validaciones_segun_config)
 	echo $obligatorio
@@ -2601,16 +2589,17 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 									<td colspan="2"><hr size="1"></td>
 								</tr>
 								<tr>
-									<td align="right">
+									<td class="ar ">
 <?php echo __('Descuento') ?>
 									</td>
 									<td align="left">
 											<div   class="controls controls-row ">
-												<input type=text class="span2" name=descuento id=descuento size=6 value=<?php echo $contrato->fields['descuento'] ?>> <div class="span1"> <input type=radio name=tipo_descuento id=tipo_descuento value='VALOR' <?php echo $contrato->fields['tipo_descuento'] == 'VALOR' ? 'checked="checked"' : '' ?> /><span class="inline-help"><?php echo __('Valor') ?></span>
+												<input style="float:left;" type=text class="span2" name=descuento id=descuento size=6 value=<?php echo $contrato->fields['descuento'] ?>> <div class="span1"> <input type=radio name=tipo_descuento id=tipo_descuento value='VALOR' <?php echo $contrato->fields['tipo_descuento'] == 'VALOR' ? 'checked="checked"' : '' ?> /><span class="inline-help"><?php echo __('Valor') ?></span>
 												</div>
 											</div>
 										<br>
-										<div   class="controls controls-row "> <input class="span2"   type=text name=porcentaje_descuento id=porcentaje_descuento size=6 value=<?php echo $contrato->fields['porcentaje_descuento'] ?>> <div class="span1">  <input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?php echo $contrato->fields['tipo_descuento'] == 'PORCENTAJE' ? 'checked="checked"' : '' ?> /> <span class="inline-help">  <?php echo __('%') ?></span>
+										<div   class="controls controls-row ">
+											<input class="span2"   style="float:left;"  type=text name=porcentaje_descuento id=porcentaje_descuento size=6 value=<?php echo $contrato->fields['porcentaje_descuento'] ?>> <div class="span1">  <input type=radio name=tipo_descuento id=tipo_descuento value='PORCENTAJE' <?php echo $contrato->fields['tipo_descuento'] == 'PORCENTAJE' ? 'checked="checked"' : '' ?> /> <span class="inline-help">  <?php echo __('%') ?></span>
 												</div>
 											</div>
 									</td>
@@ -2619,7 +2608,7 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 									<td colspan="2"><hr size="1"></td>
 								</tr>
 								<tr>
-									<td align="right">
+									<td class="ar ">
 <?php echo __('Detalle Cobranza') ?>
 															<?php if ($validaciones_segun_config)
 																echo $obligatorio

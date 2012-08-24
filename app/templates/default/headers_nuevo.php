@@ -2,7 +2,7 @@
 <?php
 /*error_reporting(E_ALL ^ E_NOTICE);*/
 //ini_set('display_errors','On');
-date_default_timezone_set('America/New_York');
+date_default_timezone_set('America/Santiago');
 $laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
 $punto=strpos($laurl,'.'); 
 $subdomain=substr($laurl,0,$punto); 
@@ -11,6 +11,7 @@ if($subdomain) $subdomain='/'.$subdomain;
 $elpath=$subdomain.$_SERVER['PHP_SELF'];
 $pathseguro='https://'.str_replace('lemontech.cl','thetimebilling.com',$laurl).$_SERVER['PHP_SELF'];
 define('HEADERLOADED',1);
+define('TEMPLATE_DIR', str_replace('/img','/',Conf::ImgDir()));
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -51,14 +52,16 @@ define('HEADERLOADED',1);
 <script src='https://www.google.com/jsapi'></script>
 <script>
 google.load("jquery","1.7");
-
 </script>
- 		<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
 
-        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
-        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
+  <!--<link rel="stylesheet" href="<?php echo TEMPLATE_DIR;?>css/normalize.css">
+        <link rel="stylesheet" href="<?php echo TEMPLATE_DIR;?>css/main.css">
+<script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>-->
+        <script src="<?php echo TEMPLATE_DIR;?>js/vendor/modernizr-2.6.1.min.js"></script>
+		
 		<script  type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
 		<script  type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
+        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
 
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
@@ -68,9 +71,12 @@ google.load("jquery","1.7");
 .tb_facebook {	background: url(https://static.thetimebilling.com/templates/default/img/barra_tipo_facebook_final.png) repeat-x;	height: 55px;display:block;text-align:center;margin:0 auto;width:100%;position:relative;}
 .non_popup {background: url(https://static.thetimebilling.com/templates/default/img/fondo_degradado2.gif) repeat-x;}
 .campoactivo {cursor:pointer;border:1px solid #EEE;width:200px;}
-.alignleft {text-align:left;font-size:10px;}
-.alignright {text-align:right;font-size:10px;}
-.aligncenter {display:block;text-align:center;margin:auto;}
+.al {text-align:left;padding-left:10px;}
+.ar {text-align:right;padding-right:10px;}
+.close {cursor:pointer;}
+ .alignleft {text-align:left;font-size:10px;}
+ .alignright {text-align:right;font-size:10px;}
+ .aligncenter {display:block;text-align:center;margin:auto;}
 #zenbox_tab {overflow: hidden; border: 0 none !important;}
 #mainttb {background:white;height: 100%;margin: -10px auto 10px; border:0 none;border-top:5px #42A62B;text-align:center;}
 .titulo_sec {padding:0 30px 5px; height:35px;background-color: #FFFFFF;text-align:left;font-size: 14px;    font-weight: bold;}
