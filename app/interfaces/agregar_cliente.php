@@ -26,7 +26,7 @@ $cliente = new Cliente($sesion);
 $contrato = new Contrato($sesion);
 $archivo = new Archivo($sesion);
 $codigo_obligatorio = true;
-if ( UtilesApp::GetConf($sesion, 'CodigoObligatorio') )   {
+if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoObligatorio') ) || ( method_exists('Conf', 'CodigoObligatorio') && Conf::CodigoObligatorio() )) {
 	if (!Conf::CodigoObligatorio())
 		$codigo_obligatorio = false;
 	else
@@ -41,11 +41,11 @@ if ($id_cliente > 0) {
 	$cliente->fields['codigo_cliente'] = $codigo_cliente;
 }
 
-$validaciones_segun_config = UtilesApp::GetConf($sesion, 'ValidacionesCliente');
+$validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 $usuario_responsable_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoComercial');
 $usuario_secundario_obligatorio = UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioCliente');
-$CodigoSecundario=UtilesApp::GetConf($sesion, 'CodigoSecundario') ;
+
 if ($opcion == "guardar") {
 	#Validaciones
 	$cli = new Cliente($sesion);
@@ -105,6 +105,16 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__("Por favor ingrese el giro de la factura"));
 		if (empty($factura_direccion))
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
+		
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
+			if (empty($factura_ciudad))
+			$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
+		}
+		
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
+			if (empty($factura_comuna))
+			$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
+		}
 		if (empty($factura_telefono))
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		if ( UtilesApp::GetConf($sesion,'ClienteReferencia') && ( empty($id_cliente_referencia) || $id_cliente_referencia == '-1' ) )
@@ -303,6 +313,12 @@ if ($opcion == "guardar") {
 			$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
 			$contrato->Edit("id_pais", $id_pais);
 			$contrato->Edit("id_cuenta", $id_cuenta);
+	
+			if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+				$contrato->Edit("id_cuenta2", $id_cuenta2);
+			}
+	
+	
 			$contrato->Edit("es_periodico", $es_periodico);
 			$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 			$contrato->Edit("periodo_fecha_inicio", Utiles::fecha2sql($periodo_fecha_inicio));
@@ -331,6 +347,15 @@ if ($opcion == "guardar") {
 			$contrato->Edit("factura_razon_social", $factura_razon_social);
 			$contrato->Edit("factura_giro", $factura_giro);
 			$contrato->Edit("factura_direccion", $factura_direccion);
+			
+			if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
+				$contrato->Edit("factura_ciudad", $factura_ciudad);
+			}
+			
+			if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
+				$contrato->Edit("factura_comuna", $factura_comuna);
+			}
+			
 			$contrato->Edit("factura_telefono", $factura_telefono);
 			$contrato->Edit("cod_factura_telefono", $cod_factura_telefono);
 
@@ -425,6 +450,10 @@ if ($opcion == "guardar") {
 
 			$contrato->Edit("separar_liquidaciones", $separar_liquidaciones);
 
+			if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+				$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+			}
+			
 			if ($contrato->Write()) {
 				#cobros pendientes
 				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
@@ -517,7 +546,6 @@ $pagina->titulo = __('Ingreso cliente');
 $pagina->PrintTop();
 ?>
 <script type="text/javascript">
-	var CodigoSecundario=<?php echo $CodigoSecundario; ?>;
 	var glosa_cliente_unica = false;
 	var rut_cliente_unica = false;
 	var glosa_cliente_tmp = '';
@@ -528,10 +556,10 @@ $pagina->PrintTop();
 
 	function validarUnicoCliente(dato,campo,id_cliente)
 	{
-		 
-		 
+		loading("Verificanco datos");
+		cargando = true;
 		var accion = 'existe_'+campo+'_cliente';
-		if(id_cliente !== undefined)
+		if(id_cliente != '')
 		{
 			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato+'&id_cliente='+id_cliente;
 		}
@@ -539,13 +567,14 @@ $pagina->PrintTop();
 		{
 			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato;
 		}
-		
-		
-			
-		 
-	jQuery.get(url_ajax,function(response) {
-		  
-		if(response==0)
+		var http = getXMLHTTP();
+		if(http) {
+
+			http.open('get',url_ajax,false);
+			http.send(null);
+
+			var response = http.responseText;
+			if(response==0)
 			{
 				if(campo == 'glosa')
 				{
@@ -567,10 +596,10 @@ $pagina->PrintTop();
 					rut_cliente_unica = false;
 				}
 			}
-				return response;
-		});
-	
-		 
+		}
+		cargando = false;
+		offLoading();
+		return true;
 	}
 
 	function Validar(form)
@@ -642,7 +671,26 @@ $pagina->PrintTop();
 				form.factura_direccion.focus();
 				return false;
 			}
+			<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
+				if(!form.factura_ciudad.value)
+			{
+				alert("<?php echo  __('Debe ingresar la ciudad del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_ciudad.focus();
+				return false;
+				}
+			<?php } ?>
 
+			<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
+				if(!form.factura_comuna.value)
+			{
+				alert("<?php echo  __('Debe ingresar la comuna del cliente') ?>");
+				MuestraPorValidacion('datos_factura');
+				form.factura_comuna.focus();
+				return false;
+			}
+			<?php } ?>
+			
 			if(form.id_pais.options[0].selected == true)
 			{
 				alert("<?php echo  __('Debe ingresar el pais del cliente') ?>");
@@ -893,24 +941,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 
 </script>
-<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
-
-<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min.css" />
-<style>
-	select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"]
-	, input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {padding: 2px 3px !important; font-size:12px !important;}
-	fieldset {border:1px solid #CCC !important;margin:auto;}
-	h2 {font-size:22px;line-height:30px;}
-	  legend {vertical-align: top  !important;
-margin-bottom: 15px !important;;
-	border-bottom:0 none !important;
-	  width:auto !important}
-	.input-append .add-on, .input-prepend .add-on {padding: 2px 5px;}
-	label {font-size:11px;}
-</style>
- 
- 
-<form name='formulario' id="formulario-cliente" method="post" action="<?php echo  $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
+<form name='formulario' id='formulario' method="post" action="<?php echo  $_SERVER[PHP_SELF] ?>" enctype="multipart/form-data">
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name="id_cliente" value="<?php echo  $cliente->fields['id_cliente'] ?>" />
 	<input type="hidden" name="id_contrato" value="<?php echo  $contrato->fields['id_contrato'] ?>" />
@@ -929,49 +960,60 @@ function TTip($texto) {
 	return "onmouseover=\"ddrivetip('$texto');\" onmouseout=\"hideddrivetip('$texto');\"";
 }
 
-if ( UtilesApp::GetConf($sesion, 'UsaDisenoNuevo') )   {  	?>
-		<table width="90%"><tr><td> 
-	 <?php } else {  ?>
-		 <table width="100%"><tr><td>
-	<?php } ?>
-							<fieldset   id="formularioinicial" class="tb_base" style="border: 1px solid #BDBDBD;">
+if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )) {
+	?>
+		<table width="90%"><tr><td> <?php } else { ?>
+					<table width="100%"><tr><td> <?php } ?>
+							<fieldset class="tb_base" style="border: 1px solid #BDBDBD;">
 								<legend><?php echo  __('Agregar Cliente') ?>&nbsp;&nbsp;<?php echo  $cliente->fields['activo'] == 0 && $id_cliente ? '<span style="color:#FF0000; font-size:10px">(' . __('Este cliente está Inactivo') . ')</span>' : '' ?></legend>
-							 
-											<div   class="controls controls-row ">
-											
-											<div class="span2"><?php echo  __('Codigo') ;	 if ($validaciones_segun_config);		echo $obligatorio ?></div >
-										 
-											  <input type="text" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo  $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo  $cliente->fields['codigo_cliente'] ?>" onchange="this.value=this.value.toUpperCase()" />
-											<div class="span4"><label ><?php echo  __('Código secundario') ?>
-											 <input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo  $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value=this.value.toUpperCase()" style='text-transform: uppercase;' />
-				<?php
-				if ( $CodigoSecundario )  {
-					echo "<span  class=\"help-inline\" style='color:#FF0000;'>*</span>";
-				} else {
-					echo "<span class=\"help-inline\"  >(" . __('Opcional') . ")</span>";
-				}
-				?>
-											 </div> </div> 
-								<div   class="controls controls-row ">
-								
-											<div class="span2"><?php echo  __('Nombre') ?>
-											<span class="req inline-help">*</span></div>
-										 
-											<input type="text" class="span5" name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo  $cliente->fields['glosa_cliente'] ?>"  />
-										 </div>  <div   class="controls controls-row ">
-									 
-											<div class="span2"><?php echo  __('Grupo') ?></div>
-										 
-											<?php echo  Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], " class='span3' ", __('Ninguno')) ?>
-										 </div>  
-									
-										 	<?php if( UtilesApp::GetConf($sesion,'ClienteReferencia') ): 
-										 
-												 echo '<div   class="controls controls-row ">'. __('Referencia') ;
-												 if ($validaciones_segun_config)		echo $obligatorio ;
-											 echo '</div><div class="span2">';
-												 echo Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', " class='span3' ", "Vacio")?>
-											 </div>
+								<table width='100%' cellspacing='3' cellpadding='3'>
+									<tr>
+										<td align="right">
+	<?php echo  __('Codigo') ?>
+	<?php if ($validaciones_segun_config)
+		echo $obligatorio ?>
+										</td>
+										<td align="left">
+											<input type="text" name="codigo_cliente" size="5" maxlength="5" <?php echo  $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo  $cliente->fields['codigo_cliente'] ?>" onchange="this.value=this.value.toUpperCase()" />
+											&nbsp;&nbsp;&nbsp;<?php echo  __('Código secundario') ?>
+											<input type="text" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo  $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value=this.value.toUpperCase()" style='text-transform: uppercase;' />
+<?php
+if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
+	echo "<span style='color:#FF0000; font-size:10px'>*</span>";
+} else {
+	echo "<span style='font-size:10px'>(" . __('Opcional') . ")</span>";
+}
+?>
+										</td>
+									</tr>
+									<tr>
+										<td align="right">
+											<?php echo  __('Nombre') ?>
+											<span class="req">*</span>
+										</td>
+										<td align="left">
+											<input name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo  $cliente->fields['glosa_cliente'] ?>"  />
+										</td>
+									</tr>
+									<tr>
+										<td align="right">
+											<?php echo  __('Grupo') ?>
+										</td>
+										<td align="left">
+											<?php echo  Html::SelectQuery($sesion, "SELECT * FROM grupo_cliente", "id_grupo_cliente", $cliente->fields[id_grupo_cliente], "", __('Ninguno')) ?>
+										</td>
+									</tr>
+									<?php if( UtilesApp::GetConf($sesion,'ClienteReferencia') ): ?>
+										<tr>
+											<td align="right">
+												<?php echo  __('Referencia') ?>
+												<?php if ($validaciones_segun_config)
+													echo $obligatorio ?>
+											</td>
+											<td align="left">
+												<?php echo Html::SelectQuery($sesion,"SELECT id_cliente_referencia, glosa_cliente_referencia FROM prm_cliente_referencia ORDER BY orden ASC","id_cliente_referencia",$cliente->fields['id_cliente_referencia'] ? $cliente->fields['id_cliente_referencia'] : '', '', "Vacio")?>
+											</td>
+										</tr>
 									<?php endif; ?>
 
 <?php										
@@ -989,26 +1031,30 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 
 ?>
 
-<?php if ( UtilesApp::GetConf($sesion, 'VerCampoUsuarioEncargado') != 1):  
-	  if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')):  									
-		  if(UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto')==0):  
-		 
-					  echo '  <div   class="controls controls-row ">	 <div class="span2">'. __('Usuario encargado').' </div> ';  
-					  if ($validaciones_segun_config): 
-						  echo $obligatorio;  
-					  endif;  
-			 
-					 
+<?php if ( UtilesApp::GetConf($sesion, 'VerCampoUsuarioEncargado') != 1): ?>
+	<?php if(!UtilesApp::GetConf($sesion, 'EncargadoSecundario')): ?>										
+		<?php if(UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto')==0): ?>
+			<tr>
+				<td align="right">
+					<?php echo  __('Usuario encargado'); ?>
+					<?php if ($validaciones_segun_config): ?>
+						<?php echo $obligatorio; ?>
+					<?php endif; ?>
+				</td>
+				<td align="left">
+					<?php
 						$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : '';
 
-						echo Html::SelectQuery($sesion, $query, "id_usuario_encargado", $id_default,  " class='span3' ", 'Vacio', 'width="170"');
+						echo Html::SelectQuery($sesion, $query, "id_usuario_encargado", $id_default, '', 'Vacio', 'width="170"');
 					?>
-				 </div> 
-		<?php endif; 
-	  endif; 
-  endif; ?>
-							 <div   class="controls controls-row ">		
-							 <div class="span2">
+				</td>
+			</tr>
+		<?php endif; ?>
+	<?php endif; ?>
+<?php endif; ?>
+									
+									<tr>
+										<td align="right">
 								    <?php echo  __('Fecha Creación') ;
 									$intfechacreacion=intval( date('Ymd',strtotime($cliente->fields['fecha_creacion'])));
 									if($intfechacreacion>19990101) {
@@ -1016,26 +1062,27 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 									} else {
 										$fecha_creacion=date('d-m-Y');
 									}
-									
+											 
 									?>
 											 
-							 </div> 
-										  <div class="span3">
-											<input type="text" name="fecha_creacion" class="span2 fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  $fecha_creacion; ?>"  />
-										 </div> 
-										 </div> 
-										<div   class="controls controls-row ">
+										</td>
+										<td align="left">
+											<!--<?php echo $intfechacreacion.' vs '.$fecha_creacion  ; ?>-->
+											<input name="fecha_creacion" class="fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo  $fecha_creacion; ?>"  />
+										</td>
+									</tr>
 									
-									 
-									 <div class="span2">		<?php echo  __('Activo') ?></div>
-										 
-										 <div class="span4">		<input type='checkbox' name='activo' value='1' <?php echo  $cliente->fields['activo'] == 1 ? 'checked="checked"' : !$id_cliente ? 'checked="checked"' : ''  ?>>
-											&nbsp;<span class="help-inline"><?php echo  __('Los clientes inactivos no aparecen en los listados.') ?></span> </div> 
-										 </div> 
-				 <div class="span6">&nbsp;<!--espaciador--></div>
-								 
+									<tr>
+										<td align="right">
+											<?php echo  __('Activo') ?>
+										</td>
+										<td align="left">
+											<input type='checkbox' name='activo' value='1' <?php echo  $cliente->fields['activo'] == 1 ? 'checked="checked"' : !$id_cliente ? 'checked="checked"' : ''  ?>>
+											&nbsp;<span><?php echo  __('Los clientes inactivos no aparecen en los listados.') ?></span>
+										</td>
+									</tr>
+								</table>
 							</fieldset>
-							 
 							<table width='100%' cellspacing="0" cellpadding="0">
 								<tr>
 									<td>
@@ -1044,7 +1091,7 @@ $query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nom
 								</tr>
 							</table>
 							<table width='100%' cellspacing="0" cellpadding="0" style="<?php
-if (UtilesApp::GetConf($sesion, 'AlertaCliente') )  {
+if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'AlertaCliente') ) || ( method_exists('Conf', 'AlertaCliente') && Conf::AlertaCliente() )) {
 	echo '';
 } else {
 	echo 'display:none;';
@@ -1052,7 +1099,7 @@ if (UtilesApp::GetConf($sesion, 'AlertaCliente') )  {
 ?>">
 								<tr>
 									<td colspan="2" align="center">
-										<fieldset  class="border_plomo tb_base">
+										<fieldset class="border_plomo tb_base">
 											<legend><?php echo  __('Alertas') ?></legend>
 											<p>&nbsp;<?php echo  __('El sistema enviará un email de alerta al encargado del cliente si se superan estos límites:') ?></p>
 											<table>
@@ -1096,15 +1143,15 @@ if (UtilesApp::GetConf($sesion, 'AlertaCliente') )  {
 <?php
 if ($cant_encargados > 0) {
 	if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
-		$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery(\"#formulario-cliente\").get(0), false);";
+		$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
 	} else {
-		$funcion_validar = "return Validar(jQuery(\"#formulario-cliente\").get(0));";
+		$funcion_validar = "return Validar(this.form);";
 	}
-?>
-								<a href="javascript:void(0);" icon='ui-icon-save' class='btn botonizame'   onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
-<?php
+		?>
+								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
+		<?php
 } else {
-?>
+	?>
 											<span style="font-size:10px;background-color:#C6DEAD"><?php echo  __('No se han configurado encargados comerciales') . '<br>' . __('Para configurar los encargados comerciales debe ir a Usuarios y activar el perfil comercial.') ?></span>
 										<?php } ?>
 									</td>
@@ -1114,18 +1161,18 @@ if ($cant_encargados > 0) {
 							<table width="100%">
 								<tr>
 									<td class="cvs" align="center">
-										<input type="button" name="asuntos" id='asuntos' class=" botonizame" value="<?php echo  __('Asuntos') ?>" onMouseOver="goLite(this.form,this)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('asuntos.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&popup=1&from=agregar_cliente')" />
+										<input type="button" name="asuntos" id='asuntos' class="tag" value="<?php echo  __('Asuntos') ?>" onMouseOver="goLite(this.form,this)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('asuntos.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&opc=entregar_asunto&popup=1&from=agregar_cliente')" />
 									</td>
 									<td class="cvs" align="center">
-										<input type="button" name="contratos" id='contratos' class=" botonizame" value="<?php echo  __('Contratos') ?>" onMouseOver="goLite(this.form,this.name)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('contratos.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&popup=1&buscar=1&activo=SI')" />
+										<input type="button" name="contratos" id='contratos' class="tag" value="<?php echo  __('Contratos') ?>" onMouseOver="goLite(this.form,this.name)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('contratos.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&popup=1&buscar=1&activo=SI')" />
 									</td>
 									<td class="cvs" align="center">
-										<input type="button" name="cobros" id='cobros' class=" botonizame" value="<?php echo  __('Cobros') ?>" onMouseOver="goLite(this.form,this)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('lista_cobros.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&popup=1&opc=buscar&no_mostrar_filtros=1')" />
+										<input type="button" name="cobros" id='cobros' class="tag" value="<?php echo  __('Cobros') ?>" onMouseOver="goLite(this.form,this)" onMouseOut="goDim(this.form,this)" onClick="iframeLoad('lista_cobros.php?codigo_cliente=<?php echo  $cliente->fields['codigo_cliente'] ?>&popup=1&opc=buscar&no_mostrar_filtros=1')" />
 									</td>
 								</tr>
 								<tr>
 									<td class="cvs" align="center" colspan=3>
-<iframe name='iframe_asuntos'  class="resizableframe" id='iframe_asuntos' src='about:blank' style="width:100%;border:0 none;">&nbsp;</iframe>
+<iframe name='iframe_asuntos' onload="calcHeight(this.id, 'pagina_body');" id='iframe_asuntos' src='about:blank' style="width:100%;border:0 none;">&nbsp;</iframe>
 
 
 									</td>
@@ -1133,72 +1180,23 @@ if ($cant_encargados > 0) {
 							</table>
 						</td></tr></table>
 				</form>
-
-
 <script type="text/javascript">
-	<?php
-if ($CodigoSecundario) {
-	echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+    
+<?php
+if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
+	echo "var iframesrc='asuntos.php?codigo_cliente_secundario=" . $cliente->fields['codigo_cliente_secundario'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente'";
 } else {
-	echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente';";
+	echo "var iframesrc='asuntos.php?codigo_cliente=" . $cliente->fields['codigo_cliente'] . "&opc=entregar_asunto&popup=1&from=agregar_cliente'";
 }
 ?>
-  
-  jQuery(document).ready(function() {
-		
-		
-		 setTimeout(function() {
-			jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
-		}, 2000);
-	});
+    
 
-    jQuery('#codigo_cliente_secundario').blur(function() {
-			<?php if ($_GET['id_cliente'])  {
-				echo 'var id_cliente='.intval($_GET['id_cliente']).';'; 
-			} else {
-				echo 'var id_cliente=null;'; 
-			}
-?>
-			var dato=jQuery(this).val();
-			var campo=jQuery(this).attr('id');
-			var accion = 'existe_'+campo+'_cliente';
-			var url_ajax = 'ajax.php?accion='+accion+'&dato_cliente='+dato;
-			jQuery.get(url_ajax,function(data) {
-			objResp=null;
-				try {
-					var objResp=JSON.parse(data);
-					
-				} catch (e) {
-					console.log(e)
-				}
-				
-					if(objResp) {
-					var bd_cliente=1*objResp.id_cliente;
-						if(id_cliente!=null && bd_cliente==id_cliente) {
-							console.log(id_cliente, bd_cliente);
-							return true;
-						} else {
-							console.log(id_cliente, objResp);
-							var codigo_cliente=objResp.codigo_cliente;
-							var codigo_cliente_secundario=objResp.codigo_cliente_secundario;
-							var glosa_cliente=objResp.glosa_cliente;
-
-							jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">×</a>  </div>'  );
-							var MensajeAlerta="Error: el código secundario "+codigo_cliente_secundario+" ya existe en la Base de Datos y corresponde a <a href='?id_cliente="+bd_cliente+"'>["+codigo_cliente +"] "+glosa_cliente+"</a>."
-							jQuery('#alerta').html(MensajeAlerta).alert();
-						}
-					}
-				
-			}); 
-		});
-		
-
-
+ setTimeout(function() {
+  jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
+  }, 3000);
 
     
     </script>
-
-	 
 <?php
-$pagina->NewPrintBottom();
-
+$pagina->PrintBottom();
+?>
