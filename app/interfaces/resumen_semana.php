@@ -1,4 +1,4 @@
-<?
+<?php 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -41,7 +41,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 						<tr>
 							<td>
 
-<?}
+<?php }
 else
 {?>
 		<form method=post id=form_semana name=form_semana><table class="tb_base" width="85%">
@@ -50,25 +50,25 @@ else
 					<table width="90%">
 						<tr>
 							<td>
-<?}?>
+<?php }?>
 		<input type='hidden' name='accion' value=''>
 		<input type='hidden' name='opcion' value=''>
 		&nbsp;</td>
 		<td>
-		<?= Html::PrintCalendar("semana",$semana); ?>
+		<?php echo  Html::PrintCalendar("semana",$semana); ?>
 		</td>
 	</tr>
 	<tr>
 		<td valign="top" class="texto" align="right" style="width:35%" >
-			<?=__('Área Usuario')?>:
+			<?php echo __('Área Usuario')?>:
 		</td>
 		<td valign="top" class="texto" align="left">
-			<?=Html::SelectQuery($sesion,'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa','id_area_usuario', $id_area_usuario,'onchange="if(this.selectedIndex > 0) $(\'usuarios[]\').disabled = true; else $(\'usuarios[]\').disabled = false;"', 'Cualquiera')?>
+			<?php echo Html::SelectQuery($sesion,'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa','id_area_usuario', $id_area_usuario,'onchange="if(this.selectedIndex > 0) $(\'usuarios[]\').disabled = true; else $(\'usuarios[]\').disabled = false;"', 'Cualquiera')?>
 		</td>
 	</tr>
 	<tr>
-		<td align=right><?=__('Usuario')?>:
-<?
+		<td align=right><?php echo __('Usuario')?>:
+<?php 
 	// Revisamos si el usuario tiene categorÃ­a de revisor.
 	$params_array['codigo_permiso'] = 'REV';
 	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
@@ -83,7 +83,7 @@ else
 
 ?>
 	</td><td align=left>
-<?
+<?php 
 	echo(Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ".$where." ORDER BY nombre ASC", "usuarios[]",$usuarios,$id_area_usuario? " disabled=true multiple size=5":"multiple size=5","","200"));
 
 ?>
@@ -91,20 +91,20 @@ else
 					</tr>
 					<tr>
 						<td align=right>
-							<?=__('Tipo de Dato')?>:
+							<?php echo __('Tipo de Dato')?>:
 						</td>
 						<td align=left>
 							<select name='tipo_dato'>
-								<option value='horas_trabajadas'><?=__('Horas Trabajadas')?></option>
-								<option value='horas_cobrables' <?= $tipo_dato=='horas_cobrables'? 'selected':''?>><?=__('Horas Cobrables')?></option>
-								<option value='horas_castigadas'<?= $tipo_dato=='horas_castigadas'? 'selected':''?>><?=__('Horas Castigadas')?></option>
+								<option value='horas_trabajadas'><?php echo __('Horas Trabajadas')?></option>
+								<option value='horas_cobrables' <?php echo  $tipo_dato=='horas_cobrables'? 'selected':''?>><?php echo __('Horas Cobrables')?></option>
+								<option value='horas_castigadas'<?php echo  $tipo_dato=='horas_castigadas'? 'selected':''?>><?php echo __('Horas Castigadas')?></option>
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<td>&nbsp;</td>
 						<td align=left>
-							<input type=submit class=btn value="<?=__('Ver semana')?>">
+							<input type=submit class=btn value="<?php echo __('Ver semana')?>">
 						</td>
 					</tr>
 				</table>
@@ -114,7 +114,7 @@ else
 </form>
 <br />
 
-<?
+<?php 
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 	
   
@@ -132,8 +132,7 @@ else
 
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
-	if( is_array($usuarios) )
-		$objeto_semana = new Semana($sesion,"",$usuarios);
+	//if( is_array($usuarios) ) 		$objeto_semana = new Semana($sesion,"",$usuarios);
 	
 	for($j=0;$j<count($usuarios);$j++)
 	{
@@ -308,9 +307,9 @@ else
 			else
 			{
 				$no_cobrable = '';
-				$color = $objeto_semana->colores[$cod_asunto_color];
+			/*	$color = $objeto_semana->colores[$cod_asunto_color];
 				
-				if($color == '')
+				if($color == '')*/
 					$color = '#E8E7D9';
 			}
 
@@ -332,7 +331,7 @@ else
 				for($q = $dia_anterior+1; $q <= $dia_semana; $q++)
 					echo("</td><td style='width: 100px'>");
 			}
-			echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
+			echo("<div id='".$id_trabajo."' $tooltip class=\"cajatrabajo\" rel=\"$cod_asunto\" onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
 			echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 			if($alto > 24)
 				echo("<br />Hr:$duracion");
@@ -385,7 +384,7 @@ else
 		    disabled: false,
 		    className: 'delete',
 		    callback: function(e) {
-		      if( confirm('<?=__("¿Desea eliminar este trabajo?")?>') )
+		      if( confirm('<?php echo __("¿Desea eliminar este trabajo?")?>') )
 		      	OpcionesTrabajo(e.target.id,'eliminar');
 		    }
 		  },{
@@ -401,19 +400,19 @@ else
 
 	/* Array para todos los trabajos ingresados */
 	var arr_trabajos = new Array();
-<?
+<?php 
 	for($i = 0; $i < $lista->num; $i++)
 	{
 ?>
-		arr_trabajos[<?=$i?>] = <?=$lista->Get($i)->fields[id_trabajo]?>;
-<?
+		arr_trabajos[<?php echo $i?>] = <?php echo $lista->Get($i)->fields[id_trabajo]?>;
+<?php 
 	}
 ?>
 	/*
 		Inicializando Menú
 		creando cada menú según cantidad de trabajos hayan ingresados
 	*/
-	var list_div = parseInt(<?=$lista->num;?>);
+	var list_div = parseInt(<?php echo $lista->num;?>);
 	for(i=0;i<list_div;i++)
 	{
 		new Proto.Menu({
@@ -423,8 +422,12 @@ else
 		})
 	}
 })
+
+jQuery('.cajatrabajo').each(function() {
+				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
+			});	 
 </script>
-<?
+<?php 
 	if( $j == count($usuarios)-1 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 		echo "</td></tr></table>";
 	} #END FOR Clientes

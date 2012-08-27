@@ -16,22 +16,7 @@ jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebil
  function downloadJSAtOnload() {
 
 
-   if (!Modernizr.borderradius) {
-    jQuery.ajax({async: false,cache:true, type: "GET", url: 'https://estaticos.thetimebilling.com/fw/js/curvycorners.js', 
-	dataType: 'script',
-	complete: function() {
-		  var settings = {
-		      tl: { radius: 5 },
-		      tr: { radius: 5 },
-		      bl: { radius: 5 },
-		      br: { radius: 5 },
-		      antiAlias: true
-		    }
-            var divObj = document.getElementById("fd_menu_grey");
-            curvyCorners(settings, divObj); 
-	    }
-        });            
-	  }
+ 
 if (_sf_async_config.pathseguro!==undefined) {
          if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
                 jQuery('#ultimocontenedor').css({'width':'330px'});

@@ -35,17 +35,17 @@ define('TEMPLATE_DIR', str_replace('/img','/',Conf::ImgDir()));
 	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
 	<!-- <?php echo Conf::TimestampDeployCSS()?> -->
 	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
-	
+	<link rel="shortcut icon" href="https://static.thetimebilling.com/favicon.ico" />
 	
 	<!--[if IE]>
 	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_ie_only.css" />
 	<![endif]-->
 	<!--[if !IE]><!-->
-	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
+	<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 	<!--<![endif]-->
-	<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-        <link rel="shortcut icon" href="https://static.thetimebilling.com/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
+        
+	<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/jquery-ui.css" />
 	<link id='zenboxcss' />
 
 
@@ -57,11 +57,10 @@ google.load("jquery","1.7");
   <!--<link rel="stylesheet" href="<?php echo TEMPLATE_DIR;?>css/normalize.css">
         <link rel="stylesheet" href="<?php echo TEMPLATE_DIR;?>css/main.css">
 <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>-->
-        <script src="<?php echo TEMPLATE_DIR;?>js/vendor/modernizr-2.6.1.min.js"></script>
-		
-		<script  type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
-		<script  type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
-        <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/all.1234370043.js"></script>
+        <script src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
+	<script  type="text/javascript" src="//static.thetimebilling.com/js/jshashtable-2.1.js"></script>
+	<script  type="text/javascript" src="//static.thetimebilling.com/js/jquery.numberformatter-1.2.3.min.js"></script>
+        <script  type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>
 
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
@@ -84,6 +83,8 @@ google.load("jquery","1.7");
 .cont_tabla table {margin-left:auto;margin-right:auto;}
 .iconzip {background: url(https://static.thetimebilling.com/images/icon-zip.gif) no-repeat;height:20px;padding-left:25px;}
 .encabezadolight th { font-style: normal;color: white;background-color: #A3D55C;height: 20px;font-size: 11px;vertical-align: middle;text-align: center;}
+.encabezadogreen th { font-style: normal;color: white;background-color: #42A62B;height: 20px;font-size: 11px;vertical-align: middle;text-align: center;}
+
 #tablon td {padding:3px 2px !important}
 .nowrap {white-space: nowrap;}
 .clearfix:after {visibility: hidden;	display: block;	font-size: 0;	content: " ";	clear: both;	height: 0;	}
@@ -110,16 +111,21 @@ margin: 0;}
 #historial {margin:5px 0 0 0px;width:680px;float:left;}
 .z10 {position:relative;z-index:10;background:white;}
 #estadoscobro {border: 1px solid #CCC;background: #EEE;height: 35px;width: 945px;position: relative;margin: 0px -2px 5px 0px;}
-#plugins {width:290px;}
+
 #langs { list-style-type: none; margin: 0; padding: 0; width: 340px;margin:auto; }
-  #langs li { list-style:none; margin: 0 2px 1px 3px; padding: 0.3em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
-#plugins li {padding:5px;}        
-#plugins li .ui-state-default {width:240px;}
-#plugins li .ui-state-active {width:230px;}
+#langs li { list-style:none; margin: 0 2px 1px 3px; padding: 0.3em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
 #langs li .ui-state-default {width: 200px;height: 20px;padding-left:15px;text-align:left;}
 #langs li label span {height:20px;}
-#plugins li span.ui-icon ,   #langs li span.ui-icon {position:relative;margin: 2px 0 0 -20px;}
-  #lttooltip {
+#langs li span.ui-icon {position:relative;margin: 2px 0 0 -20px;}
+ 
+#plugins { list-style-type: none; margin: 0; padding: 0; width: 340px;margin:auto; }
+ 
+#plugins .ui-button-text {text-align:left;}
+#plugins li .ui-state-default {width:280px;}
+#plugins li .ui-state-active {width:270px;}
+#plugins li span.ui-icon  {position:relative;margin: 2px 0 0  25px;}
+
+#lttooltip {
 position:absolute;
 display:none;
 float: left;

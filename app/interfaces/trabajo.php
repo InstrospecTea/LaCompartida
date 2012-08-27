@@ -59,7 +59,7 @@ if (!$id_usuario) {
     }
 }
 // El objeto semana contiene la lista de colores por asunto de usuario de quien se define la semana
-$objeto_semana = new Semana($sesion, $id_usuario);
+//$objeto_semana = new Semana($sesion, $id_usuario);
 if ($semana == "") {
     $semana2 = "CURRENT_DATE()";
     $sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL -  WEEKDAY(CURDATE())  DAY ) AS semana_inicio";
@@ -116,12 +116,17 @@ $where .= " AND usuario.visible=1";
     
         function calcHeight(idIframe, idMainElm){
             ifr = $(idIframe);
-            the_size = ifr.$(idMainElm).offsetHeight + 20;
+           try {
+
+		   the_size = ifr.$(idMainElm).offsetHeight + 20;
             if( the_size < 250 ) the_size = 250;
             new Effect.Morph(ifr, {
                 style: 'height:'+the_size+'px',
                 duration: 0.2
             });
+			} catch(e) {
+				console.log(e);
+			}
         }
  
                 
@@ -135,7 +140,7 @@ $where .= " AND usuario.visible=1";
 
 
         jQuery(document).ready(function() {
-			 
+		
 		jQuery.contextMenu({
 			selector: '.trabajoabierto', events: {
 				show: function(opt) {
@@ -358,11 +363,19 @@ $where .= " AND usuario.visible=1";
 				 
 			
             });
+		 
+			jQuery('.cajatrabajo').each(function() {
+				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
+			});	 
+		 
             
         }
 
         function Refrescar() {
             jQuery('#versemana').click();
+			jQuery('.cajatrabajo').each(function() {
+				jQuery(this).css('background-color',s2c(jQuery(this).attr('rel')));
+			});	 
         }
         function calendario(semana) {
     
@@ -388,7 +401,7 @@ $where .= " AND usuario.visible=1";
         <tr>
             <td align=center>
                 <div id="Iframe" class="tb_base" style="width:750px;">
-                    <iframe id='asuntos' name='asuntos' target="asuntos" onload="calcHeight(this.id, 'pagina_body');" id='asuntos' scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab ?>&opcion=<?php echo $opcion ?>" frameborder="0" style="width:80%; height:352px;"></iframe>
+                    <iframe id='asuntos' name='asuntos' target="asuntos"  class="resizableframe" id='asuntos' scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab ?>&opcion=<?php echo $opcion ?>" frameborder="0" style="width:80%; height:352px;"></iframe>
                 </div>
                 <br/>
             </td>

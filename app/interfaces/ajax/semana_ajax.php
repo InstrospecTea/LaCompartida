@@ -59,7 +59,7 @@
 		}
 	}
 	// El objeto semana contiene la lista de colores por asunto de usuario de quien se define la semana
-	$objeto_semana = new Semana($sesion, $id_usuario);
+	//$objeto_semana = new Semana($sesion, $id_usuario);
 	if($semana == "")
 	{
 		$semana2 = "CURRENT_DATE()";
@@ -220,8 +220,8 @@ echo("<table style='width:600px'>");
 		else
 		{
 			$no_cobrable = '';
-			$color = $objeto_semana->colores[$cod_asunto_color];
-			if($color == '')
+			/*$color = $objeto_semana->colores[$cod_asunto_color];
+			if($color == '')*/
 				$color = '#E8E7D9';
 		}
 
@@ -254,7 +254,7 @@ echo("<table style='width:600px'>");
 				echo("</td><td width=14%>");
 		}	
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div class='cajatrabajo ".$arraytrabajo[$id_trabajo]['abierto']."' id='".$id_trabajo."'  $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div class='cajatrabajo ".$arraytrabajo[$id_trabajo]['abierto']."' rel='".$cod_asunto."' id='".$id_trabajo."'  $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");
@@ -276,8 +276,7 @@ echo("<table style='width:600px'>");
 		#$minutos = number_format($minutos,0);
         if($minutos < 10)
             $minutos = "0$minutos";
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) ) 
-		{
+		if( UtilesApp::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) 		{
 				$dia_semana_decimal = UtilesApp::Time2Decimal( $hora.':'.$minutos.':00' );
 				echo("
 					<td width=14% style='border: 1px solid black; text-align:center;'>

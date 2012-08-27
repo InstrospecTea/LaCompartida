@@ -1514,27 +1514,31 @@ if (method_exists('Conf', 'GetConf')) {
 	</table>
 </form>
 
-						<?php
-						echo(SelectorHoras::Javascript());
-
-						function SplitDuracion($time) {
-							list($h, $m, $s) = split(":", $time);
-							return $h . ":" . $m;
-						}
-
-						function Substring($string) {
-							if (strlen($string) > 250)
-								return substr($string, 0, 250) . "...";
-							else
-								return $string;
-						}
-						?>
-<script type="text/javascript">
-<?php
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )))
-	echo "CargaIdioma('" . $codigo_asunto_secundario . "');";
-else
+<?php  
+ 
+		echo(SelectorHoras::Javascript());
+    
+ 
+    function SplitDuracion($time)
+    {
+        list($h,$m,$s) = split(":",$time);
+        return $h.":".$m;
+    }
+    function Substring($string)
+    {
+        if(strlen($string) > 250)
+            return substr($string, 0, 250)."...";
+        else
+            return $string;
+    } 
+?>
+<script language="javascript" type="text/javascript">
+<?php 
+if (UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
+		echo "CargaIdioma('".$codigo_asunto_secundario."');";
+} else {
 	echo "CargaIdioma('" . $t->fields['codigo_asunto'] . "');";
+}
 ?>
  
 </script>

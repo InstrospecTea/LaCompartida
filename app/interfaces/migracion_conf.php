@@ -1,7 +1,7 @@
 <?php
 
 class ConfMigracion {
-
+ 
 	function dbHost() {
 		return 'db1.ccvvg39btzna.us-east-1.rds.amazonaws.com';
 	}
@@ -20,24 +20,40 @@ class ConfMigracion {
 
 	function QueriesModificacionesAntes() {
 		$queries = array();
-		$queries[] = "ALTER TABLE `trabajo` DROP FOREIGN KEY  `trabajo_ibfk_4` ;";
-		$queries[] = "ALTER TABLE `cta_corriente` DROP FOREIGN KEY `cta_corriente_ibfk_7`;";
-		$queries[] = "ALTER TABLE `cobro` ADD `id_estado_factura` INT( 11 ) NULL ;";
-		$queries[] = "ALTER TABLE `cobro` ADD  `estado_real` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;";
-		$queries[] = "ALTER TABLE `cobro` ADD  `factura_rut` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
-											ADD `factura_razon_social` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;";
+		 
+		       $llavetrabajocobro=UtilesApp::ExisteLlaveForanea('trabajo.id_cobro', 'cobro.id_cobro', $this->sesion); 
+			if($llavetrabajocobro) 	$queries[] = "ALTER TABLE `trabajo` DROP FOREIGN KEY  `$llavetrabajocobro` ;";
+			
+			  $llavectacorrienteocobro=UtilesApp::ExisteLlaveForanea('cta_corriente.id_cobro', 'cobro.id_cobro', $this->sesion); 
+			if($llavectacorrienteocobro) 	$queries[] = "ALTER TABLE `cta_corriente` DROP FOREIGN KEY  `$llavectacorrienteocobro` ;";
+			
+		 if(!UtilesApp::ExisteCampo('id_estado_factura','cobro', $this->sesion))  	$queries[] = "ALTER TABLE `cobro` ADD `id_estado_factura` INT( 11 ) NULL ;";
+		 if(!UtilesApp::ExisteCampo('estado_real','cobro', $this->sesion))  $queries[] = "ALTER TABLE `cobro` ADD  `estado_real` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;";
+		 if(!UtilesApp::ExisteCampo('factura_rut','cobro', $this->sesion))   $queries[] = "ALTER TABLE `cobro` ADD  `factura_rut` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ";
+		if(!UtilesApp::ExisteCampo('factura_razon_social','cobro', $this->sesion))   $queries[] = "ALTER TABLE `cobro`	ADD `factura_razon_social` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;";
+if(!UtilesApp::ExisteCampo('id_trabajo_lemontech','cobro', $this->sesion))   $queries[] = "ALTER TABLE `cobro`	ADD `factura_razon_social` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;";
+		if (!UtilesApp::ExisteIndex('PRIMARY', DBORIGEN . ".TbTarifaCategoria", $this->sesion))
+		
+		if(!UtilesApp::ExisteCampo('id_trabajo_lemontech', DBORIGEN . ".HojaTiempoajustado",$this->sesion)) {
+						$queries[].="ALTER TABLE ".DBORIGEN.".HojaTiempoajustado  ADD `id_trabajo_lemontech` INT( 11 ) NULL;" ;
+						$queries[].="UPDATE ".DBORIGEN.".HojaTiempoajustado set  `id_trabajo_lemontech`=1*hojatiempoajustadoid;" ;
+		}
+		if (!UtilesApp::ExisteIndex('id_trabajo_lemontech', DBORIGEN . ".HojaTiempoajustado", $this->sesion))  $queries[].="ALTER TABLE ".DBORIGEN.".HojaTiempoajustado ADD INDEX ( `id_trabajo_lemontech` );";
 
+		
+					 
+		
+					
+		
 		return $queries;
 	}
 
 	function QueriesModificacionesDespues() {
 		$queries = array();
 		$queries[] = "UPDATE trabajo LEFT JOIN cobro USING( id_cobro ) SET trabajo.id_cobro = NULL WHERE cobro.id_cobro IS NULL";
-		$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
-		$queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `prc_tt2`.`cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
-		$queries[] = "ALTER TABLE `cobro`
-												  DROP `id_estado_factura`,
-												  DROP `estado_real`;";
+		if(!UtilesApp::ExisteLlaveForanea('trabajo.id_cobro', 'cobro.id_cobro', $this->sesion) ) 		$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+		if(!UtilesApp::ExisteLlaveForanea('cta_corriente.id_cobro', 'cobro.id_cobro', $this->sesion) )  $queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+		
 		$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
 		$queries[] = "UPDATE cobro SET estado = 'FACTURADO' WHERE ( SELECT count(*) FROM factura WHERE factura.id_cobro = cobro.id_cobro ) > 0 AND estado IN ('CREADO','EN REVISION','EMISION');";
 		$queries[] = "UPDATE cobro 
@@ -76,8 +92,9 @@ class ConfMigracion {
 
 	function QueryUsuario() {
 		return "SELECT 
-								Empleado.CodigoEmpleado 																				as usuario_FFF_id_usuario,
-								Empleado.Nombres 																								as usuario_FFF_nombre,
+								if(length(CodigoEmpleado)=6,2000+1*CodigoEmpleado 	,1000+1*CodigoEmpleado 	)			as usuario_FFF_id_usuario,
+CodigoEmpleado as 		usuario_FFF_id_usuario_antiguo,					
+Empleado.Nombres 																								as usuario_FFF_nombre,
 								Empleado.ApellidoPaterno 																				as usuario_FFF_apellido1,
 								Empleado.ApellidoMaterno 																				as usuario_FFF_apellido2,
 								Empleado.Siglas 																								as usuario_FFF_username,
@@ -139,16 +156,18 @@ class ConfMigracion {
 
 	function QueryAsunto() {
 		return "SELECT 
-								Cliente.Cobrador 																														as asunto_FFF_id_cobrador,
-								CONCAT(SUBSTRING(OrdenFacturacion.NumeroOrdenFact,1,4),'-',SUBSTRING(OrdenFacturacion.NumeroOrdenFact,-3)) 	as asunto_FFF_codigo_asunto,
-								OrdenFacturacion.CodigoCliente 																							as asunto_FFF_codigo_cliente,
-								OrdenFacturacion.CodigoCliente 																							as contrato_FFF_codigo_cliente,
-								CONCAT_WS(' ',ContactosCliente.Titulo, ContactosCliente.Nombre) 						as asunto_FFF_contacto,
-								CONCAT_WS(' ',Titulo, Nombre) 																							as contrato_FFF_contacto,
-								OrdenFacturacion.CodigoAbogadoResponsable 																	as asunto_FFF_id_encargado,
-								OrdenFacturacion.CodigoAbogadoResponsable 																	as contrato_FFF_id_usuario_secundario,
-								OrdenFacturacion.CodigoAbogadoResponsable 																	as asunto_FFF_id_usuario,
-								OrdenFacturacion.Attache 																										as contrato_FFF_id_usuario_responsable,
+								if(length( Cliente.Cobrador )=6,2000+1* Cliente.Cobrador   	,1000+1* Cliente.Cobrador  	) 	as asunto_FFF_id_cobrador,
+						concat(OrdenFacturacion.CodigoCliente,'-',OrdenFacturacion.NumeroOrdenFact) 	as asunto_FFF_codigo_asunto,
+					OrdenFacturacion.NumeroOrdenFact	as asunto_FFF_codigo_asunto_secundario,
+								OrdenFacturacion.CodigoCliente 					as asunto_FFF_codigo_cliente,
+OrdenFacturacion.CodigoCliente as contrato_FFF_codigo_cliente,
+CONCAT_WS(' ',ContactosCliente.Titulo, ContactosCliente.Nombre) 						as asunto_FFF_contacto,
+CONCAT_WS(' ',Titulo, Nombre) 																							as contrato_FFF_contacto,
+if(length( OrdenFacturacion.CodigoAbogadoResponsable)=6,     2000+1* OrdenFacturacion.CodigoAbogadoResponsable  	,    1000+1* OrdenFacturacion.CodigoAbogadoResponsable  	) 				as asunto_FFF_id_encargado,
+
+if(length( OrdenFacturacion.CodigoAbogadoResponsable)=6,2000+1* OrdenFacturacion.CodigoAbogadoResponsable  	,1000+1* OrdenFacturacion.CodigoAbogadoResponsable  	) 																	as contrato_FFF_id_usuario_secundario,
+if(length( OrdenFacturacion.CodigoAbogadoResponsable)=6,2000+1* OrdenFacturacion.CodigoAbogadoResponsable  	,1000+1* OrdenFacturacion.CodigoAbogadoResponsable  	) 	 																	as asunto_FFF_id_usuario,
+if(length(OrdenFacturacion.Attache )=6,2000+1*OrdenFacturacion.Attache 	,1000+1*OrdenFacturacion.Attache  	) 		as contrato_FFF_id_usuario_responsable,
 								IF(OrdenFacturacion.FlagFacturable='S','1','0') 														as asunto_FFF_cobrable,
 								IF(OrdenFacturacion.HojaTiemposFlag='O','1','0')														as asunto_FFF_activo,
 								IF(OrdenFacturacion.HojaTiemposFlag='O','SI','NO')													as contrato_FFF_activo,
@@ -175,53 +194,63 @@ class ConfMigracion {
 								Cliente.Actividad																														as contrato_FFF_factura_giro,
 								Cliente.NombreCliente																												as asunto_FFF_razon_social, 
 								Cliente.NombreCliente																												as contrato_FFF_factura_razon_social
-								,IF(OrdenFacturacion.TipoFactExtraordinaria='A','FLAT FEE','TASA')					as contrato_FFF_forma_cobro
-								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,0)	as contrato_FFF_monto,
-								'1'																																					as contrato_FFF_separar_liquidaciones 
-							FROM OrdenFacturacion 
-							LEFT JOIN Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
-							LEFT JOIN OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
-							LEFT JOIN ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente";
+									,IF(OrdenFacturacion.TipoFactExtraordinaria='A' AND  (OrdenFacturacion.HonorarioPactado>0 OR prop.hf_valorventa>0 ),'FLAT FEE','TASA')					as contrato_FFF_forma_cobro
+								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,prop.hf_valorventa)	as contrato_FFF_monto,
+								'1'	 as contrato_FFF_separar_liquidaciones 
+							FROM  ".DBORIGEN.".OrdenFacturacion left  join  ".DBORIGEN.".propuesta prop using (numeropropuesta) 
+							LEFT JOIN   ".DBORIGEN.".Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 
+							 
+							LEFT JOIN  ".DBORIGEN.".OrdenFacturacionHistoria ON OrdenFacturacion.NumeroOrdenFact = OrdenFacturacionHistoria.NumeroOrdenFact 
+							LEFT JOIN  ".DBORIGEN.".ContactosCliente ON ContactosCliente.CodigoContactoCliente = OrdenFacturacion.CodigoContactoCliente  
+								$extra ";
 	}
 
-	function QueryHoras() {
+	
+	
+			
+	function QueryHoras($extra) {
 		return "SELECT
-								if(hta.CodigoEmpleadoFacturable is not null, hta.CodigoEmpleadoFacturable,htd.CodigoEmpleado) as id_usuario
-								,hta.FechaFacturable																																					as fecha 
-								,hta.HoraInicio 																																							as hora_inicio
-								,hta.NumeroFactura																																						as id_cobro 
-								,SEC_TO_TIME(htd.Tiempo*60)																																		as duracion
-								,IF(hta.Status='C','00:00:00',SEC_TO_TIME(hta.TiempoFacturable*60))														as duracion_cobrada
-								,IF(hta.FlagFacturable = 'S','1','0') 																												as cobrable
-								,IF(hta.AsuntoLargoFacturable IS NOT NULL,hta.AsuntoLargoFacturable, htd.AsuntoLargo) 				as descripcion
-								,IF(hta.FechaCreacion IS NOT NULL,hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion
-								,IF(hta.FechaModificacion IS NOT NULL,hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
-								,IF(hta.TarifaFacturable IS NOT NULL,hta.TarifaFacturable ,htd.Tarifa) 												as tarifa_hh
-								,IF(Factura.Moneda IS NOT NULL, IF( Factura.Moneda = 'D','2',IF( Factura.Moneda = 'E', '3','1')), IF( hta.moneda = 'D','2',IF( hta.moneda = 'E', '3','1')) )
-																																																							as id_moneda
-								,IF(hta.NumeroOrdenFacturacionFact, hta.NumeroOrdenFacturacionFact,htd.NumeroOrdenFacturacion) as codigo_asunto
-								,hta.id_trabajo_lemontech 																																		as id_trabajo
-								FROM HojaTiempoajustado hta
-								LEFT JOIN Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
-								LEFT JOIN HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid 
-								LEFT JOIN Factura ON Factura.NumeroFactura = hta.NumeroFactura";
+ if(ifnull(hta.CodigoEmpleadoFacturable, htd.CodigoEmpleado)=6, 2000+1*ifnull(hta.CodigoEmpleadoFacturable, htd.CodigoEmpleado), 1000+1*ifnull(hta.CodigoEmpleadoFacturable, htd.CodigoEmpleado)) as id_usuario,
+								
+			 					hta.FechaFacturable	as fecha 
+		 					,	hta.HoraInicioFacturable	as hora_inicio
+		 					,hta.NumeroFactura			as id_cobro ,
+						 		SEC_TO_TIME(htd.Tiempo*60)  as duracion,
+                IF(hta.Status='C','00:00:00',SEC_TO_TIME(hta.TiempoFacturable*60))	as duracion_cobrada,
+							 	IF(hta.FlagFacturable = 'S','1','0') 																												as cobrable,
+								 IFNULL(hta.AsuntoLargoFacturable, htd.AsuntoLargo) 				as descripcion,
+								 IFNULL(hta.FechaCreacion, htd.FechaCreacion) 											as fecha_creacion,
+								 IFNULL(hta.FechaModificacion, htd.FechaModificacion) 					as fecha_modificacion
+								   ,IF(hta.TarifaFacturable IS NOT NULL,hta.TarifaFacturable ,htd.Tarifa) 												as tarifa_hh
+								
+                 ,if(ifnull(Factura.Moneda, hta.moneda)='D',2,if( ifnull(Factura.Moneda, hta.moneda)='E',3,1  ))		as id_moneda
+							 	,IF(hta.NumeroOrdenFacturacionFact IS NULL, concat(htd.Cliente,'-', htd.NumeroOrdenFacturacion),concat(hta.ClienteFacturable,'-', hta.NumeroOrdenFacturacionFact)) as codigo_asunto
+								 ,hta.id_trabajo_lemontech  as id_trabajo 			
+                
+               
+								FROM     ".DBORIGEN.".HojaTiempoajustado hta
+								LEFT JOIN ".DBORIGEN.".Hojatiemporelacion htr ON htr.hojatiempoajustadoid=hta.hojatiempoajustadoid
+								LEFT JOIN ".DBORIGEN.".HojaTiempoDetalle htd ON htd.hojatiempoid = htr.hojatiempoid  and hta.NumeroOrdenFacturacionFact=htd.NumeroOrdenFacturacion
+								LEFT JOIN ".DBORIGEN.".Factura ON Factura.NumeroFactura = hta.NumeroFactura
+								 $extra
+								";
 	}
 
-	function QueryGastos() {
+	function QueryGastos($extra) {
 		return "SELECT
-									IdGastoLemontech																																	as gasto_FFF_id_movimiento,
-									rucproveedor																																			as gasto_FFF_proveedor_ruc,
-									razonsocialproveedor																															as gasto_FFF_proveedor_rsocial,
-									CodigoGasto																																				as gasto_FFF_numero_documento, 
-									Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
-									Gastos.NumeroFactura																															as gasto_FFF_id_cobro,
-									Gastos.CodigoGasto																																as gasto_FFF_numero_documento,
-									Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
-									CONCAT( SUBSTRING(Gastos.NumeroOrdenFact,1,4),'-0',SUBSTRING(Gastos.NumeroOrdenFact,-3) ) as gasto_FFF_codigo_asunto,
+						   	if(CodigoGasto is null, null, 	1*CodigoGasto) 																											as gasto_FFF_id_movimiento,
+					  			rucproveedor																																			as gasto_FFF_proveedor_ruc,
+						  			razonsocialproveedor																															as gasto_FFF_proveedor_rsocial,
+					 			 CodigoGasto																																				as gasto_FFF_numero_documento, 
+					 			Gastos.FechaCreacion 																															as gasto_FFF_fecha_creacion,
+					 			
+						  			
+						 		Gastos.FechaModificacion 																													as gasto_FFF_fecha_modificacion,
+								 	CONCAT( Gastos.CodigoCliente,'-',Gastos.NumeroOrdenFact ) as gasto_FFF_codigo_asunto,
 									Gastos.FechaGasto 																																as gasto_FFF_fecha,
 									Gastos.NumeroFactura																															as gasto_FFF_id_cobro, 
-									Empleado.CodigoEmpleado 																													as gasto_FFF_id_usuario,
-									Gastos.CodigoEmpleado 																														as gasto_FFF_id_usuario_orden,
+									if(length(Empleado.CodigoEmpleado )=6,2000+1*Empleado.CodigoEmpleado  ,1000+1*Empleado.CodigoEmpleado  ) 																													as gasto_FFF_id_usuario,
+									if(length(Gastos.CodigoEmpleado 	)=6,2000+1*Gastos.CodigoEmpleado 	 ,1000+1*Gastos.CodigoEmpleado 	 )																													as gasto_FFF_id_usuario_orden,
 									Gastos.DescripcionGasto 																													as gasto_FFF_descripcion,
 									IF(Gastos.moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_egreso,
 									IF(Gastos.moneda = 'S',Gastos.MontoSoles,Gastos.MontoDolares) 														as gasto_FFF_monto_cobrable,
@@ -230,9 +259,10 @@ class ConfMigracion {
 									IF(Gastos.moneda='S','1',IF(Gastos.moneda='E','3','2')) 													as gasto_FFF_id_moneda,
 									Factura.CodigoFacturaBoleta																												as gasto_FFF_codigo_factura_gasto,
 									Factura.FechaImpresion																														as gasto_FFF_fecha_factura 
-									FROM Gastos
-									LEFT JOIN Empleado ON TRIM(Empleado.Siglas) = TRIM(Gastos.Creadopor)
-									LEFT JOIN Factura ON Gastos.NumeroFactura = Factura.NumeroFactura";
+									FROM  ".DBORIGEN.".Gastos
+									LEFT JOIN ".DBORIGEN.".Empleado ON TRIM(Empleado.Siglas) = TRIM(Gastos.Creadopor)
+									LEFT JOIN ".DBORIGEN.".Factura ON Gastos.NumeroFactura = Factura.NumeroFactura 
+										$extra ";
 	}
 
 	function QueryMonedaHistorial() {
@@ -265,10 +295,10 @@ class ConfMigracion {
 									CONCAT(SUBSTRING(Factura.NumeroOrdenFact,1,4),'-0',SUBSTRING(Factura.NumeroOrdenFact,-3)) as cobro_FFF_codigo_asunto,
 									Factura.NombreClienteFacturacion																as cobro_FFF_factura_razon_social,
 									Factura.DocIdentidadNumeroFacturacion														as cobro_FFF_factura_rut,
-									Empleado.CodigoEmpleado as cobro_FFF_id_usuario
-								FROM Factura
-								LEFT JOIN Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
-								LEFT JOIN Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
+									if(length(Empleado.CodigoEmpleado )=6,2000+1*Empleado.CodigoEmpleado  ,1000+1*Empleado.CodigoEmpleado  ) as cobro_FFF_id_usuario
+								FROM  ".DBORIGEN.".Factura
+								LEFT JOIN  ".DBORIGEN.".Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
+								LEFT JOIN  ".DBORIGEN.".Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))";
 	}
 
 	function QueryFacturas() {
@@ -299,7 +329,7 @@ class ConfMigracion {
 	function QueryUsuariosTarifas() {
 		return "SELECT 
 								T1.id_usuario_tarifa_LMT as id_usuario_tarifa 
-								, T1.CodigoEmpleado AS id_usuario 
+								, if(length(T1.CodigoEmpleado )=6,2000+1*T1.CodigoEmpleado  ,1000+1*T1.CodigoEmpleado  ) AS id_usuario 
 								, if(T1.moneda='D' ,'2',if(T1.moneda = 'E','3',if(T1.moneda = 'S','1','0'))) AS id_moneda 
 								, T1.TarifaHora AS tarifa 
 								, T1.CodigoTarifaCliente as id_tarifa 

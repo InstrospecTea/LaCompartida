@@ -690,7 +690,6 @@ if ($id_cobro) {
 				<legend><?php echo __('Filtros') ?></legend>
 				<table   style="border: 0px solid black;" >
 <?php
-
 if ($motivo != "cobros") {
 	if ($p_revisor->fields['permitido']) {
 ?>

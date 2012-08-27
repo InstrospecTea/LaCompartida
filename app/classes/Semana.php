@@ -11,33 +11,30 @@ class Semana extends Objeto
 	function Semana($sesion, $id_usuario = "", $usuarios = "")
 	{
 		$this->sesion = $sesion;
-		if( $id_usuario )
-			$condicion_usuario = " id_usuario = '".$id_usuario."' ";
-		else if( is_array( $usuarios ) )
-		{
-			$lista_usuarios = implode(",",$usuarios);
-			$condicion_usuario = " id_usuario IN (".$lista_usuarios.") ";
-		}
-		else
-			$condicion_usuario = "";
-			
-		if( $condicion_usuario != "" )
-			{
-				$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS codigo_asunto FROM trabajo WHERE ".$condicion_usuario." ORDER BY fecha DESC";
-				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				$num_asuntos = end(mysql_fetch_array(mysql_query('SELECT FOUND_ROWS()', $this->sesion->dbh)));
+		
+			return;
 				
+				$query="SELECT codigo_asunto from asunto";
+				$statement=$sesion->pdodbh->query($query);
+				$asuntos=$statement->fetchAll(PDO::FETCH_ASSOC);
+				
+				 
+				$num_asuntos =sizeof($asuntos);
+				echo "hay $num_asuntos asuntos";
 				$cont=0;
 				$codigo_colores = $this->ArregloColores($num_asuntos);
-				while(list($codigo_asunto)=mysql_fetch_array($resp))
+				foreach($asuntos as $asunto)
 				{
-					$this->colores[$codigo_asunto]=$codigo_colores[$cont++];
+					$this->colores[$asunto['codigo_asunto']]=$codigo_colores[$cont++];
 				}
-			}
+			
 	}
 	
+
+
 	function ArregloColores($num)
 	{
+		
 		$query = "SELECT SQL_CALC_FOUND_ROWS codigo_color FROM prm_color";
 		$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		$num_colores = end(mysql_fetch_array(mysql_query('SELECT FOUND_ROWS()', $this->sesion->dbh)));
@@ -54,5 +51,6 @@ class Semana extends Objeto
 			$codigo[$i] = $codigo_colores[$i%$num_colores];
 		}
 		return $codigo;
+		
 	}
 }

@@ -583,7 +583,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	
 	if($x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']]>0) {
 	$ws->write($filas, $col_id_trabajo, $arraylang['honorarios']['Resumen'][$lang], $letra_chica_underline);
-	$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
+	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
 	$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
 		}
 	$fila_honorario = $filas + 1;
@@ -591,7 +591,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	
 	if($x_gastos['subtotal_gastos_con_impuestos']>0) {
 	$ws->write($filas, $col_id_trabajo, $arraylang['gastos']['Resumen'][$lang], $letra_chica_underline);
-	$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
+	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
 	$ws->writeNumber($filas, 4, $x_gastos['subtotal_gastos_con_impuestos'], $formato_total);
 		}
 	$fila_gasto = $filas + 1;
@@ -601,7 +601,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	
 	if( $x_gastos['subtotal_gastos_sin_impuestos'] > 0 ) {
 		$ws->write($filas, $col_id_trabajo, $arraylang['gastos_sin_iva']['Resumen'][$lang].':', $letra_chica_underline);
-		$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
+		$ws->write($filas, 3, $simbolo_moneda, $letra_chica_derecha);
 		$ws->writeNumber($filas, 4, $x_gastos['subtotal_gastos_sin_impuestos'], $formato_total);
 		$fila_gasto_sin_impuesto = $filas + 1;
 		$extension_formula = ";".$col_formula_pago.$fila_gasto_sin_impuesto;
@@ -631,14 +631,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$iva = $total * ( $Cobro->fields['porcentaje_impuesto']/100 );
 	$ws->write($filas, $col_id_trabajo,  $arraylang['impuesto_honorarios']['Resumen'][$lang].":  ".$Cobro->fields['porcentaje_impuesto']."%", $letra_chica_bold);
-	$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_bold_derecha);
+	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
 	$ws->writeNumber($filas, 4, $x_resultados['impuesto'][$Cobro->fields['opc_moneda_total']], $formato_total);
 	$filas += 1;
 	
 	
 	$ivagastos = $total * ( $Cobro->fields['porcentaje_impuesto_gastos']/100 );
 	$ws->write($filas, $col_id_trabajo,  $arraylang['impuesto_gastos']['Resumen'][$lang].": ".$Cobro->fields['porcentaje_impuesto_gastos']."%", $letra_chica_bold);
-	$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_bold_derecha);
+	$ws->write($filas, 3, $simbolo_moneda, $letra_chica_bold_derecha);
 	$ws->writeNumber($filas, 4, $x_resultados['impuesto_gastos'][$Cobro->fields['opc_moneda_total']], $formato_total);
 	$filas += 1;
 	
@@ -718,7 +718,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		}
 
 		$ws->write($filas, $columna_tarifa, $arraylang['tarifa']['Listado de trabajos'][$lang] , $letra_encabezado_lista_centrado);
-		$ws->write($filas, $columna_importe,$arraylang['importe']['Listado de trabajos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista_centrado);
+		$ws->write($filas, $columna_importe,$arraylang['importe']['Listado de trabajos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista_centrado);
 		$filas += 1;
 		$ws->freezePanes(array($filas, 0));
 
@@ -1034,7 +1034,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$ws->write($filas, $columna_hora_tarificada, __('Horas Tarificadas'), $letra_encabezado_lista_centrado);
 					}
 					$ws->write($filas, $columna_tarifa, $arraylang['tarifa']['Listado de trabajos'][$lang], $letra_encabezado_lista_centrado);
-					$ws->write($filas, $columna_importe,$arraylang['importe']['Listado de trabajos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista_centrado);
+					$ws->write($filas, $columna_importe,$arraylang['importe']['Listado de trabajos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista_centrado);
 					$filas += 1;
 					
 					$fila_inicial_asunto = $filas;
@@ -1175,7 +1175,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->write($filas, $columna_gastos_fecha, $arraylang['fecha']['Listado de gastos'][$lang], $letra_encabezado_lista);
 			
 			$ws->write($filas, $columna_gastos_descripcion, $arraylang['descripcion']['Listado de gastos'][$lang], $letra_encabezado_lista);
-			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista);
+			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang].' '. $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista);
 			++$filas;
 		}
 		$ws->freezePanes(array($filas, 0));
