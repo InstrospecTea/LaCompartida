@@ -387,6 +387,32 @@ class FacturaPago extends Objeto
 		return $lista_ids;
 	}
 	
+	/**
+	 * Descarga el reporte excel básico según configuraciones
+	 */
+	public function DownloadExcel($search_query) {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+		
+		$SimpleReport = new SimpleReport($this->sesion);
+		
+		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('FACTURAS_PAGOS');
+		
+		// Load config from json
+		if (!isset($this->extra_fields['excel_config'])) {
+			// Cargar json del estudio
+		} else {
+			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
+		}
+		
+		$query = $search_query;
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$SimpleReport->LoadResults($results);
+		
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer->save(__('Facturas_Pagos'));
+	}
 }
 	
 class ListaFacturaPago extends Lista

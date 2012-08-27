@@ -898,7 +898,7 @@ class Migracion {
 		$contrato->guardar_fecha = false;
 
 		if ($contrato_generar->fields["forma_cobro"] != 'TASA' && $contrato_generar->fields["monto"] == 0) {
-			echo __('Ud. a seleccionado forma de cobro:') . " " . $contrato_generar->fields["forma_cobro"] . " " . __('y no ha ingresado monto') . "\n";
+			echo __('Ud. ha seleccionado forma de cobro:') . " " . $contrato_generar->fields["forma_cobro"] . " " . __('y no ha ingresado monto') . "\n";
 			echo "Error al guardar contrato\n";
 			return false;
 		} else if ($contrato_generar->fields["forma_cobro"] == 'TASA') {
@@ -919,6 +919,12 @@ class Migracion {
 		$contrato->Edit("observaciones", $contrato_generar->fields["observaciones"]);
 
 
+
+
+		/* 	FFF: EL RESTO QUEDA COMENTADO PORQUE HAY MAPEO 1:1 entre campo y llave 
+		  $contrato->Edit("centro_costo", $contrato_generar->fields["centro_costo"]);
+		  $contrato->Edit("glosa_contrato", $contrato_generar->fields["glosa_contrato"]);
+		  $contrato->Edit("observaciones", $contrato_generar->fields["observaciones"]);
 		if (method_exists('Conf', 'GetConf')) {
 			if (Conf::GetConf($this->sesion, 'TituloContacto')) {
 				$contrato->Edit("titulo_contacto", $contrato_generar->fields["titulo_contacto"]);

@@ -37,6 +37,12 @@ class Asunto extends Objeto
 		return $this->Load($id);
 	}
 
+	function LoadByContrato($id_contrato) {
+		$query = "SELECT id_asunto FROM asunto WHERE id_contrato = '$id_contrato' LIMIT 1";
+		$resp = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
+		return $this->Load($resp['id_asunto']);
+	}
+	
 	function CodigoACodigoSecundario($codigo_asunto)
 	{ 
 		if($codigo_asunto != '')

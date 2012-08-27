@@ -1162,8 +1162,9 @@ class Factura extends Objeto {
 
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
-
-		$min_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionDesde');
+		
+		/*EL RESTO ESTA DEPRECATED*/
+		/*$min_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionDesde');
 		$max_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionHasta');
 
 		$where_max = " 1 ";
@@ -1186,10 +1187,11 @@ class Factura extends Objeto {
 			return $min_numero_factura;
 		} else {
 			return $max_numero_documento + 1;
-		}
+		}*/
 	}
 
 	function ObtenerNumeroDocLegal($tipo_documento_legal, $serie = null) {
+		
 		if (empty($tipo_documento_legal)) {
 			return false;
 		}
@@ -1197,7 +1199,7 @@ class Factura extends Objeto {
 		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
 			$query = "SELECT numero_inicial FROM prm_doc_legal_numero WHERE id_documento_legal = " . $tipo_documento_legal . " AND serie = '" . $serie . "'";
 		} else {
-			$query = "SELECT numero_inicial FROM prm_documento_legal WHERE id_documento_legal = " . $tipo_documento_legal;
+			$query = "SELECT numero_inicial FROM prm_doc_legal_numero WHERE id_documento_legal = " . $tipo_documento_legal;
 		}
 
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1421,6 +1423,108 @@ class Factura extends Objeto {
 		$this->fields['id_estado'] = $estado;
 	}
 
+	public function SearchQuery() {
+		$query = "SELECT SQL_CALC_FOUND_ROWS
+					prm_documento_legal.codigo as tipo
+					, numero
+					, factura.serie_documento_legal
+					, factura.codigo_cliente 
+					, cliente.glosa_cliente
+					, contrato.id_contrato as idcontrato
+					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
+								factura.cliente,
+								IF( contrato.factura_razon_social IN ('',' '),
+										factura.cliente,
+										IF( contrato.factura_razon_social IS NULL,
+												factura.cliente,
+												CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+											)
+									)
+							) as factura_rsocial
+					, fecha 
+					, usuario.username AS encargado_comercial
+					, descripcion
+					, prm_estado_factura.codigo as estado
+					, factura.id_cobro
+					, cobro.codigo_idioma as codigo_idioma
+					, prm_moneda.simbolo
+					, prm_moneda.cifras_decimales
+					, prm_moneda.tipo_cambio
+					, factura.id_moneda
+					, factura.honorarios
+					, factura.subtotal_gastos
+					, factura.subtotal_gastos_sin_impuesto
+					, factura.iva
+					, total
+					, '' as saldo_pagos
+					, cta_cte_fact_mvto.saldo as saldo
+					, '' as monto_pagos_moneda_base
+					, '' as saldo_moneda_base
+					, factura.id_factura
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente, 'no' ) as mostrar_diferencia_razon_social
+				FROM factura
+				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+				LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+				LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+				LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable";
+		
+		$wheres = array();
+
+//		if (!empty($this->fields['numero'])) {
+//			$wheres[] = "sa.id_solicitud_adelanto = '{$this->fields['id_solicitud_adelanto']}'";
+//		}
+//		
+//		if (!empty($this->fields['codigo_cliente'])) {
+//			$wheres[] = "sa.codigo_cliente = '{$this->fields['codigo_cliente']}'";
+//		}
+//		
+//		if (!empty($this->fields['estado'])) {
+//			$wheres[] = "sa.estado = '{$this->fields['estado']}'";
+//		}
+//
+//		if (!empty($this->extra_fields['fecha_desde'])) {
+//			$wheres[] = "sa.fecha >= '" . Utiles::fecha2sql($this->extra_fields['fecha_desde']) . "'";
+//		}
+//		if (!empty($this->extra_fields['fecha_hasta'])) {
+//			$wheres[] = "sa.fecha <= '" . Utiles::fecha2sql($this->extra_fields['fecha_hasta']) . "'";
+//		}
+
+		$query .= " WHERE " . implode(' AND ', $wheres);
+		$query .= " GROUP BY sa.id_solicitud_adelanto";
+		
+		return $query;
+	}
+	
+	/**
+	 * Descarga el reporte excel básico según configuraciones
+	 */
+	public function DownloadExcel($search_query) {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+		
+		$SimpleReport = new SimpleReport($this->sesion);
+		
+		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('FACTURAS');
+		
+		// Load config from json
+		if (!isset($this->extra_fields['excel_config'])) {
+			// Cargar json del estudio
+		} else {
+			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
+		}
+		
+		$query = $search_query;
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$SimpleReport->LoadResults($results);
+		
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer->save(__('Facturas'));
+	}
 }
 
 #end Class

@@ -13,6 +13,8 @@ class SimpleReport_Configuration_Column {
 	public $visible;
 	public $format;
 	public $sort;
+	public $extras;
+	public $group;
 
 	function __construct() {
 		$this->field = '';
@@ -45,6 +47,16 @@ class SimpleReport_Configuration_Column {
 
 	public function Sort($sort) {
 		$this->sort = $sort;
+		return $this;
+	}
+
+	public function Extras($extras) {
+		$this->extras = $extras;
+		return $this;
+	}
+
+	public function Group($group) {
+		$this->group = $group;
 		return $this;
 	}
 

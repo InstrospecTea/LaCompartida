@@ -42,5 +42,3 @@ $_LANG['Asuntos trabajados'] = "Materias trabajados";
 $_LANG['ASUNTO'] = "MATERIA";
 $_LANG['Asunto carta'] = "Materia";
 
-
-?>

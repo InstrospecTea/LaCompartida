@@ -1,4 +1,5 @@
 <?php 
+
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../app/classes/Cobro.php';
 require_once Conf::ServerDir().'/../app/classes/Asunto.php';
@@ -8,19 +9,17 @@ require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
  *  su estructura (html), el poblamiento de sus datos (arreglos), su parseo (ingreso de arreglos al html)
  *  y finalmente su envío.
  */
-class Notificacion
-{
+
+class Notificacion {
+
 	var $sesion = null;
 	
-	function Notificacion($sesion)
-	{
+	function Notificacion($sesion) {
 		$this->sesion = $sesion;
 	}
 	
-	function msg($msg)
-	{
-		switch($msg)
-		{
+	function msg($msg) {
+		switch ($msg) {
 			case 'asunto_limite_monto':
 			case 'contrato_limite_monto':
 			case 'cliente_limite_monto':
@@ -41,11 +40,10 @@ class Notificacion
 	}
 
 	/* Entrega la estructura del mail, dependiendo si es el mail Mensual, Semanal o Diario */
-	function estructura($tipo_mail)
-	{
+
+	function estructura($tipo_mail) {
 		$mail = array();
-		switch($tipo_mail)
-		{
+		switch ($tipo_mail) {
 			
 			case 'semanal':
 				$mail['header'] = 
@@ -99,9 +97,9 @@ class Notificacion
 				break;
 				
 				/*	Estructura del mail diario:
-				 *  -Modificación de Contratos de los que es responsable el Usuario
-				 *  -Transgresión de límites de Asunto
-				 *  -Transgresión de límites de Contratos
+			 *  -ModificaciÃ³n de Contratos de los que es responsable el Usuario
+			 *  -TransgresiÃ³n de lÃ­mites de Asunto
+			 *  -TransgresiÃ³n de lÃ­mites de Contratos
 				 */	
 				case 'diario':					
 					$mail = array();
@@ -421,15 +419,14 @@ class Notificacion
 		return $mail;
 	}
 
-	/*Parseo y emisión de mail Semanal*/
-	function mensajeSemanal($dato)
-	{
+	/* Parseo y emisiÃ³n de mail Semanal */
+
+	function mensajeSemanal($dato) {
 		$estructura = $this->estructura('semanal');
 		$mensajes = array();
 		
 		if(is_array($dato))
-			foreach($dato as $id_usuario_mail => $alertas)
-			{
+			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
 				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
 				if(isset($alertas['alerta_propia']) && $alertas['alerta_propia'])
@@ -438,12 +435,10 @@ class Notificacion
 					$enviar = true;
 				}
 				if(isset($alertas['alerta_revisados']) && $alertas['alerta_revisados'])
-					if(is_array($alertas['alerta_revisados']))
-					{
+					if (is_array($alertas['alerta_revisados'])) {
 						$i = 0;
 						$filas = '';
-						foreach($alertas['alerta_revisados'] as $id_usuario_revisado => $alerta_revisado)
-						{
+						foreach ($alertas['alerta_revisados'] as $id_usuario_revisado => $alerta_revisado) {
 								$fila = str_replace('%USUARIO',$alerta_revisado['nombre'],$estructura['sub_tr_revisados']);
 								$fila = str_replace('%HORAS',$alerta_revisado['horas'],$fila);
 								$fila = str_replace('%COBRABLES',$alerta_revisado['horas_cobrables'],$fila);
@@ -466,26 +461,22 @@ class Notificacion
 		return $mensajes;
 	}
 	
-	/*Parseo y emisión de mail Diario*/
-	function mensajeDiario($dato)
-	{
+	/* Parseo y emisiÃ³n de mail Diario */
+
+	function mensajeDiario($dato) {
 		$estructura = $this->estructura('diario');
 		$mensajes = array();
 		if(is_array($dato))
-			foreach($dato as $id_usuario_mail => $alertas)
-			{
+			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
 				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
 				if(isset($alertas['asunto_excedido']) && $alertas['asunto_excedido'])
-					if(is_array($alertas['asunto_excedido']))
-					{
+					if (is_array($alertas['asunto_excedido'])) {
 						$filas = '';
 						$i = 0;
-						foreach($alertas['asunto_excedido'] as $asunto => $alertas_asunto)
-						{
+						foreach ($alertas['asunto_excedido'] as $asunto => $alertas_asunto) {
 								$lista_alertas = '';
-								foreach($alertas_asunto as $tipo_limite => $limite)
-								{
+							foreach ($alertas_asunto as $tipo_limite => $limite) {
 									$txt = $this->msg('asunto_'.$tipo_limite);
 									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
 									$txt = str_replace('%MAX',$limite['max'],$txt);
@@ -507,15 +498,12 @@ class Notificacion
 						$enviar = true;
 					}
 				if(isset($alertas['cliente_excedido']) && $alertas['cliente_excedido'])
-					if(is_array($alertas['cliente_excedido']))
-					{
+					if (is_array($alertas['cliente_excedido'])) {
 						$filas = '';
 						$i = 0;
-						foreach($alertas['cliente_excedido'] as $cliente => $alertas_cliente)
-						{
+						foreach ($alertas['cliente_excedido'] as $cliente => $alertas_cliente) {
 								$lista_alertas = '';
-								foreach($alertas_cliente as $tipo_limite => $limite)
-								{
+							foreach ($alertas_cliente as $tipo_limite => $limite) {
 									$txt = $this->msg('cliente_'.$tipo_limite);
 									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
 									$txt = str_replace('%MAX',$limite['max'],$txt);
@@ -537,15 +525,12 @@ class Notificacion
 						$enviar = true;
 					}
 				if(isset($alertas['contrato_excedido']) && $alertas['contrato_excedido'])
-					if(is_array($alertas['contrato_excedido']))
-					{
+					if (is_array($alertas['contrato_excedido'])) {
 						$filas = '';
 						$i = 0;
-						foreach($alertas['contrato_excedido'] as $asunto => $alertas_asuntos)
-						{
+						foreach ($alertas['contrato_excedido'] as $asunto => $alertas_asuntos) {
 								$lista_alertas = '';
-								foreach($alertas_asuntos as $tipo_limite => $limite)
-								{
+							foreach ($alertas_asuntos as $tipo_limite => $limite) {
 									$txt = $this->msg('contrato_'.$tipo_limite);
 									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
 									$txt = str_replace('%MAX',$limite['max'],$txt);
@@ -554,8 +539,7 @@ class Notificacion
 								}
 								$fila = str_replace('%CLIENTE',$limite['cliente'],$estructura['sub_tr_contratos_excedidos']);
 								$lista_asuntos = '';
-								foreach($limite['asunto'] as $asunto)
-								{
+							foreach ($limite['asunto'] as $asunto) {
 									$txt = str_replace('%ASUNTO',$asunto,$estructura['sub_tr_contratos_excedidos_lista_asuntos']);
 									$lista_asuntos .= $txt;
 								}
@@ -582,16 +566,14 @@ class Notificacion
 						$filas_alertas .= $tabla;
 						$enviar = true;
 				}
-				if(isset($alertas['retraso_max']))
-				{
+				if (isset($alertas['retraso_max'])) {
 						$tabla = $estructura['tr_retraso_max'];
 						$tabla = str_replace('%ACTUAL',round($alertas['retraso_max']['actual'],1),$tabla);
 						$tabla = str_replace('%MAX',$alertas['retraso_max']['max'],$tabla);
 						$filas_alertas .= $tabla;
 						$enviar = true;
 				}
-				if(isset($alertas['restriccion_diario']))
-				{
+				if (isset($alertas['restriccion_diario'])) {
 						$tabla = $estructura['tr_restriccion_diario'];
 						$tabla = str_replace('%ACTUAL',$alertas['restriccion_diario']['actual'],$tabla);
 						$tabla = str_replace('%MIN',$alertas['restriccion_diario']['min'],$tabla);
@@ -616,11 +598,9 @@ class Notificacion
 
 
 				if(isset($alertas['modificacion_contrato']) && $alertas['modificacion_contrato'])
-					if(is_array($alertas['modificacion_contrato']))
-					{
+					if (is_array($alertas['modificacion_contrato'])) {
 						$filas = '';
-						foreach($alertas['modificacion_contrato'] as $i => $alerta_modificado)
-						{	
+						foreach ($alertas['modificacion_contrato'] as $i => $alerta_modificado) {
 								$fila = str_replace('%CLIENTE',$alerta_modificado['nombre_cliente'],$estructura['sub_tr_modificacion_contrato']);
 								$lista_asuntos = '';
 								foreach($alerta_modificado['asuntos'] as $asunto)
@@ -639,11 +619,9 @@ class Notificacion
 					}
 				
 				if(isset($alertas['tarea_alerta']) && $alertas['tarea_alerta'])
-					if(is_array($alertas['tarea_alerta']))
-					{
+					if (is_array($alertas['tarea_alerta'])) {
 						$filas = '';
-						foreach($alertas['tarea_alerta'] as $i => $tarea_alerta)
-						{	
+						foreach ($alertas['tarea_alerta'] as $i => $tarea_alerta) {
 								$fila = str_replace('%CLIENTE',$tarea_alerta['cliente'],$estructura['sub_tr_tarea_alerta']);
 								$fila = str_replace('%ASUNTO',$tarea_alerta['asunto'],$fila);
 								$fila = str_replace('%TAREA_NOMBRE',$tarea_alerta['nombre'],$fila);
@@ -701,18 +679,16 @@ class Notificacion
 	}
 	
 	/*Parseo y emisión de aviso de generación de cobros programados*/
-	function mensajeProgramados($dato)
-	{
+
+	function mensajeProgramados($dato) {
 		$estructura = $this->estructura('programados');
 		$mensajes = array();
 		
-		if(is_array($dato))
-		{
+		if (is_array($dato)) {
 			$i = 0;
 			$filas = '';
 			
-			foreach($dato as $id_contrato => $alertas)
-			{
+			foreach ($dato as $id_contrato => $alertas) {
 				$enviar = false;
 				//puse hardcoded 'ADMINISTRADOR' por que se le va a enviar solo al administrador del sistema (seteado por config)
 				$mensaje = str_replace('%USUARIO',"ADMINISTRADOR",$estructura['header']);
@@ -741,4 +717,5 @@ class Notificacion
 	}
 	
 }
+
 ?>

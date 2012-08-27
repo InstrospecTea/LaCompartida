@@ -1101,7 +1101,7 @@ function funcionTR(& $trabajo) {
 	$columna_tarifa = "<td colspan=2 align=center><strong>" . __('Tarifa') . "</strong><br>" . ( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion, $trabajo->fields['id_moneda_contrato'], 'simbolo', 'prm_moneda', 'id_moneda')) . " " . $tarifa . "</td>";
 	
 	if ($p_revisor->fields['permitido']) {
-		$html .= '<td>Rev.' . Revisado(& $trabajo) . '</td>';
+		$html .= '<td>Rev.' . Revisado($trabajo) . '</td>';
 		$html .= $columna_tarifa;
 	}
 	

@@ -16,8 +16,8 @@ if (!defined('SIMPLEREPORT_ROOT')) {
 class SimpleReport extends Objeto {
 	/**
 	 * Define los campos del reporte permitidos para llenar
-	 * 
-	 * @var array 
+	 *
+	 * @var array
 	 */
 	private $campos = array(
 		'id',
@@ -28,7 +28,7 @@ class SimpleReport extends Objeto {
 
 	/**
 	 * Define los tipos posibles de reportes excel
-	 * 
+	 *
 	 * @var array('SOLICITUD_ADELANTO',
 		'FACTURAS',
 		'FACTURAS_PAGOS',
@@ -54,23 +54,23 @@ class SimpleReport extends Objeto {
 	);
 
 	/**
-	 * @var UsuarioExt 
+	 * @var UsuarioExt
 	 */
 	public $Usuario;
-	
+
 	/**
 	 * @var SimpleReport_Configuration
 	 */
 	public $Config;
-	
+
 	/**
 	 * @var array
 	 */
 	public $results;
-	
+
 	/**
 	 * Constructor de la clase para sobreescribir los default de la clase Objeto
-	 * 
+	 *
 	 * @param Sesion $Sesion
 	 * @param type $fields
 	 * @param type $params
@@ -82,11 +82,11 @@ class SimpleReport extends Objeto {
 		$this->fields = $fields;
 		$this->editable_fields = $this->campos;
 	}
-	
+
 	public function LoadWithType($type) {
 		$wheres = "tipo = '$type'";
 		$query = "SELECT * FROM {$this->tabla} WHERE $wheres LIMIT 1";
-		
+
 		try {
 			$this->fields = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
 			return true;
@@ -94,54 +94,58 @@ class SimpleReport extends Objeto {
 			return false;
 		}
 	}
-	
+
 	public function GetAll($tipo = '') {
-		
+
 		$where = array();
-		
+
 		$where[] = "id_usuario IS NULL";
-		
+
 		if (!empty($tipo)) {
 			if (!in_array($tipo, self::$tipos)) {
 				throw new Exception('Error: Por favor seleccionar un tipo válido');
 			}
-			
+
 			$where[] = "tipo = '$tipo'";
 		}
-		
+
 		// Obtener la configuración por defecto
 		$query = "SELECT * FROM reporte_listado WHERE " . implode(" AND ", $where);
-		
+
 		return $this->sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 	}
-	
+
 	public function GetConfiguration($tipo) {
 		$resultado = $this->GetAll($tipo);
-	
+
 		$configuracion = $resultado[0]['configuracion'];
-		
+
 		if (empty($configuracion)) {
 			$configuracion = $resultado[0]['configuracion_original'];
 		}
-		
+
 		return $configuracion;
 	}
-	
+
 	public function LoadConfig(SimpleReport_Configuration $config) {
 		$this->Config = $config;
 		return $this->Config;
 	}
-	
+
 	public function LoadConfigFromJson($json) {
 		return $this->LoadConfig(SimpleReport_Configuration::LoadFromJson($json));
 	}
 	
+	public function LoadConfigFromArray($config) {
+		return $this->LoadConfig(SimpleReport_Configuration::LoadFromArray($config));
+	}
+
 	public function LoadResults($results) {
 		$this->results = $results;
 	}
-	
+
 	public function RunReport() {
 		return $this->results;
 	}
-	
+
 }

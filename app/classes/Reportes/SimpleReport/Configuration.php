@@ -28,44 +28,56 @@ class SimpleReport_Configuration {
 	function SetTitle($title) {
 		$this->title = $title;
 	}
-	
+
+	/**
+	 *
+	 * @return SimpleReport_Configuration_Column[]
+	 */
 	function VisibleColumns() {
 		$visible_columns = array();
-		
+
 		foreach ($this->columns as $column) {
 			if ($column->visible) {
 				$visible_columns[] = $column;
 			}
 		}
-		
+
 		return $visible_columns;
 	}
 
 	public static function LoadFromJson($json) {
-		$json = json_decode($json, true);
+		return self::LoadFromArray(json_decode($json, true));
+	}
 
+	public static function LoadFromArray($columns) {
 		$config = new SimpleReport_Configuration();
 
-		foreach ($json as $json_column) {
-			$column = new SimpleReport_Configuration_Column();
-			$column->Field($json_column['field'])
-				->Title($json_column['title'])
-				->Order($json_column['order'])
-				->Format($json_column['format'])
-				->Visible($json_column['visible']);
-			
-			if (array_key_exists('sort', $json_column)) {
-				$column->Sort($json_column['sort']);
+		foreach ($columns as $idx => $column) {
+			$config_column = new SimpleReport_Configuration_Column();
+			$config_column->Field($column['field'])
+				->Title(array_key_exists('title', $column) ? $column['title'] : $column['field'])
+				->Order(array_key_exists('order', $column) ? $column['order'] : $idx)
+				->Format(array_key_exists('format', $column) ? $column['format'] : 'text')
+				->Visible(array_key_exists('visible', $column) ? $column['visible'] : true);
+
+			if (array_key_exists('sort', $column)) {
+				$config_column->Sort($column['sort']);
+			}
+			if (array_key_exists('group', $column)) {
+				$config_column->Group($column['group']);
+			}
+			if (array_key_exists('extras', $column)) {
+				$config_column->Extras($column['extras']);
 			}
 
-			$config->AddColumn($column);
+			$config->AddColumn($config_column);
 		}
 
 		$config = self::SortByOrder($config);
-		
+
 		return $config;
 	}
-	
+
 	public static function SortByOrder(SimpleReport_Configuration $configuration) {
 		uasort($configuration->columns, 'sort_by_order');
 		return $configuration;
@@ -75,7 +87,7 @@ class SimpleReport_Configuration {
 function sort_by_order($a, $b) {
 	$a = $a->order;
 	$b = $b->order;
-	
+
 	if ($a == $b) {
         return 0;
     }

@@ -1,4 +1,4 @@
-<?php 
+<?php
     require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -129,7 +129,7 @@
 				<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reportes_horas.php' style="color:#000;text-decoration: none;"><?php echo __('Gráfico por Período')?></a></li>
 				<li><a href='planillas.php' style="color:#000;text-decoration: none;"><?php echo __('Profesional v/s Cliente')?></a></li>
 				<li><a href='olap.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte gen&eacute;rico')?></a></li>
-				
+
       </ul>
 		</td>
 	</tr>
@@ -137,7 +137,7 @@
 		<br/>
 		</td>
 	</tr>
-<?php 
+<?php
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanzados') ) || ( method_exists('Conf','ReportesAvanzados') && Conf::ReportesAvanzados() ) ) )
 	{
 		?>
@@ -191,6 +191,8 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 			<ul style="list-style-position: outside; text-align: left;">
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_diario.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Diario')?></a></li>
 			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_alertas_graficas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Alertas')?></a></li>
+			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_saldo.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Saldo Clientes')?></a></li>
+			<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/planillas/planilla_deudas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Antigüedad Deudas Clientes')?></a></li>
 			</ul>
 			</td>
 
@@ -199,7 +201,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 		<br/>
     	</td>
     </tr>
-  <?php 
+  <?php
 	}
 	else
 		$pagina->AddInfo(__('Hay un error con ese reporte por favor comunicarse con soporte.')); ?>
@@ -210,6 +212,6 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ReportesAvanza
 </tbody>
 </table>
 </form>
-<?php 
+<?php
     $pagina->PrintBottom();
 ?>
