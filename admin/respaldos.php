@@ -94,7 +94,7 @@ if (!defined('SUBDOMAIN')) {
 	<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
 	<?php
 echo '<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>';
-echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap-combined.min.css" />';
+echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min.css" />';
 	echo '<form id="form_respaldo" method="post"><input type="hidden" id="dropname"/></form>';
 	
 

@@ -1,5 +1,9 @@
 <?php
+require_once dirname(__FILE__).'/../app/conf.php';
 
+ require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+	$sesion = new Sesion(array('ADM'));
+	
  $sesion->pdodbh->exec("CREATE TABLE IF NOT EXISTS `prm_plugin` (
 						`id_plugin` smallint(3) NOT NULL AUTO_INCREMENT,
 						`archivo_nombre` varchar(100) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'plugin.php' ,
@@ -9,9 +13,9 @@
 						UNIQUE KEY `archivo_nombre` (`archivo_nombre`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci");
 	
-	
+	echo 'Hemos detectado los siguientes plugins<br><br>';
         echo '<form id="formplugins"><ul class="buttonset" id="plugins" style="list-style:none;">';
-				echo 'Hemos detectado los siguientes plugins';
+				
 
         $archivos=array();
         $maxid=0;

@@ -1,36 +1,51 @@
 <?php
 
-$filename= realpath(dirname(__FILE__).'/../app/conf.php');
-require_once $filename;
+require_once dirname(__FILE__).'/../app/conf.php';
+require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+
 function autocargaapp($class_name) {
 	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
 		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
 	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
 		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
-	} else {
-		   $file =Conf::ServerDir() . '/../fw/classes/' . str_replace('_', DIRECTORY_SEPARATOR, substr($class,5)) . '.php';
-			if ( file_exists($file) ) {
-				require $file;
-			}
 	}
 }
 
 spl_autoload_register('autocargaapp');	
 	
-	
+	$cadenadb = 'mysql:dbname=' . Conf::dbName() . ';host=' . Conf::dbHost();
+
+		
 	
  	$sesion = new Sesion(array('ADM'));
 		 $pagina = new Pagina($sesion);
-		 $pagina->titulo = __('Consulta en todas las tabla parametricas');
+		 $pagina->titulo = __('Corre una consulta en todas las bases de una instancia');
 	$pagina->PrintTop();
 	   if($sesion->usuario->fields['rut']!='99511620') {
 		die('No Autorizado');
 	   }  
- $tabla='prm_categoria_usuario';
-$bases=$sesion->pdodbh->query("SHOW DATABASES like '%_timetracking'  ")	  ;
+ $tabla='cobro_rtf';
+ 
+ try {
+
+			$sesion->pdodbh2 = new PDO(
+					$cadenadb,
+					 'admin',
+					 'admin1awdx');
+			$sesion->pdodbh2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		} catch (PDOException $e) {
+
+			echo "Error Connection: " . $e->getMessage();
+			file_put_contents("resources/logs/Connection-log.txt", DATE . PHP_EOL . $e->getMessage() . PHP_EOL . PHP_EOL, FILE_APPEND);
+		}
+		
+$bases=$sesion->pdodbh2->query("SHOW DATABASES like '%_tt2'  ")	  ;
+$condicion="cobro_css like '%fixed%'";
 foreach($bases as $base) {
-	echo '<br>'.$base[0];
-	$filas=$sesion->pdodbh->query("select * from  {$base[0]}.$tabla  ", PDO::FETCH_ASSOC);
+	
+	$query="select * from  {$base[0]}.$tabla where {$condicion}  ";
+	echo '<br><b>'.$query.'</b>';
+	$filas=$sesion->pdodbh2->query($query, PDO::FETCH_ASSOC);
 
 	$cuerpo="";
  

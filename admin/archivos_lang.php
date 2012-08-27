@@ -1,9 +1,12 @@
 <?php
-
+require_once dirname(__FILE__).'/../app/conf.php';
+ require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+	$sesion = new Sesion(array('ADM'));
 	$query='select * from prm_lang order by orden ASC';
         
         $resultado=mysql_query($query,$sesion->dbh);
-        echo '<form id="formlangs"><ul class="sortable buttonset" id="langs">';
+        echo '<hr><form id="formlangs">';
+		echo '<ul class="sortable buttonset" id="langs">';
         $archivos=array();
         $maxid=0;
         $orden=0;
