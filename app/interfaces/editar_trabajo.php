@@ -396,7 +396,7 @@ var str_url = new String(top.location);
 if(str_url.search('/trabajo.php') > 0) {//Si la página está siendo llamada desde trabajo.php
 	// if(top.frames.semana!==undefined)     top.frames.semana.location.reload();
 
-top.window.jQuery('#versemana').click();
+
 }
 if(top.Refrescar!==undefined) top.Refrescar();
 	</script>
@@ -407,6 +407,10 @@ if(top.Refrescar!==undefined) top.Refrescar();
 <script type="text/javascript">
 
 jQuery('document').ready(function() {
+	
+	top.window.jQuery('#versemana').click();
+	top.windowjQuery('.resizableframe').load();
+	
 	jQuery('#chkCobrable').click(function() {
 		if(jQuery(this).is(':checked')) {
 			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
@@ -1185,7 +1189,7 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
         <td align=left width="475" nowrap>
 <?php 
 $codigo_asunto=$t->fields['codigo_asunto'];
-  UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, true, '', "+CargarTarifa();");
+  UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, true, '320', "+CargarTarifa();");
 
 	
 ?>

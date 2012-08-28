@@ -107,7 +107,7 @@ function EliminaCliente(id_cliente)
 		</tr>
 	</table>
 <?php  	}
-if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
+if( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) { ?>
 	<table width="90%"><tr><td> <?php  }
 else { ?>
 	<table width="100%"><tr><td> <?php  } ?>
@@ -163,8 +163,8 @@ else { ?>
 			<tr>
 				<td></td>
 				<td align=left>
-					<input type=button class=btn name=buscar value=<?php echo __('Buscar')?> onclick="Listar(this.form, 'buscar')">
-					<input type=button class=btn value="<?php echo __('Descargar listado a Excel')?>" onclick="Listar(this.form, 'xls')" >
+					<a class="btn botonizame"  href="javascript:void(0);"  icon="find" name='buscar'  onclick="Listar(jQuery('#form_cliente').get(0), 'buscar');"><?php echo __('Buscar')?></a>
+					<a class="btn botonizame"  href="javascript:void(0);" icon="xls"   onclick="Listar(jQuery('#form_cliente' ).get(0), 'xls');" ><?php echo __('Descargar listado a Excel')?></a>
 <?php
 	if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'ValidacionesCliente') )
 	{
@@ -200,11 +200,11 @@ Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cli
 		{
 			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			{
-				$where .= " AND codigo_cliente_secundario = '$codigo'";
+				$where .= " AND cliente.codigo_cliente_secundario = '$codigo'";
 			}
 			else
 			{
-				$where .= " AND codigo_cliente = '$codigo'";
+				$where .= " AND cliente.codigo_cliente = '$codigo'";
 			}
 		}
 		if( $id_grupo_cliente > 0 )
@@ -298,4 +298,3 @@ Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cli
 		return $txt;
 	}
 	$pagina->PrintBottom();
-?>
