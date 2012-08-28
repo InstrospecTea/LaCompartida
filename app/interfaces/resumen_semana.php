@@ -423,9 +423,7 @@ else
 	}
 })
 
-jQuery('.cajatrabajo').each(function() {
-				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
-			});	 
+
 </script>
 <?php 
 	if( $j == count($usuarios)-1 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
@@ -471,4 +469,9 @@ function OpcionesTrabajo(id_trabajo, opcion )
 		}
 	}
 }
+jQuery(document).ready(function() {
+jQuery('.cajatrabajo').each(function() {
+				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
+			});	 
+			});
 </script>

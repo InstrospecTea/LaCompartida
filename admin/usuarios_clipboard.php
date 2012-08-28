@@ -13,12 +13,12 @@ function autocargaapp($class_name) {
 spl_autoload_register('autocargaapp');
 
 $sesion = new Sesion(array('ADM'));
-$sesion->phpConsole();
+
 
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Importacion de Usuarios');
 $pagina->PrintTop();
-
+ 
 $identificador = UtilesApp::Getconf($sesion, 'NombreIdentificador');
 if (strtolower($identificador) == 'rut')
 	$usadv = 1;  // debiese haber un conf para definir si usa DV o no.
@@ -133,7 +133,7 @@ if ($_POST['accion'] == 'cargausuarios') {
 			
 			 
 				
-			$usuario->Edit('password', md5('12345'));
+			//$usuario->Edit('password', md5('12345'));
 			//$usuario->Edit('fecha_creacion', date('Y-m-d H:i:s'));
 
 

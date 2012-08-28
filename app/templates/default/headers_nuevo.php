@@ -58,9 +58,12 @@ google.load("jquery","1.7");
         <link rel="stylesheet" href="<?php echo TEMPLATE_DIR;?>css/main.css">
 <script  type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>-->
         <script src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
-	<script  type="text/javascript" src="//static.thetimebilling.com/js/jshashtable-2.1.js"></script>
-	<script  type="text/javascript" src="//static.thetimebilling.com/js/jquery.numberformatter-1.2.3.min.js"></script>
-        <script  type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>
+	   
+	       <script language="JavaScript" type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>
+        <script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/templates/default/css/deploy/resize_iframe.js"></script>
+		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jshashtable-2.1.js"></script>
+		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
+		
 
 	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
