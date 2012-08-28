@@ -13,7 +13,7 @@ function autocargaapp($class_name) {
 spl_autoload_register('autocargaapp');
 
 $sesion = new Sesion(array('ADM'));
-
+$sesion->phpConsole();
 
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Importacion de Usuarios');
@@ -57,8 +57,12 @@ if ($_POST['accion'] == 'cargausuarios') {
 			$campo = 0;
 
 			$cadena.="<tr class='user_row' id='fila_" . ++$i . "'>";
-			$cadena.="<td><input  style='width:60px;' type='text' id='rut' name='rut[]' value='" . $fila[$campo++] . "'/></td>";
-			//if($usadv==1);    $cadena.="<td ><input style='width:10px;' type='text' id='dvrut' name='dvrut[]' value='".$fila[$campo++]."'/></td>";
+			$rut=$fila[$campo++];
+			 if($usadv==1) $rutarray=explode('-',$rut);
+			 $rut=str_replace('.','',$rutarray[0]);
+			 $dv=$rutarray[1];
+			$cadena.="<td><input  style='width:60px;' type='text' id='rut' name='rut[]' value='" . $rut . "'/></td>";
+			  if($usadv==1);   $cadena.="<td ><input style='width:10px;' type='text' id='dvrut' name='dvrut[]' value='".$dv."'/></td>";
 
 			$cadena.="<td ><input style='width:70px;' type='text' id='nombre' name='nombre[]' value='" . $fila[$campo++] . "'/></td>";
 			$cadena.="<td><input  style='width:70px;' type='text' id='apellido1' name='apellido1[]' value='" . $fila[$campo++] . "'/></td>";
@@ -99,7 +103,7 @@ if ($_POST['accion'] == 'cargausuarios') {
 		}
 	}
 
-
+$querypermisos="";
 
 	if ($_POST['paso'] == 'inserta'):
 		$usuarios = 0;
@@ -111,18 +115,18 @@ if ($_POST['accion'] == 'cargausuarios') {
 			$usuario = new UsuarioExt($sesion);
 			$usuario->guardar_fecha = false;
 			$usuario->tabla = "usuario";
-			if ($id_usuario[$k]!='***') {
+			if ($id_usuario[$k] && $id_usuario[$k]!='***') {
 				$usuario->LoadId($id_usuario[$k]);
 				$usuario->Edit('rut', trim($rut[$k]));
 			} else {
 				$usuario->Load($rut[$k]);
 			}
-
+			
 			
 			
 			if ($usadv == 1)  $usuario->Edit('dv_rut', trim($dvrut[$k]));
 			
-			if($nombre[$k]!='***')	 $usuario->Edit('nombre', trim($nombre[$k]));
+			if($nombre[$k] && $nombre[$k]!='***')	 $usuario->Edit('nombre', trim($nombre[$k]));
 			if($apellido1[$k]!='***')	 $usuario->Edit('apellido1', trim($apellido1[$k]));
 			if($apellido2[$k]!='***')	 $usuario->Edit('apellido2', trim($apellido2[$k]));
 			if($telefono1[$k]!='***')	 $usuario->Edit('telefono1', $telefono1[$k]);
@@ -138,11 +142,11 @@ if ($_POST['accion'] == 'cargausuarios') {
 
 
 			if ($usuario->Write()) {
-				//echo $insercion.'<br>';
+	
 
 				$lastid = $usuario->fields['id_usuario'];
 
-				$querypermisos = "delete from usuario_permiso where id_usuario=$lastid;";
+				$querypermisos.= "delete from usuario_permiso where id_usuario=$lastid;";
 				$querypermisos.="insert into usuario_permiso (id_usuario, codigo_permiso) values ($lastid,'ALL');";
 				if ($select_cats[$k] != 5)
 					$querypermisos.="insert into usuario_permiso (id_usuario, codigo_permiso) values ($lastid,'PRO');";
@@ -169,18 +173,21 @@ if ($_POST['accion'] == 'cargausuarios') {
 		}
 		echo "<br>Se insertaron " . $usuarios . " usuarios.";
 		$permisos = 0;
-
+		/*$kueris=explode(';',$querypermisos);
+echo '<pre>';
+	foreach($kueris as $kueri) echo '<br/>'. $kueri;
+	echo '</pre>';*/
 		 
 
 		try {
-				$sesion->pdodbh->beginTransaction();
-				$insertstatement=$sesion->pdodbh->prepare($querypermisos);
-				$insertstatement->execute();
-					$sesion->pdodbh->commit();
+				 
+				$insertstatement=$sesion->pdodbh->exec($querypermisos);
+				 
+					 
 			 } catch (PDOException $e) {
 						 if($sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
-							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$querypermisos,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
 							$Slim->view()->setData($arrayPDOException);
 							 $Slim->applyHook('hook_error_sql');
 						 }
