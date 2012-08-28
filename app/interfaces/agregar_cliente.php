@@ -1186,7 +1186,7 @@ if ($cant_encargados > 0) {
 		$funcion_validar = "return Validar(jQuery(\"#formulario-cliente\").get(0));";
 	}
 		?>
-								<a href="javascript:void(0);" icon='ui-icon-save' class='btn botonizame'   onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
+								<a href="javascript:void(0);" icon='ui-icon-save' class='btn botonizame'   onclick='<?php echo $funcion_validar; ?>' /><?php echo __('Guardar'); ?></a>
 		<?php
 } else {
 	?>
@@ -1238,7 +1238,8 @@ if ($CodigoSecundario) {
 	});
 
     jQuery('#codigo_cliente_secundario').blur(function() {
-			<?php if ($_GET['id_cliente'])  {
+	if(jQuery(this).val()=="") return;
+	<?php if ($_GET['id_cliente'])  {
 				echo 'var id_cliente='.intval($_GET['id_cliente']).';'; 
 			} else {
 				echo 'var id_cliente=null;'; 
@@ -1264,13 +1265,15 @@ if ($CodigoSecundario) {
 							return true;
 						} else {
 							console.log(id_cliente, objResp);
+							
 							var codigo_cliente=objResp.codigo_cliente;
 							var codigo_cliente_secundario=objResp.codigo_cliente_secundario;
 							var glosa_cliente=objResp.glosa_cliente;
-
+							if(codigo_cliente!="") {
 							jQuery('#formularioinicial').prepend('<div  class="alert"><span  id="alerta"></span><a class="close" data-dismiss="alert">×</a>  </div>'  );
 							var MensajeAlerta="Error: el código secundario "+codigo_cliente_secundario+" ya existe en la Base de Datos y corresponde a <a href='?id_cliente="+bd_cliente+"'>["+codigo_cliente +"] "+glosa_cliente+"</a>."
 							jQuery('#alerta').html(MensajeAlerta).alert();
+							}
 						}
 					}
 				

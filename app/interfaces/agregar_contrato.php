@@ -1888,10 +1888,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<?php echo Html::SelectQuery($sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', "", "Vacio", "200"); ?>
 						</div></td>
 					</tr>
-						<?php } ?>
-						<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
+						<?php }  
+				  if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
 					<tr   class="controls controls-row ">
-						<td><div class="span4">
+						<td class="al"><div class="span4">
 	<?php echo __('Usa exportación LEDES'); ?>
 							</div></td>
 								<td><div class="span1">
