@@ -947,16 +947,16 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 <style>
 
 	 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"]
-	, input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {padding: 2px 3px !important; font-size:12px !important;}
-	select {padding: 1px 3px !important;font-size:10pt !important;height:26px !important;}
-	fieldset {border:1px solid #CCC !important;margin:auto;}
-	h2 {font-size:22px;line-height:30px;}
+	, input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {padding: 1px 2px !important;}
+	select {padding: 1px 1px 1px 3px !important;height:20px !important;}
+	
+	h2 {font-size:14px;line-height:18px;}
 	  legend {vertical-align: top  !important;
 margin-bottom: 15px !important;;
 	border-bottom:0 none !important;
 	  width:auto !important}
 	.input-append .add-on, .input-prepend .add-on {padding: 2px 5px;}
-
+fieldset {border:1px solid #CCC !important;margin:auto;}
 
 	
 	 
@@ -994,7 +994,7 @@ function TTip($texto) {
 										</td>
 										<td class="al " width="600">
 										<div   class="controls controls-row " style="white-space:nowrap;">	  <input type="text"  style="float:left;" class="input-small  span2"  placeholder=".input-small" name="codigo_cliente" size="5" maxlength="5" <?php echo  $codigo_obligatorio ? 'readonly="readonly"' : '' ?> value="<?php echo  $cliente->fields['codigo_cliente'] ?>" onchange="this.value=this.value.toUpperCase()" />
-											<div class="span4"  style="float:left;"><label ><?php echo  __('Código secundario') ?>
+											<div class="span4"  style="float:left;">&nbsp;&nbsp;&nbsp;<label ><?php echo  __('Código secundario') ?>
 												<input type="text"class="input-small "  id="codigo_cliente_secundario" name="codigo_cliente_secundario" size="15" maxlength="20" value="<?php echo  $cliente->fields['codigo_cliente_secundario'] ?>" onchange="this.value=this.value.toUpperCase()" style='text-transform: uppercase;' />
 				<?php
 				if ( $CodigoSecundario )  {

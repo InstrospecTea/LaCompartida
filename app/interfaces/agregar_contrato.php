@@ -1763,7 +1763,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$chk = 'checked="checked"';
 				}
 				?>
-				 </td>
+				</td>
 				<td class="al"> 
 					<label for="activo_contrato" class="inline-help"><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick=InactivaContrato(this.checked) />
 					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
@@ -1880,12 +1880,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				ORDER BY apellido1";
 				?>
 				<tr   class="controls controls-row ">
-					<td><div class="span4">
+					<td class="al"><div class="span4">
 							<?php echo __('Encargado Secundario') ?>
 							<?php if ($usuario_secundario_obligatorio) echo $obligatorio; ?>
 					</div></td>
-						<td><div class="span2">
-					<?php echo Html::SelectQuery($sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', "", "Vacio", "200"); ?>
+						<td class="al"> 
+					<?php echo Html::SelectQuery($sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', " class='span3' ", "Vacio", "200"); ?>
 						</div></td>
 					</tr>
 						<?php }  
@@ -1894,9 +1894,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<td class="al"><div class="span4">
 	<?php echo __('Usa exportación LEDES'); ?>
 							</div></td>
-								<td><div class="span1">
-									<input id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
-								</div></td>
+								<td class="al">
+									<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
+								</td>
 							 
 					<?php } ?>
 					</tr>
@@ -2700,11 +2700,11 @@ list($ultimo_cobro) = mysql_fetch_array($resp);
 													</tr>
 													<tr>
 														<td align="center" colspan="2">
-															<table id="tabla_fechas" class="span8" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:1px solid #454545;' cellpadding="3" cellspacing="3" style="border-collapse:collapse;">
+															<table id="tabla_fechas" class="span8" style='width:80%;border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:1px solid #454545;' cellpadding="2" cellspacing="2" style="border-collapse:collapse;">
 																<thead>
 																	<tr bgcolor=#6CA522>
-																		<td width="27%">Fecha</td>
-																		<td width="45%">Descripción</td>
+																		<td width="110">Fecha</td>
+																		<td  >Descripción</td>
 																		<td width="23%">Monto</td>
 																		<td width="5%">&nbsp;</td>
 																	</tr>
@@ -2712,11 +2712,11 @@ list($ultimo_cobro) = mysql_fetch_array($resp);
 																<tbody id="id_body">
 																	<tr id="fila_fecha_1">
 																		<td align="center" class="span2">
-																			<input type="text" class="input-small" name="valor_fecha[1]" value='' id="valor_fecha_1" size="11" maxlength="10" />
-																			<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_nueva_fecha" style="cursor:pointer" />
+																			<input type="text" class="input-small fechadiff" name="valor_fecha[1]" value='' id="valor_fecha_1" size="10" maxlength="10" />
+																			 
 																		</td>
 																		<td align="left">
-																			<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" size="40" />
+																			<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" width="90%" />
 																		</td>
 																		<td align="right">
 																			 
@@ -3148,13 +3148,7 @@ if ($solicitante == 0) {  // no mostrar
 							}
 	
 	
-							Calendar.setup(
-							{
-								inputField	: "valor_fecha_1",				// ID of the input field
-								ifFormat		: "%d-%m-%Y",			// the date format
-								button			: "img_nueva_fecha"		// ID of the button
-							}
-						);
+						 
 							Calendar.setup(
 							{
 								inputField	: "periodo_fecha_inicio",				// ID of the input field
