@@ -8,7 +8,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
  
  	
 	$sesion = new Sesion(array('ADM'));
-
+	 	$sesion->phpConsole(1);
   
 	$limitdesde=isset($_REQUEST['iDisplayStart'])?$_REQUEST['iDisplayStart']:'0';
 	$limitcantidad=isset($_REQUEST['iDisplayLength'])?$_REQUEST['iDisplayLength']:'25';  
@@ -17,7 +17,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 	
     if(!isset($where) || (isset($where) && $where=='')) $where=1;
 	if($_REQUEST['opc']=='actualizagastos') {
-		$sesion->phpConsole(1);
+	
 		$whereclause=base64_decode($_POST['whereclause']);
 		$querypreparar="update cta_corriente 
 							join asunto using(codigo_asunto) 
@@ -221,7 +221,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 								JOIN asunto USING(codigo_asunto)
 								
 								JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-								JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								
                 
 								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
@@ -259,14 +259,33 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		
 		
 		$selectcount="SELECT COUNT(*) $selectfrom ";
-		$rows= $sesion->pdodbh->query($selectcount)->fetch();
-		 
-					
 	
-	$sesion->debug($query);	 
-						 
+		$sesion->debug($query);
+				
+	
+ 
+					
+	try {
+			$rows= $sesion->pdodbh->query($selectcount)->fetch();
 		  $resp = $sesion->pdodbh->query($query);
-		  
+	
+		} catch (PDOException $e) {
+						 if($this->sesion->usuario->fields['rut'] == '99511620') {
+							$Slim=Slim::getInstance('default',true);
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query_log,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($logstatement) );
+							$Slim->view()->setData($arrayPDOException);
+							 $Slim->applyHook('hook_error_sql');
+						 }
+					
+					      echo '   {';
+						echo '"iTotalRecords":"'.$rows[0].'",';
+						echo '"iTotalDisplayRecords":"'.$rows[0].'",';    
+						echo '"aaData": [';   
+						echo "]";
+	 
+						echo " }";
+						die();
+	}
 
 		
 	$i=0;
@@ -286,7 +305,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		   
 		    $stringarray=array(
 			date('d-m-Y',strtotime($fila['fecha'])),
-			$fila['glosa_cliente']? mb_convert_case ($fila['glosa_cliente'],MB_CASE_TITLE):' - ',
+			$fila['glosa_cliente']? utf8_encode($fila['glosa_cliente']):' - ',
 			$fila['glosa_asunto']? utf8_encode($fila['glosa_asunto']):' - ',
 			    $fila['tipo']? $fila['tipo']:' - ',
 			    $fila['descripcion']? utf8_encode($fila['descripcion']):' ',
