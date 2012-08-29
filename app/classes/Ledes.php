@@ -15,6 +15,11 @@ require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
 class Ledes extends Objeto {
 
+	/**
+	 * numero de decimales a mostrar, el oficial es 4 pero esta gente quiere 2...
+	 */
+	private $decimales = 2;
+
 	function Ledes($sesion) {
 		$this->sesion = $sesion;
 	}
@@ -98,7 +103,7 @@ class Ledes extends Objeto {
 			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
 
 		$linea = 1;
-		
+
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($trabajo = mysql_fetch_assoc($resp)) {
 			if ($fecha_min > $trabajo['fecha']) {
@@ -112,15 +117,21 @@ class Ledes extends Objeto {
 			$monto *= $cambios[$trabajo['id_moneda']];
 			$tarifa = $trabajo['tarifa_hh'] * $cambios[$trabajo['id_moneda']];
 
-			$descripcion = str_replace("\n", ' ', $trabajo['descripcion']);
-			$descripcion = trim($descripcion);
-			
+			/**
+			 * redondeo decimales ahora para que calcen los ajustes
+			 */
+			$horas = $this->round($trabajo['horas']);
+			$monto = $this->round($monto);
+			$tarifa = $this->round($tarifa);
+
+			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
+
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $trabajo['codigo_asunto'],
 				'LINE_ITEM_NUMBER' => $linea++, //'H' . $trabajo['id_trabajo'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
-				'LINE_ITEM_NUMBER_OF_UNITS' => $trabajo['horas'],
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa * $trabajo['horas'],
+				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa * $horas,
 				'LINE_ITEM_TOTAL' => $monto,
 				'LINE_ITEM_DATE' => $trabajo['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
@@ -177,16 +188,22 @@ class Ledes extends Objeto {
 			$monto = $tramite['cobrable'] == '1' && !empty($tramite['tarifa_tramite']) ? $tramite['tarifa_tramite'] : 0;
 			$monto *= $cambios[$tramite['id_moneda_tramite']];
 			$tarifa = $tramite['tarifa_tramite'] * $cambios[$tramite['id_moneda_tramite']];
+
+			/**
+			 * redondeo decimales ahora para que calcen los ajustes
+			 */
+			$horas = $this->round($horas);
+			$monto = $this->round($monto);
+			$tarifa = $this->round($tarifa / $horas);
 			
-			$descripcion = str_replace("\n", ' ', $tramite['descripcion']);
-			$descripcion = trim($descripcion);
-			
+			$descripcion = trim(str_replace("\n", ' ', $tramite['descripcion']));
+
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $tramite['codigo_asunto'],
 				'LINE_ITEM_NUMBER' => $linea++, //'T' . $tramite['id_tramite'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
 				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto - $tarifa * $horas,
 				'LINE_ITEM_TOTAL' => $monto,
 				'LINE_ITEM_DATE' => $tramite['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
@@ -194,7 +211,7 @@ class Ledes extends Objeto {
 				'LINE_ITEM_ACTIVITY_CODE' => $trabajo['codigo_actividad'],
 				'TIMEKEEPER_ID' => $tramite['username'],
 				'LINE_ITEM_DESCRIPTION' => $descripcion,
-				'LINE_ITEM_UNIT_COST' => $tarifa / $horas,
+				'LINE_ITEM_UNIT_COST' => $tarifa,
 				'TIMEKEEPER_NAME' => $tramite['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $categorias[$tramite['id_categoria_lemontech']],
 				'CLIENT_MATTER_ID' => $tramite['codigo_homologacion']
@@ -235,23 +252,28 @@ class Ledes extends Objeto {
 			}
 			$datos = $datos_gastos[$gasto['id_movimiento']];
 
-			$descripcion = str_replace("\n", ' ', $gasto['descripcion']);
-			$descripcion = trim($descripcion);
+			/**
+			 * redondeo decimales ahora para que calcen los ajustes
+			 */
+			$total = $this->round($gasto['monto_total_mas_impuesto'] * $cambios[$gasto['id_moneda']]);
+			$sin_impuestos = $this->round($gasto['monto_total'] * $cambios[$gasto['id_moneda']]);
 			
+			$descripcion = trim(str_replace("\n", ' ', $gasto['descripcion']));
+
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $gasto['codigo_asunto'],
 				'LINE_ITEM_NUMBER' => $linea++, //'G' . $gasto['id_movimiento'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'E',
 				'LINE_ITEM_NUMBER_OF_UNITS' => '1',
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $gasto['monto_total_impuesto'] * $cambios[$gasto['id_moneda']],
-				'LINE_ITEM_TOTAL' => $gasto['monto_total_mas_impuesto'] * $cambios[$gasto['id_moneda']],
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $total - $sin_impuestos,
+				'LINE_ITEM_TOTAL' => $total,
 				'LINE_ITEM_DATE' => $gasto['fecha'],
 				'LINE_ITEM_TASK_CODE' => '',
 				'LINE_ITEM_EXPENSE_CODE' => $datos['codigo_gasto'],
 				'LINE_ITEM_ACTIVITY_CODE' => '',
 				'TIMEKEEPER_ID' => $datos['username'],
 				'LINE_ITEM_DESCRIPTION' => $descripcion,
-				'LINE_ITEM_UNIT_COST' => $gasto['monto_total'] * $cambios[$gasto['id_moneda']],
+				'LINE_ITEM_UNIT_COST' => $sin_impuestos,
 				'TIMEKEEPER_NAME' => $datos['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $categorias[$datos['id_categoria_lemontech']],
 				'CLIENT_MATTER_ID' => $datos['codigo_homologacion']
@@ -266,7 +288,7 @@ class Ledes extends Objeto {
 		 * Obtener los datos de la liquidación
 		 */
 		// Obtengo el código secundario del cliente
-		
+
 		$datos_cobro = array(
 			'INVOICE_DATE' => $cobro->fields['fecha_emision'],
 			'INVOICE_NUMBER' => $id_cobro,
@@ -329,7 +351,7 @@ class Ledes extends Objeto {
 		foreach ($filas as $k => $fila) {
 			// Será así?
 			$fila['LAW_FIRM_MATTER_ID'] = $datos_cobro['LAW_FIRM_ID'];
-			
+
 			$filas[$k] = $datos_cobro + $fila;
 		}
 
@@ -346,20 +368,21 @@ class Ledes extends Objeto {
 		//nombre del formato en la primera fila
 		$out = $formato . "[]" . "\r\n";
 
+		$numero = "N.{$this->decimales}";
 		$campos = array(
 			'INVOICE_DATE' => 'date',
 			'INVOICE_NUMBER' => 20,
 			'CLIENT_ID' => 20,
 			'LAW_FIRM_MATTER_ID' => 20,
-			'INVOICE_TOTAL' => 'N.2', //'N.4', es el oficial
+			'INVOICE_TOTAL' => $numero,
 			'BILLING_START_DATE' => 'date',
 			'BILLING_END_DATE' => 'date',
 			'INVOICE_DESCRIPTION' => 15000,
 			'LINE_ITEM_NUMBER' => 20,
 			'EXP/FEE/INV_ADJ_TYPE' => 2,
-			'LINE_ITEM_NUMBER_OF_UNITS' => 'N.2', //'N.4', es el oficial
-			'LINE_ITEM_ADJUSTMENT_AMOUNT' => 'N.2', //'N.4', es el oficial
-			'LINE_ITEM_TOTAL' => 'N.2', //'N.4', es el oficial
+			'LINE_ITEM_NUMBER_OF_UNITS' => $numero,
+			'LINE_ITEM_ADJUSTMENT_AMOUNT' => $numero,
+			'LINE_ITEM_TOTAL' => $numero,
 			'LINE_ITEM_DATE' => 'date',
 			'LINE_ITEM_TASK_CODE' => 20,
 			'LINE_ITEM_EXPENSE_CODE' => 20,
@@ -367,7 +390,7 @@ class Ledes extends Objeto {
 			'TIMEKEEPER_ID' => 20,
 			'LINE_ITEM_DESCRIPTION' => 15000,
 			'LAW_FIRM_ID' => 20,
-			'LINE_ITEM_UNIT_COST' => 'N.2', //'N.4', es el oficial
+			'LINE_ITEM_UNIT_COST' => $numero,
 			'TIMEKEEPER_NAME' => 30,
 			'TIMEKEEPER_CLASSIFICATION' => 10,
 			'CLIENT_MATTER_ID' => 20
@@ -482,6 +505,19 @@ class Ledes extends Objeto {
 		}
 
 		return $errores;
+	}
+
+	/**
+	 * redondea un valor a los decimales definidos
+	 * @param type $numero
+	 * @return type
+	 */
+	private function round($numero) {
+		$n = 10;
+		for ($i = 1; $i < $this->decimales; $i++) {
+			$n*=10;
+		}
+		return round($numero * $n) / $n;
 	}
 
 }

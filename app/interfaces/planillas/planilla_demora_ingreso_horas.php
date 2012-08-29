@@ -226,7 +226,7 @@
 												FROM 
 													usuario JOIN usuario_permiso USING(id_usuario)
 												WHERE
-													codigo_permiso='SOC' 
+													codigo_permiso='PRO' 
 												AND 
 													usuario.activo = 1
 												ORDER BY 

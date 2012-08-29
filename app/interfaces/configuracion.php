@@ -158,10 +158,11 @@ function AgregarAsunto( numero , valor_hidden )
 					$where_orden 
 					ORDER BY configuracion.id_configuracion_categoria, orden, glosa_opcion ASC";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	
+	$confs = array();
 	while(list($id, $glosa_opcion, $valor_opcion, $comentario, $valores_posibles, $id_categoria, $glosa_categoria, $orden) = mysql_fetch_array($resp))
 	{
 	    $arrayopciones[]=array($id,$glosa_opcion,$id_categoria);
+		$confs[$glosa_opcion] = $valor_opcion;
 	    
 		if( $id_categoria != $id_categoria_anterior ):
 			
@@ -275,6 +276,8 @@ function AgregarAsunto( numero , valor_hidden )
 	</table>
 </form>
 </div>
+
+<pre style="display: none"><?php var_export($confs); ?></pre>
 
 <script language="javascript" type="text/javascript">
 jQuery(document).ready(function() {

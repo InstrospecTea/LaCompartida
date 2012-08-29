@@ -135,7 +135,11 @@
 		$tramite = $lista->Get($i);
 //echo '<pre>'; var_dump($tramite->fields); exit;
 		$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda_total->Load($tramite->fields['id_moneda_asunto'] > 0 ? $tramite->fields['id_moneda_asunto'] : 1);
+		$moneda = $tramite->fields['id_moneda_asunto'] > 0 ? $tramite->fields['id_moneda_asunto'] : 1;
+		if (!empty($tramite->fields['tarifa_tramite_individual'])) {
+			$moneda = $tramite->fields['id_moneda_tramite_individual'];
+		}
+		$moneda_total->Load($moneda);
 		
 		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
 		$simbolo_moneda = $moneda_total->fields['simbolo'];
@@ -175,7 +179,10 @@
 		
 		if($p_cobranza->fields['permitido'])
 		{
-			$tarifa = Funciones::TramiteTarifa($sesion, $tramite->fields['id_tramite_tipo'],$tramite->fields['id_moneda_asunto'],$tramite->fields['codigo_asunto']); 
+			$tarifa = $tramite->fields['tarifa_tramite_individual'];
+			if (empty($tarifa)) {
+				$tarifa = Funciones::TramiteTarifa($sesion, $tramite->fields['id_tramite_tipo'],$tramite->fields['id_moneda_asunto'],$tramite->fields['codigo_asunto']);
+			}
 			$ws->writeNumber($fila_inicial + $i, $col_valor_tramite, $tarifa, $money_format);
 		}
 	}

@@ -7,7 +7,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 
 
 
-	$img_dir = "<img src=" . ($row['foto_url'] ? Conf::ImgDir() . "/" . $row['foto_url'] : '') . " alt=''/>";
+	$img_dir = empty($row['foto_url']) ? '' : ('<img src="' . ($row['foto_url'] ? Conf::ImgDir() . '/' . $row['foto_url'] : '') . '" alt=""/>');
 
 
 	$home_html.='<td>

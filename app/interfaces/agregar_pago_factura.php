@@ -63,7 +63,7 @@ if ($desde_webservice) {
 			$arreglo_facturas = explode(',', $lista_facturas);
 		}
 		$codigo_cliente = $pago->fields['codigo_cliente'];
-	} else {
+	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
 		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
 		$resunf = mysql_query($query_num_facturas,$sesion->dbh) or Utiles::errorSQL($query_num_facturas,__FILE__,__LINE__, $sesion->dbh); 

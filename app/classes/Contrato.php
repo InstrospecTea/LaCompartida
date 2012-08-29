@@ -1003,7 +1003,7 @@ class Contrato extends Objeto {
 					
 					 
 					$query_log = "INSERT INTO log_db SET id_field = '" . $this->fields[$this->campo_id] . "', titulo_tabla = '" . $this->tabla . "', campo_tabla = '" . $key . "', fecha = NOW(), usuario = '" . $this->sesion->usuario->fields['id_usuario'] . "',
-						valor_antiguo = '" . mysql_real_escape_string($this->valor_antiguo[$key], $this->session->dbh) . "', valor_nuevo ='" . mysql_real_escape_string($val, $this->session->dbh)."'"  ;
+						valor_antiguo = '" . mysql_real_escape_string($this->valor_antiguo[$key], $this->sesion->dbh) . "', valor_nuevo ='" . mysql_real_escape_string($val, $this->sesion->dbh)."'"  ;
 					$resp_log = mysql_query($query_log, $this->sesion->dbh) or Utiles::errorSQL($query_log, __FILE__, __LINE__, $this->sesion->dbh);
 					$this->logear[$key] = false;
 				}
