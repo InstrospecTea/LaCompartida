@@ -344,7 +344,7 @@ if ($preparar_cobro == 1) {
 	#totalcta {float: left;position: relative;top: 15px;}
 </style>
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://static.thetimebilling.com/tabletools/js/TableTools.js"></script>
+<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
 	var tablagastos=null;
     function Preparar_Cobro(form)
@@ -725,11 +725,11 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 <?php echo __('Clientes activos') ?>
                             </td>
                             <td colspan="2" align="left">
-				<?php echo Html::SelectArray(array(
-					array('todos', __('Todos')),
-					array('activos', __('S&oacute;lo activos')),
-					array('inactivos', __(' S&oacute;lo inactivos'))), 'clientes_activos', isset($clientes_activos)?$clientes_activos:'activos' , ' id="clientes_activos" ','','140px') ?>
-				
+                                <select name='clientes_activos' id='clientes_activos' style='width: 140px;'>
+                                    <option value=''  selected="selected"> Todos </option>
+                                    <option value='activos'> S&oacute;lo activos </option>
+                                    <option value='inactivos'> S&oacute;lo inactivos </option>
+                                </select>
                             </td>
                             <td></td>
                         </tr>
@@ -737,12 +737,11 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 						<tr>
                             <td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
                             <td colspan="2" align="left">
-			<?php echo Html::SelectArray(array(
-					array('todos',__('Gastos').' y '. __('Provisiones')),
-					array('soloingreso',' Sólo '.__('Gastos')),
-					array('sologastos',' Sólo '. __('Provisiones'))), 'egresooingreso', isset($egresooingreso)?$egresooingreso:'todos' , ' id="egresooingreso" ','','140px') ?>					
-								
-                              
+                                <select name="egresooingreso" id="egresooingreso" style="width: 140px;">
+                                    <option value=""  selected="selected"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>  </option>
+                                    <option value="soloingreso"> Sólo <?php echo __('provisiones'); ?></option>
+                                    <option value="sologastos"> Sólo <?php echo __('gastos'); ?> </option>
+                                </select>
                             </td>
                             <td></td>
                         </tr>

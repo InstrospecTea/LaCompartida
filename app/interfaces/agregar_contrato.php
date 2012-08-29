@@ -2716,7 +2716,7 @@ list($ultimo_cobro) = mysql_fetch_array($resp);
 																			 
 																		</td>
 																		<td align="left">
-																			<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" width="90%" />
+																			<input type="text" name="valor_descripcion[1]" value='' id="valor_descripcion_1" size="40" />
 																		</td>
 																		<td align="right">
 																			 
