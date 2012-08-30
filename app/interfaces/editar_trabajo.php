@@ -409,7 +409,7 @@ if(top.Refrescar!==undefined) top.Refrescar();
 jQuery('document').ready(function() {
 	
 	top.window.jQuery('#versemana').click();
-	top.windowjQuery('.resizableframe').load();
+	top.window.jQuery('.resizableframe').load();
 	
 	jQuery('#chkCobrable').click(function() {
 		if(jQuery(this).is(':checked')) {

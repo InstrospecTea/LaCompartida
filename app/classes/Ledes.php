@@ -168,7 +168,8 @@ class Ledes extends Objeto {
 				c.id_categoria_lemontech,
 				t.codigo_actividad,
 				t.codigo_tarea,
-				a.codigo_homologacion
+				a.codigo_homologacion,
+				t.cobrable
 			FROM tramite t
 			JOIN usuario u ON t.id_usuario = u.id_usuario
 			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
@@ -419,6 +420,7 @@ class Ledes extends Objeto {
 						}
 					} else if ($formato) {
 						list(, $decimales) = explode('.', $formato);
+						$valor = str_replace(',', '.', $valor);
 						$valor = number_format($valor, $decimales, '.', '');
 					}
 				}
@@ -507,6 +509,21 @@ class Ledes extends Objeto {
 		return $errores;
 	}
 
+<<<<<<< .mine
+	/**
+	 * redondea un valor a los decimales definidos
+	 * @param type $numero
+	 * @return type
+	 */
+	private function round($numero) {
+		$n = 10;
+		for ($i = 1; $i < $this->decimales; $i++) {
+			$n *= 10;
+		}
+		return floatval(round($numero * $n)) / $n;
+	}
+
+=======
 	/**
 	 * redondea un valor a los decimales definidos
 	 * @param type $numero
@@ -520,4 +537,5 @@ class Ledes extends Objeto {
 		return round($numero * $n) / $n;
 	}
 
+>>>>>>> .r9567
 }
