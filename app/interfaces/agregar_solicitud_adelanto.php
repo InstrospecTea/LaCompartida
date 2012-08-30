@@ -129,7 +129,11 @@ echo $msg;
 				<label for="id_usuario_solicitante"><?php echo __('Usuario solicitante'); ?></label>
 			</td>
 			<td align="left">
-				<?php echo Html::SelectArray(UsuarioExt::GetUsuariosActivos($Sesion), "id_usuario_solicitante", $SolicitudAdelanto->fields['id_usuario_solicitante'], 'id="id_usuario_solicitante"', '', '200px'); ?>
+				<?php
+				$usuario_solicitante = empty($SolicitudAdelanto->fields['id_usuario_solicitante']) ?
+					$Sesion->usuario->fields['id_usuario'] : $SolicitudAdelanto->fields['id_usuario_solicitante'];
+				echo Html::SelectArray(UsuarioExt::GetUsuariosActivos($Sesion), "id_usuario_solicitante", $usuario_solicitante, 'id="id_usuario_solicitante"', '', '200px');
+				?>
 			</td>
 		</tr>
 		<?php if ($SolicitudAdelanto->Loaded()) { ?>
@@ -238,7 +242,9 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 		jQuery.ajax({
 			url: url,
 			success: function (data) {
+				var valor = jQuery('#id_contrato').val();
 				jQuery('#td_selector_contrato').html(data);
+				jQuery('#id_contrato').val(valor);
 			}
 		});
 	}

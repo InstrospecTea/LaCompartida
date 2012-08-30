@@ -136,7 +136,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				$tds .= $this->td($row, $column);
 			}
 
-			$color = $row_i++ % 2 ? 'eee' : 'fff';
+			$color = $row_i++ % 2 ? 'eeeeee' : 'ffffff';
 			$html .= "<tr bgcolor=\"#$color\">$tds</tr>";
 		}
 
