@@ -363,6 +363,9 @@ $where .= " AND usuario.visible=1";
 
         function Refrescar() {
             jQuery('#versemana').click();
+			jQuery('.cajatrabajo').each(function() {
+				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
+			});	 
         }
         function calendario(semana) {
     
