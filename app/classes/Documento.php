@@ -12,7 +12,31 @@ require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class Documento extends Objeto {
 
-	function Documento($sesion, $fields = "", $params = "") {
+	private $campos = array(
+		'monto',
+		'monto_base',
+		'saldo_pago',
+		'tipo_doc',
+		'numero_doc',
+		'id_moneda',
+		'fecha',
+		'glosa_documento',
+		'codigo_cliente',
+		'id_banco',
+		'id_cuenta',
+		'numero_operacion',
+		'numero_cheque',
+		'id_factura_pago',
+		'es_adelanto',
+		'pago_honorarios',
+		'pago_gastos',
+		'id_contrato',
+		'id_solicitud_adelanto',
+		'id_usuario_ingresa',
+		'id_usuario_orden'
+	);
+
+	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "documento";
 		$this->campo_id = "id_documento";
 		#$this->guardar_fecha = false;
