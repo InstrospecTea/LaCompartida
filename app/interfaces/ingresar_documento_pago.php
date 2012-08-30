@@ -586,19 +586,19 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if (tipopago=='editaadelanto') {
 					jQuery('#overlaytipocambio').hide();
 					monedaadelanto=jQuery('#id_moneda').val();
-					jQuery('#id_moneda').attr({'id':'readonlymoneda','name':'readonlymoneda', 'disabled': true});
+					jQuery('#id_moneda').attr({'id':'readonlymoneda','name':'readonlymoneda', 'readonly': true});
 					jQuery('#tabla_informacion').append('<input id="id_moneda" name="id_moneda" type="hidden" value="'+monedaadelanto+'" />');
 				}
                 if (tipopago=='documento' || tipopago=='nuevopago' || tipopago=='adelanto') {
                     if(jQuery('#acepta_honorarios').length>0  && jQuery('#acepta_honorarios').val()==0) {
 						jQuery("input:text[id^='pago_honorarios_']").attr('disabled',true).removeClass('saldojq');
                     } else { 
-                        jQuery("input:text[id^='pago_honorarios_']").attr('disabled',false).addClass('saldojq');
+                        jQuery("input:text[id^='pago_honorarios_']").removeAttr('disabled').addClass('saldojq');
                     }
                     if(jQuery('#pago_gastos').length>0 && jQuery('#acepta_gastos').val()==0) {
                         jQuery("input:text[id^='pago_gastos_']").attr('disabled',true).removeClass('saldojq');
                     } else {
-                        jQuery("input:text[id^='pago_gastos_']").attr('disabled',false).addClass('saldojq');
+                        jQuery("input:text[id^='pago_gastos_']").removeAttr('disabled').addClass('saldojq');
                     }
                 
 					jQuery('.saldojq').each(function() {
@@ -986,7 +986,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		<tr>
 			<td align="right"><?php echo __('Solicitud de Adelanto') ?></td>
 			<td align="left">
-				<input type="text" name="id_solicitud_adelanto" disabled="disabled" value="<?php echo $id_solicitud_adelanto; ?>" id="id_solicitud_adelanto" size="11" />
+				<input type="text" name="id_solicitud_adelanto" readonly="readonly" value="<?php echo $id_solicitud_adelanto; ?>" id="id_solicitud_adelanto" size="11" />
 			</td>
 		</tr>
 <?php } ?>
@@ -1010,7 +1010,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 280);
 					} else if ($codigo_cliente) {
-							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente," disabled ","CargarTabla(1);", 280);
+							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente," readonly='readonly' ","CargarTabla(1);", 280);
 					} else {
 						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", "", "  ", "CargarTabla(1);", 280);
 					}
@@ -1068,8 +1068,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					<?php echo __('Saldo Adelanto') ?>
 				</td>
 				<td align=left>
-				<input type="text" name="saldo_pago" id="saldo_pago" size=10 value="<?php  echo str_replace("-","",$documento->fields['saldo_pago']); ?>" disabled="disabled"/>
-                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php  echo abs($documento->fields['saldo_pago']); ?>" disabled="disabled"/>			
+				<input type="text" name="saldo_pago" id="saldo_pago" size=10 value="<?php  echo str_replace("-","",$documento->fields['saldo_pago']); ?>" readonly="readonly"/>
+                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php  echo abs($documento->fields['saldo_pago']); ?>" readonly="readonly"/>			
 				</td>
 			</tr>
 		<?php } ?>
@@ -1283,7 +1283,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		//claudio  jQuery(document).ready(function() {
 <?php if (empty($adelanto) && $id_documento && $documento->fields['es_adelanto'] == '1') { ?>
 				$('tabla_informacion').select('input, select, textarea').each(function(elem){
-					elem.disabled = 'disabled';
+					elem.readonly = 'readonly';
 				});
 <?php }
 if (empty($adelanto) || $id_documento) {
