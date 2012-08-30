@@ -33,7 +33,7 @@ class Documento extends Objeto {
 		'id_contrato',
 		'id_solicitud_adelanto',
 		'id_usuario_ingresa',
-		'id_usuario_orden'
+		'id_usuario_ordena'
 	);
 
 	function __construct($sesion, $fields = "", $params = "") {
@@ -110,11 +110,13 @@ class Documento extends Objeto {
 		
 		return $tc;
 	}
-
-	function IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc = "", $fecha = '', $glosa_documento = "", $id_banco = "", $id_cuenta = "", $numero_operacion = "", $numero_cheque = "", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle = array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null, $pagar_facturas = false, $id_usuario = null, $id_usuario_orden = null, $id_solicitud_adelanto = null) {
-
-		list($dtemp, $mtemp, $atemp) = explode("-", $fecha);
-		if (strlen($dtemp) == 2) {
+	
+	function IngresoDocumentoPago(& $pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc="", $fecha = '', $glosa_documento="", $id_banco="", $id_cuenta="", $numero_operacion="", $numero_cheque="", $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle=array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null, $pagar_facturas=false,$id_usuario=null,$id_usuario_orden=null)
+	{
+		
+		list($dtemp,$mtemp,$atemp) = explode("-",$fecha);
+		if( strlen( $dtemp ) == 2 )
+		{
 			$fecha = Utiles::fecha2sql($fecha);
 		}
 				
@@ -142,6 +144,8 @@ class Documento extends Objeto {
 					$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos, $pagar_facturas);
 				}
 		} else {
+				
+				
 				$this->Edit("monto",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
 				$this->Edit("monto_base",number_format($monto_base*$multiplicador,$moneda_base['cifras_decimales'],".",""));
 				$this->Edit("saldo_pago",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
@@ -163,18 +167,14 @@ class Documento extends Objeto {
 				$this->Edit("pago_retencion", "1");
 			}
 			$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
-			if (array_key_exists('id_usuario', $this->fields)) {
-				$this->Edit("id_usuario", $id_usuario);
-			}
-			if (array_key_exists('id_usuario_orden', $this->fields)) {
-				$this->Edit("id_usuario_orden", $id_usuario_orden);
-			}
+			 
 			$this->Edit("pago_honorarios", empty($pago_honorarios) ? '0' : '1');
 			$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
 			$this->Edit("id_contrato", empty($id_contrato) ? 'NULL' : $id_contrato);
 			$this->Edit('id_solicitud_adelanto', $id_solicitud_adelanto);
 
 			if ($this->Write()) {
+					
 					$id_documento = $this->fields['id_documento'];
 					$ids_monedas = explode(',',$ids_monedas_documento);
 					$tipo_cambios = explode(',',$tipo_cambios_documento);
@@ -236,6 +236,24 @@ class Documento extends Objeto {
 		return $id_documento;
 	}
 	
+	/**
+	 * Prepara el objeto para ser guardado, corregir fechas, definir defaults, etc
+	 */
+	public function Prepare() {
+		if (empty($this->fields['codigo_cliente'])) {
+			$this->Edit("codigo_cliente", 'NULL');
+		}
+		if (array_key_exists('id_usuario_ingresa', $this->fields) && empty($this->fields['id_usuario_ingresa'])) {
+			$this->Edit("id_usuario_ingresa", 'NULL');
+		}
+		if (array_key_exists('id_usuario_orden', $this->fields) && empty($this->fields['id_usuario_orden'])) {
+			$this->Edit("id_usuario_orden", 'NULL');
+		}
+		if (array_key_exists('id_solicitud_adelanto', $this->fields) && empty($this->fields['id_solicitud_adelanto'])) {
+			$this->Edit("id_solicitud_adelanto", 'NULL');
+		}
+	}
+
 	function AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, &$out_neteos, $pagar_facturas = false) {
 		//Si se ingresa el documento, se ingresan los pagos
 		foreach ($arreglo_pagos_detalle as $key => $data) {
@@ -666,7 +684,7 @@ class Documento extends Objeto {
 						$monto_pago += $documento->fields['gastos'];
 
 						$monto_pago_base += $documento->fields['gastos']* $cambio_cobro /
-						$cambio_base;
+							$cambio_base;
 				} else {
 					$out_cobros .= "<td>" . "Null" . "</td>";
 					}
@@ -887,6 +905,48 @@ class Documento extends Objeto {
 			$cobro->Edit('estado', $estado);
 			$cobro->Write();
 }
+	}
+
+			$monto_honorarios = 0;
+			if ($honorarios > 0 && $pago_honorarios == 1) {
+				$monto_honorarios = $saldo_pago > $honorarios_convertidos ? $honorarios_convertidos : $saldo_pago;
+				$saldo_pago -= $monto_honorarios;
+				$honorarios_convertidos -= $monto_honorarios;
+			}
+			$monto_gastos = 0;
+			if ($gastos > 0 && $pago_gastos == 1) {
+				$monto_gastos = $saldo_pago > $gastos_convertidos ? $gastos_convertidos : $saldo_pago;
+				$saldo_pago -= $monto_gastos;
+				$gastos_convertidos -= $monto_gastos;
+			}
+			$honorarios = $honorarios_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
+			$gastos = $gastos_convertidos * $cobro_moneda->moneda[$id_moneda_adelanto]['tipo_cambio'] / $cobro_moneda->moneda[$id_moneda]['tipo_cambio'];
+
+			if ($monto_honorarios > 0 || $monto_gastos > 0) {
+				$neteos = array(array(
+						'id_moneda' => $id_moneda,
+						'id_documento_cobro' => $id_documento_cobro,
+						'monto_honorarios' => $monto_honorarios,
+						'monto_gastos' => $monto_gastos,
+						'id_cobro' => $id_cobro
+						));
+				$moneda_adelanto = new Moneda($this->sesion);
+				$moneda_adelanto->Load($id_moneda_adelanto);
+				$this->AgregarNeteos($id_adelanto, $neteos, $id_moneda_adelanto, $moneda_adelanto, $out_neteos);
+				$estado = 'PAGO PARCIAL';
+			}
+
+			if ($gastos == 0 && $honorarios == 0) {
+				$estado = 'PAGADO';
+				break;
+			}
+		}
+		if ($estado) {
+			$cobro = new Cobro($this->sesion);
+			$cobro->Load($id_cobro);
+			$cobro->Edit('estado', $estado);
+			$cobro->Write();
+		}
 	}
 
 }
