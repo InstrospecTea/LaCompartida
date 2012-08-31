@@ -3,6 +3,7 @@ require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
+require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class Asunto extends Objeto
 {
@@ -69,151 +70,38 @@ class Asunto extends Objeto
 			return false;
 	}
 
-	//función que asigna los codigos nuevos
-	function AsignarCodigoAsunto($codigo_cliente,$glosa_asunto="")
-	{
-		$where_codigo_gastos="";
-		if( method_exists('Conf','GetConf') ) 
-			{
-					if (Conf::GetConf($this->sesion,'CodigoEspecialGastos') ) 
-					{
-						if($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos')
-						{
-							$codigo_asunto=$codigo_cliente."-9999";
-							return $codigo_asunto;
-						}
-						$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
-					}
-					if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') )  //Formato XXXX-AAXX
-						$anio="";
-					else
-						$anio="AND STR_TO_DATE(SUBSTR(codigo_asunto,6,2),'%y')=YEAR(NOW())";
-
+	//función que asigna los códigos nuevos
+	function AsignarCodigoAsunto($codigo_cliente, $glosa_asunto = "", $secundario = false) {
+		$campo = 'codigo_asunto' . ($secundario ? '_secundario' : '');
+		$tipo = UtilesApp::GetConf($this->sesion,'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
+		$largo = $tipo == 2 ? 3 : 4;
+		
+		$where_codigo_gastos = '';
+		if (UtilesApp::GetConf($this->sesion, 'CodigoEspecialGastos')) {
+			if ($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos') {
+				return "$codigo_cliente-9999";
 			}
-		else
-			{
-				if (method_exists('Conf','CodigoEspecialGastos'))
-				{
-					if (Conf::CodigoEspecialGastos())
-					{
-						if($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos')
-						{
-							$codigo_asunto=$codigo_cliente."-9999";
-							return $codigo_asunto;
-						}
-						$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
-					}
-				}
-				if (method_exists('Conf','TipoCodigoAsunto') == 1) //Formato XXXX-AAXX
-				{
-					if (Conf::TipoCodigoAsunto())
-						$anio="";
-					else
-						$anio="AND STR_TO_DATE(SUBSTR(codigo_asunto,6,2),'%y')=YEAR(NOW())";
-				}
-				else
-					$anio="";
-			}
-		$query = "SELECT SUBSTR(codigo_asunto,6) AS x FROM asunto WHERE asunto.codigo_cliente='$codigo_cliente' $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
+			$where_codigo_gastos = "AND asunto.glosa_asunto NOT LIKE 'gastos'";
+		}
+		$yy = date('y');
+		$anio = $tipo ? '' : "AND $campo LIKE '%-$yy%'";
+		
+		$where_codigo_cliente = $secundario ?
+			"JOIN cliente USING(codigo_cliente) WHERE cliente.codigo_cliente_secundario = '$codigo_cliente'" :
+			"WHERE asunto.codigo_cliente = '$codigo_cliente'";
+		
+		$query = "SELECT TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
-		$f=empty($codigo) ? 1 : $codigo+1;
-		if(empty($codigo))
-			$g=1;
-		else
-			$g=substr($codigo,2)+1;
-		if( method_exists('Conf','GetConf') )
-		{
-			if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 1)
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
-                       else if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 2)
-                                $codigo_asunto=$codigo_cliente.'-'.sprintf("%03d",$f);
-			else
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
-
+		if(empty($codigo)){
+			$codigo = $tipo ? 0 : $yy * 100;
 		}
-		else if (method_exists('Conf','TipoCodigoAsunto'))
-		{
-			if (Conf::TipoCodigoAsunto())
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
-			else
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
-		}
-		else
-			$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
-		return $codigo_asunto;
+		
+		return sprintf("%s-%0{$largo}d", $codigo_cliente, $codigo + 1);
 	}
 
-function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario,$glosa_asunto="")
-	{
-		$where_codigo_gastos="";
-		if( method_exists('Conf','GetConf') ) 
-		{
-				if (Conf::GetConf($this->sesion,'CodigoEspecialGastos') )
-				{
-					if($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos')
-					{
-						$codigo_asunto_secundario=$codigo_cliente_secundario."-9999";
-						return $codigo_asunto;
-					}
-					$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
-				}
-				if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') )
-					$anio="";
-				else
-					$anio="AND STR_TO_DATE(SUBSTR(codigo_asunto_secundario,6,2),'%y')=YEAR(NOW())";
-		}
-		else
-		{
-			if (method_exists('Conf','CodigoEspecialGastos'))
-			{
-				if (Conf::CodigoEspecialGastos())
-				{
-					if($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos')
-					{
-						$codigo_asunto_secundario=$codigo_cliente_secundario."-9999";
-						return $codigo_asunto;
-					}
-					$where_codigo_gastos="AND asunto.glosa_asunto NOT LIKE 'gastos'";
-				}
-			}
-			if (method_exists('Conf','TipoCodigoAsunto'))
-			{
-				if (Conf::TipoCodigoAsunto())
-					$anio="";
-				else
-					$anio="AND STR_TO_DATE(SUBSTR(codigo_asunto_secundario,6,2),'%y')=YEAR(NOW())";
-			}
-			else
-				$anio="";
-		}
-		$query = "SELECT SUBSTR(codigo_asunto_secundario,6) AS x FROM asunto JOIN cliente USING( codigo_cliente ) WHERE cliente.codigo_cliente_secundario='$codigo_cliente_secundario' $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($codigo) = mysql_fetch_array($resp);
-		$f=empty($codigo) ? 1 : $codigo+1;
-		if(empty($codigo))
-			$g=1;
-		else
-			$g=substr($codigo,2)+1;
-		if( method_exists('Conf','GetConf') )
-		{
-			if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 1)
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
-			else if (Conf::GetConf($this->sesion,'TipoCodigoAsunto') == 2)
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%03d",$f);
-			else
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
-		}
-		else if (method_exists('Conf','TipoCodigoAsunto'))
-		{
-			if (Conf::TipoCodigoAsunto())
-				$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$f);
-			else
-				$codigo_asunto_secundario=$codigo_cliente_secundario.'-'.sprintf("%02d",Date('y')).sprintf("%02d",$g);
-		}
-		else
-			$codigo_asunto_secundario=$codigo_cliente_secundario.'-'.sprintf("%04d",$f);
-		return $codigo_asunto_secundario;
+	function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario, $glosa_asunto = "") {
+		return $this->AsignarCodigoAsunto($codigo_cliente_secundario, $glosa_asunto, true);
 	}
 	
 	//funcion que cambia todos los asuntos de un cliente

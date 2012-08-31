@@ -375,6 +375,7 @@
 function SubirExcel()
 {
 	nuevaVentana('SubirExcel',500,300,"subir_excel.php");
+	return false;
 }
 
 function Refrescar()
@@ -2031,7 +2032,7 @@ if ($cobro->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPorDe
 							</tr>
 							<tr>
 								<td colspan="2" align="center">
-									<a href="" style="font-size: 10px;" onclick="SubirExcel();">Subir excel modificado</a>
+									<a href="#" style="font-size: 10px;" onclick="SubirExcel();">Subir excel modificado</a>
 								</td>
 							</tr>
 							<tr>
