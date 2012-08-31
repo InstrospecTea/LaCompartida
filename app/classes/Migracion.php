@@ -23,6 +23,23 @@ class Migracion {
 
 	var $sesion = null;
 	var $logs = array();
+	 public  $errorcount;
+	 public $filasprocesadas;
+	 private $CobroMonedaStatement;
+	 
+	var $arreglocategorias = array('socio' => 1,
+		'asociado senior' => 2,
+		'asociado junior' => 3,
+		'procurador' => 4,
+		'administracion' => 5,
+		'secretaria' => 5,
+		'asociado' => 6,
+		'contratado' => 7,
+		'administrativo' => 7,
+		'asistente' => 8,
+		'practicante' => 9,
+		'' => 5
+	);
 
 	public function Migracion() {
 		$this->sesion = new Sesion();
@@ -404,6 +421,7 @@ class Migracion {
 
 	public function Query2ObjetoCobro($responseCobros) {
 		$cobros = array();
+		$this->CobroMonedaStatement=$this->sesion->pdodbh->prepare("replace into cobro_moneda (id_cobro, id_moneda, tipo_cambio) values (:idcobro, :idmoneda, :tipocambio)");
 		while ($cobro_ = mysql_fetch_assoc($responseCobros)) {
 			$cobro = new Cobro($this->sesion);
 			$cobro->guardar_fecha = false;
@@ -796,36 +814,52 @@ class Migracion {
 		return true;
 	}
 
-	public function EmitirCobros() {
-		$cobro = new Cobro($this->sesion);
+	public function EmitirCobros($from, $size) {
+	
 		$query = "SELECT cobro.id_cobro, cobro.id_usuario, cobro.codigo_cliente, cobro.id_contrato, contrato.id_carta, cobro.estado,
                                 cobro.opc_papel,contrato.id_carta, cobro.fecha_creacion 
                                 FROM cobro
                                 LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-                                WHERE cobro.estado IN ( 'CREADO', 'EN REVISION' ) AND id_cobro > 19980003";
+                                WHERE cobro.estado IN ( 'CREADO', 'EN REVISION' ) ";
+		if(intval($size)>0) $query.=" limit 0,".intval($size); // como solamente va tomando los que estan creados y en rev, empieza de 0
+	
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while ($cob = mysql_fetch_assoc($resp)) {
+				$cobro = new Cobro($this->sesion);
 			if ($cobro->Load($cob['id_cobro'])) {
 				$cobro->Edit('id_carta', $cob['id_carta']);
-				$ret = $cobro->GuardarCobro(true, true);
-				$cobro->Edit('etapa_cobro', '5');
-				$cobro->Edit('fecha_emision', $cob['fecha_creacion']);
-				if ($cob['estado'] == 'CREADO')
-					$cobro->Edit('estado', 'INCOBRABLE');
-				else
-					$cobro->Edit('estado', 'EMITIDO');
-				if ($ret == '') {
-					$his = new Observacion($sesion);
-					$his->Edit('fecha', date('Y-m-d H:i:s'));
-					$his->Edit('comentario', __('COBRO EMITIDO'));
-					$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-					$his->Edit('id_cobro', $cobro->fields['id_cobro']);
-					//$his->Write();
-					$cobro->Write();
-					echo "cobro " . $cobro->fields['id_cobro'] . " emitido con exito \n";
-				}
-				echo "no se pudo emitir cobro " . $cobro->fields['id_cobro'] . "\n";
+					if($cobro->fields['id_contrato']>0) {
+					$ret = $cobro->GuardarCobro(true, true);
+					$cobro->Edit('etapa_cobro', '5');
+					$cobro->Edit('fecha_emision', $cob['fecha_creacion']);
+					if ($cob['estado'] == 'CREADO') {
+						$cobro->Edit('estado', 'INCOBRABLE');
+					} else {
+						$cobro->Edit('estado', 'EMITIDO');
+					}
+						if ($ret == '') {
+							$his = new Observacion($this->sesion);
+							$his->Edit('fecha', date('Y-m-d H:i:s'));
+							$his->Edit('comentario', __('COBRO EMITIDO'));
+							$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
+							$his->Edit('id_cobro', $cobro->fields['id_cobro']);
+							//$his->Write();
+							$cobro->ReiniciarDocumento();
+							$cobro->Write();
+							echo "cobro " . $cobro->fields['id_cobro'] . " emitido con exito \n";
+							$this->filasprocesadas++;
+						} else {
+							echo "no se pudo emitir cobro " . $cobro->fields['id_cobro'] . "\n";
+							$this->errorcount++;
+						}
+					} else {
+						echo "El cobro " . $cobro->fields['id_cobro'] . " no tiene contrato, no puedo procesarlo.\n";
+						$this->errorcount++;
+					}
+			} else {
+				echo "no se pudo cargar el cobro " . $cobro->fields['id_cobro'] . " para emitirlo.\n";
+					$this->errorcount++;
 			}
 		}
 	}
@@ -1512,6 +1546,12 @@ class Migracion {
 		$cobro->Edit("monto_subtotal", (!empty($cobro_generar->fields['monto_subtotal'])) ? $cobro_generar->fields['monto_subtotal'] : '0');
 		$cobro->Edit("monto_contrato", (!empty($cobro_generar->fields['monto_contrato'])) ? $cobro_generar->fields['monto_contrato'] : '0');
 		$cobro->Edit("documento", (!empty($cobro_generar->fields['documento'])) ? $cobro_generar->fields['documento'] : "");
+		
+		$cobro->Edit("subtotal_gastos", (!empty($cobro_generar->fields['subtotal_gastos'])) ? $cobro_generar->fields['subtotal_gastos'] : "");
+		$cobro->Edit("monto_gastos", (!empty($cobro_generar->fields['monto_gastos'])) ? $cobro_generar->fields['monto_gastos'] : "");
+		$cobro->Edit("impuesto_gastos", (!empty($cobro_generar->fields['impuesto_gastos'])) ? $cobro_generar->fields['impuesto_gastos'] : '0');
+		$cobro->Edit("porcentaje_impuesto_gastos", (!empty($cobro_generar->fields['porcentaje_impuesto_gastos'])) ? $cobro_generar->fields['porcentaje_impuesto_gastos'] : '0');
+		
 		$cobro->Edit("porcentaje_impuesto", (!empty($cobro_generar->fields['porcentaje_impuesto'])) ? $cobro_generar->fields['porcentaje_impuesto'] : '0');
 		$cobro->Edit('estado', 'EN REVISION');
 
@@ -1520,7 +1560,7 @@ class Migracion {
 
 		if (!empty($cobro_generar->fields['factura_rut']))
 			$cobro->Edit('factura_rut', $cobro_generar->fields['factura_rut']);
-
+		if(empty($forzar_insert)) $forzar_insert=false;
 		if (!$this->Write($cobro, $forzar_insert)) {
 			if (empty($cobro->fields['id_cobro'])) {
 				echo "Error al guardar el cobro\n";
@@ -1534,12 +1574,12 @@ class Migracion {
 
 		if ($cobro->Loaded()) {
 			$this->EliminarCobroAsuntos($cobro->fields['id_cobro']);
-			$this->AddCobroAsuntos($cobro->fields['id_cobro']);
+			$this->AddCobroAsuntos($cobro->fields['id_cobro'], $contrato->fields['id_contrato']);
 		}
-
+		
 		//Moneda cobro
 		$cobro_moneda = new CobroMoneda($this->sesion);
-		$this->IngresarCobroMoneda($cobro);
+		$this->IngresarCobroMoneda($cobro,$this->CobroMonedaStatement);
 
 		//Gastos
 		if (!empty($incluye_gastos)) {
@@ -1643,9 +1683,16 @@ class Migracion {
 		return $cobro->fields['id_cobro'];
 	}
 
-	public function IngresarCobroMoneda($cobro) {
+	/**
+	 * 
+	 * @param type $cobro int
+	 * @param type $preparainsercion statement
+	 */
+	public function IngresarCobroMoneda($cobro, $preparainsercion=null) {
 		$query_monedas = "SELECT id_moneda, tipo_cambio FROM prm_moneda";
 		$resp = mysql_query($query_monedas, $this->sesion->dbh) or Utiles::errorSQL($query_monedas, __FILE__, __LINE__, $this->sesion->dbh);
+		if($preparainsercion==null) 	$preparainsercion=$this->sesion->pdodbh->prepare("replace into cobro_moneda (id_cobro, id_moneda, tipo_cambio) values (:idcobro, :idmoneda, :tipocambio)");
+		 
 		while (list($id_moneda, $tipo_cambio_actual) = mysql_fetch_array($resp)) {
 			$query_revision = "SELECT valor FROM moneda_historial WHERE id_moneda = '$id_moneda' AND fecha < '" . $cobro->fields['fecha_creacion'] . "' ORDER BY fecha DESC LIMIT 1";
 			$resp_revision = mysql_query($query_revision, $this->sesion->dbh) or Utiles::errorSQL($query_revision, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1664,11 +1711,22 @@ class Migracion {
 			$resp_rev = mysql_query($query_rev, $this->sesion->dbh) or Utiles::errorSQL($query_rev, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cantidad) = mysql_fetch_array($resp_rev);
 
-			if ($cantidad > 0)
-				$query_insert = "UPDATE cobro_moneda SET tipo_cambio = '$tipo_cambio' WHERE id_moneda = '$id_moneda' AND id_cobro = '" . $cobro->fields['id_cobro'] . "' ";
-			else
-				$query_insert = "INSERT INTO cobro_moneda SET id_cobro = '" . $cobro->fields['id_cobro'] . "', tipo_cambio = '" . $tipo_cambio . "', id_moneda = '" . $id_moneda . "'";
-			mysql_query($query_insert, $this->sesion->dbh) or Utiles::errorSQL($query_insert, __FILE__, __LINE__, $this->sesion->dbh);
+			 
+			try {
+			
+				$preparainsercion->execute(array(':idcobro'=>$cobro->fields['id_cobro'],':idmoneda'=>$id_moneda,':tipocambio'=>$tipo_cambio ));
+			 } catch (PDOException $e) {
+				 	if($this->sesion->usuario->fields['rut'] == '99511620') {
+							$Slim=Slim::getInstance('default',true);
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$queryinsercion,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($preparainsercion) );
+							$Slim->view()->setData($arrayPDOException);
+							 $Slim->applyHook('hook_error_sql');
+						 } 
+				 debug($e->getTraceAsString());
+					Utiles::errorSQL($queryinsercion, "", "",  NULL,"",$e );
+					echo 'Error!';
+					 
+			}
 		}
 	}
 
@@ -1990,9 +2048,9 @@ class Migracion {
 		return true;
 	}
 
-	public function AddCobroAsuntos($id_cobro) {
+	public function AddCobroAsuntos($id_cobro,$id_contrato=0) {
 		#Genero la parte values a través de queries
-		$query = "SELECT CONCAT('(', '$id_cobro',',\'',codigo_asunto,'\')') as value FROM asunto WHERE id_contrato = '" . $this->fields['id_contrato'] . "'";
+		$query = "SELECT CONCAT('(', '$id_cobro',',\'',codigo_asunto,'\')') as value FROM asunto WHERE id_contrato = '" .$id_contrato . "'";
 		$resp = mysql_query($query, $this->sesion->dbh);
 		if (!$resp) {
 			echo "Error explicacion: " . mysql_error($this->sesion->dbh) . "\n";

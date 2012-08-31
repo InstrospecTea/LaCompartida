@@ -873,9 +873,7 @@ class Cobro extends Objeto {
 
 		// Si es necesario calcular el impuesto por separado se actualiza el porcentaje de impuesto que se cobra.
 		$contrato = new Contrato($this->sesion);
-		$contrato->Load($this->fields['id_contrato']);
-
-		if ($emitir) {
+		if($contrato->Load($this->fields['id_contrato']) && $emitir) {
 			$contrato->Edit('notificado_monto_excedido_ult_cobro', '0');
 			$contrato->Edit('notificado_hr_excedida_ult_cobro', '0');
 			$contrato->Write();

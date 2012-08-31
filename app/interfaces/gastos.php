@@ -755,6 +755,22 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
                             </td>
                             <td></td>
                         </tr>
+					<?php		if (UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {  ?>
+						 <tr>
+                            <td align='right'>
+<?php echo __('Cobrable') ?>
+                            </td>
+					
+		<td  align="left"><select name="cobrable" id="cobrable" style="width: 140px;">
+                                    <option value=""  >Todos </option>
+                                    <option value="1" selected="selected"> Sólo <?php echo __('Cobrable'); ?></option>
+                                    <option value="0"> Sólo No <?php echo __('Cobrable'); ?> </option>
+                                </select></td>
+							  <td></td>
+                        </tr>
+						<?php } ?>
+						
+						
                         <tr>
                             <td></td>
                             <td colspan=2 align=left>

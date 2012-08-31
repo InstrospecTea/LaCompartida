@@ -229,7 +229,7 @@ class UsuarioExt extends Usuario {
 							AND id_usuario=$id_usuario";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($horas) = mysql_fetch_array($resp);
-		list($h, $m, $s) = split(":", $horas);
+		list($h, $m, $s) = explode(":", $horas);
 		if (method_exists('Conf', 'GetConf')) {
 			if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 				return UtilesApp::Time2Decimal("$h:$m");
@@ -253,7 +253,7 @@ class UsuarioExt extends Usuario {
 							AND id_usuario=$id_usuario";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($horas) = mysql_fetch_array($resp);
-		list($h, $m, $s) = split(":", $horas);
+		list($h, $m, $s) = explode(":", $horas);
 		if (empty($h) && empty($m)) {
 			$h = '00';
 			$m = '00';

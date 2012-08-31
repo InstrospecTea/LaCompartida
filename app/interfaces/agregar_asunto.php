@@ -135,6 +135,18 @@ if ($opcion == "guardar") {
 		if (empty($factura_direccion)) {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		}
+		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
+			if (empty($factura_comuna)) {
+				$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
+			}
+		}
+		
+		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
+			if (empty($factura_ciudad)) {
+				$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
+			}
+		}
+		
 		if (empty($factura_telefono)) {
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		}
@@ -296,6 +308,9 @@ if ($opcion == "guardar") {
 		}
 		$asunto->Edit("glosa_asunto", $glosa_asunto);
 		$asunto->Edit("codigo_cliente", $codigo_cliente);
+		if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+			$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
+		}
 		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto);
 		$asunto->Edit("id_area_proyecto", $id_area_proyecto);
 		$asunto->Edit("id_idioma", $id_idioma);
@@ -351,6 +366,11 @@ if ($opcion == "guardar") {
 					$contrato->Edit("direccion_contacto", $contra_clie->fields['direccion_contacto']);	
 					$contrato->Edit("id_pais", $id_pais);
 					$contrato->Edit("id_cuenta", $id_cuenta);
+	
+					if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+						$contrato->Edit("id_cuenta2", $id_cuenta2);
+					}
+			
 					$contrato->Edit("es_periodico", $contra_clie->fields['es_periodico']);
 					$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO');
 					$contrato->Edit("usa_impuesto_separado", $contra_clie->fields['usa_impuesto_separado']);
@@ -439,6 +459,10 @@ if ($opcion == "guardar") {
 
 					$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
 
+					if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+						$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+					}
+					
 					if ($contrato->Write()) {
 						#cobros pendientes
 						CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
@@ -525,6 +549,13 @@ if ($opcion == "guardar") {
 				$contrato->Edit("glosa_contrato", $glosa_contrato);
 				$contrato->Edit("id_pais", $id_pais);
 				$contrato->Edit("id_cuenta", $id_cuenta);
+	
+				if( UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
+					$contrato->Edit("id_cuenta2", $id_cuenta2);
+				}
+	
+	
+			
 				$contrato->Edit("codigo_cliente", $codigo_cliente);
 				$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL");
 				$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL");
@@ -565,6 +596,12 @@ if ($opcion == "guardar") {
 				$contrato->Edit("factura_razon_social", $factura_razon_social);
 				$contrato->Edit("factura_giro", $factura_giro);
 				$contrato->Edit("factura_direccion", $factura_direccion);
+				if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
+					$contrato->Edit("factura_comuna", $factura_comuna);
+				}
+				if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
+					$contrato->Edit("factura_ciudad", $factura_ciudad);
+				}
 				$contrato->Edit("factura_telefono", $factura_telefono);
 				$contrato->Edit("cod_factura_telefono", $cod_factura_telefono);
 				#Opciones
@@ -595,8 +632,12 @@ if ($opcion == "guardar") {
 				$contrato->Edit("limite_hh", $limite_hh);
 				$contrato->Edit("limite_monto", $limite_monto);
 
-                                $contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
-                                
+				$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
+                            
+				if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
+					$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0': '1');
+				}
+				
 				// Editar notificaciones
 				$contrato->Edit('notificar_encargado_principal', $notificar_encargado_principal);
 				if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
@@ -640,6 +681,7 @@ if ($opcion == "guardar") {
 						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 						$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
 						$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
+						$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
 						$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
 						$cobro_pendiente->Edit("hito", '1');
 						$cobro_pendiente->Write();
@@ -753,7 +795,7 @@ $pagina->PrintTop($popup);
 if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 	echo "form.glosa_asunto.value=form.glosa_asunto.value.toUpperCase();";
 }
- 
+
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	?>
 				if(!form.codigo_cliente_secundario.value)
@@ -816,6 +858,25 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					form.factura_direccion.focus();
 					return false;
 				}
+				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
+				if(!form.factura_comuna.value)
+				{
+					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
+					MuestraPorValidacion('datos_factura');
+					form.factura_comuna.focus();
+					return false;
+				}
+				<?php } ?>
+
+				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
+				if(!form.factura_ciudad.value)
+				{
+					alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
+					MuestraPorValidacion('datos_factura');
+					form.factura_ciudad.focus();
+					return false;
+				}
+				<?php } ?>
 
 				if(form.id_pais.options[0].selected == true)
 				{
@@ -1194,6 +1255,16 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 ?>
 							</td>
 						</tr>
+						<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
+						<tr>
+							<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+								<?php echo __('Código de homologación'); ?>
+							</td>
+							<td align=left>
+								<input name="codigo_homologacion" size="45" value="<?php echo $asunto->fields['codigo_homologacion']; ?>" />
+							</td>
+						</tr>
+						<?php } ?>
 						<tr>
 							<td align=right>
 <?php echo __('Título') ?>
@@ -1246,10 +1317,10 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						</tr>
 						<?php 	//if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
 									
-                                                                                    echo '<tr><td align=right>';
+							echo '<tr><td align=right>';
                                                                                     echo __('Usuario responsable');
-                                                                                    echo '</td><td align=left>';
-                                                                                    echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+                                                        echo '</td><td align=left>';
+echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
@@ -1362,7 +1433,7 @@ if ($permisos_asuntos->fields['permitido']) {
 				<table width='100%' cellspacing='0' cellpadding='0'>
 					<tr>
 						<td  <?php echo $hide_areas; ?> >
-							<input type="checkbox" name='cobro_independiente'id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
+							<input type="checkbox" name='cobro_independiente' id='cobro_independiente' onclick="ShowContrato(this.form, this)" value='1' <?php echo $checked ?> >&nbsp;&nbsp;
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
@@ -1422,7 +1493,7 @@ if ($permisos_asuntos->fields['permitido']) {
 <?php
 if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
 	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
-} else {
+ } else {
 	$funcion_validar = "return Validar(this.form);";
 }
 ?>
@@ -1463,8 +1534,8 @@ function CambioEncargadoSegunCliente(idcliente) {
     var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
     var UsuarioSecundario=<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario')? '1':'0' );?>;
     var ObligatorioEncargadoSecundarioAsunto=<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto')? '1':'0' );?>;
-    jQuery('#id_usuario_secundario').attr({'disabled':''});
-    jQuery('#id_usuario_responsable').attr({'disabled':''});
+    jQuery('#id_usuario_secundario').removeAttr('disabled');
+    jQuery('#id_usuario_responsable').removeAttr('disabled');
     jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
 	if(window.console ) console.debug(data);
         var ladata=data.split('|');
@@ -1475,14 +1546,14 @@ function CambioEncargadoSegunCliente(idcliente) {
           if(ladata[2])  jQuery('#id_usuario_secundario').append('<option value="'+ladata[1]+'" selected="selected">'+ladata[2]+'</option>').attr({'disabled':''}).val(ladata[1]);;
         }
         
-          jQuery('#id_usuario_responsable').attr({'disabled':''});
-        if(CopiarEncargadoAlAsunto) {
-        	jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
+          jQuery('#id_usuario_responsable').removeAttr('disabled');
+	if(CopiarEncargadoAlAsunto) {
+		jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
                 if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
 	   } else if(ObligatorioEncargadoSecundarioAsunto) {
              
-                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':''});
-           }
+                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
+	   }
 	
 	   
            jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');

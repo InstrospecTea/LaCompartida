@@ -1181,12 +1181,12 @@ if (UtilesApp::GetConf($sesion, 'AlertaCliente') )  {
 <?php
 if ($cant_encargados > 0) {
 	if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
-		$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery(\"#formulario-cliente\").get(0), false);";
+		$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario-cliente').get(0), false);";
 	} else {
-		$funcion_validar = "return Validar(jQuery(\"#formulario-cliente\").get(0));";
+		$funcion_validar = "return Validar(jQuery('#formulario-cliente').get(0));";
 	}
 		?>
-								<a href="javascript:void(0);" icon='ui-icon-save' class='btn botonizame'   onclick='<?php echo $funcion_validar; ?>' /><?php echo __('Guardar'); ?></a>
+								<a href="javascript:void(0);" icon="ui-icon-save" class="btn botonizame" onclick="<?php echo $funcion_validar; ?>" /><?php echo __('Guardar'); ?></a>
 		<?php
 } else {
 	?>

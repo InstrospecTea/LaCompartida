@@ -107,9 +107,11 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 				$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
 			if($id_usuario_orden)
 				$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
+			if(isset($cobrable))
+				$where .= " AND cta_corriente.cobrable =$cobrable";
 			if($id_usuario_responsable)
 				$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-			if($id_tipo)
+			if(isset($id_tipo))
 				$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 			if($clientes_activos == 'activos')
 				$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
@@ -272,7 +274,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
-							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query_log,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($logstatement) );
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($resp) );
 							$Slim->view()->setData($arrayPDOException);
 							 $Slim->applyHook('hook_error_sql');
 						 }

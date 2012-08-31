@@ -65,7 +65,7 @@ google.load("jquery","1.7");
 		<script language="JavaScript" type="text/javascript" src="https://static.thetimebilling.com/jquery.numberformatter-1.2.3.min.js"></script>
 		
 
-	<?php require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
+	<?php //require_once Conf::ServerDir().'/interfaces/fs-pat.js.php'; ?>
 
    	
 <style type="text/css">
