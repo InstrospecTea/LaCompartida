@@ -2,6 +2,7 @@
 
 require_once("../app/conf.php");
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
 require_once Conf::ServerDir().'/../app/classes/Contrato.php';
@@ -14,8 +15,8 @@ header('Access-Control-Max-Age: 3628800');
 header('Access-Control-Allow-Methods: GET, POST');
 
  
-
-$Slim=Slim::getInstance('default',true);
+require_once Conf::ServerDir().'/../fw/classes/Slim/Slim.php';
+$Slim=new Slim();
 $Slim->config('debug', true);
 
 
