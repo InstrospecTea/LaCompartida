@@ -220,8 +220,8 @@ function AgregarAsunto( numero , valor_hidden )
 				break;
 			case 'fecha':
 				// generar DatePicker
-				echo "<input type=text name=fecha value='$valor_opcion' id=fecha size=11 maxlength=10 />
-		        <img src=".Conf::ImgDir()."/calendar.gif id=img_fecha style=\"cursor:pointer\" />";
+				echo "<input type=text name='fecha' value='$valor_opcion' id='fecha' class='fechadiff' size=11 maxlength=10 />";
+		        
 		    break;
 		}
 		echo "</td></tr>\n";
@@ -241,65 +241,38 @@ function AgregarAsunto( numero , valor_hidden )
 		    <?php include dirname(__FILE__) . '/agregar_doc_legales.php'; ?>
 	    
 </div>
-<div class="grupoconf" id="caja21" rel="Lang" >
-<p><center>Active y Ordene los archivos de lang a cargar. La primera fila se carga en primer lugar, y puede ser sobreescrita por las siguientes (y así sucesivamente)</center></p>
-<?php			if(file_exists('../../admin/archivos_lang.php')) {
-		include_once  '../../admin/archivos_lang.php';  
-	}  ?>
-	    
-<br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardalangs"  setwidth="200">Guardar</a>
+<div class="grupoconf" id="cajalang" rel="Lang" >
+				<p><center>Active y Ordene los archivos de lang a cargar. La primera fila se carga en primer lugar, y puede ser sobreescrita por las siguientes (y así sucesivamente)</center></p>
 
- </div>
-<div class="grupoconf" id="caja22" rel="Plugins" >
+				<div id="formulariolang"></div>
 
-		    <p>En esta pantalla se activan o desactivan los plugins. No toque nada si no sabe para qué sirve</p> 
-	<?php  	 
- 
-	if(file_exists('../../admin/archivos_plugins.php')) {
-		include_once  '../../admin/archivos_plugins.php';  
-	}
-	    ?>
- <br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardaplugins"  setwidth="200">Guardar</a> </div> 
+				<br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardalangs"  setwidth="200">Guardar</a>
+
+			</div>
+			<div class="grupoconf" id="cajaplugin" rel="Plugins" >
+
+				<p>En esta pantalla se activan o desactivan los plugins. No toque nada si no sabe para qué sirve</p> 
+				<div id="formularioplugins"></div>
+
+				<br /><br /><a href="#" class="botonizame" icon="ui-icon-save" id="guardaplugins"  setwidth="200">Guardar</a> </div> 
 
 
-	    
-</div>
- 
+			<table>
+				<tr><td>&nbsp;</td>
+					<td><a href="javascript:void(0)" class="btn botonizame"icon="ui-icon-save"  id="enviarconf" ><?php echo __('Guardar') ?></a></td>
+				</tr>
+				<tr><td colspan="2" id="mensaje">&nbsp;</td>
 
-	<table>
-	<tr><td>&nbsp;</td>
-	    <td><input type="button" id="enviarconf" value="<?php echo __('Guardar') ?>" class="btn" /></td>
-	</tr>
-	<tr><td colspan="2" id="mensaje">&nbsp;</td>
-	    
-	</tr>
-	</table>
-</form>
-</div>
+				</tr>
+			</table>
+		</form>
+	</div>
 
 <pre style="display: none"><?php var_export($confs); ?></pre>
 
 <script language="javascript" type="text/javascript">
 jQuery(document).ready(function() {
-     jQuery('#guardalangs').click(function() {
-       console.log(jQuery('#formlangs').serialize());
-       jQuery.post('../ajax.php',jQuery('#formlangs').serialize(),function(data) {
-           jQuery('#langs li').remove();
-           jQuery('#langs').append(data);
-           jQuery(".buttonset").buttonset();
-           jQuery('.sortable').sortable();
-       });
-    });
-	
-	    jQuery('#guardaplugins').click(function() {
-       console.log(jQuery('#formplugins').serialize());
-       jQuery.post('../ajax.php',jQuery('#formplugins').serialize(),function(data) {
-           jQuery('#plugins li').remove();
-           jQuery('#plugins').append(data);
-           jQuery(".buttonset").buttonset();
-           jQuery('.sortable').sortable();
-       });
-    });
+  
 	
     jQuery('#buscacampos').append(jQuery('#buscacampo'));
     
@@ -351,17 +324,66 @@ jQuery(document).ready(function() {
 
 	jQuery('#tabs').append('<li><a href="#'+LaID+'">'+Glosa+'</a></li>');
     });
+	
+	jQuery('#guardalangs').click(function() {
+				console.log(jQuery('#formlangs').serialize());
+				jQuery.post('../ajax.php',jQuery('#formlangs').serialize(),function(guardar) {
+					jQuery.get( '../../admin/archivos_lang.php',function(data) {
+						jQuery('#formulariolang').append(data);
+						jQuery( ".buttonset").buttonset();
+						jQuery('.sortable').sortable();
+					});
+					jQuery('#formulariolang').html('');
+				});
+			});
+	
+			jQuery('#guardaplugins').click(function() {
+				console.log(jQuery('#formplugins').serialize());
+				jQuery.post('../ajax.php',jQuery('#formplugins').serialize(),function(guardar) {
+					jQuery.get( '../../admin/archivos_plugins.php',function(data) {
+						jQuery('#formularioplugins').append(data);
+						jQuery( ".buttonset").buttonset();
+						jQuery('.sortable').sortable();
+				
+					});
+					jQuery('#formularioplugins').html('');
+				});
+			});
+			
+			jQuery('#configuracion').bind( "tabsselect", function(event, ui) {
+		 
+				if(ui.tab.innerText=='Lang') {
+					jQuery('#enviarconf').hide();
+					jQuery.get( '../../admin/archivos_lang.php',function(data) {
+						jQuery('#formulariolang').append(data);
+						jQuery( ".buttonset").buttonset();
+						jQuery('.sortable').sortable();
+					});
+					jQuery('#formulariolang').html('');
+				} else if(ui.tab.innerText=='Plugins') {
+					jQuery('#enviarconf').hide();
+					jQuery.get( '../../admin/archivos_plugins.php',function(data) {
+						jQuery('#formularioplugins').append(data);
+						jQuery( ".buttonset").buttonset();
+						jQuery('.sortable').sortable();
+				
+					});
+					jQuery('#formularioplugins').html('');
+				} else {
+					jQuery('#enviarconf').show();
+				}
+		
+	 
+			});
+	
+	 
 });
-Calendar.setup(
-	{
-		inputField	: "fecha",				// ID of the input field
-		ifFormat	: "%d-%m-%Y",			// the date format
-		button			: "img_fecha"		// ID of the button
-	}
 
-);
 
-</script>
+	</script>
+	<!-- <script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>-->
+ 
+
 <?php
 	$pagina->PrintBottom($popup);
  

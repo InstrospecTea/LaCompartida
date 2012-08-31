@@ -1177,16 +1177,16 @@ A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D
 </table>
 <br>
 
-<center>
-<table class="border_plomo"   id="tbl_trabajo">
+ 
+<table class="border_plomo"   id="tbl_trabajo" style="width: 665px !important;">
     <tr>
-        <td align="center">
+        <td  width="20"  style="width:20px;">
         	<span <?php echo UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ? 'style="display:none"' : ''?> id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;
         </td>
-        <td align="right">
+        <td  width="110" style="text-align:right;width:120px;" >
 			<?php echo __('Cliente')?>
         </td>
-        <td align=left width="475" nowrap>
+        <td align=left width="530" nowrap>
 <?php 
 $codigo_asunto=$t->fields['codigo_asunto'];
   UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, true, '320', "+CargarTarifa();");
@@ -1576,7 +1576,7 @@ echo '</td>';
 				</td>
 		</tr>
 </table>
-</center>
+ 
 </form>
 
 <?php 

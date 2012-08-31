@@ -391,7 +391,7 @@ $where .= " AND usuario.visible=1";
         <tr>
             <td align=center>
                 <div id="Iframe" class="tb_base" style="width:750px;">
-                    <iframe id='asuntos' name='asuntos' target="asuntos"  class="resizableframe" id='asuntos' scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab ?>&opcion=<?php echo $opcion ?>" frameborder="0" style="width:80%; height:352px;"></iframe>
+                    <iframe id='asuntos' name='asuntos' target="asuntos"  class="resizableframe" id='asuntos' scrolling="no" src="editar_trabajo.php?popup=1&id_trabajo=<?php echo $id_trab ?>&opcion=<?php echo $opcion ?>" frameborder="0" style="width:90%; height:370px;"></iframe>
                 </div>
                 <br/>
             </td>
