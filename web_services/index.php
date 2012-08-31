@@ -16,7 +16,7 @@ header('Access-Control-Allow-Methods: GET, POST');
  
 
 $Slim=Slim::getInstance('default',true);
-$Slim->config('debug', false);
+$Slim->config('debug', true);
 
 
 $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
@@ -29,7 +29,7 @@ $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('
 				$timestamp=$Slim->request()->post('timestamp');
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
 					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
  				}
@@ -74,7 +74,7 @@ $Slim->map('/EntregarListaAsuntos(/:callback)', 'EntregarListaAsuntos')->via('GE
 				$timestamp=$Slim->request()->post('timestamp');
 				
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
 					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
  				}
@@ -128,7 +128,7 @@ $Slim->map('/EntregarDatos(/:callback)', 'EntregarDatos')->via('GET', 'POST');
 				$timestamp=$Slim->request()->post('timestamp');
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
 					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
  				}
@@ -160,7 +160,7 @@ $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('
 				 
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
 					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
  				}
@@ -207,14 +207,30 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 			 
 	
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el passwords"]');
+					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
 					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
  				}
 				
 			
-				
+				$consultatablas=$sesion->pdodbh->query( "SHOW tables like  'j_causa'");
+				$arraytablas=$consultatablas->fetchALL(PDO::FETCH_COLUMN );
+					if(in_array('j_causa',$arraytablas) ) {
+						$causas=", (SELECT count(*) as causas FROM 	j_causa WHERE 	url_cuaderno IS NOT NULL AND 	url_cuaderno <> '' AND 		eliminada = 0) as causas";
+
+					} else {
+						$causas="";
+					}
+					
 			
+				$versionct=$sesion->pdodbh->query( "SHOW COLUMNS FROM  version_db");
+				$versionctcampos=$versionct->fetchALL(PDO::FETCH_COLUMN );
+					if(in_array('version_ct',$versionctcampos) ) {
+						$version_ct=",(select max(version_ct)  version_ct from version_db) as version_ct";
+					} else {
+						$version_ct="";
+					}
+					
 			$lista_datos = array();
  			
 			$querydatos="select * from
@@ -228,8 +244,10 @@ FROM cobro) cobros,
 (select 
 sum(if(tr.fecha>=fechas.inicio_ano,time_to_sec(tr.duracion)/3600,0)) as HH_ANO,
 sum(if(tr.fecha>=fechas.inicio_mes and tr.fecha<=fechas.fin_mes,time_to_sec(tr.duracion)/3600,0)) as HH_MES,
-sum(if(tr.fecha>=fechas.iniciosemana and tr.fecha<=fechas.finsemana,time_to_sec(tr.duracion)/3600,0)) as HH_SEMANA
-
+sum(if(tr.fecha>=fechas.iniciosemana and tr.fecha<=fechas.finsemana,time_to_sec(tr.duracion)/3600,0)) as HH_SEMANA,
+(select max(version)  version_tt from version_db) as version_tt
+$version_ct
+$causas
 from trabajo tr,
 (select 
 YEAR(CURDATE())*10000+101 inicio_ano,
@@ -237,12 +255,12 @@ date_format(LAST_DAY(now() - interval 1 month),'%Y%m%d') fin_mes,
 concat(date_format(LAST_DAY(now() - interval 1 month),'%Y%m'),'01') inicio_mes,
  date_format(subdate(now(), INTERVAL 7+weekday(now()) DAY),'%Y%m%d') iniciosemana,
 date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) fechas) trabajos";
-		
-			 $respuesta = mysql_fetch_assoc(mysql_query($querydatos, $sesion->dbh) );
+	 
+			 $respuesta =$sesion->pdodbh->query( $querydatos); 
 			
 			
  
-		echo json_encode( $respuesta );
+		echo json_encode( $respuesta->fetchALL(PDO::FETCH_ASSOC ) );
 		 
 }
 
