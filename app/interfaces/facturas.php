@@ -17,7 +17,7 @@ require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new Pagina($sesion);
-
+$Slim=Slim::getInstance('default',true);
 $serienumero_documento = new DocumentoLegalNumero($sesion);
 
 $factura = new Factura($sesion);
@@ -49,7 +49,10 @@ if ($exportar_excel) {
 //		$multiple = true;
 //		require_once Conf::ServerDir().'/interfaces/facturas_listado_xls.php';
 //		exit;
+	 if($Slim) $Slim->applyHook('hook_factura_inicio');
 }
+ 
+
 
 if ($archivo_contabilidad) {
 	require_once Conf::ServerDir() . '/interfaces/facturas_contabilidad_txt.php';
@@ -600,19 +603,22 @@ if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="3" align="right">
 					<input name=boton_buscar id='boton_buscar' type=button value="<?php echo __('Buscar') ?>" onclick="BuscarFacturas(this.form,'buscar')" class=btn>
-				</td>
-				<td align="right">
+				 
 					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
+				<?php if($Slim) $Slim->applyHook('hook_factura_fin'); ?>
 				</td>
 				<td align="right">
-<?php if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
+<?php 
+
+if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
 						<input type="button" value="<?php echo __('Descargar Archivo Contabilidad'); ?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')" />
 						<br />
 						<label>desde el asiento contable
 							<input type="text" size="4" name="desde_asiento_contable" value="<?php echo $desde_asiento_contable; ?>" /></label>
-<?php } ?>
+<?php } 
+ ?>
 				</td>
 			</tr>
 		</table>
