@@ -606,7 +606,7 @@ if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
 				<td colspan="3" align="right">
 					<input name=boton_buscar id='boton_buscar' type=button value="<?php echo __('Buscar') ?>" onclick="BuscarFacturas(this.form,'buscar')" class=btn>
 				 
-					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
+					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn" id="boton_descarga" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
 				<?php if($Slim) $Slim->applyHook('hook_factura_fin'); ?>
 				</td>
 				<td align="right">
