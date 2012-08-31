@@ -509,7 +509,7 @@ class Ledes extends Objeto {
 		return $errores;
 	}
 
-<<<<<<< .mine
+ 
 	/**
 	 * redondea un valor a los decimales definidos
 	 * @param type $numero
@@ -523,19 +523,5 @@ class Ledes extends Objeto {
 		return floatval(round($numero * $n)) / $n;
 	}
 
-=======
-	/**
-	 * redondea un valor a los decimales definidos
-	 * @param type $numero
-	 * @return type
-	 */
-	private function round($numero) {
-		$n = 10;
-		for ($i = 1; $i < $this->decimales; $i++) {
-			$n*=10;
-		}
-		return round($numero * $n) / $n;
-	}
-
->>>>>>> .r9567
+ 
 }
