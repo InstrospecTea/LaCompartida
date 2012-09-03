@@ -11,7 +11,7 @@ require_once Conf::ServerDir() . '/classes/UsuarioExt.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/SolicitudAdelanto.php';
 
-$Sesion = new Sesion(array('COB'));
+$Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
 
 $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
@@ -19,10 +19,10 @@ $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
 if ($_POST['opcion'] == 'guardar') {
 	$SolicitudAdelanto->Fill($_REQUEST, true);
 	$SolicitudAdelanto->Edit('id_usuario_ingreso', $Sesion->usuario->fields['id_usuario']);
-
+	
 	if ($SolicitudAdelanto->Write()) {
 		$Pagina->AddInfo(__('Solicitud de Adelanto guardada con éxito'));
-
+		
 		if ($_REQUEST['notificar_solicitante']) {
 			$SolicitudAdelanto->NotificarSolicitante();
 		}
@@ -34,7 +34,7 @@ if ($_POST['opcion'] == 'guardar') {
 		$SolicitudAdelanto->Load($_REQUEST['id_solicitud_adelanto']);
 		unset($_REQUEST['id_solicitud_adelanto']);
 	}
-
+	
 	$SolicitudAdelanto->Fill($_REQUEST);
 }
 
@@ -45,7 +45,7 @@ $Pagina->titulo = __('Solicitud de Adelanto');
 
 if ($SolicitudAdelanto->Loaded()) {
 	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $SolicitudAdelanto->fields['id_solicitud_adelanto'];
-
+	
 	if (!empty($SolicitudAdelanto->fields['id_contrato'])) {
 		$Asunto = new Asunto($Sesion);
 		$Asunto->LoadByContrato($SolicitudAdelanto->fields['id_contrato']);
@@ -97,7 +97,7 @@ echo $msg;
 				<label for="codigo_cliente"><?php echo __('Asunto'); ?></label>
 			</td>
 			<td colspan="3" align="left" id="td_selector_contrato">
-				<?php
+				<?php 
 				$Contrato = new Contrato($Sesion);
 				echo $Contrato->ListaSelector($SolicitudAdelanto->fields['codigo_cliente'], '', $SolicitudAdelanto->fields['id_contrato']);
 				?>
@@ -129,11 +129,7 @@ echo $msg;
 				<label for="id_usuario_solicitante"><?php echo __('Usuario solicitante'); ?></label>
 			</td>
 			<td align="left">
-				<?php
-				$usuario_solicitante = empty($SolicitudAdelanto->fields['id_usuario_solicitante']) ?
-					$Sesion->usuario->fields['id_usuario'] : $SolicitudAdelanto->fields['id_usuario_solicitante'];
-				echo Html::SelectArray(UsuarioExt::GetUsuariosActivos($Sesion), "id_usuario_solicitante", $usuario_solicitante, 'id="id_usuario_solicitante"', '', '200px');
-				?>
+				<?php echo Html::SelectArray(UsuarioExt::GetUsuariosActivos($Sesion), "id_usuario_solicitante", $SolicitudAdelanto->fields['id_usuario_solicitante'], 'id="id_usuario_solicitante"', '', '200px'); ?>
 			</td>
 		</tr>
 		<?php if ($SolicitudAdelanto->Loaded()) { ?>
@@ -182,7 +178,7 @@ echo $msg;
 			$('monto').focus();
 			return false;
 		}
-
+			
 <?php
 if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 	if (UtilesApp::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador') {
@@ -202,33 +198,33 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 				var cod_cli = document.getElementById('codigo_cliente');
 	<?php } else { ?>
 				var cod_cli = document.getElementById('campo_codigo_cliente');
-	<?php } ?>
+	<?php } ?>	
 			if (cod_cli == '-1' || cod_cli == "") {
 				alert('<?php echo __('Debe ingresar un cliente') ?>');
 				return false;
 			}
-<?php } ?>
-
+<?php } ?> 
+        
 		if (form.descripcion.value == "") {
 			alert('<?php echo __('Debe ingresar una descripción'); ?>');
 			form.descripcion.focus();
 			return false;
 		}
-
+		
 		var estado_anterior = '<?php echo $SolicitudAdelanto->fields['estado']; ?>';
-
+		
 		if (form.estado.value == "DEPOSITADO" && estado_anterior != form.estado.value) {
 			if (confirm('¿Desea notificar al solicitante la disponibilidad del adelanto?')) {
 				form.notificar_solicitante.value = true;
 			}
 		}
 	}
-
+	
 	Calendar.setup({ inputField	: "fecha", ifFormat : "%d-%m-%Y", button : "img_fecha" });
-
+	
 	var valor_anterior_codigo;
 	var campo_cliente;
-
+	
 	jQuery(document).ready(function () {
 		// Cargar contratos on select
 		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
@@ -236,19 +232,17 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 		valor_anterior_codigo = campo_cliente.val();
 		window.setInterval(ComprobarCodigos, 500, campo_cliente.val());
 	});
-
+	
 	function ActualizarContratos() {
 		url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + jQuery(this).val();
 		jQuery.ajax({
 			url: url,
 			success: function (data) {
-				var valor = jQuery('#id_contrato').val();
 				jQuery('#td_selector_contrato').html(data);
-				jQuery('#id_contrato').val(valor);
 			}
 		});
 	}
-
+	
 	function ComprobarCodigos(valor_nuevo) {
 		if (valor_anterior_codigo != valor_nuevo) {
 			campo_cliente.change();
@@ -267,7 +261,7 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 					jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
 				});
 			});
-
+				
 			jQuery('.printlinkpage').live('click',function() {
 				multi = jQuery("input[name=x_pag]").val();
 				//alert(multi);
