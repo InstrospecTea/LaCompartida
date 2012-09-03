@@ -959,8 +959,8 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 
 		<tr><td>&nbsp;</td>
 			<td  align="left" colspan="4">
-				<div id="abrir_opciones_ocultar" onclick="MostrarOpcionesParaOcultar();" style="display:block;"><img src=<?php echo Conf::ImgDir() . '/mas.gif' ?>  />&nbsp;<b><?php echo __('Ocultar columnas:') ?></b></div>
-				<div id="cerrar_opciones_ocultar" onclick="OcultarOpcionesParaOcultar();" style="display:none;"><img src=<?php echo Conf::ImgDir() . '/menos.gif' ?>  />&nbsp;<b><?php echo __('Ocultar columnas:') ?></b></div>
+				<div id="abrir_opciones_ocultar" onclick="MostrarOpcionesParaOcultar();" style="display:block;"><img src=<?php echo Conf::ImgDir() . '/mas.gif' ?>  />&nbsp;<b><?php echo __('Opciones Avanzadas:') ?></b></div>
+				<div id="cerrar_opciones_ocultar" onclick="OcultarOpcionesParaOcultar();" style="display:none;"><img src=<?php echo Conf::ImgDir() . '/menos.gif' ?>  />&nbsp;<b><?php echo __('Opciones Avanzadas:') ?></b></div>
 			</td>
 		</tr>
 		<tr  id="tr_opciones_ocultar" style="display:none;">
@@ -981,7 +981,7 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked="checked"' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="llenar_olap" <?php echo $llenar_olap ? 'checked="checked"' : '' ?> /><?php echo __('Ejecutar llenado inicial de datos') ?><br/>
-<?php if ($sesion->usuario->fields['rut'] == '99511620') echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
+<?php if ($sesion->usuario->fields['rut'] == '99511620') echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
 		<tr>

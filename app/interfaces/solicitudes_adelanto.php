@@ -9,7 +9,7 @@ require_once Conf::ServerDir() . '/classes/Moneda.php';
 require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/SolicitudAdelanto.php';
 
-$Sesion = new Sesion(array('COB'));
+$Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
 
 $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
@@ -23,7 +23,7 @@ switch ($_REQUEST['accion']) {
 			$Pagina->AddError($SolicitudAdelanto->error);
 		}
 		break;
-
+		
 	case 'descargar':
 		$SolicitudAdelanto->DownloadWord();
 		break;
@@ -118,7 +118,7 @@ if ($_REQUEST['accion'] == 'buscar') {
 	if ($orden == "") {
 		$orden = "glosa_cliente";
 	}
-
+	
 	$x_pag = 25;
 
 	$b = new Buscador($Sesion, $SolicitudAdelanto->SearchQuery(), "SolicitudAdelanto", $desde, $x_pag, $orden);
@@ -140,14 +140,14 @@ function FormatoMonto(&$fila) {
 	$monto_adelantos = UtilesApp::PrintFormatoMoneda($Sesion, $fila->fields['monto_adelantos'], $fila->fields['id_moneda']);
 	$saldo_adelantos = UtilesApp::PrintFormatoMoneda($Sesion, $fila->fields['saldo_adelantos'], $fila->fields['id_moneda']);
 	$cantidad_adelantos = $fila->fields['cantidad_adelantos'];
-
+	
 	if ($cantidad_adelantos > 0) {
 		$s = ($cantidad_adelantos > 1) ? 's' : '';
 		$title = "$cantidad_adelantos adelanto$s por $monto_adelantos (saldo: $saldo_adelantos)";
 	} else {
 		$title = "Sin adelantos";
 	}
-
+	
 	return "<span title=\"$title\">$monto_solicitado</span>";
 }
 
@@ -156,17 +156,13 @@ function Opciones(& $fila) {
 
 	$boton_descargar = '<a href="solicitudes_adelanto.php?accion=descargar&id_solicitud_adelanto=' . $fila->fields['id_solicitud_adelanto'] . '" title="Descargar Solicitud">'
 		. '<img src="' . Conf::ImgDir() . '/doc.gif" border="0" alt="Descargar Solicitud" /></a>';
-
+	
 	$boton_editar = '<a href="javascript:void(0);" onclick="AgregarNuevo(\'solicitud_adelanto\', ' . $fila->fields['id_solicitud_adelanto'] . ');" title="Editar Solicitud">'
 		. '<img src="' . Conf::ImgDir() . '/editar_on.gif" border="0" alt="Editar Solicitud" /></a>';
-
+	
 	$boton_eliminar = '<a href="javascript:void(0);" onclick="if (confirm(\'¿'. __('Está seguro de eliminar la') . ' ' . __('solicitud de adelanto') . '?\')) EliminaSolicitudAdelanto(' . $fila->fields['id_solicitud_adelanto'] . ');">'
 		. '<img src="' . Conf::ImgDir() . '/cruz_roja_nuevo.gif" border="0" alt="Eliminar" /></a>';
-
-	if(empty($fila->fields['id_template'])){
-		$boton_descargar = '';
-	}
-
+	
 	return "$boton_descargar $boton_editar $boton_eliminar";
 }
 ?>
@@ -190,13 +186,13 @@ function Opciones(& $fila) {
 			return	nuovaFinestra('Agregar_SolicitudAdelanto', 720, 500, urlo, 'top=100, left=125');
 		}
 	}
-
+	
 	function EliminaSolicitudAdelanto(id_solicitud)
 	{
 		self.location.href = "solicitudes_adelanto.php?id_solicitud_adelanto="+id_solicitud+"&accion=eliminar&buscar=1&desde=<?php echo ($desde) ? $desde : '0'?>";
 		return true;
 	}
-
+	
 	Calendar.setup({ inputField	: "fecha_desde", ifFormat : "%d-%m-%Y", button : "img_fecha_desde" });
 	Calendar.setup({ inputField	: "fecha_hasta", ifFormat : "%d-%m-%Y", button : "img_fecha_hasta" });
 </script>
