@@ -343,14 +343,16 @@ $migracion->EmitirFacturasPRC();
 			
 		
 		$tiempototal = time() - $tini;
-		echo '<b>Terminado en ' . $tiempototal . ' segundos. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
+		echo '</pre></div><b>Terminado en ' . $tiempototal . ' segundos. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
 		if ($size > 0 && intval($migracion->filasprocesadas) > 1) {
 				echo '<script>';
-				echo "setTimeout(\"location.href = '$nextlink';\",35000);";
+				echo "setTimeout(\"location.href = '$nextlink';\",3500);";
 				echo '</script>';
 				
 				}  else {
 					$MigradorSaej->QueryPostFacturas();
+
+						echo '</pre></div><b>Completado el proceso de emisión de facturas. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
 				}
 		
 		break;
@@ -360,13 +362,21 @@ $migracion->EmitirFacturasPRC();
 		
 
 
-		if (method_exists('MigradorSaej', 'QueryFacturas') && $MigradorSaej->QueryFacturas()) {
+		 
 			$responseFacturas = mysql_query($MigradorSaej->QueryFacturas(), $sesion->dbh) or Utiles::errorSQL($MigradorSaej->QueryFacturas(), __FILE__, __LINE__, $sesion->dbh);
 			$migracion->Query2ObjetoFactura($responseFacturas);
-		}
+	 	$nextlink = "migracion_script.php?etapa=$etapa&from=" . ($from + $size) . "&size=$size";
 		
-		$tiempototal = time() - $tini;
-		echo '<b>Terminado en ' . $tiempototal . ' segundos. Se presentaron ' . $migracion->errorcount . ' Errores</b>';
+		echo '</pre></div><b>Terminado en ' . $tiempototal . ' segundos. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
+		if ($size > 0 && intval($migracion->filasprocesadas) > 1) {
+				echo '<script>';
+				echo "setTimeout(\"location.href = '$nextlink';\",3500);";
+				echo '</script>';
+				
+				}  
+		
+		 
+		 
 		break;	
 		
 	case 'pagos';

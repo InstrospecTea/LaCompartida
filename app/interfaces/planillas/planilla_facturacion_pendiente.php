@@ -375,123 +375,180 @@ $resp = mysql_query($update1, $sesion->dbh);
 $resp = mysql_query($update2, $sesion->dbh);
 $resp = mysql_query($update3, $sesion->dbh);
 	
-	$update3A = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
-	$update3B = "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
-	$update3C = "update olap_liquidaciones ol left join tramite tra on ol.id_entry=tra.id_tramite  set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null";
+
+if($llenar_olap) {
+	$update0 = "replace delayed into olap_liquidaciones (SELECT
+																		asunto.codigo_asunto as codigos_asuntos,
+																		asunto.codigo_asunto_secundario, 
+										  contrato.id_usuario_responsable,
+										   asunto.glosa_asunto as asuntos,
+										   (asunto.cobrable+1) as asuntos_cobrables,
+											cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+
+										CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+										ec.username as username_encargado_comercial,
+										CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+										es.username as username_encargado_secundario,
+										contrato.id_contrato,
+																		contrato.monto, 
+										contrato.forma_cobro,
+										contrato.retainer_horas,
+										contrato.id_moneda as id_moneda_contrato,
+										contrato.opc_moneda_total as id_moneda_total,
+
+																	  movs.*,0
+										FROM  asunto JOIN contrato  using (id_contrato)
+										JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+										join
+										(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+										 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+										 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+										,fecha_modificacion from  trabajo tr
+
+										 union all
+
+										 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+										 cc.id_movimiento,cc.id_usuario_orden, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+										IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+										,fecha_modificacion from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL 
+
+
+										union all
+
+										select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+										tram.id_tramite, tram.id_usuario, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+										tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+										,fecha_modificacion from tramite tram 
+
+										) movs on movs.codigo_asunto=asunto.codigo_asunto
+										 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+			if($AtacheSecundarioSoloAsunto) {
+								$update0.="LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado) ";
+			}	else {
+								$update0.="LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+			}
+										 // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
+
+			$resp = mysql_query($update0, $sesion->dbh);
+} else {
 	
-	$resp = mysql_query($update3A, $sesion->dbh);
-	$resp = mysql_query($update3B, $sesion->dbh);
-	$resp = mysql_query($update3C, $sesion->dbh);
-	
-	list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -2 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
-if(!$maxolaptime) $maxolaptime=0;
-	$update4 = "replace delayed into olap_liquidaciones (SELECT
-                                                                asunto.codigo_asunto as codigos_asuntos,
-                                                                asunto.codigo_asunto_secundario, 
-								  contrato.id_usuario_responsable,
-								   asunto.glosa_asunto as asuntos,
-								   (asunto.cobrable+1) as asuntos_cobrables,
-								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
-								
-								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
-								ec.username as username_encargado_comercial,
-								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
-								es.username as username_encargado_secundario,
-								contrato.id_contrato,
-                                                                contrato.monto, 
-								contrato.forma_cobro,
-								contrato.retainer_horas,
-								contrato.id_moneda as id_moneda_contrato,
-								contrato.opc_moneda_total as id_moneda_total,
-                                                              
-															  movs.*,0
-								FROM  asunto JOIN contrato  using (id_contrato)
-								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-								join
-								(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
-								 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
-								 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
-								,fecha_modificacion from  trabajo tr where   fecha_touch>=$maxolaptime 
+			$update3A = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
+			$update3B = "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
+			$update3C = "update olap_liquidaciones ol left join tramite tra on ol.id_entry=tra.id_tramite  set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null";
 
-								 union all
+			$resp = mysql_query($update3A, $sesion->dbh);
+			$resp = mysql_query($update3B, $sesion->dbh);
+			$resp = mysql_query($update3C, $sesion->dbh);
 
-								 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
-								 cc.id_movimiento,cc.id_usuario_orden, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
-								IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
-								,fecha_modificacion from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and  fecha_touch>=$maxolaptime
+			list($maxolaptime) = mysql_fetch_array(mysql_query("SELECT DATE_FORMAT( date_add(MAX( fecha_modificacion ), interval -2 day) ,  '%Y%m%d' ) AS maxfecha FROM olap_liquidaciones", $sesion->dbh));
+			if(!$maxolaptime) $maxolaptime=0;
+			$update4 = "replace delayed into olap_liquidaciones (SELECT
+																		asunto.codigo_asunto as codigos_asuntos,
+																		asunto.codigo_asunto_secundario, 
+										  contrato.id_usuario_responsable,
+										   asunto.glosa_asunto as asuntos,
+										   (asunto.cobrable+1) as asuntos_cobrables,
+											cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
+
+										CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+										ec.username as username_encargado_comercial,
+										CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+										es.username as username_encargado_secundario,
+										contrato.id_contrato,
+																		contrato.monto, 
+										contrato.forma_cobro,
+										contrato.retainer_horas,
+										contrato.id_moneda as id_moneda_contrato,
+										contrato.opc_moneda_total as id_moneda_total,
+
+																	  movs.*,0
+										FROM  asunto JOIN contrato  using (id_contrato)
+										JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+										join
+										(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+										 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+										 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+										,fecha_modificacion from  trabajo tr where   fecha_touch>=$maxolaptime 
+
+										 union all
+
+										 SELECT 'GAS' as tipo, 20000000+cc.id_movimiento as id_unico,
+										 cc.id_movimiento,cc.id_usuario_orden, cc.codigo_asunto,cc.cobrable, if(cc.incluir_en_cobro='SI',2,1) as incluir_en_cobro, 0 as duracion_cobrada_segs,
+										IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable, 0 as monto_thh, 0 as monto_thh_estandar, cc.id_moneda, cc.fecha, cc.id_cobro,cc.estadocobro
+										,fecha_modificacion from  cta_corriente cc WHERE cc.codigo_asunto IS NOT NULL and  fecha_touch>=$maxolaptime
 
 
-								union all
+										union all
 
-								select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
-								tram.id_tramite, tram.id_usuario, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
-								tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
-								,fecha_modificacion from tramite tram where fecha_touch>=$maxolaptime
+										select 'TRA' as tipo, 30000000 + tram.id_tramite as id_unico,
+										tram.id_tramite, tram.id_usuario, tram.codigo_asunto, tram.cobrable,  2 as incluir_en_cobro, TIME_TO_SEC(duracion) as duracion_cobrada_segs,
+										tram.tarifa_tramite, 0 as monto_thh, 0 as monto_thh_estandar,tram.id_moneda_tramite,  tram.fecha, tram.id_cobro, tram.estadocobro 
+										,fecha_modificacion from tramite tram where fecha_touch>=$maxolaptime
 
-								) movs on movs.codigo_asunto=asunto.codigo_asunto
-								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
-	if($AtacheSecundarioSoloAsunto) {
-						$update4.="LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado) ";
-	}	else {
-						$update4.="LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
-	}
-								 // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
- 
-	$resp = mysql_query($update4, $sesion->dbh);
+										) movs on movs.codigo_asunto=asunto.codigo_asunto
+										 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+			if($AtacheSecundarioSoloAsunto) {
+								$update4.="LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado) ";
+			}	else {
+								$update4.="LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+			}
+										 // quito "tr.id_tramite = 0  AND tr.duracion_cobrada >0 and" de la segunda subquery
 
-if($fechactual-$maxolaptime>2) {
-	$update5 = "truncate table trabajos_por_actualizar;";
-	$update6 = "replace into trabajos_por_actualizar (
-		select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
-		from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
-		where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
-	$resp = mysql_query($update5, $sesion->dbh);
-	$resp = mysql_query($update6, $sesion->dbh);
+			$resp = mysql_query($update4, $sesion->dbh);
 
-	$update7 = "replace delayed into olap_liquidaciones (SELECT
-                                                                asunto.codigo_asunto as codigos_asuntos,
-                                                                asunto.codigo_asunto_secundario, 
-								  contrato.id_usuario_responsable,
-								   asunto.glosa_asunto as asuntos,
-								   (asunto.cobrable+1) as asuntos_cobrables,
-								    cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
-								
-								CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
-								ec.username as username_encargado_comercial,
-								CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
-								es.username as username_encargado_secundario,
-								contrato.id_contrato,
-                                                                contrato.monto, 
-								contrato.forma_cobro,
-								contrato.retainer_horas,
-								contrato.id_moneda as id_moneda_contrato,
-								contrato.opc_moneda_total as id_moneda_total,
-                                                              
-															  movs.*,0
-								FROM  asunto JOIN contrato  using (id_contrato)
-								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-								join
-								(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
-								 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
-								 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
-								,fecha_modificacion from  trabajo tr where  id_trabajo in (select id_trabajo from trabajos_por_actualizar)  
+		if($fechactual-$maxolaptime>2) {
+			$update5 = "truncate table trabajos_por_actualizar;";
+			$update6 = "replace into trabajos_por_actualizar (
+				select id_trabajo,t.codigo_asunto, ol.duracion_cobrada_segs,time_to_sec(t.duracion_cobrada),ol.fecha_modificacion, t.fecha_touch   
+				from olap_liquidaciones ol join trabajo t on ol.id_entry=t.id_trabajo
+				where  ol.tipo='TRB'  	and ol.duracion_cobrada_segs!=time_to_sec(t.duracion_cobrada));";
+			$resp = mysql_query($update5, $sesion->dbh);
+			$resp = mysql_query($update6, $sesion->dbh);
 
-								 
+			$update7 = "replace delayed into olap_liquidaciones (SELECT
+																		asunto.codigo_asunto as codigos_asuntos,
+																		asunto.codigo_asunto_secundario, 
+										  contrato.id_usuario_responsable,
+										   asunto.glosa_asunto as asuntos,
+										   (asunto.cobrable+1) as asuntos_cobrables,
+											cliente.id_cliente, 		cliente.codigo_cliente_secundario, cliente.glosa_cliente,   cliente.fecha_creacion,cliente.id_cliente_referencia,
 
-								 
-								) movs on movs.codigo_asunto=asunto.codigo_asunto
-								 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
-		if($AtacheSecundarioSoloAsunto) {
-						$update7.=" LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado)";
-	}	else {
-						$update7.=" LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
-	}
-															
+										CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) as nombre_encargado_comercial,
+										ec.username as username_encargado_comercial,
+										CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) as nombre_encargado_secundario,
+										es.username as username_encargado_secundario,
+										contrato.id_contrato,
+																		contrato.monto, 
+										contrato.forma_cobro,
+										contrato.retainer_horas,
+										contrato.id_moneda as id_moneda_contrato,
+										contrato.opc_moneda_total as id_moneda_total,
 
-								
-	$resp = mysql_query($update7, $sesion->dbh);
+																	  movs.*,0
+										FROM  asunto JOIN contrato  using (id_contrato)
+										JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+										join
+										(select  'TRB' as tipo,10000000+tr.id_trabajo as id_unico,
+										 tr.id_trabajo, tr.id_usuario, tr.codigo_asunto, tr.cobrable, 2 as incluir_en_cobro, TIME_TO_SEC(duracion_cobrada) as duracion_cobrada_segs,
+										 0 as monto_cobrable,TIME_TO_SEC(duracion_cobrada)*tarifa_hh as monto_thh, TIME_TO_SEC(duracion_cobrada)*tarifa_hh_estandar as monto_thh_estandar, tr.id_moneda, tr.fecha,  tr.id_cobro ,tr.estadocobro
+										,fecha_modificacion from  trabajo tr where  id_trabajo in (select id_trabajo from trabajos_por_actualizar)  
+
+
+
+
+										) movs on movs.codigo_asunto=asunto.codigo_asunto
+										 LEFT JOIN usuario as ec ON ec.id_usuario = contrato.id_usuario_responsable";
+				if($AtacheSecundarioSoloAsunto) {
+								$update7.=" LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado)";
+			}	else {
+								$update7.=" LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+			}
+
+
+
+			$resp = mysql_query($update7, $sesion->dbh);
+		}
 }
-
 	$querycobros = "SELECT
 								GROUP_CONCAT( asunto.codigo_asunto ) as codigos_asuntos,
 								$codigos_asuntos_secundarios
@@ -878,8 +935,8 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				<td>&nbsp;</td><td style="text-align:center;" colspan="2">
 	<?php echo 'Filtrar por ' . __('Encargado Secundario') . ' del ' . __('Asunto') . '<br/>(Opcional)<br/>';
 	echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-					FROM usuario JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
+					FROM usuario  join prm_categoria_usuario using (id_categoria_usuario) JOIN usuario_permiso USING(id_usuario)
+					WHERE prm_categoria_usuario.id_categoria_lemontech in (1,2) and  codigo_permiso='PRO' ORDER BY apellido1", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=12 ", "", "260");
 	?>
 				</td>
 				<?php } ?>
@@ -923,6 +980,7 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked="checked"' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
+				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="llenar_olap" <?php echo $llenar_olap ? 'checked="checked"' : '' ?> /><?php echo __('Ejecutar llenado inicial de datos') ?><br/>
 <?php if ($sesion->usuario->fields['rut'] == '99511620') echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/> Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
@@ -938,4 +996,4 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 <?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
- 
+

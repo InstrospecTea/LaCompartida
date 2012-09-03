@@ -3400,7 +3400,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%valor_honorarios_totales%', $x_resultados['monto'][$this->fields['id_moneda']], $html);
 				//$cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo']
 
-				$html = str_replace('%valor_honorarios_totales_moneda_total%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['monto_thh'][$this->fields['opc_moneda_total']] + $x_resultados['impuesto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_honorarios_totales_moneda_total%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']] + $x_resultados['impuesto'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				//$html = str_replace('%valor_honorarios_totales_moneda_total%', $x_resultados['monto'][$this->fields['opc_moneda_total']], $html);
 
 				$html = str_replace('%fees%', __('%fees%'), $html); //en vez de Legal Fee es Legal Fees en inglés

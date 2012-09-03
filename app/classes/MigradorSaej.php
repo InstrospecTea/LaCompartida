@@ -347,13 +347,13 @@ class MigradorSaej extends Migracion {
 								LEFT JOIN  " . DBORIGEN . ".Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
 								LEFT JOIN  " . DBORIGEN . ".Empleado ON LOWER(TRIM(Empleado.Siglas)) = LOWER(TRIM(Factura.creadopor))
 																	$extra ";
-		if($this->size >0) $QueryCobros.="limit ".intval($this->from).",".intval($this->size);
+		if($this->size >0) $QueryCobros.=" limit ".intval($this->from).",".intval($this->size);
 		$this->sesion->debug($QueryCobros);
 		return $QueryCobros;
 	}
 
 	function QueryFacturas() {
-		return "SELECT 
+		$QueryFacturas= "SELECT 
 									Factura.NumeroFactura 									as factura_FFF_id_cobro,
 									Factura.NumeroFactura 									as factura_FFF_id_factura,
 									Factura.NumeroFactura									as factura_FFF_numero,
@@ -364,9 +364,12 @@ class MigradorSaej extends Migracion {
 									Factura.MontoImpuesto 									as factura_FFF_iva,
 									Factura.MontoNeto 										as factura_FFF_honorarios,
 									Factura.PorcentajeImpuesto 								as factura_FFF_porcentaje_impuesto
+									
 								FROM  " . DBORIGEN . ".Factura
 								LEFT JOIN  " . DBORIGEN . ".Periodo ON Periodo.CodigoPeriodo = Factura.PeriodoFacturacionFija
-								WHERE Factura.CodigoFacturaBoleta IS NOT NULL";
+								WHERE Factura.CodigoFacturaBoleta IS NOT NULL ";
+					if($this->size >0) 			$QueryFacturas.=" limit ".intval($this->from).",".intval($this->size);
+		return $QueryFacturas;
 	}
 
 	function QueryTarifas() {
@@ -1129,17 +1132,17 @@ else   'TASA' end, contrato.glosa_contrato=propuesta.referencia";
 
 	function QueryPreviaFacturas($forzar) {
 		if ($forzar == 1) {
-			$querypreviafactura = "update cobro set documento=null";
-			$querypreviafactura = "update cobro join  " . DBORIGEN . ".Factura on cobro.id_cobro=Factura.NumeroFactura set cobro.documento=Factura.CodigoFacturaBoleta where Factura.TipoDocumento='F';";
+
+			$querypreviafactura .= "update cobro join  " . DBORIGEN . ".Factura on cobro.id_cobro=Factura.NumeroFactura set cobro.documento=Factura.CodigoFacturaBoleta where Factura.TipoDocumento in ('D','B','F');";
 			$querypreviafactura.="truncate table factura;";
 			$querypreviafactura.="truncate table factura_cobro;";
 
-			$querypreviafactura.="truncate table cta_cte_fact_mvto";
-			$querypreviafactura.="truncate table cta_cte_fact_mvto_moneda";
-			$querypreviafactura.="truncate table cta_cte_fact_mvto_neteo";
+			$querypreviafactura.="truncate table cta_cte_fact_mvto;";
+			$querypreviafactura.="truncate table cta_cte_fact_mvto_moneda;";
+			$querypreviafactura.="truncate table cta_cte_fact_mvto_neteo;";
 
 			$this->sesion->pdodbh->beginTransaction();
-			$querycobro = $this->sesion->pdodbh->exec($querypreviacobro);
+			$queryfactura = $this->sesion->pdodbh->exec($querypreviafactura);
 			$this->sesion->pdodbh->commit();
 			$nextlink = "migracion_script.php?etapa={$this->etapa}&from=0&size=".$this->size;
 			echo '<br>Se limpiaron las tablas objetivo, se retomará el proceso de inserción<script>';
