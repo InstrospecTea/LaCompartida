@@ -866,31 +866,38 @@ class Migracion {
 
 	public function EmitirFacturasPRC() {
 		$query = "SELECT 
-									cobro.id_cobro 									as id_factura,
-									cobro.id_cobro 									as id_cobro,
-									cobro.porcentaje_impuesto 						as porcentaje_impuesto,
-									cobro.id_estado_factura							as id_estado,
-									documento.impuesto 								as iva,
-									documento.monto 								as total, 
-									 cobro.fecha_creacion 							as fecha,
-									contrato.factura_razon_social 						as cliente,
-									contrato.rut 									as RUT_cliente,
-									contrato.factura_direccion							as direccion_cliente, 
-									cobro.codigo_cliente 								as codigo_cliente,
-									substring_index(cobro.documento,'-',1)				as serie_documento_legal,
-									substring_index(cobro.documento,'-',-1)				as numero,
-									cobro.factura_razon_social							as cliente,
-									cobro.factura_rut								as RUT_cliente,
-									documento.subtotal_honorarios 						as subtotal,
-									documento.subtotal_sin_descuento 					as honorarios,
-									documento.subtotal_sin_descuento 					as subtotal_sin_descuento,
-									documento.subtotal_gastos 						as subtotal_gastos,
-									documento.subtotal_gastos_sin_impuesto 				as subtotal_gastos_sin_impuesto
+									cobro.id_cobro										as id_factura,
+									cobro.id_cobro										as id_cobro,
+									cobro.porcentaje_impuesto								as porcentaje_impuesto,
+									cobro.id_estado_factura								as id_estado,
+									documento.impuesto									as iva,
+									documento.monto										as total,
+									cobro.fecha_creacion									as fecha,
+									contrato.factura_razon_social							as cliente,
+									contrato.rut										as RUT_cliente,
+									contrato.factura_direccion								as direccion_cliente,
+									cobro.codigo_cliente									as codigo_cliente,
+									case substring_index(cobro.documento,'-',1)
+									when 'FA' then 1
+									when 'NC' then 2
+									when 'ND' then 3
+									when 'BO' then 4 end									as id_documento_legal,
+									substring_index(substring_index(cobro.documento,'-',2),'-',-1)	as serie_documento_legal,
+									substring_index(cobro.documento,'-',-1)					as numero,
+									cobro.factura_razon_social								as cliente,
+									cobro.factura_rut									as RUT_cliente,
+									documento.subtotal_honorarios							as subtotal,
+									documento.subtotal_sin_descuento						as honorarios,
+									documento.subtotal_sin_descuento						as subtotal_sin_descuento,
+									documento.subtotal_gastos								as subtotal_gastos,
+									documento.subtotal_gastos_sin_impuesto					as subtotal_gastos_sin_impuesto
 								FROM documento 
-								LEFT JOIN cobro ON cobro.id_cobro = documento.id_cobro AND tipo_doc = 'N' 
-								LEFT JOIN contrato ON cobro.id_contrato = contrato.id_contrato 
+								  JOIN cobro ON cobro.id_cobro = documento.id_cobro 
+								  JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 								WHERE cobro.documento IS NOT NULL 
-									AND cobro.documento != '' ";
+									AND cobro.documento != '' 		AND documento.tipo_doc = 'N' and cobro.fecha_emision<=20120825				";
+		if( $size>0) $query.="limit $from,$size";
+		$this->sesion->debug($query);
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while ($arreglo_factura = mysql_fetch_assoc($resp)) {
@@ -900,6 +907,7 @@ class Migracion {
 			foreach ($arreglo_factura as $key => $val) {
 				$factura->Edit($key, $val);
 			}
+			
 			$this->GenerarFactura($factura);
 		}
 	}
@@ -2163,60 +2171,64 @@ class Migracion {
 		}
 
 		if (!$this->ValidarFactura($factura)) {
-			echo "Error al ingresar la factura\n";
+			echo "Error al ingresar la factura: no la pude validar<br>\n";
+			$this->errorcount++;
 			return false;
-		}
+		}  else  {
 
-		$query = "SELECT id_documento_legal, glosa, codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($tipo_documento_legal, $codigo_tipo_doc) = mysql_fetch_array($resp);
+			$query = "SELECT id_documento_legal, glosa, codigo FROM prm_documento_legal WHERE id_documento_legal = '$id_documento_legal'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($tipo_documento_legal, $codigo_tipo_doc) = mysql_fetch_array($resp);
 
-		if ($this->Escribir($factura, forzar_insert)) {
-			if ($generar_nuevo_numero) {
-				$factura->GuardarNumeroDocLegal($factura->fields['id_documento_legal'], $factura->fields['numero']);
-			}
+			if ($this->Escribir($factura, $forzar_insert)) {
+				if ($generar_nuevo_numero) {
+					$factura->GuardarNumeroDocLegal($factura->fields['id_documento_legal'], $factura->fields['numero']);
+				}
 
-			$signo = ($codigo_tipo_doc == 'NC') ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
-			$neteos = empty($factura->fields['id_factura_padre']) ? null : array(array($factura->fields['id_factura_padre'], $signo * $factura->fields['total']));
+				$signo = ($codigo_tipo_doc == 'NC') ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
+				$neteos = empty($factura->fields['id_factura_padre']) ? null : array(array($factura->fields['id_factura_padre'], $signo * $factura->fields['total']));
 
-			$cta_cte_fact = new CtaCteFact($this->sesion);
-			$cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'], $signo * ($factura->fields['total'] - $factura->fields['iva']), $signo * $factura->fields['iva'], $signo * $factura->fields['total'], $factura->fields['fecha'], $neteos, $factura->fields['id_factura'], null, $codigo_tipo_doc, $ids_monedas_documento, $tipo_cambios_documento, !empty($factura->fields['anulado']));
+				$cta_cte_fact = new CtaCteFact($this->sesion);
+				$cta_cte_fact->RegistrarMvto($factura->fields['id_moneda'], $signo * ($factura->fields['total'] - $factura->fields['iva']), $signo * $factura->fields['iva'], $signo * $factura->fields['total'], $factura->fields['fecha'], $neteos, $factura->fields['id_factura'], null, $codigo_tipo_doc, $ids_monedas_documento, $tipo_cambios_documento, !empty($factura->fields['anulado']));
 
-			echo __('Documento Tributario') . " " . $mensaje_accion . "\n";
+				echo __('Documento Tributario') . " " . $mensaje_accion . "\n";
 
-			if ($factura->fields['id_cobro']) {
-				$documento = new Documento($this->sesion);
-				$documento->LoadByCobro($factura->fields['id_cobro']);
+				if ($factura->fields['id_cobro']) {
+					$documento = new Documento($this->sesion);
+					$documento->LoadByCobro($factura->fields['id_cobro']);
 
-				$valores = array(
-					$factura->fields['id_factura'],
-					$factura->fields['id_cobro'],
-					$documento->fields['id_documento'],
-					$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-					$factura->fields['iva'],
-					$documento->fields['id_moneda'],
-					$documento->fields['id_moneda']
-				);
+					$valores = array(
+						$factura->fields['id_factura'],
+						$factura->fields['id_cobro'],
+						$documento->fields['id_documento'],
+						$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+						$factura->fields['iva'],
+						$documento->fields['id_moneda'],
+						$documento->fields['id_moneda']
+					);
 
-				$query = "DELETE FROM factura_cobro WHERE id_factura = '" . $factura->fields['id_factura'] . "' AND id_cobro = '" . $factura->fields['id_cobro'] . "'";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					$query = "DELETE FROM factura_cobro WHERE id_factura = '" . $factura->fields['id_factura'] . "' AND id_cobro = '" . $factura->fields['id_cobro'] . "'";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-				$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento) VALUES ('" . implode("','", $valores) . "')";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			}
+					$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento) VALUES ('" . implode("','", $valores) . "')";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				}
 		} else {
-			echo "Error al guardar la factura";
+			echo "Error al guardar la factura: no la pude guardar<br>";
+			$this->errorcount++;
 			return false;
 		}
 
-		echo "Factura ID " . $factura->fields['id_factura'] . " guardada";
+			echo "Factura ID " . $factura->fields['id_factura'] . " guardada";
+			$this->filasprocesadas++;
 
-		$observacion = new Observacion($this->sesion);
-		$observacion->Edit('fecha', date('Y-m-d H:i:s'));
-		$observacion->Edit('comentario', "MODIFICACIÓN FACTURA");
-		$observacion->Edit('id_usuario', "NULL");
-		$observacion->Edit('id_factura', $factura->fields['id_factura']);
-		$observacion->Write();
+			$observacion = new Observacion($this->sesion);
+			$observacion->Edit('fecha', date('Y-m-d H:i:s'));
+			$observacion->Edit('comentario', "MODIFICACIÓN FACTURA");
+			$observacion->Edit('id_usuario', "NULL");
+			$observacion->Edit('id_factura', $factura->fields['id_factura']);
+			$observacion->Write();
+		}
 	}
 
 	public function GenerarPagos($factura_pago_generar = null, $documento_pago_generar = null) {

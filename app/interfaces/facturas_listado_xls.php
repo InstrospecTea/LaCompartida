@@ -112,7 +112,7 @@ $query = "SELECT cliente.glosa_cliente
 						, prm_documento_legal.codigo as tipo
 						, $numero_factura";
 if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-	$query .= "			, cliente as cliente_facturable, rut_cliente";
+	$query .= "			, cliente as cliente_facturable";
 }
 $query .= "			, '' glosa_asunto
 						, '' codigo_asunto
@@ -154,7 +154,9 @@ $query .= "			, '' glosa_asunto
 $lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query);
 
 if ($lista_suntos_liquidar->num == 0) {
-	$pagina->FatalError('No existe información con este criterio');
+	
+	 echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
+	 die('No hay datos para su criterio de búsqueda');
 }
 
 $fecha_actual = date('Y-m-d');
@@ -236,7 +238,7 @@ while (list($id_moneda, $simbolo_moneda, $cifras_decimales, $moneda_base, $tipo_
 if (UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion')) {
 	$columnas = explode(',', UtilesApp::GetConf($sesion, 'MostrarColumnaReporteFacturacion'));
 } else {
-	$columnas = array('glosa_cliente', 'fecha', 'tipo', 'numero', 'cliente_facturable', 'rut_cliente','glosa_asunto', 'codigo_asunto', 'encargado_comercial',
+	$columnas = array('glosa_cliente', 'fecha', 'tipo', 'numero', 'cliente_facturable', 'glosa_asunto', 'codigo_asunto', 'encargado_comercial',
 		'descripcion', 'id_cobro','iva', 'total', 'monto_real', 'observaciones', 'saldo_pagos', 'saldo', 'fecha_ultimo_pago', 'estado_glosa');
 }
 // Crear worksheet

@@ -17,6 +17,12 @@ require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 $Sesion = new Sesion(array('ADM', 'COB'));
 $pagina = new Pagina($Sesion);
 
+$factura = new Factura($Sesion);
+
+//$series_documento = new DocumentoLegalNumero($Sesion);
+
+
+
 set_time_limit(0);
 ini_set("memory_limit", "256M");
 $where_cobro = ' 1 ';
@@ -227,9 +233,10 @@ foreach ($TTBplugins['hook_cobro_factura_pago'] as $funcion) {
 
 
 $lista_suntos_liquidar = new ListaAsuntos($Sesion, "", $query);
-if ($lista_suntos_liquidar->num == 0)
-	$pagina->FatalError('No existe información con este criterio');
-
+if ($lista_suntos_liquidar->num == 0) {
+	 echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
+	 die('No hay datos para su criterio de búsqueda');
+}
 $fecha_actual = date('Y-m-d');
 
 $col = 0;

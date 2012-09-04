@@ -17,7 +17,7 @@ require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new Pagina($sesion);
-$Slim=Slim::getInstance('default',true);
+
 $serienumero_documento = new DocumentoLegalNumero($sesion);
 
 $factura = new Factura($sesion);
@@ -49,7 +49,7 @@ if ($exportar_excel) {
 //		$multiple = true;
 //		require_once Conf::ServerDir().'/interfaces/facturas_listado_xls.php';
 //		exit;
-	 if($Slim) $Slim->applyHook('hook_factura_inicio');
+	  
 }
  
 
@@ -451,8 +451,7 @@ function funcionTR(& $fila) {
 		}
 </script>
 
-<?php echo Autocompletador::CSS(); ?>
-<form method='post' name="form_facturas" id="form_facturas">
+ <form method='post' name="form_facturas" id="form_facturas">
 	<input type='hidden' name='opc' id='opc' value='buscar'>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -475,21 +474,7 @@ function funcionTR(& $fila) {
 					<?php echo __('Cliente') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-					<?php
-					if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
-							echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-						else
-							echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-					}
-					else {
-						if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-							echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto_secundario);
-						} else {
-							echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-						}
-					}
-					?>
+<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 				</td>
 			</tr>
 			<tr>
@@ -497,13 +482,7 @@ function funcionTR(& $fila) {
 					<?php echo __('Asunto') ?>
 				</td>
 				<td colspan="3" align=left nowrap>
-<?php
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
-} else {
-	echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
-}
-?>
+<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 				</td>
 			</tr>
 			<tr>
@@ -591,23 +570,23 @@ if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
 <?php echo __('Fecha Inicio') ?>
 				</td>
 				<td nowrap align=left>
-					<input type="text" id="fecha1" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-					<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+					<input type="text" id="fecha1" class="fechadiff"  name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+					 
 				</td>
 				<td align=right>
 <?php echo __('Fecha Fin') ?>
 				</td>
 				<td align=left width="44%">
-					<input type="text" id="fecha2" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-					<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+					<input type="text" id="fecha2" class="fechadiff" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+					 
 				</td>
 			</tr>
 			<tr>
 				<td colspan="3" align="right">
-					<input name=boton_buscar id='boton_buscar' type=button value="<?php echo __('Buscar') ?>" onclick="BuscarFacturas(this.form,'buscar')" class=btn>
+					<a name='boton_buscar' id='boton_buscar'  class="btn botonizame" icon="find"   onclick="BuscarFacturas(jQuery('#form_facturas').get(0),'buscar')" class=btn><?php echo __('Buscar') ?></a>
 				 
-					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn" id="boton_descarga" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
-				<?php if($Slim) $Slim->applyHook('hook_factura_fin'); ?>
+					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn botonizame" id="boton_descarga" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
+				<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_factura_fin'):false; ?>
 				</td>
 				<td align="right">
 <?php 
@@ -656,25 +635,13 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNue
 	}
 
 
-	Calendar.setup({
-		inputField	: "fecha1",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha1"		// ID of the button
-	});
-	Calendar.setup({
-		inputField	: "fecha2",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha2"		// ID of the button
-	});
+ 
 </script>
 <?php
 if ($opc == 'buscar') {
 	$b->Imprimir();
 }
 
-if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-	echo(Autocompletador::Javascript($sesion));
-}
-echo(InputId::Javascript($sesion));
+ 
 $pagina->PrintBottom();
 
