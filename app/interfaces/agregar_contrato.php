@@ -1000,7 +1000,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 						else
 						{
 							if(!id_tarifa)
-								var id_tarifa = form.id_tarifa.value;
+								var id_tarifa = jQuery('#id_tarifa').val();
 							nuovaFinestra( 'Tarifas', 600, 600, 'agregar_tarifa.php?popup=1&id_tarifa_edicion='+id_tarifa, '' );
 						}
 					}
