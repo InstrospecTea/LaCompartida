@@ -303,6 +303,7 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 		$last_col_letter = $col_letter;
 		if ($this->autofilter) {
 			$this->sheet->setAutoFilter("$col0_letter{$first_row}:{$last_col_letter}{$last_row}");
+			$this->sheet->freezePane('A' . ($first_row + 1));
 		}
 	}
 

@@ -26,8 +26,12 @@ if ($_REQUEST['accion'] == 'guardar') {
 			$config_array = array();
 
 			foreach ($config as $field => $field_config) {
+				$field_config['field'] = $field;
 				$field_config['title'] = utf8_encode($field_config['title']);
 				$field_config['visible'] = (array_key_exists('visible', $field_config) && $field_config['visible'] == 1);
+				if(isset($field_config['extras'])){
+					$field_config['extras'] = json_decode($field_config['extras']);
+				}
 
 				$config_array[] = $field_config;
 			}
@@ -63,9 +67,19 @@ $reportes = $SimpleReport->GetAll($_REQUEST['tipo']);
 				<ul style="text-align: left; list-style-type: none">
 					<?php foreach ($configuracion->columns as $field => $column) { ?>
 						<li>
+							<?php
+							foreach(array('format', 'sort', 'group') as $campo) {
+								if(!empty($column->$campo)) {
+							?>
+									<input name="<?php echo "data[{$reporte['tipo']}][$field][$campo]"; ?>" type="hidden" value="<?php echo $column->$campo; ?>" />
+							<?php
+								}
+							}?>
+							<?php if(!empty($column->extras)){ ?>
+								<input name="<?php echo "data[{$reporte['tipo']}][$field][extras]"; ?>" type="hidden" value='<?php echo json_encode($column->extras); ?>' />
+							<?php } ?>
+								
 							<input name="<?php echo "data[{$reporte['tipo']}][$field][order]"; ?>" type="hidden" class="sortable_item" />
-							<input name="<?php echo "data[{$reporte['tipo']}][$field][field]"; ?>" type="hidden" value="<?php echo $column->field; ?>" />
-							<input name="<?php echo "data[{$reporte['tipo']}][$field][format]"; ?>" type="hidden" value="<?php echo $column->format; ?>" />
 							<input name="<?php echo "data[{$reporte['tipo']}][$field][visible]"; ?>" type="checkbox" value="1" <?php echo $column->visible ? 'checked="checked"' : ''; ?> />
 							<input name="<?php echo "data[{$reporte['tipo']}][$field][title]"; ?>" type="text" value="<?php echo utf8_decode($column->title); ?>" />
 							<em style="font-size: 0.8em; cursor: move"><?php echo utf8_decode($configuracion_original->columns[$field]->title); ?></em>

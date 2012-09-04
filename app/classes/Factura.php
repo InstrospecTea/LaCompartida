@@ -1502,7 +1502,7 @@ class Factura extends Objeto {
 	/**
 	 * Descarga el reporte excel básico según configuraciones
 	 */
-	public function DownloadExcel($search_query) {
+	public function DownloadExcel($results) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		
 		$SimpleReport = new SimpleReport($this->sesion);
@@ -1516,14 +1516,193 @@ class Factura extends Objeto {
 			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
 		}
 		
-		$query = $search_query;
-		$statement = $this->sesion->pdodbh->prepare($query);
-		$statement->execute();
-		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);
 		
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
 		$writer->save(__('Facturas'));
+	}
+	
+	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
+		
+		if ($orden == "") {
+			$orden = "fecha DESC";
+		}
+
+		if ($where == '') {
+			$where = 1;
+			if ($numero != '') {
+				$where .= " AND numero*1 = $numero*1 ";
+			}
+			if ($fecha1 && $fecha2) {
+				$where .= " AND fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+			} else if ($fecha1) {
+				$where .= " AND fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
+			} else if ($fecha2) {
+				$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+			}
+			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+				$cliente = new Cliente($this->sesion);
+				$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
+				$codigo_cliente = $cliente->fields['codigo_cliente'];
+			}
+			if ($tipo_documento_legal_buscado) {
+				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+			}
+
+			if ($codigo_cliente) {
+				//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
+				$where .= " AND cobro.codigo_cliente='" . $codigo_cliente . "' ";
+			}
+			if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
+				$asunto = new Asunto($this->sesion);
+				$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
+				$id_contrato = $asunto->fields['id_contrato'];
+			}
+			if ($codigo_asunto) {
+				$asunto = new Asunto($this->sesion);
+				$asunto->LoadByCodigo($codigo_asunto);
+				$id_contrato = $asunto->fields['id_contrato'];
+			}
+			if ($id_contrato) {
+				$where .= " AND cobro.id_contrato=" . $id_contrato . " ";
+			}
+			if ($id_cia && ( method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza" )) {
+				$where .= " AND factura.id_cia = '$id_cia' ";
+			}
+			if ($id_cobro) {
+				$where .= " AND factura.id_cobro=" . $id_cobro . " ";
+			}
+			if ($id_estado) {
+				$where .= " AND factura.id_estado = " . $id_estado . " ";
+			}
+			if ($id_moneda) {
+				$where .= " AND factura.id_moneda = " . $id_moneda . " ";
+			}
+			if ($grupo_ventas) {
+				$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
+			}
+			if ($razon_social) {
+				$where .= " AND factura.cliente LIKE '%" . $razon_social . "%'";
+			}
+			if ($descripcion_factura) {
+				$where .= " AND (factura.descripcion LIKE '%" . $descripcion_factura . "%' OR factura.descripcion_subtotal_gastos LIKE '%" . $descripcion_factura . "%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%" . $descripcion_factura . "%')";
+			}
+			if (!empty($serie) && $serie != -1) {
+				$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
+			}
+			if (isset($desde_asiento_contable) && is_numeric($desde_asiento_contable)) {
+				$where .= " AND factura.asiento_contable >= $desde_asiento_contable";
+			}
+		} else {
+			$where = base64_decode($where);
+		}
+
+		return "SELECT SQL_CALC_FOUND_ROWS
+				prm_documento_legal.codigo as tipo
+			   , numero
+			   , factura.serie_documento_legal
+			   , factura.codigo_cliente 
+			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
+			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
+						OR contrato.factura_razon_social IN ('',' ')
+						OR contrato.factura_razon_social IS NULL,
+					factura.cliente,
+					CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
+				) as factura_rsocial
+			   , usuario.username AS encargado_comercial
+			   , fecha
+			   , usuario.username AS encargado_comercial
+			   , descripcion
+			   , prm_estado_factura.codigo as codigo_estado
+			   , prm_estado_factura.glosa as estado
+			   , factura.id_cobro
+			   , cobro.codigo_idioma as codigo_idioma
+			   , prm_moneda.simbolo
+			   , prm_moneda.cifras_decimales
+			   , prm_moneda.tipo_cambio
+			   , factura.id_moneda
+			   , factura.honorarios
+			   , factura.subtotal_gastos
+			   , factura.subtotal_gastos_sin_impuesto
+			   , factura.iva
+			   , total
+			   , '' as saldo_pagos
+			   , -cta_cte_fact_mvto.saldo as saldo
+			   , '' as monto_pagos_moneda_base
+			   , '' as saldo_moneda_base
+			   , factura.id_factura
+			   , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
+			   , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
+			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+		   FROM factura
+		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
+		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
+		   LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
+		   LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+		   LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
+		   LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
+		   LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
+		   LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
+		   LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
+		   LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+		   WHERE $where
+		   GROUP BY factura.id_factura";
+	}
+		
+	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
+		
+		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+		
+		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
+		$statement = $this->sesion->pdodbh->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		
+		foreach ($results as $key => $fila) {
+			//monto_real
+			$monto_real = $this->ObtenerValorReal($fila['id_factura']);
+			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
+			
+			//observaciones
+			$ids_doc = $this->ObtenerIdsDocumentos($fila['id_factura']);
+			$ids_doc_array = explode('||', $ids_doc);
+			$valores = array();
+			$comentarios = '';
+			if (true || $fila['total'] != $monto_real) {
+				foreach ($ids_doc_array as $par_cod_num) {
+					$documento = strtr($par_cod_num, '::', ' ');
+					if (strlen($documento) > 0) {
+						array_push($valores, $documento);
+					}
+				}
+				$comentarios = implode(', ', $valores);
+			}
+			$results[$key]['observaciones'] = $comentarios;
+			
+			//saldo pago, fecha ultimo pago
+			$query2 = "SELECT SUM(ccfmn.monto) as saldo_pagos, MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
+							FROM factura_pago AS fp
+							JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+							JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+							LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+							LEFT JOIN prm_moneda mo ON ccfm.id_moneda = mo.id_moneda
+							WHERE ccfm2.id_factura =  '" . $fila['id_factura'] . "' GROUP BY ccfm2.id_factura ";
+
+			$statement = $this->sesion->pdodbh->prepare($query2);
+			$statement->execute();
+			$pago = $statement->fetch(PDO::FETCH_ASSOC);
+			
+			$results[$key]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
+			$results[$key]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
+		}
+		
+		return $results;
 	}
 }
 

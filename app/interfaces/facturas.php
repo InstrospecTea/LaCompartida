@@ -64,138 +64,16 @@ $idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
-	if ($orden == "") {
-		$orden = "fecha DESC";
-	}
-
-	if ($where == '') {
-		$join = "";
-		$where = 1;
-		if ($numero != '') {
-			$where .= " AND numero*1 = $numero*1 ";
-		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
-			$where .= " AND fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
-		} else if ($fecha2) {
-			$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		}
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
-			$cliente = new Cliente($sesion);
-			$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
-			$codigo_cliente = $cliente->fields['codigo_cliente'];
-		}
-		if ($tipo_documento_legal_buscado) {
-			$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
-		}
-
-		if ($codigo_cliente) {
-			//$where .= " AND factura.codigo_cliente='".$codigo_cliente."' ";
-			$where .= " AND cobro.codigo_cliente='" . $codigo_cliente . "' ";
-		}
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
-			$asunto = new Asunto($sesion);
-			$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
-			$id_contrato = $asunto->fields['id_contrato'];
-		}
-		if ($codigo_asunto) {
-			$asunto = new Asunto($sesion);
-			$asunto->LoadByCodigo($codigo_asunto);
-			$id_contrato = $asunto->fields['id_contrato'];
-		}
-		if ($id_contrato) {
-			$where .= " AND cobro.id_contrato=" . $id_contrato . " ";
-		}
-		if ($id_cia && ( method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza" )) {
-			$where .= " AND factura.id_cia = '$id_cia' ";
-		}
-		if ($id_cobro) {
-			$where .= " AND factura.id_cobro=" . $id_cobro . " ";
-		}
-		if ($id_estado) {
-			$where .= " AND factura.id_estado = " . $id_estado . " ";
-		}
-		if ($id_moneda) {
-			$where .= " AND factura.id_moneda = " . $id_moneda . " ";
-		}
-		if ($grupo_ventas) {
-			$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
-		}
-		if ($razon_social) {
-			$where .= " AND factura.cliente LIKE '%" . $razon_social . "%'";
-		}
-		if ($descripcion_factura) {
-			$where .= " AND (factura.descripcion LIKE '%" . $descripcion_factura . "%' OR factura.descripcion_subtotal_gastos LIKE '%" . $descripcion_factura . "%' OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%" . $descripcion_factura . "%')";
-		}
-		if (!empty($serie) && $serie != -1) {
-			$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
-		}
-		if (isset($desde_asiento_contable) && is_numeric($desde_asiento_contable)) {
-			$where .= " AND factura.asiento_contable >= $desde_asiento_contable";
-		}
-	} else {
-		$where = base64_decode($where);
-	}
-
-	$query = "SELECT SQL_CALC_FOUND_ROWS
-									 prm_documento_legal.codigo as tipo
-								, numero
-								, factura.serie_documento_legal
-								, factura.codigo_cliente 
-								, cliente.glosa_cliente, contrato.id_contrato as idcontrato
-								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
-											factura.cliente,
-											IF( contrato.factura_razon_social IN ('',' '),
-													factura.cliente,
-													IF( contrato.factura_razon_social IS NULL,
-															factura.cliente,
-															CONCAT_WS(' ',factura.cliente,'(',contrato.factura_razon_social,')')
-														)
-												)
-										) as factura_rsocial
-								, fecha , usuario.username AS encargado_comercial
-								, fecha
-								, usuario.username AS encargado_comercial
-								, descripcion
-								, prm_estado_factura.codigo as estado
-								, factura.id_cobro
-								, cobro.codigo_idioma as codigo_idioma
-								, prm_moneda.simbolo
-								, prm_moneda.cifras_decimales
-								, prm_moneda.tipo_cambio
-								, factura.id_moneda
-								, factura.honorarios
-								, factura.subtotal_gastos
-								, factura.subtotal_gastos_sin_impuesto
-								, factura.iva
-								, total
-								, '' as saldo_pagos
-								, cta_cte_fact_mvto.saldo as saldo
-								, '' as monto_pagos_moneda_base
-								, '' as saldo_moneda_base
-								, factura.id_factura
-								, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-								, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-								, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-							FROM factura
-							JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-							JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
-							LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-							LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
-							LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-							LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-							LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-							LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
-							LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-							WHERE $where
-							GROUP BY factura.id_factura";
-
-	//echo $query;
-
 	if ($exportar_excel) {
-		$factura->DownloadExcel($query);
+		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
+			$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+			$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+		$factura->DownloadExcel($results);
+	}
+	else{
+		$query = $factura->QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
+			$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+			$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 	}
 }
 

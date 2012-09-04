@@ -90,7 +90,7 @@ class Asunto extends Objeto
 			"JOIN cliente USING(codigo_cliente) WHERE cliente.codigo_cliente_secundario = '$codigo_cliente'" :
 			"WHERE asunto.codigo_cliente = '$codigo_cliente'";
 		
-		$query = "SELECT TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
+		$query = "SELECT CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)), UNSIGNED INTEGER) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
 		if(empty($codigo)){

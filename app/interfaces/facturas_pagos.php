@@ -45,233 +45,21 @@ $idioma_default = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($Sesion, 'Idioma')));
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
-
-	if ($orden == '')
-		$orden = 'fp.fecha DESC';
-
-	if ($where == '') {
-		$join = '';
-		$where = 1;
-
-		/*
-		 * INICIO - obtener listado facturas con pago parcial o total
-		 */
-		$lista_facturas_con_pagos = '';
-		$where = 1;
-
-		if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-			if (isset($_REQUEST['id_concepto'])) {
-				$condiciones = "";
-				foreach ($_REQUEST['id_concepto'] as $key => $value) {
-					if (strlen($condiciones) > 0) {
-						$condiciones .= " OR ";
-					}
-					$condiciones .= " fp.id_concepto = '$value' ";
-				}
-				$where .= " AND ( $condiciones ) ";
-			}
-			if (isset($_REQUEST['id_banco'])) {
-				$condiciones = "";
-				foreach ($_REQUEST['id_banco'] as $key => $value) {
-					if (strlen($condiciones) > 0) {
-						$condiciones .= " OR ";
-					}
-					$condiciones .= " fp.id_banco = '$value' ";
-				}
-				$where .= " AND ( $condiciones ) ";
-			}
-			if (isset($_REQUEST['id_cuenta'])) {
-				$condiciones = "";
-				foreach ($_REQUEST['id_cuenta'] as $key => $value) {
-					if (strlen($condiciones) > 0) {
-						$condiciones .= " OR ";
-					}
-					$condiciones .= " fp.id_cuenta = '$value' ";
-				}
-				$where .= " AND ( $condiciones ) ";
-			}
-			if (isset($_REQUEST['id_estado'])) {
-				$condiciones = "";
-				foreach ($_REQUEST['id_estado'] as $key => $value) {
-					if (strlen($condiciones) > 0) {
-						$condiciones .= " OR ";
-					}
-					$condiciones .= " factura.id_estado = '$value' ";
-				}
-				$where .= " AND ( $condiciones ) ";
-			}
-		} else {
-			if ($id_concepto) {
-				$where .= " AND fp.id_concepto = '$id_concepto' ";
-			}
-			if ($id_banco) {
-				$where .= " AND fp.id_banco = '$id_banco' ";
-			}
-			if ($id_cuenta) {
-				$where .= " AND fp.id_cuenta = '$id_cuenta' ";
-			}
-			if ($id_estado) {
-				$where .= " AND factura.id_estado = '$id_estado' ";
-			}
-		}
-
-		if ($pago_retencion) {
-			$where .= " AND fp.pago_retencion = '$pago_retencion' ";
-		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND fp.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
-			$where .= " AND fp.fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
-		} else if ($fecha2) {
-			$where .= " AND fp.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		}
-
-		if (!empty($serie) && $serie != -1) {
-			$where .= " AND '$serie' LIKE CONCAT('%',factura.serie_documento_legal) ";
-		}
-		if ($numero != '')
-			$where .= " AND factura.numero*1 = $numero*1 ";
-
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
-			$cliente = new Cliente($Sesion);
-			$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
-			$codigo_cliente = $cliente->fields['codigo_cliente'];
-		}
-		if ($tipo_documento_legal_buscado)
-			$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
-
-		if ($codigo_cliente) {
-			$where .= " AND fp.codigo_cliente='$codigo_cliente' ";
-		}
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && $codigo_cliente_secundario) {
-			$asunto = new Asunto($Sesion);
-			$asunto->LoadByCodigoSecundario($codigo_cliente_secundario);
-			$id_contrato = $asunto->fields['id_contrato'];
-		}
-		if ($codigo_asunto) {
-			$asunto = new Asunto($Sesion);
-			$asunto->LoadByCodigo($codigo_asunto);
-			$id_contrato = $asunto->fields['id_contrato'];
-		}
-		if ($id_contrato) {
-			$where .= " AND cobro.id_contrato='$id_contrato' ";
-		}
-		if ($id_cobro) {
-			$where .= " AND factura.id_cobro='$id_cobro' ";
-		}
-		if ($id_estado) {
-			$where .= " AND factura.id_estado = '$id_estado' ";
-		}
-		if ($id_moneda) {
-			$where .= " AND fp.id_moneda = '$id_moneda' ";
-		}
-		if ($grupo_ventas) {
-			$where .= " AND prm_documento_legal.grupo = 'VENTAS' ";
-		}
-		if ($razon_social) {
-			$where .= " AND factura.cliente LIKE '%$razon_social%'";
-		}
-		if ($descripcion_factura) {
-			$where .= " AND (fp.descripcion LIKE '%$descripcion_factura%'";
-			$where .= " OR factura.descripcion_subtotal_gastos LIKE '%$descripcion_factura%' ";
-			$where .= " OR factura.descripcion_subtotal_gastos_sin_impuesto LIKE '%$descripcion_factura%')";
-		}
-	} else {
-		$where = base64_decode($where);
+	$FacturaPago = new FacturaPago($Sesion);
+	
+	if ($exportar_excel) {
+		$results = $FacturaPago->DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
+			$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas,
+			$razon_social, $descripcion_factura);
+		$FacturaPago->DownloadExcel($results);
 	}
-
-	$query = "SELECT SQL_CALC_FOUND_ROWS
-				  factura.id_factura
-				, factura.fecha as fecha_factura
-				, factura.id_moneda
-				, factura.honorarios
-				, factura.subtotal_gastos
-				, factura.subtotal_gastos_sin_impuesto
-				, factura.iva
-				, factura.total
-				, factura.id_factura
-				, factura.id_cobro
-				, factura.numero
-				, factura.serie_documento_legal
-				, factura.descripcion AS descripcion_factura
-				, factura.cliente as factura_razon_social
-				, fp.fecha as fecha_pago
-				, fp.descripcion as descripcion_pago
-				, fp.id_moneda AS id_moneda_factura_pago
-				, fp.codigo_cliente as cliente_pago
-				, fp.id_factura_pago
-				, prm_documento_legal.codigo as tipo
-				, factura.serie_documento_legal
-				, cliente.glosa_cliente
-				, prm_banco.nombre as nombre_banco 
-				, cuenta_banco.numero as numero_cuenta 
-				, co.glosa as concepto_pago
-				, usuario.username AS encargado_comercial
-				, prm_estado_factura.glosa as estado
-				, cobro.codigo_idioma as codigo_idioma
-				, moneda_factura.simbolo as simbolo_factura
-				, moneda_factura.cifras_decimales as cifras_decimales_factura
-				, moneda_factura.tipo_cambio as tipo_cambio_factura
-				, moneda_pago.simbolo as simbolo_pago
-				, moneda_pago.cifras_decimales as cifras_decimales_pago
-				, moneda_pago.tipo_cambio as tipo_cambio_pago
-				, -1 * ccfm2.saldo as saldo_factura
-				, ccfm.saldo as saldo_pago
-				, ccfm.monto_bruto as monto_pago
-				, -1 * ccfm2.monto_bruto as monto_factura
-				, ccfmn.monto AS monto_aporte
-				, contrato.codigo_idioma
-				, if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
-				, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
-				, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
-			FROM factura_pago AS fp
-			JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-			JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-			LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-			LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
-			LEFT JOIN prm_banco ON fp.id_banco = prm_banco.id_banco 
-			LEFT JOIN cuenta_banco ON fp.id_cuenta = cuenta_banco.id_cuenta 
-			LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-			left join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
-			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
-			LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
-			LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
-			LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
-			LEFT JOIN prm_moneda as moneda_factura ON moneda_factura.id_moneda=factura.id_moneda
-			LEFT JOIN prm_moneda as moneda_pago ON moneda_pago.id_moneda = fp.id_moneda
-			LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
-			LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
-			LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
-			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-			WHERE $where
-			GROUP BY fp.id_factura_pago";
-
-/*
-	{"order":1,"visible":true,"format":"text","field":"tipo","title":"Tipo"},
-	{"order":2,"visible":true,"format":"text","field":"numero","title":"N\u00b0 Documento"},
-	{"order":3,"visible":false,"format":"text","field":"serie_documento_legal","title":"Serie Documento"},
-  {"order":4,"visible":true,"format":"text","field":"cliente_pago","title":"C\u00f3digo Cliente"},
-  {"order":5,"visible":true,"format":"text","field":"glosa_cliente","title":"Cliente"},
-  {"order":6,"visible":false,"format":"text","field":"idcontrato","title":"Acuerdo Comercial"},
-  {"order":7,"visible":true,"format":"text","field":"factura_razon_social","title":"Raz\u00f3n Social"},
-  {"order":8,"visible":true,"format":"date","field":"fecha_factura","title":"Fecha Factura"},
-  {"order":9,"visible":true,"format":"text","field":"encargado_comercial","title":"Encargado Comercial"},
-  {"order":10,"visible":true,"format":"text","field":"estado","title":"Estado Documento"},
-  {"order":11,"visible":true,"format":"text","field":"id_cobro","title":"N\u00b0 Liquidaci\u00f3n"},
-  {"order":12,"visible":false,"format":"text","field":"codigo_idioma","title":"C\u00f3digo Idioma"},
-  {"order":13,"visible":true,"format":"text","field":"simbolo_factura","title":"S\u00edmbolo Moneda"},
-  {"order":14,"visible":false,"format":"text","field":"cifras_decimales_factura","title":"Cifras Decimales"},
-  {"order":15,"visible":true,"format":"number","field":"tipo_cambio_pago","title":"Tipo Cambio"},
-  {"order":16,"visible":true,"format":"number","field":"honorarios","title":"Honorarios"},
-  {"order":17,"visible":true,"format":"number","field":"subtotal_gastos","title":"Subtotal Gastos"},
-  {"order":18,"visible":true,"format":"number","field":"subtotal_gastos_sin_impuesto","title":"Subtotal Gastos sin impuesto"},
-  {"order":19,"visible":true,"format":"number","field":"iva","title":"IVA"},
-  {"order":20,"visible":true,"format":"number","field":"monto_factura","title":"Total Factura"},
-  {"order":21,"visible":true,"format":"number","field":"saldo","title":"Saldo Pagos"},
-  {"order":22,"visible":true,"format":"text","field":"codigos_asunto","title":"C\u00f3digos Asuntos"},
-  {"order":23,"visible":true,"format":"text","field":"glosas_asunto","title":"Asuntos"},
-  {"order":24,"visible":true,"format":"text","field":"descripcion_factura","title":"Descripci\u00f3n Factura"}
-*/	
+	
+	$query = $FacturaPago->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
+		$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
+		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas,
+		$razon_social, $descripcion_factura);
+	
 	$resp = mysql_query($query . ' LIMIT 0,12', $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
@@ -291,10 +79,6 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	// calcular el saldo en moneda base
 //echo $query;
 	
-	if ($exportar_excel) {
-		$FacturaPago = new FacturaPago($Sesion);
-		$FacturaPago->DownloadExcel($query);
-	}
 }
 
 $pagina->titulo = __('Revisar Pago de Documentos Tributarios');
