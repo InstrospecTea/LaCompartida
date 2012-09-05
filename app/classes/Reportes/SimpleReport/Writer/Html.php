@@ -112,7 +112,7 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 			$tds = '';
 			foreach ($columns as $col_idx => $column) {
 				if (in_array($column->format, $formatos_con_total) &&
-						(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
+					(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
 					$grupo_subtotal = isset($column->extras['subtotal']) && is_string($column->extras['subtotal']) ? $row[$column->extras['subtotal']] : '';
 					if (!isset($totals_rows[$grupo_subtotal])) {
 						$totals_rows[$grupo_subtotal] = array('row' => $row, 'totals' => array());
@@ -165,7 +165,37 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	}
 
 	private function td($row, $column) {
-		$valor = $row[$column->field];
+		$valor = '';
+		if (strpos($column->field, '=') !== 0) {
+			$valor = $row[$column->field];
+		} else {
+			//es una formula: reemplazar los nombres de campos por celdas
+			if (preg_match('/=(\w+)\((.+)\)/', $column->field, $matches)) {
+				switch ($matches[1]) {
+					case 'SUM':
+						$valor = 0;
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$valor += $row[trim($param, '%')];
+							} else if (is_numeric($param)) {
+								$valor += $param;
+							}
+						}
+					case 'CONCATENATE':
+						$params = explode(',', $matches[2]);
+						foreach ($params as $param) {
+							$param = trim($param);
+							if (strpos($param, '%') === 0) {
+								$valor .= $row[trim($param, '%')];
+							} else {
+								$valor .= trim($param, '"');
+							}
+						}
+				}
+			}
+		}
 
 		switch ($column->format) {
 			case 'text':

@@ -31,9 +31,11 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 	private $subtotals = array();
 	private $sum_subtotals = false;
 	private $autofilter = true;
+	private $col_letters = array();
 	public $formato_fecha = "%d/%m/%Y";
 
 	public function __construct(SimpleReport $simpleReport) {
+		ini_set('memory_limit', '1024M');
 		$this->SimpleReport = $simpleReport;
 		$this->xls = new PHPExcel();
 		$this->sheet = $this->xls->getActiveSheet();
@@ -115,8 +117,8 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 					}
 
 					$this->sheet
-							->getStyle("{$col}{$this->current_row}")
-							->applyFromArray($format);
+						->getStyle("{$col}{$this->current_row}")
+						->applyFromArray($format);
 				}
 			}
 		}
@@ -166,8 +168,8 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 				$format = SimpleReport_Writer_Excel_Format::$formats['text'];
 				$format['font'] = array('bold' => true);
 				$this->sheet
-						->getStyle("{$col_title}{$this->current_row}")
-						->applyFromArray($format);
+					->getStyle("{$col_title}{$this->current_row}")
+					->applyFromArray($format);
 				$this->current_row++;
 
 				//generar la(s) subtabla(s)
@@ -189,7 +191,7 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 
 		// Estilo de titulos
 		$this->sheet->getStyle("$col0_letter{$this->current_row}:{$col_letter}{$this->current_row}")
-				->applyFromArray(SimpleReport_Writer_Excel_Format::$formats['title']);
+			->applyFromArray(SimpleReport_Writer_Excel_Format::$formats['title']);
 
 		// 4.2 Body
 		$formatos_con_total = array('number', 'time');
@@ -199,7 +201,7 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 			$col_i = $col0;
 			foreach ($columns as $idx => $column) {
 				if (in_array($column->format, $formatos_con_total) &&
-						(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
+					(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
 					$grupo_subtotal = isset($column->extras['subtotal']) && is_string($column->extras['subtotal']) ? $row[$column->extras['subtotal']] : '';
 					if (!isset($totals_rows[$grupo_subtotal])) {
 						$totals_rows[$grupo_subtotal] = array('row' => $row, 'totals' => array());
@@ -250,8 +252,8 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 					}
 
 					$this->sheet
-							->getStyle("{$col_letter}{$this->current_row}")
-							->applyFromArray($format);
+						->getStyle("{$col_letter}{$this->current_row}")
+						->applyFromArray($format);
 
 					if (!isset($this->subtotals[$group][$col_letter])) {
 						if (!isset($this->subtotals[$group])) {
@@ -285,8 +287,8 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 			}
 
 			$this->sheet
-					->getStyle("{$col_letter}{$first_row}:{$col_letter}{$last_row}")
-					->applyFromArray($format);
+				->getStyle("{$col_letter}{$first_row}:{$col_letter}{$last_row}")
+				->applyFromArray($format);
 
 			$widths = array('number' => 20, 'date' => 15, 'text' => 25); // 1 == 9px
 			$width = isset($widths[$column->format]) ? $widths[$column->format] : 23;
@@ -308,30 +310,57 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 	}
 
 	private function cell($row, $column, $col_i) {
-		$value = $row[$column->field];
-		if ($column->format == 'text') {
-			$value = utf8_encode($value);
-
-			if (strpos($value, ";")) {
-				$value = str_replace(";", "\n", $value);
-
-				$this->sheet
-						->getStyleByColumnAndRow($col_i, $this->current_row)
-						->getAlignment()
-						->setWrapText(true);
-			}
-		} else if ($column->format == 'number' && isset($column->extras['symbol'])) {
+		if ($column->format == 'number' && isset($column->extras['symbol'])) {
 			$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
-			if(ord($symbol) == 128){
+			if (ord($symbol) == 128) {
 				$symbol = 'EUR';
 			}
 
 			$this->sheet
-					->getStyleByColumnAndRow($col_i, $this->current_row)
-					->getNumberFormat()
-					->setFormatCode(utf8_encode("\"$symbol\" #,##0.00"));
-		} else if ($column->format == 'date') {
-			$value = Utiles::sql2fecha($value, $this->formato_fecha);
+				->getStyleByColumnAndRow($col_i, $this->current_row)
+				->getNumberFormat()
+				->setFormatCode(utf8_encode("\"$symbol\" #,##0.00"));
+		}
+
+		if (!isset($this->col_letters[$column->field])) {
+			$this->col_letters[$column->field] = PHPExcel_Cell::stringFromColumnIndex($col_i);
+		}
+
+		$value = '';
+		if (strpos($column->field, '=') !== 0) {
+			$value = $row[$column->field];
+			if ($column->format == 'text') {
+				//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
+				$value = utf8_encode($value);
+
+				if (strpos($value, ";")) {
+					$value = str_replace(";", "\n", $value);
+
+					$this->sheet
+						->getStyleByColumnAndRow($col_i, $this->current_row)
+						->getAlignment()
+						->setWrapText(true);
+				}
+			} else if ($column->format == 'date') {
+				//las fechas llegan en formato SQL, pasarlas a formato excel
+				$value = Utiles::sql2fecha($value, $this->formato_fecha);
+			}
+		} else {
+			//es una formula: reemplazar los nombres de campos por celdas
+			$value = $column->field;
+			if (preg_match_all('/%(\w+)%/', $value, $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					$param = $match[1];
+					if (isset($this->col_letters[$match[1]])) {
+						$param = $this->col_letters[$match[1]] . $this->current_row;
+					} else if (isset($row[$param])) {
+						$param = '"' . $row[$param] . '"';
+					} else if (strpos($param, '"') !== 0) {
+						$param = '"' . $param . '"';
+					}
+					$value = str_replace($match[0], $param, $value);
+				}
+			}
 		}
 
 		$this->sheet->setCellValueByColumnAndRow($col_i, $this->current_row, $value);
