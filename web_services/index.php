@@ -15,7 +15,7 @@ header('Access-Control-Max-Age: 3628800');
 header('Access-Control-Allow-Methods: GET, POST');
 
  
-//require_once dirname(__FILE__).'/Slim/Slim.php';
+if(!class_exists('Slim')) require_once dirname(__FILE__).'/Slim/Slim.php';
 $Slim=new Slim();
 $Slim->config('debug', true);
 
