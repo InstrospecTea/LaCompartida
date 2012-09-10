@@ -100,9 +100,10 @@
 				case 'fecha_mes':			$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_ano_ultima_cifra':		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
+                                case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
-				case 'comuna':			$glosa_dato = $factura->fields['comuna_cliente']; break;
-				case 'ciudad':			$glosa_dato = $factura->fields['ciudad_cliente']; break;
+				case 'comuna':                          $glosa_dato = $factura->fields['comuna_cliente']; break;
+				case 'ciudad':                          $glosa_dato = $factura->fields['ciudad_cliente']; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
 				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
 				case 'descripcion_gastos_sin_iva':	$glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto']; break;
@@ -118,10 +119,10 @@
 				case 'moneda_iva': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_total': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'monto_subtotal': 			$glosa_dato = number_format( 
-												$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-												$idioma->fields['separador_decimales'],
-												$idioma->fields['separador_decimales']); break;
+                                                                        $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+                                                                        $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+                                                                        $idioma->fields['separador_decimales'],
+                                                                        $idioma->fields['separador_decimales']); break;
 				case 'monto_iva': 			$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 				case 'monto_total':			$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			}
@@ -150,12 +151,13 @@
 				$fila['razon_social']= $factura->fields['cliente']; 
 				$fila[ 'rut']= 				$factura->fields['RUT_cliente'];
 				$fila[ 'telefono']=  $contrato->fields['factura_telefono']; 
-			$fila[ 'comuna']=	 		  $factura->fields['comuna_cliente']; 
-			$fila[ 'ciudad']=	 		  $factura->fields['ciudad_cliente'];  
+                                $fila[ 'comuna']=	 		  $factura->fields['comuna_cliente']; 
+                                $fila[ 'ciudad']=	 		  $factura->fields['ciudad_cliente'];
                                 $fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
-				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1); 
+				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1);
+                                $fila[ 'fecha_ano_dos_ultimas_cifras']=		substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 				$fila[ 'direccion']=			$factura->fields['direccion_cliente']; 
 				$fila[ 'descripcion_honorarios']=		$factura->fields['descripcion']; 
 				$fila[ 'descripcion_gastos_con_iva']= 	$factura->fields['descripcion_subtotal_gastos']; 

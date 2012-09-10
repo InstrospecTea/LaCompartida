@@ -238,7 +238,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 	$SimpleReport->LoadResults($results);
 
 	if ($_REQUEST['opcion'] == 'xls') {
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save('Reporte_saldo');
 	}
 }

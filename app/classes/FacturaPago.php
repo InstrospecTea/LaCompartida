@@ -406,7 +406,7 @@ class FacturaPago extends Objeto
 		
 		$SimpleReport->LoadResults($results);
 		
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Facturas_Pagos'));
 	}
 	

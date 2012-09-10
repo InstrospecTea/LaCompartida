@@ -169,7 +169,7 @@ class Gasto extends Objeto {
 		$results = $this->sesion->pdodbh->query($search_query)->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);
 		
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Gastos'));
 	}
 }

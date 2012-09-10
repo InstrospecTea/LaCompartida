@@ -209,7 +209,16 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 					if (!isset($totals_rows[$grupo_subtotal]['totals'][$idx])) {
 						$totals_rows[$grupo_subtotal]['totals'][$idx] = array();
 					}
-					$totals_rows[$grupo_subtotal]['totals'][$idx][] = PHPExcel_Cell::stringFromColumnIndex($col_i) . $this->current_row;
+					
+					//si el anterior era del mismo grupo, me agrego al rango
+					$cell = PHPExcel_Cell::stringFromColumnIndex($col_i) . $this->current_row;
+					if (isset($totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1])) {
+						list($last_cell) = explode(':', $totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1]);
+						$totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row] = "$last_cell:$cell";
+						unset($totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1]);
+					} else {
+						$totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row] = $cell;
+					}
 				}
 
 				if (isset($column->extras['groupinline'])) {

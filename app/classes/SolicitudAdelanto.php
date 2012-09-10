@@ -356,7 +356,7 @@ BODY;
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);
 
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save('Solicitudes_Adelanto');
 	}
 

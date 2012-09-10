@@ -190,7 +190,7 @@ if ($opc == 'buscar') {
 	if ($exportar_excel) {
 
 		$search_query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE
-				DATE_FORMAT(cta_corriente.fecha, '%d-%m-%Y') AS fecha,
+				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
 				cta_corriente.codigo_cliente,
 				cliente.glosa_cliente,
 				asunto.codigo_asunto,

@@ -2,42 +2,322 @@
 
 class ReporteContrato extends Contrato
 {
-	//Etapa actual del proyecto
-	var $etapa = null;
-	//Primera etapa del proyecto
-	var $primera_etapa = null;
-
-        var $listacontratos=array();
-        var $arraygastos=array();
-        var $arrayultimocobro=array();
+ 	var $etapa = null;
+ 	var $primera_etapa = null;
+    var $listacontratos=array();
+    var $arraygastos=array();
+    var $arrayultimocobro=array();
 	var $monto = null;
-        var $asuntosporfacturar=0;
-        var $horasporfacturar=0;
-        var $MHHXYA=array();
-        var $MHHXYC=array();
-        var $arraymonto=array();
-        var $arraygasto=array();
-	 var $arrayolap=array();
-        var $fechaultimogasto=null;
-        var $fechaultimotrabajo=null;
-        var $tiempos=array();
-        var $factor=1;
+    var $asuntosporfacturar=0;
+    var $horasporfacturar=0;
+    var $MHHXYA=array();
+	var $MHHXYC=array();
+    var $arraymonto=array();
+    var $arraygasto=array();
+	var $arrayolap=array();
+    var $fechaultimogasto=null;
+    var $fechaultimotrabajo=null;
+    var $tiempos=array();
+    var $factor=1;
 	var $emitido=1;
 	var $separar_asuntos=0;
 	var $fecha_ini='';
 	var $fecha_fin='';
-	function __construct($sesion, $emitido = true, $separar_asuntos=0, $fecha_ini = '', $fecha_fin = '')
+	protected $InsertOlapStatement=null;
+	var $AtacheSecundarioSoloAsunto=0;
+	
+	function __construct($sesion, $emitido = true, $separar_asuntos=0, $fecha_ini = '', $fecha_fin = '',$AtacheSecundarioSoloAsunto=0)
 	{
+		$this->emitido=$emitido;
+		$this->separar_asuntos=$separar_asuntos;
+		$this->fecha_ini=$fecha_ini;
+		$this->fecha_fin=$fecha_fin;
 		$this->tabla = "contrato";
 		$this->campo_id = "id_contrato";
 		$this->sesion = $sesion;
 		$this->separar_asuntos=$separar_asuntos;
-		$this->ArrayOlap($emitido, $separar_asuntos, $fecha_ini, $fecha_fin);
-		$this->UltimosCobros($separar_asuntos);
-				$this->Descuentos($separar_asuntos);
+		$this->AtacheSecundarioSoloAsunto=$AtacheSecundarioSoloAsunto;
+		
+		$queryinsert = "REPLACE DELAYED INTO olap_liquidaciones (
+						SELECT
+							asunto.codigo_asunto AS codigos_asuntos,
+							asunto.codigo_asunto_secundario, 
+							contrato.id_usuario_responsable,
+							asunto.glosa_asunto as asuntos,
+							(asunto.cobrable+1) as asuntos_cobrables,
+							cliente.id_cliente,
+							cliente.codigo_cliente_secundario, 
+							cliente.glosa_cliente,
+							cliente.fecha_creacion,
+							cliente.id_cliente_referencia,
+							CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) AS nombre_encargado_comercial,
+							ec.username AS username_encargado_comercial,
+							CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) AS nombre_encargado_secundario,
+							es.username AS username_encargado_secundario,
+							contrato.id_contrato,
+							contrato.monto, 
+							contrato.forma_cobro,
+							contrato.retainer_horas,
+							contrato.id_moneda as id_moneda_contrato,
+							contrato.opc_moneda_total as id_moneda_total,
+							movs.*,
+							0
+						FROM  asunto 
+						JOIN contrato USING(id_contrato)
+						JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+						JOIN (
+								SELECT 
+									'TRB' AS tipo,
+									10000000 + tr.id_trabajo AS id_unico,
+									tr.id_trabajo,
+									tr.id_usuario,
+									tr.codigo_asunto,
+									tr.cobrable,
+									2 AS incluir_en_cobro, 
+									TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_segs,
+									0 AS monto_cobrable,
+									TIME_TO_SEC(duracion_cobrada) * tarifa_hh AS monto_thh, 
+									TIME_TO_SEC(duracion_cobrada) * tarifa_hh_estandar AS monto_thh_estandar,
+									tr.id_moneda,
+									tr.fecha,
+									tr.id_cobro,
+									tr.estadocobro,
+									fecha_modificacion 
+								FROM
+									trabajo tr 
+								WHERE
+									fecha_touch >= :maxolaptime 
 
+							UNION ALL
+
+								SELECT
+									'GAS' AS tipo, 
+									20000000 + cc.id_movimiento AS id_unico,
+									cc.id_movimiento,
+									cc.id_usuario_orden, 
+									cc.codigo_asunto,
+									cc.cobrable,
+									IF( cc.incluir_en_cobro = 'SI', 2, 1) AS incluir_en_cobro,
+									0 AS duracion_cobrada_segs,
+									IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable,
+									0 as monto_thh, 
+									0 as monto_thh_estandar, 
+									cc.id_moneda, 
+									cc.fecha, 
+									cc.id_cobro,
+									cc.estadocobro,
+									fecha_modificacion 
+								FROM
+									cta_corriente cc 
+								WHERE 
+									cc.codigo_asunto IS NOT NULL 
+									AND fecha_touch >= :maxolaptime
+
+							UNION ALL
+
+								SELECT
+									'TRA' as tipo,
+									30000000 + tram.id_tramite AS id_unico,
+									tram.id_tramite,
+									tram.id_usuario, 
+									tram.codigo_asunto, 
+									tram.cobrable,  
+									2 AS incluir_en_cobro, 
+									TIME_TO_SEC(duracion) AS duracion_cobrada_segs,
+									tram.tarifa_tramite, 
+									0 as monto_thh, 
+									0 as monto_thh_estandar,
+									tram.id_moneda_tramite,  
+									tram.fecha,
+									tram.id_cobro, 
+									tram.estadocobro,
+									fecha_modificacion 
+								FROM 
+									tramite tram 
+								WHERE
+									fecha_touch >= :maxolaptime
+							) movs ON movs.codigo_asunto = asunto.codigo_asunto
+							LEFT JOIN usuario AS ec ON ec.id_usuario = contrato.id_usuario_responsable ";
+		
+		if ($AtacheSecundarioSoloAsunto) {
+			$queryinsert.=" LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado) ";
+		} else {
+			$queryinsert.=" LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario) ";
+		}
+ 
+		
+		$this->InsertOlapStatement=$this->sesion->pdodbh->prepare($queryinsert);
+		
+		
+		
+		
 	}
+	
+	 function FillArrays() {
+		
+		$this->ArrayOlap($this->emitido, $this->separar_asuntos, $this->fecha_ini, $this->fecha_fin);
+		$this->UltimosCobros($this->separar_asuntos);
+		$this->Descuentos($this->separar_asuntos);
+	}
+	
+	function QueriesPrevias() {
+		
+		
+	
+	$updateestado = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
+	$updateestado .= "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
+	$updateestado .= "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+	 $this->sesion->pdodbh->exec($updateestado);
 
+
+	 
+
+		//Si tengo un dato en el olap y no está en las 3 tablas de origen, significa que fue eliminado, pero no lo borro sino que le pongo flag eliminado.
+		$updateeliminado = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null;";
+		$updateeliminado .= "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null;";
+		$updateeliminado .= "update olap_liquidaciones ol left join tramite tra on ol.id_entry=tra.id_tramite  set ol.eliminado=1 where ol.tipo='TRA' and tra.id_tramite  is null;";
+		$this->sesion->pdodbh->exec($updateeliminado);
+		
+	}
+	
+	function InsertQuery($maxolaptime) {
+		try {
+		$this->InsertOlapStatement->execute(array(
+			':maxolaptime'=>$maxolaptime, 
+			));
+		} catch (PDOException $e) {
+			debug($e->getMessage());
+			debug($e->getTraceAsString());
+		}
+	}
+	
+	function MissingEntriesQuery() {
+		
+		 
+		
+			$missingquery ="create temporary table missing_cta_corriente as 
+						   SELECT cc.* FROM cta_corriente cc 
+						   left join `olap_liquidaciones` ol on ol.id_unico=20000000+cc.id_movimiento and ol.tipo='GAS' 
+						   where ol.id_unico is null;";
+			$missingquery.="create temporary table missing_trabajo as 
+						   SELECT tr.* FROM trabajo tr 
+						   left join `olap_liquidaciones` ol on ol.id_unico=10000000+tr.id_trabajo and ol.tipo='TRB' 
+						   where ol.id_unico is null;";
+			$missingquery.="create temporary table missing_tramite as 
+						   SELECT tram.* FROM tramite tram 
+						   left join `olap_liquidaciones` ol on ol.id_unico=30000000+tram.id_tramite and ol.tipo='TRA' 
+						   where ol.id_unico is null;";
+			
+			$missingquery .= "REPLACE DELAYED INTO olap_liquidaciones (
+						SELECT
+							asunto.codigo_asunto AS codigos_asuntos,
+							asunto.codigo_asunto_secundario, 
+							contrato.id_usuario_responsable,
+							asunto.glosa_asunto as asuntos,
+							(asunto.cobrable+1) as asuntos_cobrables,
+							cliente.id_cliente,
+							cliente.codigo_cliente_secundario, 
+							cliente.glosa_cliente,
+							cliente.fecha_creacion,
+							cliente.id_cliente_referencia,
+							CONCAT_WS( ec.nombre, ec.apellido1, ec.apellido2 ) AS nombre_encargado_comercial,
+							ec.username AS username_encargado_comercial,
+							CONCAT_WS( es.nombre, es.apellido1, es.apellido2 ) AS nombre_encargado_secundario,
+							es.username AS username_encargado_secundario,
+							contrato.id_contrato,
+							contrato.monto, 
+							contrato.forma_cobro,
+							contrato.retainer_horas,
+							contrato.id_moneda as id_moneda_contrato,
+							contrato.opc_moneda_total as id_moneda_total,
+							movs.*,
+							0
+						FROM  asunto 
+						JOIN contrato USING(id_contrato)
+						JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+						JOIN (
+								SELECT 
+									'TRB' AS tipo,
+									10000000 + tr.id_trabajo AS id_unico,
+									tr.id_trabajo,
+									tr.id_usuario,
+									tr.codigo_asunto,
+									tr.cobrable,
+									2 AS incluir_en_cobro, 
+									TIME_TO_SEC(duracion_cobrada) AS duracion_cobrada_segs,
+									0 AS monto_cobrable,
+									TIME_TO_SEC(duracion_cobrada) * tarifa_hh AS monto_thh, 
+									TIME_TO_SEC(duracion_cobrada) * tarifa_hh_estandar AS monto_thh_estandar,
+									tr.id_moneda,
+									tr.fecha,
+									tr.id_cobro,
+									tr.estadocobro,
+									fecha_modificacion 
+								FROM
+									missing_trabajo tr 
+								 
+
+							UNION ALL
+
+								SELECT
+									'GAS' AS tipo, 
+									20000000 + cc.id_movimiento AS id_unico,
+									cc.id_movimiento,
+									cc.id_usuario_orden, 
+									cc.codigo_asunto,
+									cc.cobrable,
+									IF( cc.incluir_en_cobro = 'SI', 2, 1) AS incluir_en_cobro,
+									0 AS duracion_cobrada_segs,
+									IF( ISNULL( cc.egreso ) , -1, 1 ) * cc.monto_cobrable,
+									0 as monto_thh, 
+									0 as monto_thh_estandar, 
+									cc.id_moneda, 
+									cc.fecha, 
+									cc.id_cobro,
+									cc.estadocobro,
+									fecha_modificacion 
+								FROM
+									missing_cta_corriente cc 
+								WHERE 
+									cc.codigo_asunto IS NOT NULL 
+									 
+
+							UNION ALL
+
+								SELECT
+									'TRA' as tipo,
+									30000000 + tram.id_tramite AS id_unico,
+									tram.id_tramite,
+									tram.id_usuario, 
+									tram.codigo_asunto, 
+									tram.cobrable,  
+									2 AS incluir_en_cobro, 
+									TIME_TO_SEC(duracion) AS duracion_cobrada_segs,
+									tram.tarifa_tramite, 
+									0 as monto_thh, 
+									0 as monto_thh_estandar,
+									tram.id_moneda_tramite,  
+									tram.fecha,
+									tram.id_cobro, 
+									tram.estadocobro,
+									fecha_modificacion 
+								FROM 
+									missing_tramite tram 
+								 
+							) movs ON movs.codigo_asunto = asunto.codigo_asunto
+							LEFT JOIN usuario AS ec ON ec.id_usuario = contrato.id_usuario_responsable ";
+		
+		if ($this->AtacheSecundarioSoloAsunto) {
+			$missingquery.=" LEFT JOIN usuario as es ON es.id_usuario = asunto.id_encargado); ";
+		} else {
+			$missingquery.=" LEFT JOIN usuario as es ON es.id_usuario = contrato.id_usuario_secundario); ";
+		}
+			debug($missingquery);
+			$this->sesion->pdodbh->exec($missingquery);
+			 
+
+		
+	}
 	/*
 	Setea 1 el valor de incluir en cierre
 	*/
@@ -68,11 +348,11 @@ class ReporteContrato extends Contrato
             else:
                 $this->MHHXYA=$this->MontoHHTarifaSTD2( $emitido, $codigo_asunto, $fecha1, $fecha2 ); // monto hh del asunto y sus monedas
             endif;
-            if($this->fields['forma_cobro']=='CAP'  || $this->MHHXYC[0] <= 0): // solamente necesito calcular la cantidad de asuntos por facturar si es un contrato CAP o si el monto hh del contrato viene vacio
+            if($this->fields['forma_cobro']=='CAP'  || $this->MHHXYC[0] <= 0) { // solamente necesito calcular la cantidad de asuntos por facturar si es un contrato CAP o si el monto hh del contrato viene vacio
                 $this->asuntosporfacturar= $this->CantidadAsuntosPorFacturar2( $fecha1, $fecha2 );
-            else:
+			}  else { 
                  $this->asuntosporfacturar= 1;
-            endif;
+			}  
 			    if (!$this->separar_asuntos) {
 				$this->factor =1;
 			    } elseif( $this->MHHXYC[0] > 0 ) {
@@ -83,9 +363,7 @@ class ReporteContrato extends Contrato
                             }
 
             $this->arraymonto=$this->TotalMonto2($emitido, $codigo_asunto, $fecha1,$fecha2);
-           // $this->tiempos[4]=microtime(true);
-         //   $this->arraygasto=$this->MontoGastos2($emitido, $codigo_asunto, $fecha1,$fecha2);
-          //  $this->tiempos[5]=microtime(true);
+          
         }
 	
 	function LoadByCodigoAsunto( $codigo_asunto )

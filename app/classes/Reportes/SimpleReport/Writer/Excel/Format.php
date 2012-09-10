@@ -72,7 +72,7 @@ class SimpleReport_Writer_Excel_Format extends SimpleReport_Configuration_Format
 			'fill' => array(
 				'type' => PHPExcel_Style_Fill::FILL_SOLID,
 				'color' => array(
-					'rgb' => '9BBB59'
+					'rgb' => 'DCFFDC'//'9BBB59'
 				)
 			),
 			'borders' => array(
