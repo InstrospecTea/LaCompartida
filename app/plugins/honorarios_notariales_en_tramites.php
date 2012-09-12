@@ -13,7 +13,7 @@ $Slim->hook('hook_factura_javascript_after', 'Honorarios_Notariales_Js_Footer_Li
 
 
 function Honorarios_Notariales_Js_Footer_Light() {
-	global $trabajos_disponibles, $tramites_disponibles,$honorario,$monto_honorario;
+	global $trabajos_disponibles, $tramites_disponibles,$honorario,$monto_honorario,$_LANG;
 	$monto_trabajo=(isset($honorario) ? $honorario : $monto_honorario) - $tramites_disponibles;
 	$boton_tramites='<a style=\"margin:2px;\" class=\"btn botonizame\"  alt=\"'.floatval($tramites_disponibles) .'\" icon=\"ui-icon-invoice\" rel=\"'.__('Trámites').'\" id=\"facturar_tramites\" setwidth=\"250\" >'.  __('Facturar '. __('Trámites')) .'</a><br/>';
 	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($monto_trabajo).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios legales').'\"  id=\"facturar_trabajos\"   setwidth=\"250\"  >'.  __('Facturar '. __('Honorarios Legales')) .'</a>';
@@ -45,7 +45,7 @@ function Honorarios_Notariales_Js_Footer_Light() {
 
 function Honorarios_Notariales_Js_Footer() {
 	
-global $simbolo, $impuesto,$honorario,$monto_honorario, $descripcion_tramites, $subtotal_tramites, $simbolo;
+global $simbolo, $impuesto,$honorario,$monto_honorario, $descripcion_tramites, $subtotal_tramites, $simbolo,$_LANG;
 $subtotal_tramites=intval($subtotal_tramites);
 if (empty($honorario)) $honorario= $monto_honorario;
 $monto_trabajo=$honorario- $monto_tramite;
@@ -87,7 +87,7 @@ $textonotarial.= '</tr>';
 
 function Honorarios_Notariales_En_Tramites() {
  
-	global $sesion, $factura,$subtotal_tramites,$descripcion_tramites;
+	global $sesion, $factura,$subtotal_tramites,$descripcion_tramites,$_LANG;
  
 	if(!UtilesApp::ExisteCampo( 'subtotal_tramites','factura',$sesion)) {
 	$sesion->pdodbh->exec("ALTER TABLE  `factura` ADD    `subtotal_tramites` DOUBLE NOT NULL DEFAULT  '0' COMMENT ' Es un valor ADICIONAL al monto de honorarios, la diferencia entre  ambos da el monto de trabajos que no son trámite ' ");	
