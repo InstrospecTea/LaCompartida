@@ -87,6 +87,9 @@ if ($id_documento) {
 	}
 }
 
+	 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false; 
+
+
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario != '') {
 	$cliente = new Cliente($sesion);
 	$codigo_cliente = $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario);
