@@ -9271,7 +9271,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 			if (!ExisteLlaveForanea('documento', 'id_usuario_ingresa', 'usuario', 'id_usuario', $dbh))
 				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT  FOREIGN KEY (`id_usuario_ingresa`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
-			if (!ExisteLlaveForanea('documento', 'id_usuario_orden', 'usuario', 'id_usuario_ingresa', $dbh))
+			if (!ExisteLlaveForanea('documento', 'id_usuario_orden', 'usuario', 'id_usuario', $dbh))
 				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT   FOREIGN KEY (`id_usuario_orden`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
 
 			ejecutar($query, $dbh);
