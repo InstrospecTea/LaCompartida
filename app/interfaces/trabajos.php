@@ -731,61 +731,34 @@ if ($motivo != "cobros") {
 						<td align=right><?php echo __('Nombre Cliente') ?></td>
 						<td nowrap align='left' colspan="2">
 							<?php
-							if ($motivo != "cobros") {
-								if ($p_revisor->fields['permitido']) {
-									?>
-									<tr>
-										<td align=right><?php echo __('Cobrado') ?></td>
-										<td align='left'>
-											<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", $cobrado, '', 'Todos', '60') ?>
-											<?php echo __('Cobrable') ?> <?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, '', 'Todos', '60') ?>
-											<?php echo __('Revisado') ?> <?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "revisado", $revisado, '', 'Todos', '60') ?>
-										</td>
-										<td style="text-align:right;">
-											<?php
-											if ($motivo == 'horas') {
-												echo '&nbsp;<div style="float:left;text-align:left;width:60px;">' . __('Cobro') . " &nbsp;&nbsp;</div><input id='id_cobro' type='text' style='float:left;width:80px;' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
-											} else {
-												echo "<input type='hidden' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
-											}
-											?>
-										</td>
-									</tr>
-									<?php
+							if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
+								if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+									echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
+								} else {
+									echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
 								}
-								?>
-								<tr>
-									<td align=right><?php echo __('Nombre Cliente') ?></td>
-									<td nowrap align='left' colspan="2">
-										<?php
-										if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-											if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-												echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-											} else {
-												echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-											}
-										} else {
-											if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-												echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto);
-											} else {
-												echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
-											}
-										}
-										?>
-									</td>
-								</tr>
-								<tr>
-									<td align=right><?php echo __('Asunto') ?></td>
-									<td nowrap align='left' colspan="2">
-										<?php
-										if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-											echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
-										} else {
-											echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
-										}
-										?>
-									</td>
-								</tr>
+							} else {
+								if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+									echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos',1);", 320, $codigo_asunto);
+								} else {
+									echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
+								}
+							}
+							?>
+						</td>
+					</tr>
+							<tr>
+								<td align=right><?php echo __('Asunto') ?></td>
+								<td nowrap align='left' colspan="2">
+									<?php
+									if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+										echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
+									} else {
+										echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente);
+									}
+									?>
+								</td>
+							</tr>
 								<?php if (UtilesApp::GetConf($sesion, 'UsoActividades')) { ?>
 									<tr>
 										<td align=right><?php echo __('Actividad') ?></td>
