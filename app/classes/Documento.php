@@ -170,6 +170,8 @@ class Documento extends Objeto {
 			$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
 			$this->Edit("id_contrato", empty($id_contrato) ? 'NULL' : $id_contrato);
 			$this->Edit('id_solicitud_adelanto', $id_solicitud_adelanto);
+			$this->Edit('id_usuario_orden', $id_usuario_orden);
+			$this->Edit('id_usuario_ingresa', $id_usuario_ingresa);
 
 			if ($this->Write()) {
 
