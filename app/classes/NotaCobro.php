@@ -9188,7 +9188,8 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%direccion%', __('Dirección'), $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_direccion%', $contrato->fields['factura_direccion'], $htmlplantilla);
 		$htmlplantilla = str_replace('%valor_direccion_uc%', ucwords(strtolower($contrato->fields['factura_direccion'])), $htmlplantilla);
-		$htmlplantilla = str_replace('%direccion_carta%', nl2br($contrato->fields['direccion_contacto']), $htmlplantilla);
+		$direccion=explode('//',$contrato->fields['direccion_contacto']);
+		$htmlplantilla = str_replace('%direccion_carta%', nl2br($direccion[0]), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut%', __('RUT'), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut_minuscula%', __('Rut'), $htmlplantilla);
 		if ($contrato->fields['rut'] != '0' || $contrato->fields['rut'] != '')

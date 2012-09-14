@@ -107,11 +107,11 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 				$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
 			if($id_usuario_orden)
 				$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-			if(isset($cobrable))
+			if(isset($cobrable) && $cobrable!='' )
 				$where .= " AND cta_corriente.cobrable =$cobrable";
 			if($id_usuario_responsable)
 				$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-			if(isset($id_tipo))
+			if(isset($id_tipo) and $id_tipo!='')
 				$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 			if($clientes_activos == 'activos')
 				$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
@@ -148,7 +148,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		$cobrosnoeditables=array(); 
 		if($_GET['totalctacorriente']) {
 				echo '<b>'.__('Balance cuenta gastos').': '. UtilesApp::GetSimboloMonedaBase($sesion) . " "   ; 
-				echo number_format(UtilesApp::TotalCuentaCorriente($sesion, $where),0,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles']).'</b>';
+				echo number_format(UtilesApp::TotalCuentaCorriente($sesion, $where,$cobrable),0,$idioma_default->fields['separador_decimales'],$idioma_default->fields['separador_miles']).'</b>';
 			if($codigo_cliente_secundario || $codigo_cliente) {
 				echo '<input type="hidden" id="codcliente" name="codcliente" value="1"/>';
 			} else {

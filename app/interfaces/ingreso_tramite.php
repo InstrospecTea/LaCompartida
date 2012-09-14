@@ -1540,7 +1540,7 @@ if (UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
 	echo "CargaIdioma('" . $t->fields['codigo_asunto'] . "');";
 }
 ?>
- 
+CargarMonedaContrato();
 </script>
 
 <?php

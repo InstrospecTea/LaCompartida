@@ -421,21 +421,23 @@ if ($xls) {
 
 	$querycobros.=" 
 							WHERE $where
-								AND ( ( SELECT count(*)
-													FROM trabajo
-										 LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
-										 		 WHERE trabajo.codigo_asunto = asunto.codigo_asunto
-										 		 	 AND trabajo.cobrable = 1
-										 		 	 AND trabajo.id_tramite = 0
-										 		 	 AND trabajo.duracion_cobrada != '00:00:00'
-										 		 	 AND $where_trabajo ) > 0
-										OR ( SELECT count(*)
-														FROM cta_corriente
-											LEFT JOIN cobro ON cobro.id_cobro = cta_corriente.id_cobro
-													WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
-														AND cta_corriente.cobrable = 1
-                                                                                                                AND cta_corriente.monto_cobrable > 0 
-														AND $where_gasto ) > 0 )
+								AND (
+									( SELECT count(*)
+										FROM trabajo
+										 WHERE trabajo.codigo_asunto = asunto.codigo_asunto
+											AND trabajo.cobrable = 1
+											AND trabajo.id_tramite = 0
+											AND trabajo.duracion_cobrada != '00:00:00'
+											AND $where_trabajo
+									) > 0
+									OR ( SELECT count(*)
+										FROM cta_corriente
+										WHERE cta_corriente.codigo_asunto = asunto.codigo_asunto
+											AND cta_corriente.cobrable = 1
+											AND cta_corriente.monto_cobrable > 0
+											AND $where_gasto
+									) > 0
+								)
 							GROUP BY $group_by ";
 
 	$fila_inicial = $filas + 2;

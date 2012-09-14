@@ -3,12 +3,11 @@
  
 $Slim=Slim::getInstance('default',true);
 
-$Slim->hook('hook_ingresar_documento_pago', 'Adelantos_Con_Usuario_Orden');
+$Slim->hook('hook_ingresar_documento_pago', 'Ingresar_Adelantos_Con_Usuario_Orden');
+$Slim->hook('hook_guardar_documento_pago', 'Guardar_Adelantos_Con_Usuario_Orden');
 
-function Adelantos_Con_Usuario_Orden() {
-	global $documento;
-		global $sesion;
-		global $adelanto;
+function Ingresar_Adelantos_Con_Usuario_Orden() {
+	global $documento, $sesion, $adelanto;
  
 
 		$usuario_defecto = empty($documento->fields['id_usuario']) ? $id_usuario : 'NULL';
@@ -24,4 +23,9 @@ function Adelantos_Con_Usuario_Orden() {
 		echo '</td></tr>';
 }
 
+function Guardar_Adelantos_Con_Usuario_Orden() {
+ global $documento, $id_usuario_orden, $id_usuario_ingresa;
+	if (array_key_exists('id_usuario_orden',$documento->fields)) $documento->Edit('id_usuario_orden', $id_usuario_orden);
+	if (array_key_exists('id_usuario_ingresa',$documento->fields)) $documento->Edit('id_usuario_ingresa', $id_usuario_ingresa);
  
+}

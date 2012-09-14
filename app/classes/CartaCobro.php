@@ -1,9 +1,259 @@
 <?php
+require_once 'NotaCobro.php';
 
 class CartaCobro extends NotaCobro {
 
 	var $asuntos = array();
 	var $x_resultados = array();
+
+	public static $secciones = array(
+		'FECHA' => 'Sección FECHA',
+		'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
+		'DETALLE' => 'Sección DETALLE',
+		'ADJ' => 'Sección ADJ',
+		'PIE' => 'Sección PIE',
+		'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
+		'SALTO_PAGINA' => 'Sección SALTO_PAGINA'
+	);
+	public static $diccionario = array(
+		'CARTA' => array(
+			'%cuenta_banco%' => 'Cuenta bancaria',
+			'%logo_carta%' => 'Imagen logo',
+			'%direccion%' => 'Dirección',
+			'%titulo%' => 'Título',
+			'%subtitulo%' => 'Subtítulo',
+			'%numero_cobro%' => 'Número cobro',
+			'%xfecha_mes_dos_digitos%' => 'Mes emision (mm)',
+			'%xfecha_ano_dos_digitos%' => 'Año emision (yy)',
+			'%xnro_factura%' => 'N° del cobro',
+			'%glosa_cliente%' => 'Razón social Factura',
+			'%xdireccion%' => 'Dirección Factura',
+			'%xrut%' => 'RUT contrato'
+		),
+		'FECHA' => array(
+			'%fecha_especial%' => 'Ciudad (país), día de mes de año',
+			'%fecha_especial2%' => 'Santiago, dia de Mes de año',
+			'%fecha_espanol%' => 'dia De Mes De año',
+			'%fecha%' => 'mes dia, año',
+			'%fecha_con_de%' => 'mes dia de año',
+			'%fecha_ingles%' => 'month day, year',
+			'%fecha_ingles_ordinal%' => 'month dayth, year',
+			'%ANO%' => 'año fecha fin',
+			'%numero_cobro%' => 'número cobro',
+			'%inciales_encargado%' => 'iniciales encargado comercial',
+			'%encargado_comercial%' => 'nombre completo enargado comercial'
+		),
+		'ENVIO_DIRECCION' => array(
+			'%Asunto%' => 'Asunto',
+			'%CodigoAsunto%' => 'CodigoAsunto',
+			'%NombreContacto%' => 'NombreContacto',
+			'%NombreContacto_mayuscula%' => 'NombreContacto_mayuscula',
+			'%NumeroCliente%' => 'NumeroCliente',
+			'%NumeroContrato%' => 'NumeroContrato',
+			'%SR%' => 'SR',
+			'%asunto_mb%' => 'asunto_mb',
+			'%asunto_salto_linea%' => 'asunto_salto_linea',
+			'%factura_desc_mta%' => 'factura_desc_mta',
+			'%fecha_con_de%' => 'fecha_con_de',
+			'%fecha_especial%' => 'fecha_especial',
+			'%fecha_especial_minusculas%' => 'fecha_especial_minusculas',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%glosa_cliente_mayuscula%' => 'glosa_cliente_mayuscula',
+			'%nombre_cliente%' => 'nombre_cliente',
+			'%nombre_contacto_mb%' => 'nombre_contacto_mb',
+			'%nombre_pais%' => 'nombre_pais',
+			'%nombre_pais_mayuscula%' => 'nombre_pais_mayuscula',
+			'%num_factura%' => 'num_factura',
+			'%num_letter%' => 'num_letter',
+			'%num_letter_baz%' => 'num_letter_baz',
+			'%num_letter_documento%' => 'num_letter_documento',
+			'%pais%' => 'pais',
+			'%presente%' => 'presente',
+			'%solicitante%' => 'solicitante',
+			'%sr%' => 'sr',
+			'%titulo_contacto%' => 'titulo_contacto',
+			'%valor_direccion%' => 'valor_direccion',
+			'%valor_direccion_uc%' => 'valor_direccion_uc'
+		),
+		'DETALLE' => array(
+			'%ApellidoContacto%' => 'Apellido del contacto',
+			'%Asunto%' => 'Lista de asuntos',
+			'%Asunto_ucwords%' => 'Lista de asuntos con primeros letras en mayuscula',
+			'%FILAS_ASUNTOS_RESUMEN%' => 'FILAS_ASUNTOS_RESUMEN',
+			'%FILAS_FACTURAS_DEL_COBRO%' => 'FILAS_FACTURAS_DEL_COBRO',
+			'%FILA_FACTURAS_PENDIENTES%' => 'FILA_FACTURAS_PENDIENTESS',
+			'%NombrePilaContacto%' => 'Nombre del contacto',
+			'%SoloNombreContacto%' => 'SoloNombreContacto',
+			'%boleta_gastos%' => 'boleta_gastos',
+			'%boleta_honorarios%' => 'boleta_honorarios',
+			'%categoria_encargado_comercial%' => 'categoria_encargado_comercial',
+			'%categoria_encargado_comercial_mayusculas%' => 'categoria_encargado_comercial_mayusculas',
+			'%codigo_cci%' => 'codigo_cci',
+			'%codigo_cci2%' => 'codigo_cci2',
+			'%codigo_swift%' => 'codigo_swift',
+			'%codigo_swift2%' => 'codigo_swift2',
+			'%codigopropuesta%' => 'codigopropuesta',
+			'%concepto_gastos_cuando_hay%' => 'concepto_gastos_cuando_hay',
+			'%concepto_honorarios_cuando_hay%' => 'concepto_honorarios_cuando_hay',
+			'%cta_cte_gbp_segun_moneda%' => 'Numero de cuenta que va a cambiar segun moneda (si es dolar una cuenta, en caso contrario otra, para gbplegal',
+			'%cuenta_banco%' => 'cuenta_banco',
+			'%cuenta_mb%' => 'cuenta_mb',
+			'%cuenta_mb_boleta%' => 'cuenta_mb_boleta',
+			'%cuenta_mb_ny%' => 'direccion de cuenta de MB en Nueva York',
+			'%despedida_mb%' => 'Frase de despedida_mb',
+			'%detalle_careyallende%' => 'Letra de detalle completo del estudio Carey Allende',
+			'%detalle_cuenta_gastos%' => 'detalle_cuenta_gastos',
+			'%detalle_cuenta_gastos2%' => 'detalle_cuenta_gastos2',
+			'%detalle_cuenta_honorarios%' => 'detalle_cuenta_honorarios',
+			'%detalle_cuenta_honorarios_primer_dia_mes%' => 'detalle_cuenta_honorarios_primer_dia_mes',
+			'%detalle_ebmo%' => 'Letra de detalle completo del estudio ebmo',
+			'%detalle_mb%' => 'Frase especial Morales y Bezas',
+			'%detalle_mb_boleta%' => 'Frase descripcion detalle MB',
+			'%detalle_mb_ny%' => 'Frase especial MB New York',
+			'%duracion_trabajos%' => 'total duracion cobrable de las horas inluido en el cobro',
+			'%encargado_comercial%' => 'encargado_comercial',
+			'%encargado_comercial_uc%' => 'encargado_comercial_uc',
+			'%equivalente_a_baz%' => 'extensión frase de carte en el caso de que se hace una transfería',
+			'%equivalente_dolm%' => 'que ascienden a %monto%',
+			'%estimado%' => 'Estimada/Estimado',
+			'%fecha%' => 'Frase que indica el periodo de la fecha',
+			'%fecha_al%' => 'En frase del periodo reemplazar la palabra "hasta" con la palabra "al"',
+			'%fecha_al_minuscula%' => 'fecha_al_minuscula',
+			'%fecha_con_de%' => 'En frase del periodo reemplazar la palabra "hasta" con la palabra "de"',
+			'%fecha_con_prestada%' => 'fecha_con_prestada',
+			'%fecha_con_prestada_mayuscula%' => 'fecha_con_prestada_mayuscula',
+			'%fecha_con_prestada_minusculas%' => 'fecha_con_prestada_minusculas',
+			'%fecha_dia_carta%' => 'Día actual al momento de imprimir la carta',
+			'%fecha_diff_prestada_durante%' => 'fecha_diff_prestada_durante',
+			'%fecha_diff_prestada_durante_mayuscula%' => 'fecha_diff_prestada_durante_mayuscula',
+			'%fecha_diff_prestada_durante_minusculas%' => 'fecha_diff_prestada_durante_minusculas',
+			'%fecha_emision%' => 'Fecha de emisión del cobro',
+			'%fecha_especial%' => 'fecha_especial',
+			'%fecha_especial_mta%' => 'fecha_especial_mta',
+			'%fecha_especial_mta_en%' => 'fecha_especial_mta_en',
+			'%fecha_facturacion%' => 'fecha_facturacion',
+			'%fecha_hasta%' => 'fecha corte del cobro en Formato DIA de MES ( sin año )',
+			'%fecha_mes%' => 'fecha_mes',
+			'%fecha_mta%' => 'fecha_mta',
+			'%fecha_mta_agno%' => 'fecha_mta_agno',
+			'%fecha_mta_dia%' => 'fecha_mta_dia',
+			'%fecha_mta_mes%' => 'fecha_mta_mes',
+			'%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas',
+			'%fecha_primer_trabajo%' => 'Fecha del primer trabajo del cobro',
+			'%fecha_primer_trabajo_de%' => 'fecha_primer_trabajo_de',
+			'%fecha_primer_trabajo_durante%' => 'fecha_primer_trabajo_durante',
+			'%frase_gastos_egreso%' => 'Frase especial para baz',
+			'%frase_gastos_ingreso%' => 'Frase especial para baz',
+			'%frase_moneda%' => 'frase_moneda',
+			'%glosa_banco_contrato%' => 'glosa_banco_contrato',
+			'%glosa_banco_contrato2%' => 'glosa_banco_contrato2',
+			'%glosa_cliente%' => 'campo "factura_razon_social" de la tabla contrato',
+			'%glosa_cliente_mayuscula%' => 'glosa_cliente_mayuscula',
+			'%glosa_contrato%' => 'glosa_contrato',
+			'%glosa_cuenta_contrato%' => 'glosa_cuenta_contrato',
+			'%glosa_cuenta_contrato2%' => 'glosa_cuenta_contrato2',
+			'%lista_asuntos%' => 'lista_asuntos',
+			'%lista_asuntos_guion%' => 'lista_asuntos_guion',
+			'%logo_carta%' => 'logo_carta',
+			'%monto%' => 'Monto total del cobro',
+			'%monto_con_gasto%' => 'Monto total',
+			'%monto_en_palabras%' => 'monto_en_palabras',
+			'%monto_en_palabras_en%' => 'monto_en_palabras_en',
+			'%monto_en_pesos%' => 'monto total del cobro en moneda base',
+			'%monto_gasto%' => 'total de los gastos',
+			'%monto_gasto_separado%' => 'Frase que indica valor de gastos',
+			'%monto_gasto_separado_baz%' => 'monto_gasto_separado_baz',
+			'%monto_gastos_con_iva%' => 'monto_gastos_con_iva',
+			'%monto_gastos_cuando_hay%' => 'monto_gastos_cuando_hay',
+			'%monto_gastos_sin_iva%' => 'monto_gastos_sin_iva',
+			'%monto_honorarios_cuando_hay%' => 'monto_honorarios_cuando_hay',
+			'%monto_iva%' => 'monto_iva',
+			'%monto_original%' => 'Monto honorarios en la moneda del tarifa',
+			'%monto_sin_gasto%' => 'Monto sin gastos',
+			'%monto_solo_gastos%' => 'Monto solo gastos',
+			'%monto_total_demo%' => 'Monto total',
+			'%monto_total_demo_jdf%' => 'monto_total_demo_jdf',
+			'%monto_total_demo_uf%' => 'monto_total_demo_uf',
+			'%monto_total_sin_iva%' => 'Monto subtotal',
+			'%n_num_factura%' => 'n_num_factura',
+			'%num_factura%' => 'campo "documento" de la tabla "cobro"',
+			'%num_letter%' => 'num_letter',
+			'%num_letter_baz%' => 'num_letter_baz',
+			'%num_letter_documento%' => 'num_letter_documento',
+			'%num_letter_rebaza%' => 'num_letter_rebaza',
+			'%num_letter_rebaza_especial%' => 'num_letter_rebaza_especial',
+			'%numero_cuenta_contrato%' => 'numero_cuenta_contrato',
+			'%numero_cuenta_contrato2%' => 'numero_cuenta_contrato2',
+			'%porcentaje_impuesto%' => 'Numero de Porcentaje (incluye simbolo %)',
+			'%porcentaje_impuesto_sin_simbolo%' => 'porcentaje_impuesto_sin_simbolo',
+			'%porcentaje_iva_con_simbolo%' => 'porcentaje_iva_con_simbolo',
+			'%rut_cliente%' => 'rut_cliente',
+			'%saldo_gastos_balance%' => 'saldo_gastos_balance',
+			'%saludo_mb%' => 'Dear %sr% %ApellidoContacto%: / De mi consideración:',
+			'%si_gastos%' => 'si_gastos',
+			'%simbolo_moneda%' => 'simbolo de id_moneda del cobro',
+			'%simbolo_opc_moneda_totall%' => 'simbolo_opc_moneda_totall',
+			'%sr%' => 'Titulo del contacto definido en el contrato, por defecto "Señor"',
+			'%subtotal_gastos_diff_con_sin_provision%' => 'balance cuenta de gastos',
+			'%subtotal_gastos_sin_provision%' => 'monto gastos sin las provisiones',
+			'%subtotal_gastos_solo_provision%' => 'monto gastos solo contando las provisiones',
+			'%tipo_cuenta%' => 'tipo_cuenta',
+			'%tipo_gbp_segun_moneda%' => 'Tipo de moneda (Nacional/Extranjera) que va a cambiar segun moneda (si es dolar Extranjera, en caso contrario Nacional para gbplegal',
+		),
+		'ADJ' => array(
+			'%cliente_fax%' => 'cliente_fax',
+			'%firma_careyallende%' => 'firma_careyallende',
+			'%iniciales_encargado_comercial%' => 'iniciales_encargado_comercial',
+			'%nombre_encargado_comercial%' => 'nombre_encargado_comercial',
+			'%nro_factura%' => 'nro_factura',
+			'%num_letter%' => 'num_letter',
+			'%num_letter_baz%' => 'num_letter_baz',
+			'%num_letter_documento%' => 'num_letter_documento',
+		),
+		'PIE' => array(
+			'%direccion%' => 'direccion',
+			'%logo_carta%' => 'logo_carta',
+			'%num_letter%' => 'num_letter',
+			'%num_letter_documento%' => 'num_letter_documento',
+		),
+		'DATOS_CLIENTE' => array(
+			'%ApellidoContacto%' => 'ApellidoContacto',
+			'%NombrePilaContacto%' => 'NombrePilaContacto',
+			'%SR%' => 'SR',
+			'%encargado_comercial_mayusculas%' => 'encargado_comercial_mayusculas',
+			'%estimado%' => 'estimado',
+			'%glosa_cliente%' => 'glosa_cliente',
+			'%sr%' => 'sr',
+		),
+		'FILAS_FACTURAS_DEL_COBRO' => array(
+			'%factura_impuesto%' => 'factura_impuesto',
+			'%factura_moneda%' => 'factura_moneda',
+			'%factura_numero%' => 'factura_numero',
+			'%factura_periodo%' => 'factura_periodo',
+			'%factura_total%' => 'factura_total',
+			'%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto',
+		   
+		),
+		
+		'FILAS_FACTURAS_DEL_COBRO' => array(
+			'%factura_pendiente%' => 'factura_pendiente',
+		    ),
+		'FILAS_ASUNTOS_RESUMEN' => array(
+			'%fecha_mta%' => 'fecha_mta',
+			'%gastos_asunto%' => 'gastos_asunto',
+			'%gastos_asunto_mi%' => 'gastos_asunto_mi',
+			'%glosa_asunto%' => 'glosa_asunto',
+			'%honorarios_asunto%' => 'honorarios_asunto',
+			'%honorarios_asunto_mi%' => 'honorarios_asunto_mi',
+			'%num_factura%' => 'num_factura',
+			'%num_letter%' => 'num_letter',
+			'%simbolo%' => 'simbolo',
+			'%simbolo_mi%' => 'simbolo_mi',
+			'%total_asunto%' => 'total_asunto',
+			'%total_asunto_mi%' => 'total_asunto_mi',
+		),
+		'SALTO_PAGINA' => array()
+	);
 
 	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
@@ -13,6 +263,142 @@ class CartaCobro extends NotaCobro {
 		$this->log_update = true;
 		$this->x_resultados = array();
 		$this->guardar_fecha = true;
+	}
+
+	public function ObtenerCarta($id_carta = null) {
+		if(empty($id_carta)){
+			return array(
+				'descripcion' => 'Nueva Carta',
+				'margen_superior' => 1.5,
+				'margen_inferior' => 2,
+				'margen_izquierdo' => 2,
+				'margen_derecho' => 2,
+				'margen_encabezado' => 0.88,
+				'margen_pie_de_pagina' => 0.88,
+				'secciones' => array('CARTA' => '')
+			);
+		}
+
+		$query = "SELECT * FROM carta WHERE id_carta='$id_carta'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$carta = mysql_fetch_assoc($resp);
+		$parser = new TemplateParser($carta['formato']);
+		$carta['secciones'] = $parser->tags;
+		return $carta;
+	}
+
+	function GuardarCarta($data) {
+		$data['formato'] = '';
+		foreach($data['secciones'] as $seccion => $html){
+			$data['formato'] .= "\n###$seccion###\n$html\n";
+		}
+		unset($data['secciones']);
+
+		$Carta = new Objeto($this->sesion, array(), '', 'carta', 'id_carta');
+		$Carta->guardar_fecha = false;
+		$Carta->editable_fields = array_keys($data);
+		$Carta->Fill($data, true);
+		if($Carta->Write()){
+			return $Carta->fields['id_carta'];
+		}
+		return false;
+	}
+
+	function PrevisualizarDocumento($carta, $id_cobro){
+		$formato = '';
+		foreach($carta['secciones'] as $seccion => $html){
+			$formato .= "\n###$seccion###\n$html\n";
+		}
+		$html = $this->ReemplazarHTML($formato, $id_cobro);
+		$doc = new DocGenerator($html, $carta['formato_css'], $this->fields['opc_papel'], $this->fields['opc_ver_numpag'], 'PORTRAIT',
+			$carta['margen_superior'], $carta['margen_derecho'], $carta['margen_inferior'], $carta['margen_izquierdo'], $this->fields['estado']);
+		libxml_use_internal_errors(true);
+		$doc->output('previsualizacion_carta.doc');
+	}
+	
+	function PrevisualizarValores($id_cobro){
+		$html = '';
+		$secciones = array_keys(self::$secciones);
+		array_unshift($secciones, 'CARTA');
+		foreach($secciones as $seccion){
+			$html .= "\n###$seccion###\n
+			<tr><th colspan=3>$seccion</th></tr>";
+			if(isset(self::$diccionario[$seccion])){
+				foreach (self::$diccionario[$seccion] as $tag => $desc_tag) {
+					$html .= '<tr><td>' . str_replace('%', '&#37;', $tag) .
+						"</td><td>$tag</td><td>" .
+						str_replace('%', '&#37;', $desc_tag) . "</td></tr>\n";
+				}
+			}
+			if($seccion == 'CARTA'){
+				foreach(array_keys(self::$secciones) as $seccion){
+					$html .= "\n%$seccion%\n";
+				}
+			}
+		}
+		return '<table border="1">' . $this->ReemplazarHTML($html, $id_cobro) . '</table>';
+	}
+
+	function ReemplazarHTML($html, $id_cobro){
+		$parser_carta = new TemplateParser($html);
+
+		if(empty($id_cobro)){
+			$query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($id_cobro) = mysql_fetch_array($resp);
+		}
+		$this->Load($id_cobro);
+
+		global $contrato;
+		$contrato = new Contrato($this->sesion);
+		$contrato->Load($this->fields['id_contrato']);
+		
+		$lang = $this->fields['codigo_idioma'];
+
+		$cliente = new Cliente($this->sesion);
+		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
+
+		global $cobro_moneda;
+		$cobro_moneda = new CobroMoneda($this->sesion);
+		$cobro_moneda->Load($this->fields['id_cobro']);
+
+		global $moneda_total;
+		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
+
+		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+		if ($tipo_cambio_moneda_total == 0)
+			$tipo_cambio_moneda_total = 1;
+
+		if ($lang == '')
+			$lang = 'es';
+
+		/*
+		  require_once Conf::ServerDir()."/lang/$lang.php";
+		 */
+
+		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
+		$idioma->Load($lang);
+
+		// Moneda
+		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda->Load($this->fields['id_moneda']);
+
+		$moneda_base = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_base->Load($this->fields['id_moneda_base']);
+
+		//Moneda cliente
+		$moneda_cli = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_cli->Load($cliente->fields['id_moneda']);
+		$moneda_cliente_cambio = $cobro_moneda->moneda[$cliente->fields['id_moneda']]['tipo_cambio'];
+
+		if ($this->fields['codigo_idioma'] == 'es') {
+			setlocale(LC_ALL, "es_ES");
+		} else if ($this->fields['codigo_idioma'] == 'en') {
+			setlocale(LC_ALL, 'en_US.UTF-8');
+		}
+		
+		return $this->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 	}
 
 	function GenerarDocumentoCarta($parser_carta, $theTag = '', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
@@ -62,8 +448,11 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%ADJ%', $this->GenerarDocumentoCartaComun($parser_carta, 'ADJ', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%PIE%', $this->GenerarDocumentoCartaComun($parser_carta, 'PIE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				$html2 = str_replace('%SALTO_PAGINA%', $this->GenerarDocumentoCartaComun($parser_carta, 'SALTO_PAGINA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+
 				break;
 
+				
 
 
 			case 'DETALLE': //GenerarDocumentoCarta
@@ -139,12 +528,14 @@ class CartaCobro extends NotaCobro {
 
 				$this->LoadGlosaAsuntos();
 				$lista_asuntos = "<ul>";
-				foreach ($this->glosa_asuntos as $key => $asunto) {
+				foreach ($this->glosa_asuntos as $asunto) {
 					$lista_asuntos .= "<li>" . $asunto . "</li>";
 				}
 				$lista_asuntos .= "</ul>";
 				$html2 = str_replace('%lista_asuntos%', $lista_asuntos, $html2);
 
+				$html2 = str_replace('%FILAS_ASUNTOS_RESUMEN%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILAS_ASUNTOS_RESUMEN', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				
 				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
 				$html2 = str_replace('%cuenta_mb_ny%', __('%cuenta_mb_ny%'), $html2);
@@ -180,7 +571,7 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
@@ -191,13 +582,13 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
 				} else {
 					$html2 = str_replace('%sr%', __('Señor'), $html2);
-					$NombreContacto = split(' ', $contrato->fields['contacto']);
+					$NombreContacto = explode(' ', $contrato->fields['contacto']);
 					$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 					$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 				}
@@ -528,7 +919,7 @@ class CartaCobro extends NotaCobro {
 				else
 					$tipo_cambio_moneda_base_cobro = $this->fields['tipo_cambio_moneda_base'];
 
-				$fecha_hasta_cobro = strftime('%e de %B', mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
+				$fecha_hasta_cobro = strftime(Utiles::FormatoStrfTime('%e de %B'), mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
 				$html2 = str_replace('%fecha_hasta%', $fecha_hasta_cobro, $html2);
 				if ($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) { #!= $moneda_cli->fields['id_moneda']
 					$en_pesos = (double) $this->fields['monto'] * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_moneda_base_cobro);
@@ -759,6 +1150,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%ADJ%', $this->GenerarDocumentoCartaComun($parser_carta, 'ADJ', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%PIE%', $this->GenerarDocumentoCartaComun($parser_carta, 'PIE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				$html2 = str_replace('%SALTO_PAGINA%', $this->GenerarDocumentoCartaComun($parser_carta, 'SALTO_PAGINA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+
 				break;
 
 
@@ -780,6 +1173,15 @@ class CartaCobro extends NotaCobro {
 				} else {
 					$html2 = str_replace('%glosa_contrato%', '', $html2);
 				}
+				
+				if (isset($contrato->fields['codigopropuesta'])) {
+					$html2 = str_replace('%codigopropuesta%', $contrato->fields['codigopropuesta'], $html2);
+				} else {
+					$html2 = str_replace('%codigopropuesta%', '', $html2);
+				}
+				
+				
+				
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
@@ -815,8 +1217,13 @@ class CartaCobro extends NotaCobro {
 				$lista_asuntos_guion = implode(" - ", $this->glosa_asuntos);
 				$html2 = str_replace('%lista_asuntos_guion%', $lista_asuntos_guion, $html2);
 
-				$html2 = str_replace('%FILAS_ASUNTOS_RESUMEN%', $this->GenerarDocumentoCarta2($parser_carta, 'FILAS_ASUNTOS_RESUMEN', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				$html2 = str_replace('%FILAS_ASUNTOS_RESUMEN%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILAS_ASUNTOS_RESUMEN', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				
+				$html2 = str_replace('%FILAS_FACTURAS_DEL_COBRO%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILAS_FACTURAS_DEL_COBRO', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 
+				$html2 = str_replace('%FILA_FACTURAS_PENDIENTES%', $this->GenerarDocumentoCartaComun($parser_carta, 'FILA_FACTURAS_PENDIENTES', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				
+				
 				$html2 = str_replace('%cuenta_mb%', __('%cuenta_mb%'), $html2);
 				$html2 = str_replace('%despedida_mb%', __('%despedida_mb%'), $html2);
 				$html2 = str_replace('%cuenta_mb_ny%', __('%cuenta_mb_ny%'), $html2);
@@ -853,7 +1260,7 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
@@ -864,13 +1271,13 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
 				} else {
 					$html2 = str_replace('%sr%', __('Señor'), $html2);
-					$NombreContacto = split(' ', $contrato->fields['contacto']);
+					$NombreContacto = explode(' ', $contrato->fields['contacto']);
 					$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 					$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 				}
@@ -1175,17 +1582,17 @@ class CartaCobro extends NotaCobro {
 					}
 				} else {
 					if ($lang == 'es') {
-						$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-M-D'), '%e de %B de %Y'));
+						$fecha_lang = 'Santiago, ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 					} else {
 						$fecha_lang = 'Santiago (Chile), ' . date('F d, Y');
 					}
 				}
-				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-M-D'), '%e de %B de %Y'));
+				$fecha_espanol = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$fecha_lang_mta = 'Bogotá, D.C.,' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 				$actual_locale = setlocale(LC_ALL, 0);
-				$fecha_lang_mta_en = (setlocale(LC_ALL, 'en_US.UTF-8')) ? "Bogotá, " . strftime('%B %e, %Y') : $fecha_lang_mta;
+				$fecha_lang_mta_en = (setlocale(LC_ALL, 'en_US.UTF-8')) ? "Bogotá, " . strftime(Utiles::FormatoStrfTime("%B %e, %Y")) : $fecha_lang_mta;
 				setlocale(LC_ALL, "$actual_locale");
 				$html2 = str_replace('%fecha_especial_mta%', $fecha_lang_mta, $html2);
 				$html2 = str_replace('%fecha_especial_mta_en%', $fecha_lang_mta_en, $html2);
@@ -1285,7 +1692,7 @@ class CartaCobro extends NotaCobro {
 				else
 					$tipo_cambio_moneda_base_cobro = $this->fields['tipo_cambio_moneda_base'];
 
-				$fecha_hasta_cobro = strftime('%e de %B', mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
+				$fecha_hasta_cobro = strftime(Utiles::FormatoStrfTime('%e de %B'), mktime(0, 0, 0, date("m", strtotime($this->fields['fecha_fin'])), date("d", strtotime($this->fields['fecha_fin'])), date("Y", strtotime($this->fields['fecha_fin']))));
 				$html2 = str_replace('%fecha_hasta%', $fecha_hasta_cobro, $html2);
 				if ($this->fields['id_moneda'] > 1 && $moneda_total->fields['id_moneda'] > 1) { #!= $moneda_cli->fields['id_moneda']
 					$en_pesos = (double) $this->fields['monto'] * ($this->fields['tipo_cambio_moneda'] / $tipo_cambio_moneda_base_cobro);
@@ -1322,24 +1729,24 @@ class CartaCobro extends NotaCobro {
 					$cuenta_corriente_actual = number_format(UtilesApp::TotalCuentaCorriente($this->sesion, $where_gastos), $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 					$html2 = str_replace('%frase_gastos_ingreso%', '<tr>
-												    <td width="5%">&nbsp;</td>
-												<td align="left" class="detalle"><p>Adjunto a la presente encontrarás comprobantes de gastos realizados por cuenta de ustedes por la suma de ' . $cuenta_corriente_actual . '</p></td>
-												<td width="5%">&nbsp;</td>
-												  </tr>
-												  <tr>
-												    <td>&nbsp;</td>
-												    <td valign="top" align="left" class="detalle"><p>&nbsp;</p></td>
-												  </tr>', $html2);
+											    <td width="5%">&nbsp;</td>
+											    <td align="left" class="detalle"><p>Adjunto a la presente encontrarás comprobantes de gastos realizados por cuenta de ustedes por la suma de ' . $cuenta_corriente_actual . '</p></td>
+											    <td width="5%">&nbsp;</td>
+											</tr>
+											<tr>
+											    <td>&nbsp;</td>
+											    <td valign="top" align="left" class="detalle"><p>&nbsp;</p></td>
+											</tr>', $html2);
 					$html2 = str_replace('%frase_gastos_egreso%', '<tr>
-												    <td width="5%">&nbsp;</td>
-														<td valign="top" align="left" class="detalle"><p>A mayor abundamiento, les recordamos que a esta fecha <u>existen cobros de notaría por la suma de $xxxxxx.-</u>, la que les agradeceré enviar en cheque nominativo a la orden de don Eduardo Avello Concha.</p></td>
-														<td width="5%">&nbsp;</td>
-												  </tr>
-													<tr>
-												    <td>&nbsp;</td>
-												    <td valign="top" align="left" class="vacio"><p>&nbsp;</p></td>
-												<td>&nbsp;</td>
-												  </tr>', $html2);
+											    <td width="5%">&nbsp;</td>
+											    <td valign="top" align="left" class="detalle"><p>A mayor abundamiento, les recordamos que a esta fecha <u>existen cobros de notaría por la suma de $xxxxxx.-</u>, la que les agradeceré enviar en cheque nominativo a la orden de don Eduardo Avello Concha.</p></td>
+											    <td width="5%">&nbsp;</td>
+											</tr>
+											<tr>
+											    <td>&nbsp;</td>
+											    <td valign="top" align="left" class="vacio"><p>&nbsp;</p></td>
+											    <td>&nbsp;</td>
+											</tr>', $html2);
 				} else {
 					$html2 = str_replace('%frase_gastos_ingreso%', '', $html2);
 					$html2 = str_replace('%frase_gastos_egreso%', '', $html2);
@@ -1555,93 +1962,7 @@ class CartaCobro extends NotaCobro {
 
 				break;
 
-			case 'FILAS_ASUNTOS_RESUMEN': //GenerarDocumentoCarta2
-				/**
-				 * Esto se hizo para Mu?oz Tamayo y Asociados. (ESM) 
-				 */
-				global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo, $cifras_decimales;
-
-				$query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
-						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
-						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),4) pthhac
-						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
-						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
-						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
-						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
-  					            ,c.monto_trabajos
-						    ,c.monto_thh
-						    ,c.monto_thh_estandar
-						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos  
-						    ,kant.kant 
-
-						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
-						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
-						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
-						    join prm_moneda pm on pm.id_moneda=c.id_moneda
-						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
-						    FROM trabajo
-
-						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
-						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
-						    from cta_corriente where cobrable=1
-						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
-						    WHERE ca.id_cobro=" . $this->fields['id_cobro'];
-
-
-				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
-				$moneda_actual = $this->fields['id_cobro'];
-				$row_tmpl = $html2;
-				$html2 = '';
-				$filas = 1;
-				while ($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
-					list($subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo, $cifras_decimales) = array($rowdesglose['monto_trabajos'], $rowdesglose['subtotal_gastos'], $rowdesglose['impuesto'], $rowdesglose['impuesto_gastos'], $rowdesglose['simbolo'], $rowdesglose['cifras_decimales']);
-					$row = $row_tmpl;
-
-
-					// _mi = moneda seleccionada para descargar el documento
-					$subtotal_hh_mi = ( $subtotal_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-					$subtotal_gasto_mi = ( $subtotal_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-					$impuesto_hh_mi = ( $impuesto_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-					$impuesto_gasto_mi = ( $impuesto_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-					$simbolo_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
-					$cifras_decimales_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'];
-
-					list($pthh, $pg) = array($rowdesglose['monto_trabajos'], $rowdesglose['subtotal_gastos'], $rowdesglose['impuesto'], $rowdesglose['impuesto_gastos'], $rowdesglose['simbolo'], $rowdesglose['cifras_decimales']);
-					$row = str_replace('%glosa_asunto%', $rowdesglose['glosa_asunto'], $row);
-					$row = str_replace('%simbolo%', $simbolo, $row);
-					$row = str_replace('%honorarios_asunto%', round($rowdesglose['monto_trabajos'] * $rowdesglose['pthh'], $cifras_decimales), $row);
-					$row = str_replace('%gastos_asunto%', round($rowdesglose['subtotal_gastos'] * $rowdesglose['pg'], $cifras_decimales), $row);
-
-					$row = str_replace('%total_asunto%', round(floatval($subtotal_hh) + floatval($subtotal_gasto) + floatval($impuesto_hh) + floatval($impuesto_gasto), $cifras_decimales), $row);
-
-					$row = str_replace('%simbolo_mi%', $simbolo_mi, $row);
-					$row = str_replace('%honorarios_asunto_mi%', round($subtotal_hh_mi * $rowdesglose['pthh'], $cifras_decimales_mi), $row);
-					$row = str_replace('%gastos_asunto_mi%', round($subtotal_gasto_mi * $rowdesglose['pg'], $cifras_decimales_mi), $row);
-
-					//var_dump( $cobro_moneda ); exit;
-					$total_asunto_mi = round(floatval($subtotal_hh_mi) + floatval($subtotal_gasto_mi) + floatval($impuesto_hh_mi) + floatval($impuesto_gasto_mi), $cifras_decimales_mi);
-					$row = str_replace('%total_asunto_mi%', number_format($total_asunto_mi, $cifras_decimales_mi, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
-
-					$fecha_mta_emision = $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d/%m/%Y') : '';
-					$fecha_mta_facturacion = $this->fields['fecha_facturacion'] ? Utiles::sql2fecha($this->fields['fecha_facturacion'], '%d/%m/%Y') : $fecha_mta_emision;
-					list($fecha_mta_dia, $fecha_mta_mes, $fecha_mta_agno) = explode("/", $fecha_mta_facturacion);
-
-
-					if ($filas > 1) {
-						$row = str_replace('%num_letter%', '', $row);
-						$row = str_replace('%num_factura%', '', $row);
-						$row = str_replace('%fecha_mta%', '', $row);
-					} else {
-						$row = str_replace('%num_letter%', $this->fields['id_cobro'], $row);
-						$row = str_replace('%num_factura%', $this->fields['documento'], $row);
-						$row = str_replace('%fecha_mta%', $fecha_mta_facturacion, $row);
-					}
-					$html2 .= $row;
-					$filas++;
-				}
-
-
-				break;
+			
 		}
 
 		return $html2;
@@ -1709,9 +2030,9 @@ class CartaCobro extends NotaCobro {
 				#formato especial
 				if (method_exists('Conf', 'GetConf')) {
 					if ($lang == 'es') {
-						$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+						$fecha_lang = UtilesApp::GetConf($this->sesion, 'CiudadEstudio') . ', ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 					} else {
-						$fecha_lang = Conf::GetConf($this->sesion, 'CiudadEstudio') . ' (' . Conf::GetConf($this->sesion, 'PaisEstudio') . '), ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
+						$fecha_lang = UtilesApp::GetConf($this->sesion, 'CiudadEstudio') . ' (' . Conf::GetConf($this->sesion, 'PaisEstudio') . '), ' . ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%e de %B de %Y'));
 					}
 				} else {
 					if ($lang == 'es') {
@@ -1773,7 +2094,7 @@ class CartaCobro extends NotaCobro {
 
 			case 'ENVIO_DIRECCION': //GenerarDocumentoCartaComun
 				$query = "SELECT glosa_cliente FROM cliente
-									WHERE codigo_cliente=" . $contrato->fields['codigo_cliente'];
+									WHERE codigo_cliente='" . $contrato->fields['codigo_cliente']."'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($glosa_cliente) = mysql_fetch_array($resp);
 
@@ -1799,14 +2120,17 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
-/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */				
-				$html2 = str_replace('%solicitante%',$trabajo->fields['solicitante'] , $html2);
+				/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */
+				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
 				$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);
 				$html2 = str_replace('%glosa_cliente_mayuscula%', strtoupper($contrato->fields['factura_razon_social']), $html2);
-				$html2 = str_replace('%valor_direccion%', nl2br($contrato->fields['direccion_contacto']), $html2);
-				$html2 = str_replace('%valor_direccion_uc%', ucwords(strtolower(nl2br($contrato->fields['direccion_contacto']))), $html2);
+				
+				
+				$direccion=explode('//',$contrato->fields['direccion_contacto']);
+				$html2 = str_replace('%valor_direccion%', nl2br($direccion[0]), $html2);
+				$html2 = str_replace('%valor_direccion_uc%', ucwords(strtolower(nl2br($direccion[0]))), $html2);
 
 				#formato especial
 				if ($lang == 'es')
@@ -1896,7 +2220,7 @@ class CartaCobro extends NotaCobro {
 				$query = "SELECT CONCAT(a.nombre, ' ', a.apellido1, ' ', a.apellido2) FROM usuario AS a JOIN contrato ON a.id_usuario=contrato.id_usuario_responsable JOIN cobro ON cobro.id_contrato=contrato.id_contrato WHERE cobro.id_cobro=" . $this->fields['id_cobro'];
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($nombre_encargado) = mysql_fetch_array($resp);
-				list( $nombre, $apellido1, $apellido2 ) = split(' ', $nombre_encargado);
+				list( $nombre, $apellido1, $apellido2 ) = explode(' ', $nombre_encargado);
 				$iniciales = substr($nombre, 0, 1) . substr($apellido1, 0, 1) . substr($apellido2, 0, 1);
 				$html2 = str_replace('%iniciales_encargado_comercial%', $iniciales, $html2);
 				$html2 = str_replace('%nombre_encargado_comercial%', $nombre_encargado, $html2);
@@ -1924,6 +2248,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
 				$pie_pagina = $PdfLinea2 . ' ' . $PdfLinea3 . '<br>' . $SitioWeb . ' - E-mail: ' . $Email;
 				$html2 = str_replace('%direccion%', $pie_pagina, $html2);
+				$html2 = str_replace('%num_letter%', $this->fields['id_cobro'], $html2);
+				$html2 = str_replace('%num_letter_documento%', $this->fields['documento'], $html2);
 				break;
 
 			case 'DATOS_CLIENTE': //GenerarDocumentoCartaComun
@@ -1941,7 +2267,7 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
@@ -1952,13 +2278,13 @@ class CartaCobro extends NotaCobro {
 						$html2 = str_replace('%ApellidoContacto%', $contrato->fields['apellido_contacto'], $html2);
 					} else {
 						$html2 = str_replace('%sr%', __('Señor'), $html2);
-						$NombreContacto = split(' ', $contrato->fields['contacto']);
+						$NombreContacto = explode(' ', $contrato->fields['contacto']);
 						$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 						$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 					}
 				} else {
 					$html2 = str_replace('%sr%', __('Señor'), $html2);
-					$NombreContacto = split(' ', $contrato->fields['contacto']);
+					$NombreContacto = explode(' ', $contrato->fields['contacto']);
 					$html2 = str_replace('%NombrePilaContacto%', $NombreContacto[0], $html2);
 					$html2 = str_replace('%ApellidoContacto%', $NombreContacto[1], $html2);
 				}
@@ -1978,6 +2304,146 @@ class CartaCobro extends NotaCobro {
 				$nombre_encargado_mayuscula = strtoupper($nombre_encargado);
 				$html2 = str_replace('%encargado_comercial_mayusculas%', $nombre_encargado_mayuscula, $html2);
 
+				break;
+				
+				
+				case 'FILAS_FACTURAS_DEL_COBRO':
+				
+					$query="select concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
+						prm_moneda.simbolo,
+						factura.total-factura.iva as total_sin_impuesto,
+						factura.iva,
+						factura.total ,
+						date_format(fecha,'%Y-%m') as periodo
+							from factura 
+							join prm_moneda  using (id_moneda)
+							join prm_documento_legal using (id_documento_legal)
+							where id_cobro=".$this->fields['id_cobro'];
+					$facturasST=$this->sesion->pdodbh->query($query) ;
+					$facturasRS=$facturasST->fetchAll();
+				$row_template = $html2;
+				$html2 = '';
+					foreach ($facturasRS as $factura) {
+					$row=$row_template;
+					$row=str_replace('%factura_numero%',$factura['facturanumero'],$row);
+					$row=str_replace('%factura_moneda%',$factura['simbolo'],$row);
+					$row=str_replace('%factura_total_sin_impuesto%',$factura['total_sin_impuesto'],$row);
+					$row=str_replace('%factura_impuesto%',$factura['iva'],$row);
+					$row=str_replace('%factura_total%',$factura['total'],$row);
+					$row=str_replace('%factura_periodo%',$factura['periodo'],$row);
+					
+					$html2.=$row;
+					}
+												
+				break;
+				
+				case 'FILA_FACTURAS_PENDIENTES': //GenerarDocumentoCartaComun
+
+					$query = "SELECT numero  FROM `factura` WHERE `estado` NOT IN ('1.3.4') AND `anulado` != 1 AND codigo_cliente=" . $this->fields['codigo_cliente'];
+					$facturasST = $this->sesion->pdodbh->query($query);
+					$facturasRS = $facturasST->fetchAll();
+					$row_template = $html2;
+					$html2 = '';
+					foreach ($facturasRS as $facturaspendientes) {
+					    $row = $row_template;
+					    $row = str_replace('%facturas_pendientes%','No '.$facturaspendientes['numero'], $row);
+
+					    $html2.=$row;
+					}
+
+				break;
+
+				
+				case 'FILAS_ASUNTOS_RESUMEN': //GenerarDocumentoCarta2
+				/**
+				 * Esto se hizo para Mu?oz Tamayo y Asociados. (ESM) 
+				 */
+				global $subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo, $cifras_decimales;
+
+				$query_desglose_asuntos = "SELECT pm.cifras_decimales, pm.simbolo, @rownum:=@rownum+1 as rownum, ca.id_cobro, ca.codigo_asunto,a.glosa_asunto
+						    ,if(@rownum=kant,@sumat1:=(1.0000-@sumat1), round(ifnull(trabajos.trabajos_thh/monto_thh,0),4)) pthh
+						    ,@sumat1:=@sumat1+round(ifnull(trabajos.trabajos_thh/monto_thh,0),4) pthhac
+						    ,if(@rownum=kant,@sumat2:=(1.0000-@sumat2), round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4)) pthhe
+						    ,@sumat2:=@sumat2+round(ifnull(trabajos.trabajos_thh_estandar/monto_thh_estandar,0),4) pthheac
+						    ,if(@rownum=kant,@sumag:=(1.0000-@sumag), round(ifnull(gastos.gastos/subtotal_gastos,0),4))  pg
+						    ,@sumag:=@sumag+round(ifnull(gastos.gastos/subtotal_gastos,0),4) pgac
+  					            ,c.monto_trabajos
+						    ,c.monto_thh
+						    ,c.monto_thh_estandar
+						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos  
+						    ,kant.kant 
+
+						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
+						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro 
+						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
+						    join prm_moneda pm on pm.id_moneda=c.id_moneda
+						    left join (SELECT id_cobro, codigo_asunto, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh ) AS trabajos_thh, SUM( TIME_TO_SEC( duracion_cobrada ) /3600 * tarifa_hh_estandar ) AS trabajos_thh_estandar
+						    FROM trabajo
+
+						    GROUP BY codigo_asunto,id_cobro) trabajos on trabajos.id_cobro=c.id_cobro and trabajos.codigo_asunto=ca.codigo_asunto
+						    left join (select id_cobro, codigo_asunto, sum(ifnull(egreso,0)-ifnull(ingreso,0)) gastos
+						    from cta_corriente where cobrable=1
+						    group by id_cobro, codigo_asunto) gastos on gastos.id_cobro=c.id_cobro and gastos.codigo_asunto=ca.codigo_asunto
+						    WHERE ca.id_cobro=" . $this->fields['id_cobro'];
+
+
+				$rest_desglose_asuntos = mysql_query($query_desglose_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_desglose_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+				$moneda_actual = $this->fields['id_cobro'];
+				$row_tmpl = $html2;
+				$html2 = '';
+				$filas = 1;
+				while ($rowdesglose = mysql_fetch_array($rest_desglose_asuntos)) {
+					list($subtotal_hh, $subtotal_gasto, $impuesto_hh, $impuesto_gasto, $simbolo, $cifras_decimales) = array($rowdesglose['monto_trabajos'], $rowdesglose['subtotal_gastos'], $rowdesglose['impuesto'], $rowdesglose['impuesto_gastos'], $rowdesglose['simbolo'], $rowdesglose['cifras_decimales']);
+					$row = $row_tmpl;
+
+
+					// _mi = moneda seleccionada para descargar el documento
+					$subtotal_hh_mi = ( $subtotal_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$subtotal_gasto_mi = ( $subtotal_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$impuesto_hh_mi = ( $impuesto_hh * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$impuesto_gasto_mi = ( $impuesto_gasto * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ) / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+					$simbolo_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
+					$cifras_decimales_mi = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'];
+
+					list($pthh, $pg) = array($rowdesglose['monto_trabajos'], $rowdesglose['subtotal_gastos'], $rowdesglose['impuesto'], $rowdesglose['impuesto_gastos'], $rowdesglose['simbolo'], $rowdesglose['cifras_decimales']);
+					$row = str_replace('%glosa_asunto%', $rowdesglose['glosa_asunto'], $row);
+					$row = str_replace('%simbolo%', $simbolo, $row);
+					$row = str_replace('%honorarios_asunto%', round($rowdesglose['monto_trabajos'] * $rowdesglose['pthh'], $cifras_decimales), $row);
+					$row = str_replace('%gastos_asunto%', round($rowdesglose['subtotal_gastos'] * $rowdesglose['pg'], $cifras_decimales), $row);
+
+					$row = str_replace('%total_asunto%', round(floatval($subtotal_hh) + floatval($subtotal_gasto) + floatval($impuesto_hh) + floatval($impuesto_gasto), $cifras_decimales), $row);
+
+					$row = str_replace('%simbolo_mi%', $simbolo_mi, $row);
+					$row = str_replace('%honorarios_asunto_mi%', round($subtotal_hh_mi * $rowdesglose['pthh'], $cifras_decimales_mi), $row);
+					$row = str_replace('%gastos_asunto_mi%', round($subtotal_gasto_mi * $rowdesglose['pg'], $cifras_decimales_mi), $row);
+
+					//var_dump( $cobro_moneda ); exit;
+					$total_asunto_mi = round(floatval($subtotal_hh_mi) + floatval($subtotal_gasto_mi) + floatval($impuesto_hh_mi) + floatval($impuesto_gasto_mi), $cifras_decimales_mi);
+					$row = str_replace('%total_asunto_mi%', number_format($total_asunto_mi, $cifras_decimales_mi, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+
+					$fecha_mta_emision = $this->fields['fecha_emision'] ? Utiles::sql2fecha($this->fields['fecha_emision'], '%d/%m/%Y') : '';
+					$fecha_mta_facturacion = $this->fields['fecha_facturacion'] ? Utiles::sql2fecha($this->fields['fecha_facturacion'], '%d/%m/%Y') : $fecha_mta_emision;
+					list($fecha_mta_dia, $fecha_mta_mes, $fecha_mta_agno) = explode("/", $fecha_mta_facturacion);
+
+
+					if ($filas > 1) {
+						$row = str_replace('%num_letter%', '', $row);
+						$row = str_replace('%num_factura%', '', $row);
+						$row = str_replace('%fecha_mta%', '', $row);
+					} else {
+						$row = str_replace('%num_letter%', $this->fields['id_cobro'], $row);
+						$row = str_replace('%num_factura%', $this->fields['documento'], $row);
+						$row = str_replace('%fecha_mta%', $fecha_mta_facturacion, $row);
+					}
+					$html2 .= $row;
+					$filas++;
+				}
+
+
+				break;
+				
+				case 'SALTO_PAGINA': //GenerarDocumentoComun
+				//no borrarle al css el BR.divisor
 				break;
 		}
 
