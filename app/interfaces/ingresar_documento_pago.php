@@ -80,7 +80,8 @@ if ($id_documento) {
 	if (UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) {
 		$id_solicitud_adelanto = $documento->fields['id_solicitud_adelanto'];
 	}
-	
+		 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false; 
+
 	if ($id_cobro) {
 		$monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
 	}
@@ -141,7 +142,6 @@ if ($opcion == "guardar") {
 	
 	
 	
-	 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false; 
 
 	
 	$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $usando_adelanto, $id_contrato, !empty($pagar_facturas),$id_usuario_ingresa,$id_usuario_orden, $id_solicitud_adelanto);
@@ -171,7 +171,7 @@ if ($opcion == "guardar") {
 		?>
 		<script type="text/javascript">
 		                            
-				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '&id_documento=<?php echo $id_documento?>';
+				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '<?php echo "&id_documento=$id_documento&id_usuario_orden=$id_usuario_orden&id_usuario_ingresa=$id_usuario_ingresa"; ?>';
 		</script>
 	<?php
 	}
