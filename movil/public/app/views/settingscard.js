@@ -127,7 +127,7 @@ ToolbarDemo.views.Settingscard = Ext.extend(Ext.form.FormPanel, {
 	
 	},	
 	
-	//{ rut : '99511620-0' , password : 'admin.asdwsx'}
+	
 	login: function() {		
 		//var el     = Ext.getBody(),
 		var contenedor=this;

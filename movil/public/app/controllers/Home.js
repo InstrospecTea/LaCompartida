@@ -62,7 +62,9 @@ Ext.regController('Home', {
 		//var body=Ext.getBody();
 		//Ext.getBody().dom.style.cssText='top:0px';
 		//$(document.body).css("-webkit-transform",  "translate(0px,40px)");
-	
+	 var xancho=$(window).width();
+                         var xalto=$(window).height();
+                          alert(orientacion+' xalto:'+xalto+' xancho:'+xancho);
 	
 		var iconoReloj=ToolbarDemo.views.usersForm.down('#iconoReloj');
 		
@@ -539,6 +541,7 @@ Ext.regController('Home', {
 			ToolbarDemo.views.errorlog.tab.setIconClass('sync');
 			ToolbarDemo.views.errorlog.syncButton.setIconClass('');
 			ToolbarDemo.views.errorlog.syncButton.setIconClass('x-icon-mask sync');
+                     
 		}
     },
 	

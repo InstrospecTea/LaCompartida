@@ -1,5 +1,5 @@
 <?php
-	<?php include("offline.php"); ?>
+	 
 	
 	$needle='Rev';
 	#$dataOf="CACHE MANIFEST\n";

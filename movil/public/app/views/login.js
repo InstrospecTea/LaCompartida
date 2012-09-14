@@ -54,7 +54,7 @@ ToolbarDemo.views.LoginCard = Ext.extend(Ext.form.FormPanel, {
                 },errorPanel],
             },{
                 xtype:  'button',
-                text:   'Guardar',
+                text:   'Ingresar',
                 ui:     'confirm',
 				handler: this.login,
 				scope:this,
@@ -119,7 +119,7 @@ ToolbarDemo.views.LoginCard = Ext.extend(Ext.form.FormPanel, {
 	
 	},	
 	
-	//{ rut : '99511620-0' , password : 'admin.asdwsx'}
+	
 	login: function() {		
 		//var el     = Ext.getBody(),
 		var contenedor=this;
@@ -152,8 +152,8 @@ ToolbarDemo.views.LoginCard = Ext.extend(Ext.form.FormPanel, {
 		}
 		//alert(user.getValue());
 		//alert(pass.getValue());
-		this.user.rut=user.getValue();//'99511620-0';
-		this.user.password=pass.getValue();//'admin.asdwsx';
+		this.user.rut=user.getValue();
+		this.user.password=pass.getValue();
 		var rut = this.user.rut;
 		var password = this.user.password;
 		//alert(rut+'  '+password);

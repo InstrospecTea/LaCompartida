@@ -43,10 +43,10 @@ FROM
 		FROM asunto
 		GROUP BY id_contrato,codigo_cliente) asuntos on documento.codigo_cliente=asuntos.codigo_cliente and (documento.id_contrato=asuntos.id_contrato) 
 WHERE
-	es_adelanto = 1";
+	";
 
 
-
+(isset($_GET['eliminados']))? $query.='es_adelanto=-1':$query.='es_adelanto=1' ;
 if(isset($_GET['tiene_saldo']) && $_GET['tiene_saldo']==1) 	$query .= " AND saldo_pago < 0 ";
 if (isset($_GET['id_documento'])  && intval($_GET['id_documento'])>0  ) 	$query .= " AND documento.id_documento = " .intval($_GET['id_documento']);
 if (isset($_GET['campo_codigo_asunto']) && strlen($_GET['campo_codigo_asunto'])>0  ) $query .= " AND asuntos.codigo_asuntos like '%".$_GET['campo_codigo_asunto']."%'";
@@ -88,7 +88,20 @@ if(isset($_GET['id_contrato'])) 	$query .= " AND (documento.id_contrato = '".int
 	}
 	
 	echo '] }';
-	
+	  } elseif ($_REQUEST['accion']=='desborraadelanto') {
+	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+		if($p_cobranza) {
+			$documento=new Documento($sesion);
+			$id_documento=intval($_POST['id_documento']);
+			echo "jQuery('#mensaje').html('recuperando adelanto...'); ";
+				if(!$documento->Load($id_documento)) {
+					echo "jQuery('#mensaje').html('El adelanto no existe en la base de datos.'); ";
+				} else {
+					$documento->Edit( 'es_adelanto','1');
+						$documento->Write();
+						echo "jQuery('#boton_buscar').click();";
+				}		
+		}
 	  } elseif ($_REQUEST['accion']=='borraadelanto') {
 		 
 	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
@@ -105,7 +118,9 @@ if(isset($_GET['id_contrato'])) 	$query .= " AND (documento.id_contrato = '".int
 				echo "jQuery('#mensaje').html('El adelanto no puede eliminarse: ha sido utilizado en al menos  ".__('un cobro')."'); ";
 				} else {
 					echo "jQuery('#mensaje').html('borrando adelanto...'); ";
-					$documento->Delete();
+					//$documento->Delete();
+					$documento->Edit( 'es_adelanto','-1');
+					$documento->Write();
 				}
 			}
 		

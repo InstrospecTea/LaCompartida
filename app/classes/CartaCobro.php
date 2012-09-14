@@ -1799,8 +1799,8 @@ class CartaCobro extends NotaCobro {
 					$html2 = str_replace('%NombreContacto_mayuscula%', mb_strtoupper($contrato->fields['contacto']), $html2);
 				}
 
-				/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */
-				$html2 = str_replace('%solicitante%', $trabajo->fields['solicitante'], $html2);
+/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */				
+				$html2 = str_replace('%solicitante%',$trabajo->fields['solicitante'] , $html2);
 				$html2 = str_replace('%NombreContacto%', $contrato->fields['contacto'], $html2);
 				$html2 = str_replace('%nombre_cliente%', $glosa_cliente, $html2);
 				$html2 = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $html2);

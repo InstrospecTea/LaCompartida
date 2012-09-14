@@ -51,11 +51,11 @@ AND table_name='$tabla' AND referenced_column_name ='$columna_referenciada'  and
 	$ExisteLlaveForanea= mysql_query($foraneaquery, $dbh);
     if(!$ExisteLlaveForanea):
 		return false;
-	else:
+	else: 
 		$llave= 	mysql_fetch_assoc($ExisteLlaveForanea);
 		return $llave['constraint_name'];
-    endif;
-
+	endif;
+	 
 }
 
 /**
@@ -9274,8 +9274,6 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			if (!ExisteLlaveForanea('documento', 'id_usuario_orden', 'usuario', 'id_usuario_ingresa', $dbh))
 				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT   FOREIGN KEY (`id_usuario_orden`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
 
-
-
 			ejecutar($query, $dbh);
 
 			break;
@@ -9497,6 +9495,17 @@ QUERY;
 			}
 			break;
 
+		case 7.02:
+		$query=array();
+		if ($nombrellave=ExisteLlaveForanea('documento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
+			$query[]="ALTER TABLE  `documento` DROP FOREIGN KEY  $nombrellave  ;";
+			
+			$query[] = "ALTER TABLE  `documento` CHANGE  `id_usuario`  `id_usuario_ingresa` INT( 11 ) NULL DEFAULT NULL";
+			$query[] = "ALTER TABLE `documento` ADD CONSTRAINT   FOREIGN KEY (`id_usuario_ingresa`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
+		}
+		ejecutar($query, $dbh);
+		break;
+	
 	}
 }
 
@@ -9504,9 +9513,9 @@ QUERY;
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-$min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.16;
-$force=0;
+$min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
+$max_update = 7.02;
+$force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
 if (isset($_GET['minupdate']))

@@ -271,7 +271,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 									</tr>
 									<tr>
 									<?php echo			
-												'<th>'.__('Tipo').__('Documento').'</th>
+												'<th>'.__('Tipo ').__('Documento').'</th>
 												<th>'.__('Número').'</th>
 												<th style="white-space:nowrap; width:78px;">'.__('Fecha').'</th>';
 									

@@ -177,7 +177,9 @@ $pagina->PrintTop();
 			{
 				top:150, left:290, width:400, okLabel: "<?php echo __('Continuar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 				id: "myDialogId",
-				cancel:function(win){ return false; },
+					cancel:function(win){ 
+						return false; 
+					},
 				ok:function(win){
 					var http = getXMLHTTP();
 					if( $('fecha_ini') )
@@ -186,27 +188,10 @@ $pagina->PrintTop();
 						var fecha_fin=$('fecha_fin').value;
 
 					var uurl = 'ajax.php?accion=elimina_cobro&id_cobro='+id+'&div='+i+'&id_contrato='+id_contrato+'&id_proceso='+form.id_proceso.value+'&fecha_ini='+fecha_ini+'&fecha_fin='+fecha_fin;
-					http.open('get', uurl);
-					http.onreadystatechange = function()
-					{
-						if(http.readyState == 4)
-						{
-							var response = http.responseText;
-							if(response)
-							{
-								if(div.select('tr').length > 1){
-									var tr = div.select('td').find(function(td){return td.innerHTML==('#'+id)}).up('tr');
-									tr.innerHTML = '<td colspan="4">'+response+'</td>';
-								}
-								else{
-									div.innerHTML = '';
-									div.innerHTML = response;
-								}
-							}
-						}
-					};
-					http.send(null);
-					return true;
+					jQuery.get(uurl,function(response) {
+						jQuery('#cobros_'+i).html(response);
+					});
+				 return true;
 				}
 			});
 		}
@@ -232,16 +217,8 @@ $pagina->PrintTop();
 
 		var valor = check ? 1 : 0;
 
-		var http = getXMLHTTP();
-		http.open('get', 'ajax.php?accion=update_contrato&id_contrato='+id+'&incluir_en_cierre='+valor, false);
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-			}
-		};
-		http.send(null);
+		jQuery.get('ajax.php?accion=update_contrato&id_contrato='+id+'&incluir_en_cierre='+valor);
+		return true;
 	}
 
 

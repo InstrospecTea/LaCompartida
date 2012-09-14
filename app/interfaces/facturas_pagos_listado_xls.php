@@ -232,6 +232,10 @@ foreach ($TTBplugins['hook_cobro_factura_pago'] as $funcion) {
 }
 
 
+
+($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_cobro_factura_pago') : false;
+
+ 
 $lista_suntos_liquidar = new ListaAsuntos($Sesion, "", $query);
 if ($lista_suntos_liquidar->num == 0) {
 	 echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";

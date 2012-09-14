@@ -15,10 +15,11 @@ header('Access-Control-Max-Age: 3628800');
 header('Access-Control-Allow-Methods: GET, POST');
 
  
-if(!class_exists('Slim')) require_once dirname(__FILE__).'/Slim/Slim.php';
-$Slim=new Slim();
-$Slim->config('debug', true);
 
+$Slim=Slim::getInstance('default',true);
+$Slim->config('debug', false);
+
+$Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
 $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
@@ -30,10 +31,12 @@ $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('
 				$timestamp=$Slim->request()->post('timestamp');
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
+					$Slim->response()->status(401);
+					die('["Debe entregar el usuario y el password."]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
-					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
- 				}
+					$Slim->response()->status(401);
+					die('["Usuario o Password incorrectos"]');
+				}
 				
 				
 			
@@ -75,10 +78,12 @@ $Slim->map('/EntregarListaAsuntos(/:callback)', 'EntregarListaAsuntos')->via('GE
 				$timestamp=$Slim->request()->post('timestamp');
 				
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
+					$Slim->response()->status(401);
+					die('["Debe entregar el usuario y el password."]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
-					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
- 				}
+					$Slim->response()->status(401);
+					die('["Usuario o Password incorrectos"]');
+				}
 				
 				
 			
@@ -129,10 +134,12 @@ $Slim->map('/EntregarDatos(/:callback)', 'EntregarDatos')->via('GET', 'POST');
 				$timestamp=$Slim->request()->post('timestamp');
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
+					$Slim->response()->status(401);
+					die('["Debe entregar el usuario y el password."]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
-					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
- 				}
+					$Slim->response()->status(401);
+					die('["Usuario o Password incorrectos"]');
+				}
 				
 			
 			
@@ -161,10 +168,12 @@ $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('
 				 
 		
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
+					$Slim->response()->status(401);
+					die('["Debe entregar el usuario y el password."]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
-					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
- 				}
+					$Slim->response()->status(401);
+					die('["Usuario o Password incorrectos"]');
+				}
 				
 				
 			
@@ -208,10 +217,12 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 			 
 	
 				if ($usuario == "" || $password == "") {
-					  $Slim->halt(401, '["Debe entregar el usuario y el password"]');
+					$Slim->response()->status(401);
+					die('["Debe entregar el usuario y el password."]');
 				} else if (!$sesion->VerificarPassword($usuario, $password)) {
-					  $Slim->halt(401, '["Usuario o Password incorrectos"]');
- 				}
+					$Slim->response()->status(401);
+					die('["Usuario o Password incorrectos"]');
+				}
 				
 			
 				$consultatablas=$sesion->pdodbh->query( "SHOW tables like  'j_causa'");
@@ -277,11 +288,11 @@ $Slim->map('/CargarTrabajo(/:callback)', 'CargarTrabajo')->via('GET', 'POST');
 	$idescritorio = $Slim->request()->post('idescritorio'); // opcional, puede venir en cero, el webservice le responde al cliente con su idescritorio definitivo
 	$codigo_asunto = $Slim->request()->post('codigoasunto');
 	$duracion = intval($Slim->request()->post('duracion'));
-	$descripcion =  utf8_decode($Slim->request()->post('descripcion'));
+	$descripcion = utf8_decode($Slim->request()->post('descripcion'));
 	$ordenado_por = $Slim->request()->post('userid');  // opcional, puede venir vacio, NO Cero
 	$codigo_actividad = $Slim->request()->post('codigo_actividad');  // opcional, puede venir vacio, NO Cero
 	$area_trabajo = $Slim->request()->post('area_trabajo');  // opcional, puede venir vacio, NO Cero
-	$fecha = date('Y-m-d',strtotime($Slim->request()->post('fecha')));  // opcional, puede venir vacio, NO Cero
+	$fecha = $Slim->request()->post('fecha');  // opcional, puede venir vacio, NO Cero
 	if ($fecha == "")		$fecha = date('Y-m-d', strtotime($starttimer / 1000) + 86400);
 
 	

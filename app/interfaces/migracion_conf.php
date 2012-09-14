@@ -53,6 +53,7 @@ if(!UtilesApp::ExisteCampo('id_trabajo_lemontech','cobro', $this->sesion))   $qu
 		$queries[] = "UPDATE trabajo LEFT JOIN cobro USING( id_cobro ) SET trabajo.id_cobro = NULL WHERE cobro.id_cobro IS NULL";
 		if(!UtilesApp::ExisteLlaveForanea('trabajo.id_cobro', 'cobro.id_cobro', $this->sesion) ) 		$queries[] = "ALTER TABLE `trabajo` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
 		if(!UtilesApp::ExisteLlaveForanea('cta_corriente.id_cobro', 'cobro.id_cobro', $this->sesion) )  $queries[] = "ALTER TABLE `cta_corriente` ADD FOREIGN KEY (  `id_cobro` ) REFERENCES  `cobro` (`id_cobro`) ON DELETE SET NULL ON UPDATE CASCADE ;";
+		$queries[] = "REPLACE  INTO `prm_doc_legal_numero` (`id_doc_legal_numero`, `id_documento_legal`, `numero_inicial`, `serie`) VALUES (5, 1, '0', '002'),  (6, 1, '0', '003'), (7, 1, '0', '004');";
 		
 		$queries[] = "UPDATE cobro SET estado = estado_real WHERE estado_real IS NOT NULL AND estado_real != ''";
 		$queries[] = "UPDATE cobro SET estado = 'FACTURADO' WHERE ( SELECT count(*) FROM factura WHERE factura.id_cobro = cobro.id_cobro ) > 0 AND estado IN ('CREADO','EN REVISION','EMISION');";
@@ -182,6 +183,7 @@ if(length(OrdenFacturacion.Attache )=6,2000+1*OrdenFacturacion.Attache 	,1000+1*
 								CONCAT_WS(', ',Cliente.Telefono1, Cliente.Telefono2, Cliente.Telefono3, Cliente.Telefono4) 	as contrato_FFF_factura_telefono,
 								CONCAT_WS(', ',Cliente.Telefono1, Cliente.Telefono2, Cliente.Telefono3, Cliente.Telefono4) 	as contrato_FFF_fono_contacto,
 								OrdenFacturacion.HorasTope 																									as asunto_FFF_limite_hh,
+								OrdenFacturacion.HorasTope 																									as contrato_FFF_horas_retainer,
 								IF(Cliente.CodigoImpuesto='I','1','0') 																			as contrato_FFF_usa_impuesto_separado,
 								IF(Cliente.CodigoImpuesto='I','1','0') 																			as contrato_FFF_usa_impuesto_gastos, 
 								CONCAT(Cliente.Direccion1,' // ', Cliente.Direccion2) 											as contrato_FFF_factura_direccion,
@@ -194,8 +196,9 @@ if(length(OrdenFacturacion.Attache )=6,2000+1*OrdenFacturacion.Attache 	,1000+1*
 								Cliente.Actividad																														as contrato_FFF_factura_giro,
 								Cliente.NombreCliente																												as asunto_FFF_razon_social, 
 								Cliente.NombreCliente																												as contrato_FFF_factura_razon_social
-									,IF(OrdenFacturacion.TipoFactExtraordinaria='A' AND  (OrdenFacturacion.HonorarioPactado>0 OR prop.hf_valorventa>0 ),'FLAT FEE','TASA')					as contrato_FFF_forma_cobro
+									,  if(OrdenFacturacion.Flagretainer is not NULL,'RETAINER',   IF(OrdenFacturacion.TipoFactExtraordinaria='A' AND  (OrdenFacturacion.HonorarioPactado>0 OR prop.hf_valorventa>0 ),'FLAT FEE','TASA'))					as contrato_FFF_forma_cobro
 								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,prop.hf_valorventa)	as contrato_FFF_monto,
+								,IF(OrdenFacturacion.HonorarioPactado>0, OrdenFacturacion.HonorarioPactado,prop.hf_valorventa)	as asunto_FFF_limite_monto,
 								'1'	 as contrato_FFF_separar_liquidaciones 
 							FROM  ".DBORIGEN.".OrdenFacturacion left  join  ".DBORIGEN.".propuesta prop using (numeropropuesta) 
 							LEFT JOIN   ".DBORIGEN.".Cliente ON OrdenFacturacion.CodigoCliente = Cliente.CodigoCliente 

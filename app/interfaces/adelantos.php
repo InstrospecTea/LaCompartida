@@ -96,6 +96,17 @@ td.sorting_1 {background:transparent !important;}
 			 
 	 });
 	 
+	 jQuery('.desborraradelanto').live('click',function() {
+	 var laID=jQuery(this).attr('id').replace('desborra_','');
+
+	if(confirm('Confirma restaurar adelanto #'+laID+'?')) {
+		jQuery.post('ajax/ajax_adelantos.php?accion=desborraadelanto',{id_documento:laID},function(data) {
+															if(window.console) console.log(data);
+														},'jsonp');
+														} else {
+															return false;
+														}
+	});
 	 jQuery('.borraradelanto').live('click',function() {
 	 var laID=jQuery(this).attr('id').replace('borra_','');
 
@@ -162,12 +173,15 @@ td.sorting_1 {background:transparent !important;}
 							
 							var respuesta="<a href=\"javascript:void(0)\"  style=\"float:right;display:inline;margin-right:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
 							
-							if (o.aData[4]!=o.aData[5]) {
-								respuesta+="<a href=\"javascript:void(0)\"    class='noborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
+							if (jQuery('#eliminados').is(':checked')) {
+								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='desborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";	
+							} else {
+								if (o.aData[4]!=o.aData[5]) {
+									respuesta+="<a href=\"javascript:void(0)\"    class='noborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
 								} else {
-								respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
+									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
 								}
-							
+							}
 							if(PERMISOCOBRANZA==1) {
 								return   respuesta;
 							} else {
@@ -192,6 +206,8 @@ td.sorting_1 {background:transparent !important;}
 		});
 		 
 });
+
+
 
     function Refrescarse() {
                 
@@ -282,10 +298,19 @@ td.sorting_1 {background:transparent !important;}
 						</tr>
 						<tr>
 							<td align=right>
-								<?php echo __('Sólo Adelantos con Saldo') ?>
+								<?php echo __('Sólo '. __('Adelantos'). ' con Saldo') ?>
 							</td>
 							<td colspan="2" align="left">
 								<input type="checkbox" id="tiene_saldo" name="tiene_saldo" value="1" <?php echo $tiene_saldo ? 'checked' : ''?>/>
+							</td>
+							<td></td>
+						</tr>
+							<tr>
+							<td align=right>
+								<?php echo __('Buscar '. __('Adelantos'). ' eliminados') ?>
+							</td>
+							<td colspan="2" align="left">
+								<input type="checkbox" id="eliminados" name="eliminados" value="1" <?php echo $eliminados ? 'checked' : ''?>/>
 							</td>
 							<td></td>
 						</tr>

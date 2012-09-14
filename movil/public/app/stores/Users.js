@@ -1,24 +1,8 @@
 ToolbarDemo.stores.users = new Ext.data.Store({
     model: 'User',    	
-//	proxy: {
-        //type: 'ajax',
-		//url: '../login',
-		//url: '../intervalo',
-		//url: '../index.php',
-		//method: "POST",
-		//params: { rut : '99511620-0' , password : 'admin.asdwsx'},
-		//success:function(){
-			//	alert("Success!");
-			//},
-			//failure:function(){
-			//	alert("Error");
-			//}
-    //},	
+
 	autoLoad: true,
 	
-	//Ext.Ajax.defaultHeaders = {
-    //'Accept': 'application/json'
-	//};
 
 });
 

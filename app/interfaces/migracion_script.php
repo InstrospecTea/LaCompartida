@@ -169,7 +169,28 @@ $migracion->EmitirFacturasPRC();
 			$migracion->Query2ObjetoAsunto($responseAsunto);
 		
 
-		$MigradorSaej->QueryPostAsuntos();
+		// Lo siguiente hay que pulirlo primero: inserta los asuntos huérfanos de las tablas hta, gastos, etc.
+		$querypostasunto="update contrato cnt join `asunto` asn using (id_contrato)  join " . DBORIGEN . ".OrdenFacturacion ofn on asn.codigo_asunto_secundario=ofn.NumeroOrdenFact
+						set cnt.forma_cobro='RETAINER',
+						cnt.monto=IF(ofn.HonorarioPactado>0, ofn.HonorarioPactado, cnt.monto),
+						cnt.retainer_horas=ofn.HorasTope 
+						where ofn.Flagretainer is not NULL";
+		$querypostasunto.="insert ignore into asunto 
+		  (codigo_asunto,					codigo_asunto_secundario,					id_usuario,					id_encargado,					id_encargado2,					id_cobrador,
+		  codigo_cliente,					id_contrato,					id_tipo_asunto,					id_area_proyecto,					glosa_asunto,
+		  id_idioma,					activo,					cobrable,id_moneda)					SELECT 					concat(`ClienteFacturable`,'-',`NumeroOrdenFacturacionFact`) as codigo_asunto,
+		  `NumeroOrdenFacturacionFact` as codigo_asunto_secundario,					contrato.id_usuario_responsable as id_usuario,
+		  contrato.id_usuario_responsable as id_encargado,					contrato.id_usuario_responsable as id_encargado2,
+		  1 as id_cobrador,					cliente.codigo_cliente,					contrato.id_contrato,					1 as id_tipo_asunto,
+		  1 as id_area_proyecto,					`GlosaAsunto` as glosa_asunto,					null as id_idioma,					0 as activo,
+		  1 as cobrable,					2 as id_moneda
+		  FROM (SELECT af.codigo_asunto, min(OrdenFacturacion.CodigoCliente) CodigoCliente, af.provienede FROM `asuntos_faltantes` af join OrdenFacturacion
+		  on substring_index(af.codigo_asunto,'-',1)= substring_index(NumeroOrdenFact,'-',1)
+		  group by af.codigo_asunto)
+		  af 					left join cliente on af.`CodigoCliente`= cliente.codigo_cliente
+		  left join contrato on cliente.id_contrato=contrato.id_contrato 					where `NumeroOrdenFacturacionFact` not in ('0','')					and cliente.codigo_cliente is not null ;";
+		
+		/* 	$sesion->pdodbh->exec($querypostasunto); */
 
 		
 
@@ -220,7 +241,13 @@ $migracion->EmitirFacturasPRC();
  
 			
 		}
-
+		if (method_exists('ConfMigracion', 'QueryGastos') && $ConfMigracion->QueryGastos() != "") {
+			//$responseGastos = mysql_query($ConfMigracion->QueryGastos(), $sesion->dbh) or Utiles::errorSQL($ConfMigracion->QueryGastos(), __FILE__, __LINE__, $sesion->dbh);
+			$responseGastos = $sesion->pdodbh->query($ConfMigracion->QueryGastos($extra));
+			$migracion->Query2ObjetoGasto($responseGastos);
+			$queryposteriorgastos = "update cta_corriente cc join  " . DBORIGEN . ".Gastos gs on cc.id_movimiento=gs.id_movimiento_lemontech set  cc.fecha=gs.FechaGasto, cc.cobrable=if(gs.flagfacturable='S',1,0);";
+			$truncar = $sesion->pdodbh->exec($queryposteriorgastos);
+ 
 
 		break;
 		
@@ -334,7 +361,25 @@ $migracion->EmitirFacturasPRC();
 
 	case 'emisionfacturas':
 		echo 'Emision de Facturas<br>';
-		$MigradorSaej->QueryPreviaFacturas($forzar, $from, $size);
+		if ($forzar == 1) {
+			$querypreviafactura="update cobro set documento=null";
+			$querypreviafactura="update cobro join  ".DBORIGEN.".Factura on cobro.id_cobro=Factura.NumeroFactura set cobro.documento=Factura.CodigoFacturaBoleta where Factura.TipoDocumento='F';";
+			$querypreviafactura.="truncate table factura;";
+			$querypreviafactura.="truncate table factura_cobro;";
+
+			$querypreviafactura.="truncate table cta_cte_fact_mvto";
+			$querypreviafactura.="truncate table cta_cte_fact_mvto_moneda";
+			$querypreviafactura.="truncate table cta_cte_fact_mvto_neteo";
+
+			$sesion->pdodbh->beginTransaction();
+			$querycobro = $sesion->pdodbh->exec($querypreviacobro);
+			$sesion->pdodbh->commit();
+			$nextlink = "migracion_script.php?etapa=$etapa&from=" . ($from) . "&size=$size";
+			echo '<br>Se limpiaron las tablas objetivo, se retomará el proceso de inserción<script>';
+			echo "setTimeout(\"location.href = '$nextlink';\",1500);";
+			echo '</script>';
+			exit();
+		}
 
 		$migracion->EmitirFacturas($from,$size);
 
@@ -350,9 +395,9 @@ $migracion->EmitirFacturasPRC();
 				echo '</script>';
 				
 				}  else {
-					$MigradorSaej->QueryPostFacturas();
-
-						echo '</pre></div><b>Completado el proceso de emisión de facturas. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
+					$querypostfactura="update factura ltf join ".DBORIGEN.".Factura sjf on ltf.id_factura=sjf.NumeroFactura set  ltf.fecha= sjf.FechaGeneracion;";
+					$querypostfactura.="update cobro join factura set cobro.estado='FACTURADO' where cobro.estado in ('CREADO','EN REVISION','EMITIDO');";
+					$execquerypostfactura = $sesion->pdodbh->exec($querypostfactura);
 				}
 		
 		break;
