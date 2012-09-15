@@ -470,6 +470,9 @@ class Factura extends Objeto {
 					list($factura_id_moneda, $factura_descripcion, $id_cobro, $cobro_id_moneda, $fecha_ini, $fecha_fin, $porcentaje_impuesto, $glosa_moneda, $glosa_moneda_plural, $simbolo, $cifras_decimales, $monto_subtotal, $monto_subtotal_sin_descuento, $descuento_honorarios, $honorarios, $subtotal_gastos, $monto_gastos, $impuesto, $total) = mysql_fetch_array($resp);
 				}
 
+				// FFF 2012-09-15 normaliza saltos de linea en la descripcion. Y sí, ya probé con preg_replace y tiene comportamiento impredecible.
+				$factura_descripcion=str_replace(array('\r\n','\n\r',"\r\n","\n\r",'\n','\r'), "\n", $factura_descripcion);
+				
 				$moneda_factura = new Moneda($this->sesion);
 				$moneda_factura->Load($factura_id_moneda);
 				$query = "SELECT glosa_asunto , codigo_asunto

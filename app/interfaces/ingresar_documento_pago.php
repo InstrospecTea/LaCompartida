@@ -85,13 +85,11 @@ if ($id_documento) {
 	if ($id_cobro) {
 		$monto_usado = $documento->MontoUsadoAdelanto($id_cobro);
 	}
-	 
-	
-	($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false; 
+		 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_guardar_documento_pago') : false; 
+
 }
 	
 
-	 
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente_secundario != '') {
 	$cliente = new Cliente($sesion);
