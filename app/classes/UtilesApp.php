@@ -102,9 +102,9 @@ class UtilesApp extends Utiles {
 
 		$existencampos = $sesion->pdodbh->query($queryexisten);
 
-		$nextcolumn=$existencampos->fetchColumn();
+		$nextcolumn=$existencampos->fetchAll(PDO::FETCH_COLUMN,0);
 
-		if (!$nextcolumn) {
+		if (empty($nextcolumn)) {
 			return false;
 		} else {
 			return true;
