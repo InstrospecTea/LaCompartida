@@ -1503,15 +1503,37 @@ class Cobro extends Objeto {
 
 				if ($documento->Write()) {
 					$documento->BorrarDocumentoMoneda();
-					$query_documento_moneda = "INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
-					SELECT '" . $documento->fields['id_documento'] . "',
+					$query_documento_moneda = "REPLACE INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
+					SELECT  :iddocumento,
 						cobro_moneda.id_moneda,
 						cobro_moneda.tipo_cambio
 					FROM cobro
 					JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
-					WHERE cobro.id_cobro = '" . $this->fields['id_cobro'] . "'";
-					$resp = mysql_query($query_documento_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_documento_moneda, __FILE__, __LINE__, $this->sesion->dbh);
+					WHERE cobro.id_cobro =:idcobro";
+					
+				//	$resp = mysql_query($query_documento_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_documento_moneda, __FILE__, __LINE__, $this->sesion->dbh);
 
+					try {
+						$logstatement=$this->sesion->pdodbh->prepare($query_documento_moneda);
+						$logstatement->bindParam( ':idcobro', $this->fields['id_cobro'], PDO::PARAM_INT); 
+						$logstatement->bindParam( ':iddocumento', $this->fields['id_documento'], PDO::PARAM_INT); 
+					 	$logstatement->execute( );
+
+					} catch (PDOException $e) {
+						 if($this->sesion->usuario->fields['rut'] == '99511620') {
+							$Slim=Slim::getInstance('default',true);
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query_documento_moneda,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($logstatement) );
+							$Slim->view()->setData($arrayPDOException);
+							 $Slim->applyHook('hook_error_sql');
+						 }
+						Utiles::errorSQL($query_documento_moneda, "", "",  NULL,"",$e );
+						 
+					}
+					
+					
+					
+					
+					
 					$query_factura = " UPDATE factura_cobro SET id_documento = '" . $documento->fields['id_documento'] . "' WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND id_documento IS NULL";
 					$resp = mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
 				}
@@ -1612,7 +1634,7 @@ class Cobro extends Objeto {
 
 		if ($documento->Write()) {
 			$documento->BorrarDocumentoMoneda();
-			$query_documento_moneda = "INSERT INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
+			$query_documento_moneda = "REPLACE INTO documento_moneda (id_documento, id_moneda, tipo_cambio)
 				SELECT '" . $documento->fields['id_documento'] . "',
 					cobro_moneda.id_moneda,
 					cobro_moneda.tipo_cambio
@@ -1809,6 +1831,7 @@ class Cobro extends Objeto {
 				$this->Edit('retainer_usuarios', $contrato->fields['retainer_usuarios']);
 				#Opciones
 				$this->Edit('id_carta', $contrato->fields['id_carta']);
+				$this->Edit('id_formato', $contrato->fields['id_formato']);
 				$this->Edit("opc_ver_modalidad", $contrato->fields['opc_ver_modalidad']);
 				$this->Edit("opc_ver_profesional", $contrato->fields['opc_ver_profesional']);
 				$this->Edit("opc_ver_gastos", $contrato->fields['opc_ver_gastos']);
@@ -2369,11 +2392,11 @@ class Cobro extends Objeto {
 						,m1.tipo_cambio as tipo_cambio_ini
 						,m2.cifras_decimales as cifras_decimales_fin
 						,m2.tipo_cambio as tipo_cambio_fin
-					FROM factura f
+					FROM factura f join factura_cobro fc using (id_factura)
 					LEFT JOIN prm_moneda m1 ON m1.id_moneda = f.id_moneda
 					LEFT JOIN prm_moneda m2 ON m2.id_moneda = '" . $this->fields['opc_moneda_total'] . "'
 					WHERE f.id_estado NOT IN (3,5)
-					AND f.id_cobro = '" . $this->fields['id_cobro'] . "'";
+					AND fc.id_cobro = '" . $this->fields['id_cobro'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$ingreso = 0;
 		$egrso = 0;
