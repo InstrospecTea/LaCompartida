@@ -103,6 +103,7 @@ if (!empty($cliente->fields["id_contrato"])) {
 $validaciones_segun_config = UtilesApp::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 
+ 
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
@@ -132,8 +133,9 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
 		$val = true;
 	}
-
-	$contrato->Edit("glosa_contrato", $glosa_contrato, true);
+	$contrato->Fill($_REQUEST, true);
+	
+	/*$contrato->Edit("glosa_contrato", $glosa_contrato, true);
 	$contrato->Edit("codigo_cliente", $codigo_cliente, true);
 	$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL", true);
 	if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
@@ -166,6 +168,9 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("periodo_repeticiones", $periodo_repeticiones, true);
 	$contrato->Edit("periodo_intervalo", $periodo_intervalo, true);
 	$contrato->Edit("periodo_unidad", $codigo_unidad);
+	
+	
+	
 	$monto = str_replace(',', '.', $monto); //en caso de usar comas en vez de puntos
 	$contrato->Edit("monto", $monto, true);
 	$contrato->Edit("id_moneda", $id_moneda, true);
@@ -174,13 +179,15 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
 	$retainer_horas = str_replace(',', '.', $retainer_horas); //en caso de usar comas en vez de puntos
 	$contrato->Edit("retainer_horas", $retainer_horas);
-	if (is_array($usuarios_retainer))
+	if (is_array($usuarios_retainer)) {
 		$retainer_usuarios = implode(',', $usuarios_retainer);
-	else
+	}else {
 		$retainer_usuarios = $usuarios_retainer;
+	}
 	$contrato->Edit("retainer_usuarios", $retainer_usuarios);
 	$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
 	$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
+	
 	$contrato->Edit("id_formato", $id_formato ? $id_formato : 'NULL');
 	$contrato->Edit("id_tarifa", $id_tarifa ? $id_tarifa : 'NULL');
 	$contrato->Edit("id_tramite_tarifa", $id_tramite_tarifa ? $id_tramite_tarifa : 'NULL');
@@ -239,7 +246,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$contrato->Edit("codigo_idioma", $codigo_idioma != '' ? $codigo_idioma : 'es');
 
 	/* tarifa escalonada */
-	if (isset($_POST['esc_tiempo'])) {
+	/*if (isset($_POST['esc_tiempo'])) {
 		for ($i = 1; $i <= sizeof($_POST['esc_tiempo']); $i++) {
 			if ($_POST['esc_tiempo'][$i - 1] != '') {
 				$contrato->Edit('esc' . $i . '_tiempo', $_POST['esc_tiempo'][$i - 1]);
@@ -305,7 +312,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
 		$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0' : '1');
 	}
-
+*/
 	if ($contrato->Write()) {
 		// cobros pendientes
 		CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
@@ -1737,7 +1744,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	<form name='formulario' id='formulario' method=post>
 		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
-		<input type=hidden name=opcion_contrato value="guardar_contrato" />
+		<input type=hidden name='opcion_contrato' value="guardar_contrato" />
 		<input type=hidden name='id_contrato' value="<?php echo $contrato->fields['id_contrato'] ?>" />
 		<input type="hidden" name="desde" value="agregar_contrato" />
 <?php } ?>
@@ -2355,7 +2362,7 @@ Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER 
 <?php if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'RetainerUsuarios')) { ?>
 													<div id="div_retainer_usuarios" style="display:inline; vertical-align: top; background-color:#C6DEAD;padding-left:2px;">
 														&nbsp;<?php echo __('Usuarios') ?>
-														&nbsp;<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer, TTip($tip_retainer_usuarios) . " class=\"selectMultiple\" multiple size=5 ", "", "160"); ?> 
+														&nbsp;<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', nombre, apellido1, apellido2) FROM usuario JOIN usuario_permiso USING( id_usuario ) WHERE usuario.activo = 1 AND codigo_permiso = 'PRO'", 'usuarios_retainer[]', $usuarios_retainer, TTip($tip_retainer_usuarios) . " class=\"selectMultiple\" multiple size='5' height='60' ", "", "160"); ?> 
 													</div>
 <?php } ?>
 											</div>
@@ -2840,7 +2847,7 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 					</fieldset>
 
 					<br/>
-
+				
 					<!-- CARTAS -->
 					<fieldset style="width: 97%; background-color: #FFFFFF;">
 						<legend <?php echo!$div_show ? 'onClick="MuestraOculta(\'datos_carta\')" style="cursor:pointer"' : '' ?> >

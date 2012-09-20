@@ -16,6 +16,128 @@ class Contrato extends Objeto {
 	var $primera_etapa = null;
 	var $monto = null;
 
+	/**
+	 * Define los campos de la solicitud de adelanto permitidos para llenar
+	 *
+	 * @var array
+	 */
+	var $editable_fields = array(
+		'id_contrato'	,
+		'glosa_contrato'	,
+		'activo'	,
+		'id_usuario_responsable'	,
+		'id_usuario_secundario'	,
+		'codigo_cliente'	,
+		'centro_costo'	,
+		'id_documento_legal'	,
+		'titulo_contacto'	,
+		'contacto'	,
+		'apellido_contacto'	,
+		'fono_contacto'	,
+		'email_contacto'	,
+		'direccion_contacto'	,
+		'es_periodico'	,
+		'periodo_fecha_inicio'	,
+		'periodo_intervalo'	,
+		'periodo_unidad'	,
+		'periodo_repeticiones'	,
+		'monto'	,
+		'condiciones_de_pago'	,
+		'observaciones'	,
+		'id_moneda'	,
+		'forma_cobro'	,
+		'retainer_horas'	,
+		'retainer_usuarios'	,
+		'fecha_creacion'	,
+		'fecha_modificacion'	,
+		'id_usuario_modificador'	,
+		'id_carta'	,
+		'id_formato'	,
+		'rut'	,
+		'factura_razon_social'	,
+		'factura_giro'	,
+		'factura_direccion'	,
+		'factura_telefono'	,
+		'cod_factura_telefono'	,
+		'id_tarifa'	,
+		'fecha_inicio_cap'	,
+		'alerta_hh'	,
+		'alerta_monto'	,
+		'limite_hh'	,
+		'limite_monto'	,
+		'opc_ver_modalidad'	,
+		'opc_ver_profesional'	,
+		'opc_ver_columna_cobrable'	,
+		'opc_ver_profesional_iniciales'	,
+		'opc_ver_profesional_categoria'	,
+		'opc_ver_profesional_tarifa'	,
+		'opc_ver_profesional_importe'	,
+		'opc_ver_gastos'	,
+		'opc_ver_concepto_gastos'	,
+		'opc_ver_descuento'	,
+		'opc_ver_numpag'	,
+		'opc_ver_carta'	,
+		'opc_ver_morosidad'	,
+		'opc_ver_tipo_cambio'	,
+		'opc_ver_resumen_cobro'	,
+		'opc_ver_detalles_por_hora_iniciales'	,
+		'opc_ver_detalles_por_hora_categoria'	,
+		'opc_ver_detalles_por_hora_tarifa'	,
+		'opc_ver_detalles_por_hora_importe'	,
+		'opc_papel'	,
+		'opc_moneda_total'	,
+		'opc_moneda_gastos'	,
+		'opc_ver_asuntos_separados'	,
+		'opc_ver_horas_trabajadas'	,
+		'opc_ver_cobrable'	,
+		'incluir_en_cierre'	,
+		'codigo_idioma'	,
+		'porcentaje_descuento'	,
+		'tipo_descuento'	,
+		'descuento'	,
+		'id_moneda_monto'	,
+		'usa_impuesto_separado'	,
+		'opc_ver_solicitante'	,
+		'opc_restar_retainer'	,
+		'opc_ver_detalle_retainer'	,
+		'opc_ver_valor_hh_flat_fee'	,
+		'opc_ver_detalles_por_hora'	,
+		'correos_edicion'	,
+		'id_tramite_tarifa'	,
+		'id_moneda_tramite'	,
+		'usa_impuesto_gastos'	,
+		'separar_liquidaciones'	,
+		'notificado_hr_excedido'	,
+		'notificado_monto_excedido_ult_cobro'	,
+		'notificado_hr_excedida_ult_cobro'	,
+		'notificado_monto_excedido'	,
+		'notificar_encargado_principal'	,
+		'notificar_encargado_secundario'	,
+		'notificar_otros_correos'	,
+		'id_cuenta'	,
+		'id_pais'	,
+		'esc1_tiempo'	,
+		'esc1_id_tarifa'	,
+		'esc1_monto'	,
+		'esc1_id_moneda'	,
+		'esc1_descuento'	,
+		'esc2_tiempo'	,
+		'esc2_id_tarifa'	,
+		'esc2_monto'	,
+		'esc2_id_moneda'	,
+		'esc2_descuento'	,
+		'esc3_tiempo'	,
+		'esc3_id_tarifa'	,
+		'esc3_monto'	,
+		'esc3_id_moneda'	,
+		'esc3_descuento'	,
+		'esc4_tiempo'	,
+		'esc4_id_tarifa'	,
+		'esc4_monto'	,
+		'esc4_id_moneda'	,
+		'esc4_descuento'	
+	);
+	
 	function Contrato($sesion, $fields = "", $params = "") {
 		$this->tabla = "contrato";
 		$this->campo_id = "id_contrato";
@@ -969,10 +1091,94 @@ class Contrato extends Objeto {
 		list($simbolo_moneda, $id_moneda) = mysql_fetch_array($resp);
 		return array(0, $simbolo_moneda, $id_moneda);
 	}
+	
+	function Prepare() {
+		
+		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
+		
+		
+		$this->Edit("activo",$this->extra_fields['activo_contrato']  ? 'SI' : 'NO');
+		
+		$this->Edit("id_usuario_responsable", (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL");
+			if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
+				$this->Edit("id_usuario_secundario", (!empty($this->fields['id_usuario_secundario']) && $this->fields['id_usuario_secundario'] != -1 ) ? $this->fields['id_usuario_secundario'] : "NULL");
+			}
+			if (UtilesApp::GetConf($this->sesion, 'CopiarEncargadoAlAsunto')) {
+				$id_usuario_responsable_def = (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL";
+				$sql_cambia = "UPDATE contrato SET id_usuario_responsable = $id_usuario_responsable_def  WHERE codigo_cliente = '".$this->fields['codigo_cliente']."'";
+				if (!($res = mysql_query($sql_cambia, $this->sesion->dbh) )) {
+					throw new Exception($sql_cambia . "---" . mysql_error());
+				}
+			}
+			
+		 
+			if( is_array($this->extra_fields['usuarios_retainer']) ) {
+							$retainer_usuarios = implode(',',$usuarios_retainer);
+			} else {
+							$retainer_usuarios = $this->extra_fields['usuarios_retainer'];
+			}
+			$this->Edit("retainer_usuarios",$retainer_usuarios);
+			
+			$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
+			$this->Edit("id_carta", $this->fields['id_carta'] ?  $this->fields['id_carta'] : 'NULL');
+			$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
+			$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
+				$this->Edit("id_formato", $this->fields['id_formato']     ? $this->fields['id_formato']     : 'NULL');
+ 	
+		 
+			$this->Edit("opc_ver_profesional", empty($this->fields['opc_ver_profesional']    ) ? '0' : '1');
+			
+			if( isset( $this->extra_fields['esc_tiempo'] ) ) {
+				for( $i = 1; $i <= sizeof($this->extra_fields['esc_tiempo']) ; $i++){		
+					if( $this->extra_fields['esc_tiempo'][$i-1] != '' ){
+						$this->Edit('esc'.$i.'_tiempo', $this->extra_fields['esc_tiempo'][$i-1] );
+						if( $this->extra_fields['esc_selector'][$i-1] != 1 ){
+							//caso monto
+							$this->Edit('esc'.$i.'_id_tarifa', "NULL");
+							$this->Edit('esc'.$i.'_monto', $this->extra_fields['esc_monto'][$i-1]);
+						} else {
+							//caso tarifa
+							$this->Edit('esc'.$i.'_id_tarifa', $this->extra_fields['esc_id_tarifa_'.$i]);
+							$this->Edit('esc'.$i.'_monto', "NULL");
+						}
+						$this->Edit('esc'.$i.'_id_moneda', $this->extra_fields['esc_id_moneda_'.$i]);
+						$this->Edit('esc'.$i.'_descuento', $this->extra_fields['esc_descuento'][$i-1]);
+					} else {
+						$this->Edit('esc'.$i.'_tiempo', "NULL");
+						$this->Edit('esc'.$i.'_id_tarifa', "NULL");
+						$this->Edit('esc'.$i.'_monto', "NULL");
+						$this->Edit('esc'.$i.'_id_moneda', "NULL");
+						$this->Edit('esc'.$i.'_descuento', "NULL");
+					}
+				}		
+			}
+			if ( $this->fields['tipo_descuento'] == 'PORCENTAJE') {
+				$this->Edit("porcentaje_descuento", $this->fields['porcentaje_descuento'] > 0 ? $this->fields['porcentaje_descuento'] : '0');
+				$this->Edit("descuento", '0');
+			} else {
+				$this->Edit("descuento", $this->fields['descuento'] > 0 ? $this->fields['descuento'] : '0');
+				$this->Edit("porcentaje_descuento", '0');
+			}
+		 
+			if ($this->extra_fields['enviar_alerta_otros_correos'] == '1') {
+				$correos_separados = explode(',', $this->fields['notificar_otros_correos']);
+				for ($i = 0; $i < count($correos_separados); $i++) {
+					$correos_separados[$i] = trim($correos_separados[$i]);
+				}
+				$notificar_otros_correos = implode(',', $correos_separados);
+			} else {
+				$notificar_otros_correos = '';
+			}
+			if (UtilesApp::GetConf($this->sesion, 'ExportacionLedes')) {
+				$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0': '1');
+			}
+	}
 
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
 	function Write($enviar_mail_asunto_nuevo = true) {
 		$this->error = "";
+		$this->Prepare();
+		
 		if (!$this->Check())
 			return false;
 		if (empty($this->sesion->usuario->fields['id_usuario2'])) {
@@ -1040,7 +1246,22 @@ class Contrato extends Objeto {
 					$c++;
 				}
 			}
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				try {
+						$arrayparams=null;
+						$insertstatement=$this->sesion->pdodbh->prepare($query);
+						$insertstatement->execute($arrayparams);
+						$insertid=$this->sesion->pdodbh->lastInsertId();
+					} catch (PDOException $e) {
+						 if($this->sesion->usuario->fields['rut'] == '99511620') {
+							$Slim=Slim::getInstance('default',true);
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
+							$Slim->view()->setData($arrayPDOException);
+							 $Slim->applyHook('hook_error_sql');
+					 }
+						 Utiles::errorSQL($query, "", "",  NULL,"",$e );
+						return false;
+			}
+			
 			$this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
 
 			$query3 = " INSERT INTO modificaciones_contrato 
