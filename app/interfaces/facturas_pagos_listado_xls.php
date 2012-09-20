@@ -226,12 +226,7 @@ $query .= "			, cliente.glosa_cliente
 				LEFT JOIN cuenta_banco cta ON fp.id_cuenta = cta.id_cuenta
 				WHERE $where";
 
-global $TTBplugins;
-foreach ($TTBplugins['hook_cobro_factura_pago'] as $funcion) {
-	$query = call_user_func($funcion, $query);
-}
-
-
+ 
 
 ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_cobro_factura_pago') : false;
 
