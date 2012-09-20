@@ -1375,14 +1375,16 @@ class Migracion {
 					return false;
 				}
 				return true;
-			}
-			else //Retorna true ya que si no quiere hacer update la funci贸n corri贸 bien
+			} 	else  {//Retorna true ya que si no quiere hacer update la funci贸n corri贸 bien
 				return true;
-
+			}
 			#Utiles::CrearLog($this->sesion, "reserva", $this->fields[$campo_id], "MODIFICAR","",$query);
-		}
-		else {
-			$query = "INSERT INTO " . $objeto->tabla . " SET ";
+		} 	else {
+			if ($replace == true) {
+				$query = "REPLACE  INTO " . $objeto->tabla . " SET ";
+			} else {
+				$query = "INSERT INTO " . $objeto->tabla . " SET ";
+			}
 			if ($objeto->guardar_fecha)
 				$query .= "fecha_creacion=NOW(),";
 
@@ -1410,6 +1412,8 @@ class Migracion {
 				echo "Datos: " . $error_string . "\n";
 				echo "Query: " . $query . "\n";
 				return false;
+			} else {
+				return true;
 			}
 			$objeto->fields[$objeto->campo_id] = mysql_insert_id($this->sesion->dbh);
 		}
@@ -2118,22 +2122,22 @@ class Migracion {
 		}
 
 		$mensaje_accion = 'guardado';
-		$factura->Edit('subtotal', $factura_generar->fields['subtotal']);
-		$factura->Edit('porcentaje_impuesto', empty($factura_generar->fields['porcentaje_impuesto']) ? "0" : $factura_generar->fields['porcentaje_impuesto'] );
-		$factura->Edit('iva', $factura_generar->fields['iva']);
-		$factura->Edit('total', '' . ($factura_generar->fields['subtotal'] + $factura_generar->fields['iva']));
-		$factura->Edit("id_factura_padre", empty($factura_generar->fields['id_factura_padre']) ? "NULL" : $factura_generar->fields['id_factura_padre']);
-		$factura->Edit("fecha", Utiles::fecha2sql($factura_generar->fields['fecha']));
-		$factura->Edit("cliente", empty($factura_generar->fields['cliente']) ? "NULL" : $factura_generar->fields['cliente']);
-		$factura->Edit("RUT_cliente", empty($factura_generar->fields['RUT_cliente']) ? "NULL" : $factura_generar->fields['RUT_cliente']);
-		$factura->Edit("direccion_cliente", empty($factura_generar->fields['direccion_cliente']) ? "NULL" : $factura_generar->fields['direccion_cliente']);
-		$factura->Edit("codigo_cliente", empty($factura_generar->fields['codigo_cliente']) ? "NULL" : $factura_generar->fields['codigo_cliente']);
+		if( !empty($factura_generar->fields['subtotal'])) $factura->Edit('subtotal', $factura_generar->fields['subtotal']);
+		if( !empty($factura_generar->fields['porcentaje_impuesto'])) $factura->Edit('porcentaje_impuesto', empty($factura_generar->fields['porcentaje_impuesto']) ? "0" : $factura_generar->fields['porcentaje_impuesto'] );
+		if( !empty($factura_generar->fields['iva'])) $factura->Edit('iva', $factura_generar->fields['iva']);
+		 $factura->Edit('total', empty($factura_generar->fields['total'])? ($factura_generar->fields['subtotal'] + $factura_generar->fields['iva']) :empty($factura_generar->fields['total']) );
+		if( !empty($factura_generar->fields['id_factura_padre'])) $factura->Edit("id_factura_padre", empty($factura_generar->fields['id_factura_padre']) ? "NULL" : $factura_generar->fields['id_factura_padre']);
+		if( !empty($factura_generar->fields['fecha'])) $factura->Edit("fecha", $factura_generar->fields['fecha']);
+		if( !empty($factura_generar->fields['cliente']))  $factura->Edit("cliente", empty($factura_generar->fields['cliente']) ? "NULL" : $factura_generar->fields['cliente']);
+		if( !empty($factura_generar->fields['RUT_cliente'])) $factura->Edit("RUT_cliente", empty($factura_generar->fields['RUT_cliente']) ? "NULL" : $factura_generar->fields['RUT_cliente']);
+		if( !empty($factura_generar->fields['direccion_cliente'])) $factura->Edit("direccion_cliente", empty($factura_generar->fields['direccion_cliente']) ? "NULL" : $factura_generar->fields['direccion_cliente']);
+		if( !empty($factura_generar->fields['codigo_cliente'])) $factura->Edit("codigo_cliente", empty($factura_generar->fields['codigo_cliente']) ? "NULL" : $factura_generar->fields['codigo_cliente']);
 		$factura->Edit("id_cobro", empty($factura_generar->fields['id_cobro']) ? "NULL" : $factura_generar->fields['id_cobro']);
-		$factura->Edit("id_documento_legal", empty($factura_generar->fields['id_documento_legal']) ? '1' : $factura_generar->fields['id_documento_legal']);
-		$factura->Edit("serie_documento_legal", Conf::GetConf($this->sesion, 'SerieDocumentosLegales'));
-		$factura->Edit("numero", empty($factura_generar->fields['numero']) ? '' : $factura_generar->fields['numero']);
-		$factura->Edit("id_estado", empty($factura_generar->fields['id_estado']) ? '1' : $factura_generar->fields['id_estado']);
-		$factura->Edit("id_moneda", empty($factura_generar->fields['id_moneda']) ? $factura_generar->fields['id_moneda'] : '1');
+		if( !empty($factura_generar->fields['id_documento_legal'])) $factura->Edit("id_documento_legal", empty($factura_generar->fields['id_documento_legal']) ? '1' : $factura_generar->fields['id_documento_legal']);
+		if( !empty($factura_generar->fields['serie_documento_legal'])) $factura->Edit("serie_documento_legal",  empty($factura_generar->fields['serie_documento_legal']) ? Conf::GetConf($this->sesion, 'SerieDocumentosLegales') : $factura_generar->fields['serie_documento_legal']);
+		if( !empty($factura_generar->fields['numero'])) $factura->Edit("numero", empty($factura_generar->fields['numero']) ? '' : $factura_generar->fields['numero']);
+		if( !empty($factura_generar->fields['id_estado'])) $factura->Edit("id_estado", empty($factura_generar->fields['id_estado']) ? '1' : $factura_generar->fields['id_estado']);
+		if( !empty($factura_generar->fields['id_moneda'])) $factura->Edit("id_moneda", empty($factura_generar->fields['id_moneda']) ? $factura_generar->fields['id_moneda'] : '1');
 
 		if ($factura_generar->fields['id_estado'] == '5') {
 			$factura->Edit('estado', 'ANULADA');
@@ -2145,19 +2149,24 @@ class Migracion {
 		}
 
 		if (method_exists("Conf", "GetConf") && (Conf::GetConf($this->sesion, "DesgloseFactura") == "con_desglose")) {
+		if( !empty($factura_generar->fields['descripcion']))	$factura->Edit("descripcion", $factura_generar->fields['descripcion']);
+		if( !empty($factura_generar->fields['honorarios']))	$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "0" : $factura_generar->fields['honorarios']);
+ 		if( !empty($factura_generar->fields['subtotal_sin_descuento']))	$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "0" : $factura_generar->fields['subtotal_sin_descuento']);
+		if( !empty($factura_generar->fields['descripcion_subtotal_gastos']))	$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos']);
+		if( !empty($factura_generar->fields['subtotal_gastos']))	$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "0" : $factura_generar->fields['subtotal_gastos']);
+		if( !empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']))	$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
+		if( !empty($factura_generar->fields['subtotal_gastos_sin_impuesto']))	$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "0" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
+ 		/*} else {
+		if( !empty($factura_generar->fields['descripcion']))	$factura->Edit("descripcion", $factura_generar->fields['descripcion']);
+		if( !empty($factura_generar->fields['honorarios']))	$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "0" : $factura_generar->fields['honorarios']);
+ 		if( !empty($factura_generar->fields['subtotal_sin_descuento']))	$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "0" : $factura_generar->fields['subtotal_sin_descuento']);
+		if( !empty($factura_generar->fields['descripcion_subtotal_gastos']))	$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos']);
+		if( !empty($factura_generar->fields['subtotal_gastos']))	$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "0" : $factura_generar->fields['subtotal_gastos']);
+		if( !empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']))	$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
+		if( !empty($factura_generar->fields['subtotal_gastos_sin_impuesto']))	$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "0" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
+ 		/*} else {
 			$factura->Edit("descripcion", $factura_generar->fields['descripcion']);
-			$factura->Edit("honorarios", empty($factura_generar->fields['honorarios']) ? "0" : $factura_generar->fields['honorarios']);
-			$factura->Edit("subtotal", empty($factura_generar->fields['subtotal']) ? "0" : $factura_generar->fields['subtotal']);
-			$factura->Edit("subtotal_sin_descuento", empty($factura_generar->fields['subtotal_sin_descuento']) ? "0" : $factura_generar->fields['subtotal_sin_descuento']);
-			$factura->Edit("descripcion_subtotal_gastos", empty($factura_generar->fields['descripcion_subtotal_gastos']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos']);
-			$factura->Edit("subtotal_gastos", empty($factura_generar->fields['subtotal_gastos']) ? "0" : $factura_generar->fields['subtotal_gastos']);
-			$factura->Edit("descripcion_subtotal_gastos_sin_impuesto", empty($factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']) ? "" : $factura_generar->fields['descripcion_subtotal_gastos_sin_impuesto']);
-			$factura->Edit("subtotal_gastos_sin_impuesto", empty($factura_generar->fields['subtotal_gastos_sin_impuesto']) ? "0" : $factura_generar->fields['subtotal_gastos_sin_impuesto']);
-			$factura->Edit("total", empty($factura_generar->fields['total']) ? "0" : $factura_generar->fields['total']);
-			$factura->Edit("iva", empty($factura_generar->fields['iva']) ? "0" : $factura_generar->fields['iva']);
-		} else {
-			$factura->Edit("descripcion", $factura_generar->fields['descripcion']);
-		}
+		}*/
 
 		$factura->Edit("letra", $factura_generar->fields['letra']);
 
@@ -2636,6 +2645,66 @@ class Migracion {
 	  }
 	 */
 
+	/**
+	 * Esta funci髇 llena la tabla prm_area_proyecto en Time Tracking a partir de las tablas  diccionario de SAEJ
+	 */
+	function ActualizarAreaAsuntos() {
+
+		$queryAreaAsuntos="truncate table prm_tipo_proyecto;";
+		$queryAreaAsuntos.="truncate table prm_area_proyecto;";
+		$queryAreaAsuntos.="replace  into prm_tipo_proyecto (id_tipo_proyecto, glosa_tipo_proyecto,orden) SELECT 1*tabladetablavalor.codigo, descripcion, 1*secuencia
+						FROM ".DBORIGEN.".tabladetabla
+						JOIN  ".DBORIGEN.".`tabladetablavalor`
+						USING ( codigotabla )
+						WHERE nombretabla =  'saej_tipo_asunto'
+						ORDER BY  `tabladetablavalor`.`codigo` ASC ;";
+
+
+		$queryAreaAsuntos.="replace into prm_area_proyecto (id_area_proyecto, glosa,orden) SELECT 1*codigo, descripcion, 1*secuencia FROM ". DBORIGEN.".`tabladetabla` join  ". DBORIGEN.".tabladetablavalor using (codigotabla) where nombretabla ='saej_area_encargada' ;";
+
+
+		$queryAreaAsuntos.=" update asunto join ".DBORIGEN.".OrdenFacturacion ofn on asunto.codigo_asunto=ofn.NumeroOrdenFact set id_tipo_asunto=ofn.TipoAsunto*1 where ofn.TipoAsunto*1 in (select id_tipo_proyecto from prm_tipo_proyecto); ";
+
+		$queryAreaAsuntos.=" update asunto join ".DBORIGEN.".OrdenFacturacion ofn on asunto.codigo_asunto=ofn.NumeroOrdenFact set id_area_proyecto=ofn.codigoareaencargada*1 where ofn.codigoareaencargada*1 in (select id_area_proyecto from prm_area_proyecto); ";
+
+
+		$this->sesion->pdodbh->beginTransaction();
+		$this->sesion->pdodbh->exec($queryAreaAsuntos);
+		$this->sesion->pdodbh->commit();
+
+	}
+
+	
+	function ActualizarCuentaAsuntos() {
+		$queryCuentaAsuntos="truncate table prm_banco;";
+		$queryCuentaAsuntos.="truncate table cuenta_banco;";
+		$queryCuentaAsuntos.="replace  into prm_banco (id_banco, nombre) SELECT 1*CodigoBanco, NombreBanco FROM ".DBORIGEN.".`TbBancos`;";
+		$queryCuentaAsuntos.="insert into cuenta_banco (id_banco, numero, glosa, id_moneda) 
+			 SELECT distinct 1*codigobanco, cuentabanco,CONCAT(nombrebanco,' ',cuentabanco) as glosa,
+			 IF( monedabanco = 'S', 1, IF( monedabanco = 'E', 3, 2 ) ) as id_moneda FROM ".DBORIGEN.".`BancoEstudio`;";
+
+		$queryCuentaAsuntos.="ALTER TABLE  ".DBORIGEN.".`PagosRecibidos` ADD INDEX (  `CodigoCuentaBanco` );";
+		$queryCuentaAsuntos.="ALTER TABLE  ".DBORIGEN.".`Factura` ADD INDEX (  `Observacion` );";
+
+
+
+		$queryCuentaAsuntos.="create temporary table cuenta_contrato as
+						select distinct Factura.observacion as codigopropuesta, cuenta_banco.id_cuenta
+						from  cuenta_banco
+						join ".DBORIGEN.".`PagosRecibidos` on PagosRecibidos.CodigoCuentaBanco=cuenta_banco.numero
+						join ".DBORIGEN.".Factura on  1*PagosRecibidos.numerofactura=1*Factura .numerofactura
+						where  `CodigoCuentaBanco` is not null and Factura.observacion is not null and Factura.observacion!='';";
+
+
+		$queryCuentaAsuntos.="update  contrato join cuenta_contrato using (codigopropuesta)  set 1*contrato.id_cuenta=1*cuenta_contrato.id_cuenta;";
+
+
+			$this->sesion->pdodbh->beginTransaction();
+			$this->sesion->pdodbh->exec($queryCuentaAsuntos);
+			$this->sesion->pdodbh->commit();
+	}
+
+
 	function ActualizarAreaAsuntosPRC() {
 		$asuntos = array(
 			'0001036', '0002004', '0002015', '0002016', '0002017',
@@ -2970,4 +3039,4 @@ class Migracion {
 
 }
 
-?>
+ 

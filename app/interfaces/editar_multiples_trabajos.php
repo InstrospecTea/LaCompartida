@@ -1,4 +1,4 @@
-<?
+<?php  
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -77,7 +77,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 	$minutos_cobrables=0;
 	for($i=0; $i<count($id); ++$i)
 	{
-		if($t[$i]->Estado() == 'Cobrado' && $opcion != 'nuevo')
+		if($t[$i]->Estado() == __('Cobrado') && $opcion != 'nuevo')
 		{
 			$pagina->AddError(__('Trabajos masivos ya cobrados'));
 			$pagina->PrintTop($popup);
@@ -262,7 +262,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 				<script>
 					window.opener.Refrescar();
 				</script>
-			<?
+			<?php  
 		}
 		elseif($contadorModificados > 0)
 		{
@@ -271,7 +271,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 				<script>
 					window.opener.Refrescar();
 				</script>
-			<?
+			<?php  
 		}
 		#refresca el listado de horas.php cuando se graba la informacion desde el popup
 
@@ -292,7 +292,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 		<script>
 			window.opener.Refrescar();
 		</script>
-<?
+<?php  
 	}
 
 	/* Título opcion */
@@ -312,7 +312,7 @@ $where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][b
 <script type=text/javascript>
 function Validar(form)
 {
-<?
+<?php  
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "if(!form.codigo_asunto_secundario.value){";
@@ -322,8 +322,8 @@ function Validar(form)
 				echo "if(!form.codigo_asunto.value){";
 			}
 ?>
-			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
-<?
+			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
+<?php  
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			{
 				echo "form.codigo_asunto_secundario.focus();";
@@ -340,7 +340,7 @@ function Validar(form)
 	var cambiaCobrable = 0;
 	var cobrableOriginal = new Array();
 	var n;
-<?
+<?php  
 	for($i=0; $i<count($id); ++$i)
 		if($t[$i]->fields['cobrable'] == 0)
 			echo("cobrableOriginal[".$i."] = 0;");
@@ -390,12 +390,12 @@ function DivClear(div, dvimg)
 	if( div == 'tr_cliente' )
 	{
 		var img = document.getElementById( 'img_asunto' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
 	}
 	else
 	{
 		var img = document.getElementById( 'img_historial' );
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
 	}
 }
 
@@ -415,7 +415,7 @@ function ShowDiv(div, valor, dvimg)
 	if( div == 'tr_asunto' && codigo == '')
 	{
 		tr.style['display'] = 'none';
-		alert("<?=__('Debe seleccionar un cliente')?>");
+		alert("<?php echo __('Debe seleccionar un cliente')?>");
 		form.codigo_cliente.focus();
 		return false;
 	}
@@ -447,12 +447,12 @@ function ShowDiv(div, valor, dvimg)
 	{
 		WCH.Apply('tr_asunto');
 		WCH.Apply('tr_cliente');
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
 	}
 	else
 	{
 		WCH.Discard(div);
-		img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
 	}
 }
 
@@ -472,7 +472,7 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_cliente.value = codigo;
 		SetSelectInputId('campo_codigo_cliente','codigo_cliente');
-<?
+<?php  
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 		{
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
@@ -487,10 +487,10 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_asunto.value = codigo;
 		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+<?php   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 	 { ?>
 		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
-<? }?>
+<?php   }?>
 	}
 
 	var http = getXMLHTTP();
@@ -564,9 +564,9 @@ function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, dura
 	tr.style['display'] = 'none';
 	tr2.style['display'] = 'none';
 
-	img.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+	img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
 
-	img2.innerHTML = '<img src="<?=Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+	img2.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
 }
 
 function ActualizaCobro(valor)
@@ -575,7 +575,7 @@ function ActualizaCobro(valor)
 	var id_cobro = new Array();
 	var id_trabajo = new Array();
 	var fecha_trabajo = new Array();
-<?
+<?php  
 	for($i=0; $i<count($id); ++$i)
 	{
 		echo('codigosOriginales['.$i.'] = "'.$t[$i]->fields['codigo_asunto'] . '";');
@@ -644,15 +644,15 @@ function CheckVisible()
 {
 	if(!$('chkCobrable').checked)
 	{
-		<? if($permisos->fields['permitido']) { ?>
+		<?php   if($permisos->fields['permitido']) { ?>
 			$('chkVisible').checked=false;
-		<?
+		<?php  
 			}
 			else
 			{
 		?>
 			$('hiddenVisible').value=0;
-		<?}?>
+		<?php  }?>
 	}
 }
 </script>
@@ -661,7 +661,7 @@ A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<?
+<?php  
 echo(Autocompletador::CSS());
 if($opcion == "eliminar")
 {
@@ -670,23 +670,23 @@ if($opcion == "eliminar")
 else
 {
 ?>
-<form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?=$_SERVER[PHP_SELF]?>">
+<form id="form_editar_trabajo" name=form_editar_trabajo method="post" action="<?php echo $_SERVER[PHP_SELF]?>">
 <input type=hidden name=opcion value="guardar" />
-<?
+<?php  
 	if( $opcion != 'nuevo' )
 	{
 ?>
-<input type=hidden name='edit' value="<?= $opcion == 'edit' ? 1 : '' ?>" id='edit' />
-<?
+<input type=hidden name='edit' value="<?php echo  $opcion == 'edit' ? 1 : '' ?>" id='edit' />
+<?php  
 	}
 	else
 	{
 ?>
-<input type=hidden name='nuevo' value="<?= $opcion == 'nuevo' ? 1 : '' ?>" id='nuevo' />
-<?
+<input type=hidden name='nuevo' value="<?php echo  $opcion == 'nuevo' ? 1 : '' ?>" id='nuevo' />
+<?php  
 	}
 ?>
-<input type=hidden name=popup value='<?=$popup?>' id="popup">
+<input type=hidden name=popup value='<?php echo $popup?>' id="popup">
 
 <!-- TABLA HISTORIAL -->
 <table id="tr_cliente" cellpadding="0" cellspacing="0" width="100%">
@@ -696,7 +696,7 @@ else
 	<tr>
 		<td class="td_transparente">&nbsp;</td>
 		<td class="td_transparente" colspan="5" align="right">
-			<img style="filter:alpha(opacity=100);" src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
+			<img style="filter:alpha(opacity=100);" src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_cliente','none','img_historial');">
 		</td>
 		<td class="td_transparente">&nbsp;</td>
 	</tr>
@@ -704,7 +704,7 @@ else
 		<td width="5%" class="td_transparente">&nbsp;</td>
 		<td width="30%" id="leftcolumn" class="box_historial">
 			<div id="titulos">
-				<?=__('Cliente') ?>
+				<?php echo __('Cliente') ?>
 			</div>
 			<div id="left_data" class="span_data"></div>
 		</td>
@@ -712,7 +712,7 @@ else
 		</td>
 		<td width="30%" id="content" class="box_historial">
 			<div id="titulos">
-				<?=__('Asunto') ?>
+				<?php echo __('Asunto') ?>
 			</div>
 			<div id="content_data" class="span_data"></div>
 		</td>
@@ -720,7 +720,7 @@ else
 		</td>
 		<td width="30%" id="rightcolumn" class="box_historial">
 			<div id="titulos">
-				<?=__('Trabajo') ?>
+				<?php echo __('Trabajo') ?>
 			</div>
 			<div id="right_data" class="span_data"></div>
 		</td>
@@ -738,7 +738,7 @@ else
 	<tr>
 		<td class="td_transparente">&nbsp;</td>
 		<td align="right" colspan="4" class="td_transparente">
-			<img src="<?=Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
+			<img src="<?php echo Conf::ImgDir()?>/cruz_roja_13.gif" border="0" class="mano_on" alt="Ocultar" onClick="ShowDiv('tr_asunto','none','img_asunto');">
 		</td>
 		<td class="td_transparente">&nbsp;</td>
 	</tr>
@@ -746,7 +746,7 @@ else
 		<td width="5%" class="td_transparente">&nbsp;</td>
 		<td width="45%" id="content" class="box_historial">
 			<div id="titulos">
-				<?=__('Asunto') ?>
+				<?php echo __('Asunto') ?>
 			</div>
 			<div id="content_data2" class="span_data"></div>
 		</td>
@@ -754,7 +754,7 @@ else
 		</td>
 		<td width="45%" id="rightcolumn" class="box_historial">
 			<div id="titulos">
-				<?=__('Trabajo') ?>
+				<?php echo __('Trabajo') ?>
 			</div>
 			<div id="right_data2" class="span_data"></div>
 		</td>
@@ -766,29 +766,29 @@ else
 		<td colspan="6" class="td_transparente" style="height:190px">&nbsp;</td>
 	</tr>
 </table>
-<?
+<?php  
 if($txt_opcion)
 {
 ?>
-<table style='border:1px solid black' <?=$txt_opcion ? 'style=display:inline' : 'style=display:none'?> width=90%>
+<table style='border:1px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width=90%>
 	<tr>
-		<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?=$txt_opcion?></span></td>
+		<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?php echo $txt_opcion?></span></td>
 	</tr>
 </table>
 <br>
-<?
+<?php  
 }
 ?>
 <table style='border:1px solid black' id="tbl_trabajo" width=90%>
 	<tr>
 		<td align=center>
-			<span id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="img_historial" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()"><img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" class="mano_on" id="img_historial" onClick="ShowDiv('tr_cliente','inline','img_historial');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
 		<td align=right>
-			<?=__('Cliente')?>
+			<?php echo __('Cliente')?>
 		</td>
 		<td align=left>
-<?
+<?php  
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -812,13 +812,13 @@ if($txt_opcion)
 	 </tr>
 	 <tr>
 		<td align='center'>
-			<span id="img_asunto"><img src="<?=Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="img_asunto"><img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" id="img_asunto" class="mano_on" onMouseover="ddrivetip('Historial de trabajos ingresados')" onMouseout="hideddrivetip()" onClick="ShowDiv('tr_asunto','inline','img_asunto');"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
 		<td align='right'>
-			 <?=__('Asunto')?>
+			 <?php echo __('Asunto')?>
 		</td>
 		<td align=left>
-			<?
+			<?php  
 
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
@@ -832,40 +832,40 @@ if($txt_opcion)
 ?>
 		</td>
 	</tr>
-	<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+	<?php   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 			{ ?>
 				<tr>
 					<td colspan="2" align=right>
-						<?=__('Actividad')?>
+						<?php echo __('Actividad')?>
 					</td>
 					<td align=left>
-						<?= InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t[0]->fields[codigo_actividad]) ?>
+						<?php echo  InputId::Imprimir($sesion,"actividad","codigo_actividad","glosa_actividad", "codigo_actividad", $t[0]->fields[codigo_actividad]) ?>
 					</td>
 				</tr>
-	<?  }
+	<?php    }
 		else
 			{ ?>
 	<input type="hidden" name="codigo_actividad" id="codigo_actividad">
 	<input type="hidden" name="campo_codigo_actividad" id="campo_codigo_actividad">
-	<? }?>
-<?
+	<?php   }?>
+<?php  
 	if($permisos->fields['permitido'])
 	{
 ?>
 	<tr>
 		<td colspan="2" align=right>
-			<?=__('Total Horas') ?>
+			<?php echo __('Total Horas') ?>
 		</td>
 		<td align=left>
-			<input type="text" name="total_duracion_cobrable_horas" size=5 value=<?=$total_duracion_cobrable_horas ?> />
-			&nbsp;<?=__('Hrs')?>&nbsp;
-			<input type="text" name="total_duracion_cobrable_minutos" size=5 value=<?=$total_duracion_cobrable_minutos ?> />
-			&nbsp;<?=__('Min')?>&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:7pt"><?=__('(se modificará la duración cobrable de los trabajos seleccionados)') ?></span>
+			<input type="text" name="total_duracion_cobrable_horas" size=5 value=<?php echo $total_duracion_cobrable_horas ?> />
+			&nbsp;<?php echo __('Hrs')?>&nbsp;
+			<input type="text" name="total_duracion_cobrable_minutos" size=5 value=<?php echo $total_duracion_cobrable_minutos ?> />
+			&nbsp;<?php echo __('Min')?>&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:7pt"><?php echo __('(se modificará la duración cobrable de los trabajos seleccionados)') ?></span>
 		</td>
 	</tr>
 
-<? } ?>
-<?
+<?php   } ?>
+<?php  
 	if($permisos->fields['permitido'])
 		$where = "usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'";
 	else
@@ -877,11 +877,11 @@ if($txt_opcion)
 <?php if(!$permiso_profesional->fields['permitido'] || $permisos->fields['permitido']) { ?>
 	<tr>
 		<td colspan="2" align=right>
-			<?=__('Cobrable')?><br/>
+			<?php echo __('Cobrable')?><br/>
 		</td>
 		<td align="left">
 			<input type="checkbox" name="cobrable" value="1"
-			<?
+			<?php  
 			for($i=0; $i<count($id); ++$i)
 					// Si por lo menos uno de los trabajos seleccionados es cobrable el checkbox "cobrable" aparece seleccionado por defecto.
 					if($t[$i]->fields['cobrable'] == 1)
@@ -893,11 +893,11 @@ if($txt_opcion)
 			?>
 			id="chkCobrable" onClick="CheckVisible();" />
 			&nbsp;&nbsp;
-			<div id="divVisible" <?= $hay_alguno_cobrable? 'style="display:none"':'style="display:inline"'?> >
-			<? if($permisos->fields['permitido']) { ?>
-				<?=__('Visible')?>
+			<div id="divVisible" <?php echo  $hay_alguno_cobrable? 'style="display:none"':'style="display:inline"'?> >
+			<?php   if($permisos->fields['permitido']) { ?>
+				<?php echo __('Visible')?>
 				<input type="checkbox" name="visible" value="1"
-<?
+<?php  
 			for($i=0; $i<count($id); ++$i)
 					// Si por lo menos uno de los trabajos seleccionados es cobrable el checkbox "visible" aparece seleccionado por defecto.
 					if($t[$i]->fields['visible'] == 1)
@@ -907,19 +907,19 @@ if($txt_opcion)
 					}
 ?>
 				id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()" />
-			<? }
+			<?php   }
 				else
 				{
 			?>
-				<input type="hidden" name="visible" value="<?= $t[0]->fields['visible'] ? $t[0]->fields['visible'] : 1 ?>" id="hiddenVisible" />
-			<?
+				<input type="hidden" name="visible" value="<?php echo  $t[0]->fields['visible'] ? $t[0]->fields['visible'] : 1 ?>" id="hiddenVisible" />
+			<?php  
 				}
 			?>
 			</div>
 		</td>
 	</tr>
 <?php } ?>
-<?
+<?php  
 	if(isset($t[0]) && $t[0]->Loaded() && $opcion != 'nuevo')
 	{
 		echo("<tr><td colspan=2></td><td colspan=3 align=left>");
@@ -930,14 +930,14 @@ if($txt_opcion)
 	<tr>
 		<td colspan='3' align='right'>
 			<input type="hidden" name="opcion" value="guardar" />
-			<input type="hidden" name="ids" value="<? echo(''.$ids); ?>" />
-			<input type="submit" class="btn" value="<?=__('Guardar')?>" onclick="return Validar(this.form);" />
+			<input type="hidden" name="ids" value="<?php   echo(''.$ids); ?>" />
+			<input type="submit" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);" />
 		</td>
 	</tr>
 </table>
 </form>
 
-<?
+<?php  
 }
 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{

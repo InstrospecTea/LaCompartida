@@ -361,11 +361,7 @@ $migracion->EmitirFacturasPRC();
 
 	case 'emisionfacturas':
 		echo 'Emision de Facturas<br>';
-		if ($forzar == 1) {
-			$querypreviafactura="update cobro set documento=null";
-			$querypreviafactura="update cobro join  ".DBORIGEN.".Factura on cobro.id_cobro=Factura.NumeroFactura set cobro.documento=Factura.CodigoFacturaBoleta where Factura.TipoDocumento='F';";
-			$querypreviafactura.="truncate table factura;";
-			$querypreviafactura.="truncate table factura_cobro;";
+		 $MigradorSaej->QueryPreviaFacturas($forzar, $from, $size);
 
 			$querypreviafactura.="truncate table cta_cte_fact_mvto";
 			$querypreviafactura.="truncate table cta_cte_fact_mvto_moneda";
@@ -391,7 +387,7 @@ $migracion->EmitirFacturasPRC();
 		echo '</pre></div><b>Terminado en ' . $tiempototal . ' segundos. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
 		if ($size > 0 && intval($migracion->filasprocesadas) > 1) {
 				echo '<script>';
-				echo "setTimeout(\"location.href = '$nextlink';\",3500);";
+				echo "setTimeout(\"location.href = '$nextlink';\",1500);";
 				echo '</script>';
 				
 				}  else {
@@ -405,8 +401,8 @@ $migracion->EmitirFacturasPRC();
 	case 'correccionfacturas':
 		echo 'Corrección de Facturas para cuadrarse con SAEJ<br>';
 		
-
-
+			
+		//$MigradorSaej->QueryPreviaCorreccionFacturas($forzar);
 		 
 			$responseFacturas = mysql_query($MigradorSaej->QueryFacturas(), $sesion->dbh) or Utiles::errorSQL($MigradorSaej->QueryFacturas(), __FILE__, __LINE__, $sesion->dbh);
 			$migracion->Query2ObjetoFactura($responseFacturas);
@@ -418,7 +414,11 @@ $migracion->EmitirFacturasPRC();
 				echo "setTimeout(\"location.href = '$nextlink';\",3500);";
 				echo '</script>';
 				
-				}  
+				}  else {
+					$MigradorSaej->QueryPostCorreccionFacturas();
+
+						echo '</pre></div><b>Completado el proceso de emisión de facturas. Se procesaron '.$migracion->filasprocesadas.' registros y se presentaron ' . $migracion->errorcount . ' Errores  en '.(time()-$tini).' segundos</b>';
+				}
 		
 		 
 		 

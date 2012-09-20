@@ -630,33 +630,36 @@ if ($motivo == "horas") {
 	// Función para seleccionar todos las filas para editar, basada en la de phpMyAdmin
 	function seleccionarTodo(valor)
 	{
-		var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
-		var checkbox;
-		// Se selecciona fila por medio porque cada trabajo ocupa dos filas de la tabla y el checkbox para editar está en la primera fila de cada trabajo.
-		for (var i=0; i<rows.length; i+=2) {
-			checkbox = rows[i].getElementsByTagName( 'input' )[0];
-			if (checkbox && checkbox.type == 'checkbox' && checkbox.disabled == false) {
-				checkbox.checked = valor;
+	 
+		jQuery('.editartrabajo').each(function() {
+		 
+			if(!jQuery(this).is(':disabled')) {
+			  if(valor==true) {
+				  jQuery(this).attr('checked','checked');
+			  } else {
+				  jQuery(this).removeAttr('checked');
+			  }
 			}
-		}
+		});
+		
 		return true;
 	}
 	// Encuentra los id de los trabajos seleccionados para editar, depende del id del primer <tr> que contiene al trabajo.
 	// Los id quedan en un string separados por el caracter 't'.
 	function getIdTrabajosSeleccionados()
 	{
-		var rows = getElementsByClassName('buscador')[0].getElementsByTagName('tr');
-		var checkbox;
 		var ids = '';
-		// Se revisa fila por medio porque cada trabajo ocupa dos filas de la tabla y el checkbox para editar está en la primera fila de cada trabajo.
-		for (var i=0; i<rows.length; i+=2) {
-			checkbox = rows[i].getElementsByTagName( 'input' )[0];
-			if (checkbox.checked == true) {
-				ids += rows[i].id;
+				
+		jQuery('.editartrabajo').each(function() {
+			var trabajoid=jQuery(this).closest('tr').attr('id');
+			if(jQuery(this).is(':checked')) {
+			ids += trabajoid;
 			}
-		}
+		});
+		
 		return ids;
 	}
+	
 	// Intenta editar múltiples trabajos, genera un error si no hay trabajos seleccionados.
 	function editarMultiplesArchivos()
 	{
@@ -910,7 +913,9 @@ function Opciones(& $trabajo, $texto = '') {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
 			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
-			$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('" . __('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\">" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
+			$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('" ;
+			$opc_html.= __("No se puede modificar este trabajo. El Cobro que lo incluye ya ha sido Emitido al Cliente.") ;
+			$opc_html.= "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\">" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
 		}
 	} else if ($p_profesional->fields['permitido']) {
 		if ($trabajo->Estado() == 'Revisado') {
@@ -919,7 +924,9 @@ function Opciones(& $trabajo, $texto = '') {
 			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
 				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 			} else {
-				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('" . __('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\" >" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
+				$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('" ;
+			$opc_html.= __("No se puede modificar este trabajo. El Cobro que lo incluye ya ha sido Emitido al Cliente.") ;
+			$opc_html.="');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\" >" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
 			}
 		}
 	} else {
@@ -943,18 +950,22 @@ function LinkAlTrabajo(& $trabajo, $texto = '') {
 
 	if ($p_revisor->fields['permitido']) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
-			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
+			$opc_html.= "<a style='vertical-align:top;' href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
-			$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('" . __('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\">" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
+			$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('" ;
+			$opc_html.=__("No se puede modificar este trabajo. El Cobro que lo contiene ya ha sido Emitido al Cliente.") ;
+			$opc_html.= "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\">" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
 		}
 	} else if ($p_profesional->fields['permitido']) {
 		if ($trabajo->Estado() == 'Revisado') {
 			$opc_html .= "<span title='" . __('Este trabajo ya ha sido revisado') . "'>" . ($texto == '') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto . "</span>";
 		} else {
 			if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
-				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
+				$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"nuovaFinestra('Editar_Trabajo',550,450,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 			} else {
-				$opc_html.= "<a style='vertical-align:top;'  href=# onclick=\"alert('" . __('No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.') . "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\" >" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
+				$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('";
+				$opc_html.= __("No se puede modificar este trabajo.  El Cobro que lo contiene ya ha sido Emitido al Cliente.") ;
+				$opc_html.= "');\" title=\"" . __('Cobro ya Emitido al Cliente') . "\" >" . (($texto == '') ? "<img src=$img_dir/editar_off.gif border=0>" : $texto) . "</a>";
 			}
 		}
 	} else {
@@ -1033,15 +1044,15 @@ function funcionTR(& $trabajo) {
 	$dur_cob = "$h:$m";
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-	$fecha = Utiles::sql2fecha($trabajo->fields[fecha], $formato_fecha);
+	$fecha = Utiles::sql2fecha($trabajo->fields['fecha'], $formato_fecha);
 	if ($trabajo->fields['id_tramite_tipo'] > 0) {
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 		$html .= "<td colspan=9><strong>" . $trabajo->fields['glosa_tramite'] . "</strong></td></tr>";
 	}
-	$html .= "<tr id=\"t" . $trabajo->fields[id_trabajo] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
-	$html .= '<td><input type="checkbox" onmouseover="ddrivetip(\'Para editar múltiples trabajos haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
+	$html .= "<tr id=\"t" . $trabajo->fields['id_trabajo'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
+	$html .= '<td><input type="checkbox" class="editartrabajo " onmouseover="ddrivetip(\'Para editar múltiples trabajos haga click aquí.\')" onmouseout="hideddrivetip();" ></td>';
 	$html .= "<td>$fecha</td>";
-	$html .= "<td>" . $trabajo->fields[glosa_cliente] . "</td>";
+	$html .= "<td>" . $trabajo->fields['glosa_cliente'] . "</td>";
 	$html .= "<td><a title='" . $trabajo->fields['glosa_asunto'] . "'>" . $trabajo->fields['glosa_asunto'] . "</a></td>";
 	if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		if ($trabajo->fields['glosa_actividad'] == '') {
