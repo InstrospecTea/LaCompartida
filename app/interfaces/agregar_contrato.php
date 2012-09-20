@@ -2895,6 +2895,8 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 								</td>
 							</tr>
 <?php
+
+
 if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf')) {
 	$contrato->Edit('opc_restar_retainer', Conf::GetConf($sesion, 'OpcRestarRetainer') == 1 ? 1 : 0);
 	$contrato->Edit('opc_ver_asuntos_separados', Conf::GetConf($sesion, 'OpcVerAsuntosSeparado') == 1 ? 1 : 0);

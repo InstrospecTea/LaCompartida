@@ -1190,10 +1190,10 @@ class Contrato extends Objeto {
 		}
 		if ($this->Loaded()) {
 			$query = "UPDATE " . $this->tabla . " SET ";
-			if ($this->guardar_fecha)
+			if ($this->guardar_fecha )
 				$query .= "fecha_modificacion=NOW(),";
 
-			$c = 0;
+			$c = 0; 
 			foreach ($this->fields as $key => $val) {
 				if ($this->changes[$key]) {
 					$do_update = true;
@@ -1232,7 +1232,7 @@ class Contrato extends Objeto {
 		}
 		else {
 			$query = "INSERT INTO " . $this->tabla . " SET ";
-			if ($this->guardar_fecha)
+			if ($this->guardar_fecha && empty($this->fields['fecha_creacion']) )
 				$query .= "fecha_creacion=NOW(),";
 			$c = 0;
 			foreach ($this->fields as $key => $val) {
@@ -1251,6 +1251,8 @@ class Contrato extends Objeto {
 						$insertstatement=$this->sesion->pdodbh->prepare($query);
 						$insertstatement->execute($arrayparams);
 						$insertid=$this->sesion->pdodbh->lastInsertId();
+						$this->fields['id_contrato']=$insertid;
+						$this->Load($insertid);
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
