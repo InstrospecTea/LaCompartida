@@ -229,7 +229,12 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 		function DescripcionHonorariosGastos(& $fila)
 		{
 			$html = "";
-			$html .= "".$fila->fields['glosa_documento']."";
+			$id_documento = $fila->fields['id_documento'];
+			$id_cobro = $fila->fields['id_cobro'];
+
+			$link = "<a href='cobros5.php?id_cobro=$id_cobro&popup=1'>";
+			
+			$html .= $link.$fila->fields['glosa_documento']."</a>";
 			
 			/*Honorarios*/
 				$monto_total = Valor_Monto_Honorarios($fila);
@@ -240,9 +245,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 				$html .= "Gastos: ".$fila->fields['simbolo']."&nbsp;".$monto_total;
 
 			/*CAMPOS OCULTOS*/
-			$id_documento = $fila->fields['id_documento'];
-			$id_cobro = $fila->fields['id_cobro'];
-
+		
 			if($fila->fields['t_c_documento_moneda_cobro'])
 			{
 				$cambio_cobro = $fila->fields['t_c_documento_moneda_cobro'];
@@ -269,7 +272,7 @@ header("Content-Type: text/html; charset=ISO-8859-1");
 			$html .= "<input type=hidden name=\"decimales_cobro_".$id_documento."\" value = \"".$decimales_cobro."\" \>"."";
 			/*Decimales Cobro*/
 			$html .= "<input type=hidden name=\"id_cobro_".$id_documento."\" value = \"".$id_cobro."\" \>"."";
-
+		 
 			return $html;
 		}
 

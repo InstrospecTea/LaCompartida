@@ -12,29 +12,8 @@ require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
 class Documento extends Objeto {
 
-	private $campos = array(
-		'monto',
-		'monto_base',
-		'saldo_pago',
-		'tipo_doc',
-		'numero_doc',
-		'id_moneda',
-		'fecha',
-		'glosa_documento',
-		'codigo_cliente',
-		'id_banco',
-		'id_cuenta',
-		'numero_operacion',
-		'numero_cheque',
-		'id_factura_pago',
-		'es_adelanto',
-		'pago_honorarios',
-		'pago_gastos',
-		'id_contrato',
-		'id_solicitud_adelanto',
-		'id_usuario_ingresa',
-		'id_usuario_orden'
-	);
+	public $editable_fields=array();
+	
 
 	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "documento";
@@ -43,6 +22,11 @@ class Documento extends Objeto {
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
+		
+		$describe=$this->sesion->pdodbh->query( "SHOW COLUMNS FROM   {$this->tabla}");
+		$this->editable_fields=$describe->fetchALL(PDO::FETCH_COLUMN,0 );
+		unset($this->editable_fields[array_search($this->campo_id,$this->editable_fields)]);
+		 
 	}
 
 	function LoadByCobro($id_cobro) {
@@ -117,7 +101,7 @@ class Documento extends Objeto {
 		if (strlen($dtemp) == 2) {
 			$fecha = Utiles::fecha2sql($fecha);
 		}
-
+		
 		$query = "SELECT activo FROM cliente WHERE codigo_cliente='" . $codigo_cliente . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($activo) = mysql_fetch_array($resp);
@@ -134,7 +118,7 @@ class Documento extends Objeto {
 		$monto_base = $monto * $moneda->fields['tipo_cambio'] / $moneda_base['tipo_cambio'];
 		$out_neteos = "";
 
-		if ($usando_adelanto) { 
+		if ($usando_adelanto) {
 			$id_documento = $this->fields['id_documento'];
 			//resetea el saldo y aplica los neteos q lo recalculan
 			$this->Edit("saldo_pago", $this->fields['monto']);
@@ -143,10 +127,12 @@ class Documento extends Objeto {
 			}
 		} else {
 
-
-			$this->Edit("monto", number_format($monto * $multiplicador, $moneda->fields['cifras_decimales'], ".", ""));
 			$this->Edit("monto_base", number_format($monto_base * $multiplicador, $moneda_base['cifras_decimales'], ".", ""));
-			$this->Edit("saldo_pago", number_format($monto * $multiplicador, $moneda->fields['cifras_decimales'], ".", ""));
+			
+			$this->Edit("monto",      number_format($monto * $multiplicador, $moneda->fields['cifras_decimales'], ".", ""));
+			$this->Edit("saldo_pago", $this->fields['monto']);
+			
+			
 			if ($id_cobro) {
 				$this->Edit("id_cobro", $id_cobro);
 			}
@@ -168,11 +154,13 @@ class Documento extends Objeto {
 			 
 			$this->Edit("pago_honorarios", empty($pago_honorarios) ? '0' : '1');
 			$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
-			$this->Edit("id_contrato", empty($id_contrato) ? 'NULL' : $id_contrato);
+		
+			if(!empty($id_solicitud_adelanto) && $id_solicitud_adelanto!='') {
 			$this->Edit('id_solicitud_adelanto', $id_solicitud_adelanto);
-			$this->Edit('id_usuario_orden', $id_usuario_orden);
-			$this->Edit('id_usuario_ingresa', $id_usuario_ingresa);
-
+			if(!in_array('id_solicitud_adelanto',$this->editable_fields)) {
+					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
+				}
+			}
 			if ($this->Write()) {
 
 				$id_documento = $this->fields['id_documento'];
@@ -191,8 +179,11 @@ class Documento extends Objeto {
 				if (!empty($pagina)) {
 					$pagina->addInfo($msg);
 				}
-
+				
+		
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
+				 
+				
 			} else {
 				if (!empty($pagina)) {
 					$pagina->AddError($documento->error);
@@ -230,6 +221,7 @@ class Documento extends Objeto {
 				$cobrox->Write();
 			}
 		}
+		
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>" . $out_neteos . "</table>";
 		//echo $out_neteos;
 
@@ -251,6 +243,11 @@ class Documento extends Objeto {
 		}
 		if (array_key_exists('id_solicitud_adelanto', $this->fields) && empty($this->fields['id_solicitud_adelanto'])) {
 			$this->Edit("id_solicitud_adelanto", 'NULL');
+		}
+			$this->Edit("id_contrato", empty($this->fields['id_contrato']) ? 'NULL' : $this->fields['id_contrato']);
+		
+		if(!$this->Loaded()) {
+			$this->Edit("saldo_pago", $this->fields['monto']);
 		}
 	}
 

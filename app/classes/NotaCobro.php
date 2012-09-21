@@ -9324,7 +9324,7 @@ class NotaCobro extends Cobro {
 		$monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
 		$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
 		$espacio_moneda = ' ';
-		if (((method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio')) || (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio()))) {
+		if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio'))  {
 			$espacio_moneda = '';
 		}
 
@@ -9332,19 +9332,28 @@ class NotaCobro extends Cobro {
 		$saldo_pagos = 0;
 		$saldo_adelantos = 0;
 
-		$queryadelantos = "SELECT id_contrato, -1*saldo_pago*cm1.tipo_cambio / cm2.tipo_cambio  as saldo_adelanto
+		$queryadelantos = "SELECT ifnull(documento.id_contrato,0) as id_contrato, -1*saldo_pago*cm1.tipo_cambio / cm2.tipo_cambio  as saldo_adelanto, cliente.id_contrato as contrato_default 
 								FROM `documento` 
+								join cliente on documento.codigo_cliente=cliente.codigo_cliente
 								join cobro_moneda cm1 on cm1.id_moneda=documento.id_moneda and cm1.id_cobro=" . $this->fields['id_cobro'] . "
 								join cobro_moneda cm2 on cm2.id_moneda=" . $this->fields['opc_moneda_total'] . " and cm2.id_cobro=" . $this->fields['id_cobro'] . "
-								WHERE es_adelanto=1 and codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
-		//echo $queryadelantos;
+								WHERE es_adelanto=1 and documento.codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
+	 
+		 
 		$montoadelantosinasignar = 0;
+		$montoadelantosinasignary=0;
 		$adelantossinasignar = $this->sesion->pdodbh->query($queryadelantos);
 		foreach ($adelantossinasignar as $adelantosinasignar) {
+			 
 			if ($adelantosinasignar['id_contrato'] == $this->fields['id_contrato']) {
 				$montoadelantosinasignar+=$adelantosinasignar['saldo_adelanto'];
+			} else if ($adelantosinasignar['id_contrato']==0 && $adelantosinasignar['contrato_default']==$this->fields['id_contrato']) {
+				$montoadelantosinasignary+=$adelantosinasignar['saldo_adelanto'];
 			}
 		}
+		
+		
+		
 
 		if ($this->TienePagosAdelantos()) {
 			$query = "
