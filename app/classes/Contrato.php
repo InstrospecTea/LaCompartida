@@ -1121,6 +1121,9 @@ class Contrato extends Objeto {
 			
 			$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
 			$this->Edit("id_carta", $this->fields['id_carta'] ?  $this->fields['id_carta'] : 'NULL');
+			
+				$this->Edit("codigo_idioma", $this->fields['codigo_idioma'] ?  $this->fields['codigo_idioma'] : 'es');
+			
 			$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
 			$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
 				$this->Edit("id_formato", $this->fields['id_formato']     ? $this->fields['id_formato']     : 'NULL');
@@ -1252,7 +1255,9 @@ class Contrato extends Objeto {
 						$insertstatement->execute($arrayparams);
 						$insertid=$this->sesion->pdodbh->lastInsertId();
 						$this->fields['id_contrato']=$insertid;
+						$this->Edit('id_contrato',$insertid);
 						$this->Load($insertid);
+					 
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
@@ -1264,7 +1269,7 @@ class Contrato extends Objeto {
 						return false;
 			}
 			
-			$this->fields[$this->campo_id] = mysql_insert_id($this->sesion->dbh);
+			
 
 			$query3 = " INSERT INTO modificaciones_contrato 
 										(id_contrato,fecha_creacion,fecha_modificacion,id_usuario,id_usuario_responsable)

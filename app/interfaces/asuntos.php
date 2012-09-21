@@ -120,17 +120,11 @@ else
 <?php
 if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	echo AutocompletadorAsunto::CSS();
-} else {
-	echo Autocompletador::CSS(); 
-}
+} 
 ?>
 <form method=post name='form' id='form'>
 	<input type="hidden" name="busqueda" value="TRUE">
-	<!-- Calendario DIV -->	
-	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
-		<div class="floating" id="calendar"></div>
-	</div>
-	<!-- Fin calendario DIV -->
+ 
 
 
 <?php if ($id_cobro == "") {
@@ -140,82 +134,58 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 			<tr>
 				<td></td>
 				<td colspan="3" align="right">
-					<a href="#" id="agregar_asunto" title="<?php echo  __('Agregar Asunto') ?>"><img src="<?php echo  Conf::ImgDir() ?>/agregar.gif" border=0><?php echo  __('Agregar') . ' ' . __('Asunto') ?></a>
+					<a href="#" class="btn botonizame" icon="agregar" id="agregar_asunto" title="<?php echo  __('Agregar Asunto') ?>"><?php echo  __('Agregar') . ' ' . __('Asunto') ?></a>
 				</td>
 			</tr>
 		</table>
 		<?php 	}
 	?>
-<?php if ($opc != "entregar_asunto" && $from != "agregar_cliente") {
-	?>
-		<table width="90%"><tr><td>
-					<fieldset class="tb_base" width="100%">
+<?php if ($opc != "entregar_asunto" && $from != "agregar_cliente") { 	?>
+		 
+					<fieldset class="tb_base"  width="90%">
 						<legend><?php echo  __('Filtros') ?></legend>	
-						<table style="border: 0px solid black" width='100%'>
+						<table   style="border: 0 none" width='90%'>
 							<tr>
-								<td colspan=4>&nbsp;</td>
+								<td colspan="4">&nbsp;</td>
 							</tr>
 							<tr>
-								<td align=right style="font-weight:bold;">
+								<td class="ar" style="font-weight:bold;">
 		<?php echo  __('Activo') ?> 
 								</td>
-								<td align=left colspan=3>
+								<td class="al" style="width:80px;" >
 	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "activo", $activo, '', 'Todos', '60') ?>
 								</td>
-							</tr>
-							<tr>
-								<td align=right style="font-weight:bold;">
+							 
+								<td class="ar" style="font-weight:bold;">
 		<?php echo  __('Cobrable') ?> 
 								</td>
-								<td align=left colspan=3>
+								<td class="al"  >
 	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, '', 'Todos', '60') ?>
 								</td>
 							</tr>
 							<tr>
-								<td align=right style="font-weight:bold;">
+								<td class="ar" style="font-weight:bold;">
 	<?php echo  __('Cliente') ?>
 								</td>
-								<td nowrap align=left colspan=3>
-									<?php
-									if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
-										if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-											echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 320);
-										} else {
-											echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "", 320);
-										}
-									}
-									else {
-										if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-											if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-												echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-											} else {
-												echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
-											}
-										}
-										else {
-											if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() )) {
-												echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 320);
-											} else {
-												echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "", 320);
-											}
-										}
-									}
-									?>
+								<td nowrap class="al" colspan="3">
+									 
+									<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, false,320);?>
+									 
 								</td>
 							</tr>
 							<tr>
-								<td width=25% align=right style="font-weight:bold;">
+								<td width=25% class="ar" style="font-weight:bold;">
 									<?php echo  __('C&oacute;digo asunto') ?>
 								</td>
-								<td nowrap align=left colspan=4>
+								<td nowrap class="al" colspan=4>
 									<?php
 									if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
-										if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))
+										if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ) {
 											echo AutocompletadorAsunto::ImprimirSelector($sesion, '', $codigo_asunto_secundario, $codigo_cliente);
-										else
+										} else {
 											echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, '', $codigo_cliente);
-									}
-									else {
+										}
+									} 	else {
 										?>
 										<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo  $codigo_asunto ?>" onchange="this.value=this.value.toUpperCase();">
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -227,61 +197,44 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 								</td>
 							</tr>
 							<tr>
-								<td align=right style="font-weight:bold;">
+								<td class="ar" style="font-weight:bold;">
 									<?php echo  __('Fecha creaci&oacute;n') ?> 
 								</td>
-								<td nowrap align=left colspan= 3>
-									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-									<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td nowrap class="al" colspan= 3>
+									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" class="fechadiff" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+ 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									<?php echo  __('Hasta') ?>
-									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha2" value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-									<img src="<?php echo  Conf::ImgDir() ?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
-								</td>
+									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha2"  class="fechadiff"  value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+ 								</td>
 							</tr>
 							<tr>
-								<td align=right style="font-weight:bold;">
+								<td class="ar" style="font-weight:bold;">
 									<?php echo  __('Usuario') ?>
 								</td>
-								<td align=left colspan=3>
+								<td class="al" colspan="3">
 	<?php echo  Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ',apellido1,apellido2,',',nombre) FROM usuario", "id_usuario", $id_usuario, '', 'Todos', '200') ?>
 								</td>
 							<tr>
 							<tr>
-								<td align=right style="font-weight:bold;">
+								<td class="ar" style="font-weight:bold;">
 	<?php echo  __('&Aacute;rea') ?>
 								</td>
-								<td align=left colspan=3>
+								<td class="al" colspan="3">
 									<?php echo  Html::SelectQuery($sesion, "SELECT id_area_proyecto, glosa FROM prm_area_proyecto ORDER BY orden ASC", "id_area_proyecto", $id_area_proyecto, '', 'Todos', '200') ?>
 								</td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
-								<td align=left colspan=3>
-									<input type="button" class=btn name="buscar" value="<?php echo  __('Buscar') ?>" onclick="Listar( this.form, 'buscar')">
-									<input type="button" <?php echo $hide_areas; ?> class=btn value="<?php echo  __('Descargar listado a Excel') ?>" onclick="Listar(this.form, 'xls')" >
-									<input type="button" <?php echo $hide_areas; ?> class=btn value="<?php echo  __('Descargar Informaci&oacute;n Comercial a Excel') ?>" onclick="Listar(this.form,'facturacion_xls')" >
+								<td class="al" colspan="3">
+									<a href="javascript:void(0);" icon="find"  class="btn botonizame" name="buscar"   onclick="Listar(jQuery('#form').get(0), 'buscar')"><?php echo  __('Buscar') ?></a>
+									<a href="javascript:void(0);" icon="xls"  class="btn botonizame" <?php echo $hide_areas; ?>    onclick="Listar(jQuery('#form').get(0), 'xls')" ><?php echo  __('Descargar listado a Excel') ?></a>
+									<a href="javascript:void(0);" icon="xls"  class="btn botonizame" <?php echo $hide_areas; ?>     onclick="Listar(jQuery('#form').get(0),'facturacion_xls')" ><?php echo  __('Descargar Informaci&oacute;n Comercial a Excel') ?></a>
 								</td>
 							</tr>
 						</table>
 					</fieldset>
-				</td></tr></table>
-	<script type="text/javascript">
-		Calendar.setup(
-		{
-			inputField	: "fecha1",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha1"		// ID of the button
-		}
-	);
-		Calendar.setup(
-		{
-			inputField	: "fecha2",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha2"		// ID of the button
-		}
-	);
-	</script>
+				 
+	
 <?php }
 ?>
 	</form>
@@ -313,7 +266,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	}
 
 	if ($codigo_asunto != "") {
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')  ) {
 			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
@@ -326,7 +279,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	}
 
 	if ($codigo_cliente || $codigo_cliente_secundario) {
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ) ) && !$codigo_cliente) {
+		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')   && !$codigo_cliente) {
 			$cliente = new Cliente($sesion);
 			if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario))
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
@@ -389,23 +342,23 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->mensaje_error_fecha = "N/A";
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('Asuntos');
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-		$b->AgregarEncabezado("codigo_asunto_secundario", __('Código'), "align=left");
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario') ){
+		$b->AgregarEncabezado("codigo_asunto_secundario", __('Código'), " class='al'  style='white-space:nowrap;' ");
 	} else {
-		$b->AgregarEncabezado("codigo_asunto", __('Código'), "align=left");
+		$b->AgregarEncabezado("codigo_asunto", __('Código'), " class='al' style='white-space:nowrap;' ");
 	}
-	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "align=left");
-	$b->AgregarEncabezado("glosa_asunto", __('Asunto'), "align=left");
-	#		$b->AgregarEncabezado("descripcion_asunto","Descripción","align=left");
+	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "class='al'");
+	$b->AgregarEncabezado("glosa_asunto", __('Asunto'), "class='al'");
+	#		$b->AgregarEncabezado("descripcion_asunto","Descripción","class="al"");
 	#		$b->AgregarEncabezado("horas_trabajadas","Horas trabajadas","","","SplitDuracion");
-	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "align=left");
-	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "align=left");
+	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "class='al'");
+	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "class='al'");
 	#		$b->AgregarEncabezado("horas_no_cobradas","Horas no cobradas","","","SplitDuracion");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
 	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creación"'));
 	
 	if ($permisos->fields['permitido'] || $permisos_asuntos->fields['permitido'])
-		$b->AgregarFuncion("$link", 'Opciones', "align=center nowrap");
+		$b->AgregarFuncion("$link", 'Opciones', "align=center' nowrap");
 	$b->color_mouse_over = "#bcff5c";
 	#		if($motivo == "cobros")
 	#			$b->funcionTR = "funcionTR";
@@ -451,7 +404,7 @@ function Opciones(& $fila) {
 		return Cobrable($fila, $checkall);
 	}
 	$id_asunto = $fila->fields['id_asunto'];
-	if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
+	if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo') )  {
 		if ($permisos_asuntos->fields['permitido']) {
 			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>";
 		} else {
@@ -494,17 +447,10 @@ function funcionTR(& $asunto) {
 	return $html;
 }
 
-if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
+if (UtilesApp::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	if (empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente') {
 		echo(AutocompletadorAsunto::Javascript($sesion, false));
 	}
-} else {
-	if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-		if (empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente') {
-			echo(Autocompletador::Javascript($sesion, false));
-		}
-	}
-}
-echo(InputId::Javascript($sesion));
+} 
 $pagina->PrintBottom($popup);
-?>
+
