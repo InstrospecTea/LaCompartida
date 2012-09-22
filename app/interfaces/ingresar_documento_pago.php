@@ -149,19 +149,10 @@ if ($opcion == "guardar") {
 
 	
 	$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $usando_adelanto, $id_contrato, !empty($pagar_facturas),$id_usuario_ingresa,$id_usuario_orden, $id_solicitud_adelanto);
-	//$resp = mysql_query($testimonio, $sesion->dbh);
+	 
 	?>
 	<script type="text/javascript">
-		/*if(window.location==parent.window.location) {
-						   if( window.opener.Refrescarse ) {
-									window.opener.Refrescarse(); 
-						   } else if( window.opener.Refrescar ) {
-							   window.opener.Refrescar(); 
-							   }
-						} else 	{ 
-						   if( parent.window.Refrescar ) parent.window.Refrescar();
-							parent.window.jQuery('#dialogomodal').dialog('option','title','Datos ingresados con éxito');
-						}			*/
+		 
 			if( window.opener.Refrescarse ) {
 				window.opener.Refrescarse(); 
 			} else if( window.opener.Refrescar ) {
@@ -169,19 +160,9 @@ if ($opcion == "guardar") {
 			}
 	</script>
 	<?php
-	if ($nuevo && $id_documento) {
-
-		$_SESSION["infos_tmp"] = $pagina->infos;  /* es en este caso que da problemas que se pierden los avisos */
-		?>
-		<script type="text/javascript">
-		                            
-				document.location.href = document.location.href.replace(/&?codigo_cliente\w*=[^&]*/,'') + '<?php echo "&id_documento=$id_documento&id_usuario_orden=$id_usuario_orden&id_usuario_ingresa=$id_usuario_ingresa"; ?>';
-		</script>
-	<?php
-	}
+	//echo '<pre>';print_r($documento->fields);echo '</pre>'; die('LISTO');
 	$documento->Load($id_documento);
-	$monto_neteos = $documento->fields['saldo_pago'] - $documento->fields['monto'];
-	$monto_pago = -1 * $documento->fields['monto'];
+
 }
 
 if ($documento->Loaded()) {
@@ -198,90 +179,19 @@ $txt_tipo = empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelan
 
 $pagina->titulo = $txt_pagina;
 
-/*
- * esto fue agregado por que por algun motivo no funciona ni con $_COOKIES ni con $_SESSION para recuperarlo en la pagina 
- * luego del redirect efectuado producto de comprobación por adelantos.
- * no me gusta la solución pero es la única que está funcionando
- */
-if (isset($_SESSION['infos_tmp'])) {
-	foreach ($_SESSION['infos_tmp'] as $key => $info) {
-		$pagina->addInfo($info);
-	}
 
-	/* magia porque por ahora no puedo explicarlo */
-	$en_query_string = strpos($_SERVER['QUERY_STRING'], "id_documento");
-	if ($en_query_string !== 0) {
-		unset($_SESSION['infos_tmp']);
-	}
-}
 $pagina->PrintTop($popup);
 ?>
-
+	<script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 <script type="text/javascript">
-	//  alert(window.location.href+' vs '+parent.window.location.href);
-	//Extend the scal library to add draggable calendar support.
-	//This script block can be added to the scal.js file.
-	Object.extend(scal.prototype,
-	{
-		toggleCalendar: function()
-		{
-			var element = $(this.options.wrapper) || this.element;
-			this.options[element.visible() ? 'onclose' : 'onopen'](element);
-			this.options[element.visible() ? 'closeeffect' : 'openeffect'](element, {duration: 0.5});
-		},
-
-		isOpen: function()
-		{
-			return ( $(this.options.wrapper) || this.element).visible();
-		}
-	});
-
-	//this is a global variable to have only one instance of the calendar
-	var calendar = null;
-
-	//@element   => is the <div> where the calender will be rendered by Scal.
-	//@input     => is the <input> where the date will be updated.
-	//@container => is the <div> for dragging.
-	//@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-	function showCalendar(element, input, container, source)
-	{
-		if (!calendar)
-		{
-			container = $(container);
-			//the Draggable handle is hard coded to "rtop" to avoid other parameter.
-			new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-
-			//The singleton calendar is created.
-			calendar = new scal(element, $(input),
-			{
-				updateformat: 'dd-mm-yyyy',
-				closebutton: '&nbsp;',
-				wrapper: container
-			});
-		}
-		else
-		{
-			calendar.updateelement = $(input);
-		}
-
-		var date = new Date($F(input));
-		calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-
-		//Locates the calendar over the calling control  (in this example the "img").
-		if (source = $(source))
-		{
-			Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
-		}
-
-		//finally show the calendar =)
-		calendar.openCalendar();
-	};
-
-
-	document.observe('dom:loaded', function() {
-	});
-
-
+	 
+	 function Uniformar() {
+		 jQuery('.saldojq, #monto_pagos, #monto, #monto_aux, #saldo_pago, #saldo_pago_aux').each(function() {
+					 jQuery(this).parseNumber({format:"#.000", locale:"us"});
+					 jQuery(this).formatNumber({format:"#.000", locale:"us"});
+		  });
+	 }
+	 
 
 	function Validar(form)
 	{
@@ -387,6 +297,7 @@ if (!empty($adelanto)) {
 				}
 <?php } ?>
 		form.submit();
+		
 		}
 
 		function CheckEliminaIngreso(chk)
@@ -399,6 +310,9 @@ if (!empty($adelanto)) {
 
 			return true;
 		}
+	jQuery('document').ready(function() {
+		
+	
 		jQuery('#id_moneda').live('change', function() {
 			var tipopago=jQuery('#tipodocumento').val();
 			if(tipopago=='editaadelanto') return false;
@@ -500,8 +414,24 @@ if (!empty($adelanto)) {
         
 
         
-        jQuery('#monto').live('keyup', function() {	
+        
+		
+		 jQuery('#monto').typeWatch({
+			callback: function() {
+			 Uniformar();
+			 Repartir();
+			 SetMontoPagos();
+			 
+			},
+			wait: 700,
+			highlight: false,
+			captureLength: 1
+		  });
+		 
+		 })
+		function Repartir() {
 			var monto_tmp=0;
+			var saldo=(1.0*jQuery('#monto').val()-1.0*jQuery("#anteriorduro").val());
 			jQuery('.saldojq').each(function() {
                     
 				jQuery(this).val(Math.min(saldo, Math.max(0,Number(jQuery('#'+jQuery(this).attr('id').replace('pago','cobro')).val()))));
@@ -516,11 +446,11 @@ if (!empty($adelanto)) {
 			}); 
 			if(monto_tmp>0) {
                 
-                jQuery('#monto').val(Number(monto_tmp));
-				jQuery('#monto_pagos').val(Number(monto_tmp));
+                jQuery('#monto, #monto_pagos').val(Number(monto_tmp)+1.0*jQuery("#anteriorduro").val());
+				
 			}
-			SetMontoPagos();
-		});
+			 
+		}
         
 		function CargarTabla(actualizar,oldtasa, newtasa) {
 <?php if (!empty($adelanto) && !$id_documento) echo '		return;'; ?>
@@ -745,49 +675,35 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
      
 			} else {
 				jQuery("#pagosanteriores").val(anterior);
-				if (Number(jQuery('#monto').val())==0 && (tipopago=='documento' || tipopago=='adelanto'))   jQuery('#monto').val(anterior);
-				saldo=Number(jQuery('#monto').val()-jQuery("#anteriorduro").val());
-				// alert(saldo);
+				if (1*(jQuery('#monto').val())==0 && (tipopago=='documento' || tipopago=='adelanto'))  {
+					jQuery('#monto').val(anterior);
+					
+				}
+				 
+				 
+				 
 				jQuery('#monto_aux').val(Number(jQuery('#monto').val()));
 				jQuery('#monto_pagos').val(Number(jQuery('#monto').val()));
 			}
+			  
 <?php if ($_GET['adelanto'] == 1 AND !$_GET['id_documento'] AND !$id_documento) echo 'return;'; ?> 
                     var cifras_decimales = Number(jQuery('#cifras_decimales').val());
             
-             
-					/*if(tipopago!='adelanto') {
-             monto_tmp=0;
-                jQuery('.saldojq').each(function() {
-                    
-                   jQuery(this).val(Math.min(saldo, Math.max(0,Number(jQuery('#'+jQuery(this).attr('id').replace('pago','cobro')).val()))));
-                    
-                    saldo=saldo-Number(jQuery(this).val());
-                    
-                    if(saldo<0) { 
-                        saldo=0;
-                    } else {
-                        monto_tmp=    monto_tmp+Number(jQuery(this).val());
-                    }  
-                }); 
-             
-                
-                jQuery('#monto').val(Number(monto_tmp));
-		jQuery('#monto_pagos').val(Number(monto_tmp));
-                   }*/
+              
 					if (monto_tmp==undefined) monto_tmp=0;
 					if(jQuery('#saldo_pago_aux').length>0) {
 						saldopagomaximo=anterior+Number(jQuery('#saldo_pago_aux').val());
 						if(monto_tmp>saldopagomaximo) {
+							
 							jQuery('#monto').val(saldopagomaximo);
-							jQuery('#monto').keyup();
+							Repartir();
 							monto_tmp=saldopagomaximo;
 						}
-                  
+               
 						jQuery('#saldo_pago').val(saldopagomaximo-monto_tmp);
 					}
 <?php if (!$documento->Loaded()) { ?>
-				var monto_pagos = document.getElementById('monto_pagos');
-				var monto = document.getElementById('monto');
+				
 				if(jQuery('#monto_pagos'))
 				{
 					jQuery('#monto').val(Math.round(jQuery('#monto_pagos').val() * 100) / 100);
@@ -989,8 +905,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		<tr>
 			<td align=right><?php echo __('Fecha') ?></td>
 			<td align=left>
-				<input type="text" name="fecha" value="<?php echo $documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-				<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+				<input type="text" name="fecha" class="fechadiff" value="<?php echo $documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
+				
 			</td>
 		</tr>
 <?php if ($id_solicitud_adelanto && UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
@@ -1053,7 +969,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 				?>
 				<input name="monto" <?php echo $disabled_monto ?> id="monto" size=10 value="<?php echo str_replace("-", "", $documento->fields['monto']); ?>" />
-				<input name="monto_aux"  class="oculto" style="display:none;"   type="text" id="monto_aux" size=10 value="<?php echo abs($documento->fields['monto']); ?>" />
+				<input name="monto_aux"  class="oculto" style="display:none;"   type="text" id="monto_aux" size=10 value="<?php echo str_replace("-", "", $documento->fields['monto']); ?>" />
 
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?php echo __('Moneda') ?>&nbsp;
@@ -1080,7 +996,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				</td>
 				<td align=left>
 				<input type="text" name="saldo_pago" id="saldo_pago" size=10 value="<?php  echo str_replace("-","",$documento->fields['saldo_pago']); ?>" readonly="readonly"/>
-                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php  echo abs($documento->fields['saldo_pago']); ?>" readonly="readonly"/>			
+                                <input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php echo str_replace("-", "", $documento->fields['saldo_pago']); ?>" readonly="readonly"/>			
 				</td>
 			</tr>
 		<?php } ?>
@@ -1314,15 +1230,9 @@ if (empty($adelanto) || $id_documento) {
 
 </form>
 <script type="text/javascript">
-	jQuery('.oculto').hide();
+	 jQuery('.oculto').hide();
 	if(window.location!=parent.window.location) jQuery('#txt_pagina').hide();
-	Calendar.setup(
-	{
-		inputField	: "fecha",		// ID of the input field
-		ifFormat	: "%d-%m-%Y",	// the date format
-		button		: "img_fecha"	// ID of the button
-	}
-);
+ 
 </script>
 <?php
 if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {

@@ -1098,6 +1098,12 @@ class Contrato extends Objeto {
 		
 		
 		$this->Edit("activo",$this->extra_fields['activo_contrato']  ? 'SI' : 'NO');
+
+		$this->Edit("fono_contacto",$this->extra_fields['fono_contacto_contrato']);
+		$this->Edit("email_contacto",$this->extra_fields['email_contacto_contrato']);
+		$this->Edit("direccion_contacto",$this->extra_fields['direccion_contacto_contrato']);
+		 
+
 		
 		$this->Edit("id_usuario_responsable", (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL");
 			if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
@@ -1129,7 +1135,9 @@ class Contrato extends Objeto {
 				$this->Edit("id_formato", $this->fields['id_formato']     ? $this->fields['id_formato']     : 'NULL');
  	
 		 
-			$this->Edit("opc_ver_profesional", empty($this->fields['opc_ver_profesional']    ) ? '0' : '1');
+
+			
+
 			
 			if( isset( $this->extra_fields['esc_tiempo'] ) ) {
 				for( $i = 1; $i <= sizeof($this->extra_fields['esc_tiempo']) ; $i++){		
@@ -1174,6 +1182,38 @@ class Contrato extends Objeto {
 			}
 			if (UtilesApp::GetConf($this->sesion, 'ExportacionLedes')) {
 				$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0': '1');
+			}
+	}
+
+	/**
+	 * Completa el objeto con los valores que vengan en $parametros
+	 * También sirve para definir cuando un parámetro que no viene debe ser marcado como cero
+	 *
+	 * @param array $parametros entrega los campos y valores del objeto campo => valor
+	 * @param boolean $edicion indica si se marcan los $parametros para edición
+	 */
+	function Fill($parametros, $edicion = false) {
+		foreach ($parametros as $campo => $valor) {
+			if (in_array($campo, $this->editable_fields)) {
+				$this->fields[$campo] = $valor;
+
+
+
+				if ($edicion) {
+					$this->Edit($campo, $valor);
+				}
+			} else {
+				$this->extra_fields[$campo] = $valor;
+			}
+		}
+		foreach($this->editable_fields as $editable_field) {
+				if(substr($editable_field,0,4)=='opc_') {
+					if(empty($parametros[$editable_field])) {
+						$this->Edit($editable_field,"0");
+					} else {
+						$this->Edit($editable_field,$parametros[$editable_field]);
+					}
+				}
 			}
 	}
 
@@ -1257,7 +1297,8 @@ class Contrato extends Objeto {
 						$this->fields['id_contrato']=$insertid;
 						$this->Edit('id_contrato',$insertid);
 						$this->Load($insertid);
-					 
+						print_r($contrato->fields);
+						echo 'Contrato.php linea 1260<br><hr>';
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
