@@ -67,10 +67,13 @@ $Pagina->PrintTop();
 						</tr>
 						<tr>
 							<td align="right" width="30%">
-								<label for="codigo_asunto"><?php echo __('Asunto'); ?></label>
+								<label for="id_contrato"><?php echo __('Asuntos'); ?></label>
 							</td>
-							<td colspan="3" align="left">
-								<?php echo UtilesApp::CampoAsunto($Sesion, $SolicitudAdelanto->fields['codigo_cliente'], $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+							<td colspan="3" align="left" id="td_selector_contrato">
+								<?php
+								$Contrato = new Contrato($Sesion);
+								echo $Contrato->ListaSelector($SolicitudAdelanto->fields['codigo_cliente'], '', $SolicitudAdelanto->fields['id_contrato']);
+								?>
 							</td>
 						</tr>
 						<tr>
@@ -180,6 +183,7 @@ function Opciones(& $fila) {
 			var codigo_cliente = $('codigo_cliente').value;
 			var url_extension = "&codigo_cliente=" + codigo_cliente;
 <?php } ?>
+			url_extension += '&id_contrato=' + $('id_contrato').value;
 		}
 		if (tipo == 'solicitud_adelanto') {
 			var urlo = "agregar_solicitud_adelanto.php?popup=1" + url_extension;
@@ -195,6 +199,34 @@ function Opciones(& $fila) {
 	
 	Calendar.setup({ inputField	: "fecha_desde", ifFormat : "%d-%m-%Y", button : "img_fecha_desde" });
 	Calendar.setup({ inputField	: "fecha_hasta", ifFormat : "%d-%m-%Y", button : "img_fecha_hasta" });
+	
+	var valor_anterior_codigo;
+	var campo_cliente;
+
+	jQuery(document).ready(function () {
+		// Cargar contratos on select
+		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
+		campo_cliente.change(ActualizarContratos);
+		valor_anterior_codigo = campo_cliente.val();
+		window.setInterval(ComprobarCodigos, 500, campo_cliente.val());
+	});
+
+	function ActualizarContratos() {
+		url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + jQuery(this).val();
+		jQuery.ajax({
+			url: url,
+			success: function (data) {
+				jQuery('#td_selector_contrato').html(data);
+			}
+		});
+	}
+
+	function ComprobarCodigos(valor_nuevo) {
+		if (valor_anterior_codigo != valor_nuevo) {
+			campo_cliente.change();
+			valor_anterior_codigo = valor_nuevo;
+		}
+	}
 </script>
 <?php
 

@@ -481,6 +481,10 @@ if ($xls) {
 				$monto_estimado_thh, $simbolo_moneda_thh, $id_moneda_thh) = $ReporteContrato->arraymonto;
 
 
+		//si no hay horas (solo hay gastos) pero no se muestran los gastos, saltarse esta fila
+		if (!UtilesApp::GetConf($sesion, 'MostrarColumnasGastosEnHorasPorFacturar') && $horas_no_cobradas <= 0) {
+			continue;
+		}
 
 
 
