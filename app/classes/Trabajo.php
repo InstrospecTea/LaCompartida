@@ -405,7 +405,7 @@ class Trabajo extends Objeto
 						$continuar = false;
 						continue;
 					}
-				if( $hoja['cells'][$fila][$col_fecha] == __('NO MODIFICAR ESTA COLUMNA') )
+				if( $hoja['cells'][$fila][$col_fecha] == __('NO MODIFICAR ESTA COLUMNA') || $hoja['cells'][$fila][$col_fecha_dia] == __('NO MODIFICAR ESTA COLUMNA') || $hoja['cells'][$fila][$col_fecha_mes] == __('NO MODIFICAR ESTA COLUMNA') )
 					{
 						$continuar = true;
 						continue;
@@ -434,7 +434,7 @@ class Trabajo extends Objeto
 				}
 				if($hoja['cells'][$fila][$col_fecha_anyo] < 1930)
 				{
-					$mensajes .= "Error en el trabajo $id_trabajo - Fecha: año = ".$hoja['cells'][$fila][$col_fecha_anyo].'<br />';
+					$mensajes .= "Error en el trabajo $id_cobro $id_trabajo - Fecha: año = ".$hoja['cells'][$fila][$col_fecha_anyo].'<br />';
 					continue;
 				}
 
