@@ -272,7 +272,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 		  $resp = $sesion->pdodbh->query($query);
 	
 		} catch (PDOException $e) {
-						 if($this->sesion->usuario->fields['rut'] == '99511620') {
+						 if($sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);
 							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($resp) );
 							$Slim->view()->setData($arrayPDOException);
