@@ -7115,12 +7115,11 @@ CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 			$query = array();
 			$query[] = "INSERT ignore  INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
 
-			if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh)) {
-                                        $query[] = "ALTER TABLE  `contrato`
-					ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ,
-					ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ,
-					ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
-                                        }
+			
+            if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))          $query[] = "ALTER TABLE  `contrato` 	ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ;";
+		 if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))  $query[] = "ALTER TABLE  `contrato`  ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ;";
+		 if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))  $query[] = "ALTER TABLE  `contrato`  ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
+                                        
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());

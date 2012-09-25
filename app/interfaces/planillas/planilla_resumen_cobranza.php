@@ -386,7 +386,9 @@
 								cobro.subtotal_gastos, 
 								cobro.fecha_facturacion, 
 								cobro.fecha_enviado_cliente, 
-								cobro.fecha_cobro, 
+								IF(cobro.fecha_cobro > '1970-01-01' OR cobro.estado != 'PAGADO',
+									cobro.fecha_cobro,
+									MAX(documento_pago.fecha)) as fecha_cobro,
 								cobro.documento, 
 								cobro.monto_gastos, 
 								cobro.id_moneda, 
@@ -408,8 +410,8 @@
 								
 								LEFT JOIN documento as documento_pago ON nd.id_documento_pago = documento_pago.id_documento  AND documento_pago.tipo_doc != 'N' 
 								
-								LEFT JOIN documento_moneda AS dm1 ON dm1.id_documento = documento_pago.id_documento AND dm1.id_moneda = documento_pago.id_moneda 
-								LEFT JOIN documento_moneda AS dm2 ON dm2.id_documento = documento_pago.id_documento AND dm2.id_moneda = '".$moneda."' 
+								LEFT JOIN documento_moneda AS dm1 ON dm1.id_documento = documento.id_documento AND dm1.id_moneda = documento_pago.id_moneda 
+								LEFT JOIN documento_moneda AS dm2 ON dm2.id_documento = documento.id_documento AND dm2.id_moneda = '".$moneda."' 
 								LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 								LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente 
 								LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato

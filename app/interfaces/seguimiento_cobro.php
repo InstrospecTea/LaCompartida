@@ -408,7 +408,7 @@
 		$asuntosST=$sesion->pdodbh->query($prequery);
 		$asuntosRS=$asuntosST->fetchAll(PDO::FETCH_ASSOC);
 	foreach($asuntosRS as $contrato) {
-		$asuntos=str_replace(array("\n","'"),"",$contrato['asuntos']);
+		$asuntos=str_replace(array("\r","\n","'"),"",$contrato['asuntos']);
 		echo "\nAsuntosContrato[{$contrato['id_contrato']}]='{$asuntos}';";
 	}
 	?>
