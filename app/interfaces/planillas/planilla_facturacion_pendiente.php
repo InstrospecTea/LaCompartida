@@ -21,14 +21,15 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $AtacheSecundarioSoloAsunto = UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
-
-if ($AtacheSecundarioSoloAsunto) {
-	//Aprovecho de propagar la condición de "encargado del asunto" desde los contratos, para minimizar los asuntos sin dueño
-	 $sesion->pdodbh->exec("update contrato join cliente using (codigo_cliente)
+if($AtacheSecundarioSoloAsunto) {
+	
+	$regularizacion=$sesion->pdodbh->exec("update contrato join cliente using (codigo_cliente)
 										set contrato.id_usuario_secundario=cliente.id_usuario_encargado 
 										where contrato.id_usuario_secundario is null and cliente.id_usuario_encargado is not null and cliente.id_usuario_encargado >0;
 										update asunto join contrato using (id_contrato) set id_encargado=contrato.id_usuario_secundario where id_encargado is null;");
-
+	
+	//$sesion->pdodbh->closeCursor();
+	
 }
 
 set_time_limit(3600);
@@ -362,6 +363,17 @@ if ($xls) {
 		$codigo_asunto_secundario_sep = "";
 	}
 
+ 
+	if (!UtilesApp::existecampo('eliminado', 'olap_liquidaciones', $sesion))
+		mysql_query("ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'", $sesion->dbh);
+
+
+$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
+$update2 = "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
+$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
+$resp = mysql_query($update1, $sesion->dbh);
+$resp = mysql_query($update2, $sesion->dbh);
+$resp = mysql_query($update3, $sesion->dbh);
 	
 	
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2,$AtacheSecundarioSoloAsunto);
