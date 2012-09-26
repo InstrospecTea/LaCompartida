@@ -212,8 +212,8 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
     function DatosPanel($callback='') {
 		 global $sesion;
 				$Slim=Slim::getInstance('default',true);
-				$usuario= $Slim->request()->post('usuario');
-				$password= $Slim->request()->post('password');
+				$usuario= $Slim->request()->get('usuario');
+				$password= $Slim->request()->get('password');
 			 
 	
 				if ($usuario == "" || $password == "") {
@@ -270,9 +270,23 @@ date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) f
 	 
 			 $respuesta =$sesion->pdodbh->query( $querydatos); 
 			
-			
+			$datos = $respuesta->fetchALL(PDO::FETCH_ASSOC );
+			$datos = $datos[0];
+
+			$datos['path_real'] = realpath(dirname(__FILE__) . '/../');
+			//ultima version disponible en el update
+			//(se parsea el archivo porque las versiones viejan del update no tienen ese dato)
+			$up = file_get_contents(Conf::ServerDir() . '/update.php');
+			preg_match_all('/case\s+(\d+\.\d+)\s*:/', $up, $matches);
+			$datos['ultima_version_tt'] = end($matches[1]);
+
+			if(empty($datos['version_tt']) && file_exists(Conf::ServerDir() . '/version.php')){
+				$_GET['show'] = 0;
+				include(Conf::ServerDir() . '/version.php');
+				$respuesta['version_tt'] = $VERSION;
+			}
  
-		echo json_encode( $respuesta->fetchALL(PDO::FETCH_ASSOC ) );
+		echo json_encode($datos);
 		 
 }
 
