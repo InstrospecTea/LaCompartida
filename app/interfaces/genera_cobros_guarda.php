@@ -79,6 +79,10 @@ if ($print || $emitir) {
 		$where .= " AND cobro.fecha_creacion >= '$fecha_periodo_ini' AND cobro.fecha_creacion <= '$fecha_periodo_fin' ";
 	} else if ($fecha_periodo_ini != '' && $fecha_periodo_fin != '' && $rango == 1 && $usar_periodo == 1) {
 		$where .= " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha_periodo_ini) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha_periodo_fin) . "' ";
+	} else {
+		if (!empty($fecha_ini)) $where .= " AND cobro.fecha_ini >= '".Utiles::fecha2sql($fecha_ini)."' ";
+		if (!empty($fecha_fin)) $where .= " AND cobro.fecha_fin <= '".Utiles::fecha2sql($fecha_fin)."' ";
+			
 	}
 	if ($forma_cobro) {
 		$where .= " AND contrato.forma_cobro = '$forma_cobro' ";
