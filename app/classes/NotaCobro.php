@@ -9597,10 +9597,12 @@ class NotaCobro extends Cobro {
 					}
 					return $html;
 				}
-				$columna_hrs_retainer = $GLOBALS['columna_hrs_retainer'];
+				$columna_hrs_retainer = $this->fields['opc_ver_detalle_retainer'];
+				
+				
 				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
-				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
-				$columna_hrs_trabajadas = $GLOBALS['columna_hrs_trabajadas'];
+				 
+				$columna_hrs_trabajadas = $this->fields['opc_ver_horas_trabajadas'];
 
 				if ($this->fields['opc_ver_profesional'] == 0)
 					return '';
@@ -9840,15 +9842,16 @@ class NotaCobro extends Cobro {
 
 				$html3 = $parser->tags['PROFESIONAL_TOTAL'];
 				if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) || ( method_exists('Conf', 'ResumenProfesionalVial') && Conf::ResumenProfesionalVial() )) {
-					if ($han_trabajado_menos_del_retainer)
+					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%valor_retainer%', number_format($this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-					else
+					}  else {
 						$html3 = str_replace('%valor_retainer%', $columna_hrs_retainer ? number_format($this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '', $html3);
-
-					if ($han_trabajado_menos_del_retainer)
+					}
+					if ($han_trabajado_menos_del_retainer) {
 						$html3 = str_replace('%valor_cobrado_hh%', number_format(0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-					else
+					} else {
 						$html3 = str_replace('%valor_cobrado_hh%', number_format($valor_cobrado_hh, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+					}
 				}
 				$html3 = str_replace('%glosa%', __('Total'), $html3);
 				if ($han_trabajado_menos_del_retainer || $this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas']) {
