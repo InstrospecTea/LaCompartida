@@ -254,7 +254,8 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') )
 				id: "myDialogId",
 				cancel:function(win){ return false; },
 				ok:function(win){
-<?php
+	form.action = 'genera_cobros_guarda.php';
+		<?php
 if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') ) || ( method_exists('Conf', 'SoloGastos') && Conf::SoloGastos() )) {
 	?>
 							if($('radio_gastos').checked==true) {
@@ -265,7 +266,7 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SoloGastos') )
 	<?php
 }
 ?>
-					form.action = 'genera_cobros_guarda.php';
+				
 
 					form.submit();
 					return true;
