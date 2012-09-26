@@ -45,6 +45,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 			if ($sesion->usuario->fields['rut'] == '99511620') {
 				$versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
 				$dato = $versiondb->fetch();
+				$versiondb->closeCursor();
 
 				/* querys que regularizan datos que puedan faltar */
 		$sesion->pdodbh->exec("update usuario set username=concat(left(nombre,1), left(apellido1,1), left(apellido2,1)) where username is null or username=''");
