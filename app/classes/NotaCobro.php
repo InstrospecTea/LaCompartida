@@ -848,17 +848,22 @@ class NotaCobro extends Cobro {
 				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'CalculacionCYC') ) || ( method_exists('Conf', 'CalculacionCYC') && Conf::CalculacionCYC() )))
 					$total_gastos_moneda = round($total_gastos_moneda, $moneda_total->fields['cifras_decimales']);
 				$impuestos_total_gastos_moneda = round($total_gastos_moneda * ($this->fields['porcentaje_impuesto_gastos'] / 100), $moneda_total->fields['cifras_decimales']);
-				if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
+				if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio') ) {
 					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
+				} else {
 					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
 				break;
 
 			case 'DETALLE_TRAMITES': //GenerarDocumento
 				$html = str_replace('%tramites%', __('Trámites'), $html);
 				$aproximacion_tramites = number_format($this->fields['monto_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+				if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio') ) {
 				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				} else {
+				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] .' '. number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);	
+				}
 				break;
 
 
@@ -3840,10 +3845,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
-			case 'DETALLE_TRAMITES': //GenerarDocumento2
+			case 'DETALLE_TRAMITES': //GenerarDocumento
 				$html = str_replace('%tramites%', __('Trámites'), $html);
-				$valor_tramites = $x_resultados['monto_tramites'][$this->fields['opc_moneda_total']];
+				$aproximacion_tramites = number_format($this->fields['monto_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
+				$valor_tramites = $aproximacion_tramites * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+				if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio') ) {
 				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] . number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				} else {
+				$html = str_replace('%valor_tramites%', $moneda_total->fields['simbolo'] .' '. number_format($valor_tramites, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);	
+				}
 				break;
 
 			case 'DETALLE_GASTOS': //GenerarDocumento2

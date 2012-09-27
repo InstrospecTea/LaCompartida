@@ -215,7 +215,7 @@ Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cli
 			$where .= " AND cliente.fecha_creacion >= '".Utiles::fecha2sql($fecha1)."' ";
 		}
 		if(!empty($fecha2)){
-			$where .= " AND cliente.fecha_creacion <= '".Utiles::fecha2sql($fecha2)."' ";
+			$where .= " AND date_add(cliente.fecha_creacion, interval -1 day) < '".Utiles::fecha2sql($fecha2)."' ";
 		}
 		if( $solo_activos == 1)
 			$where .= " AND cliente.activo = 1 ";
@@ -224,7 +224,8 @@ Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cli
 					FROM cliente
 					LEFT JOIN grupo_cliente USING (id_grupo_cliente)
 					WHERE $where";
-		if($orden == "")
+		
+ 		if($orden == "")
 			$orden = "glosa_cliente";
 		$x_pag = 20;
 

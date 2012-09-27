@@ -212,8 +212,8 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
     function DatosPanel($callback='') {
 		 global $sesion;
 				$Slim=Slim::getInstance('default',true);
-				$usuario= $Slim->request()->post('usuario');
-				$password= $Slim->request()->post('password');
+				$usuario= $Slim->request()->get('usuario');
+				$password= $Slim->request()->get('password');
 			 
 	
 				if ($usuario == "" || $password == "") {
