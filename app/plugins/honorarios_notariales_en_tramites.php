@@ -15,8 +15,8 @@ $Slim->hook('hook_factura_javascript_after', 'Honorarios_Notariales_Js_Footer_Li
 function Honorarios_Notariales_Js_Footer_Light() {
 	global $trabajos_disponibles, $tramites_disponibles,$honorario,$monto_honorario,$_LANG;
 	$monto_trabajo=(isset($honorario) ? $honorario : $monto_honorario) - $tramites_disponibles;
-	$boton_tramites='<a style=\"margin:2px;\" class=\"btn botonizame\"  alt=\"'.floatval($tramites_disponibles) .'\" icon=\"ui-icon-invoice\" rel=\"'.__('Trámites').'\" id=\"facturar_tramites\" setwidth=\"250\" >'.  __('Facturar '. __('Trámites')) .'</a><br/>';
-	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($monto_trabajo).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios legales').'\"  id=\"facturar_trabajos\"   setwidth=\"250\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
+	$boton_tramites='<a style=\"margin:2px;\" class=\"btn botonizame\"  alt=\"'.floatval($tramites_disponibles) .'\" icon=\"ui-icon-invoice\" rel=\"'.__('Trámites').'\" id=\"facturar_tramites\" setwidth=\"270\" >'.  __('Facturar '. __('Trámites')) .'</a><br/>';
+	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($monto_trabajo).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
 	$checkbox_tramites='<input style=\"display:none;\"  type=\"checkbox\" value=\"1\" id=\"checkbox_tramites\" name=\"checkbox_tramites\" /> ';
 	
 	echo "jQuery('#glosa_honorarios_legales').html( 'Concepto');";
