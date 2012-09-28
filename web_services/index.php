@@ -17,6 +17,20 @@ header('Access-Control-Allow-Methods: GET, POST');
 if(!class_exists('Slim')) require_once dirname(__FILE__).'/Slim/Slim.php';
 $Slim=new Slim();
 $Slim->config('debug', true);
+	if(!$sesion->pdodbh) {
+			try {
+
+						$sesion->pdodbh = new PDO(
+								'mysql:dbname=' . Conf::dbName() . ';host=' . Conf::dbHost(),
+								Conf::dbUser(),
+								Conf::dbPass());
+						$sesion->pdodbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+					} catch (PDOException $e) {
+
+						echo "Error Connection: " . $e->getMessage();
+						
+					}
+			}
 
 $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
