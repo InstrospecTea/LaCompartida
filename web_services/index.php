@@ -17,7 +17,7 @@ header('Access-Control-Allow-Methods: GET, POST');
 if(!class_exists('Slim')) require_once dirname(__FILE__).'/Slim/Slim.php';
 $Slim=new Slim();
 $Slim->config('debug', true);
-	if(!$sesion->pdodbh) {
+if(!$sesion->pdodbh) {
 			try {
 
 						$sesion->pdodbh = new PDO(
@@ -32,7 +32,7 @@ $Slim->config('debug', true);
 					}
 			}
 
-$Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
+
 
 $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
@@ -225,8 +225,8 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
     function DatosPanel($callback='') {
 		 global $sesion;
 				$Slim=Slim::getInstance('default',true);
-				$usuario= $Slim->request()->post('usuario');
-				$password= $Slim->request()->post('password');
+				$usuario= $Slim->request()->params('usuario');
+				$password= $Slim->request()->params('password');
 			 
 	
 				if ($usuario == "" || $password == "") {
