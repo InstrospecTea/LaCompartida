@@ -296,7 +296,7 @@ date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) f
 			if(empty($datos['version_tt']) && file_exists(Conf::ServerDir() . '/version.php')){
 				$_GET['show'] = 0;
 				include(Conf::ServerDir() . '/version.php');
-				$respuesta['version_tt'] = $VERSION;
+				$datos['version_tt'] = $VERSION;
 			}
  
 		echo json_encode($datos);
