@@ -14,7 +14,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Max-Age: 3628800');
 header('Access-Control-Allow-Methods: GET, POST');
 
- 
+ if(!class_exists('Slim')) require_once dirname(__FILE__).'/Slim/Slim.php';
+
 
 $Slim=Slim::getInstance('default',true);
 $Slim->config('debug', false);
