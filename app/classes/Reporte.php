@@ -628,8 +628,14 @@ class Reporte
 
 
 		//Datos que se repiten
-		$s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
-		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar>0,cobro.monto_thh_estandar,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
+		$s_monto_thh_simple = "IF(cobro.monto_thh > 0,
+			cobro.monto_thh + cobro.monto_tramites,
+			IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
+				cobro.monto_trabajos + cobro.monto_tramites, 1))";
+		$s_monto_thh_estandar = "IF(cobro.monto_thh_estandar > 0,
+			cobro.monto_thh_estandar + cobro.monto_tramites,
+			IF(cobro.monto_trabajos + cobro.monto_tramites > 0,
+				cobro.monto_trabajos + cobro.monto_tramites, 1))";
 
 		//El calculo de la proporcionalidad puede hacerse como ' A / B ' o, si no es estandar, ' C / D '.
 		// A : monto estandar de este trabajo
