@@ -349,6 +349,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	}
 	$b->AgregarEncabezado("cliente.glosa_cliente", __('Cliente'), "class='al'");
 	$b->AgregarEncabezado("glosa_asunto", __('Asunto'), "class='al'");
+	$b->AgregarEncabezado("activo", __('Activo'), "align=left");
 	#		$b->AgregarEncabezado("descripcion_asunto","Descripción","class="al"");
 	#		$b->AgregarEncabezado("horas_trabajadas","Horas trabajadas","","","SplitDuracion");
 	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "class='al'");
