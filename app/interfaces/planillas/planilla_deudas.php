@@ -46,7 +46,8 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, T.saldo, 0)) AS '31-60',
 			-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, T.saldo, 0)) AS '61-90',
 			-SUM(IF(T.dias_atraso_pago > 90, T.saldo, 0)) AS '91+',
-			-SUM(T.saldo) AS total
+			-SUM(T.saldo) AS total,
+			GROUP_CONCAT(CONCAT('<a href=\'http://perezdearce.thetimebilling.com/time_tracking/app/interfaces/cobros6.php?id_cobro=',identificador,'&popup=1&contitulo=true&id_foco=2\' target=\"popup\" onClick=\"window.open(this.href, this.target, \'width=300,height=400\'); return false;\">',identificador,'</a>')) as cobros
 		FROM
 			(SELECT
 				d.fecha,
@@ -87,6 +88,13 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 				'groupinline' => true
 			)
 		),
+                array(
+                        'field' => 'cobros',
+                        'title' => utf8_encode(__('Cobros')),
+                        'extras' => array(
+                                'attrs' => 'width="10%" style="text-align:right"'
+                        )
+                ),
 		array(
 			'field' => '0-30',
 			'title' => '0-30 ' . utf8_encode(__('días')),
