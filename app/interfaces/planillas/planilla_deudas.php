@@ -55,8 +55,10 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 				d.glosa_documento AS descripcion,
 				d.codigo_cliente,
 				cliente.glosa_cliente AS glosa_cliente,
-				d.monto * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS monto,
-				-1 * (d.saldo_honorarios + d.saldo_gastos) * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo,
+				d.monto AS  monto,
+				d.monto * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS monto_base,
+				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo,
+				-1 * (d.saldo_honorarios + d.saldo_gastos) * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo_base,
 				DATEDIFF(NOW(), cobro.fecha_emision) AS dias_atraso_pago,
 				moneda_documento.simbolo AS moneda
 			FROM
