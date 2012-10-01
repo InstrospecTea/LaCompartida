@@ -230,6 +230,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario 
+								left join cobro in cta_corriente.id_cobro=cobro.id_cobro 
 								WHERE
 								$where 
 								 ";
@@ -249,7 +250,7 @@ require_once Conf::ServerDir().'/classes/Asunto.php';
 									prm_moneda.simbolo,
 									prm_moneda.cifras_decimales,
 									prm_cta_corriente_tipo.glosa as tipo, 
-									cta_corriente.estadocobro as estado, 
+								ifnull(cobro.estado,'SIN COBRO') as estado, 
 									cta_corriente.con_impuesto,
 									prm_idioma.codigo_idioma,
                                     contrato.activo AS contrato_activo, 
