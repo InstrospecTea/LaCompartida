@@ -177,11 +177,11 @@ if ($_GET['totalctacorriente']) {
 
 	echo '<form id="form_edita_gastos_masivos"><table id="overlayeditargastos">';
 	if ($_GET['selectodos'] == 1) {
-		$where.="  AND estadocobro in ('SIN COBRO','CREADO','EN REVISION')";
+		$where.="  AND (cobro.estado is null or cobro.estado in ('SIN COBRO','CREADO','EN REVISION'))";
 	} else {
 		$arraygasto = explode(';', ($_GET['movimientos']));
 		if (sizeof($arraygasto) > 0) {
-			$where = "estadocobro in ('SIN COBRO','CREADO','EN REVISION') and id_movimiento in (" . implode(',', $arraygasto) . ")";
+			$where = " ( cobro.estado is null or cobro.estado in ('SIN COBRO','CREADO','EN REVISION') ) and id_movimiento in (" . implode(',', $arraygasto) . ") ) ";
 		}
 	}
 

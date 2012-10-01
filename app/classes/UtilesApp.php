@@ -476,9 +476,12 @@ class UtilesApp extends Utiles {
 	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
 
-	function TotalCuentaCorriente(&$sesion, $where = '1') {
-		$where .= " AND cta_corriente.cobrable = 1 AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-
+	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
+		
+		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
+			if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
+				$where .= " AND  cta_corriente.cobrable = $cobrable ";
+			}
 		$total_ingresos = 0;
 		$total_egresos = 0;
 

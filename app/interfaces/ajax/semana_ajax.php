@@ -91,8 +91,8 @@
 	#y primera semana del año
 	$query = "SELECT $select_codigo asunto.glosa_asunto,trabajo.duracion,trabajo.fecha,trabajo.id_trabajo, trabajo.descripcion
 				,(SELECT c1.glosa_cliente FROM cliente AS c1 WHERE c1.codigo_cliente=asunto.codigo_cliente) as glosa_cliente
-				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable, trabajo.estadocobro, trabajo.revisado
-				 FROM trabajo 
+				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable, ifnull(cobro.estado,'SIN COBRO') as estado , trabajo.revisado
+				 FROM trabajo left join cobro using (id_cobro)
 				 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 					WHERE
 					trabajo.id_usuario = '$id_usuario' 
@@ -235,7 +235,7 @@ echo("<table style='width:600px'>");
                 if(!$p_revisor->fields['permitido'] && $arraytrabajo[$id_trabajo]['revisado']==1) {                 
                     $arraytrabajo[$id_trabajo]['abierto']='trabajocerrado';
                 } else {
-                   switch($arraytrabajo[$id_trabajo]['estadocobro']):
+                   switch($arraytrabajo[$id_trabajo]['estado']):
                        case 'SIN COBRO':
                        case 'CREADO':
                        case 'EN REVISION':

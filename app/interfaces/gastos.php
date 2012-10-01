@@ -207,7 +207,7 @@ if ($opc == 'buscar') {
 				cta_corriente.monto_cobrable,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
-				cta_corriente.estadocobro AS estado_cobro,
+				ifnull(cobro.estado,'SIN COBRO') AS estado_cobro,
 				IF (cta_corriente.cobrable = 1, 'SI', 'NO') AS cobrable,
 				cta_corriente.numero_documento,
 				prm_proveedor.rut as rut_proveedor,
@@ -230,6 +230,7 @@ if ($opc == 'buscar') {
 			LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
 			LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
+			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 			WHERE $where";
 
 		$gasto->DownloadExcel($search_query);
@@ -505,7 +506,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
 	echo ' { "bVisible": false, "aTargets": [ 7 ] },';
 }
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
-	echo ' { "bVisible": false, "aTargets": [ 11 ] },';
+	echo ' { "bVisible": false, "aTargets": [10 ] },';
 }
 ?>
 
