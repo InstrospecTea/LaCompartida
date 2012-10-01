@@ -31,6 +31,7 @@ $_LANG['Trabajo'] = "Task";
 $_LANG['Trabajos'] = "Tasks";
 $_LANG['Total'] = "Total";
 $_LANG['Detalle Cobro'] = "Debit Note Details";
+$_LANG['Detalle cobro'] = "Debit Note Details";
 $_LANG['Servicios prestados'] = "Services";
 $_LANG['Profesional'] = "Professional";
 $_LANG['Detalle profesional'] = "Summary of fees";

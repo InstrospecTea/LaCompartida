@@ -72,7 +72,7 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 			}
 		} else {
 			if ($codigo_cliente) {
-				$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
+				$where .= " AND asunto.codigo_cliente = '$codigo_cliente'";
 
 				if ($codigo_asunto) {
 					$asunto = new Asunto($sesion);
@@ -234,10 +234,10 @@ if ($_GET['totalctacorriente']) {
 } else if ($_REQUEST['opc'] == 'buscar') {
 
 	$selectfrom = "FROM cta_corriente
-								JOIN asunto USING(codigo_asunto)
+								left JOIN asunto USING(codigo_asunto)
 								
-								JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-								JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+								left JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+								left JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 								
                 
 								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
