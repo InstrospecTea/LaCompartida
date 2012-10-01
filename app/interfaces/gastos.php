@@ -829,4 +829,6 @@ if ($opc == 'buscar' || isset($_GET['buscar'])) {
 
 	</tbody></table>
 <?php
+$sesion->pdodbh->exec("update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch OR  cta_corriente.estadocobro!=c.estado;");
+
 $pagina->PrintBottom();
