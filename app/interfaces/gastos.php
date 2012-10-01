@@ -191,6 +191,7 @@ if ($opc == 'buscar') {
 
 		$search_query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE
 				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
+				DATE_FORMAT(cta_corriente.fecha_creacion, '%Y-%m-%d') AS fecha_creacion,
 				cta_corriente.codigo_cliente,
 				cliente.glosa_cliente,
 				asunto.codigo_asunto,
@@ -544,7 +545,8 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 					"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
 					"sPaginationType": "full_numbers",
 					"sDom":  'T<"top"ip>rt<"bottom">',
-					"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [  {
+					"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [
+							<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_js_gastos'):false; ?>  {
 			  "sExtends":    "copy",
 			   "sAction":     "flash_copy",
                     "sButtonText": "Copiar esta consulta",		
