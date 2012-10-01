@@ -160,9 +160,14 @@ if ($opc == 'buscar') {
 		if ($id_usuario_responsable) {
 			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
 		}
-		if ($id_tipo) {
+		if (isset($cobrable) && $cobrable != '') {
+			$where .= " AND cta_corriente.cobrable =$cobrable";
+		}
+		
+		if (isset($id_tipo) and $id_tipo != '') {
 			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 		}
+		
 		if ($clientes_activos == 'activos') {
 			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
 		}

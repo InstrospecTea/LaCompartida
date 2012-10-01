@@ -141,10 +141,9 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 
 
 
-	$col_select = ",'Si' as esCobrable ";
-	if (UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
+	
 		$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
-	}
+	
 }
 
 
