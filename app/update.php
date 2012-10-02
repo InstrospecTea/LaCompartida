@@ -5519,7 +5519,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 									  PRIMARY KEY  (`id_proveedor`)
 									) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 
-			if (!ExisteCampo('id_proveedor', 'cta_corriente'))
+			if (!ExisteCampo('id_proveedor', 'cta_corriente',$dbh))
 				$query[] = "ALTER TABLE `cta_corriente` ADD  `id_proveedor` INT( 11 ) NOT NULL ;";
 
 						foreach($query as $q)
@@ -6113,7 +6113,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 												VALUES (
 												NULL ,  'IdiomaPorDefecto',  'es',  'Idioma de cartas y asuntos que se define por defecto',  'select;es;en',  '4',  '555'
 												);";
-			if (ExisteCampo('id_factura', 'cta_corriente'))
+			if (ExisteCampo('id_factura', 'cta_corriente',$dbh))
 				$query[] = "ALTER TABLE  `cta_corriente` CHANGE  `id_factura` `codigo_factura_gasto` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
 
 					foreach($query as $q)
@@ -6733,8 +6733,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 
 
-			$query[] = "DROP TABLE IF EXISTS `factura_pdf_datos_categoria`;
-CREATE TABLE IF NOT EXISTS `factura_pdf_datos_categoria` (
+			$query[] = "DROP TABLE IF EXISTS `factura_pdf_datos_categoria`;";
+$query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_datos_categoria` (
   `id_factura_pdf_datos_categoria` int(11) NOT NULL AUTO_INCREMENT,
   `glosa` varchar(30) NOT NULL,
   PRIMARY KEY (`id_factura_pdf_datos_categoria`)
@@ -6749,8 +6749,8 @@ CREATE TABLE IF NOT EXISTS `factura_pdf_datos_categoria` (
 
 
 
-			$query[] = "DROP TABLE IF EXISTS `factura_pdf_tipo_datos`;
-CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
+			$query[] = "DROP TABLE IF EXISTS `factura_pdf_tipo_datos`;";
+$query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
   `id_tipo_dato` int(11) NOT NULL AUTO_INCREMENT,
   `id_factura_pdf_datos_categoria` int(11) NOT NULL,
   `codigo_tipo_dato` varchar(30) NOT NULL,
@@ -6852,10 +6852,10 @@ CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 
 			case 4.88:
 				$query = array();
-				$query[] = "INSERT ignore INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` )
+			/*DEPRECATED	$query[] = "INSERT ignore INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` )
 											VALUES (
 												NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
-											);";
+											);";*/
 				$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 												NULL ,  'ImprimirFacturaDoc',  '1', NULL ,  'boolean',  '6',  '-1'
@@ -6982,7 +6982,7 @@ CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 			case 4.96:
 				$query = array();
                              if(!ExisteCampo('margen_superior', 'factura_rtf', $dbh))   {
-				if (!ExisteCampo('margen_superior', 'factura_rtf'))
+			 
 					$query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
 								ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2.0',
@@ -7361,13 +7361,17 @@ CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
                                             )";
                           }
 			if(ExisteCampo('id_tipo_dato', 'factura_pdf_datos', $dbh)) {
-			$query[] = "ALTER TABLE `factura_pdf_datos`
+				if (!ExisteLlaveForanea('factura_pdf_datos', 'id_tipo_dato', 'factura_pdf_tipo_datos', 'id_tipo_dato', $dbh)) {
+
+				$query[] = "ALTER TABLE `factura_pdf_datos`
                                         ADD CONSTRAINT `factura_pdf_datos_ibfk_1` FOREIGN KEY (`id_tipo_dato`)
                                         REFERENCES `factura_pdf_tipo_datos` (`id_tipo_dato`) ON DELETE CASCADE ON UPDATE CASCADE;";
-			$query[] = "ALTER TABLE  `factura_pdf_datos`
-                                            DROP  `tipo_dato` ,
-                                            DROP  `glosa_dato` ;";
 			}
+			}
+			if(ExisteCampo('tipo_dato', 'factura_pdf_datos', $dbh)) $query[] = "ALTER TABLE  `factura_pdf_datos`  DROP  `tipo_dato` ";
+			if(ExisteCampo('glosa_dato', 'factura_pdf_datos', $dbh)) $query[] = "ALTER TABLE  `factura_pdf_datos`  DROP  `glosa_dato` ;";
+                                            
+			
 			if(!ExisteCampo('id_documento_legal', 'factura_pdf_datos', $dbh)) {
                             $query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
                             $query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
@@ -9553,7 +9557,8 @@ $sesion = new Sesion();
 
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
-			echo '<hr>Comienzo de proceso de cambios para versión '.number_format($new_version,2,'.','').'<br>';
+		flush();
+		echo '<hr>Comienzo de proceso de cambios para versión '.number_format($new_version,2,'.','').'<br>';
 
 			try {
 				if( !mysql_query("START TRANSACTION", $sesion->dbh) )

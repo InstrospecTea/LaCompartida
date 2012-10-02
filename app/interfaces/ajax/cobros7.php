@@ -32,10 +32,18 @@ if(!$opc) $opc=$_POST['opc'];
 $confirma=$_POST['confirma'];
 $opc_informar_contabilidad=$_POST['opc_ic'];
 
+
+
+
 if (!$cobro->Load($id_cobro)) {
     $pagina = new PaginaCobro($sesion);
 	$pagina->FatalError(__('Cobro inválido'));
 }
+
+$cobro_moneda = new CobroMoneda($sesion);
+$cobro_moneda->Load($cobro->fields['id_cobro']);
+$tipo_cambio_moneda_total = $cobro_moneda->GetTipoCambio($id_cobro, $cobro->fields['opc_moneda_total'] != '' ? $cobro->fields['opc_moneda_total'] : 1);
+
 
 if ($opc=='refrescar') {
 switch($cobro->fields['estado_contabilidad']):
@@ -209,6 +217,9 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
         }
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	$contrato->Load($cobro->fields['id_contrato']);
+
+
+	
 	$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
 		
 									if ($cobro->fields['modalidad_calculo'] == 1) {
@@ -337,7 +348,7 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
         JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
         JOIN prm_estado_factura ON factura.id_estado = prm_estado_factura.id_estado
         LEFT JOIN factura_cobro ON factura_cobro.id_factura = factura.id_factura
-        WHERE factura.id_cobro = '$id_cobro'
+        WHERE factura_cobro.id_cobro = '$id_cobro'
         GROUP BY factura.id_factura";
 
 													$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
