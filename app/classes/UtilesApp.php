@@ -499,15 +499,15 @@ class UtilesApp extends Utiles {
 								LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
 								LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								left JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
+								left JOIN cliente ON  cliente.codigo_cliente=ifnull(asunto.codigo_cliente, cta_corriente.codigo_cliente) 
 							WHERE $where";
 	
  		 
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			
 		 
-			while($ingresoyegreso=mysql_fetch_array($ingresosyegresos) ) {
-				if ($ingresoyegreso[0] > 0) {
+			while($ingresoyegreso=mysql_fetch_array($resp) ) {
+ 				if ($ingresoyegreso[0] > 0) {
 				$total_ingresos += $ingresoyegreso[2];
 				} else if ($ingresoyegreso[1] > 0) {
 				$total_egresos += $ingresoyegreso[2];
