@@ -47,13 +47,27 @@ class Reporte
 	var $proporcionalidad = 'estandar';
 	
 	var $conf = array();
-
-	//Cuanto se repite la fila para cada agrupador
+	//Codigo secundario cuando corresponde
+	var $dato_usuario='usuario.username';
+	var $dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
+	
+//Cuanto se repite la fila para cada agrupador
 	var $filas = array();
 
 	function Reporte($sesion)
 	{
 		$this->sesion = $sesion;
+		
+		if( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsaUsernameEnTodoElSistema') )
+			$this->dato_usuario = 'usuario.username';
+		else
+			$this->dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
+		
+		if( UtilesApp::GetConf($this->sesion,'CodigoSecundario') ) {
+			$this->dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
+		} else {
+			$this->dato_codigo_asunto = 'asunto.codigo_asunto';
+		}
 	}
 
 	function configuracion($opcs = array())
@@ -361,12 +375,13 @@ class Reporte
 			
 
 
-					\' - \' as glosa_cliente_asunto, 
-				\' - \' as glosa_asunto,
-				\' - \' glosa_asunto_con_codigo,
+						
+				CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
+				asunto.glosa_asunto,
+				CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
-				\' - \' as codigo_asunto,
+				'.$this->dato_codigo_asunto.' as codigo_asunto,
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
@@ -388,33 +403,7 @@ class Reporte
 			if( in_array('area_trabajo', $this->agrupador ) ){
 				$s.= " ' - ' as area_trabajo, ";
 			}
-		
-			$where = ' FROM cobro
-				LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
-				LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-				LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
-				LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-				'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
-				'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
-				LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
-			';
-
-			if($this->tipo_dato == 'valor_por_cobrar')
-			{
-				$tabla = 'cobro';
-			}
-			else
-			{
-				$where .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
-				$tabla = 'documento';
-			}
-			//moneda buscada
-			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda ON (cobro_moneda.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda.id_moneda = '".$this->id_moneda."' )";
-			//moneda del cobro
-			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = ".$tabla.".id_moneda )";
-			//moneda_base
-			$where .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
-		
+		 
 			// TIPO DE DATO
 			switch($this->tipo_dato)
 			{
@@ -424,22 +413,22 @@ class Reporte
 				
 				{
 					$s .=
-					' 0 as valor_divisor, (1/count(distinct asunto.id_asunto))*SUM( cobro.monto_trabajos
+					' 0 as valor_divisor, (1/ca2.cant_asuntos)*SUM( cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				}
 				case 'rentabilidad_base':
 				{
-					$s .= ' 0 as valor_divisor, (1/count(distinct asunto.id_asunto))*SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_trabajos
+					$s .= ' 0 as valor_divisor, (1/ca2.cant_asuntos)*SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio), 0 ))';
 					break;
 				}
 				case 'valor_pagado':
 				{
-					$s .= ' (1/count(distinct asunto.id_asunto))*SUM( IF(cobro.estado = \'PAGADO\',
-									(cobro.monto_trabajos
+					$s .= ' (1/ca2.cant_asuntos)*SUM( IF(cobro.estado = \'PAGADO\',
+									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									),
@@ -448,7 +437,7 @@ class Reporte
 				}
 				case 'valor_pagado_parcial':
 				{
-					$s .= ' (1/count(distinct asunto.id_asunto))*SUM( (cobro.monto_trabajos
+					$s .= ' (1/ca2.cant_asuntos)*SUM( (cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( 1 - documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -456,7 +445,7 @@ class Reporte
 				}
 				case 'valor_por_pagar_parcial':
 				{
-					$s .= ' (1/count(distinct asunto.id_asunto))*SUM( (cobro.monto_trabajos
+					$s .= ' (1/ca2.cant_asuntos)*SUM( (cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -464,8 +453,8 @@ class Reporte
 				}
 				case 'valor_por_pagar':
 				{
-					$s .= '(1/count(distinct asunto.id_asunto))*SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
-									(cobro.monto_trabajos
+					$s .= '(1/ca2.cant_asuntos)*SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
+									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) 
 									)) )';
@@ -473,8 +462,8 @@ class Reporte
 				}
 				case 'valor_incobrable':
 				{
-					$s .= '(1/count(distinct asunto.id_asunto))*SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
-									(cobro.monto_trabajos
+					$s .= '(1/ca2.cant_asuntos)*SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
+									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									)) )';
@@ -482,11 +471,11 @@ class Reporte
 				}
 				case 'rentabilidad':
 					$s .= ' 0 AS valor_divisor,
-						(1/count(distinct asunto.id_asunto))*SUM(cobro.monto_trabajos * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
+						(1/ca2.cant_asuntos)*SUM(cobro.monto_subtotal * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				case 'diferencia_valor_estandar':
 				{
-					$s .= ' (1/count(distinct asunto.id_asunto))*SUM( cobro.monto_trabajos
+					$s .= ' (1/ca2.cant_asuntos)*SUM( cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
@@ -500,7 +489,10 @@ class Reporte
 				}
 			}
 			 $s .= ' as '.$this->tipo_dato;
-			 $s .= ' FROM cobro join cobro_asunto using (id_cobro) join asunto using (codigo_asunto)
+			 $s .= ' FROM cobro  
+				 left join cobro_asunto using (id_cobro) 
+		left join asunto using (codigo_asunto)
+		left join (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro 
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
 						LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
 						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
@@ -537,7 +529,7 @@ class Reporte
 
 			$s .= $this->sWhere('cobro');
 
-			$s .= ' AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL  ';
+			$s .= '  AND cobro.incluye_honorarios=1 AND cobro.monto_subtotal>0  AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL  ';
                    
                 // FFF: Si se saca el reporte a proporcionalidad cliente, esta query debe traer los cobros con monto_thh=0. Si no, los con monto_thh_estandar=0        
                 if($this->proporcionalidad == 'estandar') {
@@ -569,18 +561,10 @@ class Reporte
 	//SELECT en string de Query. Elige el tipo de dato especificado.
 	function sSELECT()
 	{
-		if( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsaUsernameEnTodoElSistema') )
-			$dato_usuario = 'usuario.username';
-		else
-			$dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
+	 
 		
-		if( UtilesApp::GetConf($this->sesion,'CodigoSecundario') ) {
-			$dato_codigo_asunto = 'asunto.codigo_asunto_secundario';
-		} else {
-			$dato_codigo_asunto = 'asunto.codigo_asunto';
-		}
 			
-		$s = 'SELECT	'.$dato_usuario.' as profesional,
+		$s = 'SELECT	'.$this->dato_usuario.' as profesional,
 						usuario.username as username,
 						usuario.id_usuario,
 						cliente.id_cliente,
@@ -596,8 +580,8 @@ class Reporte
 						'.(in_array('id_usuario_secundario',$this->agrupador)?'IF(usuario_secundario.id_usuario IS NULL,\'Sin Resposable Secundario\','.$this->nombre_usuario('usuario_secundario').') AS nombre_usuario_secundario,':'').'
 						cliente.glosa_cliente,
 						asunto.glosa_asunto,
-						CONCAT('.$dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
-						'.$dato_codigo_asunto.' as codigo_asunto,
+						CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
+						'.$this->dato_codigo_asunto.' as codigo_asunto,
 						contrato.id_contrato,
 						tipo.glosa_tipo_proyecto AS tipo_asunto,
 						area.glosa AS area_asunto,
@@ -674,7 +658,7 @@ class Reporte
 									)";
 
 		//Si el Reporte está configurado para usar el monto del documento, el tipo de dato es valor, y no valor_por_cobrar
-		if($this->tipo_dato != 'valor_por_cobrar')
+		if($this->tipo_dato != 'valor_por_cobrar') {
 			$monto_honorarios = "SUM(
 										(
 											".$s_tarifa."
@@ -686,7 +670,7 @@ class Reporte
 											)
 										*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 									)";
-		else
+		} else {
 			$monto_honorarios = "SUM(
 									(
 										".$s_tarifa."
@@ -695,7 +679,7 @@ class Reporte
 									*	(cobro.monto_trabajos / ".$s_monto_thh." )
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio)
 								)";
-		
+		}
 		//Agrega el cuociente saldo_honorarios/honorarios, que indica el porcentaje que falta pagar de este trabajo.
 		$monto_por_pagar_parcial = "SUM(
 										(

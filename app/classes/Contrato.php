@@ -1096,8 +1096,7 @@ class Contrato extends Objeto {
 		
 		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
 		
-		
-		$this->Edit("activo",$this->extra_fields['activo_contrato']  ? 'SI' : 'NO');
+		//$this->Edit("activo",$this->extra_fields['activo_contrato']  ? 'SI' : 'NO');
 
 		$this->Edit("fono_contacto",$this->extra_fields['fono_contacto_contrato']);
 		$this->Edit("email_contacto",$this->extra_fields['email_contacto_contrato']);
