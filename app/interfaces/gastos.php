@@ -542,6 +542,8 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 							}, "aTargets": [5] },
 						{"fnRender": function (o,val) {
 								var activo=(o.aData[11]='SI')? 'activo' :'inactivo';
+								if(typeof(contratos)!="undefined") contratos['contrato_'+o.aData[14]]=o.aData[14];
+								 
 								return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
 							}, "aTargets": [1] }
 
