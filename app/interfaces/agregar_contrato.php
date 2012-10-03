@@ -133,6 +133,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
 		$val = true;
 	}
+	
 	$contrato->Fill($_REQUEST, true);
 	
 	/*$contrato->Edit("glosa_contrato", $glosa_contrato, true);
@@ -418,8 +419,8 @@ list($cant_encargados) = mysql_fetch_array($resp);
 <script type="text/javascript">
 	function ValidarContrato(form)
 	{
-		if(!form)
-			var form = $('formulario');
+		if(!form) var form = jQuery('[name="formulario"]').get(0);
+			 
 
 
 <?php if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) { ?>
@@ -1074,6 +1075,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 					function InactivaContrato(alerta, opcion)
 					{
 						var form = $('formulario');
+						if(!form) form = jQuery('[name="formulario"]').get(0);
 						var activo_contrato = $('activo_contrato');
 						if(!alerta)
 						{
@@ -1086,8 +1088,14 @@ list($cant_encargados) = mysql_fetch_array($resp);
 							{
 								top:150, left:290, width:400, okLabel: "<?php echo __('Aceptar') ?>", cancelLabel: "<?php echo __('Cancelar') ?>", buttonClass: "btn", className: "alphacube",
 								id: "myDialogId",
-								cancel:function(win){ activo_contrato.checked = true; return false; },
-								ok:function(win){ ValidarContrato(this.form); return true; }
+								cancel:function(win){ activo_contrato.checked = true; 
+									jQuery('#desactivar_contrato').remove();
+									return false; },
+								ok:function(win){
+									jQuery('[name="formulario"]').append('<input type="hidden" value="1" id="desactivar_contrato" name="desactivar_contrato"/>');
+									ValidarContrato(this.form); return true; 
+									
+								}
 							});
 						}
 						else
@@ -1772,7 +1780,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				?>
 				</td>
 				<td class="al"> 
-					<label for="activo_contrato" class="inline-help"><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick=InactivaContrato(this.checked) />
+					<label for="activo_contrato" class="inline-help"><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick="InactivaContrato(this.checked);" />
 					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
 				 </td>
 			</tr>
@@ -2926,6 +2934,8 @@ if (empty($contrato->fields['id_contrato']) && method_exists('Conf', 'GetConf'))
 	$contrato->Edit('opc_ver_valor_hh_flat_fee', Conf::GetConf($sesion, 'OpcVerValorHHFlatFee') == 1 ? 1 : 0);
 }
 ?>
+							
+
 							<tr>
 								<td align="right" colspan='1'><input type="checkbox" name="opc_ver_asuntos_separados" value="1" <?php echo $contrato->fields['opc_ver_asuntos_separados'] == '1' ? 'checked="checked"' : '' ?>></td>
 								<td align="left" colspan='5'><label><?php echo __('Ver asuntos por separado') ?></label></td>
@@ -3052,7 +3062,12 @@ if ($solicitante == 0) {  // no mostrar
 									<td align="right"><input type="checkbox" name="opc_ver_detalle_retainer" value="1" <?php echo $contrato->fields['opc_ver_detalle_retainer'] == '1' ? 'checked="checked"' : '' ?> /></td>
 									<td align="left" colspan='5'><label><?php echo __('Mostrar detalle retainer') ?></label></td>
 								</tr>
-<?php } ?>
+<?php } else { ?>
+		<tr>
+			<td><input type="hidden" id="opc_restar_retainer" name="opc_restar_retainer" value="1" /></td>
+		<td><input type="hidden" id="opc_ver_detalle_retainer" name="opc_ver_detalle_retainer" value="1"/></td>
+		</tr>
+<?php } ?>								
 							<tr>
 								<td align="right"><input type="checkbox" name="opc_ver_valor_hh_flat_fee" value="1" <?php echo $contrato->fields['opc_ver_valor_hh_flat_fee'] == '1' ? 'checked="checked"' : '' ?>/></td>
 								<td align="left" colspan='5'><label><?php echo __('Mostrar tarifa proporcional en base a HH'); ?></label></td>

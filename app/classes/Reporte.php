@@ -360,38 +360,39 @@ class Reporte
 
 		$campo_fecha = $this->alt($this->campo_fecha_cobro,$this->campo_fecha_cobro_2);
 
-		$s = 'SELECT \''.__('Indefinido').'\' as profesional, \''.__('Indefinido').'\' as username, \''.__('Indefinido').'\' as categoria_usuario, \''.__('Indefinido').'\' as area_usuario,
+		$s = 'SELECT \''.__('Indefinido').'\' as profesional, 
+				\''.__('Indefinido').'\' as username, 
 				-1 as id_usuario,
+				cliente.id_cliente,
 				cliente.codigo_cliente,
-				cliente.glosa_cliente,
-				contrato.id_contrato,
 				'.(in_array('codigo_cliente_secundario',$this->agrupador)?'cliente.codigo_cliente_secundario,':'').'
 				'.(in_array('prm_area_proyecto.glosa',$this->agrupador)?"'".__('Indefinido')."' AS glosa,":'').'
+				\''.__('Indefinido').'\' as categoria_usuario, 
+				\''.__('Indefinido').'\' as area_usuario,
 				'.(in_array('id_usuario_responsable',$this->agrupador)? $this->nombre_usuario('usuario_responsable').' AS nombre_usuario_responsable,':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?' usuario_responsable.id_usuario AS id_usuario_responsable,':'').'
-				cliente.glosa_cliente,
-				'.(in_array('id_usuario_secundario',$this->agrupador)? $this->nombre_usuario('usuario_secundario').' AS nombre_usuario_secundario,':'').'
 				'.(in_array('id_usuario_secundario',$this->agrupador)?' usuario_secundario.id_usuario AS id_usuario_secundario,':'').'
-			
-
-
-						
-				CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
+				'.(!$this->vista?"'Indefinido' AS agrupador_general,":'').'
+				'.(in_array('id_usuario_secundario',$this->agrupador)? $this->nombre_usuario('usuario_secundario').' AS nombre_usuario_secundario,':'').'
+				cliente.glosa_cliente,
 				asunto.glosa_asunto,
 				CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
+				asunto.codigo_asunto,	
+				contrato.id_contrato,
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
-				'.$this->dato_codigo_asunto.' as codigo_asunto,
 				grupo_cliente.id_grupo_cliente,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,\'-\') as glosa_grupo_cliente,
+				CONCAT(cliente.glosa_cliente,\' - \',asunto.codigo_asunto,\' \',asunto.glosa_asunto) as glosa_cliente_asunto,
 				IFNULL(grupo_cliente.glosa_grupo_cliente,cliente.glosa_cliente) as grupo_o_cliente,
-				cobro.id_cobro,
+				
 				'.$campo_fecha.' as fecha_final,
 				DATE_FORMAT( '.$campo_fecha.' , \'%m-%Y\') as mes_reporte,
 				DATE_FORMAT( '.$campo_fecha.' , \'%d-%m-%Y\') as dia_reporte,
 				'.(in_array('dia_corte',$this->agrupador)?'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,':'').'
 				'.(in_array('dia_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,':'').'
 				'.(in_array('mes_emision',$this->agrupador)?'IF(cobro.fecha_emision IS NULL,\''.__('Por Emitir').'\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,':'').'
+				cobro.id_cobro,
 				cobro.estado AS estado,
 				cobro.forma_cobro AS forma_cobro,
 			';
@@ -413,21 +414,21 @@ class Reporte
 				
 				{
 					$s .=
-					' 0 as valor_divisor, (1/ca2.cant_asuntos)*SUM( cobro.monto_subtotal
+					' 0 as valor_divisor, (1/ifnull(ca2.cant_asuntos,1))*SUM( cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				}
 				case 'rentabilidad_base':
 				{
-					$s .= ' 0 as valor_divisor, (1/ca2.cant_asuntos)*SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_subtotal
+					$s .= ' 0 as valor_divisor, (1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado NOT IN (\'CREADO\',\'EN REVISION\'), cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio), 0 ))';
 					break;
 				}
 				case 'valor_pagado':
 				{
-					$s .= ' (1/ca2.cant_asuntos)*SUM( IF(cobro.estado = \'PAGADO\',
+					$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado = \'PAGADO\',
 									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
@@ -437,7 +438,7 @@ class Reporte
 				}
 				case 'valor_pagado_parcial':
 				{
-					$s .= ' (1/ca2.cant_asuntos)*SUM( (cobro.monto_subtotal
+					$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( (cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( 1 - documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -445,7 +446,7 @@ class Reporte
 				}
 				case 'valor_por_pagar_parcial':
 				{
-					$s .= ' (1/ca2.cant_asuntos)*SUM( (cobro.monto_subtotal
+					$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( (cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									*  ( documento.saldo_honorarios / documento.honorarios)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) ) )';
@@ -453,7 +454,7 @@ class Reporte
 				}
 				case 'valor_por_pagar':
 				{
-					$s .= '(1/ca2.cant_asuntos)*SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
+					$s .= '(1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado = \'PAGADO\' || cobro.estado = \'INCOBRABLE\' , 0,
 									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) 
@@ -462,7 +463,7 @@ class Reporte
 				}
 				case 'valor_incobrable':
 				{
-					$s .= '(1/ca2.cant_asuntos)*SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
+					$s .= '(1/ifnull(ca2.cant_asuntos,1))*SUM( IF(cobro.estado <> \'INCOBRABLE\', 0,
 									(cobro.monto_subtotal
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio)
@@ -471,11 +472,11 @@ class Reporte
 				}
 				case 'rentabilidad':
 					$s .= ' 0 AS valor_divisor,
-						(1/ca2.cant_asuntos)*SUM(cobro.monto_subtotal * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
+						(1/ifnull(ca2.cant_asuntos,1))*SUM(cobro.monto_subtotal * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) / (cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
 				case 'diferencia_valor_estandar':
 				{
-					$s .= ' (1/ca2.cant_asuntos)*SUM( cobro.monto_subtotal
+					$s .= ' (1/ifnull(ca2.cant_asuntos,1))*SUM( cobro.monto_subtotal
 					*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 					/	(cobro_moneda.tipo_cambio/cobro_moneda_base.tipo_cambio) )';
 					break;
@@ -491,14 +492,14 @@ class Reporte
 			 $s .= ' as '.$this->tipo_dato;
 			 $s .= ' FROM cobro  
 				 left join cobro_asunto using (id_cobro) 
-		left join asunto using (codigo_asunto)
-		left join (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro 
+						LEFT JOIN  asunto using (codigo_asunto)
+						LEFT JOIN  (select id_cobro, count(codigo_asunto) cant_asuntos from cobro_asunto group by id_cobro) ca2 on ca2.id_cobro=cobro.id_cobro 
 			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
-						LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
 						LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
-						'.(in_array('id_usuario_secundario',$this->agrupador)?'LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
+						LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
+						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
+						'.(in_array('id_usuario_responsable',$this->agrupador)?' LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
+						'.(in_array('id_usuario_secundario',$this->agrupador)?' LEFT JOIN usuario AS usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario':'').'
 						LEFT JOIN prm_moneda AS moneda_base ON (moneda_base.moneda_base = 1)
 					';
 
@@ -978,15 +979,20 @@ class Reporte
 			&& !$this->ignorar_cobros_sin_horas 
 		)
 		{
+			
 			$cobroquery=$this->cobroQuery(); 
+			$stringquery= " \n\n\n union all \n\n\n $cobroquery";
+			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery() . $stringquery."\n\n --tipo dato es ".$this->tipo_dato, $this->sesion->dbh)."'";
+        	$respt = mysql_query($testimonio, $this->sesion->dbh);
 			
 			$resp = mysql_query($cobroquery, $this->sesion->dbh) or Utiles::errorSQL($cobroquery,__FILE__,__LINE__,$this->sesion->dbh);
 			while($row = mysql_fetch_array($resp))
 				$this->row[] = $row;
-		}
-		    $stringquery=($cobroquery)?" \n union all \n $cobroquery":"";
-			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery() . $stringquery."\n --tipo dato es".$this->tipo_dato, $this->sesion->dbh)."'";
+		} else {
+			 $testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery()."\n\n --tipo dato es ".$this->tipo_dato, $this->sesion->dbh)."'";
         	$respt = mysql_query($testimonio, $this->sesion->dbh);
+		}
+		    
 		
 			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery()."\n union all \n".$this->cobroQuery(), $this->sesion->dbh)."'";
         	//$respt = mysql_query($testimonio, $this->sesion->dbh);

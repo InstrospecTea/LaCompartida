@@ -1096,11 +1096,7 @@ class Contrato extends Objeto {
 		
 		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
 		
-		//$this->Edit("activo",$this->extra_fields['activo_contrato']  ? 'SI' : 'NO');
-
-		$this->Edit("fono_contacto",$this->extra_fields['fono_contacto_contrato']);
-		$this->Edit("email_contacto",$this->extra_fields['email_contacto_contrato']);
-		$this->Edit("direccion_contacto",$this->extra_fields['direccion_contacto_contrato']);
+		
 		 
 
 		
@@ -1117,14 +1113,9 @@ class Contrato extends Objeto {
 			}
 			
 		 
-			if( is_array($this->extra_fields['usuarios_retainer']) ) {
-							$retainer_usuarios = implode(',',$usuarios_retainer);
-			} else {
-							$retainer_usuarios = $this->extra_fields['usuarios_retainer'];
-			}
-			$this->Edit("retainer_usuarios",$retainer_usuarios);
 			
-			$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
+			
+			
 			$this->Edit("id_carta", $this->fields['id_carta'] ?  $this->fields['id_carta'] : 'NULL');
 			
 				$this->Edit("codigo_idioma", $this->fields['codigo_idioma'] ?  $this->fields['codigo_idioma'] : 'es');
@@ -1132,11 +1123,72 @@ class Contrato extends Objeto {
 			$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
 			$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
 				$this->Edit("id_formato", $this->fields['id_formato']     ? $this->fields['id_formato']     : 'NULL');
- 	
+				
 		 
-
+		
+			if ( $this->fields['tipo_descuento'] == 'PORCENTAJE') {
+				$this->Edit("porcentaje_descuento", $this->fields['porcentaje_descuento'] > 0 ? $this->fields['porcentaje_descuento'] : '0');
+				$this->Edit("descuento", '0');
+			} else {
+				$this->Edit("descuento", $this->fields['descuento'] > 0 ? $this->fields['descuento'] : '0');
+				$this->Edit("porcentaje_descuento", '0');
+			}
+		 
 			
+	}
 
+	/**
+	 * Completa el objeto con los valores que vengan en $parametros
+	 * También sirve para definir cuando un parámetro que no viene debe ser marcado como cero
+	 *
+	 * @param array $parametros entrega los campos y valores del objeto campo => valor
+	 * @param boolean $edicion indica si se marcan los $parametros para edición
+	 */
+	function Fill($parametros, $edicion = false) {
+		
+		 
+		foreach ($parametros as $campo => $valor) {
+			if (in_array($campo, $this->editable_fields)) {
+				$this->fields[$campo] = $valor;
+
+
+
+				if ($edicion) {
+					$this->Edit($campo, $valor);
+				}
+			} else {
+				$this->extra_fields[$campo] = $valor;
+			}
+		}
+		foreach($this->editable_fields as $editable_field) {
+				if(substr($editable_field,0,4)=='opc_') {
+					if(empty($parametros[$editable_field])) {
+						$this->Edit($editable_field,"0");
+					} else {
+						$this->Edit($editable_field,$parametros[$editable_field]);
+					}
+				}
+			}
+			
+		if($this->extra_fields['activo_contrato'] || empty($this->fields['activo'])  || empty($this->fields['id_contrato']) ) {
+			$this->Edit("activo",'SI');
+		} else if ($this->extra_fields['desactivar_contrato']) {
+			$this->Edit("activo",'NO');
+		}
+		$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
+		
+		if(!empty($this->extra_fields['glosa_asunto']) && empty($this->extra_fields['glosa_contrato']) ) $this->Edit("glosa_contrato",$this->extra_fields['glosa_asunto']);
+
+		$this->Edit("fono_contacto",$this->extra_fields['fono_contacto_contrato']);
+		$this->Edit("email_contacto",$this->extra_fields['email_contacto_contrato']);
+		$this->Edit("direccion_contacto",$this->extra_fields['direccion_contacto_contrato']);
+			
+		if( is_array($this->extra_fields['usuarios_retainer']) ) {
+							$retainer_usuarios = implode(',',$usuarios_retainer);
+			} else {
+							$retainer_usuarios = $this->extra_fields['usuarios_retainer'];
+			}
+			$this->Edit("retainer_usuarios",$retainer_usuarios);
 			
 			if( isset( $this->extra_fields['esc_tiempo'] ) ) {
 				for( $i = 1; $i <= sizeof($this->extra_fields['esc_tiempo']) ; $i++){		
@@ -1162,14 +1214,6 @@ class Contrato extends Objeto {
 					}
 				}		
 			}
-			if ( $this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$this->Edit("porcentaje_descuento", $this->fields['porcentaje_descuento'] > 0 ? $this->fields['porcentaje_descuento'] : '0');
-				$this->Edit("descuento", '0');
-			} else {
-				$this->Edit("descuento", $this->fields['descuento'] > 0 ? $this->fields['descuento'] : '0');
-				$this->Edit("porcentaje_descuento", '0');
-			}
-		 
 			if ($this->extra_fields['enviar_alerta_otros_correos'] == '1') {
 				$correos_separados = explode(',', $this->fields['notificar_otros_correos']);
 				for ($i = 0; $i < count($correos_separados); $i++) {
@@ -1182,38 +1226,8 @@ class Contrato extends Objeto {
 			if (UtilesApp::GetConf($this->sesion, 'ExportacionLedes')) {
 				$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0': '1');
 			}
-	}
-
-	/**
-	 * Completa el objeto con los valores que vengan en $parametros
-	 * También sirve para definir cuando un parámetro que no viene debe ser marcado como cero
-	 *
-	 * @param array $parametros entrega los campos y valores del objeto campo => valor
-	 * @param boolean $edicion indica si se marcan los $parametros para edición
-	 */
-	function Fill($parametros, $edicion = false) {
-		foreach ($parametros as $campo => $valor) {
-			if (in_array($campo, $this->editable_fields)) {
-				$this->fields[$campo] = $valor;
-
-
-
-				if ($edicion) {
-					$this->Edit($campo, $valor);
-				}
-			} else {
-				$this->extra_fields[$campo] = $valor;
-			}
-		}
-		foreach($this->editable_fields as $editable_field) {
-				if(substr($editable_field,0,4)=='opc_') {
-					if(empty($parametros[$editable_field])) {
-						$this->Edit($editable_field,"0");
-					} else {
-						$this->Edit($editable_field,$parametros[$editable_field]);
-					}
-				}
-			}
+			
+				
 	}
 
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()
