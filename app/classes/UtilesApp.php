@@ -479,9 +479,9 @@ class UtilesApp extends Utiles {
 	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
 		
 		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-			if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
-				$where .= " AND  cta_corriente.cobrable = $cobrable ";
-			}
+		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
+			$where .= " AND  cta_corriente.cobrable = $cobrable ";
+		}
 		$total_ingresos = 0;
 		$total_egresos = 0;
 
@@ -501,16 +501,36 @@ class UtilesApp extends Utiles {
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
 								left JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 							WHERE $where";
-//mail('ffigueroa@lemontech.cl','totalcta',$query);
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while (list( $ingreso, $egreso, $monto_cobrable) = mysql_fetch_array($resp)) {
-			if ($ingreso > 0)
-				$total_ingresos += $monto_cobrable;
-			else if ($egreso > 0)
-				$total_egresos += $monto_cobrable;
+	
+ 		 
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			
+		 
+			while($ingresoyegreso=mysql_fetch_array($ingresosyegresos) ) {
+				if ($ingresoyegreso[0] > 0) {
+				$total_ingresos += $ingresoyegreso[2];
+				} else if ($ingresoyegreso[1] > 0) {
+				$total_egresos += $ingresoyegreso[2];
+				if($ingresoyegreso[3]=='CREADO' || $ingresoyegreso[3]=='SIN COBRO') $egresos_borrador += $ingresoyegreso[2];
+				}
+			}
+			$total = $total_ingresos - $total_egresos;
+		if($array) {
+			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
+		} else {
+			return $total;
 		}
-		$total = $total_ingresos - $total_egresos;
-		return $total;
+			
+		 
+
+		 
+		
+		
+		 
+		
+		
+		
+		
 	}
 
 	/*
