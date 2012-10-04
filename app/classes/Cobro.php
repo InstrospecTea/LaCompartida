@@ -1514,10 +1514,12 @@ class Cobro extends Objeto {
 				//	$resp = mysql_query($query_documento_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_documento_moneda, __FILE__, __LINE__, $this->sesion->dbh);
 
 					try {
+						$this->sesion->pdodbh->beginTransaction();
 						$logstatement=$this->sesion->pdodbh->prepare($query_documento_moneda);
 						$logstatement->bindParam( ':idcobro', $this->fields['id_cobro'], PDO::PARAM_INT); 
-						$logstatement->bindParam( ':iddocumento', $this->fields['id_documento'], PDO::PARAM_INT); 
+						$logstatement->bindParam( ':iddocumento', $documento->fields['id_documento'], PDO::PARAM_INT); 
 					 	$logstatement->execute( );
+						$this->sesion->pdodbh->commit();
 
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
@@ -1716,7 +1718,7 @@ class Cobro extends Objeto {
 		if ($contrato->Load($id_contrato)) {
 			#Se elimina el borrador actual si es que existe
 			$contrato->EliminarBorrador($incluye_gastos, $incluye_honorarios);
-
+			
 			$hito = 0;
 			if (!empty($id_cobro_pendiente)) {
 				$query = "SELECT fecha_cobro, monto_estimado, hito FROM cobro_pendiente WHERE id_cobro_pendiente='$id_cobro_pendiente'";
@@ -1745,9 +1747,9 @@ class Cobro extends Objeto {
 					$sql_2 = "SELECT MIN(trabajo.fecha) as fmt
 									FROM trabajo
 									JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
-									JOIN contrato on asunto.id_contrato = contrato.id_contrato
+									
 									WHERE fecha <= '$fecha_fin' AND trabajo.id_cobro IS NULL
-									AND trabajo.cobrable = 1 AND contrato.id_contrato = '$id_contrato'";
+									AND trabajo.cobrable = 1 AND asunto.id_contrato = '$id_contrato'";
 					$resp_2 = mysql_query($sql_2, $this->sesion->dbh) or Utiles::errorSQL($sql_2, __FILE__, __LINE__, $this->sesion->dbh);
 					list($fmt) = mysql_fetch_array($resp_2);
 
