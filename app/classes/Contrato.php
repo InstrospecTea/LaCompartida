@@ -1177,7 +1177,7 @@ class Contrato extends Objeto {
 		}
 		$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
 		
-		if(!empty($this->extra_fields['glosa_asunto']) && empty($this->extra_fields['glosa_contrato']) ) $this->Edit("glosa_contrato",$this->extra_fields['glosa_asunto']);
+		//if(!empty($this->extra_fields['glosa_asunto']) && empty($this->fields['glosa_contrato']) ) $this->Edit("glosa_contrato",$this->extra_fields['glosa_asunto']);
 
 		$this->Edit("fono_contacto",$this->extra_fields['fono_contacto_contrato']);
 		$this->Edit("email_contacto",$this->extra_fields['email_contacto_contrato']);
