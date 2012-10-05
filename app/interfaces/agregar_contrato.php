@@ -1724,12 +1724,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 		if($('hito_fecha_'+num).disabled) return true;
 		if(permitirVacio && !fecha && !desc && !monto) return true;
-		if(fecha && !(new Date(fecha.replace(/(\d+)-(\d+)-(\d+)/, '$2/$1/$3')).getTime() > new Date().getTime())){
+		/*if(fecha && !(new Date(fecha.replace(/(\d+)-(\d+)-(\d+)/, '$2/$1/$3')).getTime() > new Date().getTime())){
 			
 			alert('Ingrese una fecha válida para el hito');
 			$('hito_fecha_'+num).focus();
 			return false;
-		}
+		}*/
 		if(!desc){
 			alert('Ingrese una descripción válida para el hito');
 			$('hito_descripcion_'+num).focus();
@@ -1780,7 +1780,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				?>
 				</td>
 				<td class="al"> 
-					<label for="activo_contrato" class="inline-help"><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick="InactivaContrato(this.checked);" />
+					<label for="activo_contrato" class="inline-help"><input type="hidden" name="activo_contrato" value="0"/><input type="checkbox" class="span1" name="activo_contrato" id="activo_contrato" value="1" <?php echo $contrato->fields['activo'] == 'SI' ? 'checked="checked"' : '' ?> <?php echo $chk ?> onclick="InactivaContrato(this.checked);" />
 					&nbsp;<?php echo __('Los contratos inactivos no aparecen en el listado de cobranza.') ?></label>
 				 </td>
 			</tr>
@@ -1801,8 +1801,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							$chk = 'checked="checked"';
 						}
 					?>
-					</td><td class="al">
-						<input class="span1" type="checkbox" name="impuesto_separado" id="impuesto_separado" value="1" <?php echo $chk ?> />
+					</td><td class="al"><input type="hidden" name="usa_impuesto_separado" value="0"/>
+						<input class="span1" type="checkbox" name="usa_impuesto_separado" id="usa_impuesto_separado" value="1" <?php echo $chk ?> />
+						
 					</td>
 				</tr>
 				<?php 	}
@@ -1823,8 +1824,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						$chk_gastos = 'checked="checked"';
 					}
 					?>
-					</td><td class="al">
-						<input class="span1"  type="checkbox" name="impuesto_gastos" id="impuesto_gastos" value="1" <?php echo $chk_gastos ?> />
+					</td><td class="al"><input type="hidden" name="usa_impuesto_gastos" value="0"/>
+						<input class="span1"  type="checkbox" name="usa_impuesto_gastos" id="impuesto_gastos" value="1" <?php echo $chk_gastos ?> />
 					</td>
 				</tr>
 				<?php
@@ -1843,7 +1844,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<td class="al">
 				<div class="span4">	<?php echo __('Liquidar por separado (honorario y gastos)') ?></div></td>
 				<td class="al">
-				<div class="span1"><input  class="span1" id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?php echo $separar_liquidaciones == '1' ? 'checked="checked"' : '' ?>  /></div>
+				<div class="span1"><input type="hidden" name="separar_liquidaciones" value="0"/><input  class="span1" id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?php echo $separar_liquidaciones == '1' ? 'checked="checked"' : '' ?>  /></div>
 			</td></tr>
 			<?php
 			$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
@@ -1910,7 +1911,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	<?php echo __('Usa exportación LEDES'); ?>
 							</div></td>
 								<td class="al">
-									<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
+								<input type="hidden" name="exportacion_ledes" value="0"/>	<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
 								</td>
 							 
 					<?php } ?>
@@ -2799,21 +2800,21 @@ for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
 										<tr>
 											<td rowspan="3"><?php echo __('Si se superan estos límites, el sistema enviará un email de alerta a:'); ?></td>
 											<td>
-												<label for="notificar_encargado_principal"><input type="checkbox" name="notificar_encargado_principal" id="notificar_encargado_principal" value="1" <?php echo $contrato->fields['notificar_encargado_principal'] == '1' ? 'checked="checked"' : ''; ?> />
+												<label for="notificar_encargado_principal"><input type="hidden" name="notificar_encargado_principal" value="0"/><input type="checkbox" name="notificar_encargado_principal" id="notificar_encargado_principal" value="1" <?php echo $contrato->fields['notificar_encargado_principal'] == '1' ? 'checked="checked"' : ''; ?> />
 												<?php echo __('Encargado Comercial'); ?></label>
 											</td>
 										</tr>
 <?php if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
 											<tr>
 												<td>
-													<label for="notificar_encargado_secundario"><input type="checkbox" name="notificar_encargado_secundario" id="notificar_encargado_secundario" value="1" <?php echo $contrato->fields['notificar_encargado_secundario'] == '1' ? 'checked="checked"' : ''; ?> />
+													<label for="notificar_encargado_secundario"><input type="hidden" name="notificar_encargado_secundario" value="0"/><input type="checkbox" name="notificar_encargado_secundario" id="notificar_encargado_secundario" value="1" <?php echo $contrato->fields['notificar_encargado_secundario'] == '1' ? 'checked="checked"' : ''; ?> />
 													<?php echo __('Encargado Secundario'); ?></label>
 												</td>
 											</tr>
 <?php } ?>
 										<tr>
 											<td>
-												<label for="enviar_alerta_otros_correos"><input type="checkbox" name="enviar_alerta_otros_correos" id="enviar_alerta_otros_correos" value="1" <?php echo $contrato->fields['notificar_otros_correos'] != '' ? 'checked="checked"' : ''; ?> />
+												<label for="enviar_alerta_otros_correos"><input type="hidden" name="enviar_alerta_otros_correos" value="0"/><input type="checkbox" name="enviar_alerta_otros_correos" id="enviar_alerta_otros_correos" value="1" <?php echo $contrato->fields['notificar_otros_correos'] != '' ? 'checked="checked"' : ''; ?> />
 												<?php echo __('Otros'); ?></label><br />
 												<input type="text" name="notificar_otros_correos" size="65" value="<?php echo $contrato->fields['notificar_otros_correos']; ?>" />
 												<br />
