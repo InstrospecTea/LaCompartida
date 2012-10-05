@@ -86,10 +86,7 @@ if (!defined('SUBDOMAIN')) {
 	echo $mensajedr;
 	?>
 
-	if (!defined('BACKUPDIR'))
-		die('Consulte con soporte para acceder a sus respaldos mediante esta pantalla');
-	echo $mensajedr;
-	?>
+
 
 	<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
 	<?php
