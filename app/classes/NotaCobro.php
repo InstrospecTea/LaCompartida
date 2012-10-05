@@ -9342,7 +9342,7 @@ class NotaCobro extends Cobro {
 		$saldo_pagos = 0;
 		$saldo_adelantos = 0;
 
-		$queryadelantos = "SELECT ifnull(documento.id_contrato,0) as id_contrato, -1*saldo_pago*cm1.tipo_cambio / cm2.tipo_cambio  as saldo_adelanto, cliente.id_contrato as contrato_default 
+		$queryadelantos = "SELECT ifnull(documento.id_contrato,0) as id_contrato, -1*saldo_pago*if(documento.id_moneda=".$this->fields['opc_moneda_total'].",1,cm1.tipo_cambio / cm2.tipo_cambio)  as saldo_adelanto, cliente.id_contrato as contrato_default 
 								FROM `documento` 
 								join cliente on documento.codigo_cliente=cliente.codigo_cliente
 								join cobro_moneda cm1 on cm1.id_moneda=documento.id_moneda and cm1.id_cobro=" . $this->fields['id_cobro'] . "
@@ -9395,7 +9395,7 @@ class NotaCobro extends Cobro {
 
 		//Deuda
 		$query = "
-				SELECT  documento.id_cobro, SUM(( documento.saldo_honorarios + documento.saldo_gastos ) * cm1.tipo_cambio / cm2.tipo_cambio) AS saldo_total_cobro
+				SELECT  documento.id_cobro, SUM(( documento.saldo_honorarios + documento.saldo_gastos ) * if(documento.id_moneda=".$this->fields['opc_moneda_total'].",1,cm1.tipo_cambio / cm2.tipo_cambio)) AS saldo_total_cobro
 				FROM documento
 				LEFT JOIN cobro ON cobro.id_cobro = documento.id_cobro
 				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
