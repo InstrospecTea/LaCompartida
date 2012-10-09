@@ -20,9 +20,10 @@ require_once Conf::ServerDir() . '/../app/classes/Cliente.php';
 
 $Sesion = new Sesion(array('COB', 'DAT'));
 
-$Pagina = new Pagina($Sesion);
 
-$Contrato = new Contrato($Sesion);
+
+if(empty($_GET['generar_silenciosamente'])) $Pagina = new Pagina($Sesion);
+
 
 if ( ( !isset($_POST['cobrosencero']) || $_POST['cobrosencero']==0  )  && isset($_GET['generar_silenciosamente'])) {
 			$forzar=false;
@@ -42,6 +43,10 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_honorarios = $tipo_liquidacion & 1 ? true : false;
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
 }
+if ($individual) {
+	$Cobro = new Cobro($Sesion);
+	if ($id_contrato) {
+		$id_proceso_nuevo = $Cobro->GeneraProceso();
 
 		if (empty($monto)) {
 			$monto = '';
