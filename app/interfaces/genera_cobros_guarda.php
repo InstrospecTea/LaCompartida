@@ -389,14 +389,14 @@ if ($print) {
 			//si se separan pero se piden ambos, se generan 2 cobros
 			if ($contra['separar_liquidaciones'] == '1' && $incluye_gastos && $incluye_honorarios) {
 			$newcobro[]=	$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, false, true);
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
 				$Cobro = new Cobro($Sesion);
 				$id_proceso_nuevo = $Cobro->GeneraProceso();
 			$newcobro[]=	$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, true, false);
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, true, false);
 			} else { //no se separan y se piden los 2, o se separan y se pide 1 (no+1 se filtra en la query)
 			$newcobro[]=$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
 			}
 		}
 	}
