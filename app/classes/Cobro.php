@@ -1762,9 +1762,13 @@ class Cobro extends Objeto {
 			$genera = $emitir_obligatoriamente;
 			if (!$genera) {
 				$wip = $contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $contrato->fields['id_contrato']);
+				 
 				if (!empty($incluye_honorarios)) {
 					if ($wip[0] > 0 || $contrato->fields['forma_cobro'] != 'TASA' && $contrato->fields['forma_cobro'] != 'CAP')
 						$genera = true;
+					if($wip[1]>0) { //si tiene trámites
+						$genera = true;
+					}
 				}
 				if (!empty($incluye_gastos) || $con_gastos) {
 					if ($wip[3] > 0)

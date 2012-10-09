@@ -368,7 +368,7 @@ class Contrato extends Objeto {
 
 		$suma_gastos = 0;
 
-		$query = "SELECT cta_corriente.monto_cobrable, cta_corriente.id_moneda FROM cta_corriente
+		$query = "SELECT if(cta_corriente.ingreso>0,-1,1)*cta_corriente.monto_cobrable, cta_corriente.id_moneda FROM cta_corriente
 						LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto
 						WHERE (cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)
 						AND (cta_corriente.id_cobro IS NULL)

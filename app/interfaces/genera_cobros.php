@@ -622,6 +622,19 @@ else
 							} 	else {
 								$chk = '';
 							}
+							if(isset($_POST['cobrosencero']) ) {
+								if($_POST['cobrosencero']==1) {
+									$chk0 = 'checked="checked"';
+								} else {
+									$chk0 = '';
+								}
+							} else {
+								if( UtilesApp::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion') ) {
+									$chk0 = '';
+								}else{
+									$chk0 = 'checked="checked"';
+								}
+							}
 							?>
 							<td>
 							</td>
@@ -630,6 +643,15 @@ else
 						<tr>
 							<td align=right><b><?php echo __('Activo') ?>&nbsp;</b></td>
 							<td align=left><input type="checkbox" name='activo' id='activo' value="1" <?php echo (!isset($_POST['opc'])) ? 'checked="checked"' : $chk ?>></td>
+						</tr>
+						<tr>
+							<td align=right><b><?php echo 'Incluir '.__('cobros').' de monto cero' ?>&nbsp;</b></td>
+							<td align=left><input type="hidden" name="cobrosencero" value="0"/><input type="checkbox" name='cobrosencero' id='cobrosencero' value="1" <?php echo $chk0; ?>>
+
+
+
+
+							</td>
 						</tr>
 						<tr>
 							<td></td>

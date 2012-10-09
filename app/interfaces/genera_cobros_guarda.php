@@ -24,7 +24,12 @@ $Pagina = new Pagina($Sesion);
 
 $Contrato = new Contrato($Sesion);
 
-$Cobro = new Cobro($Sesion);
+if ( ( !isset($_POST['cobrosencero']) || $_POST['cobrosencero']==0  )  && isset($_GET['generar_silenciosamente'])) {
+			$forzar=false;
+		} else {
+			$forzar=true;
+		}
+
 
 //si no me llega uno, es 0
 $incluye_gastos = !empty($incluye_gastos);
@@ -38,6 +43,30 @@ if ($tipo_liquidacion) { //1:honorarios, 2:gastos, 3:mixtas
 	$incluye_gastos = $tipo_liquidacion & 2 ? true : false;
 }
 
+		if (empty($monto)) {
+			$monto = '';
+		}
+		if (empty($id_cobro_pendiente)) {
+			$id_cobro_pendiente = '';
+		}
+
+
+		$fecha_ini_cobro = empty($fecha_ini)? "": Utiles::fecha2sql($fecha_ini); // Comentado por SM 28.01.2011 el conf nunca se usa
+		
+		$id = $Cobro->PrepararCobro(
+				$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios
+		);
+
+		if ($id) {
+			if(isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente']==1) {
+				die($id);
+			} else {
+				$Pagina->Redirect('cobros5.php?id_cobro=' . $id . '&popup=1');
+			}
+		}
+	}
+}
+$Contrato = new Contrato($Sesion);
 //set_time_limit(0);
 
 if ($codigo_cliente_secundario) {
@@ -92,7 +121,7 @@ if ($print || $emitir) {
 	}
 	
 	if( UtilesApp::GetConf($Sesion, 'OcultarCobrosTotalCeroGeneracion') ) {
-		$where .= " AND ( cobro.total_minutos > 0 OR cobro.forma_cobro != 'TASA' ) ";
+		$where .= " AND ( cobro.monto_subtotal > 0 OR cobro.subtotal_gastos>0 OR cobro.forma_cobro != 'TASA' ) ";
 	}
 
 	$url = "genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
@@ -111,28 +140,72 @@ if ($print) {
 								WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' )
 								ORDER BY cliente.glosa_cliente";
 	//echo $query; exit;
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	if (count(mysql_num_rows($resp)) > 0) {
-		while ($cob = mysql_fetch_array($resp)) {
-			set_time_limit(100);
-			if ($NotaCobro->Load($cob['id_cobro'])) {
-				$NotaCobro->GuardarCobro();
-				$lang = $NotaCobro->fields['codigo_idioma'] == '' ? 'es' : $NotaCobro->fields['codigo_idioma'];
-				require Conf::ServerDir() . "/lang/$lang.php";
-				if ($opcion != 'cartas')
-					$NotaCobro->fields['id_carta'] = null;
-				$html .= $NotaCobro->GeneraHTMLCobro(true);
-				$html .= "<br size=\"1\" class=\"divisor\">";
+ 	try {
+	$cobroST=$Sesion->pdodbh->query($query);
+	$cobroRT=$cobroST->fetchAll(PDO::FETCH_ASSOC);
+	$totaldecobros=count($cobroRT);
+	$counter=0;
+	$cantidaddecobros=count($cobroRT);
+	$error_logfile=ini_get('error_log');
+	$logdir=dirname($error_logfile);
+	
+	
+	//$fh=fopen($logdir.'/'.DBNAME.'_borradores.log',"w");
+	
+	//fputs($fh,"Generando borradores para ".$cantidaddecobros." cobros \n");
+
+
+ 		$html="";
+		if ($totaldecobros > 0) {
+
+			foreach ($cobroRT as $cob) {
+
+				//fputs($fh,"Generando borrador para cobro ".$cob['id_cobro']."   \n");
+				set_time_limit(100);
+				if (!$NotaCobro->Load($cob['id_cobro']))  continue;
+					
+					$lang = $NotaCobro->fields['codigo_idioma'] == '' ? 'es' : $NotaCobro->fields['codigo_idioma'];
+					require Conf::ServerDir() . "/lang/$lang.php";
+					if ($opcion != 'cartas') {
+						$NotaCobro->fields['id_carta'] = null;
+					} else {
+						if(!$NotaCobro->fields['id_carta']) {
+							$NotaCobro->fields['id_carta']=$mincarta;
+							$NotaCobro->fields['opc_ver_carta']=1;
+						}
+					}
+					
+					$NotaCobro->GuardarCobro();
+					$html = $NotaCobro->GeneraHTMLCobro(true);
+					//$html .= "<br size=\"1\" class=\"divisor\">";
+				 
+				$opc_papel = $cob['opc_papel'];
+				$id_carta = $cob['id_carta'];
+			//	debug(json_encode($cob));
+				$cssData = UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
+
+				if ($html) {
+						$cssData .= UtilesApp::CSSCobro($Sesion);
+						if(is_object($doc)) {
+							$doc->newSession($html,'PORTRAIT'  , $opc_papel,   1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
+						} else {
+							$doc = new DocGenerator($html,  $cssData,  $opc_papel, 1,'PORTRAIT', 1.5, 2.0, 2.0, 2.0,  $NotaCobro->fields['estado']);
+						}
+
+					}
+
 			}
-			$opc_papel = $cob['opc_papel'];
-			$id_carta = $cob['id_carta'];
-			$cssData .= UtilesApp::TemplateCartaCSS($Sesion, $NotaCobro->fields['id_carta']);
+		//	fclose($fh);
+			$doc->output("cobro_masivo_$id_usuario.doc",'');
+				
+		} else {
+		echo "\n<script type=\"text/javascript\">	var pause = null;	pause = setTimeout('window.history.back()',3000);	</script>\n";
+		die('No hay datos para su criterio de búsqueda');
 		}
-		if ($html) {
-			$cssData .= UtilesApp::CSSCobro($Sesion);
-			$doc = new DocGenerator($html, $cssData, 'LETTER', 1, 'PORTRAIT', 1.5, 2.0, 2.0, 2.0, $NotaCobro->fields['estado']);
-			$doc->output("cobro_masivo.doc");
-		}
+	} catch (PDOException $pdoe) {
+		debug($pdoe->getTraceAsString());
+	} catch (Exception $e) {
+		debug($e->getTraceAsString());
 	}
 	$Pagina->Redirect($url);
 } else if ($emitir) {
@@ -194,6 +267,7 @@ if ($print) {
 } else { #Creación masiva de cobros
 	$where = 1;
 	$join = "";
+		$newcobro=array();
 	if ($tipo_liquidacion) {
 		$where .= " AND contrato.separar_liquidaciones = " . ($tipo_liquidacion == '3' ? 0 : 1) . " ";
 	}
@@ -250,7 +324,7 @@ if ($print) {
 				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
 			}
 
-			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, true, true, false);
+			$newcobro[]=$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', true, true, true, false);
 		}
 		//fin gastos
 	} if ($solohh) { // desde genera_cobros.php estoy forzando que solamente incluya honorarios
@@ -268,7 +342,7 @@ if ($print) {
 				$fecha_ini_cobro = Utiles::fecha2sql($fecha_ini);  //Comentado por SM 28.01.2011 el conf nunca se usa
 			}
 
-			$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
+				$newcobro[]=$Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
 		}
 		//fin gastos
 	} /* else if ($programados) {
@@ -309,25 +383,34 @@ if ($print) {
 
 			//si se separan pero se piden ambos, se generan 2 cobros
 			if ($contra['separar_liquidaciones'] == '1' && $incluye_gastos && $incluye_honorarios) {
-				$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, false, true);
+			$newcobro[]=	$Cobro->PrepararCobro(
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, false, true);
 				$Cobro = new Cobro($Sesion);
 				$id_proceso_nuevo = $Cobro->GeneraProceso();
-				$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, true, false);
+			$newcobro[]=	$Cobro->PrepararCobro(
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, true, false);
 			} else { //no se separan y se piden los 2, o se separan y se pide 1 (no+1 se filtra en la query)
-				$Cobro->PrepararCobro(
-						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], false, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
+			$newcobro[]=$Cobro->PrepararCobro(
+						$fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $contra['id_contrato'], $forzar, $id_proceso_nuevo, '', '', false, false, $incluye_gastos, $incluye_honorarios);
 			}
 		}
 	}
 	#fin cobros wip
 
 	$Contrato->SetIncluirEnCierre($Sesion);
-	$Pagina->Redirect(
-			"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
-			"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
-			"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
-	);
+
+	if(isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente']==1) {
+
+			unset($Sesion);
+			unset($Cobro);
+			unset($Contrato);
+			die('Proceso '.$id_proceso_nuevo.' Cobros '.implode($newcobro));
+			} else {
+				$Pagina->Redirect(
+						"genera_cobros.php?activo=$activo&id_usuario=$id_usuario&codigo_cliente=$codigo_cliente&fecha_ini=$fecha_ini" .
+						"&fecha_fin=$fecha_fin&id_grupo_cliente=$id_grupo_cliente&fecha_ini=$fecha_ini&opc=buscar&cobros_generado=1" .
+						"&tipo_liquidacion=$tipo_liquidacion&forma_cobro=$forma_cobro&codigo_asunto=$codigo_asunto"
+				);
+	}
 }
 ?>
