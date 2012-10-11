@@ -5,7 +5,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/classes/Factura.php';
 	require_once Conf::ServerDir().'/classes/Moneda.php';
-        require_once Conf::ServerDir() . '/classes/Contrato.php';
+    require_once Conf::ServerDir() . '/classes/Contrato.php';
 	
 	class FacturaPdfDatos extends Objeto
 	{
@@ -25,18 +25,20 @@
 			if(!UtilesApp::ExisteCampo('align','factura_pdf_datos',$this->sesion))  mysql_query("ALTER TABLE  `factura_pdf_datos` ADD  `align` VARCHAR( 1 ) NOT NULL DEFAULT  'L' COMMENT  'J justifica, tb puede ser R C o L';",$this->sesion->dbh);
 				
 			$query = "SELECT 
-						codigo_tipo_dato, 
-						activo, 
-						coordinateX, 
-						coordinateY, 
-                                                cellW,
-                                                cellH,
-						font, 
-						style, 
-						mayuscula, 
-						tamano , align
-					FROM factura_pdf_datos 
-                                        JOIN factura_pdf_tipo_datos USING( id_tipo_dato ) 
+								codigo_tipo_dato, 
+								activo, 
+								coordinateX, 
+								coordinateY, 
+		                        cellW,
+		                        cellH,
+								font, 
+								style, 
+								mayuscula, 
+								tamano , align
+					FROM 
+						factura_pdf_datos
+           			JOIN
+           				factura_pdf_tipo_datos USING( id_tipo_dato ) 
 					WHERE activo = 1 AND id_documento_legal = '$id_documento_legal' ";
 			$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			
@@ -56,18 +58,20 @@
 		
 			echo '<pre>';print_r($factura->fields);echo '</pre>';*/
 			$querypapel = "SELECT 
-						codigo_tipo_dato, 
-						activo, 
-						coordinateX, 
-						coordinateY, 
-                                                cellW,
-                                                cellH,
-						font, 
-						style, 
-						mayuscula, 
-						tamano 
-					FROM factura_pdf_datos 
-                                        JOIN factura_pdf_tipo_datos USING( id_tipo_dato ) 
+									codigo_tipo_dato, 
+									activo, 
+									coordinateX, 
+									coordinateY, 
+			                        cellW,
+			                        cellH,
+									font, 
+									style, 
+									mayuscula, 
+									tamano
+					FROM 
+						factura_pdf_datos 
+					JOIN
+						factura_pdf_tipo_datos USING( id_tipo_dato ) 
 					WHERE codigo_tipo_dato = 'tipo_papel' AND id_documento_legal= '$id_documento_legal' limit 1";
 			
 			$resppapel = mysql_query($querypapel,$this->sesion->dbh) or Utiles::errorSQL($querypapel,__FILE__,__LINE__,$this->sesion->dbh);
@@ -90,20 +94,43 @@
 			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
 			
+			$condicion_pago = $factura->fields['condicion_pago'];
+			
+			switch ($condicion_pago){
+			    case '1': $condicion_pago = __('CONTADO'); break;
+			    case '3': $condicion_pago = __('Vencimiento 15 días	'); break;
+			    case '4': $condicion_pago = __('Vencimiento 30 días	'); break;
+			    case '5': $condicion_pago = __('Vencimiento 45 días	'); break;
+			    case '6': $condicion_pago = __('Vencimiento 60 días	'); break;
+			    case '7': $condicion_pago = __('Vencimiento 75 días	'); break;
+			    case '8': $condicion_pago = __('Vencimiento 90 días	'); break;
+			    case '9': $condicion_pago = __('Vencimiento 120 días'); break;
+			    case '12': $condicion_pago = __('Letra 30 días'); break;
+			    case '13': $condicion_pago = __('Letra 45 días'); break;
+			    case '14': $condicion_pago = __('Letra 60 días'); break;
+			    case '15': $condicion_pago = __('Letra 90 días'); break;
+			    case '18': $condicion_pago = __('Cheque 30 días'); break;
+			    case '19': $condicion_pago = __('Cheque 45 días'); break;
+			    case '20': $condicion_pago = __('Cheque 60 días'); break;
+			    case '21': $condicion_pago = __('Cheque a fecha'); break;
+			    
+			}
+			
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
 			switch( $tipo_dato ) {
 				case 'razon_social': 			$glosa_dato = $factura->fields['cliente']; break;
 				case 'rut': 				$glosa_dato = $factura->fields['RUT_cliente']; break;
-                                case 'telefono': 			$glosa_dato = $contrato->fields['factura_telefono']; break;
+				case 'telefono': 			$glosa_dato = $contrato->fields['factura_telefono']; break;
 				case 'fecha_dia': 	 		$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_mes':			$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_ano_ultima_cifra':		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
-                                case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
+				case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
 				case 'comuna':                          $glosa_dato = $factura->fields['comuna_cliente']; break;
 				case 'ciudad':                          $glosa_dato = $factura->fields['ciudad_cliente']; break;
+				case 'nota_factura':			$glosa_dato = $condicion_pago; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
 				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
 				case 'descripcion_gastos_sin_iva':	$glosa_dato = $factura->fields['descripcion_subtotal_gastos_sin_impuesto']; break;
@@ -119,10 +146,10 @@
 				case 'moneda_iva': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'moneda_total': 			$glosa_dato = $arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; break;
 				case 'monto_subtotal': 			$glosa_dato = number_format( 
-                                                                        $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-                                                                        $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-                                                                        $idioma->fields['separador_decimales'],
-                                                                        $idioma->fields['separador_decimales']); break;
+	                                                                        $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+	                                                                        $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+	                                                                        $idioma->fields['separador_decimales'],
+	                                                                        $idioma->fields['separador_decimales']); break;
 				case 'monto_iva': 			$glosa_dato = number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 				case 'monto_total':			$glosa_dato = number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); break;
 			}
@@ -142,22 +169,23 @@
                         $contrato->Load($cobro->fields['id_contrato']);
                         
 			$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
-			$idioma->Load( $cobro->fields['codigo_idioma'] ); 
-			
+			$idioma->Load( $cobro->fields['codigo_idioma'] );
+						
 			$arreglo_monedas = ArregloMonedas($this->sesion);
 			$monto_palabra=new MontoEnPalabra($this->sesion);
 			$fila=array();
 			
-				$fila['razon_social']= $factura->fields['cliente']; 
-				$fila[ 'rut']= 				$factura->fields['RUT_cliente'];
-				$fila[ 'telefono']=  $contrato->fields['factura_telefono']; 
-                                $fila[ 'comuna']=	 		  $factura->fields['comuna_cliente']; 
-                                $fila[ 'ciudad']=	 		  $factura->fields['ciudad_cliente'];
-                                $fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
+				$fila['razon_social']=			$factura->fields['cliente']; 
+				$fila[ 'rut']= 					$factura->fields['RUT_cliente'];
+				$fila[ 'telefono']=				$contrato->fields['factura_telefono']; 
+				$fila[ 'comuna']=	 			$factura->fields['comuna_cliente']; 
+				$fila[ 'ciudad']=	 			$factura->fields['ciudad_cliente'];
+				$fila[ 'nota_factura']=	 		$factura->fields['condicion_pago'];
+				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
 				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1);
-                                $fila[ 'fecha_ano_dos_ultimas_cifras']=		substr(date("Y",strtotime($factura->fields['fecha'])),-2);
+				$fila[ 'fecha_ano_dos_ultimas_cifras']=		substr(date("Y",strtotime($factura->fields['fecha'])),-2);
 				$fila[ 'direccion']=			$factura->fields['direccion_cliente']; 
 				$fila[ 'descripcion_honorarios']=		$factura->fields['descripcion']; 
 				$fila[ 'descripcion_gastos_con_iva']= 	$factura->fields['descripcion_subtotal_gastos']; 
@@ -172,12 +200,12 @@
 				$fila[ 'porcentaje_impuesto']= 		$factura->fields['porcentaje_impuesto']."%"; 
 				$fila[ 'moneda_subtotal']= 		$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
 				$fila[ 'moneda_iva']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
-				$fila[ 'moneda_total']= 			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
+				$fila[ 'moneda_total']=			$arreglo_monedas[$factura->fields['id_moneda']]['simbolo']; 
 				$fila[ 'monto_subtotal']= 			number_format( 
-												$factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-												$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-												$idioma->fields['separador_decimales'],
-												$idioma->fields['separador_decimales']); 
+											    $factura->fields['subtotal_sin_descuento'] + $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+											    $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+											    $idioma->fields['separador_decimales'],
+											    $idioma->fields['separador_decimales']); 
 				$fila[ 'monto_iva']= 			number_format($factura->fields['iva'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); 
 				$fila[ 'monto_total']=			number_format($factura->fields['total'],$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']); 
 						
