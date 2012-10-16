@@ -47,7 +47,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, T.saldo, 0)) AS '61-90',
 			-SUM(IF(T.dias_atraso_pago > 90, T.saldo, 0)) AS '91+',
 			-SUM(T.saldo) AS total,
-			GROUP_CONCAT(CONCAT('<a href=\'/time_tracking/app/interfaces/cobros6.php?id_cobro=',identificador,'&popup=1&contitulo=true&id_foco=2\' target=\"popup\" onClick=\"window.open(this.href, this.target, \'width=300,height=400\'); return false;\">',identificador,'</a>')) as cobros
+			GROUP_CONCAT(identificador SEPARATOR ', ') as cobros
 		FROM
 			(SELECT
 				d.fecha,
@@ -95,6 +95,14 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
                                 'attrs' => 'width="10%" style="text-align:right"'
                         )
                 ),
+		array(
+			'field' => 'cobros',
+			'title' => utf8_encode(__('Cobros')),
+			'extras' => array(
+				'attrs' => 'width="10%" style="text-align:right"',
+				'class' => 'cobros'
+			)
+		),
 		array(
 			'field' => '0-30',
 			'title' => '0-30 ' . utf8_encode(__('días')),
@@ -260,6 +268,19 @@ $Pagina->PrintTop();
 		});
 
 		jQuery('.subtotal td').css('font-weight', 'bold');
+		
+		jQuery('.cobros').each(function(){
+			var td = jQuery(this);
+			var ids = td.html().split(', ');
+			td.html('');
+			for(var i=0; i<ids.length; i++){
+				td.append(jQuery('<a/>', {
+					text: ids[i],
+					href: 'javascript:void(0)',
+					onclick: "nuovaFinestra('Cobro', 1000, 700,'../cobros6.php?id_cobro="+ids[i]+"&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
+				}));
+			}
+		});
 	});
 </script>
 
