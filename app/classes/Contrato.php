@@ -1235,7 +1235,9 @@ class Contrato extends Objeto {
 			if (UtilesApp::GetConf($this->sesion, 'ExportacionLedes')) {
 				$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0': '1');
 			}
-			
+			if(isset($this->extra_fields['factura_rut']) && $this->extra_fields['factura_rut']!='') {
+				$this->Edit('rut', $this->extra_fields['factura_rut']);
+			}
 				
 	}
 
