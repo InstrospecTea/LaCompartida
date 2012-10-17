@@ -183,7 +183,7 @@ class Documento extends Objeto {
 				
 		
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
-				 
+				 $this->Write();
 				
 			} else {
 				if (!empty($pagina)) {
