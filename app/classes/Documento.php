@@ -127,9 +127,9 @@ class Documento extends Objeto {
 			}
 		} else {
 
-			$this->Edit("monto_base", number_format($monto_base * $multiplicador, $moneda_base['cifras_decimales'], ".", ""));
+			$this->Edit("monto_base", number_format($monto_base * $multiplicador, max(2,$moneda_base['cifras_decimales']), ".", ""));
 			
-			$this->Edit("monto",      number_format($monto * $multiplicador, $moneda->fields['cifras_decimales'], ".", ""));
+			$this->Edit("monto",      number_format($monto * $multiplicador, max(2,$moneda->fields['cifras_decimales']), ".", ""));
 			$this->Edit("saldo_pago", $this->fields['monto']);
 			
 			
@@ -161,6 +161,7 @@ class Documento extends Objeto {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}
+		
 			if ($this->Write()) {
 
 				$id_documento = $this->fields['id_documento'];
@@ -176,9 +177,9 @@ class Documento extends Objeto {
 					$this->ActualizarDocumentoMoneda($tipo_cambio);
 				}
 				$msg = empty($adelanto) ? __('Pago ingresado con éxito') : __('Adelanto ingresado con éxito');
-				if (!empty($pagina)) {
+			 
 					$pagina->addInfo($msg);
-				}
+			 
 				
 		
 				$this->AgregarNeteos($id_documento, $arreglo_pagos_detalle, $id_moneda, $moneda, $out_neteos);
@@ -189,6 +190,7 @@ class Documento extends Objeto {
 					$pagina->AddError($documento->error);
 				}
 			}
+			
 			/* 			}
 			  else
 			  { ?>
@@ -224,7 +226,10 @@ class Documento extends Objeto {
 		
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>" . $out_neteos . "</table>";
 		//echo $out_neteos;
-
+	/*echo '<pre>';
+			print_r($this->fields);
+			echo '</pre>';*/
+		
 		return $id_documento;
 	}
 

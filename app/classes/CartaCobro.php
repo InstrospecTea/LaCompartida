@@ -2,11 +2,11 @@
 require_once 'NotaCobro.php';
 
 class CartaCobro extends NotaCobro {
+	var $carta_tabla = 'carta';
+	var $carta_id = 'id_carta';
+	var $carta_formato = 'formato';
 
-	var $asuntos = array();
-	var $x_resultados = array();
-
-	public static $secciones = array(
+	public $secciones = array(
 		'FECHA' => 'Sección FECHA',
 		'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
 		'DETALLE' => 'Sección DETALLE',
@@ -15,7 +15,7 @@ class CartaCobro extends NotaCobro {
 		'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
 		'SALTO_PAGINA' => 'Sección SALTO_PAGINA'
 	);
-	public static $diccionario = array(
+	public $diccionario = array(
 		'CARTA' => array(
 			'%cuenta_banco%' => 'Cuenta bancaria',
 			'%logo_carta%' => 'Imagen logo',
@@ -49,7 +49,6 @@ class CartaCobro extends NotaCobro {
 			'%NombreContacto%' => 'NombreContacto',
 			'%NombreContacto_mayuscula%' => 'NombreContacto_mayuscula',
 			'%NumeroCliente%' => 'NumeroCliente',
-			'%NumeroContrato%' => 'NumeroContrato',
 			'%SR%' => 'SR',
 			'%asunto_mb%' => 'asunto_mb',
 			'%asunto_salto_linea%' => 'asunto_salto_linea',
@@ -191,7 +190,6 @@ class CartaCobro extends NotaCobro {
 			'%saldo_gastos_balance%' => 'saldo_gastos_balance',
 			'%saludo_mb%' => 'Dear %sr% %ApellidoContacto%: / De mi consideración:',
 			'%si_gastos%' => 'si_gastos',
-			'%simbolo_moneda%' => 'simbolo de id_moneda del cobro',
 			'%simbolo_opc_moneda_totall%' => 'simbolo_opc_moneda_totall',
 			'%sr%' => 'Titulo del contacto definido en el contrato, por defecto "Señor"',
 			'%subtotal_gastos_diff_con_sin_provision%' => 'balance cuenta de gastos',
@@ -232,7 +230,6 @@ class CartaCobro extends NotaCobro {
 			'%factura_periodo%' => 'factura_periodo',
 			'%factura_total%' => 'factura_total',
 			'%factura_total_sin_impuesto%' => 'factura_total_sin_impuesto',
-		   
 		),
 		
 		'FILAS_FACTURAS_DEL_COBRO' => array(
@@ -255,150 +252,21 @@ class CartaCobro extends NotaCobro {
 		'SALTO_PAGINA' => array()
 	);
 
-	function __construct($sesion, $fields = "", $params = "") {
-		$this->tabla = "cobro";
-		$this->campo_id = "id_cobro";
-		$this->sesion = $sesion;
-		$this->fields = $fields;
-		$this->log_update = true;
-		$this->x_resultados = array();
-		$this->guardar_fecha = true;
+	function NuevoRegistro(){
+		return array(
+			'descripcion' => 'Nueva Carta',
+			'margen_superior' => 1.5,
+			'margen_inferior' => 2,
+			'margen_izquierdo' => 2,
+			'margen_derecho' => 2,
+			'margen_encabezado' => 0.88,
+			'margen_pie_de_pagina' => 0.88
+		);
 	}
 
-	public function ObtenerCarta($id_carta = null) {
-		if(empty($id_carta)){
-			return array(
-				'descripcion' => 'Nueva Carta',
-				'margen_superior' => 1.5,
-				'margen_inferior' => 2,
-				'margen_izquierdo' => 2,
-				'margen_derecho' => 2,
-				'margen_encabezado' => 0.88,
-				'margen_pie_de_pagina' => 0.88,
-				'secciones' => array('CARTA' => '')
-			);
-		}
-
-		$query = "SELECT * FROM carta WHERE id_carta='$id_carta'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$carta = mysql_fetch_assoc($resp);
-		$parser = new TemplateParser($carta['formato']);
-		$carta['secciones'] = $parser->tags;
-		return $carta;
-	}
-
-	function GuardarCarta($data) {
-		$data['formato'] = '';
-		foreach($data['secciones'] as $seccion => $html){
-			$data['formato'] .= "\n###$seccion###\n$html\n";
-		}
-		unset($data['secciones']);
-
-		$Carta = new Objeto($this->sesion, array(), '', 'carta', 'id_carta');
-		$Carta->guardar_fecha = false;
-		$Carta->editable_fields = array_keys($data);
-		$Carta->Fill($data, true);
-		if($Carta->Write()){
-			return $Carta->fields['id_carta'];
-		}
-		return false;
-	}
-
-	function PrevisualizarDocumento($carta, $id_cobro){
-		$formato = '';
-		foreach($carta['secciones'] as $seccion => $html){
-			$formato .= "\n###$seccion###\n$html\n";
-		}
-		$html = $this->ReemplazarHTML($formato, $id_cobro);
-		$doc = new DocGenerator($html, $carta['formato_css'], $this->fields['opc_papel'], $this->fields['opc_ver_numpag'], 'PORTRAIT',
-			$carta['margen_superior'], $carta['margen_derecho'], $carta['margen_inferior'], $carta['margen_izquierdo'], $this->fields['estado']);
-		libxml_use_internal_errors(true);
-		$doc->output('previsualizacion_carta.doc');
-	}
-	
-	function PrevisualizarValores($id_cobro){
-		$html = '';
-		$secciones = array_keys(self::$secciones);
-		array_unshift($secciones, 'CARTA');
-		foreach($secciones as $seccion){
-			$html .= "\n###$seccion###\n
-			<tr><th colspan=3>$seccion</th></tr>";
-			if(isset(self::$diccionario[$seccion])){
-				foreach (self::$diccionario[$seccion] as $tag => $desc_tag) {
-					$html .= '<tr><td>' . str_replace('%', '&#37;', $tag) .
-						"</td><td>$tag</td><td>" .
-						str_replace('%', '&#37;', $desc_tag) . "</td></tr>\n";
-				}
-			}
-			if($seccion == 'CARTA'){
-				foreach(array_keys(self::$secciones) as $seccion){
-					$html .= "\n%$seccion%\n";
-				}
-			}
-		}
-		return '<table border="1">' . $this->ReemplazarHTML($html, $id_cobro) . '</table>';
-	}
-
-	function ReemplazarHTML($html, $id_cobro){
-		$parser_carta = new TemplateParser($html);
-
-		if(empty($id_cobro)){
-			$query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($id_cobro) = mysql_fetch_array($resp);
-		}
-		$this->Load($id_cobro);
-
-		global $contrato;
-		$contrato = new Contrato($this->sesion);
-		$contrato->Load($this->fields['id_contrato']);
-		
-		$lang = $this->fields['codigo_idioma'];
-
-		$cliente = new Cliente($this->sesion);
-		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
-
-		global $cobro_moneda;
-		$cobro_moneda = new CobroMoneda($this->sesion);
-		$cobro_moneda->Load($this->fields['id_cobro']);
-
-		global $moneda_total;
-		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
-
-		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-		if ($tipo_cambio_moneda_total == 0)
-			$tipo_cambio_moneda_total = 1;
-
-		if ($lang == '')
-			$lang = 'es';
-
-		/*
-		  require_once Conf::ServerDir()."/lang/$lang.php";
-		 */
-
-		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
-		$idioma->Load($lang);
-
-		// Moneda
-		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda->Load($this->fields['id_moneda']);
-
-		$moneda_base = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda_base->Load($this->fields['id_moneda_base']);
-
-		//Moneda cliente
-		$moneda_cli = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
-		$moneda_cli->Load($cliente->fields['id_moneda']);
-		$moneda_cliente_cambio = $cobro_moneda->moneda[$cliente->fields['id_moneda']]['tipo_cambio'];
-
-		if ($this->fields['codigo_idioma'] == 'es') {
-			setlocale(LC_ALL, "es_ES");
-		} else if ($this->fields['codigo_idioma'] == 'en') {
-			setlocale(LC_ALL, 'en_US.UTF-8');
-		}
-		
-		return $this->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
+	function GenerarEjemplo($parser){
+		extract($this->ParametrosGeneracion());
+		return $this->GenerarDocumentoCarta2($parser, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 	}
 
 	function GenerarDocumentoCarta($parser_carta, $theTag = '', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
@@ -1982,50 +1850,6 @@ class CartaCobro extends NotaCobro {
 		$html2 = $parser_carta->tags[$theTag];
 
 		switch ($theTag) {
-			case 'CARTA': //GenerarDocumentoCartaComun
-				if (method_exists('Conf', 'GetConf')) {
-					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
-					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
-					$PdfLinea3 = Conf::GetConf($this->sesion, 'PdfLinea3');
-				} else {
-					$PdfLinea1 = Conf::PdfLinea1();
-					$PdfLinea2 = Conf::PdfLinea2();
-					$PdfLinea3 = Conf::PdfLinea3();
-				}
-
-				if (strpos($html2, '%cuenta_banco%')) {
-					if ($contrato->fields['id_cuenta']) {
-						$query_banco = "SELECT glosa FROM cuenta_banco WHERE id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
-						$resp = mysql_query($query_banco, $this->sesion->dbh) or Utiles::errorSQL($query_banco, __FILE__, __LINE__, $this->sesion->dbh);
-						list($glosa_cuenta) = mysql_fetch_array($resp);
-					}
-					else
-						$glosa_cuenta = '';
-					$html2 = str_replace('%cuenta_banco%', $glosa_cuenta, $html2);
-				}
-
-				$html2 = str_replace('%logo_carta%', Conf::Server() . Conf::ImgDir(), $html2);
-				$html2 = str_replace('%direccion%', $PdfLinea1, $html2);
-				$html2 = str_replace('%titulo%', $PdfLinea1, $html2);
-				$html2 = str_replace('%subtitulo%', $PdfLinea2, $html2);
-				$html2 = str_replace('%numero_cobro%', $this->fields['id_cobro'], $html2);
-
-
-
-				$html2 = str_replace('%xnro_factura%', $this->fields['id_cobro'], $html2);
-
-				$html2 = str_replace(array('%xnombre_cliente%', '%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
-
-				$html2 = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html2);
-				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
-				$html2 = str_replace('%FECHA%', $this->GenerarDocumentoCartaComun($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				$html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCartaComun($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				$html2 = str_replace('%DETALLE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DETALLE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				$html2 = str_replace('%ADJ%', $this->GenerarDocumentoCartaComun($parser_carta, 'ADJ', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				$html2 = str_replace('%PIE%', $this->GenerarDocumentoCartaComun($parser_carta, 'PIE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				$html2 = str_replace('%DATOS_CLIENTE%', $this->GenerarDocumentoCartaComun($parser_carta, 'DATOS_CLIENTE', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
-				break;
-
 			case 'FECHA': //GenerarDocumentoCartaComun
 				#formato especial
 				if (method_exists('Conf', 'GetConf')) {

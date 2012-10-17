@@ -297,10 +297,20 @@ class Contrato extends Objeto {
 	 */
 
 	function ProximoCobroEstimado($fecha_ini, $fecha_fin, $id_contrato, $horas_castigadas = NULL) {
-		$where = '1';
-		if ($fecha_ini != '')
+		
+		$wheretramite=$wheregasto=$wheretrabajo=$where = '1';
+		
+		
+		if ($fecha_ini != '') {
 			$where .= " AND fecha >= '$fecha_ini'";
+			$wheretrabajo .= " AND trabajo.fecha >= '$fecha_ini'";
+			$wheregasto .= " AND cta_corriente.fecha >= '$fecha_ini'";
+			$wheretramite .= " AND tramite.fecha >= '$fecha_ini'";
+		}
 		$where .= " AND fecha <= '$fecha_fin'";
+		$wheretrabajo.= " AND trabajo.fecha <= '$fecha_fin'";
+		$wheregasto.= " AND cta_corriente.fecha <= '$fecha_fin'";
+		$wheretramite.= " AND tramite.fecha <= '$fecha_fin'";
 		$query_select = '';
 		$hh_castigadas = '';
 		if ($horas_castigadas) {
@@ -314,7 +324,7 @@ class Contrato extends Objeto {
 								JOIN contrato on asunto.id_contrato = contrato.id_contrato
           			LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
 								LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
-								WHERE $where AND 
+								WHERE $wheretrabajo AND 
 								trabajo.id_tramite=0 AND
 								(cobro.estado IS NULL)
 								AND trabajo.cobrable = 1 AND contrato.id_contrato = '$id_contrato'
@@ -342,7 +352,7 @@ class Contrato extends Objeto {
 								JOIN tramite_tipo on tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo 
 								JOIN tramite_valor ON (tramite.id_tramite_tipo=tramite_valor.id_tramite_tipo AND contrato.id_moneda=tramite_valor.id_moneda AND contrato.id_tramite_tarifa=tramite_valor.id_tramite_tarifa)
 								LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-								WHERE tramite.fecha <= '$fecha_fin' AND (cobro.estado IS NULL) 
+								WHERE $wheretramite AND (cobro.estado IS NULL) 
 									AND tramite.cobrable=1 
 									AND contrato.id_contrato = '$id_contrato'
 								GROUP BY contrato.id_contrato";
@@ -370,12 +380,11 @@ class Contrato extends Objeto {
 
 		$query = "SELECT if(cta_corriente.ingreso>0,-1,1)*cta_corriente.monto_cobrable, cta_corriente.id_moneda FROM cta_corriente
 						LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto
-						WHERE (cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)
+						WHERE $wheregasto AND (cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)
 						AND (cta_corriente.id_cobro IS NULL)
 						AND cta_corriente.incluir_en_cobro = 'SI'
 						AND cta_corriente.cobrable = 1
-						AND asunto.id_contrato = '$id_contrato'
-						AND cta_corriente.fecha <= '$fecha_fin'";
+						AND asunto.id_contrato = '$id_contrato'						";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($monto, $id_moneda) = mysql_fetch_array($resp)) {
 			$suma_gastos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
@@ -385,7 +394,7 @@ class Contrato extends Objeto {
 					, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
 			);
 		}
-
+		if($suma_gastos<0) $suma_gastos=0;
 		#$query_gastos = "SELECT * FROM cta_corriente ";
 		if ($horas_castigadas) {
 			return array($horas_por_cobrar, $monto_por_cobrar, $hh_castigadas, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo']);

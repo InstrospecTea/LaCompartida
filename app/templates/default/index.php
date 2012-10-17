@@ -59,6 +59,8 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/configuracion.php"/>Configuracion</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/templates.php"/>Templates</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/reportes_configuracion.php"/>Configuración Reportes</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/carta.php"/>Cartas de cobro</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/nota_cobro.php"/>Notas de cobro</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/phpminiadmin.php"/>MySQL</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/error_log.php"/>Error Log</a>';
 		 echo ' | <a href="'.Conf::RootDir().'/admin/respaldos.php"/>Respaldos</a>';
