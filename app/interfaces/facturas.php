@@ -164,7 +164,7 @@ function MontoTotal(& $fila) {
 
 function Saldo(& $fila) {
 	global $idioma;
-	$saldo = $fila->fields['saldo'] * (-1);
+	$saldo = $fila->fields['saldo'];
 	return $fila->fields['simbolo'] . ' ' . number_format($saldo, $fila->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 }
 
