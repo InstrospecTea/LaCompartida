@@ -51,11 +51,11 @@ AND table_name='$tabla' AND referenced_column_name ='$columna_referenciada'  and
 	$ExisteLlaveForanea= mysql_query($foraneaquery, $dbh);
     if(!$ExisteLlaveForanea):
 		return false;
-	else: 
+	else:
 		$llave= 	mysql_fetch_assoc($ExisteLlaveForanea);
 		return $llave['constraint_name'];
-	endif;
-	 
+    endif;
+
 }
 
 /**
@@ -9277,6 +9277,8 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			if (!ExisteLlaveForanea('documento', 'id_usuario_orden', 'usuario', 'id_usuario', $dbh))
 				$query[] = "ALTER TABLE `documento` ADD CONSTRAINT   FOREIGN KEY (`id_usuario_orden`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
 
+
+
 			ejecutar($query, $dbh);
 
 			break;
@@ -9497,18 +9499,48 @@ QUERY;
 				ejecutar($queries, $dbh);
 			}
 			break;
-
-		case 7.02:
-		$query=array();
-		if ($nombrellave=ExisteLlaveForanea('documento', 'id_usuario', 'usuario', 'id_usuario', $dbh)) {
-			$query[]="ALTER TABLE  `documento` DROP FOREIGN KEY  $nombrellave  ;";
 			
-			$query[] = "ALTER TABLE  `documento` CHANGE  `id_usuario`  `id_usuario_ingresa` INT( 11 ) NULL DEFAULT NULL";
-			$query[] = "ALTER TABLE `documento` ADD CONSTRAINT   FOREIGN KEY (`id_usuario_ingresa`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;";
-		}
-		ejecutar($query, $dbh);
-		break;
-	
+		case 7.17:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO  `configuracion`
+				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+				VALUES ( 'OrientacionPapelPorDefecto', 'PORTRAIT', 'Permite cambiar la orientación del papel de los cobros',  'select;PORTRAIT;LANDSCAPE;',  '10',  '-1');";
+			
+			ejecutar($queries, $dbh);
+			break;
+			
+		case 7.18:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion`
+				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
+				('RetribucionCentroCosto', '17', 'Porcentaje de Retribución para cada Centro de Costo (Area usuario - Socio)', 'numero', 10, -1),
+				('UsarModuloRetribuciones', '0', 'Activa el módulo de Retribuciones', 'boolean', 10, -1)";
+
+			if (!ExisteCampo('retribucion_usuario_responsable', 'contrato', $dbh)){
+				$queries[] = "ALTER TABLE `contrato`
+					ADD COLUMN `retribucion_usuario_responsable` double DEFAULT '0',
+					ADD COLUMN `retribucion_usuario_secundario` double DEFAULT '0'";
+			
+				$queries[] = "ALTER TABLE `usuario` ADD COLUMN `porcentaje_retribucion` double DEFAULT '0'";
+			}
+
+			if (!ExisteCampo('id_padre', 'prm_area_usuario', $dbh)){
+				$queries[] = "ALTER TABLE `prm_area_usuario` ADD COLUMN `id_padre` int(11) DEFAULT NULL";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+			
+			case 7.19:
+			$queries = array();
+			if(!ExisteCampo('codigo_cliente', 'grupo_cliente', $dbh)) {
+				$queries[]="alter table grupo_cliente add codigo_cliente varchar(20);";
+			}
+		
+
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -9516,9 +9548,9 @@ QUERY;
   (No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-$min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.02;
-$force = 0;
+$min_update=2; //FFF: del 2 hacia atrás no tienen soporte
+$max_update = 7.19;
+$force=0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
 if (isset($_GET['minupdate']))
