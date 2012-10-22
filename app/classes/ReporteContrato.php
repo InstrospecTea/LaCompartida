@@ -162,9 +162,11 @@ class ReporteContrato extends Contrato {
 	
 	function QueriesPrevias() {
 		
-		
+	$updateestado = "update trabajo set estadocobro='SIN COBRO' where id_cobro is null ;";
+	$updateestado .= "update cta_corriente set estadocobro='SIN COBRO' where id_cobro is null ;";
+	$updateestado .= "update tramite set estadocobro='SIN COBRO' where id_cobro is null	;";
 	
-	$updateestado = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
+	$updateestado .= "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
 	$updateestado .= "update cta_corriente join cobro c on  cta_corriente.id_cobro=c.id_cobro  set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
 	$updateestado .= "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
 	 $this->sesion->pdodbh->exec($updateestado);
