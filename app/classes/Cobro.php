@@ -319,6 +319,7 @@ class Cobro extends Objeto {
 		} else {
 			$num_facturas = $this->fields['facturado'];
 		}
+		
 		if ($num_facturas == 0 && UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 			if ($actual != 'ENVIADO AL CLIENTE') {
 				$estado = 'EMITIDO';
@@ -351,7 +352,7 @@ class Cobro extends Objeto {
 					$this->Edit('fecha_facturacion', $fecha_facturacion);
 				}
 			}
-
+		
 			// Tomar suma de todos los pagos aplicados a facturas
 			if (UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura')) {
 				$query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
@@ -365,16 +366,19 @@ class Cobro extends Objeto {
 								JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total 
 							WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
 			} else {
-				$query = "SELECT ROUND( SUM(-1*documento.monto), mon.cifras_decimales ), ROUND( SUM(-1*documento.monto), mon.cifras_decimales ) 
-							FROM documento
-								JOIN prm_moneda as mon ON mon.id_moneda = documento.id_moneda 
-								JOIN cobro_moneda as md ON md.id_cobro = documento.id_cobro AND md.id_moneda = documento.id_moneda 
-								JOIN cobro_moneda as mc ON mc.id_cobro = '" . $this->fields['id_cobro'] . "' AND mc.id_moneda = '" . $this->fields['opc_moneda_total'] . "' 
-							WHERE documento.id_cobro = '" . $this->fields['id_cobro'] . "' AND tipo_doc != 'N' ";
+				$query = "SELECT ROUND( SUM(-1*docpago.monto), mon.cifras_decimales ), ROUND( SUM(-1*docpago.monto), mon.cifras_decimales ) 
+							FROM documento doccobro
+								join neteo_documento nd on doccobro.id_documento=nd.id_documento_cobro 
+								join documento docpago on docpago.id_documento=nd.id_documento_pago  
+								JOIN prm_moneda as mon ON mon.id_moneda ='" . $this->fields['opc_moneda_total'] . "'
+								 	
+							WHERE doccobro.id_cobro = '" . $this->fields['id_cobro'] . "' and doccobro.tipo_doc='N' AND docpago.tipo_doc != 'N' ";
 			}
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($monto_pagado, $monto_pago_menos_ncs) = mysql_fetch_array($resp);
-
+		
+			//echo 'PASE POR ACS:'.$query.' , monto pagado:'.$monto_pagado.' monto pago menos ncs: '.$monto_pago_menos_ncs;
+			
 			if (empty($monto_pago_menos_ncs) || $monto_pago_menos_ncs == 'NULL') {
 				if ($num_facturas > 0) {
 					if (!empty($this->fields['fecha_enviado_cliente']) && 
@@ -399,7 +403,7 @@ class Cobro extends Objeto {
 							WHERE tipo_doc = 'N' AND id_cobro = '" . $this->fields['id_cobro'] . "'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				$monto_total = mysql_result($resp, 0, 0);
-				// echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
+				//  echo 'monto_pagado: '.$monto_pagado.' monto total: '.$monto_total.'<br>'; exit;
 				$estado = (round($monto_pagado, 2) < round($monto_total, 2)) ? 'PAGO PARCIAL' : 'PAGADO';
 				if ($estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' )) {
 					$fecha_primer_pago = $this->FechaPrimerPago();

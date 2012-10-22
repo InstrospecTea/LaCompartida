@@ -437,6 +437,10 @@ if (!empty($adelanto)) {
 		function Repartir() {
 			var monto_tmp=0;
 			var saldo=(1.0000*jQuery('#monto').val()-1.0000*jQuery("#anteriorduro").val());
+			if(saldo<0 || jQuery('.saldojq').length==0) {
+				jQuery('#monto').val(jQuery("#anteriorduro").val());
+				return false;
+			}
 			console.log('a repartir: '+saldo);
 			jQuery('.saldojq').each(function() {
                     
@@ -537,17 +541,17 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if (tipopago=='editaadelanto') {
 					jQuery('#overlaytipocambio').hide();
 					monedaadelanto=jQuery('#id_moneda').val();
-					jQuery('#id_moneda').attr({'id':'readonlymoneda','name':'readonlymoneda', 'readonly': true});
+					jQuery('#id_moneda').attr({'id':'readonlymoneda','name':'readonlymoneda', 'readonly': 'readonly'});
 					jQuery('#tabla_informacion').append('<input id="id_moneda" name="id_moneda" type="hidden" value="'+monedaadelanto+'" />');
 				}
                 if (tipopago=='documento' || tipopago=='nuevopago' || tipopago=='adelanto') {
                     if(jQuery('#acepta_honorarios').length>0  && jQuery('#acepta_honorarios').val()==0) {
-						jQuery("input:text[id^='pago_honorarios_']").attr('disabled',true).removeClass('saldojq');
+						jQuery("input:text[id^='pago_honorarios_']").attr('disabled','disabled').removeClass('saldojq');
                     } else { 
                         jQuery("input:text[id^='pago_honorarios_']").removeAttr('disabled').addClass('saldojq');
                     }
                     if(jQuery('#pago_gastos').length>0 && jQuery('#acepta_gastos').val()==0) {
-                        jQuery("input:text[id^='pago_gastos_']").attr('disabled',true).removeClass('saldojq');
+                        jQuery("input:text[id^='pago_gastos_']").attr('disabled','disabled').removeClass('saldojq');
                     } else {
                         jQuery("input:text[id^='pago_gastos_']").removeAttr('disabled').addClass('saldojq');
                     }
@@ -561,13 +565,17 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						jQuery('#monto_pagos').val(1.000*total);
 
 						if(jQuery('#saldo_pago_aux').length>0) {
-                              
+                             
 							if ( (tipopago=='documento' || tipopago=='adelanto')) {
-								if(total>0) {
+								if (jQuery('.saldojq').length==0) {
+									jQuery('#monto').val(anterior-total).formatNumber({format:"#.000", locale:"us"});
+								} else if(total>0) {
 									jQuery('#monto').val(anterior).formatNumber({format:"#.000", locale:"us"});
 								} else {
 									jQuery('#monto').val(jQuery('#saldo_pago_aux').parseNumber({format:"#.000", locale:"us"})+anterior).formatNumber({format:"#.000", locale:"us"});
 									Repartir();
+								 
+									
 								}
                                     
 							}   else {
