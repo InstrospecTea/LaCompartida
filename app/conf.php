@@ -1,7 +1,10 @@
 <?php
 
 require_once '/var/www/html/addbd.php';
-
+if(defined('BACKUP')&& (BACKUP==3 ||BACKUP=='3')) {
+	include('offline.php');
+die();
+}
 class Conf
 {
 	public static function AppName() { return APPNAME; }

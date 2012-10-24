@@ -1612,12 +1612,13 @@ class Cobro extends Objeto {
 		$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 		$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
 		$documento->Edit('fecha', date('Y-m-d'));
-
+		if(!$documento->Loaded()) $documento->Write ();
 		$query = "SELECT id_documento, id_moneda FROM documento WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND tipo_doc != 'N' ";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, $this->sesion->dbh);
 
 		$saldo_honorarios = $documento->fields['honorarios'];
 		$saldo_gastos = $documento->fields['gastos'];
+		
 
 		while (list($id_documento_pago, $id_moneda) = mysql_fetch_array($resp)) {
 			$neteo = new NeteoDocumento($this->sesion);
