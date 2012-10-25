@@ -13,14 +13,15 @@ $Slim->hook('hook_factura_javascript_after', 'Honorarios_Notariales_Js_Footer_Li
  
 
 function Honorarios_Notariales_Js_Footer_Light() {
-	global $sesion,$honorario,$monto_honorario,$_LANG,$simbolo;
+	global $sesion,$honorario,$monto_honorario,$_LANG,$simbolosinadorno;
 	
 	 
 	 $descripcion_honorarios=array();
-	 if(floatval($_GET['tramites_disponibles'])>0) $descripcion_honorarios[]=__('Trámites').' '.$simbolo.' '.$_GET['tramites_disponibles'];
-	 if(floatval($_GET['trabajos_disponibles'])>0) $descripcion_honorarios[]=__('Honorarios profesionales').' '.$simbolo.' '.$_GET['trabajos_disponibles'];
+	 if(floatval($_GET['tramites_disponibles'])>0) $descripcion_honorarios[]=__('Trámites').' '.$simbolosinadorno.' '.$_GET['tramites_disponibles'];
+	 if(floatval($_GET['trabajos_disponibles'])>0) $descripcion_honorarios[]=__('Honorarios Profesionales').' '.$simbolosinadorno.' '.$_GET['trabajos_disponibles'];
 	 
-	  echo "jQuery('#descripcion_honorarios_legales').text('". implode(', ',$descripcion_honorarios)."');";
+	  echo "if(jQuery('#honorario_disp').val()>0) jQuery('#descripcion_honorarios_legales').text('". implode(', ',$descripcion_honorarios)."');";
+	  
 }
 
 
@@ -28,7 +29,7 @@ function Honorarios_Notariales_Js_Footer_Light_Old() {
 	global $trabajos_disponibles, $tramites_disponibles,$honorario,$monto_honorario,$_LANG;
 	$monto_trabajo=(isset($honorario) ? $honorario : $monto_honorario) - $tramites_disponibles;
 	$boton_tramites='<a style=\"margin:2px;\" class=\"btn botonizame\"  alt=\"'.floatval($tramites_disponibles) .'\" icon=\"ui-icon-invoice\" rel=\"'.__('Trámites').'\" id=\"facturar_tramites\" setwidth=\"270\" >'.  __('Facturar '. __('Trámites')) .'</a><br/>';
-	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($trabajos_disponibles).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
+	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($trabajos_disponibles).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios Profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
 	$boton_mixto='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($tramites_disponibles+$trabajos_disponibles).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
 	$checkbox_tramites='<input style=\"display:none;\"  type=\"checkbox\" value=\"1\" id=\"checkbox_tramites\" name=\"checkbox_tramites\" /> ';
 	

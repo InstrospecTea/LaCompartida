@@ -22,6 +22,17 @@ class UtilesApp extends Utiles {
 		}
 		return false;
 	}
+	public static function GetConfJs($sesion, $conf) {
+		if (method_exists('Conf', $conf)) {
+			//return Conf::$conf();
+			echo "var $conf='".Conf::$conf()."';\n";
+		}
+		
+		if (method_exists('Conf', 'GetConf')) {
+			echo "var $conf='".Conf::GetConf($sesion, $conf)."';\n";
+		}
+		return false;
+	}
 
 	public static function GetSimboloMonedaBase($sesion) {
 		$querypreparar = "select simbolo from prm_moneda where moneda_base=1 limit 0,1";

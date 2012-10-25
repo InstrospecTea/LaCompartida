@@ -1965,6 +1965,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_especial%', $fecha_lang, $html2);
 				$html2 = str_replace('%fecha_especial_minusculas%', strtolower($fecha_lang), $html2);
 
+				$this->loadAsuntos();
+				
 				$asuntos_doc = '';
 				for ($k = 0; $k < count($this->asuntos); $k++) {
 					$asunto = new Asunto($this->sesion);
