@@ -43,7 +43,13 @@ if (!$cobro->Load($id_cobro)) {
 $cobro_moneda = new CobroMoneda($sesion);
 $cobro_moneda->Load($cobro->fields['id_cobro']);
 $tipo_cambio_moneda_total = $cobro_moneda->GetTipoCambio($id_cobro, $cobro->fields['opc_moneda_total'] != '' ? $cobro->fields['opc_moneda_total'] : 1);
-
+if ($documento_cobro->LoadByCobro($id_cobro)) {
+			$moneda_documento = new Moneda($sesion);
+			$moneda_documento->Load($documento_cobro->fields['id_moneda']);
+		}  else {
+            $moneda_documento = new Moneda($sesion);
+			$moneda_documento->Load($cobro->fields['opc_moneda_total']);
+        }
 
 if ($opc=='refrescar') {
 switch($cobro->fields['estado_contabilidad']):
@@ -74,13 +80,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|Estado 
 
 
 } else if ($opc=='listapagos') {
-		if ($documento_cobro->LoadByCobro($id_cobro)) {
-			$moneda_documento = new Moneda($sesion);
-			$moneda_documento->Load($documento_cobro->fields['id_moneda']);
-		}  else {
-            $moneda_documento = new Moneda($sesion);
-			$moneda_documento->Load($cobro->fields['opc_moneda_total']);
-        }
+		
 $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro->fields['id_cobro'], array(), 0, true);
 
     $retorno= '<tr style="height: 26px;">
@@ -208,13 +208,7 @@ echo $estado_c.'|'.$titulo_c.'|'.$cobro->fields['estado_contabilidad'].'|'.$mens
 
         
 } else if($opc=='cajafacturas') {
-		if ($documento_cobro->LoadByCobro($id_cobro)) {
-			$moneda_documento = new Moneda($sesion);
-			$moneda_documento->Load($documento_cobro->fields['id_moneda']);
-		}  else {
-            $moneda_documento = new Moneda($sesion);
-			$moneda_documento->Load($cobro->fields['opc_moneda_total']);
-        }
+		 
 		$idioma->Load($contrato->fields['codigo_idioma']);
 	$contrato->Load($cobro->fields['id_contrato']);
 
@@ -369,7 +363,8 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 														?>
 														<tr bgcolor="<?php echo $fila++ % 2 ? '#f2f2ff' : '#ffffff' ?>">
 															<td><?php echo $tipo ?></td>
-															<td style="width:78px;white-space:nowrap;"><?php echo $factura->ObtenerNumero(null, null, null, true) ?></td>
+														
+															<td style="width:78px;white-space:nowrap;"><?php   echo $factura->ObtenerNumero(null,null, null, true) ?></td>
 															 
 															<td><?php echo date('d-m-Y',strtotime($factura->fields['fecha'])); ?></td>
 															<td><?php echo $moneda_factura->fields['simbolo'] . '&nbsp;' . number_format($subtotal_honorarios, $moneda_factura->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) ?></td>
@@ -532,9 +527,9 @@ if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
 															</td>
 															<td align="center">
 																<button type="button"  onclick="AgregarFactura(0)" ><?php echo __('Emitir') ?></button>
- 															<input type="hidden" id="honorarios_disponibles" value="<?php echo floatval($saldo_disponible_honorarios) ?>"/>
-																<input type="hidden" id="trabajos_disponibles" value="<?php echo floatval($saldo_disponible_trabajos) ?>"/>
-																	<input type="hidden" id="tramites_disponibles" value="<?php echo floatval($saldo_disponible_tramites) ?>"/>
+ 															<input type="hidden" id="honorarios_disponibles" value="<?php echo number_format($saldo_disponible_honorarios,$moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
+																<input type="hidden" id="trabajos_disponibles" value="<?php echo number_format($saldo_disponible_trabajos,$moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
+																	<input type="hidden" id="tramites_disponibles" value="<?php echo number_format($saldo_disponible_tramites,$moneda_documento->fields['cifras_decimales'], $idioma->fields['separador_decimales'], ''); ?>"/>
 								<input type="hidden" id="gastos_con_iva_disponibles" value="<?php echo $saldo_disponible_gastos_con_impuestos ?>"/>
 								<input type="hidden" id="gastos_sin_iva_disponibles" value="<?php echo $saldo_disponible_gastos_sin_impuestos ?>"/>
 															</td>

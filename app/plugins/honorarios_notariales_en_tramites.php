@@ -5,7 +5,7 @@ $Slim=Slim::getInstance('default',true);
 // Esta función queda comentada, es serious business y no hay que usarla esta vez
 //$Slim->hook('hook_footer_popup', 'Honorarios_Notariales_Js_Footer');
 
-$Slim->hook('hook_agregar_factura', 'Honorarios_Notariales_En_Tramites');
+//$Slim->hook('hook_agregar_factura', 'Honorarios_Notariales_En_Tramites');
 
 
 $Slim->hook('hook_factura_javascript_after', 'Honorarios_Notariales_Js_Footer_Light');
@@ -13,10 +13,23 @@ $Slim->hook('hook_factura_javascript_after', 'Honorarios_Notariales_Js_Footer_Li
  
 
 function Honorarios_Notariales_Js_Footer_Light() {
+	global $sesion,$honorario,$monto_honorario,$_LANG,$simbolo;
+	
+	 
+	 $descripcion_honorarios=array();
+	 if(floatval($_GET['tramites_disponibles'])>0) $descripcion_honorarios[]=__('Trámites').' '.$simbolo.' '.$_GET['tramites_disponibles'];
+	 if(floatval($_GET['trabajos_disponibles'])>0) $descripcion_honorarios[]=__('Honorarios profesionales').' '.$simbolo.' '.$_GET['trabajos_disponibles'];
+	 
+	  echo "jQuery('#descripcion_honorarios_legales').text('". implode(', ',$descripcion_honorarios)."');";
+}
+
+
+function Honorarios_Notariales_Js_Footer_Light_Old() {
 	global $trabajos_disponibles, $tramites_disponibles,$honorario,$monto_honorario,$_LANG;
 	$monto_trabajo=(isset($honorario) ? $honorario : $monto_honorario) - $tramites_disponibles;
 	$boton_tramites='<a style=\"margin:2px;\" class=\"btn botonizame\"  alt=\"'.floatval($tramites_disponibles) .'\" icon=\"ui-icon-invoice\" rel=\"'.__('Trámites').'\" id=\"facturar_tramites\" setwidth=\"270\" >'.  __('Facturar '. __('Trámites')) .'</a><br/>';
-	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($monto_trabajo).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
+	$boton_trabajos='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($trabajos_disponibles).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
+	$boton_mixto='<br/><a style=\"margin:2px;\" class=\"btn botonizame\" alt=\"'.floatval($tramites_disponibles+$trabajos_disponibles).'\"  icon=\"ui-icon-invoice2\"  rel=\"'.__('Honorarios profesionales').'\"  id=\"facturar_trabajos\"   setwidth=\"270\"  >'.  __('Facturar '. __('Honorarios Profesionales')) .'</a>';
 	$checkbox_tramites='<input style=\"display:none;\"  type=\"checkbox\" value=\"1\" id=\"checkbox_tramites\" name=\"checkbox_tramites\" /> ';
 	
 	echo "jQuery('#glosa_honorarios_legales').html( 'Concepto');";
@@ -42,8 +55,7 @@ function Honorarios_Notariales_Js_Footer_Light() {
 }
 
 
-
-function Honorarios_Notariales_Js_Footer() {
+/*function Honorarios_Notariales_Js_Footer() {
 	
 global $simbolo, $impuesto,$honorario,$monto_honorario, $descripcion_tramites, $subtotal_tramites, $simbolo,$_LANG;
 $subtotal_tramites=intval($subtotal_tramites);
@@ -70,6 +82,7 @@ $textonotarial.= '</tr>';
 	echo "jQuery('#td_honorarios_legales').prepend(\"".$montotrabajo."\");";
 	echo "jQuery('#td_impto_honorarios_legales').prepend(\"".$imptotrabajo."\");";
 	echo "jQuery('#fila_descripcion_honorarios_legales').before(\"".$textonotarial."\");";
+	
 	
 	echo "jQuery('#monto_trabajos, #monto_tramites').live('keyup',function() {
 			jQuery('#monto_honorarios_legales').attr('readonly','readonly').val(1*jQuery('#monto_trabajos').val() + 1* jQuery('#monto_tramites').val() );
@@ -104,3 +117,4 @@ function Honorarios_Notariales_En_Tramites() {
  
 }
 
+*/

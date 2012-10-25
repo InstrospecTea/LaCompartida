@@ -1,21 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-/*require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Factura.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/CtaCteFact.php';
-require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';*/
+
 
 function autocargaapp($class_name) {
 	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
@@ -482,7 +467,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 
 <form method=post id="form_facturas" name="form_facturas">
 	<input type=hidden name=opcion value="" />
-	<input type=hidden name=id_factura id=id_factura value="<?php echo  $factura->fields['id_factura'] ?>" />
+	<input type='hidden' name=id_factura id=id_factura value="<?php echo  $factura->fields['id_factura'] ?>" />
 	<input type=hidden name=id_documento_legal value="<?php echo  $id_documento_legal ?>" />
 	<input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
 	<input type=hidden name=id_cobro id=id_cobro value='<?php echo  $id_cobro ?>'/>
@@ -714,11 +699,11 @@ if ($zona_horaria) {
 				<?php
 				if (UtilesApp::GetConf($sesion, 'DescripcionFacturaConAsuntos')) {
 				?>
-					<textarea name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="5" style="font-family: Arial; font-size: 11px"><?php echo trim($descripcion_honorario); ?></textarea>
+					<textarea id="descripcion_honorarios_legales" name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="5" style="font-family: Arial; font-size: 11px"><?php echo trim($descripcion_honorario); ?></textarea>
 				<?php
 				} else if( $cantidad_lineas_descripcion > 1 ) { 
 					?>
-					<textarea name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_honorario); ?></textarea>
+					<textarea  id="descripcion_honorarios_legales"  name="descripcion_honorarios_legales"  id="descripcion_honorarios_legales" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_honorario); ?></textarea>
 				<?php
 				} else {
 				?>
@@ -737,9 +722,9 @@ if ($zona_horaria) {
 				<td align=right><?php echo  __('Gastos c/ IVA'); ?></td>
 				<td align=left>
 					<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
-							<textarea name="descripcion_gastos_con_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos); ?></textarea>
+							<textarea id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos); ?></textarea>
 					<?php }  else {?>
-							<input type="text" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="30">
+							<input type="text" id="descripcion_gastos_con_iva" name="descripcion_gastos_con_iva" value="<?php echo trim($descripcion_subtotal_gastos); ?>" size="40" maxlength="30">
 					<?php } ?>
 				</td>
 				<td align=left nowrap><?php echo  $simbolo; ?>
@@ -754,9 +739,9 @@ if ($zona_horaria) {
 					<td align=right><?php echo  __('Gastos s/ IVA'); ?></td>
 					<td align=left>
 						<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
-								<textarea name="descripcion_gastos_sin_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?></textarea>
+								<textarea id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva" cols="50" rows="<?php echo $cantidad_lineas_descripcion?>" style="font-family: Arial; font-size: 11px; text-align: left;"><?php echo trim($descripcion_subtotal_gastos_sin_impuesto); ?></textarea>
 						<?php } else { ?>
-								<input type="text" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo  trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="30" >
+								<input type="text" id="descripcion_gastos_sin_iva" name="descripcion_gastos_sin_iva"     id="descripcion_gastos_sin_iva" value="<?php echo  trim($descripcion_subtotal_gastos_sin_impuesto); ?>" size="40" maxlength="30" >
 						<?php } ?>
 					</td>
 					<td align=left nowrap><?php echo  $simbolo; ?>

@@ -16,15 +16,13 @@ $sesion = new Sesion(array('TAR'));
 
 $tarifasfaltantes = "SELECT us.id_usuario, ct.id_moneda, ct.tarifa, ct.id_tarifa
 	    FROM usuario us
-	    JOIN usuario_permiso usp
-	    USING ( id_usuario ) 
+	     
 	    JOIN categoria_tarifa ct
 	    USING ( id_categoria_usuario ) 
 	    LEFT JOIN usuario_tarifa ut ON ut.id_usuario = us.id_usuario
 	    AND ut.id_moneda = ct.id_moneda
 	    AND ut.id_tarifa = ct.id_tarifa
-	    WHERE usp.codigo_permiso =  'PRO'
-	    AND id_usuario_tarifa IS NULL ";
+	    WHERE  id_usuario_tarifa IS NULL ";
 
 $resptarifas = mysql_query($tarifasfaltantes, $sesion->dbh);
  $i=0;
