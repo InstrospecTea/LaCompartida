@@ -732,10 +732,8 @@ if ($zona_horaria) {
 				<td align=left nowrap><?php echo  $simbolo; ?>
 					<input type="text" name="monto_iva_gastos_con_iva" class="aproximable"   id="monto_iva_gastos_con_iva" value="<?php echo  $impuesto_gastos; ?>" disabled="true" value="0" size="10" maxlength="30" ></td>
 			</tr>
-			<?php
-			if (( method_exists('Conf', 'GetConf') && (Conf::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1'))) {
-				?>
-				<tr id="fila_monto_gastos_sin_iva">
+			
+				<tr id="fila_monto_gastos_sin_iva"  <?php 	echo (!UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto'))? "style='display:none;'":"";	?> >
 					<td align=right><?php echo  __('Gastos s/ IVA'); ?></td>
 					<td align=left>
 						<?php if( $cantidad_lineas_descripcion > 1 ) { ?>
@@ -748,9 +746,7 @@ if ($zona_horaria) {
 						<input type="text" name="monto_gastos_sin_iva"  class="aproximable"  id="monto_gastos_sin_iva" value="<?php echo isset($gastos_sin_iva) ? $gastos_sin_iva : $monto_subtotal_gastos_sin_impuesto; ?>" size="10" maxlength="30"   ></td>
 					<td align=left>&nbsp;</td>
 				</tr>
-		<?php
-	}
-	?>
+		 
 			<tr>
 				<td align=right colspan=2 ><?php echo  __('Monto') ?></td>
 				<td align=left nowrap><?php echo  $simbolo; ?>
@@ -1126,9 +1122,9 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 							saltar_validacion_saldo=1;
 						}
 						saldos = response.split('//');
-			$('honorario_disp').value = Number($('honorario_total').value) + Number(saldos[0]);
-			$('gastos_con_impuestos_disp').value = Number($('gastos_con_impuestos_total').value) + saldos[1];
-			$('gastos_sin_impuestos_disp').value = Number($('gastos_sin_impuestos_total').value) + saldos[2];
+			jQuery('#honorario_disp').val(jQuery('#honorario_total').parseNumber( {format:"###.000", locale:"us"}) + jQuery.parseNumber(saldos[0], {format:"###.000", locale:"us"}));
+			jQuery('#gastos_con_impuestos_disp').val(jQuery('#gastos_con_impuestos_total').parseNumber( {format:"###.000", locale:"us"}) + jQuery.parseNumber(saldos[1], {format:"###.000", locale:"us"}));
+			jQuery('#gastos_sin_impuestos_disp').val(jQuery('#gastos_sin_impuestos_total').parseNumber( {format:"###.000", locale:"us"}) +jQuery.parseNumber(saldos[1], {format:"###.000", locale:"us"}));
 
 						offLoading();
 					}
@@ -1254,22 +1250,21 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			  <?php 	if (!$factura->loaded() && ($id_documento_legal != 2)) {			?>
 							  ValidaSaldoPendienteCobro(form);
 
-								  if (UsarGastosConSinImpuesto == '1') {
+								 
 
-									  var monto_gastos_sin_iva_validacion = form.monto_gastos_sin_iva.value;
-									  var gastos_sin_impuestos_disp_validacion = form.gastos_sin_impuestos_disp.value;
+									  
+									jQuery('#monto_gastos_con_iva, #gastos_con_impuestos_disp, #monto_honorarios_legales, #honorario_disp,#monto_gastos_sin_iva,#gastos_sin_impuestos_disp').formatNumber({format:"0.000", locale:"us"});
 
-								  } else {
-
-									  var monto_gastos_sin_iva_validacion = 0;
-									  var gastos_sin_impuestos_disp_validacion = 0;
-
-								  }
-
-
+								  var monto_gastos_sin_iva_validacion = jQuery('#monto_gastos_sin_iva').parseNumber({format:"0.000", locale:"us"});  
+									  var gastos_sin_impuestos_disp_validacion = jQuery('#gastos_sin_impuestos_disp').parseNumber({format:"0.000", locale:"us"});
+								 
+								  
+								   
 							  if((form.id_documento_legal.value!=2) && (saltar_validacion_saldo==0) && (
 							  (form.monto_honorarios_legales.value+form.monto_gastos_con_iva.value+monto_gastos_sin_iva_validacion) > (form.honorario_disp.value + form.gastos_con_impuestos_disp.value+gastos_sin_impuestos_disp_validacion))) {
-
+								  console.log(form.monto_honorarios_legales.value,form.monto_gastos_con_iva.value,monto_gastos_sin_iva_validacion);
+								    console.log(form.honorario_disp.value , form.gastos_con_impuestos_disp.value,gastos_sin_impuestos_disp_validacion); 
+								  
 								  if(!confirm('<?php echo  __("Los montos ingresados superan el saldo a facturar") ?>')){								
 							  if (UsarGastosConSinImpuesto == '1') {
 									  if(form.monto_honorarios_legales.value > form.honorario_disp.value) {
