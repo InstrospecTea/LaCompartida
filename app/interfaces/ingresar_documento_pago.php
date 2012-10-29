@@ -438,7 +438,9 @@ if (!empty($adelanto)) {
 			var monto_tmp=0;
 			var saldo=(1.0000*jQuery('#monto').val()-1.0000*jQuery("#anteriorduro").val());
 			if(saldo<0 || jQuery('.saldojq').length==0) {
-				jQuery('#monto').val(jQuery("#anteriorduro").val());
+				if(Number(jQuery("#anteriorduro").val())>0){
+					jQuery('#monto').val(jQuery("#anteriorduro").val());
+				}
 				return false;
 			}
 			console.log('a repartir: '+saldo);

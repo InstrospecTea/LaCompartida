@@ -278,7 +278,7 @@ $Pagina->PrintTop();
 					text: ids[i],
 					href: 'javascript:void(0)',
 					onclick: "nuovaFinestra('Cobro', 1000, 700,'../cobros6.php?id_cobro="+ids[i]+"&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
-				}));
+				})).append(' ');
 			}
 		});
 	});
