@@ -832,15 +832,16 @@ ol.id_cobro=tram.id_cobro,
 ol.estadocobro=tram.estadocobro ,
 ol.fecha_modificacion=tram.fecha_touch
 where ol.tipo='TRA'
-
  and tram.fecha_touch>ol.fecha_modificacion";
  	
  
 	$resp = mysql_query($updategastos, $sesion->dbh);
 	$resp = mysql_query($updatetrabajos, $sesion->dbh);
 	$resp = mysql_query($updatetramite, $sesion->dbh);
-	
 
+/**	
+
+**/
 
 //Correo Hitos
 $cobro_pendiete = new CobroPendiente($sesion);
