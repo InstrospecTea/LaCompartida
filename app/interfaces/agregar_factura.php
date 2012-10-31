@@ -368,6 +368,7 @@ $x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion,$id_cobro, array(),$cobr
  	//$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion,$id_cobro,array(),0,true);
 
 
+
 $opc_moneda_total = $x_resultados['opc_moneda_total'];
 $id_moneda_factura = $opc_moneda_total;
 if (!empty($factura->fields['id_factura'])) {
@@ -379,7 +380,6 @@ $subtotal_gastos_sin_impuestos = $x_resultados['subtotal_gastos_sin_impuesto'][$
 $subtotal_gastos = $x_resultados['subtotal_gastos'][$opc_moneda_total] - $subtotal_gastos_sin_impuestos;
 $impuesto_gastos = $x_resultados['impuesto_gastos'][$opc_moneda_total];
 $impuesto = $x_resultados['impuesto'][$opc_moneda_total];
-
 //SIN DESGLOSE
 $suma_monto = $subtotal_honorarios + $subtotal_gastos;
 $suma_iva = $impuesto_gastos + $impuesto;
@@ -396,6 +396,8 @@ $descripcion_subtotal_gastos = __(UtilesApp::GetConf($sesion,'FacturaDescripcion
 $monto_subtotal_gastos = $subtotal_gastos;
 $descripcion_subtotal_gastos_sin_impuesto = __(UtilesApp::GetConf($sesion,'FacturaDescripcionGastosSinIva'));
 $monto_subtotal_gastos_sin_impuesto = $subtotal_gastos_sin_impuestos;
+
+
 
 if ($factura->loaded()) {
 	$porcentaje_impuesto = $factura->fields['porcentaje_impuesto'];
@@ -717,7 +719,7 @@ if ($zona_horaria) {
 					<input type="text" name="monto_honorarios_legales" class="aproximable"  id="monto_honorarios_legales" value="<?php echo isset($honorario) ? $honorario : $monto_honorario; ?>" size="10" maxlength="30" onblur="desgloseMontosFactura(this.form)"; onkeydown="MontoValido( this.id );"></td>
 				<td id="td_impto_honorarios_legales" align=left nowrap><?php echo  $simbolo; ?>
 					<input type="text" name="monto_iva_honorarios_legales" class="aproximable"   id="monto_iva_honorarios_legales" value="<?php echo  $impuesto; ?>" disabled="true" value="0" size="10" maxlength="30" onkeydown="MontoValido( this.id );"></td>
-			</tr>
+		 </tr>
 			<tr id="fila_descripcion_gastos_con_iva">
 				<td align=right><?php echo  __('Gastos c/ IVA'); ?></td>
 				<td align=left>
@@ -875,8 +877,8 @@ while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp))
 		<script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 
 <script type="text/javascript">
- 			var cantidad_decimales = <?php echo intval(Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura')); ?>;
-			var string_decimales =  '<?php echo str_pad('',Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura'),"0"); ?>';
+ 			var cantidad_decimales = <?php echo intval($cifras_decimales_opc_moneda_total); ?>;
+			var string_decimales =  '<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>';
    
  <?php
  echo "var porcentaje_impuesto =". $porcentaje_impuesto.';';
@@ -1385,10 +1387,11 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 
 			monto_impuesto = form.monto_honorarios_legales.value*(porcentaje_impuesto/100);
 			monto_impuesto_gasto = form.monto_gastos_con_iva.value*(porcentaje_impuesto_gastos/100);
-			monto_impuesto = monto_impuesto.toFixed(decimales);
-			monto_impuesto_gasto = monto_impuesto_gasto.toFixed(decimales);
+			//monto_impuesto = monto_impuesto.toFixed(decimales);
+			//monto_impuesto_gasto = monto_impuesto_gasto.toFixed(decimales);
 			monto_impuesto_suma = parseFloat(monto_impuesto) + parseFloat(monto_impuesto_gasto);
-
+			console.log(monto_impuesto,monto_impuesto_gasto,monto_impuesto_suma);
+			//monto_impuesto_suma= jQuery.formatNumber(monto_impuesto_suma, {format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
 <?php
 if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 	?>
@@ -1400,9 +1403,9 @@ if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 			monto_neto_suma = parseFloat(form.monto_honorarios_legales.value) + parseFloat(form.monto_gastos_con_iva.value) + parseFloat(monto_gasto_sin_impuesto);
 
 			form.monto_neto.value = monto_neto_suma;
-			form.monto_iva_honorarios_legales.value = monto_impuesto;
-			form.monto_iva_gastos_con_iva.value = monto_impuesto_gasto;
-			form.iva.value = monto_impuesto_suma.toFixed(decimales);
+			form.monto_iva_honorarios_legales.value = jQuery.formatNumber(monto_impuesto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
+			form.monto_iva_gastos_con_iva.value = jQuery.formatNumber(monto_impuesto_gasto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"}); 
+			form.iva.value = jQuery.formatNumber(monto_impuesto_suma+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"}); 
 			var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.'));
 			$('total').value = total.toFixed(decimales);
 
@@ -1410,8 +1413,8 @@ if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 			if(cantidad_decimales!=-1)  {
 				 
 				jQuery('.aproximable').each(function() {
-					 jQuery(this).parseNumber({format:"0.<?php echo str_pad('',Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura'),"0"); ?>", locale:"us"});
-					 jQuery(this).formatNumber({format:"0.<?php echo str_pad('',Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura'),"0"); ?>", locale:"us"});
+					 jQuery(this).parseNumber({format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
+					 jQuery(this).formatNumber({format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
 					 });
 
 			}
@@ -1594,8 +1597,11 @@ if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 		if(cantidad_decimales!=-1) {
 
 		jQuery('.aproximable').each(function() {  
-			jQuery(this).parseNumber({format:"0.<?php echo str_pad('',Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura'),"0"); ?>", locale:"us"});
-			jQuery(this).formatNumber({format:"0.<?php echo str_pad('',Conf::GetConf($sesion, 'CantidadDecimalesTotalFactura'),"0"); ?>", locale:"us"});
+			//	
+		 	//
+			jQuery(this).val=jQuery(this).parseNumber({format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"})+0.0000001;
+			jQuery(this).formatNumber({format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
+			
 		});
 
 

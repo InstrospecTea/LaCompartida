@@ -118,13 +118,13 @@ echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min
 			if ($object->Size >= 20000) {
 
 				$dropname = $object->Key;
-				$torrent = $S3->get_object_url($bucketName, $dropname, "+2 days", array('torrent' => true));
+				//$torrent = $S3->get_object_url($bucketName, $dropname, "+2 days", array('torrent' => true));
 				echo "<tr><td><a class='iconzip' rel='$dropname' style='  float:left;font-size:14px;' href=\"javascript::void();\">$dropname</a> &nbsp;  &nbsp;&nbsp; </td>";
 				echo "<td>";
 				echo round($object->Size / (1024 * 1024), 2) . ' MB';
 				echo "</td>";
 				echo '<td>' . date('d-m-Y', strtotime($object->LastModified)) . '</td>';
-				echo "<td><a setwidth='60' class='btn botonizame' icon='ui-icon-torrent' href='$torrent'>torrent</a></td>";
+				//echo "<td><a setwidth='60' class='btn botonizame' icon='ui-icon-torrent' href='$torrent'>torrent</a></td>";
 				echo "<td><a   class='dropbox' rel='$dropname'   href=\"javascript::void();\"><img src='https://static.thetimebilling.com/cartas/img/dropbox_ico.png'/></a></td>";
 				echo "</tr>\n";
 			}
