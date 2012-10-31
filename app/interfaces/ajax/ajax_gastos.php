@@ -26,27 +26,28 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 
 	$whereclause = base64_decode($_POST['whereclause']);
 	$querypreparar = "update cta_corriente 
-							join asunto using(codigo_asunto) 
+							join asunto using (codigo_asunto) 
 							join contrato on contrato.id_contrato=asunto.id_contrato
-							join cliente on contrato.codigo_cliente=asunto.codigo_cliente ";
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente 
+							left join cobro on cta_corriente.id_cobro=cobro.id_cobro ";
 
 	$setclause = ' set cta_corriente.fecha_touch=now() ';
 	if (isset($_POST['montocastigar']))
 		$setclause.=', cta_corriente.monto_cobrable=0';
 	if (isset($_POST['id_proveedor']) && intval($_POST['id_proveedor'] > 0))
 		$setclause.=', cta_corriente.id_proveedor=' . intval($_POST['id_proveedor']);
-	if (isset($_POST['codigo_asunto'])) {
+	if (isset($_POST['codigo_asunto']) && $_POST['codigo_asunto']!='' ) {
 		$setclause.=", cta_corriente.codigo_asunto='{$_POST['codigo_asunto']}'";
-	} else if (isset($_POST['codigo_asunto_secundario'])) {
+	} else if (isset($_POST['codigo_asunto_secundario']) && $_POST['codigo_asunto_secundario']!=''  ) {
 		$setclause.=", cta_corriente.codigo_asunto='{$_POST['codigo_asunto_secundario']}'";
 	}
 
 
 	$querypreparar.=$setclause . ' WHERE ' . $whereclause;
 
-
+	debug($querypreparar);
 	$query = $sesion->pdodbh->prepare($querypreparar);
-
+	 
 	$query->execute();
 	echo "jQuery('#boton_buscar').click();";
 	die();
@@ -152,18 +153,20 @@ if ($_GET['totalctacorriente']) {
 	echo '<form id="buscacliente" method="POST" action="seguimiento_cobro.php" target="_blank"><b>' . __('Balance cuenta gastos') . ': ' . UtilesApp::GetSimboloMonedaBase($sesion) . " ";
 	$balance = UtilesApp::TotalCuentaCorriente($sesion, $where, $cobrable, true);
 
+	if ($codigo_cliente_secundario || $codigo_cliente) {
+		echo '<input type="hidden" id="codcliente" name="codcliente" value="1"/>';
+	} else {
+			echo '<input type="hidden" id="codcliente" name="codcliente" value="0"/>';
+		}
 	if (is_array($balance)) {
 		echo number_format($balance[0], 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']) . '</b>';
-		if ($codigo_cliente_secundario || $codigo_cliente) {
-			echo '<input type="hidden" id="codcliente" name="codcliente" value="1"/>';
+		 
 			echo '<input type="hidden" id="codigo_cliente" name="codigo_cliente" value="' . $codigo_cliente . '"/>';
 			echo '<input type="hidden" id="codigo_cliente_secundario" name="codigo_cliente_secundario" value="' . $codigo_cliente_secundario . '"/>';
 			echo '<input type="hidden" id="festado" name="estado[]" value="CREADO"/>';
 			echo '<input type="hidden" id="festado" name="opc" value="buscar"/>';
 			echo '<input type="hidden" id="festado" name="fecha_fin" value="' . date('d-m-Y') . '"/>';
-		} else {
-			echo '<input type="hidden" id="codcliente" name="codcliente" value="0"/>';
-		}
+		 
 		echo '<input type="hidden"  name="ingreso" value="' . $balance[1] . '"/>';
 		echo '<input type="hidden"  name="egreso" value="' . $balance[2] . '"/>';
 		echo '<input type="hidden" id="balance" name="balance" value="' . $balance[3] . '"/>';
@@ -180,7 +183,7 @@ if ($_GET['totalctacorriente']) {
 	} else {
 		$arraygasto = explode(';', ($_GET['movimientos']));
 		if (sizeof($arraygasto) > 0) {
-			$where = " ( cobro.estado is null or cobro.estado in ('SIN COBRO','CREADO','EN REVISION') ) and id_movimiento in (" . implode(',', $arraygasto) . ") ) ";
+			$where = " ( cobro.estado is null or cobro.estado in ('SIN COBRO','CREADO','EN REVISION') ) and id_movimiento in (" . implode(',', $arraygasto) . ")  ";
 		}
 	}
 
@@ -188,6 +191,7 @@ if ($_GET['totalctacorriente']) {
 							join asunto using(codigo_asunto) 
 							join contrato on contrato.id_contrato=asunto.id_contrato
 							join cliente on contrato.codigo_cliente=asunto.codigo_cliente 
+							left join cobro on cta_corriente.id_cobro=cobro.id_cobro
 										set fecha_touch=now()
 								WHERE $where";
 
