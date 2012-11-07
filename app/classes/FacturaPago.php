@@ -12,6 +12,186 @@ require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
 class FacturaPago extends Objeto
 {
+
+	public static $configuracion_reporte = array (
+		array (
+			'format' => 'date',
+			'title' => 'Fecha Pago',
+			'field' => 'fecha_pago',
+		),
+		array (
+			'title' => 'Tipo',
+			'field' => 'tipo',
+		),
+		array (
+			'title' => 'N° Documento',
+			'field' => 'numero',
+		),
+		array (
+			'title' => 'Serie Documento',
+			'field' => 'serie_documento_legal',
+			'visible' => false,
+		),
+		array (
+			'title' => 'Código Cliente',
+			'field' => 'cliente_pago',
+		),
+		array (
+			'title' => 'Cliente',
+			'field' => 'glosa_cliente',
+		),
+		array (
+			'title' => 'Acuerdo Comercial',
+			'field' => 'idcontrato',
+			'visible' => false,
+		),
+		array (
+			'title' => 'Razón Social',
+			'field' => 'factura_razon_social',
+		),
+		array (
+			'title' => 'Encargado Comercial',
+			'field' => 'encargado_comercial',
+		),
+		array (
+			'title' => 'Estado Documento',
+			'field' => 'estado',
+		),
+		array (
+			'title' => 'N° Liquidación',
+			'field' => 'id_cobro',
+		),
+		array (
+			'title' => 'Concepto Pago',
+			'field' => 'concepto_pago',
+		),
+		array (
+			'title' => 'Descripción Pago',
+			'field' => 'descripcion_pago',
+		),
+		array (
+			'title' => 'Nombre Banco',
+			'field' => 'nombre_banco',
+		),
+		array (
+			'title' => 'N° Cuenta',
+			'field' => 'numero_cuenta',
+		),
+		array (
+			'format' => 'date',
+			'title' => 'Fecha Factura',
+			'field' => 'fecha_factura',
+		),
+		array (
+			'title' => 'Código Idioma',
+			'field' => 'codigo_idioma',
+			'visible' => false,
+		),
+		array (
+			'title' => 'Símbolo Moneda',
+			'field' => 'simbolo_factura',
+		),
+		array (
+			'title' => 'Cifras Decimales',
+			'field' => 'cifras_decimales_factura',
+			'visible' => false,
+		),
+		array (
+			'format' => 'number',
+			'title' => 'Tipo Cambio',
+			'field' => 'tipo_cambio_pago',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'Honorarios',
+			'field' => 'honorarios',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'Subtotal Gastos',
+			'field' => 'subtotal_gastos',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'Subtotal Gastos sin impuesto',
+			'field' => 'subtotal_gastos_sin_impuesto',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'IVA',
+			'field' => 'iva',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'Total Factura',
+			'field' => 'monto_factura',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_pago',
+			),
+			'title' => 'Monto Aporte',
+			'field' => 'monto_aporte',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_factura',
+			),
+			'title' => 'Saldo Factura',
+			'field' => 'saldo_factura',
+		),
+		array (
+			'format' => 'number',
+			'title' => 'Moneda Pago',
+			'field' => 'simbolo_pago',
+		),
+		array (
+			'format' => 'number',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo_pago',
+			),
+			'title' => 'Saldo Pago',
+			'field' => 'saldo_pago',
+		),
+		array (
+			'title' => 'Códigos Asuntos',
+			'field' => 'codigos_asunto',
+		),
+		array (
+			'title' => 'Asuntos',
+			'field' => 'glosas_asunto',
+		),
+		array (
+			'title' => 'Descripción Factura',
+			'field' => 'descripcion_factura',
+		),
+	);
+
 	function FacturaPago($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "factura_pago";
@@ -394,15 +574,7 @@ class FacturaPago extends Objeto
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		
 		$SimpleReport = new SimpleReport($this->sesion);
-		
-		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('FACTURAS_PAGOS');
-		
-		// Load config from json
-		if (!isset($this->extra_fields['excel_config'])) {
-			// Cargar json del estudio
-		} else {
-			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
-		}
+		$SimpleReport->LoadConfiguration('FACTURAS_PAGOS');
 		
 		$SimpleReport->LoadResults($results);
 		

@@ -1,39 +1,250 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
+
+require_once dirname(__FILE__) . '/../conf.php';
+require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
+require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
+require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
 
-class Asunto extends Objeto
-{
+class Asunto extends Objeto {
+
 	//Etapa actual del proyecto
 	var $etapa = null;
 	//Primera etapa del proyecto
 	var $primera_etapa = null;
-
 	var $monto = null;
+	public static $configuracion_reporte = array(
+		array(
+			'field' => 'codigo_asunto',
+			'title' => 'Código',
+			'extras' => array(
+				'width' => 15
+			)
+		),
+		array(
+			'field' => 'glosa_asunto',
+			'title' => 'Título',
+			'extras' => array(
+				'width' => 45
+			)
+		),
+		array(
+			'field' => 'glosa_cliente',
+			'title' => 'Cliente',
+			'extras' => array(
+				'width' => 45
+			)
+		),
+		array(
+			'field' => 'codigo_secundario',
+			'title' => 'Código Secundario',
+			'extras' => array(
+				'width' => 15
+			)
+		),
+		array(
+			'field' => 'descripcion_asunto',
+			'title' => 'Descripción',
+			'extras' => array(
+				'width' => 45
+			)
+		),
+		array(
+			'field' => 'activo',
+			'title' => 'Activo',
+			'extras' => array(
+				'width' => 10
+			)
+		),
+		array(
+			'field' => 'horas_trabajadas',
+			'title' => 'Horas Trabajadas',
+			'format' => 'number',
+			'extras' => array(
+				'decimals' => 2,
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'horas_no_cobradas',
+			'title' => 'Horas a cobrar',
+			'format' => 'number',
+			'extras' => array(
+				'decimals' => 2,
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'username_ec',
+			'title' => 'Encargado',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'username_secundario',
+			'title' => 'Encargado 2',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'username',
+			'title' => 'Encargado',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'nombre_ec',
+			'title' => 'Encargado',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'nombre_secundario',
+			'title' => 'Encargado 2',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'nombre',
+			'title' => 'Encargado',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'glosa_tarifa',
+			'title' => 'Tarifa',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'glosa_moneda',
+			'title' => 'Moneda',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'forma_cobro',
+			'title' => 'Forma Cobro',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'monto',
+			'title' => 'Monto(FF/R/C)',
+			'format' => 'number',
+			'extras' => array(
+				'symbol' => 'simbolo_moneda',
+				'decimals' => 'decimales_moneda',
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'tipo_proyecto',
+			'title' => 'Tipo de Proyecto',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'area_proyecto',
+			'title' => 'Area de Práctica',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'fecha_creacion',
+			'title' => 'Fecha Creación',
+			'format' => 'date',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'contacto',
+			'title' => 'Nombre Contacto',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'fono_contacto',
+			'title' => 'Teléfono Contacto',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'email_contacto',
+			'title' => 'E-mail Contacto',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'direccion_contacto',
+			'title' => 'Dirección Contacto',
+			'extras' => array(
+				'width' => 30
+			)
+		),
+		array(
+			'field' => 'glosa_idioma',
+			'title' => 'Idioma',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'cobrable',
+			'title' => 'Cobrable',
+			'extras' => array(
+				'width' => 10
+			)
+		),
+		array(
+			'field' => 'actividades_obligatorias',
+			'title' => 'Act. Obligatorias',
+			'extras' => array(
+				'width' => 20
+			)
+		),
+		array(
+			'field' => 'fecha_inactivo',
+			'title' => 'Fecha Inactivo',
+			'format' => 'date',
+			'extras' => array(
+				'width' => 20
+			)
+		)
+	);
 
-	function Asunto($sesion, $fields = "", $params = "")
-	{
+	function Asunto($sesion, $fields = "", $params = "") {
 		$this->tabla = "asunto";
 		$this->campo_id = "id_asunto";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
 
-	function LoadByCodigo($codigo)
-	{
+	function LoadByCodigo($codigo) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto='$codigo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
 
-	function LoadByCodigoSecundario($codigo)
-	{
+	function LoadByCodigoSecundario($codigo) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
@@ -43,29 +254,25 @@ class Asunto extends Objeto
 		$resp = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
 		return $this->Load($resp['id_asunto']);
 	}
-	
-	function CodigoACodigoSecundario($codigo_asunto)
-	{ 
-		if($codigo_asunto != '')
-			{
-				$query = "SELECT codigo_asunto_secundario FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
-				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				list($codigo_asunto_secundario)=mysql_fetch_array($resp);
-				return $codigo_asunto_secundario;
-			}
-		else	
+
+	function CodigoACodigoSecundario($codigo_asunto) {
+		if ($codigo_asunto != '') {
+			$query = "SELECT codigo_asunto_secundario FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($codigo_asunto_secundario) = mysql_fetch_array($resp);
+			return $codigo_asunto_secundario;
+		}
+		else
 			return false;
 	}
-	
-	function CodigoSecundarioACodigo($codigo_asunto_secundario)
-	{
-		if($codigo_asunto_secundario != '')
-			{
-				$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
-				$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				list($codigo_asunto)=mysql_fetch_array($resp);
-				return $codigo_asunto;
-			}
+
+	function CodigoSecundarioACodigo($codigo_asunto_secundario) {
+		if ($codigo_asunto_secundario != '') {
+			$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($codigo_asunto) = mysql_fetch_array($resp);
+			return $codigo_asunto;
+		}
 		else
 			return false;
 	}
@@ -91,7 +298,7 @@ class Asunto extends Objeto
 			"WHERE asunto.codigo_cliente = '$codigo_cliente'";
 		
 		$query = "SELECT CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)), UNSIGNED INTEGER) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
 		if(empty($codigo)){
 			$codigo = $tipo ? 0 : $yy * 100;
@@ -103,58 +310,52 @@ class Asunto extends Objeto
 	function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario, $glosa_asunto = "") {
 		return $this->AsignarCodigoAsunto($codigo_cliente_secundario, $glosa_asunto, true);
 	}
-	
+
 	//funcion que cambia todos los asuntos de un cliente
-	function InsertarCodigoAsuntosPorCliente($codigo_cliente)
-	{
+	function InsertarCodigoAsuntosPorCliente($codigo_cliente) {
 		$query = "SELECT id_asunto FROM asunto WHERE codigo_cliente='$codigo_cliente'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		for($i=1;list($id) = mysql_fetch_array($resp);$i++)
-		{
-			$this->fields[$this->campo_id]=$id;
-			$codigo_asunto=$codigo_cliente.'-'.sprintf("%04d",$i);
-			$this->Edit("codigo_asunto",$codigo_asunto);
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		for ($i = 1; list($id) = mysql_fetch_array($resp); $i++) {
+			$this->fields[$this->campo_id] = $id;
+			$codigo_asunto = $codigo_cliente . '-' . sprintf("%04d", $i);
+			$this->Edit("codigo_asunto", $codigo_asunto);
 			$this->Write();
 		}
 		return true;
 	}
 
 	//funcion que actualiza todos los codigos de los clientes existentes (usar una vez para actualizar el registro)
-	function ActualizacionCodigosAsuntos()
-	{
+	function ActualizacionCodigosAsuntos() {
 		$query = "SELECT codigo_cliente FROM cliente";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		for($i=1;list($id) = mysql_fetch_array($resp);$i++)
-		{
-			if ($id!='NULL')
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		for ($i = 1; list($id) = mysql_fetch_array($resp); $i++) {
+			if ($id != 'NULL')
 				$this->InsertarCodigoAsuntosPorCliente($id);
 		}
 		return true;
 	}
 
-	function TotalHoras($emitido = true)
-	{
+	function TotalHoras($emitido = true) {
 		$where = '';
-		if(!$emitido)
+		if (!$emitido)
 			$where = "AND (t2.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado='EN REVISION')";
-		
+
 		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 as hrs_no_cobradas
 							FROM trabajo AS t2
 							LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
 							WHERE 1 $where 
 							AND t2.cobrable = 1
-							AND t2.codigo_asunto='".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+							AND t2.codigo_asunto='" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_horas_no_cobradas) = mysql_fetch_array($resp);
 		return $total_horas_no_cobradas;
 	}
 
-	function TotalMonto($emitido = true)
-	{
+	function TotalMonto($emitido = true) {
 		$where = '';
-		if(!$emitido)
+		if (!$emitido)
 			$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
-			
+
 		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo   
 							FROM trabajo 
 							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
@@ -164,98 +365,90 @@ class Asunto extends Objeto
 							LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
 							WHERE 1 $where  
 							AND trabajo.cobrable = 1 
-							AND trabajo.codigo_asunto='".$this->fields['codigo_asunto']."' GROUP BY trabajo.codigo_asunto"; 
-							
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+							AND trabajo.codigo_asunto='" . $this->fields['codigo_asunto'] . "' GROUP BY trabajo.codigo_asunto";
+
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_monto_trabajado, $moneda) = mysql_fetch_array($resp);
-		return array($total_monto_trabajado,$moneda);
+		return array($total_monto_trabajado, $moneda);
 	}
-	
-	function AlertaAdministrador($mensaje, $sesion)
-	{
+
+	function AlertaAdministrador($mensaje, $sesion) {
 		$query = "SELECT CONCAT_WS(' ',nombre, apellido1, apellido2) as nombre, email 
 								FROM usuario 
-							 WHERE activo=1 AND id_usuario = '".$this->fields['id_encargado']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+							 WHERE activo=1 AND id_usuario = '" . $this->fields['id_encargado'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($nombre, $email) = mysql_fetch_array($resp);
 
-		if (method_exists('Conf','GetConf'))
-		{
+		if (method_exists('Conf', 'GetConf')) {
 			$MailAdmin = Conf::GetConf($sesion, 'MailAdmin');
-		}
-		else if( method_exists('Conf','MailAdmin') )
-		{
+		} else if (method_exists('Conf', 'MailAdmin')) {
 			$MailAdmin = Conf::MailAdmin();
 		}
-			 
-		Utiles::Insertar( $sesion,  __("Alerta")." ".__("ASUNTO")." - ".$this->fields['glosa_asunto']." | ".Conf::AppName(), $mensaje, $email, $nombre);
-		Utiles::Insertar( $sesion,  __("Alerta")." ".__("ASUNTO")." - ".$this->fields['glosa_asunto']." | ".Conf::AppName(), $mensaje, $MailAdmin, $nombre);
+
+		Utiles::Insertar($sesion, __("Alerta") . " " . __("ASUNTO") . " - " . $this->fields['glosa_asunto'] . " | " . Conf::AppName(), $mensaje, $email, $nombre);
+		Utiles::Insertar($sesion, __("Alerta") . " " . __("ASUNTO") . " - " . $this->fields['glosa_asunto'] . " | " . Conf::AppName(), $mensaje, $MailAdmin, $nombre);
 		return true;
 	}
-	
-	function Eliminar()
-	{
-		if(!$this->Loaded())
+
+	function Eliminar() {
+		if (!$this->Loaded())
 			return false;
 		#Valida si no tiene algún trabajo relacionado
-		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$query = "SELECT COUNT(*) FROM trabajo WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
-			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene trabajos asociados');
+		if ($count > 0) {
+			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene trabajos asociados');
 			return false;
 		}
-		
-		$query = "SELECT Count(*) FROM cta_corriente WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+
+		$query = "SELECT Count(*) FROM cta_corriente WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
-			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene gastos asociados');
+		if ($count > 0) {
+			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene gastos asociados');
 			return false;
 		}
-		
+
 		#solo se puede eliminar asuntos que no tengan cobros asociados
-		$query = "SELECT COUNT(*) FROM cobro_asunto WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		$query = "SELECT COUNT(*) FROM cobro_asunto WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
+		if ($count > 0) {
 			$query = "SELECT cobro.id_cobro 
 									FROM cobro_asunto 
 									JOIN cobro ON cobro.id_cobro = cobro_asunto.id_cobro 
-									WHERE cobro_asunto.codigo_asunto = '".$this->fields['codigo_asunto']."'";
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+									WHERE cobro_asunto.codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
-			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene cobros asociados') . ". " . 
-					__('Cobro asociado') . __(': #'.$cobro);
-			return false;
-		}
-		
-		#solo se pueden eliminar asuntos que no tengan carpetas asociados
-		$query = "SELECT COUNT(*) FROM carpeta WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-		list($count) = mysql_fetch_array($resp);
-		if($count > 0)
-		{
-			$query = "SELECT id_carpeta, glosa_carpeta FROM carpeta WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-			$resp = mysql_query($query, $this->sesion->dbh) or Utile::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-			list($id_carpeta, $glosa_carpeta) = mysql_fetch_array($resp);
-			$this->error = __('No se puede eliminar un').' '.__('asunto').' '.__('que tiene carpetas asociados. Carpeta asociado: #'.$id_carpeta.' ( '.$glosa_carpeta.' )');
+			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene cobros asociados') . ". " .
+					__('Cobro asociado') . __(': #' . $cobro);
 			return false;
 		}
 
-		$query = "DELETE FROM asunto WHERE codigo_asunto = '".$this->fields['codigo_asunto']."'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+		#solo se pueden eliminar asuntos que no tengan carpetas asociados
+		$query = "SELECT COUNT(*) FROM carpeta WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+		if ($count > 0) {
+			$query = "SELECT id_carpeta, glosa_carpeta FROM carpeta WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utile::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($id_carpeta, $glosa_carpeta) = mysql_fetch_array($resp);
+			$this->error = __('No se puede eliminar un') . ' ' . __('asunto') . ' ' . __('que tiene carpetas asociados. Carpeta asociado: #' . $id_carpeta . ' ( ' . $glosa_carpeta . ' )');
+			return false;
+		}
+
+		$query = "DELETE FROM asunto WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return true;
 	}
+
 }
 
-class ListaAsuntos extends Lista
-{
-	function ListaAsuntos($sesion, $params, $query)
-	{
+class ListaAsuntos extends Lista {
+
+	function ListaAsuntos($sesion, $params, $query) {
 		$this->Lista($sesion, 'Asunto', $params, $query);
 	}
+
 }

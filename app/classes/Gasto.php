@@ -9,6 +9,126 @@ require_once 'Asunto.php';
 
 class Gasto extends Objeto {
 
+	public static $configuracion_reporte = array (
+		array (
+			'field' => 'id_movimiento',
+			'title' => 'N°',
+			'visible' => false
+		),
+		array (
+			'field' => 'fecha',
+			'format' => 'date',
+			'title' => 'Fecha',
+		),
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+		),
+		array (
+			'field' => 'glosa_cliente',
+			'title' => 'Cliente',
+		),
+		array (
+			'field' => 'codigo_asunto',
+			'title' => 'Código Asunto',
+		),
+		array (
+			'field' => 'glosa_asunto',
+			'title' => 'Asunto',
+		),
+		array (
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+		),
+		array (
+			'field' => 'usuario_ingresa',
+			'title' => 'Ingresado por',
+		),
+		array (
+			'field' => 'usuario_ordena',
+			'title' => 'Ordenado por',
+		),
+		array (
+			'field' => 'tipo',
+			'title' => 'Tipo',
+		),
+		array (
+			'field' => 'descripcion',
+			'title' => 'Descripción',
+		),
+		array (
+			'field' => 'simbolo',
+			'title' => 'Símbolo Moneda',
+		),
+		array (
+			'field' => 'egreso',
+			'format' => 'number',
+			'title' => 'Egreso',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'ingreso',
+			'format' => 'number',
+			'title' => 'Ingreso',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'monto_cobrable',
+			'format' => 'number',
+			'title' => 'Monto Cobrable',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'con_impuesto',
+			'title' => 'Con Impuesto',
+		),
+		array (
+			'field' => 'id_cobro',
+			'title' => 'N° Liquidación',
+		),
+		array (
+			'field' => 'estado_cobro',
+			'title' => 'Estado Liquidación',
+		),
+		array (
+			'field' => 'cobrable',
+			'title' => 'Cobrable',
+		),
+		array (
+			'field' => 'numero_documento',
+			'title' => 'N° Documento',
+		),
+		array (
+			'field' => 'rut_proveedor',
+			'title' => 'RUT Proveedor',
+		),
+		array (
+			'field' => 'nombre_proveedor',
+			'title' => 'Proveedor',
+		),
+		array (
+			'field' => 'tipo_documento_asociado',
+			'title' => 'Tipo Documento Asociado',
+		),
+		array (
+			'field' => 'fecha_documento_asociado',
+			'title' => 'Fecha Documento Asociado',
+		),
+		array (
+			'field' => 'codigo_documento_asociado',
+			'title' => 'N° Documento Asociado',
+		),
+	);
+
 	function Gasto($sesion, $fields = "", $params = "") {
 		$this->tabla = "cta_corriente";
 		$this->campo_id = "id_movimiento";
@@ -156,15 +276,7 @@ class Gasto extends Objeto {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		
 		$SimpleReport = new SimpleReport($this->sesion);
-		
-		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('GASTOS');
-		
-		// Load config from json
-		if (!isset($this->extra_fields['excel_config'])) {
-			// Cargar json del estudio
-		} else {
-			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
-		}
+		$SimpleReport->LoadConfiguration('GASTOS');
 		
 		$results = $this->sesion->pdodbh->query($search_query)->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);

@@ -16,6 +16,180 @@ require_once Conf::ServerDir() . '/../app/classes/NotaCobro.php';
 
 class Factura extends Objeto {
 
+	public static $configuracion_reporte = array (
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+			'visible' => false,
+		),
+		array (
+			'field' => 'glosa_cliente',
+			'title' => 'Cliente',
+		),
+		array (
+			'field' => 'fecha',
+			'format' => 'date',
+			'title' => 'Fecha Documento',
+		),
+		array (
+			'field' => 'tipo',
+			'title' => 'Tipo',
+		),
+		array (
+			'field' => 'serie_documento_legal',
+			'title' => 'Serie Documento',
+			'visible' => false,
+		),
+		array (
+			'field' => 'numero',
+			'title' => 'N° Documento',
+		),
+		array (
+			'field' => 'factura_rsocial',
+			'title' => 'Razón Social',
+		),
+		array (
+			'field' => 'glosas_asunto',
+			'title' => 'Asuntos',
+		),
+		array (
+			'field' => 'codigos_asunto',
+			'title' => 'Códigos Asuntos',
+		),
+		array (
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+		),
+		array (
+			'field' => 'descripcion',
+			'title' => 'Descripción Factura',
+		),
+		array (
+			'field' => 'id_cobro',
+			'title' => 'N° Liquidación',
+		),
+		array (
+			'field' => 'idcontrato',
+			'title' => 'Acuerdo Comercial',
+			'visible' => false,
+		),
+		array (
+			'field' => 'simbolo',
+			'visible' => false,
+			'title' => 'Símbolo Moneda',
+		),
+		array (
+			'field' => 'tipo_cambio',
+			'format' => 'number',
+			'title' => 'Tipo Cambio',
+			'visible' => false,
+		),
+		array (
+			'field' => 'honorarios',
+			'format' => 'number',
+			'title' => 'Honorarios',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'subtotal_gastos',
+			'format' => 'number',
+			'title' => 'Subtotal Gastos',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'subtotal_gastos_sin_impuesto',
+			'format' => 'number',
+			'title' => 'Subtotal Gastos sin impuesto',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'subtotal',
+			'format' => 'number',
+			'title' => 'Subtotal',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'iva',
+			'format' => 'number',
+			'title' => 'IVA',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'total',
+			'format' => 'number',
+			'title' => 'Total',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'monto_real',
+			'format' => 'number',
+			'title' => 'Monto Real',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'observaciones',
+			'title' => 'Observaciones',
+		),
+		array (
+			'field' => 'pagos',
+			'format' => 'number',
+			'title' => 'Pagos',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'saldo',
+			'format' => 'number',
+			'title' => 'Saldo',
+			'extras' =>
+			array (
+				'symbol' => 'simbolo',
+			),
+		),
+		array (
+			'field' => 'fecha_ultimo_pago',
+			'format' => 'date',
+			'title' => 'Fecha Último Pago',
+		),
+		array (
+			'field' => 'estado',
+			'title' => 'Estado Documento',
+		),
+		array (
+			'field' => 'codigo_idioma',
+			'title' => 'Código Idioma',
+			'visible' => false,
+		),
+		array (
+			'field' => 'cifras_decimales',
+			'title' => 'Cifras Decimales',
+			'visible' => false,
+		),
+	);
+
 	function Factura($sesion, $fields = "", $params = "") {
 		$this->tabla = "factura";
 		$this->campo_id = "id_factura";
@@ -1509,15 +1683,7 @@ class Factura extends Objeto {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		
 		$SimpleReport = new SimpleReport($this->sesion);
-		
-		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('FACTURAS');
-		
-		// Load config from json
-		if (!isset($this->extra_fields['excel_config'])) {
-			// Cargar json del estudio
-		} else {
-			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
-		}
+		$SimpleReport->LoadConfiguration('FACTURAS');
 		
 		$SimpleReport->LoadResults($results);
 		

@@ -43,6 +43,66 @@ class SolicitudAdelanto extends Objeto {
 		'DEPOSITADO'
 	);
 
+	public static $configuracion_reporte = array (
+		array (
+			'field' => 'id_solicitud_adelanto',
+			'title' => 'N°',
+		),
+		array (
+			'field' => 'codigo_cliente',
+			'title' => 'Código Cliente',
+		),
+		array (
+			'field' => 'glosa_cliente',
+			'title' => 'Cliente',
+		),
+		array (
+			'field' => 'descripcion',
+			'title' => 'Descripción',
+		),
+		array (
+			'field' => 'fecha',
+			'title' => 'Fecha',
+			'format' => 'date',
+		),
+		array (
+			'field' => 'monto',
+			'title' => 'Monto solicitado',
+			'format' => 'number',
+		),
+		array (
+			'field' => 'estado',
+			'title' => 'Estado',
+		),
+		array (
+			'field' => 'username',
+			'title' => 'Solicitante',
+		),
+		array (
+			'field' => 'cantidad_adelantos',
+			'title' => 'Cantidad Adelantos',
+		),
+		array (
+			'field' => 'monto_adelantos',
+			'title' => 'Monto Adelantos',
+			'format' => 'number',
+		),
+		array (
+			'field' => 'saldo_adelantos',
+			'title' => 'Saldo Adelantos',
+			'format' => 'number',
+		),
+		array (
+			'field' => 'codigos_asunto',
+			'title' => 'Códigos Asuntos',
+		),
+		array (
+			'field' => 'glosas_asunto',
+			'title' => 'Asuntos',
+		),
+	);
+
+
 	/**
 	 * @var Cliente
 	 */
@@ -340,16 +400,8 @@ BODY;
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
-
-		$this->extra_fields['excel_config'] = $SimpleReport->GetConfiguration('SOLICITUDES_ADELANTO');
-
-		// Load config from json
-		if (!isset($this->extra_fields['excel_config'])) {
-			// Cargar json del estudio
-		} else {
-			$SimpleReport->LoadConfigFromJson($this->extra_fields['excel_config']);
-		}
-
+		$SimpleReport->LoadConfiguration('SOLICITUDES_ADELANTO');
+		
 		$query = $this->SearchQuery();
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
