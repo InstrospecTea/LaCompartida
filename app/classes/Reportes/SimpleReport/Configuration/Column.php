@@ -31,7 +31,7 @@ class SimpleReport_Configuration_Column {
 	}
 
 	public function Title($title) {
-		$this->title = $title;
+		$this->title = mb_detect_encoding($title, 'UTF-8', true) != 'UTF-8' ? utf8_encode($title) : $title;
 		return $this;
 	}
 

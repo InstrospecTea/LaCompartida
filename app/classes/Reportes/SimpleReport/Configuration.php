@@ -7,7 +7,7 @@
  */
 class SimpleReport_Configuration {
 	/**
-	 * @type array
+	 * @type SimpleReport_Configuration_Column[]
 	 */
 	public $columns;
 

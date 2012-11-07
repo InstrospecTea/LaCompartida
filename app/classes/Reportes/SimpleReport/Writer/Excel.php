@@ -337,7 +337,7 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 
 		$value = '';
 		if (strpos($column->field, '=') !== 0) {
-			$value = $row[$column->field];
+			$value = isset($row[$column->field]) ? $row[$column->field] : '';
 			if ($column->format == 'text') {
 				//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
 				$value = utf8_encode($value);

@@ -44,12 +44,20 @@ class SimpleReport_Writer_Spreadsheet_Format extends SimpleReport_Configuration_
 			'FgColor' => 35,
 			'Color' => 'black'
 		),
-		'total' => array(
+		'total_number' => array(
 			'Size' => 10,
 			'VAlign' => 'top',
 			'Bold' => 1,
 			'Top' => 1,
 			'Color' => 'black'
+		),
+		'total_time' => array(
+			'Size' => 10,
+			'VAlign' => 'top',
+			'Bold' => 1,
+			'Top' => 1,
+			'Color' => 'black',
+			'NumFormat' => '[h]:mm'
 		),
 		'number' => array(
 			'Size' => 10,

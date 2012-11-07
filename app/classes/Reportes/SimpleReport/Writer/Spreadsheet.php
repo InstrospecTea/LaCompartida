@@ -13,12 +13,14 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 	 * fila actual del excel
 	 * @var integer
 	 */
-	private $current_row;
-	private $subtotals = array();
-	private $sum_subtotals = false;
+	private $current_row = 0;
 	private $autofilter = true;
 	private $col_letters = array();
 	public $formato_fecha = "%d/%m/%Y";
+	/**
+	 * una tabla (con un encabezado) para todos los grupos
+	 */
+	private $single_table = false;
 
 	/**
 	 * @var Spreadsheet_Excel_Writer
@@ -34,32 +36,45 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 	public function __construct(SimpleReport $simpleReport) {
 		ini_set('memory_limit', '1024M');
 		$this->SimpleReport = $simpleReport;
-		$this->xls = new Spreadsheet_Excel_Writer();
 	}
 
-	public function save($filename = null) {
+	public function save($filename = null, $group_values = null, &$current_xls = null, &$current_sheet = null, &$current_row = 0, $indent_level = 0) {
 		// 1. Construir base Excel
 		// Enviar headers a la pagina
 		if (empty($filename)) {
 			$filename = $this->SimpleReport->Config->title;
 		}
-		$this->xls->send("$filename.xls");
+		if (!isset($current_xls)){
+			$this->xls->send("$filename.xls");
+			// Crear worksheet
+			$this->sheet = & $this->xls->addWorksheet($this->SimpleReport->Config->title);
+			$this->sheet->setLandscape();
+			// Definir colores y formatos
+			//$this->xls->setCustomColor(35, 155, 187, 89); //verde lemontech
+			$this->xls->setCustomColor(35, 220, 255, 220); //encabezados
+			$this->xls->setCustomColor(36, 255, 255, 220); //?
+		} else {
+			$this->xls = & $current_xls;
+			$this->sheet = & $current_sheet;
+		}
 
-		// Crear worksheet
-		$this->sheet = & $this->xls->addWorksheet($this->SimpleReport->Config->title);
-		$this->sheet->setLandscape();
 
-		// Definir colores y formatos
-		//$this->xls->setCustomColor(35, 155, 187, 89); //verde lemontech
-		$this->xls->setCustomColor(35, 220, 255, 220); //encabezados
-		$this->xls->setCustomColor(36, 255, 255, 220); //?
 		foreach (SimpleReport_Writer_Spreadsheet_Format::$formats as $name => $format) {
 			$this->formats[$name] = & $this->xls->addFormat($format);
+		}
+		} else {
+			$this->xls = & $parent_writer->xls;
+			$this->sheet = & $parent_writer->sheet;
+			$this->current_row = & $parent_writer->current_row;
+			$this->formats = & $parent_writer->formats;
+			$this->autofilter = false;
+
+			$this->current_row++;
 		}
 
 		// 1.1 Formatear todos los arreglos
 		// 2. Correr query
-		$result = $this->SimpleReport->RunReport();
+		$result = $this->SimpleReport->RunReport($group_values);
 		// 3. Ordenar y filtrar segun conf
 		$columns = $this->SimpleReport->Config->VisibleColumns();
 
@@ -67,44 +82,48 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		$groups = array();
 		foreach ($columns as $idx => $column) {
 			if ($column->group) {
-				$groups[$column->group] = $column->field;
+				//el espacio es para q se mantenga como string y no se reseteen los indices al shiftear
+				$groups[$column->group + $indent_level . ' '] = $column->field;
 				unset($columns[$idx]);
 			}
 		}
 		ksort($groups);
 
-		$this->current_row = 0;
-
-		// 4. Escribir en excel
-		$this->groups($result, $columns, $groups);
-
-		//fila con totales cuando hay mas de un subtotal
-		if ($this->sum_subtotals) {
-			foreach ($this->subtotals as $cols) {
-				$this->current_row++;
-				foreach ($cols as $subtotal) {
-					$column = $subtotal['column'];
-					$row = $subtotal['row'];
-					$row[$column->field] = '=' . implode('+', $subtotal['cells']);
-
-					$this->cell($row, $column, $subtotal['col_i'], 'total');
-				}
-			}
+		if ($current_row > 0) {
+			$this->current_row = & $current_row;
+		} else  {
+			$this->current_row = 0;
 		}
 
+		// 4. Escribir en excel
+		$this->groups($result, $columns, $groups, $totals, 'Total', $indent_level ? $indent_level + 1 : 0);
+
 		// 5. Descargar
-		$this->xls->close();
-		exit;
+		if (!isset($current_xls)){
+			$this->xls->close();
+			exit;
+		}
 	}
 
-	private function groups($result, $columns, $groups, $col0 = 0) {
+	private function groups($result, $columns, $groups, &$totals, $total_name, $col0 = 0) {
 		if (empty($groups)) {
-			return $this->table($result, $columns, $col0);
+			return $this->table($result, $columns, $totals, $total_name, $col0);
 		} else {
+			if(!$col0){
+				$col0 = 1;
+			}
+			if(isset($this->SimpleReport->custom_format['single_table']) && !$this->single_table){
+				$this->single_table = true;
+				$this->header($columns, $col0);
+			}
 			$col_i = key($groups) - 1;
+			$col_i = $col_i + ($this->indent_level);
 			$column = array_shift($groups);
 
 			$grouped_rows = array();
+			if(!$result){
+				$result = array();
+			}
 			foreach ($result as $row) {
 				$group = $row[$column];
 				if (!isset($grouped_rows[$group])) {
@@ -117,31 +136,78 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$this->autofilter = false;
 			}
 
+			$totals = array();
 			foreach ($grouped_rows as $group => $rows) {
 				//poner el titulo del grupo
-				$this->sheet->write($this->current_row, $col_i, $group, $this->formats['encabezado']);
+				$s = str_pad('', $col_i*3);
+				$this->sheet->write($this->current_row, 0, $s . $group, $this->formats['encabezado']);
 				$this->current_row++;
 
 				//generar la(s) subtabla(s)
-				$this->groups($rows, $columns, $groups, $col_i + 1);
+				$this->groups($rows, $columns, $groups, $subtotals, "$s Subtotal $group", $col0);
+
+				//acumular el total de este grupo
+				if(!empty($subtotals)){
+					$r = $this->current_row - count($subtotals);
+					foreach ($subtotals as $g => $totals_row) {
+						if (!isset($totals[$g])) {
+							$totals[$g] = array('row' => $totals_row['row'], 'totals' => array());
+						}
+						$c = $col0;
+						foreach($columns as $col_idx => $column){
+							if(isset($totals_row['totals'][$col_idx])){
+								$totals[$g]['totals'][$col_idx][] = $this->xls->rowcolToCell($r, $c);
+							}
+							$c++;
+						}
+						$r++;
+					}
+				}
+			}
+
+			if(!empty($totals)) {
+				$this->totales($totals, $columns, $total_name, $col0);
 			}
 		}
 	}
 
-	private function table($result, $columns, $col0 = 0) {
-		// 4.1 Headers
+	private function header($columns, $col0 = 0) {
 		$col_i = $col0;
-		foreach ($columns as $idx => $column) {
+		foreach ($columns as $column) {
 			$this->sheet->write($this->current_row, $col_i++, utf8_decode($column->title), $this->formats['title']);
 		}
+		$this->current_row++;
+	}
+
+
+	private function table($result, $columns, &$totals_rows, $totals_name, $col0 = 0) {
+		$report = $this->SimpleReport;
+
+		// 4.1 Headers
+		$report = $this->SimpleReport;
+		$repeat_header = false;
+		if (isset($report->custom_format)) {
+			$repeat_header = $report->custom_format['repeat_header_each_row'];
+		}
+
+		if(!$this->single_table && !$repeat_header){
+				$this->header($columns, $col0);
+		}
+		$first_row = $this->current_row;
 
 		// 4.2 Body
 		$formatos_con_total = array('number', 'time');
-		$first_row = ++$this->current_row;
 		$totals_rows = array();
+		if(empty($result)){
+			$result = array();
+		}
 		foreach ($result as $row_idx => $row) {
+			if($repeat_header){
+				$this->header($columns, $col0);
+			}
 			$col_i = $col0;
 			foreach ($columns as $idx => $column) {
+
 				if (in_array($column->format, $formatos_con_total) &&
 					(!isset($column->extras['subtotal']) || $column->extras['subtotal'])) {
 					$grupo_subtotal = isset($column->extras['subtotal']) && is_string($column->extras['subtotal']) ? $row[$column->extras['subtotal']] : '';
@@ -151,7 +217,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					if (!isset($totals_rows[$grupo_subtotal]['totals'][$idx])) {
 						$totals_rows[$grupo_subtotal]['totals'][$idx] = array();
 					}
-					
+
 					//si el anterior era del mismo grupo, me agrego al rango
 					$cell = $this->xls->rowcolToCell($this->current_row, $col_i);
 					if (isset($totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1])) {
@@ -177,44 +243,26 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$this->cell($row, $column, $col_i);
 				$col_i++;
 			}
+
 			$this->current_row++;
-		}
+
+			if ($report->SubReport) {
+				$values = array();
+				foreach ($report->SubReport['Keys'] as $key) {
+					$values[$key] = $row[$key];
+				}
+				$subresult = $report->SubReport['SimpleReport']->RunReport($values);
+				if(!empty($subresult)){
+					$this->SimpleReport->results;
+					$writer = SimpleReport_IOFactory::createWriter($report->SubReport['SimpleReport'], 'Spreadsheet');
+					$writer->save('', $values, $this, $report->SubReport['Level']);
+				}
+				$this->current_row++;
+			}
 
 		// 4.3 Totales
 		$last_row = $this->current_row - 1;
-		foreach ($totals_rows as $group => $totals_row) {
-			$totals = $totals_row['totals'];
-			$row = $totals_row['row'];
-
-			$col_i = $col0;
-			foreach ($columns as $idx => $column) {
-				if (isset($totals[$idx])) {
-					$sum_cells = count($totals_rows) > 1 ? implode(',', $totals[$idx]) :
-						($this->xls->rowcolToCell($first_row, $col_i) . ':' . $this->xls->rowcolToCell($last_row, $col_i));
-					//el implode hace q se muestre el error "a value used in the formula is of the wrong datatype",
-					//aunque editando manualmente la formula (sin cambiar nada) se arregla
-					$row[$column->field] = "=SUBTOTAL(9,$sum_cells)";
-					$this->cell($row, $column, $col_i, 'total');
-
-					if (!isset($this->subtotals[$group][$col_i])) {
-						if (!isset($this->subtotals[$group])) {
-							$this->subtotals[$group] = array();
-						}
-						$this->subtotals[$group][$col_i] = array(
-							'col_i' => $col_i,
-							'column' => $column,
-							'row' => $row,
-							'cells' => array()
-						);
-					} else {
-						$this->sum_subtotals = true;
-					}
-					$this->subtotals[$group][$col_i]['cells'][] = $this->xls->rowcolToCell($this->current_row, $col_i);
-				}
-				$col_i++;
-			}
-			$this->current_row++;
-		}
+		$this->totales($totals_rows, $columns, $totals_name, $col0, false, $first_row, $last_row);
 
 		// 4.4 Estilos de columnas
 		for ($col_i = 0; $col_i < count($columns); $col_i++) {
@@ -237,24 +285,65 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 	}
 
+	private function totales($totals_rows, $columns, $name, $col0 = 0, $subtotals = true, $first_row = 0, $last_row = 0) {
+		foreach ($totals_rows as $group => $totals_row) {
+			$totals = $totals_row['totals'];
+			$row = $totals_row['row'];
+
+			if($col0){
+				$this->sheet->write($this->current_row, $col0-1, $name, $this->formats['text']);
+			}
+			$col_i = $col0;
+			foreach ($columns as $idx => $column) {
+				if (isset($totals[$idx])) {
+					if($subtotals){
+						$row[$column->field] = '=' . implode('+', $totals[$idx]);
+						$this->cell($row, $column, $col_i, 'total_' . $column->format);
+					}
+					else{
+						$sum_cells = count($totals_rows) > 1 || !$first_row ? implode(',', $totals[$idx]) :
+							($this->xls->rowcolToCell($first_row, $col_i) . ':' . $this->xls->rowcolToCell($last_row, $col_i));
+						//el implode hace q se muestre el error "a value used in the formula is of the wrong datatype",
+						//aunque editando manualmente la formula (sin cambiar nada) se arregla
+						$row[$column->field] = "=SUBTOTAL(9,$sum_cells)";
+						$this->cell($row, $column, $col_i, 'total_' . $column->format);
+					}
+				}
+				$col_i++;
+			}
+			$this->current_row++;
+		}
+	}
+
+
 	private function cell($row, $column, $col_i, $format = null) {
+
 		if (empty($format)) {
 			$format = $column->format;
 		}
-		if (in_array($format, array('number', 'total')) && isset($column->extras['symbol'])) {
-			$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
-			if (ord($symbol) == 128) {
-				$symbol = 'EUR';
+		if (in_array($format, array('number', 'total_number')) && (isset($column->extras['symbol']) || isset($column->extras['decimals']))) {
+			$symbol = '';
+			if(isset($column->extras['symbol'])){
+				$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
+				if (ord($symbol) == 128) {
+					$symbol = 'EUR';
+				}
+			}
+			$decimals = 2;
+			if (isset($column->extras['decimals'])) {
+				$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
 			}
 
-			if (!isset($this->formats[$format . '_' . $symbol])) {
-				$this->formats[$format . '_' . $symbol] = & $this->xls->addFormat(
+			$f = $format . '_' . $symbol . '_' . $decimals;
+			if (!isset($this->formats[$f])) {
+				$decimals = $decimals ? '.' . str_pad('', $decimals, '0') : '';
+				$symbol = $symbol ? "[$$symbol] " : '';
+				$this->formats[$f] = & $this->xls->addFormat(
 						SimpleReport_Writer_Spreadsheet_Format::$formats[$format] +
-						array('NumFormat' => "[$$symbol] #,###,0.00")
+						array('NumFormat' => "$symbol#,###,0$decimals")
 				);
 			}
-
-			$format = $format . '_' . $symbol;
+			$format = $f;
 		}
 
 		if (!isset($this->col_letters[$column->field])) {
@@ -263,7 +352,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 		$value = '';
 		if (strpos($column->field, '=') !== 0) {
-			$value = $row[$column->field];
+			$value = isset($row[$column->field]) ? $row[$column->field] : '';
 			if ($format == 'text') {
 				//reemplazar los ; por \n (si se manda directamente el \n se pierde antes de llegar aca)
 				if (strpos($value, ";")) {
@@ -272,10 +361,13 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				}
 			} else if ($format == 'date') {
 				//las fechas llegan en formato SQL, pasarlas a formato excel
-				$value = Utiles::sql2fecha($value, $this->formato_fecha);
+				$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->formato_fecha);
+			} else if ($format == 'time') {
+				$value /= 24;
 			}
 
-			$this->sheet->write($this->current_row, $col_i, $value, $this->formats[$format]);
+			$function = $format == 'text' ? 'writeString' : 'write';
+			$this->sheet->$function($this->current_row, $col_i, $value, $this->formats[$format]);
 
 			if (isset($column->extras['rowspan']) && $column->extras['rowspan'] > 1) {
 				$this->sheet->mergeCells($this->current_row - $column->extras['rowspan'] + 1, $col_i, $this->current_row, $col_i);
@@ -296,7 +388,6 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					$value = str_replace($match[0], $param, $value);
 				}
 			}
-
 			$this->sheet->writeFormula($this->current_row, $col_i, $value, $this->formats[$format]);
 		}
 	}

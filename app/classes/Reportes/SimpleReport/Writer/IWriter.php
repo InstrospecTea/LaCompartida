@@ -12,4 +12,5 @@ interface SimpleReport_Writer_IWriter {
 	 * @throws 	Exception
 	 */
 	public function save($pFilename = null);
+
 }
