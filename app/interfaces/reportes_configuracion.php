@@ -21,59 +21,44 @@ if ($_REQUEST['accion'] == 'guardar') {
 	foreach ($data as $tipo => $config) {
 		$SimpleReport->LoadWithType($tipo);
 
-		if ($SimpleReport->Loaded()) {
-			$orig = json_decode($SimpleReport->fields['configuracion_original'], true);
-			$nueva = array();
-			foreach($orig as $conf){
-				if(isset($config[$conf['field']])){
-					$conf_data = $config[$conf['field']];
-					$conf['title'] = utf8_encode($conf_data['title']);
-					$conf['visible'] = array_key_exists('visible', $conf_data) && $conf_data['visible'] == 1;
-					$conf['order'] = $conf_data['order'];
-				}
-				$nueva[] = $conf;
-			}
-			$SimpleReport->Edit('configuracion', json_encode($nueva));
-			$SimpleReport->Write();
+		$nueva = array();
+		foreach($config as $field => $conf){
+			$conf['field'] = $field;
+			$conf['title'] = utf8_encode($conf['title']);
+			$conf['visible'] = array_key_exists('visible', $conf) && $conf['visible'] == 1;
+			$nueva[] = $conf;
 		}
+		$SimpleReport->Edit('configuracion', json_encode($nueva));
+		$SimpleReport->Write();
 	}
 }
 
-$reportes = $SimpleReport->GetAll($_REQUEST['tipo']);
+$configuraciones = $SimpleReport->GetAllConfigurations();
 ?>
 <div id="tabs">
 	<ul>
-		<?php foreach ($reportes as $reporte) { ?>
-			<li><a href="#<?php echo $reporte['tipo']; ?>"><?php echo $reporte['tipo']; ?></a></li>
+		<?php foreach (array_keys($configuraciones) as $tipo) { ?>
+			<li><a href="#<?php echo $tipo; ?>"><?php echo $tipo; ?></a></li>
 		<?php } ?>
 	</ul>
-	<?php
-	foreach ($reportes as $reporte) {
-		$configuracion_original = $SimpleReport->LoadConfigFromJson($reporte['configuracion_original']);
-
-		if (!empty($reporte['configuracion'])) {
-			$configuracion = $SimpleReport->LoadConfigFromJson($reporte['configuracion']);
-		} else {
-			$configuracion = $configuracion_original;
-		}
-		?>
-		<div id="<?php echo $reporte['tipo']; ?>">
-			<form action="reportes_configuracion.php" method="POST" id="<?php echo "form_{$reporte['tipo']}"; ?>" class="reportes">
+	<?php foreach ($configuraciones as $tipo => $configuracion) { ?>
+		<div id="<?php echo $tipo; ?>">
+			<form action="reportes_configuracion.php" method="POST" id="<?php echo "form_$tipo"; ?>" class="reportes">
 				<input type="hidden" name="accion" value="guardar" />
-				<h1>Configuración de: <?php echo $reporte['tipo']; ?></h1>
+				<h1>Configuración de: <?php echo $tipo; ?></h1>
 				<ul style="text-align: left; list-style-type: none">
 					<?php foreach ($configuracion->columns as $field => $column) { ?>
 						<li>
-							<input name="<?php echo "data[{$reporte['tipo']}][$field][order]"; ?>" type="hidden" class="sortable_item" />
-							<input name="<?php echo "data[{$reporte['tipo']}][$field][visible]"; ?>" type="checkbox" value="1" <?php echo $column->visible ? 'checked="checked"' : ''; ?> />
-							<input name="<?php echo "data[{$reporte['tipo']}][$field][title]"; ?>" type="text" value="<?php echo utf8_decode($column->title); ?>" />
-							<em style="font-size: 0.8em; cursor: move"><?php echo utf8_decode($configuracion_original->columns[$field]->title); ?></em>
+							<input name="<?php echo "data[$tipo][$field][order]"; ?>" type="hidden" class="sortable_item" />
+							<input name="<?php echo "data[$tipo][$field][visible]"; ?>" type="checkbox" value="1" <?php echo $column->visible ? 'checked="checked"' : ''; ?> />
+							<input name="<?php echo "data[$tipo][$field][title]"; ?>" type="text" value="<?php echo utf8_decode($column->title); ?>" />
+							<em style="font-size: 0.8em; cursor: move"><?php echo utf8_decode($configuracion->columns[$field]->extras['original_title']) . " ($field)"; ?></em>
 						</li>
 					<?php } ?> 
 				</ul>
 				<br />
 				<div>
-					<input type="button" id="<?php echo "submit_{$reporte['tipo']}"; ?>" value="Guardar" class="btn" />
+					<input type="button" id="<?php echo "submit_$tipo"; ?>" value="Guardar" class="btn" />
 				</div>
 			</form>
 		</div>

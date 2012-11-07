@@ -61,6 +61,23 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 			$where_gastos .= ' AND 1=0 ';
 		}
 	}
+	
+	if ($mostrar_sin_saldo) {
+		$where_liquidaciones .= " OR (
+			d.tipo_doc = 'N' AND
+			(d.saldo_honorarios + d.saldo_gastos) = 0 AND
+			cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE') AND
+			d.codigo_cliente = '$codigo_cliente'
+			$where_liquidaciones
+		)";
+		$where_adelantos .= " OR (
+			d.es_adelanto = 1 AND
+			d.saldo_pago = 0 AND
+			d.codigo_cliente = '$codigo_cliente'
+			$where_adelantos
+		)";
+//		$where_gastos .= "";
+	}
 
 	$query_liquidaciones = "SELECT
 				DATE(cobro.fecha_emision) AS fecha,
@@ -156,77 +173,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 			ORDER BY fecha";
 
 	$SimpleReport = new SimpleReport($Sesion);
-	$config_reporte = array(
-		array(
-			'field' => 'tipo',
-			'group' => 1
-		),
-		array(
-			'field' => 'fecha',
-			'title' => __('Fecha'),
-			'format' => 'date',
-			'extras' => array(
-				'attrs' => 'width="10%" style="text-align:center"'
-			)
-		),
-		array(
-			'field' => 'descripcion',
-			'title' => utf8_encode(__('Descripción')),
-			'extras' => array(
-				'attrs' => 'style="text-align:left"'
-			)
-		),
-		array(
-			'field' => 'tipo_liq',
-			'title' => __('Tipo'),
-			'extras' => array(
-				'attrs' => 'width="5%"',
-				'width' => 5
-			)
-		),
-		array(
-			'field' => 'monto_original',
-			'title' => __('Monto'),
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_documento',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal' => false
-			)
-		),
-		array(
-			'field' => 'saldo_original',
-			'title' => __('Saldo'),
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_documento',
-				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"',
-				'subtotal' => false
-			)
-		),
-		array(
-			'field' => 'monto_base',
-			'title' => __('Monto (base)'),
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_base',
-				'attrs' => 'width="15%" style="text-align:right"'
-			)
-		),
-		array(
-			'field' => 'saldo_base',
-			'title' => __('Saldo (base)'),
-			'format' => 'number',
-			'extras' => array(
-				'symbol' => 'moneda_base',
-				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"'
-			)
-		)
-	);
 
-	$SimpleReport->LoadConfigFromArray($config_reporte);
+	$SimpleReport->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
 	$saldo_total = 0;
 
@@ -304,6 +252,16 @@ $Pagina->PrintTop();
                                 <input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
                             </td>
                         </tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="left">
+								<label>
+									<input type="hidden" name="mostrar_sin_saldo" value="0" />
+									<input type="checkbox" name="mostrar_sin_saldo" id="mostrar_sin_saldo" value="1" <?php echo $mostrar_sin_saldo ? 'checked="checked"' : '' ?> />
+									<?php echo __('Mostrar liquidaciones y adelantos sin saldo'); ?>
+								</label>
+							</td>
+						</tr>
 						<tr>
 							<td></td>
 							<td colspan=2 align=left>

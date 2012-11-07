@@ -14,6 +14,12 @@ $sesion = new Sesion(array('DAT', 'COB', 'SASU'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
+if($excel){
+	$asunto = new Asunto($sesion);
+	$asunto->DownloadExcel(compact('activo', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario',
+		'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc'));
+}
+
 if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	require_once Conf::ServerDir() . '/classes/AutocompletadorAsunto.php';
 } else {
@@ -89,7 +95,7 @@ $pagina->PrintTop($popup);
 		if (from == 'buscar') {
 			form.action = 'asuntos.php?buscar=1';
 		} else if (from == 'xls') {
-			form.action = 'asuntos_xls.php';
+			form.action = 'asuntos.php?excel=1';
 		} else if (from == 'facturacion_xls') {
 			form.action = 'asuntos_facturacion_xls.php';
 		} else {

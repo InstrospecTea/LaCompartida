@@ -27,7 +27,7 @@
 
 	if($excel)
 	{
-		require_once('clientes_xls.php');
+		$cliente->DownloadExcel(compact('glosa_cliente', 'codigo', 'id_grupo_cliente', 'fecha1', 'fecha2', 'solo_activos'));
 		exit;
 	}
 
@@ -67,7 +67,7 @@ function Listar( form, from )
 	if(from == 'buscar')
 		form.action = 'clientes.php?buscar=1';
 	else if(from == 'xls')
-		form.action = 'clientes_xls.php';
+		form.action = 'clientes.php?excel=1';
 	else
 		return false;
 

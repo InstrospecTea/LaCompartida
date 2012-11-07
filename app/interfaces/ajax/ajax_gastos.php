@@ -324,6 +324,7 @@ if ($_GET['totalctacorriente']) {
 		$i++;
 
 		$stringarray = array(
+		    
 			date('d-m-Y', strtotime($fila['fecha'])),
 			$fila['glosa_cliente'] ? utf8_encode($fila['glosa_cliente']) : ' - ',
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
@@ -338,7 +339,9 @@ if ($_GET['totalctacorriente']) {
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
 			(( $fila['egreso'] > 0) ? $fila['simbolo'] . ' ' . ($fila['monto_cobrable']) : ' '), $fila['id_contrato']
-				);
+			
+				
+		    );
 
 
 
