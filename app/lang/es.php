@@ -2,7 +2,7 @@
 
 require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
 
- 
+
 
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
@@ -128,6 +128,9 @@ $_LANG['Lista de Usuarios'] = "Lista de Usuarios";
 $_LANG['Para buscar ingresa el nombre del usuario o parte de él.'] = "Para buscar ingresa el nombre del usuario o parte de él.";
 $_LANG['Usuario Responsable'] = "Usuario Responsable";
 $_LANG['Encargado Comercial'] = 'Encargado Comercial';
+$_LANG['Retribución Encargado Comercial'] = 'Retribución Encargado Comercial';
+$_LANG['Retribución Encargado Secundario'] = 'Retribución Encargado Secundario';
+$_LANG['Porcentaje de Retribución'] = 'Porcentaje de Retribución';
 $_LANG['Centro Costo'] = "Centro Costo";
 $_LANG['Usuario editado con éxito.'] = "Usuario editado con éxito.";
 $_LANG['Usuario ingresado con éxito, su nuevo password es'] = "Usuario ingresado con éxito, su nuevo password es";
@@ -591,6 +594,13 @@ $_LANG['Cobrables'] = "Cobrables";
 $_LANG['Profesional vs. Asunto'] = "Profesional vs. Asunto";
 $_LANG['Profesional vs. Cliente'] = "Profesional vs. Cliente";
 $_LANG['Horas por Cliente'] = "Horas por Cliente";
+$_LANG['Retribuciones'] = "Retribuciones";
+$_LANG['Reporte de Retribuciones'] = "Reporte de Retribuciones";
+$_LANG['Horas Cobrables'] = 'Horas Cobrables';
+$_LANG['Montos Cobrables'] = 'Montos Cobrables';
+$_LANG['Calcular según'] = 'Calcular seg&uacute;n';
+
+
 $_LANG['Informe'] = "Informe";
 $_LANG['Reporte Morosidad'] = "Reporte Deuda cliente";
 $_LANG['Dimensión 1'] = "Dimensión 1";

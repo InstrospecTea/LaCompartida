@@ -4603,7 +4603,7 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_categoria%', '<td align="left">%categoria%</td>', $row);
 					else
 						$row = str_replace('%td_categoria%', '', $row);
-					$row = str_replace('%categoria%', $trabajo->fields['categoria'], $row);
+					$row = str_replace('%categoria%', __($trabajo->fields['categoria']), $row);
 
 					if ($this->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 						$row = str_replace('%td_tarifa%', '<td align="center">%tarifa%</td>', $row);
@@ -9593,7 +9593,7 @@ class NotaCobro extends Cobro {
 
 								$resumen_fila = str_replace('%nombre%', $usuarios['usuario'], $resumen_fila);
 								if ($this->fields['opc_ver_profesional_categoria']) {
-									$resumen_fila = str_replace('%categoria%', $usuarios['categoria'], $resumen_fila);
+									$resumen_fila = str_replace('%categoria%', __($usuarios['categoria']), $resumen_fila);
 								} else {
 									$resumen_fila = str_replace('%categoria%', '', $resumen_fila);
 								}
@@ -9824,7 +9824,7 @@ class NotaCobro extends Cobro {
 					}
 
 					if ($this->fields['opc_ver_profesional_categoria'] == 1) {
-						$html3 = str_replace('%categoria%', $data['glosa_categoria'], $html3);
+						$html3 = str_replace('%categoria%', __($data['glosa_categoria']), $html3);
 					} else {
 						$html3 = str_replace('%categoria%', '', $html3);
 					}
