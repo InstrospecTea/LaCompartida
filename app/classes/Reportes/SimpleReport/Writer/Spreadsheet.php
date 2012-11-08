@@ -38,13 +38,14 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		$this->SimpleReport = $simpleReport;
 	}
 
-	public function save($filename = null, $group_values = null, &$current_xls = null, &$current_sheet = null, &$current_row = 0, $indent_level = 0) {
+	public function save($filename = null, $group_values = null, $parent_writer = null, $indent_level = 0) {
 		// 1. Construir base Excel
 		// Enviar headers a la pagina
 		if (empty($filename)) {
 			$filename = $this->SimpleReport->Config->title;
 		}
-		if (!isset($current_xls)){
+		if (!$parent_writer){
+			$this->xls = new Spreadsheet_Excel_Writer();
 			$this->xls->send("$filename.xls");
 			// Crear worksheet
 			$this->sheet = & $this->xls->addWorksheet($this->SimpleReport->Config->title);
@@ -53,15 +54,10 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			//$this->xls->setCustomColor(35, 155, 187, 89); //verde lemontech
 			$this->xls->setCustomColor(35, 220, 255, 220); //encabezados
 			$this->xls->setCustomColor(36, 255, 255, 220); //?
-		} else {
-			$this->xls = & $current_xls;
-			$this->sheet = & $current_sheet;
-		}
 
-
-		foreach (SimpleReport_Writer_Spreadsheet_Format::$formats as $name => $format) {
-			$this->formats[$name] = & $this->xls->addFormat($format);
-		}
+			foreach (SimpleReport_Writer_Spreadsheet_Format::$formats as $name => $format) {
+				$this->formats[$name] = & $this->xls->addFormat($format);
+			}
 		} else {
 			$this->xls = & $parent_writer->xls;
 			$this->sheet = & $parent_writer->sheet;
@@ -89,17 +85,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 		}
 		ksort($groups);
 
-		if ($current_row > 0) {
-			$this->current_row = & $current_row;
-		} else  {
-			$this->current_row = 0;
-		}
-
 		// 4. Escribir en excel
 		$this->groups($result, $columns, $groups, $totals, 'Total', $indent_level ? $indent_level + 1 : 0);
 
 		// 5. Descargar
-		if (!isset($current_xls)){
+		if (!$parent_writer){
 			$this->xls->close();
 			exit;
 		}
@@ -117,7 +107,6 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$this->header($columns, $col0);
 			}
 			$col_i = key($groups) - 1;
-			$col_i = $col_i + ($this->indent_level);
 			$column = array_shift($groups);
 
 			$grouped_rows = array();
@@ -259,6 +248,8 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				}
 				$this->current_row++;
 			}
+
+		}
 
 		// 4.3 Totales
 		$last_row = $this->current_row - 1;
