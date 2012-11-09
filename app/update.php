@@ -9531,7 +9531,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 			
-			case 7.19:
+		case 7.19:
 			$queries = array();
 			if(!ExisteCampo('codigo_cliente', 'grupo_cliente', $dbh)) {
 				$queries[]="alter table grupo_cliente add codigo_cliente varchar(20);";

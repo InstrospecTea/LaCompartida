@@ -988,6 +988,7 @@ class Cobro extends Objeto {
 				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 				$duracion_minutos = $h * 60 + $m;
+				$id_usuario = $trabajo->fields['id_usuario'];
 
 				//se inicializa el valor del retainer del trabajo
 				$retainer_trabajo_minutos = 0;
@@ -997,23 +998,23 @@ class Cobro extends Objeto {
 				// por trabajo, si no saca lo del contrato actual
 				if (UtilesApp::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
 					// Según Tarifa del contrato
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
+					$profesional[$id_usuario]['tarifa'] = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
 					// Según Tarifa estándar del sistema
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+					$profesional[$id_usuario]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
 					// Según tarifa estándar de sistema y si no existe tarifa en moneda indicada buscar mejor tarifa en otra moneda
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
-				} else if ($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '') {
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
+					$profesional[$id_usuario]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+				} else if ($profesional[$id_usuario]['tarifa'] == '') {
+					$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
 
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+					$profesional[$id_usuario]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
 
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+					$profesional[$id_usuario]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
 				}
 
 				// Se calcula el valor del trabajo, según el tiempo trabajado y la tarifa
 				if ($trabajo->fields['cobrable'] == '1') {
-					$valor_trabajo = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa'];
-					$valor_trabajo_estandar = $duracion * $profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'];
+					$valor_trabajo = $duracion * $profesional[$id_usuario]['tarifa'];
+					$valor_trabajo_estandar = $duracion * $profesional[$id_usuario]['tarifa_hh_estandar'];
 				} else {
 					$valor_trabajo = 0;
 					$valor_trabajo_estandar = 0;
@@ -1046,7 +1047,7 @@ class Cobro extends Objeto {
 									$cobro_total_honorarios_hh_incluidos_retainer += $valor_trabajo;
 								}
 							} else {
-								$valor_a_cobrar = min($valor_trabajo, ($cobro_total_horas - $this->fields['retainer_horas']) * $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+								$valor_a_cobrar = min($valor_trabajo, ($cobro_total_horas - $this->fields['retainer_horas']) * $profesional[$id_usuario]['tarifa']);
 								//se agrega el valor del retainer en el trabajo para luego ser mostrado
 								if ($trabajo->fields['cobrable'] == '1') {
 									if ($cobro_total_minutos - ($this->fields['retainer_horas'] * 60) < $duracion_minutos) {
@@ -1080,11 +1081,11 @@ class Cobro extends Objeto {
 				$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
 				$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 				$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-				$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
+				$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
+				$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa']);
 				$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
-				$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
-				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'], $decimales, '.', ''));
+				$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
+				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
 
 				if (!$trabajo->Write(false))
 					return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
@@ -1099,12 +1100,12 @@ class Cobro extends Objeto {
 				$duracion_minutos = $h * 60 + $m + $s / 60;
 
 				// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
-				if ($profesional[$trabajo->fields['nombre_usuario']]['tarifa'] == '') {
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
+				if ($profesional[$id_usuario]['tarifa'] == '') {
+					$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
 
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+					$profesional[$id_usuario]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
 
-					$profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+					$profesional[$id_usuario]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
 				}
 				if ($trabajo->fields['cobrable'] == '0') {
 					$valor_a_cobrar = 0;
@@ -1115,7 +1116,7 @@ class Cobro extends Objeto {
 				} else {
 					// Valor a cobrar proporcional a la fracción de horas del total asignadas a este trabajo.
 					$retainer_trabajo_minutos = $this->fields['retainer_horas'] * 60 * $duracion_minutos / $cobro_total_minutos;
-					$valor_a_cobrar = $profesional[$trabajo->fields['nombre_usuario']]['tarifa'] * ($cobro_total_horas - $this->fields['retainer_horas']) * $duracion_minutos / $cobro_total_minutos;
+					$valor_a_cobrar = $profesional[$id_usuario]['tarifa'] * ($cobro_total_horas - $this->fields['retainer_horas']) * $duracion_minutos / $cobro_total_minutos;
 				}
 
 				// Se suma el monto a cobrar
@@ -1136,9 +1137,9 @@ class Cobro extends Objeto {
 				$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:$segundor_retainer");
 				$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 				$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-				$trabajo->Edit('tarifa_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa']);
-				$trabajo->Edit('costo_hh', $profesional[$trabajo->fields['nombre_usuario']]['tarifa_defecto']);
-				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$trabajo->fields['nombre_usuario']]['tarifa_hh_estandar'], $decimales, '.', ''));
+				$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
+				$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
+				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
 				if (!$trabajo->Write(false))
 					return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
 			}
