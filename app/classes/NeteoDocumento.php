@@ -1,4 +1,4 @@
-<?php
+<?php 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -146,12 +146,16 @@ class NeteoDocumento extends Objeto
 		$this->Edit('valor_pago_honorarios', $pago_honorarios);
 		$this->Edit('valor_pago_gastos', $pago_gastos);
 
-#echo "Pago_honorarios:".$pago_honorarios."<br>";
-#echo "cambioPago:".$cambio_pago."<br>";
-#echo "cambioCobro:".$cambio_cobro."<br>";
-
-		$cobro_gastos =		$pago_gastos		* $cambio_pago / $cambio_cobro;
-		$cobro_honorarios =	$pago_honorarios	* $cambio_pago / $cambio_cobro;
+/*echo "Pago_honorarios:".$pago_honorarios."<br>";
+echo "cambioPago:".$cambio_pago."<br>";
+echo "cambioCobro:".$cambio_cobro."<br>";*/
+if((floatval($cambio_pago) == floatval($cambio_cobro)) || floatval($cambio_cobro)==0) {
+	$tasa=1;
+} else {
+	$tasa=floatval($cambio_pago) / floatval($cambio_cobro);
+}
+		$cobro_gastos =		$pago_gastos		* $tasa;
+		$cobro_honorarios =	$pago_honorarios	* $tasa;
 
 		$cobro_gastos = number_format($cobro_gastos, $decimales_cobro,'.','');
 		$cobro_honorarios = number_format($cobro_honorarios, $decimales_cobro,'.','');
@@ -194,7 +198,7 @@ class NeteoDocumento extends Objeto
 				$documento_pago->Load($this->fields['id_documento_pago']);
 				$saldo_pago = $documento_pago->fields['saldo_pago'];
 				$saldo_pago += $valor_pago_original;
-				$documento_pago->Edit('saldo_pago',number_format($saldo_pago,$decimales_pago,'.',''));
+			//	$documento_pago->Edit('saldo_pago',number_format($saldo_pago,$decimales_pago,'.',''));
 
 				$documento_cobro->Write();
 				$documento_pago->Write();
@@ -251,6 +255,8 @@ class NeteoDocumento extends Objeto
 				}
 				
 				if(UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura') && !empty($documento_pago->fields['es_adelanto'])){
+					//echo '<pre>';					print_r($this->fields);					echo '<pre>';
+					
 					$factura_pago = new FacturaPago($this->sesion);
 					$factura_pago->LoadByNeteoAdelanto($this->fields[$this->campo_id]);
 					
