@@ -190,7 +190,6 @@ $pagina->PrintTop($popup);
 		  });
 	 }
 
-
 	function Validar(form)
 	{
 		var tipopago=jQuery('#tipodocumento').val();
@@ -335,9 +334,9 @@ if (!empty($adelanto)) {
 		});
 
 		jQuery('.saldojq').live('keyup',function() {
-      var total=parseFloat(0);
-			var tipopago=jQuery('#tipodocumento').val();
-			var anterior=0;
+      var total = parseFloat(0);
+			var tipopago = jQuery('#tipodocumento').val();
+			var anterior = 0;
 			jQuery(this).val(jQuery(this).val().replace(',','.'));
 			jQuery("input[id^='pago_gastos_anterior']").each(function() {
 				anterior+=Math.max(0,Number(jQuery(this).val()));
