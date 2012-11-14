@@ -242,10 +242,9 @@
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
 								
 		$x_pag = 20;
-		$orden = 'cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
+		$orden = ' cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
 	 
-		PhpConsole::start();
-		debug($query);
+		
                 $b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 		$b->mensaje_error_fecha = "N/A";
 		$b->nombre = "busc_gastos";
