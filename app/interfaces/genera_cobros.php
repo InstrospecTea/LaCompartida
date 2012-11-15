@@ -116,7 +116,7 @@ if ($opc == 'asuntos_liquidar') {
 						FROM contrato
 						JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 						LEFT JOIN asunto ON asunto.id_contrato=contrato.id_contrato
-						JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente
+						JOIN cliente ON cliente.codigo_cliente=contrato.codigo_cliente AND cliente.activo = 1
 						JOIN prm_moneda as moneda ON (moneda.id_moneda=contrato.id_moneda)
 						LEFT JOIN prm_moneda as moneda_monto ON moneda_monto.id_moneda=contrato.id_moneda_monto
 						WHERE $where
