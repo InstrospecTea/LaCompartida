@@ -20,8 +20,8 @@ $encolados=0;
 $enviados=0;
 
 
-	$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0 limit 0,60";
-	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0";
+$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	while(list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo )=mysql_fetch_array($resp))
 	{
