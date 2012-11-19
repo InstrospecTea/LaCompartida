@@ -3,6 +3,10 @@
  
 require_once '/var/www/html/addbd.php';
 
+if (extension_loaded('newrelic')) {
+		newrelic_set_appname (SUBDOMAIN);
+
+	   }
 if (defined('BACKUP') && (BACKUP == 3 || BACKUP == '3')) {
 	include('offline.php');
 	die();
@@ -12,13 +16,17 @@ header("Instance-ID:" . $instanceid);
 if (defined('FILEPATH')) {
 	header("X-vhost:" . FILEPATH);
 	setcookie('vhost', FILEPATH);
+	
 	if (isset($_SERVER['REDIRECT_URL'])) {
- 		$_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_URL'];
+		$_SERVER['SCRIPT_NAME'] = $_SERVER['REDIRECT_URL'];
+		$_SERVER['PHP_SELF'] = $_SERVER['REDIRECT_URL'];
 	}
-	 
+	if (isset($_SESSION['VHOST'])) {
+		
+	} else {
 		$_SESION['VHOST'] = FILEPATH;
 		
-	 
+	}
 }
 
 
