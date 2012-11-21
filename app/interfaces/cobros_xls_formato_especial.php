@@ -229,9 +229,9 @@
 
 	// Escribir encabezado
 	// Agregar la imagen del logo
-	$altura_logo = UtilesApp::AlturaLogoExcel($sesion);
+	$altura_logo = UtilesApp::AlturaLogoExcel();
 	if ($altura_logo) {
-		$ws->setRow(0, $altura_logo);
+		$ws->setRow($filas, $altura_logo);
 		$ws->insertBitmap($filas, $col_asunto, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1);
 	}
 	$filas += 3;

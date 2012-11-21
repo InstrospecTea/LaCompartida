@@ -1775,7 +1775,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
                                     </tr>
                                     <tr>        
                                         <td align="right"><input type="checkbox" name="opc_ver_columna_cobrable" id="opc_ver_columna_cobrable" value="1" <?php echo $cobro->fields['opc_ver_columna_cobrable'] == '1' ? 'checked' : '' ?>></td>
-                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_numpag"><?php echo __('Mostrar columna cobrable') ?></label></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_ver_columna_cobrable"><?php echo __('Mostrar columna cobrable') ?></label></td>
                                     </tr>
 									<?php
 									if (UtilesApp::GetConf($sesion, 'OrdenadoPor')) {

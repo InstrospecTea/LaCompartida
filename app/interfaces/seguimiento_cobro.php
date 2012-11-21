@@ -355,7 +355,7 @@
 					" + $txt_iva ($honorarios)";
 			}
 
-			$texto_honorarios = "$honorarios por <a href='horas.php?from=reporte&id_cobro={$cobro->fields['id_cobro']}'>" .
+			$texto_honorarios = "$honorarios por <a href=\"horas.php?from=reporte&id_cobro={$cobro->fields['id_cobro']}\">" .
 				number_format($total_horas, 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.</a> ';
 
 			$gastos = $cobro->fields['simbolo_moneda_total'] . ' ' . number_format($cobro->fields['monto_gastos'], $cobro->fields['cifras_decimales_moneda_total'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);

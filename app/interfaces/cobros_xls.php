@@ -677,7 +677,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->setColumn($col_cobrable, $col_cobrable, Utiles::GlosaMult($sesion, 'cobrable', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 	}
 	// Agregar la imagen del logo
-	$altura_logo = UtilesApp::AlturaLogoExcel($sesion);
+	$altura_logo = UtilesApp::AlturaLogoExcel();
 	if ($altura_logo) {
 		$ws->setRow(0, .8 * $altura_logo);
 		$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, .8, .8);
