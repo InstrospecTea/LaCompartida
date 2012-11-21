@@ -20,6 +20,7 @@ $sesion = new Sesion(array('ADM'));
 ,sum(if(up.codigo_permiso='SEC',1,0)) as SEC
 ,sum(if(up.codigo_permiso='SOC',1,0)) as SOC
 ,sum(if(up.codigo_permiso='TAR',1,0)) as TAR
+,sum(if(up.codigo_permiso='RET',1,0)) as RET
 ,sum(if(up.codigo_permiso='ALL',1,0)) as PALL
 from usuario usr
 left join  usuario_permiso up on up.id_usuario=usr.id_usuario 

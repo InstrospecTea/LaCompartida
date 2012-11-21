@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -79,13 +79,13 @@ class Tramite extends Objeto
         return false;
     }
 }
-
-class ListaTramites extends Lista
-{
-	function ListaTramites($sesion, $params, $query)
+if(!class_exists('ListaTramites')) {
+	class ListaTramites extends Lista
 	{
-		$this->Lista($sesion, 'Tramite', $params, $query);
+		function ListaTramites($sesion, $params, $query)
+		{
+			$this->Lista($sesion, 'Tramite', $params, $query);
+		}
 	}
 }
-
-?>
+ 

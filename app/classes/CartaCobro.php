@@ -1010,7 +1010,7 @@ class CartaCobro extends NotaCobro {
 
 				$html2 = str_replace(array('%xnombre_cliente%', '%glosa_cliente%'), $contrato->fields['factura_razon_social'], $html2); #glosa cliente de factura
 
-				$html2 = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html2);
+				$html2 = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html2);
 				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 				$html2 = str_replace('%FECHA%', $this->GenerarDocumentoCartaComun($parser_carta, 'FECHA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
 				$html2 = str_replace('%ENVIO_DIRECCION%', $this->GenerarDocumentoCartaComun($parser_carta, 'ENVIO_DIRECCION', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);

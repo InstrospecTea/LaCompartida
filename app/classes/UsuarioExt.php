@@ -672,6 +672,9 @@ class UsuarioExt extends Usuario {
 		);
 	}
 
+	public function TienePermiso($permiso){
+		return $this->permisos->Find('FindPermiso', array('codigo_permiso' => $permiso))->fields['permitido'];
+	}
 }
 
 ?>

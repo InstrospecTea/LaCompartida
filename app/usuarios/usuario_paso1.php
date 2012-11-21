@@ -180,6 +180,7 @@ td.sorting_1 {background:transparent !important;}
 				{ "mDataProp": "SEC" },
 				{ "mDataProp": "SOC" },
 				{ "mDataProp": "TAR" },
+				{ "mDataProp": "RET" },
 				{ "mDataProp": "ACT" } 
 	 
 		],   
@@ -197,14 +198,14 @@ td.sorting_1 {background:transparent !important;}
 				 botones+= "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
 				}
 			   		return botones+" rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut="+o.aData['rut']+"' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
-	},   "sClass": "dttactivo", "bUseRendered": false, "aTargets": [ 15 ]   }  ,
+	},   "sClass": "dttactivo", "bUseRendered": false, "aTargets": [ 16 ]   }  ,
 	{  "fnRender": function ( o, val ) {
 			   	if(val==1) {
 					return "<div class='permiso on' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'><input class='permiso' type='image' src='https://static.thetimebilling.com/images/check_nuevo.gif' alt='OK' rel='"+o.aData['id_usuario']+';'+o.mDataProp+"'/></div>";
 				} else {
     				return "<div class='permiso off' id='"+o.aData['id_usuario']+';'+o.mDataProp+"'><input class='permiso'  type='image' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif' rel='"+o.aData['id_usuario']+';'+o.mDataProp+"' alt='NO' /></div>";
 				}
-	}, "bUseRendered": false, "sClass": "dttpermisos",  "aTargets": [3,4,5,6,7,8,9,10,11,12,13,14   ]   }  ,
+	}, "bUseRendered": false, "sClass": "dttpermisos",  "aTargets": [3,4,5,6,7,8,9,10,11,12,13,14,15   ]   }  ,
 	 { "bVisible": false, "aTargets": [ 0,1 ] }
 	
     
@@ -224,13 +225,13 @@ td.sorting_1 {background:transparent !important;}
 		  jQuery('#contienefiltro').append(jQuery('#tablapermiso_filter'));
 		 /*jQuery('#tablapermiso_filter').append(' S&oacute;lo activos');*/
 		 
-		 oTable.fnFilter( '1',15 );
+		 oTable.fnFilter( '1',16 );
 	 	
 		 jQuery('#activo').click(function() {
 			if(jQuery(this).is(':checked')) {
-				 oTable.fnFilter( '1',15,0,1 );
+				 oTable.fnFilter( '1',16,0,1 );
 			} else {
-				 oTable.fnFilter('',15,0,1  );
+				 oTable.fnFilter('',16,0,1  );
 			}
 		 });
 jQuery('.permiso').live('click',function() {
@@ -734,6 +735,7 @@ function Listar( form, from )
 				<th>Secretaría</th>
 				<th>Socio</th>
 				<th>Tarifa</th>
+				<th>Retribuciones</th>
 				<th width="25">Activo</th>
 			 
 		</tr></thead>

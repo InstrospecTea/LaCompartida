@@ -494,8 +494,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0, 1);
 
 				// Agregar la imagen del logo
-	if (UtilesApp::GetConf($sesion, 'LogoExcel')) {
-					$ws->setRow(0, .8*UtilesApp::AlturaLogoExcel());
+				$altura_logo = UtilesApp::AlturaLogoExcel($sesion);
+				if ($altura_logo) {
+					$ws->setRow(0, 0.8 * $altura_logo);
 					$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, .8, .8);
 				}
 

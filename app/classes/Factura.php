@@ -9,12 +9,13 @@ require_once 'Cobro.php';
 require_once 'Cliente.php';
 require_once 'Asunto.php';
 require_once 'CobroMoneda.php';
+require_once 'Moneda.php';
 require_once 'MontoEnPalabra.php';
 require_once 'UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/NotaCobro.php';
- 
+require_once 'NotaCobro.php';
 
 class Factura extends Objeto {
+	var $max_numero = 1000000000;
 
 	public static $configuracion_reporte = array (
 		array (
@@ -232,15 +233,15 @@ class Factura extends Objeto {
 
 	function ObtenerValorReal($id_factura) {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
-					FROM cta_cte_fact_mvto ccfm 
+					FROM cta_cte_fact_mvto ccfm
 						JOIN factura f USING ( id_factura )
-                                                JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado 
+                                                JOIN prm_estado_factura pef ON f.id_estado = pef.id_estado
 						JOIN factura fp ON ( fp.id_factura = IF( ( f.id_factura_padre IS NULL OR f.id_factura_padre = 0)	, f.id_factura, f.id_factura_padre ) )
-						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto 
+						JOIN cta_cte_fact_mvto_moneda ccfmm ON ( ccfm.id_cta_cte_mvto = ccfmm.id_cta_cte_fact_mvto
 							AND ccfm.id_moneda = ccfmm.id_moneda )
-						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto 
+						JOIN cta_cte_fact_mvto_moneda ccfmmbase ON ( ccfm.id_cta_cte_mvto = ccfmmbase.id_cta_cte_fact_mvto
 							AND ccfmmbase.id_moneda = fp.id_moneda )
-					WHERE f.id_factura =  '$id_factura' 
+					WHERE f.id_factura =  '$id_factura'
 						OR ( f.id_factura_padre = '$id_factura' AND pef.glosa NOT LIKE '%ANULADO%' );"; //11357
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $valor_real ) = mysql_fetch_array($resp);
@@ -252,9 +253,9 @@ class Factura extends Objeto {
 	}
 
 	function ObtenerIdsDocumentos($id_factura) {
-		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', f.numero) as bloque 
-					FROM cta_cte_fact_mvto ccfm 
-						JOIN factura f USING ( id_factura ) 
+		$query = "SELECT CONCAT(ccfm.tipo_mvto, '::', f.numero) as bloque
+					FROM cta_cte_fact_mvto ccfm
+						JOIN factura f USING ( id_factura )
 					WHERE f.id_factura_padre =  '$id_factura';";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$ids_array = array();
@@ -268,6 +269,50 @@ class Factura extends Objeto {
 		}
 		return false;
 	}
+
+	function SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda = null, $tipos_cambio = null) {
+		$monedas = ArregloMonedas($this->sesion);
+		if (empty($tipos_cambio)) {
+			$tipos_cambio = array();
+			foreach ($monedas as $id => $moneda) { //uf:20000, us:500, idmoneda:us. adelanto de 100 uf -> us4000
+				$tipos_cambio[$id] = $moneda['tipo_cambio'];
+			}
+		}
+		$cambios = array();
+		foreach ($tipos_cambio as $id => $cambio) {
+			$cambios[$id] = $id_moneda ? $cambio / $tipos_cambio[$id_moneda] : $cambio;
+		}
+		$where_contrato = '';
+		if ($id_contrato) {
+			$where_contrato = " AND (id_contrato = '$id_contrato' OR id_contrato IS NULL) ";
+		}
+		$query = "SELECT saldo_pago, documento.id_moneda, prm_moneda.tipo_cambio
+			FROM documento
+			JOIN prm_moneda ON documento.id_moneda = prm_moneda.id_moneda
+			WHERE es_adelanto = 1 AND codigo_cliente = '$codigo_cliente'
+			$where_contrato AND saldo_pago < 0";
+		if (empty($pago_honorarios)) {
+			$query.= ' AND pago_gastos = 1';
+		} else if (empty($pago_gastos)) {
+			$query.= ' AND pago_honorarios = 1';
+		}
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$saldo = 0;
+		while (list($saldo_pago, $moneda_pago, $tipo_cambio) = mysql_fetch_array($resp)) {
+			if ($id_moneda) {
+				$tipo_cambio = $cambios[$moneda_pago];
+			}
+			$saldo += -$saldo_pago * $tipo_cambio;
+		}
+		if (!$saldo) {
+			return '';
+		}
+		if ($id_moneda) {
+			return $monedas[$id_moneda]['simbolo'] . ' ' . number_format($saldo, 2);
+		}
+		return $saldo;
+	}
+
 
 	function Escribir() {
 		if (!$this->Id()) {
@@ -529,12 +574,14 @@ class Factura extends Objeto {
 					$html2 = str_replace('%Senores%', 'SEÑORES', $html2);
 					$html2 = str_replace('%tipo_doc_legal%', $glosa_tipo_doc_mayus, $html2);
 					$html2 = str_replace('%numero_doc_legal%', $numero_factura, $html2);
+					$html2 = str_replace('%numero_factura_cyc%', __('FACTURA DE VENTA NO.').' '. $numero_factura, $html2);
 				} else {
 					$titulos_es = array('Sr.', 'Sra.', 'Srta.');
 					$titulos_en = array('Mr.', 'Mrs.', 'Ms.');
 					$titulo_contacto = str_replace($titulos_es, $titulos_en, $titulo_contacto);
 					$html2 = str_replace('%numero_factura%', __($glosa_tipo_doc) . ' No. ' . $numero_factura, $html2);
 					$html2 = str_replace('%Senores%', 'Messrs', $html2);
+					$html2 = str_replace('%numero_factura_cyc%', __('INVOICE').' '. $numero_factura, $html2);
 				}
 				$html2 = str_replace('%subtitulo%', '', $html2);
 
@@ -646,7 +693,7 @@ class Factura extends Objeto {
 
 				// FFF 2012-09-15 normaliza saltos de linea en la descripcion. Y sí, ya probé con preg_replace y tiene comportamiento impredecible.
 				$factura_descripcion=str_replace(array('\r\n','\n\r',"\r\n","\n\r",'\n','\r'), "\n", $factura_descripcion);
-				
+
 				$moneda_factura = new Moneda($this->sesion);
 				$moneda_factura->Load($factura_id_moneda);
 				$query = "SELECT glosa_asunto , codigo_asunto
@@ -670,17 +717,17 @@ class Factura extends Objeto {
 
 				if (UtilesApp::GetConf($this->sesion, 'CalculacionCyC')) {
 					/* esto habría que mejorarlo en el caso de que se les ocurriera facturar en más de 1 documento */
-					$query_cyc = "SELECT 
+					$query_cyc = "SELECT
 									subtotal_honorarios,
 									subtotal_sin_descuento,
 									descuento_honorarios,
-									honorarios, 
+									honorarios,
 									impuesto,
 									subtotal_gastos,
 									subtotal_gastos_sin_impuesto,
 									subtotal_sin_descuento
 
-								FROM documento 
+								FROM documento
 								WHERE id_cobro = '{$this->fields["id_cobro"]}'
 									AND tipo_doc='N'
 								;";
@@ -746,10 +793,11 @@ class Factura extends Objeto {
 				if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
 
 					// Lo separo en lineas
-					$factura_descripcion_separado = explode("\n", __($factura_descripcion));
-					$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
-					$honorarios_descripcion = $factura_descripcion_separado;
-					
+					//$factura_descripcion_separado = explode("\n", __($factura_descripcion));
+					//$factura_descripcion_separado = implode("<br />\n", $factura_descripcion_separado);
+					//$honorarios_descripcion = $factura_descripcion_separado;
+					$honorarios_descripcion = nl2br(__($factura_descripcion));
+
 					if ($mostrar_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
 					}
@@ -759,7 +807,7 @@ class Factura extends Objeto {
 				} else {
 					$factura_descripcion_separado = __($factura_descripcion);
 					$honorarios_descripcion = $factura_descripcion_separado;
-					
+
 					if ($subtotal_gastos_con_impuesto) {
 						$factura_descripcion_separado .="<br/><br/>" . __($descripcion_subtotal_gastos);
 					}
@@ -1024,18 +1072,18 @@ class Factura extends Objeto {
 
 				/*
 				 * Montos Especiales de Vouga y Olmedo (o Paraguay en general )
-				 * 
+				 *
 				 * anchors:
-				 * 
+				 *
 				 * %simbolo_honorarios_sin_impuesto% simbolo de moneda de honorarios sin impuesto
 				 * %monto_honorarios_sin_impuesto% valor de honorarios cuando por contrato no llevan impuesto
 				 * %simbolo_honorarios_con_impuesto% simbolo de moneda de honorarios
 				 * %monto_honorarios_con_impuesto% valor de honorarios cuando si incluyen impuesto es excluyente con %monto_honorarios_sin_impuesto%
-				 * 
-				 * %simbolo_subtotal_gastos_con_impuesto% 
+				 *
+				 * %simbolo_subtotal_gastos_con_impuesto%
 				 * %subtotal_gastos_con_impuesto%
 				 * descripcion_subtotal_gastos_sin_impuesto%
-				 * %simbolo_subtotal_gastos_sin_impuesto% 
+				 * %simbolo_subtotal_gastos_sin_impuesto%
 				 * %subtotal_gastos_sin_impuesto%
 				 * %total_exentos% sumatoria de los valores que no llevan impuesto
 				 * %total_diez% sumatoria de los valores que en paraguay llevan 10% de impuesto
@@ -1074,10 +1122,10 @@ class Factura extends Objeto {
 					$subtotal_exentos = number_format($honorarios_sin_impuesto + $gastos_sin_impuesto, $moneda_factura->fields['cifras_decimales'], '.', '');
 
 					$subtotal_completo = $honorarios_con_impuesto + $gastos_con_impuesto + $honorarios_sin_impuesto + $gastos_sin_impuesto;
-					$query_glosa_banco = " SELECT cb.glosa 
-												FROM cuenta_banco cb 
-													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta ) 
-													JOIN cobro cob ON ( c.id_contrato = cob.id_contrato ) 
+					$query_glosa_banco = " SELECT cb.glosa
+												FROM cuenta_banco cb
+													JOIN contrato c ON ( cb.id_cuenta = c.id_cuenta )
+													JOIN cobro cob ON ( c.id_contrato = cob.id_contrato )
 												WHERE cob.id_cobro = '{$cobro->fields[id_cobro]}' LIMIT 1";
 					//echo $query_glosa_banco; exit;
 					$resu_glosa = mysql_query($query_glosa_banco, $this->sesion->dbh) or Utiles::errorSQL($query_glosa_banco, __FILE__, __LINE__, $this->sesion->dbh);
@@ -1096,7 +1144,7 @@ class Factura extends Objeto {
 
 					/*
 					 * se reemplazan por '', por que si se pone &nbsp; se corre todo para abajo y dejaria un espacio,
-					 *  al no tener nada html esconde la fila 
+					 *  al no tener nada html esconde la fila
 					 */
 					$html2 = str_replace('%simbolo_honorarios_sin_impuesto%', '', $html2);
 					$html2 = str_replace('%simbolo_honorarios_con_impuesto%', '', $html2);
@@ -1148,8 +1196,8 @@ class Factura extends Objeto {
 					}
 
 					if (UtilesApp::GetConf($this->sesion, "CantidadLineasDescripcionFacturas") > 1) {
-						$descripcion_subtotal_gastos_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos));
-						$descripcion_subtotal_gastos_sin_impuesto_separado = str_replace("\n", "<br/>", __($descripcion_subtotal_gastos_sin_impuesto));
+						$descripcion_subtotal_gastos_separado = nl2br( __($descripcion_subtotal_gastos));
+						$descripcion_subtotal_gastos_sin_impuesto_separado = nl2br( __($descripcion_subtotal_gastos_sin_impuesto));
 					} else {
 						$descripcion_subtotal_gastos_separado = __($descripcion_subtotal_gastos);
 						$descripcion_subtotal_gastos_sin_impuesto_separado = __($descripcion_subtotal_gastos_sin_impuesto);
@@ -1282,9 +1330,11 @@ class Factura extends Objeto {
 	function ObtenerNumero($id_factura = null, $serie = null, $numero = null, $mostrar_comprobante = false) {
 		if ($this->Loaded()) {
 			if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie')) {
+
 				$serie = empty($this->fields['serie_documento_legal']) ? '001' : $this->fields['serie_documento_legal'];
 				$n = str_pad($serie, 3, '0', STR_PAD_LEFT) . "-" . $this->fields['numero'];
 			} else {
+
 				$n = $this->fields['numero'];
 			}
 
@@ -1339,7 +1389,7 @@ class Factura extends Objeto {
 
 	function ObtieneNumeroDocumentoLegal($tipo_documento_legal) {
 		return $this->ObtenerNumeroDocLegal($tipo_documento_legal);
-		
+
 		/*EL RESTO ESTA DEPRECATED*/
 		/*$min_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionDesde');
 		$max_numero_factura = UtilesApp::GetConf($this->sesion, 'NumeracionHasta');
@@ -1352,8 +1402,8 @@ class Factura extends Objeto {
 			$where_max .= " AND f.id_documento_legal = " . $tipo_documento_legal;
 		}
 
-		$query = "SELECT IF(MAX(f.numero)>pdl.numero_inicial,MAX(f.numero),pdl.numero_inicial) as numero_actual 
-					FROM factura f 
+		$query = "SELECT IF(MAX(f.numero)>pdl.numero_inicial,MAX(f.numero),pdl.numero_inicial) as numero_actual
+					FROM factura f
 					LEFT JOIN prm_documento_legal pdl on pdl.id_documento_legal = f.id_documento_legal
 					WHERE $where_max";
 
@@ -1368,7 +1418,7 @@ class Factura extends Objeto {
 	}
 
 	function ObtenerNumeroDocLegal($tipo_documento_legal, $serie = null) {
-		
+
 		if (empty($tipo_documento_legal)) {
 			return false;
 		}
@@ -1448,11 +1498,9 @@ class Factura extends Objeto {
 		if (empty($tipo_documento_legal)) {
 			return false;
 		}
-		if (UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') and !empty($serie)) {
-			$query = "SELECT MAX(numero+0) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . (int) $serie . "'";
-		} else {
-			$query = "SELECT MAX(numero+0) as numero_actual FROM factura WHERE id_documento_legal = '" . $tipo_documento_legal . "' AND serie_documento_legal = '" . Conf::GetConf($this->sesion, 'SerieDocumentosLegales') . "'";
-		}
+		$serie = UtilesApp::GetConf($this->sesion, 'NumeroFacturaConSerie') && !empty($serie) ? (int)$serie : Conf::GetConf($this->sesion, 'SerieDocumentosLegales');
+		$query = "SELECT MAX(numero+0) as numero_actual FROM factura
+			WHERE id_documento_legal = '$tipo_documento_legal' AND (numero+0) < {$this->max_numero} AND serie_documento_legal = '$serie'";
 		$numero_resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($numero_max) = mysql_fetch_array($numero_resp);
 		return $numero_max;
@@ -1468,7 +1516,8 @@ class Factura extends Objeto {
 	}
 
 	function GuardarNumeroDocLegal($tipo_documento_legal, $numero, $serie = null) {
-		if (empty($tipo_documento_legal) or empty($numero)) {
+		//si el "numero" no es un int32 lo ignoro para efectos del numero siguiente
+		if (empty($tipo_documento_legal) || empty($numero) || !is_numeric($numero) || $numero >= $this->max_numero) {
 			return false;
 		}
 
@@ -1605,7 +1654,7 @@ class Factura extends Objeto {
 					prm_documento_legal.codigo as tipo
 					, numero
 					, factura.serie_documento_legal
-					, factura.codigo_cliente 
+					, factura.codigo_cliente
 					, cliente.glosa_cliente
 					, contrato.id_contrato as idcontrato
 					, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente ),
@@ -1618,7 +1667,7 @@ class Factura extends Objeto {
 											)
 									)
 							) as factura_rsocial
-					, fecha 
+					, fecha
 					, usuario.username AS encargado_comercial
 					, descripcion
 					, prm_estado_factura.codigo as estado
@@ -1638,7 +1687,8 @@ class Factura extends Objeto {
 					, '' as monto_pagos_moneda_base
 					, '' as saldo_moneda_base
 					, factura.id_factura
-					, if(factura.RUT_cliente != contrato.rut,factura.cliente, 'no' ) as mostrar_diferencia_razon_social
+					, if(factura.RUT_cliente != contrato.rut,factura.cliente, 'no' ) as mostrar_diferencia_razon_social,
+					factura.RUT_cliente
 				FROM factura
 				JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 				JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -1648,17 +1698,17 @@ class Factura extends Objeto {
 				LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 				LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 				LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable";
-		
+
 		$wheres = array();
 
 //		if (!empty($this->fields['numero'])) {
 //			$wheres[] = "sa.id_solicitud_adelanto = '{$this->fields['id_solicitud_adelanto']}'";
 //		}
-//		
+//
 //		if (!empty($this->fields['codigo_cliente'])) {
 //			$wheres[] = "sa.codigo_cliente = '{$this->fields['codigo_cliente']}'";
 //		}
-//		
+//
 //		if (!empty($this->fields['estado'])) {
 //			$wheres[] = "sa.estado = '{$this->fields['estado']}'";
 //		}
@@ -1672,29 +1722,43 @@ class Factura extends Objeto {
 
 		$query .= " WHERE " . implode(' AND ', $wheres);
 		$query .= " GROUP BY sa.id_solicitud_adelanto";
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Descarga el reporte excel básico según configuraciones
 	 */
-	public function DownloadExcel($results) {
+	public function DownloadExcel($results,$tipo='Spreadsheet') {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-		
+
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->LoadConfiguration('FACTURAS');
-		
+
 		$SimpleReport->LoadResults($results);
-		
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
+
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, $tipo);
 		$writer->save(__('Facturas'));
 	}
-	
+	/**
+	 * Descarga el reporte excel básico según configuraciones
+	 */
+	public function DownloadRegistroVentas($results) {
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->LoadConfiguration('REGISTRO_VENTAS');
+
+		$SimpleReport->LoadResults($results);
+
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer->save(__('Reg_Venta'));
+	}
+
 	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
-		
+
 		if ($orden == "") {
 			$orden = "fecha DESC";
 		}
@@ -1772,7 +1836,7 @@ class Factura extends Objeto {
 				prm_documento_legal.codigo as tipo
 			   , numero
 			   , factura.serie_documento_legal
-			   , factura.codigo_cliente 
+			   , factura.codigo_cliente
 			   , cliente.glosa_cliente, contrato.id_contrato as idcontrato
 			   , IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
 						OR contrato.factura_razon_social IN ('',' ')
@@ -1805,6 +1869,7 @@ class Factura extends Objeto {
 			   , if(factura.RUT_cliente != contrato.rut,factura.cliente,'no' ) as mostrar_diferencia_razon_social
 			   , GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 			   , GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
+			   , factura.RUT_cliente
 		   FROM factura
 		   JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 		   JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
@@ -1819,25 +1884,25 @@ class Factura extends Objeto {
 		   WHERE $where
 		   GROUP BY factura.id_factura";
 	}
-		
+
 	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
-		
+
 		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
-		
+
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		
+
 		foreach ($results as $key => $fila) {
 			//monto_real
 			$monto_real = $this->ObtenerValorReal($fila['id_factura']);
 			$results[$key]['monto_real'] = strtoupper($fila['codigo_estado']) == 'A' ? '0' : $monto_real;
-			
+
 			//observaciones
 			$ids_doc = $this->ObtenerIdsDocumentos($fila['id_factura']);
 			$ids_doc_array = explode('||', $ids_doc);
@@ -1853,7 +1918,7 @@ class Factura extends Objeto {
 				$comentarios = implode(', ', $valores);
 			}
 			$results[$key]['observaciones'] = $comentarios;
-			
+
 			//saldo pago, fecha ultimo pago
 			$query2 = "SELECT SUM(ccfmn.monto) as saldo_pagos, MAX(ccfm.fecha_modificacion) as fecha_ultimo_pago
 							FROM factura_pago AS fp
@@ -1866,21 +1931,22 @@ class Factura extends Objeto {
 			$statement = $this->sesion->pdodbh->prepare($query2);
 			$statement->execute();
 			$pago = $statement->fetch(PDO::FETCH_ASSOC);
-			
+
 			$results[$key]['pagos'] = $pago['saldo_pagos'] > 0 ? $pago['saldo_pagos'] : '0';
 			$results[$key]['fecha_ultimo_pago'] = $pago['fecha_ultimo_pago'];
 		}
-		
+
 		return $results;
 	}
 }
 
 #end Class
+if(!class_exists('ListaFacturas')) {
+	class ListaFacturas extends Lista {
 
-class ListaFacturas extends Lista {
+		function ListaFacturas($sesion, $params, $query) {
+			$this->Lista($sesion, 'Factura', $params, $query);
+		}
 
-	function ListaFacturas($sesion, $params, $query) {
-		$this->Lista($sesion, 'Factura', $params, $query);
 	}
-
 }

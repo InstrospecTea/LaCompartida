@@ -550,7 +550,7 @@ if (UtilesApp::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 					<a name='boton_buscar' id='boton_buscar' icon='find' class="btn botonizame"   onclick="BuscarFacturasPago(jQuery('#form_facturas').get(0),'buscar')"  ><?php echo __('Buscar') ?></a>
 				</td>
 				<td align="right">
-					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn botonizame" id="boton_descarga" name="boton_excel" onclick="BuscarFacturasPago(jQuery('#form_facturas').get(0)), 'exportar_excel')">
+					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn botonizame" id="boton_descarga" name="boton_excel" onclick="BuscarFacturasPago(jQuery('#form_facturas').get(0), 'exportar_excel')">
 				<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_factura_pago_fin'):false; ?>
 						   
 				</td>

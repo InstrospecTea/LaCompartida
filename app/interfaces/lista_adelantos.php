@@ -11,11 +11,11 @@ if ($_GET['popup'] || $_GET['ajax'])
         $pagina = new Pagina($sesion);
 	$pagina->titulo = $titulo ? $titulo : "Adelantos";
 	if ($_GET['ajax']) $desde=$_POST['xdesde'];
-        
+
 }
         if ($_GET['popup']==1)
 {
-      
+
 	$pagina->PrintTop($_GET['popup']);
 }
 $filtros=$_POST;
@@ -32,7 +32,8 @@ SELECT
 	CONCAT(prm_moneda.simbolo, ' ', IF(documento.monto = 0, 0, documento.monto*-1)) AS monto_con_simbolo,
 	CONCAT(prm_moneda.simbolo, ' ', IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1)) AS saldo_pago_con_simbolo,
 	documento.glosa_documento,
-	documento.fecha
+	documento.fecha,
+	documento.id_moneda
 FROM
 	documento
 	LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
@@ -88,7 +89,7 @@ if($elegir_para_pago || isset($filtros['tiene_saldo'])){
 if(isset($filtros['id_contrato'])){
 	$query .= " AND (documento.id_contrato = '".$filtros['id_contrato']."' OR documento.id_contrato IS NULL)";
 }
- 
+
 $buscador = new Buscador($sesion, $query, "Objeto", $desde, $x_pag = 12, empty($orden) ? 'documento.fecha_creacion DESC' : $orden);
 $buscador->nombre = "buscador_adelantos";
 $buscador->titulo = "Adelantos";
@@ -114,15 +115,20 @@ $buscador->Imprimir();
 
 function ElegirParaPago(&$fila)
 {
-	global $id_cobro;
-	return '<button type="button" onclick="ElegirParaPago(\'' . Conf::RootDir() . '/app/interfaces/ingresar_documento_pago.php?id_cobro=' . $id_cobro . '&id_documento=' . $fila->fields['id_documento'] . '&popup=1&pago=true&codigo_cliente=' . $fila->fields['codigo_cliente'] . '\')">Utilizar</button>';
+	global $id_cobro, $desde_factura_pago;
+	if ($desde_factura_pago) {
+		return '<button type="button" onclick="ElegirParaPago(window.opener.location.href.replace(/&id_moneda=\d+/, \'\') + \'&id_adelanto=' . $fila->fields['id_documento'] . '&id_moneda=' . $fila->fields['id_moneda'] . '\')">Utilizar</button>';
+	} else {
+		return '<button type="button" onclick="ElegirParaPago(\'' . Conf::RootDir() . '/app/interfaces/ingresar_documento_pago.php?id_cobro=' . $id_cobro . '&id_documento=' . $fila->fields['id_documento'] . '&popup=1&pago=true&codigo_cliente=' . $fila->fields['codigo_cliente'] . '\')">Utilizar</button>';
+	}
+
 }
 
 function OpcionesListaAdelanto(&$fila)
 {
 $accion_adelanto = "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
    	// $accion_adelanto = "<a href='ingresar_documento_pago.php?id_documento=" . $fila->fields['id_documento'] .  "&adelanto=1&popup=1&codigo_cliente=". $fila->fields['codigo_cliente'] ."&tipopago=editaadelanto' onclick=\"return hs.htmlExpand(this, {objectType: 'iframe',height:580,width:800})\" title='Editar Adelanto'><img src='" . Conf::ImgDir() . "/editar_on.gif' border='0' title='Editar' /></a>";
-	
+
     if ($fila->fields['monto'] == $fila->fields['saldo_pago'])
 	{
 		$accion_adelanto .= "<a style='cursor:pointer;'><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border='0' title='Eliminar' onclick='EliminarAdelanto(" . $fila->fields['id_documento'] . ");return false;' /></a>";

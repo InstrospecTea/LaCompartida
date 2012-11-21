@@ -31,6 +31,12 @@ define('TEMPLATE_DIR', str_replace('/img','/',Conf::ImgDir()));
 	var baseurl= '<?php echo base64_encode($laurl);?>';
         var root_dir = '<?php echo Conf::RootDir();?>';
 	var img_dir = '<?php echo Conf::ImgDir()?>';
+	// Hack para evitar problemas con Internet Explorer y los console.log
+	var console = console || {
+		log:function(){},
+		warn:function(){},
+		error:function(){}
+	};
     </script>
 	<title><?php echo Conf::AppName()?> - <?php echo  $this->titulo ?></title>
 	<!-- <?php echo Conf::TimestampDeployCSS()?> -->

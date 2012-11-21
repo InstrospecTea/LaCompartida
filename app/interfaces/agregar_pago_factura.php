@@ -1,4 +1,4 @@
-<?php
+ <?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
@@ -32,6 +32,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 }
 $documento = new Documento($sesion);
+$documento_adelanto = new Documento($sesion);
 $cobro = new Cobro($sesion);
 if ($id_cobro) {
 	$cobro->Load($id_cobro);
@@ -47,34 +48,50 @@ if ($desde_webservice) {
 	if (isset($_GET['id_factura_pago'])) {
 		$id_factura_pago = $_GET['id_factura_pago'];
 	}
+
+	if ($id_adelanto) {
+		$query_factura_pago = "select fp.id_factura_pago
+			from factura_pago fp
+			join neteo_documento nd on nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+			join documento dd on dd.id_documento = nd.id_documento_cobro and dd.id_cobro = $id_cobro
+			where nd.id_documento_pago = $id_adelanto
+			";
+		$res = mysql_query($query_factura_pago,$sesion->dbh) or Utiles::errorSQL($query_factura_pago,__FILE__,__LINE__, $sesion->dbh);
+		list($id_factura_pago) = mysql_fetch_array($res);
+		$utilizando_adelanto = true;
+	}
+
 	if (!empty($id_factura_pago)) {
 		$pago->Load($id_factura_pago);
 		$id_moneda = $pago->fields['id_moneda'];
 		$id_moneda_cobro = $pago->fields['id_moneda_cobro'];
-		$lista_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago);
 		$numeros_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago, 'id_factura_pago', 'numero');
 		$arreglo_facturas = explode(',', $lista_facturas);
-		if ($id_factura) {
-			if (empty($lista_facturas)) {
-				$lista_facturas = $id_factura;
-			} else if (!in_array($id_factura, $arreglo_facturas)) {
-				$lista_facturas = $lista_facturas . ',' . $id_factura;
-			}
-			$arreglo_facturas = explode(',', $lista_facturas);
-		}
 		$codigo_cliente = $pago->fields['codigo_cliente'];
 	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
 		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
-		$resunf = mysql_query($query_num_facturas,$sesion->dbh) or Utiles::errorSQL($query_num_facturas,__FILE__,__LINE__, $sesion->dbh); 
-		if( mysql_num_rows($resunf) > 0 ) {			
+		$resunf = mysql_query($query_num_facturas,$sesion->dbh) or Utiles::errorSQL($query_num_facturas,__FILE__,__LINE__, $sesion->dbh);
+		if( mysql_num_rows($resunf) > 0 ) {
 			while( $numfact = mysql_fetch_array($resunf)) {
 				array_push($numeros_facturas_tmp, $numfact['numero']);
 			}
 			$numeros_facturas = implode( ',', $numeros_facturas_tmp );
 		}
-		
+
+		$query_montos_facturas = "SELECT SUM(honorarios) as honorarios, SUM(subtotal_gastos+subtotal_gastos_sin_impuesto) as gastos
+																FROM factura WHERE id_factura IN ($lista_facturas) ";
+		$res_montos = mysql_query($query_montos_facturas,$sesion->dbh) or Utiles::errorSQL($query_num_facturas,__FILE__,__LINE__, $sesion->dbh);
+		list($honorarios_facturas, $gastos_facturas) = mysql_fetch_array($res_montos);
+		$factura_fake = new Factura($sesion);
+		$hay_adelantos = $factura_fake->SaldoAdelantosDisponibles($codigo_cliente, $cobro->fields['id_contrato'], $honorarios_facturas, $gastos_facturas) > 0;
+
 	}
+
+
+
+
+
 }
 $moneda_pago = new Moneda($sesion);
 $moneda_pago->Load($id_moneda);
@@ -82,8 +99,65 @@ $moneda_pago->Load($id_moneda);
 $moneda_cobro = new Moneda($sesion);
 $moneda_cobro->Load($id_moneda_cobro);
 
-if (!empty($pago->fields['id_neteo_documento_adelanto']))
+if (!empty($pago->fields['id_neteo_documento_adelanto'])) {
 	$id_neteo_documento_adelanto = $pago->fields['id_neteo_documento_adelanto'];
+	$neteo = new NeteoDocumento($sesion);
+	$neteo->Load($id_neteo_documento_adelanto);
+	$id_adelanto = $neteo->fields['id_documento_pago'];
+}
+
+$monto_pago_adelanto = $monto_pago;
+
+
+$id_concepto = $pago->fields['id_concepto'];
+$tipo_doc = $pago->fields['tipo_doc'];
+$nro_documento = $pago->fields['nro_documento'];
+$nro_cheque = $pago->fields['nro_cheque'];
+$descripcion = $pago->fields['descripcion'];
+$id_banco = $pago->fields['id_banco'];
+$id_cuenta = $pago->fields['id_cuenta'];
+$pago_retencion = $pago->fields['pago_retencion'];
+
+if ($id_adelanto) {
+	$documento_adelanto->Load($id_adelanto);
+}
+
+global $saldo_pago;
+$saldo_pago = $id_neteo_documento_adelanto ? $pago->fields['monto_moneda_cobro'] : null;
+if ($id_adelanto) {
+
+	$query_tipo_cambio = "select cm.tipo_cambio as tipo_cambio_cobro, ca.tipo_cambio as  tipo_cambio_adelanto
+		from cobro c
+		 join cobro_moneda cm on c.id_moneda_monto = cm.id_moneda and cm.id_cobro = $id_cobro
+		 join cobro_moneda ca on ca.id_moneda = " . $documento_adelanto->fields['id_moneda'] . "  and ca.id_cobro = $id_cobro
+		 where c.id_cobro = $id_cobro";
+
+	$res_tipo_cambio = mysql_query($query_tipo_cambio,$sesion->dbh) or Utiles::errorSQL($query_tipo_cambio,__FILE__,__LINE__, $sesion->dbh);
+	list($tipo_cambio_cobro, $tipo_cambio_adelanto) = mysql_fetch_array($res_tipo_cambio);
+ 	if ($monto_pago_adelanto > $documento_adelanto->fields['saldo_pago']) {
+ 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
+ 		$monto_pago = $monto_pago_adelanto*$tipo_cambio_adelanto/$tipo_cambio_cobro;
+ 	}
+
+ 	$saldo_pago = (-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto'])*$tipo_cambio_adelanto/$tipo_cambio_cobro;
+
+   }
+
+if ($utilizando_adelanto) {
+	$monto_pago_adelanto = $monto_pago*$tipo_cambio_cobro/$tipo_cambio_adelanto;
+	$query = "SELECT id_concepto FROM prm_factura_pago_concepto WHERE glosa = 'Adelanto'";
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	list($id_concepto) = mysql_fetch_array($resp);
+
+	$tipo_doc = $documento_adelanto->fields['tipo_doc'];
+	$nro_documento = $documento_adelanto->fields['numero_doc'];
+	$nro_cheque = $documento_adelanto->fields['numero_cheque'];
+	$descripcion = 'Adelanto #'.$documento_adelanto->fields['id_documento'].' - '. $documento_adelanto->fields['glosa_documento'];
+	$id_banco = $documento_adelanto->fields['id_banco'];
+	$id_cuenta = $documento_adelanto->fields['id_cuenta'];
+
+}
+
 
 if ($opcion == 'imprimir_voucher') {
 	include dirname(__FILE__) . '/factura_pago_doc.php';
@@ -99,7 +173,7 @@ if ($opcion == 'guardar') {
 			$errores[] = __('El monto ingresado en el campo "Monto pagado" no es válido, debe ingresar el monto descontado del saldo.');
 	}
 	else {
-		if (empty($id_neteo_documento_adelanto)) {
+		if (empty($id_adelanto)) {
 			if (!is_numeric($monto))
 				$pagina->AddError(__('El monto ingresado en el campo "Monto" no es válido.'));
 			if (!is_numeric($monto_moneda_cobro) && $monto_moneda_cobro != '')
@@ -114,7 +188,35 @@ if ($opcion == 'guardar') {
 		$guardar_datos = false;
 	}
 
-	if ($guardar_datos) {
+	if ($guardar_datos && $id_adelanto) {
+		$documento->LoadByCobro($id_cobro);
+		$facturas = array();
+		foreach ($_POST as $nombre_variable => $valor) {
+			if (strpos($nombre_variable, 'saldo_') ===  0) {
+				$saldo_fact = explode('_', $nombre_variable);
+				$factura = $saldo_fact[1];
+				$saldo = $valor;
+				$facturas[$factura] = $saldo;
+			}
+		}
+		if ($documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], $facturas, $id_adelanto, true)) {
+			$query_factura_pago_guardar = "select fp.id_factura_pago
+			from factura_pago fp
+			join neteo_documento nd on nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+			where nd.id_documento_pago = $id_adelanto and nd.id_documento_cobro = " . $documento->fields['id_documento'];
+
+			$res = mysql_query($query_factura_pago_guardar,$sesion->dbh) or Utiles::errorSQL($query_factura_pago_guardar,__FILE__,__LINE__, $sesion->dbh);
+			list($id_factura_pago) = mysql_fetch_array($res);
+
+ 			$pagina->addInfo(__('Adelanto ingresado con éxito'));
+ 			?>
+			<script type="text/javascript">
+				window.opener.Refrescar();
+				//location.href = 'agregar_pago_factura.php?popup=1&<?php echo "id_factura_pago=$id_factura_pago&id_cobro=$id_cobro" ?>';
+			</script>
+			<?php
+		}
+	} else if ($guardar_datos) {
 		//echo '<pre>';print_r($_POST);echo '</pre>';
 		if (empty($id_neteo_documento_adelanto)) {
 			if (!empty($id_factura_pago)) {
@@ -166,7 +268,9 @@ if ($opcion == 'guardar') {
 			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
 			$monto_pago -= $monto;
 
-			//Al llamar desde Webservice, IngresarPago utilizó una $pagina falsa. Se puede ver el contenido mediante: 
+			$cobro->CambiarEstadoSegunFacturas();
+
+			//Al llamar desde Webservice, IngresarPago utilizó una $pagina falsa. Se puede ver el contenido mediante:
 			//echo $pagina->Output();
 			if ($desde_webservice) {
 				if ($pago->fields['id_factura_pago'])
@@ -192,9 +296,11 @@ $mvto_pago->LoadByPago($id_factura_pago);
 
 $imprimir_voucher = false;
 $pagina->PrintTop($popup);
-
+$join_facturas = 'LEFT JOIN';
+$on_facturas = '';
 if ($lista_facturas) {
-	$definir_orden = " IF(f.id_factura IN ($lista_facturas), IF(monto_pago > 0, 0, 1), 2) AS orden ";
+	$definir_orden = " IF(f.id_factura IN ($lista_facturas), IF(monto_pago > 0, 0, 1),  IF(monto_pago > 0, 1, 2))  AS orden ";
+
 } else {
 	$definir_orden = " IF(monto_pago > 0, 0, 1) AS orden ";
 }
@@ -208,24 +314,24 @@ if ($id_cobro) {
 
 $query__listado = "SELECT SQL_CALC_FOUND_ROWS
 								f.id_cobro,
-								f.id_factura, 
-								f.numero, 
-								pdl.glosa AS glosa_documento_legal, 
-								IF(ccfm.saldo-ccfmn.monto=0, 0, IF(ccfmn.monto > 0,-ccfm.saldo+ccfmn.monto,-ccfm.saldo)) as saldo_factura, 
+								f.id_factura,
+								f.numero,
+								pdl.glosa AS glosa_documento_legal,
+								IF(ccfm.saldo-ccfmn.monto=0, 0, IF(ccfmn.monto > 0,-ccfm.saldo+ccfmn.monto,-ccfm.saldo)) as saldo_factura,
 								ccfmn.monto AS monto_pago,
-								f.id_moneda, 
-								pm.simbolo as simbolo, 
-								pm.tipo_cambio, 
-								pm.cifras_decimales, 
-								$definir_orden, 
-								$definir_orden2 
-							FROM cta_cte_fact_mvto AS ccfm 
-							LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn 
-										 ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda 
-										AND ccfmn.id_mvto_pago = '{$mvto_pago->fields['id_cta_cte_mvto']}' 
-							LEFT JOIN factura AS f ON ccfm.id_factura = f.id_factura 
-                                                        join (select d.id_cobro from documento d where d.tipo_doc='N') doc on doc.id_cobro=f.id_cobro							
-                                                        JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda 
+								f.id_moneda,
+								pm.simbolo as simbolo,
+								pm.tipo_cambio,
+								pm.cifras_decimales,
+								$definir_orden,
+								$definir_orden2
+							FROM cta_cte_fact_mvto AS ccfm
+							LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn
+										 ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda
+										AND ccfmn.id_mvto_pago = '{$mvto_pago->fields['id_cta_cte_mvto']}'
+							$join_facturas factura AS f ON ccfm.id_factura = f.id_factura $on_facturas
+                                                        join (select d.id_cobro from documento d where d.tipo_doc='N') doc on doc.id_cobro=f.id_cobro
+                                                        JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda
 							LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal";
 $query__listado .="	WHERE (f.codigo_cliente = '$codigo_cliente'";
 $query__listado .= $where_lista_cobro;
@@ -236,35 +342,63 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-          
-        jQuery('.saldojq').keyup(function() {
-			var total=Number(0);
-			MontoValido( jQuery(this).attr('id') );
-			var max=Number(jQuery('#x_'+jQuery(this).attr('id').replace('_','_hide_')).val());
-			if (Number(jQuery(this).val())>max) jQuery(this).val(max);
-			jQuery('.saldojq').each(function() {
-				total=total+Number(jQuery(this).val());
-            });      
-			jQuery('#monto_moneda_cobro').val(total); 
-			var moneda = jQuery('#id_moneda').val();
-      
-			var num2=Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
-			var div= Number(jQuery('#factura_pago_moneda_'+moneda).val());
-			var decimales= Number(jQuery('#cifras_decimales_pago').val());
-       
-			jQuery('#monto').val((Number(total*num2/div).toFixed(decimales)));
-       
-        });
+
+      jQuery('.saldojq').keyup(function() {
+				var decimales_cobro = Number(jQuery('#cifras_decimales_cobro').val());
+				var decimales= Number(jQuery('#cifras_decimales_pago').val());
+
+				var total=Number(0);
+				var total_pagar=Number(0);
+				MontoValido( jQuery(this).attr('id') );
+				var max=Number(jQuery('#x_'+jQuery(this).attr('id').replace('_','_hide_')).val());
+				var max_saldo = Number(jQuery('#saldo_pago_aux').val());
+				if (Number(jQuery(this).val())>max) jQuery(this).val(Redondear(max, decimales_cobro));
+				jQuery('.saldojq').each(function() {
+					total=total+Number(jQuery(this).val());
+      	});
+				jQuery('.saldojq:not([readonly="readonly"])').each(function() {
+					total_pagar=total_pagar+Number(jQuery(this).val());
+      	});
+
+				var moneda = jQuery('#id_moneda').val();
+				var num2=Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
+				var div= Number(jQuery('#factura_pago_moneda_'+moneda).val());
+
+				<?php
+				if ($id_adelanto) {
+				?>
+				if (total_pagar > max_saldo) {
+					jQuery(this).val(Redondear(Number(jQuery(this).val()) - (total_pagar-max_saldo), decimales_cobro));
+					total_pagar = max_saldo;
+				}
+				if (total > max_saldo) {
+					total = max_saldo;
+				}
+				<?php
+				} else {
+					$total_pagar = $total;
+				} ?>
+
+				jQuery('#monto_moneda_cobro').val(Redondear(total_pagar, decimales_cobro));
+
+				var monto_total = Redondear(total*num2/div, decimales);
+				var monto_total_pagar = Redondear(total_pagar*num2/div, decimales);
+
+				jQuery('#monto').val(monto_total_pagar);
+				jQuery('#saldo_adelanto').val(Number(jQuery('#saldo_pago_original').val().replace(',','.')) - monto_total);
+
+        }).keyup();
 		jQuery('#monto_moneda_cobro').keyup(function() {
 			var moneda = jQuery('#id_moneda').val();
 			var num1=Number(jQuery('#monto_moneda_cobro').val());
 			var num2=Number(jQuery('#factura_pago_moneda_<?php echo $id_moneda_cobro; ?>').val());
 			var div= Number(jQuery('#factura_pago_moneda_'+moneda).val());
 			var decimales= Number(jQuery('#cifras_decimales_pago').val());
-       
-			jQuery('#monto').val((Number(num1*num2/div).toFixed(decimales))).keyup();
-       
-       
+
+			var monto_total = Redondear(num1*num2/div, decimales);
+			jQuery('#monto').val(monto_total).keyup();
+			jQuery('#saldo_adelanto').val(Redondear(Number(jQuery('#saldo_pago_original').val().replace(',','.')) - monto_total, decimales));
+
 		});
     });
 	function ShowCheque()
@@ -274,19 +408,19 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		else
 			$('tr_cheque').style.display = "none";
 	}
-	
-	
-	
+
+
+
 	function MostrarTipoCambioPago()
 	{
 		$('TipoCambioDocumentoPago').show();
 	}
-	
+
 	function MontoValido( id_campo )
 	{
 		var monto = document.getElementById( id_campo ).value;
 		if(monto.match(/^\d+(\.\d+)?$/)) return false;
-		
+
 		monto = monto.replace(/[^\d.,]/g, '');
 		monto = monto.replace(',','.');
 		if(monto=='') monto = '0';
@@ -296,15 +430,15 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			monto += arr_monto[$i];
 		if( arr_monto.length > 1 )
 			monto += '.' + arr_monto[arr_monto.length-1];
-		
+
 		document.getElementById( id_campo ).value = monto;
 	}
-	
+
 	function CancelarDocumentoMonedaPago()
 	{
 		$('TipoCambioDocumentoPago').hide();
 	}
-	
+
 	function ActualizarDocumentoMonedaPago()
 	{
 		ids_monedas = $('ids_monedas_factura_pago').value;
@@ -319,10 +453,10 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			var tc = new Array();
 			for(var i = 0; i< arreglo_ids.length; i++)
 				tc[i] = $('factura_pago_moneda_'+arreglo_ids[i]).value;
-			$('contenedor_tipo_load').innerHTML = 
+			$('contenedor_tipo_load').innerHTML =
 				"<table width=510px><tr><td align=center><br><br><img src='<?php echo Conf::ImgDir() ?>/ajax_loader.gif'/><br><br></td></tr></table>";
 			var http = getXMLHTTP();
-			var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_factura_pago_moneda&id_factura=<?php echo $factura->fields['id_factura'] ?>&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');	
+			var url = root_dir + '/app/interfaces/ajax.php?accion=actualizar_factura_pago_moneda&id_factura=<?php echo $factura->fields['id_factura'] ?>&ids_monedas=' + ids_monedas+'&tcs='+tc.join(',');
 			http.open('get', url);
 			http.onreadystatechange = function()
 			{
@@ -331,15 +465,15 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 					var response = http.responseText;
 					if(response == 'EXITO')
 					{
-						$('contenedor_tipo_load').innerHTML = '';	
+						$('contenedor_tipo_load').innerHTML = '';
 					}
 				}
-			}	
+			}
 			http.send(null);
 			CancelarDocumentoMonedaPago();
 		}
 	}
-	
+
 	function ActualizarMonto()
 	{
 <?php if (!empty($id_neteo_documento_adelanto)) echo 'return false;'; ?>
@@ -350,7 +484,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		var monto = Number(0);
 		for(var i = 0; i<=arreglo_facturas.length-1; i++)
 		{
-			$$('[id^="saldo_"]').each(function(elem){
+			$$('[id^="saldo_"].saldojq').each(function(elem){
 				ids = elem.id.split('_');
 				if(ids[1]==arreglo_facturas[i])
 				{
@@ -366,13 +500,9 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		}
 	}
 
-	function Redondear(num, decimales){
-		return Number(num).toFixed(decimales);
-	}
-
 	var suma_saldo = 0;
 	var monto_tmp = 0;
-	function ActualizarMontoMonedaCobro(){ 
+	function ActualizarMontoMonedaCobro(){
 		var moneda = $('id_moneda').value;
 		if(moneda == '<?php echo $id_moneda_cobro ?>'){
 			$('span_monto_equivalente').style.visibility = 'hidden';
@@ -398,7 +528,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 <?php } ?>
 	}
 
-	function CargarCuenta( origen, destino ) 
+	function CargarCuenta( origen, destino )
 	{
 		var http = getXMLHTTP();
 		var url = 'ajax.php?accion=cargar_cuentas&id=' + $(origen).value;
@@ -416,15 +546,15 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				{
 					$(destino).options.length = 0;
 					cuentas = response.split('//');
-          		
+
 					for(var i=0;i<cuentas.length;i++)
 					{
 						valores = cuentas[i].split('|');
-          			
+
 						var option = new Option();
 						option.value = valores[0];
 						option.text = valores[1];
-          			
+
 						try
 						{
 							$(destino).add(option);
@@ -440,7 +570,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		};
 		http.send(null);
 	}
-	
+
 	function SetBanco( origen, destino )
 	{
 		var http = getXMLHTTP();
@@ -459,7 +589,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		};
 		http.send(null);
 	}
-	
+
 	function ActualizarMontosIndividuales( id )
 	{
 		suma_saldo=0;
@@ -470,7 +600,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		var monto = $(id).value;
 		for(var i = 0; i<=arreglo_facturas.length-1; i++)
 		{
-			$$('[id^="saldo_"]').each(function(elem){
+			$$('[id^="saldo_"].saldojq').each(function(elem){
 				ids = elem.id.split('_');
 				if(ids[1]==arreglo_facturas[i]) {
 					var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
@@ -548,14 +678,14 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			$('monto').focus();
 			$('boton_guardar').disabled = false;
 			return false;
-		} 
+		}
 		else if( !isNumber( $('monto_moneda_cobro').value ) ) {
 			alert( 'El formato del monto ingresado no es valido.' );
 			$('monto_moneda_cobro').focus();
 			$('boton_guardar').disabled = false;
 			return false;
 		}
-		
+
 		if( $('monto').value <= 0 ){
 			alert( 'El monto ingresado debe ser mayor a 0' );
 			$('monto').focus();
@@ -567,8 +697,8 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			$('boton_guardar').disabled = false;
 			return false;
 		}
-		
-		$$('[id^="saldo_"]').each(function(elem){
+
+		$$('[id^="saldo_"].saldojq').each(function(elem){
 			if( !isNumber( $(elem.id).value ) ) {
 				alert( 'El formato del monto ingresado no es valido.' );
 				$(elem.id).focus();
@@ -592,7 +722,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			return Validar ? Validar(form) : true;
 		}
 	}
-	
+
 	function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
 	}
@@ -603,12 +733,15 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 		var monto = $('monto_moneda_cobro').value;
 		var monto_orig = Number(Redondear(monto, cifras_decimales));
 		var suma = 0;
-		$$('[id^="saldo_"]').each(function(elem){
+		$$('[id^="saldo_"].saldojq').each(function(elem){
 			var ids = elem.id.split('_');
 			var saldo_individual = Math.max(Math.min($('x_saldo_hide_'+ids[1]).value,monto),0);
-			monto -= Number(Redondear(saldo_individual, cifras_decimales));
-			suma += Number(elem.value);
+			if (!jQuery(elem).attr('readonly') || <?php echo (!$id_adelanto ?  "true" : "false") ?>) {
+				monto -= Number(Redondear(saldo_individual, cifras_decimales));
+				suma += Number(elem.value);
+			}
 		});
+
 		monto = Number(Redondear(monto, cifras_decimales));
 		suma = Number(Redondear(suma, cifras_decimales));
 <?php if (empty($id_neteo_documento_adelanto)) { ?>
@@ -632,7 +765,8 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 	<input type=hidden name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
 	<input type=hidden name='lista_facturas' id='lista_facturas' value='<?php echo $lista_facturas ?>' />
 	<input type=hidden name='id_factura_pago' id='id_factura_pago' value='<?php echo $pago->fields['id_factura_pago']; ?>' />
-	<input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
+	<input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
+	<input type=hidden name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
 	<input type=hidden name='id_factura_pago' id='id_factura_pago' value="<?php echo $pago->fields['id_factura_pago'] ?>" />
 	<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?php echo $pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>" />
 	<input type="hidden" name="codigo_cliente_factura" value="<?php echo $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente ?>" >
@@ -666,10 +800,21 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 					<input type="checkbox" name="pago_retencion" id="pago_retencion" onchange="CalculaPagoIva();" value=1 <?php echo $pago->fields['pago_retencion'] ? "checked='checked'" : "" ?> />&nbsp;<?php echo __('Pago retención impuestos') ?>
 				</td>
 			<?php } else { ?>
-				<td align=right width="50%">
+				<td align=right width="25%">
 					&nbsp;
 				</td>
+			<?php }
+
+			if (!$id_adelanto && $hay_adelantos && empty($pago->fields['id_factura_pago'])) {
+				$saldo_gastos = $gastos_facturas > 0 ? '&pago_gastos=1' : '';
+				$saldo_honorarios = $honorarios_facturas > 0 ? '&pago_honorarios=1' : '';
+				?>
+				<td>
+				<button type="button" onclick="nuovaFinestra('Adelantos', 730, 470, 'lista_adelantos.php?popup=1&id_cobro=<?php echo $id_cobro; ?>&codigo_cliente=<?php echo $codigo_cliente ?>&elegir_para_pago=1<?php echo $saldo_honorarios; ?><?php echo $saldo_gastos; ?>&id_contrato=<?php echo $cobro->fields['id_contrato']; ?>&desde_factura_pago=1', 'top=\'100\', left=\'125\', scrollbars=\'yes\'');return false;" ><?php echo __('Utilizar un adelanto'); ?></button>
+				</td align=right width="25%">
 			<?php } ?>
+
+
 		</tr>
 	</table>
 	<table id="tabla_informacion" style="border: 1px solid black;" width='90%'>
@@ -713,8 +858,28 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				<?php echo __('Monto') ?>
 			</td>
 			<td align=left colspan="3">
-				<?php $monto_pago = str_replace(',', '.', $monto_pago); ?>
-				<input name="monto" id="monto" size=10 value="<?php echo number_format($pago->fields['monto'] ? $pago->fields['monto'] : $monto_pago, $moneda_pago->fields['cifras_decimales'], '.', '') ?>" onkeyup="MontoValido( this.id );ActualizarMontoMonedaCobro();"/>
+				<?php
+				 $monto_pago = str_replace(',', '.', $monto_pago);
+				 $saldo_pago_original = -$documento_adelanto->fields['saldo_pago'];
+				 if (!$utilizando_adelanto && $pago->fields['monto']) {
+				 		$monto_pago_adelanto = $pago->fields['monto'];
+				 } else if ($utilizando_adelanto && $pago->fields['monto']) {
+				 		$monto_pago_adelanto += $pago->fields['monto'];
+				 		$saldo_pago_original += $pago->fields['monto'];
+				 }
+				 if ($id_adelanto && !$utilizando_adelanto) {
+ 						$saldo_pago_original += $pago->fields['monto'];
+				 }
+
+				 $saldo_adelanto = $saldo_pago_original - $monto_pago_adelanto;
+				 $monto_pago_adelanto = str_replace(',', '.', $monto_pago_adelanto);
+				 if(empty($monto_pago_adelanto)){
+					 $monto_pago_adelanto = 0;
+				 }
+				 ?>
+
+
+				<input name="monto" id="monto" size=10 value="<?php echo number_format($monto_pago_adelanto, $moneda_pago->fields['cifras_decimales'], '.', '') ?>" onkeyup="MontoValido( this.id );ActualizarMontoMonedaCobro();"/>
 
 				<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $id_moneda, 'onchange="ActualizarMontoMonedaCobro()"', '', "80"); ?>
 				<span style="color:#FF0000; font-size:10px">*</span>
@@ -726,12 +891,26 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				</span>
 			</td>
 		</tr>
+
+		<?php if ($id_adelanto) { ?>
+			<tr>
+				<td align=right>
+					<?php echo __('Saldo Adelanto') ?>
+				</td>
+				<td align=left>
+					<input type="text" name="saldo_adelanto" id="saldo_adelanto" size=10 value="<?php  echo $saldo_adelanto; ?>" readonly="readonly"/>
+					<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_original" id="saldo_pago_original" size=10 value="<?php echo $saldo_pago_original; ?>" readonly="readonly"/>
+        	<input type="text"  class="oculto" style="display:none;"   name="saldo_pago_aux" id="saldo_pago_aux" size=10 value="<?php echo $saldo_pago; ?>" readonly="readonly"/>
+				</td>
+			</tr>
+		<?php } ?>
+
 		<tr>
 			<td align=right>
 				<?php echo __('Concepto') ?>
 			</td>
 			<td align=left colspan="3">
-				<?php echo Html::SelectQuery($sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $pago->fields['id_concepto'], '', '', "168"); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', '', "168"); ?>
 			</td>
 		</tr>
 		<tr>
@@ -748,7 +927,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 					while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
 						$tipos[$codigo] = $glosa;
 					}
-					$cod_tipo = $pago->fields['tipo_doc'];
+					$cod_tipo = $tipo_doc;
 					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) {
 						$cod_tipo = 'T';
 					}
@@ -759,7 +938,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				</select>
 
 				<?php echo __('N° Documento:') ?>
-				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $pago->fields['nro_documento']); ?>" />
+				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $nro_documento); ?>" />
 			</td>
 		</tr>
 		<tr id="tr_cheque" style="display:none;">
@@ -767,7 +946,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				<?php echo __('N° Cheque') ?>
 			</td>
 			<td align="left" colspan="3" width="70%">
-				<input name=numero_cheque id=numero_cheque size=10 value="<?php echo $documento->fields['nro_cheque']; ?>" />
+				<input name=numero_cheque id=numero_cheque size=10 value="<?php echo $nro_cheque; ?>" />
 			</td>
 		</tr>
 		<tr>
@@ -776,32 +955,25 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			</td>
 			<td align=left colspan="3">
 				<textarea name=glosa_documento cols="45" rows="3"><?php
-				if ($pago->fields['descripcion'])
-					echo $pago->fields['descripcion'];
-				else if ($id_cobro) {					
+				if ($descripcion)
+					echo $descripcion;
+				else if ($id_cobro) {
 					echo "Pago de Factura # " . $numeros_facturas;
 				}
 				?></textarea>
 			</td>
 		</tr>
-		<?php
-		if ($pago->fields['id_cuenta']) {
-			$id_banco = $pago->fields['id_banco'];
-			$id_cuenta = $pago->fields['id_cuenta'];
-		}
-		?>
+
 		<tr>
 			<td align=right>
 				<?php echo __('Banco') ?>
 			</td>
 			<td align=left colspan="3">
-				<?php echo Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $pago->fields['id_banco'] ? $pago->fields['id_banco'] : $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, 'onchange="CargarCuenta(\'id_banco\',\'id_cuenta\');"', "Cualquiera", "150") ?>
 			</td>
 		</tr>
 		<?php
-		if (!empty($pago->fields['id_banco'])) {
-			$where_banco = " WHERE cuenta_banco.id_banco = '" . $pago->fields['id_banco'] . "' ";
-		} else if (!empty($id_banco)) {
+		if (!empty($id_banco)) {
 			$where_banco = " WHERE cuenta_banco.id_banco = '$id_banco' ";
 		} else {
 			$where_banco = " WHERE 1=2 ";
@@ -816,7 +988,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 , CONCAT( cuenta_banco.numero,
      IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 FROM cuenta_banco
-LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $pago->fields['id_cuenta'] ? $pago->fields['id_cuenta'] : $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150") ?>
+LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta",  $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150") ?>
 			</td>
 		</tr>
 		<tr>
@@ -834,7 +1006,7 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 			<td align=right colspan="4">
 				&nbsp;
 			</td>
-		</tr>	
+		</tr>
 		<tr>
 			<td align=right colspan="4">
 				<div id="TipoCambioDocumentoPago" style="display:none; left: 50px; top: 250px; background-color: white; position:absolute; z-index: 4;">
@@ -846,8 +1018,8 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 								<tr>
 									<?php
 									if ($pago->fields['id_factura_pago']) {
-										$query = "SELECT count(*) 
-													FROM cta_cte_fact_mvto_moneda 
+										$query = "SELECT count(*)
+													FROM cta_cte_fact_mvto_moneda
 													LEFT JOIN cta_cte_fact_mvto AS ccfm ON ccfm.id_cta_cte_mvto=cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
 													WHERE ccfm.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
 										$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -857,9 +1029,9 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 										$cont = 0;
 									if ($cont > 0) {
 										$query =
-												"SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio 
-									FROM cta_cte_fact_mvto_moneda 
-									JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda 
+												"SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio
+									FROM cta_cte_fact_mvto_moneda
+									JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda
 									LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
 									WHERE cta_cte_fact_mvto.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
 										$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -909,8 +1081,6 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 		</tr>
 	</table>
 	<?php
-	global $saldo_pago;
-	$saldo_pago = $id_neteo_documento_adelanto ? $pago->fields['monto_moneda_cobro'] : null;
 	$x_pag = 15;
 	$b = new Buscador($sesion, $query__listado, "Objeto", 0, 0, "orden ASC, orden2 ASC");
 	$b->mensaje_error_fecha = "N/A";
@@ -930,6 +1100,8 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 	function Opciones(& $fila) {
 		global $lista_facturas;
 		global $saldo_pago;
+		global $id_cobro;
+		global $id_adelanto;
 
 		$arreglo_facturas = explode(',', $lista_facturas);
 
@@ -948,7 +1120,8 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 			$saldo_pago -= $monto_a_pagar;
 		}
 
-		$opc_html = $fila->fields['simbolo'] . "&nbsp;<input type=\"text\" size=7 class=\"saldojq\" id=\"saldo_" . $fila->fields['id_factura'] . "\" name=\"saldo_" . $fila->fields['id_factura'] . "\" value=\"" . $monto_a_pagar . "\" onkeyup=\"MontoValido( this.id );ActualizarMonto();\"/>";
+		$readonly = ($id_adelanto && ($id_cobro != $fila->fields['id_cobro'])) ? "readonly='readonly'" : '';
+		$opc_html = $fila->fields['simbolo'] . "&nbsp;<input $readonly type=\"text\" size=7 class=\"saldojq\" id=\"saldo_" . $fila->fields['id_factura'] . "\" name=\"saldo_" . $fila->fields['id_factura'] . "\" value=\"" . $monto_a_pagar . "\" onkeyup=\"MontoValido( this.id );ActualizarMonto();\"/>";
 		$opc_html .= "<input type=hidden name=\"x_saldo_hide_" . $fila->fields['id_factura'] . "\" id=\"x_saldo_hide_" . $fila->fields['id_factura'] . "\" value=\"" . $fila->fields['saldo_factura'] . "\" />";
 		$opc_html .= "<input type=hidden name=\"tipo_cambio_" . $fila->fields['id_factura'] . "\" id=\"tipo_cambio_" . $fila->fields['id_factura'] . "\" value=\"" . $fila->fields['tipo_cambio'] . "\" />";
 		$opc_html .= "<input type=hidden name=\"cifras_decimales_" . $fila->fields['id_factura'] . "\" id=\"cifras_decimales_" . $fila->fields['id_factura'] . "\" value=\"" . $fila->fields['cifras_decimales'] . "\" />";
@@ -959,17 +1132,17 @@ LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_ban
 
 
 <script type="text/javascript">
-<?php if (!empty($id_neteo_documento_adelanto)) { ?>
+<?php if (!empty($id_adelanto)) { ?>
 			$('tabla_informacion').select('input, select, textarea').each(function(elem){
 				elem.disabled = 'disabled';
 			});
-<?php 
+<?php
 		if ($pago->fields['id_factura_pago']) {
 ?>
 			$('btn_imprimir_voucher').disabled = false;
 <?php
 		}
-	} 
+	}
 ?>
 
 		Calendar.setup(
@@ -993,4 +1166,5 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectClie
 }
 echo InputId::Javascript($sesion);
 $pagina->PrintBottom($popup);
+
 ?>

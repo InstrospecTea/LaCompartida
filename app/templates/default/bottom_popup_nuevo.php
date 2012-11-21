@@ -2,10 +2,10 @@
 <div id="dialogomodal" style="display:none;" ></div>  
 <div id="dialog-confirm" style="display:none;" ></div>  
 <div id="lttooltip"></div>
+<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.js?20121106"></script>
 <script type="text/javascript">
 /* <![CDATA[   */
 <?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_footer_popup') : false; ?>
-jQuery.ajax({async: false,cache:true,type: "GET", url:'https://static.thetimebilling.com/bottom.js', dataType: 'script' });
    
  
 

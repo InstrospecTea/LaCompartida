@@ -806,8 +806,13 @@ function funcionTR(& $contrato) {
 		$query_cobros = "SELECT
 													id_cobro,
 													monto,
+													monto_subtotal,
+													descuento,
+													impuesto,
 													cobro.codigo_idioma,
 													monto_gastos,
+													subtotal_gastos,
+													impuesto_gastos,
 													fecha_ini,
 													fecha_fin,
 													prm_moneda.simbolo,
@@ -851,6 +856,7 @@ function funcionTR(& $contrato) {
 		$html .= "<td style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999; font-size:10px'>" . __('Borrador') . "</td><td colspan=4 style='border-right:1px dashed #999999; border-left:1px dashed #999999; border-top:1px dashed #999999;'>";
 		$html .= "<div id='cobros_$i'>";
 		$html .= "<table width=100%>";
+		$txt_iva = __('IVA');
 		for ($z = 0; $z < $lista_cobros->num; $z++) {
 			$cobro = $lista_cobros->Get($z);
 			$idioma_cobro = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
@@ -862,10 +868,25 @@ function funcionTR(& $contrato) {
 			$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-") . ' ' . __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 
 			$texto_tipo = empty($cobro->fields['incluye_honorarios']) ? '(sólo gastos)' :
-					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');
-			$texto_honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles'])
-					. ' por ' . number_format($total_horas, 1, $idioma_cobro->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
-			$texto_gastos = $cobro->fields['simbolo_moneda_opcion'] . ' ' . number_format($cobro->fields['monto_gastos'], $cobro->fields['cifras_decimales_moneda_opcion'], $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) . ' en gastos ';
+					(empty($cobro->fields['incluye_gastos']) ? '(sólo honorarios)' : '');			
+			
+			$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']);
+			if(!empty($cobro->fields['impuesto'])){
+				$honorarios = $cobro->fields['simbolo'] . ' ' . number_format($cobro->fields['monto_subtotal'] - $cobro->fields['descuento'], 2, $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) .
+					" + $txt_iva ($honorarios)";
+			}
+			
+			$texto_honorarios = "$honorarios por " .
+				number_format($total_horas, 1, $idioma_cobro->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs. ';
+			
+			$gastos = $cobro->fields['simbolo_moneda_opcion'] . ' ' . number_format($cobro->fields['monto_gastos'], $cobro->fields['cifras_decimales_moneda_opcion'], $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']);
+			
+			if(!empty($cobro->fields['impuesto_gastos'])){
+				$gastos = $cobro->fields['simbolo_moneda_opcion'] . ' ' . number_format($cobro->fields['subtotal_gastos'], $cobro->fields['cifras_decimales_moneda_opcion'], $idioma_cobro->fields['separador_decimales'], $idioma_cobro->fields['separador_miles']) .
+					" + $txt_iva ($gastos)";
+			}
+			$texto_gastos = "$gastos en gastos ";
+			
 			$texto_monto = !empty($cobro->fields['incluye_honorarios']) && !empty($cobro->fields['incluye_gastos']) && !empty($cobro->fields['monto_gastos']) ?
 					$texto_honorarios . ' y ' . $texto_gastos :
 					(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);

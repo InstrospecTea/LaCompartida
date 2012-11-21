@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '../../../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
+require_once Conf::ServerDir() . '/classes/Contrato.php';
 
 function autocargaapp($class_name) {
 	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
@@ -22,13 +23,28 @@ $orden = $arrayorden[intval($_REQUEST['iSortCol_0'])] . " " . $_REQUEST['sSortDi
 
 if (!isset($where) || (isset($where) && $where == ''))
 	$where = 1;
+if ($_REQUEST['opc'] == 'contratoasunto') {
+	$codigo_asunto = $_REQUEST['codigo_asunto'];
+	if ($codigo_asunto) {
+		$contrato = new Contrato($sesion);
+		$contrato->LoadByCodigoAsunto($codigo_asunto);
+		$id_contrato = $contrato->fields['id_contrato'];
+	} else {
+		$id_contrato = '';
+	}
+	$data = array(
+   	"id_contrato" => $id_contrato
+  );
+  echo json_encode($data);
+  exit;
+}
 if ($_REQUEST['opc'] == 'actualizagastos') {
 
 	$whereclause = base64_decode($_POST['whereclause']);
-	$querypreparar = "update cta_corriente 
-							join asunto using (codigo_asunto) 
+	$querypreparar = "update cta_corriente
+							join asunto using (codigo_asunto)
 							join contrato on contrato.id_contrato=asunto.id_contrato
-							join cliente on contrato.codigo_cliente=asunto.codigo_cliente 
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente
 							left join cobro on cta_corriente.id_cobro=cobro.id_cobro ";
 
 	$setclause = ' set cta_corriente.fecha_touch=now() ';
@@ -47,7 +63,7 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 
 	debug($querypreparar);
 	$query = $sesion->pdodbh->prepare($querypreparar);
-	 
+
 	$query->execute();
 	echo "jQuery('#boton_buscar').click();";
 	die();
@@ -142,9 +158,9 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 
 
 
-	
+
 		$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
-	
+
 }
 
 
@@ -160,13 +176,13 @@ if ($_GET['totalctacorriente']) {
 		}
 	if (is_array($balance)) {
 		echo number_format($balance[0], 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']) . '</b>';
-		 
+
 			echo '<input type="hidden" id="codigo_cliente" name="codigo_cliente" value="' . $codigo_cliente . '"/>';
 			echo '<input type="hidden" id="codigo_cliente_secundario" name="codigo_cliente_secundario" value="' . $codigo_cliente_secundario . '"/>';
 			echo '<input type="hidden" id="festado" name="estado[]" value="CREADO"/>';
 			echo '<input type="hidden" id="festado" name="opc" value="buscar"/>';
 			echo '<input type="hidden" id="festado" name="fecha_fin" value="' . date('d-m-Y') . '"/>';
-		 
+
 		echo '<input type="hidden"  name="ingreso" value="' . $balance[1] . '"/>';
 		echo '<input type="hidden"  name="egreso" value="' . $balance[2] . '"/>';
 		echo '<input type="hidden" id="balance" name="balance" value="' . $balance[3] . '"/>';
@@ -187,10 +203,10 @@ if ($_GET['totalctacorriente']) {
 		}
 	}
 
-	$querypreparar = "update cta_corriente 
-							join asunto using(codigo_asunto) 
+	$querypreparar = "update cta_corriente
+							join asunto using(codigo_asunto)
 							join contrato on contrato.id_contrato=asunto.id_contrato
-							join cliente on contrato.codigo_cliente=asunto.codigo_cliente 
+							join cliente on contrato.codigo_cliente=asunto.codigo_cliente
 							left join cobro on cta_corriente.id_cobro=cobro.id_cobro
 										set fecha_touch=now()
 								WHERE $where";
@@ -206,7 +222,7 @@ if ($_GET['totalctacorriente']) {
 		<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo", "id_cta_corriente_tipo", '1', '', '', "160"); ?>
 			</td>
 		</tr>
-			<?php } ?>		 
+			<?php } ?>
 	<tr>
 		<td align=right>
 			<?php echo __('Proveedor') ?>
@@ -238,43 +254,43 @@ if ($_GET['totalctacorriente']) {
 
 	$selectfrom = "FROM cta_corriente
 								left JOIN asunto USING(codigo_asunto)
-								
-								left JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+
+								left JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 								left JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-								
-                
-								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
+
+
+								LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
 								LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario 
+								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 								left join cobro on cta_corriente.id_cobro=cobro.id_cobro
 								WHERE
-								$where 
+								$where
 								 ";
-	$query = "SELECT  
+	$query = "SELECT
 									cta_corriente.id_movimiento,
 									cta_corriente.fecha,
-									cta_corriente.egreso, 
-									cta_corriente.ingreso, 
-									cta_corriente.monto_cobrable, 
-									ifnull(cta_corriente.codigo_cliente,'-') codigo_cliente, 
+									cta_corriente.egreso,
+									cta_corriente.ingreso,
+									cta_corriente.monto_cobrable,
+									ifnull(cta_corriente.codigo_cliente,'-') codigo_cliente,
 									ifnull(cta_corriente.numero_documento,'-') numero_documento,
 									cta_corriente.numero_ot,
 									ifnull(cta_corriente.descripcion,'-') descripcion,
 									cobro.id_cobro,
 									ifnull(concat_ws(' - ',asunto.codigo_asunto,asunto.glosa_asunto),'-') glosa_asunto,
-									ifnull(concat_ws(' - ',cliente.codigo_cliente, cliente.glosa_cliente),'-') glosa_cliente, 
+									ifnull(concat_ws(' - ',cliente.codigo_cliente, cliente.glosa_cliente),'-') glosa_cliente,
 									prm_moneda.simbolo,
 									prm_moneda.cifras_decimales,
-									prm_cta_corriente_tipo.glosa as tipo, 
-									ifnull(cobro.estado,'SIN COBRO') as estado, 
+									prm_cta_corriente_tipo.glosa as tipo,
+									ifnull(cobro.estado,'SIN COBRO') as estado,
 									cta_corriente.con_impuesto,
 									prm_idioma.codigo_idioma,
-                                    contrato.activo AS contrato_activo, 
+                                    contrato.activo AS contrato_activo,
 									1 as opcion, contrato.id_contrato
 									$col_select
-								$selectfrom 
-								order by $orden 
+								$selectfrom
+								order by $orden
 								limit $limitdesde,$limitcantidad";
 
 
@@ -318,13 +334,13 @@ if ($_GET['totalctacorriente']) {
 	echo '"aaData": [';
 
 	foreach ($resp as $fila) {
-		//	while($fila = mysql_fetch_array($resp)) {     
+		//	while($fila = mysql_fetch_array($resp)) {
 		if ($i != 0)
 			echo ',';
 		$i++;
 
 		$stringarray = array(
-		    
+
 			date('d-m-Y', strtotime($fila['fecha'])),
 			$fila['glosa_cliente'] ? utf8_encode($fila['glosa_cliente']) : ' - ',
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
@@ -339,8 +355,8 @@ if ($_GET['totalctacorriente']) {
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
 			(( $fila['egreso'] > 0) ? $fila['simbolo'] . ' ' . ($fila['monto_cobrable']) : ' '), $fila['id_contrato']
-			
-				
+
+
 		    );
 
 

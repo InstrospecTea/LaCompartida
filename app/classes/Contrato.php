@@ -117,6 +117,7 @@ class Contrato extends Objeto {
 		'notificar_encargado_secundario'	,
 		'notificar_otros_correos'	,
 		'id_cuenta'	,
+		'id_cuenta2'	,
 		'id_pais'	,
 		'esc1_tiempo'	,
 		'esc1_id_tarifa'	,
@@ -137,7 +138,9 @@ class Contrato extends Objeto {
 		'esc4_id_tarifa'	,
 		'esc4_monto'	,
 		'esc4_id_moneda'	,
-		'esc4_descuento'	
+		'esc4_descuento'	,
+		'retribucion_usuario_responsable',
+		'retribucion_usuario_secundario'
 	);
 	
 	function Contrato($sesion, $fields = "", $params = "") {
@@ -1106,11 +1109,11 @@ class Contrato extends Objeto {
 	function Prepare() {
 		
 		$this->Edit("monto", str_replace(',','.',$this->fields['monto']), true);
-		
-		
-		 
 
-		
+
+
+
+
 		$this->Edit("id_usuario_responsable", (!empty($this->fields['id_usuario_responsable']) && $this->fields['id_usuario_responsable'] != -1 ) ? $this->fields['id_usuario_responsable'] : "NULL");
 			if (UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')) {
 				$this->Edit("id_usuario_secundario", (!empty($this->fields['id_usuario_secundario']) && $this->fields['id_usuario_secundario'] != -1 ) ? $this->fields['id_usuario_secundario'] : "NULL");
@@ -1324,7 +1327,6 @@ class Contrato extends Objeto {
 						$this->Edit('id_contrato',$insertid);
 						$this->Load($insertid);
 						print_r($contrato->fields);
-						echo 'Contrato.php linea 1260<br><hr>';
 					} catch (PDOException $e) {
 						 if($this->sesion->usuario->fields['rut'] == '99511620') {
 							$Slim=Slim::getInstance('default',true);

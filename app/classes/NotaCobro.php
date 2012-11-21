@@ -2949,7 +2949,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%xnro_factura%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%xnombre_cliente%', $contrato->fields['factura_razon_social'], $html);
 				$html = str_replace('%xglosa_cliente%', $contrato->fields['factura_razon_social'], $html);
-				$html = str_replace('%xdireccion%', $contrato->fields['factura_direccion'], $html);
+				$html = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html);
 				$html = str_replace('%xrut%', $contrato->fields['rut'], $html);
 
 				require_once('CartaCobro.php');
@@ -2999,8 +2999,8 @@ class NotaCobro extends Cobro {
 				} else {
 					$fecha_lang = date('F d, Y');
 				}
-				$fecha_mes_del_cobro = strtotime($this->fields['fecha_fin']);
-				$fecha_mes_del_cobro = strftime("%B %Y", mktime(0, 0, 0, date("m", $fecha_mes_del_cobro), date("d", $fecha_mes_del_cobro) - 5, date("Y", $fecha_mes_del_cobro)));
+				$time_fecha_fin = strtotime($this->fields['fecha_fin']);
+				$fecha_mes_del_cobro = strftime("%B %Y", mktime(0, 0, 0, date("m", $time_fecha_fin), date("d", $time_fecha_fin) - 5, date("Y", $time_fecha_fin)));
 
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
@@ -3008,8 +3008,8 @@ class NotaCobro extends Cobro {
 				} else {
 					$codigo_cliente = $this->fields['codigo_cliente'];
 				}
-				$html = str_replace('%fecha_mes_dos_digitos%', date("m", $fecha_mes_del_cobro), $html);
-				$html = str_replace('%fecha_ano_dos_digitos%', date("y", $fecha_mes_del_cobro), $html);
+				$html = str_replace('%fecha_mes_dos_digitos%', date("m", $time_fecha_fin), $html);
+				$html = str_replace('%fecha_ano_dos_digitos%', date("y", $time_fecha_fin), $html);
 				$html = str_replace('%codigo_cliente%', $codigo_cliente, $html);
 				$html = str_replace('%fecha_mes_del_cobro%', ucfirst($fecha_mes_del_cobro), $html);
 				$html = str_replace('%fecha_larga%', $fecha_lang, $html);
@@ -3155,7 +3155,7 @@ class NotaCobro extends Cobro {
 				else
 					$html = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%CTA_CORRIENTE%', $this->GenerarDocumento2($parser, 'CTA_CORRIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-				$html = str_replace('%TIPO_CAMBIO%', $this->GenerarDocumento2($parser, 'TIPO_CAMBIO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%TIPO_CAMBIO%', $this->GenerarDocumentoComun($parser, 'TIPO_CAMBIO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%MOROSIDAD%', $this->GenerarDocumento2($parser, 'MOROSIDAD', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%GLOSA_ESPECIAL%', $this->GenerarDocumentoComun($parser, 'GLOSA_ESPECIAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 
@@ -9240,8 +9240,8 @@ class NotaCobro extends Cobro {
 				|| $this->fields['fecha_emision'] == NULL ) ? '&nbsp;' : Utiles::sql2fecha($this->fields['fecha_emision'], $idioma->fields['formato_fecha']), $htmlplantilla);
 		$htmlplantilla = str_replace('%glosa_cliente%', $contrato->fields['factura_razon_social'], $htmlplantilla);
 		$htmlplantilla = str_replace('%direccion%', __('Dirección'), $htmlplantilla);
-		$htmlplantilla = str_replace('%valor_direccion%', $contrato->fields['factura_direccion'], $htmlplantilla);
-		$htmlplantilla = str_replace('%valor_direccion_uc%', ucwords(strtolower($contrato->fields['factura_direccion'])), $htmlplantilla);
+		$htmlplantilla = str_replace('%valor_direccion%', nl2br($contrato->fields['factura_direccion']), $htmlplantilla);
+		$htmlplantilla = str_replace('%valor_direccion_uc%', nl2br(ucwords(strtolower($contrato->fields['factura_direccion']))), $htmlplantilla);
 		$direccion=explode('//',$contrato->fields['direccion_contacto']);
 		$htmlplantilla = str_replace('%direccion_carta%', nl2br($direccion[0]), $htmlplantilla);
 		$htmlplantilla = str_replace('%rut%', __('RUT'), $htmlplantilla);

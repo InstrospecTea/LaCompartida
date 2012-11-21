@@ -3,6 +3,22 @@
 class SimpleReport_Writer_Spreadsheet_Format extends SimpleReport_Configuration_Format {
 
 	public static $formats = array(
+		'filtros' => array(
+			'Size' => 10,
+			'VAlign' => 'top',
+			'Align' => 'left',
+			'Bold' => '1',
+			'Color' => 'black',
+			'FgColor' => 35,
+			'Bottom' => 1
+		),
+		'valoresfiltros' => array(
+			'Size' => 10,
+			'VAlign' => 'top',
+			'Align' => 'left',
+			'Bold' => '1',
+			'Color' => 'black'
+		),
 		'encabezado' => array(
 			'Size' => 12,
 			'VAlign' => 'top',

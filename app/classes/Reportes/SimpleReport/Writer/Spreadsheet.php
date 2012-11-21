@@ -68,6 +68,19 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			$this->current_row++;
 		}
 
+		if (!empty($this->SimpleReport->filters)) {
+			foreach ( $this->SimpleReport->filters as $nombre => $valor) {
+				if (!empty ($valor)){
+					$this->sheet->writeString($this->current_row, 0, $nombre, $this->formats['filtros']);
+					$this->sheet->writeString($this->current_row, 1, $valor, $this->formats['valoresfiltros']);
+					$this->current_row ++;
+				}
+			}
+			$this->current_row ++;
+		}
+
+
+
 		// 1.1 Formatear todos los arreglos
 		// 2. Correr query
 		$result = $this->SimpleReport->RunReport($group_values);
@@ -100,11 +113,11 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			return $this->table($result, $columns, $totals, $total_name, $col0);
 		} else {
 			if(!$col0){
-				$col0 = 1;
+				$col0 = 0;
 			}
 			if(isset($this->SimpleReport->custom_format['single_table']) && !$this->single_table){
-				$this->single_table = true;
-				$this->header($columns, $col0);
+				    $this->single_table = true;
+				    $this->header($columns, $col0);
 			}
 			$col_i = key($groups) - 1;
 			$column = array_shift($groups);
@@ -214,7 +227,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 						$totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row] = "$last_cell:$cell";
 						unset($totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1]);
 					} else {
-						$totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row] = $cell;
+						$totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row] = "$cell:$cell";
 					}
 				}
 

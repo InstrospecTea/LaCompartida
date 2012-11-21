@@ -15,7 +15,7 @@ spl_autoload_register('autocargaapp');
 $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
-
+$nuevo_modulo_gastos = UtilesApp::GetConf($sesion, 'NuevoModuloGastos');
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 set_time_limit(300);
@@ -371,6 +371,15 @@ if ($preparar_cobro == 1) {
 	}
     }
 
+		function CargarContrato(asunto) {
+			var ajax_url = './ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
+			jQuery.getJSON(ajax_url,function(data) {
+				if (data) {
+					jQuery('#id_contrato').val(data.id_contrato);
+				}
+			});
+		}
+
     function AgregarNuevo(tipo)
     {
 <?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
@@ -411,7 +420,6 @@ if ($preparar_cobro == 1) {
 	});
 
 	jQuery('.buscargastos').click(function()     {
-
 	    var form=jQuery('#form_gastos');
 	    var from=jQuery(this).attr('rel');
 	    //jQuery(this).attr('disabled','disabled');
@@ -465,7 +473,21 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 		return true;
 	    }   else if(from =='datatables' || from == 'buscar') {
 		contratos= {};
+
+		<?php if ($nuevo_modulo_gastos) { ?>
+				var id_contrato = jQuery('#id_contrato').val();
+				var params = jQuery('#form_gastos').serialize();
+				var ajax_url = './planillas/planilla_saldo.php?opcion=json&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
+				var html_url = './planillas/planilla_saldo.php?popup=1&opcion=buscar&tipo_liquidacion=2&id_contrato=' + id_contrato + '&' + params;
+				jQuery('#totalcta').text('');
+				jQuery.getJSON(ajax_url,function(data) {
+					var onclick_html = "nuevaVentana('',1000,700,'" + html_url + "', '');";
+					var restul_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html +  '">' + data.resultado + '</a></b>';
+					jQuery('#totalcta').html(restul_html);
+				});
+		<?php } else { ?>
 		jQuery('#totalcta').load('ajax/ajax_gastos.php?totalctacorriente=1&'+jQuery('#form_gastos').serialize());
+		<?php } ?>
 					
 		tablagastos=   jQuery('#tablon').dataTable({
 		    "fnPreDrawCallback": function( oSettings ) {
@@ -690,8 +712,8 @@ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw()
 <?php echo __('Asunto') ?>
 				</td>
 				<td nowrap colspan=3 align=left>
-<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-
+<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+		<input type="hidden" name='id_contrato' id='id_contrato' value='<?php $id_contrato ?>' />
 
 				</td>
 			    </tr>
@@ -751,19 +773,23 @@ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw()
                             </td>
                             <td></td>
                         </tr>
-
+											<?php if (!$nuevo_modulo_gastos) { ?>
 			<tr>
                             <td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
                             <td colspan="2" align="left">
+
                                 <select name="egresooingreso" id="egresooingreso" style="width: 140px;">
                                     <option value=""  selected="selected"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>  </option>
                                     <option value="soloingreso"> Sólo <?php echo __('provisiones'); ?></option>
                                     <option value="sologastos"> Sólo <?php echo __('gastos'); ?> </option>
                                 </select>
+
                             </td>
                             <td></td>
                         </tr>
-
+												<?php } else { ?>
+													<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />
+												<?php } ?>
                         <tr>
                             <td align=right>
 <?php echo __('Moneda') ?>
@@ -798,7 +824,9 @@ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw()
                                 <input name="boton_xls_resumen" type="button" value="<?php echo __('Descargar Resumen Excel') ?>"   rel="excel_resumen" class=" btn buscargastos" />
                             </td>
                             <td width='40%' align=right>
+															<?php if (!$nuevo_modulo_gastos) { ?>
                                 <img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo __('Agregar provisión') ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
+															<?php } ?>
                                 <img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo __('Agregar') ?> <?php echo __('gasto') ?></a>
                             </td>
                         </tr>
@@ -817,7 +845,7 @@ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw()
             </form>
         </td></tr></table>
 
-<div id="totalcta" style='font-size:11px'><b>
+<div id="totalcta" style='font-size:11px;z-index:999;'><b>
 <?php
 if ($opc == 'buscar') {
     if ($total_cta) {

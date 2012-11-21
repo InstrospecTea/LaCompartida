@@ -273,14 +273,18 @@
 				$pdf->SetFont($datos['font'], $datos['style'], $datos['tamano']);
 				$pdf->SetXY($datos['coordinateX'],$datos['coordinateY']);
 			 
-                               if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
-                                        $pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
-                                } else if( $datos['mayuscula'] == 'may' ) {
-					$pdf->Write(4, strtoupper($datos['dato_letra']));
+				if( $datos['mayuscula'] == 'may' ) {
+					$datos['dato_letra']= strtoupper($datos['dato_letra']);
 				} else if( $datos['mayuscula'] == 'min' ) {
-					$pdf->Write(4, strtolower($datos['dato_letra']));
-				} else {
-					$pdf->Write(4, $datos['dato_letra']);
+					$datos['dato_letra']= strtolower($datos['dato_letra']);
+				} else if( $datos['mayuscula'] == 'cap' ) {
+					$datos['dato_letra']= ucwords(strtolower($datos['dato_letra']));
+				}  
+				
+                 if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
+						$pdf->MultiCell( $datos['cellW'], $datos['cellH'], $datos['dato_letra'],0,( $datos['align']? $datos['align']:'L') );
+                               } else  {
+						$pdf->Write(4, $datos['dato_letra']);
 				}
 			
 			}

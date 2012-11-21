@@ -6982,7 +6982,7 @@ $query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 			case 4.96:
 				$query = array();
                              if(!ExisteCampo('margen_superior', 'factura_rtf', $dbh))   {
-			 
+
 					$query[] = "ALTER TABLE  `factura_rtf` ADD  `margen_superior` DOUBLE NOT NULL DEFAULT  '1.5',
 								ADD  `margen_inferior` DOUBLE NOT NULL DEFAULT  '2.0',
 								ADD  `margen_izquierdo` DOUBLE NOT NULL DEFAULT  '2.0',
@@ -7115,11 +7115,11 @@ $query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 			$query = array();
 			$query[] = "INSERT ignore  INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
 
-			
+
             if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))          $query[] = "ALTER TABLE  `contrato` 	ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ;";
 		 if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))  $query[] = "ALTER TABLE  `contrato`  ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ;";
 		 if(!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))  $query[] = "ALTER TABLE  `contrato`  ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
-                                        
+
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());
@@ -7370,8 +7370,8 @@ $query[] = "CREATE TABLE IF NOT EXISTS `factura_pdf_tipo_datos` (
 			}
 			if(ExisteCampo('tipo_dato', 'factura_pdf_datos', $dbh)) $query[] = "ALTER TABLE  `factura_pdf_datos`  DROP  `tipo_dato` ";
 			if(ExisteCampo('glosa_dato', 'factura_pdf_datos', $dbh)) $query[] = "ALTER TABLE  `factura_pdf_datos`  DROP  `glosa_dato` ;";
-                                            
-			
+
+
 			if(!ExisteCampo('id_documento_legal', 'factura_pdf_datos', $dbh)) {
                             $query[] = "ALTER TABLE  `factura_pdf_datos` ADD  `id_documento_legal` INT( 11 ) NOT NULL AFTER  `id_tipo_dato` ;";
                             $query[] = "ALTER TABLE  `factura_pdf_datos` ADD INDEX (  `id_documento_legal` ) ;";
@@ -9495,20 +9495,23 @@ QUERY;
 					$nueva_str = addslashes(json_encode($nueva));
 					$queries[] = "UPDATE reporte_listado SET configuracion = '$nueva_str' WHERE id = {$fila['id']}";
 				}
-				
+
 				ejecutar($queries, $dbh);
 			}
 			break;
-			
+
 		case 7.17:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO  `configuracion`
 				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 				VALUES ( 'OrientacionPapelPorDefecto', 'PORTRAIT', 'Permite cambiar la orientación del papel de los cobros',  'select;PORTRAIT;LANDSCAPE;',  '10',  '-1');";
-			
+			$queries[] = "INSERT IGNORE INTO  `configuracion`
+				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+				VALUES ( 'SepararPorUsuario', '0', 'Permite entregar subtotales por usuario en la nota de cobro',  'boolean',  '10',  '-1');";
+
 			ejecutar($queries, $dbh);
 			break;
-			
+
 		case 7.18:
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion`
@@ -9520,7 +9523,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `contrato`
 					ADD COLUMN `retribucion_usuario_responsable` double DEFAULT '0',
 					ADD COLUMN `retribucion_usuario_secundario` double DEFAULT '0'";
-			
+
 				$queries[] = "ALTER TABLE `usuario` ADD COLUMN `porcentaje_retribucion` double DEFAULT '0'";
 			}
 
@@ -9530,14 +9533,70 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
-			
+
 		case 7.19:
 			$queries = array();
 			if(!ExisteCampo('codigo_cliente', 'grupo_cliente', $dbh)) {
 				$queries[]="alter table grupo_cliente add codigo_cliente varchar(20);";
 			}
-		
 
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.20:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `configuracion`
+				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
+				('RetribucionUsuarioResponsable', '10', 'Porcentaje de Retribución por defecto para el usuario responsable de un contrato', 'numero', 10, -1),
+				('RetribucionUsuarioSecundario', '10', 'Porcentaje de Retribución por defecto para el usuario secundario de un contrato', 'numero', 10, -1)";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.21:
+			$queries = array();
+			if(!ExisteCampo('id_usuario_secundario', 'cobro', $dbh)) {
+				$queries[] = "ALTER TABLE `cobro`
+					ADD `fecha_retribucion_responsable` DATETIME NULL COMMENT 'fecha en que se marco como retribuido desde el reporte de retribuciones',
+					ADD `monto_retribucion_responsable` FLOAT NULL COMMENT 'monto retribuido al encargado comercial',
+					ADD `id_moneda_retribucion_responsable` INT NULL,
+					ADD `fecha_retribucion_secundario` DATETIME NULL COMMENT 'fecha en que se marco como retribuido desde el reporte de retribuciones',
+					ADD `monto_retribucion_secundario` FLOAT NULL COMMENT 'monto retribuido al encargado secundario',
+					ADD `id_moneda_retribucion_secundario` INT NULL,
+					ADD `id_usuario_secundario` INT NULL COMMENT 'copiado del contrato al momento de emitir' AFTER `id_usuario_responsable`,
+					CHANGE `id_usuario_responsable` `id_usuario_responsable` INT NULL DEFAULT NULL COMMENT 'Quien era el encargado comercial cuando se emitio el cobro',
+					CHANGE `id_ultimo_emisor` `id_ultimo_emisor` INT NULL DEFAULT NULL COMMENT 'Quien emitió el cobro por última vez'";
+
+				$queries[] = "UPDATE cobro c SET c.id_usuario_secundario = (SELECT id_usuario_secundario FROM contrato WHERE id_contrato = c.id_contrato)";
+			}
+			if(!ExisteCampo('fecha_retribucion', 'trabajo', $dbh)) {
+				$queries[] = "ALTER TABLE `trabajo`
+					ADD `fecha_retribucion` DATETIME NULL COMMENT 'fecha en que se marco como retribuido desde el reporte de retribuciones',
+					ADD `id_moneda_retribucion` INT NULL,
+					ADD `monto_retribucion_usuario` FLOAT NULL COMMENT 'monto retribuido al usuario',
+					ADD `monto_retribucion_area` FLOAT NULL COMMENT 'monto retribuido al area (socio)'";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.22:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO `prm_permisos` (`codigo_permiso`, `glosa`) VALUES ('RET', 'Retribuciones')";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.23:
+			$queries = array();
+			$queries[] = "ALTER TABLE  `reporte_listado` CHANGE  `tipo`  `tipo` VARCHAR( 100 ) NOT NULL";
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.24:
+			$queries = array();
+			$queries[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+												VALUES ( NULL ,  'NuevoModuloGastos',  '0', 'Se dejan de lado las provisiones en favor de los adelantos' ,  'boolean',  '6',  '-1' );";
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9549,7 +9608,7 @@ QUERY;
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.19;
+$max_update = 7.24;
 $force=0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

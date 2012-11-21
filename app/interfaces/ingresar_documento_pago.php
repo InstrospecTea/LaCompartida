@@ -219,9 +219,9 @@ $pagina->PrintTop($popup);
 <?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 		?>
-			var cod_cli_seg = document.getElementById('codigo_cliente_secundario');
+			var cod_cli_seg = $F('codigo_cliente_secundario');
 	<?php } else { ?>
-			var cod_cli_seg = document.getElementById('campo_codigo_cliente_secundario');
+			var cod_cli_seg = $F('campo_codigo_cliente_secundario');
 	<?php } ?>
 			if (cod_cli_seg == '-1' || cod_cli_seg == "") {
 		alert('<?php echo __('Debe ingresar un cliente')?>');
@@ -230,9 +230,9 @@ $pagina->PrintTop($popup);
 <?php } else {
 	if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 		?>
-			var cod_cli = document.getElementById('codigo_cliente');
+			var cod_cli = $F('codigo_cliente');
 	<?php } else { ?>
-			var cod_cli = document.getElementById('campo_codigo_cliente');
+			var cod_cli = $F('campo_codigo_cliente');
 	<?php } ?>
 			if (cod_cli == '-1' || cod_cli == "") {
 				alert('<?php echo __('Debe ingresar un cliente') ?>');
@@ -242,7 +242,7 @@ $pagina->PrintTop($popup);
 <?php } ?>
 
 
-			if(monto <= 0 || (jQuery('#montoadelanto').length==0 && monto_pagos_real<=0))
+			if(monto <= 0 || (jQuery('#montoadelanto').length==0 && monto_pagos_real<=0 && jQuery('#elajax').val() != ''))
 			{
 				alert('<?php echo __('El monto de un pago debe ser siempre mayor a 0') ?>');
 				$('monto').focus();
@@ -319,8 +319,7 @@ if (!empty($adelanto)) {
 			jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
 				anterior+=Math.max(0,Number(self.val()));
 			});
-
-			MontoValido(self.attr('id') );
+			MontoValido(self.attr('id'));
 			self.val(Math.max(0,Math.min(self.val(),Math.max(0,parseFloat(jQuery('#'+self.attr('id').replace('pago','cobro')).val())))));
 
 			jQuery('.saldojq').each(function() {
@@ -336,7 +335,7 @@ if (!empty($adelanto)) {
 			if(jQuery('#montoadelanto').length>0) {
 				monto_adelanto=parseFloat(jQuery('#montoadelanto').val().replace('-',''));
 				var delta=jQuery('#monto_pagos').val()-monto_adelanto;
-				console.log( 'delta es '+delta);
+				//console.log( 'delta es '+delta);
 				if (delta>0) {
 						alert('Exceso adelanto');
 						self.val(self.val()-delta);
@@ -357,7 +356,8 @@ if (!empty($adelanto)) {
 
 				jQuery('#saldo_pago').val(saldopagomaximo-total) ;
 			}
-			jQuery('#saldo_pago').formatNumber({format:"#.000", locale:"us"});
+			 jQuery('#saldo_pago').formatNumber({format:"#.000", locale:"us"});
+
 		}
 
 	jQuery('document').ready(function() {
@@ -397,6 +397,7 @@ if (!empty($adelanto)) {
 				captureLength: 1
 			});
 		});
+
 
 		jQuery('#pago_honorarios').live('change', function(){
 			if(jQuery('#pago_honorarios').is(':checked')){
@@ -450,7 +451,7 @@ if (!empty($adelanto)) {
 				}
 				return false;
 			}
-			console.log('a repartir: '+saldo);
+			//console.log('a repartir: '+saldo);
 			jQuery('.saldojq').each(function() {
 
 				jQuery(this).val(Math.min(saldo, Math.max(0,Number(jQuery('#'+jQuery(this).attr('id').replace('pago','cobro')).val()))));
@@ -463,7 +464,7 @@ if (!empty($adelanto)) {
 					monto_tmp=    monto_tmp+jQuery(this).parseNumber({format:"#.000", locale:"us"});
 				}
 				jQuery(this).formatNumber({format:"#.000", locale:"us"});
-									 console.log('quedan: '+saldo);
+                   //console.log('quedan: '+saldo);
 			});
 			if(monto_tmp>0) {
 
@@ -488,21 +489,21 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 	if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 		?>
-							var codigo_cliente_secundario = document.getElementById('codigo_cliente_secundario');
+							var codigo_cliente_secundario = $F('codigo_cliente_secundario');
 	<?php } else { ?>
-							var codigo_cliente_secundario = document.getElementById('campo_codigo_cliente_secundario');
+							var codigo_cliente_secundario = $F('campo_codigo_cliente_secundario');
 	<?php } ?>
-											var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente_secundario=' + codigo_cliente_secundario.value+'&id_cobro='+id_cobro;
+	                    var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente_secundario=' + codigo_cliente_secundario+'&id_cobro='+id_cobro;     
 
 <?php } else {
 
 	if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 		?>
-							var codigo_cliente = document.getElementById('codigo_cliente');
+							var codigo_cliente = $F('codigo_cliente');
 	<?php } else { ?>
-							var codigo_cliente = document.getElementById('campo_codigo_cliente');
+							var codigo_cliente = $F('campo_codigo_cliente');
 	<?php } ?>
-						var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente=' + codigo_cliente.value+'&id_cobro='+id_cobro;
+						var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda + '&codigo_cliente=' + codigo_cliente+'&id_cobro='+id_cobro;     
 
 <?php } ?>
 
@@ -647,9 +648,9 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 		function MontoValido( id_campo )
 		{
-			var monto = document.getElementById( id_campo ).value;
+			var monto = $F( id_campo );
 			if (monto<0) monto=0;
-			document.getElementById( id_campo ).value = monto;
+			$( id_campo ).value = monto;
 
 			if(monto.match(/^\d+(\.\d+)?$/)) return false;
 
@@ -663,7 +664,8 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			if( arr_monto.length > 1 ) {
 				monto += '.' + arr_monto[arr_monto.length-1];
 			}
-			document.getElementById( id_campo ).value = monto;
+
+			$( id_campo ).value = monto;
 		}
 
 
@@ -762,9 +764,9 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	try {
 		var montoadelanto=jQuery('#mondoadelanto').parseNumber({format:"#.000", locale:"us"});
 	} catch (e) {
-		console.log(e);
+		//console.log(e);
 	}
-	console.log('recalculando saldo adelanto. Anterior '+anterior,saldoaux,elmonto,montoadelanto,anterior+saldoaux-elmonto);
+	//console.log('recalculando saldo adelanto. Anterior '+anterior,saldoaux,elmonto,montoadelanto,anterior+saldoaux-elmonto);
 				if(jQuery('#mondoadelanto').length>0) {
 					jQuery('#saldo_pago').val(anterior+montoadelanto-elmonto).formatNumber({format:"#.000", locale:"us"});
 				} else {

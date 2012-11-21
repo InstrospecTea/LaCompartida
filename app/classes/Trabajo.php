@@ -64,7 +64,20 @@ class Trabajo extends Objeto
 						list($fecha,$descripcion,$duracion,$duracion_cobrada,$id_usuario, $codigo_asunto, $cobrable) = mysql_fetch_array($resp);
 						$query = "INSERT INTO trabajo_historial 
 												 (id_trabajo, id_usuario, fecha, fecha_trabajo, fecha_trabajo_modificado, descripcion, descripcion_modificado, duracion, duracion_modificado, duracion_cobrada, duracion_cobrada_modificado, id_usuario_trabajador, id_usuario_trabajador_modificado, accion, codigo_asunto, codigo_asunto_modificado, cobrable, cobrable_modificado) 
-									VALUES ('".$this->fields['id_trabajo']."','".$this->sesion->usuario->fields['id_usuario']."','".date("Y-m-d H:i:s")."','".$fecha."','".$this->fields['fecha']."','".addslashes($descripcion)."','".addslashes($this->fields['descripcion'])."','".$duracion."','".$this->fields['duracion']."','".$duracion_cobrada."','".$this->fields['duracion_cobrada']."','".$id_usuario."','".$this->fields['id_usuario']."','MODIFICAR','".$codigo_asunto."','".$this->fields['codigo_asunto']."','".$cobrable."','".$this->fields['cobrable']."')";
+									VALUES ('".$this->fields['id_trabajo']."','".$this->sesion->usuario->fields['id_usuario']."','".date("Y-m-d H:i:s")."','".$fecha."','".$this->fields['fecha']."'
+
+										,'".mysql_real_escape_string(empty($descripcion)? ' Sin descripcion' : $descripcion)."'
+										,'".mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion'])."'
+										,'".mysql_real_escape_string($duracion)."'
+										,'".($this->fields['duracion'])."'
+										,'".mysql_real_escape_string($duracion_cobrada)."'
+										,'".($this->fields['duracion_cobrada'])."'
+										,".mysql_real_escape_string($id_usuario)."
+										,".$this->fields['id_usuario']."
+										,'MODIFICAR'
+										,".mysql_real_escape_string($codigo_asunto)."
+										,".mysql_real_escape_string($this->fields['codigo_asunto'])."
+										,'".$cobrable."','".$this->fields['cobrable']."')";
 					}
 			}
 		else
@@ -74,17 +87,29 @@ class Trabajo extends Objeto
 						// Creamos un trabajo nuevo, logueamos la creación.
 						$query = "INSERT INTO trabajo_historial 
 														 (id_trabajo, id_usuario, fecha, fecha_trabajo_modificado, descripcion_modificado, duracion_modificado, duracion_cobrada_modificado, id_usuario_trabajador_modificado, accion, codigo_asunto_modificado, cobrable_modificado) 
-											VALUES ('".$this->fields[id_trabajo]."','".$this->sesion->usuario->fields[id_usuario]."','".date("Y-m-d H:i:s")."','".$this->fields['fecha']."','".addslashes($this->fields['descripcion'])."','".$this->fields['duracion']."','".$this->fields['duracion_cobrada']."','".$this->fields['id_usuario']."','CREAR','".$this->fields[codigo_asunto]."','".$this->fields[cobrable]."')";
+											VALUES ('".$this->fields['id_trabajo']."'
+													,'".$this->sesion->usuario->fields['id_usuario']."'
+													,'".date("Y-m-d H:i:s")."','".$this->fields['fecha']."'
+													,'".mysql_real_escape_string(empty($this->fields['descripcion'])? ' Sin descripcion' : $this->fields['descripcion'])."'
+													,'".($this->fields['duracion'])."'
+													,'".($this->fields['duracion_cobrada'])."'
+													,'".$this->fields['id_usuario']."'
+													,'CREAR'
+													,'".$this->fields['codigo_asunto']."'
+													,'".$this->fields['cobrable']."')";
 					}
 			}
 		if(parent::Write())
 			{
 				// Modificamos un trabajo que ya existía, logueamos el cambio.
-				if( $ingreso_historial )
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				if( $ingreso_historial ) {
+				
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+				}
 				return true;
-			}
+			} else {
 		return false;
+			}
 	}
 
 	function InsertarTrabajoTarifa()
@@ -672,12 +697,13 @@ class Trabajo extends Objeto
 			}
 	}
 }
-
+if(!class_exists('ListaTrabajos')) {
 class ListaTrabajos extends Lista
-{
-	function ListaTrabajos($sesion, $params, $query)
 	{
-		$this->Lista($sesion, 'Trabajo', $params, $query);
+		function ListaTrabajos($sesion, $params, $query)
+		{
+			$this->Lista($sesion, 'Trabajo', $params, $query);
+		}
 	}
 }
 ?>

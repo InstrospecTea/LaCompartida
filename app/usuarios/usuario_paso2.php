@@ -25,6 +25,8 @@ if ($opc == "eliminar") {
 	}
 }
 
+$modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
+
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
 	$arr1 = $usuario->fields;
@@ -41,20 +43,25 @@ if ($opc == 'edit') {
 	$usuario->Edit('username', $username);
 	$usuario->Edit('centro_de_costo', $centro_de_costo);
 
+	if ($modulo_retribuciones_activo){
+		$usuario->Edit('porcentaje_retribucion', $porcentaje_retribucion);
+	}
+
 	$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
 	$usuario->Edit('id_area_usuario', $id_area_usuario);
 	$usuario->Edit('telefono1', $telefono1);
 	$usuario->Edit('telefono2', $telefono2);
-	
+
 	/**
-	 * Esto ya no se está ocupando... sacarlo? 
-	 *
+	 * Esto ya no se está ocupando... sacarlo?
+	 **/
+	/*
 	$usuario->Edit('dir_calle', $dir_calle);
 	$usuario->Edit('dir_numero', $dir_numero);
 	$usuario->Edit('dir_depto', $dir_depto);
 	$usuario->Edit('dir_comuna', $dir_comuna);
-	/* */
-	
+	  */
+
 	$usuario->Edit('email', $email);
 	$usuario->Edit('activo', $activo);
 	$usuario->Edit('visible', $activo == 1 ? 1 : $visible);
@@ -195,9 +202,9 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	}
 
 	function Cambiar_Usuario_Categoria(id_usuario,id_origen,accion)
-	{ 
+	{
 		if(confirm('¿Desea cambiar todas las tarifas del abogado a esta categoría?'))
-		{  
+		{
 			document.form_usuario.submit();
 			var select_origen = document.getElementById(id_origen);
 			var http = getXMLHTTP();
@@ -205,7 +212,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 			cargando = true;
 			http.open('get', vurl, true);
-			
+
 			http.onreadystatechange = function()
 			{
 				if(http.readyState == 4)
@@ -222,14 +229,14 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	{
 		var fuera = $('usuarios_fuera');
 		var dentro = $('usuarios_revisados');
-			  
+
 		if (fuera.selectedIndex==-1) return;
-			  
+
 		valor = fuera.value;
 		txt = fuera.options[fuera.selectedIndex].text;
-			  
+
 		fuera.options[fuera.selectedIndex]=null;
-			  
+
 		opc = new Option(txt,valor);
 		dentro.options[dentro.options.length]=opc;
 
@@ -253,7 +260,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	{
 		var usuarios = new Array();
 		var dentro = $('usuarios_revisados');
-			
+
 		for(i = 0; i < dentro.options.length; i++ )
 		{
 			usuarios[i] = dentro.options[i].value;
@@ -265,7 +272,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		if (necesitaConfirmar)
 			return "Usted ha modificado los usuarios revisados sin guardar los cambios. Si continúa cerrando la página perderá los cambios realizados.";
 	}
-		
+
 	function Expandir(id)
 	{
 		var tabla = $(id+"_tabla");
@@ -281,7 +288,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			img.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
 		}
 	}
-									
+
 </script>
 
 <form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data" onSubmit="return Validar(this);">
@@ -360,10 +367,34 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 <?php if ($validaciones_segun_config) echo $obligatorio ?>
 				</td>
 				<td valign="top" class="texto" align="left">
-<?php echo Html::SelectQuery($sesion, 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa', 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario) ?>
+
+<?php
+			$query_areas = 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa';
+			if ($modulo_retribuciones_activo) {
+				$query_areas = '
+													SELECT area.id, CONCAT(REPEAT("&nbsp;", IF(ISNULL(padre.id), 0, 5)), area.glosa)
+														FROM prm_area_usuario AS area
+															LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
+														ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
+			}
+			echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario)
+ ?>
 				</td>
 			</tr>
-
+			<?php
+			if ($modulo_retribuciones_activo) {
+			?>
+			<tr>
+				<td valign="top" class="texto" align="right">
+					<?php echo __('Porcentaje de Retribución') ?>
+				</td>
+				<td valign="top" class="texto" align="left">
+					<?php	echo '<input type="text" size="6" value="' . $usuario->fields['porcentaje_retribucion']  . '" name="porcentaje_retribucion" />%'; ?>
+				</td>
+			</tr>
+			<?php
+			}
+			?>
 			<tr><td>&nbsp;</td></tr>  <!-- spacer -->
 			<!-- tr>
 				<td valign="top" class="texto" align="right">
@@ -534,7 +565,7 @@ echo "</select>";
 		<?php echo $usuario->select_revisados(); ?>
 				</td>
 				<td>
-					<input type=button class="btn" value="<?php echo __('Eliminar') ?>" onclick="EliminarUsuarioRevisado()"/> 
+					<input type=button class="btn" value="<?php echo __('Eliminar') ?>" onclick="EliminarUsuarioRevisado()"/>
 				</td>
 			</tr>
 		</table>
@@ -570,19 +601,19 @@ echo "</select>";
 			</tr>
 			<tr>
 				<td width=18% align="right">
-					<label for="alerta_semanal" align="right"><?php echo __('Alerta Semanal') ?></label> 
+					<label for="alerta_semanal" align="right"><?php echo __('Alerta Semanal') ?></label>
 				</td>
 				<td width=10%>
 					<input type="checkbox" id="alerta_semanal" name="alerta_semanal" <?php echo $usuario->fields['alerta_semanal'] ? "checked" : "" ?> value=1 />
 				</td>
 				<td width=18% align="right">
-<?php echo __('Mín. HH') ?> 
+<?php echo __('Mín. HH') ?>
 				</td>
 				<td width=18%>
 					<input type="text" size=10 value="<?php echo $usuario->fields['restriccion_min'] ?>" name="restriccion_min" />
 				</td>
 				<td width=18% align="right">
-					<?php echo __('Máx. HH') ?> 
+					<?php echo __('Máx. HH') ?>
 				</td>
 				<td width=18%>
 					<input type="text" size=10 value="<?php echo $usuario->fields['restriccion_max'] ?>" name="restriccion_max" />
@@ -663,16 +694,16 @@ if ($usuario->loaded) {
 				<td width="180px" style="font-weight:bold; border:1px solid #ccc; text-align:center;">Fin</td>
 				<td width="40px" style="border:1px solid #ccc">&nbsp;</td>
 			</tr>
-<?php 
-if (!empty($usuario_vacaciones)) { 
-	foreach ($usuario_vacaciones as $k => $vaca) { 
+<?php
+if (!empty($usuario_vacaciones)) {
+	foreach ($usuario_vacaciones as $k => $vaca) {
 ?>
 					<tr>
 						<td style="border:1px solid #ccc; text-align:center;"><?php echo $vaca['fecha_inicio']; ?></td>
 						<td style="border:1px solid #ccc; text-align:center;"><?php echo $vaca['fecha_fin']; ?></td>
 						<td style="border:1px solid #ccc; text-align: center"><img src= "<?php echo Conf::ImgDir() ?>/eliminar.gif" id="vacacion_<?php echo $vaca['id']; ?>" border="0" style="cursor:pointer;" class="cls_eliminar_vacacion" title="Eliminar registro" ></td>
 					</tr>
-<?php 
+<?php
 	}
 }
 ?>
@@ -739,7 +770,7 @@ if (!empty($usuario_vacaciones)) {
 	</form>
 	<?php
 	if($sesion->usuario->fields['rut']=='99511620')  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
-	
+
 }
 
 function CargarPermisos() {
@@ -781,7 +812,7 @@ function CargarPermisos() {
 }
 ?>
 <script>
-    
+
 	jQuery(document).ready(function() {
 		jQuery("#chkpermisos .ui-button").live('change',function() {
 			alert(jQuery(this).attr('class'));
@@ -790,18 +821,18 @@ function CargarPermisos() {
 			});
 		});
 	});
-     
 
-	
-	    
+
+
+
 	window.onbeforeunload = function(){
 		return preguntarGuardar();
 	};
-	
+
 <?php if ($focus_username) { ?>
 		$('username').value = '';
 <?php } ?>
-	
+
 	String.prototype.fechaDDMMAAAA = function() {
 		return this.replace(/^(\d{2})\-(\d{2})\-(\d{4})$/, "$3/$2/$1");
 	}
@@ -831,8 +862,8 @@ function CargarPermisos() {
 	});
 	//Eliminar Vacaciones
 	$$('.cls_eliminar_vacacion').each(function(elemento){
-		elemento.observe('click', function(evento){ 
-			evento.stop(); 
+		elemento.observe('click', function(evento){
+			evento.stop();
 			if( confirm('¿Está seguro que quiere borrar las vacaciones de este usuario?') )
 			{
 				var ide = elemento.id;
@@ -843,7 +874,7 @@ function CargarPermisos() {
 			}
 		});
 	});
-	
+
 </script>
 <?php
 $pagina->PrintBottom();

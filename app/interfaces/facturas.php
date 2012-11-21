@@ -82,7 +82,7 @@ $pagina->PrintTop();
 
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 
-	$resp = mysql_query($query . ' LIMIT 0,12', $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	$monto_saldo_total = 0;
 	$glosa_monto_saldo_total = '';
 	$where_moneda = ' WHERE moneda_base = 1';

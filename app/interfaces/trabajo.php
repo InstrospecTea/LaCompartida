@@ -76,7 +76,7 @@ if ($semana == "") {
     $semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
     $semana_siguiente = date("d-m-Y", strtotime("$semana_actual+7 days"));
 }
-if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
     $select_codigo = "(SELECT c2.codigo_cliente_secundario FROM cliente as c2 WHERE c2.codigo_cliente=asunto.codigo_cliente) as codigo_cliente,asunto.codigo_asunto_secundario as codigo_asunto,";
 } else {
     $select_codigo = "asunto.codigo_cliente,asunto.codigo_asunto,";
@@ -101,42 +101,37 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 ?> 	<center> <?php
 #agregado para el nuevo select
 
-if ($p_revisor->fields['permitido'])
+if ($p_revisor->fields['permitido']) {
     $where = "usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'";
-else
+} else {
     $where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "'
 							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
+}
 $where .= " AND usuario.visible=1";
 ?>
 	<script src="https://static.thetimebilling.com/contextmenu/jquery.contextMenu.js" type="text/javascript"></script>
 		<link  href="https://static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
-		
-		
-    
-        function calcHeight(idIframe, idMainElm){
-            ifr = $(idIframe);
-            the_size = ifr.$(idMainElm).offsetHeight + 20;
-            if( the_size < 250 ) the_size = 250;
-            new Effect.Morph(ifr, {
-                style: 'height:'+the_size+'px',
-                duration: 0.2
-            });
-        }
- 
-                
- 
-
-	
-
+		function calcHeight(idIframe, idMainElm){
+			ifr = $(idIframe);
+			try {
+				the_size = ifr.$(idMainElm).offsetHeight + 20;
+				if (the_size < 250) the_size = 250;
+				new Effect.Morph(ifr, {
+					style: 'height:'+the_size+'px',
+					duration: 0.2
+				});
+			} catch(e) {
+				console.log(e);
+			}
+		}
 
 		var diaid=0;
 		var trabajoid=0;
 
+		jQuery(document).ready(function() {
 
-        jQuery(document).ready(function() {
-			 
-		jQuery.contextMenu({
+			jQuery.contextMenu({
 			selector: '.trabajoabierto', events: {
 				show: function(opt) {
 					 var $this = this;
@@ -193,13 +188,9 @@ $where .= " AND usuario.visible=1";
 			}
 		});
 		
-		 
-
 	  var semana= jQuery('#semanactual').val();
             var usuario= jQuery('#id_usuario').val();
 		 
-			
- 
             jQuery('.cambiasemana').click(function() {
                 var semana=jQuery(this).val(); 
                 var usuario= jQuery('#id_usuario').val();
@@ -208,7 +199,6 @@ $where .= " AND usuario.visible=1";
 				} else {
 					Refrescasemana(semana,usuario,null,'right');
 				}
-                
             });
         
             jQuery('#versemana').click(function() {
@@ -232,15 +222,12 @@ $where .= " AND usuario.visible=1";
                 jQuery(this).css({'background':'#DF9862'});
             },    function() {      jQuery(this).css({'background':'#FFF'});   });
 
-
-
             jQuery(window).load(function() {
 				jQuery('#divsemana').html(DivLoading);
                 Refrescasemana(semana,usuario); 
-					
-				
             });
         });
+		
         function Refrescasemana(semana,usuario,eldiv,slide) {
          if(window.console) console.log(semana);
 		 semanaplus=semana.split('-');
@@ -388,8 +375,6 @@ $where .= " AND usuario.visible=1";
                 jQuery('#asuntos').attr('src','editar_trabajo.php?opcion='+opcion+'&id_trabajo='+id_trabajo+'&popup=1&fecha='+f_dia);
             }
         }
-
-
     </script>
 
     <table cellspacing=0 cellpadding=0 width=100%>
@@ -469,3 +454,5 @@ if ($p_revisor->fields['permitido']) {
  
 <?php
 $pagina->PrintBottom();
+
+	

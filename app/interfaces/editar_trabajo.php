@@ -132,7 +132,7 @@
 				if(!$descripcion || $descripcion == ''){
 					$pagina->AddError("Debe Agregar una descripcion");
 				}
-				if(!$codigo_cliente || $codigo_cliente == ''){
+				if((!$codigo_cliente || $codigo_cliente == '') &&(!$codigo_cliente_secundario || $codigo_cliente_secundario == '')) {
 					$pagina->AddError("Debe seleccionar un cliente");
 				}
                 $errores = $pagina->GetErrors();

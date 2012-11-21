@@ -31,7 +31,12 @@ spl_autoload_register('autocargaapp');
 	   echo '<form class="form-horizontal" method="POST">';
 	   echo '<div class="controls controls-row"><label class="span3">Host de Base de Datos</label>
 				'
-					.Html::SelectArray(array('rdsdb1.thetimebilling.com','rdsdb2.thetimebilling.com','rdsdb3.thetimebilling.com'), 'dbhost', DBHOST,' class="span5" ','','380px').'
+					.Html::SelectArray(array(
+						'192.168.1.101',
+						'192.168.1.102',
+						'rdsdb1.thetimebilling.com',
+						'rdsdb2.thetimebilling.com',
+						'rdsdb3.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
 				
 			</div><br/>';
 	  
@@ -71,33 +76,52 @@ spl_autoload_register('autocargaapp');
 		
 $bases=$sesion->pdodbh2->query("SHOW DATABASES like '{$_POST['schema']}'  ")	  ;
  $arraybases=$bases->fetchAll(PDO::FETCH_COLUMN,0);
- 
+
 foreach($arraybases as $base) {
+
+	 echo '<pre style="text-align:left;">';
+	$query=trim($_POST['query']);
+
+
+
 	
-	$query="use $base ;".$_POST['query'];
-	echo '<br><b>'.$query.'</b><br>';
 	try {
-		$filas=$sesion->pdodbh2->exec($query);
-	 
-		$cuerpo="";
 
-			foreach ($filas as $fila) {
-				$cabeceras=array_keys($fila);
-				$cuerpo.= '<tr>';
-				foreach($fila as $celda) {
-					$cuerpo.= '<td>'.$celda.'</td>';
-				}
-				$cuerpo.= '</tr>';
+		$sesion->pdodbh2->exec("use $base;");
+		echo "use $base;\n";
+		echo '<br><b>'.$query.'</b><br>';
+
+			if(stripos($query,'select')===false) {
+				$filas=$sesion->pdodbh2->exec($query);
+				echo 'Filas afectadas: '. $filas;
+				echo '</pre>';
+			} else {
+
+				$filas=$sesion->pdodbh2->query($query);
+				$filasRS=$filas->fetchAll(PDO::FETCH_ASSOC);
+				$cuerpo="";
+				echo '</pre>';
+						foreach ($filasRS as $fila) {
+							$cabeceras=array_keys($fila);
+							$cuerpo.= '<tr>';
+							foreach($fila as $celda) {
+								$cuerpo.= '<td>'.str_replace(",",", ",$celda).'</td>';
+							}
+							$cuerpo.= '</tr>';
+						}
+
+					echo '<table class="table-bordered" border="1">';
+					echo '<thead><tr><th>'.implode('</th><th>',$cabeceras).'</th></tr></thead>';
+					echo '<tbody>';
+					echo $cuerpo;
+					echo '</tbody>';
+					echo '</table><hr><br>';
 			}
-
-		echo '<table border="1">';
-		echo '<tr><th>'.implode('</td><td>',$cabeceras).'</th></tr>';
-		echo $cuerpo;
-		echo '</table>';
-
 		} catch (PDOException $e) {
 			echo 'Excepción en '.$base.':<br>';
 			echo $e->getMessage().'<br>';
+			print_r($e->getTrace());
+			echo '</pre>';
 		}
 	}
 

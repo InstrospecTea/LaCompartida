@@ -10,12 +10,43 @@ require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
 
-if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['codigo_cliente'])) {
+$tipos_liquidacion = array(
+    
+	1 => __('Sólo Honorarios'),
+	2 => __('Sólo Gastos'),
+	3 => __('Sólo Mixtas (Honorarios y Gastos)'));
+
+if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json')) && !empty($_REQUEST['codigo_cliente'])) {
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
 	$id_contrato = $_REQUEST['id_contrato'];
 	$tipo_liquidacion = $_REQUEST['tipo_liquidacion'];
 	$fecha1 = $_REQUEST['fecha1'];
 	$fecha2 = $_REQUEST['fecha2'];
+	$moneda_mostrar = $_REQUEST['moneda_mostrar'];
+	
+	if (empty($moneda_mostrar)) {
+		$moneda_base = Utiles::MonedaBase($Sesion);
+		$moneda_mostrar = $moneda_base['id_moneda'];
+	}
+
+	/* Test Query */
+	$query_glosa_cliente = "SELECT glosa_cliente AS cliente FROM cliente WHERE codigo_cliente = '" . $codigo_cliente . "'";
+	$resp = mysql_query($query_glosa_cliente) or Utiles::errorSQL($query_glosa_cliente, __FILE__, __LINE__);
+	list($glosa_clientes) = mysql_fetch_array($resp);
+
+	$query_glosa_asuntos = "SELECT glosa_asunto AS asunto FROM asunto WHERE id_contrato = '" . $id_contrato . "'";
+	$resp2 = mysql_query($query_glosa_asuntos) or Utiles::errorSQL($query_glosa_asuntos, __FILE__, __LINE__);
+	list($glosa_asuntos) = mysql_fetch_array($resp2);
+
+	if ($glosa_asuntos == NULL) {
+		$glosa_asuntos = 'Todos';
+	}
+
+	$filters = array(
+		__('Cliente') => "$glosa_clientes",
+		__('Asuntos') => "$id_contrato $glosa_asuntos",
+		__('Tipo liquidación') => $tipos_liquidacion[$tipo_liquidacion],
+		'Desde' => $fecha1, 'Hasta' => $fecha2);
 
 	$where_fecha = '';
 	if ($fecha1) {
@@ -26,11 +57,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 	}
 
 	$where_liquidaciones =
-			$where_adelantos =
-			$where_gastos = $where_fecha;
+		$where_adelantos =
+		$where_gastos = $where_fecha;
 	$join_liquidaciones =
-			$join_adelantos =
-			$join_gastos = '';
+		$join_adelantos =
+		$join_gastos = '';
 
 	$tipo_liq_gastos = 'G';
 	$tipo_liq_honorarios = 'H';
@@ -61,7 +92,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 			$where_gastos .= ' AND 1=0 ';
 		}
 	}
-	
+
 	if ($mostrar_sin_saldo) {
 		$where_liquidaciones .= " OR (
 			d.tipo_doc = 'N' AND
@@ -89,16 +120,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 				moneda_base.simbolo AS moneda_base,
 				d.monto AS monto_original,
 				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo_original,
-				d.monto * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS monto_base,
-				-1 * (d.saldo_honorarios + d.saldo_gastos) * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo_base,
+				d.monto * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio) AS monto_base,
+				-1 * (d.saldo_honorarios + d.saldo_gastos) * (tipo_cambio_documento.tipo_cambio / tipo_cambio_base.tipo_cambio) AS saldo_base,
 				IF(contrato.separar_liquidaciones = 0,
 					'$tipo_liq_mixtas', IF(cobro.incluye_honorarios = 1,
 						'$tipo_liq_honorarios', '$tipo_liq_gastos')) AS tipo_liq
 			FROM
 				documento d
-			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-			INNER JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
 			JOIN cobro ON cobro.id_cobro = d.id_cobro
+			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
+			JOIN cobro_moneda tipo_cambio_documento ON tipo_cambio_documento.id_moneda = moneda_documento.id_moneda AND tipo_cambio_documento.id_cobro = cobro.id_cobro
+			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
+			JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 			JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			$join_liquidaciones
 			WHERE
@@ -127,7 +160,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 			FROM
 				documento d
 			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-			INNER JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
+			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			$join_adelantos
 			WHERE
 				d.es_adelanto = 1 AND
@@ -160,7 +193,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 			FROM
 				cta_corriente cc
 			INNER JOIN prm_moneda moneda_gasto ON cc.id_moneda=moneda_gasto.id_moneda
-			INNER JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
+			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			LEFT JOIN cobro ON cc.id_cobro = cobro.id_cobro
 			$join_gastos
 			WHERE
@@ -176,6 +209,15 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 
 	$SimpleReport->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
+	$query_simbolo_base = "SELECT simbolo FROM prm_moneda WHERE id_moneda = $moneda_mostrar";
+	$resp = mysql_query($query_simbolo_base) or Utiles::errorSQL($query_simbolo_base, __FILE__, __LINE__);
+	list($simbolo_base) = mysql_fetch_array($resp);
+
+	$SimpleReport->Config->columns['monto_base']->Title(__('Monto') . " ($simbolo_base)");
+	$SimpleReport->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
+
+	$SimpleReport->SetFilters($filters);
+
 	$saldo_total = 0;
 
 	$query = "($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos)";
@@ -189,15 +231,26 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls')) && !empty($_REQUEST['c
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save('Reporte_saldo');
 	}
+	if ($_REQUEST['opcion'] == 'json') {
+		foreach ($results as $fila) {
+			$saldo_total += $fila['saldo_base'];
+		}
+		$moneda_base = $fila['moneda_base'];
+		$data = array(
+			"resultado" => $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.')
+		);
+		echo json_encode($data);
+		exit;
+	}
 }
 
 $Pagina = new Pagina($Sesion);
 
 $Pagina->titulo = __('Reporte Saldo');
-$Pagina->PrintTop();
+$Pagina->PrintTop($popup);
 ?>
 <table width="90%">
-	<tr>
+    <tr>
 		<td>
 			<form method="POST" name="form_reporte_saldo" action="planilla_saldo.php" id="form_reporte_saldo">
 				<input  id="xdesde"  name="xdesde" type="hidden" value="">
@@ -235,10 +288,17 @@ $Pagina->PrintTop();
 							</td>
 							<td colspan=2 align=left>
 								<?php
-								echo Html::SelectArray(array(
-									array('1', __('Sólo Honorarios')),
-									array('2', __('Sólo Gastos')),
-									array('3', __('Sólo Mixtas (Honorarios y Gastos)'))), 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))
+								echo Html::SelectArrayDecente($tipos_liquidacion, 'tipo_liquidacion', $_REQUEST['tipo_liquidacion'], '', __('Todas'))
+								?>
+							</td>
+						</tr>
+						<tr>
+							<td align=right>
+								<label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
+							</td>
+							<td colspan=2 align=left>
+								<?php
+								echo Html::SelectQuery($Sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda', 'moneda_mostrar', $_REQUEST['moneda_mostrar']);
 								?>
 							</td>
 						</tr>
@@ -275,13 +335,13 @@ $Pagina->PrintTop();
 				</fieldset>
 			</form>
 		</td>
-	</tr>
+    </tr>
 </table>
 <script type="text/javascript">
-	var valor_anterior_codigo;
-	var campo_cliente;
+    var valor_anterior_codigo;
+    var campo_cliente;
 
-	function ActualizarContratos(val) {
+    function ActualizarContratos(val) {
 		var url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + val;
 		jQuery.ajax({
 			url: url,
@@ -289,17 +349,17 @@ $Pagina->PrintTop();
 				jQuery('#td_selector_contrato').html(data);
 			}
 		});
-	}
+    }
 
-	function ComprobarCodigos() {
+    function ComprobarCodigos() {
 		var valor_nuevo = campo_cliente.val()
 		if (valor_anterior_codigo != valor_nuevo) {
 			ActualizarContratos(valor_nuevo);
 			valor_anterior_codigo = valor_nuevo;
 		}
-	}
+    }
 
-	jQuery(document).ready(function () {
+    jQuery(document).ready(function () {
 		// Cargar contratos on select
 		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
 		valor_anterior_codigo = campo_cliente.val();
@@ -315,7 +375,7 @@ $Pagina->PrintTop();
 		jQuery('.saldo:contains(-)').css('color', '#f00');
 		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
 		jQuery('.subtotal td').css('font-weight', 'bold');
-	});
+    });
 </script>
 <?php
 if ($_REQUEST['opcion'] == 'buscar' && !empty($_REQUEST['codigo_cliente'])) {

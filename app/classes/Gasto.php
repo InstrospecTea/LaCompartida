@@ -287,11 +287,12 @@ class Gasto extends Objeto {
 }
 
 #end Class
+if(!class_exists('ListaGastos')) {
+	class ListaGastos extends Lista {
 
-class ListaGastos extends Lista {
+		function ListaGastos($sesion, $params, $query) {
+			$this->Lista($sesion, 'Gasto', $params, $query);
+		}
 
-	function ListaGastos($sesion, $params, $query) {
-		$this->Lista($sesion, 'Gasto', $params, $query);
 	}
-
 }

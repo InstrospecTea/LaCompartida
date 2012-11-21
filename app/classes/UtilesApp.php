@@ -824,28 +824,23 @@ class UtilesApp extends Utiles {
 		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
 		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
 
-		if (!self::ExisteCampo('LogoExcel', 'configuracion', $sesion)) {
-			$querypreparar = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-								VALUES ( 'LogoExcel',  '/var/www/virtual/',  'Ruta absoluta (no URL) al logo en BMP para las planillas',  'string',  '10',  '-1' );";
-
-			$preparacion = $sesion->pdodbh->prepare($querypreparar);
-			$preparacion->execute();
-		}
-
 		$bitmap = UtilesApp::GetConf($sesion, 'LogoExcel');
+		if(!$bitmap){
+			return 0;
+		}
 		// Open file.
 		$bmp_fd = @fopen($bitmap, "rb");
 		if (!$bmp_fd)
-			$this->raiseError("Couldn't import $bitmap");
+			return 0;//throw new Exception("Couldn't import $bitmap");
 		// Slurp the file into a string.
 		$data = fread($bmp_fd, filesize($bitmap));
 		// Check that the file is big enough to be a bitmap.
 		if (strlen($data) <= 0x36)
-			$this->raiseError("$bitmap doesn't contain enough data.\n");
+			return 0;//throw new Exception("$bitmap doesn't contain enough data.\n");
 		// The first 2 bytes are used to identify the bitmap.
 		$identity = unpack("A2ident", $data);
 		if ($identity['ident'] != "BM")
-			$this->raiseError("$bitmap doesn't appear to be a valid bitmap image.\n");
+			return 0;//throw new Exception("$bitmap doesn't appear to be a valid bitmap image.\n");
 		// Remove bitmap data.
 		$data = substr($data, 18);
 		// Read the bitmap width and height.

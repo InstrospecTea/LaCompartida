@@ -44,17 +44,18 @@ if ($refrescar && ($opc == 'guardar_cobro' || $opc == 'guardar')) {
 $factura_pago = new FacturaPago($sesion);
 $enpdf = ($opc == 'grabar_documento_pdf') ? true : false;
 
+if (!$cobro->Load($id_cobro)) {
+	$pagina->FatalError(__('Cobro inválido'));
+}
+
 if ($opc == 'eliminar_pago') {
 	if ($eliminar_pago > 0) {
 		$factura_pago->Load($eliminar_pago);
 		if ($factura_pago->Eliminar()) {
 			$pagina->addInfo(__('Pago borrado con éxito'));
+			$cobro->CambiarEstadoSegunFacturas();
 		}
 	}
-}
-
-if (!$cobro->Load($id_cobro)) {
-	$pagina->FatalError(__('Cobro inválido'));
 }
 
 if($opc == 'descargar_ledes'){

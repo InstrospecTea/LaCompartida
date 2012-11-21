@@ -56,6 +56,7 @@ $tarifa_permitido = ($cantidad_permisos > 0);
 
 $validaciones_segun_config = method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
+$modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones');
 
 if (!defined('HEADERLOADED'))
 	$addheaderandbottom = true;
@@ -1863,6 +1864,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</div></td>
 <td class="al">
 				<?php
+
 				if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
 					echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'], ' class="span3" onchange="CambioEncargado(this)" disabled="disabled"', "Vacio", "200");
 					echo '(Se copia del contrato principal)';
@@ -1875,7 +1877,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							echo '(Se copia del contrato principal)';
 						} else {
 							//FFF si estoy agregando o editando un asunto que se cobra por separado
-							echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato_defecto->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", ' class="span3" onchange="CambioEncargado(this)"', "Vacio", "200");
+							echo Html::SelectQuery($sesion, $query, "id_usuario_responsable", $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : "", ' class="span3" onchange="CambioEncargado(this)"', "Vacio", "200");
 						}
 					} else if (UtilesApp::GetConf($sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
 						// Estoy creando un cliente (y su contrato por defecto). 
@@ -1889,6 +1891,23 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 </td>
 			</tr>
 			<?php
+			if ($modulo_retribuciones_activo) {
+				?>
+				<tr>
+				<td class="al"><div class="span4">
+					<?php
+					echo __('Retribución') . ' ' . __('Encargado Comercial');
+					?>
+				</div></td>
+				<td class="al">
+					<input name="retribucion_usuario_responsable" type="text" size="6" value="<?php
+						echo empty($contrato->fields['id_contrato']) ? UtilesApp::GetConf($sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable'];
+					?>"/>%
+				</td>
+				</tr>
+			<?php
+			}//$modulo_retribuciones_activo
+
 			if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
 				$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario
@@ -1904,7 +1923,24 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<?php echo Html::SelectQuery($sesion, $query, "id_usuario_secundario", $contrato->fields['id_usuario_secundario'] ? $contrato->fields['id_usuario_secundario'] : '', " class='span3' ", "Vacio", "200"); ?>
 						</div></td>
 					</tr>
-						<?php }  
+				<?php
+				if ($modulo_retribuciones_activo) {
+				?>
+				<tr>
+				<td class="al"><div class="span4">
+					<?php
+					echo __('Retribución') . ' ' . __('Encargado Secundario');
+					?>
+				</div></td>
+				<td class="al">
+					<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php
+						echo empty($contrato->fields['id_contrato']) ? UtilesApp::GetConf($sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario'];
+					?>" />%
+				</td>
+				</tr>
+						<?php
+					}
+			}
 				  if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
 					<tr   class="controls controls-row ">
 						<td class="al"><div class="span4">

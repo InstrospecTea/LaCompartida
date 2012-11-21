@@ -2,6 +2,7 @@
         <script type="text/javascript">window.jQuery || document.write('<script src="//static.thetimebilling.com/js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
         <script type="text/javascript" src="//static.thetimebilling.com/js/plugins.js"></script>
         <script type="text/javascript" src="//static.thetimebilling.com/js/main.js"></script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.js?20121106"></script>
 		
 		
         
@@ -29,7 +30,6 @@ $Slim=Slim::getInstance('default',true);
         droplinemenu.buildmenu("droplinetabs1");
 	}
     });
-jQuery.ajax({async: false,cache:true,type: "GET", url:"//static.thetimebilling.com/js/bottom.js", dataType: "script" });
 
  
 

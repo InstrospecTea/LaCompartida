@@ -86,8 +86,6 @@ jQuery('#usar_ad').tooltip( {animation:true, placement:'right',title:'Seleccione
 </div>
 </div>
 
-<script type="text/javascript">
-	jQuery.ajax({async: false,cache:true,type: "GET", url:"//static.thetimebilling.com/js/bottom.js", dataType: "script" });
-</script>
+<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.js?20121106"></script>
 </body>
 </html>

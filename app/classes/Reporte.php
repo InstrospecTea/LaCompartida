@@ -1427,6 +1427,7 @@ class Reporte
 	function rellenar(&$a,$b)
 	{
 		$a['valor'] = 0;
+		$a['valor_divisor'] = 0;
 		$a['filas'] = 0;
 		$a['filtro_campo'] = $b['filtro_campo'];
 		$a['filtro_valor'] = $b['filtro_valor'];
@@ -1472,20 +1473,24 @@ class Reporte
 											
 											foreach($e as $ag6 => $f) {
 											if(is_array($f)) {
-											if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]))
-											{
-												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor'] = 0;
-												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filas'] = 1;
-												$data[$ag1][$ag2][$ag3][$ag4][$ag5]['filas'] +=1;
-												$data[$ag1][$ag2][$ag3][$ag4]['filas'] +=1;
-												$data[$ag1][$ag2][$ag3]['filas'] +=1;
-												$data[$ag1][$ag2]['filas'] +=1;
-												$data[$ag1]['filas'] +=1;
-												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'];
-												$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'];
+													if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]))
+													{
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor'] = 0;
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filas'] = 1;
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5]['filas'] +=1;
+														$data[$ag1][$ag2][$ag3][$ag4]['filas'] +=1;
+														$data[$ag1][$ag2][$ag3]['filas'] +=1;
+														$data[$ag1][$ag2]['filas'] +=1;
+														$data[$ag1]['filas'] +=1;
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_campo'];
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'] = $data2[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['filtro_valor'];
+													}
+												} else {
+													if(!array_key_exists($ag6, $data[$ag1][$ag2][$ag3][$ag4][$ag5])){
+														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor']=0;
+													}
+											    }
 											}
-											    } else {
-												if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6])) $data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor']=0;
 										}
 									}
 								}
@@ -1493,8 +1498,6 @@ class Reporte
 						}
 					}
 				}
-			}
-		}
 			}
 		}
 		return $data;
