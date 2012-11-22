@@ -314,16 +314,16 @@ if (!empty($adelanto)) {
 			var anterior = 0;
 			self.val(self.val().replace(',','.'));
 			jQuery("input[id^='pago_gastos_anterior']").each(function() {
-				anterior+=Math.max(0,Number(self.val()));
+				anterior+=Math.max(0,Number(jQuery(this).val()));
 			});
 			jQuery("input:hidden[id^='pago_honorarios_anterior']").each(function() {
-				anterior+=Math.max(0,Number(self.val()));
+				anterior+=Math.max(0,Number(jQuery(this).val()));
 			});
 			MontoValido(self.attr('id'));
 			self.val(Math.max(0,Math.min(self.val(),Math.max(0,parseFloat(jQuery('#'+self.attr('id').replace('pago','cobro')).val())))));
 
 			jQuery('.saldojq').each(function() {
-				total=parseFloat(total)+parseFloat(self.val());
+				total=parseFloat(total)+parseFloat(jQuery(this).val());
 			});
 
 			total=parseFloat(total)+parseFloat(jQuery("#anteriorduro").val());
