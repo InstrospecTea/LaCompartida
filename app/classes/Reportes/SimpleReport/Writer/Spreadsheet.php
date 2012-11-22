@@ -369,6 +369,9 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 			} else if ($format == 'time') {
 				$value /= 24;
 			}
+			if(strpos($format, 'number') !== false || $format == 'time'){
+				$value = number_format($value, 10, '.', '');
+			}
 
 			$function = $format == 'text' ? 'writeString' : 'write';
 			$this->sheet->$function($this->current_row, $col_i, $value, $this->formats[$format]);

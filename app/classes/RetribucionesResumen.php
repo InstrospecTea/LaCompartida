@@ -36,9 +36,11 @@ class RetribucionesResumen {
 		array(
 			'field' => 'porcentaje_retribucion',
 			'title' => '% Retribución',
+			'format' => 'number',
 			'extras' => array(
 				'width' => 20,
-				'attrs' => 'style="text-align:right"'
+				'attrs' => 'style="text-align:right"',
+				'subtotal' => false
 			)
 		),
 		array(
