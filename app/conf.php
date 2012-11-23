@@ -16,16 +16,8 @@ header("Instance-ID:" . $instanceid);
 if (defined('FILEPATH')) {
 	header("X-vhost:" . FILEPATH);
 	setcookie('vhost', FILEPATH);
-	
-	if (isset($_SERVER['REDIRECT_URL'])) {
-		$_SERVER['SCRIPT_NAME'] = $_SERVER['REDIRECT_URL'];
-		$_SERVER['PHP_SELF'] = $_SERVER['REDIRECT_URL'];
-	}
-	if (isset($_SESSION['VHOST'])) {
-		
-	} else {
-		$_SESION['VHOST'] = FILEPATH;
-		
+if (isset($_SERVER['REDIRECT_URL'])) {
+				$_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_URL'];
 	}
 }
 
