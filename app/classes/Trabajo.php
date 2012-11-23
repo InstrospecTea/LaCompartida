@@ -75,8 +75,8 @@ class Trabajo extends Objeto
 										,".mysql_real_escape_string($id_usuario)."
 										,".$this->fields['id_usuario']."
 										,'MODIFICAR'
-										,".mysql_real_escape_string($codigo_asunto)."
-										,".mysql_real_escape_string($this->fields['codigo_asunto'])."
+										,'".mysql_real_escape_string($codigo_asunto)."'
+										,'".mysql_real_escape_string($this->fields['codigo_asunto'])."'
 										,'".$cobrable."','".$this->fields['cobrable']."')";
 					}
 			}
