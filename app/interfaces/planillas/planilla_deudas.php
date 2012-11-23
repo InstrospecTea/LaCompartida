@@ -79,6 +79,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		ORDER BY glosa_cliente";
 
 	$SimpleReport = new SimpleReport($Sesion);
+	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
 		array(
 			'field' => 'glosa_cliente',

@@ -206,6 +206,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json')) && !empty($_RE
 			ORDER BY fecha";
 
 	$SimpleReport = new SimpleReport($Sesion);
+	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 
 	$SimpleReport->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 

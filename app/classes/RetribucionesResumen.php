@@ -561,6 +561,7 @@ class RetribucionesResumen {
 		$porcentaje_retribucion_socios = $this->porcentaje_retribucion_socios;
 
 		$reporte = new SimpleReport($this->sesion);
+		$reporte->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$reporte->LoadConfiguration('RETRIBUCIONES_RESUMEN_ENCABEZADO');
 		if ($porcentaje_retribucion_socios>0) {
 			$reporte->Config->columns['retribucion_socios']->Title("Aporte al Área $porcentaje_retribucion_socios%");
@@ -578,6 +579,7 @@ class RetribucionesResumen {
 		));
 
 		$subreporte = new SimpleReport($this->sesion);
+		$subreporte->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$subreporte->LoadConfiguration('RETRIBUCIONES_RESUMEN_DETALLE');
 		if ($porcentaje_retribucion_socios>0) {
 			$subreporte->Config->columns['retribucion_socios']->Title("Aporte al Área $porcentaje_retribucion_socios%");

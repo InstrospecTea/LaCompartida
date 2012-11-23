@@ -16,7 +16,6 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 	private $current_row = 0;
 	private $autofilter = true;
 	private $col_letters = array();
-	public $formato_fecha = "%d/%m/%Y";
 	/**
 	 * una tabla (con un encabezado) para todos los grupos
 	 */
@@ -365,12 +364,12 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				}
 			} else if ($format == 'date') {
 				//las fechas llegan en formato SQL, pasarlas a formato excel
-				$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->formato_fecha);
+				$value = $value == '0000-00-00 00:00:00' ? '' : Utiles::sql2fecha($value, $this->SimpleReport->regional_format['date_format']);
 			} else if ($format == 'time') {
 				$value /= 24;
 			}
-			if(strpos($format, 'number') !== false || $format == 'time'){
-				$value = number_format($value, 10, '.', '');
+			if((strpos($format, 'number') !== false || $format == 'time') && is_numeric($value)){
+				$value = str_replace(',', '.', $value);
 			}
 
 			$function = $format == 'text' ? 'writeString' : 'write';

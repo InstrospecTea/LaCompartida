@@ -195,7 +195,7 @@ if (isset($opc) && $opc == 'marcar_retribuido') {
 								<?php
 								echo Html::SelectArrayDecente(array(
 									'EMITIDO,ENVIADO AL CLIENTE' => 'Emitido',
-									'FACTURADO,PAGO PARCIAL' => 'Fecturado',
+									'FACTURADO,PAGO PARCIAL' => 'Facturado',
 									'PAGADO' => 'Pagado',
 									), 'estado', isset($estado) ? $estado : 'PAGADO', '', 'Todos');
 								?>

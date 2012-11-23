@@ -169,7 +169,7 @@ $moneda_base = Utiles::MonedaBase($sesion);
 								<?php
 								echo Html::SelectArrayDecente(array(
 									'EMITIDO,ENVIADO AL CLIENTE' => 'Emitido',
-									'FACTURADO,PAGO PARCIAL' => 'Fecturado',
+									'FACTURADO,PAGO PARCIAL' => 'Facturado',
 									'PAGADO' => 'Pagado',
 									), 'estado', $estado ? $estado : 'PAGADO', '', 'Todos');
 								?>

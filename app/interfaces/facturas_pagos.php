@@ -136,7 +136,7 @@ function MontoAporte(& $fila) {
 	$idioma = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	$idioma->Load($fila->fields['codigo_idioma']);
 
-	return $fila->fields['simbolo_pago'] . ' ' . number_format($fila->fields['monto_aporte'], $fila->fields['cifras_decimales_pago'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+	return $fila->fields['simbolo_factura'] . ' ' . number_format($fila->fields['monto_aporte'], $fila->fields['cifras_decimales_factura'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 }
 
 function NumeroFactura(& $fila) {
@@ -172,7 +172,7 @@ function SaldoPago(& $fila) {
 function Opciones(& $fila) {
 	$id_factura_pago = $fila->fields['id_factura_pago'];
 	$codigo_cliente = $fila->fields['cliente_pago'];
-	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&id_cobro={$fila->fields['id_cobro']}&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumentoPago(" . $id_factura_pago . ");\" ><img src='" . Conf::ImgDir() . "/pdf.gif' border=0 title=Imprimir></a>";
 	return $html_opcion;
 }

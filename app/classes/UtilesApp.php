@@ -2068,4 +2068,13 @@ HTML;
 		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
 	}
 
+	public static function ObtenerFormatoIdioma($sesion) {
+		$query_idioma = "SELECT formato_fecha as date_format, separador_decimales as decimal_separator, separador_miles as thousands_separator
+			FROM prm_idioma WHERE codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma')";
+		$result = $sesion->pdodbh->query($query_idioma)->fetchAll(PDO::FETCH_ASSOC);
+		if(!empty($result)){
+			return $result[0];
+		}
+		return array('date_format' => '%d/%m/%Y', 'thousands_separator' => '.', 'decimal_separator' => ',');
+	}
 }

@@ -376,6 +376,7 @@ class Retribuciones {
 		$porcentaje_retribucion_socios = Conf::GetConf($this->sesion, 'RetribucionCentroCosto');
 
 		$reporte = new SimpleReport($this->sesion);
+		$reporte->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$reporte->LoadConfiguration('RETRIBUCIONES_ENCABEZADO');
 		if(!UtilesApp::GetConf($this->sesion, 'EncargadoSecundario')){
 			$reporte->Config->columns['nombre_usuario_secundario']->Visible(false);
@@ -394,6 +395,7 @@ class Retribuciones {
 		$this->ProcesaDatosSubreporte($datos_reporte, $datos_subreporte, $tipo_calculo, $porcentaje_retribucion_socios);
 		//end prepare child dat
 		$subreporte = new SimpleReport($this->sesion);
+		$subreporte->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$subreporte->LoadConfiguration('RETRIBUCIONES_DETALLE');
 
 		$subreporte->Config->columns['horas_cobradas']->Visible($tipo_calculo != 'monto_cobrado');

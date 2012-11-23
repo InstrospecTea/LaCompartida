@@ -276,6 +276,7 @@ class Gasto extends Objeto {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		
 		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('GASTOS');
 		
 		$results = $this->sesion->pdodbh->query($search_query)->fetchAll(PDO::FETCH_ASSOC);

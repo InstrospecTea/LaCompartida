@@ -400,6 +400,7 @@ BODY;
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('SOLICITUDES_ADELANTO');
 		
 		$query = $this->SearchQuery();

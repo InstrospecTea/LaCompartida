@@ -1733,6 +1733,7 @@ class Factura extends Objeto {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('FACTURAS');
 
 		$SimpleReport->LoadResults($results);
@@ -1747,6 +1748,7 @@ class Factura extends Objeto {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('REGISTRO_VENTAS');
 
 		$SimpleReport->LoadResults($results);

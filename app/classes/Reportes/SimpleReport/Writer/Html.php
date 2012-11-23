@@ -11,7 +11,6 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 	 * @var SimpleReport
 	 */
 	var $SimpleReport;
-	public $formato_fecha = "%d/%m/%Y";
 	/**
 	 * una tabla (con un encabezado) para todos los grupos
 	 */
@@ -313,14 +312,18 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				}
 				break;
 			case 'number':
-				$valor = number_format($valor, 2, ',', '.');
+				$decimals = 2;
+				if (isset($column->extras['decimals'])) {
+					$decimals = array_key_exists($column->extras['decimals'], $row) ? $row[$column->extras['decimals']] : $column->extras['decimals'];
+				}
+				$valor = number_format($valor, $decimals, $this->SimpleReport->regional_format['decimal_separator'], $this->SimpleReport->regional_format['thousands_separator']);
 				if (isset($column->extras['symbol'])) {
 					$symbol = array_key_exists($column->extras['symbol'], $row) ? $row[$column->extras['symbol']] : $column->extras['symbol'];
 					$valor = "$symbol&nbsp;$valor";
 				}
 				break;
 			case 'date':
-				$valor = Utiles::sql2fecha($valor, $this->formato_fecha);
+				$valor = Utiles::sql2fecha($valor, $this->SimpleReport->regional_format['date_format']);
 				break;
 			case 'time':
 				$valor = UtilesApp::Hora2HoraMinuto($valor);
