@@ -3,32 +3,6 @@
  
 require_once '/var/www/html/addbd.php';
 
-if (extension_loaded('newrelic')) {
-		newrelic_set_appname (SUBDOMAIN);
-
-	   }
-if (defined('BACKUP') && (BACKUP == 3 || BACKUP == '3')) {
-	include('offline.php');
-	die();
-}
-if(file_exists('/var/www/html/instanceid')) $instanceid=file_get_contents('/var/www/html/instanceid');
-header("Instance-ID:" . $instanceid);
-if (defined('FILEPATH')) {
-	header("X-vhost:" . FILEPATH);
-	setcookie('vhost', FILEPATH);
-	
-	if (isset($_SERVER['REDIRECT_URL'])) {
-		$_SERVER['SCRIPT_NAME'] = $_SERVER['REDIRECT_URL'];
-		$_SERVER['PHP_SELF'] = $_SERVER['REDIRECT_URL'];
-	}
-	if (isset($_SESSION['VHOST'])) {
-		
-	} else {
-		$_SESION['VHOST'] = FILEPATH;
-		
-	}
-}
-
 
 if (!class_exists('Conf')) {
 	class Conf
@@ -75,7 +49,7 @@ if (!class_exists('Conf')) {
 					$glosa['j_prm_materia'] = "glosa_materia";
 					$glosa['cliente'] = "glosa_cliente";
 					$glosa['j_prm_estado_causa'] = "glosa_estado_causa";
-					 $glosa['prm_categoria_usuario'] = "Categoríde Usuario";
+					 $glosa['prm_categoria_usuario'] = "CategorÃ­de Usuario";
 			$glosa['prm_area_proyecto'] = "prm_area_proyecto";
 			$glosa['prm_tipo_proyecto'] = "prm_tipo_proyecto";
 			$glosa['prm_area_usuario'] = "prm_area_usuario";
@@ -120,11 +94,10 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
 defined('BACKUPDIR') || define('BACKUPDIR','/tmp');
 defined('USERWS') || define('USERWS',Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS',Conf::UsuarioWS());
- 
-ini_set('error_log','/var/www/error_logs/'.DBUSER.'_error_log.log');
-	
 
-require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
 
-require_once Conf::ServerDir().'/../app/lang/es.php';		//Para que cargue el idioma por defecto
-require_once Conf::ServerDir().'/../app/lang/abogado.php';	//Por si hay palabras especificas relacionadas con el rubro
+
+
+require_once APPPATH.'/fw/funciones/funciones.php';
+require_once APPPATH.'/app/lang/es.php';		//Para que cargue el idioma por defecto
+require_once APPPATH.'/app/lang/abogado.php';	//Por si hay palabras especificas relacionadas con el rubro
