@@ -1302,7 +1302,7 @@ list($numero_facturas_asociados) = mysql_fetch_array($resp);
 
 $existe_factura = ($numero_facturas_asociados > 0) ? 1 : 0;
 
-$query = "SELECT count(*) FROM documento WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "' AND tipo_doc != 'N' and monto!=0";
+$query = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '{$cobro->fields['id_cobro']}'";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 list($numero_documentos_pagos_asociados) = mysql_fetch_array($resp);
 
