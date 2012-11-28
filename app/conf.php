@@ -1,8 +1,11 @@
 <?php
 
- 
-require_once '/var/www/html/addbd.php';
-
+if(file_exists('/var/www/html/addbd.php')){
+	require_once '/var/www/html/addbd.php';
+}
+else if(file_exists(dirname(__FILE__) . '/miconf.php')){
+	require_once dirname(__FILE__) . '/miconf.php';
+}
 
 if (!class_exists('Conf')) {
 	class Conf
