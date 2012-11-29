@@ -45,10 +45,10 @@ $Slim=Slim::getInstance('default',true);
 
 </script>
 <?php
-$path = Conf::ServerDir() . '/../aviso.txt';
-if (file_exists($path)) {
-	$data = json_decode(file_get_contents($path), true);
-	$aviso = UtilesApp::utf8izar($data, false);
+$path_aviso = Conf::ServerDir() . '/../aviso.txt';
+if (file_exists($path_aviso)) {
+	$aviso = json_decode(file_get_contents($path_aviso), true);
+	$aviso['mensaje'] = nl2br($aviso['mensaje']);
 
 	//solo mostrar aviso a los q tienen algun permiso especificado
 	$mostrar = false;
@@ -73,6 +73,23 @@ if (file_exists($path)) {
 		</style>
 		<script type="text/javascript">
 			var aviso = <?php echo json_encode($aviso); ?>;
+			if(aviso.date){
+				var date = new Date(aviso.date*1);
+				if(date.getTime() < new Date().getTime()){
+					aviso.mensaje += '<br/><br/>La actualización se realizará dentro de algunos minutos';
+					aviso.fecha = null;
+				}
+				else{
+					aviso.fecha = date.getDate() + '-' + (date.getMonth() + 1)  + '-' + date.getFullYear();
+					aviso.hora = date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+				}
+			}
+			if(aviso.fecha){
+				aviso.mensaje += '<br/><br/>La actualización se realizará el día ' + aviso.fecha;
+				if(aviso.hora){
+					aviso.mensaje += ' alrededor de las ' + aviso.hora + ' (hora local)';
+				}
+			}
 			if(aviso.link){
 				aviso.mensaje += '<br/><br/><a href="' + aviso.link + '">Ver más información...</a>';
 			}
@@ -84,7 +101,9 @@ if (file_exists($path)) {
 					sticky: true,
 					class_name: 'notificacion',
 					after_close: function(){
-						localStorage['esconder_notificacion'] = aviso.id;
+						if(localStorage){
+							localStorage['esconder_notificacion'] = aviso.id;
+						}
 					}
 				});
 			}

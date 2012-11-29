@@ -49,12 +49,17 @@ $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 	Este aviso se mostrará desde ahora hasta que se elimine, y lo verán todos los usuarios con los permisos seleccionados, para todos los estudios que usen esta versión del código.
 	<br/>
 	<br/>
-	<form action="" method="POST">
-		<label>Mensaje:<textarea name="aviso[mensaje]"><?php echo $aviso['mensaje']; ?></textarea></label>
+	<form id="form_aviso" action="" method="POST">
+		<label>Mensaje: <textarea name="aviso[mensaje]" rows="6" cols="37"><?php echo $aviso['mensaje']; ?></textarea></label>
 		<br/>
-		<label>Fecha (hora Chile):<input name="aviso[fecha]" value="<?php echo $aviso['fecha']; ?>"/></label>
+		<label>Fecha:
+			<input id="fecha" name="aviso[fecha]" value="<?php echo $aviso['fecha']; ?>"/>
+			<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+		</label>
 		<br/>
-		<label>Link detalle:<input name="aviso[link]" value="<?php echo $aviso['link']; ?>"/></label>
+		<label>Hora (Chile): <input id="hora" name="aviso[hora]" value="<?php echo $aviso['hora']; ?>"/></label>
+		<br/>
+		<label>Link detalle: <input name="aviso[link]" value="<?php echo $aviso['link']; ?>"/></label>
 		<br/>
 		<h3>Mostrar a:</h3>
 		<?php foreach ($permisos as $permiso) { ?>
@@ -65,6 +70,7 @@ $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 			<br/>
 		<?php } ?>
 		<br/>
+		<input type="hidden" id="date" name="aviso[date]" value=""/>
 		<input type="hidden" id="opc" name="opc" value="guardar"/>
 		<button id="btn_guardar">Guardar</button>
 		<button id="btn_eliminar">Eliminar</button>
@@ -72,8 +78,21 @@ $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 </div>
 <script type="text/javascript">
 	jQuery(function(){
-		jQuery('#btn_guardar').click(function(){
-			jQuery('#opc').val('guardar');
+		Calendar.setup({
+			inputField  : "fecha",       // ID of the input field
+			ifFormat    : "%d-%m-%Y",     // the date format
+			button      : "img_fecha"   // ID of the button
+		});
+		
+		jQuery('#form_aviso').submit(function(){
+			var fecha = jQuery('#fecha').val();
+			var hora = jQuery('#hora').val();
+			if(fecha && hora){
+				var mf = fecha.match(/(\d+)-(\d+)-(\d+)/);
+				var mh = hora.match(/(\d+)\D?(\d+)?\D?(\d+)?/);
+				var date = new Date(mf[3], mf[2] - 1, mf[1], mh[1], mh[2] || 0, mh[3] || 0);
+				jQuery('#date').val(date.getTime());
+			}
 		});
 		jQuery('#btn_eliminar').click(function(){
 			jQuery('#opc').val('eliminar');
