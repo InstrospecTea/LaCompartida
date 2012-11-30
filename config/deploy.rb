@@ -149,8 +149,8 @@ namespace :deploy do
   task :finalize_update, :except => { :no_release => true } do
     transaction do
       run "chmod -R g+w #{releases_path}/#{release_name}"
-      run "echo 'stage: #{current_stage}' > #{releases_path}/#{release_name}/config/environment.txt"
-      run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/config/environment.txt"
+      run "echo 'stage: #{current_stage}' > #{releases_path}/#{release_name}/environment.txt"
+      run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
 

@@ -52,9 +52,9 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$sesion->pdodbh->exec("insert ignore into usuario_permiso (select id_usuario, 'ALL' as codigo_permiso from usuario where activo=1);");
 		//$sesion->pdodbh->exec("INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)  VALUES ('lifetime', '7200', 'duración de la sesión en segundos', 'numero', '10', '-1');");
 
-		
+
 		$sesion->pdodbh->exec("delete from usuario_permiso where id_usuario=".$sesion->usuario->fields['id_usuario']." and codigo_permiso in ('SEC','PRO','SOC')");
-		
+
 				echo '<br>&nbsp;&nbsp;&nbsp; <a href="' . Conf::RootDir() . '/app/update.php?hash=' . Conf::Hash() . '"/>Update</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/configuracion.php"/>Configuracion</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/templates.php"/>Templates</a>';
@@ -71,12 +71,18 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$_GET['lastver'] = 1;
 				include(Conf::ServerDir() . '/update.php');
 			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../') .'</b><br>';
+			$environment = file_get_contents( dirname(__FILE__) . '/../../../environment.txt');
+			$source_version = file_get_contents( dirname(__FILE__) . '/../../../VERSION');
+			$deploy_revision = file_get_contents( dirname(__FILE__) . '/../../../REVISION');
+			$deploy_stage = $environment;
+			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
+
 		if(function_exists('svn_status')) print_r(svn_status( dirname(__FILE__)  ));
 			}
-	
-		
-		
-		
+
+
+
+
 			?>
 			<br/><br style="clear:both;display:block;"/>
 		</td>
