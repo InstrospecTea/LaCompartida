@@ -28,10 +28,14 @@ if (!empty($_POST['opc'])) {
 		case 'guardar':
 			$data = UtilesApp::utf8izar($_POST['aviso']);
 			$data['id'] = uniqid();
-			$ret = file_put_contents($path, json_encode($data));
+			if(!file_put_contents($path, json_encode($data))){
+				echo 'No se pudo guardar el aviso (revisar permiso de escritura en directorio)';
+			}
 			break;
 		case 'eliminar':
-			$ret = unlink($path);
+			if(file_exists($path) && !unlink($path)){
+				echo 'No se pudo eliminar el aviso';
+			}
 			break;
 	}
 }
