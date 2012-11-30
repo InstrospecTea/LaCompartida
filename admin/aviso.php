@@ -12,11 +12,12 @@ function autocargaapp($class_name) {
 
 spl_autoload_register('autocargaapp');
 
-$sesion = new Sesion(array('ADM'));
-$pagina = new Pagina($sesion);
-$pagina->titulo = __('Aviso de actualización');
-$pagina->PrintTop();
-if ($sesion->usuario->fields['rut'] != '99511620') {
+$Sesion = new Sesion(array('ADM'));
+$Pagina = new Pagina($Sesion);
+$Pagina->titulo = __('Aviso de actualización');
+$Pagina->PrintTop();
+
+if ($Sesion->usuario->fields['rut'] != '99511620') {
 	die('No Autorizado');
 }
 
@@ -47,7 +48,7 @@ if (file_exists($path)) {
 }
 
 $query = "SELECT codigo_permiso, glosa FROM prm_permisos";
-$permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+$permisos = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div style="text-align: left">
 	Este aviso se mostrará desde ahora hasta que se elimine, y lo verán todos los usuarios con los permisos seleccionados, para todos los estudios que usen esta versión del código.
@@ -87,7 +88,7 @@ $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 			ifFormat    : "%d-%m-%Y",     // the date format
 			button      : "img_fecha"   // ID of the button
 		});
-		
+
 		jQuery('#form_aviso').submit(function(){
 			var fecha = jQuery('#fecha').val();
 			var hora = jQuery('#hora').val();
@@ -104,4 +105,4 @@ $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 	});
 </script>
 <?php
-$pagina->PrintBottom();
+$Pagina->PrintBottom();
