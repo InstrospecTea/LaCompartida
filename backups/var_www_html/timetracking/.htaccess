@@ -1,0 +1,14 @@
+RewriteEngine On
+RewriteBase /
+ 
+
+RewriteCond %{HTTP_COOKIE} vhost=([^;]+) [NC]
+RewriteRule .* - [E=VHOST:%1,NE]
+
+RewriteCond %{REQUEST_URI} ^/([a-z0-9-_]+)/(.*)
+RewriteRule .* - [E=SUBDIR:%1,NE]
+
+
+RewriteCond %{ENV:VHOST}<>%{ENV:SUBDIR} !^(.*)<>\1$
+RewriteCond %{HTTP_COOKIE} vhost=([^;]+) [NC]
+RewriteRule (.*)    /%1/$1 [L]
