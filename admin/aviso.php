@@ -20,32 +20,25 @@ if ($sesion->usuario->fields['rut'] != '99511620') {
 	die('No Autorizado');
 }
 
-//se guarda el aviso en un archivo para que todos los clientes de este directorio lo vean
-$path = Conf::ServerDir() . '/../aviso.txt';
-
+$sdb = new SDB();
 if (!empty($_POST['opc'])) {
 	switch ($_POST['opc']) {
 		case 'guardar':
-			$data = UtilesApp::utf8izar($_POST['aviso']);
+			$data = $_POST['aviso'];
 			$data['id'] = uniqid();
-			if(!file_put_contents($path, json_encode($data))){
-				echo 'No se pudo guardar el aviso (revisar permiso de escritura en directorio)';
+			if(!$sdb->put('avisos', Conf::ServerDir(), $data)) {
+				echo 'No se pudo guardar el aviso';
 			}
 			break;
 		case 'eliminar':
-			if(file_exists($path) && !unlink($path)){
+			if(!$sdb->delete('avisos', Conf::ServerDir())) {
 				echo 'No se pudo eliminar el aviso';
 			}
 			break;
 	}
 }
 
-$aviso = array();
-if (file_exists($path)) {
-	$data = json_decode(file_get_contents($path), true);
-	$aviso = UtilesApp::utf8izar($data, false);
-}
-
+$aviso = $sdb->get('avisos', Conf::ServerDir());
 $query = "SELECT codigo_permiso, glosa FROM prm_permisos";
 $permisos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 ?>

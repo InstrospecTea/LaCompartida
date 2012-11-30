@@ -8,9 +8,7 @@ defined('DBNAME') || define('DBNAME',	'timetracking');
 list($nada,$subdir)=explode('/',$_SERVER['REQUEST_URI']);
 defined('ROOTDIR') || define('ROOTDIR',$subdir);
 
-
-
-
+defined('CACHEDIR') || define('CACHEDIR','/tmp');
 
 defined('APPNAME') || define('APPNAME', 'El Lemontech');
 
@@ -19,6 +17,9 @@ defined('SUBDOMAIN') || define('SUBDOMAIN',$subdominio);
 defined('DOCROOT') || define('DOCROOT',dirname(__FILE__));
 
 defined('APPPATH') || define('APPPATH',$_SERVER['DOCUMENT_ROOT'].'/'.ROOTDIR);
+
+//AmazonWS SDK: https://github.com/amazonwebservices/aws-sdk-for-php.git
+include DOCROOT . '/../../aws-sdk-for-php/sdk.class.php';
 
 ini_set('display_errors', 'On');
 set_time_limit(0);

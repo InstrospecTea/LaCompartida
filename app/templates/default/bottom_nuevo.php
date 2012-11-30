@@ -45,9 +45,9 @@ if ($popup == true) {
 
 </script>
 <?php
-$path_aviso = Conf::ServerDir() . '/../aviso.txt';
-if (file_exists($path_aviso)) {
-	$aviso = json_decode(file_get_contents($path_aviso), true);
+$sdb = new SDB();
+$aviso = $sdb->get('avisos', Conf::ServerDir());
+if (!empty($aviso)) {
 	$aviso['mensaje'] = nl2br($aviso['mensaje']);
 
 	//solo mostrar aviso a los q tienen algun permiso especificado
@@ -73,7 +73,7 @@ if (file_exists($path_aviso)) {
 			}
 		</style>
 		<script type="text/javascript">
-			var aviso = <?php echo json_encode($aviso); ?>;
+			var aviso = <?php echo json_encode(UtilesApp::utf8izar($aviso)); ?>;
 			if(aviso.date){
 				var date = new Date(aviso.date*1);
 				if(date.getTime() < new Date().getTime()){

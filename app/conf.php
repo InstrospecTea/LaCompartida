@@ -1,5 +1,7 @@
 <?php
 
+ini_set('display_errors', 'Off');
+
 if(file_exists('/var/www/html/addbd.php')){
 	require_once '/var/www/html/addbd.php';
 }
@@ -87,6 +89,13 @@ if (!class_exists('Conf')) {
 	public static       function UsuarioWS()  {           return defined('USERWS')? USERWS:  base64_encode(rand(10000,90000));          }
 
 
+		public static function AmazonKey(){
+			return array(
+				'key' => 'AKIAIQYFL5PYVQKORTBA',
+				'secret' => 'q5dgekDyR9DgGVX7/Zp0OhgrMjiI0KgQMAWRNZwn',
+				'default_cache_config' => CACHEDIR
+			);
+		}
 	}
 }
 defined('ROOTDIR') || define('ROOTDIR',str_replace('//','/','/'.Conf::RootDir()));
@@ -97,6 +106,7 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
 defined('BACKUPDIR') || define('BACKUPDIR','/tmp');
 defined('USERWS') || define('USERWS',Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS',Conf::UsuarioWS());
+defined('CACHEDIR') || define('CACHEDIR','/var/www/virtual/cache/');
 
 
 
