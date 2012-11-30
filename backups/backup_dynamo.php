@@ -26,6 +26,7 @@ if (file_exists(dirname(__FILE__).'/AWSSDKforPHP/sdk.class.php')) {
 	 require_once 'AWSSDKforPHP/sdk.class.php';
 	}
 
+require_once dirname(__FILE__).'/DatabaseUpdater.php';
 
 set_time_limit(7200);
 
@@ -162,10 +163,18 @@ $S3sdk = new AmazonS3(array('key' => 'AKIAJDGKILFBFXH3Y2UA',
 
 if(!is_dir('/var/www/cache/dynamoDBbackups')) mkdir('/var/www/cache/dynamoDBbackups',0755);
 loguear('leyendo DynamoDB');
-$dynamodb = new AmazonDynamoDB(array(
-        'key' => 'AKIAJDGKILFBFXH3Y2UA',
-        'secret' => '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'
-        ,'default_cache_config' => '/var/www/cache/dynamoDBbackups'));
+$connection_params = array(
+		    'key' => 'AKIAJDGKILFBFXH3Y2UA',
+		    'secret' => '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',
+		    'default_cache_config' => '/var/www/cache/dynamoDBbackups'
+		  );
+
+$dynamodb = new AmazonDynamoDB($connection_params);
+
+$db_updater = new DatabaseUpdater(
+  'c85ef9997e6a30032a765a20ee69630b',
+  $connection_params
+);
 
 $scan_response = $dynamodb->scan(array(
 'TableName' => 'thetimebilling'
@@ -266,9 +275,9 @@ foreach($arreglo as $sitio):
 		
 
 		loguear("copiando a S3:  $path");
-		 try {
-		$crearobject=$S3sdk->create_object($bucketname,$filebkp,array('fileUpload'=>$path));
-		// echo '<pre>';	print_r($crearobject);	echo '</pre>';
+		try {
+			$crearobject=$S3sdk->create_object($bucketname,$filebkp,array('fileUpload'=>$path));
+			$db_updater->update('update_db', $sitio['subdominiosubdir'], $sitio['update_db']);
 		} catch(Exception $e) {
 		print_r($e);
 		
