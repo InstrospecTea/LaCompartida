@@ -1,0 +1,14 @@
+RewriteEngine On
+
+RewriteBase /
+ 
+
+RewriteCond %{HTTP_COOKIE} vhost=([^;]+) [NC]
+RewriteRule .* - [E=VHOST:%1,NE]
+
+RewriteCond %{REQUEST_URI} ^/([a-z0-9-_]+)/(.*)
+RewriteRule .* - [E=SUBDIR:%1,NE]
+
+RewriteCond %{REQUEST_URI} ^/(bk|backups)
+RewriteCond %{HTTP_HOST} ^(.*)\.(thetimebilling\.com|lemontech\.cl)
+RewriteRule ^ https://%1.thetimebilling.com/time_tracking/admin/respaldos.php [R,L]
