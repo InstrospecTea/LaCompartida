@@ -10,7 +10,7 @@ set :ssh_options, { :forward_agent => true }
 set :application, "time_tracking"
 set :scm, :git
 set :git_enable_submodules, 1
-set :repository, "git@github.com:LemontechSA/ttb-test.git"
+set :repository, "git@github.com:LemontechSA/ttb.git"
 
 set :deploy_to, "/var/www/html/deploy/#{application}"
 set :use_sudo, false
@@ -57,6 +57,7 @@ namespace :deploy do
     transaction do
       run "chmod -R g+w #{releases_path}/#{release_name}"
       run "echo '#{current_stage}' > #{releases_path}/#{release_name}/config/environment.txt"
+      run "echo '#{branch}' >> #{releases_path}/#{release_name}/config/environment.txt"
     end
   end
 
