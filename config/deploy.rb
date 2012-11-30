@@ -23,7 +23,7 @@ set :rvm_ruby_string, "1.9.3@#{application}"
 
 set :scm, :git
 set :git_enable_submodules, 1
-set :repository, "git@github.com:LemontechSA/ttb-test.git"
+set :repository, "git@github.com:LemontechSA/ttb.git"
 
 base_domain = 'thetimebilling.com'
 base_directory = "/var/www/html"
