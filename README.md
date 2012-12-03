@@ -44,21 +44,29 @@ The Time Billing - Time Tracking
 * La aplicación no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
 
 ###Workspace y setup Proyecto
-- Hacer checkout del proyecto
-
-      $ svn checkout svn.lemontech.cl/time_tracking
+- Clonar el proyecto
+- Clonar en otro directorio [Amazon WS SDK][awssdk]
+- Inicializar [HubFlow](#hubflow)
+      $ git hf init
 - Abrir el proyecto con tu editor favorito
 - Recuerda que el charset para el editor (Eclipse/SublimeText/NetBeans) debe ser: "iso-8859-1"
-- Duplica el archivo conf.php.default con el nombre conf.php
+- Duplica el archivo app/miconf.php.default con el nombre app/miconf.php
 - Duplica el archivo version.php.default con el nombre version.php
-- Edita el archivo **conf.php** para configurar
-  * dbHost: Servidor de base de datos
-  * dbName: Nombre de la base de datos creada anteriormente
-  * dbUser: Usuario de inicio de sesión con acceso full a la base de datos **dbName**
-  * dbPass: El password del usuario **dbUser**
+- Edita el archivo **miconf.php** para configurar
+  * DBHOST: Servidor de base de datos
+  * DBNAME: Nombre de la base de datos creada anteriormente
+  * DBUSER: Usuario de inicio de sesión con acceso full a la base de datos **DBNAME**
+  * DBPASS: El password del usuario **DBUSER**
+  * CACHEDIR: Path del directorio donde guardar el cache
+  * Incluir AWSSDK usando el directorio en que se clonó
 - Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio trunk dentro de tu repositorio
 - Recuerda reiniciar Apache cada vez que hagas cambios en la configuración y tener el servidor Mysql iniciado
 - [Test][6]
+- Si AWSSDK arroja un error de certificado SSL, editar el archivo (path de awssdk)/lib/requestcore/requestcore.class.php y en la función send_request (línea 844) editar el siguiente código:
+		$curl_handle = $this->prep_request();
+	+	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+		$this->response = curl_exec($curl_handle);
+
 
 
 ###Tips y Troubleshooting en MacOS X
@@ -130,3 +138,4 @@ Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archi
 [7]: https://github.com/nvie/gitflow
 [8]: https://github.com/datasift/gitflow
 [9]: https://github.com/nvie/gitflow/wiki/Windows
+[awssdk]: https://github.com/amazonwebservices/aws-sdk-for-php
