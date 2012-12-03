@@ -185,7 +185,7 @@ if ($opc == 'anular_emision') {
 	$ret = $cobro->GuardarCobro();
 	if ($accion == 'emitir' && $ret == '') {	 ##################### EMISION ######################
 		/* Guardo el cobro generando los movimientos de cuenta corriente */
-		$query_pagos = "SELECT count(*) FROM documento WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "' AND tipo_doc != 'N' ";
+		$query_pagos = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '{$cobro->fields['id_cobro']}'";
 		$resp_pagos = mysql_query($query_pagos, $sesion->dbh) or Utiles::errorSQL($query_pagos, __FILE__, __LINE__, $sesion->dbh);
 		list($cantidad_pagos) = mysql_fetch_array($resp_pagos);
 		if ($cantidad_pagos > 0) {
@@ -272,7 +272,7 @@ if ($opc == 'anular_emision') {
 	  $his->Edit('id_cobro',$cobro->fields['id_cobro']);
 	  $his->Write(); */
 } else if ($opc == 'volver_a_creado') {
-	$query = "SELECT count(*) FROM documento WHERE id_cobro = '" . $cobro->fields['id_cobro'] . "' ";
+	$query = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '{$cobro->fields['id_cobro']}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($cantidad_pagos) = mysql_fetch_array($resp);
 
