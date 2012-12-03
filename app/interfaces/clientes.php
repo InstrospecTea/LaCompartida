@@ -226,7 +226,7 @@ Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cli
 					WHERE $where";
 		
  		if($orden == "")
-			$orden = "glosa_cliente";
+			$orden = "cliente.glosa_cliente";
 		$x_pag = 20;
 
 		$b = new Buscador($sesion, $query, "Cliente", $desde, $x_pag, $orden);
