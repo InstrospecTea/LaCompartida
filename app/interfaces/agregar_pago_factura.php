@@ -330,7 +330,6 @@ $query__listado = "SELECT SQL_CALC_FOUND_ROWS
 										 ON ccfm.id_cta_cte_mvto = ccfmn.id_mvto_deuda
 										AND ccfmn.id_mvto_pago = '{$mvto_pago->fields['id_cta_cte_mvto']}'
 							$join_facturas factura AS f ON ccfm.id_factura = f.id_factura $on_facturas
-                                                        join (select d.id_cobro from documento d where d.tipo_doc='N') doc on doc.id_cobro=f.id_cobro
                                                         JOIN prm_moneda AS pm ON f.id_moneda = pm.id_moneda
 							LEFT JOIN prm_documento_legal AS pdl ON pdl.id_documento_legal = f.id_documento_legal";
 $query__listado .="	WHERE (f.codigo_cliente = '$codigo_cliente'";
