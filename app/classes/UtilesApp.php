@@ -12,26 +12,66 @@ require_once Conf::ServerDir() . '/classes/InputId.php';
 
 class UtilesApp extends Utiles {
 
+	/**
+	 *
+	 * @param object $sesion
+	 * @param string $conf
+	 * @return string
+	 *  Ahora comprueba si existe el array $sesion->arrayconf para llenarlo una sola vez y consultar de él de ahí en adelante.
+	 * Si no, intenta usar memcache
+	 * Tiene fallback al código antiguo por si
+	 */
 	public static function GetConf($sesion, $conf) {
-		if (method_exists('Conf', 'GetConf')) {
+		global $memcache;
+		$existememcache=is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
+		if (isset($sesion->arrayconf) ) {  // si existe el objeto arrayconf me conviene consultarlo en vez de ir a memcache
+			 if (empty($sesion->arrayconf)) { // si el objeto arrayconf está vacio lo voy a llenar una sola vez con memcache
+					if ($existememcache && $config = $memcache->get(DBNAME . '_config')) { // si existe la llave en memcache
+							$sesion->arrayconf = json_decode($config, true);
+					} else {
+							$queryconf = "select glosa_opcion, valor_opcion from configuracion		";
+							$configST = $sesion->pdodbh->query($queryconf);
+							$sesion->arrayconf = $configST->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+							foreach ($sesion->arrayconf as $config => $valor) {
+								$sesion->arrayconf[$config] = $valor[0][0];
+							}
+						if($existememcache)	$memcache->set(DBNAME . '_config', json_encode($sesion->arrayconf), false, 120);
+					}
+			 }
+			return $sesion->arrayconf[$conf];
+		} else if ($existememcache) { //si  no existe el objeto arrayconf  se usa directo memcache
+					if ($config = $memcache->get(DBNAME . '_config')) { // si existe la llave en memcache
+							$arrayconf = json_decode($config, true);
+					} else {
+							$queryconf = "select glosa_opcion, valor_opcion from configuracion		";
+							$configST = $sesion->pdodbh->query($queryconf);
+							$arrayconf = $configST->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+							foreach ($arrayconf as $config => $valor) {
+								$arrayconf[$config] = $valor[0][0];
+							}
+							$memcache->set(DBNAME . '_config', json_encode($arrayconf), false, 120);
+					}
+			return $arrayconf[$conf];
+		} else if (method_exists('Conf', 'GetConf')) {
 			return Conf::GetConf($sesion, $conf);
-		}
 
-		if (method_exists('Conf', $conf)) {
+		} else if (method_exists('Conf', $conf)) {
 			return Conf::$conf();
+		} else {
+			return false;
 		}
-		return false;
 	}
+
+	/**
+	 *
+	 * @param object $sesion
+	 * @param string $conf
+	 *  Escribe el valor de un config en formato JS.
+	 */
 	public static function GetConfJs($sesion, $conf) {
-		if (method_exists('Conf', $conf)) {
-			//return Conf::$conf();
-			echo "var $conf='".Conf::$conf()."';\n";
-		}
-		
-		if (method_exists('Conf', 'GetConf')) {
-			echo "var $conf='".Conf::GetConf($sesion, $conf)."';\n";
-		}
-		return false;
+
+			echo "var $conf='" . self::GetConf($sesion, $conf) . "';\n";
+
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
@@ -2062,11 +2102,13 @@ HTML;
 		return $menu_html;
 	}
 
+
 	public static function PrintFormatoMoneda(&$Sesion, $monto, $id_moneda) {
 		extract(array_pop(Moneda::GetMonedas($Sesion, $id_moneda)));
 
 		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
 	}
+
 
 	public static function ObtenerFormatoIdioma($sesion) {
 		$query_idioma = "SELECT formato_fecha as date_format, separador_decimales as decimal_separator, separador_miles as thousands_separator
@@ -2077,4 +2119,51 @@ HTML;
 		}
 		return array('date_format' => '%d/%m/%Y', 'thousands_separator' => '.', 'decimal_separator' => ',');
 	}
+
+	/**
+	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parámetro
+	 * $encode permite realizar la acción inversa
+	 * @param mixed $data Arreglo o string a modificar
+	 * @param boolean $encode encode (true) o decode (false)
+	 * @return mixed
+	 */
+	public static function utf8izar($data, $encode = true) {
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				// Previene doble codificación
+				unset($data[$key]);
+				$key = self::utf8izar($key, $encode);
+				$data[$key] = self::utf8izar($value, $encode);
+			}
+		} else if (is_string($data)) {
+			// ^ = XOR = or exclusivo = true && false || false && true
+			if (mb_detect_encoding($data, 'UTF-8', true) == 'UTF-8' ^ $encode) {
+				$data = $encode ? utf8_encode($data) : utf8_decode($data);
+			}
+		}
+
+		return $data;
+	}
+
+
+		public static function ArregloMonedas($sesion) {
+		$query = "SELECT
+								prm_moneda.id_moneda,
+								prm_moneda.tipo_cambio,
+								prm_moneda.cifras_decimales,
+								prm_moneda.glosa_moneda,
+								prm_moneda.glosa_moneda_plural,
+								prm_moneda.simbolo
+							FROM prm_moneda";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		while (list($id_moneda, $tipo_cambio, $cifras_decimales, $glosa_moneda, $glosa_moneda_plural, $simbolo) = mysql_fetch_array($resp)) {
+			$moneda[$id_moneda]['tipo_cambio'] = $tipo_cambio;
+			$moneda[$id_moneda]['glosa_moneda'] = $glosa_moneda;
+			$moneda[$id_moneda]['glosa_moneda_plural'] = $glosa_moneda_plural;
+			$moneda[$id_moneda]['cifras_decimales'] = $cifras_decimales;
+			$moneda[$id_moneda]['simbolo'] = $simbolo;
+		}
+		return $moneda;
+	}
+
 }
