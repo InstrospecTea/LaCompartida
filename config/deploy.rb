@@ -3,6 +3,9 @@ require "rvm/capistrano"
 require 'capistrano/cli'
 require 'capistrano_colors'
 require 'aws'
+load 'config/deploy/cap_notify'
+
+set :notify_emails, ["implementacion@lemontech.cl"]
 
 capistrano_color_matchers = [
   { :match => /command finished/,       :color => :hide,      :prio => 10 },
@@ -114,6 +117,10 @@ namespace :deploy do
     run "ssh-add ~/.ssh/id_rsa"
   end
 
+  desc "Send email notification"
+  task :send_notification do
+    Notifier.deploy_notification(self).deliver 
+  end
 
   task :run_udpates do
       production_environment = (current_stage == "production")
@@ -178,5 +185,7 @@ namespace :deploy do
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", "deploy:run_udpates"
+  after "deploy", 'deploy:send_notification'
+
 
 end
