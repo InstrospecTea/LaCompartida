@@ -59,7 +59,7 @@ task :feature do
   if (default_branch == "develop")
     feature_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{default_branch}]: ")
   end
-  feature_branch ||= default_branch
+  feature_branch = (feature_branch && feature_branch.length > 0) ? feature_branch : default_branch
   feature_name = feature_branch.split('/').last
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{feature_name}"
   set :branch, feature_branch
@@ -86,7 +86,7 @@ task :release do
   if (default_branch == "master")
     release_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
   end
-  release_branch ||= default_branch
+  release_branch = (release_branch && release_branch.length > 0) ? release_branch : default_branch
   set :branch, release_branch
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
   set :deploy_to, "#{base_directory}/#{file_path}"
