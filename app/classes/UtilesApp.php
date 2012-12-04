@@ -24,7 +24,9 @@ class UtilesApp extends Utiles {
 	public static function GetConf($sesion, $conf) {
 		global $memcache;
 		$existememcache=is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
-		if (isset($sesion->arrayconf) ) {  // si existe el objeto arrayconf me conviene consultarlo en vez de ir a memcache
+		if (method_exists('Conf', $conf)) {
+			return Conf::$conf();
+		} else 	if (isset($sesion->arrayconf) ) {  // si existe el objeto arrayconf me conviene consultarlo en vez de ir a memcache
 			 if (empty($sesion->arrayconf)) { // si el objeto arrayconf está vacio lo voy a llenar una sola vez con memcache
 					if ($existememcache && $config = $memcache->get(DBNAME . '_config')) { // si existe la llave en memcache
 							$sesion->arrayconf = json_decode($config, true);
@@ -55,8 +57,6 @@ class UtilesApp extends Utiles {
 		} else if (method_exists('Conf', 'GetConf')) {
 			return Conf::GetConf($sesion, $conf);
 
-		} else if (method_exists('Conf', $conf)) {
-			return Conf::$conf();
 		} else {
 			return false;
 		}
