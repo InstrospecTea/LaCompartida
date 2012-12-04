@@ -3,6 +3,9 @@ require "rvm/capistrano"
 require 'capistrano/cli'
 require 'capistrano_colors'
 require 'aws'
+load 'config/deploy/cap_notify'
+
+set :notify_emails, ["implementacion@lemontech.cl"]
 
 capistrano_color_matchers = [
   { :match => /command finished/,       :color => :hide,      :prio => 10 },
@@ -56,7 +59,7 @@ task :feature do
   if (default_branch == "develop")
     feature_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{default_branch}]: ")
   end
-  feature_branch ||= default_branch
+  feature_branch = (feature_branch && feature_branch.length > 0) ? feature_branch : default_branch
   feature_name = feature_branch.split('/').last
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{feature_name}"
   set :branch, feature_branch
@@ -83,7 +86,7 @@ task :release do
   if (default_branch == "master")
     release_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
   end
-  release_branch ||= release_branch
+  release_branch = (release_branch && release_branch.length > 0) ? release_branch : default_branch
   set :branch, release_branch
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
   set :deploy_to, "#{base_directory}/#{file_path}"
@@ -114,6 +117,10 @@ namespace :deploy do
     run "ssh-add ~/.ssh/id_rsa"
   end
 
+  desc "Send email notification"
+  task :send_notification do
+    Notifier.deploy_notification(self).deliver 
+  end
 
   task :run_udpates do
       production_environment = (current_stage == "production")
@@ -178,5 +185,7 @@ namespace :deploy do
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", "deploy:run_udpates"
+  after "deploy", 'deploy:send_notification'
+
 
 end
