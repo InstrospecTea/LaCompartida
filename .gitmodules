@@ -1,3 +1,9 @@
 [submodule "fw"]
 	path = fw
 	url = git@github.com:LemontechSA/framework.git
+[submodule "backups/AWSSDKforPHP"]
+	path = backups/AWSSDKforPHP
+	url = git://github.com/amazonwebservices/aws-sdk-for-php.git
+[submodule "backups/PHPMailer"]
+	path = backups/PHPMailer
+	url = git://github.com/Synchro/PHPMailer.git
