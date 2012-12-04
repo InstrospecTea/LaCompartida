@@ -86,7 +86,7 @@ task :release do
   if (default_branch == "master")
     release_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
   end
-  release_branch ||= release_branch
+  release_branch ||= default_branch
   set :branch, release_branch
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
   set :deploy_to, "#{base_directory}/#{file_path}"
