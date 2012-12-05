@@ -64,9 +64,9 @@ The Time Billing - Time Tracking
 - [Test][6]
 - Si AWSSDK arroja un error de certificado SSL, editar el archivo (path de awssdk)/lib/requestcore/requestcore.class.php y en la función send_request (línea 844) editar el siguiente código:
 
-		$curl_handle = $this->prep_request();
-	+	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
-		$this->response = curl_exec($curl_handle);
+	$curl_handle = $this->prep_request();
+	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+	$this->response = curl_exec($curl_handle);
 
 
 
