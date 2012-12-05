@@ -10,7 +10,7 @@ class SDB {
 	private $sdb;
 	private $cache_time;
 
-	public function __construct($cache_time = 60) {
+	public function __construct($cache_time = 600) {
 		$this->sdb = new AmazonSDB(Conf::AmazonKey());
 		$this->cache_time = $cache_time;
 	}
@@ -35,14 +35,12 @@ class SDB {
 	public function put($tabla, $llave, $valores){
 		//se serializa para poder guardar cualquier cosa (SDB solo guarda strings)
 		$data = array('data' => serialize(UtilesApp::utf8izar($valores)));
-		$return = $this->sdb->put_attributes($tabla, $llave, $data, true)->isOK();
 		$this->sdb->delete_cache()->get_attributes($tabla, $llave);
-		return $return;
+		return $this->sdb->put_attributes($tabla, $llave, $data, true)->isOK();
 	}
 
 	public function delete($tabla, $llave){
+		$this->sdb->delete_cache()->get_attributes($tabla, $llave);
 		return $this->sdb->delete_attributes($tabla, $llave)->isOK();
 	}
 }
-
-?>

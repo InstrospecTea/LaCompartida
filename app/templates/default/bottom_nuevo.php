@@ -45,6 +45,7 @@ if ($popup == true) {
 
 </script>
 <?php
+require_once Conf::ServerDir() . '/classes/SDB.php';
 $sdb = new SDB();
 $aviso = $sdb->get('avisos', Conf::ServerDir());
 if (!empty($aviso)) {

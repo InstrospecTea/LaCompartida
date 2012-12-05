@@ -1,3 +1,4 @@
 # RVM
 .rvmrc
 /app/miconf.php
+/app/test/spec/conf.rb
