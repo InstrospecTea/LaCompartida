@@ -338,6 +338,7 @@ $Pagina->PrintTop($popup);
 		</td>
     </tr>
 </table>
+<LINK rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
     var valor_anterior_codigo;
     var campo_cliente;
