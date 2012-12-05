@@ -14,16 +14,15 @@
  *
  */
 
-require_once dirname(__FILE__).'/DatabaseUpdater.php';
+require_once dirname(__FILE__) . '/DatabaseUpdater.php';
 
 $db_updater = new DatabaseUpdater(
-  'c85ef9997e6a30032a765a20ee69630b',
-  array(
-    'key' => 'AKIAJDGKILFBFXH3Y2UA',
-    'secret' => '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',
-    'default_cache_config' => '/var/www/cache/dynamoDBbackups'
-  )
+	'c85ef9997e6a30032a765a20ee69630b',
+	array(
+		'key' => 'AKIAJDGKILFBFXH3Y2UA',
+		'secret' => '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',
+		'default_cache_config' => '/var/www/cache/dynamoDBbackups'
+	)
 );
 
 $db_updater->update($argv[1], $argv[2], $argv[3]);
-?>
