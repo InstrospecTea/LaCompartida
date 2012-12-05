@@ -540,7 +540,7 @@ class Cobro extends Objeto {
 	function AnularEmision($estado = 'CREADO') {
 		$id_cobro = $this->fields['id_cobro'];
 
-		$query = "SELECT count(*) FROM documento WHERE id_cobro = '$id_cobro' AND tipo_doc != 'N' ";
+		$query = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '$id_cobro'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad_pagos) = mysql_fetch_array($resp);
 
@@ -1630,22 +1630,20 @@ class Cobro extends Objeto {
 		$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
 		$documento->Edit('fecha', date('Y-m-d'));
 		if(!$documento->Loaded()) $documento->Write ();
-		$query = "SELECT id_documento, id_moneda FROM documento WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND tipo_doc != 'N' ";
+		$query = "SELECT nd.id_neteo_documento, dp.id_moneda
+			FROM neteo_documento nd JOIN documento dp ON nd.id_documento_pago = dp.id_documento
+			WHERE nd.id_documento_cobro = '{$documento->fields['id_documento']}'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, $this->sesion->dbh);
 
 		$saldo_honorarios = $documento->fields['honorarios'];
 		$saldo_gastos = $documento->fields['gastos'];
 
-
-		while (list($id_documento_pago, $id_moneda) = mysql_fetch_array($resp)) {
+		while (list($id_neteo, $id_moneda) = mysql_fetch_array($resp)) {
 			$neteo = new NeteoDocumento($this->sesion);
-			$neteo->Ids($id_documento_pago, $documento->fields['id_documento']);
+			$neteo->Load($id_neteo);
 
-			$documento_moneda_pago = new DocumentoMoneda($this->sesion);
-			$documento_moneda_pago->Load($id_documento_pago);
-
-			$neteo->Edit('valor_cobro_honorarios', number_format($neteo->fields['valor_pago_honorarios'] * $documento_moneda_pago->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', ''));
-			$neteo->Edit('valor_cobro_gastos', number_format($neteo->fields['valor_cobro_gastos'] * $documento_moneda_pago->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', ''));
+			$neteo->Edit('valor_cobro_honorarios', number_format($neteo->fields['valor_pago_honorarios'] * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', ''));
+			$neteo->Edit('valor_cobro_gastos', number_format($neteo->fields['valor_cobro_gastos'] * $cobro_moneda->moneda[$id_moneda]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', ''));
 
 			$saldo_honorarios -= $neteo->fields['valor_cobro_honorarios'];
 			$saldo_gastos -= $neteo->fields['valor_cobro_gastos'];

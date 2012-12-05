@@ -3,6 +3,9 @@ require "rvm/capistrano"
 require 'capistrano/cli'
 require 'capistrano_colors'
 require 'aws'
+load 'config/deploy/cap_notify'
+
+set :notify_emails, ["implementacion@lemontech.cl"]
 
 capistrano_color_matchers = [
   { :match => /command finished/,       :color => :hide,      :prio => 10 },
@@ -14,7 +17,7 @@ colorize( capistrano_color_matchers )
 default_run_options[:pty] = true
 
 set :application, "time_tracking"
-set :stages, %w(develop staging feature release production)
+set :stages, %w(develop staging feature release production custom)
 set :default_stage, "staging"
 set :ssh_options, { :forward_agent => true }
 set :use_sudo, false
@@ -56,7 +59,7 @@ task :feature do
   if (default_branch == "develop")
     feature_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{default_branch}]: ")
   end
-  feature_branch ||= default_branch
+  feature_branch = (feature_branch && feature_branch.length > 0) ? feature_branch : default_branch
   feature_name = feature_branch.split('/').last
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{feature_name}"
   set :branch, feature_branch
@@ -65,13 +68,25 @@ task :feature do
   set :user, "ec2-user"
 end
 
+task :custom do
+  set :current_stage, "custom"
+  custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch []: ")
+  custom_name = custom_branch.split('/').last
+  set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_name}"
+  set :branch, custom_branch
+  set :deploy_to, "#{base_directory}/#{file_path}"
+  role :web, "amazonap1.thetimebilling.com"
+  set :user, "ec2-user"
+end
+
+
 task :release do
   set :current_stage, "release"
   default_branch = fetch(:branch, "master")
   if (default_branch == "master")
     release_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
   end
-  release_branch ||= release_branch
+  release_branch = (release_branch && release_branch.length > 0) ? release_branch : default_branch
   set :branch, release_branch
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
   set :deploy_to, "#{base_directory}/#{file_path}"
@@ -102,6 +117,10 @@ namespace :deploy do
     run "ssh-add ~/.ssh/id_rsa"
   end
 
+  desc "Send email notification"
+  task :send_notification do
+    Notifier.deploy_notification(self).deliver 
+  end
 
   task :run_udpates do
       production_environment = (current_stage == "production")
@@ -166,5 +185,7 @@ namespace :deploy do
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", "deploy:run_udpates"
+  after "deploy", 'deploy:send_notification'
+
 
 end
