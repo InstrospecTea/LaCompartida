@@ -1,20 +1,6 @@
 <?php
-	require_once dirname(__FILE__).'/../app/conf.php';
-	
-function autocargaapp($class_name) {
-	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
-	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
-	} else {
-		   $file =Conf::ServerDir() . '/../fw/classes/' . str_replace('_', DIRECTORY_SEPARATOR, substr($class,5)) . '.php';
-			if ( file_exists($file) ) {
-				require $file;
-			}
-	}
-}
-
-spl_autoload_register('autocargaapp');	
+require_once '/var/www/html/addbd.php';
+require_once APPPATH.'/app/conf.php'; 
 
 	$sesion = new Sesion(array('ADM'));
 	$pagina = new Pagina($sesion);

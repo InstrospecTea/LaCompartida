@@ -1,8 +1,6 @@
 <?php
-
- 
 require_once '/var/www/html/addbd.php';
-
+require_once APPPATH.'/vendor/autoload.php'; 
 
 if (!class_exists('Conf')) {
 	class Conf
@@ -94,6 +92,7 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
 defined('BACKUPDIR') || define('BACKUPDIR','/tmp');
 defined('USERWS') || define('USERWS',Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS',Conf::UsuarioWS());
+defined('APPPATH') || define('APPPATH',dirname(dirname(__FILE__)));
 
 
 

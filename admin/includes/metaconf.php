@@ -1,11 +1,6 @@
 <?php
-
-$filename= realpath(dirname(__FILE__).'/../app/conf.php');
-require_once $filename;
-	function autocargafw($class_name) {    require  Conf::ServerDir().'/../fw/classes/'.$class_name . '.php';	}
-	function autocargaapp($class_name) {    require  Conf::ServerDir().'/classes/'.$class_name . '.php';	}
-	spl_autoload_register('autocargafw'); 
-	spl_autoload_register('autocargaapp'); 
+require_once '/var/www/html/addbd.php';
+require_once APPPATH.'/app/conf.php'; 
 	
 	
 	

@@ -1,12 +1,6 @@
 <?php
-
-require_once dirname(__FILE__).'/../app/conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/classes/S3.php';
-
-
- 
+require_once '/var/www/html/addbd.php';
+require_once APPPATH.'/app/conf.php'; 
 	
 	
 	$sesion = new Sesion(array('ADM'));
