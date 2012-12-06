@@ -35,18 +35,14 @@ if (!is_dir('/var/www/error_logs')) {
 	loguear("creando directorio '/var/www/error_logs'");
 	if (!mkdir('/var/www/error_logs', 0777, true)) {
 		$errores[] = loguear("error al crear directorio '/var/www/error_logs'");
-		continue;
 	}
 }
 
 class CONF {
 
 	public $dir_temp = '/tmp';
-
 	public $alerta_disco_temp = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
-
 	public $alerta_disco_base = 5; //(GB) si el espacio libre es menos q eso, tira un mensaje (y manda mail)
-
 	public $mailer = array(
 		'host' => 'smtp.gmail.com',
 		'port' => 465,
@@ -55,11 +51,11 @@ class CONF {
 		'from' => 'bogorandom@gmail.com',
 		'to' => 'servidores@lemontech.cl'
 	);
+
 }
 
 function decrypt($msg, $k) {
 	$msg = base64_decode($msg); // base64 decode?
-
 	// open cipher module (do not change cipher/mode)
 	if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', '')) {
 		return false;
@@ -155,9 +151,9 @@ if (!is_dir('/var/www/cache/S3')) {
 }
 
 $S3sdk = new AmazonS3(array(
-	'key' => 'AKIAJDGKILFBFXH3Y2UA',
-	'secret' => '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',
-	'default_cache_config' => '/var/www/cache/S3')
+			'key' => 'AKIAJDGKILFBFXH3Y2UA',
+			'secret' => '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',
+			'default_cache_config' => '/var/www/cache/S3')
 );
 
 if (!is_dir('/var/www/cache/dynamoDBbackups')) {
@@ -174,18 +170,18 @@ $connection_params = array(
 $dynamodb = new AmazonDynamoDB($connection_params);
 
 $db_updater = new DatabaseUpdater(
-	'c85ef9997e6a30032a765a20ee69630b',
-	$connection_params
+				'c85ef9997e6a30032a765a20ee69630b',
+				$connection_params
 );
 
 $scan_response = $dynamodb->scan(array(
 	'TableName' => 'thetimebilling'
-));
+		));
 
 $i = 0;
 
 foreach ($scan_response->body->Items as $registro) {
-	i++;
+	$i++;
 	foreach ($registro as $etiqueta => $objeto) {
 		foreach (get_object_vars($objeto) as $tipo => $valor) {
 			$arreglo[$i][$etiqueta] = $valor;
@@ -210,7 +206,7 @@ foreach ($arreglo as $sitio) {
 			$sitio['vhost'],
 			$sitio['dbclon']
 		);
-		$slavehost = ($sitio['dbslave'] != '_' && $sitio['dbslave'] != '') ? $sitio['dbslave']:$sitio['dbhost'];
+		$slavehost = ($sitio['dbslave'] != '_' && $sitio['dbslave'] != '') ? $sitio['dbslave'] : $sitio['dbhost'];
 		$subdominiosubdir = explode('.', $sitio['subdominiosubdir']);
 		$bucketname = 'ttbackup' . $subdominiosubdir[0];
 		loguear('comprobando bucket S3 ' . $bucketname);
@@ -236,7 +232,8 @@ foreach ($arreglo as $sitio) {
 		$filebkp = $db . "_" . $fecha . ".sql.gz";
 		$path = $conf->dir_temp . "/" . $filebkp;
 
-		if($sitio['mistery'] == 1) $sitio['dbpass'] = decrypt($sitio['dbpass'], $sitio['backupdir']);
+		if ($sitio['mistery'] == 1)
+			$sitio['dbpass'] = decrypt($sitio['dbpass'], $sitio['backupdir']);
 
 		try {
 			$file_exists = $S3sdk->get_object_metadata($bucketname, $filebkp);
@@ -248,14 +245,14 @@ foreach ($arreglo as $sitio) {
 			loguear("respaldo $filebkp ya existe: omitiendo...");
 		} else {
 			if (!file_exists($conf->dir_temp)) {
-				loguear("creando directorio temporal ".$conf->dir_temp);
+				loguear("creando directorio temporal " . $conf->dir_temp);
 				if (!mkdir($conf->dir_temp, 0755, true)) {
 					$errores[] = loguear("error al crear directorio " . $conf->dir_temp);
 					continue;
 				}
 			}
 
-			/*********** DUMPEANDO A GZIP ******************/
+			/*			 * ********* DUMPEANDO A GZIP ***************** */
 
 			loguear("dumpeando a $path");
 			$sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db | gzip  > $path";
@@ -289,7 +286,7 @@ foreach ($arreglo as $sitio) {
 			}
 		}
 
-		/*********** CLONANDO ******************/
+		/*		 * ********* CLONANDO ***************** */
 		if ($dbclon && $dbclon != '' && $dbclon != '_') {
 			loguear("clonando a " . $dbclon);
 			$dbclonarray = explode(':', $dbclon);
@@ -303,12 +300,12 @@ foreach ($arreglo as $sitio) {
 			if ($dbclonarray['dbname'] == $db && $dbclonarray['dbhost'] == $sitio['dbhost']) {
 				$errores[] = loguear("no se puede clonar " . $dbclonarray['dbhost'] . ".$db sobre si misma");
 			} else {
-				$sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db |  mysql --host=" . $dbclonarray['dbhost'] . "   --user=" . $sitio['dbuser'] . "   --password=" . $sitio['dbpass'] . "  ". $dbclonarray['dbname'];
+				$sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db |  mysql --host=" . $dbclonarray['dbhost'] . "   --user=" . $sitio['dbuser'] . "   --password=" . $sitio['dbpass'] . "  " . $dbclonarray['dbname'];
 				//echo $sentencia;
 				exec(" $sentencia ", $out, $ret);
 
 				if ($ret) {
-					$errores[] = loguear("error clonando $db en {$dbclonarray['dbhost']} {$dbclonarray['dbname']}: \n $sentencia \n $ret\noutput: ". implode("\n", $out));
+					$errores[] = loguear("error clonando $db en {$dbclonarray['dbhost']} {$dbclonarray['dbname']}: \n $sentencia \n $ret\noutput: " . implode("\n", $out));
 				}
 			}
 		}
@@ -321,16 +318,16 @@ foreach ($arreglo as $sitio) {
 				$dropname = $object->Key;
 				if ($dropname != '') {
 
-				 if (preg_match("/\d{4}-\d{2}-\d{2}/", $dropname, $match)) {
+					if (preg_match("/\d{4}-\d{2}-\d{2}/", $dropname, $match)) {
 						$fechaviejo = $match[0];
-						if (fechaBorrable($fechaviejo, $duracion) ) {
+						if (fechaBorrable($fechaviejo, $duracion)) {
 							$S3sdk->delete_object($bucketname, $dropname);
 							$respaldosborrar[] = $dropname;
-						} else 	if ($object->Size < 500) {
+						} else if ($object->Size < 500) {
 							$S3sdk->delete_object($bucketname, $dropname);
 							$respaldosborrar[] = $dropname;
 						} else {
-						 	$respaldos[] = $dropname;
+							$respaldos[] = $dropname;
 						}
 					}
 				}
