@@ -86,34 +86,30 @@ The Time Billing - Time Tracking
 
         $ bundle install
 
+  * Copy server definition file
+
+        $ cp config/cap_servers.rb.default config/cap_servers.rb
+
 ###Deploy in local machinne
-    $ cap develop deploy
+    $ cap local deploy
 
   With  specific branch (default=develop):
 
-    $ cap -s branch=master develop deploy
+    $ cap -s branch=master local deploy
 
-###Deploy to staging (staging.thetimebilling.com/time_tracking)
-    $ cap staging deploy
+###Deploy a Feature ([client].thetimebilling.com/time_tracking_feature)
+    $ cap feature deploy
 
-  With  specific branch (default=develop):
-
-    $ cap -s branch=master staging deploy
+  And enter the Feature Branch later
 
 ###Deploy to release ([client].thetimebilling.com/time_tracking_release)
     $ cap release deploy
 
-  With  specific branch (default=master):
-
-    $ cap -s branch=release/feat2010 release deploy
-
-    $ cap -s branch=hotfix/fix2011 release deploy
+  And enter the Release/Hotfix Branch later
 
 ###Deploy to production environment ([client].thetimebilling.com/time_tracking)
     $ cap production deploy
-
-  Only can deploy the master branch
-
+  
 
 ##HubFlow
 Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].

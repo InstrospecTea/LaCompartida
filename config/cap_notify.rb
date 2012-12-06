@@ -18,10 +18,12 @@ class Notifier < ActionMailer::Base
     user = Etc.getlogin
     repo = cap_vars.repository
     repo["git@github.com:"] = "http://github.com/"
-
+    servers = cap_vars.roles[:web].servers.collect do |a| "<li>#{a}</li>" end
     text_msg = "You need to configure HTML visualization"
     html_msg = "<b><a href='#{repo}'>#{cap_vars.application}</a></b> was just deployed to <b> #{cap_vars.current_stage}</b> by <b>#{user}</b>.<br/><br/>"
     html_msg += "When: #{now.strftime("%d/%m/%Y")} at #{now.strftime("%I:%M %p")} <br/>"    
+    html_msg += "Servers:"
+    html_msg += "<ul>#{servers.join}</ul>"
     html_msg += "Server Path: <b>#{cap_vars.releases_path}/#{cap_vars.release_name}</b><br/>"
     html_msg += "Repository: <b>#{repo}</b><br/>"
     html_msg += "Branch: <b>#{cap_vars.branch}</b><br/>"

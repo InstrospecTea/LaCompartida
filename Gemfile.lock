@@ -32,6 +32,8 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
+    capistrano-multiconfig (0.0.4)
+      capistrano (>= 2.5.5)
     capistrano-notifier (0.2.0)
       actionmailer
       activesupport
@@ -88,6 +90,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk
   capistrano
+  capistrano-multiconfig
   capistrano-notifier
   capistrano_colors
   railsless-deploy

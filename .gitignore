@@ -5,6 +5,9 @@ miconf.php
 .svn/
 nbproject/
 /nbproject/private/nbproject/
+cap_servers.rb
+REVISION
+environment.txt
 
 #################
 ## Eclipse
