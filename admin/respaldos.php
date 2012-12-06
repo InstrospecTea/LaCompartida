@@ -1,6 +1,5 @@
 <?php
-require_once '/var/www/html/addbd.php';
-require_once APPPATH.'/app/conf.php'; 
+require_once dirname(__FILE__).'/../app/conf.php';
 
 $S3 = new AmazonS3(array('key' => 'AKIAIQYFL5PYVQKORTBA',
 			'secret' => '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'

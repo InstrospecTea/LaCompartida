@@ -1,6 +1,5 @@
 <?php
-require_once '/var/www/html/addbd.php';
-require_once APPPATH.'/app/conf.php'; 
+require_once dirname(__FILE__).'/../app/conf.php';
 
 $sesion = new Sesion(array('ADM'));
 $sesion->phpConsole();

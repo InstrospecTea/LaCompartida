@@ -1,6 +1,5 @@
 <?php
-require_once '/var/www/html/addbd.php';
-require_once APPPATH.'/app/conf.php'; 
+require_once dirname(__FILE__).'/../app/conf.php';
 
 		
 	
@@ -34,7 +33,7 @@ require_once APPPATH.'/app/conf.php';
 		  }
 		  $query[]="update usuario set activo=0 where id_usuario=$idorigen";
 		 
-		  foreach ($query[] as $sentencia) {
+		  foreach ($query as $sentencia) {
 				echo '<pre>' . $sentencia[0] . '</pre>';
 				try {
 

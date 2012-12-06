@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__FILE__) . '/../vendor/autoload.php';
+
 ini_set('display_errors', 'Off');
 
 if (file_exists('/var/www/html/addbd.php')) {
