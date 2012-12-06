@@ -124,6 +124,15 @@ The Time Billing - Time Tracking
   Only can deploy the master branch
 
 
+##Test
+###Pruebas de Integración
+  * Duplica el archivo app/test/spec/conf.rb.default  con el nombre app/test/spec/conf.rb y configura tu sitio local
+  * Ejecutar pruebas
+
+      $ cd app/test
+      $ rspec 
+
+
 ##HubFlow
 Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].
 
