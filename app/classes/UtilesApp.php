@@ -23,7 +23,7 @@ class UtilesApp extends Utiles {
 	 */
 	public static function GetConf($sesion, $conf) {
 		global $memcache;
-		$existememcache=is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
+		$existememcache = is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
 		if (method_exists('Conf', $conf)) {
 			return Conf::$conf();
 		} else 	if (isset($sesion->arrayconf) ) {  // si existe el objeto arrayconf me conviene consultarlo en vez de ir a memcache
@@ -69,9 +69,7 @@ class UtilesApp extends Utiles {
 	 *  Escribe el valor de un config en formato JS.
 	 */
 	public static function GetConfJs($sesion, $conf) {
-
-			echo "var $conf='" . self::GetConf($sesion, $conf) . "';\n";
-
+		echo "var $conf='" . self::GetConf($sesion, $conf) . "';\n";
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
@@ -82,7 +80,7 @@ class UtilesApp extends Utiles {
 		return $result['simbolo'];
 	}
 
-	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes=false, $width=320, $oncambio='') {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '') {
 		echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
@@ -2102,13 +2100,10 @@ HTML;
 		return $menu_html;
 	}
 
-
 	public static function PrintFormatoMoneda(&$Sesion, $monto, $id_moneda) {
 		extract(array_pop(Moneda::GetMonedas($Sesion, $id_moneda)));
-
 		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
 	}
-
 
 	public static function ObtenerFormatoIdioma($sesion) {
 		$query_idioma = "SELECT formato_fecha as date_format, separador_decimales as decimal_separator, separador_miles as thousands_separator
@@ -2141,10 +2136,8 @@ HTML;
 				$data = $encode ? utf8_encode($data) : utf8_decode($data);
 			}
 		}
-
 		return $data;
 	}
-
 
 		public static function ArregloMonedas($sesion) {
 		$query = "SELECT
@@ -2165,5 +2158,4 @@ HTML;
 		}
 		return $moneda;
 	}
-
 }
