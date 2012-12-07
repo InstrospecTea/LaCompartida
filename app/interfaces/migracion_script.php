@@ -3,17 +3,7 @@
 set_time_limit(0);
 ini_set('memory_limit', '512M');
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 $tini = time();
-
-function autocargaapp($class_name) {
-	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
-	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
-	}
-}
-spl_autoload_register('autocargaapp');
 
 $sesion = new Sesion(array('ADM'));
 $sesion->phpConsole(7);

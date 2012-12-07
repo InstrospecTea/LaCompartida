@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 ini_set('display_errors', 'Off');
 
@@ -18,7 +19,7 @@ if (!class_exists('Conf')) {
 		public static function dbHost() { return DBHOST; }
 		public static function dbName() { return DBNAME; }
 		public static function dbUser() { return DBUSER; }
-		public static function dbPass() { return DBPASS; }	
+		public static function dbPass() { return DBPASS; }
 		public static function Server() { return "https://" . SUBDOMAIN . ".thetimebilling.com"; }
 		public static function RootDir() { return '/' . ROOTDIR; }
 		public static function ServerIP() { return SUBDOMAIN . '.thetimebilling.com'; }
@@ -26,7 +27,7 @@ if (!class_exists('Conf')) {
 		public static function Hash() { return 'c85ef9997e6a30032a765a20ee69630b'; }
 		public static function Logo($fullPath = false) { return ($fullPath ? Conf::Server() : '') . Conf::ImgDir() . '/logo_tt.jpg'; }
 		public static function LogoDoc($fullPath = false) { return ($fullPath ? Conf::Server() : '') . Conf::ImgDir() . '/logo_tt.jpg'; } 
-		public static function FicheroLogoDoc() { return "logo_lemon.png"; }  
+		public static function FicheroLogoDoc() { return "logo_lemon.png"; }
 		public static function EsAmbientePrueba() { if(defined('BACKUP')&& (BACKUP == 2 || BACKUP == '2')) return true; }
 		public static function RutaGraficos() { return "/usr/lib64/php/modules/ChartDirector/lib/phpchartdir.php"; }
 		public static function RutaPdf() { return "/usr/share/php/fpdf/fpdf.php"; }
@@ -81,6 +82,7 @@ if (!class_exists('Conf')) {
 		}
 	}
 }
+
 defined('ROOTDIR') || define('ROOTDIR', str_replace('//','/','/' . Conf::RootDir()));
 defined('DBUSER') || define('DBUSER', Conf::dbUser());
 defined('DBHOST') || define('DBHOST', Conf::dbHost());
