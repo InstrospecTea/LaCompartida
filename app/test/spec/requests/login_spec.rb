@@ -4,7 +4,7 @@ describe "login", :type => :request do
 	it "should fail when entering invalid credentials" do
 		visit '/'
 		fill_in 'rut', :with => '1234'
-		fill_in 'dvrut', :with => '5'
+		fill_in 'dvrut', :with => '5' if has_field? 'dvrut'
 		fill_in 'password', :with => 'holi'
 		click_button 'Entrar'
 

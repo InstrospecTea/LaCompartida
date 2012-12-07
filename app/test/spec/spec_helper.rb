@@ -32,9 +32,9 @@ RSpec.configure do |config|
 end
 
 def login_admin
-    visit '/'
+  visit '/'
 	fill_in 'rut', :with => '99511620'
-	fill_in 'dvrut', :with => '0'
+	fill_in 'dvrut', :with => '0' if has_field? 'dvrut'
 	fill_in 'password', :with => 'admin.asdwsx'
 	click_button 'Entrar'
 end
