@@ -15,33 +15,31 @@ spl_autoload_register('autocargaapp');
 $Sesion = new Sesion(array('ADM'));
 $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Aviso de actualización');
-$Pagina->PrintTop();
 
 if ($Sesion->usuario->fields['rut'] != '99511620') {
 	die('No Autorizado');
 }
 
-$sdb = new SDB();
 if (!empty($_POST['opc'])) {
 	switch ($_POST['opc']) {
 		case 'guardar':
 			$data = $_POST['aviso'];
-			$data['id'] = uniqid();
-			if(!$sdb->put('avisos', Conf::ServerDir(), $data)) {
+			if (!Aviso::Guardar($data)) {
 				echo 'No se pudo guardar el aviso';
 			}
 			break;
 		case 'eliminar':
-			if(!$sdb->delete('avisos', Conf::ServerDir())) {
+			if(!Aviso::Eliminar()) {
 				echo 'No se pudo eliminar el aviso';
 			}
 			break;
 	}
 }
 
-$aviso = $sdb->get('avisos', Conf::ServerDir());
+$aviso = Aviso::Obtener();
 $query = "SELECT codigo_permiso, glosa FROM prm_permisos";
 $permisos = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+$Pagina->PrintTop();
 ?>
 <div style="text-align: left">
 	Este aviso se mostrará desde ahora hasta que se elimine, y lo verán todos los usuarios con los permisos seleccionados, para todos los estudios que usen esta versión del código.

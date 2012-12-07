@@ -10,6 +10,7 @@ require 'conf'
 Capybara.default_driver = :selenium
 Capybara.save_and_open_page_path = File.dirname(__FILE__) + '/../snapshots'
 Capybara.app_host = APPHOST
+Capybara.default_wait_time = 5
 
 include Capybara::DSL
 
