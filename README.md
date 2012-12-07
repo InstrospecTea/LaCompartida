@@ -58,16 +58,10 @@ The Time Billing - Time Tracking
   * DBUSER: Usuario de inicio de sesión con acceso full a la base de datos **DBNAME**
   * DBPASS: El password del usuario **DBUSER**
   * CACHEDIR: Path del directorio donde guardar el cache
-  * Incluir AWSSDK usando el directorio en que se clonó
 - Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio trunk dentro de tu repositorio
 - Recuerda reiniciar Apache cada vez que hagas cambios en la configuración y tener el servidor Mysql iniciado
 - [Test][6]
-- Si AWSSDK arroja un error de certificado SSL, editar el archivo (path de awssdk)/lib/requestcore/requestcore.class.php y en la función send_request (línea 844) editar el siguiente código:
-
-		$curl_handle = $this->prep_request();
-		curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
-		$this->response = curl_exec($curl_handle);
-
+- Si AWSSDK arroja un error de certificado SSL, buscar el archivo ```curl-ca-bundle.crt``` (si se instaló Git usando RailsInstaller, debería estar en C:\RailsInstaller\Git\bin\curl-ca-bundle.crt) y agregar la siguiente línea al php.ini: ```curl.cainfo="(path del archivo)"```
 
 
 ###Tips y Troubleshooting en MacOS X
