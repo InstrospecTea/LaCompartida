@@ -82,15 +82,17 @@ if ($popup == true) {
 				}
 			}
 			if(aviso.link) {
-				aviso.mensaje += '<br/><br/><a href="' + aviso.link + '">Ver más información</a>';
+				aviso.mensaje += '<br/><br/><a href="' + aviso.link + '">Ver más información</a>&nbsp;&nbsp;';
+			} else {
+				aviso.mensaje += '<br/>	<br/>&nbsp;&nbsp;';
 			}
-			aviso.mensaje += '&nbsp;&nbsp;<a href="#" id="ocultar_aviso">Ocultar aviso</a>';
+			aviso.mensaje += '<a href="#" id="ocultar_aviso">Ocultar aviso</a>';
 
 			function desactivar_mensaje() { 
 				document.cookie ='esconder_notificacion=' + aviso.id + '; path=/';
 				if (mensaje && mensaje > 0) {
 					jQuery.gritter.remove(mensaje, { 
-						fade: true,
+						fade: false,
 						speed: 'fast' 
 					});
 				}

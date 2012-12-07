@@ -21,6 +21,7 @@ describe "avisos", :type => :request do
 
 		visit '/app/usuarios/index.php'
 		page.should have_content mensaje
+		page.should have_link 'Avisos', '#'
 
 		visit '/app/interfaces/clientes.php'
 		page.should have_content mensaje
@@ -38,7 +39,10 @@ describe "avisos", :type => :request do
 
 		visit '/app/interfaces/clientes.php'
 		page.should have_no_content mensaje
+
+		page.should_not have_link 'Avisos', '#'
 	end
+
 
 	it "no debe mostrar aviso despues de eliminarlo" do 
 		visit '/admin/aviso.php'
@@ -55,6 +59,17 @@ describe "avisos", :type => :request do
 		visit '/app/interfaces/clientes.php'
 		page.should have_no_content mensaje
 
+		page.should_not have_link 'Avisos', '#'
+	end
+
+	it "no debe mostrar aviso una vez que el usuario lo cierra" do
+		visit '/admin/aviso.php'
+		fill_in 'aviso[mensaje]', :with => mensaje
+		check 'Administrador'
+		click_button 'Guardar'
+		click_link 'Ocultar aviso'
+		visit '/app/interfaces/clientes.php'
+		page.should have_no_content mensaje
 	end
 
 end
