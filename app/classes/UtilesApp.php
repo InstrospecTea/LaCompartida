@@ -21,45 +21,47 @@ class UtilesApp extends Utiles {
 	 * Si no, intenta usar memcache
 	 * Tiene fallback al código antiguo por si
 	 */
-	public static function GetConf($sesion, $conf) {
+	public static function GetConf(Sesion $Sesion, $conf) {
 		global $memcache;
 		$existememcache = is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
-		if (method_exists('Conf', $conf)) {
-			return Conf::$conf();
-		} else 	if (isset($sesion->arrayconf) ) {  // si existe el objeto arrayconf me conviene consultarlo en vez de ir a memcache
-			 if (empty($sesion->arrayconf)) { // si el objeto arrayconf está vacio lo voy a llenar una sola vez con memcache
-					if ($existememcache && $config = $memcache->get(DBNAME . '_config')) { // si existe la llave en memcache
-							$sesion->arrayconf = json_decode($config, true);
-					} else {
-							$queryconf = "select glosa_opcion, valor_opcion from configuracion		";
-							$configST = $sesion->pdodbh->query($queryconf);
-							$sesion->arrayconf = $configST->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
-							foreach ($sesion->arrayconf as $config => $valor) {
-								$sesion->arrayconf[$config] = $valor[0][0];
-							}
-						if($existememcache)	$memcache->set(DBNAME . '_config', json_encode($sesion->arrayconf), false, 120);
-					}
-			 }
-			return $sesion->arrayconf[$conf];
-		} else if ($existememcache) { //si  no existe el objeto arrayconf  se usa directo memcache
-					if ($config = $memcache->get(DBNAME . '_config')) { // si existe la llave en memcache
-							$arrayconf = json_decode($config, true);
-					} else {
-							$queryconf = "select glosa_opcion, valor_opcion from configuracion		";
-							$configST = $sesion->pdodbh->query($queryconf);
-							$arrayconf = $configST->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
-							foreach ($arrayconf as $config => $valor) {
-								$arrayconf[$config] = $valor[0][0];
-							}
-							$memcache->set(DBNAME . '_config', json_encode($arrayconf), false, 120);
-					}
-			return $arrayconf[$conf];
-		} else if (method_exists('Conf', 'GetConf')) {
-			return Conf::GetConf($sesion, $conf);
 
-		} else {
-			return false;
+		if ($existememcache) {
+			$Sesion->arrayconf = json_decode($memcache->get(DBNAME . '_config'), true);
+			error_log("CACHE HIT FROM MEMCACHED! $conf = $config");
 		}
+
+		// Prioridad sobre los conf?
+		if (method_exists('Conf', $conf)) {
+			$config = Conf::$conf();
+			error_log("NO CACHE? $conf = $config");
+			return $config;
+		}
+
+		// 1) Existe variable caching?
+		if (count($Sesion->arrayconf) > 0) {
+			// 1.1) Usar variable desde caching
+			$config = $Sesion->arrayconf[$conf];
+			error_log("CACHE HIT! $conf = $config");
+		} else {
+			// 1.2) Setear variable desde BD y 1.1
+			$query = "SELECT glosa_opcion, valor_opcion FROM configuracion";
+			$bd_configs = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+
+			foreach ($bd_configs as $glosa => $valor) {
+				$Sesion->arrayconf[$glosa] = $valor[0][0];
+			}
+
+			// 1.3) Ocupo memcache?
+			if ($existememcache) {
+				$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
+			}
+
+			$config = $Sesion->arrayconf[$conf];
+			error_log("CACHE SET $conf = $config (" . count($Sesion->arrayconf) . " registros)");
+		}
+
+		// 2) Usar variable
+		return $config;
 	}
 
 	/**
@@ -526,7 +528,7 @@ class UtilesApp extends Utiles {
 	 */
 
 	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
-		
+
 		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
 		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
 			$where .= " AND  cta_corriente.cobrable = $cobrable ";
@@ -548,13 +550,13 @@ class UtilesApp extends Utiles {
 								LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
 								LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
 								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								left JOIN cliente ON  cliente.codigo_cliente=ifnull(asunto.codigo_cliente, cta_corriente.codigo_cliente) 
+								left JOIN cliente ON  cliente.codigo_cliente=ifnull(asunto.codigo_cliente, cta_corriente.codigo_cliente)
 							WHERE $where";
-	
- 		 
+
+
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			
-		 
+
+
 			while($ingresoyegreso=mysql_fetch_array($resp) ) {
  				if ($ingresoyegreso[0] > 0) {
 				$total_ingresos += $ingresoyegreso[2];
@@ -569,8 +571,8 @@ class UtilesApp extends Utiles {
 		} else {
 			return $total;
 		}
-			
-	 
+
+
 	}
 
 	/*
@@ -1236,7 +1238,7 @@ HTML;
 		$arr_resultado['cifras_decimales_id_moneda_monto'] = $cobro_moneda->moneda[$arr_resultado['id_moneda_monto']]['cifras_decimales'];
 		$arr_resultado['cifras_decimales_opc_moneda_total'] = $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales'];
 
- 
+
 		/*		 * *
 		 * CALCULO FORMAS DE PAGO - INICIO
 		 * */
@@ -1252,9 +1254,9 @@ HTML;
 		if (($arr_resultado['id_moneda'] != $arr_resultado['id_moneda_monto']) && ($arr_resultado['id_moneda_monto'] == $arr_resultado['opc_moneda_total'])) {
 			if (($cobro->fields['forma_cobro'] == 'FLAT FEE')
 					&& (empty($datos_cobro->fields[$campo[$xtabla]['descuento']]) || ($datos_cobro->fields[$campo[$xtabla]['descuento']] == 0))) {
-				
-				
-					
+
+
+
 				for ($i = 0; $i < $lista_monedas->num; $i++) {
 					$id_moneda_obj = $lista_monedas->Get($i);
 					$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
@@ -1539,16 +1541,16 @@ HTML;
 		/*		 * *
 		 * CALCULO COBRO NORMAL
 		 * */
-		
-		
+
+
 		if ($hacer_calculo_normal == 0) {
 			/*			 * *
 			 * SI NO SE INDICO EL CALCULO DEL/LOS MONTO/S EN UNA MONEDA ESPECIFICA,
 			 * SE CALCULA PARA TODAS LAS MONEDAS
 			 * */
-		 	 
-			 
-			
+
+
+
 			if ($id_moneda == 0) {
 				for ($e = 0; $e < $lista_monedas->num; $e++) {
 					$id_moneda_obj = $lista_monedas->Get($e);
@@ -1560,7 +1562,7 @@ HTML;
 					 * SI NO SE INDICO ALGUN MONTO EN PARTICULAR,
 					 * SE CALCULAN LOS MONOS INGRESADOS POR DEFECTOS
 					 * */
-					
+
 					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
 						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
 							$id_moneda_original = $arr_resultado['opc_moneda_total'];
@@ -1584,9 +1586,9 @@ HTML;
 							);
 					}
 					}
-						 
-				 
-					
+
+
+
 					$monto_trabajo_con_descuento = $cobro->TotalCobrosCap($id_cobro) + $cobro->fields[$campo[$xtabla]['monto_trabajo']] - $datos_cobro->fields[$campo[$xtabla]['descuento']];
 					$arr_resultado['monto_trabajo_con_descuento'][$id_moneda_actual] = UtilesApp::CambiarMoneda($monto_trabajo_con_descuento//monto_moneda_l
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
@@ -1600,7 +1602,7 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
-					
+
 					$arr_resultado['monto_thh_estandar'][$id_moneda_actual] = UtilesApp::CambiarMoneda($cobro->fields['monto_thh_estandar']//monto_moneda_l
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']//decimales ini
@@ -1631,8 +1633,8 @@ HTML;
 					);
 
 					  $arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
-					
-					
+
+
 				$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual]) * ($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
