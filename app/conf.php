@@ -11,6 +11,7 @@ if (file_exists('/var/www/html/addbd.php')) {
 if (!class_exists('Conf')) {
 	class Conf
 	{
+		
 		public static function AppName() { return APPNAME; }
 		public static function ServerDir() { return dirname(__FILE__); }
 		public static function ImgDir() { return  '//static.thetimebilling.com/templates/default/img'; }
@@ -62,12 +63,67 @@ if (!class_exists('Conf')) {
 		public static function PasswordMail() { return 'tt.asdwsx'; }
 		public static function TieneTablaVisitante() { return true; }
 
-		public static function GetConf($Sesion, $glosa_opcion) {
-			$query_conf = "SELECT valor_opcion FROM configuracion WHERE glosa_opcion='$glosa_opcion'";
-			$resp_conf = mysql_query($query_conf, $Sesion->dbh) or Utiles::errorSQL($query_conf, __FILE__, __LINE__, $Sesion->dbh);
-			list($valor_opcion) = mysql_fetch_array($resp_conf);
-			return $valor_opcion;
+	/**
+	 *
+	 * @param object $sesion
+	 * @param string $conf
+	 * @return string
+	 *  Ahora comprueba si existe el array $sesion->arrayconf para llenarlo una sola vez y consultar de él de ahí en adelante.
+	 * Si no, intenta usar memcache
+	 * Tiene fallback al código antiguo por si
+	 */
+	public static function GetConf(Sesion $Sesion, $conf) {
+		global $memcache;
+		$existememcache =isset($memcache) && is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC. Primero se comprueba con isset para evitar un warning de undefined variable.
+
+		// Prioridad sobre los conf?
+		//1) Primera Prioridad: Siempre es más barato leer un método static de la clase conf que obtenerlo de memcache o de la base de datos.
+		if (method_exists(__CLASS__, $conf)) {
+			$config = self::$conf();
+			error_log("CONF ESTATICA $conf = $config");
+			return $config;
+
+		 // 2) Segunda prioridad: leer de la memoria. Existe variable caching?
+		} else if (count($Sesion->arrayconf ) > 0) {
+			// 2.1) Usar variable desde caching
+			$arrayconf = $Sesion->arrayconf;
+			error_log("CACHE HIT! $conf = {$arrayconf[$conf]}");
+			return $arrayconf[$conf];
+
+		// 3) Tercera prioridad: existe memcache y la llave de configuración está vigente.
+		} else if ($existememcache && $arrayconf= json_decode($memcache->get(DBNAME . '_config'), true)) {
+				$Sesion->arrayconf = $arrayconf;
+				error_log("CACHE HIT FROM MEMCACHED! $conf ={$arrayconf[$conf]}");
+				return $arrayconf[$conf];
+
+		// 4) Cuarta prioridad: tengo que obtener el dato de la BD, aprovecho de llenar el dato en memoria y en memcache.
+		} else {
+				 //4.1 compruebo conexión a la BBDD para consultar array de configuraciones
+				if(isset($Sesion->pdodbh)) {
+					$query = "SELECT glosa_opcion, valor_opcion FROM configuracion";
+					$bd_configs = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+					foreach ($bd_configs as $glosa => $valor) {
+						$Sesion->arrayconf[$glosa] = $valor[0][0];
+					}
+
+					// 4.2) Si existe memcache, fijo la llave usando lo obtenido en 4.1
+					if ($existememcache) {
+						$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
+						error_log("MEMCACHE CACHE SET $conf = {$Sesion->arrayconf[$conf]} (" . count($Sesion->arrayconf) . " registros)");
+					}
+
+					return $Sesion->arrayconf[$conf];
+
+				} else {
+					error_log('No hay conexion a BD');
+					return false;
+				}
+
+
 		}
+
+
+	}
 
 		public static function PasswordWS() { return defined('PASSWS') ? PASSWS : base64_encode(rand(10000,90000)); }
 		public static function UsuarioWS() { return defined('USERWS') ? USERWS : base64_encode(rand(10000,90000)); }

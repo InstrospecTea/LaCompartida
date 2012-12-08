@@ -22,46 +22,7 @@ class UtilesApp extends Utiles {
 	 * Tiene fallback al código antiguo por si
 	 */
 	public static function GetConf(Sesion $Sesion, $conf) {
-		global $memcache;
-		$existememcache = is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC
-
-		if ($existememcache) {
-			$Sesion->arrayconf = json_decode($memcache->get(DBNAME . '_config'), true);
-			error_log("CACHE HIT FROM MEMCACHED! $conf = $config");
-		}
-
-		// Prioridad sobre los conf?
-		if (method_exists('Conf', $conf)) {
-			$config = Conf::$conf();
-			error_log("NO CACHE? $conf = $config");
-			return $config;
-		}
-
-		// 1) Existe variable caching?
-		if (count($Sesion->arrayconf) > 0) {
-			// 1.1) Usar variable desde caching
-			$config = $Sesion->arrayconf[$conf];
-			error_log("CACHE HIT! $conf = $config");
-		} else {
-			// 1.2) Setear variable desde BD y 1.1
-			$query = "SELECT glosa_opcion, valor_opcion FROM configuracion";
-			$bd_configs = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
-
-			foreach ($bd_configs as $glosa => $valor) {
-				$Sesion->arrayconf[$glosa] = $valor[0][0];
-			}
-
-			// 1.3) Ocupo memcache?
-			if ($existememcache) {
-				$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
-			}
-
-			$config = $Sesion->arrayconf[$conf];
-			error_log("CACHE SET $conf = $config (" . count($Sesion->arrayconf) . " registros)");
-		}
-
-		// 2) Usar variable
-		return $config;
+		return Conf::GetConf($Sesion, $conf);
 	}
 
 	/**
@@ -71,7 +32,7 @@ class UtilesApp extends Utiles {
 	 *  Escribe el valor de un config en formato JS.
 	 */
 	public static function GetConfJs($sesion, $conf) {
-		echo "var $conf='" . self::GetConf($sesion, $conf) . "';\n";
+		echo "var $conf='" . Conf::GetConf($sesion, $conf) . "';\n";
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
