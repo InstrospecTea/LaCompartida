@@ -3,7 +3,6 @@
 .rvmrc
 .svn/
 app/classes/AWSSDKforPHP/
-fw/
 nbproject/
 /nbproject/private/nbproject/
 
