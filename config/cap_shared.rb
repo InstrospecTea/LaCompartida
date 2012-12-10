@@ -39,9 +39,6 @@ def update_database(cap_vars)
   table_tt = dynamo_db.tables['thetimebilling']
   table_tt.load_schema
   table_tt.items.to_a.map do |i|
-    puts "\n\e[0;31m      * marked for update: #{i.attributes['dominio']} \e[0m\n"
-    puts "#{cap_vars.file_path}/current"
-    puts i.attributes['filepath']
     if (i.attributes['filepath'] == "#{cap_vars.file_path}/current")
       i.attributes['update_db'] = '1'
       puts "\n\e[0;31m      * marked for update: #{i.attributes['dominio']} \e[0m\n"
