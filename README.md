@@ -44,24 +44,21 @@ The Time Billing - Time Tracking
 * La aplicación no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
 
 ###Workspace y setup Proyecto
-- Clonar el proyecto
-- Clonar en otro directorio [Amazon WS SDK][awssdk]
-- Inicializar [HubFlow](#hubflow)
-      $ git hf init
+- Hacer checkout del proyecto
+
+      $ svn checkout svn.lemontech.cl/time_tracking
 - Abrir el proyecto con tu editor favorito
 - Recuerda que el charset para el editor (Eclipse/SublimeText/NetBeans) debe ser: "iso-8859-1"
-- Duplica el archivo app/miconf.php.default con el nombre app/miconf.php
+- Duplica el archivo conf.php.default con el nombre conf.php
 - Duplica el archivo version.php.default con el nombre version.php
-- Edita el archivo **miconf.php** para configurar
-  * DBHOST: Servidor de base de datos
-  * DBNAME: Nombre de la base de datos creada anteriormente
-  * DBUSER: Usuario de inicio de sesión con acceso full a la base de datos **DBNAME**
-  * DBPASS: El password del usuario **DBUSER**
-  * CACHEDIR: Path del directorio donde guardar el cache
+- Edita el archivo **conf.php** para configurar
+  * dbHost: Servidor de base de datos
+  * dbName: Nombre de la base de datos creada anteriormente
+  * dbUser: Usuario de inicio de sesión con acceso full a la base de datos **dbName**
+  * dbPass: El password del usuario **dbUser**
 - Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio trunk dentro de tu repositorio
 - Recuerda reiniciar Apache cada vez que hagas cambios en la configuración y tener el servidor Mysql iniciado
 - [Test][6]
-- Si AWSSDK arroja un error de certificado SSL, buscar el archivo ```curl-ca-bundle.crt``` (si se instaló Git usando RailsInstaller, debería estar en C:\RailsInstaller\Git\bin\curl-ca-bundle.crt) y agregar la siguiente línea al php.ini: ```curl.cainfo="(path del archivo)"```
 
 
 ###Tips y Troubleshooting en MacOS X
@@ -89,34 +86,29 @@ The Time Billing - Time Tracking
 
         $ bundle install
 
+  * Copy server definition file
+
+        $ cp config/cap_servers.rb.default config/cap_servers.rb
+
 ###Deploy in local machinne
-    $ cap develop deploy
+    $ cap local deploy
 
   With  specific branch (default=develop):
 
-    $ cap -s branch=master develop deploy
+    $ cap -s branch=master local deploy
 
-###Deploy to staging (staging.thetimebilling.com/time_tracking)
-    $ cap staging deploy
+###Deploy a Feature ([client].thetimebilling.com/time_tracking_feature)
+    $ cap feature deploy
 
-  With  specific branch (default=develop):
-
-    $ cap -s branch=master staging deploy
+  And enter the Feature Branch later
 
 ###Deploy to release ([client].thetimebilling.com/time_tracking_release)
     $ cap release deploy
 
-  With  specific branch (default=master):
-
-    $ cap -s branch=release/feat2010 release deploy
-
-    $ cap -s branch=hotfix/fix2011 release deploy
+  And enter the Release/Hotfix Branch later
 
 ###Deploy to production environment ([client].thetimebilling.com/time_tracking)
     $ cap production deploy
-
-  Only can deploy the master branch
-
 
 ##Test
 ###Pruebas de Integración
@@ -124,8 +116,7 @@ The Time Billing - Time Tracking
   * Ejecutar pruebas
 
       $ cd app/test
-      $ rspec 
-
+      $ rspec
 
 ##HubFlow
 Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].
@@ -142,4 +133,3 @@ Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archi
 [7]: https://github.com/nvie/gitflow
 [8]: https://github.com/datasift/gitflow
 [9]: https://github.com/nvie/gitflow/wiki/Windows
-[awssdk]: https://github.com/amazonwebservices/aws-sdk-for-php

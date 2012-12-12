@@ -5,8 +5,12 @@
 /app/test/spec/conf.rb
 
 .svn/
+app/classes/AWSSDKforPHP/
 nbproject/
 /nbproject/private/nbproject/
+cap_servers.rb
+REVISION
+environment.txt
 
 #################
 ## Eclipse
