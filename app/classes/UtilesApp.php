@@ -1629,6 +1629,13 @@ HTML;
 				}
 				}
 
+				if($xtabla == 'cobro') {
+					$suma_monto_honorario_moneda_tarifa = $datos_cobro->fields[$campo[$xtabla]['monto_subtotal']]-$datos_cobro->fields[$campo[$xtabla]['descuento']];
+				}
+				if($xtabla == 'documento') {
+					$suma_monto_honorario_moneda_tarifa = $datos_cobro->fields['subtotal_sin_descuento'];
+				}
+
 				$arr_resultado['monto_honorarios'][$id_moneda] = UtilesApp::CambiarMoneda($suma_monto_honorario_moneda_tarifa//monto_moneda_l
 								, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 								,  $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
