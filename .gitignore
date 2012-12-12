@@ -3,6 +3,7 @@
 .rvmrc
 miconf.php
 .svn/
+app/classes/AWSSDKforPHP/
 nbproject/
 /nbproject/private/nbproject/
 cap_servers.rb
