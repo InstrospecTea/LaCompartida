@@ -110,7 +110,7 @@ if ($popup == true) {
 			}
 			jQuery('#ocultar_aviso').live('click', desactivar_mensaje);
 			jQuery('#mostrar_aviso').click(avisar_actualizacion);
-			if (getCookie('esconder_notificacion') != aviso.id) {
+			if ('<?php echo Aviso::FlagOcultar(); ?>' != aviso.id) {
 				avisar_actualizacion();
 			}
 		</script>
