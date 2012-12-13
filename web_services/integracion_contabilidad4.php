@@ -9,7 +9,7 @@ require_once Conf::ServerDir() . '/../app/classes/Moneda.php';
 require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 
 apache_setenv("force-response-1.0", "TRUE");
-apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo mÃ¡s importante
+apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 
 $Sesion = new Sesion();
 $ns = "urn:TimeTracking";
@@ -193,6 +193,33 @@ $server->wsdl->addComplexType(
 );
 
 $server->wsdl->addComplexType(
+	'Gasto', 'complexType', 'struct', 'all', '', array(
+		'id' => array('name' => 'id', 'type' => 'xsd:integer'),
+		'usuario_ingreso' => array('name' => 'usuario_ingreso', 'type' => 'xsd:string'),
+		'usuario_orden' => array('name' => 'usuario_orden', 'type' => 'xsd:string'),
+		'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
+		'codigo_asunto' => array('name' => 'codigo_asunto', 'type' => 'xsd:string'),
+		'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
+		'glosa_gasto' => array('name' => 'glosa_gasto', 'type' => 'xsd:string'),
+		'ingreso' => array('name' => 'ingreso', 'type' => 'xsd:decimal'),
+		'egreso' => array('name' => 'egreso', 'type' => 'xsd:decimal'),
+		'moneda' => array('name' => 'moneda', 'type' => 'xsd:string'),
+		'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
+		'cobrable' => array('name' => 'cobrable', 'type' => 'xsd:boolean'),
+		'monto_cobrable' => array('name' => 'monto_cobrable', 'type' => 'xsd:decimal'),
+		'numero_documento' => array('name' => 'numero_documento', 'type' => 'xsd:string'),
+		'numero_ot' => array('name' => 'numero_ot', 'type' => 'xsd:string'),
+		'con_impuesto' => array('name' => 'con_impuesto', 'type' => 'xsd:boolean'),
+		'proveedor' => array('name' => 'proveedor', 'type' => 'xsd:string'),
+		'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
+		'numero_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
+));
+
+$server->wsdl->addComplexType(
+		'ListaGastos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:Gasto[]')), 'tns:Gasto'
+);
+
+$server->wsdl->addComplexType(
 		'DatosResultado', 'complexType', 'struct', 'all', '', array(
 	'id_cobro' => array('name' => 'id_cobro', 'type' => 'xsd:integer'),
 	'resultado' => array('name' => 'resultado', 'type' => 'xsd:string'),
@@ -350,7 +377,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 			$reporte->Query();
 			$r = $reporte->toArray();
 
-			/* Se obtienen ademÃ¡s las horas de cada usuario. */
+			/* Se obtienen además las horas de cada usuario. */
 			$reporte->setTipoDato('horas_cobrables');
 			$reporte->Query();
 			$r_cobradas = $reporte->toArray();
@@ -615,7 +642,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 
 		return new soapval('lista_cobros_emitidos', 'ListaCobros', $lista_cobros);
 	}
-	return new soap_fault('Client', '', 'Usuario o contraseÃ±a incorrecta.', '');
+	return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 }
 
 $server->register('InformarNotaVenta', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'lista_cobros' => 'tns:ListaCobros'), array('resultados' => 'tns:ResultadoCobros'), $ns);
@@ -922,14 +949,14 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 
 									if ($resultado['id_factura']) {
 										$id_factura = $resultado['id_factura'];
-										$resultado_facturas[] = array('codigo_factura_lemontech' => $id_factura, 'resultado_factura' => 'Factura guardada con Ã©xito');
+										$resultado_facturas[] = array('codigo_factura_lemontech' => $id_factura, 'resultado_factura' => 'Factura guardada con éxito');
 									}
 									else
 										$resultado_facturas[] = array('codigo_factura_lemontech' => '-', 'resultado_factura' => $resultado['error']);
 								}
 								//Ingresar nueva factura?
 							}
-							//TerminÃ³ ingreso de factura correcto, ingreso pago.
+							//Terminó ingreso de factura correcto, ingreso pago.
 							if ($datos_factura['ListaPagos']) {
 								foreach ($datos_factura['ListaPagos'] as $datos_pago) {
 									//print_r($datos_pago);
@@ -976,7 +1003,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 													$otras_cuentas_banco[] = $numero_moneda;
 											}
 											if (!$id_cuenta_encontrada) {
-												$error_pago = "no existe la cuenta NÂ° $cuenta ($datos_pago[moneda]), $datos_pago[banco] posee las siguientes cuentas: " . join(', ', $otras_cuentas_banco);
+												$error_pago = "no existe la cuenta N° $cuenta ($datos_pago[moneda]), $datos_pago[banco] posee las siguientes cuentas: " . join(', ', $otras_cuentas_banco);
 											}
 										}
 									}//Fin revision moneda
@@ -1036,7 +1063,7 @@ function InformarNotaVenta($usuario, $password, $lista_cobros) {
 		}
 		return $resultado_cobros;
 	}
-	return new soap_fault('Client', '', 'Usuario o contraseÃ±a incorrecta.', '');
+	return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 }
 
 $server->register('ListaDocumentosPagos', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'timestamp' => 'xsd:integer'), array('lista_documentos_pagos' => 'tns:ListaDocumentosPagos'), $ns);
@@ -1048,7 +1075,7 @@ function ListaDocumentosPagos($usuario, $password, $timestamp) {
 	//Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
 	if (!UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
-		return new soap_fault('Client', '', 'Usuario o contraseÃ±a incorrecta.', '');
+		return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 	}
 
 	/**
@@ -1191,7 +1218,7 @@ function ListaGastos($usuario, $password, $timestamp) {
 	//Mapeo usernames a centro_de_costos
 	$username_centro_de_costo = array();
 	if (!UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
-		return new soap_fault('Client', '', 'Usuario o contraseÃ±a incorrecta.', '');
+		return new soap_fault('Client', '', 'Usuario o contraseña incorrecta.', '');
 	}
 
 	$Gasto = new Gasto($Sesion);
