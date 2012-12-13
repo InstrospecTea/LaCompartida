@@ -15,6 +15,10 @@ class Aviso {
 		return $sdb->get('avisos', Conf::ServerDir());
 	}
 
+	public static function FlagOcultar(){
+		return $_COOKIE['esconder_notificacion'];
+	}
+
 	public static function Guardar($data) {
 		$sdb = new SDB();
 		$data['id'] = uniqid();

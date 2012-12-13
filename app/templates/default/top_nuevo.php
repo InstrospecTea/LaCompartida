@@ -44,12 +44,12 @@ if (!UtilesApp::GetConf($sesion,'ActualizacionTerminado')) {
 				<script type="text/javascript">
 					jQuery(document).ready(function() {
 						var aviso = <?php echo json_encode(UtilesApp::utf8izar($aviso)); ?>;
-						var mostrar_aviso = (getCookie('esconder_notificacion') != aviso.id);
+						var mostrar_aviso = ('<?php echo Aviso::FlagOcultar(); ?>' != aviso.id);
 						jQuery('a#mostrar_aviso').html(mostrar_aviso ? 'Avisos (1)' : 'Avisos');
 						jQuery('a#mostrar_aviso').css('color', mostrar_aviso ? '#FFA300' : 'white');
 					});
 				</script>
-				<a href="#" id="mostrar_aviso">Anuncios</a>
+				<a href="#" id="mostrar_aviso">Avisos</a>
 				|
 			<?php } ?>
 			<span class="text_bold">Usuario</span>:
