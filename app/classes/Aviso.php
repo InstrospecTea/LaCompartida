@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir() . '/classes/SDB.php';
 
 class Aviso {
 

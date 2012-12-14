@@ -1,16 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../app/conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-
-function autocargaapp($class_name) {
-	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
-	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
-	}
-}
-
-spl_autoload_register('autocargaapp');
 
 $Sesion = new Sesion(array('ADM'));
 $Pagina = new Pagina($Sesion);
@@ -80,6 +69,7 @@ $Pagina->PrintTop();
 			button      : "img_fecha"   // ID of the button
 		});
 
+		//si se guarda una fecha con hora, se guarda el timestamp en UTC para mostrarlo en hora local
 		jQuery('#form_aviso').submit(function(){
 			var fecha = jQuery('#fecha').val();
 			var hora = jQuery('#hora').val();
