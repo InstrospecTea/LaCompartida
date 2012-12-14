@@ -114,7 +114,6 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
-<<<<<<< HEAD
     uuidtools (2.1.3)
     websocket (1.0.4)
     xpath (1.0.0)
@@ -127,18 +126,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk
   capistrano
-=======
-    uuidtools (2.1.3)
-
-PLATFORMS
-  ruby
-  x86-mingw32
-
-DEPENDENCIES
-  aws-sdk
-  capistrano
   capistrano-multiconfig
->>>>>>> develop
   capistrano-notifier
   capistrano_colors
   capybara
