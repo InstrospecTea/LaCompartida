@@ -171,4 +171,3 @@ document.observe("dom:loaded", function() {
 
 
 </head>
-    

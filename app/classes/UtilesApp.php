@@ -2075,6 +2075,31 @@ HTML;
 		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
 	}
 
+	/**
+	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parámetro
+	 * $encode permite realizar la acción inversa
+	 * @param mixed $data Arreglo o string a modificar
+	 * @param boolean $encode encode (true) o decode (false)
+	 * @return mixed
+	 */
+	public static function utf8izar($data, $encode = true) {
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				// Previene doble codificación
+				unset($data[$key]);
+				$key = self::utf8izar($key, $encode);
+				$data[$key] = self::utf8izar($value, $encode);
+			}
+		} else if (is_string($data)) {
+			// ^ = XOR = or exclusivo = true && false || false && true
+			if (mb_detect_encoding($data, 'UTF-8', true) == 'UTF-8' ^ $encode) {
+				$data = $encode ? utf8_encode($data) : utf8_decode($data);
+			}
+		}
+
+		return $data;
+	}
+
 	public static function ObtenerFormatoIdioma($sesion) {
 		$query_idioma = "SELECT formato_fecha as date_format, separador_decimales as decimal_separator, separador_miles as thousands_separator
 			FROM prm_idioma WHERE codigo_idioma = (SELECT LOWER(valor_opcion) FROM configuracion WHERE glosa_opcion = 'Idioma')";

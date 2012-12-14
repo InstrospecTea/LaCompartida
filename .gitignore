@@ -1,7 +1,9 @@
 
 # RVM
 .rvmrc
-miconf.php
+/app/miconf.php
+/app/test/spec/conf.rb
+
 .svn/
 app/classes/AWSSDKforPHP/
 nbproject/
