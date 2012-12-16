@@ -4,7 +4,6 @@ if (file_exists(dirname(__FILE__) . '/AWSSDKforPHP/sdk.class.php')) {
 
 	require_once dirname(__FILE__) . '/AWSSDKforPHP/sdk.class.php';
 } else {
-	$errores[] = loguear("No se pudo comprobar si existe la libreria PEAR de AWS: AWSSDKforPHP");
 	require_once 'AWSSDKforPHP/sdk.class.php';
 }
 
@@ -44,4 +43,7 @@ $crearobject = $S3sdk->create_object('TTBfiles', 'directorios.json', array('body
 );
 
 
-
+ echo '<pre>';
+  print_r($arraysymlinks);
+   echo '</pre>';
+   	 
