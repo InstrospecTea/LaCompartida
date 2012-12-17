@@ -4,6 +4,7 @@ load 'config/cap_shared'
 load 'config/cap_servers'
 
 set :current_stage, "production"
+set :notify_emails, notify_emails << "areacomercial@lemontech.cl"
 
 # Prompt to make really sure we want to deploy into prouction
 puts "\n\e[0;31m   ######################################################################"
@@ -21,7 +22,7 @@ namespace :deploy do
 
   desc "Send email notification"
   task :send_notification do
-    Notifier.deploy_notification(self).deliver 
+    Notifier.deploy_notification(self).deliver
   end
 
   task :run_udpates do
@@ -35,7 +36,7 @@ namespace :deploy do
       run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
-  
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
