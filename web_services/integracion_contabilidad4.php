@@ -195,24 +195,25 @@ $server->wsdl->addComplexType(
 $server->wsdl->addComplexType(
 	'Gasto', 'complexType', 'struct', 'all', '', array(
 		'id' => array('name' => 'id', 'type' => 'xsd:integer'),
-		'usuario_ingreso' => array('name' => 'usuario_ingreso', 'type' => 'xsd:string'),
-		'usuario_orden' => array('name' => 'usuario_orden', 'type' => 'xsd:string'),
+		'usuario_ingresa' => array('name' => 'usuario_ingreso', 'type' => 'xsd:string'),
+		'usuario_ordena' => array('name' => 'usuario_orden', 'type' => 'xsd:string'),
 		'codigo_cliente' => array('name' => 'codigo_cliente', 'type' => 'xsd:string'),
 		'codigo_asunto' => array('name' => 'codigo_asunto', 'type' => 'xsd:string'),
 		'descripcion' => array('name' => 'descripcion', 'type' => 'xsd:string'),
 		'glosa_gasto' => array('name' => 'glosa_gasto', 'type' => 'xsd:string'),
 		'ingreso' => array('name' => 'ingreso', 'type' => 'xsd:decimal'),
 		'egreso' => array('name' => 'egreso', 'type' => 'xsd:decimal'),
-		'moneda' => array('name' => 'moneda', 'type' => 'xsd:string'),
+		'codigo_moneda' => array('name' => 'moneda', 'type' => 'xsd:string'),
 		'fecha' => array('name' => 'fecha', 'type' => 'xsd:string'),
 		'cobrable' => array('name' => 'cobrable', 'type' => 'xsd:boolean'),
 		'monto_cobrable' => array('name' => 'monto_cobrable', 'type' => 'xsd:decimal'),
+		'impuesto' => array('name' => 'impuesto', 'type' => 'xsd:decimal'),
 		'numero_documento' => array('name' => 'numero_documento', 'type' => 'xsd:string'),
 		'numero_ot' => array('name' => 'numero_ot', 'type' => 'xsd:string'),
 		'con_impuesto' => array('name' => 'con_impuesto', 'type' => 'xsd:boolean'),
-		'proveedor' => array('name' => 'proveedor', 'type' => 'xsd:string'),
+		'nombre_proveedor' => array('name' => 'proveedor', 'type' => 'xsd:string'),
 		'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
-		'numero_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
+		'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
 ));
 
 $server->wsdl->addComplexType(
@@ -1227,10 +1228,37 @@ function ListaGastos($usuario, $password, $timestamp) {
 
 	$result_gastos = $Sesion->pdodbh->query($query_gastos)->fetchAll(PDO::FETCH_ASSOC);
 
+	$factor_impuesto = Conf::GetConf($Sesion, 'ValorImpuestoGastos') / 100;
+
 	$gastos = array();
 
 	foreach ($result_gastos as $gasto) {
-		$gastos[] = $gasto;
+		$con_impuesto = $gasto['con_impuesto'] == 'SI';
+
+		$gasto_ws = array(
+			'id' => $gasto['id_movimiento'],
+			'usuario_ingresa' => $gasto['usuario_ingresa'],
+			'usuario_ordena' => $gasto['usuario_ordena'],
+			'codigo_cliente' => $gasto['codigo_cliente'],
+			'codigo_asunto' => $gasto['codigo_asunto'],
+			'descripcion' => $gasto['descripcion'],
+			'glosa_gasto' => $gasto['tipo'],
+			'ingreso' => $gasto['ingreso'],
+			'egreso' => $gasto['egreso'],
+			'codigo_moneda' => $gasto['codigo_moneda'],
+			'fecha' => $gasto['fecha'],
+			'cobrable' => $gasto['cobrable'] == 'SI',
+			'monto_cobrable' => $gasto['monto_cobrable'],
+			'impuesto' => $gasto['monto_cobrable'] * ($con_impuesto ? $factor_impuesto : 0),
+			'numero_documento' => $gasto['numero_documento'],
+			'numero_ot' => $gasto['numero_ot'],
+			'con_impuesto' => $con_impuesto,
+			'nombre_proveedor' => $gasto['nombre_proveedor'],
+			'tipo_documento_asociado' => $gasto['tipo_documento_asociado'],
+			'codigo_documento_asociado' => $gasto['codigo_documento_asociado'],
+		);
+
+		$gastos[] = $gasto_ws;
 	}
 
 	return $gastos;

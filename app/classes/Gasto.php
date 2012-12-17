@@ -320,7 +320,9 @@ class Gasto extends Objeto {
 				cta_corriente.codigo_factura_gasto AS codigo_documento_asociado,
 				prm_moneda.cifras_decimales,
 				cta_corriente.numero_ot,
-				cta_corriente.id_moneda
+				cta_corriente.id_moneda,
+				prm_moneda.codigo AS codigo_moneda,
+				cta_corriente.con_impuesto
 			FROM cta_corriente
 			LEFT JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 			LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
