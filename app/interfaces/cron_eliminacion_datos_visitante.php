@@ -23,7 +23,7 @@ if( UtilesApp::GetConf($sesion,'EsAmbientePrueba' )) 	{
 		echo 'Movimientos borrados.<br>';
 		
 		/* Query para borrar los neteos de documentos */
-		$query = "DELETE FROM neteo_documento WHERE id_usuario in (select id_usuario from usuario where id_visitante>0)";
+		$query = "TRUNCATE TABLE neteo_documento";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		echo 'Neteos borrado.<br>';
 		
