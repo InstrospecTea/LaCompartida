@@ -1,11 +1,6 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../app/classes/Moneda.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
- 
+require_once dirname(dirname(__FILE__)).'/conf.php'; 
+
 class Reporte
 {
 	// Sesion PHP
@@ -262,6 +257,11 @@ class Reporte
 			case "area_trabajo":
 				$this->id_agrupador[] = "trabajo.id_area_trabajo";
 				break;
+ 
+			case "codigo_contrato":
+				$this->id_agrupador[] = "contrato.codigo_contrato";
+				break;
+ 
 				
 			default:
 				$this->id_agrupador[] = $s;
@@ -294,6 +294,13 @@ class Reporte
 			case "id_trabajo":
 			  
 				break;
+ 
+			
+			case "codigo_contrato":
+				$this->id_agrupador_cobro[] = "codigo_contrato";
+				break;
+			
+ 
 			case "glosa_asunto": 
 			case "glosa_asunto_con_codigo":
 			case "glosa_cliente_asunto":
@@ -379,6 +386,9 @@ class Reporte
 				CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 				asunto.codigo_asunto,	
 				contrato.id_contrato,
+ 
+				contrato.codigo_contrato,
+ 
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
 				grupo_cliente.id_grupo_cliente,
@@ -529,6 +539,7 @@ class Reporte
 			unset($this->filtros['asunto.id_tipo_asunto']);
 
 			$s .= $this->sWhere('cobro');
+			 
 
 			$s .= '  AND cobro.incluye_honorarios=1 AND cobro.monto_subtotal>0  AND (cobro.total_minutos = 0 OR cobro.total_minutos IS NULL  ';
                    
@@ -547,7 +558,7 @@ class Reporte
 			$agrupa_cobro[] = "id_usuario";
 			$agrupa_cobro[] = "id_cliente";
 			$agrupa_cobro[] ="codigo_asunto";
-
+			
 		if($this->requiereMoneda($this->tipo_dato))
 			$agrupa_cobro[] = "id_cobro";
 
@@ -584,6 +595,9 @@ class Reporte
 						CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 						'.$this->dato_codigo_asunto.' as codigo_asunto,
 						contrato.id_contrato,
+ 
+						contrato.codigo_contrato,
+ 
 						tipo.glosa_tipo_proyecto AS tipo_asunto,
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
@@ -698,11 +712,15 @@ class Reporte
 		
 		switch($this->tipo_dato)
 		{
-			case "horas_trabajadas": case "horas_cobrables": case "horas_no_cobrables":
-			{
-				$s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600";
+			case "horas_trabajadas": 
+			case "horas_no_cobrables":
+				$s .= "SUM(TIME_TO_SEC( trabajo.duracion ))/3600.0";
 				break;
-			}
+
+			case "horas_cobrables": 
+				$s .= "SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600.0";
+				break;
+
 			case "costo":
 			    {
 				$s .= $datos_monedas.", ifnull((cobro_moneda_base.tipo_cambio/cobro_moneda.tipo_cambio),1)*SUM(cut.costo_hh*TIME_TO_SEC( trabajo.duracion ))/3600";
@@ -843,7 +861,7 @@ class Reporte
 			//moneda_base
 			$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
 		}
-
+		
 		if( UtilesApp::GetConf($this->sesion, 'UsoActividades') ){
 			$s .= " LEFT JOIN actividad ON ( trabajo.codigo_actividad = actividad.codigo_actividad ) ";
 		}
@@ -885,6 +903,10 @@ class Reporte
 				}
 			}
 		}
+		global $where;
+		$where=$s;
+		($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_reporte_avanzado'):false; 
+		$s=$where;
 		//Añado el periodo determinado
 		if($from == 'trabajo')
 		{
@@ -924,7 +946,7 @@ class Reporte
 		    $agrupa[] = "id_usuario";
 		    	$agrupa[] = "id_cliente";
 			$agrupa[] ="codigo_asunto";
-
+			
 		if($this->requiereMoneda($this->tipo_dato))
 			$agrupa[] = "id_cobro";
 
@@ -959,7 +981,6 @@ class Reporte
 	function Query()
 	{
 		$stringquery="";	
-
 	    $resp = mysql_unbuffered_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
 		
 		$this->row = array();
@@ -993,9 +1014,6 @@ class Reporte
         	$respt = mysql_query($testimonio, $this->sesion->dbh);
 		}
 		    
-		
-			$testimonio = "INSERT INTO z_log_fff SET fecha = NOW(), mensaje='".  mysql_real_escape_string($this->sQuery()."\n union all \n".$this->cobroQuery(), $this->sesion->dbh)."'";
-        	//$respt = mysql_query($testimonio, $this->sesion->dbh);
 		
 	}
 
@@ -1472,7 +1490,7 @@ class Reporte
 												Reporte::rellenar($data[$ag1][$ag2][$ag3][$ag4][$ag5],$data2[$ag1][$ag2][$ag3][$ag4][$ag5]);
 											
 											foreach($e as $ag6 => $f) {
-											if(is_array($f)) {
+												if(is_array($f)) {
 													if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]))
 													{
 														$data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]['valor'] = 0;
