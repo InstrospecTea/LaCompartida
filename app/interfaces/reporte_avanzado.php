@@ -1929,12 +1929,12 @@ if ($comparar)
 																<script> 
 																		RevisarMoneda(); RevisarCircular(); RevisarTabla();
 																		jQuery(document).ready(function(){
-																			 jQuery('#dispersion').css('display','');
-																			 if(jQuery('#comparar').is(':checked')) {
-																				jQuery('#tabla, #dispersion').removeAttr('style').show();
-																			} else {
-																				jQuery('#tabla, #dispersion').removeAttr('style').hide();
-																			}
+																			 
+																			if(jQuery('#comparar').is(':checked')) {
+																				   jQuery('#tabla, #dispersion').css('display','inline-block').show();
+																			   } else {
+																				   jQuery('#tabla, #dispersion').css('display','none').hide();
+																			   }
 																			
 																			jQuery('#formulario').on('click','#mis_reportes',function() {
 																				CargarReporte();
@@ -1949,10 +1949,10 @@ if ($comparar)
 	
 																			jQuery('#comparar').on('click',function() {
 																				if(jQuery('#comparar').is(':checked')) {
-																					jQuery('#tabla, #dispersion').show();
-																				} else {
-																					jQuery('#tabla, #dispersion').hide();
-																				}
+																				   jQuery('#tabla, #dispersion').css('display','inline-block').show();
+																			   } else {
+																				   jQuery('#tabla, #dispersion').css('display','none').hide();
+																			   }
 																			});
 	
 																			jQuery('#runreporte').on('click',function(){
