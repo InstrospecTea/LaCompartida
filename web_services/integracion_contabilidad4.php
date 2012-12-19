@@ -1237,8 +1237,8 @@ function ListaGastos($usuario, $password, $timestamp) {
 
 		$gasto_ws = array(
 			'id' => $gasto['id_movimiento'],
-			'usuario_ingresa' => $gasto['usuario_ingresa'],
-			'usuario_ordena' => $gasto['usuario_ordena'],
+			'usuario_ingresa' => $gasto['usuarername_ingresa'],
+			'usuario_ordena' => $gasto['usuarername_ordena'],
 			'codigo_cliente' => $gasto['codigo_cliente'],
 			'codigo_asunto' => $gasto['codigo_asunto'],
 			'descripcion' => $gasto['descripcion'],
@@ -1253,6 +1253,7 @@ function ListaGastos($usuario, $password, $timestamp) {
 			'numero_documento' => $gasto['numero_documento'],
 			'numero_ot' => $gasto['numero_ot'],
 			'con_impuesto' => $con_impuesto,
+			'codigo_proveedor' => $gasto['rut_proveedor'],
 			'nombre_proveedor' => $gasto['nombre_proveedor'],
 			'tipo_documento_asociado' => $gasto['tipo_documento_asociado'],
 			'codigo_documento_asociado' => $gasto['codigo_documento_asociado'],
