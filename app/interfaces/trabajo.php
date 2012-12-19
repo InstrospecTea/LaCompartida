@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(__FILE__)).'/conf.php'; 
+require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
@@ -274,7 +274,6 @@ $where .= " AND usuario.visible=1";
 
                  jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false',
                      drop: function (event,ui) {
-                       console.log(event);
 					   var  cuando=jQuery(this).attr('rel');
 					   var  idtrabajo= ui.draggable.attr('id');
 					   jQuery(ui.draggable).children('span').remove();

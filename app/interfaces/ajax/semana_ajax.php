@@ -1,7 +1,6 @@
-<?php  
-require_once dirname(dirname(dirname(__FILE__))).'/conf.php';
+<?php
+require_once dirname(__FILE__) . '/../../conf.php';
 
- 
     $sesion = new Sesion(array('PRO','REV','SEC'));
     $pagina = new Pagina($sesion);
     
