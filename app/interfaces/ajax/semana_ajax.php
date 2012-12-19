@@ -1,16 +1,7 @@
-<?php     require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Html.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-    require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-    require_once Conf::ServerDir().'/classes/Semana.php';
-    require_once Conf::ServerDir().'/classes/InputId.php';
-    require_once Conf::ServerDir().'/classes/Trabajo.php';
-    require_once Conf::ServerDir().'/classes/Asunto.php';
-		require_once Conf::ServerDir().'/classes/UtilesApp.php';
+<?php  
+require_once dirname(dirname(dirname(__FILE__))).'/conf.php';
 
+ 
     $sesion = new Sesion(array('PRO','REV','SEC'));
     $pagina = new Pagina($sesion);
     
@@ -129,8 +120,8 @@
     
 
 <?php
-echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0;height: 50%;width: 70px;top: 18px;  border:0 none;" type="text" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" title="'.Utiles::sql3fecha($semana_siguiente,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y').'" />
-      <input style="text-indent: -10000px;color:white;position: absolute;height: 50%;width: 70px;left:0;top: 18px; border:0 none;" type="text" value="'.$semana_anterior.'" id="hiddensemanaanterior" title="'.Utiles::sql3fecha($semana_anterior,'%d-%m-%Y').'" rel="'.Utiles::sql3fecha($semana_anterior,'%d de %B de %Y').'"/>';
+echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0;height: 50%;width: 70px;top: 18px;  border:0 none;" type="text" value="'.$semana_siguiente.'" id="hiddensemanasiguiente" title="'.$semana_siguiente.'" rel="'.strftime("%d de %B de %Y",strtotime($semana_siguiente)).'" />
+      <input style="text-indent: -10000px;color:white;position: absolute;height: 50%;width: 70px;left:0;top: 18px; border:0 none;" type="text" value="'.$semana_anterior.'" id="hiddensemanaanterior" title="'.$semana_anterior.'" rel="'.strftime("%d de %B de %Y",strtotime($semana_anterior)).'"/>';
 
 
 echo("<table style='width:600px'>");
@@ -215,7 +206,8 @@ echo("<table style='width:600px'>");
 		if($lista->Get($i)->fields['cobrable'] == 0 || $lista->Get($i)->fields['cobrable'] == 2)
 		{
 			$no_cobrable = __('No cobrable');
-			$color = '#FFFFFF';
+			$color = '#F0F0F0';
+			$pintame='';
 		}
 		else
 		{
@@ -223,6 +215,7 @@ echo("<table style='width:600px'>");
 			/*$color = $objeto_semana->colores[$cod_asunto_color];
 			if($color == '')*/
 				$color = '#E8E7D9';
+				$pintame=' pintame ';
 		}
 
 		$total[$dia_semana]  += $hh + $mm/60; 
@@ -254,7 +247,7 @@ echo("<table style='width:600px'>");
 				echo("</td><td width=14%>");
 		}	
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div class='cajatrabajo ".$arraytrabajo[$id_trabajo]['abierto']."' rel='".$cod_asunto."' id='".$id_trabajo."'  $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div class='cajatrabajo $pintame ".$arraytrabajo[$id_trabajo]['abierto']."' rel='".$cod_asunto."' id='".$id_trabajo."'  $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");

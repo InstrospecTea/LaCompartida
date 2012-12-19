@@ -44,6 +44,7 @@
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
 			exit;
+
 		} elseif(($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo')
 		{
 			if(!$permiso_revisor->fields['permitido'])
@@ -54,12 +55,29 @@
 				exit;
 			}
 		} elseif($opcion=='cambiofecha') {
+
                     $semana=Utiles::fecha2sql($fecha);
                     $t->Edit('fecha',$semana);
                     $t->Write(true);
                     die('semana|'.$semana);
                     
+
+         } else if ($opcion=='clonar') {
+                    $semana=Utiles::fecha2sql($fecha);
+					unset($t->fields['id_trabajo']);
+					unset($t->fields['id_cobro']);
+					unset($t->fields['estadocobro']);
+					unset($t->fields['fecha_creacion']);
+					$t->Edit('fecha',$semana);
+					foreach($t->fields as $key=>$value) {
+						if($value!='') $t->changes[$key]=1;
                 }
+					 
+                    $t->Write(true);
+                    die('id_trabajo|'.$t->fields['id_trabajo']);
+                    
+           }
+
 		if(!$id_usuario)
 			$id_usuario = $t->fields['id_usuario'];
 
@@ -123,14 +141,10 @@
 				if($duracion == '00:00:00' )  {
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
-				 $asunto = new Asunto($sesion);
-                            if (UtilesApp::GetConf($sesion,'CodigoSecundario'))    {
-                                    $asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-                                    $codigo_asunto=$asunto->fields['codigo_asunto'];
-                            }  else   {
-                                    $asunto->LoadByCodigo($codigo_asunto);
-                            }
-				if(!$codigo_asunto || $codigo_asunto ==''){
+
+
+				if ((!$codigo_asunto || $codigo_asunto =='') && (!$codigo_asunto_secundario || $codigo_asunto_secundario==''))  {
+
 					$pagina->AddError("Debe seleccionar un ".__('Asunto'));
 				}
 				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && (! $id_area_trabajo || $id_area_trabajo == '')){
@@ -149,6 +163,16 @@
                     if(Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
                     {
                             $valida = true;
+                            $asunto = new Asunto($sesion);
+                            if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
+                            {
+                                    $asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
+                                    $codigo_asunto=$asunto->fields['codigo_asunto'];
+                            }
+                            else
+                            {
+                                    $asunto->LoadByCodigo($codigo_asunto);
+                            }
                            
 
                             /*
@@ -941,6 +965,9 @@ function CargaIdioma( codigo ) {
 			  }
 			}).done(function(response) {
 			var idio = response.split("|");
+			if (idio[1].length==0) idio[1]='Español';
+			if (idio[0].length==0) idio[0]='es';
+			 
 			if (IdiomaGrande) {
 				jQuery('#txt_span').html(idio[1]);
 			} else {
@@ -948,10 +975,11 @@ function CargaIdioma( codigo ) {
 			}
 	
  
-				if(idio[0]=='es')
+				if(idio[0]=='es' ) {
 					googie2.setCurrentLanguage('es');
-				if(idio[0]=='en')
+				} else if(idio[0]=='en') {
 					googie2.setCurrentLanguage('en');
+				}
 				});	
 		
 	   
