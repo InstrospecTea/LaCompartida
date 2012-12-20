@@ -432,7 +432,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-	  Reemplaza , por . para numero
+		Reemplaza , por . para numero
 	 */
 
 	function PonerPuntoNumeros($valor) {
@@ -457,7 +457,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-	  HTML 2 (F)PDF
+		HTML 2 (F)PDF
 	 */
 
 	function Html2Pdf($html) {
@@ -465,27 +465,27 @@ class UtilesApp extends Utiles {
 		exit();
 
 		/*
-		  require_once dirname(__FILE__).'/../libs/html2fpdf/html2fpdf.php';
-		  $pdf = new HTML2FPDF('P','mm','A4');
-		  $pdf->DisableTags();
-		  $pdf->DisplayPreferences('');
-		  $pdf->SetAuthor( 'Lemontech SA.' );
-		  $pdf->SetCreator( 'Lemontech SA.' );
-		  $pdf->SetTitle( 'Informe periódico' );
-		  $pdf->SetSubject("Lemontech SA.");
-		  $pdf->SetDisplayMode('fullpage', 'continuous'); #'real'
-		  $pdf->PageNo();
-		  $pdf->AddPage();
-		  $pdf->UseCSS(true);
-		  $pdf->WriteHTML($html);
-		  $pdf->Close();
-		  $pdf->Output('informe_periodico.pdf', 'D');
+			require_once dirname(__FILE__).'/../libs/html2fpdf/html2fpdf.php';
+			$pdf = new HTML2FPDF('P','mm','A4');
+			$pdf->DisableTags();
+			$pdf->DisplayPreferences('');
+			$pdf->SetAuthor( 'Lemontech SA.' );
+			$pdf->SetCreator( 'Lemontech SA.' );
+			$pdf->SetTitle( 'Informe periódico' );
+			$pdf->SetSubject("Lemontech SA.");
+			$pdf->SetDisplayMode('fullpage', 'continuous'); #'real'
+			$pdf->PageNo();
+			$pdf->AddPage();
+			$pdf->UseCSS(true);
+			$pdf->WriteHTML($html);
+			$pdf->Close();
+			$pdf->Output('informe_periodico.pdf', 'D');
 		 */
 	}
 
 	/*
-	  La cuenta corriente funciona sólo restando de los ingresos para gastos,
-	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
+		La cuenta corriente funciona sólo restando de los ingresos para gastos,
+		todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
 
 	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
@@ -519,7 +519,7 @@ class UtilesApp extends Utiles {
 
 
 			while($ingresoyegreso=mysql_fetch_array($resp) ) {
- 				if ($ingresoyegreso[0] > 0) {
+				if ($ingresoyegreso[0] > 0) {
 				$total_ingresos += $ingresoyegreso[2];
 				} else if ($ingresoyegreso[1] > 0) {
 				$total_egresos += $ingresoyegreso[2];
@@ -537,7 +537,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-	  La cuenta del cliente funciona sólo sumando los montos asociados al cliente
+		La cuenta del cliente funciona sólo sumando los montos asociados al cliente
 	 */
 
 	function TotalCuentaCliente(&$sesion, $codigo_cliente = '') {
@@ -909,7 +909,7 @@ class UtilesApp extends Utiles {
 		list($codigo) = mysql_fetch_array($resp);
 		$menu_html = "<!-- Menu Section--> \n";
 		$menu_html .= <<<HTML
-    		<div id="droplinetabs1" class="droplinetabs"><ul>
+				<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
 
 		if (!$bitmodfactura)
@@ -951,7 +951,7 @@ HTML;
 																				<b class="spiffy5 color_activo" style="width:103px;"></b></b>
 																				<div class="spiffyfg"><![endif]--><span>$glosa_menu</span><!--[if IE]>
 																				</div></b><![endif]--></a></div>
-										  <ul $active style="display: none;" class="top">
+											<ul $active style="display: none;" class="top">
 HTML;
 					} else if ($j == 0) {
 						$menu_html .= <<<HTML
@@ -964,20 +964,20 @@ HTML;
 																				<b class="spiffy5 color_activo" style="width:68px;"></b></b>
 																				<div class="spiffyfg"><![endif]--><span>$glosa_menu</span><!--[if IE]>
 																				</div></b><![endif]--></a></div>
-										  <ul $active style="display: none;" class="top">
+											<ul $active style="display: none;" class="top">
 HTML;
 					}
 					$menu_html .= <<<HTML
-            			<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>$glosa_submenu</a></li>
+									<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>$glosa_submenu</a></li>
 HTML;
 				}
 			}
 			$menu_html .= <<<HTML
-         				</ul></li>
+								</ul></li>
 HTML;
 		}
 		$menu_html .= <<<HTML
-    		</ul></div><div id="fd_menu_grey" class="barra_fija"><ul active=true>
+				</ul></div><div id="fd_menu_grey" class="barra_fija"><ul active=true>
 HTML;
 		$query = "SELECT * FROM menu WHERE codigo_padre='$codigo' AND tipo=0 AND codigo in ('$lista_menu_permiso') ORDER BY orden";
 		$resp3 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -995,18 +995,18 @@ HTML;
 					$activo_adentro_otros = '';
 				}
 				$menu_html .= <<<HTML
-            			<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>$glosa_submenu</span></a></li><![endif]-->
-            			<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>$glosa_submenu</span></a></li><!--<![endif]-->
+									<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>$glosa_submenu</span></a></li><![endif]-->
+									<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>$glosa_submenu</span></a></li><!--<![endif]-->
 HTML;
 			}
 		}
 		$menu_html .= <<<HTML
-      </ul>
+			</ul>
 HTML;
 		if (isset($vinculo_ayuda))
 		$menu_html .= $vinculo_ayuda;
 		$menu_html .= <<<HTML
-     </div>
+		 </div>
 HTML;
 
 		$menu_html.="<!-- End Menu Section--> \n";
@@ -1294,7 +1294,7 @@ HTML;
 									, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 									,  $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 					);
- 					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual])*($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
+					$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(($arr_resultado['monto_subtotal_completo'][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual])*($cobro->fields['porcentaje_impuesto'] / 100), '', $decimales_completos, '', $cifras_decimales_actual);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] =
 							$arr_resultado[$campo[$xtabla]['monto']][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $decimales_completos, '', $decimales_completos);
 				}
@@ -1487,17 +1487,17 @@ HTML;
 				}
 				$hacer_calculo_normal++;
 			}/*
-			  for($e=0;$e<$lista_monedas->num;$e++)
-			  {
-			  $id_moneda_obj = $lista_monedas->Get($e);
-			  $id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
-			  $arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$campo[$xtabla]['monto']]//monto_moneda_l
-			  ,$arr_resultado['tipo_cambio_id_moneda']//tipo de cambio ini
-			  ,$arr_resultado['cifras_decimales_id_moneda']//decimales ini
-			  ,$arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio fin
-			  ,$arr_resultado['cifras_decimales_opc_moneda_total']//decimales fin
-			  );
-			  } */
+				for($e=0;$e<$lista_monedas->num;$e++)
+				{
+				$id_moneda_obj = $lista_monedas->Get($e);
+				$id_moneda_actual = $id_moneda_obj->fields['id_moneda'];
+				$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$campo[$xtabla]['monto']]//monto_moneda_l
+				,$arr_resultado['tipo_cambio_id_moneda']//tipo de cambio ini
+				,$arr_resultado['cifras_decimales_id_moneda']//decimales ini
+				,$arr_resultado['tipo_cambio_opc_moneda_total']//tipo de cambio fin
+				,$arr_resultado['cifras_decimales_opc_moneda_total']//decimales fin
+				);
+				} */
 		}
 		/*		 * *
 		 * CALCULO COBRO NORMAL
@@ -1541,7 +1541,7 @@ HTML;
 						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
 							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
 										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-                                                                            , $decimales_completos
+																																						, $decimales_completos
 										, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 										, $decimales_completos
 							);
@@ -1593,7 +1593,7 @@ HTML;
 								, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 					);
 
-					  $arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
+						$arr_resultado['saldo_honorarios'][$id_moneda_actual] = $arr_resultado['monto'][$id_moneda_actual]; */
 
 
 				$arr_resultado['monto_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor_monto_honorarios, '', $cifras_decimales_actual, '', $cifras_decimales_actual);
@@ -1752,7 +1752,7 @@ HTML;
 		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
 					prm_proveedor.id_proveedor as id_proveedor,
-                                                                                          prm_proveedor.glosa as glosa_proveedor,
+																																													prm_proveedor.glosa as glosa_proveedor,
 					usuario.username as id_usuario,
 					usuario.username as username,
 					cta_corriente.fecha,
@@ -1769,7 +1769,7 @@ HTML;
 				FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-                                                                        LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+																																				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
 				LEFT JOIN usuario ON cta_corriente.id_usuario_orden = usuario.id_usuario
 				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
 		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
@@ -1970,7 +1970,7 @@ HTML;
 		list($codigo) = mysql_fetch_array($resp);
 		$menu_html = "<!-- Menu Section--> \n";
 		$menu_html .= <<<HTML
-    		<div id="droplinetabs1" class="droplinetabs"><ul>
+				<div id="droplinetabs1" class="droplinetabs"><ul>
 HTML;
 		if (!$bitmodfactura)
 			$bitmodfactura = '0';
@@ -2009,7 +2009,7 @@ HTML;
 																				<b class="spiffy5 color_activo" style="width:103px;"></b></b>
 																				<div class="spiffyfg"><![endif]--><span>${row['glosa']}</span><!--[if IE]>
 																				</div></b><![endif]--></a></div>
-										  <ul $active style="display: none;" class="top">
+											<ul $active style="display: none;" class="top">
 HTML;
 				} else if ($j == 0) {
 					$menu_html .= <<<HTML
@@ -2022,19 +2022,19 @@ HTML;
 																				<b class="spiffy5 color_activo" style="width:68px;"></b></b>
 																				<div class="spiffyfg"><![endif]--><span>${row['glosa']}</span><!--[if IE]>
 																				</div></b><![endif]--></a></div>
-										  <ul $active style="display: none;" class="top">
+											<ul $active style="display: none;" class="top">
 HTML;
 				}
 				$menu_html .= <<<HTML
-            			<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>${row2['glosa']}</a></li>
+									<li><a class="corner_round" href="$root_dir${row2['url']}" $estilo>${row2['glosa']}</a></li>
 HTML;
 			}
 			$menu_html .= <<<HTML
-         				</ul></li>
+								</ul></li>
 HTML;
 		}
 		$menu_html .= <<<HTML
-    		</ul></div><div id="fd_menu_grey" class="barra_fija"><ul active=true>
+				</ul></div><div id="fd_menu_grey" class="barra_fija"><ul active=true>
 HTML;
 		$query = "SELECT * FROM menu WHERE codigo_padre='$codigo' AND tipo=0 AND codigo in ('$lista_menu_permiso') ORDER BY orden";
 		$resp3 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -2047,16 +2047,16 @@ HTML;
 				$activo_adentro_otros = '';
 			}
 			$menu_html .= <<<HTML
-            			<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>${row3['glosa']}</span></a></li><![endif]-->
-            			<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>${row3['glosa']}</span></a></li><!--<![endif]-->
+									<!--[if IE]><li><a href="$root_dir${row3['url']}" $activo_adentro_ie><span>${row3['glosa']}</span></a></li><![endif]-->
+									<!--[if !IE]><!--><li><a href="$root_dir${row3['url']}" $activo_adentro_otros><span>${row3['glosa']}</span></a></li><!--<![endif]-->
 HTML;
 		}
 		$menu_html .= <<<HTML
-      </ul>
+			</ul>
 HTML;
 		$menu_html .= $vinculo_ayuda;
 		$menu_html .= <<<HTML
-     </div>
+		 </div>
 HTML;
 
 		$menu_html.="<!-- End Menu Section--> \n";
