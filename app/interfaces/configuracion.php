@@ -365,7 +365,7 @@ jQuery(document).ready(function() {
 			
 			jQuery('#configuracion').bind( "tabsselect", function(event, ui) {
 		 
-				if(ui.tab.innerText=='Lang') {
+				if(ui.tab.textContent=='Lang') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_lang.php',function(data) {
 						jQuery('#formulariolang').append(data);
@@ -373,7 +373,7 @@ jQuery(document).ready(function() {
 						jQuery('.sortable').sortable();
 					});
 					jQuery('#formulariolang').html('');
-				} else if(ui.tab.innerText=='Plugins') {
+				} else if(ui.tab.textContent=='Plugins') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_plugins.php',function(data) {
 						jQuery('#formularioplugins').append(data);
