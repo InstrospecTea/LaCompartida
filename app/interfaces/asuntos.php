@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
@@ -15,8 +15,8 @@ $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 if($excel){
-	$asunto = new Asunto($sesion);
-	$asunto->DownloadExcel(compact('activo', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario',
+	$Asunto = new Asunto($sesion);
+	$Asunto->DownloadExcel(compact('activo', 'codigo_asunto', 'glosa_asunto', 'codigo_cliente', 'codigo_cliente_secundario',
 		'fecha1', 'fecha2', 'motivo', 'id_usuario', 'id_area_proyecto', 'opc'));
 }
 
@@ -25,7 +25,7 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 } else {
 	require_once Conf::ServerDir() . '/classes/Autocompletador.php';
 }
- 
+
 $params_array['codigo_permiso'] = 'DAT';
 $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array); #tiene permiso de admin de datos
 if ($permisos->fields['permitido'] && $accion == "eliminar") {
@@ -51,18 +51,18 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-   
+
        jQuery(document).ready(function() {
         jQuery("#agregar_asunto").click(function() {
            var CODCLIENTE='<?php echo $codigo_cliente; ?>';
            if (CODCLIENTE=='') {CODCLIENTE=jQuery("#campo_codigo_cliente").val();}
-           nuovaFinestra('Agregar_Asunto',850,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto'); 
+           nuovaFinestra('Agregar_Asunto',850,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto');
         });
     });
 
 
    // $('#agregar_asunto').click(function() {     alert("clickeado");        });
-  
+
 	function GrabarCampo(accion,asunto,cobro,valor)
 	{
 		var http = getXMLHTTP();
@@ -101,7 +101,7 @@ $pagina->PrintTop($popup);
 		} else {
 			return false;
 		}
-		
+
 		form.submit();
 		return true;
 	}
@@ -126,15 +126,15 @@ else
 <?php
 if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	echo AutocompletadorAsunto::CSS();
-} 
+}
 ?>
 <form method=post name='form' id='form'>
 	<input type="hidden" name="busqueda" value="TRUE">
- 
+
 
 
 <?php if ($id_cobro == "") {
-	
+
 	?>
 		<table style="border: 0px solid black" width='100%'>
 			<tr>
@@ -147,23 +147,23 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 		<?php 	}
 	?>
 <?php if ($opc != "entregar_asunto" && $from != "agregar_cliente") { 	?>
-		 
+
 					<fieldset class="tb_base"  width="90%">
-						<legend><?php echo  __('Filtros') ?></legend>	
+						<legend><?php echo  __('Filtros') ?></legend>
 						<table   style="border: 0 none" width='90%'>
 							<tr>
 								<td colspan="4">&nbsp;</td>
 							</tr>
 							<tr>
 								<td class="ar" style="font-weight:bold;">
-		<?php echo  __('Activo') ?> 
+		<?php echo  __('Activo') ?>
 								</td>
 								<td class="al" style="width:80px;" >
 	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "activo", $activo, '', 'Todos', '60') ?>
 								</td>
-							 
+
 								<td class="ar" style="font-weight:bold;">
-		<?php echo  __('Cobrable') ?> 
+		<?php echo  __('Cobrable') ?>
 								</td>
 								<td class="al"  >
 	<?php echo  Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, '', 'Todos', '60') ?>
@@ -174,9 +174,9 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 	<?php echo  __('Cliente') ?>
 								</td>
 								<td nowrap class="al" colspan="3">
-									 
+
 									<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, false,320);?>
-									 
+
 								</td>
 							</tr>
 							<tr>
@@ -204,7 +204,7 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 							</tr>
 							<tr>
 								<td class="ar" style="font-weight:bold;">
-									<?php echo  __('Fecha creaci&oacute;n') ?> 
+									<?php echo  __('Fecha creaci&oacute;n') ?>
 								</td>
 								<td nowrap class="al" colspan= 3>
 									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" class="fechadiff" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
@@ -239,8 +239,8 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 							</tr>
 						</table>
 					</fieldset>
-				 
-	
+
+
 <?php }
 ?>
 	</form>
@@ -263,8 +263,8 @@ if ($buscar || $opc == "entregar_asunto") {
 			$activo = 0;
 		$where .= " AND a1.activo = $activo ";
 	}
-	
-	
+
+
 	if ($_POST['cobrable']=='SI') {
 				$where .= " AND a1.cobrable=1  ";
 	} else if  ($_POST['cobrable']=='NO') {
@@ -320,7 +320,7 @@ if ($buscar || $opc == "entregar_asunto") {
 
 					(SELECT SUM(TIME_TO_SEC(duracion))/3600
 					FROM trabajo AS t3
-					WHERE 
+					WHERE
 					t3.codigo_asunto=a1.codigo_asunto
 					AND t3.cobrable = 1
 					) AS horas_trabajadas,
@@ -341,8 +341,8 @@ if ($buscar || $opc == "entregar_asunto") {
 		$x_pag = 15;
 	else
 		$x_pag = 10;
-	
-	//echo $query; 
+
+	//echo $query;
 	$b = new Buscador($sesion, $query, "Asunto", $desde, $x_pag, $orden);
 	$b->formato_fecha = "$formato_fecha";
 	$b->mensaje_error_fecha = "N/A";
@@ -363,7 +363,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	#		$b->AgregarEncabezado("horas_no_cobradas","Horas no cobradas","","","SplitDuracion");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
 	$b->AgregarEncabezado("a1.fecha_creacion", __('Fecha de creación"'));
-	
+
 	if ($permisos->fields['permitido'] || $permisos_asuntos->fields['permitido'])
 		$b->AgregarFuncion("$link", 'Opciones', "align=center' nowrap");
 	$b->color_mouse_over = "#bcff5c";
@@ -458,6 +458,6 @@ if (UtilesApp::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 	if (empty($_REQUEST["id_cobro"]) && $from != 'agregar_cliente') {
 		echo(AutocompletadorAsunto::Javascript($sesion, false));
 	}
-} 
+}
 $pagina->PrintBottom($popup);
 
