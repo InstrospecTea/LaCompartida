@@ -51,6 +51,19 @@
 				$contrato_doc_legal->Write();
 			}
 		}
+					// piso los valores cacheados del conf
+					$query = "SELECT glosa_opcion, valor_opcion FROM configuracion";
+					$bd_configs = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+					foreach ($bd_configs as $glosa => $valor) {
+						$Sesion->arrayconf[$glosa] = $valor[0][0];
+					}
+					global $memcache;
+					$existememcache =isset($memcache) && is_object($memcache);
+					// 4.2) Si existe memcache, fijo la llave usando lo obtenido en 4.1
+					if ($existememcache) {
+						$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
+						error_log("MEMCACHE CACHE SET $conf = {$Sesion->arrayconf[$conf]} (" . count($Sesion->arrayconf) . " registros)");
+					}
 	}
 ?>
 
@@ -352,7 +365,7 @@ jQuery(document).ready(function() {
 			
 			jQuery('#configuracion').bind( "tabsselect", function(event, ui) {
 		 
-				if(ui.tab.innerText=='Lang') {
+				if(ui.tab.textContent=='Lang') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_lang.php',function(data) {
 						jQuery('#formulariolang').append(data);
@@ -360,7 +373,7 @@ jQuery(document).ready(function() {
 						jQuery('.sortable').sortable();
 					});
 					jQuery('#formulariolang').html('');
-				} else if(ui.tab.innerText=='Plugins') {
+				} else if(ui.tab.textContent=='Plugins') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_plugins.php',function(data) {
 						jQuery('#formularioplugins').append(data);

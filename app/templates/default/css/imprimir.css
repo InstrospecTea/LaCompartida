@@ -1,0 +1,24 @@
+/*Ocultando Botones de interface Botones de interface*/
+#boton_buscar, #boton_xls, #imprimir{
+    display: none !important;
+}
+/*Ocultando header tipo facebook*/
+#tb_facebook, .tb_facebook {
+    display: none !important; 
+}
+/*Ocultando Menu*/
+#droplinetabs, #droplinetabs1, #barra_fija{
+    display: none !important; 
+}
+#zenbox_tab{
+    display: none !important; 
+}
+
+TD.encabezado{
+    color: #000;
+    background-color: #000;
+}
+TR.encabezado{
+    color: #000;
+    background-color: #000;
+}

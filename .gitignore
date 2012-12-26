@@ -1,12 +1,17 @@
 
 # RVM
 .rvmrc
+/app/miconf.php
+/app/test/spec/conf.rb
+
 .svn/
 app/classes/AWSSDKforPHP/
 nbproject/
 /nbproject/private/nbproject/
+cap_servers.rb
+REVISION
+environment.txt
 
-=======
 #################
 ## Eclipse
 #################
@@ -174,6 +179,4 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
-
-
-
+/app/interfaces/DOMPDF_FONT_DIRlog.htm
