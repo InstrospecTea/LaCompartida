@@ -1,5 +1,11 @@
 # Changelog
 
+## Hotfix: 12.121
+
+Miércoles 2 de Enero, 2013.
+
+* **Fixed:** [Corrige el reporte de factura para que sume por moneda y considere el número de factura como número](https://github.com/LemontechSA/ttb/pull/41)
+
 ## Hotfix: 12.1.1
 
 Jueves 27 de Diciembre, 2012.
