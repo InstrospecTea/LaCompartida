@@ -13,16 +13,15 @@ if (!isset($where) || (isset($where) && $where == '')) {
 }
 if ($_REQUEST['opc'] == 'contratoasunto') {
 	$codigo_asunto = $_REQUEST['codigo_asunto'];
+	$data = array('id_contrato' => '');
 	if ($codigo_asunto) {
 		$contrato = new Contrato($sesion);
 		$contrato->LoadByCodigoAsunto($codigo_asunto);
-		$id_contrato = $contrato->fields['id_contrato'];
-	} else {
-		$id_contrato = '';
+		$data['id_contrato'] = $contrato->fields['id_contrato'];
+		if(isset($contrato->fields['codigo_contrato'])){
+			$data['codigo_contrato'] = $contrato->fields['codigo_contrato'];
+		}
 	}
-	$data = array(
-		"id_contrato" => $id_contrato
-	);
 	echo json_encode($data);
 	exit;
 }

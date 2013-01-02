@@ -63,6 +63,7 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$documento->fields['id_moneda'] = $SolicitudAdelanto->fields['id_moneda'];
 	$documento->fields['glosa_documento'] = $SolicitudAdelanto->fields['descripcion'];
 	$documento->fields['id_contrato'] = $SolicitudAdelanto->fields['id_contrato'];
+	$id_contrato = $SolicitudAdelanto->fields['id_contrato'];
 	$codigo_cliente = $SolicitudAdelanto->fields['codigo_cliente'];
 	$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
 	if($id_contrato && !$codigo_asunto){
@@ -855,23 +856,6 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				CancelarDocumentoMonedaPago();
 			}
 		}
-
-		function CargarContratos(){
-<?php if (!$adelanto) { ?>
-				return true;
-<?php } ?>
-			var http = getXMLHTTP();
-			var url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente='+$F('codigo_cliente');
-			http.open('get', url);
-			http.onreadystatechange = function()
-			{
-				if(http.readyState == 4)
-				{
-					$('td_selector_contrato').innerHTML = http.responseText;
-				}
-			}
-			http.send(null);
-		}
 </script>
 <?php echo Autocompletador::CSS(); ?>
 <form method='post' action="#" id="form_documentos" autocomplete='off'>
@@ -990,43 +974,12 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		<tr>
 			<td align="right" width="20%"><?php echo __('Cliente') ?></td>
 			<td colspan="3" align="left">
-				<?php
-				/* voy a poner nuevo metodo de select cliente, acorde a agregar_pago_factura */
-
-				if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-					$cliente = new Cliente($sesion);
-					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
-				}
-				if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-					if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarContratos(); CargarTabla(1);");
-					} else {
-						echo Autocompletador::ImprimirSelector($sesion, $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente, '', '', 280, "CargarContratos(); CargarTabla(1);");
-					}
-				} else {
-					if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 280);
-					} else if ($codigo_cliente) {
-							echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente," readonly='readonly' ","CargarContratos(); CargarTabla(1);", 280);
-					} else {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", "", "  ", "CargarContratos(); CargarTabla(1);", 280);
-					}
-				}
-				?>
-
+				<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario, '', 280, "+CargarTabla(1);"); ?>
 			</td>
 		</tr>
-		<?php if ($adelanto) { ?>
-			<tr>
-				<td align="right">
-					<?php echo __('Asuntos'); ?>
-		</td>
-		<td id="td_selector_contrato" style="text-align:left;margin:2px;">
-			<?php $contrato = new Contrato($sesion);
-			echo $contrato->ListaSelector($codigo_cliente, 'CargarTabla(1);', $documento->fields['id_contrato'],390); ?>
-		</td>
-			</tr>
-		<?php } ?>
+		<?php if ($adelanto) {
+			UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, 280);
+		} ?>
 		<tr>
 			<td align=right>
 				<?php echo __('Monto') ?>
@@ -1306,7 +1259,7 @@ if (empty($adelanto) || $id_documento) {
 </script>
 <?php
 if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-	echo Autocompletador::Javascript($sesion, false, 'CargarContratos(); CargarTabla(1);');
+	echo Autocompletador::Javascript($sesion, false, 'CargarTabla(1);');
 }
 echo InputId::Javascript($sesion, "", "No existen N° de cuenta asociadas a este banco.");
 $pagina->PrintBottom($popup);
