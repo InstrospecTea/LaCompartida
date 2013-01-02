@@ -53,13 +53,10 @@ if (!class_exists('Conf')) {
 		}
 
 		public static function Locale() { return array('es_CL','es_ES'); }
-		public static function NombreIdentificador() {return 'DNI'; }
 		public static function BorrarDatosAdministracion() { return false; }
 
 		public static function TimestampDeployJS(){ return '1234370043'; }
 		public static function TimestampDeployCSS(){ return '1226330411'; }
-		public static function UsernameMail() { return 'ptimetracking@lemontech.cl'; }
-		public static function PasswordMail() { return 'tt.asdwsx'; }
 		public static function TieneTablaVisitante() { return true; }
 
 		/**
