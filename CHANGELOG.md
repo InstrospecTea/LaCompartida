@@ -1,5 +1,11 @@
 # Changelog
 
+## Hotfix: 12.1.1
+
+Jueves 27 de Diciembre, 2012.
+
+* **Fixed:** [Elimina las funciones de la clase Conf que se obtienen desde la BD](https://github.com/LemontechSA/ttb/pull/40)
+
 ## Release: 12.1.0
 
 Miércoles 26 de Diciembre, 2012.
