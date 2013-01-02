@@ -1246,7 +1246,7 @@ if (empty($adelanto) || $id_documento) {
 <?php if (UtilesApp::GetConf($sesion, 'UsarModuloSolicitudAdelantos')) { ?>
 	jQuery(document).ready(function() {
 		jQuery('#monto').change().keyup();
-		jQuery('#codigo_cliente').change();
+		CargarTabla(1);
 	});
 <?php } ?>
 	</script>
