@@ -93,6 +93,13 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				//el espacio es para q se mantenga como string y no se reseteen los indices al shiftear
 				$groups[$column->group + $indent_level . ' '] = $column->field;
 				unset($columns[$idx]);
+			} else if(isset($column->extras['subtotal']) && $column->extras['subtotal'] && !isset($columns[$column->extras['subtotal']])) {
+				$col_subtotal = new SimpleReport_Configuration_Column();
+				$col_subtotal->Field($column->extras['subtotal'])
+					->Title($column->extras['subtotal'])
+					->Format('text')
+					->Extras(array('width' => 0));
+				$columns[$column->extras['subtotal']] = $col_subtotal;
 			}
 		}
 		ksort($groups);
@@ -265,6 +272,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 		// 4.3 Totales
 		$last_row = $this->current_row - 1;
+		$this->current_row++; //espacio para no pescar los totales en los filtros
 		$this->totales($totals_rows, $columns, $totals_name, $col0, false, $first_row, $last_row);
 
 		// 4.4 Estilos de columnas
@@ -276,7 +284,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				$width = $column->extras['width'];
 			}
 
-			$this->sheet->setColumn($col_i + $col0, $col_i + $col0, $width);
+			$this->sheet->setColumn($col_i + $col0, $col_i + $col0, $width, 0, empty($width) ? 1 : 0);
 		}
 
 		// 4.5 Autofilter
@@ -301,6 +309,13 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 				if (isset($totals[$idx])) {
 					if($subtotals){
 						$row[$column->field] = '=' . implode('+', $totals[$idx]);
+						$this->cell($row, $column, $col_i, 'total_' . $column->format);
+					}
+					else if($first_row && $last_row && isset($column->extras['subtotal'])){
+						$sum_cells = $this->xls->rowcolToCell($first_row, $col_i) . ':' . $this->xls->rowcolToCell($last_row, $col_i);
+						$col_cond = $this->col_letters[$column->extras['subtotal']];
+						$cond_cells = $this->xls->rowcolToCell($first_row, $col_cond) . ':' . $this->xls->rowcolToCell($last_row, $col_cond);
+						$row[$column->field] = "=SUMIF($cond_cells,\"$group\",$sum_cells)";
 						$this->cell($row, $column, $col_i, 'total_' . $column->format);
 					}
 					else{

@@ -1,19 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Factura.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/../app/classes/FacturaPdfDatos.php';
-require_once Conf::ServerDir() . '/classes/DocumentoLegalNumero.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new Pagina($sesion);
@@ -252,7 +238,7 @@ function funcionTR(& $fila) {
 	} else {
 		$html .= "<td align=left>" . $fila->fields['glosa_cliente'] . "</td>";
 	}
-	$html .= "<td align=left>" . GlosaAsuntos(& $fila, $sesion) . "</td>";
+	$html .= "<td align=left>" . GlosaAsuntos($fila, $sesion) . "</td>";
 	$html .= "<td align=left>" . $fila->fields['encargado_comercial'] . "</td>";
 	$html .= "<td align=left>" . $fila->fields['descripcion'] . "</td>";
 	if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
@@ -261,13 +247,13 @@ function funcionTR(& $fila) {
 		$html .= "<td align=center>" . $fila->fields['anulado'] . "</td>";
 	}
 	$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',950,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a></td>";
-	$html .= "<td align=right nowrap>" . SubTotal(& $fila) . "</td>";
-	$html .= "<td align=right nowrap>" . Iva(& $fila) . "</td>";
-	$html .= "<td align=right nowrap>" . MontoTotal(& $fila) . "</td>";
-	$html .= "<td align=right nowrap>" . Pago(& $fila, $sesion) . "</td>";
-	$html .= "<td align=right nowrap>" . Saldo(& $fila) . "</td>";
-	$html .= "<td align=right>" . FechaUltimoPago(& $fila, $sesion) . "</td>";
-	$html .= "<td align=center nowrap>" . Opciones(& $fila) . "</td>";
+	$html .= "<td align=right nowrap>" . SubTotal($fila) . "</td>";
+	$html .= "<td align=right nowrap>" . Iva($fila) . "</td>";
+	$html .= "<td align=right nowrap>" . MontoTotal($fila) . "</td>";
+	$html .= "<td align=right nowrap>" . Pago($fila, $sesion) . "</td>";
+	$html .= "<td align=right nowrap>" . Saldo($fila) . "</td>";
+	$html .= "<td align=right>" . FechaUltimoPago($fila, $sesion) . "</td>";
+	$html .= "<td align=center nowrap>" . Opciones($fila) . "</td>";
 	$html .= "</tr>";
 
 	$i++;
