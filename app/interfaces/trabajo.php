@@ -65,25 +65,7 @@ if ($semana == "") {
 	$semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
 	$semana_siguiente = date("d-m-Y", strtotime("$semana_actual+7 days"));
 }
-if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-	$select_codigo = "(SELECT c2.codigo_cliente_secundario FROM cliente as c2 WHERE c2.codigo_cliente=asunto.codigo_cliente) as codigo_cliente,asunto.codigo_asunto_secundario as codigo_asunto,";
-} else {
-	$select_codigo = "asunto.codigo_cliente,asunto.codigo_asunto,";
-}
-#se usa yearweek para ver por semana Y año cada trabajo esto soluciona el problema de la ultima
-#y primera semana del año
-$query = "SELECT $select_codigo asunto.glosa_asunto,trabajo.duracion,trabajo.fecha,trabajo.id_trabajo, trabajo.descripcion
-				,(SELECT c1.glosa_cliente FROM cliente AS c1 WHERE c1.codigo_cliente=asunto.codigo_cliente) as glosa_cliente
-				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable
-				 FROM trabajo 
-				 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-					WHERE
-					trabajo.id_usuario = '$id_usuario' 
-					AND YEARWEEK(fecha,1) = YEARWEEK($semana2,1)
-					ORDER BY fecha,id_trabajo";
-
-$lista = new ListaTrabajos($sesion, "", $query);
-
+ 
 $dias = array(__("Lunes"), __("Martes"), __("Miércoles"), __("Jueves"), __("Viernes"), __("Sábado"), __("Domingo"));
 $tip_anterior = Html::Tooltip("<b>" . __('Semana anterior') . ":</b><br>" . Utiles::sql3fecha($semana_anterior, '%d de %B de %Y'));
 $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Utiles::sql3fecha($semana_siguiente, '%d de %B de %Y'));
@@ -98,9 +80,26 @@ if ($p_revisor->fields['permitido']) {
 }
 $where .= " AND usuario.visible=1";
 ?>
+	   <style type="text/css">
+		
+			.diasemana {float:left;display:inline-block;width:13.6%;margin:1px; border: 1px solid black; text-align:center;}
+			.celdadias {float:left;display:inline-block;width:13.93%;margin:1px 0; border: 1px solid white; text-align:center;position:relative;}
+			.totaldia {width:98%;border: 1px solid black; text-align:center;position:absolute;bottom:-20px;}
+			
+   </style>
 	<script src="//static.thetimebilling.com/contextmenu/jquery.contextMenu.js" type="text/javascript"></script>
 	<link  href="//static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
+		  function SecToTime(sec_numb) {
+    
+    var hours   = Math.floor(sec_numb / 3600);
+    var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
+    var seconds = sec_numb - (hours * 3600) - (minutes * 60);
+    if (minutes < 10) {minutes = "0"+minutes;}
+    
+    var time    = hours+':'+minutes;
+    return time;
+}
 		function calcHeight(idIframe, idMainElm){
 			ifr = $(idIframe);
 			try {
@@ -152,7 +151,7 @@ $where .= " AND usuario.visible=1";
 			});
 
 			jQuery.contextMenu({
-				selector: '#cabecera_dias td', 
+				selector: '#cabecera_dias div', 
 				events: {
 					show: function(opt) {
 						var $this = this;
@@ -210,14 +209,14 @@ $where .= " AND usuario.visible=1";
 				ddrivetip('<b>Semana Anterior</b><br/><br/>'+jQuery("#hiddensemanaanterior").attr('rel'));
 			},    function() {        hideddrivetip();    });
 
-			jQuery("#cabecera_dias td").hover(function() {
+			jQuery("#cabecera_dias div").hover(function() {
 				jQuery(this).css({'background':'#DF9862'});
 			},    function() {      jQuery(this).css({'background':'#FFF'});   });
 
-			jQuery(window).load(function() {
+			/*Query(window).load(function() {
 				jQuery('#divsemana').html(DivLoading);
 				Refrescasemana(semana,usuario); 
-			});
+			});*/
 		});
 		
 		function Refrescasemana(semana,usuario,eldiv,slide) {
@@ -228,41 +227,41 @@ $where .= " AND usuario.visible=1";
 			var diaplus=dias+1;
 			var fecha='';
 			var divsemana= eldiv ? jQuery('#'+eldiv) : jQuery('#divsemana');
-
+			
 			jQuery.get('ajax/semana_ajax.php?popup=1&semana='+semana+'&id_usuario='+usuario, function(datos) {
-				if(!slide) { 
-					data=datos ;
-					divsemana.html(data);
+
+				if(!slide) {
+					divsemana.html('').append(datos);
 				} else if(slide=='left') {
-					divsemana.css('left','-1150px');
+					divsemana.html('').css('left','-1150px').append(datos).animate({left:0},1000);
 					data=jQuery('#lastweek').html();
-					divsemana.html(data).animate({left:0},1000);
 				} else if (slide=='right') {
-					divsemana.css({'left':'1150px'});
+					divsemana.html('').css({'left':'1150px'}).append(datos).animate({left:0},1000);
 					data=jQuery('#nextweek').html();
-					divsemana.html(data).animate({left:0},1000);
 				}
 
 				var nextweek=jQuery("#hiddensemanasiguiente").val();
 				var lastweek=jQuery("#hiddensemanaanterior").val();
+					var maxaltura=0;
+					jQuery('.semanacompleta').each(function() {
+								var altura=jQuery(this).height()-73;
+								maxaltura=altura>maxaltura? altura:maxaltura;
+								jQuery(".celdadias",jQuery(this)).css({'height':altura});
+							});
+					jQuery("#contienehoras").css({'height':(maxaltura+73)});
 
+					for (diaplus=dias+1;diaplus<=7;diaplus=diaplus+1)             {
+						fecha=jQuery('#dia'+(diaplus-1)).val();
+						jQuery("#celdadia"+(diaplus+1)).attr('rel',fecha);
+					 
+					}
 				if(!eldiv) {
 
 					jQuery("#proxsemana").val(nextweek);
 					jQuery("#antsemana").val(lastweek);
 
-
-					jQuery("#celdastrabajo td").each(function() {
-						dias++;
-						fecha=jQuery('#dia'+(dias-1)).val();
-						jQuery(this).attr({'id':'celda'+dias, 'class':'celdadias','rel':fecha});
-					});
-					for (diaplus=dias+1;diaplus<=7;diaplus=diaplus+1)             {
-						fecha=jQuery('#dia'+(diaplus-1)).val();
-						jQuery("#celdastrabajo").append('<td class="celdadias" width="14%" id="celda'+diaplus+'" rel="'+fecha+'"></td>');
-
-
-					}
+					
+				
 					var nextweek=jQuery("#hiddensemanasiguiente").val();
 					var lastweek=jQuery("#hiddensemanaanterior").val();
 				Refrescasemana(nextweek,usuario,'nextweek');  
@@ -272,8 +271,9 @@ $where .= " AND usuario.visible=1";
                 jQuery('.trabajoabierto').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'});
               
 
-                 jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false',
+                 jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false', 
                      drop: function (event,ui) {
+ 
 					   var  cuando=jQuery(this).attr('rel');
 					   var  idtrabajo= ui.draggable.attr('id');
 					   jQuery(ui.draggable).children('span').remove();
@@ -281,18 +281,34 @@ $where .= " AND usuario.visible=1";
 					   if(event.ctrlKey) {
 						ui.draggable.addClass('clon');
 						jQuery(this).append(ui.draggable.clone());
-							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'clonar',popup:1},function(data){
-								var arreglo=data.split('|');
-								console.log(arreglo);
-								jQuery('.clon').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'}).attr({'alt':'clonado','id':arreglo[1]}).removeClass('clon');
-							});
-						} else {
+						var Option='clonar';
+							} else {
 							jQuery(this).append(ui.draggable);
-							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
+							 var Option='cambiofecha';
+							}
+							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:Option,popup:1},function(data){
 								var arreglo=data.split('|');
-
+											jQuery('.totaldia').each(function() {
+												var time=0;
+												jQuery('.cajatrabajo',jQuery(this).parent()).each(function() {
+													time=1*time+1*jQuery(this).attr('duracion');
+												});
+												jQuery(this).attr('duracion',time).html(SecToTime(time));
+											});
+										 	if(event.ctrlKey) {
+												jQuery('.clon').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'}).attr({'alt':'clonado','id':arreglo[1]}).removeClass('clon');
+											} 
+												maxaltura=0;
+											jQuery('.semanacompleta').each(function() {
+												var altura=jQuery(this).height()-73;
+												jQuery(".celdadias",jQuery(this)).css({'height':altura});
+												maxaltura=altura>maxaltura? altura:maxaltura;
+											});
+											console.log(maxaltura);
+											jQuery("#contienehoras").css({'height':maxaltura+130});
 							});
-						}
+						
+						
                     }
 
                 });
@@ -417,18 +433,18 @@ $where .= " AND usuario.visible=1";
             </td>
         </tr>
         <tr><td style="text-align:center;font-weight:bold;padding:10px;">Haga click con el botón derecho sobre algún trabajo para modificarlo</td></tr>
-        <tr>
-            <td style="text-align:center;">
-				<div id="contienehoras" style="margin:auto;position:relative;width:750px;overflow-x: hidden;">
+         </table>
+          
+				<div id="contienehoras" style="margin:auto;position:relative;width:750px;overflow-x: hidden;text-align:center;">
 					<div class="tb_base" id="divsemana" style="width: 750px;position:relative;right:0;left:0;">
 						<div class="divloading">&nbsp;</div>
 					</div>
-					<div class="tb_base" id="nextweek" style=" position:absolute; right:-550px;top:0px;display:none;"></div>
-					<div class="tb_base" id="lastweek" style="position:absolute;left:-550px;top:0px;display:none;"></div>
+					<div class="tb_base" id="nextweek" style=" position:absolute; right:-550px;top:0px;visibility:hidden;float:right;"></div>
+					<div class="tb_base" id="lastweek" style="position:absolute;left:-550px;top:0px;visibility:hidden;float:left;"></div>
 				</div>
-            </td>
-        </tr>
-    </table>
+          
+        
+  
 
 
 	<?php
