@@ -31,7 +31,8 @@ class SimpleReport_Writer_Spreadsheet_Format extends SimpleReport_Configuration_
 			'Size' => 10,
 			'VAlign' => 'top',
 			'Color' => 'black',
-			'TextWrap' => 1
+			'TextWrap' => 1,
+			'NumFormat' => 'dd-mm-yyyy'
 		),
 		'text' => array(
 			'Size' => 10,

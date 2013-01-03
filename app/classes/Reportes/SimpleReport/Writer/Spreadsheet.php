@@ -88,6 +88,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 		//agrupadores de resultados
 		$groups = array();
+		$aux_columns = array();
 		foreach ($columns as $idx => $column) {
 			if ($column->group) {
 				//el espacio es para q se mantenga como string y no se reseteen los indices al shiftear
@@ -99,8 +100,12 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 					->Title($column->extras['subtotal'])
 					->Format('text')
 					->Extras(array('width' => 0));
-				$columns[$column->extras['subtotal']] = $col_subtotal;
+				$aux_columns[$column->extras['subtotal']] = $col_subtotal;
 			}
+		}
+		if(!empty($aux_columns)){
+			//se insertan las columnas ocultas antes del final, para asegurar que se incluyan si se intenta seleccionar todo
+			$columns = array_slice($columns, 0, -1) + $aux_columns + array_slice($columns, -1);
 		}
 		ksort($groups);
 
