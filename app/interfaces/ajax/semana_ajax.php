@@ -129,7 +129,7 @@ echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0
 	<?php //echo "semana $semana_actual";
 		$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
 	?>
-            <strong><?php echo $horas_trabajadas_mes;?></strong>
+            <strong id="totalmes"><?php echo $horas_trabajadas_mes;?></strong>
 		 
     
 		</div>
@@ -300,7 +300,7 @@ echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0
         
 <?php $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario,$semanacompleta[1][0]);
 ?>
-            <strong><?php echo $horas_trabajadas_semana?></strong>
+            <strong id="totalsemana"><?php echo $horas_trabajadas_semana?></strong>
 		</div>
 		</div>
 </form>

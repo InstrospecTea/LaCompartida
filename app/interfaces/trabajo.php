@@ -213,10 +213,7 @@ $where .= " AND usuario.visible=1";
 				jQuery(this).css({'background':'#DF9862'});
 			},    function() {      jQuery(this).css({'background':'#FFF'});   });
 
-			/*Query(window).load(function() {
-				jQuery('#divsemana').html(DivLoading);
-				Refrescasemana(semana,usuario); 
-			});*/
+			
 		});
 		
 		function Refrescasemana(semana,usuario,eldiv,slide) {
@@ -306,6 +303,12 @@ $where .= " AND usuario.visible=1";
 											});
 											console.log(maxaltura);
 											jQuery("#contienehoras").css({'height':maxaltura+130});
+											if(Option=='clonar') {
+												jQuery('#totalsemana').html(arreglo[2]);
+												jQuery('#totalmes').html(arreglo[3]);
+											}
+				
+					
 							});
 						
 						

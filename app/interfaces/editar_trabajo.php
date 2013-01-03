@@ -74,7 +74,19 @@
                 }
 					 
                     $t->Write(true);
-                    die('id_trabajo|'.$t->fields['id_trabajo']);
+					 if(date('N',strtotime($t->fields['fecha']))==1) {
+						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']));
+						} else {
+						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']." last Monday"));
+						}
+						
+						if( UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta')) {
+							$hhmes=$sesion->usuario->HorasTrabajadasEsteMes($t->fields['id_usuario'], 'horas_trabajadas',$lastmonday);
+						} else {
+							$hhmes=$sesion->usuario->HorasTrabajadasEsteMes($t->fields['id_usuario'], 'horas_trabajadas');
+						}
+                     die('id_trabajo|'.$t->fields['id_trabajo'].'|'.$sesion->usuario->HorasTrabajadasEsteSemana($t->fields['id_usuario'],$lastmonday).'|'.$hhmes);
+
                     
            }
 
