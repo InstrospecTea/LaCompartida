@@ -43,7 +43,11 @@ class Factura extends Objeto {
 		),
 		array (
 			'field' => 'numero',
+			'format' => 'number',
 			'title' => 'N° Documento',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array (
 			'field' => 'factura_rsocial',
@@ -92,6 +96,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -101,6 +106,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -110,6 +116,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -119,6 +126,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -128,6 +136,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -137,6 +146,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -146,6 +156,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -159,6 +170,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -168,6 +180,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (

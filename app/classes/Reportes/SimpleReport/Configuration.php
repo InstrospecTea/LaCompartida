@@ -36,9 +36,9 @@ class SimpleReport_Configuration {
 	function VisibleColumns() {
 		$visible_columns = array();
 
-		foreach ($this->columns as $column) {
+		foreach ($this->columns as $field => $column) {
 			if ($column->visible) {
-				$visible_columns[] = $column;
+				$visible_columns[$field] = $column;
 			}
 		}
 
