@@ -1234,6 +1234,8 @@ function ListaGastos($usuario, $password, $timestamp) {
 
 	foreach ($result_gastos as $gasto) {
 		$con_impuesto = $gasto['con_impuesto'] == 'SI';
+		$impuesto = $gasto['monto_cobrable'] * ($con_impuesto ? $factor_impuesto : 0);
+		$impuesto = number_format($impuesto, 2, '.', '');
 
 		$gasto_ws = array(
 			'id' => $gasto['id_movimiento'],
@@ -1249,7 +1251,7 @@ function ListaGastos($usuario, $password, $timestamp) {
 			'fecha' => '' . $gasto['fecha'],
 			'cobrable' => $gasto['cobrable'] == 'SI',
 			'monto_cobrable' => $gasto['monto_cobrable'],
-			'impuesto' => $gasto['monto_cobrable'] * ($con_impuesto ? $factor_impuesto : 0),
+			'impuesto' => $impuesto,
 			'numero_documento' => '' . $gasto['numero_documento'],
 			'numero_ot' => '' . $gasto['numero_ot'],
 			'con_impuesto' => $con_impuesto,
