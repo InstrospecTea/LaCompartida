@@ -388,8 +388,9 @@ switch ($accion) {
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
-			if ($i > 0)
+			if ($i > 0) {
 				echo("~");
+			}
 			echo(join("|", $fila));
 		}
 		if ($vacio) {

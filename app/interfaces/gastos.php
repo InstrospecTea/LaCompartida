@@ -128,7 +128,7 @@ if ($opc == 'buscar') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
 		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
+			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
 		}
 		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
