@@ -12,11 +12,11 @@
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
-	
+
 	$proveedor = new Proveedor($sesion);
 	$where = " WHERE 1";
 
-	
+
 	if($opcion == 'guardar')
 	{
 		$txt_tipo = "guardado";
@@ -38,7 +38,7 @@
 			</script>
 			<?
 		}
-	} else if( $opcion == 'eliminar' ) {	
+	} else if( $opcion == 'eliminar' ) {
 		if(!empty($id_proveedor))
 		{
 			if($proveedor->Load($id_proveedor))
@@ -88,19 +88,19 @@
 		$('rut').value=$('rut_'+id).value
 		$('glosa').value=$('glosa_'+id).value
 	}
-	
+
 	function EliminarProveedor(id)
 	{
 		if( confirm('Está seguro que quiere eliminar el proveedor.') ) {
 			$('id_proveedor').value=id;
-			$('opcion').value = 'eliminar'; 
+			$('opcion').value = 'eliminar';
 			$('form_documentos').submit();
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	var continuar = 1;
 	function Guardar(form)
 	{
@@ -122,13 +122,13 @@
 			form.glosa.focus();
 			return false;
 		}
-		
+
 		form.opcion.value='guardar';
 		form.submit();
 	}
 
-		
-	
+
+
 </script>
 
 <form method=post action="" id="form_documentos" autocomplete='off'>
@@ -155,7 +155,7 @@
 			<?=__('Rut')?>
 		</td>
 		<td align=left colspan="3">
-			<input type="text" name="rut" value="<?=$proveedor->fields['rut'] ? $proveedor->fields['rut'] : '' ?>" id="rut" size="12" maxlength="12" />
+			<input type="text" name="rut" value="<?=$proveedor->fields['rut'] ? $proveedor->fields['rut'] : '' ?>" id="rut" size="12" maxlength="15" />
 		</td>
 	</tr>
 	<tr>
@@ -207,7 +207,7 @@
 		$opc_html .= "<input type='hidden' value='".$fila->fields['glosa']."' id='glosa_".$id_proveedor."'  name='glosa_".$id_proveedor."'>";
 		$opc_html .= "<a target=\"_parent\" onClick=EditarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Proveedor></a>";
 		$opc_html .= "<a target=\"_parent\" onClick=EliminarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title=Eliminar Proveedor></a>";
-    
+
 		return $opc_html;
 	}
 ?>

@@ -9600,6 +9600,11 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.25:
+			$queries = array();
+			$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL DEFAULT";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9608,7 +9613,7 @@ QUERY;
 
 $num = 0;
 $min_update=2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.24;
+$max_update = 7.25;
 $force=0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
