@@ -1317,6 +1317,7 @@ class CartaCobro extends NotaCobro {
 					$fecha_al = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('to') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_diff_prestada = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
 					$fecha_diff_prestada_durante = $datediff > 0 && $datediff < 12 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($this->fields['fecha_fin'])));
+					$fecha_diff_con_de = $datediff > 0 && $datediff < 12 ? $texto_fecha_es : __('during the month of') . ' ' . ucfirst(Utiles::sql3fecha($this->fields['fecha_fin'], '%B de %Y'));
 				}
 
 				if (( $fecha_diff == 'durante el mes de No existe fecha' || $fecha_diff == 'hasta el mes de No existe fecha' ) && $lang == 'es') {
