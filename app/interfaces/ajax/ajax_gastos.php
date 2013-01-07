@@ -118,7 +118,7 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 			$where .= " AND cta_corriente.id_cobro is not null AND cobro.estado in ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL','PAGADO', 'ENVIADO AL CLIENTE' ,'INCOBRABLE') ";
 		}
 		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
+			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
 		}
 		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
@@ -361,10 +361,11 @@ if ($_GET['totalctacorriente']) { ?>
 function Monto(& $fila) {
 	global $sesion;
 	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-	if ($fila->fields['codigo_idioma'] != '')
+	if ($fila->fields['codigo_idioma'] != '') {
 		$idioma->Load($fila->fields['codigo_idioma']);
-	else
+	} else {
 		$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+	}
 	return $fila->fields['egreso'] > 0 ? $fila->fields[simbolo] . " " . number_format($fila->fields['monto_cobrable'], $fila->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '';
 }
 

@@ -222,7 +222,7 @@ if ($opc == 'buscar') {
 			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 			WHERE $where";
-		
+
 		$gasto->DownloadExcel($search_query);
 	}
 
