@@ -211,7 +211,8 @@ $server->wsdl->addComplexType(
 		'numero_documento' => array('name' => 'numero_documento', 'type' => 'xsd:string'),
 		'numero_ot' => array('name' => 'numero_ot', 'type' => 'xsd:string'),
 		'con_impuesto' => array('name' => 'con_impuesto', 'type' => 'xsd:boolean'),
-		'nombre_proveedor' => array('name' => 'proveedor', 'type' => 'xsd:string'),
+		'codigo_proveedor' => array('name' => 'codigo_proveedor', 'type' => 'xsd:string'),
+		'nombre_proveedor' => array('name' => 'nombre_proveedor', 'type' => 'xsd:string'),
 		'tipo_documento_asociado' => array('name' => 'tipo_documento_asociado', 'type' => 'xsd:string'),
 		'codigo_documento_asociado' => array('name' => 'numero_documento_asociado', 'type' => 'xsd:string')
 ));
