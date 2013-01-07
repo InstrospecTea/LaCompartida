@@ -96,7 +96,13 @@ class Documento extends Objeto {
 		return $tc;
 	}
 
-	function IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc = "", $fecha = '', $glosa_documento = "", $id_banco = "", $id_cuenta = "", $numero_operacion = "", $numero_cheque = "", $ids_monedas_documento = array(), $tipo_cambios_documento = array(), $arreglo_pagos_detalle = array(), $id_factura_pago = null, $adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false, $id_contrato = null, $pagar_facturas = false, $id_usuario_ingresa = null, $id_usuario_orden = null, $id_solicitud_adelanto = null) {
+	function IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc,
+		$numero_doc = "", $fecha = '', $glosa_documento = "", $id_banco = "", $id_cuenta = "",
+		$numero_operacion = "", $numero_cheque = "", $ids_monedas_documento = array(),
+		$tipo_cambios_documento = array(), $arreglo_pagos_detalle = array(), $id_factura_pago = null,
+		$adelanto = null, $pago_honorarios = null, $pago_gastos = null, $usando_adelanto = false,
+		$id_contrato = null, $pagar_facturas = false, $id_usuario_ingresa = null, $id_usuario_orden = null,
+		$id_solicitud_adelanto = null, $codigo_asunto = null) {
 
 		list($dtemp, $mtemp, $atemp) = explode("-", $fecha);
 		if (strlen($dtemp) == 2) {
@@ -154,13 +160,24 @@ class Documento extends Objeto {
 			$this->Edit("es_adelanto", empty($adelanto) ? '0' : '1');
 			if (!empty($adelanto)) {
 				$this->Edit("id_contrato", $id_contrato);
+				if(empty($id_contrato) || $id_contrato == 'NULL'){
+					$codigo_asunto = 'NULL';
+				} else if(empty($codigo_asunto)) {
+					$query = "SELECT codigo_asunto FROM asunto
+						WHERE id_contrato = '$id_contrato'
+						AND codigo_cliente = '$codigo_cliente'
+						LIMIT 1";
+					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+					list($codigo_asunto) = mysql_fetch_array($resp);
+				}
+				$this->Edit('codigo_asunto', $codigo_asunto);
 			}
 			$this->Edit("pago_honorarios", empty($pago_honorarios) ? '0' : '1');
 			$this->Edit("pago_gastos", empty($pago_gastos) ? '0' : '1');
 
 			if(!empty($id_solicitud_adelanto) && $id_solicitud_adelanto!='') {
-			$this->Edit('id_solicitud_adelanto', $id_solicitud_adelanto);
-			if(!in_array('id_solicitud_adelanto',$this->editable_fields)) {
+				$this->Edit('id_solicitud_adelanto', $id_solicitud_adelanto);
+				if(!in_array('id_solicitud_adelanto',$this->editable_fields)) {
 					$this->sesion->pdodbh->exec("alter table {$this->tabla} add `id_solicitud_adelanto` int(11) unsigned NOT NULL");
 				}
 			}

@@ -9686,19 +9686,22 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
 		case 7.29:
 			$queries = array();
-
-			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
-				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
+			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
 			}
-
-			if (!ExisteCampo('usuario', 'password_by', $dbh)) {
-				$queries[] = "ALTER TABLE  `usuario` ADD  `reset_password_by` VARCHAR(1) DEFAULT 'U';";
+			if(!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
+				$queries[] = "ALTER TABLE `documento` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `documento` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
 			}
-
 			ejecutar($queries, $dbh);
-			break;
+		break;	
+
 	}
 }
 

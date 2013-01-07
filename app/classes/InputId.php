@@ -172,6 +172,7 @@ class InputId
 			{
 				var select_origen = document.getElementById(id_origen);
 				var select_destino = document.getElementById(id_destino);
+				var valor_original_destino = select_destino.value;
 
 				if (jQuery(select_destino).get(0).nodeName.toLowerCase()!='select') {
 					//no es un select, termino la func.
@@ -245,7 +246,8 @@ class InputId
 										{
 											select_destino.value = select_origen.value;
 										}
-										offLoading();
+											select_destino.value = valor_original_destino;
+										}
 
 								select_destino.onchange();
 							}
@@ -267,31 +269,17 @@ class InputId
 
 
 
-		function CargarSelectCliente(codigo)  {
-			if(codigo!='')
-			{
+	function CargarSelectCliente(codigo)  {
+		if(codigo!='') {
 			";
-			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )  		{
-				$output .= "
-
-				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
-
-
-				jQuery.get(url, function(response) {
-								";
-				if( $desde != 'iframe' && (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  )		{
-								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
-								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;
-								if( $('codigo_cliente_secundario')) $('codigo_cliente_secundario').onchange();";
-						} 	else		{
-								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
-								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;";
-						}
-						$output .= "}); ";
-						}
-	else
-	{
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
+			$output .= "var campo = jQuery('#codigo_cliente_secundario, #campo_codigo_cliente_secundario');";
+				 
+		} else {
+			$output .= "var campo = jQuery('#codigo_cliente, #campo_codigo_cliente');";
+		}
 		$output .= "
+			var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 						//var array_cliente=codigo.split('-');
 
 
@@ -299,25 +287,26 @@ class InputId
 
 				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 
-
-					jQuery.get(url, function(response) {
-					console.log(response);	";
-						if( $desde != 'iframe' && ( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) )		{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;
-								if( $('codigo_cliente')) $('codigo_cliente').onchange();";
-						}
-						else
-						{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;";
-						}
-						$output .= "});";
-						}
-$output .= "
-			}
-}
-function RevisarConsistenciaClienteAsunto( form ) {
+			jQuery.get(url, function(response) {  		
+				response = response.replace(' ','');
+				if(campo.val() != response) {
+					campo.val(response);
+					";
+		if( $desde != 'iframe' && (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  ) {
+			$output .= "campo.change();";
+		}
+		$output .= "
+					try {
+						refrescacombos();
+					} catch (e) {
+						console.log(e);
+					}
+				}
+			});
+		}
+	}
+	
+	function RevisarConsistenciaClienteAsunto( form ) {
 		var accion = 'consistencia_cliente_asunto';
 		if( form.codigo_cliente_secundario && !form.codigo_cliente )
 			var codigo_cliente = form.codigo_cliente_secundario.value;

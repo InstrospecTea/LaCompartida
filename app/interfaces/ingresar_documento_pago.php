@@ -64,6 +64,12 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$documento->fields['glosa_documento'] = $SolicitudAdelanto->fields['descripcion'];
 	$documento->fields['id_contrato'] = $SolicitudAdelanto->fields['id_contrato'];
 	$codigo_cliente = $SolicitudAdelanto->fields['codigo_cliente'];
+	$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
+	if($id_contrato && !$codigo_asunto){
+		$Asunto = new Asunto($sesion);
+		$Asunto->LoadByContrato($id_contrato);
+		$codigo_asunto = $Asunto->fields['codigo_asunto'];
+	}
 }
 
 $documento_cobro = new Documento($sesion);
@@ -147,7 +153,7 @@ if ($opcion == "guardar") {
 
 
 
-	$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $usando_adelanto, $id_contrato, !empty($pagar_facturas),$id_usuario_ingresa,$id_usuario_orden, $id_solicitud_adelanto);
+	$id_documento = $documento->IngresoDocumentoPago($pagina, $id_cobro, $codigo_cliente, $monto, $id_moneda, $tipo_doc, $numero_doc, $fecha, $glosa_documento, $id_banco, $id_cuenta, $numero_operacion, $numero_cheque, $ids_monedas_documento, $tipo_cambios_documento, $arreglo_pagos_detalle, null, $adelanto, $pago_honorarios, $pago_gastos, $usando_adelanto, $id_contrato, !empty($pagar_facturas),$id_usuario_ingresa,$id_usuario_orden, $id_solicitud_adelanto, $codigo_asunto);
 
 
 
@@ -157,11 +163,16 @@ if ($opcion == "guardar") {
 
 if ($documento->Loaded()) {
 	$codigo_cliente = $documento->fields['codigo_cliente'];
+	$codigo_asunto = $documento->fields['codigo_asunto'];
 }
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario') && $codigo_cliente != '') {
 	$cliente = new Cliente($sesion);
 	$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
+	if(!empty($codigo_asunto)){
+		$Asunto = new Asunto();
+		$codigo_asunto_secundario = $Asunto->CodigoACodigoSecundario($codigo_asunto);
+	}
 }
 
 $txt_pagina = $id_documento ? (empty($adelanto) ? __('Edición de Pago') : __('Edición del Adelanto')) : (empty($adelanto) ? __('Documento de Pago') : __('Documento de Adelanto'));

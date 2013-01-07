@@ -47,9 +47,12 @@ if ($SolicitudAdelanto->Loaded()) {
 	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $SolicitudAdelanto->fields['id_solicitud_adelanto'];
 	
 	if (!empty($SolicitudAdelanto->fields['id_contrato'])) {
-		$Asunto = new Asunto($Sesion);
-		$Asunto->LoadByContrato($SolicitudAdelanto->fields['id_contrato']);
-		$codigo_asunto = $Asunto->fields['codigo_asunto'];
+		$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
+		if(empty($codigo_asunto)){
+			$Asunto = new Asunto($Sesion);
+			$Asunto->LoadByContrato($SolicitudAdelanto->fields['id_contrato']);
+			$codigo_asunto = $Asunto->fields['codigo_asunto'];
+		}
 	}
 }
 
