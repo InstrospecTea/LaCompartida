@@ -6,7 +6,7 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/Log.php';
 
 class Cron {
-	var $Session;
+	var $Sesion;
 
 	public function __construct() {
 		$this->Sesion = new Sesion(null, true);
@@ -14,7 +14,7 @@ class Cron {
 
 	public function query($query) {
 		$result = mysql_query($query, $this->Sesion->dbh)
-				or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
 		$table = array();
 		while ($row = mysql_fetch_assoc($result)) {
 			$table[] = $row;
