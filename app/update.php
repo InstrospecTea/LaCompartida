@@ -9613,6 +9613,7 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+<<<<<<< HEAD
 
 		case 7.26 :
 			$query = array();
@@ -9641,6 +9642,8 @@ QUERY;
 
 			ejecutar($query, $dbh);
 			break;
+=======
+>>>>>>> 7b45f3b029e2f104cdc3459b2b3786a2ccbd52a8
 	}
 }
 
@@ -9649,7 +9652,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.26;
+$max_update = 7.24;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

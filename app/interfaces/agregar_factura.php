@@ -161,9 +161,6 @@ if ($id_cobro > 0) {
 		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
 		}
-		if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
-			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "NULL");
-		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
@@ -639,11 +636,16 @@ if ($zona_horaria) {
 			<td align=right><?php echo  __('Comuna') ?></td>
 			<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo  $factura->fields['comuna_cliente'] ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
 		</tr>
-		<?php }	if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {	?>
+		<?php
+			}
+
+			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
+		?>
 		<tr>
 			<td align="right"><?php echo __('Ciudad'); ?></td>
 			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  $factura->fields['ciudad_cliente'] ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
 		</tr>
+<<<<<<< HEAD
 		<?php }	if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
@@ -655,8 +657,9 @@ if ($zona_horaria) {
 			<?php } ?>
 		</tr>
 			
+=======
+>>>>>>> 7b45f3b029e2f104cdc3459b2b3786a2ccbd52a8
 		<?php } ?>
-		
 		<tr>
 			<td align=right><?php echo  __('Condición de Pago') ?></td>
 			<td align=left colspan=3>
@@ -928,11 +931,12 @@ if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundar
 				var cliente = document.getElementById('cliente');;
 				var direccion_cliente = document.getElementById('direccion_cliente');
 				var id_contrato = jQuery('#id_contrato').val();
-				<?php if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
-				var comuna_cliente = document.getElementById('giro_cliente');
-				<?php }if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
+				<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
 				var comuna_cliente = document.getElementById('comuna_cliente');
-				<?php }	if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {	?>
+				<?php
+					}
+					if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
+				?>
 				var ciudad_cliente = document.getElementById('ciudad_cliente');
 				<?php } ?>
 
@@ -966,7 +970,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 				http.open('get', url, true);
 				http.onreadystatechange = function()
 				{
-					if(http.readyState == 5)
+					if(http.readyState == 4)
 					{
 						var response = http.responseText;
 
@@ -983,7 +987,6 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 								cliente.value = '';
 								comuna_cliente.value = '';
 								ciudad_cliente.value = '';
-								giro_cliente.value = '';
 
 								select_destino.options.length = 1;
 								offLoading();
@@ -998,10 +1001,7 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 									var option = new Option();
 									option.value = valores[0];
 									option.text = valores[1];
-									
-									if(valores[5] != '') {
-									if(windows.giro_cliente) giro_cliente.value = valores [5];
-									}
+
 
 									if(valores[4] != '') {
 									if(window.ciudad_cliente)	ciudad_cliente.value = valores[4];
