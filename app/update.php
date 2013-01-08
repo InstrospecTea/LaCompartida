@@ -9613,10 +9613,12 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-<<<<<<< HEAD
 
 		case 7.26 :
 			$query = array();
+			
+			$query[] = "INSERT ignore INTO `timetracking`.`configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`)
+						VALUES (NULL , 'LugarFacturacion', '', 'Lugar desde el cual se factura', 'string', '1', '10');";
 			
 			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
@@ -9642,8 +9644,6 @@ QUERY;
 
 			ejecutar($query, $dbh);
 			break;
-=======
->>>>>>> 7b45f3b029e2f104cdc3459b2b3786a2ccbd52a8
 	}
 }
 
