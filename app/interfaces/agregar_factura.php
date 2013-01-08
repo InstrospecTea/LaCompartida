@@ -459,8 +459,6 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 	$query = "SELECT factura_giro FROM contrato WHERE  id_contrato = $id_contrato AND codigo_cliente LIKE '$codigo_cliente'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	list($factura_giro) = mysql_fetch_array($resp);
-	
-	echo $factura_giro;
 ?>
 
 <form method=post id="form_facturas" name="form_facturas">
