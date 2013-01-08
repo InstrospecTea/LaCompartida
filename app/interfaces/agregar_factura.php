@@ -455,6 +455,17 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
  */
   //echo Autocompletador::CSS(); ?>
 
+<?php
+	// Revisar campo FACTURA_GIRO en tabla CONTRATO esta vacio..
+
+ 	$id_contrato = $cobro->fields['id_contrato'];
+	$query = "SELECT factura_giro FROM contrato WHERE  id_contrato = $id_contrato AND codigo_cliente LIKE '$codigo_cliente'";
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	list($factura_giro) = mysql_fetch_array($resp);
+	
+	echo $factura_giro;
+?>
+
 <form method=post id="form_facturas" name="form_facturas">
 	<input type="hidden" name=opcion value="" />
 	<input type='hidden' name=id_factura id=id_factura value="<?php echo  $factura->fields['id_factura'] ?>" />
@@ -636,8 +647,14 @@ if ($zona_horaria) {
 		<?php }	if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
+			
+			<?php if(empty($factura->fields['giro_cliente'] )) { ?>
+			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura_giro  ?>" id="giro_cliente" size="70" maxlength="255" /></td>
+			<?php }else { ?>
 			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura->fields['giro_cliente'] ?>" id="giro_cliente" size="70" maxlength="255" /></td>
+			<?php } ?>
 		</tr>
+			
 		<?php } ?>
 		
 		<tr>

@@ -9636,7 +9636,7 @@ QUERY;
                                 group by  pdl.id_documento_legal)";
 
 			if (!ExisteCampo('giro_cliente', 'factura', $dbh)) {
-				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `giro_cliente`";
+				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `ciudad_cliente`";
 			}
 
 			ejecutar($query, $dbh);
