@@ -2,7 +2,6 @@
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('ADM'));
-$sesion->phpConsole(1);
 
 $limitdesde = isset($_REQUEST['iDisplayStart']) ? $_REQUEST['iDisplayStart'] : '0';
 $limitcantidad = isset($_REQUEST['iDisplayLength']) ? $_REQUEST['iDisplayLength'] : '25';

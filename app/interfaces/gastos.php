@@ -158,7 +158,7 @@ if ($opc == 'buscar') {
 		} else if ($fecha1) {
 			$where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "' ";
 		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . "' ";
+			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59' ";
 		} else if (!empty($id_cobro)) {
 			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
 		}
@@ -194,7 +194,7 @@ if ($opc == 'buscar') {
 				prm_moneda.simbolo,
 				cta_corriente.egreso,
 				cta_corriente.ingreso,
-				IF(monto_cobrable = ingreso, monto_cobrable*(-1),monto_cobrable) as monto_cobrable,
+				IF(monto_cobrable = ingreso, monto_cobrable*(-1),monto_cobrable)*cta_corriente.cobrable as monto_cobrable,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				ifnull(cobro.estado,'SIN COBRO') AS estado_cobro,
