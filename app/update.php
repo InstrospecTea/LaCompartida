@@ -9617,7 +9617,7 @@ QUERY;
 		case 7.26 :
 			$query = array();
 			
-			$query[] = "INSERT ignore INTO `timetracking`.`configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`)
+			$query[] = "INSERT ignore INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`)
 						VALUES (NULL , 'LugarFacturacion', '', 'Lugar desde el cual se factura', 'string', '1', '10');";
 			
 			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
