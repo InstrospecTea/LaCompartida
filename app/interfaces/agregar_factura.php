@@ -643,7 +643,7 @@ if ($zona_horaria) {
 			<td align="right"><?php echo __('Ciudad'); ?></td>
 			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  $factura->fields['ciudad_cliente'] ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
 		</tr>
-<<<<<<< HEAD
+
 		<?php }	if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
@@ -655,8 +655,6 @@ if ($zona_horaria) {
 			<?php } ?>
 		</tr>
 			
-=======
->>>>>>> 7b45f3b029e2f104cdc3459b2b3786a2ccbd52a8
 		<?php } ?>
 		<tr>
 			<td align=right><?php echo  __('Condición de Pago') ?></td>
