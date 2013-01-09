@@ -1174,7 +1174,7 @@ function funcionTR(& $trabajo) {
 						buttons: {
 							"<?php echo __('Entiendo y acepto') ?>": function() {
 								jQuery('#descargapro').removeAttr('disabled');
-								window.open('trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>');
+								window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
 								dialogoconfirma.dialog( "close" );
 												
 								return true;
@@ -1191,7 +1191,7 @@ function funcionTR(& $trabajo) {
 					});
 				} else {
 					jQuery('#descargapro').removeAttr('disabled');  
-					window.open('trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>');
+					window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
 					return true;
                 }
 			});
