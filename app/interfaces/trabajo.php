@@ -274,8 +274,8 @@ $where .= " AND usuario.visible=1";
 					   var  cuando=jQuery(this).attr('rel');
 					   var  idtrabajo= ui.draggable.attr('id');
 					   jQuery(ui.draggable).children('span').remove();
-
-					   if(event.ctrlKey) {
+					  
+					   if(event.ctrlKey || event.altKey) {
 						ui.draggable.addClass('clon');
 						jQuery(this).append(ui.draggable.clone());
 						var Option='clonar';
@@ -292,7 +292,7 @@ $where .= " AND usuario.visible=1";
 												});
 												jQuery(this).attr('duracion',time).html(SecToTime(time));
 											});
-										 	if(event.ctrlKey) {
+										 	if(event.ctrlKey || event.altKey) {
 												jQuery('.clon').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'}).attr({'alt':'clonado','id':arreglo[1]}).removeClass('clon');
 											} 
 												maxaltura=0;
@@ -324,9 +324,14 @@ $where .= " AND usuario.visible=1";
 						var  cuando=jQuery(this).attr('title');
 							var  idtrabajo= ui.draggable.attr('id');
 							jQuery(ui.draggable).children('span').remove();
-							
+							  if(event.ctrlKey || event.altKey) {
+						 			var Option='clonar';
+								} else {
+								jQuery(this).append(ui.draggable);
+									var Option='cambiofecha';
+								}
 							  
-							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:'cambiofecha',popup:1},function(data){
+							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:Option,popup:1},function(data){
 								var arreglo=data.split('|');
 						   if(window.console) console.log(arreglo);
 							 jQuery('#semanactual').val(cuando);
