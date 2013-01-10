@@ -1,4 +1,10 @@
 # Changelog
+## Hotfix: 12.1.4
+
+Jueves 10 de enero, 2013.
+
+* **Fixed:** Elimina archivo admin/index.php que permitía pasar un valor arbitrario por GET para incluir ese archivo. 
+
 
 ## Hotfix: 12.1.3
 
