@@ -37,6 +37,9 @@ The Time Billing - Time Tracking
 
       $ sudo pear install Spreadsheet_Excel_Writer-beta
 
+ * OLE (0.5)
+
+      $ sudo pear install OLE-0.5
 
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
