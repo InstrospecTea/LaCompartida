@@ -87,8 +87,11 @@ $where .= " AND usuario.visible=1";
 			.totaldia {width:98%;border: 1px solid black; text-align:center;position:absolute;bottom:-20px;}
 			
    </style>
+   <link  href="//static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
 	<script src="//static.thetimebilling.com/contextmenu/jquery.contextMenu.js" type="text/javascript"></script>
-	<link  href="//static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+	<script src="//static.thetimebilling.com/js/bootstrap.min.js" type="text/javascript"></script>
+	
+	
     <script type="text/javascript">
 		  function SecToTime(sec_numb) {
     
@@ -270,44 +273,62 @@ $where .= " AND usuario.visible=1";
 
                  jQuery('.celdadias').droppable({greedy:true, accept:'.cajatrabajo', addClasses:'false', 
                      drop: function (event,ui) {
- 
-					   var  cuando=jQuery(this).attr('rel');
+						 var cuadrodestino=jQuery(this);
+					   var  cuando=cuadrodestino.attr('rel');
 					   var  idtrabajo= ui.draggable.attr('id');
 					   jQuery(ui.draggable).children('span').remove();
 					  
 					   if(event.ctrlKey || event.altKey) {
 						ui.draggable.addClass('clon');
-						jQuery(this).append(ui.draggable.clone());
+						
 						var Option='clonar';
 							} else {
-							jQuery(this).append(ui.draggable);
+						
 							 var Option='cambiofecha';
 							}
-							jQuery.post('editar_trabajo.php',{id_trabajo:idtrabajo, fecha:cuando, opcion:Option,popup:1},function(data){
+							
+							jQuery.ajax({url:'editar_trabajo.php',
+										data:{id_trabajo:idtrabajo, fecha:cuando, opcion:Option,popup:1},
+										type:'POST'
+									 }).complete(function(dataresponse){
+								
+								var data=dataresponse.responseText;
+								var status=dataresponse.status;
+								if(status==200) {
 								var arreglo=data.split('|');
+										
+										 	if(event.ctrlKey || event.altKey) {
+												cuadrodestino.append(ui.draggable.clone());
+												jQuery('.clon').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'}).attr({'alt':'clonado','id':arreglo[1]}).removeClass('clon');
+											} else {
+												cuadrodestino.append(ui.draggable);
+											}
+											var maxaltura=0;
 											jQuery('.totaldia').each(function() {
 												var time=0;
+												var sumaaltura=0;
 												jQuery('.cajatrabajo',jQuery(this).parent()).each(function() {
 													time=1*time+1*jQuery(this).attr('duracion');
+													sumaaltura=1*sumaaltura+1*jQuery(this).height();
+													
 												});
-												jQuery(this).attr('duracion',time).html(SecToTime(time));
+												maxaltura=sumaaltura>maxaltura? sumaaltura:maxaltura;
+												jQuery(this).attr('duracion',time).attr('altura',sumaaltura).html(SecToTime(time));
+												
 											});
-										 	if(event.ctrlKey || event.altKey) {
-												jQuery('.clon').draggable({cursor:'move', containment:'#contienehoras', revert:'true', helper:'clone'}).attr({'alt':'clonado','id':arreglo[1]}).removeClass('clon');
-											} 
-												maxaltura=0;
-											jQuery('.semanacompleta').each(function() {
-												var altura=jQuery(this).height()-73;
-												jQuery(".celdadias",jQuery(this)).css({'height':altura});
-												maxaltura=altura>maxaltura? altura:maxaltura;
-											});
-											console.log(maxaltura);
-											jQuery("#contienehoras").css({'height':maxaltura+130});
+											jQuery(".celdadias").css({'height':maxaltura+20});
+									
+											
+											jQuery("#contienehoras").css({'height':maxaltura+120});
 											if(Option=='clonar') {
 												jQuery('#totalsemana').html(arreglo[2]);
 												jQuery('#totalmes').html(arreglo[3]);
 											}
-				
+									} else {
+											jQuery('#respuesta').html('<div  class="alert alert-error">'+dataresponse.responseText+'<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+									}
+					
+					
 					
 							});
 						
@@ -450,6 +471,7 @@ $where .= " AND usuario.visible=1";
 					<div class="tb_base" id="nextweek" style=" position:absolute; right:-550px;top:0px;visibility:hidden;float:right;"></div>
 					<div class="tb_base" id="lastweek" style="position:absolute;left:-550px;top:0px;visibility:hidden;float:left;"></div>
 				</div>
+	<div id="respuesta"></div>
           
         
   

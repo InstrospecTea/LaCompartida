@@ -202,7 +202,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		if ($dia_anterior != $dia_semana) {
 			//$total[$dia_semana] = 0;
 			$letime=sprintf('%02d:%02d', ($total[$dia_anterior]/3600),$total[$dia_anterior]/60%60);
-			echo "<div class='totaldia' rel='dia" . $dia_anterior . "'>";
+			echo "<div id='totaldia$dia_angerior' class='totaldia' rel='dia" . $dia_anterior . "'>";
 				if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 					echo UtilesApp::Time2Decimal($letime.':00');
 				} else {
