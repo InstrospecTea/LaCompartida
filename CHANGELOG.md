@@ -1,10 +1,15 @@
 # Changelog
+## Hotfix: 12.1.5
+
+Viernes 11 de enero, 2013.
+
+* **Fixed:** [Excluye cobros en borrador/revision/incobrable del reporte de deudas](https://github.com/LemontechSA/ttb/pull/44)
+
 ## Hotfix: 12.1.4
 
 Jueves 10 de enero, 2013.
 
-* **Fixed:** Elimina archivo admin/index.php que permitía pasar un valor arbitrario por GET para incluir ese archivo. 
-
+* **Fixed:** [Elimina archivo admin/index.php que permitía pasar un valor arbitrario por GET para incluir ese archivo.](https://github.com/LemontechSA/ttb/commit/1b84914e831a8d2fce0bea1e1816bd6f210e3c49)
 
 ## Hotfix: 12.1.3
 
