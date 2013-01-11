@@ -43,9 +43,13 @@
 
                     $semana=Utiles::fecha2sql($fecha);
                     $t->Edit('fecha',$semana);
+                   	 try {
                     $t->Write(true);
                     die('semana|'.$semana);
-                    
+                     } catch (Exception $e) {
+						header('HTTP/1.0 401 Unauthorized');
+						die($e->getMessage() );
+					 }
 
          } else if ($opcion=='clonar') {
                     $semana=Utiles::fecha2sql($fecha);
@@ -58,6 +62,7 @@
 						if($value!='') $t->changes[$key]=1;
                 }
 					 
+					try {
                     $t->Write(true);
 					 if(date('N',strtotime($t->fields['fecha']))==1) {
 						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']));
@@ -72,6 +77,11 @@
 						}
                      die('id_trabajo|'.$t->fields['id_trabajo'].'|'.$sesion->usuario->HorasTrabajadasEsteSemana($t->fields['id_usuario'],$lastmonday).'|'.$hhmes);
 
+					  } catch (Exception $e) {
+					 
+					 header('HTTP/1.0 401 Unauthorized');
+					die($e->getMessage() );
+					 }
                     
            }
 
@@ -1590,7 +1600,3 @@ if (CodigoSecundario )  {
 	}
  
  
-</script>
-<?php	 
-    echo(SelectorHoras::Javascript());
-    $pagina->PrintBottom($popup);

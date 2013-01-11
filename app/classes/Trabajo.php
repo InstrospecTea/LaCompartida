@@ -99,19 +99,60 @@ class Trabajo extends Objeto
 													,'".$this->fields['cobrable']."')";
 					}
 			}
-		if(parent::Write())
-			{
-				// Modificamos un trabajo que ya existía, logueamos el cambio.
-				if( $ingreso_historial ) {
-				
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				}
-				return true;
-			} else {
-		return false;
+			
+			try {
+				if(parent::Write()) 	{
+						// Modificamos un trabajo que ya existía, logueamos el cambio.
+						if( $ingreso_historial ) {
+							$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
+						}
+						return true;
+					} else {
+						return false;
+					}
+			} catch (Exception $e) {
+				throw new Exception($e->getMessage());
 			}
+			
 	}
 
+	function Check() {
+		
+		if($this->Loaded() && !in_array($this->fields['estadocobro'],array('SIN COBRO','CREADO','EN REVISION'))) {
+			throw new Exception('No se puede mover un trabajo cobrado');
+		} else {
+		
+		$horasenfecha=$this->HorasEnFecha($this->fields['fecha'],$this->fields['id_usuario']);
+		
+		$duracion=$this->fields['duracion'];
+		$duracionsegundos=strtotime($duracion)-strtotime('today');
+		$totaldiacondicional=($horasenfecha['duracion']+ $duracionsegundos);
+		
+			if($totaldiacondicional>=86400) {
+				throw new Exception('No se puede trabajar m�s de 24 horas diarias');
+			} else {
+				return true;
+			}
+		}
+	}
+	/*
+	 * param $fecha fecha que se quiere verificar en formato 'YYYY-MM-DD'
+	 * param $id_usuario id usuario, opcional
+	 * return array $duracion, un array con llaves duracion y duracion_cobrada
+	 */
+	function HorasEnFecha($fecha=null,$id_usuario=null) {
+		if($fecha==null) {
+			$fecha=date('Y-m-d');
+		}
+		
+		$queryhoras="select sum(time_to_sec(duracion)) as duracion, sum(time_to_sec(duracion_cobrada)) as duracion_cobrada from trabajo where fecha='$fecha'";
+		if($id_usuario!=null) {
+			$queryhoras.=" and id_usuario ='$id_usuario'";
+		}
+ 		$duracion=$this->sesion->pdodbh->query($queryhoras)->fetchAll(PDO::FETCH_ASSOC);
+		return $duracion[0];
+	}
+	
 	function InsertarTrabajoTarifa()
 	{
 		$id_trabajo = $this->fields['id_trabajo'];
