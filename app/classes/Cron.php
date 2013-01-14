@@ -7,14 +7,17 @@ require_once Conf::ServerDir() . '/classes/Log.php';
 
 class Cron {
 	var $Sesion;
+	var $FileNameLog;
 
 	public function __construct() {
 		$this->Sesion = new Sesion(null, true);
+
+		// iniciar sesión como Lemontech
+		$this->Sesion->usuario = new Usuario($this->Sesion, '99511620');
 	}
 
 	public function query($query) {
-		$result = mysql_query($query, $this->Sesion->dbh)
-				or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
+		$result = mysql_query($query, $this->Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
 		$table = array();
 		while ($row = mysql_fetch_assoc($result)) {
 			$table[] = $row;
@@ -22,7 +25,11 @@ class Cron {
 		return $table;
 	}
 
-	public function log($text, $fileName = null) {
-		Log::write($text, $fileName);
+	public function log($text, $file_name = null) {
+		if (!empty($file_name)) {
+			$this->FileNameLog = $file_name;
+		}
+
+		Log::write($text, $this->FileNameLog);
 	}
 }

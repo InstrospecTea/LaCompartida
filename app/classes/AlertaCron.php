@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
 //require_once Conf::ServerDir() . '/classes/Cobro.php';
 require_once Conf::ServerDir() . '/classes/Asunto.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
- 
+
 class Alerta {
 
 	var $sesion = null;
@@ -110,7 +110,7 @@ class Alerta {
 	}
 
 	function EnviarAlertaProfesional($id_persona, $mensaje, $sesion, $header = true) {
-		
+
 		if (is_numeric($id_persona)) {
 			$query = "SELECT email, CONCAT_WS(' ', nombre, apellido1) as nombre FROM usuario WHERE usuario.activo=1 AND id_usuario = '$id_persona'";
 			$resp = mysql_query($query);
@@ -118,7 +118,7 @@ class Alerta {
 		} else {
 			list($email, $nombre) = explode(':', $id_persona);
 		}
-		
+
 		if ($header) {
 			$mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : "") . "Alerta: $mensaje";
 		}
@@ -216,19 +216,16 @@ class Alerta {
 		list($horas_mes) = mysql_fetch_array($resp);
 		return $horas_mes;
 	}
-		
-	function enviarAvisoCobrosProgramados( $mensajes, $sesion )
-	{
-			$from =  html_entity_decode(Conf::AppName());
 
-		if(  method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MailAdmin') != '' )
-		{
-			$to = Conf::GetConf($sesion,'MailAdmin'); // Mail al admin
+	function enviarAvisoCobrosProgramados($mensajes, $sesion) {
+		$from = html_entity_decode(Conf::AppName());
+
+		if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'MailAdmin') != '') {
+			$to = Conf::GetConf($sesion, 'MailAdmin'); // Mail al admin
 		}
 
-		foreach( $mensajes as $id_usuario => $mensaje )
-		{
-			Utiles::Insertar( $sesion, "Aviso $from", $mensaje, $to, "Administrador");
+		foreach ($mensajes as $id_usuario => $mensaje) {
+			Utiles::Insertar($sesion, "Aviso $from", $mensaje, $to, "Administrador");
 		}
 	}
 }
