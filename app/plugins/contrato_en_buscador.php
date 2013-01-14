@@ -68,8 +68,9 @@ $Slim->hook('hook_activacion', function() {
 	}
 	
 	function Codigo_Contrato_En_Query() {
-		global  $where, $query, $groupby;
+		global  $where, $query, $groupby,$sesion;
 			
+		if(!UtilesApp::ExisteCampo('codigo_contrato', 'contrato',$sesion)) return;
 			$query.=", contrato.codigo_contrato ";
 			$groupby.=", contrato.codigo_contrato ";
 			 
