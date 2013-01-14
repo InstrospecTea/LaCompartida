@@ -129,6 +129,7 @@
 				case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
 				case 'comuna':                          $glosa_dato = $factura->fields['comuna_cliente']; break;
+				case 'factura_codigopostal':                          $glosa_dato = $factura->fields['factura_codigopostal']; break;
 				case 'ciudad':                          $glosa_dato = $factura->fields['ciudad_cliente']; break;
 				case 'nota_factura':			$glosa_dato = $condicion_pago; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
@@ -181,6 +182,7 @@
 				$fila[ 'telefono']=				$contrato->fields['factura_telefono']; 
 				$fila[ 'comuna']=	 			$factura->fields['comuna_cliente']; 
 				$fila[ 'ciudad']=	 			$factura->fields['ciudad_cliente'];
+				$fila[ 'factura_codigopostal']=	 			$factura->fields['factura_codigopostal'];
 				$fila[ 'nota_factura']=	 		$factura->fields['condicion_pago'];
 				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
