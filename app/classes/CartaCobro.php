@@ -1930,7 +1930,8 @@ class CartaCobro extends NotaCobro {
 				}
 
 				/* PSU optimizacion segmento codigo y creacion ANCHOR NOMBRE CONTACTO MAYUSCULA */
-
+				$html2= str_replace('%glosa_codigo_postal%',__('Código Postal'),$html2);
+				$html2= str_replace('%codigo_postal%',$contrato->fields['codigo_postal'],$html2);
 				$html2 = str_replace('%titulo_contacto%', $contrato->fields['titulo_contacto'], $html2);
 				$html2 = str_replace('%nombre_contacto_mb%', __('%nombre_contacto_mb%'), $html2);
 				if (UtilesApp::GetConf($this->sesion, 'TituloContacto')) {

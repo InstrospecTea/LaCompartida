@@ -9622,6 +9622,17 @@ QUERY;
 				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `comuna_cliente`;";
 			}
+			
+			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'factura_codigopostal', 'Código Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
+
+
+			$queries[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+			
 			ejecutar($queries, $dbh);
 			break;
 	}

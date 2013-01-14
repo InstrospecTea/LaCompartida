@@ -158,6 +158,9 @@ if ($id_cobro > 0) {
 		if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
 			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "NULL");
 		}
+		if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
+			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
+		}
 		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
 		}
@@ -627,6 +630,13 @@ if ($zona_horaria) {
 		</tr>
 		<?php
 			}
+			
+if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
+		echo	'<tr>
+			<td align="right">'. __('Código Postal') .'</td>
+			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="'.  $factura->fields['factura_codigopostal'] .'" id="factura_codigopostal" size="70" maxlength="255" /></td>
+		</tr>';
+		}			
 
 			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 		?>

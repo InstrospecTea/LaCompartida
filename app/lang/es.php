@@ -1,6 +1,5 @@
 <?php
 
-require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
 
 
 
@@ -1082,3 +1081,4 @@ $_LANG['Factura ACL'] = "Factura";
 $_LANG['es_Hrs Trabajadas']="Hrs Trabajadas";
 $_LANG['en_Hrs Trabajadas']="Worked Hours";
 
+$_LANG['Código Postal'] = "Código Postal";
