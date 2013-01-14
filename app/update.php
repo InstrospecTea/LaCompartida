@@ -9613,6 +9613,17 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+			
+				case 7.26:
+			$queries = array();
+			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `factura_comuna`;";
+			}
+				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `comuna_cliente`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9621,7 +9632,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.24;
+$max_update = 7.26;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
