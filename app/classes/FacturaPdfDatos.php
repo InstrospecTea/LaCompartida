@@ -124,6 +124,7 @@
 				case 'telefono': 			$glosa_dato = $contrato->fields['factura_telefono']; break;
 				case 'fecha_dia': 	 		$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_mes':			$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
+				case 'fecha_numero_mes':			$glosa_dato = strftime("%m",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_ano_ultima_cifra':		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
 				case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
@@ -188,6 +189,7 @@
 				$fila[ 'nota_factura']=	 		$factura->fields['condicion_pago'];
 				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
+				$fila[ 'fecha_numero_mes']=			strftime("%m",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
 				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1);
 				$fila[ 'fecha_ano_dos_ultimas_cifras']=		substr(date("Y",strtotime($factura->fields['fecha'])),-2);

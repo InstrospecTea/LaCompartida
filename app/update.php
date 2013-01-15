@@ -9637,6 +9637,15 @@ QUERY;
                                 (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
                                 from factura_pdf_tipo_datos td, prm_documento_legal pdl
                                 group by  pdl.id_documento_legal)";
+			
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (1, 'fecha_numero_mes', 'Fecha digito mes') on duplicate key update glosa_tipo_dato='Fecha digito mes';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
 
 			if (!ExisteCampo('giro_cliente', 'factura', $dbh)) {
 				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `ciudad_cliente`";
