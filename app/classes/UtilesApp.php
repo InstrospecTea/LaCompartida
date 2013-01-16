@@ -500,7 +500,7 @@ class UtilesApp extends Utiles {
 		$query = "SELECT
 								IF( cta_corriente.id_cobro IS NOT NULL, ingreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), ingreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
 								IF( cta_corriente.id_cobro IS NOT NULL, egreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), egreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
-								IF( cta_corriente.id_cobro IS NOT NULL, monto_cobrable*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), monto_cobrable*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )
+								IF( cta_corriente.id_cobro IS NOT NULL, monto_cobrable*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), monto_cobrable*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable
 							, ifnull(cobro.estado,'SIN COBRO') as estado FROM cta_corriente
 							JOIN prm_moneda as moneda_gasto ON cta_corriente.id_moneda=moneda_gasto.id_moneda
 							JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1

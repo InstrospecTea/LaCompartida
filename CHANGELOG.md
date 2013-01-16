@@ -1,10 +1,33 @@
 # Changelog
+## Hotfix: 12.1.6
 
-## Hotfix: 12.121
+Mi閞coles 16 de enero, 2013.
 
-Mi茅rcoles 2 de Enero, 2013.
+* **Fixed:** [Arregla filtro UsaCobranzaFechaDesde al emitir borradores](https://github.com/LemontechSA/ttb/pull/47)
 
-* **Fixed:** [Corrige el reporte de factura para que sume por moneda y considere el n煤mero de factura como n煤mero](https://github.com/LemontechSA/ttb/pull/41)
+## Hotfix: 12.1.5
+
+Viernes 11 de enero, 2013.
+
+* **Fixed:** [Excluye cobros en borrador/revision/incobrable del reporte de deudas](https://github.com/LemontechSA/ttb/pull/44)
+
+## Hotfix: 12.1.4
+
+Jueves 10 de enero, 2013.
+
+* **Fixed:** [Elimina archivo admin/index.php que permit韆 pasar un valor arbitrario por GET para incluir ese archivo.](https://github.com/LemontechSA/ttb/commit/1b84914e831a8d2fce0bea1e1816bd6f210e3c49)
+
+## Hotfix: 12.1.3
+
+Viernes 4 de Enero, 2013.
+
+* **Fixed:** [Corrige diferencia de valores entre la interfaz y la planilla excel](https://github.com/LemontechSA/ttb/pull/42)
+
+## Hotfix: 12.1.2
+
+Mi閞coles 2 de Enero, 2013.
+
+* **Fixed:** [Corrige el reporte de factura para que sume por moneda y considere el n鷐ero de factura como n鷐ero](https://github.com/LemontechSA/ttb/pull/41)
 
 ## Hotfix: 12.1.1
 
@@ -14,16 +37,16 @@ Jueves 27 de Diciembre, 2012.
 
 ## Release: 12.1.0
 
-Mi茅rcoles 26 de Diciembre, 2012.
+Mi閞coles 26 de Diciembre, 2012.
 
-* **New:** [Nuevo sistema de Avisos de actualizaci贸n](https://github.com/LemontechSA/ttb/issues/5)
-* **New:** [Utilizaci贸n de cache para Conf::GetConf()](https://github.com/LemontechSA/ttb/issues/10)
+* **New:** [Nuevo sistema de Avisos de actualizaci髇](https://github.com/LemontechSA/ttb/issues/5)
+* **New:** [Utilizaci髇 de cache para Conf::GetConf()](https://github.com/LemontechSA/ttb/issues/10)
 * **New:** [Autoloader de clases en el sistema](https://github.com/LemontechSA/ttb/issues/13)
-* **New:** [Utilizaci贸n de miconf.php para desarrollo local sin adddb.php](https://github.com/LemontechSA/ttb/issues/15)
-* **New:** [Nuevo sistema de deploy autom谩tico con notificaciones al equipo](https://github.com/LemontechSA/ttb/issues/17) y #25
-* **Fixed:** [Correcci贸n de impresi贸n con Mediaprint CSS para reporte de saldo](https://github.com/LemontechSA/ttb/issues/19)
+* **New:** [Utilizaci髇 de miconf.php para desarrollo local sin adddb.php](https://github.com/LemontechSA/ttb/issues/15)
+* **New:** [Nuevo sistema de deploy autom醫ico con notificaciones al equipo](https://github.com/LemontechSA/ttb/issues/17) y #25
+* **Fixed:** [Correcci髇 de impresi髇 con Mediaprint CSS para reporte de saldo](https://github.com/LemontechSA/ttb/issues/19)
 * **Fixed:** [Limpieza a carpeta admin](https://github.com/LemontechSA/ttb/issues/24)
-* **Fixed:** [Limpieza a Encabezados y pie de p谩gina para cartas de cobro](https://github.com/LemontechSA/ttb/issues/28)
+* **Fixed:** [Limpieza a Encabezados y pie de p醙ina para cartas de cobro](https://github.com/LemontechSA/ttb/issues/28)
 
 ## Hotfix: 12.0.3
 
@@ -33,7 +56,7 @@ Viernes 21 de Diciembre, 2012.
 
 ## Hotfix: 12.0.2
 
-Mi茅rcoles 12 de Diciembre, 2012.
+Mi閞coles 12 de Diciembre, 2012.
 
 * **Fixed:** [Al emitir una factura y presionar guardar, sistema muestra alerta que hay Adelantos disponibles para el cliente. Estos adelantos son solo para pagos de gastos y no Honorarios. Realiza la alerta pero de igual forma se emite la Factura sin problemas, no se toman los pagos de los adelantos](https://github.com/LemontechSA/ttb/pull/27)
 
