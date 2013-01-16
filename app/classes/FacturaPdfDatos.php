@@ -113,7 +113,6 @@
 			    case '19': $condicion_pago = __('Cheque 45 días'); break;
 			    case '20': $condicion_pago = __('Cheque 60 días'); break;
 			    case '21': $condicion_pago = __('Cheque a fecha'); break;
-			    
 			}
 			
 			$arreglo_monedas = ArregloMonedas($this->sesion);
