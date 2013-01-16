@@ -1,4 +1,10 @@
 # Changelog
+## Hotfix: 12.1.6
+
+Miércoles 16 de enero, 2013.
+
+* **Fixed:** [Arregla filtro UsaCobranzaFechaDesde al emitir borradores](https://github.com/LemontechSA/ttb/pull/47)
+
 ## Hotfix: 12.1.5
 
 Viernes 11 de enero, 2013.
