@@ -130,7 +130,7 @@
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
 				case 'comuna':                          $glosa_dato = $factura->fields['comuna_cliente']; break;
 				case 'ciudad':                          $glosa_dato = $factura->fields['ciudad_cliente']; break;
-				case 'giro':                          $glosa_dato = $factura->fields['giro_cliente']; break;
+				case 'giro_cliente':                          $glosa_dato = $factura->fields['giro_cliente']; break;
 				case 'lugar':                          $glosa_dato =  UtilesApp::GetConf($this->sesion, 'LugarFacturacion'); break;
 				case 'nota_factura':			$glosa_dato = $condicion_pago; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
@@ -183,7 +183,7 @@
 				$fila[ 'telefono']=				$contrato->fields['factura_telefono']; 
 				$fila[ 'comuna']=	 			$factura->fields['comuna_cliente']; 
 				$fila[ 'ciudad']=	 			$factura->fields['ciudad_cliente'];
-				$fila[ 'giro']=					$factura->fields['giro_cliente'];
+				$fila[ 'giro_cliente']=					$factura->fields['giro_cliente'];
 				$fila[ 'lugar']=					UtilesApp::GetConf($this->sesion, 'LugarFacturacion');
 				$fila[ 'nota_factura']=	 		$factura->fields['condicion_pago'];
 				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 

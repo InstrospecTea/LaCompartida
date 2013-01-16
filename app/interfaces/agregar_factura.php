@@ -161,6 +161,9 @@ if ($id_cobro > 0) {
 		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
 		}
+		if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
+			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "NULL");
+		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
