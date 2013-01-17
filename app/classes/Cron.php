@@ -14,10 +14,12 @@ class Cron {
 
 	public function query($query) {
 		$result = mysql_query($query, $this->Sesion->dbh)
-				or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
 		$table = array();
-		while ($row = mysql_fetch_assoc($result)) {
-			$table[] = $row;
+		if (!mysql_info($this->Sesion->dbh)) {
+			while ($row = mysql_fetch_assoc($result)) {
+				$table[] = $row;
+			}
 		}
 		return $table;
 	}
