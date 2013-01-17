@@ -6,8 +6,22 @@ ini_set('display_errors', 'On');
 
 $Sesion = new Sesion(null, true);
 $Pagina = new Pagina($Sesion, true);
+$Usuario = new UsuarioExt($Sesion);
 
-$view = $_REQUEST['view'];
+$view = 'enviar_instrucciones';
+
+// Que existe y sea del mismo largo que el definido al crearlo
+if (isset($_REQUEST['token']) && strlen($_REQUEST['token']) > 0) {
+	// Validar token
+	$token = addslashes($_REQUEST['token']);
+	$view = 'restablecer_password';
+	$Usuario->LoadWithToken($token);
+
+	if (!$Usuario->Loaded()) {
+		$Sesion->error_msg = __('El token para reestablecer el password es incorrecto o ya expiró');
+		$view = 'enviar_instrucciones';
+	}
+}
 
 if (isset($_POST['accion'])) {
 	switch ($_POST['accion']) {
@@ -20,9 +34,49 @@ if (isset($_POST['accion'])) {
 
 			$passwd = $_POST['password'];
 			$c_passwd = $_POST['confirme_password'];
+			$token = $_POST['token'];
 
 			if ($passwd == '' || $c_passwd == '' || $passwd != $c_passwd) {
 				$Sesion->error_msg = __('Debe ingresar un password válido y ambos deben ser iguales');
+				$view = 'restablecer_password';
+			}
+
+			if ($token != $_GET['token']) {
+				// Algo raro están trantando de hacer
+			}
+
+			$Usuario->Edit('password', md5($passwd));
+			$Usuario->Edit('reset_password_token', 'NULL');
+			$Usuario->Edit('reset_password_sent_at', 'NULL');
+
+			if ($Usuario->Write()) {
+				$host = Conf::Host();
+				$mail =<<<MAIL
+<p>Estimado {$Usuario->fields['nombre']},</p>
+
+<p>Se ha modificado correctamente su password para ser utilizado en el sistema.</p>
+
+<p>Para ingresar lo puede hacer en el siguiente enlace o copie y péguelo en la barra de direcciones de su navegador.</p>
+
+<p>{$host}</p>
+
+<p>Si tiene alguna duda o necesita mayor asistencia, no dude en contactarnos en http://soporte.thetimebilling.com/</p>
+
+<p>El equipo The Time & Billing</p>
+MAIL;
+
+				$array_correo = array(
+					array(
+						'mail' => $Usuario->fields['email'],
+						'nombre' => "{$Usuario->fields['nombre']} {$Usuario->fields['apellido1']}"
+					)
+				);
+
+				if (!Utiles::EnviarMail($Sesion, $array_correo, 'Password Restablecido en The Time Billing', $mail, false)) {
+					// Para que avisarle de esto, si por pantalla se avisa igual
+				}
+			} else {
+				$Sesion->error_msg = __('Hubo un error al tratar de restablecer el password, favor intentarlo más tarde');
 				$view = 'restablecer_password';
 			}
 			break;
@@ -32,19 +86,57 @@ if (isset($_POST['accion'])) {
 			$Sesion->error_msg = __('Se han enviado correctamente las instrucciones');
 
 			$email = trim($_POST['email']);
-			if ($email == '' || preg_match("/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i", $email)) {
+			if ($email == '' || !UtilesApp::isValidEmail($email)) {
 				$Sesion->error_msg = __('Debe ingresar un correo electrónico válido');
 				$view = 'enviar_instrucciones';
 			}
 
-			$Usuario = new Usuario($Sesion);
 			$Usuario->LoadByEmail($email);
 
 			if (!$Usuario->Loaded()) {
 				$Sesion->error_msg = __('El email indicado no se encuentra registrado en el sistema');
 				$view = 'enviar_instrucciones';
 			}
+
 			// Enviar mail con token
+			// 1. Generar token
+			$token = Utiles::RandomString() . Utiles::RandomString() . Utiles::RandomString();
+			// 2. Guardar el token en el usuario
+			$Usuario->Edit('reset_password_token', $token);
+			$Usuario->Edit('reset_password_sent_at', date('Y-m-d H:i:s'));
+
+			if ($Usuario->Write()) {
+				// 3. Enviar mail
+				$host = Conf::Host();
+				$mail =<<<MAIL
+<p>Estimado {$Usuario->fields['nombre']},</p>
+
+<p>Para generar un nuevo password para su usuario {$Usuario->fields['rut']}, haga click en el siguiente enlace o copie y péguelo en la barra de direcciones de su navegador.</p>
+
+<p>{$host}app/usuarios/reset_password.php?token={$Usuario->fields['reset_password_token']}</p>
+
+<p>Este enlace caducará en 60 minutos. Si no desea generar un nuevo password simplement ignore este correo y nada será modificado.</p>
+
+<p>Si tiene alguna duda o necesita mayor asistencia, no dude en contactarnos en http://soporte.thetimebilling.com/</p>
+
+<p>El equipo The Time & Billing</p>
+MAIL;
+
+				$array_correo = array(
+					array(
+						'mail' => $email,
+						'nombre' => "{$Usuario->fields['nombre']} {$Usuario->fields['apellido1']}"
+					)
+				);
+
+				if (!Utiles::EnviarMail($Sesion, $array_correo, 'Restablecer Password en The Time Billing', $mail, false)) {
+					$Sesion->error_msg = __('Ocurrió un problema al tratar de enviar las instrucciones, favor intente nuevamente más tarde');
+					$view = 'enviar_instrucciones';
+				}
+			} else {
+				$Sesion->error_msg = __('Ocurrió un problema al tratar de enviar las instrucciones, favor intente nuevamente más tarde');
+				$view = 'enviar_instrucciones';
+			}
 
 			break;
 	}
@@ -141,6 +233,7 @@ $Pagina->PrintTop(true);
 							<td>&nbsp;</td>
 							<td align="left">
 								<input type="hidden" name="accion" value="reset" />
+								<input type="hidden" name="token" value="<?php echo $token; ?>" />
 								<input type="submit" class="btn" value="Cambiar Password" />
 							</td>
 						</tr>

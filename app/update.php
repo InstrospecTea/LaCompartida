@@ -9613,6 +9613,15 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.27:
+			$queries = array();
+			if (!ExisteCampo('reset_password_token', 'usuario', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario`
+											 ADD  `reset_password_token` VARCHAR( 255 ) NULL,
+											 ADD  `reset_password_sent_at` DATETIME NULL;";
+			}
+			ejecutar($queries, $dbh);
 	}
 }
 
