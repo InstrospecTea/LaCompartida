@@ -8,7 +8,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  */
 class Log {
 	var $logFile = 'app';
-	var $logFolder = '/tmp/logs';
+	var $logFolder = LOGDIR;
 
 	public function __construct() {
 	}
@@ -25,7 +25,7 @@ class Log {
 		if (!is_writable($file)) {
 			echo $file . __(' no se puede escribir.');
 		}
-		$text = date('Y-m-d H:i:s') . " - {$name}: {$text}\n";
+		$text = date('Y-m-d H:i:s') . " - {$text}\n";
 		$me->writeFile($text, $file);
 	}
 

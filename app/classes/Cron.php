@@ -6,10 +6,14 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 require_once Conf::ServerDir() . '/classes/Log.php';
 
 class Cron {
-	var $Session;
+	var $Sesion;
+	var $FileNameLog;
 
 	public function __construct() {
 		$this->Sesion = new Sesion(null, true);
+
+		// iniciar sesión como Lemontech
+		$this->Sesion->usuario = new Usuario($this->Sesion, '99511620');
 	}
 
 	public function query($query) {
@@ -24,7 +28,11 @@ class Cron {
 		return $table;
 	}
 
-	public function log($text, $fileName = null) {
-		Log::write($text, $fileName);
+	public function log($text, $file_name = null) {
+		if (!empty($file_name)) {
+			$this->FileNameLog = $file_name;
+		}
+
+		Log::write($text, $this->FileNameLog);
 	}
 }

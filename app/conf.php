@@ -139,7 +139,7 @@ defined('BACKUPDIR') || define('BACKUPDIR', '/tmp');
 defined('USERWS') || define('USERWS', Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS', Conf::UsuarioWS());
 defined('CACHEDIR') || define('CACHEDIR', '/var/www/virtual/cache/');
-
+defined('LOGDIR') || define('LOGDIR', '/tmp/log');
 
 require_once APPPATH . '/fw/funciones/funciones.php';
 require_once APPPATH . '/app/lang/es.php';		//Para que cargue el idioma por defecto
