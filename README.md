@@ -1,41 +1,45 @@
-The-Time-Billing
-================
+
+
+The Time Billing
+================================
 
 The Time Billing - Time Tracking
 
 
 ###Prerequisitos del sistema
-- Apache web server con PHP habilitado [(MacOSX Users)][1]
-- Mysql
-- Pear [(MacOSX Users)][2]
+* Apache web server con PHP habilitado [(MacOSX Users)][1]
+* Mysql
+* Pear [(MacOSX Users)][2]
 
 ###Configuraciones personalizadas
-- Apache charset encoding:
+* Apache charset encoding:
 
-      AddDefaultCharset ISO-8859-1
-    AddCharset ISO-8859-1  .iso8859-1  .latin1
+        AddDefaultCharset ISO-8859-1
+        AddCharset ISO-8859-1 .iso8859-1 .latin1
 
-- Php Configurations
+* PHP Configurations
 
-      register_globals=On
-    error\_reporting = E\_COMPILE\_ERROR|E\_ERROR|E\_CORE_ERROR  (or E\_ALL & ~E\_NOTICE)
-    short\_open\_tag=On
-    default\_charset = "iso-8859-1"
+        register_globals = On
+        error_reporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR (or E_ALL & ~E_NOTICE)
+        short_open_tag = On
+        default_charset = "iso-8859-1"
 
-- MySQL Configurations
+* MySQL Configurations
 
-      [mysqld]
-      character-set-server = latin1
-    character-set-client = latin1
+        [mysqld]
+        character-set-server = latin1
+        character-set-client = latin1
 
-###Librer铆as
+###Librer韆s
 * [Numbers_Words][3]:
 
-      $ sudo pear install Numbers_Words-0.16.4
+        $ sudo pear install Numbers_Words-0.16.4
 
 * Spreadsheet Excel writer (unestable version)
 
-      $ sudo pear install Spreadsheet_Excel_Writer-beta
+        $ sudo pear install Spreadsheet_Excel_Writer-beta
+
+> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraci髇 o instalci髇 de nuevos paquetes
 
  * OLE (0.5)
 
@@ -44,39 +48,53 @@ The Time Billing - Time Tracking
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
 * Crear un login
-* La aplicaci贸n no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
+* La aplicaci髇 no carga un modelo por defecto, por lo tanto, necesitas tener un dump y cargarlo.
 
 ###Workspace y setup Proyecto
-- Hacer checkout del proyecto
+* Clonar el proyecto desde GitHub
 
-      $ svn checkout svn.lemontech.cl/time_tracking
-- Abrir el proyecto con tu editor favorito
-- Recuerda que el charset para el editor (Eclipse/SublimeText/NetBeans) debe ser: "iso-8859-1"
-- Duplica el archivo conf.php.default con el nombre conf.php
-- Duplica el archivo version.php.default con el nombre version.php
-- Edita el archivo **conf.php** para configurar
+        $ git clone git@github.com:LemontechSA/ttb.git
+
+* Abrir el proyecto con tu editor favorito
+* Recuerda que el charset para el editor (Eclipse/[Sublime Text 2][10]/NetBeans) debe ser: "iso-8859-1"
+  > En Sublime Text 2 hay que editar el proyecto y agregar las siguientes l韓eas:
+
+  >       "settings":
+  >       [
+  >        {
+  >         "default_encoding": "Western (ISO 8859-1)"
+  >        }
+  >       ]
+
+* Duplica el archivo app/miconf.php.default con el nombre app/miconf.php
+* Edita el archivo **miconf.php** para configurar
   * dbHost: Servidor de base de datos
   * dbName: Nombre de la base de datos creada anteriormente
-  * dbUser: Usuario de inicio de sesi贸n con acceso full a la base de datos **dbName**
+  * dbUser: Usuario de inicio de sesi髇 con acceso full a la base de datos **dbName**
   * dbPass: El password del usuario **dbUser**
-- Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio trunk dentro de tu repositorio
-- Recuerda reiniciar Apache cada vez que hagas cambios en la configuraci贸n y tener el servidor Mysql iniciado
-- [Test][6]
+  * Agrega la siguiente linea para no desplegar ciertos mensajes:
+
+        $ error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
+
+* [Probar configuraci髇][6]
+
+> **Opcional**: Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio del repositorio
+
+> Recuerda reiniciar Apache cada vez que hagas cambios en la configuraci髇 y tener el servidor Mysql iniciado
 
 
 ###Tips y Troubleshooting en MacOS X
-- Instalar Command Line Tools desde XCode
-- Instalar [Autoconf y automake][4]
-- Compilar e instalar [xDebug][5]
+* Instalar Command Line Tools desde XCode
+* Instalar [Autoconf y automake][4]
+* Compilar e instalar [xDebug][5]
 
-- **file or directory not found**: Si eres un usuario OSX e instalaste mysql a trav茅s de Homebrew, lo m谩s probable es que el socket por defecto de mysql en la configuraci贸n de php no corresponda ya que brew lo deja en /tmp/:
+* **file or directory not found**: Si eres un usuario OSX e instalaste mysql a trav閟 de Homebrew, lo m醩 probable es que el socket por defecto de mysql en la configuraci髇 de php no corresponda ya que brew lo deja en /tmp/:
+  * Para verificar el socket haz phpinfo(), luego en una consola abre mysql y ejecuta el comando STATUS;
+  * Busca el socket y reemplaza la ruta en php.ini
 
-      Para verificar el socket haz phpinfo(), luego en una consola abre mysql y ejecuta el comando STATUS;
-    Busca el socket y reemplaza la ruta en php.ini
+* **unknown or incorrect time zone: 'America/Asuncion'**: Timezones en MySql
 
-- **unknown or incorrect time zone: 'America/Asuncion'**: Timezones en MySql
-
-      $ mysql\_tzinfo\_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
+        $ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
 
 
 ##Deployment
@@ -85,6 +103,7 @@ The Time Billing - Time Tracking
   * bundler Gem
 
         $ gem install bundler
+
   * Install capistrano and dependences
 
         $ bundle install
@@ -94,6 +113,7 @@ The Time Billing - Time Tracking
         $ cp config/cap_servers.rb.default config/cap_servers.rb
 
 ###Deploy in local machinne
+
     $ cap local deploy
 
   With  specific branch (default=develop):
@@ -101,28 +121,31 @@ The Time Billing - Time Tracking
     $ cap -s branch=master local deploy
 
 ###Deploy a Feature ([client].thetimebilling.com/time_tracking_feature)
+
     $ cap feature deploy
 
   And enter the Feature Branch later
 
 ###Deploy to release ([client].thetimebilling.com/time_tracking_release)
+
     $ cap release deploy
 
   And enter the Release/Hotfix Branch later
 
-###Deploy to production environment ([client].thetimebilling.com/time_tracking)
+###Deploy to production environment ([client].thetimebilling.co/time_tracking)
+
     $ cap production deploy
 
 ##Test
-###Pruebas de Integraci贸n
-  * Duplica el archivo app/test/spec/conf.rb.default  con el nombre app/test/spec/conf.rb y configura tu sitio local
+###Pruebas de Integraci髇
+  * Duplica el archivo app/test/spec/conf.rb.default con el nombre app/test/spec/conf.rb y configura tu sitio local
   * Ejecutar pruebas
 
-      $ cd app/test
-      $ rspec
+        $ cd app/test
+        $ rspec
 
 ##HubFlow
-Es como [GitFlow][7] pero con m谩s flow. Descargar de [ac谩][8].
+Es como [GitFlow][7] pero con m醩 flow. Descargar de [ac醈[8].
 
 Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archivo msysgit-install.cmd reemplazando "git-flow" por "git-hf" y "gitflow" por "hubflow".
 
@@ -136,3 +159,4 @@ Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archi
 [7]: https://github.com/nvie/gitflow
 [8]: https://github.com/datasift/gitflow
 [9]: https://github.com/nvie/gitflow/wiki/Windows
+[10]: http://www.sublimetext.com/
