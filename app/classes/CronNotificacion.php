@@ -205,7 +205,6 @@ class CronNotificacion extends Cron {
 	 * y se registra en el log_correo.
 	 */
 	public function diarios() {
-
 		$this->modificacion_contrato();
 		$this->limites_asuntos() ;
 		$this->limites_contrato();
@@ -738,25 +737,28 @@ class CronNotificacion extends Cron {
 	 *		Alertas de ingreso de horas.
 	 */
 	public function ingreso_horas() {
-		if (date('N') < 6) { //Lunes a Viernes
-			$opc = 'mail_retrasos';
+		// Solo enviar alertas de Lunes a Viernes
+		if (date('N') < 6) {
 			$query = "SELECT usuario.id_usuario
-						FROM usuario
-						JOIN usuario_permiso USING(id_usuario)
-						WHERE codigo_permiso='PRO' AND alerta_diaria = '1' AND retraso_max_notificado = 0 AND activo=1";
-			$resultados = $this->query($query);
-			$total_resultados = count($resultados);
-			for ($x = 0; $x < $total_resultados; ++$x) {
-				$id_usuario = $row[$x]['id_usuario'];
-				$prof = new Usuario($this->Sesion);
-				$prof->LoadId($id_usuario);
+				FROM usuario
+					INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
+				WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
+					AND usuario.retraso_max_notificado = 0 AND usuario.activo = 1";
 
-				if ($prof->fields['retraso_max'] > 0) {
-					//Calcular horas de retraso excluyendo los fines de semana
-					$query = "SELECT MAX(fecha_creacion) AS ultima_fecha_ingreso FROM trabajo WHERE id_usuario='$id_usuario'";
-					$resp = $this->query($query);
-					$ultima_fecha_ingreso = $resp[0]['ultima_fecha_ingreso'];
-					$start = strtotime($ultima_fecha_ingreso);
+			$profesionales = $this->query($query);
+			$total_profesionales = count($profesionales);
+
+			for ($x = 0; $x < $total_profesionales; $x++) {
+				$id_usuario = $profesionales[$x]['id_usuario'];
+				$profesional = new Usuario($this->Sesion);
+				$profesional->LoadId($id_usuario);
+
+				if ($profesional->fields['retraso_max'] > 0) {
+					// Calcular horas de retraso excluyendo los fines de semana
+					$query = "SELECT MAX(trabajo.fecha_creacion) AS ultima_fecha_ingreso FROM trabajo WHERE trabajo.id_usuario = '$id_usuario'";
+					$trabajo = $this->query($query);
+
+					$start = strtotime($trabajo[0]['ultima_fecha_ingreso']);
 					$end = strtotime(date('Y-m-d'));
 					$dias_retraso = 0;
 					while ($start <= $end) {
@@ -767,24 +769,32 @@ class CronNotificacion extends Cron {
 					}
 					$horas_retraso = 24 * $dias_retraso;
 
-					if ($horas_retraso > $prof->fields['retraso_max']) {
-						$this->datoDiario[$id_usuario]['retraso_max'] = array('actual' => $horas_retraso, 'max' => $prof->fields['retraso_max']);
-						$query = "UPDATE usuario SET retraso_max_notificado = 1 WHERE id_usuario = '$id_usuario'";
+					if ($horas_retraso > $profesional->fields['retraso_max']) {
+						$this->datoDiario[$id_usuario]['retraso_max'] = array(
+							'actual' => $horas_retraso,
+							'max' => $profesional->fields['retraso_max']
+						);
+						$query = "UPDATE usuario SET usuario.retraso_max_notificado = 1 WHERE usuario.id_usuario = '$id_usuario'";
 						$this->query($query);
 					}
 				}
 
-				if ($prof->fields['restriccion_diario'] > 0) {
+				if ($profesional->fields['restriccion_diario'] > 0) {
 					$timezone_offset = UtilesApp::get_offset_os_utc() - UtilesApp::get_utc_offset(Conf::GetConf($this->Sesion, 'ZonaHoraria'));
-					$query = "SELECT SUM( TIME_TO_SEC( duracion )/3600 ) AS cantidad_horas FROM trabajo WHERE id_usuario = '$id_usuario' AND fecha = DATE( DATE_ADD( NOW(), INTERVAL $timezone_offset HOUR ) ) ";
-					$resp = $this->query($query);
-					$cantidad_horas = $resp[0]['cantidad_horas'];
-					if (!$cantidad_horas) {
-						$cantidad_horas = 0;
-					}
-					if ($cantidad_horas < $prof->fields['restriccion_diario']) {
+					$query = "SELECT SUM(TIME_TO_SEC(trabajo.duracion) / 3600) AS cantidad_horas
+						FROM trabajo
+						WHERE trabajo.id_usuario = '$id_usuario'
+							AND trabajo.fecha = DATE(DATE_ADD(NOW(), INTERVAL $timezone_offset HOUR))";
+					$trabajo = $this->query($query);
+
+					$cantidad_horas = !empty($trabajo[0]['cantidad_horas']) ? $trabajo[0]['cantidad_horas'] : 0;
+
+					if ($cantidad_horas < $profesional->fields['restriccion_diario']) {
 						$cantidad_horas = number_format($cantidad_horas, 1, ',', '.');
-						$this->datoDiario[$id_usuario]['restriccion_diario'] = array('actual' => $cantidad_horas, 'min' => $prof->fields['restriccion_diario']);
+						$this->datoDiario[$id_usuario]['restriccion_diario'] = array(
+							'actual' => $cantidad_horas,
+							'min' => $profesional->fields['restriccion_diario']
+						);
 					}
 				}
 			}

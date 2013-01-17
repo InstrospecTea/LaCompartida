@@ -1035,9 +1035,9 @@ HTML;
 	public static function get_utc_offset($tz = 'America/Santiago') {
 		$offset = self::get_timezone_offset($tz, 'UTC') / 3600;
 		switch ($tz) {
-			case 'America/Bogota': $offset = 5;
+			case 'America/Bogota': $offset = -5;
 				break;
-			case 'America/Santiago': $offset = 3;
+			case 'America/Santiago': $offset = -3;
 				break;
 		}
 		return $offset;
