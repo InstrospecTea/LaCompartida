@@ -41,6 +41,12 @@ class CronNotificacion extends Cron {
 		$this->desplegar_correo = $desplegar_correo;
 		$this->semanales();
 		$this->diarios();
+
+		if (date("j") == 1) {
+			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
+		}
+
+		$this->suspencion_pago();
 	}
 
 	public function semanales() {
@@ -212,15 +218,22 @@ class CronNotificacion extends Cron {
 		$this->cierre_cobranza();
 		$this->ingreso_horas();
 		$this->cobros_pagados();
+		$this->hitos_cumplidos();
+		$this->horas_mensuales();
 
-		$this->crear_correos();
+		// Fin del mail diario. Envío.
+		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
 
-		if (date("j") == 1) {
-			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
+		foreach ($mensajes as $id_usuario => $mensaje) {
+			if ($this->correo) {
+				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+			}
 		}
 
-		$this->suspencion_pago();
-
+		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+			var_dump($this->datoDiario);
+			echo implode('<br><br><br>', $mensajes);
+		}
 	}
 
 	/*
@@ -795,6 +808,7 @@ class CronNotificacion extends Cron {
 	}
 
 	/*
+	// esta alerta se creó para el cliente blr, actualmente no es ocupado
 	public function tareas() {
 		//Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
 		//FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
@@ -914,53 +928,39 @@ class CronNotificacion extends Cron {
 		$this->query($updatetramite);
 	}
 
-	/*
-	 * Revisa los hitos cumplidos para el envio de correo
+	/**
+	 * Revisa los hitos cumplidos segun fecha de cobro
 	 */
-	public function revisar_hitos() {
-		//Correo Hitos
+	public function hitos_cumplidos() {
 		$cobro_pendiete = new CobroPendiente($this->Sesion);
 		$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();
 
-		foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido) {
-			$this->datoDiario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+		if (!empty($hitos_cumplidos)) {
+			foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido) {
+				$this->datoDiario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+			}
 		}
+	}
 
+	/**
+	 * Suma el total de horas generadas por los trabajos ingresados
+	 */
+	public function horas_mensuales() {
 		if (UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasMensuales')) {
-			$query = "SELECT id_usuario,
-							TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(duracion))), '%H:%i') AS horas
-						FROM trabajo
-						WHERE fecha >= '" . date('Y-m') . "-01'
-						GROUP BY id_usuario";
+			$fecha_trabajo = date('Y-m-01');
+			$query = "SELECT trabajo.id_usuario, TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(trabajo.duracion))), '%H:%i') AS horas
+				FROM trabajo
+				WHERE trabajo.fecha >= '{$fecha_trabajo}'
+				GROUP BY trabajo.id_usuario";
 			$horas = $this->query($query);
+
 			$total_horas = count($horas);
 			for ($x = 0; $x < $total_horas; ++$x) {
 				$hora = $horas[$x];
 				$this->datoDiario[$hora['id_usuario']]['horas_mensuales'] = $hora['horas'];
 			}
 		}
-
 	}
-
-	/*
-	 * Registra los correos para su envío
-	 */
-	public function crear_correos() {
-		// Fin del mail diario. Envío.
-		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
-
-		foreach ($mensajes as $id_usuario => $mensaje) {
-			if ($this->correo) {
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
-			}
-		}
-
-		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
-			var_dump($this->datoDiario);
-			echo implode('<br><br><br>', $mensajes);
-		}
-	}
-
 
 	/**
 	 * Notificacion de suspencion de pago por comision por concepto de
