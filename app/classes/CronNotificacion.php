@@ -206,12 +206,11 @@ class CronNotificacion extends Cron {
 	 */
 	public function diarios() {
 		$this->modificacion_contrato();
-		$this->limites_asuntos() ;
+		$this->limites_asuntos();
 		$this->limites_contrato();
-		$this->limites_cliente() ;
+		$this->limites_cliente();
 		$this->cierre_cobranza();
 		$this->ingreso_horas();
-		$this->tareas();
 		$this->cobros_pagados();
 
 		$this->crear_correos();
@@ -593,13 +592,10 @@ class CronNotificacion extends Cron {
 	 *		Alertas de limites de Cliente.
 	 */
 	public function limites_cliente() {
-		$query_clientes = "SELECT cliente.codigo_cliente,
-								usuario.id_usuario,
-								usuario.username,
-								cliente.glosa_cliente
-							FROM cliente
-							JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
-							WHERE cliente.activo = '1'";
+		$query_clientes = "SELECT cliente.codigo_cliente, usuario.id_usuario, usuario.username, cliente.glosa_cliente
+			FROM cliente
+				INNER JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
+			WHERE cliente.activo = 1";
 		$resultados_clientes = $this->query($query_clientes);
 		$total_resultados_clientes = count($resultados_clientes);
 		for ($x = 0; $x < $total_resultados_clientes; ++$x) {
@@ -625,7 +621,6 @@ class CronNotificacion extends Cron {
 			if ($cliente->fields['alerta_monto'] > 0) {
 				list($total_monto_ult_cobro, $moneda_desde_ult_cobro) = $cliente->TotalMonto(false);
 			}
-
 
 			//Notificacion "Límite de monto"
 			$total_monto = number_format($total_monto, 1);
@@ -664,7 +659,6 @@ class CronNotificacion extends Cron {
 
 			//Notificacion "Horas desde el último cobro"
 			if (($total_horas_ult_cobro > $cliente->fields['alerta_hh']) && ($cliente->fields['alerta_hh'] > 0) && ($cliente->fields['notificado_hr_excedida_ult_cobro'] == 0)) {
-
 				$this->datoDiario[$resultado_cliente['id_usuario']]['cliente_excedido'][$cliente->fields['codigo_cliente']]['alerta_hh'] = array(
 					'cliente' => $resultado_cliente['glosa_cliente'],
 					'max' => $cliente->fields['alerta_hh'],
@@ -672,7 +666,6 @@ class CronNotificacion extends Cron {
 				$cliente->Edit('notificado_hr_excedida_ult_cobro', '1');
 				$cliente->Write();
 			}
-
 		}
 	}
 
@@ -802,10 +795,6 @@ class CronNotificacion extends Cron {
 	}
 
 	/*
-	 * Mail diario
-	 * Septimo componente:
-	 *		Alertas de Tareas
-	 */
 	public function tareas() {
 		//Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
 		//FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
@@ -858,6 +847,7 @@ class CronNotificacion extends Cron {
 			}
 		}
 	}
+	*/
 
 	/*
 	 * Refresca los cobros pagados ayer
