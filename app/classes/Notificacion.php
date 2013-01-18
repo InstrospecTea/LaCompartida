@@ -1,13 +1,13 @@
 <?php
 
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../app/classes/Cobro.php';
-require_once Conf::ServerDir().'/../app/classes/Asunto.php';
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+require_once dirname(__FILE__) . '/../conf.php';
+require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
+require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
+require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 
 /*  Clase que maneja los diferentes tipos de mail (mensual, semanal, diario),
  *  su estructura (html), el poblamiento de sus datos (arreglos), su parseo (ingreso de arreglos al html)
- *  y finalmente su envío.
+ *  y finalmente su env�o.
  */
 
 class Notificacion {
@@ -96,15 +96,15 @@ class Notificacion {
 					"</table>";
 				break;
 
-				/*	Estructura del mail diario:
-			 *  -ModificaciÃ³n de Contratos de los que es responsable el Usuario
-			 *  -TransgresiÃ³n de lÃ­mites de Asunto
-			 *  -TransgresiÃ³n de lÃ­mites de Contratos
-				 */
-				case 'diario':
-					$mail = array();
-					$mail['header'] =
-						"<table style='border:1px solid black'>
+			/* 	Estructura del mail diario:
+			 *  -Modificación de Contratos de los que es responsable el Usuario
+			 *  -Transgresión de límites de Asunto
+			 *  -Transgresión de límites de Contratos
+			 */
+			case 'diario':
+				$mail = array();
+				$mail['header'] =
+					"<table style='border:1px solid black'>
 							<tr>
 								<td colspan=7>Estimado/a %USUARIO:</td>
 							</tr>
@@ -113,7 +113,7 @@ class Notificacion {
 								<td colspan=6>El d&iacute;a de hoy:</td>
 							</tr>
 						";
-					$mail['tr_tarea_alerta'] =
+				$mail['tr_tarea_alerta'] =
 					"
 					<tr>
 						<td>&nbsp;</td>
@@ -132,8 +132,8 @@ class Notificacion {
 						</td>
 					</tr>
 					";
-					$mail['sub_tr_tarea_alerta'] =
-						"<tr style='background-color:%COLOR;'>
+				$mail['sub_tr_tarea_alerta'] =
+					"<tr style='background-color:%COLOR;'>
 							<td rowspan=3>%CLIENTE - <span style='color:#333333;'>%ASUNTO</span></td>
 							<td>%TAREA_NOMBRE</td>
 							<td rowspan=3>%ALERTA</td>
@@ -143,8 +143,8 @@ class Notificacion {
 						";
 
 
-					$mail['tr_modificacion_contrato'] =
-						"<tr>
+				$mail['tr_modificacion_contrato'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -161,18 +161,18 @@ class Notificacion {
 								</fieldset>
 							</td>
 						</tr>";
-					$mail['sub_tr_modificacion_contrato'] =
-						"<tr style='background-color:%COLOR;'>
+				$mail['sub_tr_modificacion_contrato'] =
+					"<tr style='background-color:%COLOR;'>
 							<td>%CLIENTE</td>
 							<td style='padding-right: 8px; padding-left:8px;'>%LISTA_ASUNTOS</td>
 							<td>%NOMBRE_MODIFICADOR</td>
 							<td>%FECHA</td>
 						</tr>";
-					$mail['sub_tr_modificacion_contrato_lista_asuntos'] =
-						"%ASUNTO<br>";
+				$mail['sub_tr_modificacion_contrato_lista_asuntos'] =
+					"%ASUNTO<br>";
 
-					$mail['tr_asuntos_excedidos'] =
-						"<tr>
+				$mail['tr_asuntos_excedidos'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -188,17 +188,17 @@ class Notificacion {
 								</fieldset>
 							</td>
 						</tr>";
-					$mail['sub_tr_asuntos_excedidos'] =
-						"<tr style='background-color:%COLOR'>
+				$mail['sub_tr_asuntos_excedidos'] =
+					"<tr style='background-color:%COLOR'>
 							<td> %CLIENTE </td>
 							<td style='padding-right: 8px; padding-left:8px;'> %ASUNTO </td>
 							<td> %ALERTAS </td>
 						</tr>";
-					$mail['sub_tr_asuntos_excedidos_lista_alertas'] =
-						"%ALERTA<br>";
+				$mail['sub_tr_asuntos_excedidos_lista_alertas'] =
+					"%ALERTA<br>";
 
-					$mail['tr_clientes_excedidos'] =
-						"<tr>
+				$mail['tr_clientes_excedidos'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -213,16 +213,16 @@ class Notificacion {
 								</fieldset>
 							</td>
 						</tr>";
-					$mail['sub_tr_clientes_excedidos'] =
-						"<tr style='background-color:%COLOR'>
+				$mail['sub_tr_clientes_excedidos'] =
+					"<tr style='background-color:%COLOR'>
 							<td> %CLIENTE </td>
 							<td> %ALERTAS </td>
 						</tr>";
-					$mail['sub_tr_clientes_excedidos_lista_alertas'] =
-						"%ALERTA<br>";
+				$mail['sub_tr_clientes_excedidos_lista_alertas'] =
+					"%ALERTA<br>";
 
-					$mail['tr_contratos_excedidos'] =
-						"<tr>
+				$mail['tr_contratos_excedidos'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -238,22 +238,22 @@ class Notificacion {
 								</fieldset>
 							</td>
 						</tr>";
-					$mail['sub_tr_contratos_excedidos'] =
-						"<tr style='background-color:%COLOR'>
+				$mail['sub_tr_contratos_excedidos'] =
+					"<tr style='background-color:%COLOR'>
 							<td> %CLIENTE </td>
 							<td style='padding-right: 8px; padding-left:8px;'> %ASUNTOS </td>
 							<td> %ALERTAS </td>
 						</tr>";
 
-					$mail['sub_tr_contratos_excedidos_lista_asuntos'] =
-						"%ASUNTO<br>";
+				$mail['sub_tr_contratos_excedidos_lista_asuntos'] =
+					"%ASUNTO<br>";
 
-					$mail['sub_tr_contratos_excedidos_lista_alertas'] =
-						"%ALERTA<br>";
+				$mail['sub_tr_contratos_excedidos_lista_alertas'] =
+					"%ALERTA<br>";
 
 
-					$mail['alertas'] =
-						"<tr>
+				$mail['alertas'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -266,31 +266,31 @@ class Notificacion {
 						</tr>
 						";
 
-					$mail['tr_fin_de_mes'] =
-						"<tr>
+				$mail['tr_fin_de_mes'] =
+					"<tr>
 							<td>
 								<span style='color:#CC2233;'>Alerta:</span> <b>Fin de mes</b> Hoy deben quedar las horas del mes ingresadas.
 							</td>
 						</tr>
 						";
 
-					$mail['tr_retraso_max'] =
-						"<tr>
+				$mail['tr_retraso_max'] =
+					"<tr>
 							<td>
 								<span style='color:#CC2233;'>Alerta:</span> Se ha superado el tiempo m&aacute;ximo (%MAX horas) sin ingresar trabajos. El ultimo trabajo se ingres&oacute; hace %ACTUAL horas.
 							</td>
 						</tr>
 						";
 
-					$mail['tr_restriccion_diario'] =
-						"<tr>
+				$mail['tr_restriccion_diario'] =
+					"<tr>
 							<td>
 								<span style='color:#CC2233;'>Alerta:</span> Se ha ingresado un total de %ACTUAL horas, de un m&iacute;nimo de %MIN.
 							</td>
 						</tr>
 						";
 
-					$mail['tr_restriccion_horas'] =
+				$mail['tr_restriccion_horas'] =
 					"
 						<tr>
 							<td>
@@ -300,8 +300,8 @@ class Notificacion {
 						</tr>
 					";
 
-					$mail['tr_horas_mensuales'] =
-						"<tr>
+				$mail['tr_horas_mensuales'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td>
 								Ha ingresado un total de %HORAS horas durante este mes.
@@ -309,7 +309,7 @@ class Notificacion {
 						</tr>
 						";
 
-					$mail['tr_modificacion_contrato'] =
+				$mail['tr_modificacion_contrato'] =
 					"
 						<tr>
 							<td>&nbsp;</td>
@@ -330,7 +330,7 @@ class Notificacion {
 						</tr>
 					";
 
-					$mail['tr_cliente_hitos_cumplidos'] =
+				$mail['tr_cliente_hitos_cumplidos'] =
 					"
 					<tr>
 						<td>&nbsp;</td>
@@ -340,7 +340,7 @@ class Notificacion {
 								<table width='100%' style='border-collapse:collapse;'>
 									<tr style='background-color:#B3E58C;'>
 										<th width='200px'>Cliente</th>
-										<th>". __('Hitos') . "</th>
+										<th>" . __('Hitos') . "</th>
 									</tr>
 									%FILAS_CLIENTE
 								</table>
@@ -349,7 +349,7 @@ class Notificacion {
 					</tr>
 					";
 
-					$mail['sub_tr_cliente_hitos_cumplidos'] =
+				$mail['sub_tr_cliente_hitos_cumplidos'] =
 					"
 						<tr>
 							<td>%NOMBRE_CLIENTE</td>
@@ -367,16 +367,16 @@ class Notificacion {
 						</tr>
 					";
 
-					$mail['lista_hitos'] = "<p>" . __('Hito') . ": %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
+				$mail['lista_hitos'] = "<p>" . __('Hito') . ": %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
 
 
-					$mail['bottom'] =
-						"</table>";
+				$mail['bottom'] =
+					"</table>";
 				break;
 			case 'programados':
-					$mail = array();
-					$mail['header'] =
-						"<table style='border:1px solid black'>
+				$mail = array();
+				$mail['header'] =
+					"<table style='border:1px solid black'>
 							<tr>
 								<td colspan=7>Estimado/a %USUARIO:</td>
 							</tr>
@@ -386,8 +386,8 @@ class Notificacion {
 							</tr>
 						";
 
-					$mail['tr_cobros_programados'] =
-						"<tr>
+				$mail['tr_cobros_programados'] =
+					"<tr>
 							<td>&nbsp;</td>
 							<td colspan=7>
 								<fieldset>
@@ -404,155 +404,154 @@ class Notificacion {
 							</td>
 						</tr>";
 
-					$mail['sub_tr_cobros_programados'] =
-						"<tr style='background-color:%COLOR'>
+				$mail['sub_tr_cobros_programados'] =
+					"<tr style='background-color:%COLOR'>
 							<td> %CLIENTE </td>
 							<td style='padding-right: 8px; padding-left:8px;'> %ASUNTOS </td>
 							<td> %MONTO </td>
 						</tr>";
 
 
-					$mail['bottom'] =
-						"</table>";
+				$mail['bottom'] =
+					"</table>";
 				break;
 		}
 		return $mail;
 	}
 
-	/* Parseo y emisiÃ³n de mail Semanal */
+	/* Parseo y emisión de mail Semanal */
 
 	function mensajeSemanal($dato) {
 		$estructura = $this->estructura('semanal');
 		$mensajes = array();
 
-		if(is_array($dato))
+		if (is_array($dato))
 			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
-				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
-				if(isset($alertas['alerta_propia']) && $alertas['alerta_propia'])
-				{
-					$mensaje .= str_replace('%TXT',$alertas['alerta_propia'],$estructura['tr_propio']);
+				$mensaje = str_replace('%USUARIO', $alertas['nombre_pila'], $estructura['header']);
+				if (isset($alertas['alerta_propia']) && $alertas['alerta_propia']) {
+					$mensaje .= str_replace('%TXT', $alertas['alerta_propia'], $estructura['tr_propio']);
 					$enviar = true;
 				}
-				if(isset($alertas['alerta_revisados']) && $alertas['alerta_revisados'])
+				if (isset($alertas['alerta_revisados']) && $alertas['alerta_revisados'])
 					if (is_array($alertas['alerta_revisados'])) {
 						$i = 0;
 						$filas = '';
 						foreach ($alertas['alerta_revisados'] as $id_usuario_revisado => $alerta_revisado) {
-								$fila = str_replace('%USUARIO',$alerta_revisado['nombre'],$estructura['sub_tr_revisados']);
-								$fila = str_replace('%HORAS',$alerta_revisado['horas'],$fila);
-								$fila = str_replace('%COBRABLES',$alerta_revisado['horas_cobrables'],$fila);
-								$fila = str_replace('%ALERTA',$alerta_revisado['alerta'],$fila);
+							$fila = str_replace('%USUARIO', $alerta_revisado['nombre'], $estructura['sub_tr_revisados']);
+							$fila = str_replace('%HORAS', $alerta_revisado['horas'], $fila);
+							$fila = str_replace('%COBRABLES', $alerta_revisado['horas_cobrables'], $fila);
+							$fila = str_replace('%ALERTA', $alerta_revisado['alerta'], $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$filas.=$fila;
-								$i++;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$filas.=$fila;
+							$i++;
 						}
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_revisados']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_revisados']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
 				$mensaje .= $estructura['bottom'];
 				//Enviar mail (id_usuario_mail, mensaje);
-				if($enviar)
+				if ($enviar)
 					$mensajes[$id_usuario_mail] = $mensaje;
 			}
 		return $mensajes;
 	}
 
-	/* Parseo y emisiÃ³n de mail Diario */
+	/* Parseo y emisión de mail Diario */
 
 	function mensajeDiario($dato) {
 		$estructura = $this->estructura('diario');
 		$mensajes = array();
-		if(is_array($dato))
+		if (is_array($dato))
 			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
-				$mensaje = str_replace('%USUARIO',$alertas['nombre_pila'],$estructura['header']);
-				if(isset($alertas['asunto_excedido']) && $alertas['asunto_excedido'])
+				$mensaje = str_replace('%USUARIO', $alertas['nombre_pila'], $estructura['header']);
+				if (isset($alertas['asunto_excedido']) && $alertas['asunto_excedido'])
 					if (is_array($alertas['asunto_excedido'])) {
 						$filas = '';
 						$i = 0;
 						foreach ($alertas['asunto_excedido'] as $asunto => $alertas_asunto) {
-								$lista_alertas = '';
+							$lista_alertas = '';
 							foreach ($alertas_asunto as $tipo_limite => $limite) {
-									$txt = $this->msg('asunto_'.$tipo_limite);
-									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
-									$txt = str_replace('%MAX',$limite['max'],$txt);
-									$txt = str_replace('%MONEDA',$limite['moneda'],$txt);
-									$lista_alertas .= str_replace('%ALERTA',$txt,$estructura['sub_tr_asuntos_excedidos_lista_alertas']);
-								}
-								$fila = str_replace('%CLIENTE',$limite['cliente'],$estructura['sub_tr_asuntos_excedidos']);
-								$fila = str_replace('%ASUNTO',$limite['asunto'],$fila);
-								$fila = str_replace('%ALERTAS',$lista_alertas,$fila);
+								$txt = $this->msg('asunto_' . $tipo_limite);
+								$txt = str_replace('%ACTUAL', $limite['actual'], $txt);
+								$txt = str_replace('%MAX', $limite['max'], $txt);
+								$txt = str_replace('%MONEDA', $limite['moneda'], $txt);
+								$lista_alertas .= str_replace('%ALERTA', $txt, $estructura['sub_tr_asuntos_excedidos_lista_alertas']);
+							}
+							$fila = str_replace('%CLIENTE', $limite['cliente'], $estructura['sub_tr_asuntos_excedidos']);
+							$fila = str_replace('%ASUNTO', $limite['asunto'], $fila);
+							$fila = str_replace('%ALERTAS', $lista_alertas, $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$i++;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$i++;
 
-								$filas.=$fila;
+							$filas.=$fila;
 						}
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_asuntos_excedidos']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_asuntos_excedidos']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
-				if(isset($alertas['cliente_excedido']) && $alertas['cliente_excedido'])
+				if (isset($alertas['cliente_excedido']) && $alertas['cliente_excedido'])
 					if (is_array($alertas['cliente_excedido'])) {
 						$filas = '';
 						$i = 0;
 						foreach ($alertas['cliente_excedido'] as $cliente => $alertas_cliente) {
-								$lista_alertas = '';
+							$lista_alertas = '';
 							foreach ($alertas_cliente as $tipo_limite => $limite) {
-									$txt = $this->msg('cliente_'.$tipo_limite);
-									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
-									$txt = str_replace('%MAX',$limite['max'],$txt);
-									$txt = str_replace('%MONEDA',$limite['moneda'],$txt);
-									$lista_alertas .= str_replace('%ALERTA',$txt,$estructura['sub_tr_clientes_excedidos_lista_alertas']);
-								}
-								$fila = str_replace('%CLIENTE',$limite['cliente'],$estructura['sub_tr_clientes_excedidos']);
-								$fila = str_replace('%ALERTAS',$lista_alertas,$fila);
+								$txt = $this->msg('cliente_' . $tipo_limite);
+								$txt = str_replace('%ACTUAL', $limite['actual'], $txt);
+								$txt = str_replace('%MAX', $limite['max'], $txt);
+								$txt = str_replace('%MONEDA', $limite['moneda'], $txt);
+								$lista_alertas .= str_replace('%ALERTA', $txt, $estructura['sub_tr_clientes_excedidos_lista_alertas']);
+							}
+							$fila = str_replace('%CLIENTE', $limite['cliente'], $estructura['sub_tr_clientes_excedidos']);
+							$fila = str_replace('%ALERTAS', $lista_alertas, $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$i++;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$i++;
 
-								$filas.=$fila;
+							$filas.=$fila;
 						}
 
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_clientes_excedidos']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_clientes_excedidos']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
-				if(isset($alertas['contrato_excedido']) && $alertas['contrato_excedido'])
+				if (isset($alertas['contrato_excedido']) && $alertas['contrato_excedido'])
 					if (is_array($alertas['contrato_excedido'])) {
 						$filas = '';
 						$i = 0;
 						foreach ($alertas['contrato_excedido'] as $asunto => $alertas_asuntos) {
-								$lista_alertas = '';
+							$lista_alertas = '';
 							foreach ($alertas_asuntos as $tipo_limite => $limite) {
-									$txt = $this->msg('contrato_'.$tipo_limite);
-									$txt = str_replace('%ACTUAL',$limite['actual'],$txt);
-									$txt = str_replace('%MAX',$limite['max'],$txt);
-									$txt = str_replace('%MONEDA',$limite['moneda'],$txt);
-									$lista_alertas .= str_replace('%ALERTA',$txt,$estructura['sub_tr_contratos_excedidos_lista_alertas']);
-								}
-								$fila = str_replace('%CLIENTE',$limite['cliente'],$estructura['sub_tr_contratos_excedidos']);
-								$lista_asuntos = '';
+								$txt = $this->msg('contrato_' . $tipo_limite);
+								$txt = str_replace('%ACTUAL', $limite['actual'], $txt);
+								$txt = str_replace('%MAX', $limite['max'], $txt);
+								$txt = str_replace('%MONEDA', $limite['moneda'], $txt);
+								$lista_alertas .= str_replace('%ALERTA', $txt, $estructura['sub_tr_contratos_excedidos_lista_alertas']);
+							}
+							$fila = str_replace('%CLIENTE', $limite['cliente'], $estructura['sub_tr_contratos_excedidos']);
+							$lista_asuntos = '';
 							foreach ($limite['asunto'] as $asunto) {
-									$txt = str_replace('%ASUNTO',$asunto,$estructura['sub_tr_contratos_excedidos_lista_asuntos']);
-									$lista_asuntos .= $txt;
-								}
-								$fila = str_replace('%ASUNTOS',$lista_asuntos,$fila);
-								$fila = str_replace('%ALERTAS',$lista_alertas,$fila);
+								$txt = str_replace('%ASUNTO', $asunto, $estructura['sub_tr_contratos_excedidos_lista_asuntos']);
+								$lista_asuntos .= $txt;
+							}
+							$fila = str_replace('%ASUNTOS', $lista_asuntos, $fila);
+							$fila = str_replace('%ALERTAS', $lista_alertas, $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$i++;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$i++;
 
-								$filas.=$fila;
+							$filas.=$fila;
 						}
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_contratos_excedidos']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_contratos_excedidos']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
@@ -560,87 +559,84 @@ class Notificacion {
 				//ALERTAS
 
 				$filas_alertas = '';
-				if(isset($alertas['fin_de_mes']) && $alertas['fin_de_mes'])
-				{
-						$tabla = $estructura['tr_fin_de_mes'];
-						$filas_alertas .= $tabla;
-						$enviar = true;
+				if (isset($alertas['fin_de_mes']) && $alertas['fin_de_mes']) {
+					$tabla = $estructura['tr_fin_de_mes'];
+					$filas_alertas .= $tabla;
+					$enviar = true;
 				}
 				if (isset($alertas['retraso_max'])) {
-						$tabla = $estructura['tr_retraso_max'];
-						$tabla = str_replace('%ACTUAL',round($alertas['retraso_max']['actual'],1),$tabla);
-						$tabla = str_replace('%MAX',$alertas['retraso_max']['max'],$tabla);
-						$filas_alertas .= $tabla;
-						$enviar = true;
+					$tabla = $estructura['tr_retraso_max'];
+					$tabla = str_replace('%ACTUAL', round($alertas['retraso_max']['actual'], 1), $tabla);
+					$tabla = str_replace('%MAX', $alertas['retraso_max']['max'], $tabla);
+					$filas_alertas .= $tabla;
+					$enviar = true;
 				}
 				if (isset($alertas['restriccion_diario'])) {
-						$tabla = $estructura['tr_restriccion_diario'];
-						$tabla = str_replace('%ACTUAL',$alertas['restriccion_diario']['actual'],$tabla);
-						$tabla = str_replace('%MIN',$alertas['restriccion_diario']['min'],$tabla);
-						$filas_alertas .= $tabla;
-						$enviar = true;
+					$tabla = $estructura['tr_restriccion_diario'];
+					$tabla = str_replace('%ACTUAL', $alertas['restriccion_diario']['actual'], $tabla);
+					$tabla = str_replace('%MIN', $alertas['restriccion_diario']['min'], $tabla);
+					$filas_alertas .= $tabla;
+					$enviar = true;
 				}
-				if(isset($alertas['restriccion_mensual']) && $alertas['restriccion_mensual'])
-				{
-					$meses = array('','','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
+				if (isset($alertas['restriccion_mensual']) && $alertas['restriccion_mensual']) {
+					$meses = array('', '', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 					$mes = date('n');
 					$mes = $meses[$mes];
 
-					$txt = str_replace('%ACTUAL',$alertas['restriccion_mensual']['actual'],$estructura['tr_restriccion_horas']);
-					$txt = str_replace('%MINIMO',$alertas['restriccion_mensual']['min'],$txt);
-					$filas_alertas .= str_replace('%MES',$mes,$txt);
+					$txt = str_replace('%ACTUAL', $alertas['restriccion_mensual']['actual'], $estructura['tr_restriccion_horas']);
+					$txt = str_replace('%MINIMO', $alertas['restriccion_mensual']['min'], $txt);
+					$filas_alertas .= str_replace('%MES', $mes, $txt);
 					$enviar = true;
 				}
-				if(isset($filas_alertas) && $filas_alertas)
-				{
-					$mensaje .= str_replace('%ALERTAS',$filas_alertas,$estructura['alertas']);
+				if (isset($filas_alertas) && $filas_alertas) {
+					$mensaje .= str_replace('%ALERTAS', $filas_alertas, $estructura['alertas']);
 				}
 
 
-				if(isset($alertas['modificacion_contrato']) && $alertas['modificacion_contrato'])
+				if (isset($alertas['modificacion_contrato']) && $alertas['modificacion_contrato'])
 					if (is_array($alertas['modificacion_contrato'])) {
 						$filas = '';
 						foreach ($alertas['modificacion_contrato'] as $i => $alerta_modificado) {
-								$fila = str_replace('%CLIENTE',$alerta_modificado['nombre_cliente'],$estructura['sub_tr_modificacion_contrato']);
-								$lista_asuntos = '';
-								foreach($alerta_modificado['asuntos'] as $asunto)
-									$lista_asuntos .= str_replace('%ASUNTO',$asunto,$estructura['sub_tr_modificacion_contrato_lista_asuntos']);
-								$fila = str_replace('%LISTA_ASUNTOS',$lista_asuntos,$fila);
-								$fila = str_replace('%NOMBRE_MODIFICADOR',$alerta_modificado['nombre_modificador'],$fila);
-								$fila = str_replace('%FECHA',$alerta_modificado['fecha'],$fila);
+							$fila = str_replace('%CLIENTE', $alerta_modificado['nombre_cliente'], $estructura['sub_tr_modificacion_contrato']);
+							$lista_asuntos = '';
+							foreach ($alerta_modificado['asuntos'] as $asunto)
+								$lista_asuntos .= str_replace('%ASUNTO', $asunto, $estructura['sub_tr_modificacion_contrato_lista_asuntos']);
+							$fila = str_replace('%LISTA_ASUNTOS', $lista_asuntos, $fila);
+							$fila = str_replace('%NOMBRE_MODIFICADOR', $alerta_modificado['nombre_modificador'], $fila);
+							$fila = str_replace('%FECHA', $alerta_modificado['fecha'], $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$filas.=$fila;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$filas.=$fila;
 						}
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_modificacion_contrato']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_modificacion_contrato']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
 
-				if(isset($alertas['tarea_alerta']) && $alertas['tarea_alerta'])
+				if (isset($alertas['tarea_alerta']) && $alertas['tarea_alerta'])
 					if (is_array($alertas['tarea_alerta'])) {
 						$filas = '';
 						foreach ($alertas['tarea_alerta'] as $i => $tarea_alerta) {
-								$fila = str_replace('%CLIENTE',$tarea_alerta['cliente'],$estructura['sub_tr_tarea_alerta']);
-								$fila = str_replace('%ASUNTO',$tarea_alerta['asunto'],$fila);
-								$fila = str_replace('%TAREA_NOMBRE',$tarea_alerta['nombre'],$fila);
-								$fila = str_replace('%TAREA_DETALLE',$tarea_alerta['detalle'],$fila);
-								$fila = str_replace('%TAREA_ESTADO',$tarea_alerta['estado'],$fila);
-								$fila = str_replace('%ALERTA',$tarea_alerta['alerta'],$fila);
+							$fila = str_replace('%CLIENTE', $tarea_alerta['cliente'], $estructura['sub_tr_tarea_alerta']);
+							$fila = str_replace('%ASUNTO', $tarea_alerta['asunto'], $fila);
+							$fila = str_replace('%TAREA_NOMBRE', $tarea_alerta['nombre'], $fila);
+							$fila = str_replace('%TAREA_DETALLE', $tarea_alerta['detalle'], $fila);
+							$fila = str_replace('%TAREA_ESTADO', $tarea_alerta['estado'], $fila);
+							$fila = str_replace('%ALERTA', $tarea_alerta['alerta'], $fila);
 
-								$color = $i%2? '#DDDDDD':'#FFFFFF';
-								$fila = str_replace('%COLOR',$color,$fila);
-								$filas.=$fila;
+							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
+							$fila = str_replace('%COLOR', $color, $fila);
+							$filas.=$fila;
 						}
-						$tabla = str_replace('%FILAS',$filas,$estructura['tr_tarea_alerta']);
+						$tabla = str_replace('%FILAS', $filas, $estructura['tr_tarea_alerta']);
 						$mensaje .= $tabla;
 						$enviar = true;
 					}
 
-				if(isset($alertas['horas_mensuales']) && $alertas['horas_mensuales'])
-				{
+				if (isset($alertas['horas_mensuales']) && $alertas['horas_mensuales']) {
 					$mensaje .= str_replace('%HORAS', $alertas['horas_mensuales'], $estructura['tr_horas_mensuales']);
+					$enviar = true;
 				}
 
 				$mensaje .= $estructura['bottom'];
@@ -672,13 +668,14 @@ class Notificacion {
 					$enviar = true;
 				}
 
-				if($enviar)
+				if ($enviar) {
 					$mensajes[$id_usuario_mail] = $mensaje;
+				}
 			}
 		return $mensajes;
 	}
 
-	/*Parseo y emisión de aviso de generación de cobros programados*/
+	/* Parseo y emisi�n de aviso de generaci�n de cobros programados */
 
 	function mensajeProgramados($dato) {
 		$estructura = $this->estructura('programados');
@@ -718,5 +715,3 @@ class Notificacion {
 	}
 
 }
-
-?>
