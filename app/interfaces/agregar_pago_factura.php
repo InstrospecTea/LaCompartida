@@ -108,7 +108,8 @@ if (!empty($pago->fields['id_neteo_documento_adelanto'])) {
 
 $monto_pago_adelanto = $monto_pago;
 
-
+/* Comentado el 18-01-2013 hotfix 12.1.7
+ * no permire guardar registros de campos
 $id_concepto = $pago->fields['id_concepto'];
 $tipo_doc = $pago->fields['tipo_doc'];
 $nro_documento = $pago->fields['nro_documento'];
@@ -117,6 +118,7 @@ $descripcion = $pago->fields['descripcion'];
 $id_banco = $pago->fields['id_banco'];
 $id_cuenta = $pago->fields['id_cuenta'];
 $pago_retencion = $pago->fields['pago_retencion'];
+ */
 
 if ($id_adelanto) {
 	$documento_adelanto->Load($id_adelanto);
