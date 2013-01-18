@@ -41,6 +41,12 @@ class CronNotificacion extends Cron {
 		$this->desplegar_correo = $desplegar_correo;
 		$this->semanales();
 		$this->diarios();
+
+		if (date("j") == 1) {
+			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
+		}
+
+		$this->suspencion_pago();
 	}
 
 	public function semanales() {
@@ -205,24 +211,29 @@ class CronNotificacion extends Cron {
 	 * y se registra en el log_correo.
 	 */
 	public function diarios() {
-
 		$this->modificacion_contrato();
-		$this->limites_asuntos() ;
+		$this->limites_asuntos();
 		$this->limites_contrato();
-		$this->limites_cliente() ;
+		$this->limites_cliente();
 		$this->cierre_cobranza();
 		$this->ingreso_horas();
-		$this->tareas();
 		$this->cobros_pagados();
+		$this->hitos_cumplidos();
+		$this->horas_mensuales();
 
-		$this->crear_correos();
+		// Fin del mail diario. Envío.
+		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
 
-		if (date("j") == 1) {
-			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
+		foreach ($mensajes as $id_usuario => $mensaje) {
+			if ($this->correo) {
+				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+			}
 		}
 
-		$this->suspencion_pago();
-
+		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
+			var_dump($this->datoDiario);
+			echo implode('<br><br><br>', $mensajes);
+		}
 	}
 
 	/*
@@ -594,13 +605,10 @@ class CronNotificacion extends Cron {
 	 *		Alertas de limites de Cliente.
 	 */
 	public function limites_cliente() {
-		$query_clientes = "SELECT cliente.codigo_cliente,
-								usuario.id_usuario,
-								usuario.username,
-								cliente.glosa_cliente
-							FROM cliente
-							JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
-							WHERE cliente.activo = '1'";
+		$query_clientes = "SELECT cliente.codigo_cliente, usuario.id_usuario, usuario.username, cliente.glosa_cliente
+			FROM cliente
+				INNER JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
+			WHERE cliente.activo = 1";
 		$resultados_clientes = $this->query($query_clientes);
 		$total_resultados_clientes = count($resultados_clientes);
 		for ($x = 0; $x < $total_resultados_clientes; ++$x) {
@@ -626,7 +634,6 @@ class CronNotificacion extends Cron {
 			if ($cliente->fields['alerta_monto'] > 0) {
 				list($total_monto_ult_cobro, $moneda_desde_ult_cobro) = $cliente->TotalMonto(false);
 			}
-
 
 			//Notificacion "Límite de monto"
 			$total_monto = number_format($total_monto, 1);
@@ -665,7 +672,6 @@ class CronNotificacion extends Cron {
 
 			//Notificacion "Horas desde el último cobro"
 			if (($total_horas_ult_cobro > $cliente->fields['alerta_hh']) && ($cliente->fields['alerta_hh'] > 0) && ($cliente->fields['notificado_hr_excedida_ult_cobro'] == 0)) {
-
 				$this->datoDiario[$resultado_cliente['id_usuario']]['cliente_excedido'][$cliente->fields['codigo_cliente']]['alerta_hh'] = array(
 					'cliente' => $resultado_cliente['glosa_cliente'],
 					'max' => $cliente->fields['alerta_hh'],
@@ -673,7 +679,6 @@ class CronNotificacion extends Cron {
 				$cliente->Edit('notificado_hr_excedida_ult_cobro', '1');
 				$cliente->Write();
 			}
-
 		}
 	}
 
@@ -738,25 +743,28 @@ class CronNotificacion extends Cron {
 	 *		Alertas de ingreso de horas.
 	 */
 	public function ingreso_horas() {
-		if (date('N') < 6) { //Lunes a Viernes
-			$opc = 'mail_retrasos';
+		// Solo enviar alertas de Lunes a Viernes
+		if (date('N') < 6) {
 			$query = "SELECT usuario.id_usuario
-						FROM usuario
-						JOIN usuario_permiso USING(id_usuario)
-						WHERE codigo_permiso='PRO' AND alerta_diaria = '1' AND retraso_max_notificado = 0 AND activo=1";
-			$resultados = $this->query($query);
-			$total_resultados = count($resultados);
-			for ($x = 0; $x < $total_resultados; ++$x) {
-				$id_usuario = $row[$x]['id_usuario'];
-				$prof = new Usuario($this->Sesion);
-				$prof->LoadId($id_usuario);
+				FROM usuario
+					INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
+				WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
+					AND usuario.retraso_max_notificado = 0 AND usuario.activo = 1";
 
-				if ($prof->fields['retraso_max'] > 0) {
-					//Calcular horas de retraso excluyendo los fines de semana
-					$query = "SELECT MAX(fecha_creacion) AS ultima_fecha_ingreso FROM trabajo WHERE id_usuario='$id_usuario'";
-					$resp = $this->query($query);
-					$ultima_fecha_ingreso = $resp[0]['ultima_fecha_ingreso'];
-					$start = strtotime($ultima_fecha_ingreso);
+			$profesionales = $this->query($query);
+			$total_profesionales = count($profesionales);
+
+			for ($x = 0; $x < $total_profesionales; $x++) {
+				$id_usuario = $profesionales[$x]['id_usuario'];
+				$profesional = new Usuario($this->Sesion);
+				$profesional->LoadId($id_usuario);
+
+				if ($profesional->fields['retraso_max'] > 0) {
+					// Calcular horas de retraso excluyendo los fines de semana
+					$query = "SELECT MAX(trabajo.fecha_creacion) AS ultima_fecha_ingreso FROM trabajo WHERE trabajo.id_usuario = '$id_usuario'";
+					$trabajo = $this->query($query);
+
+					$start = strtotime($trabajo[0]['ultima_fecha_ingreso']);
 					$end = strtotime(date('Y-m-d'));
 					$dias_retraso = 0;
 					while ($start <= $end) {
@@ -767,24 +775,32 @@ class CronNotificacion extends Cron {
 					}
 					$horas_retraso = 24 * $dias_retraso;
 
-					if ($horas_retraso > $prof->fields['retraso_max']) {
-						$this->datoDiario[$id_usuario]['retraso_max'] = array('actual' => $horas_retraso, 'max' => $prof->fields['retraso_max']);
-						$query = "UPDATE usuario SET retraso_max_notificado = 1 WHERE id_usuario = '$id_usuario'";
+					if ($horas_retraso > $profesional->fields['retraso_max']) {
+						$this->datoDiario[$id_usuario]['retraso_max'] = array(
+							'actual' => $horas_retraso,
+							'max' => $profesional->fields['retraso_max']
+						);
+						$query = "UPDATE usuario SET usuario.retraso_max_notificado = 1 WHERE usuario.id_usuario = '$id_usuario'";
 						$this->query($query);
 					}
 				}
 
-				if ($prof->fields['restriccion_diario'] > 0) {
+				if ($profesional->fields['restriccion_diario'] > 0) {
 					$timezone_offset = UtilesApp::get_offset_os_utc() - UtilesApp::get_utc_offset(Conf::GetConf($this->Sesion, 'ZonaHoraria'));
-					$query = "SELECT SUM( TIME_TO_SEC( duracion )/3600 ) AS cantidad_horas FROM trabajo WHERE id_usuario = '$id_usuario' AND fecha = DATE( DATE_ADD( NOW(), INTERVAL $timezone_offset HOUR ) ) ";
-					$resp = $this->query($query);
-					$cantidad_horas = $resp[0]['cantidad_horas'];
-					if (!$cantidad_horas) {
-						$cantidad_horas = 0;
-					}
-					if ($cantidad_horas < $prof->fields['restriccion_diario']) {
+					$query = "SELECT SUM(TIME_TO_SEC(trabajo.duracion) / 3600) AS cantidad_horas
+						FROM trabajo
+						WHERE trabajo.id_usuario = '$id_usuario'
+							AND trabajo.fecha = DATE(DATE_ADD(NOW(), INTERVAL $timezone_offset HOUR))";
+					$trabajo = $this->query($query);
+
+					$cantidad_horas = !empty($trabajo[0]['cantidad_horas']) ? $trabajo[0]['cantidad_horas'] : 0;
+
+					if ($cantidad_horas < $profesional->fields['restriccion_diario']) {
 						$cantidad_horas = number_format($cantidad_horas, 1, ',', '.');
-						$this->datoDiario[$id_usuario]['restriccion_diario'] = array('actual' => $cantidad_horas, 'min' => $prof->fields['restriccion_diario']);
+						$this->datoDiario[$id_usuario]['restriccion_diario'] = array(
+							'actual' => $cantidad_horas,
+							'min' => $profesional->fields['restriccion_diario']
+						);
 					}
 				}
 			}
@@ -792,10 +808,7 @@ class CronNotificacion extends Cron {
 	}
 
 	/*
-	 * Mail diario
-	 * Septimo componente:
-	 *		Alertas de Tareas
-	 */
+	// esta alerta se creó para el cliente blr, actualmente no es ocupado
 	public function tareas() {
 		//Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
 		//FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
@@ -848,6 +861,7 @@ class CronNotificacion extends Cron {
 			}
 		}
 	}
+	*/
 
 	/*
 	 * Refresca los cobros pagados ayer
@@ -914,53 +928,39 @@ class CronNotificacion extends Cron {
 		$this->query($updatetramite);
 	}
 
-	/*
-	 * Revisa los hitos cumplidos para el envio de correo
+	/**
+	 * Revisa los hitos cumplidos segun fecha de cobro
 	 */
-	public function revisar_hitos() {
-		//Correo Hitos
+	public function hitos_cumplidos() {
 		$cobro_pendiete = new CobroPendiente($this->Sesion);
 		$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();
 
-		foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido) {
-			$this->datoDiario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+		if (!empty($hitos_cumplidos)) {
+			foreach ($hitos_cumplidos as $usuario_responable => $hito_cumplido) {
+				$this->datoDiario[$usuario_responable]['hitos_cumplidos'][] = $hito_cumplido;
+			}
 		}
+	}
 
+	/**
+	 * Suma el total de horas generadas por los trabajos ingresados
+	 */
+	public function horas_mensuales() {
 		if (UtilesApp::GetConf($this->Sesion, 'AlertaDiariaHorasMensuales')) {
-			$query = "SELECT id_usuario,
-							TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(duracion))), '%H:%i') AS horas
-						FROM trabajo
-						WHERE fecha >= '" . date('Y-m') . "-01'
-						GROUP BY id_usuario";
+			$fecha_trabajo = date('Y-m-01');
+			$query = "SELECT trabajo.id_usuario, TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(trabajo.duracion))), '%H:%i') AS horas
+				FROM trabajo
+				WHERE trabajo.fecha >= '{$fecha_trabajo}'
+				GROUP BY trabajo.id_usuario";
 			$horas = $this->query($query);
+
 			$total_horas = count($horas);
 			for ($x = 0; $x < $total_horas; ++$x) {
 				$hora = $horas[$x];
 				$this->datoDiario[$hora['id_usuario']]['horas_mensuales'] = $hora['horas'];
 			}
 		}
-
 	}
-
-	/*
-	 * Registra los correos para su envío
-	 */
-	public function crear_correos() {
-		// Fin del mail diario. Envío.
-		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
-
-		foreach ($mensajes as $id_usuario => $mensaje) {
-			if ($this->correo) {
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
-			}
-		}
-
-		if ($this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
-			var_dump($this->datoDiario);
-			echo implode('<br><br><br>', $mensajes);
-		}
-	}
-
 
 	/**
 	 * Notificacion de suspencion de pago por comision por concepto de
