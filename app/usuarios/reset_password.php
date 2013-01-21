@@ -115,7 +115,7 @@ MAIL;
 
 <p>{$host}app/usuarios/reset_password.php?token={$Usuario->fields['reset_password_token']}</p>
 
-<p>Este enlace caducará en 60 minutos. Si no desea generar un nuevo password simplement ignore este correo y nada será modificado.</p>
+<p>Este enlace caducará en 60 minutos. Si no desea generar un nuevo password simplemente ignore este correo y nada será modificado.</p>
 
 <p>Si tiene alguna duda o necesita mayor asistencia, no dude en contactarnos en http://soporte.thetimebilling.com/</p>
 
