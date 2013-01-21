@@ -68,6 +68,15 @@ if ($desde_webservice) {
 		$numeros_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago, 'id_factura_pago', 'numero');
 		$arreglo_facturas = explode(',', $lista_facturas);
 		$codigo_cliente = $pago->fields['codigo_cliente'];
+		$id_concepto = $pago->fields['id_concepto'];
+		$tipo_doc = $pago->fields['tipo_doc'];
+		$nro_documento = $pago->fields['nro_documento'];
+		$nro_cheque = $pago->fields['nro_cheque'];
+		$descripcion = $pago->fields['descripcion'];
+		$id_banco = $pago->fields['id_banco'];
+		$id_cuenta = $pago->fields['id_cuenta'];
+		$pago_retencion = $pago->fields['pago_retencion'];
+	 
 	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
 		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
@@ -108,17 +117,7 @@ if (!empty($pago->fields['id_neteo_documento_adelanto'])) {
 
 $monto_pago_adelanto = $monto_pago;
 
-/* Comentado el 18-01-2013 hotfix 12.1.7
- * no permire guardar registros de campos
-$id_concepto = $pago->fields['id_concepto'];
-$tipo_doc = $pago->fields['tipo_doc'];
-$nro_documento = $pago->fields['nro_documento'];
-$nro_cheque = $pago->fields['nro_cheque'];
-$descripcion = $pago->fields['descripcion'];
-$id_banco = $pago->fields['id_banco'];
-$id_cuenta = $pago->fields['id_cuenta'];
-$pago_retencion = $pago->fields['pago_retencion'];
- */
+
 
 if ($id_adelanto) {
 	$documento_adelanto->Load($id_adelanto);
