@@ -219,13 +219,12 @@ if ($opcion == 'guardar') {
 			$tipo_doc=$_POST['tipo_doc'];
 			$numero_doc=$_POST['numero_doc'];
 			$numero_cheque=$_POST['numero_cheque'];
-			$glosa_documento=$_POST['glosa_documento'];
+			$descripcion=$_POST['glosa_documento'];
 			$id_banco=$_POST['id_banco'];
 			$id_cuenta=$_POST['id_cuenta'];
 			$pago_retencion=$_POST['pago_retencion'];
 			$id_concepto=$_POST['id_concepto'];
-			$descripcion = $_POST['descripcion'];
-
+ 
 			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 			$pago->Edit('monto', $monto);
 		
@@ -235,13 +234,12 @@ if ($opcion == 'guardar') {
 			$pago->Edit('tipo_doc', $tipo_doc);
 			$pago->Edit('nro_documento', $numero_doc);
 			$pago->Edit('nro_cheque', $numero_cheque);
-			$pago->Edit('descripcion', $glosa_documento);
+			$pago->Edit('descripcion', $descripcion);
 			$pago->Edit('id_banco', $id_banco);
 			$pago->Edit('id_cuenta', $id_cuenta);
 			$pago->Edit('pago_retencion', $pago_retencion);
 			$pago->Edit('id_concepto', $id_concepto);
-			$pago->Edit('descripcion', $descripcion);
-		}
+ 		}
 		else {
 			$pago->LoadByNeteoAdelanto($id_neteo_documento_adelanto);
 		}
@@ -952,7 +950,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				<?php echo __('Descripción') ?>
 			</td>
 			<td align=left colspan="3">
-				<textarea name=glosa_documento cols="45" rows="3"><?php
+				<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?php
 				if ($descripcion)
 					echo $descripcion;
 				else if ($id_cobro) {
