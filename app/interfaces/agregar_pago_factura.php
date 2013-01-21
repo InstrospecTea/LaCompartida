@@ -226,23 +226,38 @@ if ($opcion == 'guardar') {
 			if ($desde_webservice) {
 				$pago->Edit('id_contabilidad', $id_contabilidad);
 			}
-			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
-			//$pago->Edit('codigo_cliente', $codigo_cliente);
-			$pago->Edit('codigo_cliente', $_POST['codigo_cliente_factura']);
-			$pago->Edit('monto', $monto);
-			if (is_numeric($_POST['id_moneda']) && $_POST['id_moneda'] != $id_moneda)
+				if (is_numeric($_POST['id_moneda']) && $_POST['id_moneda'] != $id_moneda)
 				$id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
+
+			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
+			
+			$codigo_cliente_factura=$_POST['codigo_cliente_factura'];
+			$monto=$_POST['monto'];
+			$monto_moneda_cobro=$_POST['monto_moneda_cobro'];
+			$id_moneda_cobro=$_POST['id_moneda_cobro'];
+			$tipo_doc=$_POST['tipo_doc'];
+			$numero_doc=$_POST['numero_doc'];
+			$numero_cheque=$_POST['numero_cheque'];
+			$glosa_documento=$_POST['glosa_documento'];
+			$id_banco=$_POST['id_banco'];
+			$id_cuenta=$_POST['id_cuenta'];
+			$pago_retencion=$_POST['pago_retencion'];
+			$id_concepto=$_POST['id_concepto'];
+
+			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
+			$pago->Edit('monto', $monto);
+		
 			$pago->Edit('id_moneda', $id_moneda);
-			$pago->Edit('monto_moneda_cobro', $_POST['monto_moneda_cobro']);
-			$pago->Edit('id_moneda_cobro', $_POST['id_moneda_cobro']);
-			$pago->Edit('tipo_doc', $_POST['tipo_doc']);
-			$pago->Edit('nro_documento', $_POST['numero_doc']);
-			$pago->Edit('nro_cheque', $_POST['numero_cheque']);
-			$pago->Edit('descripcion', $_POST['glosa_documento']);
-			$pago->Edit('id_banco', $_POST['id_banco']);
-			$pago->Edit('id_cuenta', $_POST['id_cuenta']);
-			$pago->Edit('pago_retencion', $_POST['pago_retencion']);
-			$pago->Edit('id_concepto', $_POST['id_concepto']);
+			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
+			$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
+			$pago->Edit('tipo_doc', $tipo_doc);
+			$pago->Edit('nro_documento', $numero_doc);
+			$pago->Edit('nro_cheque', $numero_cheque);
+			$pago->Edit('descripcion', $glosa_documento);
+			$pago->Edit('id_banco', $id_banco);
+			$pago->Edit('id_cuenta', $id_cuenta);
+			$pago->Edit('pago_retencion', $pago_retencion);
+			$pago->Edit('id_concepto', $id_concepto);
 		}
 		else {
 			$pago->LoadByNeteoAdelanto($id_neteo_documento_adelanto);
