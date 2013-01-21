@@ -224,6 +224,7 @@ if ($opcion == 'guardar') {
 			$id_cuenta=$_POST['id_cuenta'];
 			$pago_retencion=$_POST['pago_retencion'];
 			$id_concepto=$_POST['id_concepto'];
+			$descripcion = $_POST['descripcion'];
 
 			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 			$pago->Edit('monto', $monto);
@@ -239,6 +240,7 @@ if ($opcion == 'guardar') {
 			$pago->Edit('id_cuenta', $id_cuenta);
 			$pago->Edit('pago_retencion', $pago_retencion);
 			$pago->Edit('id_concepto', $id_concepto);
+			$pago->Edit('descripcion', $descripcion);
 		}
 		else {
 			$pago->LoadByNeteoAdelanto($id_neteo_documento_adelanto);
