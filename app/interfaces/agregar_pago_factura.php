@@ -1,25 +1,6 @@
  <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Documento.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/NeteoDocumento.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Observacion.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/FacturaPago.php';
-require_once Conf::ServerDir() . '/classes/CtaCteFact.php';
-require_once Conf::ServerDir() . '/classes/CtaCteFactMvto.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
+
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
