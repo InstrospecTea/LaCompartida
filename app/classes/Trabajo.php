@@ -12,7 +12,7 @@ class Trabajo extends Objeto
 	var $etapa = null;
 	//Primera etapa del proyecto
 	var $primera_etapa = null;
- 
+
 	var $monto = null;
 
 	function Trabajo($sesion, $fields = "", $params = "")
@@ -22,7 +22,7 @@ class Trabajo extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	
+
 	function get_codigo_cliente()
 	{
 		$query = "SELECT codigo_cliente
@@ -50,7 +50,7 @@ class Trabajo extends Objeto
 			return __("Revisado");
 
 			return __("Abierto");
-			
+
 	}
 
 	function Write($ingreso_historial = true)
@@ -62,8 +62,8 @@ class Trabajo extends Objeto
 						$query = "SELECT fecha, descripcion, duracion, duracion_cobrada, id_usuario, codigo_asunto, cobrable FROM trabajo WHERE id_trabajo=".$this->fields['id_trabajo'];
 						$resp = mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 						list($fecha,$descripcion,$duracion,$duracion_cobrada,$id_usuario, $codigo_asunto, $cobrable) = mysql_fetch_array($resp);
-						$query = "INSERT INTO trabajo_historial 
-												 (id_trabajo, id_usuario, fecha, fecha_trabajo, fecha_trabajo_modificado, descripcion, descripcion_modificado, duracion, duracion_modificado, duracion_cobrada, duracion_cobrada_modificado, id_usuario_trabajador, id_usuario_trabajador_modificado, accion, codigo_asunto, codigo_asunto_modificado, cobrable, cobrable_modificado) 
+						$query = "INSERT INTO trabajo_historial
+												 (id_trabajo, id_usuario, fecha, fecha_trabajo, fecha_trabajo_modificado, descripcion, descripcion_modificado, duracion, duracion_modificado, duracion_cobrada, duracion_cobrada_modificado, id_usuario_trabajador, id_usuario_trabajador_modificado, accion, codigo_asunto, codigo_asunto_modificado, cobrable, cobrable_modificado)
 									VALUES ('".$this->fields['id_trabajo']."','".$this->sesion->usuario->fields['id_usuario']."','".date("Y-m-d H:i:s")."','".$fecha."','".$this->fields['fecha']."'
 
 										,'".mysql_real_escape_string(empty($descripcion)? ' Sin descripcion' : $descripcion)."'
@@ -85,8 +85,8 @@ class Trabajo extends Objeto
 				if( $ingreso_historial )
 					{
 						// Creamos un trabajo nuevo, logueamos la creaciÃ³n.
-						$query = "INSERT INTO trabajo_historial 
-														 (id_trabajo, id_usuario, fecha, fecha_trabajo_modificado, descripcion_modificado, duracion_modificado, duracion_cobrada_modificado, id_usuario_trabajador_modificado, accion, codigo_asunto_modificado, cobrable_modificado) 
+						$query = "INSERT INTO trabajo_historial
+														 (id_trabajo, id_usuario, fecha, fecha_trabajo_modificado, descripcion_modificado, duracion_modificado, duracion_cobrada_modificado, id_usuario_trabajador_modificado, accion, codigo_asunto_modificado, cobrable_modificado)
 											VALUES ('".$this->fields['id_trabajo']."'
 													,'".$this->sesion->usuario->fields['id_usuario']."'
 													,'".date("Y-m-d H:i:s")."','".$this->fields['fecha']."'
@@ -99,7 +99,7 @@ class Trabajo extends Objeto
 													,'".$this->fields['cobrable']."')";
 					}
 			}
-			
+
 			try {
 				if(parent::Write()) 	{
 						// Modificamos un trabajo que ya existÃ­a, logueamos el cambio.
@@ -113,21 +113,20 @@ class Trabajo extends Objeto
 			} catch (Exception $e) {
 				throw new Exception($e->getMessage());
 			}
-			
+
 	}
 
 	function Check() {
-		
-		if($this->Loaded() && !in_array($this->fields['estadocobro'],array('SIN COBRO','CREADO','EN REVISION'))) {
+		if($this->Loaded() && !in_array($this->fields['estado_cobro'],array('','SIN COBRO','CREADO','EN REVISION'))) {
 			throw new Exception('No se puede mover un trabajo cobrado');
 		} else {
-		
+
 		$horasenfecha=$this->HorasEnFecha($this->fields['fecha'],$this->fields['id_usuario']);
-		
+
 		$duracion=$this->fields['duracion'];
 		$duracionsegundos=strtotime($duracion)-strtotime('today');
 		$totaldiacondicional=($horasenfecha['duracion']+ $duracionsegundos);
-		
+
 			if($totaldiacondicional>=86400) {
 				throw new Exception('No se puede trabajar más de 24 horas diarias');
 			} else {
@@ -144,7 +143,7 @@ class Trabajo extends Objeto
 		if($fecha==null) {
 			$fecha=date('Y-m-d');
 		}
-		
+
 		$queryhoras="select sum(time_to_sec(duracion)) as duracion, sum(time_to_sec(duracion_cobrada)) as duracion_cobrada from trabajo where fecha='$fecha'";
 		if($id_usuario!=null) {
 			$queryhoras.=" and id_usuario ='$id_usuario'";
@@ -152,73 +151,73 @@ class Trabajo extends Objeto
  		$duracion=$this->sesion->pdodbh->query($queryhoras)->fetchAll(PDO::FETCH_ASSOC);
 		return $duracion[0];
 	}
-	
+
 	function InsertarTrabajoTarifa()
 	{
 		$id_trabajo = $this->fields['id_trabajo'];
 		$codigo_asunto = $this->fields['codigo_asunto'];
 		$id_usuario = $this->fields['id_usuario'];
 		$dbh = $this->sesion->dbh;
-		
+
 		$contrato = new Contrato($this->sesion);
 		$contrato->LoadByCodigoAsunto($codigo_asunto);
-		
-		$query = "SELECT 
-									prm_moneda.id_moneda, 
-									( SELECT usuario_tarifa.tarifa 
-											FROM usuario_tarifa 
-											LEFT JOIN contrato ON contrato.id_tarifa = usuario_tarifa.id_tarifa 
-											LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato 
-										WHERE usuario_tarifa.id_usuario = '$id_usuario' AND 
-													asunto.codigo_asunto = '$codigo_asunto' 
+
+		$query = "SELECT
+									prm_moneda.id_moneda,
+									( SELECT usuario_tarifa.tarifa
+											FROM usuario_tarifa
+											LEFT JOIN contrato ON contrato.id_tarifa = usuario_tarifa.id_tarifa
+											LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
+										WHERE usuario_tarifa.id_usuario = '$id_usuario' AND
+													asunto.codigo_asunto = '$codigo_asunto'
 													AND usuario_tarifa.id_moneda = prm_moneda.id_moneda)
 								FROM prm_moneda";
 		$resp = mysql_query($query, $dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$dbh);
-		
+
 		while( list( $id_moneda, $valor ) = mysql_fetch_array($resp) )
 		{
 			if( empty($valor) ) $valor = 0;
-			$query_insert = "INSERT trabajo_tarifa 
+			$query_insert = "INSERT trabajo_tarifa
 													SET id_trabajo = '$id_trabajo',
 															id_moneda = '$id_moneda',
-															valor = '$valor' 
+															valor = '$valor'
 												ON DUPLICATE KEY UPDATE valor = '$valor' ";
 			mysql_query($query_insert, $dbh) or Utiles::errorSQL($query_insert,__FILE__,__LINE__,$dbh);
-			
+
 			if( $contrato->fields['id_moneda'] == $id_moneda ) {
 				$this->Edit("tarifa_hh", $valor);
 				$this->Write();
 			}
 		}
 	}
-	
+
 	function GetTrabajoTarifa( $id_moneda, $id_trabajo = '')
 	{
 		if( $id_trabajo == '' ) {
 			$id_trabajo = $this->fields['id_trabajo'];
 		}
-		$query = "SELECT valor 
-								FROM trabajo_tarifa 
-								WHERE id_trabajo = '$id_trabajo' 
+		$query = "SELECT valor
+								FROM trabajo_tarifa
+								WHERE id_trabajo = '$id_trabajo'
 									AND id_moneda = '$id_moneda' ";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		list($valor) = mysql_fetch_array($resp);
 		return $valor;
 	}
-	
+
 	function ActualizarTrabajoTarifa( $id_moneda, $valor, $id_trabajo = '')
 	{
 		if( $id_trabajo == '' ) {
 			$id_trabajo = $this->fields['id_trabajo'];
 		}
-		$query = "INSERT INTO trabajo_tarifa 
-													SET id_trabajo = '$id_trabajo', 
+		$query = "INSERT INTO trabajo_tarifa
+													SET id_trabajo = '$id_trabajo',
 															id_moneda = '$id_moneda',
-															valor = '$valor' 
+															valor = '$valor'
 									ON DUPLICATE KEY UPDATE valor = '$valor' ";
 		mysql_query($query,$this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 	}
-	
+
 	function Eliminar()
 	{
 		/*if($this->sesion->usuario->fields[id_usuario] != $this->fields[id_usuario])
@@ -237,8 +236,8 @@ class Trabajo extends Objeto
 			// Si se pudo eliminar, loguear el cambio.
 			if($resp)
 			{
-				$query = "INSERT INTO trabajo_historial 
-												(id_trabajo, id_usuario, fecha, fecha_trabajo, descripcion, duracion, duracion_cobrada, id_usuario_trabajador, accion, codigo_asunto, cobrable) 
+				$query = "INSERT INTO trabajo_historial
+												(id_trabajo, id_usuario, fecha, fecha_trabajo, descripcion, duracion, duracion_cobrada, id_usuario_trabajador, accion, codigo_asunto, cobrable)
 								 VALUES ('".$this->fields[id_trabajo]."','".$this->sesion->usuario->fields[id_usuario]."','".date("Y-m-d H:i:s")."','".$this->fields['fecha']."','".$this->fields['descripcion']."','".$this->fields['duracion']."','".$this->fields['duracion_cobrada']."',".$this->fields['id_usuario'].",'ELIMINAR','".$this->fields[codigo_asunto]."','".$this->fields[cobrable]."')";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
@@ -285,7 +284,7 @@ class Trabajo extends Objeto
 		$seconds_in_a_day = 86400;
 		// Unix timestamp to Excel date difference in seconds
 		$ut_to_ed_diff = $seconds_in_a_day * 25569;
-		
+
 		return gmdate('Y-m-d',($dias * $seconds_in_a_day)-$ut_to_ed_diff);
 	}
 
@@ -309,7 +308,7 @@ class Trabajo extends Objeto
 		$excel = new Spreadsheet_Excel_Reader();
 		if(!$excel->read($archivo_data["tmp_name"]))
 			return __('Error, el archivo no se puede leer, intente nuevamente.');
-			
+
 		$query = "SELECT MAX(id_trabajo) FROM trabajo";
 		$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($max_id_trabajo) = mysql_fetch_array($resp);
@@ -330,10 +329,10 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°') 
-					&& 
-					in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) ) 
-					&& 
+		while(	!(  $excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°')
+					&&
+					in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) )
+					&&
 					$fila_base<$excel->sheets[0]['numRows'] )
 						{
 							++$fila_base;
@@ -350,7 +349,7 @@ class Trabajo extends Objeto
 			$col_fecha_mes = $col_fecha_ini;
 		}
 		$col_fecha_anyo = $col_fecha_fin;
-		
+
 		// Encontrar las posiciones de las columnas, usando los nombres de la base de datos.
 		$nombre_descripcion_es = Utiles::glosa($sesion, 'descripcion', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
 		$nombre_descripcion_en = Utiles::glosa($sesion, 'descripcion', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
@@ -407,21 +406,21 @@ class Trabajo extends Objeto
 		}
 		if($col_descripcion == 23 || $col_duracion_cobrable == 23 || $col_abogado == 23)
 			return __('Error, los nombres de las columnas no corresponden, por favor revise que está subiendo el archivo correcto.');
-  
+
 		// Para dara feedback al usuario.
 		$num_modificados = 0;
 		$num_insertados = 0;
 		$mensajes = '';
 		$trabajos_en_hoja = array();
 		$cobros_en_excel = array();
-		
-		
+
+
 		// Leemos todas las hojas
 		foreach($excel->sheets as $hoja)
 		{
-			if( $hoja['cells'][1][$col_id_trabajo] == __('N°') || 
-					$hoja['cells'][2][$col_id_trabajo] == __('N°') || 
-					$hoja['cells'][3][$col_id_trabajo] == __('N°') || 
+			if( $hoja['cells'][1][$col_id_trabajo] == __('N°') ||
+					$hoja['cells'][2][$col_id_trabajo] == __('N°') ||
+					$hoja['cells'][3][$col_id_trabajo] == __('N°') ||
 					$hoja['cells'][4][$col_id_trabajo] == __('N°') )
 				continue;
 			// Busca numero de cobro
@@ -429,9 +428,9 @@ class Trabajo extends Objeto
 							{
 								$posicion_principal_es = strlen(Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_es", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 								$posicion_principal_en = strlen(Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_en", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-								
+
 								if( (int) substr(strstr($hoja['cells'][1][$i],Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_es", 'prm_excel_cobro', 'nombre_interno', 'grupo')),$posicion_principal_es+1) > 0 )
-									{ 
+									{
 										$id_cobro = (int) substr(strstr($hoja['cells'][1][$i],Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_es", 'prm_excel_cobro', 'nombre_interno', 'grupo')),$posicion_principal_es+1);
 									}
 								else if( (int) substr(strstr($hoja['cells'][1][$i],Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_en", 'prm_excel_cobro', 'nombre_interno', 'grupo')),$posicion_principal_en+1) > 0 )
@@ -439,34 +438,34 @@ class Trabajo extends Objeto
 										$id_cobro = (int) substr(strstr($hoja['cells'][1][$i],Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_en", 'prm_excel_cobro', 'nombre_interno', 'grupo')),$posicion_principal_en+1);
 									}
 							}
-							
+
 							if(!$id_cobro)
 									{
 										$mensajes .= "<br/>no se pude detectar el numero " . __("del cobro.");
 										continue;
 									}
-										
+
 							$cobro = new Cobro($sesion);
 							$cobro->Load($id_cobro);
 							$cobro->LoadAsuntos();
 			$continuar = false;
-			// Para cambiar el asunto en el caso de ver los asuntos por separado necesitamos una variable para 
+			// Para cambiar el asunto en el caso de ver los asuntos por separado necesitamos una variable para
 			// saber en que asunto estamos actualmente, por defecto la definemos vacio para indicar que los asuntos
 			// no se muestran por separado.
 			$codigo_asunto_escondido = '';
 			for($fila=1; $fila<=$hoja['numRows']; ++$fila)
 			{
-				// Buscamos por indicaciones escondidos en el caso de asuntos por separado para saber en que asunto estamos 
+				// Buscamos por indicaciones escondidos en el caso de asuntos por separado para saber en que asunto estamos
 				// actualmente.
 				if( $hoja['cells'][$fila][$col_fecha] == 'asuntos_separado' )
 					$codigo_asunto_escondido = $hoja['cells'][$fila][$col_descripcion];
-					
+
 				// Importan solo las filas que guardan trabajos.
 				if(!is_numeric($hoja['cells'][$fila][$col_id_trabajo]) && ( $hoja['cells'][$fila][$col_id_trabajo] || !$hoja['cells'][$fila][$col_fecha_dia] || !$hoja['cells'][$fila][$col_fecha_mes] || !$hoja['cells'][$fila][$col_fecha_anyo] || !$hoja['cells'][$fila][$col_descripcion] || !$hoja['cells'][$fila][$col_duracion_cobrable] ) )
 					continue;
-				
+
 				// Para ignorar los lineas escondidas que se usan por el resumen profesional
-				if( $continuar ) 
+				if( $continuar )
 					{
 						$continuar = false;
 						continue;
@@ -476,16 +475,16 @@ class Trabajo extends Objeto
 						$continuar = true;
 						continue;
 					}
-					
+
 				// Leemos los campos del trabajo en el excel
 				$id_trabajo = $hoja['cells'][$fila][$col_id_trabajo];
-					
+
 				$descripcion = $hoja['cells'][$fila][$col_descripcion];
-				
+
 				//La fecha se genera concatenando.
 				$error_en_fecha = '';
 
-				
+
 				$dia = intval($hoja['cells'][$fila][$col_fecha_dia]);
 				$mes = intval($hoja['cells'][$fila][$col_fecha_mes]);
 				if($mes < 1 && $mes > 13)
@@ -510,11 +509,11 @@ class Trabajo extends Objeto
 					$dia = '0'.$dia;
 
 				$fecha = $hoja['cells'][$fila][$col_fecha_anyo].'-'.$mes.'-'.$dia;
-									
+
 				if($col_solicitante != 23)
 					$solicitante = $hoja['cells'][$fila][$col_solicitante];
-					
-					
+
+
 				$abogado = $hoja['cells'][$fila][$col_abogado];
 				// cargar usuario con su username
 				$usuario = new Usuario($sesion);
@@ -525,30 +524,30 @@ class Trabajo extends Objeto
 						continue;
 					}
 				// Excel guarda la duración como número, donde 1 es un día.
-				
+
 				$duracion_cobrable = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_cobrable], $ingresado_por_decimales);
 				if($duracion_cobrable != '00:00:00')
 					$cobrable=1;
-				else 
+				else
 					$cobrable=0;
-					
+
 				// Si existe una columna duracion_trabajada, toma el valor si no ponga lo igual a la duracion cobrable.
-				if($col_duracion_trabajada != 23 ) 
+				if($col_duracion_trabajada != 23 )
 					$duracion_trabajada = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_trabajada], $ingresado_por_decimales);
 				else
 					$duracion_trabajada = $duracion_cobrable;
-			 
+
 			 // Revisamos la variable $codigo_asunto_escondido:
-			 // Por sia caso que tiene valor sabemos que los asuntos se muestran por separado y que el asunto actual 
+			 // Por sia caso que tiene valor sabemos que los asuntos se muestran por separado y que el asunto actual
 			 // es igual al valor de la variable, si no tiene valor tenemos que revisar la columna $col_asunto y averiguar
 			 // si el valor indicado ahi esta valido.
-			 		if( $codigo_asunto_escondido != '' ) 
+			 		if( $codigo_asunto_escondido != '' )
 			 			$codigo_asunto = $codigo_asunto_escondido;
-			 		else	
+			 		else
 			 			{
 			 				// Por defecto seleccionamos el primer asunto del cobro, si es que el usuario ha indica un codigo,
 							// veremos si esta coincide con codigo_asunto o codigo_asunto_secundario de uno de lo asuntos dentro
-							// del cobro, y selecionamos el asunto correspondiente. Si no corresponde con nada avisamos al cliente 
+							// del cobro, y selecionamos el asunto correspondiente. Si no corresponde con nada avisamos al cliente
 							// que el codigo ingresado no existe.
 							$asunto_data = $hoja['cells'][$fila][$col_asunto];
 							$codigo_asunto = $cobro->asuntos[0];
@@ -556,10 +555,10 @@ class Trabajo extends Objeto
 							{
 							$codigo_existe = false;
 							foreach($cobro->asuntos as $asunto => $data )
-								{ 
+								{
 									$asunto = new Asunto($sesion);
 									$asunto->LoadByCodigo($data);
-									if( substr($asunto->fields['codigo_asunto'],-4)==$asunto_data || $asunto->fields['codigo_asunto'] == $asunto_data ) 
+									if( substr($asunto->fields['codigo_asunto'],-4)==$asunto_data || $asunto->fields['codigo_asunto'] == $asunto_data )
 										{
 											$codigo_asunto = $data;
 											$codigo_existe = true;
@@ -572,7 +571,7 @@ class Trabajo extends Objeto
 											break;
 										}
 								}
-							if( !$codigo_existe ) 
+							if( !$codigo_existe )
 								{
 									$mensajes .= "<br />No se puede modificar el trabajo $id_trabajo ($descripcion) porque el codigo de asunto ingresado (cod: $asunto_data) no existe.<br/>";
 									continue;
@@ -586,17 +585,17 @@ class Trabajo extends Objeto
 				// Si no existe el original o no hay cambios ignoramos la línea.
 				if(($id_trabajo > 0 && !$trabajo_original )
 					|| ( $trabajo_original->fields['fecha']==$fecha
-					&& ($col_solicitante == 23 || $trabajo_original->fields['solicitante']==$solicitante) 
+					&& ($col_solicitante == 23 || $trabajo_original->fields['solicitante']==$solicitante)
 					&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion']==$duracion_trabajada )
-					&& $trabajo_original->fields['descripcion']==$descripcion 
-					&& ( ( $col_asunto == 23 && $codigo_asunto_escondido == '' ) || $trabajo_original->fields['codigo_asunto']==$codigo_asunto ) 
-					&& ($trabajo_original->fields['duracion_cobrada']==$duracion_cobrable || $trabajo_original->fields['duracion_cobrada']=='' && $duracion_cobrable=='00:00:00') 
-					&& $trabajo_original->fields['id_usuario']==$usuario->fields['id_usuario'] 
+					&& $trabajo_original->fields['descripcion']==$descripcion
+					&& ( ( $col_asunto == 23 && $codigo_asunto_escondido == '' ) || $trabajo_original->fields['codigo_asunto']==$codigo_asunto )
+					&& ($trabajo_original->fields['duracion_cobrada']==$duracion_cobrable || $trabajo_original->fields['duracion_cobrada']=='' && $duracion_cobrable=='00:00:00')
+					&& $trabajo_original->fields['id_usuario']==$usuario->fields['id_usuario']
 					&& $trabajo_original->fields['id_cobro']==$id_cobro) )
 					continue;
-					
+
 				if( !$id_trabajo )
-					{	
+					{
 						$tarifa_hh = Funciones::Tarifa($sesion,$usuario->fields['id_usuario'],$cobro->fields['id_moneda'],$codigo_asunto);
 						$costo_hh = Funciones::TarifaDefecto($sesion,$usuario->fields['id_usuario'],$cobro->fields['id_moneda']);
 						$tarifa_hh_estandar = Funciones::MejorTarifa($sesion,$usuario->fields['id_usuario'],$cobro->fields['id_moneda'],$id_cobro);
@@ -614,7 +613,7 @@ class Trabajo extends Objeto
 													costo_hh,
 													tarifa_hh_estandar,
 													fecha_creacion,
-													fecha_modificacion ) 
+													fecha_modificacion )
 												VALUES
 												( '".$codigo_asunto."',
 													'".$id_cobro."',
@@ -642,13 +641,13 @@ class Trabajo extends Objeto
 							$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque " . __("el cobro") . " se encuentra en estado $estado_cobro.<br />";
 							  continue;
 						}
-		
+
 						// Respaldar el trabajo antes de modificarlo.
 						$query = "INSERT INTO trabajo_respaldo_excel
 									(id_trabajo,
 									fecha,
 									codigo_asunto,
-									id_cobro, 
+									id_cobro,
 									id_usuario,
 									".($col_solicitante != 23?'solicitante,':'')."
 									descripcion,
@@ -663,7 +662,7 @@ class Trabajo extends Objeto
 									'".addslashes($trabajo_original->fields['descripcion'])."',
 									'".$trabajo_original->fields['duracion_cobrada']."')";
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		
+
 						// Anotar el cambio en el historial.
 						$query = "SELECT MAX(id_trabajo_respaldo_excel) FROM trabajo_respaldo_excel";
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -672,51 +671,51 @@ class Trabajo extends Objeto
 									(id_trabajo,
 									id_usuario,
 									fecha,
-									fecha_trabajo, 
-									fecha_trabajo_modificado, 
-									descripcion, 
-									descripcion_modificado, 
-									duracion_cobrada, 
-									duracion_cobrada_modificado, 
-									id_usuario_trabajador, 
-									id_usuario_trabajador_modificado, 
+									fecha_trabajo,
+									fecha_trabajo_modificado,
+									descripcion,
+									descripcion_modificado,
+									duracion_cobrada,
+									duracion_cobrada_modificado,
+									id_usuario_trabajador,
+									id_usuario_trabajador_modificado,
 									accion,
 									codigo_asunto,
-									codigo_asunto_modificado, 
+									codigo_asunto_modificado,
 									cobrable,
-									cobrable_modificado, 
+									cobrable_modificado,
 									id_trabajo_respaldo_excel)
 								VALUES
 									('$id_trabajo',
 									'".$sesion->usuario->fields['id_usuario']."',
 									'".date("Y-m-d H:i:s")."',
 									'".$trabajo_original->fields['fecha']."',
-									'".$fecha."', 
-									'".addslashes($trabajo_original->fields['descripcion'])."', 
-									'".addslashes($descripcion)."', 
-									'".$duracion_cobrable."', 
-									'".$trabajo_original->fields['duracion_cobrada']."', 
-									".$trabajo_original->fields['id_usuario'].", 
+									'".$fecha."',
+									'".addslashes($trabajo_original->fields['descripcion'])."',
+									'".addslashes($descripcion)."',
+									'".$duracion_cobrable."',
+									'".$trabajo_original->fields['duracion_cobrada']."',
+									".$trabajo_original->fields['id_usuario'].",
 									".$usuario->fields['id_usuario'].",
 									'SUBIR_XLS',
 									'".$trabajo_original->fields['codigo_asunto']."',
-									'".$codigo_asunto."', 
+									'".$codigo_asunto."',
 									'".$trabajo_original->fields['cobrable']."',
-									'".$cobrable."', 
+									'".$cobrable."',
 									'$id_trabajo_respaldo_excel')";
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		
+
 						// Actualizar el trabajo.
 						$query = "UPDATE trabajo
-								SET fecha='$fecha', 
-										".($abogado==''?'':"id_usuario = ".$usuario->fields['id_usuario'].", ")." 
+								SET fecha='$fecha',
+										".($abogado==''?'':"id_usuario = ".$usuario->fields['id_usuario'].", ")."
 										".((($asunto_data==''||$col_asunto==23)&&$codigo_asunto_escondido=='')?'':"codigo_asunto = '".$codigo_asunto."', ")."
-										id_cobro = ".$id_cobro.", 
-										".($col_solicitante != 23?"solicitante='".addslashes($solicitante)."',":'')." 
-										descripcion='".addslashes($descripcion)."', 
-										".($col_duracion_trabajada != 23?"duracion='".$duracion_trabajada."',":'')." 
-										duracion_cobrada='$duracion_cobrable' 
-								WHERE id_trabajo='$id_trabajo'"; 
+										id_cobro = ".$id_cobro.",
+										".($col_solicitante != 23?"solicitante='".addslashes($solicitante)."',":'')."
+										descripcion='".addslashes($descripcion)."',
+										".($col_duracion_trabajada != 23?"duracion='".$duracion_trabajada."',":'')."
+										duracion_cobrada='$duracion_cobrable'
+								WHERE id_trabajo='$id_trabajo'";
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 						++$num_modificados;
 				}
