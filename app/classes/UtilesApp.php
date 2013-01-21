@@ -1600,33 +1600,40 @@ HTML;
 					$arr_resultado['monto'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual] + $arr_resultado['impuesto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 					$arr_resultado['saldo_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);
 				}
-			}
-			/*			 * *
-			 * CALCULO DE LOS MONTOS PARA UNA MONEDA ESPECIFICA
-			 * */ else {
-				$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda]['cifras_decimales'];
-				for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
-					if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
-						$id_moneda_original = $arr_resultado['opc_moneda_total'];
-					} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
-						$id_moneda_original = $arr_resultado['id_moneda_monto'];
-					} else {
-						$id_moneda_original = $arr_resultado['id_moneda'];
-					}
-					$arr_resultado[$arr_monto['cobro'][$a]][$id_moneda] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
-									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
-									, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-									, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
-					);
-					if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
-						$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
-									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
-									, $decimales_completos
-									, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
-									, $decimales_completos
+			} else {
+					/*
+					 * CALCULO DE LOS MONTOS PARA UNA MONEDA ESPECIFICA
+					 * */
+					$cifras_decimales_actual = $cobro_moneda->moneda[$id_moneda]['cifras_decimales'];
+					for ($a = 0; $a < count($arr_monto[$xtabla]); $a++) {
+						if (($arr_monto[$xtabla][$a] == 'impuesto_gastos') || ($arr_monto[$xtabla][$a] == 'subtotal_gastos') || ($arr_monto[$xtabla][$a] == 'monto_gastos')) {
+							$id_moneda_original = $arr_resultado['opc_moneda_total'];
+						} else if ($arr_monto[$xtabla][$a] == 'monto_contrato') {
+							$id_moneda_original = $arr_resultado['id_moneda_monto'];
+						} else {
+							$id_moneda_original = $arr_resultado['id_moneda'];
+						}
+						$arr_resultado[$arr_monto['cobro'][$a]][$id_moneda] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]//monto_moneda_l
+										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+										, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
+										, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
+										, $cobro_moneda->moneda[$id_moneda]['cifras_decimales']//decimales fin
 						);
+						if ($arr_monto[$xtabla][$a] == $campo[$xtabla]['monto_subtotal']) {
+							$arr_resultado['monto_subtotal_completo'][$id_moneda_actual] = UtilesApp::CambiarMoneda($datos_cobro->fields[$arr_monto[$xtabla][$a]]
+										, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
+										, $decimales_completos
+										, $cobro_moneda->moneda[$id_moneda]['tipo_cambio']//tipo de cambio fin
+										, $decimales_completos
+							);
+					}
 				}
+
+				if ($xtabla == 'cobro') {
+					$suma_monto_honorario_moneda_tarifa = $datos_cobro->fields[$campo[$xtabla]['monto_subtotal']] - $datos_cobro->fields[$campo[$xtabla]['descuento']];
+				}
+				if ($xtabla == 'documento') {
+					$suma_monto_honorario_moneda_tarifa = $datos_cobro->fields['subtotal_sin_descuento'];
 				}
 
 				$arr_resultado['monto_honorarios'][$id_moneda] = UtilesApp::CambiarMoneda($suma_monto_honorario_moneda_tarifa//monto_moneda_l
@@ -2066,6 +2073,31 @@ HTML;
 		extract(array_pop(Moneda::GetMonedas($Sesion, $id_moneda)));
 
 		return "$simbolo " . number_format($monto, $cifras_decimales, ',', '.');
+	}
+
+	/**
+	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parámetro
+	 * $encode permite realizar la acción inversa
+	 * @param mixed $data Arreglo o string a modificar
+	 * @param boolean $encode encode (true) o decode (false)
+	 * @return mixed
+	 */
+	public static function utf8izar($data, $encode = true) {
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				// Previene doble codificación
+				unset($data[$key]);
+				$key = self::utf8izar($key, $encode);
+				$data[$key] = self::utf8izar($value, $encode);
+			}
+		} else if (is_string($data)) {
+			// ^ = XOR = or exclusivo = true && false || false && true
+			if (mb_detect_encoding($data, 'UTF-8', true) == 'UTF-8' ^ $encode) {
+				$data = $encode ? utf8_encode($data) : utf8_decode($data);
+			}
+		}
+
+		return $data;
 	}
 
 	public static function ObtenerFormatoIdioma($sesion) {

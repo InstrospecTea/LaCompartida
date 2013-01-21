@@ -1,22 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-
-function autocargaapp($class_name) {
-	if (file_exists(Conf::ServerDir() . '/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/classes/' . $class_name . '.php';
-	} else if (file_exists(Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php')) {
-		require Conf::ServerDir() . '/../fw/classes/' . $class_name . '.php';
-	} else {
-		   $file =Conf::ServerDir() . '/../fw/classes/' . str_replace('_', DIRECTORY_SEPARATOR, substr($class,5)) . '.php';
-			if ( file_exists($file) ) {
-				require $file;
-			}
-	}
-}
-
-spl_autoload_register('autocargaapp');
-
 	//La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 	//(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 	//se repliquen en el ingreso de datos via webservice.

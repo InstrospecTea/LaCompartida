@@ -63,10 +63,10 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/nota_cobro.php"/>Notas de cobro</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/phpminiadmin.php"/>MySQL</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/error_log.php"/>Error Log</a>';
-		 echo ' | <a href="'.Conf::RootDir().'/admin/respaldos.php"/>Respaldos</a>';
+		 		echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
 
 		echo ' <br><br> Este software corre sobre la DB '. Conf::dbHost() .' <b>'. Conf::dbName().'</b> version '.$dato[0] ;
-
 				echo '. La m&aacute;s actual disponible es la ';
 				$_GET['lastver'] = 1;
 				include(Conf::ServerDir() . '/update.php');
@@ -91,4 +91,3 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 	<?php echo $home_html ?>
 
 </table>
-
