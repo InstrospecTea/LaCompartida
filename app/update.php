@@ -9613,6 +9613,12 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+		case 7.26:
+			if (!ExisteCampo('termino_pago_comision', 'cliente', $dbh)) {
+				$queries[] = "ALTER TABLE `cliente` ADD COLUMN `termino_pago_comision` DATETIME NULL DEFAULT NULL  AFTER `limite_monto`;";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 

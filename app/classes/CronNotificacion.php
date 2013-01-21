@@ -14,7 +14,6 @@ require_once Conf::ServerDir() . '/classes/CobroPendiente.php';
  *
  * @author CPS 2.0
  */
-
 class CronNotificacion extends Cron {
 
 	public $Alerta;
@@ -35,8 +34,8 @@ class CronNotificacion extends Cron {
 	}
 
 	public function main($correo, $desplegar_correo = null) {
-		//$this->Sesion->phpConsole();
-		//$this->Sesion->debug('empieza el cron notificacion');
+		$this->Sesion->phpConsole();
+		$this->Sesion->debug('empieza el cron notificacion');
 		$this->correo = $correo;
 		$this->desplegar_correo = $desplegar_correo;
 		$this->semanales();
@@ -73,8 +72,6 @@ class CronNotificacion extends Cron {
 		} else if (method_exists('Conf', 'DiaMailSemanal')) {
 			$DiaMailSemanal = Conf::DiaMailSemanal();
 		}
-
-		$DiaMailSemanal = 'Thu';
 
 		if (date('D') == $DiaMailSemanal || (isset($forzar_semanal) && $forzar_semanal == 'aefgaeddfesdg23k1h3kk1')) {
 			// Mensaje para JPRO: Alertas de Mínimo y Máximo de horas semanales
@@ -189,7 +186,6 @@ class CronNotificacion extends Cron {
 					$dato_semanal[$resultado['$id_usuario']]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $resultado['$revisados'])));
 				}
 			}
-
 		}
 		// echo htmlentities(print_r($mail_semanal,true));
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
@@ -210,6 +206,7 @@ class CronNotificacion extends Cron {
 	 * Llena array $dato_diario con la información que se informará por correo
 	 * y se registra en el log_correo.
 	 */
+
 	public function diarios() {
 		$this->modificacion_contrato();
 		$this->limites_asuntos();
@@ -240,9 +237,10 @@ class CronNotificacion extends Cron {
 	 * Mail diario
 	 * Primer componente:
 	 * 		Se alerta cada día a los responsables del contrato las
-	 *		modificaciones de datos.
+	 * 		modificaciones de datos.
 	 */
-	function modificacion_contrato() {
+
+	private function modificacion_contrato() {
 		$CorreosModificacionAdminDatos = '';
 		if (method_exists('Conf', 'GetConf')) {
 			$CorreosModificacionAdminDatos = Conf::GetConf($this->Sesion, 'CorreosModificacionAdminDatos');
@@ -310,7 +308,8 @@ class CronNotificacion extends Cron {
 	 * Segundo Componente:
 	 * 		Alertas de límites de Asuntos.
 	 */
-	function limites_asuntos() { //capsula
+
+	private function limites_asuntos() {
 		$query_asuntos = "SELECT asunto.codigo_asunto,
 								usuario.id_usuario,
 								usuario.username,
@@ -371,8 +370,8 @@ class CronNotificacion extends Cron {
 
 			//Notificacion "Límite de horas"
 			if (($total_horas_trabajadas > $asunto->fields['limite_hh'])
-					&& ($asunto->fields['limite_hh'] > 0 )
-					&& ($asunto->fields['notificado_hr_excedido'] == 0)) {
+				&& ($asunto->fields['limite_hh'] > 0 )
+				&& ($asunto->fields['notificado_hr_excedido'] == 0)) {
 				echo "Límite de horas\n";
 				$this->datoDiario[$asunto_db['id_usuario']]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_horas'] = array(
 					'cliente' => $asunto_db['glosa_cliente'],
@@ -384,8 +383,8 @@ class CronNotificacion extends Cron {
 
 			//Notificacion "Monto desde el último cobro"
 			if (($total_monto_ult_cobro > $asunto->fields['alerta_monto'])
-					&& ($asunto->fields['alerta_monto'] > 0)
-					&& ($asunto->fields['notificado_monto_excedido_ult_cobro'] == 0)) {
+				&& ($asunto->fields['alerta_monto'] > 0)
+				&& ($asunto->fields['notificado_monto_excedido_ult_cobro'] == 0)) {
 				$this->datoDiario[$asunto_db['id_usuario']]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_ultimo_cobro'] = array(
 					'cliente' => $asunto_db['glosa_cliente'],
 					'asunto' => $asunto->fields['glosa_asunto'],
@@ -397,8 +396,8 @@ class CronNotificacion extends Cron {
 
 			//Notificacion "Horas desde el último cobro"
 			if (($total_horas_ult_cobro > $asunto->fields['alerta_hh'])
-					&& ($asunto->fields['alerta_hh'] > 0)
-					&& ($asunto->fields['notificado_hr_excedida_ult_cobro'] == 0)) {
+				&& ($asunto->fields['alerta_hh'] > 0)
+				&& ($asunto->fields['notificado_hr_excedida_ult_cobro'] == 0)) {
 
 				$this->datoDiario[$asunto_db['id_usuario']]['asunto_excedido'][$asunto->fields['codigo_asunto']]['alerta_hh'] = array(
 					'cliente' => $asunto_db['glosa_cliente'],
@@ -416,7 +415,8 @@ class CronNotificacion extends Cron {
 	 * Tercer componente:
 	 * 		Alertas de limites de Contrato.
 	 */
-	function limites_contrato() {
+
+	private function limites_contrato() {
 		$query_contratos = "SELECT contrato.id_contrato,
 								usuario_encargado_principal.id_usuario,
 								usuario_encargado_principal.username AS nombre_usuario,
@@ -439,7 +439,7 @@ class CronNotificacion extends Cron {
 		$contratos_db = $this->query($query_contratos);
 		$total_contratos_db = count($contratos_db);
 		for ($x = 0; $x < $total_contratos_db; ++$x) {
-			$data_contrato = $contratos[$x];
+			$data_contrato = $contratos_db[$x];
 
 			$contrato = new Contrato($this->Sesion);
 			$contrato->Load($data_contrato['id_contrato']);
@@ -602,13 +602,17 @@ class CronNotificacion extends Cron {
 
 	/* Mail diario
 	 * Cuarto componente:
-	 *		Alertas de limites de Cliente.
+	 * 		Alertas de limites de Cliente.
 	 */
-	public function limites_cliente() {
-		$query_clientes = "SELECT cliente.codigo_cliente, usuario.id_usuario, usuario.username, cliente.glosa_cliente
-			FROM cliente
-				INNER JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
-			WHERE cliente.activo = 1";
+
+	private function limites_cliente() {
+		$query_clientes = "SELECT cliente.codigo_cliente,
+								usuario.id_usuario,
+								usuario.username,
+								cliente.glosa_cliente
+							FROM cliente
+							INNER JOIN usuario ON (cliente.id_usuario_encargado = usuario.id_usuario)
+							WHERE cliente.activo = '1'";
 		$resultados_clientes = $this->query($query_clientes);
 		$total_resultados_clientes = count($resultados_clientes);
 		for ($x = 0; $x < $total_resultados_clientes; ++$x) {
@@ -685,53 +689,59 @@ class CronNotificacion extends Cron {
 	/*
 	 * Mail diario
 	 * Quinto componente:
-	 *		Cierre de cobranza.
+	 * 		Cierre de cobranza.
 	 */
-	public function cierre_cobranza() {
-		$query = "SELECT usuario.id_usuario,
-						usuario.username,
-						usuario.restriccion_mensual
-					FROM usuario
-					JOIN usuario_permiso USING (id_usuario)
-					WHERE codigo_permiso='PRO'
-						AND activo=1";
-		$resultados = $this->query($query);
-		$total_resultados = count($resultados);
-		for ($x = 0; $x < $total_resultados; ++$x) {
-			$usuario = $resultados[$x];
 
-			$this->datoDiario[$usuario['id_usuario']]['nombre_pila'] = $usuario['username'];
-			if (method_exists('Conf', 'GetConf')) {
-				$adelanto_alerta_fin_de_mes = (int) Conf::GetConf($this->Sesion, 'AdelantoAlertaFinDeMes');
-			}
-			$manana = mktime(date('G'), date('i'), date('s'), date('n'), date('j') + $adelanto_alerta_fin_de_mes, date('Y'));
+	private function cierre_cobranza() {
+		if (method_exists('Conf', 'GetConf')) {
+			$adelanto_alerta_fin_de_mes = (int) Conf::GetConf($this->Sesion, 'AdelantoAlertaFinDeMes');
+		}
+		$manana = mktime(date('G'), date('i'), date('s'), date('n'), date('j') + $adelanto_alerta_fin_de_mes, date('Y'));
 
-			/* Cuarto componente: Mail de alerta mensual de cierre de cobranza */
-			if (UtilesApp::GetConf($this->Sesion, 'CorreosMensuales') && UtilesApp::esUltimoDiaHabilDelMes($manana)) {
-				$this->datoDiario[$usuario['id_usuario']]['fin_de_mes'] = 1;
-			}
+		$CorreosMensuales = UtilesApp::GetConf($this->Sesion, 'CorreosMensuales');
+		$esUltimoDiaHabilDelMes = UtilesApp::esUltimoDiaHabilDelMes($manana);
+		$esSegundoDiaHabilDelMes = UtilesApp::esSegundoDiaHabilDelMes();
 
-			if (UtilesApp::GetConf($this->Sesion, 'CorreosMensuales') && UtilesApp::esSegundoDiaHabilDelMes()) {
-				// horas ingresadas el mes anterior
-				$mes = date('n') - 1;
-				$ano = date('Y');
-				if ($mes == 0) {
-					$mes = 12;
-					--$ano;
+		if ($CorreosMensuales && ($esUltimoDiaHabilDelMes || $esSegundoDiaHabilDelMes)) {
+			$query = "SELECT usuario.id_usuario,
+							usuario.username,
+							usuario.restriccion_mensual
+						FROM usuario
+						JOIN usuario_permiso USING (id_usuario)
+						WHERE codigo_permiso='PRO'
+							AND activo=1";
+			$resultados = $this->query($query);
+			$total_resultados = count($resultados);
+			for ($x = 0; $x < $total_resultados; ++$x) {
+				$usuario = $resultados[$x];
+
+				$this->datoDiario[$usuario['id_usuario']]['nombre_pila'] = $usuario['username'];
+				/* Cuarto componente: Mail de alerta mensual de cierre de cobranza */
+				if ($esUltimoDiaHabilDelMes) {
+					$this->datoDiario[$usuario['id_usuario']]['fin_de_mes'] = 1;
 				}
+				if ($esSegundoDiaHabilDelMes) {
+					// horas ingresadas el mes anterior
+					$mes = date('n') - 1;
+					$ano = date('Y');
+					if ($mes == 0) {
+						$mes = 12;
+						--$ano;
+					}
 
-				$query = "SELECT SUM(TIME_TO_SEC(duracion)) / 3600 AS horas_mes
-							FROM trabajo
-							WHERE id_usuario = '{$usuario['id_usuario']}'
-								AND MONTH(fecha) = $mes
-								AND YEAR(fecha) = $ano";
-				$resp = $this->query($query);
-				$horas_mes = $resp[0]['horas_mes'];
-				if (!$horas_mes) {
-					$horas_mes = '0.00';
-				}
-				if ($horas_mes < $usuario['restriccion_mensual']) {
-					$this->datoDiario[$usuario['id_usuario']]['restriccion_mensual'] = array('actual' => $horas_mes, 'min' => $usuario['restriccion_mensual']);
+					$query = "SELECT SUM(TIME_TO_SEC(duracion)) / 3600 AS horas_mes
+								FROM trabajo
+								WHERE id_usuario = '{$usuario['id_usuario']}'
+									AND MONTH(fecha) = $mes
+									AND YEAR(fecha) = $ano";
+					$resp = $this->query($query);
+					$horas_mes = $resp[0]['horas_mes'];
+					if (!$horas_mes) {
+						$horas_mes = '0.00';
+					}
+					if ($horas_mes < $usuario['restriccion_mensual']) {
+						$this->datoDiario[$usuario['id_usuario']]['restriccion_mensual'] = array('actual' => $horas_mes, 'min' => $usuario['restriccion_mensual']);
+					}
 				}
 			}
 		}
@@ -740,8 +750,9 @@ class CronNotificacion extends Cron {
 	/*
 	 * Mail Diario
 	 * Sexto componente:
-	 *		Alertas de ingreso de horas.
+	 * 		Alertas de ingreso de horas.
 	 */
+
 	public function ingreso_horas() {
 		// Solo enviar alertas de Lunes a Viernes
 		if (date('N') < 6) {
@@ -808,72 +819,72 @@ class CronNotificacion extends Cron {
 	}
 
 	/*
-	// esta alerta se creó para el cliente blr, actualmente no es ocupado
-	public function tareas() {
-		//Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
-		//FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
-		$tarea = new Tarea($this->Sesion);
-		if (!UtilesApp::ExisteCampo('alerta', 'tarea', $this->Sesion)) {
-			$this->query("ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad`;");
-		}
-		$query = "SELECT cliente.glosa_cliente,
-						asunto.glosa_asunto,
-						CONCAT_WS(' ', e.nombre, e.apellido1, LEFT(e.apellido2, 1)) AS nombre_encargado,
-						CONCAT_WS(' ', r.nombre, r.apellido1, LEFT(r.apellido2, 1)) AS nombre_revisor,
-						e.id_usuario as id_encargado,
-						r.id_usuario as id_revisor,
-						tarea.fecha_entrega,
-						tarea.nombre,
-						tarea.detalle,
-						tarea.estado,
-						tarea.alerta
-					FROM tarea
-					JOIN cliente ON tarea.codigo_cliente = cliente.codigo_cliente
-					JOIN asunto ON tarea.codigo_asunto = asunto.codigo_asunto
-					LEFT JOIN usuario AS e ON e.id_usuario = tarea.usuario_encargado
-					JOIN usuario AS r ON r.id_usuario = tarea.usuario_revisor
-					WHERE alerta > 0
-						AND DATE_ADD(NOW(), INTERVAL (alerta) DAY) < fecha_entrega
-						AND DATE_ADD(NOW(), INTERVAL (alerta+1) DAY) > fecha_entrega
-						AND estado <> 'Lista'";
-		$tareas = $this->query($query);
-		$total_tareas = count($tareas);
-		for ($x = 0; $x < $total_tareas; ++$x) {
-			$tarea_db = $tareas[$x];
+	  // esta alerta se creó para el cliente blr, actualmente no es ocupado
+	  public function tareas() {
+	  //Ya que los mails se envían al final del día, se debe enviar la alerta de 1 día si tiene plazo pasado mañana.
+	  //FFF Comprueba la existencia de tarea.alerta. Si no existe, lo crea. Compensa la posible falta del update 3.69
+	  $tarea = new Tarea($this->Sesion);
+	  if (!UtilesApp::ExisteCampo('alerta', 'tarea', $this->Sesion)) {
+	  $this->query("ALTER TABLE `tarea` ADD `alerta` INT( 2 ) NOT NULL DEFAULT '0' AFTER `prioridad`;");
+	  }
+	  $query = "SELECT cliente.glosa_cliente,
+	  asunto.glosa_asunto,
+	  CONCAT_WS(' ', e.nombre, e.apellido1, LEFT(e.apellido2, 1)) AS nombre_encargado,
+	  CONCAT_WS(' ', r.nombre, r.apellido1, LEFT(r.apellido2, 1)) AS nombre_revisor,
+	  e.id_usuario as id_encargado,
+	  r.id_usuario as id_revisor,
+	  tarea.fecha_entrega,
+	  tarea.nombre,
+	  tarea.detalle,
+	  tarea.estado,
+	  tarea.alerta
+	  FROM tarea
+	  JOIN cliente ON tarea.codigo_cliente = cliente.codigo_cliente
+	  JOIN asunto ON tarea.codigo_asunto = asunto.codigo_asunto
+	  LEFT JOIN usuario AS e ON e.id_usuario = tarea.usuario_encargado
+	  JOIN usuario AS r ON r.id_usuario = tarea.usuario_revisor
+	  WHERE alerta > 0
+	  AND DATE_ADD(NOW(), INTERVAL (alerta) DAY) < fecha_entrega
+	  AND DATE_ADD(NOW(), INTERVAL (alerta+1) DAY) > fecha_entrega
+	  AND estado <> 'Lista'";
+	  $tareas = $this->query($query);
+	  $total_tareas = count($tareas);
+	  for ($x = 0; $x < $total_tareas; ++$x) {
+	  $tarea_db = $tareas[$x];
 
-			$t = array();
-			$t['cliente'] = $tarea_db['glosa_cliente'];
-			$t['asunto'] = $tarea_db['glosa_asunto'];
-			$t['fecha_entrega'] = $tarea_db['fecha_entrega'];
-			$t['nombre'] = $tarea_db['nombre'];
-			$t['detalle'] = $tarea_db['detalle'];
-			$t['estado'] = $tarea->IconoEstado($tarea_db['estado'], true);
-			$t['alerta'] = __('Alerta') . ' - ' . __('Fecha de entrega') . ': ' . Utiles::sql2fecha($tarea_db['fecha_entrega'], '%d-%m-%y') . '. ' . __('Se ha activado la alerta de') . ' ' . glosa_dia($tarea_db['alerta']) . '.<br>';
-			if ($tarea_db['id_encargado']) {
-				$t['alerta'] .= '&nbsp;&nbsp;' . __('Encargado') . ': ' . $tarea_db['nombre_encargado'] . '.<br>';
-			}
-			$t['alerta'] .= '&nbsp;&nbsp;' . __('Revisor') . ': ' . $tarea_db['nombre_revisor'] . '.';
+	  $t = array();
+	  $t['cliente'] = $tarea_db['glosa_cliente'];
+	  $t['asunto'] = $tarea_db['glosa_asunto'];
+	  $t['fecha_entrega'] = $tarea_db['fecha_entrega'];
+	  $t['nombre'] = $tarea_db['nombre'];
+	  $t['detalle'] = $tarea_db['detalle'];
+	  $t['estado'] = $tarea->IconoEstado($tarea_db['estado'], true);
+	  $t['alerta'] = __('Alerta') . ' - ' . __('Fecha de entrega') . ': ' . Utiles::sql2fecha($tarea_db['fecha_entrega'], '%d-%m-%y') . '. ' . __('Se ha activado la alerta de') . ' ' . glosa_dia($tarea_db['alerta']) . '.<br>';
+	  if ($tarea_db['id_encargado']) {
+	  $t['alerta'] .= '&nbsp;&nbsp;' . __('Encargado') . ': ' . $tarea_db['nombre_encargado'] . '.<br>';
+	  }
+	  $t['alerta'] .= '&nbsp;&nbsp;' . __('Revisor') . ': ' . $tarea_db['nombre_revisor'] . '.';
 
-			if ($tarea_db['estado'] == 'Por Asignar' || $tarea_db['estado'] == 'Por Asignar' || !$tarea_db['id_encargado']) {
-				$this->datoDiario[$tarea_db['id_revisor']]['tarea_alerta'][] = $t;
-			} else {
-				$this->datoDiario[$tarea_db['id_encargado']]['tarea_alerta'][] = $t;
-			}
-		}
-	}
-	*/
+	  if ($tarea_db['estado'] == 'Por Asignar' || $tarea_db['estado'] == 'Por Asignar' || !$tarea_db['id_encargado']) {
+	  $this->datoDiario[$tarea_db['id_revisor']]['tarea_alerta'][] = $t;
+	  } else {
+	  $this->datoDiario[$tarea_db['id_encargado']]['tarea_alerta'][] = $t;
+	  }
+	  }
+	  }
+	 */
 
 	/*
 	 * Refresca los cobros pagados ayer
 	 */
-	public function cobros_pagados() {
+
+	private function cobros_pagados() {
 		$update1 = "update trabajo join cobro c on trabajo.id_cobro=c.id_cobro set trabajo.estadocobro=c.estado where c.fecha_touch>= trabajo.fecha_touch ;";
 		$update2 = "update cta_corriente join cobro c on cta_corriente.id_cobro=c.id_cobro set cta_corriente.estadocobro=c.estado  where c.fecha_touch >=cta_corriente.fecha_touch;";
 		$update3 = "update tramite join cobro c on tramite.id_cobro=c.id_cobro set tramite.estadocobro=c.estado where c.fecha_touch >= tramite.fecha_touch ;";
 		$this->query($update1);
 		$this->query($update2);
 		$this->query($update3);
-		$AtacheSecundarioSoloAsunto = UtilesApp::GetConf($this->Sesion, 'AtacheSecundarioSoloAsunto');
 
 		$updategastos = "UPDATE olap_liquidaciones ol JOIN cta_corriente cc ON ol.id_unico=(20000000+cc.id_movimiento)
 		SET
@@ -963,10 +974,10 @@ class CronNotificacion extends Cron {
 	}
 
 	/**
-	 * Notificacion de suspencion de pago por comision por concepto de
-	 * presentacion de nuevos clientes.
+	 * Notificación de suspencion de pago por comision por concepto de
+	 * presentación de nuevos clientes.
 	 */
-	public function suspencion_pago() {
+	private function suspencion_pago() {
 		if (UtilesApp::GetConf($this->Sesion, 'UsoPagoComisionNuevoCliente') == 1) {
 			$max = UtilesApp::GetConf($this->Sesion, 'UsoPagoComisionNuevoClienteTiempo');
 			$max = $max && is_numeric($max) ? $max : 730; /* 730 dias */
@@ -976,41 +987,34 @@ class CronNotificacion extends Cron {
 
 			$column = 'c.id_cliente, c.fecha_creacion';
 
-			$query = 'SELECT %s FROM cliente c, usuario u ';
-			$query .= 'WHERE c.id_usuario_encargado = u.id_usuario ';
-			$query .= 'AND UNIX_TIMESTAMP(CURRENT_DATE)-UNIX_TIMESTAMP(c.fecha_creacion) >= ' . $max;
+			$query = "SELECT %s FROM cliente c, usuario u
+						WHERE c.id_usuario_encargado = u.id_usuario
+							AND UNIX_TIMESTAMP(CURRENT_DATE)-UNIX_TIMESTAMP(c.fecha_creacion) >= $max
+							AND termino_pago_comision IS NULL";
 
-			$r = mysql_query(sprintf($query, 'COUNT(*) AS cant'), $this->Sesion->dbh)
-				or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
-
-			if (!$r) {
-
-			} else {
-				$cant = array_shift(mysql_fetch_row($r));
-				if ($cant < 1) {
-
-				} else {
-					$pages = ceil($cant / 10);
-					$query .= ' ORDER BY c.id_cliente DESC LIMIT %s, %s';
-
-					for ($i = 10; $i <= $cant; $i = $i + 10) {
+			$r = $this->query(sprintf($query, 'COUNT(*) AS cant'));
+			if (!empty($r)) {
+				$cant = $r[0]['cant'];
+				if ($cant > 0) {
+					$query .= ' ORDER BY c.id_cliente DESC LIMIT 10';
+					$message = 'El usuario "%s" deja de recibir comision por concepto de captacion del cliente "%s"';
+					$columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
+					for ($i = 0; $i <= $cant; $i = $i + 10) {
 						$columns = "c.id_cliente, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS usuario, c.glosa_cliente";
-
-						$q = sprintf($query, $columns, ($i - 10), $i);
-						$r = mysql_query($q, $this->Sesion->dbh)
-							or Utiles::errorSQL($query, __FILE__, __LINE__, $this->Sesion->dbh);
-
-						$message = 'El usuario "%s" deja de recibir comision por concepto de captacion del cliente "%s"';
-
-						while ($row = mysql_fetch_object($r)) {
+						$q = sprintf($query, $columns, $i, $i + 10);
+						$rows = $this->query($q);
+						$total_rows = count($rows);
+						for ($x = 0; $x < $total_rows; ++$x) {
+							$row = $rows[$x];
 							$from = html_entity_decode(Conf::AppName());
-
-							$m = sprintf($message, $row->usuario, $row->glosa_cliente);
+							$m = sprintf($message, $row['usuario'], $row['glosa_cliente']);
 							Utiles::Insertar($this->Sesion, __("Alerta de facturación de tiempos") . " $from", $m, $email, false);
+							$this->query("UPDATE cliente SET termino_pago_comision=now(), fecha_modificacion=now() WHERE id_cliente={$row['id_cliente']}");
 						}
 					}
 				}
 			}
 		}
 	}
+
 }
