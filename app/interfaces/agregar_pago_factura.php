@@ -57,7 +57,7 @@ if ($desde_webservice) {
 		$id_banco = $pago->fields['id_banco'];
 		$id_cuenta = $pago->fields['id_cuenta'];
 		$pago_retencion = $pago->fields['pago_retencion'];
-	 
+
 	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
 		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
@@ -211,28 +211,28 @@ if ($opcion == 'guardar') {
 				$id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
 
 			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
-			
+
 			$codigo_cliente_factura=$_POST['codigo_cliente_factura'];
 			$monto=$_POST['monto'];
 			$monto_moneda_cobro=$_POST['monto_moneda_cobro'];
 			$id_moneda_cobro=$_POST['id_moneda_cobro'];
 			$tipo_doc=$_POST['tipo_doc'];
-			$numero_doc=$_POST['numero_doc'];
+			$nro_documento=$_POST['numero_doc'];
 			$numero_cheque=$_POST['numero_cheque'];
 			$descripcion=$_POST['glosa_documento'];
 			$id_banco=$_POST['id_banco'];
 			$id_cuenta=$_POST['id_cuenta'];
 			$pago_retencion=$_POST['pago_retencion'];
 			$id_concepto=$_POST['id_concepto'];
- 
+
 			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 			$pago->Edit('monto', $monto);
-		
+
 			$pago->Edit('id_moneda', $id_moneda);
 			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
 			$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
 			$pago->Edit('tipo_doc', $tipo_doc);
-			$pago->Edit('nro_documento', $numero_doc);
+			$pago->Edit('nro_documento', $nro_documento);
 			$pago->Edit('nro_cheque', $numero_cheque);
 			$pago->Edit('descripcion', $descripcion);
 			$pago->Edit('id_banco', $id_banco);
