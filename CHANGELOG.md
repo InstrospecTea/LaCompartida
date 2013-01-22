@@ -3,7 +3,7 @@
 
 Martes 22 de enero, 2013.
 
-* **Fixed:** [Permite crear nuevos asuntos (y de pasada nuevos contratos) cuando el cliente tiene autocompletador de asuntos y asunto secundario.](https://github.com/LemontechSA/ttb/pull/57)
+* **Fixed:** [Permite crear nuevos asuntos (y de pasada nuevos contratos) cuando el cliente tiene autocompletador de asuntos y asunto secundario](https://github.com/LemontechSA/ttb/pull/57)
 * **Fixed:** [Corrige la sección cliente de la nota de cobro cuando se utiliza desde la factura](https://github.com/LemontechSA/ttb/pull/57)
 * **Fixed:** [Corrige el selector de fecha en el buscador de cobros, paréntesis y selector](https://github.com/LemontechSA/ttb/pull/57)
 
