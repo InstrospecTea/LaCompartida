@@ -1,14 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/CobroAsunto.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('DAT', 'COB', 'SASU'));
 $pagina = new Pagina($sesion);
@@ -51,17 +42,22 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("#agregar_asunto").click(function() {
+			var CODCLIENTE = '<?php echo $codigo_cliente; ?>';
+			if (CODCLIENTE == '') {
+				if(jQuery("#campo_codigo_cliente_secundario").length>0) {
+					CODCLIENTE=jQuery("#campo_codigo_cliente_secundario").val();
+				} else {
+					CODCLIENTE=jQuery("#campo_codigo_cliente").val();
+				}
+			}
+			nuovaFinestra('Agregar_Asunto',850,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto');
+		});
+	});
 
-       jQuery(document).ready(function() {
-        jQuery("#agregar_asunto").click(function() {
-           var CODCLIENTE='<?php echo $codigo_cliente; ?>';
-           if (CODCLIENTE=='') {CODCLIENTE=jQuery("#campo_codigo_cliente").val();}
-           nuovaFinestra('Agregar_Asunto',850,600,'agregar_asunto.php?codigo_cliente='+CODCLIENTE+'&popup=1&motivo=agregar_proyecto');
-        });
-    });
 
-
-   // $('#agregar_asunto').click(function() {     alert("clickeado");        });
+	 // $('#agregar_asunto').click(function() {     alert("clickeado");        });
 
 	function GrabarCampo(accion,asunto,cobro,valor)
 	{
@@ -208,10 +204,10 @@ if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsu
 								</td>
 								<td nowrap class="al" colspan= 3>
 									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha1" class="fechadiff" value="<?php echo  $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
- 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									<?php echo  __('Hasta') ?>
 									<input onkeydown="if(event.keyCode==13)Listar( this.form, 'buscar' );" type="text" name="fecha2"  class="fechadiff"  value="<?php echo  $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
- 								</td>
+								</td>
 							</tr>
 							<tr>
 								<td class="ar" style="font-weight:bold;">
@@ -379,15 +375,15 @@ if ($buscar || $opc == "entregar_asunto") {
 
 function Cobrable(& $fila) {
 	/*    global $sesion;
-	  global $id_cobro;
-	  //echo $fila->fields['horas_no_cobradas'];
-	  $checked = '';
-	  if($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
-	  $checked = "checked";
+		global $id_cobro;
+		//echo $fila->fields['horas_no_cobradas'];
+		$checked = '';
+		if($fila->fields['id_cobro_asunto'] == $id_cobro and $id_cobro != '')
+		$checked = "checked";
 
-	  $id_moneda = $fila->fields['id_moneda'];
-	  $Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
-	  return $Check;
+		$id_moneda = $fila->fields['id_moneda'];
+		$Check = "<input type='checkbox' $checked onchange=GrabarCampo('agregar_asunto','".$fila->fields['codigo_asunto']."','$id_cobro',this.checked,'$id_moneda')>";
+		return $Check;
 	 */
 	global $id_cobro;
 	$checked = '';
