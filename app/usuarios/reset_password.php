@@ -89,6 +89,7 @@ MAIL;
 			if ($email == '' || !UtilesApp::isValidEmail($email)) {
 				$Sesion->error_msg = __('Debe ingresar un correo electrónico válido');
 				$view = 'enviar_instrucciones';
+				break;
 			}
 
 			$Usuario->LoadByEmail($email);
