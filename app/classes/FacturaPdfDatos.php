@@ -113,7 +113,6 @@
 			    case '19': $condicion_pago = __('Cheque 45 días'); break;
 			    case '20': $condicion_pago = __('Cheque 60 días'); break;
 			    case '21': $condicion_pago = __('Cheque a fecha'); break;
-			    
 			}
 			
 			$arreglo_monedas = ArregloMonedas($this->sesion);
@@ -124,12 +123,15 @@
 				case 'telefono': 			$glosa_dato = $contrato->fields['factura_telefono']; break;
 				case 'fecha_dia': 	 		$glosa_dato = date("d",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_mes':			$glosa_dato = strftime("%B",strtotime($factura->fields['fecha'])); break; 
+				case 'fecha_numero_mes':			$glosa_dato = strftime("%m",strtotime($factura->fields['fecha'])); break; 
 				case 'fecha_ano':			$glosa_dato = date("Y",strtotime($factura->fields['fecha'])); break;
 				case 'fecha_ano_ultima_cifra':		$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-1); break;
 				case 'fecha_ano_dos_ultimas_cifras':	$glosa_dato = substr(date("Y",strtotime($factura->fields['fecha'])),-2); break;
 				case 'direccion':			$glosa_dato = $factura->fields['direccion_cliente']; break;
 				case 'comuna':                          $glosa_dato = $factura->fields['comuna_cliente']; break;
 				case 'ciudad':                          $glosa_dato = $factura->fields['ciudad_cliente']; break;
+				case 'giro_cliente':                          $glosa_dato = $factura->fields['giro_cliente']; break;
+				case 'lugar':                          $glosa_dato =  UtilesApp::GetConf($this->sesion, 'LugarFacturacion'); break;
 				case 'nota_factura':			$glosa_dato = $condicion_pago; break;
 				case 'descripcion_honorarios':		$glosa_dato = $factura->fields['descripcion']; break;
 				case 'descripcion_gastos_con_iva': 	$glosa_dato = $factura->fields['descripcion_subtotal_gastos']; break;
@@ -181,9 +183,12 @@
 				$fila[ 'telefono']=				$contrato->fields['factura_telefono']; 
 				$fila[ 'comuna']=	 			$factura->fields['comuna_cliente']; 
 				$fila[ 'ciudad']=	 			$factura->fields['ciudad_cliente'];
+				$fila[ 'giro_cliente']=					$factura->fields['giro_cliente'];
+				$fila[ 'lugar']=					UtilesApp::GetConf($this->sesion, 'LugarFacturacion');
 				$fila[ 'nota_factura']=	 		$factura->fields['condicion_pago'];
 				$fila[ 'fecha_dia']= 	 		date("d",strtotime($factura->fields['fecha'])); 
 				$fila[ 'fecha_mes']=			strftime("%B",strtotime($factura->fields['fecha']));  
+				$fila[ 'fecha_numero_mes']=			strftime("%m",strtotime($factura->fields['fecha']));  
 				$fila[ 'fecha_ano']=			date("Y",strtotime($factura->fields['fecha']));
 				$fila[ 'fecha_ano_ultima_cifra']=		substr(date("Y",strtotime($factura->fields['fecha'])),-1);
 				$fila[ 'fecha_ano_dos_ultimas_cifras']=		substr(date("Y",strtotime($factura->fields['fecha'])),-2);
