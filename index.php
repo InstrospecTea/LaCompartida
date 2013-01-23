@@ -11,7 +11,7 @@ $_SESSION['ERROR'] = '';
 $Pagina->PrintHeaders();
 ?>
 <div style="padding-top: 50px; text-align: center">
-	<div style="border: 1px solid #999; width: 380px; margin: 0 auto;">
+	<div style="border: 1px solid #999; width: 400px; margin: 0 auto;">
 		<div style="background-color: #efefef; padding: 8px; margin-bottom: 5px;">
 			<?php echo Conf::AppName() ?>
 		</div>
@@ -22,7 +22,7 @@ $Pagina->PrintHeaders();
 				</tr>
 			</table>
 		<?php } ?>
-		<div style="padding: 5px">
+		<div style="padding: 10px">
 			<form action="<?php if(defined('APPDOMAIN')) echo str_replace(array('http:','https:'),'',APPDOMAIN); ?>app/usuarios/login.php" method="post">
 				<table style="width: 100%">
 					<tbody>
@@ -37,15 +37,15 @@ $Pagina->PrintHeaders();
 							<td align="right"><?php echo Conf::GetConf($Sesion, 'NombreIdentificador'); ?>:</td>
 							<td align="left">
 								<?php if (strtolower(UtilesApp::Getconf($Sesion, 'NombreIdentificador')) == 'rut') { ?>
-									<input type="text" name="rut" value="" size="10" /> - <input type="text"  name="dvrut" value="" size="1" />
+									<input type="text" name="rut" value="" style="width: 90%" /> - <input type="text"  name="dvrut" value="" size="1" />
 								<?php } else { ?>
-									<input type="text" name="rut" value="" size="17" />
+									<input type="text" name="rut" value="" style="width: 100%" />
 								<?php } ?>
 							</td>
 						</tr>
 						<tr>
 							<td align="right">Password:</td>
-							<td align="left"><input type="password" name="password" value="" size="17" /></td>
+							<td align="left"><input type="password" name="password" value="" style="width: 100%" /></td>
 						</tr>
 						<?php if (Conf::GetConf($Sesion, 'RecordarSesion')) { ?>
 							<tr>

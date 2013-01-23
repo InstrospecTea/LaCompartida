@@ -157,7 +157,7 @@ $Pagina->PrintTop(true);
 				</tr>
 			</table>
 		<?php } ?>
-		<div style="padding: 5px">
+		<div style="padding: 10px">
 			<form action="#" method="post">
 				<table style="width: 100%">
 					<tbody>
