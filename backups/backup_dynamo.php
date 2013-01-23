@@ -146,19 +146,7 @@ foreach ($temps as $temp) {
     $errores[] = loguear("error al borrar temporal antiguo $temp");
   }
 }
-if (!is_dir('/var/www/cache/S3')) {
-  mkdir('/var/www/cache/S3', 0755);
-}
-
-$S3sdk = new AmazonS3(array(
-      'key' => 'AKIAJDGKILFBFXH3Y2UA',
-      'secret' => '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',
-      'default_cache_config' => '/var/www/cache/S3')
-);
-
-if (!is_dir('/var/www/cache/dynamoDBbackups')) {
-  mkdir('/var/www/cache/dynamoDBbackups', 0755);
-}
+ 
 
 loguear('leyendo DynamoDB');
 $connection_params = array(
@@ -168,6 +156,7 @@ $connection_params = array(
 );
 
 $dynamodb = new AmazonDynamoDB($connection_params);
+$S3sdk = new AmazonS3($connection_params);
 
 $db_updater = new DatabaseUpdater(
   'c85ef9997e6a30032a765a20ee69630b',
@@ -180,18 +169,23 @@ $scan_response = $dynamodb->scan(array(
 
 $i = 0;
 
-foreach ($scan_response->body->Items as $registro) {
-  $i++;
-  foreach ($registro as $etiqueta => $objeto) {
-    foreach (get_object_vars($objeto) as $tipo => $valor) {
-      $arreglo[$i][$etiqueta] = $valor;
-    }
-  }
+foreach($scan_response->body->Items as $registro) {
+         $i++;
+         foreach($registro as $etiqueta=>$objeto) {
+                foreach(get_object_vars($objeto) as $tipo=>$valor)      $arreglo[$i][$etiqueta]= $valor;
+         }
+                 $apps[$arreglo[$i]['subdominiosubdir']]=$arreglo[$i];
 }
+$jsonscan=json_encode($arreglo);
 
-$jsonscan = json_encode($arreglo);
-file_put_contents('/var/www/backup_svn/dynamo.json', $jsonscan);
-loguear('termina la lectura de DynamoDB');
+$S3sdk->create_object('TTBfiles','dynamo2.json',
+                                        array('body' =>  $jsonscan)
+                                        );
+
+
+file_put_contents('/var/www/backup_svn/dynamo2.json',$jsonscan);
+ loguear('termina la lectura de DynamoDB');
+
 
 foreach ($arreglo as $sitio) {
   if (isset($argv[1]) && $argv[1] != $sitio['dbname']) {
@@ -256,9 +250,12 @@ foreach ($arreglo as $sitio) {
       /*       * ********* DUMPEANDO A GZIP ***************** */
 
       loguear("dumpeando a $path");
-      $sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db | gzip  > $path";
+      file_put_contents('/var/www/error_logs/backup_mysqlerror.txt','');
+
+      $sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt | gzip  > $path";
       //echo $sentencia;
       exec(" $sentencia ", $out, $ret);
+      $ret=file_get_contents('/var/www/error_logs/backup_mysqlerror.txt');
       if ($ret) {
         $errores[] = loguear("error generando dump para $db. retornado: $ret\noutput: " . implode("\n", $out));
         if (file_exists($path)) {
@@ -290,6 +287,8 @@ foreach ($arreglo as $sitio) {
     /*     * ********* CLONANDO ***************** */
     if ($dbclon && $dbclon != '' && $dbclon != '_') {
       loguear("clonando a " . $dbclon);
+      file_put_contents('/var/www/error_logs/backup_mysqlerror.txt','');
+
       $dbclonarray = explode(':', $dbclon);
       if (count($dbclonarray) == 2) {
         $dbclonarray['dbhost'] = $dbclonarray[0];
@@ -301,10 +300,10 @@ foreach ($arreglo as $sitio) {
       if ($dbclonarray['dbname'] == $db && $dbclonarray['dbhost'] == $sitio['dbhost']) {
         $errores[] = loguear("no se puede clonar " . $dbclonarray['dbhost'] . ".$db sobre si misma");
       } else {
-        $sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db |  mysql --host=" . $dbclonarray['dbhost'] . "   --user=" . $sitio['dbuser'] . "   --password=" . $sitio['dbpass'] . "  " . $dbclonarray['dbname'];
+        $sentencia = "mysqldump --disable-keys --skip-add-locks  --lock-tables=false --net_buffer_length=50000  --extended-insert  --delayed-insert  --insert-ignore --quick --single-transaction --add-drop-table  --host=" . $slavehost . " --user=" . $sitio['dbuser'] . "  --password=" . $sitio['dbpass'] . " $db 2>/var/www/error_logs/backup_mysqlerror.txt |  mysql --host=" . $dbclonarray['dbhost'] . "   --user=" . $sitio['dbuser'] . "   --password=" . $sitio['dbpass'] . "  " . $dbclonarray['dbname'];
         //echo $sentencia;
         exec(" $sentencia ", $out, $ret);
-
+        $ret=file_get_contents('/var/www/error_logs/backup_mysqlerror.txt');
         if ($ret) {
           $errores[] = loguear("error clonando $db en {$dbclonarray['dbhost']} {$dbclonarray['dbname']}: \n $sentencia \n $ret\noutput: " . implode("\n", $out));
         }
