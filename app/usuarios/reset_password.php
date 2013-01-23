@@ -223,11 +223,11 @@ $Pagina->PrintTop(true);
 						</tr>
 						<tr>
 							<td align="right"><label for="password"><?php echo __('Password'); ?></label>:</td>
-							<td align="left"><input type="password" name="password" id="password" size="25" /></td>
+							<td align="left"><input type="password" name="password" id="password" style="width: 100%;" /></td>
 						</tr>
 						<tr>
 							<td align="right"><label for="confirme_password"><?php echo __('Confirme Password'); ?></label>:</td>
-							<td align="left"><input type="password" name="confirme_password" id="confirme_password" size="25" /></td>
+							<td align="left"><input type="password" name="confirme_password" id="confirme_password" style="width: 100%;" /></td>
 						</tr>
 						<tr>
 							<td>&nbsp;</td>
@@ -252,7 +252,7 @@ $Pagina->PrintTop(true);
 						</tr>
 						<tr>
 							<td align="right"><label for="email"><?php echo __('Email'); ?></label>:</td>
-							<td align="left"><input type="email" name="email" id="email" value="<?php echo $email; ?>" size="28" /></td>
+							<td align="left"><input type="email" name="email" id="email" value="<?php echo $email; ?>" style="width: 100%;" /></td>
 						</tr>
 						<tr>
 							<td>&nbsp;</td>
