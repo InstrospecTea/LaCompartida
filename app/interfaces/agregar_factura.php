@@ -38,6 +38,8 @@ if ($id_cobro > 0) {
 	$cobro = new Cobro($sesion);
 	$cobro->load($id_cobro);
 
+$contrato=new Contrato($sesion);
+$contrato->Load($cobro->fields['id_contrato']);
 
 }
 
@@ -76,28 +78,7 @@ if ($id_cobro > 0) {
 	   $opc_inicial = $opcion;
 			if($opcion == "restaurar")
 			{
-				/*
-				 * comentado por Erwin, ya que el botón restaurar ahora hará cambio de estado por javascript
-				 * ya que tiene que actualizar valores de saldos e impuesto.
-				 */
-
-				/*$factura->Edit('estado','ABIERTA');
-				$factura->Edit('anulado',0);
-				$factura->Edit("id_estado", "1");
-				if($factura->Escribir())
-				{
-					$pagina->AddInfo(__('Documento Tributario').' '.__('restaurado con éxito'));
-					if( $id_cobro )
-					{
-						$cobror = new Cobro( $sesion ); #cobro restaurar
-						$cobror->Load($id_cobro);
-						if( $cobror->Loaded() )
-						{
-							$cobror->CambiarEstadoSegunFacturas();
-						}
-					}
-					$requiere_refrescar = "window.opener.Refrescar();";
-				}*/
+			
 				$opc_inicial = $opcion;
 				$opcion = "guardar";
 			}
@@ -150,22 +131,22 @@ if ($id_cobro > 0) {
 		$factura->Edit('condicion_pago',''.$condicion_pago);
 		$factura->Edit('iva', $iva);
 		$factura->Edit('total', '' . ($monto_neto + $iva));
-		$factura->Edit("id_factura_padre", $id_factura_padre ? $id_factura_padre : "NULL");
+		$factura->Edit("id_factura_padre", $id_factura_padre ? $id_factura_padre : NULL);
 		$factura->Edit("fecha", Utiles::fecha2sql($fecha));
-		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "NULL");
-		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "NULL");
-		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "NULL");
+		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
+		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
+		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
 		if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {
-			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "NULL");
+			$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		}
 		if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
 			$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
 		}
 		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
-			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
+			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "");
 		}
 		if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
-			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "NULL");
+			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "");
 		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
@@ -458,13 +439,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
  */
   //echo Autocompletador::CSS(); ?>
 
-<?php
-	// Revisar campo FACTURA_GIRO en tabla CONTRATO esta vacio..
 
- 	$id_contrato = $cobro->fields['id_contrato'];
-	$query = "SELECT factura_giro FROM contrato WHERE  id_contrato = $id_contrato AND codigo_cliente LIKE '$codigo_cliente'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	list($factura_giro) = mysql_fetch_array($resp);
 ?>
 
 <form method=post id="form_facturas" name="form_facturas">
@@ -491,6 +466,7 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
 	</div>
 	<!-- Fin calendario DIV -->
 	<br>
+
 	<table width='90%'>
 		<tr>
 			<td align=left><b>
@@ -595,25 +571,10 @@ if ($zona_horaria) {
 		</tr>
 		<tr>
 			<td align=right><?php echo  __('Cliente') ?></td>
-			<td align=left colspan=3><?php
-	/*	if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, '');
-			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, '', '', 280, '');
-			}
-		} else {
-			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "CambioCliente()", 280);
-			} else {
-				echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $factura->fields['codigo_cliente'] ? $factura->fields['codigo_cliente'] : $codigo_cliente, " ", "CambioCliente();", 280);
-			}
-		}*/
-			 UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario);
-?>
+			<td align=left colspan=3>
+				<?php	 UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 
-<!--<input type="text" name="cliente" value="<?php echo  $factura->fields['cliente'] ?>" id="cliente" size="70" maxlength="99" />-->
-				<span style="color:#FF0000; font-size:10px">*</span></td>
+ 				<span style="color:#FF0000; font-size:10px">*</span></td>
 		</tr>
 		<tr>
 		<?php if (UtilesApp::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
@@ -633,39 +594,37 @@ if ($zona_horaria) {
 		</tr>
 		<tr>
 			<td align=right><?php echo  __('Direcci&oacute;n Cliente') ?></td>
-			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?php echo  $factura->fields['direccion_cliente'] ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
+			<td align=left colspan=3><input type="text" name="direccion_cliente" value="<?php echo  ($factura->fields['direccion_cliente']? $factura->fields['direccion_cliente']:$contrato->fields['factura_direccion']) ?>" id="direccion_cliente" size="70" maxlength="255" /></td>
 		</tr>
 		<?php if( UtilesApp::existecampo('comuna_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align=right><?php echo  __('Comuna') ?></td>
-			<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo  $factura->fields['comuna_cliente'] ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
+			<td align=left colspan=3><input type="text" name="comuna_cliente" value="<?php echo  ($factura->fields['comuna_cliente']? $factura->fields['comuna_cliente']: $contrato->fields['factura_comuna'])  ?>" id="comuna_cliente" size="70" maxlength="255" /></td>
 		</tr>
 		<?php
 			}
-			
+			 
 if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
 		echo	'<tr>
 			<td align="right">'. __('Código Postal') .'</td>
-			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="'.  $factura->fields['factura_codigopostal'] .'" id="factura_codigopostal" size="70" maxlength="255" /></td>
+			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="'.  ($factura->fields['factura_codigopostal']? $factura->fields['factura_codigopostal']:$contrato->fields['factura_codigopostal']) .'" id="factura_codigopostal" size="70" maxlength="255" /></td>
 		</tr>';
-		}			
+		}
 
 			if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 		?>
 		<tr>
 			<td align="right"><?php echo __('Ciudad'); ?></td>
-			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  $factura->fields['ciudad_cliente'] ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
+			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  ($factura->fields['ciudad_cliente']) ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
 		</tr>
 
 		<?php }	if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
 		<tr>
 			<td align="right"><?php echo __('Giro'); ?></td>
 			
-			<?php if(empty($factura->fields['giro_cliente'] )) { ?>
-			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura_giro  ?>" id="giro_cliente" size="70" maxlength="255" /></td>
-			<?php }else { ?>
-			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura->fields['giro_cliente'] ?>" id="giro_cliente" size="70" maxlength="255" /></td>
-			<?php } ?>
+			
+			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  ($factura->fields['giro_cliente']?$factura->fields['giro_cliente']:$contrato->fields['factura_giro'])  ?>" id="giro_cliente" size="70" maxlength="255" /></td>
+			
 		</tr>
 			
 		<?php } ?>
@@ -1660,11 +1619,7 @@ if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
 </script>
 
  <?php
-/*if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador' ) || ( method_exists('Conf', 'TipoSelectCliente') && Conf::TipoSelectCliente() )) {
-	echo Autocompletador::Javascript($sesion, false, 'CambioCliente();');
-}
- echo InputId::Javascript($sesion);
- */
+
 
 
 

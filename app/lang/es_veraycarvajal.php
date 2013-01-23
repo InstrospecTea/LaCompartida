@@ -1,7 +1,5 @@
 <?php
 
-require_once Conf::ServerDir() . '/../fw/funciones/funciones.php';
-
 
 
 $_LANG['Vacaciones'] = "Vacaciones";
