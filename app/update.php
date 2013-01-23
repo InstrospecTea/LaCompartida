@@ -9613,8 +9613,58 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
-			
-				case 7.26:
+
+		case 7.26 :
+			$query = array();
+
+			$query[] = "INSERT ignore INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`)
+						VALUES (NULL , 'LugarFacturacion', '', 'Lugar desde el cual se factura', 'string', '1', '10');";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'lugar', 'Lugar') on duplicate key update glosa_tipo_dato='Lugar';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'giro_cliente', 'Giro') on duplicate key update glosa_tipo_dato='Giro';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (1, 'fecha_numero_mes', 'Fecha digito mes') on duplicate key update glosa_tipo_dato='Fecha digito mes';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			if (!ExisteCampo('giro_cliente', 'factura', $dbh)) {
+				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `ciudad_cliente`";
+			}
+
+			ejecutar($query, $dbh);
+			break;
+
+		case 7.27:
+			$queries = array();
+			if (!ExisteCampo('reset_password_token', 'usuario', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario`
+											 ADD  `reset_password_token` VARCHAR( 255 ) NULL,
+											 ADD  `reset_password_sent_at` DATETIME NULL;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.28:
 			$queries = array();
 			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `factura_comuna`;";
@@ -9622,19 +9672,20 @@ QUERY;
 				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `comuna_cliente`;";
 			}
-			
+
 			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
 								VALUES (2, 'factura_codigopostal', 'Código Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
 
 
 			$queries[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
-                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
-                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
-                                group by  pdl.id_documento_legal)";
-			
+									(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+									from factura_pdf_tipo_datos td, prm_documento_legal pdl
+									group by  pdl.id_documento_legal)";
+
 			ejecutar($queries, $dbh);
 			break;
+
 	}
 }
 
@@ -9643,7 +9694,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.26;
+$max_update = 7.28;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

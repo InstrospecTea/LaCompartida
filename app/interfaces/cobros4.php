@@ -39,6 +39,7 @@
         } else {
             $fecha_ini = $cobro->fields['fecha_ini'];
             $fecha_fin = $cobro->fields['fecha_fin'];
+			
         }
         
 	$cobro->Edit('etapa_cobro','3');
@@ -72,6 +73,11 @@
                     $where = "( $where OR cta_corriente.id_cobro = '$id_cobro' )";
                 }
 	}
+	
+	if (UtilesApp::GetConf($sesion,'UsaFechaDesdeCobranza'))
+			$fecha_ini = date("Y-m-d", strtotime($fecha_ini));
+			$fecha_fin = date("Y-m-d", strtotime($fecha_fin));
+			$and .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
 
 	$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
                           cta_corriente.*, 
@@ -87,8 +93,8 @@
                     LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda 
                     LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
                     $join_cobro_asunto 
-                    WHERE $where AND (egreso > 0 OR ingreso > 0)";
-        
+                    WHERE $where $and AND (egreso > 0 OR ingreso > 0)";
+	
                 if($check_gasto == 1 && isset($cobro))	//Check_trabajo vale 1 cuando aprietan boton buscar
 		{
 			$query2 = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro='$id_cobro'";

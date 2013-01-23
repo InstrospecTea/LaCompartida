@@ -1,4 +1,38 @@
 # Changelog
+## Hotfix: 12.1.10
+
+Martes 22 de enero, 2013.
+
+* **Fixed:** [Permite crear nuevos asuntos (y de pasada nuevos contratos) cuando el cliente tiene autocompletador de asuntos y asunto secundario](https://github.com/LemontechSA/ttb/pull/57)
+* **Fixed:** [Corrige la sección cliente de la nota de cobro cuando se utiliza desde la factura](https://github.com/LemontechSA/ttb/pull/57)
+* **Fixed:** [Corrige el selector de fecha en el buscador de cobros, paréntesis y selector](https://github.com/LemontechSA/ttb/pull/57)
+
+Para ver más historia de este hotfix, [ver aquí](https://github.com/LemontechSA/ttb/pull/57)
+
+## Hotfix: 12.1.9
+
+Viernes 18 de enero, 2013.
+
+* **Fixed:** [Arregla el hotfix 12.1.7 y corrige el problema de Memcached con acéntos](https://github.com/LemontechSA/ttb/pull/53)
+
+## Hotfix: 12.1.8
+
+Viernes 18 de enero, 2013.
+
+* **Fixed:** [Permite ingresar trabajos con código secundario](https://github.com/LemontechSA/ttb/commit/f1392f48fe40f22d11d4916ae47d40daf984eb4b)
+
+## Hotfix: 12.1.7
+
+Viernes 18 de enero, 2013.
+
+* **Fixed:** [Al agregar un pago en /agregar_pago_factura.php y definir un valor en el selector "concepto" (id_concepto) y posteriormente guardar no se postea el valor en la bd](https://github.com/LemontechSA/ttb/pull/52)
+
+## Hotfix: 12.1.6
+
+Miércoles 16 de enero, 2013.
+
+* **Fixed:** [Arregla filtro UsaCobranzaFechaDesde al emitir borradores](https://github.com/LemontechSA/ttb/pull/47)
+
 ## Hotfix: 12.1.5
 
 Viernes 11 de enero, 2013.

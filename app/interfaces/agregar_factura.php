@@ -164,6 +164,9 @@ if ($id_cobro > 0) {
 		if( UtilesApp::existecampo('ciudad_cliente', 'factura', $sesion)) {
 			$factura->Edit("ciudad_cliente", $ciudad_cliente ? addslashes($ciudad_cliente) : "NULL");
 		}
+		if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {
+			$factura->Edit("giro_cliente", $giro_cliente ? addslashes($giro_cliente) : "NULL");
+		}
 		$factura->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "");
 		$factura->Edit("id_cobro", $id_cobro ? $id_cobro : NULL);
 		$factura->Edit("id_documento_legal", $id_documento_legal ? $id_documento_legal : 1);
@@ -455,6 +458,15 @@ if ($monto_subtotal_gastos_sin_impuesto == '') {
  */
   //echo Autocompletador::CSS(); ?>
 
+<?php
+	// Revisar campo FACTURA_GIRO en tabla CONTRATO esta vacio..
+
+ 	$id_contrato = $cobro->fields['id_contrato'];
+	$query = "SELECT factura_giro FROM contrato WHERE  id_contrato = $id_contrato AND codigo_cliente LIKE '$codigo_cliente'";
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	list($factura_giro) = mysql_fetch_array($resp);
+?>
+
 <form method=post id="form_facturas" name="form_facturas">
 	<input type="hidden" name=opcion value="" />
 	<input type='hidden' name=id_factura id=id_factura value="<?php echo  $factura->fields['id_factura'] ?>" />
@@ -644,6 +656,18 @@ if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
 			<td align="right"><?php echo __('Ciudad'); ?></td>
 			<td align=left colspan=3><input type="text" name="ciudad_cliente" value="<?php echo  $factura->fields['ciudad_cliente'] ?>" id="ciudad_cliente" size="70" maxlength="255" /></td>
 		</tr>
+
+		<?php }	if( UtilesApp::existecampo('giro_cliente', 'factura', $sesion)) {	?>
+		<tr>
+			<td align="right"><?php echo __('Giro'); ?></td>
+			
+			<?php if(empty($factura->fields['giro_cliente'] )) { ?>
+			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura_giro  ?>" id="giro_cliente" size="70" maxlength="255" /></td>
+			<?php }else { ?>
+			<td align=left colspan=3><input type="text" name="giro_cliente" value="<?php echo  $factura->fields['giro_cliente'] ?>" id="giro_cliente" size="70" maxlength="255" /></td>
+			<?php } ?>
+		</tr>
+			
 		<?php } ?>
 		<tr>
 			<td align=right><?php echo  __('Condición de Pago') ?></td>
