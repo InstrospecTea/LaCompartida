@@ -2171,4 +2171,55 @@ HTML;
 		}
 		return $isValid;
 	}
+
+	public static function CorreoAreaComercial(array $userdata,$cant_visitas=0) {
+		$correos = array();
+					$correo = array( 'mail' => 'areacomercial@lemontech.cl', 'nombre' => 'Equipo Time Tracking' );
+					array_push($correos,$correo);
+					$subject = 'Demo1: Visitante repetetivo.';
+					$body = 'El visitante, <br><br>Nombre:       '.$userdata['nombre'].'
+																						<br>Apellido1:    '.$userdata['apellido1'].'
+																						<br>Apellido2:    '.$userdata['apellido2'].' 
+																						<br>Empresa:      '.$userdata['empresa'].'
+																						<br>Telefono:     '.$userdata['telefono'].'
+																						<br>Mail:         '.$userdata['email'].' 
+																						<br>País:         '.$userdata['pais'];
+					if($cant_visitas>0) $body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
+					return Utiles::EnviarMail($sesion,$correos,$subject,$body,false);
+	}
+	public static  function CrearUsuario($sesion,array $userdata,$id_visitante=false) {
+		$query = "SELECT id_notificacion_tt FROM usuario ORDER BY id_notificacion_tt DESC LIMIT 1";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list($id_notificacion) = mysql_fetch_array( $resp ); 
+
+					$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario DESC LIMIT 1";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list( $id_usuario ) = mysql_fetch_array($resp);
+					$id_usuario++;
+
+					$usuario = new Usuario($sesion);
+					$usuario->Edit('id_usuario',$id_usuario);
+					$usuario->Edit('rut',$userdata['rut']);
+					$usuario->Edit('email',$userdata['email']);
+					$usuario->Edit('nombre',$userdata['nombre']);
+					$usuario->Edit('apellido1',$userdata['apellido1']);
+					$usuario->Edit('apellido2',$userdata['apellido2']);
+                    $usuario->Edit('username',$userdata['nombre'].' '.$userdata['apellido1']);
+					$usuario->Edit('password',md5('12345'));
+					if($id_visitante) $usuario->Edit('id_visitante',$id_visitante);
+					$usuario->Edit('id_notificacion_tt',$id_notificacion);
+					$usuario->Write();
+
+					$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso ) 
+												VALUES ( ".$id_usuario.", 'ADM' ),
+															 ( ".$id_usuario.", 'ALL' ),
+															 ( ".$id_usuario.", 'COB' ),
+															 ( ".$id_usuario.", 'DAT' ),
+															 ( ".$id_usuario.", 'OFI' ),
+															 ( ".$id_usuario.", 'PRO' ),
+															 ( ".$id_usuario.", 'REP' ),
+															 ( ".$id_usuario.", 'REV' )";
+					return mysql_query($query,$sesion->dbh);
+}
+
 }
