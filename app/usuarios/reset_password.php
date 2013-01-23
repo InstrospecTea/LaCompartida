@@ -103,7 +103,7 @@ MAIL;
 				$token = Utiles::RandomString() . Utiles::RandomString() . Utiles::RandomString();
 				// 2. Guardar el token en el usuario
 				$Usuario->Edit('reset_password_token', $token);
-				$Usuario->Edit('reset_password_sent_at', date('Y-m-d H:i:s'));
+				$Usuario->Edit('reset_password_sent_at', 'NOW()');
 
 				if ($Usuario->Write()) {
 					// 3. Enviar mail
