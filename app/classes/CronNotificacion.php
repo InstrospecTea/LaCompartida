@@ -23,9 +23,14 @@ class CronNotificacion extends Cron {
 	private $datoDiario = array();
 
 	public function __construct() {
+		$this->fecha_cron = date('Y-m-d');
+		$this->FileNameLog = 'CronNotificacion';
+
 		parent::__construct();
+
 		$this->Alerta = new Alerta($this->Sesion);
 		$this->Notificacion = new Notificacion($this->Sesion);
+
 		if (method_exists('Conf', 'GetConf')) {
 			date_default_timezone_set(Conf::GetConf($this->Sesion, 'ZonaHoraria'));
 		} else {
@@ -34,11 +39,16 @@ class CronNotificacion extends Cron {
 	}
 
 	public function main($correo, $desplegar_correo = null) {
+		$this->log('INICIO CronNotificacion');
+
 		$this->Sesion->phpConsole();
 		$this->Sesion->debug('empieza el cron notificacion');
 		$this->correo = $correo;
 		$this->desplegar_correo = $desplegar_correo;
+
+		$this->log('INICIO semanales');
 		$this->semanales();
+		$this->log('INICIO diarios');
 		$this->diarios();
 
 		if (date("j") == 1) {
@@ -46,6 +56,8 @@ class CronNotificacion extends Cron {
 		}
 
 		$this->suspencion_pago();
+
+		$this->log('FIN CronNotificacion');
 	}
 
 	public function semanales() {
@@ -187,7 +199,6 @@ class CronNotificacion extends Cron {
 				}
 			}
 		}
-		// echo htmlentities(print_r($mail_semanal,true));
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 		foreach ($mensajes as $id_usuario => $mensaje) {
@@ -208,14 +219,23 @@ class CronNotificacion extends Cron {
 	 */
 
 	public function diarios() {
+		$this->log('- modificacion_contrato');
 		$this->modificacion_contrato();
+		$this->log('- limites_asuntos');
 		$this->limites_asuntos();
+		$this->log('- limites_contrato');
 		$this->limites_contrato();
+		$this->log('- limites_cliente');
 		$this->limites_cliente();
+		$this->log('- cierre_cobranza');
 		$this->cierre_cobranza();
+		$this->log('- ingreso_horas');
 		$this->ingreso_horas();
+		$this->log('- cobros_pagados');
 		$this->cobros_pagados();
+		$this->log('- hitos_cumplidos');
 		$this->hitos_cumplidos();
+		$this->log('- horas_mensuales');
 		$this->horas_mensuales();
 
 		// Fin del mail diario. Envío.
@@ -372,7 +392,6 @@ class CronNotificacion extends Cron {
 			if (($total_horas_trabajadas > $asunto->fields['limite_hh'])
 				&& ($asunto->fields['limite_hh'] > 0 )
 				&& ($asunto->fields['notificado_hr_excedido'] == 0)) {
-				echo "Límite de horas\n";
 				$this->datoDiario[$asunto_db['id_usuario']]['asunto_excedido'][$asunto->fields['codigo_asunto']]['limite_horas'] = array(
 					'cliente' => $asunto_db['glosa_cliente'],
 					'asunto' => $asunto->fields['glosa_asunto'],
@@ -418,26 +437,33 @@ class CronNotificacion extends Cron {
 
 	private function limites_contrato() {
 		$query_contratos = "SELECT contrato.id_contrato,
-								usuario_encargado_principal.id_usuario,
-								usuario_encargado_principal.username AS nombre_usuario,
-								usuario_encargado_secundario.id_usuario AS id_usuario_secundario,
-								usuario_encargado_secundario.username AS nombre_usuario_secundario,
-								cliente.glosa_cliente,
-								GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ',') as asuntos
-							FROM contrato
-								LEFT JOIN usuario usuario_encargado_principal ON (contrato.id_usuario_responsable = usuario_encargado_principal.id_usuario)
-								LEFT JOIN usuario usuario_encargado_secundario ON (contrato.id_usuario_secundario = usuario_encargado_secundario.id_usuario)
-								JOIN cliente ON (contrato.codigo_cliente = cliente.codigo_cliente)
-								JOIN asunto ON (asunto.id_contrato = contrato.id_contrato)
-							WHERE contrato.activo = 'SI'
-								AND cliente.activo = '1'
-								AND (contrato.id_usuario_responsable IS NOT NULL
-									OR contrato.id_usuario_secundario IS NOT NULL
-									OR (contrato.notificar_otros_correos IS NOT NULL
-										AND contrato.notificar_otros_correos <> ''))
-							GROUP BY contrato.id_contrato";
+			usuario_encargado_principal.id_usuario,
+			usuario_encargado_principal.username AS nombre_usuario,
+			usuario_encargado_secundario.id_usuario AS id_usuario_secundario,
+			usuario_encargado_secundario.username AS nombre_usuario_secundario,
+			cliente.glosa_cliente,
+			GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ',') as asuntos
+		FROM contrato
+			LEFT JOIN usuario usuario_encargado_principal ON (contrato.id_usuario_responsable = usuario_encargado_principal.id_usuario)
+			LEFT JOIN usuario usuario_encargado_secundario ON (contrato.id_usuario_secundario = usuario_encargado_secundario.id_usuario)
+			JOIN cliente ON (contrato.codigo_cliente = cliente.codigo_cliente)
+			JOIN asunto ON (asunto.id_contrato = contrato.id_contrato)
+		WHERE contrato.activo = 'SI'
+			AND cliente.activo = '1'
+			AND (contrato.id_usuario_responsable IS NOT NULL
+				OR contrato.id_usuario_secundario IS NOT NULL
+				OR (contrato.notificar_otros_correos IS NOT NULL
+					AND contrato.notificar_otros_correos <> ''))
+			AND (contrato.limite_monto > 0 OR contrato.limite_hh > 0 OR contrato.alerta_hh > 0 OR contrato.alerta_monto > 0)
+		GROUP BY contrato.id_contrato";
+
 		$contratos_db = $this->query($query_contratos);
 		$total_contratos_db = count($contratos_db);
+
+		if (!empty($total_contratos_db)) {
+			Contrato::QueriesPrevias($this->Sesion);
+		}
+
 		for ($x = 0; $x < $total_contratos_db; ++$x) {
 			$data_contrato = $contratos_db[$x];
 
@@ -448,21 +474,26 @@ class CronNotificacion extends Cron {
 			if ($contrato->fields['limite_monto'] > 0) {
 				list($total_monto, $moneda_total_monto) = $contrato->TotalMonto();
 			}
+
+			// Alerta de limite de horas emitidas
 			if ($contrato->fields['limite_hh'] > 0) {
 				$total_horas_trabajadas = $contrato->TotalHoras();
 			}
-			//Alerta de limite de horas no emitidas
+
+			// Alerta de limite de horas no emitidas
 			if ($contrato->fields['alerta_hh'] > 0) {
 				$total_horas_ult_cobro = $contrato->TotalHoras(false);
 			}
-			//Significa que se requiere alerta por monto no emitido
+
+			// Significa que se requiere alerta por monto no emitido
 			if ($contrato->fields['alerta_monto'] > 0) {
 				list($total_monto_ult_cobro, $moneda_desde_ult_cobro) = $contrato->TotalMonto(false);
 			}
 
-			//Notificacion "Límite de monto"
+			// Notificacion "Límite de monto"
 			$total_monto = number_format($total_monto, 1);
 			$total_monto_ult_cobro = number_format($total_monto_ult_cobro, 1);
+
 
 			if (($total_monto > $contrato->fields['limite_monto']) && ($contrato->fields['limite_monto'] > 0) && ($contrato->fields['notificado_monto_excedido'] == 0)) {
 
@@ -480,7 +511,6 @@ class CronNotificacion extends Cron {
 				}
 
 				if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
-					echo $contrato->fields['id_usuario_secundario'] . "\n";
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $data_contrato['nombre_usuario_secundario'];
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_monto'] = $contrato_excedido;
 				}
@@ -498,7 +528,7 @@ class CronNotificacion extends Cron {
 				$contrato->Write();
 			}
 
-			//Notificacion "Límite de horas"
+			// Notificacion "Límite de horas"
 			if (($total_horas_trabajadas > $contrato->fields['limite_hh']) && ($contrato->fields['limite_hh'] > 0 ) && ($contrato->fields['notificado_hr_excedido'] == 0)) {
 
 				$contrato_excedido = array(
@@ -513,7 +543,6 @@ class CronNotificacion extends Cron {
 				}
 
 				if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
-					echo $contrato->fields['id_usuario_secundario'] . "\n";
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $data_contrato['nombre_usuario_secundario'];
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['limite_horas'] = $contrato_excedido;
 				}
@@ -531,7 +560,7 @@ class CronNotificacion extends Cron {
 				$contrato->Write();
 			}
 
-			//Notificacion "Monto desde el último cobro"
+			// Notificacion "Monto desde el último cobro"
 			if (($total_monto_ult_cobro > $contrato->fields['alerta_monto']) && ($contrato->fields['alerta_monto'] > 0) && ($contrato->fields['notificado_monto_excedido_ult_cobro'] == 0)) {
 				$contrato_excedido = array(
 					'cliente' => $data_contrato['glosa_cliente'],
@@ -546,7 +575,6 @@ class CronNotificacion extends Cron {
 				}
 
 				if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
-					echo $contrato->fields['id_usuario_secundario'] . "\n";
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $data_contrato['nombre_usuario_secundario'];
 					if (!isset($this->datoDiario[$contrato->fields['id_usuario_secundario']]['contrato_excedido']))
 						$this->datoDiario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'] = array();
@@ -566,7 +594,7 @@ class CronNotificacion extends Cron {
 				$contrato->Write();
 			}
 
-			//Notificacion "Horas desde el último cobro"
+			// Notificacion "Horas desde el último cobro"
 			if (($total_horas_ult_cobro > $contrato->fields['alerta_hh']) && ($contrato->fields['alerta_hh'] > 0) && ($contrato->fields['notificado_hr_excedida_ult_cobro'] == 0)) {
 				$contrato_excedido = array(
 					'cliente' => $data_contrato['glosa_cliente'],
@@ -580,7 +608,6 @@ class CronNotificacion extends Cron {
 				}
 
 				if (!empty($contrato->fields['id_usuario_secundario']) && $contrato->fields['notificar_encargado_secundario'] == '1') {
-					echo $contrato->fields['id_usuario_secundario'] . "\n";
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['nombre_pila'] = $data_contrato['nombre_usuario_secundario'];
 					$this->datoDiario[$contrato->fields['id_usuario_secundario']]['contrato_excedido'][$contrato->fields['id_contrato']]['alerta_hh'] = $contrato_excedido;
 				}
