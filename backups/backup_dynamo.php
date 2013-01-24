@@ -237,7 +237,6 @@ foreach ($arreglo as $sitio) {
 
     if ($file_exists[Key] == $filebkp) {
       loguear("respaldo $filebkp ya existe: omitiendo...");
-      $db_updater->update('update_db', $sitio['subdominiosubdir'], $sitio['update_db']);
     } else {
       if (!file_exists($conf->dir_temp)) {
         loguear("creando directorio temporal " . $conf->dir_temp);
@@ -283,6 +282,7 @@ foreach ($arreglo as $sitio) {
         $errores[] = loguear("error al borrar el comprimido temporal $path");
       }
     }
+      $db_updater->update('update_db', $sitio['subdominiosubdir'], $sitio['update_db']);
 
     /*     * ********* CLONANDO ***************** */
     if ($dbclon && $dbclon != '' && $dbclon != '_') {
