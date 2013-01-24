@@ -1,4 +1,10 @@
 # Changelog
+## Hotfix: 12.1.11
+
+Jueves 24 de enero, 2013.
+
+* **Fixed:** [Diferencias en el código del profesional en los trámites de Cobro entre Archivo Excel y Word](https://github.com/LemontechSA/ttb/pull/59)
+
 ## Hotfix: 12.1.10
 
 Martes 22 de enero, 2013.
