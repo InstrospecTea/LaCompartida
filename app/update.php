@@ -9612,6 +9612,7 @@ QUERY;
 				$queries[] = "ALTER TABLE contrato ADD codigo_contrato VARCHAR(20), add index (codigo_contrato);";
 			}
 			ejecutar($queries, $dbh);
+
 			break;
 
 		case 7.26 :
@@ -9738,6 +9739,7 @@ if (isset($_GET['lastver'])) {
 			echo '<hr>Comienzo de proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
 
 			try {
+
 				if (!mysql_query("START TRANSACTION", $sesion->dbh))
 					throw new Exception(mysql_error($sesion->dbh));
 
@@ -9745,15 +9747,19 @@ if (isset($_GET['lastver'])) {
 					throw new Exception(mysql_error($sesion->dbh));
 
 				Actualizaciones($sesion->dbh, $new_version);
-
 				if (!mysql_query("COMMIT", $sesion->dbh))
 					throw new Exception(mysql_error($sesion->dbh));
 			} catch (Exception $exc) {
-				if (!mysql_query("ROLLBACK", $sesion->dbh))
-					echo 'Error en ROLLBACK: ' . mysql_error($sesion->dbh);
+				$error_message = '';
+				if (!mysql_query("ROLLBACK", $sesion->dbh)) {
+					$error_message .= 'Error en ROLLBACK: ' . '<br />' ;
+				}
+				$error_message .= 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br />';
+				$error_message .= 'Se encontró un error: ' . $exc->getMessage() . '<br />';
+				echo($error_message);
 
-				echo 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
-				echo( 'Se encontró un error: ' . $exc->getMessage() );
+				EnviarLogError($error_message, $exc, $sesion);
+
 				exit(1);
 			}
 
@@ -9764,6 +9770,26 @@ if (isset($_GET['lastver'])) {
 				echo '<p>Su software está corriendo la versi&oacute;n ' . number_format($VERSION, 2, '.', '') . '</p>';
 		}
 	}
+}
+
+function EnviarLogError($error_message, $e, $sesion) {
+	$array_correo = array(
+		array('mail' => 'implementacion@lemontech.cl',
+				'nombre' => 'Implementación Lemontech'
+		),
+		array('mail' => 'soporte@lemontech.cl',
+				'nombre' => 'Soporte Lemontech'
+		),
+	);
+	$mail =<<<MAIL
+<p>Ha ocurrido un error al actualizar</p>
+
+<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
+
+<p>$error_message</p>
+MAIL;
+
+	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function GuardarVersion($versionFileName, $new_version, $sesion) {
