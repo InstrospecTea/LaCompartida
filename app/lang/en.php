@@ -1,6 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../fw/funciones/funciones.php';
 
 $_LANG['Asunto'] = "Matter";
 $_LANG['Asuntos'] = "Matters";
@@ -808,3 +807,5 @@ $_LANG['Categoría'] = "Category";
 $_LANG['Dirección'] = 'Address';
 $_LANG['Importe'] = 'Fees';
 $_LANG['Importes'] = 'Fees';
+
+$_LANG['Código Postal'] = "Postal Code";

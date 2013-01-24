@@ -9663,6 +9663,29 @@ QUERY;
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.28:
+			$queries = array();
+			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `factura_comuna`;";
+			}
+				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `comuna_cliente`;";
+			}
+
+			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'factura_codigopostal', 'Código Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
+
+
+			$queries[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+									(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+									from factura_pdf_tipo_datos td, prm_documento_legal pdl
+									group by  pdl.id_documento_legal)";
+
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -9671,7 +9694,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.27;
+$max_update = 7.28;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

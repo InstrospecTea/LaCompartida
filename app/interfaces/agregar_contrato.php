@@ -2031,6 +2031,17 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</tr>
 										<?php
 									}
+if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $sesion)) { ?>
+								<tr>
+									<td align="right" colspan="1">
+								<?php echo __('Código Postal'); ?>
+																</td>
+									<td align="left" colspan="5">
+										<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
+									</td>
+								</tr>
+										<?php
+									}									
 									if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 										?>
 								<tr>
