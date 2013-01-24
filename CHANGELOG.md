@@ -1,4 +1,18 @@
 # Changelog
+## Release: 13.0.0
+
+Jueves 24 de enero, 2013.
+
+* **New:** [Recupera archivo Backup Dynamo](https://github.com/LemontechSA/ttb/issues/58)
+* **New:** [Cambios para clientes mexicanos](https://github.com/LemontechSA/ttb/issues/54)
+* **New:** [Se agregan los campos giro y lugar de emisión a la factura factura](https://github.com/LemontechSA/ttb/issues/49)
+* **New:** [Restablecer Password](https://github.com/LemontechSA/ttb/issues/48)
+* **New:** [Muestra la versión de software que está corriendo un ambiente](https://github.com/LemontechSA/ttb/issues/45)
+* **New:** [Elimina popup al descargar excel revisar horas](https://github.com/LemontechSA/ttb/issues/43)
+* **New:** [filtra correos según dirección válida](https://github.com/LemontechSA/ttb/issues/39)
+* **Fixed:** [Traducción a anchor %fecha_con_de% al inglés](https://github.com/LemontechSA/ttb/issues/37)
+
+
 ## Hotfix: 12.1.11
 
 Jueves 24 de enero, 2013.
