@@ -584,7 +584,7 @@ if ($zona_horaria) {
 				<input type="text" name="RUT_cliente" value="<?php echo $factura->fields['RUT_cliente'] ?>" id="RUT_cliente" size="40" maxlength="20" />
 			</td>
 		<?php } else { ?>
-			<td align="right"><?php echo __('RUT/NIT'); ?></td>
+			<td align="right"><?php echo __('ROL/RUT'); ?></td>
 			<td align="left" colspan="3"><input type="text" name="RUT_cliente" value="<?php echo $factura->fields['RUT_cliente'] ?>" id="RUT_cliente" size="70" maxlength="20" /></td>
 		<?php } ?>
 		</tr>
