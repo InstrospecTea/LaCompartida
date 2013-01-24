@@ -607,7 +607,7 @@ if ($zona_horaria) {
 if( UtilesApp::existecampo('factura_codigopostal', 'factura', $sesion)) {
 		echo	'<tr>
 			<td align="right">'. __('Código Postal') .'</td>
-			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="'.  ($factura->fields['factura_codigopostal']? $factura->fields['factura_codigopostal']:$contrato->fields['factura_codigopostal']) .'" id="factura_codigopostal" size="70" maxlength="255" /></td>
+			<td align="left" colspan="3"><input type="text" name="factura_codigopostal" value="'.  ($factura->fields['factura_codigopostal']? $factura->fields['factura_codigopostal']:$contrato->fields['factura_codigopostal']) .'" id="factura_codigopostal" size="30" maxlength="20" /></td>
 		</tr>';
 		}
 

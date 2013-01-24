@@ -9667,10 +9667,10 @@ QUERY;
 		case 7.28:
 			$queries = array();
 			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
-				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `factura_comuna`;";
+				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `factura_comuna`;";
 			}
 				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 10 ) NOT NULL AFTER  `comuna_cliente`;";
+				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `comuna_cliente`;";
 			}
 
 			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
