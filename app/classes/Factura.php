@@ -593,14 +593,14 @@ class Factura extends Objeto {
 
 				$glosa_cliente = $this->fields['cliente'];
 				$direccion_cliente = $this->fields['direccion_cliente'];
-				if( UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
+				if (UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
 					$ciudad_cliente = $this->fields['ciudad_cliente'];
 				}
-				if( UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion)) {
-				$comuna_cliente = $this->fields['comuna_cliente'];
+				if (UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion)) {
+					$comuna_cliente = $this->fields['comuna_cliente'];
 				}
-				if( UtilesApp::existecampo('giro_cliente', 'factura', $this->sesion)) {
-				$giro_cliente = $this->fields['giro_cliente'];
+				if (UtilesApp::existecampo('giro_cliente', 'factura', $this->sesion)) {
+					$giro_cliente = $this->fields['giro_cliente'];
 				}
 
 				$MAX = UtilesApp::GetConf($this->sesion, 'AnchoMaximoGlosaCliente');
@@ -629,8 +629,8 @@ class Factura extends Objeto {
 				$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($direccion_cliente), $html2);
 				$html2 = str_replace('%comuna_cliente%', $comuna_cliente, $html2);
 				$html2 = str_replace('%ciudad_cliente%', $ciudad_cliente, $html2);
-				$html2 = str_replace('%giro_cliente%', UtilesApp::GetConf($this->sesion, 'LugarFacturacion'), $html2);
-				$html2 = str_replace('%lugar_facturacion%', UtilesApp::GetConf($Sesion, $direccion_cliente), $html2);
+				$html2 = str_replace('%giro_cliente%', $giro_cliente, $html2);
+				$html2 = str_replace('%lugar_facturacion%', UtilesApp::GetConf($this->sesion, 'LugarFacturacion'), $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
