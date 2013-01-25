@@ -161,7 +161,7 @@ class UsuarioExt extends Usuario {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while (list( $id_tarifa, $id_moneda, $tarifa) = mysql_fetch_array($resp)) {
-			$query2 = "INSERT usuario_tarifa SET id_usuario = '" . $id . "', id_moneda = '" . $id_moneda . "', tarifa = " . $tarifa . ", id_tarifa = '" . $id_tarifa . "' 
+			$query2 = "INSERT usuario_tarifa SET id_usuario = '" . $id . "', id_moneda = '" . $id_moneda . "', tarifa = " . $tarifa . ", id_tarifa = '" . $id_tarifa . "'
 									ON DUPLICATE KEY UPDATE tarifa = '" . $tarifa . "'";
 			$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
 		}
@@ -320,7 +320,7 @@ class UsuarioExt extends Usuario {
 	function select_revisados() {
 		$query =
 			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
-			FROM 
+			FROM
 			usuario JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisado)
 			WHERE id_revisor = '" . $this->fields['id_usuario'] . "' AND usuario.activo = 1 AND usuario.id_usuario <> '" . $this->fields['id_usuario'] . "'
 			ORDER BY usuario.nombre, usuario.apellido1";
@@ -336,9 +336,9 @@ class UsuarioExt extends Usuario {
 		$query_otros =
 			"SELECT usuario.id_usuario, CONCAT_WS(' ',nombre,apellido1,apellido2) AS nombre
 			FROM usuario
-			WHERE id_usuario NOT IN ( 
-				SELECT usuario_revisor.id_revisado 
-				FROM usuario_revisor 
+			WHERE id_usuario NOT IN (
+				SELECT usuario_revisor.id_revisado
+				FROM usuario_revisor
 				WHERE id_revisor = '" . $this->fields['id_usuario'] . "'  ) AND activo = 1 AND usuario.id_usuario <> '" . $this->fields['id_usuario'] . "'
 				ORDER BY usuario.nombre, usuario.apellido1";
 		$html = Html::SelectQuery($this->sesion, $query_otros, "usuarios_fuera", '', " style='width:200px'", "", "220");
@@ -497,11 +497,11 @@ class UsuarioExt extends Usuario {
 		 * Ej:
 		 * AND nombre_dato IN ('id_categoria_usuario','activo');
 		 * Otros datos
-		 * 
+		 *
 		 * dias_ingreso_trabajo
 		 * permisos
 		 * etc.
-		 * 
+		 *
 		 */
 		$nombre_dato = "";
 		if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'FiltroHistorialUsuarios') != '') {
@@ -510,15 +510,15 @@ class UsuarioExt extends Usuario {
 			$nombre_dato = " AND nombre_dato IN ( '" . $filtros . "' )";
 		}
 
-		$query = "SELECT 
+		$query = "SELECT
 						usuario_historial.id_usuario_creador,
 						usuario_historial.nombre_dato,
 						usuario_historial.valor_original,
 						usuario_historial.valor_actual,
-						usuario_historial.fecha, 
+						usuario_historial.fecha,
 						usuario.nombre,
 						usuario.apellido1,
-						usuario.apellido2 
+						usuario.apellido2
 					FROM usuario_cambio_historial usuario_historial ";
 		$query .= " JOIN usuario ON usuario.id_usuario = usuario_historial.id_usuario_creador";
 		$query .= " WHERE usuario_historial.id_usuario = '" . $id_usuario . "' ";
@@ -617,11 +617,11 @@ class UsuarioExt extends Usuario {
 	 * @return array Usuarios del sistema según la condición del $where
 	 */
 	public static function GetUsuarios(&$Sesion, $where = '') {
-		$query = "SELECT 
-					id_usuario, 
+		$query = "SELECT
+					id_usuario,
 					CONCAT_WS(', ', apellido1, nombre) as nombre,
 					email
-				FROM usuario 
+				FROM usuario
 				$where
 				ORDER BY apellido1";
 		$result = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
@@ -664,7 +664,7 @@ class UsuarioExt extends Usuario {
 		// Buscar las entidades que no tienen relacion o clase
 		$query = "SELECT * FROM prm_categoria_usuario WHERE id_categoria_usuario = '{$this->fields['id_categoria_usuario']}'";
 		$categoria = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
-		
+
 		return array(
 			'NombreCompleto' => $this->NombreCompleto(),
 			'Email' => $this->fields['email'],
@@ -674,6 +674,14 @@ class UsuarioExt extends Usuario {
 
 	public function TienePermiso($permiso){
 		return $this->permisos->Find('FindPermiso', array('codigo_permiso' => $permiso))->fields['permitido'];
+	}
+
+	public function LoadWithToken($token) {
+		$query = "SELECT * FROM " . $this->tbl_usuario
+						. " WHERE reset_password_token = '$token'"
+						. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
+
+		return $this->LoadWithQuery($query);
 	}
 }
 
