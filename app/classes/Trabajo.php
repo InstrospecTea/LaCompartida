@@ -53,7 +53,7 @@ class Trabajo extends Objeto
 
 	}
 
-	function Write($ingreso_historial = true)
+	function Write($ingreso_historial = true, $espera_excepcion = false)
 	{
 		if($this->Loaded())
 			{
@@ -111,7 +111,12 @@ class Trabajo extends Objeto
 						return false;
 					}
 			} catch (Exception $e) {
-				throw new Exception($e->getMessage());
+				if($espera_excepcion) {
+					throw new Exception($e->getMessage());
+				}
+				else {
+					return false;
+				}
 			}
 
 	}
@@ -121,7 +126,7 @@ class Trabajo extends Objeto
 			throw new Exception('No se puede mover un trabajo cobrado');
 		} else {
 
-		$horasenfecha=$this->HorasEnFecha($this->fields['fecha'],$this->fields['id_usuario']);
+		$horasenfecha = $this->HorasEnFecha($this->fields['fecha'], $this->fields['id_usuario'], $this->fields['id_trabajo']);
 
 		$duracion=$this->fields['duracion'];
 		$duracionsegundos=strtotime($duracion)-strtotime('today');
@@ -137,9 +142,10 @@ class Trabajo extends Objeto
 	/*
 	 * param $fecha fecha que se quiere verificar en formato 'YYYY-MM-DD'
 	 * param $id_usuario id usuario, opcional
+	 * param $id_trabajo id trabajo, opcional (para no contarlo 2 veces si se edita)
 	 * return array $duracion, un array con llaves duracion y duracion_cobrada
 	 */
-	function HorasEnFecha($fecha=null,$id_usuario=null) {
+	function HorasEnFecha($fecha=null, $id_usuario=null, $id_trabajo=null) {
 		if($fecha==null) {
 			$fecha=date('Y-m-d');
 		}
@@ -147,6 +153,9 @@ class Trabajo extends Objeto
 		$queryhoras="select sum(time_to_sec(duracion)) as duracion, sum(time_to_sec(duracion_cobrada)) as duracion_cobrada from trabajo where fecha='$fecha'";
 		if($id_usuario!=null) {
 			$queryhoras.=" and id_usuario ='$id_usuario'";
+		}
+		if(!empty($id_trabajo)) {
+			$queryhoras.=" and id_trabajo != '$id_trabajo'";
 		}
  		$duracion=$this->sesion->pdodbh->query($queryhoras)->fetchAll(PDO::FETCH_ASSOC);
 		return $duracion[0];

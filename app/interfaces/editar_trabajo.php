@@ -44,7 +44,7 @@
                     $semana=Utiles::fecha2sql($fecha);
                     $t->Edit('fecha',$semana);
                    	 try {
-                    $t->Write(true);
+                    $t->Write(true, true);
                     die('semana|'.$semana);
                      } catch (Exception $e) {
 						header('HTTP/1.0 401 Unauthorized');
@@ -63,7 +63,7 @@
                 }
 					 
 					try {
-                    $t->Write(true);
+                    $t->Write(true, true);
 					 if(date('N',strtotime($t->fields['fecha']))==1) {
 						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']));
 						} else {
@@ -290,7 +290,8 @@
                                     $t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
 							
 							if($t->fields['cobrable']==0) $t->fields['duracion_cobrada']='00:00:00';
-                            if($t->Write())
+							try{
+								if($t->Write(true, true))
                             {
                                     if( $actualizar_trabajo_tarifa )
                                             $t->InsertarTrabajoTarifa();
@@ -307,6 +308,9 @@
                                     </script>
     <?php
                             }
+							} catch(Exception $e) {
+								$pagina->AddError($e->getMessage());
+                    }
                     }
                     else
                     {
