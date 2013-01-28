@@ -9804,7 +9804,7 @@ function EnviarLogError($error_message, $e, $sesion) {
 <p>$error_message</p>
 MAIL;
 
-	//Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
+	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function GuardarVersion($versionFileName, $new_version, $sesion) {
