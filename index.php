@@ -9,8 +9,6 @@ $Pagina = new Pagina($Sesion, true);
 $_SESSION['ERROR'] = '';
 
 $Pagina->PrintHeaders();
-
-echo date('Y-m-d', mktime(0, 0, 0, 1, 100, 2012));
 ?>
 <div style="padding-top: 50px; text-align: center">
 	<div style="border: 1px solid #999; width: 400px; margin: 0 auto;">
