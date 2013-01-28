@@ -48,6 +48,8 @@ if (isset($_POST['accion'])) {
 			$Usuario->Edit('password', md5($passwd));
 			$Usuario->Edit('reset_password_token', 'NULL');
 			$Usuario->Edit('reset_password_sent_at', 'NULL');
+			$Usuario->Edit('force_reset_password', 'NULL');
+			$Usuario->Edit('reset_password_by', 'U');
 
 			if ($Usuario->Write()) {
 				$host = Conf::Host();
@@ -144,7 +146,12 @@ MAIL;
 
 $Pagina->titulo = __('Restablecer Password');
 $Pagina->PrintTop(true);
+$modulo_password_strength = Conf::GetConf($Sesion, 'PasswordStrength') || false;
+if ($modulo_password_strength) {
+	PasswordStrength::PrintCSS("180px");
+}
 ?>
+
 <div style="padding-top: 50px; text-align: center">
 	<div style="border: 1px solid #999; width: 400px; margin: 0 auto;">
 		<div style="background-color: #efefef; padding: 8px; margin-bottom: 5px;">
@@ -223,12 +230,20 @@ $Pagina->PrintTop(true);
 						</tr>
 						<tr>
 							<td align="right"><label for="password"><?php echo __('Password'); ?></label>:</td>
-							<td align="left"><input type="password" name="password" id="password" style="width: 100%;" /></td>
+							<td align="left"><input type="text" name="password" id="password" style="width: 100%;" />
+							</td>
 						</tr>
 						<tr>
 							<td align="right"><label for="confirme_password"><?php echo __('Confirme Password'); ?></label>:</td>
 							<td align="left"><input type="password" name="confirme_password" id="confirme_password" style="width: 100%;" /></td>
 						</tr>
+						<?php
+						if ($modulo_password_strength) {
+							echo "<tr><td align='left' colspan='2'>";
+							PasswordStrength::PrintHTML();
+							echo "</td></tr>";
+						}
+						?>
 						<tr>
 							<td>&nbsp;</td>
 							<td align="left">
@@ -273,5 +288,16 @@ $Pagina->PrintTop(true);
 		</div>
 	</div>
 </div>
+<script type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		<?php
+		if ($modulo_password_strength) {
+			PasswordStrength::PrintJS("password");
+		}
+		?>
+	});
+</script>
 <?php
 $Pagina->PrintBottom(true);
+

@@ -586,20 +586,6 @@ switch ($accion) {
 						glosa_valuacion = '$glosa_valuacion', fecha_creacion = '" . Utiles::fecha2sql(date()) . "'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		break;
-	case 'rate_password':
-		$password = '';
-		if (isset($_POST['password'])) {
-			$password = $_POST['password'];
-		}
-	  if (strlen($password)==0 || !$password) {
-	    echo 1;
-	    break;
-	  }
-  	$ch = curl_init();
-  	curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/accounts/RatePassword?Passwd=' . urlencode($password));
-  	curl_exec($ch);
-  	curl_closE($ch);
-  	break;
 	default:
 		echo("ERROR");
 };

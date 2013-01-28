@@ -26,6 +26,7 @@ if ($opc == "eliminar") {
 }
 
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
+$modulo_password_strength = Conf::GetConf($sesion, 'PasswordStrength') || false;
 
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
@@ -742,83 +743,12 @@ if (!empty($usuario_vacaciones)) {
 	</fieldset>
 </form>
 <br/><br/>
-<?php if ($usuario->loaded) { ?>
-	<style type="text/css" media="screen">
-		div#change_password_information {
-			display: none;
-		}
-		div#passwordMeterFormItem {
-			width: 210px;
-		}
-		table#passwordMeter {
-			width: 100%;
-			height: 10px;
-			margin: 0;
-			clear: both;
-		}
-		span#passwordStrengthLabel {
-			float: left;
-		}
-		table#passwordMeter tbody, table#passwordMeter tr {
-			border: none;
-		}
-		table#passwordMeter td {
-			padding: 0;
-			height: 10px;
-		}
-		table#passwordMeter td#barLeft {
-			background-color: #e0e0e0;
-			width: 0%;
-		}
-		table#passwordMeter td#barRight {
-			background-color: #e0e0e0;
-			width: 100%;
-		}
-		table#passwordMeter td#barLeft.Weak {
-			width: 25%;
-			background-color: #AA0033;
-		}
-		table#passwordMeter td#barRight.Weak {
-			width: 75%;
-		}
-		table#passwordMeter td#barLeft.Fair {
-			width: 50%;
-			background-color: #FFCC33;
-		}
-		table#passwordMeter td#barRight.Fair {
-			width: 50%;
-		}
-		table#passwordMeter td#barLeft.Good {
-			width: 75%;
-			background-color: #6699CC;
-		}
-		table#passwordMeter td#barRight.Good {
-			width: 25%;
-		}
-		table#passwordMeter td#barLeft.Strong {
-			width: 100%;
-			background-color: #008000;
-		}
-		table#passwordMeter td#barRight.Strong {
-			width: 0%;
-		}
-		span#passwordStrengthDescription {
-			display: block;
-			float: right;
-		}
-		span#passwordStrengthDescription.Weak {
-			color: #AA0033;
-		}
-		span#passwordStrengthDescription.Fair {
-			color: #FFCC33;
-		}
-		span#passwordStrengthDescription.Good {
-			color: #6699CC;
-		}
-		span#passwordStrengthDescription.Strong {
-			color: #008000;
-		}
-	</style>
+<?php
+if ($usuario->loaded) {
+	if ($modulo_password_strength) {
+		PasswordStrength::PrintCSS();
+	}
+?>
 	<form  method="post" action="<?php echo $SERVER[PHP_SELF] ?>">
 		<input type="hidden" name="opc" value="pass" />
 		<input type="hidden" name="rut" value="<?php echo $rut ?>" />
@@ -839,7 +769,7 @@ if (!empty($usuario_vacaciones)) {
 							?>
 							<span><?php echo __('Establecida por el') . " $reset_password_by" ?></span>
 							<a href="#" id="change_password_link" ><?php echo __('Cambiar contraseña') ?></a><br/>
-							<div id="change_password_information">
+							<div id="change_password_information" style="display:none">
 								<?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
 								<strong><?php echo __('Atención') ?></strong>: <?php echo __('La contraseña anterior será reemplazada e imposible de recuperar.') ?><br/><br/>
 
@@ -849,18 +779,11 @@ if (!empty($usuario_vacaciones)) {
 										<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
 										<input type="text" name="new_password" id="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
 									</div>
-									<div id='passwordMeterFormItem' style='float:left'>
-										<label>
-											<span id='passwordStrengthLabel'>Fortaleza</span>
-											<span id='passwordStrengthDescription'></span>
-										</label>
-										<table id='passwordMeter'>
-											<tr>
-												<td id='barLeft'></td>
-												<td id='barRight'></td>
-											</tr>
-										</table>
-									</div>
+									<?php
+									if ($modulo_password_strength) {
+										PasswordStrength::PrintHTML();
+									}
+									?>
 								</div>
 								<div>
 									<input type="radio" name="genpass" value="1" id="rand_pass" />
@@ -942,40 +865,12 @@ function CargarPermisos() {
 				icons: { primary: this.checked ? 'ui-icon-check' : 'ui-icon-closethick' }
 			});
 		});
-		var WITHOUT_CLASIFICATION = 5;
-		var passwor_callback = function(passwordCode) {
-			var word = 'Sin clasificar';
-			var strclass = 'without';
-			switch (passwordCode) {
-			case '0':
-				word = 'Muy insegura'
-				strclass = 'Weak'
-				break;
-			case '1':
-				word = 'Insegura';
-				strclass = 'Weak'
-				break;
-			case '2':
-				word = 'Normal';
-				strclass = 'Fair';
-				break;
-			case '3':
-				word = 'Buena';
-				strclass = 'Good';
-				break;
-			case '4':
-				word = 'Segura';
-				strclass = 'Strong';
-				break;
-			}
-			jQuery('table#passwordMeter td#barLeft').removeClass();
-			jQuery('table#passwordMeter td#barRight').removeClass();
-			jQuery('table#passwordMeter td#barLeft').addClass(strclass);
-			jQuery('table#passwordMeter td#barRight').addClass(word);
-			jQuery('span#passwordStrengthDescription').html(word);
-			jQuery('span#passwordStrengthDescription').removeClass();
-			jQuery('span#passwordStrengthDescription').addClass(strclass);
-		};
+
+		<?php
+		if ($modulo_password_strength) {
+			PasswordStrength::PrintJS("new_password");
+		}
+		?>
 
 		jQuery('#change_password_link').live('click', function() {
 			var lang_cambiar = "<?php echo __('Cambiar contraseña'); ?>";
@@ -987,29 +882,16 @@ function CargarPermisos() {
 			jQuery('#change_password_information').toggle();
 			jQuery('#new_password').val('');
 			jQuery('#new_passa, #rand_pass').attr('checked', false);
-			passwor_callback(WITHOUT_CLASIFICATION);
+
+			<?php
+			if ($modulo_password_strength) {
+				PasswordStrength::PrintJSReset();
+			}
+			?>
+
 			return false;
 		});
 
-		jQuery('#new_password').typeWatch({
-			callback: function() {
-				var password = jQuery(this.el).val();
-				if (password) {
-					jQuery.ajax({
-						type: 'POST',
-						url: '../ajax.php',
-						data: { accion: 'rate_password', password: password},
-						success: passwor_callback,
-						async:false
-					});
-				} else {
-					passwor_callback(WITHOUT_CLASIFICATION);
-				}
-			},
-			wait: 250,
-			highlight: false,
-			captureLength: 0
-		 });
 	});
 
 
