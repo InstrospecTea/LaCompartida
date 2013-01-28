@@ -9686,7 +9686,22 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+		case 7.29:
+			$queries = array();
 
+			$queries[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
+												VALUES ( NULL ,  'PasswordStrength',  '0', 'Utilizar seguridad de Contraseñas' ,  'boolean',  '6',  '-1' );";
+
+			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
+			}
+
+			if (!ExisteCampo('usuario', 'password_by', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `reset_password_by` VARCHAR(1) DEFAULT 'U';";
+			}
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9695,7 +9710,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.28;
+$max_update = 7.29;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
@@ -9789,7 +9804,7 @@ function EnviarLogError($error_message, $e, $sesion) {
 <p>$error_message</p>
 MAIL;
 
-	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
+	//Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function GuardarVersion($versionFileName, $new_version, $sesion) {
