@@ -9,6 +9,8 @@ $Pagina = new Pagina($Sesion, true);
 $_SESSION['ERROR'] = '';
 
 $Pagina->PrintHeaders();
+
+echo date('Y-m-d', mktime(0, 0, 0, 1, 100, 2012));
 ?>
 <div style="padding-top: 50px; text-align: center">
 	<div style="border: 1px solid #999; width: 400px; margin: 0 auto;">
@@ -37,7 +39,7 @@ $Pagina->PrintHeaders();
 							<td align="right"><?php echo Conf::GetConf($Sesion, 'NombreIdentificador'); ?>:</td>
 							<td align="left">
 								<?php if (strtolower(UtilesApp::Getconf($Sesion, 'NombreIdentificador')) == 'rut') { ?>
-									<input type="text" name="rut" value="" style="width: 65%" /> - <input type="text"  name="dvrut" value="" size="1" />
+									<input type="text" name="rut" value="" style="width: 63%" /> - <input type="text"  name="dvrut" value="" size="1" />
 								<?php } else { ?>
 									<input type="text" name="rut" value="" style="width: 100%" />
 								<?php } ?>
