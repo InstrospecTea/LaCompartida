@@ -801,8 +801,10 @@ if ($usuario->loaded) {
 								$force_reset_password = $usuario->fields['force_reset_password'];
 								$checked_str = ($force_reset_password && $force_reset_password == "1") ? "checked" : "";
 							?>
+						<label>
 							<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
 							<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
+						</label>
 					<td>
 				</tr>
 				<tr>

@@ -64,11 +64,13 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$_GET['lastver'] = 1;
 				include(Conf::ServerDir() . '/update.php');
 			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../') .'</b><br>';
-			$environment = file_get_contents( dirname(__FILE__) . '/../../../environment.txt');
-			$source_version = file_get_contents( dirname(__FILE__) . '/../../../VERSION');
-			$deploy_revision = file_get_contents( dirname(__FILE__) . '/../../../REVISION');
-			$deploy_stage = $environment;
-			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
+			$path_environment = dirname(__FILE__) . '/../../../environment.txt';
+			$path_source_version = dirname(__FILE__) . '/../../../VERSION';
+			$path_deploy_revision = dirname(__FILE__) . '/../../../REVISION';
+			$environment = is_readable($path_environment) ? file_get_contents($path_environment) : '';
+			$source_version = is_readable($path_source_version) ? file_get_contents($path_source_version) : '';
+			$deploy_revision = is_readable($path_deploy_revision) ? file_get_contents($path_deploy_revision) : '';
+			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy:&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
 
 			}
 
