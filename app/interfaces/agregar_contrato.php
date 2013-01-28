@@ -122,12 +122,13 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		} else {
 			$tarifa = new Tarifa($sesion);
 			$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+                        $_REQUEST['id_tarifa'] = $id_tarifa;
 		}
 	}
 
 	if ($usuario_responsable_obligatorio && empty($id_usuario_responsable) or $id_usuario_responsable == '-1') {
 		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
-		$val = true;
+		$val = strue;
 	}
 
 	if (UtilesApp::GetConf($sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
