@@ -60,7 +60,7 @@ if ($opc == 'edit') {
 	$usuario->Edit('dir_numero', $dir_numero);
 	$usuario->Edit('dir_depto', $dir_depto);
 	$usuario->Edit('dir_comuna', $dir_comuna);
-	  */
+		*/
 
 	$usuario->Edit('email', $email);
 	$usuario->Edit('activo', $activo);
@@ -119,20 +119,26 @@ if ($opc == 'edit') {
 	}
 }
 else if ($opc == 'pass' and $usuario->loaded) {
-	if ($genpass > 0)
-		$new_password = Utiles::NewPassword();
+ 	if (isset($genpass)) {
+		if ($genpass > 0) {
+			$new_password = Utiles::NewPassword();
+		}
+		$usuario->Edit('reset_password_by', 'A');
+		$usuario->Edit('password', md5($new_password));
+	}
 
-	$usuario->Edit('password', md5($new_password));
+	$force_reset = (isset($force_reset_password) && $force_reset_password == '1') ? $force_reset_password : 0;
+	$usuario->Edit('force_reset_password', $force_reset);
 
 	if ($usuario->Write()) {
 		$pagina->AddInfo(__('Contraseña modificada con éxito'));
-
-		if ($genpass > 0)
+		if ($genpass > 0) {
 			$pagina->AddInfo(__('Nueva contraseña:') . ' ' . $new_password);
-	}
-	else {
+		}
+	} else {
 		$pagina->AddError($usuario->error);
 	}
+
 } elseif ($opc == 'cancelar')
 	$pagina->Redirect('usuario_paso1.php');
 elseif ($opc == 'elimina_vacacion' and $usuario->loaded) {
@@ -153,6 +159,7 @@ if ($usuario->loaded)
 $lista_monedas = new ListaObjetos($sesion, "", "SELECT * FROM prm_moneda");
 $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la selección, presiona la tecla <strong>CTRL</strong> al momento de hacer <strong>clic</strong>.");
 ?>
+<script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 <script language="javascript" type="text/javascript">
 <?php if ($usuario->loaded) { ?>
 		function CheckActivo(activo)
@@ -736,7 +743,82 @@ if (!empty($usuario_vacaciones)) {
 </form>
 <br/><br/>
 <?php if ($usuario->loaded) { ?>
-
+	<style type="text/css" media="screen">
+		div#change_password_information {
+			display: none;
+		}
+		div#passwordMeterFormItem {
+			width: 210px;
+		}
+		table#passwordMeter {
+			width: 100%;
+			height: 10px;
+			margin: 0;
+			clear: both;
+		}
+		span#passwordStrengthLabel {
+			float: left;
+		}
+		table#passwordMeter tbody, table#passwordMeter tr {
+			border: none;
+		}
+		table#passwordMeter td {
+			padding: 0;
+			height: 10px;
+		}
+		table#passwordMeter td#barLeft {
+			background-color: #e0e0e0;
+			width: 0%;
+		}
+		table#passwordMeter td#barRight {
+			background-color: #e0e0e0;
+			width: 100%;
+		}
+		table#passwordMeter td#barLeft.Weak {
+			width: 25%;
+			background-color: #AA0033;
+		}
+		table#passwordMeter td#barRight.Weak {
+			width: 75%;
+		}
+		table#passwordMeter td#barLeft.Fair {
+			width: 50%;
+			background-color: #FFCC33;
+		}
+		table#passwordMeter td#barRight.Fair {
+			width: 50%;
+		}
+		table#passwordMeter td#barLeft.Good {
+			width: 75%;
+			background-color: #6699CC;
+		}
+		table#passwordMeter td#barRight.Good {
+			width: 25%;
+		}
+		table#passwordMeter td#barLeft.Strong {
+			width: 100%;
+			background-color: #008000;
+		}
+		table#passwordMeter td#barRight.Strong {
+			width: 0%;
+		}
+		span#passwordStrengthDescription {
+			display: block;
+			float: right;
+		}
+		span#passwordStrengthDescription.Weak {
+			color: #AA0033;
+		}
+		span#passwordStrengthDescription.Fair {
+			color: #FFCC33;
+		}
+		span#passwordStrengthDescription.Good {
+			color: #6699CC;
+		}
+		span#passwordStrengthDescription.Strong {
+			color: #008000;
+		}
+	</style>
 	<form  method="post" action="<?php echo $SERVER[PHP_SELF] ?>">
 		<input type="hidden" name="opc" value="pass" />
 		<input type="hidden" name="rut" value="<?php echo $rut ?>" />
@@ -745,20 +827,60 @@ if (!empty($usuario_vacaciones)) {
 			<legend><?php echo __('Cambio de contraseña') ?></legend>
 			<table width="100%">
 				<tr>
-					<td colspan="2" class="texto" align="left">
-			<?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
-						<strong><?php echo __('Atención') ?></strong>: <?php echo __('La contraseña anterior será reemplazada e imposible de recuperar.') ?><br/>
+					<td width="100" align="left">
+						<strong><?php echo __('Contraseña') ?>:</strong>
 					</td>
+					<td align="left">
+							<?php
+								$reset_password_by = __('Administrador');
+								if ($usuario->fields['reset_password_by'] == 'U') {
+									$reset_password_by = __('Usuario');
+								}
+							?>
+							<span><?php echo __('Establecida por el') . " $reset_password_by" ?></span>
+							<a href="#" id="change_password_link" ><?php echo __('Cambiar contraseña') ?></a><br/>
+							<div id="change_password_information">
+								<?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
+								<strong><?php echo __('Atención') ?></strong>: <?php echo __('La contraseña anterior será reemplazada e imposible de recuperar.') ?><br/><br/>
+
+								<div style="height:35px">
+									<div style="float:left">
+										<input type="radio" name="genpass" value="0" id="new_pass" />
+										<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
+										<input type="text" name="new_password" id="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
+									</div>
+									<div id='passwordMeterFormItem' style='float:left'>
+										<label>
+											<span id='passwordStrengthLabel'>Fortaleza</span>
+											<span id='passwordStrengthDescription'></span>
+										</label>
+										<table id='passwordMeter'>
+											<tr>
+												<td id='barLeft'></td>
+												<td id='barRight'></td>
+											</tr>
+										</table>
+									</div>
+								</div>
+								<div>
+									<input type="radio" name="genpass" value="1" id="rand_pass" />
+									<label for="rand_pass"><?php echo __('Generar contraseña aleatoria') ?></label>
+								</div>
+							</div>
+					<td>
 				</tr>
 				<tr>
-					<td width="20">&nbsp;</td>
-					<td class="texto" align="left">
-						<input type="radio" name="genpass" value="0" id="new_pass" />
-						<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
-						<input type="text" name="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
-						<input type="radio" name="genpass" value="1" checked="checked" id="rand_pass" />
-						<label for="rand_pass"><?php echo __('Generar contraseña aleatoria') ?></label>
+					<td width="100" align="left">
+						<strong>&nbsp;</strong>
 					</td>
+					<td align="left">
+							<?php
+								$force_reset_password = $usuario->fields['force_reset_password'];
+								$checked_str = ($force_reset_password && $force_reset_password == "1") ? "checked" : "";
+							?>
+							<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
+							<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
+					<td>
 				</tr>
 				<tr>
 					<td align="right" colspan="2">
@@ -820,9 +942,75 @@ function CargarPermisos() {
 				icons: { primary: this.checked ? 'ui-icon-check' : 'ui-icon-closethick' }
 			});
 		});
+		var WITHOUT_CLASIFICATION = 5;
+		var passwor_callback = function(passwordCode) {
+			var word = 'Sin clasificar';
+			var strclass = 'without';
+			switch (passwordCode) {
+			case '0':
+				word = 'Muy insegura'
+				strclass = 'Weak'
+				break;
+			case '1':
+				word = 'Insegura';
+				strclass = 'Weak'
+				break;
+			case '2':
+				word = 'Normal';
+				strclass = 'Fair';
+				break;
+			case '3':
+				word = 'Buena';
+				strclass = 'Good';
+				break;
+			case '4':
+				word = 'Segura';
+				strclass = 'Strong';
+				break;
+			}
+			jQuery('table#passwordMeter td#barLeft').removeClass();
+			jQuery('table#passwordMeter td#barRight').removeClass();
+			jQuery('table#passwordMeter td#barLeft').addClass(strclass);
+			jQuery('table#passwordMeter td#barRight').addClass(word);
+			jQuery('span#passwordStrengthDescription').html(word);
+			jQuery('span#passwordStrengthDescription').removeClass();
+			jQuery('span#passwordStrengthDescription').addClass(strclass);
+		};
+
+		jQuery('#change_password_link').live('click', function() {
+			var lang_cambiar = "<?php echo __('Cambiar contraseña'); ?>";
+			if (jQuery(this).text() == lang_cambiar) {
+				jQuery(this).text('Cancelar');
+			} else {
+				jQuery(this).text(lang_cambiar);
+			}
+			jQuery('#change_password_information').toggle();
+			jQuery('#new_password').val('');
+			jQuery('#new_passa, #rand_pass').attr('checked', false);
+			passwor_callback(WITHOUT_CLASIFICATION);
+			return false;
+		});
+
+		jQuery('#new_password').typeWatch({
+			callback: function() {
+				var password = jQuery(this.el).val();
+				if (password) {
+					jQuery.ajax({
+						type: 'POST',
+						url: '../ajax.php',
+						data: { accion: 'rate_password', password: password},
+						success: passwor_callback,
+						async:false
+					});
+				} else {
+					passwor_callback(WITHOUT_CLASIFICATION);
+				}
+			},
+			wait: 250,
+			highlight: false,
+			captureLength: 0
+		 });
 	});
-
-
 
 
 	window.onbeforeunload = function(){
