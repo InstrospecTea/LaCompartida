@@ -1015,6 +1015,20 @@ list($cant_encargados) = mysql_fetch_array($resp);
 						}
 					}
 
+					function CreaTramiteTarifa(form, opcion, id_tramite_tarifa)
+					{
+						var form = $('formulario');
+						if(opcion)
+							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
+						else
+						{
+							//var id_tramite_tarifa = form.id_tramite_tarifa.value;
+							if(!id_tramite_tarifa)
+								var id_tramite_tarifa = jQuery('#id_tramite_tarifa').val();
+							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
+						}
+					}
+
 					function ActualizarTarifaTramiteDesdePopup() {
 						//document.getElementById('id_tramite_tarifa_holder').innerHtml = "<select name='' id=''><option>me los cagué a todos</option></select>";
 						var http = getXMLHTTP();
@@ -1059,17 +1073,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 						http.send(null);
 					}
 	
-					function CreaTramiteTarifa(form, opcion)
-					{
-						var form = $('formulario');
-						if(opcion)
-							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
-						else
-						{
-							var id_tramite_tarifa = form.id_tramite_tarifa.value;
-							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
-						}
-					}
+
 
 					/*
 	Desactivar contrato para no verlo en cobros. (generación)
