@@ -25,12 +25,23 @@ if (isset($_GET['endswitch']) && isset($_SESSION['switchuser'])) {
 
 $pagina = new Pagina($sesion);
 
+if ($sesion->logged) {
+  $Usuario = $sesion->usuario;
+  $force_reset_password = $Usuario->fields['force_reset_password'];
+  if ($force_reset_password && $force_reset_password == 1) {
+    $token = Utiles::RandomString() . Utiles::RandomString() . Utiles::RandomString();
+    $Usuario->Edit('reset_password_token', $token);
+    $Usuario->Edit('reset_password_sent_at', 'NOW()');
+    if ($Usuario->Write()) {
+      $location_page = Conf::RootDir() . "/app/usuarios/reset_password.php?token=$token";
+      header("Location: $location_page");
+    }
+  }
+}
 
 $pagina->titulo = "Bienvenido a " . Conf::AppName();
 
 $pagina->PrintTop();
-
-
 
 
 
