@@ -230,7 +230,7 @@ if ($modulo_password_strength) {
 						</tr>
 						<tr>
 							<td align="right"><label for="password"><?php echo __('Password'); ?></label>:</td>
-							<td align="left"><input type="text" name="password" id="password" style="width: 100%;" />
+							<td align="left"><input type="password" name="password" id="password" style="width: 100%;" />
 							</td>
 						</tr>
 						<tr>
