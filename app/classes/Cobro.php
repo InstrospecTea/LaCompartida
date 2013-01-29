@@ -1918,11 +1918,18 @@ class Cobro extends Objeto {
 					$cobro_moneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
 
 					###### GASTOS ######
+					if (UtilesApp::Getconf($this->sesion, 'UsaFechaDesdeCobranza')) {
+						$and_fecha .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+					} else {
+						$and_fecha .= "AND cta_corriente.fecha <= '$fecha_fin'";
+					}
+
 					if (!empty($incluye_gastos)) {
-						if ($solo_gastos == true)
+						if ($solo_gastos == true) {
 							$where = '(cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)';
-						else
+						} else {
 							$where = '1';
+						}
 
 						$query_gastos = "SELECT cta_corriente.* FROM cta_corriente
 												LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto OR cta_corriente.codigo_asunto IS NULL
@@ -1932,7 +1939,7 @@ class Cobro extends Objeto {
 												AND cta_corriente.cobrable = 1
 												AND cta_corriente.codigo_cliente = '" . $contrato->fields['codigo_cliente'] . "'
 												AND (asunto.id_contrato = '" . $contrato->fields['id_contrato'] . "')
-												AND cta_corriente.fecha <= '$fecha_fin'";
+												$and_fecha";
 						$lista_gastos = new ListaGastos($this->sesion, '', $query_gastos);
 						for ($v = 0; $v < $lista_gastos->num; $v++) {
 							$gasto = $lista_gastos->Get($v);
@@ -1950,10 +1957,11 @@ class Cobro extends Objeto {
 						if ($solo_gastos != true) {
 							$emitir_trabajo = new Objeto($this->sesion, '', '', 'trabajo', 'id_trabajo');
 							$where_up = '1';
-							if ($fecha_ini == '' || $fecha_ini == '0000-00-00')
+							if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
 								$where_up .= " AND fecha <= '$fecha_fin' ";
-							else
+							} else {
 								$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							}
 							$query2 = "SELECT * FROM trabajo
 													JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 													JOIN contrato ON asunto.id_contrato = contrato.id_contrato

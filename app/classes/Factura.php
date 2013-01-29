@@ -1,18 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once 'Cobro.php';
-require_once 'Cliente.php';
-require_once 'Asunto.php';
-require_once 'CobroMoneda.php';
-require_once 'Moneda.php';
-require_once 'MontoEnPalabra.php';
-require_once 'UtilesApp.php';
-require_once 'NotaCobro.php';
 
 class Factura extends Objeto {
 	var $max_numero = 1000000000;
@@ -43,7 +31,11 @@ class Factura extends Objeto {
 		),
 		array (
 			'field' => 'numero',
+			'format' => 'number',
 			'title' => 'N° Documento',
+			'extras' => array(
+				'subtotal' => false
+			)
 		),
 		array (
 			'field' => 'factura_rsocial',
@@ -92,6 +84,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -101,6 +94,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -110,6 +104,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -119,6 +114,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -128,6 +124,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -137,6 +134,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -146,6 +144,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -159,6 +158,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -168,6 +168,7 @@ class Factura extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -530,16 +531,15 @@ class Factura extends Objeto {
 				$html2 = str_replace('%DATOS_FACTURA%', $this->GenerarDocumento($parser_factura, 'DATOS_FACTURA', $lang), $html2);
 				$html2 = str_replace('%BOTTOM%', $this->GenerarDocumento($parser_factura, 'BOTTOM', $lang), $html2);
 				$html2 = str_replace('%BOTTOM_COPIA%', $this->GenerarDocumento($parser_factura, 'BOTTOM_COPIA', $lang), $html2);
+				$html2 = str_replace('%CLIENTE%', $cobro->GenerarSeccionCliente($parser_factura->tags['CLIENTE'], $idioma, $moneda, $asunto), $html2);
+				$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumentoComun($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
+
 				if ($cobro->fields['modalidad_calculo'] == 1) {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumentoComun($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento2($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumentoComun($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento2($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento2($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				} else {
-					$html2 = str_replace('%CLIENTE%', $cobro->GenerarDocumentoComun($parser_factura, 'CLIENTE', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%DETALLE_COBRO%', $cobro->GenerarDocumento($parser_factura, 'DETALLE_COBRO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
-					$html2 = str_replace('%SALTO_PAGINA%', $cobro->GenerarDocumentoComun($parser_factura, 'SALTO_PAGINA', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%ASUNTOS%', $cobro->GenerarDocumento($parser_factura, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 					$html2 = str_replace('%GASTOS%', $cobro->GenerarDocumento($parser_factura, 'GASTOS', $parser_carta, $moneda_Cliente_cambio, $moneda_cli, $lang, $html3, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html2);
 				}
@@ -593,11 +593,14 @@ class Factura extends Objeto {
 
 				$glosa_cliente = $this->fields['cliente'];
 				$direccion_cliente = $this->fields['direccion_cliente'];
-				if( UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
+				if (UtilesApp::existecampo('ciudad_cliente', 'factura', $this->sesion)) {
 					$ciudad_cliente = $this->fields['ciudad_cliente'];
 				}
-				if( UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion)) {
-				$comuna_cliente = $this->fields['comuna_cliente'];
+				if (UtilesApp::existecampo('comuna_cliente', 'factura', $this->sesion)) {
+					$comuna_cliente = $this->fields['comuna_cliente'];
+				}
+				if (UtilesApp::existecampo('giro_cliente', 'factura', $this->sesion)) {
+					$giro_cliente = $this->fields['giro_cliente'];
 				}
 
 				$MAX = UtilesApp::GetConf($this->sesion, 'AnchoMaximoGlosaCliente');
@@ -626,6 +629,8 @@ class Factura extends Objeto {
 				$html2 = str_replace('%direccion_cliente_mayuscula%', strtoupper($direccion_cliente), $html2);
 				$html2 = str_replace('%comuna_cliente%', $comuna_cliente, $html2);
 				$html2 = str_replace('%ciudad_cliente%', $ciudad_cliente, $html2);
+				$html2 = str_replace('%giro_cliente%', $giro_cliente, $html2);
+				$html2 = str_replace('%lugar_facturacion%', UtilesApp::GetConf($this->sesion, 'LugarFacturacion'), $html2);
 				$html2 = str_replace('%num_dia%', date('d', strtotime($fecha_factura)), $html2);
 				$html2 = str_replace('%glosa_mes%', str_replace($meses_org, $mes_largo_es, date('M', strtotime($fecha_factura))), $html2);
 				$html2 = str_replace('%num_anio%', date('Y', strtotime($fecha_factura)), $html2);
