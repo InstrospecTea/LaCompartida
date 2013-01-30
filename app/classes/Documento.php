@@ -206,9 +206,7 @@ class Documento extends Objeto {
 				 $this->Write();
 
 			} else {
-				if (!empty($pagina)) {
-					$pagina->AddError($documento->error);
-				}
+				 throw new Exception($this->error);
 			}
 
 			/* 			}
