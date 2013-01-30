@@ -30,7 +30,7 @@ while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql
 	$encolados[] = array(json_encode($adresses), $subject);
 	if (count($correos) > 0) {
 
-		if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, false, $id_archivo_anexo)) {
+		if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, true, $id_archivo_anexo)) {
 
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=" . $id;
 			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);

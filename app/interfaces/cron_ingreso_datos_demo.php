@@ -7,6 +7,8 @@
 	require_once Conf::ServerDir().'/classes/Cobro.php';
 	require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
+set_time_limit(0);
+
 /*
 Valores necesarios:
 fecha_ini
