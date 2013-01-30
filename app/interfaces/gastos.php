@@ -761,7 +761,7 @@ if(typeof(window.tablagastos.fnDraw)=='function'  )  window.tablagastos.fnDraw()
                             </td>
                             <td></td>
                         </tr>
-						<?php if (!$nuevo_modulo_gastos) { ?>
+					<?php if (!$nuevo_modulo_gastos || $sesion->usuario->fields['rut']=='99511620') { ?>
 							<tr>
 	                            <td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
 	                            <td colspan="2" align="left">
