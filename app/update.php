@@ -9689,9 +9689,6 @@ QUERY;
 		case 7.29:
 			$queries = array();
 
-			$queries[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-												VALUES ( NULL ,  'PasswordStrength',  '0', 'Utilizar seguridad de Contraseñas' ,  'boolean',  '6',  '-1' );";
-
 			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
 				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
 			}

@@ -26,7 +26,6 @@ if ($opc == "eliminar") {
 }
 
 $modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
-$modulo_password_strength = Conf::GetConf($sesion, 'PasswordStrength') || false;
 
 if ($opc == 'edit') {
 	//Arreglo Original, antes de guardar los cambios $arr1
@@ -745,9 +744,7 @@ if (!empty($usuario_vacaciones)) {
 <br/><br/>
 <?php
 if ($usuario->loaded) {
-	if ($modulo_password_strength) {
-		PasswordStrength::PrintCSS();
-	}
+	PasswordStrength::PrintCSS();
 ?>
 	<form  method="post" action="<?php echo $SERVER[PHP_SELF] ?>">
 		<input type="hidden" name="opc" value="pass" />
@@ -779,11 +776,7 @@ if ($usuario->loaded) {
 										<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
 										<input type="text" name="new_password" id="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
 									</div>
-									<?php
-									if ($modulo_password_strength) {
-										PasswordStrength::PrintHTML();
-									}
-									?>
+									<?php PasswordStrength::PrintHTML(); ?>
 								</div>
 								<div>
 									<input type="radio" name="genpass" value="1" id="rand_pass" />
@@ -868,11 +861,7 @@ function CargarPermisos() {
 			});
 		});
 
-		<?php
-		if ($modulo_password_strength) {
-			PasswordStrength::PrintJS("new_password");
-		}
-		?>
+		<?php PasswordStrength::PrintJS("new_password"); ?>
 
 		jQuery('#change_password_link').live('click', function() {
 			var lang_cambiar = "<?php echo __('Cambiar contraseña'); ?>";
@@ -885,11 +874,7 @@ function CargarPermisos() {
 			jQuery('#new_password').val('');
 			jQuery('#new_passa, #rand_pass').attr('checked', false);
 
-			<?php
-			if ($modulo_password_strength) {
-				PasswordStrength::PrintJSReset();
-			}
-			?>
+			<?php PasswordStrength::PrintJSReset(); ?>
 
 			return false;
 		});

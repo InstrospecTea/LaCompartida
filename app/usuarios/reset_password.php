@@ -146,10 +146,8 @@ MAIL;
 
 $Pagina->titulo = __('Restablecer Password');
 $Pagina->PrintTop(true);
-$modulo_password_strength = Conf::GetConf($Sesion, 'PasswordStrength') || false;
-if ($modulo_password_strength) {
-	PasswordStrength::PrintCSS("180px");
-}
+PasswordStrength::PrintCSS("180px");
+
 ?>
 
 <div style="padding-top: 50px; text-align: center">
@@ -237,13 +235,9 @@ if ($modulo_password_strength) {
 							<td align="right"><label for="confirme_password"><?php echo __('Confirme Password'); ?></label>:</td>
 							<td align="left"><input type="password" name="confirme_password" id="confirme_password" style="width: 100%;" /></td>
 						</tr>
-						<?php
-						if ($modulo_password_strength) {
-							echo "<tr><td align='left' colspan='2'>";
-							PasswordStrength::PrintHTML();
-							echo "</td></tr>";
-						}
-						?>
+						<tr><td align='left' colspan='2'>
+						<?php PasswordStrength::PrintHTML(); ?>
+						</td></tr>
 						<tr>
 							<td>&nbsp;</td>
 							<td align="left">
@@ -291,11 +285,7 @@ if ($modulo_password_strength) {
 <script type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		<?php
-		if ($modulo_password_strength) {
-			PasswordStrength::PrintJS("password");
-		}
-		?>
+		<?php PasswordStrength::PrintJS("password"); ?>
 	});
 </script>
 <?php
