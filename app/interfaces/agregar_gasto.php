@@ -1,24 +1,13 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Gasto.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-// require_once Conf::ServerDir().'/classes/GastoGeneral.php';
+
+require_once dirname(__FILE__) . '/../conf.php'; 
 
 $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_usuario'];
 
 $gasto = new Gasto($sesion);
+global $gasto;
 // $gastoGeneral = new GastoGeneral($sesion);
 
 $ingreso = new Gasto($sesion);
@@ -44,6 +33,7 @@ if ( ( $gasto->Loaded() && $gasto->fields['egreso'] > 0 ) || $prov == 'false') {
 	$txt_tipo = __('Provisión');
 	$prov = 'true';
 }
+	
 
 if ($opcion == "guardar") {
 	if (!$codigo_cliente && $codigo_cliente_secundario) {
@@ -122,7 +112,9 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_moneda", $id_moneda);
 		$gasto->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "NULL");
 		$gasto->Edit("codigo_asunto", $codigo_asunto ? $codigo_asunto : "NULL");
+ 
 		$gasto->Edit("codigo_gasto",$codigo_gasto ? $codigo_gasto : "NULL");
+ 
 		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
@@ -194,82 +186,12 @@ if ($opcion == "guardar") {
 
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
+
+ 
 ?>
 
 <script type="text/javascript">
-	<?php global $gasto;
-	$contrato=new Contrato($sesion);
 	
-	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-		$contrato->LoadByCodigoAsuntoSecundario($codigo_asunto_secundario);
-		echo 'var CodigoSecundario=1;';
-	} else {
-		$contrato->LoadByCodigoAsunto($codigo_asunto);
-		echo 'var CodigoSecundario=0;';
-	} 
-	$gasto->extra_fields['id_contrato']=$contrato->fields['id_contrato'];
-?>
-	//Extend the scal library to add draggable calendar support.
-	//This script block can be added to the scal.js file.
-	Object.extend(scal.prototype,
-	{
-		toggleCalendar: function()
-		{
-			var element = $(this.options.wrapper) || this.element;
-			this.options[element.visible() ? 'onclose' : 'onopen'](element);
-			this.options[element.visible() ? 'closeeffect' : 'openeffect'](element, {duration: 0.5});
-		},
-
-		isOpen: function()
-		{
-			return ( $(this.options.wrapper) || this.element).visible();
-		}
-	});
-
-	//this is a global variable to have only one instance of the calendar
-	var calendar = null;
-
-	//@element   => is the <div> where the calender will be rendered by Scal.
-	//@input     => is the <input> where the date will be updated.
-	//@container => is the <div> for dragging.
-	//@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-	function showCalendar(element, input, container, source)
-	{
-		if (!calendar)
-		{
-			container = $(container);
-			//the Draggable handle is hard coded to "rtop" to avoid other parameter.
-			new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-
-			//The singleton calendar is created.
-			calendar = new scal(element, $(input),
-			{
-				updateformat: 'dd-mm-yyyy',
-				closebutton: '&nbsp;',
-				wrapper: container
-			});
-		}
-		else
-		{
-			calendar.updateelement = $(input);
-		}
-
-		var date = new Date($F(input));
-		calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-
-		//Locates the calendar over the calling control  (in this example the "img").
-		if (source = $(source))
-		{
-			Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
-		}
-
-		//finally show the calendar =)
-		calendar.openCalendar();
-	};
-
-
-	document.observe('dom:loaded', function() {
-	});
 
 	function ShowGastos(valor)
 	{
@@ -283,7 +205,7 @@ $pagina->PrintTop($popup);
 	function CambiaMonto( form )
 	{
 		var monto = form.monto.value;
-		form.monto.value = monto.replace(',','.');
+		//form.monto.value = monto.replace(',','.');
 <?php
 if (UtilesApp::GetConf($sesion, 'ComisionGastos')) {
 	?>
@@ -301,8 +223,8 @@ if (UtilesApp::GetConf($sesion, 'ComisionGastos')) {
 	function Validar(form)
 	{
 		monto = parseFloat(form.monto.value);
-		if( form.monto_cobrable ) {
-			monto_cobrable = parseFloat(form.monto_cobrable.value);
+		if( jQuery('#monto_cobrable').length>0 ) {
+			monto_cobrable = parseFloat(jQuery('#monto_cobrable').val());
 		}
 
 		if( form.monto_cobrable && ( monto <= 0 || isNaN(monto) ) ) {
@@ -449,29 +371,38 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 		}
 	}
 
-	function AgregarNuevo(tipo, prov)
-	{
+
 <?php
-if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	$contrato=new Contrato($sesion);
+	
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		$contrato->LoadByCodigoAsuntoSecundario($codigo_asunto_secundario);
+		echo 'var CodigoSecundario=1;';
+	} else {
+		$contrato->LoadByCodigoAsunto($codigo_asunto);
+		echo 'var CodigoSecundario=0;';
+	} 
+	$gasto->extra_fields['id_contrato']=$contrato->fields['id_contrato'];
 	?>
-				var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-				var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-				if(tipo == 'gasto')
-				{
-					var urlo = "agregar_gasto.php?popup=1&prov="+prov+"&codigo_cliente_secundario="+codigo_cliente_secundario+"&codigo_asunto_secundario="+codigo_asunto_secundario;
-					window.location=urlo;
-				}
-	<?php
-} else {
-	?>
-				var codigo_cliente = $('codigo_cliente').value;
-				var codigo_asunto = $('codigo_asunto').value;
-				if(tipo == 'gasto')
-				{
-					var urlo = "agregar_gasto.php?popup=1&prov="+prov+"&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto;
-					window.location=urlo;
-				}
-<?php } ?>
+	
+	function AgregarNuevo(tipo, prov)	{
+		if(CodigoSecundario) {
+					var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+					var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
+					if(tipo == 'gasto')
+					{
+						var urlo = "agregar_gasto.php?popup=1&prov="+prov+"&codigo_cliente_secundario="+codigo_cliente_secundario+"&codigo_asunto_secundario="+codigo_asunto_secundario;
+						window.location=urlo;
+					}
+		} else {
+					var codigo_cliente = $('codigo_cliente').value;
+					var codigo_asunto = $('codigo_asunto').value;
+					if(tipo == 'gasto')
+					{
+						var urlo = "agregar_gasto.php?popup=1&prov="+prov+"&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto;
+						window.location=urlo;
+					}
+		 } 
 	}
 
 	function AgregarProveedor()
@@ -480,14 +411,13 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		nuovaFinestra('Agregar_Proveedor',430,370,urlo);
 	}
 </script>
-<?php echo(Autocompletador::CSS()); ?>
-<form method=post action="<?php echo $SERVER[PHP_SELF] ?>"  id="form_gastos" autocomplete='off'>
-	<input type=hidden name=opcion value="guardar" />
-	<input type=hidden name=id_gasto value="<?php echo $gasto->fields['id_movimiento'] ?>" />
-	<input type=hidden name=id_gasto_general value="<?php echo $gasto->fields['id_gasto_general'] ?>" />
-	<input type=hidden name='prov' value='<?php echo $prov ?>'>
-	<input type=hidden name=id_movimiento_pago id=id_movimiento_pago value=<?php echo $gasto->fields['id_movimiento_pago'] ?>>
-	<input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
+<form method="post"   style="padding:5px;" id="form_gastos" autocomplete='off'>
+	<input type="hidden" id="opcion" name="opcion" value="guardar" />
+	<input type="hidden"  name="id_gasto" value="<?php echo $gasto->fields['id_movimiento'] ?>" />
+	<input type="hidden"  name="id_gasto_general" value="<?php echo $gasto->fields['id_gasto_general'] ?>" />
+	<input type="hidden"  name='prov' value='<?php echo $prov ?>'>
+	<input type="hidden"  name="id_movimiento_pago" id="id_movimiento_pago" value=<?php echo $gasto->fields['id_movimiento_pago'] ?>>
+	<input type="hidden"  name="elimina_ingreso" id="elimina_ingreso" value=''>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
@@ -533,15 +463,17 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 	?>
 
- 		<div id="celda_agregar_gasto fr" style="width:96%;" >
+	 <div id="celda_agregar_gasto fr" style="width:96%;" >
 			 <span class="fl">
 				<b><?php echo __('Información de') ?> <?php echo $prov == 'true' ? __('provisión') : __('gasto') ?></b>
 			</span>
 			
 				 <a href='javascript:void(0)' class="fr btn botonizame" icon="agregar"   style="margin:2px;" onclick="AgregarNuevo('gasto',<?php echo $prov ?>);" title="Agregar Gasto"><?php echo $prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto') ?></a>
 				<?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_agregar_gasto_inicio') : false; ?>
-		</div>
-	<table class="border_plomo" style="background-color: #FFFFFF;" width='90%'>
+			</div>
+		 
+ 
+	<table class="border_plomo" style="background-color: #FFFFFF;" width='96%'>
 		<tr>
 			<td align=right>
 				<?php echo __('Fecha') ?>
@@ -555,7 +487,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				<?php echo __('Cliente') ?>
 			</td>
 			<td align=left>
-			<?php UtilesApp::CampoCliente($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
+<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,false,320,'',false); ?>
 
 				<span style="color:#FF0000; font-size:10px">*</span>
 			</td>
@@ -586,7 +518,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					<?php echo __('Tipo de Gasto') ?>
 				</td>
 				<td align=left>
-					<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo", "id_cta_corriente_tipo", $gasto->fields['id_cta_corriente_tipo'] ? $gasto->fields['id_cta_corriente_tipo'] : '1', '', '', "160"); ?>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo order by glosa", "id_cta_corriente_tipo", $gasto->fields['id_cta_corriente_tipo'] ? $gasto->fields['id_cta_corriente_tipo'] : '1', '', '', "160"); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -605,7 +537,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				<?php echo __('Monto') ?>
 			</td>
 			<td align=left>
-				<input name="monto" id="monto" size=10 onchange="CambiaMonto(this.form);" value="<?php echo $gasto->fields['egreso'] ? $gasto->fields['egreso'] : $gasto->fields['ingreso'] ?>" />
+				<input name="monto" id="monto" size=10  value="<?php printf("%.2F",$gasto->fields['egreso'] ? $gasto->fields['egreso'] : $gasto->fields['ingreso']);   ?>" />
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?php echo __('Moneda') ?>&nbsp;
 				<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", $gasto->fields['id_moneda'] ? $gasto->fields['id_moneda'] : '', '', '', "80"); ?>
@@ -619,7 +551,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					<?php echo __('Porcentaje comisión') ?>
 				</td>
 				<td align="left">
-					<input name="porcentajeComision" size="10" onchange="CambiaMonto(this.form);" value="<?php echo method_exists('Conf', 'GetConf') ? Conf::GetConf($sesion, 'ComisionGastos') : Conf::ComisionGastos() ?>" /> %
+					<input name="porcentajeComision" size="10"   value="<?php echo Conf::GetConf($sesion, 'ComisionGastos'); ?>" /> %
 				</td>
 			</tr>
 		<?php } ?>
@@ -629,7 +561,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					<?php echo __('Monto cobrable') ?>&nbsp;
 				</td>
 				<td align=left>
-					<input name="monto_cobrable" id="monto_cobrable" size=10 value="<?php echo $gasto->fields['monto_cobrable'] ?>" />
+					<input name="monto_cobrable" id="monto_cobrable" size=10 value="<?php  printf("%.2F",$gasto->fields['monto_cobrable']); ?>" />
 				</td>
 			</tr>
 		<?php } ?>
@@ -807,7 +739,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		<br />
 		<?php if ($gasto->fields['id_movimiento_pago'] > 0) { ?>
 			<div id='tabla_gastos'>
-				<table style="border: 1px solid black;" width='90%'>
+				<table style="border: 1px solid #666;" width='96%'>
 					<tr>
 						<td align=right>
 							<?php echo __('Fecha') ?>
@@ -830,7 +762,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						</td>
 						<td align=left>
 							<input type="text" name="monto_pago" id=monto_pago value="<?php echo $ingreso->fields['ingreso'] ?>" style="text-align:right" size=8>
-							<input type=hidden name=tipo_moneda value=<?php echo Utiles::Glosa($sesion, $ingreso->fields['id_moneda'], 'simbolo', 'prm_moneda', 'id_moneda') ?>>
+							<input type="hidden"  name=tipo_moneda value=<?php echo Utiles::Glosa($sesion, $ingreso->fields['id_moneda'], 'simbolo', 'prm_moneda', 'id_moneda') ?>>
 						</td>
 					</tr>
 					<tr>
@@ -838,7 +770,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 							<?php echo __('Descripción') ?>
 						</td>
 						<td align=left>
-							<textarea name=descripcion_ingreso cols="45" rows="3"><?php echo $ingreso->fields['descripcion'] ?></textarea>
+							<textarea name="descripcion_ingreso" cols="45" rows="3"><?php echo $ingreso->fields['descripcion'] ?></textarea>
 						</td>
 					</tr>
 					<?php
@@ -869,37 +801,30 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 	?>
 
-	<br />
-	<table style="border: 0px solid black;" width='90%'>
-		<tr>
-			<td align=left>
-				<input type=button class=btn value="<?php echo __('Guardar') ?>" onclick="return Validar(this.form);" /> <input type=button class=btn value="<?php echo __('Cerrar') ?>" onclick="Cerrar();" />
-			</td>
-		</tr>
-	</table>
+ <br>
+			<div class="fl">
+				<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_gastos').get(0));"><?php echo  __('Guardar') ?></a>
+				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar') ?></a>
+			</div>
+		 
 
 </form>
-<script type="text/javascript">
+ <script type="text/javascript">
 	 
-<?php if (UtilesApp::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
+<?php 
+
+
+	if (UtilesApp::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
 		CargaIdioma("<?php echo $codigo_asunto ?>");
 <?php } ?>
-	jQuery("#monto").blur(function(){
+	jQuery("#monto, #monto_cobrable").change(function(){
 		var str = jQuery(this).val();
 		jQuery(this).val( str.replace(',','.') );
 		jQuery(this).parseNumber({format:"#.00", locale:"us"});
 		jQuery(this).formatNumber({format:"#.00", locale:"us"});
-	});
-	jQuery("#monto_cobrable").blur(function(){
-		var str = jQuery(this).val();
-		jQuery(this).val( str.replace(',','.') );
-		jQuery(this).parseNumber({format:"#.00", locale:"us"});
-		jQuery(this).formatNumber({format:"#.00", locale:"us"});
+		CambiaMonto(this.form);
 	});
 </script>
 <?php
-if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-	echo Autocompletador::Javascript($sesion);
-}
-echo InputId::Javascript($sesion);
+
 $pagina->PrintBottom($popup);
