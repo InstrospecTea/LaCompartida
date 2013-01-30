@@ -21,6 +21,10 @@ if (isset($_REQUEST['token']) && strlen($_REQUEST['token']) > 0) {
 		$Sesion->error_msg = __('El token para reestablecer el password es incorrecto o ya expiró');
 		$view = 'enviar_instrucciones';
 	}
+
+	if (isset($_REQUEST['adm'])) {
+		$Sesion->error_msg = __('Por motivos de seguridad el Administrador le ha solicitado cambiar su password');
+	}
 }
 
 if (isset($_POST['accion'])) {

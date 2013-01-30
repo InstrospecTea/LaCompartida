@@ -33,8 +33,7 @@ if ($sesion->logged) {
     $Usuario->Edit('reset_password_token', $token);
     $Usuario->Edit('reset_password_sent_at', 'NOW()');
     if ($Usuario->Write()) {
-      $location_page = Conf::RootDir() . "/app/usuarios/reset_password.php?token=$token";
-      header("Location: $location_page");
+      $pagina->Redirect(Conf::RootDir() . "/app/usuarios/reset_password.php?token=$token&adm");
     }
   }
 }
