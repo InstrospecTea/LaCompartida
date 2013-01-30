@@ -258,11 +258,6 @@ class Reporte
 				$this->id_agrupador[] = "trabajo.id_area_trabajo";
 				break;
  
-			case "codigo_contrato":
-				$this->id_agrupador[] = "contrato.codigo_contrato";
-				break;
- 
-				
 			default:
 				$this->id_agrupador[] = $s;
 		}
@@ -294,13 +289,6 @@ class Reporte
 			case "id_trabajo":
 			  
 				break;
- 
-			
-			case "codigo_contrato":
-				$this->id_agrupador_cobro[] = "codigo_contrato";
-				break;
-			
- 
 			case "glosa_asunto": 
 			case "glosa_asunto_con_codigo":
 			case "glosa_cliente_asunto":
@@ -386,9 +374,6 @@ class Reporte
 				CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 				asunto.codigo_asunto,	
 				contrato.id_contrato,
- 
-				contrato.codigo_contrato,
- 
 				\' - \' as tipo_asunto,
 				\' - \' as area_asunto,
 				grupo_cliente.id_grupo_cliente,
@@ -595,9 +580,6 @@ class Reporte
 						CONCAT('.$this->dato_codigo_asunto.',\': \',asunto.glosa_asunto) AS glosa_asunto_con_codigo,
 						'.$this->dato_codigo_asunto.' as codigo_asunto,
 						contrato.id_contrato,
- 
-						contrato.codigo_contrato,
- 
 						tipo.glosa_tipo_proyecto AS tipo_asunto,
 						area.glosa AS area_asunto,
 						grupo_cliente.id_grupo_cliente,
@@ -903,10 +885,6 @@ class Reporte
 				}
 			}
 		}
-		global $where;
-		$where=$s;
-		($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_reporte_avanzado'):false; 
-		$s=$where;
 		//Añado el periodo determinado
 		if($from == 'trabajo')
 		{

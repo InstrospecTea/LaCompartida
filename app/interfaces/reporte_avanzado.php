@@ -97,7 +97,6 @@ $estados_cobro = array("CREADO",
 
 $agrupadores = array(
 	'glosa_cliente',
-	'codigo_contrato',
 	'codigo_asunto',
 	'glosa_asunto_con_codigo',
 	'profesional',
@@ -114,7 +113,6 @@ $agrupadores = array(
 	'mes_reporte',
 	'dia_reporte',
 	'mes_emision',
-	'codigo_contrato',
 	'grupo_o_cliente'
 );
 if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
@@ -127,7 +125,6 @@ if ($debug == 1) {
 	$agrupadores[] = 'id_contrato';
 }
 
-$glosa_dato['codigo_contrato'] = "Código " . __('Contrato');
 $glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
 
 $glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
@@ -1430,7 +1427,7 @@ if (!$popup) {
 										<input type="radio" name="fecha_corta" id="fecha_corta_selector" value="selector" onclick ="SeleccionarSelector()" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
 									</td>
 									<td align=left colspan=3>
-										<label for="fecha_corta_selector">
+										<span onclick="jQuery('#fecha_corta_selector').click()">
 											<select name="fecha_mes" id="fecha_mes" style='width:90px'>
 												<option value='1' <?php echo $fecha_mes == 1 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
 												<option value='2' <?php echo $fecha_mes == 2 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
@@ -1449,7 +1446,7 @@ if (!$popup) {
 	<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
 													<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
 	<?php } ?>
-											</select></label>
+											</select></span>
 									</td>
 								</tr>
 								<tr>
@@ -1469,7 +1466,6 @@ if (!$popup) {
 								</tr>
 
 							</table>
-							<table><?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_filtros_reporte_avanzado') : false; ?>	</table>
 						</center>
 
 
