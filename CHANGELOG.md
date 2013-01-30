@@ -1,4 +1,16 @@
 # Changelog
+
+## Hotfix: 13.0.1
+
+Lunes 28 de enero, 2013.
+
+* **Fixed:** [Corrige el problema del login cuando el identificador es Rut en Chrome/Windows](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Guarda la moneda correcta cuando se crean los saldos aprovisionados luego de emitir un cobro](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Modificación a agregar contrato y asunto para recuperar tarifa plana](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Corrección para el cron que ingresa datos al demo no termine su ejecución](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Modificación a agregar contrato para definir tarifa trámites](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Corrige el problema del cron correo que no enviaba copia al administrador](https://github.com/LemontechSA/ttb/issues/64)
+
 ## Release: 13.0.0
 
 Jueves 24 de enero, 2013.
