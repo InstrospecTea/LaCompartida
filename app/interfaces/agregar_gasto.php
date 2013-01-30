@@ -191,7 +191,13 @@ if ($opcion == "guardar") {
 		}
 	}
 }
-	global $gasto;
+
+$pagina->titulo = $txt_pagina;
+$pagina->PrintTop($popup);
+?>
+
+<script type="text/javascript">
+	<?php global $gasto;
 	$contrato=new Contrato($sesion);
 	
 	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
@@ -202,12 +208,7 @@ if ($opcion == "guardar") {
 		echo 'var CodigoSecundario=0;';
 	} 
 	$gasto->extra_fields['id_contrato']=$contrato->fields['id_contrato'];
-	
-$pagina->titulo = $txt_pagina;
-$pagina->PrintTop($popup);
 ?>
-
-<script type="text/javascript">
 	//Extend the scal library to add draggable calendar support.
 	//This script block can be added to the scal.js file.
 	Object.extend(scal.prototype,
