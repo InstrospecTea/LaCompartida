@@ -191,7 +191,18 @@ if ($opcion == "guardar") {
 		}
 	}
 }
-
+	global $gasto;
+	$contrato=new Contrato($sesion);
+	
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		$contrato->LoadByCodigoAsuntoSecundario($codigo_asunto_secundario);
+		echo 'var CodigoSecundario=1;';
+	} else {
+		$contrato->LoadByCodigoAsunto($codigo_asunto);
+		echo 'var CodigoSecundario=0;';
+	} 
+	$gasto->extra_fields['id_contrato']=$contrato->fields['id_contrato'];
+	
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
 ?>
@@ -521,16 +532,14 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 	?>
 
-	<table style="border: 0px solid black;" width='90%'>
-		<tr>
-			<td align=left>
+ 		<div id="celda_agregar_gasto fr" style="width:96%;" >
+			 <span class="fl">
 				<b><?php echo __('Información de') ?> <?php echo $prov == 'true' ? __('provisión') : __('gasto') ?></b>
-			</td>
-			<td width='40%' align=right>
-				<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0 > <a href='javascript:void(0)' onclick="AgregarNuevo('gasto',<?php echo $prov ?>);" title="Agregar Gasto"><?php echo $prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto') ?></a>
-			</td>
-		</tr>
-	</table>
+			</span>
+			
+				 <a href='javascript:void(0)' class="fr btn botonizame" icon="agregar"   style="margin:2px;" onclick="AgregarNuevo('gasto',<?php echo $prov ?>);" title="Agregar Gasto"><?php echo $prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto') ?></a>
+				<?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_agregar_gasto_inicio') : false; ?>
+		</div>
 	<table class="border_plomo" style="background-color: #FFFFFF;" width='90%'>
 		<tr>
 			<td align=right>
