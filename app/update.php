@@ -9687,7 +9687,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.29:
+		case 7.30:
 			$queries = array();
 			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
@@ -9710,7 +9710,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.29;
+$max_update = 7.30;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
