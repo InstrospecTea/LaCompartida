@@ -249,6 +249,7 @@ if ($opcion == "guardar") {
 				} else {
 					$tarifa = new Tarifa($sesion);
 					$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
 			}
 
