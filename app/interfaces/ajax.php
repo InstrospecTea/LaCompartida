@@ -732,7 +732,7 @@ if ($accion == "consistencia_cliente_asunto") {
 	if (isset($_POST['password'])) {
 		$password = $_POST['password'];
 	}
-	PasswordStrength::Rate($password);
+	echo PasswordStrength::Rate($password);
 } else {
 	echo("ERROR AJAX. Acción: $accion");
 }
