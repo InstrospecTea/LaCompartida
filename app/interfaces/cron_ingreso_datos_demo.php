@@ -23,13 +23,15 @@ if (Conf::EsAmbientePrueba()) {
 
 	echo '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
 
-	$mktime_fin = time();
-	$fecha_fin = date("Y-m-d", $mktime_fin);
-	list($anio_fin, $mes_fin, $dia_fin) = explode('-', $fecha_fin);
+	// $mktime_fin = time();
+	// $fecha_fin = date("Y-m-d", $mktime_fin);
+	// list($anio_fin, $mes_fin, $dia_fin) = explode('-', $fecha_fin);
 
-	$mktime_inicio = mktime(0, 0, 0, date("m", time()), 1, date("Y", time()) - 1);
-	$fecha_inicio = date("Y-m-d", $mktime_inicio);
-	list($anio_inicio, $mes_inicio, $dia_inicio) = explode('-', $fecha_inicio);
+	// $mktime_inicio = mktime(0, 0, 0, date("m", time()), 1, date("Y", time()) - 1);
+	// $fecha_inicio = date("Y-m-d", $mktime_inicio);
+	// list($anio_inicio, $mes_inicio, $dia_inicio) = explode('-', $fecha_inicio);
+	$fecha_fin = date("Y-m-d", time());
+	$fecha_ini = date("Y-m-d", mktime(0,0,0,date("m",time()),1,date("Y",time())-1));
 
 	$max_dia = 5;
 
@@ -488,6 +490,7 @@ if (Conf::EsAmbientePrueba()) {
 				echo 'id_cobro: '.$id_cobro.'<br><br>-----------------------------------<br><br>';
 
 				$cobro->GuardarCobro(true);
+				echo "GuardarCobro(true) -> ";
 				$cobro->Edit('fecha_emision',date('Y-m-d H:i:s'));
 				$cobro->Edit('estado','EMITIDO');
 				$cobro->Edit('fecha_creacion',date('Y-m-d H:i:s',$fecha_mk_fin_periodo));
@@ -502,26 +505,33 @@ if (Conf::EsAmbientePrueba()) {
 				$his->Edit('fecha',date('Y-m-d H:i:s'));
 				$his->Edit('comentario',$historial_comentario);
 
+				echo "usuario: $id_usuario_cobro -> ";
 				if (!$sesion->usuario->fields['id_usuario']) {
 					$his->Edit('id_usuario',$id_usuario_cobro);
 				} else {
 					$his->Edit('id_usuario',$sesion->usuario->fields['id_usuario']);
 				}
 				$his->Edit('id_cobro',$cobro->fields['id_cobro']);
+				echo "Write Observacion -> ";
 				$his->Write();
+				echo "Write Cobro -> ";
 				$cobro->Write();
 
 				$cobro_moneda = new CobroMoneda($sesion);
 				$cobro_moneda->Load($cobro->fields['id_cobro']);
+				echo "Cobro Moneda Cargado -> ";
 
 				$documento = new Documento($sesion);
 				$documento->LoadByCobro($id_cobro);
+				echo "Documento Cargado -> ";
 				$documento->Edit('fecha', date("Y-m-d",$fecha_mk_fin_periodo));
 				$documento->Write();
+				echo "Documento Modificado -> ";
 
 				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 5184000 || rand(0,100) < 80) {
 					$cobro->Edit('estado','ENVIADO AL CLIENTE');
 					$cobro->Write();
+					echo "Marcado como ENVIADO AL CLIENTE -> ";
 				}
 
 				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 7776000 || ( $cobro->fields['estado']=='ENVIADO AL CLIENTE' && rand(0,100) < 60 )) {
@@ -537,6 +547,7 @@ if (Conf::EsAmbientePrueba()) {
 					$documento_pago->Edit("glosa_documento",'Pago de Cobro N°'.$cobro->fields['id_cobro']);
 					$documento_pago->Edit("codigo_cliente",$documento->fields['codigo_cliente']);
 					$documento_pago->Write();
+					echo "Documento de pago creado -> ";
 
 					$neteo_documento = new NeteoDocumento($sesion);
 					$neteo_documento->Edit('id_documento_cobro',$documento->fields['id_documento']);
@@ -546,13 +557,16 @@ if (Conf::EsAmbientePrueba()) {
 					$neteo_documento->Edit('valor_pago_honorarios',$cobro->fields['monto']);
 					$neteo_documento->Edit('valor_pago_gastos',$cobro->fields['monto_gastos']);
 					$neteo_documento->Write();
+					echo "Neteo Documento creado -> ";
 
 					$cobro->Edit('estado','PAGADO');
 					$cobro->Write();
+					echo "Marcado como PAGADO -> ";
 				}
 			}
+			echo "<br />";
 		}
-
+		echo "<br />";
 		$fecha_mk_ini = $fecha_mk_fin_periodo;
 	}
 
