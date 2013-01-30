@@ -91,11 +91,8 @@ class Cobro extends Objeto {
 				}
 
 				if ($this->fields['monto_gastos'] > 0) {
-					$query = 'SELECT opc_moneda_gastos FROM contrato WHERE id_contrato = ' . $this->fields['id_contrato'];
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-					list($id_moneda) = mysql_fetch_array($resp);
 					$provision = new Gasto($this->sesion);
-					$provision->Edit('id_moneda', $id_moneda);
+					$provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
 					$provision->Edit('ingreso', $this->fields['monto_gastos']);
 					$provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
