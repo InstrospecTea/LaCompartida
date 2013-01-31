@@ -9687,6 +9687,19 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.29:
+			$queries = array();
+			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
+			}
+
+			if (!ExisteCampo('usuario', 'password_by', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `reset_password_by` VARCHAR(1) DEFAULT 'U';";
+			}
+
+			ejecutar($queries, $dbh);
+		break;	
+
 		case 7.30:
 			$queries = array();
 			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
