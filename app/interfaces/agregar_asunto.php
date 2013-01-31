@@ -311,7 +311,7 @@ if ($opcion == "guardar") {
 			$fecha_inactivo = date('Y-m-d H:i:s');
 			$asunto->Edit("fecha_inactivo", $fecha_inactivo,true);
 		} else {
-			$asunto->Edit("fecha_inactivo", ',true');
+			$asunto->Edit("fecha_inactivo", '', true);
 		}
 		$asunto->Edit("cobrable", $cobrable,true);
 		$asunto->Edit("mensual", $mensual ? "SI" : "NO");
