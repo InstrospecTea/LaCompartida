@@ -122,6 +122,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		} else {
 			$tarifa = new Tarifa($sesion);
 			$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+			$_REQUEST['id_tarifa'] = $id_tarifa;
 		}
 	}
 
@@ -1014,6 +1015,20 @@ list($cant_encargados) = mysql_fetch_array($resp);
 						}
 					}
 
+					function CreaTramiteTarifa(form, opcion, id_tramite_tarifa)
+					{
+						var form = $('formulario');
+						if(opcion)
+							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
+						else
+						{
+							//var id_tramite_tarifa = form.id_tramite_tarifa.value;
+							if(!id_tramite_tarifa)
+								var id_tramite_tarifa = jQuery('#id_tramite_tarifa').val();
+							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
+						}
+					}
+
 					function ActualizarTarifaTramiteDesdePopup() {
 						//document.getElementById('id_tramite_tarifa_holder').innerHtml = "<select name='' id=''><option>me los cagué a todos</option></select>";
 						var http = getXMLHTTP();
@@ -1058,17 +1073,7 @@ list($cant_encargados) = mysql_fetch_array($resp);
 						http.send(null);
 					}
 	
-					function CreaTramiteTarifa(form, opcion)
-					{
-						var form = $('formulario');
-						if(opcion)
-							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
-						else
-						{
-							var id_tramite_tarifa = form.id_tramite_tarifa.value;
-							nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
-						}
-					}
+
 
 					/*
 	Desactivar contrato para no verlo en cobros. (generación)
@@ -2031,6 +2036,17 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								</tr>
 										<?php
 									}
+if (UtilesApp::existecampo('factura_codigopostal', 'contrato', $sesion)) { ?>
+								<tr>
+									<td align="right" colspan="1">
+								<?php echo __('Código Postal'); ?>
+																</td>
+									<td align="left" colspan="5">
+										<input  type="text"  name='factura_codigopostal' size=50 value="<?php echo $contrato->fields['factura_codigopostal'] ?>"  />
+									</td>
+								</tr>
+										<?php
+									}									
 									if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 										?>
 								<tr>

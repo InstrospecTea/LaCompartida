@@ -137,6 +137,12 @@ if ($codigo_asunto) {
 ########################### SQL INFORME DE GASTOS #########################
 $where = "1";
 $join_extra = "";
+if ($cobrado == 'NO') {
+	$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
+}
+if ($cobrado == 'SI') {
+	$where .= " AND cta_corriente.id_cobro is not null AND cobro.estado IN ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL', 'PAGADO', 'ENVIADO AL CLIENTE', 'INCOBRABLE') ";
+}
 if ($codigo_cliente) {
     $where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
     $cliente = new Cliente($sesion);
@@ -163,6 +169,12 @@ if ($fecha2)
 // Filtrar por moneda del gasto
 if ($moneda_gasto != '') {
     $where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
+}
+
+if ($egresooingreso == 'soloingreso') {
+	$where .= " AND cta_corriente.ingreso IS NOT NULL ";
+} else if ($egresooingreso == 'sologastos') {
+	$where .= " AND cta_corriente.ingreso IS NULL ";
 }
 
 $moneda_base = Utiles::MonedaBase($sesion);
@@ -218,8 +230,7 @@ if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 							JOIN cobro_moneda cmb ON (factura.id_cobro = cmb.id_cobro AND cmb.id_moneda = {$moneda_base['id_moneda']} )
 						WHERE factura.id_cobro = cta_corriente.id_cobro AND cta_corriente.id_cobro IS NOT NULL AND ( factura.estado != 'ANULADA' OR factura.id_estado = 1 ) 
 	) as acumulado_factura";
-    $join_extra .= " LEFT JOIN cobro ON cta_corriente.id_cobro = cobro.id_cobro 
-                         LEFT JOIN cobro_moneda as moneda_gastos_segun_cobro ON moneda_gastos_segun_cobro.id_cobro = cobro.id_cobro AND moneda_gastos_segun_cobro.id_moneda = cta_corriente.id_moneda ";
+    $join_extra .= "LEFT JOIN cobro_moneda as moneda_gastos_segun_cobro ON moneda_gastos_segun_cobro.id_cobro = cobro.id_cobro AND moneda_gastos_segun_cobro.id_moneda = cta_corriente.id_moneda ";
     $orden .= ", cta_corriente.id_cobro ASC ";
 }
 
@@ -244,6 +255,7 @@ $query = "SELECT cta_corriente.egreso,
 				LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 				LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 				JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
+				LEFT JOIN cobro ON cta_corriente.id_cobro = cobro.id_cobro 
 				$join_extra
 			WHERE $where 
 			ORDER BY $orden";

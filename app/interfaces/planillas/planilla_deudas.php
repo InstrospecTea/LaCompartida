@@ -71,6 +71,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			$join
 			WHERE
 				d.tipo_doc = 'N' AND
+				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE') AND
 				(d.saldo_honorarios + d.saldo_gastos) > 0
 				$where
 			GROUP BY d.id_documento

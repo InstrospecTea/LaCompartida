@@ -123,6 +123,13 @@
 				if($duracion == '00:00:00' )  {
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
+				 $asunto = new Asunto($sesion);
+                            if (UtilesApp::GetConf($sesion,'CodigoSecundario'))    {
+                                    $asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
+                                    $codigo_asunto=$asunto->fields['codigo_asunto'];
+                            }  else   {
+                                    $asunto->LoadByCodigo($codigo_asunto);
+                            }
 				if(!$codigo_asunto || $codigo_asunto ==''){
 					$pagina->AddError("Debe seleccionar un ".__('Asunto'));
 				}
@@ -142,16 +149,7 @@
                     if(Trabajo::CantHorasDia($duracion - $t->fields['duracion'],Utiles::fecha2sql($fecha),$id_usuario,$sesion))
                     {
                             $valida = true;
-                            $asunto = new Asunto($sesion);
-                            if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
-                            {
-                                    $asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-                                    $codigo_asunto=$asunto->fields['codigo_asunto'];
-                            }
-                            else
-                            {
-                                    $asunto->LoadByCodigo($codigo_asunto);
-                            }
+                           
 
                             /*
                             Ha cambiado el asunto del trabajo se setea nuevo Id_cobo de alguno que esté creado
