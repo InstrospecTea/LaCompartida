@@ -1,5 +1,9 @@
 # Changelog
-
+## Hotfix: 13.0.2
+Jueves 31 de enero, 2013.
+* **Fixed** [En la pantalla de asunto, al elegir un cliente se quedaba eternamiente intentando refrescar asunto] (https://github.com/LemontechSA/ttb/issues/68)
+* **New** [Al crear un asunto, guarda un registro en la tabla log_db] (https://github.com/LemontechSA/ttb/issues/68)
+* **New** [Al editar un asunto, guarda los campos clave (codigo asunto, usuario, cobrable, activo) en la log_db] (https://github.com/LemontechSA/ttb/issues/68)
 ## Hotfix: 13.0.1
 
 Lunes 28 de enero, 2013.
