@@ -486,7 +486,7 @@ class Documento extends Objeto {
 
 				if ($modulo_fact && !$es_adelanto) {
 					$out .= "<tr><td style='white-space: nowrap;text-align:left;'>";
-					if ($this->sesion->usuario->fields['rut'] == '99511620') {
+					if ($this->sesion->usuario->TienePermiso('SADM')) {
 						//FFF: Lemontech puede editar los pagos con la interfaz vieja, solo para debug
 						$out.="<a href='javascript:void(0)' style=\"color: blue; font-size: 11px;\" onclick=\"EditarPago(" . $id . ")\" title=\"Editar Pago\">" . $nombre . "</a>";
 					} else {

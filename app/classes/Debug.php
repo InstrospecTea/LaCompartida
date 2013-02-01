@@ -6,7 +6,7 @@ class Debug
 {
 	function debug_echo( &$sesion, $str )
 		{
-			if( $sesion->usuario->fields['rut'] == '99511620' )
+			if( $sesion->usuario->TienePermiso('SADM') )
 				return $str;
 			else	
 				return '';
@@ -14,7 +14,7 @@ class Debug
 		
 	function debug_print_r( &$sesion, $arreglo )
 		{
-			if( $sesion->usuario->fields['rut'] == '99511620' )
+			if( $sesion->usuario->TienePermiso('SADM') )
 				{
 					echo '<pre>';
 					print_r($arreglo);
@@ -27,7 +27,7 @@ class Debug
 		
 	function h1( &$sesion, $str )
 		{
-			if( $sesion->usuario->fields['rut'] == '99511620' )
+			if( $sesion->usuario->TienePermiso('SADM') )
 				{
 					echo '<h1>';
 					echo $str;

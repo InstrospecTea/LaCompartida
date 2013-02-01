@@ -5,7 +5,7 @@ $Sesion = new Sesion(array('ADM'));
 $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Aviso de actualización');
 
-if ($Sesion->usuario->fields['rut'] != '99511620') {
+if (!$Sesion->usuario->TienePermiso('SADM')) {
 	die('No Autorizado');
 }
 

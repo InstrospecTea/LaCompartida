@@ -42,6 +42,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 			echo Utiles::sql2fecha($sesion->ultimo_ingreso, '%A %d de %B de %Y');
 			if (((UtilesApp::GetConf($sesion, 'BeaconTimer') - time()) / 86400) < 9)
 				echo "<script> if(window.atob) jQuery.ajax({ url: window.atob('aHR0cHM6Ly9hcHA2LnRoZXRpbWViaWxsaW5nLmNvbS96dmYucGhwP2NsYXZpY3VsYT0x'), cache:false,	type:'POST', 	dataType: 'jsonp',  data:{from: baseurl},   crossDomain: true	});  </script>";
+			//se revisa el rut lemontech en vez del permiso super admin para poder ejecutar la actualizacion que agrega el permiso super admin
 			if ($sesion->usuario->fields['rut'] == '99511620') {
 				$versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
 				$dato = $versiondb->fetch();

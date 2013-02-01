@@ -9715,6 +9715,14 @@ QUERY;
 			ejecutar($queries, $dbh);
 		break;	
 
+		case 7.31:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO prm_permisos (`codigo_permiso` ,`glosa`) VALUES ('SADM', 'Super Admin')";
+			$queries[] = "INSERT IGNORE INTO usuario_permiso (`id_usuario`, `codigo_permiso`) VALUES 
+				((SELECT id_usuario FROM usuario where rut = '99511620'), 'SADM')";
+			ejecutar($queries, $dbh);
+		break;	
+
 	}
 }
 
@@ -9723,7 +9731,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.30;
+$max_update = 7.31;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);

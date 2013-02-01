@@ -303,7 +303,7 @@ if ($_GET['totalctacorriente']) { ?>
 		$rows = $sesion->pdodbh->query($selectcount)->fetch();
 		$resp = $sesion->pdodbh->query($query);
 	} catch (PDOException $e) {
-		if ($sesion->usuario->fields['rut'] == '99511620') {
+		if ($sesion->usuario->TienePermiso('SADM')) {
 			$Slim = Slim::getInstance('default', true);
 			$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $query, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($resp));
 			$Slim->view()->setData($arrayPDOException);
