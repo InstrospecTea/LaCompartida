@@ -32,7 +32,12 @@ class UtilesApp extends Utiles {
 	 *  Escribe el valor de un config en formato JS.
 	 */
 	public static function GetConfJs($sesion, $conf) {
-		echo "var $conf='" . Conf::GetConf($sesion, $conf) . "';\n";
+		$v = Conf::GetConf($sesion, $conf);
+		if (is_numeric($v)) {
+			echo "var $conf = $v;\n";
+		} else {
+			echo "var $conf = '$v';\n";
+	}
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
