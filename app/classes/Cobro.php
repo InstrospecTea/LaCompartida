@@ -578,7 +578,7 @@ class Cobro extends Objeto {
 			$documento->EliminarNeteos();
 			$query_factura = "UPDATE factura_cobro SET id_documento = NULL WHERE id_documento = '" . $documento->fields['id_documento'] . "'";
 			mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
-			//if( $sesion->usuario->fields['rut']=='99511620') print_r($documento);
+			//if( $sesion->usuario->TienePermiso('SADM')) print_r($documento);
 			$documento->Delete();
 		}
 	}
@@ -1561,7 +1561,7 @@ class Cobro extends Objeto {
 						$logstatement->execute();
 						$this->sesion->pdodbh->commit();
 					} catch (PDOException $e) {
-						if ($this->sesion->usuario->fields['rut'] == '99511620') {
+						if ($this->sesion->usuario->TienePermiso('SADM')) {
 							$Slim = Slim::getInstance('default', true);
 							$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $query_documento_moneda, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($logstatement));
 							$Slim->view()->setData($arrayPDOException);

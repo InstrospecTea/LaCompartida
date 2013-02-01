@@ -809,7 +809,7 @@ if ($usuario->loaded) {
 		</fieldset>
 	</form>
 	<?php
-	if($sesion->usuario->fields['rut']=='99511620')  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
+	if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
 
 }
 
@@ -854,6 +854,7 @@ function CargarPermisos() {
 <script>
 
 	jQuery(document).ready(function() {
+		jQuery('[name=SADM]').closest('tr').hide();
 		jQuery("#chkpermisos .ui-button").live('change',function() {
 			alert(jQuery(this).attr('class'));
 			jQuery(this).button("option", {

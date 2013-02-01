@@ -1,13 +1,6 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/SolicitudAdelanto.php';
+
+require_once dirname(__FILE__) . '/../conf.php'; 
 
 $Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
@@ -65,17 +58,7 @@ $Pagina->PrintTop();
 								<?php echo UtilesApp::CampoCliente($Sesion, $SolicitudAdelanto->fields['codigo_cliente'], $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 							</td>
 						</tr>
-						<tr>
-							<td align="right" width="30%">
-								<label for="id_contrato"><?php echo __('Asuntos'); ?></label>
-							</td>
-							<td colspan="3" align="left" id="td_selector_contrato">
-								<?php
-								$Contrato = new Contrato($Sesion);
-								echo $Contrato->ListaSelector($SolicitudAdelanto->fields['codigo_cliente'], '', $SolicitudAdelanto->fields['id_contrato']);
-								?>
-							</td>
-						</tr>
+						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $SolicitudAdelanto->fields['codigo_cliente'], $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 						<tr>
 							<td align="right">
 								<label for="fecha_desde"><?php echo __('Fecha Desde') ?></label>
@@ -178,10 +161,12 @@ function Opciones(& $fila) {
 		} else {
 <?php if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) { ?>
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente_secundario;
+			var url_extension = "&codigo_cliente_secundario=" + codigo_cliente_secundario +
+				'&codigo_asunto_secundario=' + $F('codigo_asunto_secundario');
 <?php } else { ?>
 			var codigo_cliente = $('codigo_cliente').value;
-			var url_extension = "&codigo_cliente=" + codigo_cliente;
+			var url_extension = "&codigo_cliente=" + codigo_cliente +
+				'&codigo_asunto=' + $F('codigo_asunto');
 <?php } ?>
 			url_extension += '&id_contrato=' + $('id_contrato').value;
 		}
@@ -199,34 +184,7 @@ function Opciones(& $fila) {
 	
 	Calendar.setup({ inputField	: "fecha_desde", ifFormat : "%d-%m-%Y", button : "img_fecha_desde" });
 	Calendar.setup({ inputField	: "fecha_hasta", ifFormat : "%d-%m-%Y", button : "img_fecha_hasta" });
-	
-	var valor_anterior_codigo;
-	var campo_cliente;
 
-	jQuery(document).ready(function () {
-		// Cargar contratos on select
-		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
-		campo_cliente.change(ActualizarContratos);
-		valor_anterior_codigo = campo_cliente.val();
-		window.setInterval(ComprobarCodigos, 500, campo_cliente.val());
-	});
-
-	function ActualizarContratos() {
-		url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + jQuery(this).val();
-		jQuery.ajax({
-			url: url,
-			success: function (data) {
-				jQuery('#td_selector_contrato').html(data);
-			}
-		});
-	}
-
-	function ComprobarCodigos(valor_nuevo) {
-		if (valor_anterior_codigo != valor_nuevo) {
-			campo_cliente.change();
-			valor_anterior_codigo = valor_nuevo;
-		}
-	}
 </script>
 <?php
 
