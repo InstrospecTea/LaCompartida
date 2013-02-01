@@ -2,6 +2,9 @@
 
 ## Hotfix: 13.0.2
 
+Viernes 1 de febrero, 2013.
+* **Fixed** [Le da ancho al dv] https://github.com/LemontechSA/ttb/commit/6cfa4ad56dc3756c62d3911f3ac67216a14b88f7#index.php
+
 Jueves 31 de enero, 2013.
 
 * **Fixed:** [En la pantalla de asunto, al elegir un cliente se quedaba eternamiente intentando refrescar asunto](https://github.com/LemontechSA/ttb/issues/69)
