@@ -313,7 +313,7 @@ if ($opcion == "guardar") {
 		} else {
 			$asunto->Edit("fecha_inactivo", '', true);
 		}
-		$asunto->Edit("cobrable", $cobrable,true);
+		$asunto->Edit("cobrable", intval($cobrable),true);
 		$asunto->Edit("mensual", $mensual ? "SI" : "NO");
 		$asunto->Edit("alerta_hh", $asunto_alerta_hh);
 		$asunto->Edit("alerta_monto", $asunto_alerta_monto);
