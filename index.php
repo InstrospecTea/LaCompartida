@@ -37,7 +37,7 @@ $Pagina->PrintHeaders();
 							<td align="right"><?php echo Conf::GetConf($Sesion, 'NombreIdentificador'); ?>:</td>
 							<td align="left">
 								<?php if (strtolower(UtilesApp::Getconf($Sesion, 'NombreIdentificador')) == 'rut') { ?>
-									<input type="text" name="rut" value="" style="width: 63%" /> - <input type="text"  name="dvrut" value="" size="1" />
+									<input type="text" name="rut" value="" style="width: 63%" /> - <input type="text"  name="dvrut" value="" size="1" style="width:15px;"/>
 								<?php } else { ?>
 									<input type="text" name="rut" value="" style="width: 100%" />
 								<?php } ?>
