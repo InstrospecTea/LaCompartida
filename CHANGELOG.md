@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.0.3
+Miércoles 6 de febrero 2013.
+* **Fixed** [Evita error en IE cuando los abogados no pueden ver la duración cobrable] (http://soporte.thetimebilling.com/tickets/7618?col=22917348&page=1)
+
 ## Hotfix: 13.0.2
 
 Viernes 1 de febrero, 2013.
