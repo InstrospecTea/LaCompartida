@@ -57,13 +57,30 @@
 		$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') >= DATE_FORMAT('$fecha_ini','%Y-%m-%d') ";
 	if($fecha_fin)
 		$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') <= DATE_FORMAT('$fecha_fin','%Y-%m-%d') ";
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+		$codigo_asunto_secundario .= ",cl.codigo_cliente_secundario";
+		$codigo_cliente_secundario .= ",a.codigo_asunto_secundario";
+		$sel_cod_asunto_sec .=",codigo_asunto_secundario";
+		$sel_cod_cli_sec .=",codigo_cliente_secundario";
+	} else {
+		$codigo_asunto_secundario .= "";
+		$codigo_cliente_secundario .= "";
+		$sel_cod_asunto_sec .="";
+		$sel_cod_cli_sec .="";
+	}
+
+	//echo $codigo_asunto_secundario; exit;
 	// Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 	$query_asuntos_liquidar="
 		SELECT
 		idcontrato
 		,glosa_cliente
+		,codigo_cliente
+		$sel_cod_cli_sec
 		,listado_asuntos
 		,listado_codigo_asuntos
+		,codigo_asunto
+		$sel_cod_asunto_sec
 		,carta_honorarios
 		,abogado
 		,simbolo_moneda
@@ -86,6 +103,10 @@
 			,CONCAT(LEFT(u.nombre,1),LEFT(u.apellido1,1),LEFT(u.apellido2,1)) AS abogado
 			,mo.simbolo as simbolo_moneda
 			,mo.id_moneda as idmoneda
+			,a.codigo_asunto
+			$codigo_asunto_secundario
+			$codigo_cliente_secundario
+			
 			,(SELECT id_cobro FROM cobro WHERE cobro.id_contrato = co.id_contrato AND cobro.estado NOT IN ('CREADO','REVISION') ORDER BY fecha_fin DESC LIMIT 1 ) AS ultimo_id_cobro
 			FROM asunto a
 			LEFT JOIN contrato co ON a.id_contrato = co.id_contrato
@@ -107,7 +128,7 @@
 	$wb = new Spreadsheet_Excel_Writer();
 
 	// Enviar headers a la pagina
-	$wb->send( __('Asuntos por') .' '.__('cobrar') .' '. $fecha_actual);
+	$wb->send( __('Asuntos por') .' '.__('cobrar') .' '. $fecha_actual .__('.xls'));
 
 	// Definir colores
 	$wb->setCustomColor ( 35, 220, 255, 220 );
@@ -178,7 +199,13 @@
 
 		// ancho celdas
 		if($col_name[$i] == 'glosa_cliente') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+		else if($col_name[$i] == 'codigo_cliente') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+		else if($col_name[$i] == 'codigo_cliente_secundario') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+
 		else if($col_name[$i] == 'listado_asuntos') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+		else if($col_name[$i] == 'codigo_asunto') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+		else if($col_name[$i] == 'codigo_asunto_secundario') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
+
 		else if($col_name[$i] == 'abogado') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
 		else if($col_name[$i] == 'simbolo_moneda') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 9); }
 		else if($col_name[$i] == 'carta_honorarios') { $ws1->setColumn($arr_col[$col_name[$i]]['celda'], $arr_col[$col_name[$i]]['celda'], 25); }
@@ -196,14 +223,26 @@
 		else if($col_name[$i] == 'hh_val_cobrado') { $arr_col[$col_name[$i]]['css'] = $formato_tiempo; }
 		else if($col_name[$i] == 'monto_total') { $arr_col[$col_name[$i]]['css'] = $formato_total; }
 		else if($col_name[$i] == 'glosa_cliente') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+		else if($col_name[$i] == 'codigo_cliente') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+		else if($col_name[$i] == 'codigo_cliente_secundario') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+
 		else if($col_name[$i] == 'listado_asuntos') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+		else if($col_name[$i] == 'codigo_asunto') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+		else if($col_name[$i] == 'codigo_asunto_secundario') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
+
 		else if($col_name[$i] == 'carta_honorarios') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
 		else if($col_name[$i] == 'glosa_ultimo_cobro') { $arr_col[$col_name[$i]]['css'] = $formato_descripcion; }
 		else { $arr_col[$col_name[$i]]['css'] = $formato_normal; }
 
 		// titulos celdas
 		if($col_name[$i] == 'glosa_cliente') { $arr_col[$col_name[$i]]['titulo'] = __('Cliente'); }
+		else if($col_name[$i] == 'codigo_cliente') { $arr_col[$col_name[$i]]['titulo'] = __('Codigo Cliente.'); }
+		else if($col_name[$i] == 'codigo_cliente_secundario') { $arr_col[$col_name[$i]]['titulo'] = __('Codigo Cliente Secundario.'); }	
+		
 		else if($col_name[$i] == 'listado_asuntos') { $arr_col[$col_name[$i]]['titulo'] = __('Asunto'); }
+		else if($col_name[$i] == 'codigo_asunto') { $arr_col[$col_name[$i]]['titulo'] = __('Codigo Asunto'); }
+		else if($col_name[$i] == 'codigo_asunto-secundario') { $arr_col[$col_name[$i]]['titulo'] = __('Codigo Asunto Secundario'); }
+
 		else if($col_name[$i] == 'abogado') { $arr_col[$col_name[$i]]['titulo'] = __('Abogado'); }
 		else if($col_name[$i] == 'simbolo_moneda') { $arr_col[$col_name[$i]]['titulo'] = __('Moneda'); }
 		else if($col_name[$i] == 'carta_honorarios') { $arr_col[$col_name[$i]]['titulo'] = __('Carta Honorarios'); }
