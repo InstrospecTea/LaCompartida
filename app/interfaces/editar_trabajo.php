@@ -771,7 +771,12 @@ echo '</td>';
 ?>
 		</td>
 <?php 
-	}
+	}  else {
+ echo '<input type="hidden" name="duracion_cobrada" id="duracion_cobrada" value="" />';
+ echo '<input type="hidden" name="hora_duracion_cobrada" id="hora_duracion_cobrada" value="" />';
+ echo '<input type="hidden" name="minuto_duracion_cobrada" id="minuto_duracion_cobrada" value="" />';
+}
+
 ?>
 			</tr>
 		</table>
