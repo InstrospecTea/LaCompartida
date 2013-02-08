@@ -2,10 +2,10 @@
 
 
 
-
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
 $_LANG['Fecha'] = "Fecha";
+$_LANG['Hitos'] = "Metas";
 $_LANG['Periodo'] = "Periodo";
 $_LANG['hasta'] = "hasta";
 $_LANG['Nombre'] = "Nombre";
@@ -38,9 +38,10 @@ $_LANG['Descripción de Gastos'] = "Descripción de Gastos";
 $_LANG['HH'] = "HH";
 $_LANG['Valor HH'] = "Valor HH";
 $_LANG['Teléfono'] = "Teléfono";
-$_LANG['RUT'] = "RUT";
-$_LANG['Rut'] = "Rut";
-$_LANG['RUT personal'] = "RUT";
+$_LANG['RUT'] = "RFC";
+$_LANG['Rut'] = "RFC";
+$_LANG['ROL/RUT'] = "RFC";
+$_LANG['RUT personal'] = "RFC";
 $_LANG['Contacto'] = "Contacto";
 $_LANG['Atención'] = "Atención";
 $_LANG['Giro'] = "Giro";
@@ -139,7 +140,7 @@ $_LANG['Datos personales'] = "Datos personales";
 $_LANG['Debe ingresar una dirección de correo electrónico'] = "Debe ingresar una dirección de correo electrónico";
 $_LANG['Departamento'] = "Departamento";
 $_LANG['Número'] = "Número";
-$_LANG['Comuna'] = "Comuna";
+$_LANG['Comuna'] = "Colonia";
 $_LANG['Los campos marcados con un asterisco rojo son obligatorios.'] = "Los campos marcados con un asterisco rojo son obligatorios.";
 $_LANG['Debe ingresar el e-mail del usuario'] = "Debe ingresar el e-mail del usuario";
 $_LANG['Usuario editado con éxito.'] = "Usuario editado con éxito.";
@@ -550,7 +551,7 @@ $_LANG['Tip honorarios'] = "Sólamente lleva la cuenta de las HH profesionales. A
 $_LANG['Tip mensual'] = "El cobro se hará de forma mensual.";
 $_LANG['Tip tarifa especial'] = "Al ingresar una nueva tarifa, esta se actualizará automáticamente.";
 $_LANG['Tip individual'] = "El cobro se hará de forma individual de acuerdo al monto definido por Cliente.";
-$_LANG['Para agregar un nuevo usuario ingresa su RUT aquí.'] = "Para agregar un nuevo usuario ingresa su RUT aquí.";
+$_LANG['Para agregar un nuevo usuario ingresa su RUT aquí.'] = "Para agregar un nuevo usuario ingresa su RFC aquí.";
 
 
 #TIPO CAMBIO
@@ -1081,4 +1082,3 @@ $_LANG['Factura ACL'] = "Factura";
 $_LANG['es_Hrs Trabajadas']="Hrs Trabajadas";
 $_LANG['en_Hrs Trabajadas']="Worked Hours";
 
-$_LANG['Código Postal'] = "Código Postal";

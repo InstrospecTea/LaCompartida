@@ -2,31 +2,22 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-include_once dirname(__FILE__) . '/../classes/AlertaCron.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-
-
 set_time_limit(180);
 $sesion = new Sesion(null, true);
-
-
 $sesion->debug('abri sesión');
-
 $sesion->debug('incluyo alertacron');
 $alerta = new Alerta($sesion);
 $sesion->debug('instancio $alerta');
 $encolados = 0;
 $enviados = 0;
 
-
-$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0";
+$query = "SELECT id_log_correo, subject, mensaje, mail, nombre, id_archivo_anexo FROM log_correo WHERE enviado=0 limit 0,60";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql_fetch_array($resp)) {
 	$correos = array();
 	$adresses = explode(',', $mail);
+
 	foreach ($adresses as $adress) {
 		$correo = array('nombre' => $nombre, 'mail' => trim($adress));
 
@@ -39,7 +30,6 @@ while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql
 	}
 
 	++$encolados;
-
 
 	if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, false, $id_archivo_anexo)) {
 		$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=" . $id;
@@ -101,5 +91,3 @@ function validEmail($email) {
 	}
 	return $isValid;
 }
-
-?>

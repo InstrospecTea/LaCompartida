@@ -59,6 +59,7 @@ class Contrato extends Objeto {
 		'factura_direccion'	,
 		'factura_telefono'	,
 		'factura_comuna'	,
+		'factura_codigopostal'	,
 		'factura_ciudad'	,
 		'cod_factura_telefono'	,
 		'id_tarifa'	,

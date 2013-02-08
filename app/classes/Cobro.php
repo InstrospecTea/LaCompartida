@@ -1,11 +1,12 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 class Cobro extends Objeto {
 
 	var $asuntos = array();
-	var $FacturasDelCobro =array();
-	var $StringFacturasDelCobro =array();
+	var $FacturasDelCobro = array();
+	var $StringFacturasDelCobro = array();
 
 	function Cobro($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
@@ -19,72 +20,79 @@ class Cobro extends Objeto {
 	function Write() {
 		$ingreso_historial = false;
 
-		if( $this->fields['estado'] != $this->valor_antiguo['estado'] &&
-				!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado']) ) {
+		if ($this->fields['estado'] != $this->valor_antiguo['estado'] &&
+			!empty($this->fields['estado']) && !empty($this->valor_antiguo['estado'])) {
 			$ingreso_historial = true;
 		}
-                    if( parent::Write() ) {
-                            if( $ingreso_historial ) {
-                                    // Esa linea es necesaria para que el estado no se guardará dos veces
-                                    $this->valor_antiguo['estado'] = $this->fields['estado'];
+		if (parent::Write()) {
+			if ($ingreso_historial) {
+				// Esa linea es necesaria para que el estado no se guardará dos veces
+				$this->valor_antiguo['estado'] = $this->fields['estado'];
 
-                                $his = new Observacion($this->sesion);
+				$his = new Observacion($this->sesion);
 
-                                if($ultimaobservacion=$his->UltimaObservacion($this->fields['id_cobro'])) {
-                                        if($ultimaobservacion['comentario']!=__("COBRO {$this->fields['estado']}")) {
-                                            $his->Edit('fecha', date('Y-m-d H:i:s'));
-                                            $his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
-                                            $his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-                                            $his->Edit('id_cobro', $this->fields['id_cobro']);
-                                            $his->Write();
-                                        }
-                                }
-
-                    }
-                       return true;
-              }
-        }
-	 function BotoneraCobro() {
-		echo "<br /><br />    <a class=\"btn botonizame\" icon=\"ui-icon-doc\" setwidth=\"185\" onclick=\"return VerDetalles(jQuery('#todo_cobro').get(0));\" >".  __('Descargar Archivo') ." Word</a>";
-
-							if (UtilesApp::GetConf($this->sesion, 'MostrarBotonCobroPDF')) echo  "<br class=\"clearfix vpx\" /><a class=\"btn botonizame\"  icon=\"ui-icon-pdf\"  setwidth=\"185\" onclick=\"return VerDetallesPDF(jQuery('#todo_cobro').get(0));\">". __('Descargar Archivo') ." PDF</a>";
-
-							if (!UtilesApp::GetConf($this->sesion, 'EsconderExcelCobroModificable')) echo "<br class=\"clearfix vpx\"/><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0)); \">". __('descargar_excel_modificable') ." </a>";
-
-							if (UtilesApp::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) echo "	<br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); \">". __('Excel rentabilidad')."  </a>	";
-
-							if (UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') echo "  <br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');\">". __('Descargar Excel Cobro') ." </a>";
-
+				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
+					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+						$his->Edit('fecha', date('Y-m-d H:i:s'));
+						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+						$his->Edit('id_cobro', $this->fields['id_cobro']);
+						$his->Write();
+					}
+				}
+			}
+			return true;
+		}
 	}
+
+	function BotoneraCobro() {
+		echo "<br /><br />    <a class=\"btn botonizame\" icon=\"ui-icon-doc\" setwidth=\"185\" onclick=\"return VerDetalles(jQuery('#todo_cobro').get(0));\" >" . __('Descargar Archivo') . " Word</a>";
+
+		if (UtilesApp::GetConf($this->sesion, 'MostrarBotonCobroPDF')) {
+			echo "<br class=\"clearfix vpx\" /><a class=\"btn botonizame\"  icon=\"ui-icon-pdf\"  setwidth=\"185\" onclick=\"return VerDetallesPDF(jQuery('#todo_cobro').get(0));\">" . __('Descargar Archivo') . " PDF</a>";
+		}
+		if (!UtilesApp::GetConf($this->sesion, 'EsconderExcelCobroModificable')) {
+			echo "<br class=\"clearfix vpx\"/><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0)); \">" . __('descargar_excel_modificable') . " </a>";
+		}
+		if (UtilesApp::GetConf($this->sesion, 'ExcelRentabilidadFlatFee')) {
+			echo "	<br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'rentabilidad'); \">" . __('Excel rentabilidad') . "  </a>	";
+		}
+		if (UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != '' && UtilesApp::GetConf($this->sesion, 'XLSFormatoEspecial') != 'cobros_xls.php') {
+			echo "  <br class=\"clearfix vpx\" /><a class=\"btn botonizame\" icon=\"xls\" setwidth=\"185\" onclick=\"return DescargarExcel(jQuery('#todo_cobro').get(0), 'especial');\">" . __('Descargar Excel Cobro') . " </a>";
+		}
+	}
+
 	//Guarda los pagos que pudo haber hecho un documento
-	function SetPagos($pago_honorarios, $pago_gastos, $id_documento=null) {
+	function SetPagos($pago_honorarios, $pago_gastos, $id_documento = null) {
 		$nuevo_pago = false;
 		$pagado = false;
 		if ($pago_honorarios) {
 			if ($this->fields['honorarios_pagados'] == 'NO') {
-				if ($id_documento)
+				if ($id_documento) {
 					$this->Edit('id_doc_pago_honorarios', $id_documento);
+				}
 				$this->Edit('honorarios_pagados', 'SI');
 				$nuevo_pago = true;
 			}
-		}
-		else {
+		} else {
 			$this->Edit('id_doc_pago_honorarios', 'NULL');
 			$this->Edit('honorarios_pagados', 'NO');
 		}
 		if ($pago_gastos) {
 			if ($this->fields['gastos_pagados'] == 'NO') {
-				if ($id_documento)
+				if ($id_documento) {
 					$this->Edit('id_doc_pago_gastos', $id_documento);
+				}
 				$this->Edit('gastos_pagados', 'SI');
 
 				$descripcion = __("Pago de Gasto de Cobro #") . $this->fields['id_cobro'];
-				if ($id_documento)
+				if ($id_documento) {
 					$descripcion .= __(" por Documento #") . $id_documento;
+				}
 
 				if ($this->fields['monto_gastos'] > 0) {
 					$provision = new Gasto($this->sesion);
-					$provision->Edit('id_moneda', $this->fields['id_moneda']);
+					$provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
 					$provision->Edit('ingreso', $this->fields['monto_gastos']);
 					$provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
@@ -105,21 +113,22 @@ class Cobro extends Objeto {
 		}
 
 		if ($this->fields['honorarios_pagados'] == 'SI' && $this->fields['gastos_pagados'] == 'SI' && ($this->fields['estado'] != 'PAGADO' || $nuevo_pago)) {
-			if (!$this->fields['fecha_cobro'])
+			if (!$this->fields['fecha_cobro']) {
 				$this->Edit('fecha_cobro', date('Y-m-d H:i:s'));
+			}
 
 			$estado_anterior = $this->fields['estado'];
 			$this->Edit('estado', 'PAGADO');
 
 			#Se ingresa la anotación en el historial
-			if( $estado_anterior != 'PAGADO') {
-				/*$his = new Observacion($this->sesion);
-				$his->Edit('fecha', date('Y-m-d H:i:s'));
-				$his->Edit('comentario', __('COBRO PAGADO'));
-				$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-				$his->Edit('id_cobro', $this->fields['id_cobro']);
-				if ($his->Write())
-					$pagado = true;*/
+			if ($estado_anterior != 'PAGADO') {
+				/* $his = new Observacion($this->sesion);
+				  $his->Edit('fecha', date('Y-m-d H:i:s'));
+				  $his->Edit('comentario', __('COBRO PAGADO'));
+				  $his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+				  $his->Edit('id_cobro', $this->fields['id_cobro']);
+				  if ($his->Write())
+				  $pagado = true; */
 				$pagado = true;
 			}
 		}
@@ -131,10 +140,11 @@ class Cobro extends Objeto {
 		$query = "SELECT count(*) FROM factura WHERE id_cobro = '" . $this->fields['id_cobro'] . "' AND anulado = 0";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cont) = mysql_fetch_array($resp);
-		if ($cont > 0)
+		if ($cont > 0) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	#retorna el listado de asuntos asociados a un cobro
@@ -272,7 +282,7 @@ class Cobro extends Objeto {
 	}
 
 	function FacturasDelCobro() {
-		$query="select concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
+		$query = "select concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
 						prm_moneda.simbolo,
 						cast(factura.total-factura.iva as decimal(10,4)) as total_sin_impuesto ,
 						factura.iva,
@@ -281,11 +291,11 @@ class Cobro extends Objeto {
 							from factura
 							join prm_moneda ON (prm_moneda.id_moneda = factura.id_moneda)
 							join prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
-							where id_cobro=".$this->fields['id_cobro'];
-					$facturasST=$this->sesion->pdodbh->query($query) ;
-					$this->FacturasDelCobro=$facturasST->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP);
+							where id_cobro=" . $this->fields['id_cobro'];
+		$facturasST = $this->sesion->pdodbh->query($query);
+		$this->FacturasDelCobro = $facturasST->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
 
-					return $this->FacturasDelCobro;
+		return $this->FacturasDelCobro;
 	}
 
 	function TieneFacturasSinAnular() {
@@ -300,7 +310,7 @@ class Cobro extends Objeto {
 		/**
 		 * INCOBRABLE			si estaba en incobrable no se toca
 		 * ENVIADO AL CLIENTE	si no hay facturas y pasó por el estado enviado al cliente, dejarlo asi
-		 *						(salvo que tenga el config EnviarAlClienteAntesDeFacturar)
+		 * 						(salvo que tenga el config EnviarAlClienteAntesDeFacturar)
 		 * EMITIDO				sin facturas (no-anuladas) y sin fecha de enviado al cliente
 		 * FACTURADO			con facturas && monto pagado == 0
 		 * PAGADO				con facturas && monto_pagado == monto_total
@@ -382,8 +392,8 @@ class Cobro extends Objeto {
 			if (empty($monto_pago_menos_ncs) || $monto_pago_menos_ncs == 'NULL') {
 				if ($num_facturas > 0) {
 					if (!empty($this->fields['fecha_enviado_cliente']) &&
-							$this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' &&
-							!UtilesApp::GetConf($this->sesion, 'EnviarAlClienteAntesDeFacturar')) {
+						$this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' &&
+						!UtilesApp::GetConf($this->sesion, 'EnviarAlClienteAntesDeFacturar')) {
 						$estado = 'ENVIADO AL CLIENTE';
 					} else {
 						$estado = 'FACTURADO';
@@ -427,12 +437,12 @@ class Cobro extends Objeto {
 		$estado_anterior = $this->fields['estado'];
 		$this->Edit('estado', $estado);
 		if ($this->Write() && $estado_anterior != $estado) {
-			/*$his = new Observacion($this->sesion);
-			$his->Edit('fecha', date('Y-m-d H:i:s'));
-			$his->Edit('comentario', __('COBRO ' . $estado));
-			$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
-			$his->Edit('id_cobro', $this->fields['id_cobro']);
-			$his->Write();*/
+			/* $his = new Observacion($this->sesion);
+			  $his->Edit('fecha', date('Y-m-d H:i:s'));
+			  $his->Edit('comentario', __('COBRO ' . $estado));
+			  $his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
+			  $his->Edit('id_cobro', $this->fields['id_cobro']);
+			  $his->Write(); */
 			return $estado;
 		}
 		return null;
@@ -489,8 +499,9 @@ class Cobro extends Objeto {
 					if (!$provision_generada->fields['id_cobro']) {
 						$provision_generada->Eliminar();
 						$gasto_generado->Load($this->fields['id_gasto_generado']);
-						if ($gasto_generado->Loaded())
+						if ($gasto_generado->Loaded()) {
 							$gasto_generado->Eliminar();
+						}
 					}
 				}
 			}
@@ -518,9 +529,9 @@ class Cobro extends Objeto {
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			return true;
-		}
-		else
+		} else {
 			return false;
+		}
 	}
 
 	function AnularEmision($estado = 'CREADO') {
@@ -538,14 +549,17 @@ class Cobro extends Objeto {
 				return false;
 			}
 
-			if ($cantidad_pagos > 0)
+			if ($cantidad_pagos > 0) {
 				return false;
+			}
 		}
 
 		$query = "UPDATE trabajo SET fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-		if(array_key_exists('estado_anterior',$this->fields ))  $this->Edit('estado_anterior', $this->fields['estado']);
+		if (array_key_exists('estado_anterior', $this->fields)) {
+			$this->Edit('estado_anterior', $this->fields['estado']);
+		}
 		$this->Edit('estado', $estado);
 		$this->Edit('id_doc_pago_honorarios', 'NULL');
 		$this->Edit('id_doc_pago_gastos', 'NULL');
@@ -553,7 +567,7 @@ class Cobro extends Objeto {
 		$this->AnularDocumento($estado, $cantidad_pagos > 0 ? true : false);
 	}
 
-	function AnularDocumento($estado = 'CREADO', $hay_pagos=false) {
+	function AnularDocumento($estado = 'CREADO', $hay_pagos = false) {
 		$documento = new Documento($this->sesion);
 		$documento->LoadByCobro($this->fields['id_cobro']);
 
@@ -574,9 +588,9 @@ class Cobro extends Objeto {
 			$query = "SELECT id_moneda FROM cobro WHERE id_cobro = '$id_cobro' ";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($id_moneda) = mysql_fetch_array($resp);
-		}
-		else
+		} else {
 			$id_moneda = $this->fields['id_moneda'];
+		}
 
 		return $id_moneda;
 	}
@@ -600,10 +614,11 @@ class Cobro extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$monto_total = 0;
 		while (list($egreso, $monto, $ingreso) = mysql_fetch_array($resp)) {
-			if ($egreso > 0)
-				$monto_total+=$monto;
-			else if ($ingreso > 0)
-				$monto_total-=$monto;
+			if ($egreso > 0) {
+				$monto_total += $monto;
+			} else if ($ingreso > 0) {
+				$monto_total -= $monto;
+			}
 		}
 		return $monto_total;
 	}
@@ -629,8 +644,9 @@ class Cobro extends Objeto {
 
 		$tiempo_inicial = 0;
 		for ($i = 1; $i < 4; $i++) {
-			if (empty($this->fields['esc' . $i . '_tiempo']))
+			if (empty($this->fields['esc' . $i . '_tiempo'])) {
 				break;
+			}
 
 			$this->escalonadas['num']++;
 			$this->escalonadas[$i] = array();
@@ -640,8 +656,8 @@ class Cobro extends Objeto {
 			$this->escalonadas[$i]['id_tarifa'] = $this->fields['esc' . $i . '_id_tarifa'];
 			$this->escalonadas[$i]['id_moneda'] = $this->fields['esc' . $i . '_id_moneda'];
 			$this->escalonadas[$i]['monto'] = UtilesApp::CambiarMoneda(
-							$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
-					) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
+					$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+				) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
 
 			$this->escalonadas[$i]['descuento'] = $this->fields['esc' . $i . '_descuento'];
 
@@ -666,8 +682,8 @@ class Cobro extends Objeto {
 		$this->escalonadas[$i2]['id_tarifa'] = $this->fields['esc' . $i . '_id_tarifa'];
 		$this->escalonadas[$i2]['id_moneda'] = $this->fields['esc' . $i . '_id_moneda'];
 		$this->escalonadas[$i2]['monto'] = UtilesApp::CambiarMoneda(
-						$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
-				) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
+				$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+			) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
 		$this->escalonadas[$i2]['descuento'] = $this->fields['esc' . $i . '_descuento'];
 
 		if (!empty($this->escalonadas[$i2]['monto'])) {
@@ -742,11 +758,11 @@ class Cobro extends Objeto {
 
 					// Busca la tarifa según abogado y definición de la escalonada
 					$tarifa_estandar = UtilesApp::CambiarMoneda(
-									Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda']), $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+							Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda']), $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
 					);
 					if (!empty($this->escalonadas[$x_escalonada]['id_tarifa']) && $this->escalonadas[$x_escalonada]['id_tarifa'] != "NULL") {
 						$tarifa = UtilesApp::CambiarMoneda(
-										Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda'], '', $this->escalonadas[$x_escalonada]['id_tarifa']), $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+								Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda'], '', $this->escalonadas[$x_escalonada]['id_tarifa']), $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$x_escalonada]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
 						);
 
 						$valor_escalonada_actual = ( 1 - $this->escalonadas[$x_escalonada]['descuento'] / 100 ) * $duracion_escalonada_actual * $tarifa;
@@ -761,12 +777,12 @@ class Cobro extends Objeto {
 						$valor_trabajo_estandar += $duracion_escalonada_actual * $tarifa_estandar;
 
 						// Esa variable hay que sumar al valor cobrado de ese trabajo ...
-						$deltatiempo=$this->escalonadas[$x_escalonada]['tiempo_final'] - $this->escalonadas[$x_escalonada]['tiempo_inicial'];
-                                                if($deltatiempo>0) {
-                                                   $aporte_monto_trabajo += $duracion_escalonada_actual * ( $this->escalonadas[$x_escalonada]['monto'] / ( $deltatiempo ) );
-                                                } else {
-                                                   $aporte_monto_trabajo +=  $this->escalonadas[$x_escalonada]['monto'];
-                                                }
+						$deltatiempo = $this->escalonadas[$x_escalonada]['tiempo_final'] - $this->escalonadas[$x_escalonada]['tiempo_inicial'];
+						if ($deltatiempo > 0) {
+							$aporte_monto_trabajo += $duracion_escalonada_actual * ( $this->escalonadas[$x_escalonada]['monto'] / ( $deltatiempo ) );
+						} else {
+							$aporte_monto_trabajo += $this->escalonadas[$x_escalonada]['monto'];
+						}
 					}
 
 					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['duracion'] = $duracion_escalonada_actual;
@@ -778,7 +794,7 @@ class Cobro extends Objeto {
 					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['usuario'] = $trabajo->fields['usr_nombre'];
 					$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['trabajos'][$trabajo->fields['id_trabajo']]['categoria'] = $trabajo->fields['categoria'];
 
-					if( is_array($detalle_trabajos[$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]) ) {
+					if (is_array($detalle_trabajos[$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']])) {
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['duracion'] += $duracion_escalonada_actual;
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['valor'] += $valor_escalonada_actual;
 					} else {
@@ -786,7 +802,7 @@ class Cobro extends Objeto {
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['valor'] += $valor_escalonada_actual;
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['usuario'] = $trabajo->fields['usr_nombre'];
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['categoria'] = $trabajo->fields['categoria'];
-						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['tarifa'] = ( !empty($tarifa) ? $tarifa : 0 );
+						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['tarifa'] = (!empty($tarifa) ? $tarifa : 0 );
 						$detalle_trabajos['detalle_escalonadas'][$x_escalonada]['usuarios'][$trabajo->fields['id_usuario']]['descuento'] = $this->escalonadas[$x_escalonada]['descuento'];
 					}
 
@@ -804,13 +820,13 @@ class Cobro extends Objeto {
 						} else {
 							break;
 						}
-					}
-					else
+					} else {
 						break;
+					}
 				}
 
 				$cobro_total_honorario_cobrable += $valor_trabajo;
-				if( $duracion_trabajo > 0 ) {
+				if ($duracion_trabajo > 0) {
 					$tarifa_hh = $valor_trabajo_hh / $duracion_trabajo;
 					$tarifa_hh_estandar = $valor_trabajo_estandar / $duracion_trabajo;
 				} else {
@@ -836,9 +852,9 @@ class Cobro extends Objeto {
 				continue;
 			}
 		}
-		$total_minutos_tmp = ( $cobro_total_duracion * 60 ) ;
+		$total_minutos_tmp = ( $cobro_total_duracion * 60 );
 
-		return array($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos );
+		return array($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos);
 	}
 
 	// La variable $mantener_porcentaje_impuesto es importante en la migracion de datos donde no importa el datos
@@ -872,26 +888,29 @@ class Cobro extends Objeto {
 		$moneda_del_cobro->Load($this->fields['id_moneda']);
 		$decimales = $moneda_del_cobro->fields['cifras_decimales'];
 
-		if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
+		if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 			$cobro_total_honorario_cobrable = $cobro_monto_moneda_cobro;
+		}
 
 		// Si es necesario calcular el impuesto por separado se actualiza el porcentaje de impuesto que se cobra.
 		$contrato = new Contrato($this->sesion);
-		if($contrato->Load($this->fields['id_contrato']) && $emitir) {
+		if ($contrato->Load($this->fields['id_contrato']) && $emitir) {
 			$contrato->Edit('notificado_monto_excedido_ult_cobro', '0');
 			$contrato->Edit('notificado_hr_excedida_ult_cobro', '0');
 			$contrato->Write();
 		}
 
 		if (!$mantener_porcentaje_impuesto) {
-			if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado'])
+			if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado']) {
 				$this->Edit('porcentaje_impuesto', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuesto') : Conf::ValorImpuesto()));
-			else
+			} else {
 				$this->Edit('porcentaje_impuesto', '0');
-			if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoPorGastos') ) || ( method_exists('Conf', 'UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos'])
+			}
+			if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoPorGastos') ) || ( method_exists('Conf', 'UsarImpuestoPorGastos') && Conf::UsarImpuestoPorGastos() ) ) && $contrato->fields['usa_impuesto_gastos']) {
 				$this->Edit('porcentaje_impuesto_gastos', (method_exists('Conf', 'GetConf') ? Conf::GetConf($this->sesion, 'ValorImpuestoGastos') : Conf::ValorImpuestoGastos()));
-			else
+			} else {
 				$this->Edit('porcentaje_impuesto_gastos', '0');
+			}
 		}
 		$query = "SELECT SQL_CALC_FOUND_ROWS tramite.id_tramite,
                                    tramite.tarifa_tramite,
@@ -906,8 +925,9 @@ class Cobro extends Objeto {
                                JOIN tramite_tipo USING( id_tramite_tipo )
                                WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
                                ORDER BY tramite.fecha ASC";
-		if (!$mantener_porcentaje_impuesto)
+		if (!$mantener_porcentaje_impuesto) {
 			$lista_tramites = new ListaTramites($this->sesion, '', $query);
+		}
 
 		for ($z = 0; $z < $lista_tramites->num; $z++) {
 			$tramite = $lista_tramites->Get($z);
@@ -920,16 +940,18 @@ class Cobro extends Objeto {
 				$tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar'] = Funciones::MejorTramiteTarifa($this->sesion, $tramite->fields['id_tramite_tipo'], $this->fields['id_moneda'], $this->fields['id_cobro']);
 			}
 			$tramite->Edit('id_moneda_tramite', $this->fields['id_moneda']);
-			if ($tramite->fields['tarifa_tramite_individual'] > 0)
+			if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 				$valor_tramite = number_format($tramite->fields['tarifa_tramite_individual'] * ( $cobro_moneda->moneda[$tramite->fields['id_moneda_tramite_individual']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] ), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', '');
-			else
+			} else {
 				$valor_tramite = $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa'];
+			}
 			$tramite->Edit('tarifa_tramite', $valor_tramite);
 			$tramite->Edit('tarifa_tramite_defecto', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_defecto']);
 			$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 
-			if (!$tramite->Write())
+			if (!$tramite->Write()) {
 				return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
+			}
 		}
 
 		/*
@@ -939,9 +961,9 @@ class Cobro extends Objeto {
 		 * Eso vamos a conseguir con la definición de las variables $select_retainer_usuarios y $orden_retainer_usuarios
 		 */
 		if (method_exists('Conf', 'GetConf')
-				&& Conf::GetConf($this->sesion, 'RetainerUsuarios')
-				&& $this->fields['retainer_usuarios'] != ""
-				&& $this->fields['forma_cobro'] == 'RETAINER') {
+			&& Conf::GetConf($this->sesion, 'RetainerUsuarios')
+			&& $this->fields['retainer_usuarios'] != ""
+			&& $this->fields['forma_cobro'] == 'RETAINER') {
 			$select_retainer_usuarios = "IF( trabajo.id_usuario IN ( " . $this->fields['retainer_usuarios'] . " ), '1', '2' ) as incluir_en_retainer, ";
 			$orden_retainer_usuarios = "incluir_en_retainer, ";
 		} else {
@@ -975,10 +997,11 @@ class Cobro extends Objeto {
 				WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 				AND trabajo.id_tramite=0
 				ORDER BY $orden_retainer_usuarios trabajo.fecha ASC";
-		if (!$mantener_porcentaje_impuesto)
+		if (!$mantener_porcentaje_impuesto) {
 			$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
-		else
+		} else {
 			$lista_trabajos->num = 0;
+		}
 
 		if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 			list($cobro_total_honorario_cobrable, $cobro_total_minutos) = $this->MontoHonorariosEscalonados($lista_trabajos);
@@ -1087,8 +1110,9 @@ class Cobro extends Objeto {
 				$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
 
-				if (!$trabajo->Write(false))
+				if (!$trabajo->Write(false)) {
 					return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+				}
 			} #End for cobros
 		}
 
@@ -1140,8 +1164,9 @@ class Cobro extends Objeto {
 				$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
 				$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 				$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $decimales, '.', ''));
-				if (!$trabajo->Write(false))
+				if (!$trabajo->Write(false)) {
 					return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+				}
 			}
 		}
 
@@ -1150,10 +1175,11 @@ class Cobro extends Objeto {
 			$cobro_total_honorario_cobrable = $this->fields['monto_ajustado'];
 			for ($z = 0; $z < $lista_trabajos->num; ++$z) {
 				$trabajo = $lista_trabajos->Get($z);
-				if ($cobro_total_honorario_cobrable_original > 0)
+				if ($cobro_total_honorario_cobrable_original > 0) {
 					$factor = $cobro_total_honorario_cobrable / $cobro_total_honorario_cobrable_original;
-				else
+				} else {
 					$factor = 1;
+				}
 				$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 				$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
@@ -1167,8 +1193,9 @@ class Cobro extends Objeto {
 		#GASTOS del Cobro
 		if (!UtilesApp::GetConf($this->sesion, 'NuevoModuloGastos')) {
 			$no_generado = '';
-			if ($this->fields['id_gasto_generado'])
+			if ($this->fields['id_gasto_generado']) {
 				$no_generado = ' AND cta_corriente.id_movimiento != ' . $this->fields['id_gasto_generado'];
+			}
 
 			$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.descripcion,
 						cta_corriente.fecha,
@@ -1186,37 +1213,39 @@ class Cobro extends Objeto {
 						$no_generado
 					ORDER BY cta_corriente.fecha ASC";
 
-			if (!$mantener_porcentaje_impuesto)
+			if (!$mantener_porcentaje_impuesto) {
 				$lista_gastos = new ListaGastos($this->sesion, '', $query);
-			else
+			} else {
 				$lista_gastos->num = 0;
+			}
 
 			for ($v = 0; $v < $lista_gastos->num; $v++) {
 				$gasto = $lista_gastos->Get($v);
 
 				//cobro_total_gastos en moneda cobro
-				if ($gasto->fields['egreso'] > 0)
+				if ($gasto->fields['egreso'] > 0) {
 					$cobro_total_gastos_egreso += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-				elseif ($gasto->fields['ingreso'] > 0)
+				} elseif ($gasto->fields['ingreso'] > 0) {
 					$cobro_total_gastos_provision += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
-
+				}
 				//cobro_base_gastos en moneda base
-				if ($gasto->fields['egreso'] > 0)
-					$cobro_base_gastos_egreso += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
-				elseif ($gasto->fields['ingreso'] > 0)
-					$cobro_base_gastos_provision += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio'];#revisar 15-05-09
+				if ($gasto->fields['egreso'] > 0) {
+					$cobro_base_gastos_egreso += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio']; #revisar 15-05-09
+				} elseif ($gasto->fields['ingreso'] > 0) {
+					$cobro_base_gastos_provision += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $moneda_base['tipo_cambio']; #revisar 15-05-09
+				}
 
 
-
-				if (!empty($gasto->fields['codigo_asunto']) && empty($codigo_asunto_cualquiera))
+				if (!empty($gasto->fields['codigo_asunto']) && empty($codigo_asunto_cualquiera)) {
 					$codigo_asunto_cualquiera = $gasto->fields['codigo_asunto'];
-				else if (!empty($trabajo->fields['codigo_asunto']))
+				} else if (!empty($trabajo->fields['codigo_asunto'])) {
 					$codigo_asunto_cualquiera = $trabajo->fields['codigo_asunto'];
-				else if (empty($codigo_asunto_cualquiera))
+				} else if (empty($codigo_asunto_cualquiera)) {
 					$codigo_asunto_cualquiera = $this->asuntos[0];
+				}
 			}
-			$cobro_total_gastos=$cobro_total_gastos_egreso - $cobro_total_gastos_provision;
-			$cobro_base_gastos=$cobro_base_gastos_egreso - $cobro_base_gastos_provision;
+			$cobro_total_gastos = $cobro_total_gastos_egreso - $cobro_total_gastos_provision;
+			$cobro_base_gastos = $cobro_base_gastos_egreso - $cobro_base_gastos_provision;
 
 
 			/* Si las Provisiones superan al Gasto, se debe generar un Gasto por esa cantidad, de modo que total_gastos quede en 0, y se debe crear una provisión igual a ese gasto, para incluir en cobro futuro */
@@ -1229,46 +1258,48 @@ class Cobro extends Objeto {
 
 
 				if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
-				   /* require('PhpConsole.php');
-				    PhpConsole::start(true, true, dirname(__FILE__));*/
-				  //En vez de generar un gasto ficticio, divido un gasto en dos.
-				  //Decido cual es la provision que voy a dividir
-				    $queryprovision="select id_movimiento from cta_corriente WHERE cta_corriente.id_cobro='" . $this->fields['id_cobro'] . "'     and ingreso is not null and egreso is null order by ingreso desc limit 0,1";
-			    //debug($queryprovision);
-					$resultprovision=mysql_query($queryprovision, $this->sesion->dbh);
+					/* require('PhpConsole.php');
+					  PhpConsole::start(true, true, dirname(__FILE__)); */
+					//En vez de generar un gasto ficticio, divido un gasto en dos.
+					//Decido cual es la provision que voy a dividir
+					$queryprovision = "select id_movimiento from cta_corriente WHERE cta_corriente.id_cobro='" . $this->fields['id_cobro'] . "'     and ingreso is not null and egreso is null order by ingreso desc limit 0,1";
+					//debug($queryprovision);
+					$resultprovision = mysql_query($queryprovision, $this->sesion->dbh);
 
-				list($id_provision_objetivo)=mysql_fetch_array($resultprovision,$this->sesion->dbh );
+					list($id_provision_objetivo) = mysql_fetch_array($resultprovision, $this->sesion->dbh);
 
-				$provision_original=new Gasto($this->sesion);
-				$provision_original->Load($id_provision_objetivo);
-
-
-				$provision_original_ingreso=$provision_original->fields['ingreso'];
-				$provision_original_cobrable=$provision_original->fields['monto_cobrable'];
-				$provision_original->Edit('ingreso',$provision_original_ingreso - $monto_provision_restante);
-				$provision_original->Edit('monto_cobrable',$provision_original_cobrable - $monto_provision_restante);
+					$provision_original = new Gasto($this->sesion);
+					$provision_original->Load($id_provision_objetivo);
 
 
-				  //debug($provision_original);
-				 $cobro_total_gastos = $cobro_total_gastos_egreso;
-				 $cobro_base_gastos = $cobro_base_gastos_egreso;
+					$provision_original_ingreso = $provision_original->fields['ingreso'];
+					$provision_original_cobrable = $provision_original->fields['monto_cobrable'];
+					$provision_original->Edit('ingreso', $provision_original_ingreso - $monto_provision_restante);
+					$provision_original->Edit('monto_cobrable', $provision_original_cobrable - $monto_provision_restante);
+
+
+					//debug($provision_original);
+					$cobro_total_gastos = $cobro_total_gastos_egreso;
+					$cobro_base_gastos = $cobro_base_gastos_egreso;
 				} else {
 					//METODO VIEJO: SE NETEA CON DOS MOVIMIENTOS IMAGINARIOS
 					$cobro_total_gastos = 0;
 					$cobro_base_gastos = 0;
-					    $gas = new Gasto($this->sesion);
-				    if ($this->fields['id_gasto_generado'])    $gas->Load($this->fields['id_gasto_generado']);
+					$gas = new Gasto($this->sesion);
+					if ($this->fields['id_gasto_generado']) {
+						$gas->Load($this->fields['id_gasto_generado']);
+					}
 
-				    $gas->Edit('id_moneda', $this->fields['opc_moneda_total']);
-				    $gas->Edit('codigo_asunto', $codigo_asunto_cualquiera);
-				    $gas->Edit('egreso', $monto_provision_restante);
-				    $gas->Edit('monto_cobrable', $monto_provision_restante);
-				    $gas->Edit('ingreso', 0);
-				    $gas->Edit('id_cobro', $this->fields['id_cobro']);
-				    $gas->Edit('codigo_cliente', $this->fields['codigo_cliente']);
-				    $gas->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
-				    $gas->Edit('incluir_en_cobro', 'SI');
-				    $gas->Edit('fecha', date('Y-m-d 00:00:00'));
+					$gas->Edit('id_moneda', $this->fields['opc_moneda_total']);
+					$gas->Edit('codigo_asunto', $codigo_asunto_cualquiera);
+					$gas->Edit('egreso', $monto_provision_restante);
+					$gas->Edit('monto_cobrable', $monto_provision_restante);
+					$gas->Edit('ingreso', 0);
+					$gas->Edit('id_cobro', $this->fields['id_cobro']);
+					$gas->Edit('codigo_cliente', $this->fields['codigo_cliente']);
+					$gas->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
+					$gas->Edit('incluir_en_cobro', 'SI');
+					$gas->Edit('fecha', date('Y-m-d 00:00:00'));
 					$gas->Write();
 					$this->Edit('id_gasto_generado', $gas->fields['id_movimiento']);
 				}
@@ -1276,8 +1307,9 @@ class Cobro extends Objeto {
 
 
 				$provision = new Gasto($this->sesion);
-				if ($this->fields['id_provision_generada'])
+				if ($this->fields['id_provision_generada']) {
 					$provision->Load($this->fields['id_provision_generada']);
+				}
 
 				$provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
 				$provision->Edit('codigo_asunto', $codigo_asunto_cualquiera);
@@ -1285,19 +1317,19 @@ class Cobro extends Objeto {
 				$provision->Edit('ingreso', $monto_provision_restante);
 				$provision->Edit('monto_cobrable', $monto_provision_restante);
 
-					//debug('Sobran '.$monto_provision_restante);
+				//debug('Sobran '.$monto_provision_restante);
 
 				$provision->Edit('id_cobro', 'NULL');
 				$provision->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 				$provision->Edit('descripcion', __("Saldo aprovisionado restante tras Cobro #") . $this->fields['id_cobro']);
 				$provision->Edit('incluir_en_cobro', 'SI');
 				$provision->Edit('fecha', date('Y-m-d 00:00:00'));
-				if (!UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) $provision->Write();
+				if (!UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
+					$provision->Write();
+				}
 				//debug(print_r($provision));
 
 				$this->Edit('id_provision_generada', $provision->fields['id_movimiento']);
-
-
 			} else {
 				$gas = new Gasto($this->sesion);
 				if ($this->fields['id_gasto_generado']) {
@@ -1315,16 +1347,18 @@ class Cobro extends Objeto {
 		}
 		#Obtenemos el saldo_final de GASTOS diferencia de: saldo_inicial - (la suma de los gastos-provisiones de este cobro)
 		#En moneda OPC opciones ver
-		if (!$mantener_porcentaje_impuesto)
+		if (!$mantener_porcentaje_impuesto) {
 			$saldo_final_gastos = $this->SaldoFinalCuentaCorriente();
+		}
 
 		#Carga del cliente del cobro
 		$cliente = new Cliente($this->sesion);
 		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
 
 		#Calculo de la cuenta corriente del cliente para el cobro
-		if ($cliente->Loaded() && !$mantener_porcentaje_impuesto)
+		if ($cliente->Loaded() && !$mantener_porcentaje_impuesto) {
 			$saldo_cta_corriente = $cliente->TotalCuentaCorriente();
+		}
 
 		if (!$moneda_del_cobro) {
 			$moneda_del_cobro = new Moneda($this->sesion);
@@ -1352,8 +1386,9 @@ class Cobro extends Objeto {
 			$contrato->Load($this->fields['id_contrato']);
 			$sumatoria_cobros = $this->TotalCobrosCap('', $this->fields['id_moneda']) + $cobro_honorarios_menos_descuento;
 
-			if ($sumatoria_cobros > $cobro_monto_moneda_cobro) //Es decir que lo cobrado ha superado el valor del cap
+			if ($sumatoria_cobros > $cobro_monto_moneda_cobro) { //Es decir que lo cobrado ha superado el valor del cap
 				$cap_descuento = min($sumatoria_cobros - $cobro_monto_moneda_cobro, + $cobro_honorarios_menos_descuento);
+			}
 		}
 		if ($cap_descuento > 0) {
 			$cap_descuento = round($cap_descuento, $moneda_del_cobro->fields['cifras_decimales']);
@@ -1365,27 +1400,28 @@ class Cobro extends Objeto {
 		// Si es necesario calcular el impuesto por separado
 		$contrato = new Contrato($this->sesion);
 		$contrato->Load($this->fields['id_contrato']);
-		if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado'])
+		if (( ( method_exists('Conf', 'UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado']) {
 			$cobro_total *= 1 + $this->fields['porcentaje_impuesto'] / 100.0;
+		}
 
 		// Se guarda la información del cobro
 
-		$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable,6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto', number_format($cobro_total, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
-		$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/*$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']*/, ".", ""));
+		$this->Edit('monto_original', number_format($cobro_total_honorario_cobrable_original, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto_subtotal', number_format($this->CalculaMontoTramites($this) + $cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto', number_format($cobro_total, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto_trabajos', number_format($cobro_total_honorario_cobrable, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto_tramites', number_format($this->CalculaMontoTramites($this), 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto_thh', number_format($cobro_total_honorario_hh, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
+		$this->Edit('monto_thh_estandar', number_format($cobro_total_honorario_hh_estandar, 6/* $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'] */, ".", ""));
 		$this->Edit('total_minutos', $cobro_total_minutos);
 
 
 		if (UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
-		    $this->Edit('saldo_final_gastos', number_format($saldo_final_gastos_egreso, 6, ".", ""));
-		    $gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'],array('listar_detalle'),true);
+			$this->Edit('saldo_final_gastos', number_format($saldo_final_gastos_egreso, 6, ".", ""));
+			$gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'], array('listar_detalle'), true);
 		} else {
-		    $this->Edit('saldo_final_gastos', number_format($saldo_final_gastos, 6, ".", ""));
-		$gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+			$this->Edit('saldo_final_gastos', number_format($saldo_final_gastos, 6, ".", ""));
+			$gastos_cobro = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
 		}
 
 		$this->Edit('subtotal_gastos', number_format($gastos_cobro['gasto_total'], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], ".", ""));
@@ -1401,71 +1437,67 @@ class Cobro extends Objeto {
 		$this->Edit('tipo_cambio_moneda_base', $moneda_base['tipo_cambio']); #revisar 15-05-2009
 
 		if ($this->Write()) {
-			if( UtilesApp::GetConf($this->sesion,'SeEstaCobrandoEspecial') ) {
-							$se_esta_cobrando = "Honorarios Profesionales\n";
-							$se_esta_cobrando .= "Periodo Comprendido: \n";
+			if (UtilesApp::GetConf($this->sesion, 'SeEstaCobrandoEspecial')) {
+				$se_esta_cobrando = "Honorarios Profesionales\n";
+				$se_esta_cobrando .= "Periodo Comprendido: \n";
 
-							if( $this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini']) ) {
-								$se_esta_cobrando_fecha_ini = Utiles::sql2date($this->fields['fecha_ini']);
-								$se_esta_cobrando .=__('Desde').': '.$se_esta_cobrando_fecha_ini."\n";
-							}
-							if($this->fields['fecha_fin'] != '0000-00-00' && !empty($this->fields['fecha_fin']))
-							{
-									$se_esta_cobrando_fecha_fin = Utiles::sql2date($this->fields['fecha_fin']);
-									$se_esta_cobrando .=__('Hasta').': '.$se_esta_cobrando_fecha_fin."\n";
-							}
-							$se_esta_cobrando .= "Tarifa Cobrada: ";
-							$se_esta_cobrando .= $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo']." ";
-							$se_esta_cobrando .= $this->fields['monto'];
+				if ($this->fields['fecha_ini'] != '0000-00-00' && !empty($this->fields['fecha_ini'])) {
+					$se_esta_cobrando_fecha_ini = Utiles::sql2date($this->fields['fecha_ini']);
+					$se_esta_cobrando .=__('Desde') . ': ' . $se_esta_cobrando_fecha_ini . "\n";
+				}
+				if ($this->fields['fecha_fin'] != '0000-00-00' && !empty($this->fields['fecha_fin'])) {
+					$se_esta_cobrando_fecha_fin = Utiles::sql2date($this->fields['fecha_fin']);
+					$se_esta_cobrando .=__('Hasta') . ': ' . $se_esta_cobrando_fecha_fin . "\n";
+				}
+				$se_esta_cobrando .= "Tarifa Cobrada: ";
+				$se_esta_cobrando .= $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . " ";
+				$se_esta_cobrando .= $this->fields['monto'];
 
-							$this->Edit('se_esta_cobrando',$se_esta_cobrando);
-							$this->Write();
-						}
-			if ($emitir) {
-
-
-
-
-			if ($provision && $provision_original && UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
-
-			    if($provision_original) 	$provision_original->Write();
-
-
-			    if($provision) $provision->Write();
-			    //debug('Genero provision y provision original');
-			    $x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'],array(),0,true,true);
-			    $x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'],array('listar_detalle'),true);
-			} else {
-			    $x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
-			   $x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
-
+				$this->Edit('se_esta_cobrando', $se_esta_cobrando);
+				$this->Write();
 			}
+			if ($emitir) {
+				if ($provision && $provision_original && UtilesApp::GetConf($this->sesion, 'NuevoMetodoGastoProvision')) {
 
-				if($provision_original) {
-				$adelanto = new Documento($this->sesion);
-				$adelanto->Edit('id_tipo_documento','0');
-				$adelanto->Edit('codigo_cliente', $this->fields['codigo_cliente']);
-				$adelanto->Edit('id_contrato', $this->fields['id_contrato']);
-				$adelanto->Edit('glosa_documento', __('Adelanto Provisión N°') . ' ' . $provision_original->fields['id_movimiento'].' ('.$provision_original->fields['descripcion'].')');
+					if ($provision_original) {
+						$provision_original->Write();
+					}
 
-				$adelanto->Edit('id_moneda', $this->fields['opc_moneda_total']);
-				$adelanto->Edit('id_moneda_base', $this->fields['id_moneda_base']);
-				$adelanto->Edit('monto', -1*$provision_original->fields['monto_cobrable']);
-				$adelanto->Edit('saldo_pago', -1*$provision_original->fields['monto_cobrable']);
-				$adelanto->Edit('gastos_pagados', 'NO');
-				$adelanto->Edit('honorarios_pagados', 'NO');
-				$adelanto->Edit('monto_base', -1*$provision_original->fields['monto_cobrable']);
-				$adelanto->Edit('numero_doc', $provision_original->fields['numero_documento']);
-				$adelanto->Edit('pago_gastos', 1);
-				$adelanto->Edit('pago_honorarios', 0);
-				$adelanto->Edit('es_adelanto', 1);
-				$adelanto->Edit('fecha', date('Y-m-d'));
-				$adelanto->Write();
-				$provision_original->Delete();
 
-			    }
+					if ($provision) {
+						$provision->Write();
+					}
+					//debug('Genero provision y provision original');
+					$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro'], array(), 0, true, true);
+					$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro'], array('listar_detalle'), true);
+				} else {
+					$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+					$x_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+				}
 
-			    //Documentos
+				if ($provision_original) {
+					$adelanto = new Documento($this->sesion);
+					$adelanto->Edit('id_tipo_documento', '0');
+					$adelanto->Edit('codigo_cliente', $this->fields['codigo_cliente']);
+					$adelanto->Edit('id_contrato', $this->fields['id_contrato']);
+					$adelanto->Edit('glosa_documento', __('Adelanto Provisión N°') . ' ' . $provision_original->fields['id_movimiento'] . ' (' . $provision_original->fields['descripcion'] . ')');
+					$adelanto->Edit('id_moneda', $this->fields['opc_moneda_total']);
+					$adelanto->Edit('id_moneda_base', $this->fields['id_moneda_base']);
+					$adelanto->Edit('monto', -1 * $provision_original->fields['monto_cobrable']);
+					$adelanto->Edit('saldo_pago', -1 * $provision_original->fields['monto_cobrable']);
+					$adelanto->Edit('gastos_pagados', 'NO');
+					$adelanto->Edit('honorarios_pagados', 'NO');
+					$adelanto->Edit('monto_base', -1 * $provision_original->fields['monto_cobrable']);
+					$adelanto->Edit('numero_doc', $provision_original->fields['numero_documento']);
+					$adelanto->Edit('pago_gastos', 1);
+					$adelanto->Edit('pago_honorarios', 0);
+					$adelanto->Edit('es_adelanto', 1);
+					$adelanto->Edit('fecha', date('Y-m-d'));
+					$adelanto->Write();
+					$provision_original->Delete();
+				}
+
+				//Documentos
 				$documento = new Documento($this->sesion, '', '');
 				$documento->Edit('id_tipo_documento', '2');
 				$documento->Edit('codigo_cliente', $this->fields['codigo_cliente']);
@@ -1498,10 +1530,11 @@ class Cobro extends Objeto {
 				$documento->Edit('honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 				$documento->Edit('saldo_honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 				$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
-				if ($this->fields['forma_cobro'] == 'FLAT FEE')
+				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 					$documento->Edit('monto_trabajos', number_format($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
-				else
+				} else {
 					$documento->Edit('monto_trabajos', number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+				}
 				$documento->Edit('monto_tramites', number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
 				$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 				$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
@@ -1518,25 +1551,23 @@ class Cobro extends Objeto {
 					JOIN cobro_moneda ON cobro.id_cobro = cobro_moneda.id_cobro
 					WHERE cobro.id_cobro =:idcobro";
 
-				//	$resp = mysql_query($query_documento_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_documento_moneda, __FILE__, __LINE__, $this->sesion->dbh);
+					//	$resp = mysql_query($query_documento_moneda, $this->sesion->dbh) or Utiles::errorSQL($query_documento_moneda, __FILE__, __LINE__, $this->sesion->dbh);
 
 					try {
 						$this->sesion->pdodbh->beginTransaction();
-						$logstatement=$this->sesion->pdodbh->prepare($query_documento_moneda);
-						$logstatement->bindParam( ':idcobro', $this->fields['id_cobro'], PDO::PARAM_INT);
-						$logstatement->bindParam( ':iddocumento', $documento->fields['id_documento'], PDO::PARAM_INT);
-					 	$logstatement->execute( );
+						$logstatement = $this->sesion->pdodbh->prepare($query_documento_moneda);
+						$logstatement->bindParam(':idcobro', $this->fields['id_cobro'], PDO::PARAM_INT);
+						$logstatement->bindParam(':iddocumento', $documento->fields['id_documento'], PDO::PARAM_INT);
+						$logstatement->execute();
 						$this->sesion->pdodbh->commit();
-
 					} catch (PDOException $e) {
-						 if($this->sesion->usuario->fields['rut'] == '99511620') {
-							$Slim=Slim::getInstance('default',true);
-							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query_documento_moneda,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($logstatement) );
+						if ($this->sesion->usuario->fields['rut'] == '99511620') {
+							$Slim = Slim::getInstance('default', true);
+							$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $query_documento_moneda, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($logstatement));
 							$Slim->view()->setData($arrayPDOException);
-							 $Slim->applyHook('hook_error_sql');
-						 }
-						Utiles::errorSQL($query_documento_moneda, "", "",  NULL,"",$e );
-
+							$Slim->applyHook('hook_error_sql');
+						}
+						Utiles::errorSQL($query_documento_moneda, "", "", NULL, "", $e);
 					}
 
 
@@ -1547,13 +1578,12 @@ class Cobro extends Objeto {
 					$resp = mysql_query($query_factura, $this->sesion->dbh) or Utiles::errorSQL($query_factura, __FILE__, __LINE__, $this->sesion->dbh);
 				}
 			}
+		} else {
+			return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
 		}
-		else
+		if (!$this->Write()) {
 			return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
-
-		if (!$this->Write())
-			return __('Error no se pudo guardar ') . __('cobro') . ' # ' . $this->fields['id_cobro'];
-
+		}
 		return '';
 	}
 
@@ -1606,16 +1636,19 @@ class Cobro extends Objeto {
 		$documento->Edit('honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 		$documento->Edit('saldo_honorarios', $x_resultados['monto'][$this->fields['opc_moneda_total']]);
 		$documento->Edit('monto', $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']]);
-		if ($this->fields['forma_cobro'] == 'FLAT FEE')
+		if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 			$documento->Edit('monto_trabajos', number_format($x_resultados['monto_contrato'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
-		else
+		} else {
 			$documento->Edit('monto_trabajos', number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
+		}
 		$documento->Edit('monto_tramites', number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $decimales, ".", ""));
 		$documento->Edit('gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 		$documento->Edit('saldo_gastos', $x_resultados['monto_gastos'][$this->fields['opc_moneda_total']]);
 		$documento->Edit('monto_base', $x_resultados['monto_cobro_original_con_iva'][$this->fields['id_moneda_base']]);
 		$documento->Edit('fecha', date('Y-m-d'));
-		if(!$documento->Loaded()) $documento->Write ();
+		if (!$documento->Loaded()) {
+			$documento->Write();
+		}
 		$query = "SELECT nd.id_neteo_documento, dp.id_moneda
 			FROM neteo_documento nd JOIN documento dp ON nd.id_documento_pago = dp.id_documento
 			WHERE nd.id_documento_cobro = '{$documento->fields['id_documento']}'";
@@ -1658,13 +1691,15 @@ class Cobro extends Objeto {
 	  return SUM()
 	 */
 
-	function TotalCobrosCap($id_contrato='', $id_moneda_cobros_cap = 'contrato.id_moneda_monto') {
-		if (!$id_contrato)
+	function TotalCobrosCap($id_contrato = '', $id_moneda_cobros_cap = 'contrato.id_moneda_monto') {
+		if (!$id_contrato) {
 			$id_contrato = $this->fields['id_contrato'];
+		}
 		$contrato = new Contrato($this->sesion);
 		$contrato->Load($id_contrato);
-		if ($contrato->fields['forma_cobro'] <> 'CAP')
+		if ($contrato->fields['forma_cobro'] <> 'CAP') {
 			return 0;
+		}
 
 
 		//if($this->fields['id_cobro'])
@@ -1716,7 +1751,9 @@ class Cobro extends Objeto {
 	  parametros fecha_ini; fecha_fin; id_contrato
 	 */
 
+
 	function PrepararCobro($fecha_ini = '', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+
 		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -1730,10 +1767,11 @@ class Cobro extends Objeto {
 				$query = "SELECT fecha_cobro, monto_estimado, hito FROM cobro_pendiente WHERE id_cobro_pendiente='$id_cobro_pendiente'";
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($fecha_hito, $monto_hito, $hito) = mysql_fetch_array($resp);
-				if ($hito)
+				if ($hito) {
 					$emitir_obligatoriamente = true;
-				else
+				} else {
 					$fecha_fin = $fecha_hito;
+				}
 			}
 
 			if ($fecha_ini == '') {
@@ -1759,8 +1797,9 @@ class Cobro extends Objeto {
 					$resp_2 = mysql_query($sql_2, $this->sesion->dbh) or Utiles::errorSQL($sql_2, __FILE__, __LINE__, $this->sesion->dbh);
 					list($fmt) = mysql_fetch_array($resp_2);
 
-					if ($fuc > $fmt)
+					if ($fuc > $fmt) {
 						$fecha_ini = '0000-00-00'; //=$fmt?? xq se usa el 00-00-0000??? ah?????
+					}
 				}
 			}
 
@@ -1770,15 +1809,17 @@ class Cobro extends Objeto {
 				$wip = $contrato->ProximoCobroEstimado($fecha_ini, $fecha_fin, $contrato->fields['id_contrato']);
 
 				if (!empty($incluye_honorarios)) {
-					if ($wip[0] > 0 || $contrato->fields['forma_cobro'] != 'TASA' && $contrato->fields['forma_cobro'] != 'CAP')
+					if ($wip[0] > 0 || $contrato->fields['forma_cobro'] != 'TASA' && $contrato->fields['forma_cobro'] != 'CAP') {
 						$genera = true;
-					if($wip[1]>0) { //si tiene trámites
+					}
+					if ($wip[1] > 0) { //si tiene trámites
 						$genera = true;
 					}
 				}
 				if (!empty($incluye_gastos) || $con_gastos) {
-					if ($wip[3] > 0)
+					if ($wip[3] > 0) {
 						$genera = true;
+					}
 				}
 			}
 
@@ -1788,16 +1829,16 @@ class Cobro extends Objeto {
 				$moneda->Load($contrato->fields['id_moneda']);
 
 				if (( ( ( method_exists('Conf', 'LoginDesdeSitio') && Conf::LoginDesdeSitio() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'LoginDesdeSitio') ) ) && !$this->sesion->usuario->fields['id_usuario']) || !$this->sesion->usuario->fields['id_usuario']) {
-					if (( method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'TieneTablaVisitante') ))
+					if (( method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'TieneTablaVisitante') )) {
 						$query = "SELECT id_usuario FROM usuario WHERE id_visitante = 0 ORDER BY id_usuario LIMIT 1";
-					else
+					} else {
 						$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
+					}
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					list($id_usuario_cobro) = mysql_fetch_array($resp);
 
 					$this->Edit('id_usuario', $id_usuario_cobro);
-				}
-				else {
+				} else {
 					$this->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				}
 				$this->Edit('codigo_cliente', $contrato->fields['codigo_cliente']);
@@ -1833,10 +1874,12 @@ class Cobro extends Objeto {
 
 				//este es el monto fijo, pero si no se inclyen honorarios no va
 				$monto = empty($monto) ? $contrato->fields['monto'] : $monto;
-				if (empty($incluye_honorarios))
+				if (empty($incluye_honorarios)) {
 					$monto = '0';
-				if ($hito)
+				}
+				if ($hito) {
 					$monto = $monto_hito;
+				}
 				$this->Edit('monto_contrato', $monto);
 
 				$this->Edit('retainer_horas', $contrato->fields['retainer_horas']);
@@ -1897,14 +1940,17 @@ class Cobro extends Objeto {
 				$this->Edit("id_moneda_monto", $contrato->fields['id_moneda_monto']);
 				$this->Edit("opc_ver_columna_cobrable", $contrato->fields['opc_ver_columna_cobrable']);
 
-				if ($fecha_ini != '' && $fecha_ini != '0000-00-00')
+				if ($fecha_ini != '' && $fecha_ini != '0000-00-00') {
 					$this->Edit('fecha_ini', $fecha_ini);
+				}
 
-				if ($fecha_fin != '')
+				if ($fecha_fin != '') {
 					$this->Edit('fecha_fin', $fecha_fin);
+				}
 
-				if ($solo_gastos == true)
+				if ($solo_gastos == true) {
 					$this->Edit('solo_gastos', 1);
+				}
 
 				$this->Edit("incluye_honorarios", $incluye_honorarios);
 				$this->Edit("incluye_gastos", $incluye_gastos);
@@ -1925,11 +1971,18 @@ class Cobro extends Objeto {
 					$cobro_moneda->ActualizarTipoCambioCobro($this->fields['id_cobro']);
 
 					###### GASTOS ######
+					if (UtilesApp::Getconf($this->sesion, 'UsaFechaDesdeCobranza')) {
+						$and_fecha .= "AND cta_corriente.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+					} else {
+						$and_fecha .= "AND cta_corriente.fecha <= '$fecha_fin'";
+					}
+
 					if (!empty($incluye_gastos)) {
-						if ($solo_gastos == true)
+						if ($solo_gastos == true) {
 							$where = '(cta_corriente.egreso > 0 OR cta_corriente.ingreso > 0)';
-						else
+						} else {
 							$where = '1';
+						}
 
 						$query_gastos = "SELECT cta_corriente.* FROM cta_corriente
 												LEFT JOIN asunto ON cta_corriente.codigo_asunto = asunto.codigo_asunto OR cta_corriente.codigo_asunto IS NULL
@@ -1939,7 +1992,7 @@ class Cobro extends Objeto {
 												AND cta_corriente.cobrable = 1
 												AND cta_corriente.codigo_cliente = '" . $contrato->fields['codigo_cliente'] . "'
 												AND (asunto.id_contrato = '" . $contrato->fields['id_contrato'] . "')
-												AND cta_corriente.fecha <= '$fecha_fin'";
+												$and_fecha";
 						$lista_gastos = new ListaGastos($this->sesion, '', $query_gastos);
 						for ($v = 0; $v < $lista_gastos->num; $v++) {
 							$gasto = $lista_gastos->Get($v);
@@ -1957,10 +2010,11 @@ class Cobro extends Objeto {
 						if ($solo_gastos != true) {
 							$emitir_trabajo = new Objeto($this->sesion, '', '', 'trabajo', 'id_trabajo');
 							$where_up = '1';
-							if ($fecha_ini == '' || $fecha_ini == '0000-00-00')
+							if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
 								$where_up .= " AND fecha <= '$fecha_fin' ";
-							else
+							} else {
 								$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							}
 							$query2 = "SELECT * FROM trabajo
 													JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 													JOIN contrato ON asunto.id_contrato = contrato.id_contrato
@@ -1980,10 +2034,11 @@ class Cobro extends Objeto {
 
 							$emitir_tramite = new Objeto($this->sesion, '', '', 'tramite', 'id_tramite');
 							$where_up = '1';
-							if ($fecha_ini == '' || $fecha_ini == '0000-00-00')
+							if ($fecha_ini == '' || $fecha_ini == '0000-00-00') {
 								$where_up .= " AND fecha <= '$fecha_fin' ";
-							else
+							} else {
 								$where_up .= " AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+							}
 							$query_tramites = "SELECT * FROM tramite
 																		JOIN asunto ON tramite.codigo_asunto = asunto.codigo_asunto
 																		JOIN contrato ON asunto.id_contrato = contrato.id_contrato
@@ -2003,12 +2058,13 @@ class Cobro extends Objeto {
 
 					### COBROS PENDIENTES ###
 					$cobro_pendiente = new CobroPendiente($this->sesion);
-					if (!empty($id_cobro_pendiente))
-						if ($cobro_pendiente->Load($id_cobro_pendiente))
+					if (!empty($id_cobro_pendiente)) {
+						if ($cobro_pendiente->Load($id_cobro_pendiente)) {
 							$cobro_pendiente->AsociarCobro($this->sesion, $this->fields['id_cobro']);
-
+						}
+					}
 					#Se ingresa la anotación en el historial
-					if( $this->fields['estado'] != 'COBRO CREADO'){
+					if ($this->fields['estado'] != 'COBRO CREADO') {
 						$his = new Observacion($this->sesion);
 						$his->Edit('fecha', date('Y-m-d H:i:s'));
 						$his->Edit('comentario', __('COBRO CREADO'));
@@ -2034,15 +2090,16 @@ class Cobro extends Objeto {
 		return number_format((float) $str, 0, ',', '.');
 	}
 
-		/*
+	/*
 	  GeneraProceso, obtiene un id de proceso para cada generacion de cobros.
 	 */
 
 	function EsCobrado() {
-		if (!$this->fields['estado'] || $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION')
+		if (!$this->fields['estado'] || $this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
 			return false;
-		else
+		} else {
 			return true;
+		}
 	}
 
 	function GeneraProceso() {
@@ -2065,10 +2122,11 @@ class Cobro extends Objeto {
 								ORDER BY id_cobro DESC LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id_cobro) = mysql_fetch_array($resp);
-		if ($id_cobro)
+		if ($id_cobro) {
 			return $id_cobro;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	/*
@@ -2125,17 +2183,17 @@ class Cobro extends Objeto {
 								AND cobro_moneda.id_moneda=" . $gasto->fields['id_moneda'];
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			$cobro_moneda = mysql_fetch_array($resp);
-			if ($gasto->fields['egreso'] > 0)
-				$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 14
-			elseif ($gasto->fields['ingreso'] > 0)
-				$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio'];#error gasto 15
+			if ($gasto->fields['egreso'] > 0) {
+				$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 14
+			} elseif ($gasto->fields['ingreso'] > 0) {
+				$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda['tipo_cambio'] / $moneda->fields['tipo_cambio']; #error gasto 15
+			}
 		}
 		$saldo_inicial = 0;
 		$saldo_inicial = $this->SaldoInicialCuentaCorriente();
 		$saldo_final_gastos = $saldo_inicial - $saldo_gastos;
 		return $saldo_final_gastos;
 	}
-
 
 	function TienePagosAdelantos() {
 		$query = "
@@ -2151,20 +2209,21 @@ class Cobro extends Objeto {
 
 	function DetalleProfesional() {
 		global $contrato;
-		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorTarifa') ) || ( method_exists('Conf', 'OrdenarPorTarifa') && Conf::OrdenarPorTarifa() )))
+		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorTarifa') ) || ( method_exists('Conf', 'OrdenarPorTarifa') && Conf::OrdenarPorTarifa() ))) {
 			$order_categoria = "t.tarifa_hh DESC, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() )))
+		} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaNombreUsuario') && Conf::OrdenarPorCategoriaNombreUsuario() ))) {
 			$order_categoria = "u.id_categoria_usuario, u.nombre, u.apellido1, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() )))
+		} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario') ) || ( method_exists('Conf', 'OrdenarPorCategoriaUsuario') && Conf::OrdenarPorCategoriaUsuario() ))) {
 			$order_categoria = "cu.orden, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() )))
+		} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'SepararPorUsuario') ) || ( method_exists('Conf', 'SepararPorUsuario') && Conf::SepararPorUsuario() ))) {
 			$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() )))
+		} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional') ) || ( method_exists('Conf', 'OrdenarPorCategoriaDetalleProfesional') && Conf::OrdenarPorCategoriaDetalleProfesional() ))) {
 			$order_categoria = "u.id_categoria_usuario DESC, ";
-		else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() )))
+		} else if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria') ) || ( method_exists('Conf', 'OrdenarPorFechaCategoria') && Conf::OrdenarPorFechaCategoria() ))) {
 			$order_categoria = "t.fecha, u.id_categoria_usuario, u.id_usuario, ";
-		else
+		} else {
 			$order_categoria = "";
+		}
 
 		$query = "SELECT SUM( TIME_TO_SEC( duracion_cobrada )/3600 ) FROM trabajo WHERE cobrable = 1 AND id_cobro = '" . $this->fields['id_cobro'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -2178,7 +2237,7 @@ class Cobro extends Objeto {
 			}
 		}
 
-		if( UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC') ) {
+		if (UtilesApp::Getconf($this->sesion, 'DejarTarifaCeroRetainerPRC')) {
 			$query_tarifa = "SELECT SUM( ( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) ) * t2.tarifa_hh ) / SUM( TIME_TO_SEC(t2.duracion_cobrada) - TIME_TO_SEC( duracion_retainer ) )
 												FROM trabajo AS t2 WHERE t2.id_cobro = '" . $this->fields['id_cobro'] . "'
 												 AND t2.id_usuario = u.id_usuario
@@ -2219,12 +2278,14 @@ class Cobro extends Objeto {
 
 		$contrato_horas = $this->fields['retainer_horas'];
 
-		if ($total_horas_cobro > 0)
+		if ($total_horas_cobro > 0) {
 			$factor_proporcional = ( $total_horas_cobro - $contrato_horas ) / $total_horas_cobro;
-		else
+		} else {
 			$factor_proporcional = 1;
-		if ($factor_proporcional < 0)
+		}
+		if ($factor_proporcional < 0) {
 			$factor_proporcional = 0;
+		}
 		$array_profesionales = array();
 		$array_resumen_profesionales = array();
 		while ($row = mysql_fetch_assoc($resp)) {
@@ -2375,8 +2436,9 @@ class Cobro extends Objeto {
 				$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
 				$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
 			}
-			if (!is_array($array_profesionales[$row['codigo_asunto']]))
+			if (!is_array($array_profesionales[$row['codigo_asunto']])) {
 				$array_profesionales[$row['codigo_asunto']] = array();
+			}
 			$array_profesionales[$row['codigo_asunto']][$row['id_usuario']] = $array_profesional_usuario;
 		}
 
@@ -2387,11 +2449,11 @@ class Cobro extends Objeto {
 			$array_resumen_profesionales[$id_usuario]['duracion_descontada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_descontada']);
 			$array_resumen_profesionales[$id_usuario]['duracion_incobrables'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_incobrables']);
 			$array_resumen_profesionales[$id_usuario]['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_retainer']);
-			if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['opc_ver_valor_hh_flat_fee'])
+			if ($this->fields['forma_cobro'] == 'FLAT FEE' && $this->fields['opc_ver_valor_hh_flat_fee']) {
 				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_cobrada'] - $array_resumen_profesional[$id_usuario]['duracion_incobrables'];
-			else
+			} else {
 				$array_resumen_profesionales[$id_usuario]['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($data['glosa_duracion_tarificada']);
-			$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
+			}$array_resumen_profesionales[$id_usuario]['valor_tarificada'] = $array_resumen_profesionales[$id_usuario]['duracion_tarificada'] * $data['tarifa'];
 
 			$resumen_valor_hh += $data['duracion_cobrada'] * $data['tarifa'];
 		}
@@ -2451,14 +2513,12 @@ class Cobro extends Objeto {
 		return $mensaje;
 	}
 
-
 }
-if(!class_exists('ListaCobros')) {
-	class ListaCobros extends Lista {
 
+if (!class_exists('ListaCobros')) {
+	class ListaCobros extends Lista {
 		function ListaCobros($sesion, $params, $query) {
 			$this->Lista($sesion, 'Cobro', $params, $query);
 		}
-
 	}
 }

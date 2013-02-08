@@ -9217,6 +9217,8 @@ class NotaCobro extends Cobro {
 		$htmlplantilla = str_replace('%servicios_prestados%', __('POR SERVICIOS PROFESIONALES PRESTADOS'), $htmlplantilla);
 		$htmlplantilla = str_replace('%a%', __('A'), $htmlplantilla);
 		$htmlplantilla = str_replace('%a_min%', empty($contrato->fields['contacto']) ? '' : __('a'), $htmlplantilla);
+		$htmlplantilla= str_replace('%glosa_codigo_postal%',__('Código Postal'),$htmlplantilla);
+		$htmlplantilla= str_replace('%codigo_postal%',$contrato->fields['factura_codigopostal'],$htmlplantilla);
 		$htmlplantilla = str_replace('%cliente%', __('Cliente'), $htmlplantilla);
 
 		$query = "SELECT glosa_cliente FROM cliente 

@@ -70,7 +70,7 @@ if (!class_exists('Conf')) {
 		 */
 		public static function GetConf(Sesion $Sesion, $conf) {
 			global $memcache;
-			$existememcache =isset($memcache) && is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC. Primero se comprueba con isset para evitar un warning de undefined variable.
+			$existememcache = isset($memcache) && is_object($memcache); // nunca se sabe si correrán este código en una máquina sin MC. Primero se comprueba con isset para evitar un warning de undefined variable.
 
 			// Prioridad sobre los conf?
 			//1) Primera Prioridad: Siempre es más barato leer un método static de la clase conf que obtenerlo de memcache o de la base de datos.
@@ -87,7 +87,7 @@ if (!class_exists('Conf')) {
 				return $arrayconf[$conf];
 
 			// 3) Tercera prioridad: existe memcache y la llave de configuración está vigente.
-			} else if ($existememcache && $arrayconf= json_decode($memcache->get(DBNAME . '_config'), true)) {
+			} else if ($existememcache && $arrayconf = UtilesApp::utf8izar(json_decode($memcache->get(DBNAME . '_config'), true), false)) {
 				$Sesion->arrayconf = $arrayconf;
 				//error_log("CACHE HIT FROM MEMCACHED! $conf ={$arrayconf[$conf]}");
 				return $arrayconf[$conf];
@@ -104,7 +104,7 @@ if (!class_exists('Conf')) {
 
 					// 4.2) Si existe memcache, fijo la llave usando lo obtenido en 4.1
 					if ($existememcache) {
-						$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
+						$memcache->set(DBNAME . '_config', json_encode(UtilesApp::utf8izar($Sesion->arrayconf)), false, 120);
 						//error_log("MEMCACHE CACHE SET $conf = {$Sesion->arrayconf[$conf]} (" . count($Sesion->arrayconf) . " registros)");
 					}
 

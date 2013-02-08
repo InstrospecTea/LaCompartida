@@ -41,6 +41,9 @@ The Time Billing - Time Tracking
 
 > Recuerda reiniciar Apache cada vez que hagas cambios en la configuración o instalción de nuevos paquetes
 
+ * OLE (0.5)
+
+      $ sudo pear install OLE-0.5
 
 ###Base de datos
 * Crear base de datos en servidor localhost con encoding "Latin1"
