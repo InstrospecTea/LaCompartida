@@ -11,6 +11,14 @@ class Log {
 	var $logFolder = LOGDIR;
 
 	public function __construct() {
+		if (!is_dir($this->logFolder)) {
+			try {
+				mkdir($this->logFolder);
+			} catch(Exception $e) {
+				echo ("No es posible crear el directorio '{$this->logFolder}'<br/>\n" . $e->getMessage());
+				exit;
+			}
+		}
 	}
 
 	public function write($text = '', $file_name = null) {
