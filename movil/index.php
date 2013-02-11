@@ -1,124 +1,150 @@
 <?php
 
-require_once(dirname(__FILE__).'/../app/conf.php');
-require_once(dirname(__FILE__).'/lib/limonade.php');
+require_once(dirname(__FILE__) . '/../app/conf.php');
 
-function wsClient() {
-    $webservice=str_replace('//web_services','/web_services',Conf::Host().'/web_services/webservices.php?wsdl');
-	return new SoapClient($webservice);
-}
+$Slim=Slim::getInstance('default')? Slim::getInstance('default') : new Slim();
+$sesion = new Sesion();
 
-dispatch_get('/', 'root');
+
+
+
+$wsdl = Conf::Server() . Conf::RootDir() . '/web_services/webservices.php';
+
+$wsClient = new SoapClient($wsdl . '?wsdl');
+$wsClient->__setLocation($wsdl);
+
+$Slim->get('/', 'root');
+
 function root() {
-    $redirect=str_replace('//movil','/movil',Conf::Host().'/movil/public/index.php');
-	redirect_to($redirect);
+	$redirect = str_replace('//movil', '/movil', Conf::Host() . '/movil/public/index.php');
+	$Slim = Slim::getInstance();
+	$Slim->redirect($redirect);
 }
 
 
+$Slim->map('login', 'Authenticate')->via('GET', 'POST');
+$Slim->map('/login', 'Authenticate')->via('GET', 'POST');
 
-dispatch_post('/login', 'check_login');
-dispatch_post('login', 'check_login');
-dispatch_get('login', 'check_login');
-function check_login() {
+
+function Authenticate()  {
+	global $sesion;
+	$Slim=Slim::getInstance('default');
+		$usuario= $Slim->request()->params('rut');
+		$password= $Slim->request()->params('password');
+		if (empty($usuario) || empty($password) || $usuario == "" || $password == "") {
+					$Slim->response()->status(401);
+					$Slim->halt(401,'["Debe entregar el usuario y el password."]');
+				} else if (!$sesion->VerificarPassword($usuario, $password)) {
+					$Slim->response()->status(401);
+					$Slim->halt(401,'["Usuario o Password incorrectos"]');
+				}
+		header('Content-Type: text/javascript; charset=utf8');
+		header('Access-Control-Allow-Origin: *');
+		header('Access-Control-Max-Age: 3628800');
+		header('Access-Control-Allow-Methods: GET, POST');
+
+}
+
+
+$Slim->post('/clientes', 'obtener_clientes');
+$Slim->post('clientes', 'obtener_clientes');
+
+//$Slim->get('/clientes', 'obtener_clientes');
+function obtener_clientes() {
+	global $sesion, $wsClient;
+	$Slim = Slim::getInstance();
 	try {
-		wsClient()->GetTimeLastWork($_POST['rut'], $_POST['password']);
-	} catch(SoapFault $e) {
-		status(401);
-		return "Usuario o contraseña incorrecto";
+		$retorno = $wsClient->EntregarListaClientes($_POST['rut'], $_POST['password']);
+	} catch (SoapFault $e) {
+		$Slim->halt(401, '["Debe entregar el usuario y el password."]');
 	}
-	status(200);
-	return "Usuario y contraseña correctos";
+
+
+	echo json_encode($retorno);
 }
 
-dispatch_post('/clientes', 'obtener_clientes');
-dispatch_post('clientes', 'obtener_clientes');
-//dispatch_get('/clientes', 'obtener_clientes');
-function obtener_clientes() {	
-	try {
-		$retorno=wsClient()->EntregarListaClientes($_POST['rut'], $_POST['password']);
-	} catch(SoapFault $e) {
-		status(401);
-		return "Usuario o contraseña incorrecto";
-	}
-	status(200);
-	
-	return json($retorno);
-}
+$Slim->post('/asuntos', 'obtener_asuntos');
+$Slim->post('asuntos', 'obtener_asuntos');
 
-dispatch_post('/asuntos', 'obtener_asuntos');
-dispatch_post('asuntos', 'obtener_asuntos');
-//dispatch_get('/asuntos', 'obtener_asuntos');
+//$Slim->get('/asuntos', 'obtener_asuntos');
 function obtener_asuntos() {
+	global $sesion, $wsClient;
+	$Slim = Slim::getInstance();
 	try {
-		$retorno=wsClient()->EntregarListaAsuntos($_POST['rut'], $_POST['password']);
-	} catch(SoapFault $e) {
-		status(401);
-		return "Usuario o contraseña incorrecto";
+		$retorno = $wsClient->EntregarListaAsuntos($_POST['rut'], $_POST['password']);
+	} catch (SoapFault $e) {
+		$Slim->halt(401, '["Debe entregar el usuario y el password."]');
 	}
-	status(200);
-	
-	return json($retorno);
+
+
+	echo json_encode($retorno);
 }
 
-dispatch_get('/intervalo', 'obtener_intervalo');
-dispatch_get('intervalo', 'obtener_intervalo');
+$Slim->get('/intervalo', 'obtener_intervalo');
+$Slim->get('intervalo', 'obtener_intervalo');
+
 function obtener_intervalo() {
+	global $sesion, $wsClient;
 	//status(401);
 	//return "holiwi";
-	return json(wsClient()->Intervalo());
+	echo json_encode($wsClient->Intervalo());
 }
 
-dispatch_get('/nombre_empresa', 'obtener_nombre_empresa');
+$Slim->get('/nombre_empresa', 'obtener_nombre_empresa');
+
 function obtener_nombre_empresa() {
 	return Conf::PdfLinea1();
 }
 
-dispatch_post('/trabajos', 'cargar_trabajo');
-dispatch_post('trabajos', 'cargar_trabajo');
+$Slim->post('/trabajos', 'cargar_trabajo');
+$Slim->post('trabajos', 'cargar_trabajo');
+
 function cargar_trabajo() {
+	global $sesion, $wsClient;
+	$Slim = Slim::getInstance();
 	try {
-		wsClient()->CargarTrabajo($_POST['rut'], $_POST['password'], "", $_POST['codigo_asunto'], "", $_POST['descripcion'], date('Y-m-d',strtotime($_POST['fecha'])+86400), (int)$_POST['duracion']*60);		
-	} catch(SoapFault $e) {
-		if ($e->faultmessage == "Debe entregar el usuario y el password.") {
-			status(401);
+		$wsClient->CargarTrabajo($_POST['rut'], $_POST['password'], "", $_POST['codigo_asunto'], "", $_POST['descripcion'], date('Y-m-d', strtotime($_POST['fecha']) + 86400), (int) $_POST['duracion'] * 60);
+	} catch (SoapFault $e) {
+		if ($e->faultstring == "Debe entregar el usuario y el password.") {
+			$Slim->halt(401, '["Debe entregar el usuario y el password."]');
 		} else {
-			status(500);
+			$Slim->halt(401, $e->faultstring);
 		}
-		return $e->faultmessage;
 	}
-	status(200);
-	return "Trabajo cargado OK";
+
+	echo "Trabajo cargado OK";
 }
 
-dispatch_post('/trabajos2', 'cargar_trabajo2');
-dispatch_post('trabajos2', 'cargar_trabajo2');
-function cargar_trabajo2() { 
+$Slim->post('/trabajos2', 'cargar_trabajo2');
+$Slim->post('trabajos2', 'cargar_trabajo2');
+
+function cargar_trabajo2() {
+	global $sesion, $wsClient;
+	$Slim = Slim::getInstance();
 	try {
-		wsClient()->CargarTrabajo2($_POST['rut'], $_POST['password'], "", $_POST['codigo_asunto'], "", $_POST['descripcion'], $_POST['ordenado_por'], date('Y-m-d',strtotime($_POST['fecha'])+86400), (int)$_POST['duracion']*60,"");		
-	} catch(SoapFault $e) {
-		if ($e->faultmessage == "Debe entregar el usuario y el password.") {
-			status(401);
+		$wsClient->CargarTrabajo2($_POST['rut'], $_POST['password'], "", $_POST['codigo_asunto'], "", $_POST['descripcion'], $_POST['ordenado_por'], date('Y-m-d', strtotime($_POST['fecha']) + 86400), (int) $_POST['duracion'] * 60, "");
+	} catch (SoapFault $e) {
+		if ($e->faultstring == "Debe entregar el usuario y el password.") {
+			$Slim->halt(401, '["Debe entregar el usuario y el password."]');
 		} else {
-			status(500);
+			$Slim->halt(500, $e->faultstring);
 		}
-		return $e->faultmessage;
 	}
-	status(200);
-	return "Trabajo cargado OK";
+
+	echo "Trabajo cargado OK";
 }
 
-dispatch_get('/*.manifest', 'obtener_manifest');
-dispatch_get('*.manifest', 'obtener_manifest');
- function obtener_manifest() {
-	if(!headers_sent()) header('Content-Type: text/cache-manifest; charset='.strtolower(option('encoding')));
-  // content_type "text/cache-manifest"
+$Slim->get('/*.manifest', 'obtener_manifest');
+$Slim->get('*.manifest', 'obtener_manifest');
+
+function obtener_manifest() {
+	$Slim = Slim::getInstance();
+	if (!headers_sent())
+		header('Content-Type: text/cache-manifest; charset=' . strtolower(option('encoding')));
+	// content_type "text/cache-manifest"
 	set('environment', params(0));
-                
-  return render('manifest.php');
-  
-  
+
+	echo $Slim::flash('manifest.php');
 }
 
-
-run();
-
+$Slim->run();

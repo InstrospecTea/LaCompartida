@@ -32,7 +32,12 @@ class UtilesApp extends Utiles {
 	 *  Escribe el valor de un config en formato JS.
 	 */
 	public static function GetConfJs($sesion, $conf) {
-		echo "var $conf='" . Conf::GetConf($sesion, $conf) . "';\n";
+		$v = Conf::GetConf($sesion, $conf);
+		if (is_numeric($v)) {
+			echo "var $conf = $v;\n";
+		} else {
+			echo "var $conf = '$v';\n";
+	}
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
@@ -83,6 +88,44 @@ class UtilesApp extends Utiles {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
 		} else {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+		}
+	}
+	
+	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {
+		?>
+		<tr>
+			<td align="right">
+				<?php echo __('Asuntos'); ?>
+			</td>
+			<td colspan="3" align="left" id="td_selector_contrato">
+				<?php self::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $width, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+				<input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
+				<script type="text/javascript">
+					function CargarContrato(asunto) {
+						var ajax_url = root_dir + '/app/interfaces/ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
+						jQuery.getJSON(ajax_url,function(data) {
+							if (data) {
+								jQuery('#id_contrato').val(data.id_contrato);
+								jQuery('#codigo_contrato').val(data.codigo_contrato);
+							}
+						});
+					}
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3">
+				<em>
+					<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarán los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.'); ?>
+				</em>
+			</td>
+		</tr>
+		<?php
+		if($Slim=Slim::getInstance('default',true)){
+			global $id_contrato, $Contrato;
+			$Contrato = new Contrato($sesion);
+			$Slim->applyHook('hook_filtros_asunto_contrato');
 		}
 	}
 
@@ -2102,7 +2145,7 @@ HTML;
 		return $data;
 	}
 
-		public static function ArregloMonedas($sesion) {
+	public static function ArregloMonedas($sesion) {
 		$query = "SELECT
 								prm_moneda.id_moneda,
 								prm_moneda.tipo_cambio,
@@ -2121,4 +2164,105 @@ HTML;
 		}
 		return $moneda;
 	}
+
+	/**
+	 * Validate an email address.
+	 * Provide email address (raw input)
+	 * Returns true if the email address has the email
+	 * address format and the domain exists.
+	 */
+	public static function isValidEmail($email) {
+		$email = trim($email);
+		$isValid = true;
+		$atIndex = strrpos($email, "@");
+		if (is_bool($atIndex) && !$atIndex) {
+			$isValid = false;
+		} else {
+			$domain = substr($email, $atIndex + 1);
+			$local = substr($email, 0, $atIndex);
+			$localLen = strlen($local);
+			$domainLen = strlen($domain);
+			if ($localLen < 1 || $localLen > 64) {
+				// local part length exceeded
+				$isValid = false;
+			} else if ($domainLen < 1 || $domainLen > 255) {
+				// domain part length exceeded
+				$isValid = false;
+			} else if ($local[0] == '.' || $local[$localLen - 1] == '.') {
+				// local part starts or ends with '.'
+				$isValid = false;
+			} else if (preg_match('/\\.\\./', $local)) {
+				// local part has two consecutive dots
+				$isValid = false;
+			} else if (!preg_match('/^[A-Za-z0-9\\-\\.]+$/', $domain)) {
+				// character not valid in domain part
+				$isValid = false;
+			} else if (preg_match('/\\.\\./', $domain)) {
+				// domain part has two consecutive dots
+				$isValid = false;
+			} else if (!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/', str_replace("\\\\", "", $local))) {
+				// character not valid in local part unless
+				// local part is quoted
+				if (!preg_match('/^"(\\\\"|[^"])+"$/', str_replace("\\\\", "", $local))) {
+					$isValid = false;
+				}
+			}
+			if ($isValid && !(checkdnsrr($domain, "MX") || checkdnsrr($domain, "A"))) {
+				// domain not found in DNS
+				$isValid = false;
+			}
+		}
+		return $isValid;
+	}
+
+	public static function CorreoAreaComercial(array $userdata,$cant_visitas=0) {
+		$correos = array();
+					$correo = array( 'mail' => 'areacomercial@lemontech.cl', 'nombre' => 'Equipo Time Tracking' );
+					array_push($correos,$correo);
+					$subject = 'Demo1: Visitante repetetivo.';
+					$body = 'El visitante, <br><br>Nombre:       '.$userdata['nombre'].'
+																						<br>Apellido1:    '.$userdata['apellido1'].'
+																						<br>Apellido2:    '.$userdata['apellido2'].' 
+																						<br>Empresa:      '.$userdata['empresa'].'
+																						<br>Telefono:     '.$userdata['telefono'].'
+																						<br>Mail:         '.$userdata['email'].' 
+																						<br>País:         '.$userdata['pais'];
+					if($cant_visitas>0) $body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
+					return Utiles::EnviarMail($sesion,$correos,$subject,$body,false);
+	}
+	public static  function CrearUsuario($sesion,array $userdata,$id_visitante=false) {
+		$query = "SELECT id_notificacion_tt FROM usuario ORDER BY id_notificacion_tt DESC LIMIT 1";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list($id_notificacion) = mysql_fetch_array( $resp ); 
+
+					$query = "SELECT id_usuario FROM usuario ORDER BY id_usuario DESC LIMIT 1";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list( $id_usuario ) = mysql_fetch_array($resp);
+					$id_usuario++;
+
+					$usuario = new Usuario($sesion);
+					$usuario->Edit('id_usuario',$id_usuario);
+					$usuario->Edit('rut',$userdata['rut']);
+					$usuario->Edit('email',$userdata['email']);
+					$usuario->Edit('nombre',$userdata['nombre']);
+					$usuario->Edit('apellido1',$userdata['apellido1']);
+					$usuario->Edit('apellido2',$userdata['apellido2']);
+                    $usuario->Edit('username',$userdata['nombre'].' '.$userdata['apellido1']);
+					$usuario->Edit('password',md5('12345'));
+					if($id_visitante) $usuario->Edit('id_visitante',$id_visitante);
+					$usuario->Edit('id_notificacion_tt',$id_notificacion);
+					$usuario->Write();
+
+					$query = "INSERT INTO usuario_permiso( id_usuario, codigo_permiso ) 
+												VALUES ( ".$id_usuario.", 'ADM' ),
+															 ( ".$id_usuario.", 'ALL' ),
+															 ( ".$id_usuario.", 'COB' ),
+															 ( ".$id_usuario.", 'DAT' ),
+															 ( ".$id_usuario.", 'OFI' ),
+															 ( ".$id_usuario.", 'PRO' ),
+															 ( ".$id_usuario.", 'REP' ),
+															 ( ".$id_usuario.", 'REV' )";
+					return mysql_query($query,$sesion->dbh);
+}
+
 }

@@ -1,20 +1,5 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../fw/classes/SelectorHoras.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Contrato.php';
-	require_once Conf::ServerDir().'/classes/Asunto.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
-	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
 
 	$sesion = new Sesion(array('PRO','REV','SEC'));
 	$pagina = new Pagina($sesion);
@@ -44,7 +29,8 @@
 			$pagina->PrintTop($popup);
 			$pagina->PrintBottom($popup);
 			exit;
-		} elseif(($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo')
+
+		} else if(($t->Estado() == 'Revisado' || $t->Estado()== __("Revisado")) && $opcion != 'nuevo')
 		{
 			if(!$permiso_revisor->fields['permitido'])
 			{
@@ -53,13 +39,42 @@
 				$pagina->PrintBottom($popup);
 				exit;
 			}
-		} elseif($opcion=='cambiofecha') {
+		} else if($opcion=='cambiofecha') {
+
                     $semana=Utiles::fecha2sql($fecha);
                     $t->Edit('fecha',$semana);
                     $t->Write(true);
                     die('semana|'.$semana);
                     
+
+         } else if ($opcion=='clonar') {
+                    $semana=Utiles::fecha2sql($fecha);
+					unset($t->fields['id_trabajo']);
+					unset($t->fields['id_cobro']);
+					unset($t->fields['estadocobro']);
+					unset($t->fields['fecha_creacion']);
+					$t->Edit('fecha',$semana);
+					foreach($t->fields as $key=>$value) {
+						if($value!='') $t->changes[$key]=1;
                 }
+					 
+                    $t->Write(true);
+					 if(date('N',strtotime($t->fields['fecha']))==1) {
+						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']));
+						} else {
+						$lastmonday=date('Y-m-d',strtotime($t->fields['fecha']." last Monday"));
+						}
+						
+						if( UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta')) {
+							$hhmes=$sesion->usuario->HorasTrabajadasEsteMes($t->fields['id_usuario'], 'horas_trabajadas',$lastmonday);
+						} else {
+							$hhmes=$sesion->usuario->HorasTrabajadasEsteMes($t->fields['id_usuario'], 'horas_trabajadas');
+						}
+                     die('id_trabajo|'.$t->fields['id_trabajo'].'|'.$sesion->usuario->HorasTrabajadasEsteSemana($t->fields['id_usuario'],$lastmonday).'|'.$hhmes);
+
+                    
+           }
+
 		if(!$id_usuario)
 			$id_usuario = $t->fields['id_usuario'];
 
@@ -123,7 +138,10 @@
 				if($duracion == '00:00:00' )  {
                     $pagina->AddError("Las horas ingresadas deben ser mayor a 0.");
                 }
-				if(!$codigo_asunto || $codigo_asunto ==''){
+
+
+				if ((!$codigo_asunto || $codigo_asunto =='') && (!$codigo_asunto_secundario || $codigo_asunto_secundario==''))  {
+
 					$pagina->AddError("Debe seleccionar un ".__('Asunto'));
 				}
 				if( UtilesApp::GetConf ($sesion, 'UsarAreaTrabajos') && (! $id_area_trabajo || $id_area_trabajo == '')){
@@ -152,6 +170,7 @@
                             {
                                     $asunto->LoadByCodigo($codigo_asunto);
                             }
+                           
 
                             /*
                             Ha cambiado el asunto del trabajo se setea nuevo Id_cobo de alguno que esté creado
@@ -404,651 +423,13 @@ if(top.Refrescar!==undefined) top.Refrescar();
 	}
 ?>
 
-<script type="text/javascript">
 
-jQuery('document').ready(function() {
-	
-	top.window.jQuery('#versemana').click();
-	top.window.jQuery('.resizableframe').load();
-	
-	jQuery('#chkCobrable').click(function() {
-		if(jQuery(this).is(':checked')) {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
-			jQuery('#divVisible').hide();
-			jQuery('.seccioncobrable').show();
-		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
-			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
-		}
-	});
-	if(jQuery('#chkCobrable').is(':checked')) {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
-			jQuery('#divVisible').hide();
-			jQuery('.seccioncobrable').show();
-		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
-			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
-		}
-}) ;
-
-	
-function MostrarTrabajoTarifas()
-{
-	$('TarifaTrabajo').show();
-}
-
-function CancelarTrabajoTarifas()
-{
-	$('TarifaTrabajo').hide();
-}
-
-function ActualizarTrabajosTarifas()
-{
-	$('opcion').value = "actualizar_trabajo_tarifa";
-	$('form_editar_trabajo').submit();
-}
-
-function Confirmar(form)
-{
-			var r=confirm("Está modificando un trabajo, desea continuar?");
-			if(r==true)
-				{
-				Validar(form);
-				}
-			else
-				{
-				return false;
-				}
-}
-
-function Validar(form)
-{
-<?php
-			if(UtilesApp::GetConf($sesion,'CodigoSecundario'))
-			{
-				echo "if(!form.codigo_asunto_secundario.value){";
-			}
-			else
-			{
-				echo "if(!form.codigo_asunto.value){";
-			}
-?>
-			alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
-<?php
-			if (UtilesApp::GetConf($sesion,'CodigoSecundario'))
-			{
-				echo "form.codigo_asunto_secundario.focus();";
-			}
-			else
-			{
-				echo "form.codigo_asunto.focus();";
-
-				}
-
-			echo 'return false;';echo '}';
-    
-	?>
-    if(!form.fecha.value)
-    {
-        alert("<?php echo __('Debe ingresar una fecha.')?>");
-        form.fecha.focus();
-        return false;
-    }
-
-    if(!form.duracion.value)
-    {
-        alert("<?php echo __('Debe establecer la duración')?>");
-        form.duracion.focus();
-        return false;
-    }
-	else
-	{
-		if( form.duracion.value == '00:00:00' ){
-			alert("<?php echo __('La duración debe ser mayor a 0')?>");
-<?php
-	if( method_exists('Conf','GetConf') )
-	{
-		if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector'){
-			echo "document.getElementById('hora_duracion').focus();";
-		}
-		else
-		{
-			echo "form.duracion.focus();";
-		}
-	}
-?>
-			return false;
-		}
-	}
- <?php
-	//Revisa el Conf si esta permitido y la función existe
-	if($tipo_ingreso=='decimal')
-	{
-?>
-			var dur=form.duracion.value.replace(",",".");
-			var dur_cob=form.duracion_cobrada.value.replace(",",".");
-			if(isNaN(dur) || isNaN(dur_cob))
-			{
-				alert("<?php echo __('Solo se aceptan valores numéricos')?>");
-				form.duracion.focus();
-				return false;
-			}
-			var decimales=dur.split(".");
-			var decimales_cobrada=dur_cob.split(".");
-			if(decimales[1].length > 1 || decimales_cobrada[1].length > 1)
-			{
-				alert("<?php echo __('Solo se permite ingresar un decimal')?>");
-				form.duracion.focus();
-				return false;
-			}
-<?php
-	}
-?>
-    if(!form.descripcion.value)
-    {
-        alert("<?php echo __('Debe ingresar la descripción')?>");
-        form.descripcion.focus();
-        return false;
-    }
-
-<?php
-	if  ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarAreaTrabajos') ) {
-?>
-            if( !form.id_area_trabajo.value ) 
-            {
-                alert("<?php echo __('Debe seleccionar una area de trabajo')?>");
-                form.id_area_trabajo.focus();
-                return false;
-            }
-<?php
-        }
-?>
-
-	//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-	if(form.id_cobro.value != '' && $('id_trabajo').value != '')
-	{
-	<?php
-		if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) 
-			{ ?>
-				if(ActualizaCobro(form.codigo_asunto_secundario.value))
-					return true;
-				else
-					return false;
-	<?php 	} 
-		else 
-			{ ?>
-				if(ActualizaCobro(form.codigo_asunto.value))
-					return true;
-				else
-					return false;
-	<?php } ?>
-	}
-<?php 
-	if (method_exists('Conf','GetConf'))
-	{
-		$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-	}
-	else if(method_exists('Conf','Ordenado_por'))
-	{
-		$Ordenado_por = Conf::Ordenado_por();
-	}
-	else
-	{
-		$Ordenado_por = 0;
-	}
-
-	if($Ordenado_por==1)
-	{
-?>
-	if(form.solicitante.value=='')
-	{
-		alert("<?php echo __('Debe ingresar la persona que solicitó el trabajo')?>");
-		form.solicitante.focus();
-		return false;
-	}
-<?php
-	}
-	//Se pasa todo a mayúscula por conf
-	if( UtilesApp::GetConf($sesion,'TodoMayuscula') )
-	{
-		echo "form.descripcion.value=form.descripcion.value.toUpperCase();";
-		if (method_exists('Conf','GetConf'))
-		{
-			$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-		}
-		else if(method_exists('Conf','Ordenado_por'))
-		{
-			$Ordenado_por = Conf::Ordenado_por();
-		}
-		else
-		{
-			$Ordenado_por = 0;
-		}
-
-		if ($Ordenado_por!=0)
-			echo "form.solicitante.value=form.solicitante.value.toUpperCase();";
-	}
-	
-	// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
-	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0)
-	{
-?>
-	temp = $('fecha').value.split("-");
-	fecha = new Date(temp[2]+'//'+temp[1]+'//'+temp[0]);
-	hoy = new Date();
-	fecha_tope = new Date(hoy.getTime()-(<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
-	if (fecha_tope > fecha)
-	{
-		var dia = fecha_tope.getDate();
-		var mes = fecha_tope.getMonth()+1;
-		var anio = fecha_tope.getFullYear();
-		alert("No se pueden ingresar trabajos anteriores a "+ dia + "-" + mes + "-" + anio);
-		$('fecha').focus;
-		return false;
-	}
-<?php
-	}
-	//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
-	if(isset($t) && $t->Loaded() && $opcion != 'nuevo')
-	{
-?>
-	var string = new String(top.location);
-	if(string.search('/trabajo.php') > 0)//revisa que esté en la página de ingreso de trabajo
-		if(!confirm('Está modificando un trabajo, desea continuar?'))
-			return false;
-<?php
-	}
-?>
-top.window.jQuery('#semanactual').val(jQuery('#fecha').val());
-	return true;
-}
-
-function MontoValido( id_campo )
-{
-	var monto = document.getElementById( id_campo ).value.replace('\,','.');
-	var arr_monto = monto.split('\.');
-	var monto = arr_monto[0];
-	for($i=1;$i<arr_monto.length-1;$i++)
-		monto += arr_monto[$i];
-	if( arr_monto.length > 1 )
-		monto += '.' + arr_monto[arr_monto.length-1];
-	
-	document.getElementById( id_campo ).value = monto;
-}
-
-function CargarTarifa()
-{
-	 
-		
-		var id_usuario = $('id_usuario').value;
-	<?php 	if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) 	{ ?>
-			var codigo_asunto = $('codigo_asunto_secundario').value;
-			var codigo_cliente = $('codigo_cliente_secundario').value;
-	<?php } 	else 		{ ?>
-			var codigo_asunto = $('codigo_asunto').value;
-			var codigo_cliente = $('codigo_cliente').value;
-	<?php } ?>
-
-	 
-	var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario='+id_usuario+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente;
-	 
-	 jQuery.get(vurl, function(response) {
-		 if( jQuery('#tarifa_trabajo').length>0)	 jQuery('#tarifa_trabajo').val(response);
-	 });
-	return true;
-}
-
-function IngresarNuevo(form)
-{
-	form.opcion.value = 'nuevo';
-	form.id_trabajo.value = '';
-	var url="semana.php?popup=1&semana="+form.semana.value+"&id_usuario="+<?php echo $id_usuario?>+"&opcion=nuevo";
-	self.location.href = url;
-}
-
-function CambiaDuracion(form, input)
-{
-
-	if(document.getElementById('duracion_cobrada') && input=='duracion')
-		form.duracion_cobrada.value = form.duracion.value;
-
-//	if(form.duracion.value != '00:00:00' && input == 'duracion')
-//		form.duracion_cobrada.value = form.duracion.value;
-}
-
-/*Clear los elementos*/
-function DivClear(div, dvimg)
-{
-	var left_data = document.getElementById('left_data');
-	var content_data = document.getElementById('content_data');
-	var right_data = document.getElementById('right_data');
-	left_data.innerHTML = '';
-	content_data.innerHTML = '';
-	right_data.innerHTML = '';
-
-	var content = document.getElementById('content_data2');
-	var right = document.getElementById('right_data2');
-	content.innerHTML = '';
-	right.innerHTML = '';
-
-	if( div == 'tr_cliente' )
-	{
-		var img = document.getElementById( 'img_asunto' );
-		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
-	}
-	else
-	{
-		var img = document.getElementById( 'img_historial' );
-		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
-	}
-}
-
-function ShowDiv(div, valor, dvimg)
-{
-	var div_id = document.getElementById(div);
-	var img = document.getElementById(dvimg);
-	var form = document.getElementById('form_editar_trabajo');
-	<?php if (UtilesApp::GetConf($sesion, "TipoSelectCliente") == "autocompletador") { ?>
-	var codigo = document.getElementById('codigo_cliente');
-	<?php } else { ?>
-	var codigo = document.getElementById('campo_codigo_cliente');
-	<?php } ?>
-	var tr = document.getElementById('tr_cliente');
-	var tr2 = document.getElementById('tr_asunto');
-	var al = document.getElementById('al');
-	//var tbl_trabajo = document.getElementById('tbl_trabajo');
-
-	DivClear(div, dvimg);
-
-	codigo = (codigo == null) ? "" : codigo.value;
-
-	if( div == 'tr_asunto' && codigo == '')
-	{
-		tr.style['display'] = 'none';
-		alert("<?php echo __('Debe seleccionar un cliente')?>");
-		form.codigo_cliente.focus();
-		return false;
-	}
-
-	div_id.style['display'] = valor;
-	/* FADE
-	if(valor == 'inline')
-		var fade = true;
-	else
-		var fade = false;
-	setTimeout("MSG('"+div+"',"+fade+")",10);
-	*/
-
-	if( div == 'tr_cliente' )
-	{
-		WCH.Discard('tr_asunto');
-		tr2.style['display'] = 'none';
-		Lista('lista_clientes','left_data','','');
-	}
-	else if( div == 'tr_asunto' )
-	{
-		WCH.Discard('tr_cliente');
-		tr.style['display'] = 'none';
-		Lista('lista_asuntos','content_data2',codigo,'2');
-	}
-
-	/*Cambia IMG*/
-	if(valor == 'inline')
-	{
-		WCH.Apply('tr_asunto');
-		WCH.Apply('tr_cliente');
-		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
-	}
-	else
-	{
-		WCH.Discard(div);
-		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
-	}
-}
-
-/*
-AJAX Lista de datos historial
-accion -> llama ajax
-div -> que hace update
-codigo -> codigo del parámetro necesario SQL
-div_post -> id div posterior onclick
-*/
-function Lista(accion, div, codigo, div_post)
-{
-	var form = document.getElementById('form_editar_trabajo');
-	var data = document.getElementById(div);
-	hideddrivetip();
-	if(accion == 'lista_asuntos')
-	{
-		<?php if (UtilesApp::GetConf($sesion, "TipoSelectCliente") == "autocompletador") { ?>
-		//form.codigo_cliente.value = codigo;
-		SetSelectInputId('codigo_cliente','glosa_cliente');
-		<?php } else { ?>
-		form.campo_codigo_cliente.value = codigo;
-		SetSelectInputId('campo_codigo_cliente','codigo_cliente');	
-		<?php } ?>
-<?php 
-		if( UtilesApp::GetConf($sesion,'CodigoSecundario') )
-		{
-			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
-		}
-		else
-		{
-			echo "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos');";
-		}
-?>
-	}
-	else if(accion == 'lista_trabajos')
-	{
-		form.campo_codigo_asunto.value = codigo;
-		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<?php if( UtilesApp::GetConf($sesion,'UsoActividades') ) echo "CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');";?>
-
-	}
-
-	var http = getXMLHTTP();
-
-	if(div == 'content_data')
-	{
-		var right_data = document.getElementById('right_data');
-		right_data.innerHTML = '';
-	}
-
-	var vurl = 'ajax_historial.php?accion='+accion+'&codigo='+codigo+'&div_post='+div_post+'&div='+div;
-    http.open('get', vurl, false);
-    http.onreadystatechange = function()
-    {
-        if(http.readyState == 4)
-        {
-			var response = http.responseText;
-			data.innerHTML = response;
-        }
-	};
-    http.send(null);
-}
-
-function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, duracion_cobrada, cobrable, visible, fecha)
-{
-	var form = document.getElementById('form_editar_trabajo');
-	form.campo_codigo_actividad.value = codigo_actividad;
-	SetSelectInputId('campo_codigo_actividad','codigo_actividad');
-
-	form.duracion.value = duracion;
-	if( document.getElementById('duracion_cobrada') )
-		form.duracion_cobrada.value = duracion_cobrada;
-	form.cobrable.checked = cobrable > 0 ? true : false;
-	form.visible.checked = visible > 0 ? true : false;
-	form.descripcion.value = descripcion;
-
-	/*
-	var fecha_arr = fecha.split('-',3);
-	
-	var m = document.getElementById('fecha_Month_ID');
-	var d = document.getElementById('fecha_Day_ID');
-	var a = document.getElementById('fecha_Year_ID');
-	for( i=0; i<m.options.length; i++ )
-	{
-		if( parseInt(m.options[i].value) == parseInt(fecha_arr[1]-1) )
-		{
-			m.options[i].selected = true;
-			fecha_Object.changeMonth(m);
-		}
-	}
-	for(i=0; i<d.options.length; i++)
-	{
-		if( parseInt(d.options[i].text) == fecha_arr[2] )
-		{
-			d.options[i].selected = true;
-			fecha_Object.changeDay(d);
-		}
-	}
-	if(fecha_arr[0])
-	{
-		a.value = fecha_arr[0];
-		fecha_Object.fixYear(a);
-		fecha_Object.checkYear(a);
-	}*/
-
-	form.fecha.value = fecha;
-	var tr = document.getElementById('tr_cliente');
-	var tr2 = document.getElementById('tr_asunto');
-	var img = document.getElementById('img_historial');
-	var img2 = document.getElementById('img_asunto');
-
-	WCH.Discard('tr_asunto');
-	WCH.Discard('tr_cliente');
-	tr.style['display'] = 'none';
-	tr2.style['display'] = 'none';
-
-	img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
-
-	img2.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
-}
-
-function CargaIdioma( codigo ) {	 
-	 var IdiomaGrande = '<?php echo UtilesApp::GetConf($sesion, 'IdiomaGrande'); ?>';
-	if(!codigo) 	{
-		jQuery('#txt_span').html('');
-		return false;
-	}  else 	{
-		jQuery.ajax({
-			type: "GET",
-			url:"ajax.php",
-			contentType: "application/x-www-form-urlencoded;charset=ISO-8859-1",
-			data:{accion: 'idioma',codigo_asunto: codigo},
-			 beforeSend: function ( xhr ) {
-				 xhr.overrideMimeType("text/html; charset=ISO-8859-1");
-			  }
-			}).done(function(response) {
-			var idio = response.split("|");
-			if (IdiomaGrande) {
-				jQuery('#txt_span').html(idio[1]);
-			} else {
-				jQuery('#txt_span').html( 'Idioma: '+idio[1]);
-			}
-	
- 
-				if(idio[0]=='es')
-					googie2.setCurrentLanguage('es');
-				if(idio[0]=='en')
-					googie2.setCurrentLanguage('en');
-				});	
-		
-	   
-	}
-}
-
-function ActualizaCobro(valor)
-{
-	var codigo_asunto_hide = $('codigo_asunto_hide').value;
-	var id_cobro = $('id_cobro').value;
-	var id_trabajo = $('id_trabajo').value;
-	var fecha_trabajo_hide = $('fecha_trabajo_hide').value;
-	var form = $('form_editar_trabajo');
-	
-	if(codigo_asunto_hide != valor && id_cobro && id_trabajo)
-	{
-		var text_window = "<img src='<?php echo Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA")?></u><br><br>";
-		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
-		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo '. __('asunto') .'en caso de que exista')?>.</span><br>';
-		text_window += '<br><table><tr>';
-		text_window += '</table>';
-		Dialog.confirm(text_window,
-		{
-			top:100, left:80, width:400, okLabel: "<?php echo __('Aceptar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
-			id: "myDialogId",
-			cancel:function(win){ return false; },
-			ok:function(win){ if(ActualizarCobroAsunto(valor)) form.submit(); return true; }
-		});
-	}
-	else
-	{
-		return true;
-	}
-}
-
-function ActualizarCobroAsunto(valor)
-{
-		var codigo_asunto_hide = $('codigo_asunto_hide').value;
-		var id_cobro = $('id_cobro').value;
-		var id_trabajo = $('id_trabajo').value;
-		var fecha_trabajo_hide = $('fecha_trabajo_hide').value;
-		var http = getXMLHTTP();
-		var urlget = 'ajax.php?accion=set_cobro_trabajo&codigo_asunto='+valor+'&id_trabajo='+id_trabajo+'&fecha='+fecha_trabajo_hide+'&id_cobro_actual='+id_cobro;
-		http.open('get',urlget, true);
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-			}
-		};
-	    http.send(null);
-	  return true;
-}
-
-//Cuando se le saca el check de cobrable se hace visible = 0
-function CheckVisible()
-{
-	if(!$('chkCobrable').checked)
-	{
-		<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
-			$('chkVisible').checked=false;
-		<?php
-			}
-			else
-			{
-		?>
-			$('hiddenVisible').value=0;
-		<?php }?>
-	}
-}
-
-function AgregarNuevo(tipo)
-{
-<?php if(UtilesApp::GetConf($sesion,'CodigoSecundario')){?>
-	var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-	var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
-<?php } else { ?>
-	var codigo_cliente = $('codigo_cliente').value;
-	var codigo_asunto = $('codigo_asunto').value;
-<?php } ?>
-	if(tipo == 'trabajo')
-	{
-		var urlo = "editar_trabajo.php?popup=1";
-		window.location=urlo;
-	}
-}
-
-</script>
 <style>
 A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<?php echo(Autocompletador::CSS()); ?>
+
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
@@ -1203,7 +584,7 @@ $codigo_asunto=$t->fields['codigo_asunto'];
              <?php echo __('Asunto')?>
         </td>
         <td align=left width="440" nowrap>
-<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,320,"+CargarTarifa();CargaIdioma(this.value);");  ?>
+<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario,320,"+CargarTarifa();");  ?>
        </td>
     </tr>
 <?php
@@ -1390,7 +771,12 @@ echo '</td>';
 ?>
 		</td>
 <?php 
-	}
+	}  else {
+ echo '<input type="hidden" name="duracion_cobrada" id="duracion_cobrada" value="" />';
+ echo '<input type="hidden" name="hora_duracion_cobrada" id="hora_duracion_cobrada" value="" />';
+ echo '<input type="hidden" name="minuto_duracion_cobrada" id="minuto_duracion_cobrada" value="" />';
+}
+
 ?>
 			</tr>
 		</table>
@@ -1399,20 +785,10 @@ echo '</td>';
     <tr>
         <td colspan="2" align=right>
         	<?php
-		if (method_exists('Conf','GetConf'))
-		{
-			$IdiomaGrande = Conf::GetConf($sesion, 'IdiomaGrande');
-		}
-		else if(method_exists('Conf','IdiomaGrande'))
-		{
-			$IdiomaGrande = Conf::IdiomaGrande();
-		}
-		else
-		{
-			$IdiomaGrande = false;
-		}
+ 
+	 
 
-		if($IdiomaGrande)
+		if(Conf::GetConf($sesion, 'IdiomaGrande'))
 		{
 ?>
 				<?php echo __('Descripción')?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
@@ -1429,14 +805,7 @@ echo '</td>';
         <td align=left>
             <textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo  stripslashes($t->fields[descripcion]) ?></textarea></td>
 
-		<script type="text/javascript">
-			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
-			googie2.setLanguages({'es': 'Español', 'en': 'English'});
-			googie2.dontUseCloseButtons();
-			googie2.setSpellContainer("spell_container");
-			googie2.decorateTextarea("descripcion");
-		</script>
-
+	 
     </tr>
 			<tr>
 				<?php
@@ -1595,29 +964,624 @@ echo '</td>';
     }
 ?>
 <script language="javascript" type="text/javascript">
+	
+<?php UtilesApp::GetConfJS($sesion,'CodigoSecundario'); 
 
-var formObj = $('form_editar_trabajo');
-<?php 
-if (UtilesApp::GetConf($sesion,'CodigoSecundario') )  {
-	echo "CargaIdioma('".$codigo_asunto_secundario."');";
-}  else {
-	echo "CargaIdioma('".$t->fields['codigo_asunto']."');";
+ UtilesApp::GetConfJS($sesion, 'OrdenadoPor');
+UtilesApp::GetConfJS($sesion,'TodoMayuscula'); 
+ UtilesApp::GetConfJS($sesion,'UsarAreaTrabajos');
+ UtilesApp::GetConfJS($sesion,'LimpiarTrabajo');
+UtilesApp::GetConfJs($sesion,'UsoActividades');
+UtilesApp::GetConfJS($sesion, "TipoSelectCliente");
+UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
+UtilesApp::GetConfJS($sesion,'PrellenarTrabajoConActividad');
+	?>	
+function MostrarTrabajoTarifas()
+{
+	jQuery('#TarifaTrabajo').show();
 }
-  	
+
+function CancelarTrabajoTarifas()
+{
+	jQuery('#TarifaTrabajo').hide();
+}
+
+function ActualizarTrabajosTarifas()
+{
+	jQuery('#opcion').val("actualizar_trabajo_tarifa");
+	jQuery('#form_editar_trabajo').submit();
+}
+
+function Confirmar(form)
+{
+			var r=confirm("Está modificando un trabajo, desea continuar?");
+			if(r==true)
+				{
+				Validar(form);
+				}
+			else
+				{
+				return false;
+				}
+}
+
+function Validar(form)
+{
+
+			if(CodigoSecundario) {
+				if(!form.codigo_asunto_secundario.value) {
+					alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
+					form.codigo_asunto_secundario.focus();
+					return false;
+				}
+			} 	else	{
+				if(!form.codigo_asunto.value) {
+					alert("<?php echo __('Debe seleccionar un').' '.__('asunto')?>");
+					form.codigo_asunto.focus();
+					return false;
+				}
+			}
+
+		
+
+    if(!form.fecha.value)
+    {
+        alert("<?php echo __('Debe ingresar una fecha.')?>");
+        form.fecha.focus();
+        return false;
+    }
+
+    if(!form.duracion.value)
+    {
+        alert("<?php echo __('Debe establecer la duración')?>");
+        form.duracion.focus();
+        return false;
+    }
+	else
+	{
+		if( form.duracion.value == '00:00:00' ){
+			alert("<?php echo __('La duración debe ser mayor a 0')?>");
+<?php
+		if($tipo_ingreso=='selector'){
+			echo "document.getElementById('hora_duracion').focus();";
+		}	else	{
+			echo "form.duracion.focus();";
+		}
+	
+?>
+			return false;
+		}
+	}
+ <?php
+	//Revisa el Conf si esta permitido y la función existe
+	if($tipo_ingreso=='decimal')
+	{
+?>
+			var dur=form.duracion.value.replace(",",".");
+			var dur_cob=form.duracion_cobrada.value.replace(",",".");
+			if(isNaN(dur) || isNaN(dur_cob))
+			{
+				alert("<?php echo __('Solo se aceptan valores numéricos')?>");
+				form.duracion.focus();
+				return false;
+			}
+			var decimales=dur.split(".");
+			var decimales_cobrada=dur_cob.split(".");
+			if(decimales[1].length > 1 || decimales_cobrada[1].length > 1)
+			{
+				alert("<?php echo __('Solo se permite ingresar un decimal')?>");
+				form.duracion.focus();
+				return false;
+			}
+<?php
+	}
+?>
+    if(!form.descripcion.value)
+    {
+        alert("<?php echo __('Debe ingresar la descripción')?>");
+        form.descripcion.focus();
+        return false;
+    }
+
+ 
+	if  (UsarAreaTrabajos) {
+ 
+            if( !form.id_area_trabajo.value ) 
+            {
+                alert("<?php echo __('Debe seleccionar una area de trabajo')?>");
+                form.id_area_trabajo.focus();
+                return false;
+            }
+ 
+        }
+ 
+
+	//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
+	if(form.id_cobro.value != '' && $('id_trabajo').value != '')
+	{
+ 
+		if( CodigoSecundario) 
+			{  
+				if(ActualizaCobro(form.codigo_asunto_secundario.value))
+					return true;
+				else
+					return false;
+		} 	else 		{  
+					if(ActualizaCobro(form.codigo_asunto.value))
+						return true;
+					else
+						return false;
+		  }  
+	}
+
+
+
+	if(OrdenadoPor==1)
+	{
+ 
+	if(form.solicitante.value=='')
+	{
+		alert("<?php echo __('Debe ingresar la persona que solicitó el trabajo')?>");
+		form.solicitante.focus();
+		return false;
+	}
+ 
+	}
+	//Se pasa todo a mayúscula por conf
+	if( TodoMayuscula )
+	{
+		 form.descripcion.value=form.descripcion.value.toUpperCase(); 
+		
+
+		if (OrdenadoPor!=0)
+			 form.solicitante.value=form.solicitante.value.toUpperCase(); 
+	}
+	<?php
+	// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
+	if (!$permiso_cobranza->fields['permitido'] && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0)
+	{
+	?>
+	temp = $('fecha').value.split("-");
+	fecha = new Date(temp[2]+'//'+temp[1]+'//'+temp[0]);
+	hoy = new Date();
+	fecha_tope = new Date(hoy.getTime()-(<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo']+1) ?>*24*60*60*1000));
+	if (fecha_tope > fecha)
+	{
+		var dia = fecha_tope.getDate();
+		var mes = fecha_tope.getMonth()+1;
+		var anio = fecha_tope.getFullYear();
+		alert("No se pueden ingresar trabajos anteriores a "+ dia + "-" + mes + "-" + anio);
+		$('fecha').focus;
+		return false;
+	}
+<?php
+	}
+	//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
+	if(isset($t) && $t->Loaded() && $opcion != 'nuevo')
+	{
+?>
+	var string = new String(top.location);
+	if(string.search('/trabajo.php') > 0)//revisa que esté en la página de ingreso de trabajo
+		if(!confirm('Está modificando un trabajo, desea continuar?'))
+			return false;
+<?php
+	}
+?>
+top.window.jQuery('#semanactual').val(jQuery('#fecha').val());
+	return true;
+}
+
+function MontoValido( id_campo )
+{
+	var monto = document.getElementById( id_campo ).value.replace('\,','.');
+	var arr_monto = monto.split('\.');
+	var monto = arr_monto[0];
+	for($i=1;$i<arr_monto.length-1;$i++)
+		monto += arr_monto[$i];
+	if( arr_monto.length > 1 )
+		monto += '.' + arr_monto[arr_monto.length-1];
+	
+	document.getElementById( id_campo ).value = monto;
+}
+
+function CargarTarifa()
+{
+	 
+		
+		var id_usuario = $('id_usuario').value;
+	  	if( CodigoSecundario ) 	{ 
+			var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
+			var codigo_cliente = jQuery('#codigo_cliente_secundario').val();
+	  } 	else 		{  
+			var codigo_asunto = jQuery('#codigo_asunto').val();
+			var codigo_cliente = jQuery('#codigo_cliente').val();
+		}  
+
+	 
+	var vurl = 'ajax.php?accion=cargar_tarifa_trabajo&id_usuario='+id_usuario+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente;
+	 
+	 jQuery.get(vurl, function(response) {
+		 if( jQuery('#tarifa_trabajo').length>0)	 jQuery('#tarifa_trabajo').val(response);
+	 });
+	return true;
+}
+
+function IngresarNuevo(form)
+{
+	form.opcion.value = 'nuevo';
+	form.id_trabajo.value = '';
+	var url="semana.php?popup=1&semana="+form.semana.value+"&id_usuario="+<?php echo $id_usuario?>+"&opcion=nuevo";
+	self.location.href = url;
+}
+
+function CambiaDuracion(form, input)
+{
+
+	if(document.getElementById('duracion_cobrada') && input=='duracion')
+		form.duracion_cobrada.value = form.duracion.value;
+
+//	if(form.duracion.value != '00:00:00' && input == 'duracion')
+//		form.duracion_cobrada.value = form.duracion.value;
+}
+
+/*Clear los elementos*/
+function DivClear(div, dvimg)
+{
+	var left_data = document.getElementById('left_data');
+	var content_data = document.getElementById('content_data');
+	var right_data = document.getElementById('right_data');
+	left_data.innerHTML = '';
+	content_data.innerHTML = '';
+	right_data.innerHTML = '';
+
+	var content = document.getElementById('content_data2');
+	var right = document.getElementById('right_data2');
+	content.innerHTML = '';
+	right.innerHTML = '';
+
+	if( div == 'tr_cliente' )
+	{
+		var img = document.getElementById( 'img_asunto' );
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+	}
+	else
+	{
+		var img = document.getElementById( 'img_historial' );
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" title="Mostrar" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+	}
+}
+
+function ShowDiv(div, valor, dvimg)
+{
+	var div_id = document.getElementById(div);
+	var img = document.getElementById(dvimg);
+	var form = document.getElementById('form_editar_trabajo');
+	  if (TipoSelectCliente == "autocompletador") {  
+	var codigo = document.getElementById('codigo_cliente');
+	  } else { 
+	var codigo = document.getElementById('campo_codigo_cliente');
+	  }  
+	var tr = document.getElementById('tr_cliente');
+	var tr2 = document.getElementById('tr_asunto');
+	var al = document.getElementById('al');
+	//var tbl_trabajo = document.getElementById('tbl_trabajo');
+
+	DivClear(div, dvimg);
+
+	codigo = (codigo == null) ? "" : codigo.value;
+
+	if( div == 'tr_asunto' && codigo == '')
+	{
+		tr.style['display'] = 'none';
+		alert("<?php echo __('Debe seleccionar un cliente')?>");
+		form.codigo_cliente.focus();
+		return false;
+	}
+
+	div_id.style['display'] = valor;
+
+
+	if( div == 'tr_cliente' )
+	{
+		WCH.Discard('tr_asunto');
+		tr2.style['display'] = 'none';
+		Lista('lista_clientes','left_data','','');
+	}
+	else if( div == 'tr_asunto' )
+	{
+		WCH.Discard('tr_cliente');
+		tr.style['display'] = 'none';
+		Lista('lista_asuntos','content_data2',codigo,'2');
+	}
+
+	/*Cambia IMG*/
+	if(valor == 'inline')
+	{
+		WCH.Apply('tr_asunto');
+		WCH.Apply('tr_cliente');
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/menos.gif" border="0" title="Ocultar" class="mano_on" onClick="ShowDiv(\''+div+'\',\'none\',\''+dvimg+'\');">';
+	}
+	else
+	{
+		WCH.Discard(div);
+		img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\''+div+'\',\'inline\',\''+dvimg+'\');">';
+	}
+}
+
+/*
+AJAX Lista de datos historial
+accion -> llama ajax
+div -> que hace update
+codigo -> codigo del parámetro necesario SQL
+div_post -> id div posterior onclick
+*/
+function Lista(accion, div, codigo, div_post)
+{
+	var form = document.getElementById('form_editar_trabajo');
+	var data = document.getElementById(div);
+	hideddrivetip();
+	if(accion == 'lista_asuntos')
+	{
+		 if (TipoSelectCliente == "autocompletador") {  
+		//form.codigo_cliente.value = codigo;
+			SetSelectInputId('codigo_cliente','glosa_cliente');
+		  } else { 
+			form.campo_codigo_cliente.value = codigo;
+			SetSelectInputId('campo_codigo_cliente','codigo_cliente');	
+		  }  
+ 
+		if(CodigoSecundario )
+		{
+			 CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos'); 
+		}
+		else
+		{
+			 CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos'); 
+		}
+ 
+	}
+	else if(accion == 'lista_trabajos')
+	{
+		form.campo_codigo_asunto.value = codigo;
+		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
+		if(UsoActividades ) {
+			CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+		}
+
+	}
+
+	var http = getXMLHTTP();
+
+	if(div == 'content_data')
+	{
+		var right_data = document.getElementById('right_data');
+		right_data.innerHTML = '';
+	}
+
+	var vurl = 'ajax_historial.php?accion='+accion+'&codigo='+codigo+'&div_post='+div_post+'&div='+div;
+    http.open('get', vurl, false);
+    http.onreadystatechange = function()
+    {
+        if(http.readyState == 4)
+        {
+			var response = http.responseText;
+			data.innerHTML = response;
+        }
+	};
+    http.send(null);
+}
+
+function UpdateTrabajo(id_trabajo, descripcion, codigo_actividad, duracion, duracion_cobrada, cobrable, visible, fecha)
+{
+	var form = document.getElementById('form_editar_trabajo');
+	form.campo_codigo_actividad.value = codigo_actividad;
+	SetSelectInputId('campo_codigo_actividad','codigo_actividad');
+
+	form.duracion.value = duracion;
+	if( document.getElementById('duracion_cobrada') )
+		form.duracion_cobrada.value = duracion_cobrada;
+	form.cobrable.checked = cobrable > 0 ? true : false;
+	form.visible.checked = visible > 0 ? true : false;
+	form.descripcion.value = descripcion;
+
+ 
+
+	form.fecha.value = fecha;
+	var tr = document.getElementById('tr_cliente');
+	var tr2 = document.getElementById('tr_asunto');
+	var img = document.getElementById('img_historial');
+	var img2 = document.getElementById('img_asunto');
+
+	WCH.Discard('tr_asunto');
+	WCH.Discard('tr_cliente');
+	tr.style['display'] = 'none';
+	tr2.style['display'] = 'none';
+
+	img.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_cliente\',\'inline\',\'img_historial\');">';
+
+	img2.innerHTML = '<img src="<?php echo Conf::ImgDir()?>/mas.gif" border="0" onMouseover="ddrivetip(\'Historial de trabajos ingresados\')" onMouseout="hideddrivetip()" class="mano_on" onClick="ShowDiv(\'tr_asunto\',\'inline\',\'img_asunto\');">';
+}
+
+function CargaIdioma( codigo ) {	 
+	return;
+}
+
+function ActualizaCobro(valor)
+{
+	var codigo_asunto_hide = $('codigo_asunto_hide').value;
+	var id_cobro = $('id_cobro').value;
+	var id_trabajo = $('id_trabajo').value;
+	var fecha_trabajo_hide = $('fecha_trabajo_hide').value;
+	var form = $('form_editar_trabajo');
+	
+	if(codigo_asunto_hide != valor && id_cobro && id_trabajo)
+	{
+		var text_window = "<img src='<?php echo Conf::ImgDir()?>/alerta_16.gif'>&nbsp;&nbsp;<span style='font-size:12px; color:#FF0000; text-align:center;font-weight:bold'><u><?php echo __("ALERTA")?></u><br><br>";
+		text_window += '<span style="text-align:center; font-size:11px; color:#000; "><?php echo __('Ud. está modificando un trabajo que pertenece al cobro')?>:'+id_cobro+' ';
+		text_window += '<?php echo __('. Si acepta, el trabajo se desvinculará de ') . __('este cobro') . __(' y eventualmente se vinculará a ') . __('un cobro') . __(' pendiente para el nuevo '. __('asunto') .'en caso de que exista')?>.</span><br>';
+		text_window += '<br><table><tr>';
+		text_window += '</table>';
+		Dialog.confirm(text_window,
+		{
+			top:100, left:80, width:400, okLabel: "<?php echo __('Aceptar')?>", cancelLabel: "<?php echo __('Cancelar')?>", buttonClass: "btn", className: "alphacube",
+			id: "myDialogId",
+			cancel:function(win){ return false; },
+			ok:function(win){ if(ActualizarCobroAsunto(valor)) form.submit(); return true; }
+		});
+	}
+	else
+	{
+		return true;
+	}
+}
+
+function ActualizarCobroAsunto(valor)
+{
+		var codigo_asunto_hide = $('codigo_asunto_hide').value;
+		var id_cobro = $('id_cobro').value;
+		var id_trabajo = $('id_trabajo').value;
+		var fecha_trabajo_hide = $('fecha_trabajo_hide').value;
+		var http = getXMLHTTP();
+		var urlget = 'ajax.php?accion=set_cobro_trabajo&codigo_asunto='+valor+'&id_trabajo='+id_trabajo+'&fecha='+fecha_trabajo_hide+'&id_cobro_actual='+id_cobro;
+		http.open('get',urlget, true);
+		http.onreadystatechange = function()
+		{
+			if(http.readyState == 4)
+			{
+				var response = http.responseText;
+			}
+		};
+	    http.send(null);
+	  return true;
+}
+
+//Cuando se le saca el check de cobrable se hace visible = 0
+function CheckVisible()
+{
+	if(!$('chkCobrable').checked)
+	{
+		<?php if($permiso_revisor->fields['permitido'] || UtilesApp::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
+			$('chkVisible').checked=false;
+		<?php
+			}
+			else
+			{
+		?>
+			$('hiddenVisible').value=0;
+		<?php }?>
+	}
+}
+
+function AgregarNuevo(tipo)
+{
+ if(CodigoSecundario){
+	var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+	var codigo_asunto_secundario = $('codigo_asunto_secundario').value;
+ } else { 
+	var codigo_cliente = $('codigo_cliente').value;
+	var codigo_asunto = $('codigo_asunto').value;
+ } 
+	if(tipo == 'trabajo')
+	{
+		var urlo = "editar_trabajo.php?popup=1";
+		window.location=urlo;
+	}
+}
+
+	jQuery('document').ready(function() {
+	
+	jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
+		
+		var codigo=jQuery(this).val();
+		 
+			if(!codigo) 	{
+				jQuery('#txt_span').html('');
+				return false;
+			}  else 	{
+				jQuery.ajax({
+					type: "GET",
+					url:"ajax.php",
+					contentType: "application/x-www-form-urlencoded;charset=ISO-8859-1",
+					data:{accion: 'idioma',codigo_asunto: codigo},
+					 beforeSend: function ( xhr ) {
+						 xhr.overrideMimeType("text/html; charset=ISO-8859-1");
+					  }
+					}).done(function(response) {
+					var idio = response.split("|");
+					if (idio[1].length==0) idio[1]='Español';
+					if (idio[0].length==0) idio[0]='es';
+
+					if (IdiomaGrande) {
+						jQuery('#txt_span').html(idio[1]);
+					} else {
+						jQuery('#txt_span').html( 'Idioma: '+idio[1]);
+					}
+
+
+						if(idio[0]=='es' ) {
+							googie2.setCurrentLanguage('es');
+						} else if(idio[0]=='en') {
+							googie2.setCurrentLanguage('en');
+						}
+						});	
+
+
+			}
+	});
+		
+	
+	top.window.jQuery('#versemana').click();
+	top.window.jQuery('.resizableframe').load();
+	
+	jQuery('#chkCobrable').click(function() {
+		if(jQuery(this).is(':checked')) {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
+			jQuery('#divVisible').hide();
+			jQuery('.seccioncobrable').show();
+		} else {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#divVisible').show();
+			jQuery('.seccioncobrable').hide();
+		}
+	});
+	if(jQuery('#chkCobrable').is(':checked')) {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').removeAttr('disabled');
+			jQuery('#divVisible').hide();
+			jQuery('.seccioncobrable').show();
+		} else {
+			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			jQuery('#divVisible').show();
+			jQuery('.seccioncobrable').hide();
+		}
+
+			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
+			googie2.setLanguages({'es': 'Español', 'en': 'English'});
+			googie2.dontUseCloseButtons();
+			googie2.setSpellContainer("spell_container");
+			googie2.decorateTextarea("descripcion");
+});
+var formObj = $('form_editar_trabajo');
+ 
+if (CodigoSecundario )  {
+	 CargaIdioma('<?php echo $codigo_asunto_secundario; ?>'); 
+}  else {
+	 CargaIdioma('<?php echo $t->fields['codigo_asunto']; ?>'); 
+}
+  <?php	
  if(empty($id_trabajo) &&  (UtilesApp::GetConf($sesion,'LimpiarTrabajo') ))  { ?>
 
 	$$('#codigo_asunto_hide, #id_cobro, #campo_codigo_cliente, #codigo_cliente, #campo_codigo_cliente_secundario, #codigo_cliente_secundario, #campo_codigo_asunto_secundario, #codigo_asunto_secundario, #codigo_actividad, #campo_codigo_actividad, #descripcion, #solicitante').each(function(elem){ elem.value = ''; });
 
-<?php 
-	if( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) 	{ ?>
+ 
+	if( TipoSelectCliente=='autocompletador' ) 	{ 
 		$$('#glosa_cliente').each(function(elem){ elem.value = ''; });
-	<?php
+	 
 	}
-} ?>
 
-<?php
-	if( UtilesApp::GetConf($sesion,'PrellenarTrabajoConActividad') ) 	{
-?>
+
+<?php } ?> 
+	if( PrellenarTrabajoConActividad ) 	{
+ 
 	$('codigo_actividad').observe('change', function(evento){
 		actividad_seleccionada = this.options[this.selectedIndex];
 		if(actividad_seleccionada.value != '')
@@ -1627,15 +1591,11 @@ if (UtilesApp::GetConf($sesion,'CodigoSecundario') )  {
 		}
 	});
 	
-<?php
+ 
 	}
-?>
-//	jQuery('#chkCobrable').click();
+ 
+ 
 </script>
-<?php	if(UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  
-		{
-			echo(Autocompletador::Javascript($sesion));
-		}
-		echo(InputId::Javascript($sesion));
+<?php	 
     echo(SelectorHoras::Javascript());
     $pagina->PrintBottom($popup);

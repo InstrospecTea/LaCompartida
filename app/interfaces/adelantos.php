@@ -268,13 +268,7 @@ td.sorting_1 {background:transparent !important;}
 
 	  						</td>
 						</tr>
-						<tr>
-	    					<td align="right" width="30%"><?php echo __('Asunto') ?></td>
-	    					<td colspan="3" align="left">
-                                <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?>
-
-	  						</td>
-						</tr>
+						<?php UtilesApp::FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 						<tr>
 							<td align=right><?php echo __('Fecha Desde') ?></td>
 							<td align="left">

@@ -1,10 +1,6 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../fw/classes/Html.php';
+require_once dirname(dirname(__FILE__)).'/conf.php';
 
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class InputId //Es cuando uno quiere unir un codigo con un selectbox
 {
@@ -20,12 +16,59 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		$this->onchange = $onchange;
 	}
 
+	function ImprimirAsunto($sesion,   $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false) {
+		$join = '';
+		if(  UtilesApp::GetConf($sesion,'CodigoSecundario')  && $otro_filtro != '')
+				{
+					$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario='$otro_filtro'";
+					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+					list($otro_filtro) = mysql_fetch_array($resp);
+				}
+			$join .= "JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente";
+			if(!$usa_inactivo)
+				$where = " WHERE asunto.activo=1 AND cliente.activo = 1 ";
+			if($otro_filtro != "")
+				$where .= "  AND asunto.codigo_cliente = '$otro_filtro' ";
+			else
+				$where .= " AND 1=0";
+			$oncambio=$onchange;
+ 			$output .= Html::SelectQuery($sesion,
+							"SELECT ".$campo_id.",".$campo_glosa."
+							FROM asunto
+							$join
+							$where
+							ORDER BY ".$campo_glosa,
+							$name,
+							$selected,
+							"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones",
+							__("Cualquiera"),$width);
+			return $output;
+	}
+	function ImprimirCliente($sesion, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false) {
+		$join = '';
+		if( !$usa_inactivo){
+			$where = " WHERE (activo=1 or cliente.codigo_cliente='$selected' )";
+		}
+		$oncambio=$onchange;
+ 		$output .= Html::SelectQuery($sesion,
+						"SELECT ".$campo_id.",".$campo_glosa."
+						FROM cliente
+						$join
+						$where
+						ORDER BY ".$campo_glosa,
+						$name,
+						$selected,
+						"onchange=\"SetCampoInputId('".$name."','campo_".$name."'); $onchange\" $opciones ",
+						__("Cualquiera"),$width);
+		return $output;
+	}
+
 	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="",$width=320, $otro_filtro = "",$usa_inactivo=false, $desde = "", $filtro_banco = "")
 	{
 		$join = '';
 		if($tabla == "asunto")
 		{
-			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ) && $otro_filtro != '')
+			if(  UtilesApp::GetConf($sesion,'CodigoSecundario')  && $otro_filtro != '')
 				{
 					$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario='$otro_filtro'";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -63,7 +106,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		}
 			
 
-		$output .= "<input maxlength=10 id=\"campo_".$name."\" size=10 value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" $opciones />";
+		$output .= "<input maxlength=\"15\" id=\"campo_".$name."\" size=\"15\" value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" ".str_replace("class='comboplus'","",$opciones)." />";
 		$output .= Html::SelectQuery($sesion,
 						"SELECT ".$campo_id.",".$campo_glosa."
 						FROM ".$tabla."
@@ -113,8 +156,8 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 			$oncambio='';
 		else
 			$oncambio=$onchange;
-
-		$output .= "<input maxlength=10 id=\"campo_".$name."\" size=10 value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" $opciones />";
+		 
+		$output .= "<input maxlength=10 id=\"campo_".$name."\" size=10 value=\"".$selected."\" onchange=\"this.value=this.value.toUpperCase();SetSelectInputId('campo_".$name."','".$name."');$oncambio\" ".str_replace("class='comboplus'","",$opciones)." />";
 
 		$output .= Html::SelectQuery($sesion,
 					"SELECT ".$campo_id.",".$campo_glosa."
@@ -142,7 +185,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				
 				if( obj_select.value != obj_campo.value && select != \"codigo_cliente\" && select != \"codigo_cliente_secundario\" )
 				{
-					CargarSelect(campo,select,\"cargar_asuntos_desde_campo\")
+					CargarSelect(campo,select,\"cargar_asuntos_desde_campo\",jQuery('#soloasuntosactivos').is(':checked')?1:0);
 				}
 			}
 			function SetCampoInputId(select,campo)
@@ -172,17 +215,23 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 				}
 				return false;
 			}
-			function CargarSelect(id_origen,id_destino,accion)
+ 
+			function CargarSelect(id_origen,id_destino,accion,soloactivos)
 			{
+			
+				
+				soloactivos = typeof soloactivos !== 'undefined' ? soloactivos : 1;
 				var select_origen = document.getElementById(id_origen);
 				var select_destino = document.getElementById(id_destino);
-				
+				var valor_original_destino = select_destino.value;
+				console.log(id_origen,id_destino,accion,soloactivos);
 			 
-				var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value ;
-
+				var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value+'&soloactivos='+soloactivos ;
+				 jQuery('#'+id_destino).addClass('loadingbar');
+ 
 				jQuery.get(url, function(response) 
 				{
-						
+					 
 						
 						if(response.indexOf('|') != -1)
 						{
@@ -200,9 +249,11 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							{
 								if( accion != \"cargar_asuntos_desde_campo\" )
 									select_destino.options.length = 1;
-								offLoading();
+ 
+								 jQuery('#'+id_destino).removeClass('loadingbar');
+ 
 								
-								if( accion == \"cargar_asuntos_desde_campo\" )
+								if( accion ==\"cargar_asuntos_desde_campo\" )
 									{
 									alert('".__('El código ingresado no existe')."');
 									jQuery('#'+id_origen).val('');
@@ -245,7 +296,12 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 										{
 											select_destino.value = select_origen.value;
 										}
-										offLoading();
+										else if(valor_original_destino){
+											select_destino.value = valor_original_destino;
+										}
+ 
+										 jQuery('#'+id_destino).removeClass('loadingbar');
+ 
 								
 								select_destino.onchange();
 							}
@@ -267,57 +323,37 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 
 
-		function CargarSelectCliente(codigo)  {
-			if(codigo!='')
-			{
+	function CargarSelectCliente(codigo)  {
+		if(codigo!='') {
 			";
-			if( UtilesApp::GetConf($sesion,'CodigoSecundario') )  		{
-				$output .= "
-
-				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
-				
-
-				jQuery.get(url, function(response) {  		
-								";
-				if( $desde != 'iframe' && (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  )		{
-								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
-								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;
-								if( $('codigo_cliente_secundario')) $('codigo_cliente_secundario').onchange();";
-						} 	else		{
-								$output .= "if($('codigo_cliente_secundario')) $('codigo_cliente_secundario').value=response;
-								if($('campo_codigo_cliente_secundario')) $('campo_codigo_cliente_secundario').value=response;";
-						}
-						$output .= "}); ";
-						}
-	else
-	{
+		if( UtilesApp::GetConf($sesion,'CodigoSecundario') ) {
+			$output .= "var campo = jQuery('#codigo_cliente_secundario, #campo_codigo_cliente_secundario');";
+		} else {
+			$output .= "var campo = jQuery('#codigo_cliente, #campo_codigo_cliente');";
+		}
 		$output .= "
-						//var array_cliente=codigo.split('-');
-						
-						 
-						//var codigo_cliente=array_cliente[0];
+			var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
 
-				var url = root_dir + '/app/ajax.php?accion=averiguar_codigo_cliente&id=' + codigo ;
-						
-
-					jQuery.get(url, function(response) {	
-					console.log(response);	";
-						if( $desde != 'iframe' && ( UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) )		{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;
-								if( $('codigo_cliente')) $('codigo_cliente').onchange();";
-						}
-						else
-						{
-								$output .= "if($('codigo_cliente')) $('codigo_cliente').value=response;
-								if($('campo_codigo_cliente')) $('campo_codigo_cliente').value=response;";
-						}
-						$output .= "});";
-						}
-$output .= "
-			}
-}
-function RevisarConsistenciaClienteAsunto( form ) {
+			jQuery.get(url, function(response) {  		
+				response = response.replace(' ','');
+				if(campo.val() != response) {
+					campo.val(response);
+					";
+		if( $desde != 'iframe' && (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador' )  ) {
+			$output .= "campo.change();";
+		}
+		$output .= "
+					try {
+						refrescacombos();
+					} catch (e) {
+						console.log(e);
+					}
+				}
+			});
+		}
+	}
+	
+	function RevisarConsistenciaClienteAsunto( form ) {
 		var accion = 'consistencia_cliente_asunto';
 		if( form.codigo_cliente_secundario && !form.codigo_cliente )
 			var codigo_cliente = form.codigo_cliente_secundario.value;
@@ -360,4 +396,3 @@ function RevisarConsistenciaClienteAsunto( form ) {
 		 
 		
 }
-?>

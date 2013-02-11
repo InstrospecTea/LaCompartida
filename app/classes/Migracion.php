@@ -1729,7 +1729,7 @@ class Migracion {
 			
 				$preparainsercion->execute(array(':idcobro'=>$cobro->fields['id_cobro'],':idmoneda'=>$id_moneda,':tipocambio'=>$tipo_cambio ));
 			 } catch (PDOException $e) {
-				 	if($this->sesion->usuario->fields['rut'] == '99511620') {
+				 	if($this->sesion->usuario->TienePermiso('SADM')) {
 							$Slim=Slim::getInstance('default',true);
 							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$queryinsercion,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($preparainsercion) );
 							$Slim->view()->setData($arrayPDOException);

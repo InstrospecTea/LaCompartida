@@ -9612,7 +9612,117 @@ QUERY;
 				$queries[] = "ALTER TABLE contrato ADD codigo_contrato VARCHAR(20), add index (codigo_contrato);";
 			}
 			ejecutar($queries, $dbh);
+
 			break;
+
+		case 7.26 :
+			$query = array();
+
+			$query[] = "INSERT ignore INTO `configuracion` (`id` ,`glosa_opcion` ,`valor_opcion` ,`comentario` ,`valores_posibles` ,`id_configuracion_categoria` ,`orden`)
+						VALUES (NULL , 'LugarFacturacion', '', 'Lugar desde el cual se factura', 'string', '1', '10');";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'lugar', 'Lugar') on duplicate key update glosa_tipo_dato='Lugar';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'giro_cliente', 'Giro') on duplicate key update glosa_tipo_dato='Giro';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (1, 'fecha_numero_mes', 'Fecha digito mes') on duplicate key update glosa_tipo_dato='Fecha digito mes';";
+
+			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+                                (select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+                                from factura_pdf_tipo_datos td, prm_documento_legal pdl
+                                group by  pdl.id_documento_legal)";
+
+			if (!ExisteCampo('giro_cliente', 'factura', $dbh)) {
+				$query[] = "ALTER TABLE  `factura` ADD  `giro_cliente` VARCHAR( 100 ) NULL AFTER  `ciudad_cliente`";
+			}
+
+			ejecutar($query, $dbh);
+			break;
+
+		case 7.27:
+			$queries = array();
+			if (!ExisteCampo('reset_password_token', 'usuario', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario`
+											 ADD  `reset_password_token` VARCHAR( 255 ) NULL,
+											 ADD  `reset_password_sent_at` DATETIME NULL;";
+			}
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.28:
+			$queries = array();
+			if (!ExisteCampo('factura_codigopostal', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE  `contrato` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `factura_comuna`;";
+			}
+				if (!ExisteCampo('factura_codigopostal', 'factura', $dbh)) {
+				$queries[] = "ALTER TABLE  `factura` ADD  `factura_codigopostal` VARCHAR( 20 ) NULL AFTER  `comuna_cliente`;";
+			}
+
+			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
+								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
+								VALUES (2, 'factura_codigopostal', 'Código Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
+
+
+			$queries[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
+									(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
+									from factura_pdf_tipo_datos td, prm_documento_legal pdl
+									group by  pdl.id_documento_legal)";
+
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.29:
+			$queries = array();
+			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
+			}
+
+			if (!ExisteCampo('usuario', 'password_by', $dbh)) {
+				$queries[] = "ALTER TABLE  `usuario` ADD  `reset_password_by` VARCHAR(1) DEFAULT 'U';";
+			}
+
+			ejecutar($queries, $dbh);
+		break;	
+
+		case 7.30:
+			$queries = array();
+			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
+			}
+			if(!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
+				$queries[] = "ALTER TABLE `documento` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `documento` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
+			}
+			ejecutar($queries, $dbh);
+		break;	
+
+		case 7.31:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO prm_permisos (`codigo_permiso` ,`glosa`) VALUES ('SADM', 'Super Admin')";
+			$queries[] = "INSERT IGNORE INTO usuario_permiso (`id_usuario`, `codigo_permiso`) VALUES 
+				((SELECT id_usuario FROM usuario where rut = '99511620'), 'SADM')";
+			ejecutar($queries, $dbh);
+		break;	
+
 	}
 }
 
@@ -9621,7 +9731,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.24;
+$max_update = 7.31;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
@@ -9665,6 +9775,7 @@ if (isset($_GET['lastver'])) {
 			echo '<hr>Comienzo de proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
 
 			try {
+
 				if (!mysql_query("START TRANSACTION", $sesion->dbh))
 					throw new Exception(mysql_error($sesion->dbh));
 
@@ -9672,15 +9783,19 @@ if (isset($_GET['lastver'])) {
 					throw new Exception(mysql_error($sesion->dbh));
 
 				Actualizaciones($sesion->dbh, $new_version);
-
 				if (!mysql_query("COMMIT", $sesion->dbh))
 					throw new Exception(mysql_error($sesion->dbh));
 			} catch (Exception $exc) {
-				if (!mysql_query("ROLLBACK", $sesion->dbh))
-					echo 'Error en ROLLBACK: ' . mysql_error($sesion->dbh);
+				$error_message = '';
+				if (!mysql_query("ROLLBACK", $sesion->dbh)) {
+					$error_message .= 'Error en ROLLBACK: ' . '<br />' ;
+				}
+				$error_message .= 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br />';
+				$error_message .= 'Se encontró un error: ' . $exc->getMessage() . '<br />';
+				echo($error_message);
 
-				echo 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
-				echo( 'Se encontró un error: ' . $exc->getMessage() );
+				EnviarLogError($error_message, $exc, $sesion);
+
 				exit(1);
 			}
 
@@ -9691,6 +9806,26 @@ if (isset($_GET['lastver'])) {
 				echo '<p>Su software está corriendo la versi&oacute;n ' . number_format($VERSION, 2, '.', '') . '</p>';
 		}
 	}
+}
+
+function EnviarLogError($error_message, $e, $sesion) {
+	$array_correo = array(
+		array('mail' => 'implementacion@lemontech.cl',
+				'nombre' => 'Implementación Lemontech'
+		),
+		array('mail' => 'soporte@lemontech.cl',
+				'nombre' => 'Soporte Lemontech'
+		),
+	);
+	$mail =<<<MAIL
+<p>Ha ocurrido un error al actualizar</p>
+
+<p>Ambiente: http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}</p>
+
+<p>$error_message</p>
+MAIL;
+
+	Utiles::EnviarMail($sesion, $array_correo, 'Error en Update', $mail, false);
 }
 
 function GuardarVersion($versionFileName, $new_version, $sesion) {

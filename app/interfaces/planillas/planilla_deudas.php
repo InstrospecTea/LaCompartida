@@ -197,17 +197,7 @@ $Pagina->PrintTop();
 								<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
 							</td>
 						</tr>
-						<tr>
-							<td align="right" width="30%">
-								<label for="id_contrato"><?php echo __('Asuntos'); ?></label>
-							</td>
-							<td colspan="3" align="left" id="td_selector_contrato">
-								<?php
-								$Contrato = new Contrato($Sesion);
-								echo $Contrato->ListaSelector($_REQUEST['codigo_cliente'], '', $_REQUEST['id_contrato']);
-								?>
-							</td>
-						</tr>
+						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 						<tr>
 							<td align=right>
 								<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación')?></label>
@@ -235,33 +225,7 @@ $Pagina->PrintTop();
 	</tr>
 </table>
 <script type="text/javascript">
-	var valor_anterior_codigo;
-	var campo_cliente;
-
-	function ActualizarContratos(val) {
-		var url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + val;
-		jQuery.ajax({
-			url: url,
-			success: function (data) {
-				jQuery('#td_selector_contrato').html(data);
-			}
-		});
-	}
-
-	function ComprobarCodigos() {
-		var valor_nuevo = campo_cliente.val()
-		if (valor_anterior_codigo != valor_nuevo) {
-			ActualizarContratos(valor_nuevo);
-			valor_anterior_codigo = valor_nuevo;
-		}
-	}
-
 	jQuery(document).ready(function () {
-		// Cargar contratos on select
-		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
-		valor_anterior_codigo = campo_cliente.val();
-		window.setInterval(ComprobarCodigos, 500);
-
 		jQuery('#boton_xls').click(function(){
 			jQuery('#opcion').val('xls');
 		});

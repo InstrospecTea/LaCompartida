@@ -387,7 +387,7 @@ if ($borradores) {
 	$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 	//if ($opc_ver_solicitante) {
 	$ws->write($filas, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);   //si no se quiere ver esto se oculta al final de cada hoja
-	//}	
+	//}
 	if (!$opc_ver_asuntos_separados) {
 		$ws->write($filas, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 	}
@@ -725,13 +725,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'contacto', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-	$ws->write($filas, $col_abogado, $contacto->fields['contacto'], $formato_encabezado);
+	$ws->write($filas, $col_abogado, $contrato->fields['contacto'], $formato_encabezado);
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 	++$filas;
 
 	$ws->write($filas, $col_id_trabajo, Utiles::GlosaMult($sesion, 'telefono', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-	$ws->write($filas, $col_abogado, $contacto->fields['fono_contacto'], $formato_encabezado);
+	$ws->write($filas, $col_abogado, $contrato->fields['fono_contacto'], $formato_encabezado);
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 	$filas += 2;
 
@@ -941,7 +941,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			// Si existen trabajos imprime la tabla
 			if ($cont_trabajos > 0) {
 				// Buscar todos los trabajos de este asunto/cobro
-				$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
+				$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
 										trabajo.id_cobro,
 										trabajo.id_trabajo,
 										trabajo.codigo_asunto,
@@ -966,15 +966,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										TIME_TO_SEC(duracion)/3600 AS duracion_horas,
 										IF( trabajo.cobrable = 1, trabajo.tarifa_hh, '0') AS tarifa_hh,
 										DATE_FORMAT(trabajo.fecha_cobro, '%e-%c-%x') AS fecha_cobro,
-										asunto.codigo_asunto_secundario as codigo_asunto_secundario, 
-										prm_categoria_usuario.orden as orden 
+										asunto.codigo_asunto_secundario as codigo_asunto_secundario,
+										prm_categoria_usuario.orden as orden
 									FROM trabajo
 										JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 										LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 										JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
 										LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 										LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
-										LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario 
+										LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
 										LEFT JOIN prm_moneda ON cobro.id_moneda = prm_moneda.id_moneda
 									WHERE $where_trabajos AND trabajo.id_tramite=0 AND trabajo.id_cobro=" . $cobro->fields['id_cobro'];
 
@@ -983,6 +983,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				} else {
 					$orden = "trabajo.fecha, trabajo.descripcion";
 				}
+
 				$b1 = new Buscador($sesion, $query_trabajos, "Trabajo", $desde, '', $orden);
 				$lista_trabajos = $b1->lista;
 
@@ -1173,7 +1174,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				if ($opc_ver_asuntos_separados)
 					$where_tramites .= " AND tramite.codigo_asunto ='" . $asunto->fields['codigo_asunto'] . "' ";
 
-				$query_tramites_si_trabajos = "SELECT  
+				$query_tramites_si_trabajos = "SELECT
 													tramite.id_tramite,
 													tramite.fecha,
 													glosa_tramite,
@@ -1183,7 +1184,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 													tramite.descripcion,
 													'1' as cantidad_repeticiones,
 													tramite.trabajo_si_no,
-													 tramite.tarifa_tramite as tarifa, 
+													 tramite.tarifa_tramite as tarifa,
 													tramite.id_cobro,
 													tramite.codigo_asunto,
 													cliente.glosa_cliente,
@@ -1203,12 +1204,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 													JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 													LEFT JOIN cliente ON asunto.codigo_cliente=cliente.codigo_cliente
 													LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-												WHERE $where_tramites 
+												WHERE $where_tramites
 													AND tramite.id_cobro='" . $cobro->fields['id_cobro'] . "'
 													AND tramite.trabajo_si_no = 1";
-				
-				
-				$query_tramites_no_trabajos = "SELECT  
+
+
+				$query_tramites_no_trabajos = "SELECT
 													tramite.id_tramite,
 													tramite.fecha,
 													glosa_tramite,
@@ -1218,7 +1219,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 													tramite.descripcion,
 													COUNT(*) as cantidad_repeticiones,
 													tramite.trabajo_si_no,
-													SUM( tramite.tarifa_tramite ) as tarifa, 
+													SUM( tramite.tarifa_tramite ) as tarifa,
 													tramite.id_cobro,
 													tramite.codigo_asunto,
 													cliente.glosa_cliente,
@@ -1238,11 +1239,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 													JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 													LEFT JOIN cliente ON asunto.codigo_cliente=cliente.codigo_cliente
 													LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
-												WHERE $where_tramites 
+												WHERE $where_tramites
 													AND tramite.id_cobro='" . $cobro->fields['id_cobro'] . "'
 													AND tramite.trabajo_si_no = 0
 												GROUP BY tramite_tipo.glosa_tramite, tramite.descripcion, tramite.codigo_asunto, prm_moneda.simbolo";
-				
+
 				$query_tramites = "SELECT SQL_CALC_FOUND_ROWS * FROM (" . $query_tramites_si_trabajos . "  UNION ALL " . $query_tramites_no_trabajos . "  ) a ORDER BY fecha ASC";
 				//echo $query_tramites; exit;
 				$lista_tramites = new ListaTramites($sesion, '', $query_tramites);
@@ -1301,9 +1302,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 					//$ws->write($filas, $col_fecha, Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $formato_normal);
 					if ($cobro->fields['opc_ver_detalles_por_hora_iniciales'] || UtilesApp::GetConf($sesion, 'UsarUsernameTodoelSistema')) {
-						$nombre = $trabajo->fields['username'];
+						$nombre = $tramite->fields['usr_nombre'];
 					} else {
-						$nombre = $trabajo->fields['nombre_usuario'];
+						$nombre = $tramite->fields['nombre_usuario'];
 					}
 					$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 
@@ -1591,23 +1592,23 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 
 		// Contenido de gastos
-		$query = "SELECT 
-										cta_corriente.ingreso, 
-										cta_corriente.egreso, 
+		$query = "SELECT
+										cta_corriente.ingreso,
+										cta_corriente.egreso,
 										cta_corriente.monto_cobrable,
 
-										CAST( IF( fecha_factura IS NULL OR 
-												cta_corriente.fecha_factura = '' OR 
-												cta_corriente.fecha_factura = 00000000, 
-											cta_corriente.fecha, 
-											cta_corriente.fecha_factura) as DATE) as fecha, 
+										CAST( IF( fecha_factura IS NULL OR
+												cta_corriente.fecha_factura = '' OR
+												cta_corriente.fecha_factura = 00000000,
+											cta_corriente.fecha,
+											cta_corriente.fecha_factura) as DATE) as fecha,
 
 										cta_corriente.id_moneda,
 										asunto.codigo_asunto,
 										asunto.glosa_asunto,
 										cta_corriente.descripcion
 										$_columnas_adicionales
-									FROM cta_corriente join asunto using (codigo_asunto) 
+									FROM cta_corriente join asunto using (codigo_asunto)
 										$_joins
 									WHERE id_cobro='" . $cobro->fields['id_cobro'] . "'
 									$order";
@@ -1619,7 +1620,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$col_formula_gastos_montos = Utiles::NumToColumnaExcel($columna_gastos_montos);
 		for ($i = 0; $i < $lista_gastos->num; $i++) {
 			$gasto = $lista_gastos->Get($i);
-//CABECERAS PARA CADA ASUNTO 
+//CABECERAS PARA CADA ASUNTO
 			if ($cobro->fields['opc_ver_asuntos_separados'] && $gasto->fields['codigo_asunto'] != $codigo_asunto_anterior) {
 
 				if (!empty($codigo_asunto_anterior)) {
@@ -1909,9 +1910,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->write($filas, $col_fecha_ini, Utiles::GlosaMult($sesion, 'monto_cap_inicial', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_resumen_text);
 			$ws->writeNumber($filas++, $col_fecha_ini + 1, $contrato->fields['monto'], $formato_moneda_monto_resumen);
 			$fila_inicial = $filas;
-			$query_cob = "SELECT 
-								cobro.id_cobro, 
-								cobro.documento, 
+			$query_cob = "SELECT
+								cobro.id_cobro,
+								cobro.documento,
 								((cobro.monto_subtotal-cobro.descuento) * cm2.tipo_cambio) / cm1.tipo_cambio
 							FROM cobro
 								JOIN contrato ON cobro.id_contrato=contrato.id_contrato
@@ -1919,7 +1920,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 								JOIN cobro_moneda as cm2 ON cobro.id_cobro=cm2.id_cobro AND cm2.id_moneda=cobro.id_moneda
 							WHERE cobro.id_contrato=" . $cobro->fields['id_contrato'] . "
 								AND cobro.forma_cobro='CAP'";
-			
+
 			$resp_cob = mysql_query($query_cob, $sesion->dbh) or Utiles::errorSQL($query_cob, __FILE__, __LINE__, $sesion->dbh);
 			while (list($id_cobro, $id_factura, $monto_cap) = mysql_fetch_array($resp_cob)) {
 				$monto_cap = number_format($monto_cap, $moneda_monto->fields['cifras_decimales'], '.', '');
@@ -1956,7 +1957,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	}
 }
 
-/* FFF bloque de hitos, requerimiento PRC		
+/* FFF bloque de hitos, requerimiento PRC
   echo 'El cobro es ';
   echo '<pre>';
   print_r($cobro->fields);
@@ -1966,10 +1967,10 @@ $query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_contrat
 $resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query_hitos, __FILE__, __LINE__, $sesion->dbh);
 list($cont_hitos) = mysql_fetch_array($resp_hitos);
 if ($cont_hitos > 0) {
-	$query_hitos = "select * from (select id_cobro_pendiente, (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid, 
-						round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,   
+	$query_hitos = "select * from (select id_cobro_pendiente, (select count(*) total from cobro_pendiente cp2 where cp2.id_contrato=cp.id_contrato) total,  @a:=@a+1 as rowid,
+						round(if(cbr.id_cobro=cp.id_cobro, @a,0),0) as thisid,
 						date_format(cast(ifnull(cp.fecha_cobro,ifnull(cbr.fecha_emision,'00000000')) as DATE),'%d/%m/%y') as fecha_hito,
-						cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  , 
+						cp.descripcion, cp.monto_estimado, pm.simbolo, pm.codigo, pm.tipo_cambio  ,
 						cp.id_contrato, cp.id_cobro , ifnull(cbr.estado,'PENDIENTE') as estado, cbr.monto_thh,cbr.monto_thh_estandar,cbr.total_minutos, cp.fecha_cobro fc2
 						FROM `cobro_pendiente` cp join  contrato c using (id_contrato) join prm_moneda pm using (id_moneda) left join cobro cbr on cbr.id_contrato=c.id_contrato and cbr.id_cobro=cp.id_cobro  join (select @a:=0) FFF
 						where cp.hito=1    ) hitos  where    id_contrato={$cobro->fields['id_contrato']} ";
@@ -2005,7 +2006,7 @@ if ($cont_hitos > 0) {
 		$filas++;
 
 		$ws->write($filas, $col_descripcion, $fila_hitos['descripcion'], $formato_normal);
-		//$ws->write($filas, $col_descripcion+1,  '',$formato_normal); 
+		//$ws->write($filas, $col_descripcion+1,  '',$formato_normal);
 		$ws->write($filas, $col_descripcion + 1, ucwords($fila_hitos['estado']), $formato_normal);
 		$ws->write($filas, $col_descripcion + 2, $fecha_hito, $formato_normal);
 
@@ -2028,7 +2029,7 @@ if ($cont_hitos > 0) {
 	$minutos_cobrables = sprintf("%02d", $totalminutos % 60);
 
 	$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $formato_total);
-	//$ws->write($filas, $col_descripcion+1, ' ',$formato_total); 
+	//$ws->write($filas, $col_descripcion+1, ' ',$formato_total);
 
 
 	$ws->write($filas, $col_descripcion + 5, intval($totalthh), $formato_moneda_total);

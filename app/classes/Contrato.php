@@ -59,6 +59,7 @@ class Contrato extends Objeto {
 		'factura_direccion'	,
 		'factura_telefono'	,
 		'factura_comuna'	,
+		'factura_codigopostal'	,
 		'factura_ciudad'	,
 		'cod_factura_telefono'	,
 		'id_tarifa'	,
@@ -1328,7 +1329,7 @@ class Contrato extends Objeto {
 						$this->Load($insertid);
 						print_r($contrato->fields);
 					} catch (PDOException $e) {
-						 if($this->sesion->usuario->fields['rut'] == '99511620') {
+						 if($this->sesion->usuario->TienePermiso('SADM')) {
 							$Slim=Slim::getInstance('default',true);
 							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$query,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
 							$Slim->view()->setData($arrayPDOException);

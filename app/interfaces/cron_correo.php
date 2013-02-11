@@ -20,7 +20,7 @@ while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql
 	foreach ($adresses as $adress) {
 		$correo = array('nombre' => $nombre, 'mail' => trim($adress));
 
-		if (validEmail($adress)) {
+		if (UtilesApp::isValidEmail($adress)) {
 			array_push($correos, $correo);
 		} else {
 			error_log('Se intenta enviar correo no valido ' . $adress . ' (usuario ' . $nombre . ')');
@@ -30,7 +30,7 @@ while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql
 	$encolados[] = array(json_encode($adresses), $subject);
 	if (count($correos) > 0) {
 
-		if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, false, $id_archivo_anexo)) {
+		if (Utiles::EnviarMail($sesion, $correos, $subject, $mensaje, true, $id_archivo_anexo)) {
 
 			$query2 = "UPDATE log_correo SET enviado=1 WHERE id_log_correo=" . $id;
 			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
@@ -41,54 +41,3 @@ while (list($id, $subject, $mensaje, $mail, $nombre, $id_archivo_anexo ) = mysql
 
 echo '<br>Se ha detectado ' . count($encolados) . ' correos pendientes:';
 echo '<br>Se ha  enviado ' . $enviados . ' correos pendientes';
-
-/**
-  Validate an email address.
-  Provide email address (raw input)
-  Returns true if the email address has the email
-  address format and the domain exists.
- */
-function validEmail($email) {
-	$email = trim($email);
-	$isValid = true;
-	$atIndex = strrpos($email, "@");
-	if (is_bool($atIndex) && !$atIndex) {
-		$isValid = false;
-	} else {
-		$domain = substr($email, $atIndex + 1);
-		$local = substr($email, 0, $atIndex);
-		$localLen = strlen($local);
-		$domainLen = strlen($domain);
-		if ($localLen < 1 || $localLen > 64) {
-			// local part length exceeded
-			$isValid = false;
-		} else if ($domainLen < 1 || $domainLen > 255) {
-			// domain part length exceeded
-			$isValid = false;
-		} else if ($local[0] == '.' || $local[$localLen - 1] == '.') {
-			// local part starts or ends with '.'
-			$isValid = false;
-		} else if (preg_match('/\\.\\./', $local)) {
-			// local part has two consecutive dots
-			$isValid = false;
-		} else if (!preg_match('/^[A-Za-z0-9\\-\\.]+$/', $domain)) {
-			// character not valid in domain part
-			$isValid = false;
-		} else if (preg_match('/\\.\\./', $domain)) {
-			// domain part has two consecutive dots
-			$isValid = false;
-		} else if (!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/', str_replace("\\\\", "", $local))) {
-			// character not valid in local part unless
-			// local part is quoted
-			if (!preg_match('/^"(\\\\"|[^"])+"$/', str_replace("\\\\", "", $local))) {
-				$isValid = false;
-			}
-		}
-		if ($isValid && !(checkdnsrr($domain, "MX") || checkdnsrr($domain, "A"))) {
-			// domain not found in DNS
-			$isValid = false;
-		}
-	}
-	return $isValid;
-}
-

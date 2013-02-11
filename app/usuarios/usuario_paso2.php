@@ -60,7 +60,7 @@ if ($opc == 'edit') {
 	$usuario->Edit('dir_numero', $dir_numero);
 	$usuario->Edit('dir_depto', $dir_depto);
 	$usuario->Edit('dir_comuna', $dir_comuna);
-	  */
+		*/
 
 	$usuario->Edit('email', $email);
 	$usuario->Edit('activo', $activo);
@@ -119,20 +119,26 @@ if ($opc == 'edit') {
 	}
 }
 else if ($opc == 'pass' and $usuario->loaded) {
-	if ($genpass > 0)
-		$new_password = Utiles::NewPassword();
+ 	if (isset($genpass)) {
+		if ($genpass > 0) {
+			$new_password = Utiles::NewPassword();
+		}
+		$usuario->Edit('reset_password_by', 'A');
+		$usuario->Edit('password', md5($new_password));
+	}
 
-	$usuario->Edit('password', md5($new_password));
+	$force_reset = (isset($force_reset_password) && $force_reset_password == '1') ? $force_reset_password : 0;
+	$usuario->Edit('force_reset_password', $force_reset);
 
 	if ($usuario->Write()) {
 		$pagina->AddInfo(__('Contraseña modificada con éxito'));
-
-		if ($genpass > 0)
+		if ($genpass > 0) {
 			$pagina->AddInfo(__('Nueva contraseña:') . ' ' . $new_password);
-	}
-	else {
+		}
+	} else {
 		$pagina->AddError($usuario->error);
 	}
+
 } elseif ($opc == 'cancelar')
 	$pagina->Redirect('usuario_paso1.php');
 elseif ($opc == 'elimina_vacacion' and $usuario->loaded) {
@@ -153,6 +159,7 @@ if ($usuario->loaded)
 $lista_monedas = new ListaObjetos($sesion, "", "SELECT * FROM prm_moneda");
 $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la selección, presiona la tecla <strong>CTRL</strong> al momento de hacer <strong>clic</strong>.");
 ?>
+<script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
 <script language="javascript" type="text/javascript">
 <?php if ($usuario->loaded) { ?>
 		function CheckActivo(activo)
@@ -735,8 +742,10 @@ if (!empty($usuario_vacaciones)) {
 	</fieldset>
 </form>
 <br/><br/>
-<?php if ($usuario->loaded) { ?>
-
+<?php
+if ($usuario->loaded) {
+	PasswordStrength::PrintCSS();
+?>
 	<form  method="post" action="<?php echo $SERVER[PHP_SELF] ?>">
 		<input type="hidden" name="opc" value="pass" />
 		<input type="hidden" name="rut" value="<?php echo $rut ?>" />
@@ -745,20 +754,51 @@ if (!empty($usuario_vacaciones)) {
 			<legend><?php echo __('Cambio de contraseña') ?></legend>
 			<table width="100%">
 				<tr>
-					<td colspan="2" class="texto" align="left">
-			<?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
-						<strong><?php echo __('Atención') ?></strong>: <?php echo __('La contraseña anterior será reemplazada e imposible de recuperar.') ?><br/>
+					<td width="100" align="left">
+						<strong><?php echo __('Contraseña') ?>:</strong>
 					</td>
+					<td align="left">
+							<?php
+								$reset_password_by = __('Administrador');
+								if ($usuario->fields['reset_password_by'] == 'U') {
+									$reset_password_by = __('Usuario');
+								}
+							?>
+							<span><?php echo __('Establecida por el') . " $reset_password_by" ?></span>
+							<a href="#" id="change_password_link" ><?php echo __('Cambiar contraseña') ?></a><br/>
+							<div id="change_password_information" style="display:none">
+								<?php echo __('Ingrese una nueva contraseña para este usuario, o escoja crear una aleatoria.') ?><br/>
+								<strong><?php echo __('Atención') ?></strong>: <?php echo __('La contraseña anterior será reemplazada e imposible de recuperar.') ?><br/><br/>
+
+								<div style="height:35px">
+									<div style="float:left">
+										<input type="radio" name="genpass" value="0" id="new_pass" />
+										<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
+										<input type="text" name="new_password" id="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
+									</div>
+									<?php PasswordStrength::PrintHTML(); ?>
+								</div>
+								<div>
+									<input type="radio" name="genpass" value="1" id="rand_pass" />
+									<label for="rand_pass"><?php echo __('Generar contraseña aleatoria') ?></label>
+								</div>
+							</div>
+					<td>
 				</tr>
 				<tr>
-					<td width="20">&nbsp;</td>
-					<td class="texto" align="left">
-						<input type="radio" name="genpass" value="0" id="new_pass" />
-						<label for="new_pass"><?php echo __('Contraseña nueva') ?>:</label>
-						<input type="text" name="new_password" value="" size="16" onclick="javascript:document.getElementById('new_pass').checked='checked'"/><br/>
-						<input type="radio" name="genpass" value="1" checked="checked" id="rand_pass" />
-						<label for="rand_pass"><?php echo __('Generar contraseña aleatoria') ?></label>
+					<td width="100" align="left">
+						<strong>&nbsp;</strong>
 					</td>
+					<td align="left">
+							<?php
+								$force_reset_password = $usuario->fields['force_reset_password'];
+								$checked_str = ($force_reset_password && $force_reset_password == "1") ? "checked" : "";
+							?>
+						<label>
+							<input type="checkbox" name="force_reset_password" id="force_reset_password" value="1" <?php echo $checked_str ?> />
+							<span>Solicitar un cambio de contraseña al pr&oacute;ximo inicio de sesi&oacute;n</span>
+						</label>
+					<td>
 				</tr>
 				<tr>
 					<td align="right" colspan="2">
@@ -769,7 +809,7 @@ if (!empty($usuario_vacaciones)) {
 		</fieldset>
 	</form>
 	<?php
-	if($sesion->usuario->fields['rut']=='99511620')  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
+	if($sesion->usuario->TienePermiso('SADM'))  echo '<a style="border:0 none;" href="'. Conf::RootDir().'/app/usuarios/index.php?switchuser='.$rut.'">Loguearse como este usuario</a>';
 
 }
 
@@ -814,15 +854,33 @@ function CargarPermisos() {
 <script>
 
 	jQuery(document).ready(function() {
+		jQuery('[name=SADM]').closest('tr').hide();
 		jQuery("#chkpermisos .ui-button").live('change',function() {
 			alert(jQuery(this).attr('class'));
 			jQuery(this).button("option", {
 				icons: { primary: this.checked ? 'ui-icon-check' : 'ui-icon-closethick' }
 			});
 		});
+
+		<?php PasswordStrength::PrintJS("new_password"); ?>
+
+		jQuery('#change_password_link').live('click', function() {
+			var lang_cambiar = "<?php echo __('Cambiar contraseña'); ?>";
+			if (jQuery(this).text() == lang_cambiar) {
+				jQuery(this).text('Cancelar');
+			} else {
+				jQuery(this).text(lang_cambiar);
+			}
+			jQuery('#change_password_information').toggle();
+			jQuery('#new_password').val('');
+			jQuery('#new_passa, #rand_pass').attr('checked', false);
+
+			<?php PasswordStrength::PrintJSReset(); ?>
+
+			return false;
+		});
+
 	});
-
-
 
 
 	window.onbeforeunload = function(){
