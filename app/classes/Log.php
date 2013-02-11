@@ -8,12 +8,14 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  */
 class Log {
 	var $logFile = 'app';
-	var $logFolder = LOGDIR;
+	var $logFolder = null;
 
 	public function __construct() {
+		$this->logFolder = LOGDIR . Conf::dbUser() . '/ttb/' . date('y-m');
+
 		if (!is_dir($this->logFolder)) {
 			try {
-				mkdir($this->logFolder);
+				mkdir($this->logFolder, 0777, true);
 			} catch(Exception $e) {
 				echo ("No es posible crear el directorio '{$this->logFolder}'<br/>\n" . $e->getMessage());
 				exit;
