@@ -5,7 +5,7 @@ require_once dirname(__FILE__).'/../app/conf.php';
 		 $pagina = new Pagina($sesion);
 		 $pagina->titulo = __('Log de Errores: Últimas 100 filas');
 	$pagina->PrintTop();
-	   if($sesion->usuario->fields['rut']!='99511620') {
+	   if(!$sesion->usuario->TienePermiso('SADM')) {
 		die('No Autorizado');
 	   }  
 	   $archivologs=ini_get('error_log');

@@ -32,7 +32,12 @@ class UtilesApp extends Utiles {
 	 *  Escribe el valor de un config en formato JS.
 	 */
 	public static function GetConfJs($sesion, $conf) {
-		echo "var $conf='" . Conf::GetConf($sesion, $conf) . "';\n";
+		$v = Conf::GetConf($sesion, $conf);
+		if (is_numeric($v)) {
+			echo "var $conf = $v;\n";
+		} else {
+			echo "var $conf = '$v';\n";
+	}
 	}
 
 	public static function GetSimboloMonedaBase($sesion) {
@@ -83,6 +88,44 @@ class UtilesApp extends Utiles {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", $oncambio, $width, $codigo_cliente_secundario);
 		} else {
 			echo InputId::Imprimir($sesion, "asunto", "codigo_asunto", "glosa_asunto", "codigo_asunto", $codigo_asunto, "", $oncambio, $width, $codigo_cliente);
+		}
+	}
+	
+	public static function FiltroAsuntoContrato($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato = '', $width = 320) {
+		?>
+		<tr>
+			<td align="right">
+				<?php echo __('Asuntos'); ?>
+			</td>
+			<td colspan="3" align="left" id="td_selector_contrato">
+				<?php self::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $width, $oncambio = "CargarSelectCliente(this.value);CargarContrato(this.value)"); ?>
+				<input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
+				<script type="text/javascript">
+					function CargarContrato(asunto) {
+						var ajax_url = root_dir + '/app/interfaces/ajax/ajax_gastos.php?opc=contratoasunto&codigo_asunto=' + asunto;
+						jQuery.getJSON(ajax_url,function(data) {
+							if (data) {
+								jQuery('#id_contrato').val(data.id_contrato);
+								jQuery('#codigo_contrato').val(data.codigo_contrato);
+							}
+						});
+					}
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3">
+				<em>
+					<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarán los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.'); ?>
+				</em>
+			</td>
+		</tr>
+		<?php
+		if($Slim=Slim::getInstance('default',true)){
+			global $id_contrato, $Contrato;
+			$Contrato = new Contrato($sesion);
+			$Slim->applyHook('hook_filtros_asunto_contrato');
 		}
 	}
 

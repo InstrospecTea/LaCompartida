@@ -174,7 +174,7 @@ echo '<pre>';
 				 
 					 
 			 } catch (PDOException $e) {
-						 if($sesion->usuario->fields['rut'] == '99511620') {
+						 if($sesion->usuario->TienePermiso('SADM')) {
 							$Slim=Slim::getInstance('default',true);
 							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$querypermisos,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($arrayparamsdebug) );
 							$Slim->view()->setData($arrayPDOException);

@@ -13,16 +13,15 @@ if (!isset($where) || (isset($where) && $where == '')) {
 }
 if ($_REQUEST['opc'] == 'contratoasunto') {
 	$codigo_asunto = $_REQUEST['codigo_asunto'];
+	$data = array('id_contrato' => '');
 	if ($codigo_asunto) {
 		$contrato = new Contrato($sesion);
 		$contrato->LoadByCodigoAsunto($codigo_asunto);
-		$id_contrato = $contrato->fields['id_contrato'];
-	} else {
-		$id_contrato = '';
+		$data['id_contrato'] = $contrato->fields['id_contrato'];
+		if(isset($contrato->fields['codigo_contrato'])){
+			$data['codigo_contrato'] = $contrato->fields['codigo_contrato'];
+		}
 	}
-	$data = array(
-		"id_contrato" => $id_contrato
-	);
 	echo json_encode($data);
 	exit;
 }
@@ -304,7 +303,7 @@ if ($_GET['totalctacorriente']) { ?>
 		$rows = $sesion->pdodbh->query($selectcount)->fetch();
 		$resp = $sesion->pdodbh->query($query);
 	} catch (PDOException $e) {
-		if ($sesion->usuario->fields['rut'] == '99511620') {
+		if ($sesion->usuario->TienePermiso('SADM')) {
 			$Slim = Slim::getInstance('default', true);
 			$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $query, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($resp));
 			$Slim->view()->setData($arrayPDOException);

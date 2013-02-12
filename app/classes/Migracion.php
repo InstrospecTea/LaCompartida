@@ -1727,20 +1727,18 @@ class Migracion {
 			$resp_rev = mysql_query($query_rev, $this->sesion->dbh) or Utiles::errorSQL($query_rev, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cantidad) = mysql_fetch_array($resp_rev);
 
-
 			try {
-
-				$preparainsercion->execute(array(':idcobro' => $cobro->fields['id_cobro'], ':idmoneda' => $id_moneda, ':tipocambio' => $tipo_cambio));
-			} catch (PDOException $e) {
-				if ($this->sesion->usuario->fields['rut'] == '99511620') {
-					$Slim = Slim::getInstance('default', true);
-					$arrayPDOException = array('File' => $e->getFile(), 'Line' => $e->getLine(), 'Mensaje' => $e->getMessage(), 'Query' => $queryinsercion, 'Trace' => json_encode($e->getTrace()), 'Parametros' => json_encode($preparainsercion));
-					$Slim->view()->setData($arrayPDOException);
-					$Slim->applyHook('hook_error_sql');
-				}
-				debug($e->getTraceAsString());
-				Utiles::errorSQL($queryinsercion, "", "", NULL, "", $e);
-				echo 'Error!';
+				$preparainsercion->execute(array(':idcobro'=>$cobro->fields['id_cobro'],':idmoneda'=>$id_moneda,':tipocambio'=>$tipo_cambio ));
+			 } catch (PDOException $e) {
+				 	if($this->sesion->usuario->TienePermiso('SADM')) {
+							$Slim=Slim::getInstance('default',true);
+							$arrayPDOException=array('File'=>$e->getFile(),'Line'=>$e->getLine(),'Mensaje'=>$e->getMessage(),'Query'=>$queryinsercion,'Trace'=>json_encode($e->getTrace()),'Parametros'=>json_encode($preparainsercion) );
+							$Slim->view()->setData($arrayPDOException);
+							 $Slim->applyHook('hook_error_sql');
+						 }
+				 debug($e->getTraceAsString());
+					Utiles::errorSQL($queryinsercion, "", "",  NULL,"",$e );
+					echo 'Error!';
 			}
 		}
 	}

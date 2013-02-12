@@ -160,7 +160,7 @@ function AgregarAsunto( numero , valor_hidden )
 <form name="formulario" id="formulario" method="post" action='' autocomplete="off" onsubmit="return validar_doc_legales(true)">
 	<input type=hidden name='opc' value='guardar'>
 <?php
-	if( $sesion->usuario->fields['rut'] != '99511620' ) 
+	if( !$sesion->usuario->TienePermiso('SADM') ) 
 		$where_orden = " WHERE orden > -1 ";
 	else 
 		$where_orden = "";

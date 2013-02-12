@@ -278,7 +278,7 @@ if ($opcion == "guardar") {
 		$asunto->NoEditar("tarifa_especial");
 		//$asunto->EditarTodos();
 		$asunto->Edit("id_usuario", $sesion->usuario->fields['id_usuario']);
-		$asunto->Edit("codigo_asunto", $codigo_asunto);
+		$asunto->Edit("codigo_asunto", $codigo_asunto,true);
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -4));
 		} else {
@@ -292,12 +292,12 @@ if ($opcion == "guardar") {
 			$glosa_asunto = strtoupper($glosa_asunto);
 		}
 		$asunto->Edit("glosa_asunto", $glosa_asunto);
-		$asunto->Edit("codigo_cliente", $codigo_cliente);
+		$asunto->Edit("codigo_cliente", $codigo_cliente,true);
 		if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
 			$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
-		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto);
-		$asunto->Edit("id_area_proyecto", $id_area_proyecto);
+		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto,true);
+		$asunto->Edit("id_area_proyecto", $id_area_proyecto,true);
 		$asunto->Edit("id_idioma", $id_idioma);
 		$asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
@@ -306,14 +306,14 @@ if ($opcion == "guardar") {
 		$asunto->Edit("fono_contacto", $fono_contacto);
 		$asunto->Edit("email_contacto", $email_contacto);
 		$asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
-		$asunto->Edit("activo", $activo);
+		$asunto->Edit("activo", intval($activo),true);
 		if (!$activo) {
 			$fecha_inactivo = date('Y-m-d H:i:s');
-			$asunto->Edit("fecha_inactivo", $fecha_inactivo);
+			$asunto->Edit("fecha_inactivo", $fecha_inactivo,true);
 		} else {
-			$asunto->Edit("fecha_inactivo", '');
+			$asunto->Edit("fecha_inactivo", '', true);
 		}
-		$asunto->Edit("cobrable", $cobrable);
+		$asunto->Edit("cobrable", intval($cobrable),true);
 		$asunto->Edit("mensual", $mensual ? "SI" : "NO");
 		$asunto->Edit("alerta_hh", $asunto_alerta_hh);
 		$asunto->Edit("alerta_monto", $asunto_alerta_monto);

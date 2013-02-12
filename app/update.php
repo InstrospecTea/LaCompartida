@@ -9686,9 +9686,9 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
+
 		case 7.29:
 			$queries = array();
-
 			if (!ExisteCampo('usuario', 'force_reset_password', $dbh)) {
 				$queries[] = "ALTER TABLE  `usuario` ADD  `force_reset_password` TINYINT(4) DEFAULT 0;";
 			}
@@ -9699,12 +9699,35 @@ QUERY;
 
 			ejecutar($queries, $dbh);
 			break;
-		case 7.26:
+		case 7.30:
 			if (!ExisteCampo('termino_pago_comision', 'cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `cliente` ADD COLUMN `termino_pago_comision` DATETIME NULL DEFAULT NULL  AFTER `limite_monto`;";
 			}
 			ejecutar($queries, $dbh);
 			break;
+		case 7.31:
+			$queries = array();
+			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
+			}
+			if(!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
+				$queries[] = "ALTER TABLE `documento` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
+				$queries[] = "ALTER TABLE `documento` ADD INDEX ( `codigo_asunto` ) ";
+				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
+			}
+			ejecutar($queries, $dbh);
+		break;
+
+		case 7.32:
+			$queries = array();
+			$queries[] = "INSERT IGNORE INTO prm_permisos (`codigo_permiso` ,`glosa`) VALUES ('SADM', 'Super Admin')";
+			$queries[] = "INSERT IGNORE INTO usuario_permiso (`id_usuario`, `codigo_permiso`) VALUES
+				((SELECT id_usuario FROM usuario where rut = '99511620'), 'SADM')";
+			ejecutar($queries, $dbh);
+		break;
+
 	}
 }
 
@@ -9713,7 +9736,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.29;
+$max_update = 7.32;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
