@@ -807,7 +807,9 @@ else
 							<td align=right width='30%'><b><?php echo __('Cliente') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
 								<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-
+								<?php if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) { ?>
+									<input type="hidden" name="codigo_cliente" id="codigo_cliente"/>
+								<?php } ?>
 							</td>
 						</tr>
 						<tr>
