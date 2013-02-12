@@ -178,24 +178,24 @@ class CronNotificacion extends Cron {
 			for ($x = 0; $x < $total_resultados; ++$x) {
 				$resultado = $resultados[$x];
 				$profesional = new Usuario($this->Sesion);
-				$profesional->LoadId($resultado['$id_usuario']);
+				$profesional->LoadId($resultado['id_usuario']);
 
 				if (UtilesApp::GetConf($this->Sesion, 'AlertaSemanalTodosAbogadosaAdministradores')) {
-					if ($resultado['$codigo_permiso'] == 'ADM') {
-						$resultado['$revisados'] = $ids_usuarios_profesionales;
+					if ($resultado['codigo_permiso'] == 'ADM') {
+						$resultado['revisados'] = $ids_usuarios_profesionales;
 					} else {
-						$resultado['$revisados'] = $resultado['$id_usuario'];
+						$resultado['revisados'] = $resultado['id_usuario'];
 					}
-				} else if ($resultado['$revisados'] != "") {
-					$resultado['$revisados'] .= ',' . $resultado['$id_usuario'];
+				} else if ($resultado['revisados'] != "") {
+					$resultado['revisados'] .= ',' . $resultado['id_usuario'];
 				} else if (UtilesApp::GetConf($this->Sesion, 'ResumenHorasSemanalesAAbogadosIndividuales')) {
-					$resultado['$revisados'] = $resultado['$id_usuario'];
+					$resultado['revisados'] = $resultado['id_usuario'];
 				}
 
 				if (UtilesApp::GetConf($this->Sesion, 'ReporteRevisadosATodosLosAbogados')) {
-					$dato_semanal[$resultado['$id_usuario']]['alerta_revisados'] = $cache_revisados;
+					$dato_semanal[$resultado['id_usuario']]['alerta_revisados'] = $cache_revisados;
 				} else {
-					$dato_semanal[$resultado['$id_usuario']]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $resultado['$revisados'])));
+					$dato_semanal[$resultado['id_usuario']]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $resultado['revisados'])));
 				}
 			}
 		}
