@@ -162,7 +162,7 @@ class CronNotificacion extends Cron {
 				$having = " AND (codigo_permiso = 'REV' OR revisados IS NOT NULL)";
 			}
 
-			$query = "SELECT usuario.id_usuario,
+			$query = "SELECT usuario.id_usuario, usuario.nombre AS nombre_pila,
 							alerta_semanal, codigo_permiso,
 							GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
 						FROM usuario
@@ -179,23 +179,24 @@ class CronNotificacion extends Cron {
 				$resultado = $resultados[$x];
 				$profesional = new Usuario($this->Sesion);
 				$profesional->LoadId($resultado['id_usuario']);
-
+				$id_usuario = $resultado['id_usuario'];
+				$revisados = $resultado['revisados'];
+				$dato_semanal[$id_usuario]['nombre_pila'] = $resultado['nombre_pila'];
 				if (UtilesApp::GetConf($this->Sesion, 'AlertaSemanalTodosAbogadosaAdministradores')) {
 					if ($resultado['codigo_permiso'] == 'ADM') {
-						$resultado['revisados'] = $ids_usuarios_profesionales;
+						$revisados = $ids_usuarios_profesionales;
 					} else {
-						$resultado['revisados'] = $resultado['id_usuario'];
+						$revisados = $id_usuario;
 					}
-				} else if ($resultado['revisados'] != "") {
-					$resultado['revisados'] .= ',' . $resultado['id_usuario'];
+				} else if ($revisados != "") {
+					$revisados .= ',' . $id_usuario;
 				} else if (UtilesApp::GetConf($this->Sesion, 'ResumenHorasSemanalesAAbogadosIndividuales')) {
-					$resultado['revisados'] = $resultado['id_usuario'];
+					$revisados = $id_usuario;
 				}
-
 				if (UtilesApp::GetConf($this->Sesion, 'ReporteRevisadosATodosLosAbogados')) {
-					$dato_semanal[$resultado['id_usuario']]['alerta_revisados'] = $cache_revisados;
+					$dato_semanal[$id_usuario]['alerta_revisados'] = $cache_revisados;
 				} else {
-					$dato_semanal[$resultado['id_usuario']]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $resultado['revisados'])));
+					$dato_semanal[$id_usuario]['alerta_revisados'] = array_intersect_key($cache_revisados, array_flip(explode(',', $revisados)));
 				}
 			}
 		}
