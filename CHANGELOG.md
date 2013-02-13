@@ -1,5 +1,9 @@
 # Changelog
 
+## Release: 13.1.0
+Miércoles 13 de febrero 2013.
+* **Completar**
+
 ## Hotfix: 13.0.4
 Miércoles 13 de febrero 2013.
 * **Fixed** [Corrige la consulta de seguimiento de cobros](https://www.pivotaltracker.com/projects/286009#!/stories/44387509)
