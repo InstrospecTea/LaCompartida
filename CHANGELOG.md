@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.0.4
+Miércoles 13 de febrero 2013.
+* **Fixed** [Corrige la consulta de seguimiento de cobros](https://www.pivotaltracker.com/projects/286009#!/stories/44387509)
+
 ## Hotfix: 13.0.3
 Jueves 7 de febrero 2013.
 * **Fixed** [Corrige el objeto $contacto (que no existe) por $contrato. Pasaba en 2 lugares que nunca imprimian nada](https://github.com/LemontechSA/ttb/pull/74)
