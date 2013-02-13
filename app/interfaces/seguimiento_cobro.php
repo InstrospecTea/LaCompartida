@@ -228,6 +228,8 @@
 
 							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 									$query.=" LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
+							} else if ($codigo_asunto_secundario){
+								$query.=" JOIN asunto as a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
 							}
 							$query.=" left join documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'
                                                         $joinfactura
