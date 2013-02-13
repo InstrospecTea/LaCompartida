@@ -8,7 +8,8 @@ defined('DBNAME') || define('DBNAME',	'timetracking');
 list($nada,$subdir)=explode('/',$_SERVER['REQUEST_URI']);
 defined('ROOTDIR') || define('ROOTDIR',$subdir);
 
-defined('CACHEDIR') || define('CACHEDIR','/tmp');
+defined('CACHEDIR') || define('CACHEDIR','/tmp/');
+defined('LOGDIR') || define('LOGDIR', '/tmp/logs/');
 
 defined('APPNAME') || define('APPNAME', 'El Lemontech');
 
