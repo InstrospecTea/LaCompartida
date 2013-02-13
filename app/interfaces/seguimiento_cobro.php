@@ -135,7 +135,7 @@
 		}
 		if($codigo_asunto_secundario)
 		{
-			$where .= " AND asunto.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
+			$where .= " AND a2.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
 		}
 		if(!empty($tipo_liquidacion) && $tipo_liquidacion!='')
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ". 	" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
