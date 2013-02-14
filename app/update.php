@@ -9718,7 +9718,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
 			}
 			ejecutar($queries, $dbh);
-		break;
+			break;
 
 		case 7.32:
 			$queries = array();
@@ -9726,7 +9726,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO usuario_permiso (`id_usuario`, `codigo_permiso`) VALUES
 				((SELECT id_usuario FROM usuario where rut = '99511620'), 'SADM')";
 			ejecutar($queries, $dbh);
-		break;
+			break;
 
 	}
 }
