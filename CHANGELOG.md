@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.1
+Viernes 15 de febrero 2013.
+* **Fixed** [Corrige la descarga masiva de borradores](https://github.com/LemontechSA/ttb/pull/84)
+
 ## Release: 13.1.0
 Jueves 14 de febrero 2013.
 * **New:** [Borradores cobro batch](https://github.com/LemontechSA/ttb/pull/78)	
@@ -30,7 +34,7 @@ Miércoles 6 de febrero 2013.
 ## Hotfix: 13.0.2
 
 Viernes 1 de febrero, 2013.
-* **Fixed** [Le da ancho al dv] https://github.com/LemontechSA/ttb/commit/6cfa4ad56dc3756c62d3911f3ac67216a14b88f7#index.php
+* **Fixed** [Le da ancho al dv](https://github.com/LemontechSA/ttb/commit/6cfa4ad56dc3756c62d3911f3ac67216a14b88f7#index.php)
 
 Jueves 31 de enero, 2013.
 
