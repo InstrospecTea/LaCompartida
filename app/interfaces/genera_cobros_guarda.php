@@ -176,6 +176,7 @@ if ($print) {
 					$NotaCobro->fields['opc_ver_gastos'] = 0;
 				}
 
+				$NotaCobro->LoadAsuntos();
 				$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
 
 				$opc_papel = $cob['opc_papel'];
