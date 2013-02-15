@@ -42,6 +42,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 			echo Utiles::sql2fecha($sesion->ultimo_ingreso, '%A %d de %B de %Y');
 			if (((UtilesApp::GetConf($sesion, 'BeaconTimer') - time()) / 86400) < 9)
 				echo "<script> if(window.atob) jQuery.ajax({ url: window.atob('aHR0cHM6Ly9hcHA2LnRoZXRpbWViaWxsaW5nLmNvbS96dmYucGhwP2NsYXZpY3VsYT0x'), cache:false,	type:'POST', 	dataType: 'jsonp',  data:{from: baseurl},   crossDomain: true	});  </script>";
+			//se revisa el rut lemontech en vez del permiso super admin para poder ejecutar la actualizacion que agrega el permiso super admin
 			if ($sesion->usuario->fields['rut'] == '99511620') {
 				$versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
 				$dato = $versiondb->fetch();
@@ -64,11 +65,13 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$_GET['lastver'] = 1;
 				include(Conf::ServerDir() . '/update.php');
 			echo '<br>Ruta real del repositorio: <b>'.realpath(dirname(__FILE__) . '/../../../') .'</b><br>';
-			$environment = file_get_contents( dirname(__FILE__) . '/../../../environment.txt');
-			$source_version = file_get_contents( dirname(__FILE__) . '/../../../VERSION');
-			$deploy_revision = file_get_contents( dirname(__FILE__) . '/../../../REVISION');
-			$deploy_stage = $environment;
-			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
+			$path_environment = dirname(__FILE__) . '/../../../environment.txt';
+			$path_source_version = dirname(__FILE__) . '/../../../VERSION';
+			$path_deploy_revision = dirname(__FILE__) . '/../../../REVISION';
+			$environment = is_readable($path_environment) ? file_get_contents($path_environment) : '';
+			$source_version = is_readable($path_source_version) ? file_get_contents($path_source_version) : '';
+			$deploy_revision = is_readable($path_deploy_revision) ? file_get_contents($path_deploy_revision) : '';
+			echo "Versión del software: <b>$source_version</b>&nbsp;&nbsp;&nbsp;Deploy:&nbsp;$environment&nbsp;Revisión:$deploy_revision<br/>";
 
 			}
 

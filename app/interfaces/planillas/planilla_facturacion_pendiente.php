@@ -841,7 +841,7 @@ $pagina->PrintTop();
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="separar_asuntos" <?php echo $separar_asuntos ? 'checked="checked"' : '' ?> /><?php echo __('Separar Asuntos') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="llenar_olap" <?php echo $llenar_olap ? 'checked="checked"' : '' ?> /><?php echo __('Ejecutar llenado inicial de datos') ?><br/>
-<?php if ($sesion->usuario->fields['rut'] == '99511620') echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
+<?php if ($sesion->usuario->TienePermiso('SADM')) echo '&nbsp;&nbsp;&nbsp;<input type="checkbox" name="enviamail" id="enviamail"/>Enviar correo al admin<br/>'; ?>
 			</td>
 		</tr>
 		<tr>

@@ -727,6 +727,12 @@ if ($accion == "consistencia_cliente_asunto") {
 		$tipos_cambio[$tipo[0]] = $tipo[1];
 	}
 	echo $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $pago_honorarios, $pago_gastos, $id_moneda, $tipos_cambio);
+} else if ($accion == 'rate_password') {
+	$password = '';
+	if (isset($_POST['password'])) {
+		$password = $_POST['password'];
+	}
+	echo PasswordStrength::Rate($password);
 } else {
 	echo("ERROR AJAX. Acción: $accion");
 }

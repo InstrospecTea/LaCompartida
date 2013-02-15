@@ -322,12 +322,15 @@ if ($buscar || $opc == "entregar_asunto") {
 					) AS horas_trabajadas,
 
 					ca.id_cobro AS id_cobro_asunto,
-					DATE_FORMAT( (SELECT MAX(fecha_fin) FROM cobro AS c1 WHERE c1.id_contrato = a1.id_contrato), '$formato_fecha') as fecha_ultimo_cobro
-					FROM asunto AS a1
+					DATE_FORMAT( (SELECT MAX(fecha_fin) FROM cobro AS c1 WHERE c1.id_contrato = a1.id_contrato), '$formato_fecha') as fecha_ultimo_cobro";
+				  	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_asuntos'):false;
+			$query.=" FROM asunto AS a1
 					LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
 					LEFT JOIN cobro_asunto AS ca ON (ca.codigo_asunto=a1.codigo_asunto AND ca.id_cobro='$id_cobro')
+					left join contrato on contrato.id_contrato=a1.id_contrato
 					WHERE $where
 					GROUP BY a1.codigo_asunto";
+			 
 	if ($orden == "")
 		$orden = "a1.activo DESC, horas_no_cobradas DESC, glosa_asunto";
 	if (stristr($orden, ".") === FALSE)

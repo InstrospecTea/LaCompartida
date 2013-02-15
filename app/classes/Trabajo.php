@@ -596,7 +596,7 @@ class Trabajo extends Objeto
 						$estado_cobro = Utiles::Glosa($sesion, $trabajo_original->fields['id_cobro'], 'estado', 'cobro');
 						if($estado_cobro == 'No existe información')
 							continue;
-						if($estado_cobro != 'CREADO' && $estado_cobro != 'EN REVISION'  && $sesion->usuario->fields['rut']!='99511620')
+						if($estado_cobro != 'CREADO' && $estado_cobro != 'EN REVISION'  && !$sesion->usuario->TienePermiso('SADM'))
 						{
 							$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque " . __("el cobro") . " se encuentra en estado $estado_cobro.<br />";
 							  continue;

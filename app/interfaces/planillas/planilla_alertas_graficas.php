@@ -9,19 +9,19 @@
 
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
-	
+
 	set_time_limit(300);
-	
+
 	$pagina = new Pagina($sesion);
 	/*Genera Excel*/
 	if($xls)
 	{
 		$filas = 0;
 		$espacio = 3;
-		
+
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
-		
+
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);
 		$wb->setCustomColor(37, 220, 220, 220);
@@ -164,7 +164,7 @@
 		//Cada valor, y despues su alerta
 		$col_glosa_alerta = $indice_columnas++;
 		$col_porcentaje = $indice_columnas++;
-		
+
 		$col_grafico_alerta = array();
 		$grafico = 20;
 		for($i=0;$i<$grafico;$i++)
@@ -174,7 +174,7 @@
 		$col_deglose = $indice_columnas++;
 		$col_monto = $indice_columnas++;
 		$col_tipo = $indice_columnas++;
-		
+
 		//Fin definición columnas
 		unset($indice_columnas);
 
@@ -182,7 +182,7 @@
 		function setCol($col,$ancho)
 		{
 			global $ws1;
-			$ws1->setColumn($col,$col,$ancho);	
+			$ws1->setColumn($col,$col,$ancho);
 		}
 		// Poner un Header de tabla
 		function setHead($fila,$col,$txt)
@@ -196,7 +196,7 @@
 			$ws1->write($fila,$col_ini,$txt,$formato);
 			for($i=$col_ini+1; $i<=$col_fin; $i++)
 				$ws1->write($fila,$i,'',$formato);
-			$ws1->mergeCells($fila, $col_ini, $fila, $col_fin);		
+			$ws1->mergeCells($fila, $col_ini, $fila, $col_fin);
 		}
 
 		setCol($col_cliente,30);
@@ -233,7 +233,7 @@
 		setHead($filas,$col_porcentaje,__('%'));
 
 		$ws1->freezePanes(array(3, 0, 3, 0));
-		
+
 		//Query de contratos
 		$where = "1";
 		if(is_array($clientes))
@@ -274,7 +274,7 @@
 		ORDER BY cliente.glosa_cliente";
 
 		$tipo_alerta = array();
-		
+
 		//Aqui guardo cada fila de los resultados.
 		$res = array();
 		function addAlerta(&$res,$codigo_cliente,$glosa_cliente,$id_contrato,$contrato,$asuntos,$encargado,$alerta)
@@ -288,7 +288,7 @@
 				$res[$codigo_cliente] = array('glosa'=>$glosa_cliente,'filas'=>0,'contratos'=>array());
 			if(!isset($res[$codigo_cliente]['contratos'][$id_contrato]))
 				$res[$codigo_cliente]['contratos'][$id_contrato] = array('glosa'=>$contrato,'asuntos'=>$asuntos,'encargado'=>$encargado,'filas'=>0,'alertas'=>array());
-	
+
 			$res[$codigo_cliente]['contratos'][$id_contrato]['alertas'][] = $alerta;
 			//Cada fila ocupa $espacio filas
 			$res[$codigo_cliente]['filas'] += $espacio;
@@ -297,7 +297,7 @@
 		function newAlerta($tipo,$monto,$tope,$simbolo)
 		{
 			global $grafico,$filtrar_contrato;
-			
+
 			if($filtrar_contrato == 'en_alerta')
 				if($tope > $monto)
 					return null;
@@ -322,19 +322,22 @@
 		}
 
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+		Contrato::QueriesPrevias($sesion);
+
 		while($row = mysql_fetch_array($resp))
 		{
-			$en_alerta = false;	
+			$en_alerta = false;
 			#Carga de datos:
 				$contrato = new Contrato($sesion);
 				$contrato->Load($row['id_contrato']);
 
-				// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido. 
+				// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 				list($total_monto,$moneda_total_monto) =  $contrato->TotalMonto();
 				$total_horas_trabajadas = $contrato->TotalHoras();
 				$total_horas_ult_cobro =  $contrato->TotalHoras(false);
-				list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $contrato->TotalMonto(false);	
-		
+				list($total_monto_ult_cobro,$moneda_desde_ult_cobro) =  $contrato->TotalMonto(false);
+
 
 				if($contrato->fields['limite_hh'] > 0 )
 				{
@@ -367,10 +370,10 @@
 			for($i = 1; $i < $cliente['filas'];$i++)
 				$ws1->write($filas+$i,$col_cliente,'',$txt_opcion);
 			$ws1->mergeCells($filas,$col_cliente,$filas+$cliente['filas']-1,$col_cliente);
-		
+
 			$filas_contrato = $filas;
 			foreach($cliente['contratos'] as $contrato)
-			{	
+			{
 				$ws1->write($filas_contrato,$col_contrato,$contrato['glosa'],$txt_opcion);
 				$ws1->write($filas_contrato,$col_asuntos,$contrato['asuntos'],$txt_opcion);
 				$ws1->write($filas_contrato,$col_encargado_comercial,$contrato['encargado'],$txt_opcion);
@@ -380,7 +383,7 @@
 					$ws1->write($filas_contrato+$i,$col_asuntos,'',$txt_opcion);
 					$ws1->write($filas_contrato+$i,$col_encargado_comercial,'',$txt_opcion);
 				}
-				
+
 				foreach($contrato['alertas'] as $j => $alerta)
 				{
 					$ws1->write($filas_contrato+$j*$espacio,$col_glosa_alerta,$alerta['glosa'],$txt_opcion);
@@ -393,8 +396,8 @@
 					$ws1->write($filas_contrato+$j*$espacio+1,$col_porcentaje,'',$txt_opcion);
 					$ws1->write($filas_contrato+$j*$espacio+2,$col_porcentaje,'',$txt_opcion);
 					$ws1->mergeCells($filas_contrato+$j*$espacio,$col_porcentaje,$filas_contrato+$j*$espacio+2,$col_porcentaje);
-				
-				
+
+
 					//Grafico monto
 					$f = $formato_grafico_monto;
 					if($alerta['monto'] > $alerta['tope'])
@@ -403,33 +406,33 @@
 						$ws1->write($filas_contrato+$j*$espacio,$col_grafico+$k,'',$f);
 					if($alerta['grafico_monto'])
 						$ws1->mergeCells($filas_contrato+$j*$espacio,$col_grafico,$filas_contrato+$j*$espacio,$col_grafico+$k-1);
-					
+
 					//Grafico alerta
 					for($k = 0; $k<$alerta['grafico_tope'];$k++)
 						$ws1->write($filas_contrato+$j*$espacio+1,$col_grafico+$k,'',$formato_grafico_alerta);
 					if($alerta['grafico_tope'])
 						$ws1->mergeCells($filas_contrato+$j*$espacio+1,$col_grafico,$filas_contrato+$j*$espacio+1,$col_grafico+$k-1);
-					
+
 					//Deglose
 					$ws1->write($filas_contrato+$j*$espacio,$col_deglose,__('Ingresado:'),$txt_right);
 					$ws1->write($filas_contrato+$j*$espacio,$col_monto,$alerta['monto'],$formato_moneda);
 					$ws1->write($filas_contrato+$j*$espacio,$col_tipo,$alerta['simbolo'],$txt);
-					
+
 					$ws1->write($filas_contrato+$j*$espacio+1,$col_deglose,__('Tope:'),$txt_right);
 					$ws1->write($filas_contrato+$j*$espacio+1,$col_monto,$alerta['tope'],$formato_moneda);
 					$ws1->write($filas_contrato+$j*$espacio+1,$col_tipo,$alerta['simbolo'],$txt);
-					
+
 					//Tercera fila: comentar si $espacio = 2
 					$ws1->write($filas_contrato+$j*$espacio+2,$col_deglose,'',$txt);
 					$ws1->write($filas_contrato+$j*$espacio+2,$col_monto,'',$txt);
 					$ws1->write($filas_contrato+$j*$espacio+2,$col_tipo,'',$txt);
-					
-				}
-				$ws1->mergeCells($filas_contrato,$col_contrato,$filas_contrato+$contrato['filas']-1,$col_contrato);	
-				$ws1->mergeCells($filas_contrato,$col_asuntos,$filas_contrato+$contrato['filas']-1,$col_asuntos);			
-				$ws1->mergeCells($filas_contrato,$col_encargado_comercial,$filas_contrato+$contrato['filas']-1,$col_encargado_comercial);			
 
-				$filas_contrato += $contrato['filas'];	
+				}
+				$ws1->mergeCells($filas_contrato,$col_contrato,$filas_contrato+$contrato['filas']-1,$col_contrato);
+				$ws1->mergeCells($filas_contrato,$col_asuntos,$filas_contrato+$contrato['filas']-1,$col_asuntos);
+				$ws1->mergeCells($filas_contrato,$col_encargado_comercial,$filas_contrato+$contrato['filas']-1,$col_encargado_comercial);
+
+				$filas_contrato += $contrato['filas'];
 			}
 			$filas += $cliente['filas'];
 		}
@@ -439,7 +442,7 @@
 		exit;
 	}
 	//FIN if(xls)
-	
+
 	//Pagina
 	$pagina->titulo = __('Reporte de Alertas');
 	$pagina->PrintTop();

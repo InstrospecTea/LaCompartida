@@ -21,6 +21,10 @@ if (isset($_REQUEST['token']) && strlen($_REQUEST['token']) > 0) {
 		$Sesion->error_msg = __('El token para reestablecer el password es incorrecto o ya expiró');
 		$view = 'enviar_instrucciones';
 	}
+
+	if (isset($_REQUEST['adm'])) {
+		$Sesion->error_msg = __('Por motivos de seguridad el Administrador le ha solicitado cambiar su password');
+	}
 }
 
 if (isset($_POST['accion'])) {
@@ -48,6 +52,8 @@ if (isset($_POST['accion'])) {
 			$Usuario->Edit('password', md5($passwd));
 			$Usuario->Edit('reset_password_token', 'NULL');
 			$Usuario->Edit('reset_password_sent_at', 'NULL');
+			$Usuario->Edit('force_reset_password', 'NULL');
+			$Usuario->Edit('reset_password_by', 'U');
 
 			if ($Usuario->Write()) {
 				$host = Conf::Host();
@@ -144,7 +150,10 @@ MAIL;
 
 $Pagina->titulo = __('Restablecer Password');
 $Pagina->PrintTop(true);
+PasswordStrength::PrintCSS("180px");
+
 ?>
+
 <div style="padding-top: 50px; text-align: center">
 	<div style="border: 1px solid #999; width: 400px; margin: 0 auto;">
 		<div style="background-color: #efefef; padding: 8px; margin-bottom: 5px;">
@@ -223,12 +232,16 @@ $Pagina->PrintTop(true);
 						</tr>
 						<tr>
 							<td align="right"><label for="password"><?php echo __('Password'); ?></label>:</td>
-							<td align="left"><input type="password" name="password" id="password" style="width: 100%;" /></td>
+							<td align="left"><input type="password" name="password" id="password" style="width: 100%;" />
+							</td>
 						</tr>
 						<tr>
 							<td align="right"><label for="confirme_password"><?php echo __('Confirme Password'); ?></label>:</td>
 							<td align="left"><input type="password" name="confirme_password" id="confirme_password" style="width: 100%;" /></td>
 						</tr>
+						<tr><td align='left' colspan='2'>
+						<?php PasswordStrength::PrintHTML(); ?>
+						</td></tr>
 						<tr>
 							<td>&nbsp;</td>
 							<td align="left">
@@ -273,5 +286,12 @@ $Pagina->PrintTop(true);
 		</div>
 	</div>
 </div>
+<script type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		<?php PasswordStrength::PrintJS("password"); ?>
+	});
+</script>
 <?php
 $Pagina->PrintBottom(true);
+

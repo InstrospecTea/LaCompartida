@@ -1,4 +1,3 @@
-
 AddDefaultCharset utf-8
 
 AddType text/cache-manifest appcache
@@ -7,13 +6,10 @@ AddType text/cache-manifest appcache manifest
 AddType text/cache-manifest .manifest manifest
 
 <IfModule mod_rewrite.c>
-	Options +FollowSymlinks
-	Options +Indexes
 	RewriteEngine on
 	RewriteBase /
 	RewriteCond %{REQUEST_URI} (.+)/(\w+)$
 	RewriteCond %{SCRIPT_FILENAME} !-f
 	RewriteCond %{SCRIPT_FILENAME} !-d
-	RewriteRule ^(.*)$   %1/index.php?/$1    [NC,L]	
-		
+	RewriteRule ^    %1/index.php [QSA,L]
 </IfModule>
