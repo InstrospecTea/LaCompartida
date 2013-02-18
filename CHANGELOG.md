@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.3
+Lunes 18 de febrero 2013.
+* **Fixed** [Corrige el reporte profesional vs cliente](https://github.com/LemontechSA/ttb/pull/86)
+
 ## Hotfix: 13.1.2
 Lunes 18 de febrero 2013.
 * **Fixed** [Corrige la creación de clientes](https://github.com/LemontechSA/ttb/pull/85)
