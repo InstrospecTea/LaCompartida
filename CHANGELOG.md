@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.2
+Lunes 18 de febrero 2013.
+* **Fixed** [Corrige la creación de clientes](https://github.com/LemontechSA/ttb/pull/85)
+
 ## Hotfix: 13.1.1
 Viernes 15 de febrero 2013.
 * **Fixed** [Corrige la descarga masiva de borradores](https://github.com/LemontechSA/ttb/pull/84)

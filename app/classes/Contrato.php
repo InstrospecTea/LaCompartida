@@ -1314,7 +1314,7 @@ class Contrato extends Objeto {
 				} else {
 					$CorreosModificacionAdminDatos = '';
 				}
-				if ($CorreosModificacionAdminDatos != '') {
+				if ($CorreosModificacionAdminDatos != '' && !empty($this->fields['id_usuario_responsable'])) {
 					// En caso de cambiar a avisar a más de un encargado editar el query y cambiar el if() por while()
 					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $this->fields['id_usuario_responsable'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
