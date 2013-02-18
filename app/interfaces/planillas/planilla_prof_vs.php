@@ -66,8 +66,7 @@
 								usuario_tarifa_standard.id_tarifa=tarifa_defecto.id_tarifa
 							WHERE fecha >= '$fecha1' AND fecha <= '$fecha2'
 							GROUP BY trabajo.id_usuario, trabajo.codigo_asunto";
-							echo $query;
-							exit;
+							
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	for($i = 0; list($id_usuario, $cliente, $duracion, $valor_hh, $valor_standard, $glosa_grupo_cliente) = mysql_fetch_array($resp); $i++)
 	{
