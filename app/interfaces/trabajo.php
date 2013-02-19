@@ -48,16 +48,13 @@ if (!$id_usuario) {
 // El objeto semana contiene la lista de colores por asunto de usuario de quien se define la semana
 //$objeto_semana = new Semana($sesion, $id_usuario);
 if ($semana == "") {
-	$semana2 = "CURRENT_DATE()";
 	$sql_f = "SELECT DATE_ADD(CURDATE(), INTERVAL - WEEKDAY(CURDATE()) DAY) AS semana_inicio";
 	$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 	list($semana_actual) = mysql_fetch_array($resp);
 	$semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
 	$semana_siguiente = date("d-m-Y", strtotime("$semana_actual+7 days"));
 } else {
-	$semana2 = "'$semana'";
 	$sql_f = "SELECT DATE_ADD('{$semana}', INTERVAL - WEEKDAY('{$semana}') DAY) AS semana_inicio";
-
 	$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 	list($semana_actual) = mysql_fetch_array($resp);
 	$semana_anterior = date("d-m-Y", strtotime("$semana_actual-7 days"));
@@ -134,7 +131,7 @@ $where .= " AND usuario.visible = 1";
 				duration: 0.2
 			});
 		} catch(e) {
-			console.log(e);
+			// console.log(e);
 		}
 	}
 
@@ -217,9 +214,7 @@ $where .= " AND usuario.visible = 1";
 			},
 			callback: function(key, options) {
 				var m = "global: " + key;
-				console.log(options);
 				var iddia = diaid.replace('_', '');
-				console.log(iddia);
 				var fechadia = jQuery('#' + iddia);
 				var f_dia = jQuery(fechadia).val();
 				OpcionesTrabajo('', '', f_dia);
@@ -282,7 +277,6 @@ $where .= " AND usuario.visible = 1";
 	});
 
 	function Refrescasemana(semana, usuario, eldiv, slide) {
-		if (window.console) console.log(semana);
 		semanaplus = semana.split('-');
 		semana = semanaplus[2] + '-' + semanaplus[1] + '-' + semanaplus[0];
 		var dias = 0;
@@ -329,6 +323,7 @@ $where .= " AND usuario.visible = 1";
 				Refrescasemana(lastweek,usuario,'lastweek');
 				calendario(semana);
 
+				/*
 				jQuery('.trabajoabierto').draggable({
 					cursor: 'move',
 					containment: '#contienehoras',
@@ -432,13 +427,13 @@ $where .= " AND usuario.visible = 1";
 							opcion: Option,
 							popup: 1
 						}, function(data) {
-							var arreglo=data.split('|');
-							if (window.console) console.log(arreglo);
+							var arreglo = data.split('|');
 							jQuery('#semanactual').val(cuando);
 							jQuery('#versemana').click();
 						});
 					}
 				});
+				*/
 			}
 		});
 
