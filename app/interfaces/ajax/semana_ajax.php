@@ -20,13 +20,13 @@ if (!$id_usuario) {
 		$id_usuario = $sesion->usuario->fields['id_usuario'];
 	} else if ($p_secretaria->fields['permitido']) {
 		$query = "SELECT usuario.id_usuario,
-						CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+						CONCAT_WS(' ', apellido1, apellido2,',',nombre)
 						as nombre
 						FROM usuario
 			          JOIN usuario_permiso USING(id_usuario)
-                      JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario 
-                      WHERE usuario.visible = 1 AND 
-                            usuario_permiso.codigo_permiso='PRO' AND 
+                      JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario
+                      WHERE usuario.visible = 1 AND
+                            usuario_permiso.codigo_permiso='PRO' AND
                             usuario_secretario.id_secretario='" . $sesion->usuario->fields['id_usuario'] . "'
                       GROUP BY usuario.id_usuario ORDER BY nombre LIMIT 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -35,7 +35,7 @@ if (!$id_usuario) {
 	}
 	if (!$id_usuario) {
 		$query = "SELECT usuario.id_usuario,
-								CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+								CONCAT_WS(' ', apellido1, apellido2,',',nombre)
 								as nombre
 								FROM usuario
 								JOIN usuario_permiso USING(id_usuario)
@@ -71,20 +71,20 @@ $query = "SELECT $select_codigo        asunto.glosa_asunto,trabajo.duracion,trab
 				, TIME_TO_SEC(ifnull(duracion,0))/90 as alto, dias.dia AS dia_semana,
 				trabajo.cobrable,
 				ifnull(cobro.estado,'SIN COBRO') as estado , trabajo.revisado
-				 FROM 
-				(select 2 as dia 
-				union select 3 as dia 
-				union select 4 as dia 
-				union select 5 as dia 
-				union select 6 as dia 
-				union select 7 as dia
-				union select 8 as dia) as dias
+				 FROM
+				(select 2 as dia, 1 as orden
+				union select 3 as dia, 2 as orden
+				union select 4 as dia, 3 as orden
+				union select 5 as dia, 4 as orden
+				union select 6 as dia, 5 as orden
+				union select 7 as dia, 6 as orden
+				union select 1 as dia, 7 as orden) as dias
 				left join  trabajo on DAYOFWEEK(trabajo.fecha)=dias.dia and trabajo.id_usuario =  '$id_usuario'  and	fecha between '{$semanacompleta[1][0]}' and  '{$semanacompleta[7][0]}'
 				left join cobro using (id_cobro)
 				left JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 				left join cliente on asunto.codigo_cliente=cliente.codigo_cliente
-										
-					ORDER BY dias.dia";
+
+					ORDER BY dias.orden";
 
 // echo $query;
 
@@ -194,11 +194,11 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		}
 
 		$total[$dia_semana] += $hh*3600+ $mm * 60+$ss;
-		
+
 #		$total[$dia_semana] += ($alto/40);
-		
-		
-				
+
+
+
 		if ($dia_anterior != $dia_semana) {
 			//$total[$dia_semana] = 0;
 			$letime=sprintf('%02d:%02d', ($total[$dia_anterior]/3600),$total[$dia_anterior]/60%60);
