@@ -250,13 +250,10 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		$dia_semana_decimal = UtilesApp::Time2Decimal($hora . ':' . $minutos . ':00');
 		echo $dia_semana_decimal;
 	} else {
-		echo $hora . ':' . $minutos;
+		echo sprintf('%02d:%02d', ($total[$dia_anterior] / 3600), $total[$dia_anterior] / 60 % 60);
 	}
 	echo "</div>";
-
 	echo "</div>";
-
-
 	echo "</div>";
 	?>
 
