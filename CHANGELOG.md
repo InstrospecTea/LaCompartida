@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.5
+Miércoles 20 de febrero 2013.
+* **Fixed** [Hotfix/13.1.5](https://github.com/LemontechSA/ttb/pull/90)
+
 ## Hotfix: 13.1.4
 Martes 19 de febrero 2013.
 * **Fixed** [Comentar drag and drop de trabajos](https://github.com/LemontechSA/ttb/pull/88)
