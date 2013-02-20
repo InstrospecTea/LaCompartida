@@ -47,7 +47,6 @@ if (!$id_usuario) {
 	}
 }
 // El objeto semana contiene la lista de colores por asunto de usuario de quien se define la semana
-//$objeto_semana = new Semana($sesion, $id_usuario);
 $semanacompleta = semanacompleta($semana);
 
 $semana_actual = $semanacompleta[1][1];
@@ -63,15 +62,19 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 #se usa yearweek para ver por semana Y año cada trabajo esto soluciona el problema de la ultima
 #y primera semana del año
 
-
-
-$query = "SELECT $select_codigo        asunto.glosa_asunto,trabajo.duracion,trabajo.fecha,
-		      trabajo.id_trabajo, trabajo.descripcion
-				,cliente.glosa_cliente
-				, TIME_TO_SEC(ifnull(duracion,0))/90 as alto, dias.dia AS dia_semana,
+$query = "SELECT $select_codigo
+				asunto.glosa_asunto,
+				trabajo.duracion,
+				trabajo.fecha,
+				trabajo.id_trabajo,
+				trabajo.descripcion,
+				cliente.glosa_cliente,
+				TIME_TO_SEC(ifnull(duracion,0))/90 as alto,
+				dias.dia AS dia_semana,
 				trabajo.cobrable,
-				ifnull(cobro.estado,'SIN COBRO') as estado , trabajo.revisado
-				 FROM
+				IFNULL(cobro.estado, 'SIN COBRO') as estado,
+				trabajo.revisado
+			FROM
 				(select 2 as dia, 1 as orden
 				union select 3 as dia, 2 as orden
 				union select 4 as dia, 3 as orden
@@ -79,19 +82,17 @@ $query = "SELECT $select_codigo        asunto.glosa_asunto,trabajo.duracion,trab
 				union select 6 as dia, 5 as orden
 				union select 7 as dia, 6 as orden
 				union select 1 as dia, 7 as orden) as dias
-				left join  trabajo on DAYOFWEEK(trabajo.fecha)=dias.dia and trabajo.id_usuario =  '$id_usuario'  and	fecha between '{$semanacompleta[1][0]}' and  '{$semanacompleta[7][0]}'
-				left join cobro using (id_cobro)
-				left JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-				left join cliente on asunto.codigo_cliente=cliente.codigo_cliente
-
-					ORDER BY dias.orden";
-
-// echo $query;
-
+			LEFT JOIN  trabajo ON DAYOFWEEK(trabajo.fecha)=dias.dia
+				AND trabajo.id_usuario =  '$id_usuario'
+				AND	fecha between '{$semanacompleta[1][0]}'
+				AND  '{$semanacompleta[7][0]}'
+			LEFT JOIN cobro using (id_cobro)
+			LEFT JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+			LEFT JOIN cliente on asunto.codigo_cliente=cliente.codigo_cliente
+			ORDER BY dias.orden";
 
 $lista = new ListaTrabajos($sesion, "", $query);
 
-//	print_r($lista);
 
 $dias = array(__("Lunes"), __("Martes"), __("Mi&eacute;rcoles"), __("Jueves"), __("Viernes"), __("S&aacute;bado"), __("Domingo"));
 $tip_anterior = Html::Tooltip("<b>" . __('Semana anterior') . ":</b><br>" . Utiles::sql3fecha($semana_anterior, '%d de %B de %Y'));
@@ -99,11 +100,12 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 
 #agregado para el nuevo select
 
-if ($p_revisor->fields['permitido'])
+if ($p_revisor->fields['permitido']) {
 	$where = "usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO'";
-else
-	$where = "usuario_secretario.id_secretario = '" . $sesion->usuario->fields['id_usuario'] . "'
-							OR usuario.id_usuario IN ('$id_usuario','" . $sesion->usuario->fields['id_usuario'] . "')";
+} else {
+	$where = "usuario_secretario.id_secretario = '{$sesion->usuario->fields['id_usuario']}'
+					OR usuario.id_usuario IN ('{$id_usuario}','{$sesion->usuario->fields['id_usuario']}')";
+}
 $where .= " AND usuario.visible=1";
 
 echo "<form method='post' name='form_semana' id='form_semana' rel='$semana_actual'>";
@@ -122,10 +124,9 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		<b><?php echo Utiles::sql3fecha($semanacompleta[1][0], '%d de %B de %Y'); ?></b>
 	</div>
 	<div style="text-align:left;float:right;">
-<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual') ?>:
+		<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual') ?>:
 
 		<?php
-		//echo "semana $semana_actual";
 		$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
 		?>
 		<strong id="totalmes"><?php echo $horas_trabajadas_mes; ?></strong>
@@ -148,7 +149,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 	echo("</div>");
 
 	echo("<div id='celdastrabajo' style='width:600px'>");
-	$dia_semana =$dia_anterior = 2;
+	$dia_semana = $dia_anterior = 2;
 	$total[2] = 0;
 	echo("<div class='celdadias' id='celdadia2' >");
 	for ($i = 0; $i < $lista->num; $i++) {
@@ -158,20 +159,12 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
 		$alto = max($lista->Get($i)->fields['alto'], 12) . "px";
 		$cod_asunto = $lista->Get($i)->fields['codigo_asunto'];
-		/* if (UtilesApp::GetConf($sesion,'CodigoSecundario') ):
-		  $cod_asunto_color = $asunto->CodigoSecundarioACodigo($cod_asunto);
-		  else:
-		  $cod_asunto_color = $cod_asunto;
-		  endif; */
 		$cliente = $lista->Get($i)->fields['codigo_cliente'];
 		$dia_semana = $lista->Get($i)->fields['dia_semana'];
 
 
 
-	//	if ($dia_semana == 1) 		$dia_semana = 8;
-
 		$duracion = $lista->Get($i)->fields['duracion'];
-		//echo $duracion;
 		if ((UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal')) {
 			list($hh, $mm, $ss) = split(":", $duracion);
 			$duracion = UtilesApp::Time2Decimal($duracion);
@@ -187,32 +180,27 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 			$pintame = '';
 		} else {
 			$no_cobrable = '';
-			/* $color = $objeto_semana->colores[$cod_asunto_color];
-			  if($color == '') */
 			$color = '#E8E7D9';
 			$pintame = ' pintame ';
 		}
 
-		$total[$dia_semana] += $hh*3600+ $mm * 60+$ss;
+		$total[$dia_semana] += $hh * 3600 + $mm * 60 + $ss;
 
-#		$total[$dia_semana] += ($alto/40);
 
 
 
 		if ($dia_anterior != $dia_semana) {
-			//$total[$dia_semana] = 0;
-			$letime=sprintf('%02d:%02d', ($total[$dia_anterior]/3600),$total[$dia_anterior]/60%60);
+			$letime = sprintf('%02d:%02d', ($total[$dia_anterior] / 3600), $total[$dia_anterior] / 60 % 60);
 			echo "<div id='totaldia$dia_angerior' class='totaldia' rel='dia" . $dia_anterior . "'>";
-				if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
-					echo UtilesApp::Time2Decimal($letime.':00');
-				} else {
-					  echo $letime;
-				}
-				echo "</div>";
+			if (UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
+				echo UtilesApp::Time2Decimal($letime . ':00');
+			} else {
+				echo $letime;
+			}
+			echo "</div>";
 			echo "</div>";
 			echo "<div class='celdadias' id='celdadia" . $dia_semana . "' >";
 		}
-		//echo 'Total '.$dia_semana.'('.$dia_anterior.') = '.$total[$dia_semana];
 
 		$descripcion = nl2br(str_replace("'", "`", $lista->Get($i)->fields['descripcion']));
 		$id_trabajo = $lista->Get($i)->fields['id_trabajo'];
@@ -222,7 +210,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		if (!$p_revisor->fields['permitido'] && $arraytrabajo[$id_trabajo]['revisado'] == 1) {
 			$arraytrabajo[$id_trabajo]['abierto'] = 'trabajocerrado';
 		} else {
-			switch ($arraytrabajo[$id_trabajo]['estado']):
+			switch ($arraytrabajo[$id_trabajo]['estado']) {
 				case 'SIN COBRO':
 				case 'CREADO':
 				case 'EN REVISION':
@@ -233,7 +221,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 					$arraytrabajo[$id_trabajo]['abierto'] = 'trabajocerrado';
 					$cobrado = true;
 					break;
-			endswitch;
+			}
 		}
 
 		$tooltip = Html::Tooltip("<b>" . __('Cliente') . "(" . $lista->Get($i)->fields['codigo_cliente'] . "):</b><br>" . $lista->Get($i)->fields['glosa_cliente'] . "<br><b>" . __('Asunto') . "(" . $lista->Get($i)->fields['codigo_asunto'] . "):</b><br>" . $lista->Get($i)->fields[glosa_asunto] . "<br /><b>" . __('Duración') . ":</b><br>" . $duracion . "<br /><b>" . __('Descripción') . ":</b><br>" . $descripcion . "<br><b>" . $no_cobrable . "</b>");
@@ -253,7 +241,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 		$minutos = 0;
 		$hora+=1;
 	}
-	#$minutos = number_format($minutos,0);
+
 	if ($minutos < 10) {
 		$minutos = "0$minutos";
 	}
@@ -273,10 +261,9 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 	?>
 
 	<div style="margin-top:20px;clear:left;float:right;">
-	<?php echo __('Total semana') ?>:
+		<?php echo __('Total semana') ?>:
 
-	<?php $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario, $semanacompleta[1][0]);
-	?>
+<?php $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario, $semanacompleta[1][0]); ?>
 		<strong id="totalsemana"><?php echo $horas_trabajadas_semana ?></strong>
 	</div>
 </div>
@@ -284,46 +271,46 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
 
 
-		<?php
+<?php
 
-		function SplitDuracion($time) {
-			list($h, $m, $s) = split(":", $time);
-			return $h . ":" . $m;
-		}
+function SplitDuracion($time) {
+	list($h, $m, $s) = split(":", $time);
+	return $h . ":" . $m;
+}
 
-		function Substring($string) {
-			if (strlen($string) > 250)
-				return substr($string, 0, 250) . "...";
-			else
-				return $string;
-		}
+function Substring($string) {
+	if (strlen($string) > 250)
+		return substr($string, 0, 250) . "...";
+	else
+		return $string;
+}
 
-		function semanacompleta($fecha = null) {
-			if (!$fecha || $fecha == null)
-				$fecha = date('Y-m-d');
-			$semana = array();
-			$yearweek = date('oW', strtotime($fecha));
+function semanacompleta($fecha = null) {
+	if (!$fecha || $fecha == null)
+		$fecha = date('Y-m-d');
+	$semana = array();
+	$yearweek = date('oW', strtotime($fecha));
 
 
-			if (date('N', strtotime($fecha)) == 1) {
-				$semana[1][0] = date('Y-m-d', strtotime($fecha));
-				$semana[1][1] = date('d-m-Y', strtotime($fecha));
-			} else {
-				$semana[1][0] = date('Y-m-d', strtotime($fecha . " last Monday"));
-				$semana[1][1] = date('d-m-Y', strtotime($fecha . " last Monday"));
-			}
-			for ($dia = 2; $dia <= 7; $dia++) {
-				$semana[$dia][0] = date('Y-m-d', strtotime($semana[$dia - 1][0] . "+ 1 day"));
-				$semana[$dia][1] = date('d-m-Y', strtotime($semana[$dia - 1][0] . "+ 1 day"));
-			}
-			$semana['yearweek'] = $yearweek;
-			$semana['today'][0] = date('Y-m-d', strtotime($fecha));
-			$semana['today'][1] = date('d-m-Y', strtotime($fecha));
-			$semana['lastweek'][0] = date('Y-m-d', strtotime($semana[1][0] . " last Monday"));
-			$semana['lastweek'][1] = date('d-m-Y', strtotime($semana[1][0] . " last Monday"));
-			$semana['nextweek'][0] = date('Y-m-d', strtotime($semana[1][0] . " next Monday"));
-			$semana['nextweek'][1] = date('d-m-Y', strtotime($semana[1][0] . " next Monday"));
+	if (date('N', strtotime($fecha)) == 1) {
+		$semana[1][0] = date('Y-m-d', strtotime($fecha));
+		$semana[1][1] = date('d-m-Y', strtotime($fecha));
+	} else {
+		$semana[1][0] = date('Y-m-d', strtotime($fecha . " last Monday"));
+		$semana[1][1] = date('d-m-Y', strtotime($fecha . " last Monday"));
+	}
+	for ($dia = 2; $dia <= 7; $dia++) {
+		$semana[$dia][0] = date('Y-m-d', strtotime($semana[$dia - 1][0] . "+ 1 day"));
+		$semana[$dia][1] = date('d-m-Y', strtotime($semana[$dia - 1][0] . "+ 1 day"));
+	}
+	$semana['yearweek'] = $yearweek;
+	$semana['today'][0] = date('Y-m-d', strtotime($fecha));
+	$semana['today'][1] = date('d-m-Y', strtotime($fecha));
+	$semana['lastweek'][0] = date('Y-m-d', strtotime($semana[1][0] . " last Monday"));
+	$semana['lastweek'][1] = date('d-m-Y', strtotime($semana[1][0] . " last Monday"));
+	$semana['nextweek'][0] = date('Y-m-d', strtotime($semana[1][0] . " next Monday"));
+	$semana['nextweek'][1] = date('d-m-Y', strtotime($semana[1][0] . " next Monday"));
 
-			return $semana;
-		}
-		?>
+	return $semana;
+}
+?>
