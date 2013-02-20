@@ -424,6 +424,14 @@ span.indefinido { color: #550000; }
 		{
 			global $fecha_ini, $fecha_fin,$clientes,$usuarios;
 
+			if (is_array($clientes)){
+			$clientes = implode(",",$clientes);	
+			}
+
+			if (is_array($usuarios)){
+			$usuarios = implode(",",$usuarios);	
+			}
+
 			if($email)
 				return $valor;
 
