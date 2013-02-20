@@ -2,6 +2,10 @@
 
 ## Hotfix: 13.1.5
 Miércoles 20 de febrero 2013.
+* **Fixed** [Hotfix/13.1.5](https://github.com/LemontechSA/ttb/pull/91)
+
+## Hotfix: 13.1.5
+Miércoles 20 de febrero 2013.
 * **Fixed** [Hotfix/13.1.5](https://github.com/LemontechSA/ttb/pull/90)
 
 ## Hotfix: 13.1.4
