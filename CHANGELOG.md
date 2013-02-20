@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.4
+Martes 19 de febrero 2013.
+* **Fixed** [Comentar drag and drop de trabajos](https://github.com/LemontechSA/ttb/pull/88)
+
 ## Hotfix: 13.1.3
 Lunes 18 de febrero 2013.
 * **Fixed** [Corrige el reporte profesional vs cliente](https://github.com/LemontechSA/ttb/pull/86)
@@ -14,19 +18,19 @@ Viernes 15 de febrero 2013.
 
 ## Release: 13.1.0
 Jueves 14 de febrero 2013.
-* **New:** [Borradores cobro batch](https://github.com/LemontechSA/ttb/pull/78)	
+* **New:** [Borradores cobro batch](https://github.com/LemontechSA/ttb/pull/78)
 * **New:** [Refactorización y mejoras al Cron](https://github.com/LemontechSA/ttb/pull/55)
-* **New:** [Plugins resumen factura y archivo contabilidad cpb](https://github.com/LemontechSA/ttb/pull/76)	
-* **New:** [Clonar trabajos ctrl drag](https://github.com/LemontechSA/ttb/pull/70)	
-* **Fixed:** [En la pantalla de asunto, al elegir un cliente se quedaba eternamiente intentando refrescar asunto](https://github.com/LemontechSA/ttb/pull/68)	
-* **New:** [Al crear un asunto, guarda un registro en la tabla log_db](https://github.com/LemontechSA/ttb/pull/68)	 
+* **New:** [Plugins resumen factura y archivo contabilidad cpb](https://github.com/LemontechSA/ttb/pull/76)
+* **New:** [Clonar trabajos ctrl drag](https://github.com/LemontechSA/ttb/pull/70)
+* **Fixed:** [En la pantalla de asunto, al elegir un cliente se quedaba eternamiente intentando refrescar asunto](https://github.com/LemontechSA/ttb/pull/68)
+* **New:** [Al crear un asunto, guarda un registro en la tabla log_db](https://github.com/LemontechSA/ttb/pull/68)
 * **New:** [Al editar un asunto, guarda los campos clave (codigo asunto, usuario, cobrable, activo) en la log_db](https://github.com/LemontechSA/ttb/pull/68)
-* **New:** [Uso de Slim](https://github.com/LemontechSA/ttb/pull/67)	
-* **New:** [Plugin convertir provision en adelanto](https://github.com/LemontechSA/ttb/pull/66)	
-* **Fixed:** [Corrige el problema del login cuando el identificador es Rut en Chrome/Windows](https://github.com/LemontechSA/ttb/pull/64)	
-* **New:** [Forzar cambio de password por los administradores](https://github.com/LemontechSA/ttb/pull/61)	
-* **New:** [Permite clonar trabajos usando CTRL+drag](https://github.com/LemontechSA/ttb/pull/32)	
-* **New:** [Mejoras reporte Avanzado](https://github.com/LemontechSA/ttb/pull/31)	
+* **New:** [Uso de Slim](https://github.com/LemontechSA/ttb/pull/67)
+* **New:** [Plugin convertir provision en adelanto](https://github.com/LemontechSA/ttb/pull/66)
+* **Fixed:** [Corrige el problema del login cuando el identificador es Rut en Chrome/Windows](https://github.com/LemontechSA/ttb/pull/64)
+* **New:** [Forzar cambio de password por los administradores](https://github.com/LemontechSA/ttb/pull/61)
+* **New:** [Permite clonar trabajos usando CTRL+drag](https://github.com/LemontechSA/ttb/pull/32)
+* **New:** [Mejoras reporte Avanzado](https://github.com/LemontechSA/ttb/pull/31)
 
 
 ## Hotfix: 13.0.4
