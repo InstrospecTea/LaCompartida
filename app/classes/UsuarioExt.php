@@ -468,8 +468,7 @@ class UsuarioExt extends Usuario {
 
 					$glosa_actual = (sizeof($_arr_sde_actual) ? implode("<br />", $_arr_sde_actual) : '');
 					$glosa_origen = (sizeof($_arr_sde_original) ? implode("<br />", $_arr_sde_original) : '');
-				} else if (trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria'
-					|| trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados') {
+				} else if (trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria' || trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados') {
 					$glosa_actual = (!empty($historia['valor_actual'])) ? 'activo' : 'inactivo';
 					$glosa_origen = (!empty($historia['valor_original'])) ? 'activo' : 'inactivo';
 				} else {
@@ -672,17 +671,76 @@ class UsuarioExt extends Usuario {
 		);
 	}
 
-	public function TienePermiso($permiso){
+	public function TienePermiso($permiso) {
 		return $this->permisos->Find('FindPermiso', array('codigo_permiso' => $permiso))->fields['permitido'];
 	}
 
 	public function LoadWithToken($token) {
 		$query = "SELECT * FROM " . $this->tbl_usuario
-						. " WHERE reset_password_token = '$token'"
-						. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
+			. " WHERE reset_password_token = '$token'"
+			. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
 
 		return $this->LoadWithQuery($query);
 	}
-}
 
-?>
+	public function PreCrearDato($data) {
+		$cedula = 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))';
+		$data['rut'] = $data[$cedula];
+		unset($data[$cedula]);
+		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
+			$rutdv = explode('-', $data['rut']);
+			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
+			$data['dv'] = trim($rutdv[1]);
+		}
+
+		if (isset($data['admin'])) {
+			$this->extra_fields = array('admin' => $data['admin']);
+			unset($data['admin']);
+		}
+
+		return $data;
+	}
+
+	public function PostCrearDato() {
+		$permisos = array('ALL', 'PRO');
+		if (isset($this->extra_fields['admin'])) {
+			$admin = trim($this->extra_fields['admin']);
+			if (!empty($admin) && $admin[0] != 'N') {
+				$permisos = array(
+					'ADM', 'ALL', 'COB', 'DAT', 'REP', 'REV', 'TAR', 'SOC', 'OFI', 'PRO'
+				);
+			}
+		}
+		$values = array();
+		foreach($permisos as $permiso){
+			$values[] = "({$this->fields['id_usuario']}, '$permiso')";
+		}
+		$query = 'INSERT IGNORE INTO usuario_permiso (id_usuario, codigo_permiso) VALUES ' . implode(', ', $values);
+		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+	}
+
+	/**
+	 * Completa el objeto con los valores que vengan en $parametros
+	 * 
+	 * @param array $parametros entrega los campos y valores del objeto campo => valor
+	 * @param boolean $edicion indica si se marcan los $parametros para edición
+	 */
+	function Fill($parametros, $edicion = false) {
+		foreach ($parametros as $campo => $valor) {
+			if (in_array($campo, $this->editable_fields)) {
+				$this->fields[$campo] = $valor;
+
+				if ($edicion) {
+					$this->Edit($campo, $valor);
+				}
+			} else {
+				$this->extra_fields[$campo] = $valor;
+			}
+		}
+	}
+
+	function Write() {
+		$this->loaded = !empty($this->fields['id_usuario']);
+		return parent::Write();
+	}
+}
