@@ -198,7 +198,9 @@ span.indefinido { color: #550000; }
 	/*Se crea el reporte según el Input del usuario*/
 	$reporte = new Reporte($sesion);
 
-	//USUARIOS
+	/*FILTROS*/
+	
+	/*PROFESIONALES*/
 	$users = $usuarios;
 	if(!is_array($users))	
 		$users = array($users);
@@ -215,50 +217,54 @@ span.indefinido { color: #550000; }
 		if($cliente)
 			$reporte->addFiltro('cliente','codigo_cliente',$cliente);
 
-	/* Seccion para filtros */	
+	/*FIN FILTROS*/
 
-	/*FILTRO CLIENTES*/
+	
+	/*FILTROS ADICIONALES*/
+
+	/*PROFESIONALES FILTRO ADICIONAL*/
+	$users = $usuariosF;
+	if(!is_array($users))	
+		$users = array($users);
+	foreach($users as $usuario)
+		if($usuario)
+			$reporte->addFiltro('usuario','id_usuario',$usuario);
+
+
+	/*CLIENTES FILTRO ADICIONAL*/
 	$clients = $clientesF;
-	if(!is_array($clientsF))	
-		$clientsF = array($clientsF);
-
-	foreach($clientsF as $cliente)
+	if(!is_array($clients))	
+		$clients = array($clients);
+	foreach($clients as $cliente)
 		if($cliente)
 			$reporte->addFiltro('cliente','codigo_cliente',$cliente);
 
-	/*FILTRO USUARIOSF*/
-	$usersF = $usuariosF;
-	if(!is_array($usersF))	
-		$usersF = array($usersF);
-	foreach($usersF as $usuarioF)
-		if($usuarioF)
-			$reporte->addFiltro('usuario','id_usuario',$usuarioF);
+	/*FILTRO ENCARGADOS ADICIONAL*/
+	$encargados_comerciales = $encargados;
+	if(!is_array($encargados_comerciales))
+		$encargados_comerciales = array($encargados_comerciales);
+	foreach($encargados_comerciales as $encargado_com)
+		if($encargado_com)
+			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado_com);
 
-	/*FILTRO ENCARGADOS*/
-	$encargadosF = $encargados;
-	if(!is_array($encargadosF))	
-		$encargadosF = array($encargadosF);
-	foreach($encargadosF as $encargadoF)
-		if($encargadoF)
-			$reporte->addFiltro('contrato','id_usuario_responsable',$encargadoF);
+	/*FILTRO AREA PROFESIONAL ADICIONAL*/
 
-	/*FILTRO AREA PROFESIONAL*/
-	$areas_profesionalF = $areas_profesional;
-	if(!is_array($areas_profesionalF))	
-		$areas_profesionalF = array($areas_profesionalF);
-	foreach($areas_profesionalF as $area_proF)
-		if($area_proF)
-			$reporte->addFiltro('asunto','id_area_proyecto',$area_proF);
+	$areas_profesionales = $area_profesional;
+	if(!is_array($areas_profesionales))	
+		$areas_profesionales = array($areas_profesionales);
+	foreach($areas_profesionales as $area_pro)
+		if($area_pro)
+			$reporte->addFiltro('usuario','id_area_usuario',$area_pro);
 
-	/*FILTRO CATEGORIAS PROFESIONAL*/
+	/*FILTRO CATEGORIAS PROFESIONAL ADICIONAL*/
 	$categorias_profesionalF = $categorias_profesional;
 	if(!is_array($categorias_profesionalF))	
 		$categorias_profesionalF = array($categorias_profesionalF);
-	foreach($categorias_profesionalF as $cat_proF)
-		if($cat_proF)
-			$reporte->addFiltro('usuario','id_categoria_usuario',$cat_proF);
+	foreach($categorias_profesionalF as $cat_pro)
+		if($cat_pro)
+			$reporte->addFiltro('usuario','id_categoria_usuario',$cat_pro);
 
-	/*FILTRO AREA ASUNTO*/
+	/*FILTRO AREA ASUNTO ADICIONAL*/
 	$areas_asuntoF = $areas_asunto;
 	if(!is_array($areas_asuntoF))	
 		$areas_asuntoF = array($areas_asuntoF);
@@ -266,7 +272,7 @@ span.indefinido { color: #550000; }
 		if($areas_asuF)
 			$reporte->addFiltro('asunto','id_area_proyecto',$areas_asuF);
 
-	/*FILTRO TIPOS ASUNTO*/
+	/*FILTRO TIPOS ASUNTO ADICIONAL*/
 	$tipos_asuntoF = $tipos_asunto;
 	if(!is_array($tipos_asuntoF))	
 		$tipos_asuntoF = array($tipos_asuntoF);
@@ -274,14 +280,14 @@ span.indefinido { color: #550000; }
 		if($tipo_asuF)
 			$reporte->addFiltro('asunto','id_tipo_asunto',$tipo_asuF);
 
-	/*FILTRO ESTADO COBRO*/
+	/*FILTRO ESTADO COBRO ADICIONAL*/
 	$estadocobro = $estado_cobro;
 	if(!is_array($estado_cobro))
 		$estadocobro = array ($estadocobro);
 	foreach($estadocobro as $estadoF)
 			$reporte->addFiltro('cobro','estado',$estadoF);
 
-	/*FILTRO MONEDA*/
+	/*FILTRO MONEDA ADICIONAL*/
 	$monedascontrato = $moneda_contrato;
 	if(!is_array($monedascontrato))	
 		$monedascontrato = array($monedascontrato);
@@ -289,7 +295,9 @@ span.indefinido { color: #550000; }
 		if($monedacontrato)
 			$reporte->addFiltro('contrato','id_moneda',$monedacontrato);
 
-	/* FIN FILTROS */
+	/* FIN FILTROS ADICIONAL*/
+
+
 
 	$reporte->id_moneda = $id_moneda;	
 

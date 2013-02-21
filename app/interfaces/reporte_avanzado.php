@@ -1246,17 +1246,17 @@ if (!$popup) {
 												</tr>
 												<tr valign=top>
 													<td align=right>
-														<input type="checkbox" name="check_area_prof" id="check_area_prof" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_prof ? 'checked' : '' ?> />
-														<label for="check_area_prof">
+														<input type="checkbox" name="check_area_profesional" id="check_area_profesional" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_profesional ? 'checked' : '' ?> />
+														<label for="check_area_profesional">
 															<b><?php echo __('Área Profesional') ?>:&nbsp;&nbsp;</b>
 														</label>
 													</td>
 													<td align=left>
-														<div class = 'area_prof_full' style='width:200px;<?php echo $check_area_prof ? "display:none;" : "" ?>'>
-															<label for="check_area_prof" style="cursor:pointer"><hr></label>
+														<div class = 'area_prof_full' style='width:200px;<?php echo $check_area_profesional ? "display:none;" : "" ?>'>
+															<label for="check_area_profesional" style="cursor:pointer"><hr></label>
 														</div>
-														<div class = 'area_prof_full' style="<?php echo $check_area_prof ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas_profesional[]", $areas_profesional, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
+														<div class = 'area_prof_full' style="<?php echo $check_area_profesional ? "" : "display:none;" ?>">
+															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "area_profesional[]", $area_profesional, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1875,7 +1875,7 @@ if (!$popup) {
 																			$url_iframe .= "&clientes=" . implode(',', $clientesF);
 																	if ($check_profesionales)
 																		if (is_array($usuariosF))
-																			$url_iframe .= "&usuarios=" . implode(',', $usuariosF);
+																		$url_iframe .= "&usuarios=" . implode(',', $usuariosF);
 
 																	if ($check_area_asunto)
 																		if (is_array($areas_asunto))
@@ -1888,12 +1888,13 @@ if (!$popup) {
 																		if (is_array($moneda_contrato))
 																			$url_iframe .= "&moneda_contrato=" . implode(',', $moneda_contrato);
 
-																	if ($check_area_prof)
-																		if (is_array())
-																			$url_iframe .= "&areas_profesional=" . implode(',', $areas_profesional);
+																	if ($check_area_profesional)
+																		if (is_array($area_profesional))
+																			$url_iframe .= "&areas_pro=" . implode(',', $area_profesional);
+
 																	if ($check_cat_prof)
 																		if (is_array($categorias_profesional))
-																			$url_iframe .= "&categorias_profesional=" . implode(',', $categorias_profesional);
+																			$url_iframe .= "&categorias_pro=" . implode(',', $categorias_profesional);
 
 																	if ($check_encargados)
 																		if (is_array($encargados))
