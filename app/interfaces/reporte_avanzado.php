@@ -401,7 +401,7 @@ if (!$popup) {
 					if(selector_siguiente.options[j].text == selector.options[selector.selectedIndex].text)
 					{
 						selector_siguiente.options[j]=null;
-						CambiarAgrupador(i);	
+						CambiarAgrupador(i);
 					}
 				}
 				//y se dispone lo viejo, SOLO si no resultó elegido en uno anterior
@@ -425,7 +425,7 @@ if (!$popup) {
 			valor = selector.value;
 			txt = selector.options[selector.selectedIndex].text;
 			opc = new Option(txt,valor);
-			selector_previo.options[0] = opc;	
+			selector_previo.options[0] = opc;
 
 			ActualizarNuevoReporte();
 		}
@@ -435,7 +435,7 @@ if (!$popup) {
 		}
 		function ResizeIframe(width, height)
 		{
-			currentfr = document.getElementById('planilla'); 
+			currentfr = document.getElementById('planilla');
 			currentfr.height = height+'px'; // currentfr.Document.body.scrollHeight;
 			currentfr.width = width+'px'; // currentfr.Document.body.scrollHeight;
 
@@ -495,7 +495,7 @@ if (!$popup) {
 			//var dispersion = document.getElementById('dispersion');
 			var td_dato_comparado = document.getElementById('td_dato_comparado');
 			var td_dato = document.getElementById('td_dato');
-			
+
 
 			//Si el valor comparado es igual al principal, debo cambiarlo:
 			if(tipo_de_dato_comparado.selectedIndex == tipo_de_dato.selectedIndex)
@@ -508,27 +508,27 @@ if (!$popup) {
 
 			if (jQuery('#comparar').is(':checked'))
 			{
-				 
+
 				jQuery('#dispersion ,#tipo_dato_comparado, #td_dato_comparado, #vs, #tipo_tinta').show();
-				 
+
 				jQuery('#td_dato').removeClass('borde_blanco').addClass('borde_rojo');
 				jQuery('#td_dato_comparado').addClass('borde_azul');
 				jQuery('#'+jQuery('#tipo_dato_comparado').val()).addClass('boton_comparar');
-					
+
 			} 	else	{
-				 
-				 
-			 
+
+
+
 				jQuery('#dispersion, #tipo_dato_comparado, #vs, #tipo_tinta').hide();
-					 
+
 				jQuery('#td_dato').removeClass('borde_rojo').addClass('borde_blanco');
 				jQuery('#td_dato_comparado').removeClass('borde_azul');
 				jQuery('#'+jQuery('#tipo_dato_comparado').val()).removeClass('boton_comparar');
 			}
-				
-			 	
+
+
 			RevisarTabla();
-		
+
 			RevisarMoneda();
 			RevisarCircular();
 			ActualizarNuevoReporte();
@@ -614,8 +614,8 @@ if (!$popup) {
 		function SelectValueSet(SelectName, Value)
 		{
 			SelectObject = $(SelectName);
-			for(index = 0; 
-			index < SelectObject.length; 
+			for(index = 0;
+			index < SelectObject.length;
 			index++) {
 				if(SelectObject[index].value == Value)
 					SelectObject.selectedIndex = index;
@@ -694,7 +694,7 @@ if (!$popup) {
 
 				return 0;
 			}
-			jQuery('#span_eliminar_reporte, #span_editar_reporte').show(); 
+			jQuery('#span_eliminar_reporte, #span_editar_reporte').show();
 
 			/*Se añade 'envio'*/
 			var separa = reporte.split('*');
@@ -713,7 +713,7 @@ if (!$popup) {
 				$('comparar').checked = true;
 			}
 			else
-				$('comparar').checked = false;		
+				$('comparar').checked = false;
 			Comparar();
 
 			Agrupadores( agrupadores.size() - parseInt($('numero_agrupadores').value));
@@ -755,7 +755,7 @@ if (!$popup) {
 				{
 					jQuery('#fecha_corta_anual').click();
 				}
-			}	
+			}
 			jQuery('#eliminado_reporte').val(reporte);
 		}
 		/*Submitea la form para que genere un reporte segun lo elegido.*/
@@ -800,13 +800,13 @@ if (!$popup) {
 			$('formulario').opc.value = 'nuevo_reporte';
 
 
-			$('formulario').submit();	
+			$('formulario').submit();
 		}
 
 		function EliminarReporte()
 		{
 			$('formulario').opc.value = 'eliminar_reporte';
-			$('formulario').submit();	
+			$('formulario').submit();
 		}
 
 		function NuevoReporte()
@@ -825,7 +825,7 @@ if (!$popup) {
 			var texto = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].innerHTML : undefined;
 			var id_reporte = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-id_reporte") : 0;
 
-			var envio_reporte = mis_reportes.selectedIndex >= 0 ? 
+			var envio_reporte = mis_reportes.selectedIndex >= 0 ?
 				mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-envio_reporte") : 0;
 
 			texto = texto.split('&nbsp;');
@@ -843,7 +843,7 @@ if (!$popup) {
 				var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
 				if(fecha_corta == 'semanal')
 					$('select_reporte_envio_semana').selectedIndex = envio_reporte;
-				else 
+				else
 					$('select_reporte_envio_mes').selectedIndex=envio_reporte;
 			}
 		}
@@ -856,7 +856,7 @@ if (!$popup) {
 			$('reporte_envio_selector').hide();
 			ActualizarNuevoReporte();
 		}
-		
+
 		function SeleccionarMes()
 		{
 			ActualizarPeriodo(<?php echo $mes_pasado ?>);
@@ -865,7 +865,7 @@ if (!$popup) {
 			$('reporte_envio_selector').hide();
 			ActualizarNuevoReporte();
 		}
-		
+
 		function SeleccionarSelector()
 		{
 
@@ -877,7 +877,7 @@ if (!$popup) {
 			$('reporte_envio_mes').hide();
 			ActualizarNuevoReporte();
 		}
-				
+
 		function SeleccionarAnual()
 		{
 			ActualizarPeriodo(<?php echo $actual; ?>);
@@ -949,10 +949,10 @@ if (!$popup) {
 				limite_check.style['display'] = 'none';
 			}
 		}
-		
+
 		function ActualizarPeriodo(fi,ff)
 		{
-			jQuery('#fecha_ini').val(fi).datepicker( "option", "dateFormat", "dd-mm-yy" );	
+			jQuery('#fecha_ini').val(fi).datepicker( "option", "dateFormat", "dd-mm-yy" );
 			jQuery('#fecha_fin').val(ff).datepicker( "option", "dateFormat", "dd-mm-yy" );
 
 
@@ -1005,7 +1005,7 @@ if (!$popup) {
 <?php
 }
 ?>
-	
+
 <form method=post name=formulario action="" id=formulario autocomplete='off'>
 	<input type=hidden name=opc id=opc value='print'>
 	<input type=hidden name=debug id=debug value='<?php echo $debug ?>'>
@@ -1172,7 +1172,7 @@ if (!$popup) {
 									<td style="width:470px;"  rowspan="6">
 										<div id="filtrosimple">
 											<div id="profesional" style="float:left;display:inline-block;"><b><?php echo __('Profesional') ?>:</b><br/>
-												<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]", $usuarios, "", "Todos", "200"); ?>	 
+												<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]", $usuarios, "", "Todos", "200"); ?>
 											</div>
 											<div id="cliente" style="float:right;padding-right:10px;display:inline-block;">
 
@@ -1292,7 +1292,7 @@ if (!$popup) {
 														</div>
 													</td>
 												</tr>
-												
+
 													<?php if ($filtros_extra) { ?>
 												<tr valign=top>
 													<td align=right>
@@ -1312,7 +1312,7 @@ if (!$popup) {
 												</tr>
 
 													<?php } ?>
-													
+
 												<tr valign=top>
 													<td align=right>
 														<input type="checkbox" name="check_estado_cobro" id="check_estado_cobro" value="1" onchange="$$('.estado_cobro_full').invoke('toggle')" <?php echo $check_estado_cobro ? 'checked' : '' ?> />
@@ -1676,7 +1676,7 @@ if (!$popup) {
 							<tr>
 								<?php echo nada(12) ?>
 							</tr>
-							<tr>	
+							<tr>
 								<?php echo tinta() ?>
 								<?php echo nada(8) ?>
 								<?php echo celda("costo") ?>
@@ -1705,13 +1705,15 @@ if (!$popup) {
 								 style=' <?php echo $numero_agrupadores == 1 ? 'display:none;' : '' ?> cursor:pointer;' />
 								<select name="vista" id="vista" onchange="RevisarTabla();">
 							<?php
-							foreach ($vistas as $key => $v) {
-								$s = implode('-', $v);
-								echo '<option value="' . $s . '" ';
-								if ($vista == $s)
-									echo 'selected';
-								echo ">" . implode(' - ', $vistas_lang[$key]);
-								echo "</option>\n";
+							if (is_array($visitas)) {
+								foreach ($vistas as $key => $v) {
+									$s = implode('-', $v);
+									echo '<option value="' . $s . '" ';
+									if ($vista == $s)
+										echo 'selected';
+									echo ">" . implode(' - ', $vistas_lang[$key]);
+									echo "</option>\n";
+								}
 							}
 							?>
 								</select>
@@ -1722,9 +1724,9 @@ if (!$popup) {
 							<tr>
 								<td colspan=6 align=left>
 									<div style="float:left">
-										<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)"; 
+										<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)";
 											 style='cursor:pointer;' />
-										<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)"; 
+										<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)";
 											 style='cursor:pointer;' />
 										<?php echo __('Agrupar por') ?>:&nbsp;
 										<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?php echo $numero_agrupadores ?> />
@@ -1793,7 +1795,7 @@ if (!$popup) {
 									<table cellpadding="2" cellspacing="5">
 										<tr>
 											<td>
-												<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1" 
+												<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
 														<?php
 														if (isset($orden_barras_max2min) || !isset($tipo_dato))
 															echo 'checked="checked"';
@@ -1931,27 +1933,27 @@ if (!$popup) {
 																}
 																?>
 
-																<script> 
+																<script>
 																		RevisarMoneda(); RevisarCircular(); RevisarTabla();
 																		jQuery(document).ready(function(){
-																			 
+
 																			if(jQuery('#comparar').is(':checked')) {
 																				jQuery('#tabla, #dispersion').css('display','inline-block').show();
 																			} else {
 																				jQuery('#tabla, #dispersion').css('display','none').hide();
 																			}
-																			
+
 																			jQuery('#formulario').on('click','#mis_reportes',function() {
 																				CargarReporte();
-																				 
+
 																			});
-																			
+
 																			jQuery('#fullfiltrostoggle').click(function() {
 																				jQuery('#filtrosimple').toggle();
 																				jQuery('#full_filtros').toggle();
 																			});
-																		
-	
+
+
 																			jQuery('#comparar').on('click',function() {
 																				if(jQuery('#comparar').is(':checked')) {
 																					jQuery('#tabla, #dispersion').css('display','inline-block').show();
@@ -1959,7 +1961,7 @@ if (!$popup) {
 																					jQuery('#tabla, #dispersion').css('display','none').hide();
 																				}
 																			});
-	
+
 																			jQuery('#runreporte').on('click',function(){
 																				if(jQuery('#comparar').is(':checked')) {
 																					jQuery('#tipo_dato_comparado').removeAttr('disabled');
@@ -1973,7 +1975,7 @@ if (!$popup) {
 																					vista[i]=jQuery(this).val();
 																				});
 																				jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
-		
+
 																				jQuery('#vista').val(vista.join('-')) ;
 																				jQuery.ajax({
 																					url: "reporte_avanzado_planilla.php?popup=1&vista="+jQuery('#vista').val(),
@@ -1984,8 +1986,8 @@ if (!$popup) {
 																				});
 																			});
 																			CargarReporte();
-																		});								
+																		});
 
-																</script> 
+																</script>
 																<?php
-																$pagina->PrintBottom($popup);										
+																$pagina->PrintBottom($popup);
