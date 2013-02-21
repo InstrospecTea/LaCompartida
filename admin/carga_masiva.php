@@ -8,7 +8,7 @@ $pagina->titulo = __('Carga masiva de datos');
 $pagina->PrintTop();
 ?>
 <form method="POST" action="datos_carga_masiva.php">
-	Cargar <?php echo Html::SelectArray(array('usuario', 'cliente', 'asunto'), 'tipo'); ?>
+	Cargar <?php echo Html::SelectArray(array('UsuarioExt', 'Cliente', 'Asunto'), 'clase'); ?>
 	<textarea name="raw_data" rows="18" cols="100"></textarea><br /><br />
 	<input type="submit" value="Enviar"/>
 	<!-- agregar opcion para cargar datos ya existentes para edicion masiva -->

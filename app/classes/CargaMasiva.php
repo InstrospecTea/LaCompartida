@@ -10,70 +10,20 @@ require_once dirname(__FILE__) . '/../conf.php';
 class CargaMasiva extends Objeto {
 
 	/**
-	 * tablas[tabla][clase, id, glosa, campos?]
-	 * @var array
-	 */
-	private static $tablas = array(
-		'usuario' => array(
-			'clase' => 'UsuarioExt',
-			'id' => 'id_usuario',
-			'glosa' => 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))',
-			'campos' => array(
-				'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))' => 'RUT',
-				'nombre' => 'Nombre',
-				'apellido1' => 'Apellido Paterno',
-				'apellido2' => 'Apellido Materno',
-				'username' => 'Código',
-				'email' => array(
-					'titulo' => 'Email',
-					'requerido' => true
-				),
-				'telefono1' => 'Teléfono 1',
-				'telefono2' => 'Teléfono 2',
-				'admin' => array(
-					'titulo' => 'Es Administrador',
-					'tipo' => 'bool'
-				),
-				'id_categoria_usuario' => array(
-					'titulo' => 'Categoría de Usuario',
-					'relacion' => 'prm_categoria_usuario',
-					'creable' => true
-				),
-				'id_area_usuario' => array(
-					'titulo' => 'Área de Usuario',
-					'relacion' => 'prm_area_usuario',
-					'creable' => true,
-					'defval' => 1
-				),
-			)
-		),
-		'prm_categoria_usuario' => array(
-			'clase' => 'CategoriaUsuario',
-			'id' => 'id_categoria_usuario',
-			'glosa' => 'glosa_categoria'
-		),
-		'prm_area_usuario' => array(
-			'clase' => 'AreaUsuario',
-			'id' => 'id',
-			'glosa' => 'glosa'
-		),
-	);
-
-	/**
-	 * clases reusables para cada tabla
+	 * instancias reusables para cada clase
 	 * @var type 
 	 */
-	private $clases = array();
+	private $instancias = array();
 
 	/**
 	 * listado de campos cargables de una tabla y su metadata
-	 * @param string $tabla
+	 * @param string $clase
 	 * @return array data[campo][titulo, tipo, relacion?, creable?]
 	 */
-	public function ObtenerCampos($tabla) {
-		$llave = $this->LlaveUnica($tabla);
+	public function ObtenerCampos($clase) {
+		$llave = $this->LlaveUnica($clase);
 		$campos = array();
-		foreach (self::$tablas[$tabla]['campos'] as $campo => $info) {
+		foreach ($clase::$campos_carga_masiva as $campo => $info) {
 			if (!is_array($info)) {
 				$info = array('titulo' => $info);
 			}
@@ -90,37 +40,36 @@ class CargaMasiva extends Objeto {
 
 	/**
 	 * campo que funciona como llave unica de la tabla
-	 * @param string $tabla
+	 * @param string $clase
 	 * @return string
 	 */
-	public function LlaveUnica($tabla) {
-		return self::$tablas[$tabla]['glosa'];
+	public function LlaveUnica($clase) {
+		return $clase::$llave_carga_masiva;
 	}
 
 	/**
-	 * obtiene el pseudomodelo asociado a la tabla
-	 * @param string $tabla
+	 * obtiene una instancia del pseudomodelo
+	 * @param string $clase
 	 * @return Objeto
 	 */
-	public function ObtenerClase($tabla) {
-		if (!isset($this->clases[$tabla])) {
-			$clase = self::$tablas[$tabla]['clase'];
-			$this->clases[$tabla] = new $clase($this->sesion);
+	public function ObtenerInstancia($clase) {
+		if (!isset($this->instancias[$clase])) {
+			$this->instancias[$clase] = new $clase($this->sesion);
 		}
-		return $this->clases[$tabla];
+		return $this->instancias[$clase];
 	}
 
 	/**
 	 * obtiene una lista asociativa con los datos de las tablas a usar
-	 * @param string $tabla
+	 * @param string $clase
 	 * @param bool $invertir listado glosa => id
 	 * @return array listado en formato data[tabla][id] = glosa
 	 */
-	public function ObtenerListados($tabla, $invertir = false) {
+	public function ObtenerListados($clase, $invertir = false) {
 		$llaves = array();
-		$llaves[$tabla] = $this->ObtenerListado($tabla, $invertir);
-		foreach (self::$tablas[$tabla]['campos'] as $campo) {
-			if (is_array($campo) && isset($campo['relacion'])) {
+		$llaves[$clase] = $this->ObtenerListado($clase, $invertir);
+		foreach ($this->ObtenerCampos($clase) as $campo) {
+			if (isset($campo['relacion'])) {
 				$llaves[$campo['relacion']] = $this->ObtenerListado($campo['relacion'], $invertir);
 			}
 		}
@@ -129,13 +78,13 @@ class CargaMasiva extends Objeto {
 
 	/**
 	 * obtiene una lista asociativa id => glosa de una tabla
-	 * @param string $tabla
+	 * @param string $clase
 	 * @param bool $invertir listado glosa => id
 	 * @return array
 	 */
-	private function ObtenerListado($tabla, $invertir = false) {
-		$info = self::$tablas[$tabla];
-		$query = "SELECT {$info['id']} as id, {$info['glosa']} as glosa FROM $tabla";
+	private function ObtenerListado($clase, $invertir = false) {
+		$instancia = $this->ObtenerInstancia($clase);
+		$query = "SELECT {$instancia->campo_id} as id, {$clase::$llave_carga_masiva} as glosa FROM {$instancia->tabla}";
 		$resp = $this->sesion->pdodbh->query($query);
 		$data = $resp->fetchAll();
 
@@ -188,15 +137,16 @@ class CargaMasiva extends Objeto {
 	/**
 	 * carga masiva de datos
 	 * @param type $data matriz de datos[numfila][numcol]=valor
-	 * @param type $tabla
+	 * @param type $clase
 	 * @param type $campos lista de campos a los que corresponde cada columna
 	 * @return array listado de errores
 	 */
-	public function CargarData($data, $tabla, $campos) {
+	public function CargarData($data, $clase, $campos) {
 		$errores = array();
-		$listados = $this->ObtenerListados($tabla, true);
-		$info_tabla = self::$tablas[$tabla];
-		$info_campos = $this->ObtenerCampos($tabla);
+		$listados = $this->ObtenerListados($clase, true);
+		$llave = $this->LlaveUnica($clase);
+		$campo_id = $this->ObtenerInstancia($clase)->campo_id;
+		$info_campos = $this->ObtenerCampos($clase);
 
 		foreach ($data as $idx => $fila) {
 			//convertir lista en arreglo asociativo campo => valor
@@ -206,7 +156,7 @@ class CargaMasiva extends Objeto {
 			}
 
 			try {
-				foreach($info_campos as $campo => $info) {
+				foreach ($info_campos as $campo => $info) {
 					if (isset($info['relacion'])) {
 						//convierte la relacion por glosa a relacion por id
 						if (empty($fila[$campo])) {
@@ -215,7 +165,7 @@ class CargaMasiva extends Objeto {
 							$fila[$campo] = $listados[$info['relacion']][$fila[$campo]];
 						} else if ($info['creable']) {
 							$id = $this->CrearDato(array(
-								self::$tablas[$info['relacion']]['glosa'] => $fila[$campo]
+								$this->LlaveUnica($info['relacion']) => $fila[$campo]
 								), $info['relacion']);
 							$listados[$info['relacion']][$fila[$campo]] = $id;
 							$fila[$campo] = $id;
@@ -223,18 +173,18 @@ class CargaMasiva extends Objeto {
 							throw new Exception("No existe '{$info['titulo']}' con el valor '{$fila[$campo]}'");
 						}
 					}
-					
-					if(in_array($fila[$campo], array('', 'NULL')) && isset($info['defval'])){
+
+					if (in_array($fila[$campo], array('', 'NULL')) && isset($info['defval'])) {
 						$fila[$campo] = $info['defval'];
 					}
 				}
-				
+
 				//si ya existia una entrada con esta llave unica, seteo el id para q se edite
-				if (isset($listados[$tabla][$fila[$info_tabla['glosa']]])) {
-					$fila[$info_tabla['id']] = $listados[$tabla][$fila[$info_tabla['glosa']]];
+				if (isset($listados[$clase][$fila[$llave]])) {
+					$fila[$campo_id] = $listados[$clase][$fila[$llave]];
 				}
 
-				$this->CrearDato($fila, $tabla);
+				$this->CrearDato($fila, $clase);
 			} catch (Exception $e) {
 				$errores[$idx] = $e->getMessage();
 			}
@@ -246,29 +196,29 @@ class CargaMasiva extends Objeto {
 	/**
 	 * crea (o edita) un dato en una tabla, usando los metodos Fill, PreCrearDato y PostCrearDato del pseudomodelo
 	 * @param array $data
-	 * @param type $tabla
+	 * @param type $clase
 	 */
-	private function CrearDato($data, $tabla) {
-		$clase = $this->ObtenerClase($tabla);
-		$clase->fields = array();
-		$clase->changes = array();
+	private function CrearDato($data, $clase) {
+		$instancia = $this->ObtenerInstancia($clase);
+		$instancia->fields = array();
+		$instancia->changes = array();
 
-		if (method_exists($clase, 'PreCrearDato')) {
-			$data = $clase->PreCrearDato($data);
+		if (method_exists($instancia, 'PreCrearDato')) {
+			$data = $instancia->PreCrearDato($data);
 		}
 
-		if (empty($clase->editable_fields)) {
-			$clase->editable_fields = array_keys($data);
+		if (empty($instancia->editable_fields)) {
+			$instancia->editable_fields = array_keys($data);
 		}
-		$clase->Fill($data, true);
+		$instancia->Fill($data, true);
 
-		if ($clase->Write()) {
-			if (method_exists($clase, 'PostCrearDato')) {
-				$clase->PostCrearDato();
+		if ($instancia->Write()) {
+			if (method_exists($instancia, 'PostCrearDato')) {
+				$instancia->PostCrearDato();
 			}
-			return $clase->fields[$clase->campo_id];
+			return $instancia->fields[$instancia->campo_id];
 		}
-		throw new Exception("Error al guardar $tabla" . (empty($clase->error) ? '' : ": {$clase->error}"));
+		throw new Exception("Error al guardar $clase" . (empty($instancia->error) ? '' : ": {$instancia->error}"));
 	}
 
 }

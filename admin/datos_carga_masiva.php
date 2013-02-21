@@ -4,33 +4,33 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 $sesion = new Sesion(array('ADM'));
 
 $pagina = new Pagina($sesion);
-$pagina->titulo = __("Carga masiva de $tipo");
+$pagina->titulo = __("Carga masiva de $clase");
 $pagina->PrintTop();
 
 $CargaMasiva = new CargaMasiva($sesion);
 
 if (isset($data) && isset($campos)) {
-	$CargaMasiva->CargarData($data, $tipo, $campos);
+	$CargaMasiva->CargarData($data, $clase, $campos);
 }
 
-$listados = $CargaMasiva->ObtenerListados($tipo);
+$listados = $CargaMasiva->ObtenerListados($clase);
 
-$campos_tipo = $CargaMasiva->ObtenerCampos($tipo);
+$campos_clase = $CargaMasiva->ObtenerCampos($clase);
 $titulos_campos = array_map(function($campo) {
 		return $campo['titulo'];
-	}, $campos_tipo);
+	}, $campos_clase);
 
 if (isset($raw_data)) {
 	$data = $CargaMasiva->ParsearData($raw_data);
-	$campos = array_keys($campos_tipo);
+	$campos = array_keys($campos_clase);
 }
 
 if (empty($data)) {
 	$data[] = array_fill(0, count($campos), '');
 } else if (count($campos) > count($data[0])) {
 	$campos = array_slice($campos, 0, count($data[0]));
-} else{
-	while(count($campos) < count($data[0])){
+} else {
+	while (count($campos) < count($data[0])) {
 		$campos[] = '';
 	}
 }
@@ -73,15 +73,15 @@ if (empty($data)) {
 		</tbody>
 	</table>
 
-	<input type="hidden" name="tipo" value="<?php echo $tipo; ?>"/>
+	<input type="hidden" name="clase" value="<?php echo $clase; ?>"/>
 	<input type="submit" value="Enviar"/>
 </form>
 
 <script type="text/javascript">
-	var tipo = '<?php echo $tipo; ?>';
-	var llave = '<?php echo $CargaMasiva->LlaveUnica($tipo); ?>';
+	var clase = '<?php echo $clase; ?>';
+	var llave = '<?php echo $CargaMasiva->LlaveUnica($clase); ?>';
 	var listados = <?php echo json_encode(UtilesApp::utf8izar($listados)); ?>;
-	var campos_tipo = <?php echo json_encode(UtilesApp::utf8izar($campos_tipo)); ?>;
+	var campos_clase = <?php echo json_encode(UtilesApp::utf8izar($campos_clase)); ?>;
 
 	function cambioRelacion() {
 		jQuery(this).closest('td').find('[name^=data]')
@@ -93,7 +93,7 @@ if (empty($data)) {
 				.val(jQuery(this).is(':checked') ? 'SI' : 'NO');
 	}
 
-	function limpiar(s){
+	function limpiar(s) {
 		return s.replace(/\s/g, '').toUpperCase();
 	}
 
@@ -117,7 +117,7 @@ if (empty($data)) {
 			//fail: no existe el dato, si es creable solo es warning, si no es un error
 			var idx = td.index();
 			var campo = jQuery('[name="campos[' + idx + ']"]').val();
-			var creable = campos_tipo[campo].creable;
+			var creable = campos_clase[campo].creable;
 			input.addClass(creable ? 'warning' : 'error')
 					.attr('title', 'No existe este valor en el listado actual' +
 					(creable ? '. Se creará al cargar los datos' : ''));
@@ -125,7 +125,7 @@ if (empty($data)) {
 
 			if (creable) {
 				//homogeneizar espacios/mayusculas con otras filas existentes
-				jQuery('[name^=data][name$="['+idx+']"]').filter(function(){
+				jQuery('[name^=data][name$="[' + idx + ']"]').filter(function() {
 					return limpiar(jQuery(this).val()) === val;
 				}).val(input.val());
 			}
@@ -158,7 +158,7 @@ if (empty($data)) {
 		validarRepetidos(idx);
 
 		var existe = false;
-		jQuery.each(listados[tipo], function(id, valor) {
+		jQuery.each(listados[clase], function(id, valor) {
 			if (limpiar(valor) === val) {
 				existe = valor;
 				return false;
@@ -168,7 +168,7 @@ if (empty($data)) {
 			//ya existe en los datos anteriores: se esta editando
 			input.addClass('warning').val(existe);
 			td.closest('tr').addClass('warning')
-					.attr('title', campos_tipo[llave].titulo + ' debe ser único, pero ya existe el valor ' + existe + ' entre los datos actuales. Se editará el dato existente con los valores ingresados');
+					.attr('title', campos_clase[llave].titulo + ' debe ser único, pero ya existe el valor ' + existe + ' entre los datos actuales. Se editará el dato existente con los valores ingresados');
 		}
 		else {
 			input.removeClass('warning');
@@ -176,18 +176,18 @@ if (empty($data)) {
 		}
 	}
 
-	function actualizarCheckbox(input, defval){
+	function actualizarCheckbox(input, defval) {
 		var val = limpiar(input.val());
 		var checked = defval;
-		if(val !== ''){
+		if (val !== '') {
 			checked = val.charAt(0) !== 'N' && val !== '0';
 		}
 
 		var check = input.closest('td').find(':checkbox');
-		if(checked){
+		if (checked) {
 			check.attr('checked', 'checked');
 		}
-		else{
+		else {
 			check.removeAttr('checked');
 		}
 	}
@@ -197,15 +197,15 @@ if (empty($data)) {
 			var input = jQuery(this);
 			var idx = input.closest('td').index();
 			var campo = jQuery('[name="campos[' + idx + ']"]').val();
-			var info = campos_tipo[campo];
-			
+			var info = campos_clase[campo];
+
 			input.removeClass('error').removeClass('warning').removeAttr('title');
-			
-			if(!info){
+
+			if (!info) {
 				return;
 			}
-			
-			if(info.requerido && limpiar(input.val()) === ''){
+
+			if (info.requerido && limpiar(input.val()) === '') {
 				input.addClass('error').attr('title', 'Este campo es obligatorio');
 			}
 			else if (campo === llave) {
@@ -220,13 +220,13 @@ if (empty($data)) {
 		});
 
 		jQuery('[name^=campos]').change(function() {
-			var info = campos_tipo[jQuery(this).val()];
+			var info = campos_clase[jQuery(this).val()];
 			var idx = jQuery(this).closest('th').index();
 			var inputs = jQuery('[name^=data][name$="[' + idx + ']"]');
 			var extras = inputs.siblings('.extra');
 			extras.html('');
 
-			if(info){
+			if (info) {
 				//mostrar listado para relaciones o checkbox para bools
 				if (info.relacion) {
 					var sel = jQuery('<select/>', {html: '<option value=""/>'});
@@ -248,9 +248,9 @@ if (empty($data)) {
 			inputs.change();
 		}).change();
 
-		jQuery('form').submit(function(){
+		jQuery('form').submit(function() {
 			var errores = jQuery('.error');
-			if(errores.length){
+			if (errores.length) {
 				alert('Hay errores!');
 				errores.focus();
 				return false;

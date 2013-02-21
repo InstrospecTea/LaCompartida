@@ -4,8 +4,41 @@ require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
+define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
+
 class UsuarioExt extends Usuario {
 
+	public static $llave_carga_masiva = CONCAT_RUT_DV_USUARIO;
+	public static $campos_carga_masiva = array(
+		CONCAT_RUT_DV_USUARIO => 'RUT',
+		'nombre' => 'Nombre',
+		'apellido1' => 'Apellido Paterno',
+		'apellido2' => 'Apellido Materno',
+		'username' => 'Código',
+		'email' => array(
+			'titulo' => 'Email',
+			'requerido' => true
+		),
+		'telefono1' => 'Teléfono 1',
+		'telefono2' => 'Teléfono 2',
+		'admin' => array(
+			'titulo' => 'Es Administrador',
+			'tipo' => 'bool'
+		),
+		'id_categoria_usuario' => array(
+			'titulo' => 'Categoría de Usuario',
+			'relacion' => 'CategoriaUsuario',
+			'creable' => true
+		),
+		'id_area_usuario' => array(
+			'titulo' => 'Área de Usuario',
+			'relacion' => 'AreaUsuario',
+			'creable' => true,
+			'defval' => 1
+		)
+	);
+	public $tabla = 'usuario';
+	public $campo_id = 'id_usuario';
 	var $secretarios = null;
 
 	function Loaded() {
@@ -684,9 +717,8 @@ class UsuarioExt extends Usuario {
 	}
 
 	public function PreCrearDato($data) {
-		$cedula = 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))';
-		$data['rut'] = $data[$cedula];
-		unset($data[$cedula]);
+		$data['rut'] = $data[CONCAT_RUT_DV_USUARIO];
+		unset($data[CONCAT_RUT_DV_USUARIO]);
 		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
 			$rutdv = explode('-', $data['rut']);
 			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
@@ -712,7 +744,7 @@ class UsuarioExt extends Usuario {
 			}
 		}
 		$values = array();
-		foreach($permisos as $permiso){
+		foreach ($permisos as $permiso) {
 			$values[] = "({$this->fields['id_usuario']}, '$permiso')";
 		}
 		$query = 'INSERT IGNORE INTO usuario_permiso (id_usuario, codigo_permiso) VALUES ' . implode(', ', $values);
@@ -743,4 +775,5 @@ class UsuarioExt extends Usuario {
 		$this->loaded = !empty($this->fields['id_usuario']);
 		return parent::Write();
 	}
+
 }
