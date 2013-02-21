@@ -1954,6 +1954,65 @@ if (!$popup) {
 																				jQuery('#full_filtros').toggle();
 																			});
 
+																			jQuery('#fullfiltrostoggle').click(function() {
+
+																				jQuery('[id="check_clientes"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="clientesF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_profesionales"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="usuariosF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_encargados"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="encargados[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_area_profesional"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_cat_prof"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_area_asunto"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="areas_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_tipo_asunto"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="tipos_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_estado_cobro"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="estado_cobro[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_moneda_contrato"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="moneda_contrato[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+
+
+																			});
 
 																			jQuery('#comparar').on('click',function() {
 																				if(jQuery('#comparar').is(':checked')) {
