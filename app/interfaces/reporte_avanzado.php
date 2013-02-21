@@ -1954,6 +1954,7 @@ if (!$popup) {
 																				jQuery('#full_filtros').toggle();
 																			});
 
+																			/*Validaciones al presional filtros*/
 																			jQuery('#fullfiltrostoggle').click(function() {
 
 																				jQuery('[id="check_clientes"] option').each(function(index, option) {
@@ -2010,9 +2011,51 @@ if (!$popup) {
 																			    jQuery('[id="moneda_contrato[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
-
-
 																			});
+
+																			/*LIMPIAR FILTROS SEGUN SU CHECKBOX*/
+																			jQuery('#check_clientes').click(function() {
+																				jQuery('[id="clientesF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_profesionales').click(function() {
+																				jQuery('[id="usuariosF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_encargados').click(function() {
+																				jQuery('[id="encargados[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_area_profesional').click(function() {
+																				jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_area_asunto').click(function() {
+																				jQuery('[id="areas_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_tipo_asunto').click(function() {
+																				jQuery('[id="tipos_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_estado_cobro').click(function() {
+																				jQuery('[id="estado_cobro[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_moneda_contrato').click(function() {
+																				jQuery('[id="moneda_contrato[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			
+																			/* FIN LIMPIAR FILTROS SEGUN SU CHECKBOX*/
 
 																			jQuery('#comparar').on('click',function() {
 																				if(jQuery('#comparar').is(':checked')) {
