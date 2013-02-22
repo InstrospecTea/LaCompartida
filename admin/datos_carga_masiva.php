@@ -43,6 +43,9 @@ if (empty($data)) {
 	#data tbody tr:nth-child(odd){
 		background-color: #eee;
 	}
+	#data select{
+		max-width: 100px;
+	}
 	.warning{
 		background-color: #ffc !important;
 	}
@@ -65,7 +68,7 @@ if (empty($data)) {
 					<?php foreach ($fila as $c => $col) { ?>
 						<td>
 							<input name="<?php echo "data[$idx][$c]"; ?>" value="<?php echo $col; ?>"/>
-							<span class="extra"></span>
+							<div class="extra"/>
 						</td>
 					<?php } ?>
 				</tr>
@@ -266,7 +269,7 @@ if (empty($data)) {
 			if (info.requerido && limpiar(input.val()) === '') {
 				input.addClass('error').attr('title', 'Este campo es obligatorio');
 			}
-			else if (campo === llave) {
+			else if (campo === llave) { //todo: unicidad de campos no-llave (y uniques multiples)
 				validarUnicidad(input.closest('td'));
 			}
 			else if (info.relacion) {
@@ -295,13 +298,11 @@ if (empty($data)) {
 						sel.append(jQuery('<option/>', {value: id, text: valor}));
 					});
 					sel.change(cambioRelacion);
-					extras.append(jQuery('<br/>'));
 					extras.append(sel);
 				}
 				else if (info.tipo === 'bool') {
 					//agregar checkbox
 					var check = jQuery('<input/>', {type: 'checkbox'}).change(cambioCheck);
-					extras.append(jQuery('<br/>'));
 					extras.append(check);
 				}
 			}
@@ -310,6 +311,7 @@ if (empty($data)) {
 		}).change();
 
 		jQuery('form').submit(function() {
+			var msg = '';
 			var repetidos = [];
 			var faltan = [];
 			var campos = jQuery('[name^=campos]');
@@ -324,7 +326,6 @@ if (empty($data)) {
 					faltan.push(info.titulo);
 				}
 			});
-			var msg = '';
 			if (repetidos.length) {
 				msg += '\nLas siguientes columnas están repetidas: ' + repetidos.join(', ');
 			}
@@ -342,7 +343,6 @@ if (empty($data)) {
 				alert(msg);
 				return false;
 			}
-
 
 			var warnings = jQuery('.warning');
 			if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {

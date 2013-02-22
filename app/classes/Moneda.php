@@ -8,6 +8,8 @@ require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 class Moneda extends Objeto {
 
+	public static $llave_carga_masiva = 'codigo';
+
 	function Moneda($sesion, $fields = "", $params = "") {
 		$this->tabla = "prm_moneda";
 		$this->campo_id = "id_moneda";

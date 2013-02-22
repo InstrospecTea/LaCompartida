@@ -8,6 +8,73 @@ require_once Conf::ServerDir() . '/classes/Contrato.php';
 
 class Cliente extends Objeto {
 
+	public static $llave_carga_masiva = 'glosa_cliente';
+	public static $campos_carga_masiva = array(
+		'glosa_cliente' => 'Nombre Cliente',
+		'id_grupo_cliente' => array(
+			'titulo' => 'Grupo',
+			'relacion' => 'GrupoCliente',
+			'creable' => true
+		),
+		'codigo_cliente_secundario' => 'Código Secundario',
+		'cedula' => 'Rut/CNI',
+		'rsocial' => 'Razón social',
+		'dir_calle' => 'Dirección',
+		'factura_ciudad' => 'Ciudad',
+		'factura_comuna' => 'Comuna',
+		'giro' => 'Giro del Cliente',
+		'nombre_contacto' => 'Nombre Contacto',
+		'fono_contacto' => 'Teléfono Contacto',
+		'mail_contacto' => array(
+			'titulo' => 'Email Contacto',
+			'tipo' => 'email'
+		),
+		'activo' => array(
+			'titulo' => 'Está Activo (SI/NO)',
+			'tipo' => 'bool',
+			'defval' => true
+		),
+		'id_cliente_referencia' => array(
+			'titulo' => 'Cliente Referencia',
+			'relacion' => 'ClienteReferencia',
+			'creable' => true
+		),
+		'forma_cobro' => array(
+			'titulo' => 'Forma de Cobro',
+			'tipo' => array('TASA', 'FLAT FEE', 'RETAINER', 'PROPORCIONAL', 'HITOS')
+		),
+		'id_tarifa' => array(
+			'titulo' => 'Tarifa',
+			'relacion' => 'Tarifa',
+			'creable' => true
+		),
+		'id_moneda' => array(
+			'titulo' => 'Moneda Tarifa',
+			'relacion' => 'Moneda'
+		),
+		'monto' => 'Monto Fijo',
+		'id_moneda_monto' => array(
+			'titulo' => 'Moneda Monto Fijo',
+			'relacion' => 'Moneda'
+		),
+		'retainer_horas' => 'Horas Retainer',
+		'opc_moneda_gastos' => array(
+			'titulo' => 'Moneda Gastos',
+			'relacion' => 'Moneda'
+		),
+		'opc_moneda_total' => array(
+			'titulo' => 'Moneda Liquidación',
+			'relacion' => 'Moneda'
+		),
+		'id_cuenta' => array(
+			'titulo' => 'Cuenta Bancaria',
+			'relacion' => 'CuentaBanco'
+		),
+		'id_usuario_encargado' => array(
+			'titulo' => 'Usuario Encargado',
+			'relacion' => 'UsuarioExt'
+		),
+	);
 	public static $configuracion_reporte = array(
 		array(
 			'field' => 'codigo_cliente',
