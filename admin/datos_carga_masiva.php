@@ -10,7 +10,7 @@ $pagina->PrintTop();
 $CargaMasiva = new CargaMasiva($sesion);
 
 if (isset($data) && isset($campos)) {
-	$CargaMasiva->CargarData($data, $clase, $campos);
+	$errores = $CargaMasiva->CargarData($data, $clase, $campos);
 }
 
 $listados = $CargaMasiva->ObtenerListados($clase);
@@ -61,7 +61,7 @@ if (empty($data)) {
 		</thead>
 		<tbody>
 			<?php foreach ($data as $idx => $fila) { ?>
-				<tr>
+				<tr <?php echo isset($errores[$idx]) ? 'class="error" title="' . $errores[$idx] . '"' : ''; ?>>
 					<?php foreach ($fila as $c => $col) { ?>
 						<td>
 							<input name="<?php echo "data[$idx][$c]"; ?>" value="<?php echo $col; ?>"/>
@@ -94,7 +94,18 @@ if (empty($data)) {
 	}
 
 	function limpiar(s) {
-		return s.replace(/\s/g, '').toUpperCase();
+		s = s.replace(/\s/g, '').toUpperCase();
+		var acentos = {
+			'Á|À|Ä': 'A',
+			'É|È|Ë': 'E',
+			'Í|Ì|Ï': 'I',
+			'Ó|Ò|Ö': 'O',
+			'Ú|Ù|Ü': 'U'
+		};
+		jQuery.each(acentos, function(acento, limpio) {
+			s = s.replace(new RegExp(acento, 'g'), limpio);
+		});
+		return s;
 	}
 
 	//valida que el valor ingresado este dentro de las opciones existentes
@@ -154,6 +165,7 @@ if (empty($data)) {
 		var idx = td.index();
 		var input = td.find('[name^=data]').removeAttr('title');
 		var val = limpiar(input.val());
+		var tr = td.closest('tr');
 
 		validarRepetidos(idx);
 
@@ -167,12 +179,17 @@ if (empty($data)) {
 		if (existe) {
 			//ya existe en los datos anteriores: se esta editando
 			input.addClass('warning').val(existe);
-			td.closest('tr').addClass('warning')
-					.attr('title', campos_clase[llave].titulo + ' debe ser único, pero ya existe el valor ' + existe + ' entre los datos actuales. Se editará el dato existente con los valores ingresados');
+			tr.addClass('warning');
+			if (!tr.hasClass('error')) {
+				tr.attr('title', campos_clase[llave].titulo + ' debe ser único, pero ya existe el valor ' + existe + ' entre los datos actuales. Se editará el dato existente con los valores ingresados');
+			}
 		}
 		else {
 			input.removeClass('warning');
-			td.closest('tr').removeClass('warning').removeAttr('title');
+			tr.removeClass('warning');
+			if (!tr.hasClass('error')) {
+				tr.removeAttr('title');
+			}
 		}
 	}
 
@@ -255,7 +272,17 @@ if (empty($data)) {
 				errores.focus();
 				return false;
 			}
+
+			var warnings = jQuery('.warning');
+			if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {
+				warnings.focus();
+				return false;
+			}
 			return true;
+		});
+		
+		jQuery('tr.error :input').one('change', function(){
+			jQuery(this).closest('tr').removeClass('error').removeAttr('title');
 		});
 	});
 

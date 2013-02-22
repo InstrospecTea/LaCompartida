@@ -735,13 +735,10 @@ class UsuarioExt extends Usuario {
 
 	public function PostCrearDato() {
 		$permisos = array('ALL', 'PRO');
-		if (isset($this->extra_fields['admin'])) {
-			$admin = trim($this->extra_fields['admin']);
-			if (!empty($admin) && $admin[0] != 'N') {
-				$permisos = array(
-					'ADM', 'ALL', 'COB', 'DAT', 'REP', 'REV', 'TAR', 'SOC', 'OFI', 'PRO'
-				);
-			}
+		if (isset($this->extra_fields['admin']) && !empty($this->extra_fields['admin'])) {
+			$permisos = array(
+				'ADM', 'ALL', 'COB', 'DAT', 'REP', 'REV', 'TAR', 'SOC', 'OFI', 'PRO'
+			);
 		}
 		$values = array();
 		foreach ($permisos as $permiso) {

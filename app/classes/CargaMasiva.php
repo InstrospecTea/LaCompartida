@@ -177,6 +177,10 @@ class CargaMasiva extends Objeto {
 					if (in_array($fila[$campo], array('', 'NULL')) && isset($info['defval'])) {
 						$fila[$campo] = $info['defval'];
 					}
+
+					if ($info['tipo'] == 'bool') {
+						$fila[$campo] = strtoupper($fila[$campo][0]) != 'N' && $fila[$campo] != '0' ? 1 : 0;
+					}
 				}
 
 				//si ya existia una entrada con esta llave unica, seteo el id para q se edite

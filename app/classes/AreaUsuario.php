@@ -11,6 +11,7 @@ class AreaUsuario extends Objeto {
 		$this->campo_id = 'id';
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->guardar_fecha = false;
 	}
 
 }

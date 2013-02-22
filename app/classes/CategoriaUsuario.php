@@ -11,6 +11,7 @@ class CategoriaUsuario extends Objeto {
 		$this->campo_id = 'id_categoria_usuario';
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->guardar_fecha = false;
 	}
 
 }
