@@ -2030,10 +2030,16 @@ if (!$popup) {
 																			    });
 																			});
 																			jQuery('#check_area_profesional').click(function() {
+																				jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_cat_prof').click(function() {
 																				jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			});
+
 																			jQuery('#check_area_asunto').click(function() {
 																				jQuery('[id="areas_asunto[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
