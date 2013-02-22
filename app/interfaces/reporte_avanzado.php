@@ -1954,6 +1954,12 @@ if (!$popup) {
 																				jQuery('#full_filtros').toggle();
 																			});
 
+																			jQuery('#runreporte').click(function(){
+																				if (!jQuery('#filtrosimple').is(':visible')) {
+																				    jQuery('#filtrosimple :input').val('');
+																				}
+																			});					
+
 																			/*Validaciones al presional filtros*/
 																			jQuery('#fullfiltrostoggle').click(function() {
 
