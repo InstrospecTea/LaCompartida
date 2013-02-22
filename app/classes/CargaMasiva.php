@@ -33,6 +33,9 @@ class CargaMasiva extends Objeto {
 			if ($campo == $llave) {
 				$info['requerido'] = true;
 			}
+			if (is_array($info['tipo'])) {
+				$info['relacion'] = $campo;
+			}
 			$campos[$campo] = $info;
 		}
 		return $campos;
@@ -68,9 +71,11 @@ class CargaMasiva extends Objeto {
 	public function ObtenerListados($clase, $invertir = false) {
 		$llaves = array();
 		$llaves[$clase] = $this->ObtenerListado($clase, $invertir);
-		foreach ($this->ObtenerCampos($clase) as $campo) {
-			if (isset($campo['relacion'])) {
-				$llaves[$campo['relacion']] = $this->ObtenerListado($campo['relacion'], $invertir);
+		foreach ($this->ObtenerCampos($clase) as $campo => $info) {
+			if (is_array($info['tipo'])) {
+				$llaves[$campo] = array_combine($info['tipo'], $info['tipo']);
+			} else if (isset($info['relacion'])) {
+				$llaves[$info['relacion']] = $this->ObtenerListado($info['relacion'], $invertir);
 			}
 		}
 		return $llaves;

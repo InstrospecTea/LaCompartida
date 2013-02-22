@@ -10,14 +10,21 @@ class UsuarioExt extends Usuario {
 
 	public static $llave_carga_masiva = CONCAT_RUT_DV_USUARIO;
 	public static $campos_carga_masiva = array(
-		CONCAT_RUT_DV_USUARIO => 'RUT',
-		'nombre' => 'Nombre',
-		'apellido1' => 'Apellido Paterno',
+		CONCAT_RUT_DV_USUARIO => 'RUT', //todo: agregar tipo "rut" para validar? (solo si esta configurado como rut)
+		'nombre' => array(
+			'titulo' => 'Nombre',
+			'requerido' => true
+		),
+		'apellido1' => array(
+			'titulo' => 'Apellido Paterno',
+			'requerido' => true
+		),
 		'apellido2' => 'Apellido Materno',
 		'username' => 'Código',
 		'email' => array(
 			'titulo' => 'Email',
-			'requerido' => true
+			'requerido' => true,
+			'tipo' => 'email'
 		),
 		'telefono1' => 'Teléfono 1',
 		'telefono2' => 'Teléfono 2',

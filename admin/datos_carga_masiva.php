@@ -83,16 +83,35 @@ if (empty($data)) {
 	var listados = <?php echo json_encode(UtilesApp::utf8izar($listados)); ?>;
 	var campos_clase = <?php echo json_encode(UtilesApp::utf8izar($campos_clase)); ?>;
 
+	/** 
+	 * actualizar el valor del input al cambiar un selector de relacion
+	 */
 	function cambioRelacion() {
-		jQuery(this).closest('td').find('[name^=data]')
-				.val(jQuery(this).find(':selected').text()).change();
+		var input = jQuery(this).closest('td').find('[name^=data]');
+		var val_input = limpiar(input.val());
+		var idx = jQuery(this).closest('td').index();
+		var iguales = jQuery('[name^=data][name$="[' + idx + ']"]').filter(function() {
+			return limpiar(jQuery(this).val()) === val_input;
+		});
+		if (iguales.length > 1 && confirm('Cambiar todos los datos de esta columna que tienen el valor ' + input.val() + '?')) {
+			input = iguales;
+		}
+		input.val(jQuery(this).find(':selected').text()).change();
 	}
 
+	/**
+	 * actualizar el input al (des)checkear un checkbox
+	 */
 	function cambioCheck() {
 		jQuery(this).closest('td').find('[name^=data]')
 				.val(jQuery(this).is(':checked') ? 'SI' : 'NO');
 	}
 
+	/**
+	 * eliminar espacios, minusculas y acentos para comparar
+	 * @param {string} s
+	 * @returns {string}
+	 */
 	function limpiar(s) {
 		s = s.replace(/\s/g, '').toUpperCase();
 		var acentos = {
@@ -108,7 +127,10 @@ if (empty($data)) {
 		return s;
 	}
 
-	//valida que el valor ingresado este dentro de las opciones existentes
+	/**
+	 * valida que el valor ingresado este dentro de las opciones existentes
+	 * @param {jQuery} td
+	 */
 	function validarRelacion(td) {
 		var input = td.find('[name^=data]');
 		var val = limpiar(input.val());
@@ -120,9 +142,7 @@ if (empty($data)) {
 		if (op.length) {
 			//todo ok: actualizo el selector y corrijo el valor del input para hacerlo identico al original
 			op.closest('select').val(op.val());
-			input.val(op.text()).removeAttr('title');
-			input.removeClass('warning');
-			input.removeClass('error');
+			input.val(op.text());
 		}
 		else {
 			//fail: no existe el dato, si es creable solo es warning, si no es un error
@@ -143,7 +163,10 @@ if (empty($data)) {
 		}
 	}
 
-	//valida que no haya valores repetidos en una columna
+	/**
+	 * valida que no haya valores repetidos en una columna
+	 * @param {int} idx
+	 */
 	function validarRepetidos(idx) {
 		var inputs = jQuery('[name^=data][name$="[' + idx + ']"]');
 		inputs.filter('.error').removeClass('error').removeAttr('title');
@@ -161,6 +184,10 @@ if (empty($data)) {
 		repetidos.addClass('error').attr('title', 'Este valor debe ser único, pero está repetido en esta carga');
 	}
 
+	/**
+	 * valida que no se repitan las lalves unicas
+	 * @param {jQuery} td
+	 */
 	function validarUnicidad(td) {
 		var idx = td.index();
 		var input = td.find('[name^=data]').removeAttr('title');
@@ -185,7 +212,6 @@ if (empty($data)) {
 			}
 		}
 		else {
-			input.removeClass('warning');
 			tr.removeClass('warning');
 			if (!tr.hasClass('error')) {
 				tr.removeAttr('title');
@@ -193,6 +219,11 @@ if (empty($data)) {
 		}
 	}
 
+	/**
+	 * actualiza el checkeado de un checkbox cuando se cambia el input
+	 * @param {jQuery} input
+	 * @param {bool} defval
+	 */
 	function actualizarCheckbox(input, defval) {
 		var val = limpiar(input.val());
 		var checked = defval;
@@ -206,6 +237,16 @@ if (empty($data)) {
 		}
 		else {
 			check.removeAttr('checked');
+		}
+	}
+
+	/**
+	 * valida que el email sea un email
+	 * @param {jQuery} input
+	 */
+	function validarEmail(input) {
+		if (!input.val().match(/^\s*[\w\.-]+@[\w\.-]+\.\w+\s*$/)) {
+			input.addClass('error').attr('title', 'Ingrese un mail válido');
 		}
 	}
 
@@ -234,6 +275,9 @@ if (empty($data)) {
 			else if (info.tipo === 'bool') {
 				actualizarCheckbox(input, info.defval);
 			}
+			else if (info.tipo === 'email') {
+				validarEmail(input);
+			}
 		});
 
 		jQuery('[name^=campos]').change(function() {
@@ -251,13 +295,13 @@ if (empty($data)) {
 						sel.append(jQuery('<option/>', {value: id, text: valor}));
 					});
 					sel.change(cambioRelacion);
+					extras.append(jQuery('<br/>'));
 					extras.append(sel);
 				}
 				else if (info.tipo === 'bool') {
 					//agregar checkbox
 					var check = jQuery('<input/>', {type: 'checkbox'}).change(cambioCheck);
-					var br = jQuery('<br/>');
-					extras.append(br);
+					extras.append(jQuery('<br/>'));
 					extras.append(check);
 				}
 			}
@@ -266,12 +310,39 @@ if (empty($data)) {
 		}).change();
 
 		jQuery('form').submit(function() {
+			var repetidos = [];
+			var faltan = [];
+			var campos = jQuery('[name^=campos]');
+			jQuery.each(campos_clase, function(campo, info) {
+				var num = campos.filter(function() {
+					return jQuery(this).val() === campo;
+				}).length;
+				if (num > 1) {
+					repetidos.push(info.titulo);
+				}
+				else if (!num && info.requerido) {
+					faltan.push(info.titulo);
+				}
+			});
+			var msg = '';
+			if (repetidos.length) {
+				msg += '\nLas siguientes columnas están repetidas: ' + repetidos.join(', ');
+			}
+			if (faltan.length) {
+				msg += '\nLas siguientes columnas no están pero son obligatorias: ' + faltan.join(', ');
+			}
+
 			var errores = jQuery('.error');
 			if (errores.length) {
-				alert('Hay errores!');
+				msg += '\nHay errores en los datos!';
 				errores.focus();
+			}
+
+			if (msg) {
+				alert(msg);
 				return false;
 			}
+
 
 			var warnings = jQuery('.warning');
 			if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {
@@ -280,8 +351,8 @@ if (empty($data)) {
 			}
 			return true;
 		});
-		
-		jQuery('tr.error :input').one('change', function(){
+
+		jQuery('tr.error :input').one('change', function() {
 			jQuery(this).closest('tr').removeClass('error').removeAttr('title');
 		});
 	});
