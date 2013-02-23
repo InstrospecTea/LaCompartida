@@ -1,8 +1,4 @@
 <?php
-
-
-
-
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
 $_LANG['Fecha'] = "Fecha";
@@ -839,17 +835,17 @@ $_LANG['%cuenta_mb%'] = "";
 $_LANG['%detalle_mb_ny%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, por los servicios legales prestados a ustedes %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%. Agradeceremos efectuar el pago mediante transferencia bancaria a la siguiente cuenta:";
 $_LANG['%detalle_mb_ny_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, por los servicios legales prestados a ustedes %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios%%detalle_cuenta_gastos%. Agradeceremos efectuar el pago mediante transferencia bancaria a la siguiente cuenta:";
 $_LANG['%cuenta_mb_ny%'] = "<table width='100%'>
-															<tr><td width='35%'>Banco Intermediario:</td><td width='65%'>HSBC Bank USA NA</td></tr>
-															<tr><td width='35%'>Dirección:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
-															<tr><td width='35%'>Swift Banco Intermediario:</td><td width='65%'>MRMDUS33</td></tr>
-															<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
-															<tr><td width='35%'>Cuenta Banco Intermediario:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
-															<tr><td width='35%'>Beneficiario:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
-															<tr><td width='35%'>Banco Beneficiario:</td><td width='65%'>HSBC Bank Chile</td></tr>
-															<tr><td width='35%'>Dirección:</td><td width='65%'>Av. Andrés Bello 2711, piso 9, Las Condes, Santiago</td></tr>
-															<tr><td width='35%'>Swift Banco Beneficiario:</td><td width='65%'>BLICCLRM</td></tr>
-															<tr><td width='35%'>Cuenta beneficiario:</td><td width='65%'>000-020552-060</td></tr>
-														</table>";
+								<tr><td width='35%'>Banco Intermediario:</td><td width='65%'>HSBC Bank USA NA</td></tr>
+								<tr><td width='35%'>Dirección:</td><td width='65%'>452 Fifth Avenue, New York, NY 10018</td></tr>
+								<tr><td width='35%'>Swift Banco Intermediario:</td><td width='65%'>MRMDUS33</td></tr>
+								<tr><td width='35%'>ABA:</td><td width='65%'>021 001 088</td></tr>
+								<tr><td width='35%'>Cuenta Banco Intermediario:</td><td width='65%'>000056634 HSBC Bank Chile</td></tr>
+								<tr><td width='35%'>Beneficiario:</td><td width='65%'>Morales & Besa Ltda.</td></tr>
+								<tr><td width='35%'>Banco Beneficiario:</td><td width='65%'>HSBC Bank Chile</td></tr>
+								<tr><td width='35%'>Dirección:</td><td width='65%'>Isidora Goyenechea 2800, piso 23, Las Condes, Santiago</td></tr>
+								<tr><td width='35%'>Swift Banco Beneficiario:</td><td width='65%'>BLICCLRM</td></tr>
+								<tr><td width='35%'>Cuenta beneficiario:</td><td width='65%'>000-020552-060</td></tr>
+							</table>";
 #Carta MB Chile con Boleta Adjunta (Boleta)
 $_LANG['%detalle_mb_boleta%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%.";
 $_LANG['%detalle_mb_boleta_asuntos%'] = "La presente es nuestra cuenta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios legales prestados %fecha%. Esta cantidad corresponde a %detalle_cuenta_honorarios% %boleta_honorarios%%boleta_gastos%.";
