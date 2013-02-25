@@ -437,7 +437,7 @@ function Refrescar()
 		else if(Conf::TipoIngresoHoras()=='selector')
 		{
 			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $t->fields['duracion_defecto'] : $duracion, 14);
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $tramite->fields['duracion_defecto'] : $duracion, 14);
 		}
 	}
 	else
