@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 /**
  * clase base para la carga masiva de datos via excel
  *
- * @author Javier
+ * @author Javier, inspirado en el usuarios_clipboard de Felipe y el migrador de Marcos
  */
 class CargaMasiva extends Objeto {
 
@@ -211,7 +211,7 @@ class CargaMasiva extends Objeto {
 		$instancia = $this->ObtenerInstancia($clase);
 		$instancia->fields = array();
 		$instancia->changes = array();
-
+		
 		if (method_exists($instancia, 'PreCrearDato')) {
 			$data = $instancia->PreCrearDato($data);
 		}

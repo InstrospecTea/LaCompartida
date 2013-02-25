@@ -244,11 +244,11 @@ if (empty($data)) {
 	}
 
 	/**
-	 * valida que el email sea un email
+	 * valida que el email sea un email (o vacio)
 	 * @param {jQuery} input
 	 */
 	function validarEmail(input) {
-		if (!input.val().match(/^\s*[\w\.-]+@[\w\.-]+\.\w+\s*$/)) {
+		if (input.val() && !input.val().match(/^\s*[\w\.-]+@[\w\.-]+\.\w+\s*$/)) {
 			input.addClass('error').attr('title', 'Ingrese un mail válido');
 		}
 	}

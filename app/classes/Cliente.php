@@ -17,7 +17,7 @@ class Cliente extends Objeto {
 			'creable' => true
 		),
 		'codigo_cliente_secundario' => 'Código Secundario',
-		'cedula' => 'Rut/CNI',
+		'rut' => 'Rut/CNI',
 		'rsocial' => 'Razón social',
 		'dir_calle' => 'Dirección',
 		'factura_ciudad' => 'Ciudad',
@@ -48,6 +48,7 @@ class Cliente extends Objeto {
 			'relacion' => 'Tarifa',
 			'creable' => true
 		),
+		'monto_tarifa_flat' => 'Monto Tarifa Flat',
 		'id_moneda' => array(
 			'titulo' => 'Moneda Tarifa',
 			'relacion' => 'Moneda'
@@ -687,6 +688,79 @@ class Cliente extends Objeto {
 
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Planilla_Clientes'));
+	}
+
+	public function PreCrearDato($data) {
+		if(isset($data['id_cliente'])) {
+			$this->Load($data['id_cliente']);
+		} else {
+			$data['codigo_cliente'] = $this->AsignarCodigoCliente();
+		}
+
+		if (!empty($data['monto_tarifa_flat'])) {
+			$Tarifa = new Tarifa($this->sesion);
+			$data['id_tarifa'] = $Tarifa->GuardaTarifaFlat($data['monto_tarifa_flat'], $data['id_moneda']);
+			unset($data['monto_tarifa_flat']);
+		}
+
+		//no intento guardar los campos que son de la tabla contrato
+		$campos_contrato = array('id_moneda_monto', 'id_tarifa', 'factura_ciudad', 'factura_comuna', 'id_cuenta',
+			'forma_cobro', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total');
+		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
+
+		//copio algunos datos de la tabla cliente a su equivalente en contrato
+		$datos_clon = array(
+			'id_moneda_tramite' => 'id_moneda',
+			'id_moneda_monto' => 'id_moneda',
+			'opc_moneda_total' => 'id_moneda',
+			'opc_moneda_gastos' => 'id_moneda',
+			'id_usuario_responsable' => 'id_usuario_encargado',
+			'factura_razon_social' => 'rsocial',
+			'factura_giro' => 'giro',
+			'factura_direccion' => 'dir_calle',
+			'factura_telefono' => 'fono_contacto',
+			'email_contacto' => 'mail_contacto',
+			'contacto' => 'nombre_contacto',
+			'direccion_contacto' => 'dir_calle'
+		);
+		foreach ($datos_clon as $nombre_contrato => $nombre_cliente) {
+			if (isset($data[$nombre_cliente]) &&
+				(!isset($data[$nombre_contrato]) || empty($data[$nombre_contrato]) || $data[$nombre_contrato] == 'NULL')) {
+				$data[$nombre_contrato] = $data[$nombre_cliente];
+			}
+		}
+		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
+		$this->extra_fields['rut'] = $data['rut'];
+
+		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
+			$rutdv = explode('-', $data['rut']);
+			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
+			$data['dv'] = trim($rutdv[1]);
+		}
+
+		return $data;
+	}
+
+	public function PostCrearDato() {
+		$Contrato = new Contrato($this->sesion);
+		$id_contrato = $this->fields['id_contrato'];
+		if (!empty($id_contrato)) {
+			$Contrato->Load($id_contrato);
+		}
+
+		$Contrato->editable_fields = array_keys($this->extra_fields);
+		$Contrato->Fill($this->extra_fields, true);
+		$Contrato->Edit('codigo_cliente', $this->fields['codigo_cliente']);
+		if ($Contrato->Write()) {
+			if (!$id_contrato) {
+				$this->Edit('id_contrato', $Contrato->fields['id_contrato']);
+				if (!$this->Write()) {
+					throw new Exception('No se pudo asociar el contrato al cliente');
+				}
+			}
+		} else {
+			throw new Exception('No se pudo guardar el contrato asociado al cliente');
+		}
 	}
 
 }

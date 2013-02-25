@@ -58,6 +58,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/admin/phpminiadmin.php"/>MySQL</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/error_log.php"/>Error Log</a>';
 		 		echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
+		 		echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
 
 		echo ' <br><br> Este software corre sobre la DB '. Conf::dbHost() .' <b>'. Conf::dbName().'</b> version '.$dato[0] ;
