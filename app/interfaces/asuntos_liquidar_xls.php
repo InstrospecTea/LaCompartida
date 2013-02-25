@@ -65,12 +65,16 @@ if ($fecha_fin)
 	$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') <= DATE_FORMAT('$fecha_fin','%Y-%m-%d') ";
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	$codigo_asunto .= "";
 	$codigo_asunto_secundario .= ",cl.codigo_cliente_secundario";
+	$codigo_cliente .= "";
 	$codigo_cliente_secundario .= ",a.codigo_asunto_secundario";
 	$sel_cod_asunto_sec .=",codigo_asunto_secundario";
 	$sel_cod_cli_sec .=",codigo_cliente_secundario";
 } else {
+	$codigo_asunto .= ",codigo_asunto";
 	$codigo_asunto_secundario .= "";
+	$codigo_cliente .= ",codigo_cliente";
 	$codigo_cliente_secundario .= "";
 	$sel_cod_asunto_sec .="";
 	$sel_cod_cli_sec .="";
@@ -83,11 +87,11 @@ $query_asuntos_liquidar = "
 							SELECT
 								idcontrato 
 								,glosa_cliente
-								,codigo_cliente
+								$codigo_cliente
 								$sel_cod_cli_sec
 								,listado_asuntos
 								,listado_codigo_asuntos
-								,codigo_asunto
+								$codigo_asunto
 								$sel_cod_asunto_sec
 								,carta_honorarios
 								,abogado
