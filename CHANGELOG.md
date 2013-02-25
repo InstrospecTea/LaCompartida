@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.7
+Viernes 22 de febrero 2013.
+* **Fixed** [Ocultar botón "Copiar datos de Cliente"](https://github.com/LemontechSA/ttb/pull/92)
+
 ## Hotfix: 13.1.6
 Viernes 22 de febrero 2013.
 * **Fixed** [Correccion filtros en reporte avanzado](https://github.com/LemontechSA/ttb/pull/91)

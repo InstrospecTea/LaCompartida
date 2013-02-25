@@ -973,6 +973,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					 $('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;'+codigo_cliente_secundario+'-';
 				}
 
+<?php /*
 	function CopiarDatosCliente(form)
 	{
 		if(!form)
@@ -985,6 +986,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			return true;
 		}
 	}
+*/ ?>
 </script>
 <!--onKeyUp="highlight(event)" onClick="highlight(event)"-->
 <form name=formulario id=formulario method=post>
@@ -1210,7 +1212,10 @@ if ($permisos_asuntos->fields['permitido']) {
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
-							<input type="button" name='copiar_datos' id='copiar_datos' onclick="CopiarDatosCliente(this.form)" value='Copiar datos de Cliente'>&nbsp;&nbsp;
+							<?php
+							// <input type="button" name='copiar_datos' id='copiar_datos' onclick="CopiarDatosCliente(this.form)" value='Copiar datos de Cliente'>
+							?>
+							&nbsp;
 						</td>
 					</tr>
 				</table>
