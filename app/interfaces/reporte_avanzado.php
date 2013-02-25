@@ -401,7 +401,7 @@ if (!$popup) {
 					if(selector_siguiente.options[j].text == selector.options[selector.selectedIndex].text)
 					{
 						selector_siguiente.options[j]=null;
-						CambiarAgrupador(i);	
+						CambiarAgrupador(i);
 					}
 				}
 				//y se dispone lo viejo, SOLO si no resultó elegido en uno anterior
@@ -425,7 +425,7 @@ if (!$popup) {
 			valor = selector.value;
 			txt = selector.options[selector.selectedIndex].text;
 			opc = new Option(txt,valor);
-			selector_previo.options[0] = opc;	
+			selector_previo.options[0] = opc;
 
 			ActualizarNuevoReporte();
 		}
@@ -435,7 +435,7 @@ if (!$popup) {
 		}
 		function ResizeIframe(width, height)
 		{
-			currentfr = document.getElementById('planilla'); 
+			currentfr = document.getElementById('planilla');
 			currentfr.height = height+'px'; // currentfr.Document.body.scrollHeight;
 			currentfr.width = width+'px'; // currentfr.Document.body.scrollHeight;
 
@@ -495,7 +495,7 @@ if (!$popup) {
 			//var dispersion = document.getElementById('dispersion');
 			var td_dato_comparado = document.getElementById('td_dato_comparado');
 			var td_dato = document.getElementById('td_dato');
-		
+
 
 			//Si el valor comparado es igual al principal, debo cambiarlo:
 			if(tipo_de_dato_comparado.selectedIndex == tipo_de_dato.selectedIndex)
@@ -508,27 +508,27 @@ if (!$popup) {
 
 			if (jQuery('#comparar').is(':checked'))
 			{
-			 
+
 				jQuery('#dispersion ,#tipo_dato_comparado, #td_dato_comparado, #vs, #tipo_tinta').show();
-			 
+
 				jQuery('#td_dato').removeClass('borde_blanco').addClass('borde_rojo');
 				jQuery('#td_dato_comparado').addClass('borde_azul');
 				jQuery('#'+jQuery('#tipo_dato_comparado').val()).addClass('boton_comparar');
-				
+
 			} 	else	{
-			 
-			 
-		 
+
+
+
 				jQuery('#dispersion, #tipo_dato_comparado, #vs, #tipo_tinta').hide();
-				 
+
 				jQuery('#td_dato').removeClass('borde_rojo').addClass('borde_blanco');
 				jQuery('#td_dato_comparado').removeClass('borde_azul');
 				jQuery('#'+jQuery('#tipo_dato_comparado').val()).removeClass('boton_comparar');
 			}
-			
-		 	
+
+
 			RevisarTabla();
-	
+
 			RevisarMoneda();
 			RevisarCircular();
 			ActualizarNuevoReporte();
@@ -562,13 +562,13 @@ if (!$popup) {
 			var comparar = $('comparar');
 
 			if(
-					tipo_de_dato.value in
-					{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
-						||
-						(comparar.checked && tipo_de_dato_comparado.value in
-					{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
-				)
-			) {
+			tipo_de_dato.value in
+			{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
+				||
+				(comparar.checked && tipo_de_dato_comparado.value in
+			{'costo':'', 'costo_hh':'', 'valor_pagado':'','valor_cobrado':'','valor_por_cobrar':'','valor_por_pagar':'','valor_incobrable':'','valor_hora':'','diferencia_valor_estandar':'','valor_trabajado_estandar':''}
+		)
+		) {
 				Monedas(true);
 			} else {
 				Monedas(false);
@@ -614,8 +614,8 @@ if (!$popup) {
 		function SelectValueSet(SelectName, Value)
 		{
 			SelectObject = $(SelectName);
-			for(index = 0; 
-			index < SelectObject.length; 
+			for(index = 0;
+			index < SelectObject.length;
 			index++) {
 				if(SelectObject[index].value == Value)
 					SelectObject.selectedIndex = index;
@@ -626,387 +626,392 @@ if (!$popup) {
 		{
 			switch(s)
 			{
-	<?php foreach ($tipos_de_dato as $td)
-		echo "case '" . $td . "': return '" . __($td) . "'; " ?>
-	<?php foreach ($agrupadores as $td)
-		echo "case '" . $td . "': return '" . __($td) . "'; " ?>
+				<?php foreach ($tipos_de_dato as $td)
+					echo "case '" . $td . "': return '" . __($td) . "'; "
+					?>
+				<?php foreach ($agrupadores as $td)
+					echo "case '" . $td . "': return '" . __($td) . "'; "
+					?>
 					default: return s;
-					}
-				}
+			}
+		}
 
-				/*Carga lo elegido en el deglose del nuevo reporte*/
-				function ActualizarNuevoReporte()
+		/*Carga lo elegido en el deglose del nuevo reporte*/
+		function ActualizarNuevoReporte()
+		{
+			var s = Traductor($('tipo_dato').value);
+			if($('comparar').checked == true)
+				s += ' vs. '+Traductor($('tipo_dato_comparado').value);
+
+
+			$('tipos_datos_nuevo_reporte').innerHTML = s;
+
+			s = '';
+			var numero_agrupadores = parseInt($('numero_agrupadores').value);
+			for(i = 0; i < numero_agrupadores; i++)
+			{
+				if(i != 0 && i != 3)
+					s += ' - ';
+				s += Traductor($('agrupador_'+i).value);
+				if(i==2)
+					s += '<br />';
+			}
+			$('agrupadores_nuevo_reporte').innerHTML = s;
+
+			s = "<i>Puede seleccionar 'Semana pasada',<br /> 'Mes pasado' o 'Año en curso'.</i>";
+			var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
+
+			if(fecha_corta == 'semanal')
+				s = "<?php echo __('Semana pasada') ?>";
+
+			if(fecha_corta == 'mensual')
+				s = "<?php echo __('Mes pasado') ?>";
+
+			if(fecha_corta == 'anual')
+				s = "<?php echo __('Año en curso') ?>";
+
+			$('periodo_nuevo_reporte').innerHTML = s;
+
+			var campo_fecha =  document.formulario.campo_fecha;
+			if(campo_fecha[0].checked)
+				s = '<?php echo __("Trabajo") ?>';
+			else if(campo_fecha[1].checked)
+				s = '<?php echo __("Corte") ?>';
+			else
+				s = '<?php echo __("Emisión") ?>';
+
+			$('segun_nuevo_reporte').innerHTML = s;
+
+		}
+
+		/*Carga los datos del reporte elegido en los selectores*/
+		function CargarReporte()
+		{
+			var reporte = jQuery('#mis_reportes').val();
+			if(reporte == "0")
+			{
+				jQuery('#span_eliminar_reporte, #span_editar_reporte').hide();
+
+				return 0;
+			}
+			jQuery('#span_eliminar_reporte, #span_editar_reporte').show();
+
+			/*Se añade 'envio'*/
+			var separa = reporte.split('*');
+			reporte = separa[0];
+			var envio = separa[1];
+			var segun = separa[2];
+
+			var elementos = reporte.split('.');
+			var datos = elementos[0].split(',');
+			var agrupadores = elementos[1].split(',');
+
+			SelectValueSet('tipo_dato',datos[0]);
+			if(datos.size() == 2)
+			{
+				SelectValueSet('tipo_dato_comparado',datos[1]);
+				$('comparar').checked = true;
+			}
+			else
+				$('comparar').checked = false;
+			Comparar();
+
+			Agrupadores( agrupadores.size() - parseInt($('numero_agrupadores').value));
+
+			for(i = 0; i < agrupadores.size(); i++)
+			{
+				SelectValueSet('agrupador_'+i,agrupadores[i]);
+				CambiarAgrupador(i);
+			}
+
+			if(segun == 'trabajo')
+			{
+
+				jQuery('#campo_fecha_trabajo').click();
+			}
+			else if(segun == 'cobro')
+			{
+				jQuery('#campo_fecha_cobro').click();
+
+			}
+			else
+			{
+
+				jQuery('#campo_fecha_emision').click();
+			}
+
+			if(elementos.size()==3)
+			{
+				var periodo = elementos[2];
+				if(periodo=='semanal')
 				{
-					var s = Traductor($('tipo_dato').value);
-					if($('comparar').checked == true)
-						s += ' vs. '+Traductor($('tipo_dato_comparado').value);
-		
-
-					$('tipos_datos_nuevo_reporte').innerHTML = s;
-
-					s = '';
-					var numero_agrupadores = parseInt($('numero_agrupadores').value);
-					for(i = 0; i < numero_agrupadores; i++)
-					{
-						if(i != 0 && i != 3)
-							s += ' - ';
-						s += Traductor($('agrupador_'+i).value);
-						if(i==2)
-							s += '<br />';
-					}
-					$('agrupadores_nuevo_reporte').innerHTML = s;
-		
-					s = "<i>Puede seleccionar 'Semana pasada',<br /> 'Mes pasado' o 'Año en curso'.</i>";
-					var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
-
-					if(fecha_corta == 'semanal')
-						s = "<?php echo __('Semana pasada') ?>";
-		
-					if(fecha_corta == 'mensual')
-						s = "<?php echo __('Mes pasado') ?>";
-
-					if(fecha_corta == 'anual')
-						s = "<?php echo __('Año en curso') ?>";
-
-					$('periodo_nuevo_reporte').innerHTML = s;
-
-					var campo_fecha =  document.formulario.campo_fecha;
-					if(campo_fecha[0].checked)
-						s = '<?php echo __("Trabajo") ?>';
-					else if(campo_fecha[1].checked)
-						s = '<?php echo __("Corte") ?>';
-					else
-						s = '<?php echo __("Emisión") ?>';
-
-					$('segun_nuevo_reporte').innerHTML = s;
-
+					jQuery('#fecha_corta_semana').click();
 				}
-
-				/*Carga los datos del reporte elegido en los selectores*/
-				function CargarReporte()
+				else if(periodo=='mensual')
 				{
-					var reporte = jQuery('#mis_reportes').val();
-					if(reporte == "0")
-					{
-						jQuery('#span_eliminar_reporte, #span_editar_reporte').hide();
-			
-						return 0;
-					}
-					jQuery('#span_eliminar_reporte, #span_editar_reporte').show(); 
-
-					/*Se añade 'envio'*/
-					var separa = reporte.split('*');
-					reporte = separa[0];
-					var envio = separa[1];
-					var segun = separa[2];
-
-					var elementos = reporte.split('.');
-					var datos = elementos[0].split(',');
-					var agrupadores = elementos[1].split(',');
-
-					SelectValueSet('tipo_dato',datos[0]);
-					if(datos.size() == 2)
-					{
-						SelectValueSet('tipo_dato_comparado',datos[1]);
-						$('comparar').checked = true;
-					}
-					else
-						$('comparar').checked = false;		
-					Comparar();
-		
-					Agrupadores( agrupadores.size() - parseInt($('numero_agrupadores').value));
-		
-					for(i = 0; i < agrupadores.size(); i++)
-					{
-						SelectValueSet('agrupador_'+i,agrupadores[i]);
-						CambiarAgrupador(i);
-					}
-
-					if(segun == 'trabajo')
-					{
-			 
-						jQuery('#campo_fecha_trabajo').click();
-					}
-					else if(segun == 'cobro')
-					{
-						jQuery('#campo_fecha_cobro').click();
-			 
-					}
-					else
-					{
-		 
-						jQuery('#campo_fecha_emision').click();
-					}
-
-					if(elementos.size()==3)
-					{
-						var periodo = elementos[2];
-						if(periodo=='semanal')
-						{
-							jQuery('#fecha_corta_semana').click();
-						}
-						else if(periodo=='mensual')
-						{
-							jQuery('#fecha_corta_mes').click();
-						}
-						else if(periodo=='anual')
-						{
-							jQuery('#fecha_corta_anual').click();
-						}
-					}	
-					jQuery('#eliminado_reporte').val(reporte);
+					jQuery('#fecha_corta_mes').click();
 				}
-				/*Submitea la form para que genere un reporte segun lo elegido.*/
-				function GenerarReporte()
+				else if(periodo=='anual')
 				{
-					var s = $('tipo_dato').value;
-					if($('comparar').checked == true)
-						s += ','+$('tipo_dato_comparado').value;
-					s += '.';
-					var numero_agrupadores = parseInt($('numero_agrupadores').value);
-					for(i = 0; i < numero_agrupadores; i++)
-					{
-						if(i != 0)
-							s += ',';
-						s += $('agrupador_'+i).value;
-					}
-		
-					var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
-		
-					if(fecha_corta == 'semanal' || fecha_corta == 'mensual' || fecha_corta == 'anual')
-						s += '.'+fecha_corta;
-
-					var reporte_envio = 0;
-					if(fecha_corta == 'semanal')
-						reporte_envio = $('select_reporte_envio_semana').value;
-					if(fecha_corta == 'mensual')
-						reporte_envio = $('select_reporte_envio_mes').value;
-					if(fecha_corta == 'anual')
-						reporte_envio = $('select_reporte_envio_mes').value;
-
-					$('nuevo_reporte_envio').value = reporte_envio;
-		
-					var campo_fecha =  document.formulario.campo_fecha;
-					if(campo_fecha[0].checked)
-						$('nuevo_reporte_segun').value = 'trabajo';
-					else if(campo_fecha[1].checked)
-						$('nuevo_reporte_segun').value = 'cobro';
-					else
-						$('nuevo_reporte_segun').value = 'emision';
-
-					$('nuevo_reporte').value = s;
-					$('formulario').opc.value = 'nuevo_reporte';
-
-
-					$('formulario').submit();	
+					jQuery('#fecha_corta_anual').click();
 				}
+			}
+			jQuery('#eliminado_reporte').val(reporte);
+		}
+		/*Submitea la form para que genere un reporte segun lo elegido.*/
+		function GenerarReporte()
+		{
+			var s = $('tipo_dato').value;
+			if($('comparar').checked == true)
+				s += ','+$('tipo_dato_comparado').value;
+			s += '.';
+			var numero_agrupadores = parseInt($('numero_agrupadores').value);
+			for(i = 0; i < numero_agrupadores; i++)
+			{
+				if(i != 0)
+					s += ',';
+				s += $('agrupador_'+i).value;
+			}
 
-				function EliminarReporte()
-				{
-					$('formulario').opc.value = 'eliminar_reporte';
-					$('formulario').submit();	
-				}
+			var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
 
-				function NuevoReporte()
-				{
-					$('div_nuevo_reporte').show();
-					$('label_nuevo_reporte').show();
-					$('label_editar_reporte').hide();
-					$('nombre_reporte').value='';
-					$('id_reporte_editado').value = 0;
-					ActualizarNuevoReporte();
-				}
+			if(fecha_corta == 'semanal' || fecha_corta == 'mensual' || fecha_corta == 'anual')
+				s += '.'+fecha_corta;
 
-				function EditarReporte()
-				{
-					var mis_reportes = $('mis_reportes');
-					var texto = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].innerHTML : undefined;
-					var id_reporte = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-id_reporte") : 0;
+			var reporte_envio = 0;
+			if(fecha_corta == 'semanal')
+				reporte_envio = $('select_reporte_envio_semana').value;
+			if(fecha_corta == 'mensual')
+				reporte_envio = $('select_reporte_envio_mes').value;
+			if(fecha_corta == 'anual')
+				reporte_envio = $('select_reporte_envio_mes').value;
 
-					var envio_reporte = mis_reportes.selectedIndex >= 0 ? 
-						mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-envio_reporte") : 0;
+			$('nuevo_reporte_envio').value = reporte_envio;
 
-					texto = texto.split('&nbsp;');
-					$('nombre_reporte').value = texto[2];
-					$('id_reporte_editado').value = id_reporte;
+			var campo_fecha =  document.formulario.campo_fecha;
+			if(campo_fecha[0].checked)
+				$('nuevo_reporte_segun').value = 'trabajo';
+			else if(campo_fecha[1].checked)
+				$('nuevo_reporte_segun').value = 'cobro';
+			else
+				$('nuevo_reporte_segun').value = 'emision';
 
-
-					$('div_nuevo_reporte').show();
-					$('label_nuevo_reporte').hide();
-					$('label_editar_reporte').show();
-					ActualizarNuevoReporte();
-
-					if(envio_reporte)
-					{
-						var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
-						if(fecha_corta == 'semanal')
-							$('select_reporte_envio_semana').selectedIndex = envio_reporte;
-						else 
-							$('select_reporte_envio_mes').selectedIndex=envio_reporte;
-					}
-				}
+			$('nuevo_reporte').value = s;
+			$('formulario').opc.value = 'nuevo_reporte';
 
 
-				function SeleccionarSemana()
-				{
-					ActualizarPeriodo(<?php echo $semana_pasada ?>);
-					$('reporte_envio_semana').show();
-					$('reporte_envio_mes').hide();
-					$('reporte_envio_selector').hide();
-					ActualizarNuevoReporte();
-				}
-				function SeleccionarMes()
-				{
-					ActualizarPeriodo(<?php echo $mes_pasado ?>);
-					$('reporte_envio_mes').show();
-					$('reporte_envio_semana').hide();
-					$('reporte_envio_selector').hide();
-					ActualizarNuevoReporte();
-				}
-				function SeleccionarSelector()
-				{
-		 
-					jQuery( "#fecha_ini, #fecha_fin" ).datepicker( "setDate", '01-'+jQuery('#fecha_mes').val()+'-'+jQuery('#fecha_anio').val() );
-					jQuery( "#fecha_fin" ).datepicker( "setDate",new Date(jQuery('#fecha_anio').val(), jQuery('#fecha_mes').val(), 0) );
-		
-					$('reporte_envio_selector').show();
-					$('reporte_envio_semana').hide();
-					$('reporte_envio_mes').hide();
-					ActualizarNuevoReporte();
-				}
-				function SeleccionarAnual()
-				{
-					ActualizarPeriodo(<?php echo $actual; ?>);
-					$('reporte_envio_selector').hide();
-					$('reporte_envio_semana').hide();
-					$('reporte_envio_mes').show();
-					ActualizarNuevoReporte();
-				}
+			$('formulario').submit();
+		}
+
+		function EliminarReporte()
+		{
+			$('formulario').opc.value = 'eliminar_reporte';
+			$('formulario').submit();
+		}
+
+		function NuevoReporte()
+		{
+			$('div_nuevo_reporte').show();
+			$('label_nuevo_reporte').show();
+			$('label_editar_reporte').hide();
+			$('nombre_reporte').value='';
+			$('id_reporte_editado').value = 0;
+			ActualizarNuevoReporte();
+		}
+
+		function EditarReporte()
+		{
+			var mis_reportes = $('mis_reportes');
+			var texto = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].innerHTML : undefined;
+			var id_reporte = mis_reportes.selectedIndex >= 0 ? mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-id_reporte") : 0;
+
+			var envio_reporte = mis_reportes.selectedIndex >= 0 ?
+				mis_reportes.options[mis_reportes.selectedIndex].getAttribute("data-envio_reporte") : 0;
+
+			texto = texto.split('&nbsp;');
+			$('nombre_reporte').value = texto[2];
+			$('id_reporte_editado').value = id_reporte;
 
 
-				//Hace visible o invisible el input de Moneda.
-				function Monedas(visible)
-				{
-					var div_moneda = $('moneda');
-					var div_anti_moneda = $('anti_moneda');
-					var div_moneda_select = $('moneda_select');
-					var div_anti_moneda_select = $('anti_moneda_select');
+			$('div_nuevo_reporte').show();
+			$('label_nuevo_reporte').hide();
+			$('label_editar_reporte').show();
+			ActualizarNuevoReporte();
 
-					if(visible)
-					{
-						div_moneda.style['display'] = 'inline';
-						div_moneda_select.style['display'] = 'inline';
-						div_anti_moneda.style['display'] = 'none';
-						div_anti_moneda_select.style['display'] = 'none';
-					}
-					else
-					{
-						div_moneda.style['display'] = 'none';
-						div_moneda_select.style['display'] = 'none';
-						div_anti_moneda.style['display'] = 'inline';
-						div_anti_moneda_select.style['display'] = 'inline';
-					}
-				}
+			if(envio_reporte)
+			{
+				var fecha_corta = Form.getInputs('formulario','radio','fecha_corta').find(function(radio) { return radio.checked; }).value;
+				if(fecha_corta == 'semanal')
+					$('select_reporte_envio_semana').selectedIndex = envio_reporte;
+				else
+					$('select_reporte_envio_mes').selectedIndex=envio_reporte;
+			}
+		}
+
+		function SeleccionarSemana()
+		{
+			ActualizarPeriodo(<?php echo $semana_pasada ?>);
+			$('reporte_envio_semana').show();
+			$('reporte_envio_mes').hide();
+			$('reporte_envio_selector').hide();
+			ActualizarNuevoReporte();
+		}
+
+		function SeleccionarMes()
+		{
+			ActualizarPeriodo(<?php echo $mes_pasado ?>);
+			$('reporte_envio_mes').show();
+			$('reporte_envio_semana').hide();
+			$('reporte_envio_selector').hide();
+			ActualizarNuevoReporte();
+		}
+
+		function SeleccionarSelector()
+		{
+
+			jQuery( "#fecha_ini, #fecha_fin" ).datepicker( "setDate", '01-'+jQuery('#fecha_mes').val()+'-'+jQuery('#fecha_anio').val() );
+			jQuery( "#fecha_fin" ).datepicker( "setDate",new Date(jQuery('#fecha_anio').val(), jQuery('#fecha_mes').val(), 0) );
+
+			$('reporte_envio_selector').show();
+			$('reporte_envio_semana').hide();
+			$('reporte_envio_mes').hide();
+			ActualizarNuevoReporte();
+		}
+
+		function SeleccionarAnual()
+		{
+			ActualizarPeriodo(<?php echo $actual; ?>);
+			$('reporte_envio_selector').hide();
+			$('reporte_envio_semana').hide();
+			$('reporte_envio_mes').show();
+			ActualizarNuevoReporte();
+		}
+
+		//Hace visible o invisible el input de Moneda.
+		function Monedas(visible)
+		{
+			var div_moneda = $('moneda');
+			var div_anti_moneda = $('anti_moneda');
+			var div_moneda_select = $('moneda_select');
+			var div_anti_moneda_select = $('anti_moneda_select');
+
+			if(visible)
+			{
+				div_moneda.style['display'] = 'inline';
+				div_moneda_select.style['display'] = 'inline';
+				div_anti_moneda.style['display'] = 'none';
+				div_anti_moneda_select.style['display'] = 'none';
+			}
+			else
+			{
+				div_moneda.style['display'] = 'none';
+				div_moneda_select.style['display'] = 'none';
+				div_anti_moneda.style['display'] = 'inline';
+				div_anti_moneda_select.style['display'] = 'inline';
+			}
+		}
 
 				//Hace visible o invisible por ID [Para Inputs con + y -]
-				function MostrarOculto(ID)
-				{
-					var table_full = $("full_"+ID);
-					var table_mini = $("mini_"+ID);
-					var check = $(ID+"_check");
-					var img = $(ID+"_img");
+		function MostrarOculto(ID)
+		{
+			var table_full = $("full_"+ID);
+			var table_mini = $("mini_"+ID);
+			var check = $(ID+"_check");
+			var img = $(ID+"_img");
 
-					if(table_full.style['display']!="none")
-					{
-						table_full.style['display'] = "none";
-						table_mini.style['display'] = "";
-						check.checked = false;
-						img.innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'>";
-					}
-					else
-					{
-						table_full.style['display'] = "";
-						table_mini.style['display'] = "none";
-						check.checked = true;
-						img.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
-					}
+			if(table_full.style['display']!="none")
+			{
+				table_full.style['display'] = "none";
+				table_mini.style['display'] = "";
+				check.checked = false;
+				img.innerHTML = "<img src='../templates/default/img/mas.gif' border='0' title='Desplegar'>";
+			}
+			else
+			{
+				table_full.style['display'] = "";
+				table_mini.style['display'] = "none";
+				check.checked = true;
+				img.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
+			}
+		}
+
+		function MostrarLimite(visible)
+		{
+			var limite_check = $('limite_check');
+			var limite_checkbox = $("limite_checkbox");
+			if(visible)
+			{
+				limite_check.style['display'] = 'inline';
+			}
+			else
+			{
+				limite_checkbox.checked = false;
+				limite_check.style['display'] = 'none';
+			}
+		}
+
+		function ActualizarPeriodo(fi,ff)
+		{
+			jQuery('#fecha_ini').val(fi).datepicker( "option", "dateFormat", "dd-mm-yy" );
+			jQuery('#fecha_fin').val(ff).datepicker( "option", "dateFormat", "dd-mm-yy" );
+
+
+		}
+
+		/*Setea el Tipo de Dato, marcando la selección, haciendo visible la moneda y el gráfico circular*/
+		function TipoDato(valor)
+		{
+			var td_col = document.getElementById(valor);
+			var tipo_de_dato = document.getElementById('tipo_dato');
+			var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
+			var comparar = document.getElementById('comparar');
+			var tintas = document.getElementsByName('tinta');
+
+			for(var i=0; i< tintas.length; i++)
+			{
+				if(tintas[i].checked)
+					var tinta = tintas[i].value;
+			}
+
+			if(!comparar.checked || (comparar.checked && tinta=='rojo' && valor!= tipo_de_dato_comparado.value))
+			{
+				td_col.className = 'boton_presionado';
+
+				<?php
+				foreach ($tipos_de_dato as $key => $t_d) {
+					echo " if(valor == '" . $t_d . "' ){ ";
+					echo " tipo_de_dato.selectedIndex = " . $key . "; \n";
+					echo "} else {td_col= document.getElementById('" . $t_d . "'); if(td_col.className=='boton_presionado')td_col.className = 'boton_normal'; }\n";
 				}
-
-				function MostrarLimite(visible)
-				{
-					var limite_check = $('limite_check');
-					var limite_checkbox = $("limite_checkbox");
-					if(visible)
-					{
-						limite_check.style['display'] = 'inline';
+				?>
+			}
+			else if(valor != tipo_de_dato.value)
+			{
+				td_col.className = 'boton_comparar';
+					<?php
+					foreach ($tipos_de_dato as $key => $t_d) {
+						echo " if(valor == '" . $t_d . "' ){ ";
+						echo " tipo_de_dato_comparado.selectedIndex = " . $key . "; \n";
+						echo "} else {td_col= document.getElementById('" . $t_d . "'); if(td_col.className=='boton_comparar') td_col.className = 'boton_normal'; }\n";
 					}
-					else
-					{
-						limite_checkbox.checked = false;
-						limite_check.style['display'] = 'none';
-					}
-				}
-				function ActualizarPeriodo(fi,ff)
-				{
-					jQuery('#fecha_ini').val(fi).datepicker( "option", "dateFormat", "dd-mm-yy" );	
-					jQuery('#fecha_fin').val(ff).datepicker( "option", "dateFormat", "dd-mm-yy" );
-		             
-
-				}
-
-				/*Setea el Tipo de Dato, marcando la selección, haciendo visible la moneda y el gráfico circular*/
-				function TipoDato(valor)
-				{
-					var td_col = document.getElementById(valor);
-					var tipo_de_dato = document.getElementById('tipo_dato');
-					var tipo_de_dato_comparado = document.getElementById('tipo_dato_comparado');
-					var comparar = document.getElementById('comparar');
-					var tintas = document.getElementsByName('tinta');
-
-					for(var i=0; i< tintas.length; i++)
-					{
-						if(tintas[i].checked)
-							var tinta = tintas[i].value;
-					}
-
-					if(!comparar.checked || (comparar.checked && tinta=='rojo' && valor!= tipo_de_dato_comparado.value))
-					{
-						td_col.className = 'boton_presionado';
-
-	<?php
-	foreach ($tipos_de_dato as $key => $t_d) {
-		echo " if(valor == '" . $t_d . "' ){ ";
-		echo " tipo_de_dato.selectedIndex = " . $key . "; \n";
-		echo "} else {td_col= document.getElementById('" . $t_d . "'); if(td_col.className=='boton_presionado')td_col.className = 'boton_normal'; }\n";
+					?>
+			}
+		RevisarMoneda();
+		RevisarCircular();
+		ActualizarNuevoReporte();
 	}
-	?>
-						}
-						else if(valor != tipo_de_dato.value)
-						{
-							td_col.className = 'boton_comparar';
-	<?php
-	foreach ($tipos_de_dato as $key => $t_d) {
-		echo " if(valor == '" . $t_d . "' ){ ";
-		echo " tipo_de_dato_comparado.selectedIndex = " . $key . "; \n";
-		echo "} else {td_col= document.getElementById('" . $t_d . "'); if(td_col.className=='boton_comparar') td_col.className = 'boton_normal'; }\n";
-	}
-	?>
-							}
-							RevisarMoneda();
-							RevisarCircular();
-							ActualizarNuevoReporte();
-						}
 
 	</script>
-	<?php
+<?php
 }
 ?>
+
 <form method=post name=formulario action="" id=formulario autocomplete='off'>
 	<input type=hidden name=opc id=opc value='print'>
 	<input type=hidden name=debug id=debug value='<?php echo $debug ?>'>
-<?php
-if (!$popup) {
-	?>
+	<?php
+	if (!$popup) {
+		?>
 		<!-- Calendario DIV -->
 		<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 			<div class="floating" id="calendar"></div>
@@ -1026,45 +1031,45 @@ if (!$popup) {
 							<div>
 								<select name="mis_reportes_elegido" id='mis_reportes'  >
 									<option value="0"><?php echo __('Seleccione Reporte...') ?></option>
-		<?php
-		$estilo_eliminar_reporte = 'style="visibility:hidden"';
-		if (empty($mis_reportes)) {
-			echo '<option value="0">-- ' . __('No se han agregado reportes') . '. --</option>';
-		} else {
-			$j = 1;
-			foreach ($mis_reportes as $indice_reporte => $mi_reporte) {
-				$elementos = explode('.', $mi_reporte);
-				$mis_datos = explode(',', $elementos[0]);
-				$mis_agrupadores = explode(',', $elementos[1]);
+									<?php
+									$estilo_eliminar_reporte = 'style="visibility:hidden"';
+									if (empty($mis_reportes)) {
+										echo '<option value="0">-- ' . __('No se han agregado reportes') . '. --</option>';
+									} else {
+										$j = 1;
+										foreach ($mis_reportes as $indice_reporte => $mi_reporte) {
+											$elementos = explode('.', $mi_reporte);
+											$mis_datos = explode(',', $elementos[0]);
+											$mis_agrupadores = explode(',', $elementos[1]);
 
-				foreach ($mis_datos as $i => $mi_dato)
-					$mis_datos[$i] = __($mi_dato);
-				foreach ($mis_agrupadores as $i => $mi_agrupador)
-					$mis_agrupadores[$i] = __($mi_agrupador);
+											foreach ($mis_datos as $i => $mi_dato)
+												$mis_datos[$i] = __($mi_dato);
+											foreach ($mis_agrupadores as $i => $mi_agrupador)
+												$mis_agrupadores[$i] = __($mi_agrupador);
 
-				$selected_mi_reporte = '';
-				if ($mi_reporte == $nuevo_reporte || $mis_reportes_elegido == $mi_reporte) {
-					$selected_mi_reporte = 'selected';
-					$estilo_eliminar_reporte = '';
-				}
-				$glosa = $mis_reportes_glosa[$indice_reporte];
-				if (!$glosa)
-					$glosa = implode(' vs. ', $mis_datos) . ' : ' . implode(' - ', $mis_agrupadores);
+											$selected_mi_reporte = '';
+											if ($mi_reporte == $nuevo_reporte || $mis_reportes_elegido == $mi_reporte) {
+												$selected_mi_reporte = 'selected';
+												$estilo_eliminar_reporte = '';
+											}
+											$glosa = $mis_reportes_glosa[$indice_reporte];
+											if (!$glosa)
+												$glosa = implode(' vs. ', $mis_datos) . ' : ' . implode(' - ', $mis_agrupadores);
 
 
-				$mi_reporte_envio = $mis_reportes_envio[$indice_reporte];
-				$mi_reporte_segun = $mis_reportes_segun[$indice_reporte];
-				$mi_reporte_id = $mis_reportes_id[$indice_reporte];
-				//mi_reporte : tipo_dato(s),agrupador(es),periodo
-				//mi_reporte_envio : dia (semana o mes)
-				$string_mi_reporte = $mi_reporte . '*' . $mi_reporte_envio . '*' . $mi_reporte_segun;
+											$mi_reporte_envio = $mis_reportes_envio[$indice_reporte];
+											$mi_reporte_segun = $mis_reportes_segun[$indice_reporte];
+											$mi_reporte_id = $mis_reportes_id[$indice_reporte];
+											//mi_reporte : tipo_dato(s),agrupador(es),periodo
+											//mi_reporte_envio : dia (semana o mes)
+											$string_mi_reporte = $mi_reporte . '*' . $mi_reporte_envio . '*' . $mi_reporte_segun;
 
-				$num = $j < 10 ? '0' . $j : $j;
-				echo '<option ' . $selected_mi_reporte . ' value="' . $string_mi_reporte . '" id="mi_reporte_' . $mi_reporte . '" data-id_reporte="' . $mi_reporte_id . '" data-envio_reporte="' . $mi_reporte_envio . '" >' . $num . ' )&nbsp;&nbsp;' . $glosa . "</option>";
-				$j++;
-			}
-		}
-		?>
+											$num = $j < 10 ? '0' . $j : $j;
+											echo '<option ' . $selected_mi_reporte . ' value="' . $string_mi_reporte . '" id="mi_reporte_' . $mi_reporte . '" data-id_reporte="' . $mi_reporte_id . '" data-envio_reporte="' . $mi_reporte_envio . '" >' . $num . ' )&nbsp;&nbsp;' . $glosa . "</option>";
+											$j++;
+										}
+									}
+									?>
 								</select>
 								<span id="span_editar_reporte" <?php echo $estilo_eliminar_reporte ?> >&nbsp;<a style='color:#009900' href="javascript:void(0)" onclick="EditarReporte();"><?php echo __('Editar') ?></a></span>&nbsp;
 								<span id="span_eliminar_reporte" <?php echo $estilo_eliminar_reporte ?> >&nbsp;<a style='color:#CC1111' href="javascript:void(0)" onclick="EliminarReporte();"><?php echo __('Eliminar') ?></a></span>
@@ -1125,13 +1130,13 @@ if (!$popup) {
 														<span id='reporte_envio_mes' style="<?php echo $fecha_corta == 'mensual' || $fecha_corta == 'anual' ? '' : 'display:none;' ?>">
 															<select name='reporte_envio_mes' id='select_reporte_envio_mes'>
 																<option value='0'><?php echo __('No enviar') ?></option>
-	<?php
-	for ($i = 1; $i <= 30; $i++) {
-		echo "<option value='" . $i . "'>";
-		echo __('día') . " " . str_pad($i, 2, '0', STR_PAD_LEFT);
-		echo " " . __('del mes') . "</option>";
-	}
-	?>
+																<?php
+																for ($i = 1; $i <= 30; $i++) {
+																	echo "<option value='" . $i . "'>";
+																	echo __('día') . " " . str_pad($i, 2, '0', STR_PAD_LEFT);
+																	echo " " . __('del mes') . "</option>";
+																}
+																?>
 															</select>
 														</span>
 														<br>
@@ -1158,7 +1163,7 @@ if (!$popup) {
 					<fieldset width="100%" class="border_plomo tb_base" align="center">
 						<legend id="fullfiltrostoggle" style="cursor:pointer">
 							<span id="filtros_img"><img src= "<?php echo Conf::ImgDir() ?><?php echo $filtros_check ? '/menos.gif' : '/mas.gif' ?>" border="0" ></span>
-																<?php echo __('Filtros') ?>
+							<?php echo __('Filtros') ?>
 						</legend>
 						<input type="checkbox" name="filtros_check" id="filtros_check" value="1" <?php echo $filtros_check ? 'checked' : '' ?> style="display:none;" />
 						<center>
@@ -1167,24 +1172,24 @@ if (!$popup) {
 									<td style="width:470px;"  rowspan="6">
 										<div id="filtrosimple">
 											<div id="profesional" style="float:left;display:inline-block;"><b><?php echo __('Profesional') ?>:</b><br/>
-	<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]", $usuarios, "", "Todos", "200"); ?>	 
+												<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]", $usuarios, "", "Todos", "200"); ?>
 											</div>
 											<div id="cliente" style="float:right;padding-right:10px;display:inline-block;">
 
 												<b><?php echo __('Cliente') ?>:</b><br/>
-	<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]", $clientes, "", "Todos", "200"); ?>
+												<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]", $clientes, "", "Todos", "200"); ?>
 											</div></div>
 
 
 										<!-- SELECTOR FILTROS EXPANDIDO -->
-	<?php
-	$largo_select = 6;
+										<?php
+										$largo_select = 6;
 
-	if (Conf::GetConf($sesion, 'ReportesAvanzados_FiltrosExtra')) {
-		$filtros_extra = true;
-		$largo_select = 11;
-	}
-	?>
+										if (Conf::GetConf($sesion, 'ReportesAvanzados_FiltrosExtra')) {
+											$filtros_extra = true;
+											$largo_select = 11;
+										}
+										?>
 
 										<div id="full_filtros" style="<?php echo $filtros_check ? '' : 'display:none;' ?> ">
 
@@ -1203,7 +1208,7 @@ if (!$popup) {
 															<label for="check_clientes" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'cliente_full' style="<?php echo $check_clientes ? "" : "display:none;" ?>">
-										<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1219,7 +1224,7 @@ if (!$popup) {
 															<label for="check_profesionales" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'prof_full' style="<?php echo $check_profesionales ? "" : "display:none;" ?>">
-	<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1235,23 +1240,23 @@ if (!$popup) {
 															<label for="check_encargados" style="cursor:pointer;" ><hr></label>
 														</div>
 														<div class = 'encargados_full' style="<?php echo $check_encargados ? "" : "display:none;" ?>" >
-	<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
 												<tr valign=top>
 													<td align=right>
-														<input type="checkbox" name="check_area_prof" id="check_area_prof" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_prof ? 'checked' : '' ?> />
-														<label for="check_area_prof">
+														<input type="checkbox" name="check_area_profesional" id="check_area_profesional" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_profesional ? 'checked' : '' ?> />
+														<label for="check_area_profesional">
 															<b><?php echo __('Área Profesional') ?>:&nbsp;&nbsp;</b>
 														</label>
 													</td>
 													<td align=left>
-														<div class = 'area_prof_full' style='width:200px;<?php echo $check_area_prof ? "display:none;" : "" ?>'>
-															<label for="check_area_prof" style="cursor:pointer"><hr></label>
+														<div class = 'area_prof_full' style='width:200px;<?php echo $check_area_profesional ? "display:none;" : "" ?>'>
+															<label for="check_area_profesional" style="cursor:pointer"><hr></label>
 														</div>
-														<div class = 'area_prof_full' style="<?php echo $check_area_prof ? "" : "display:none;" ?>">
-	<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
+														<div class = 'area_prof_full' style="<?php echo $check_area_profesional ? "" : "display:none;" ?>">
+															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "area_profesional[]", $area_profesional, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1267,7 +1272,7 @@ if (!$popup) {
 															<label for="check_cat_prof" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'cat_prof_full' style="<?php echo $check_cat_prof ? "" : "display:none;" ?>">
-	<?php echo Html::SelectQuery($sesion, "SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias_profesional[]", $categorias_profesional, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1283,30 +1288,31 @@ if (!$popup) {
 															<label for="check_area_asunto" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'area_asunto_full' style="<?php echo $check_area_asunto ? "" : "display:none;" ?>" >
-	<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto", "areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto", "areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
-	<?php if ($filtros_extra) { ?>
-													<tr valign=top>
-														<td align=right>
-															<input type="checkbox" name="check_tipo_asunto" id="check_tipo_asunto" value="1" onchange="$$('.tipo_asunto_full').invoke('toggle')" <?php echo $check_tipo_asunto ? 'checked' : '' ?> />
-															<label for="check_tipo_asunto">
-																<b><?php echo __('Tipo de Asunto') ?>:&nbsp;&nbsp;</b>
-															</label>
-														</td>
-														<td align=left>
-															<div class = 'tipo_asunto_full' style='width:200px;<?php echo $check_tipo_asunto ? "display:none;" : "" ?>'>
-																<label for="check_tipo_asunto" style="cursor:pointer;" ><hr></label>
-															</div>
-															<div class = 'tipo_asunto_full' style="<?php echo $check_tipo_asunto ? "" : "display:none;" ?>" >
-		<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto", "tipos_asunto[]", $tipos_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
-															</div>
-														</td>
-													</tr>
 
+													<?php if ($filtros_extra) { ?>
+												<tr valign=top>
+													<td align=right>
+														<input type="checkbox" name="check_tipo_asunto" id="check_tipo_asunto" value="1" onchange="$$('.tipo_asunto_full').invoke('toggle')" <?php echo $check_tipo_asunto ? 'checked' : '' ?> />
+														<label for="check_tipo_asunto">
+															<b><?php echo __('Tipo de Asunto') ?>:&nbsp;&nbsp;</b>
+														</label>
+													</td>
+													<td align=left>
+														<div class = 'tipo_asunto_full' style='width:200px;<?php echo $check_tipo_asunto ? "display:none;" : "" ?>'>
+															<label for="check_tipo_asunto" style="cursor:pointer;" ><hr></label>
+														</div>
+														<div class = 'tipo_asunto_full' style="<?php echo $check_tipo_asunto ? "" : "display:none;" ?>" >
+															<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto", "tipos_asunto[]", $tipos_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+														</div>
+													</td>
+												</tr>
 
-	<?php } ?>
+													<?php } ?>
+
 												<tr valign=top>
 													<td align=right>
 														<input type="checkbox" name="check_estado_cobro" id="check_estado_cobro" value="1" onchange="$$('.estado_cobro_full').invoke('toggle')" <?php echo $check_estado_cobro ? 'checked' : '' ?> />
@@ -1320,10 +1326,10 @@ if (!$popup) {
 														</div>
 														<div class = 'estado_cobro_full' style="<?php echo $check_estado_cobro ? "" : "display:none;" ?>" >
 															<select name='estado_cobro[]' id='estado_cobro[]' class="SelectMultiple" multiple size=8 style="width:200px" />
-	<?php foreach ($estados_cobro as $ec) {
-		?>
-																<option value="<?php echo $ec ?>" <?php if ($estado_cobro) if (in_array($ec, $estado_cobro)) echo "selected"; ?> ><?php echo __($ec) ?></option>
-	<?php } ?>
+															<?php foreach ($estados_cobro as $ec) {
+																?>
+																<option value="<?php echo $ec ?>" <?php if ($estado_cobro) if (in_array($ec, $estado_cobro)) echo "selected";  ?> ><?php echo __($ec) ?></option>
+															<?php } ?>
 															</select>
 														</div>
 													</td>
@@ -1340,7 +1346,7 @@ if (!$popup) {
 															<label for="check_moneda_contrato" style="cursor:pointer;" ><hr></label>
 														</div>
 														<div class = 'moneda_contrato_full' style="<?php echo $check_moneda_contrato ? "" : "display:none;" ?>" >
-	<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda", "moneda_contrato[]", $moneda_contrato, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda", "moneda_contrato[]", $moneda_contrato, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1363,16 +1369,16 @@ if (!$popup) {
 									<label for="fecha_corta_semana"><?php echo __("Semana pasada") ?></label>
 								</td>
 
-	<?php
-	$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
-	$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
-	$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
-	?>
+								<?php
+								$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
+								$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
+								$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
+								?>
 
 								<td align=right>
 									<span title="<?php echo __($explica_periodo_trabajo) ?>">
 										<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
-	<?php if ($campo_fecha == 'trabajo' || $campo_fecha == '') echo 'checked="checked"'; ?>
+											<?php if ($campo_fecha == 'trabajo' || $campo_fecha == '') echo 'checked="checked"'; ?>
 											   onclick ="SincronizarCampoFecha()" />
 									</span>
 								</td>
@@ -1393,10 +1399,11 @@ if (!$popup) {
 
 									<td align=right>
 										<span title="<?php echo __($explica_periodo_cobro) ?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-								<?php if ($campo_fecha == 'cobro')
-									echo 'checked="checked"';
-								?>
-																									 onclick ="SincronizarCampoFecha()" />
+											<?php
+											if ($campo_fecha == 'cobro')
+												echo 'checked="checked"';
+											?>
+																									  onclick ="SincronizarCampoFecha()" />
 										</span>
 									</td>
 									<td align=left>
@@ -1412,10 +1419,11 @@ if (!$popup) {
 									</td>
 									<td align=right>
 										<span title="<?php echo __($explica_periodo_emision) ?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-	<?php if ($campo_fecha == 'emision')
-		echo 'checked="checked"';
-	?>
-																									   onclick ="SincronizarCampoFecha()" />
+											<?php
+											if ($campo_fecha == 'emision')
+												echo 'checked="checked"';
+											?>
+																										onclick ="SincronizarCampoFecha()" />
 										</span>
 									</td>
 									<td align=left>
@@ -1443,9 +1451,9 @@ if (!$popup) {
 												<option value='12' <?php echo $fecha_mes == 12 ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
 											</select>
 											<select name="fecha_anio" id="fecha_anio" style='width:55px'>
-	<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
+												<?php for ($i = (date('Y') - 5); $i < (date('Y') + 5); $i++) { ?>
 													<option value='<?php echo $i ?>' <?php echo $fecha_anio == $i ? 'selected' : '' ?>><?php echo $i ?></option>
-	<?php } ?>
+												<?php } ?>
 											</select></span>
 									</td>
 								</tr>
@@ -1458,7 +1466,7 @@ if (!$popup) {
 										<div id=periodo_rango>
 
 											<input type="text" name="fecha_ini" class="fechadiff" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y", strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
-	<?php echo __('al') ?>
+												<?php echo __('al') ?>
 											<input type="text" name="fecha_fin" class="fechadiff"  value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
 
 										</div>
@@ -1477,7 +1485,7 @@ if (!$popup) {
 					<fieldset align="center" width="90%" class="border_plomo tb_base">
 						<legend onClick="MostrarOculto('tipo_dato')" style="cursor:pointer">
 							<span id="tipo_dato_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
-	<?php echo __('Tipo de Dato') ?>
+								<?php echo __('Tipo de Dato') ?>
 						</legend>
 						<input type="checkbox" name="tipo_dato_check" id="tipo_dato_check" value="1" <?php echo $tipo_dato_check ? 'checked' : '' ?> style="display:none;" />
 						<center>
@@ -1497,20 +1505,20 @@ if (!$popup) {
 									</td>
 									<td>
 										<span id="vs" style='<?php echo $comparar ? '' : 'display: none;' ?>'>
-	<?php echo __(" Vs. ") ?>
+											<?php echo __(" Vs. ") ?>
 										</span>
 									</td>
 									<td id = 'td_dato_comparado' class='borde_azul' style='<?php echo $comparar ? '' : 'display: none;' ?>' >
 
 										<select name='tipo_dato_comparado' id='tipo_dato_comparado' style='width:180px; ' >
-	<?php
-	foreach ($tipos_de_dato as $tipo) {
-		echo "<option value='" . $tipo . "'";
-		if ($tipo_dato_comparado == $tipo)
-			echo "selected";
-		echo "> " . __($tipo) . "</option>";
-	}
-	?>
+											<?php
+											foreach ($tipos_de_dato as $tipo) {
+												echo "<option value='" . $tipo . "'";
+												if ($tipo_dato_comparado == $tipo)
+													echo "selected";
+												echo "> " . __($tipo) . "</option>";
+											}
+											?>
 										</select>
 									</td>
 								</tr>
@@ -1520,35 +1528,35 @@ if (!$popup) {
 						<table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;padding:10px;margin:auto;" border="0" cellpadding="0" cellspacing="0">
 
 							<tr>
-											<?php echo celda('horas_trabajadas') ?>
-											<?php echo borde_abajo(2) ?>
-	<?php echo celda('horas_cobrables') ?>
-	<?php echo borde_abajo(2) ?>
-	<?php echo celda('horas_visibles') ?>
-											<?php echo borde_abajo(2) ?>
-											<?php echo celda('horas_cobradas') ?>
-	<?php echo borde_abajo(2) ?>
-	<?php echo celda('horas_pagadas') ?>
+								<?php echo celda('horas_trabajadas') ?>
+								<?php echo borde_abajo(2) ?>
+								<?php echo celda('horas_cobrables') ?>
+								<?php echo borde_abajo(2) ?>
+								<?php echo celda('horas_visibles') ?>
+								<?php echo borde_abajo(2) ?>
+								<?php echo celda('horas_cobradas') ?>
+								<?php echo borde_abajo(2) ?>
+								<?php echo celda('horas_pagadas') ?>
 							</tr>
 							<tr>
-											<?php echo borde_derecha() ?>
-											<?php echo nada(1) ?>
-											<?php echo borde_derecha() ?>
-											<?php echo nada(1) ?>
-											<?php echo borde_derecha() ?>
-											<?php echo nada(1) ?>
-											<?php echo borde_derecha() ?>
-											<?php echo nada(1) ?>
+								<?php echo borde_derecha() ?>
+								<?php echo nada(1) ?>
+								<?php echo borde_derecha() ?>
+								<?php echo nada(1) ?>
+								<?php echo borde_derecha() ?>
+								<?php echo nada(1) ?>
+								<?php echo borde_derecha() ?>
+								<?php echo nada(1) ?>
 							</tr>
 							<tr>
-	<?php echo nada(9) ?>
+								<?php echo nada(9) ?>
 							</tr>
 							<tr>
-	<?php echo nada() ?>
-	<?php echo borde_abajo() ?>
-	<?php echo celda("horas_no_cobrables") ?>
-	<?php echo borde_abajo() ?>
-	<?php echo celda("horas_castigadas") ?>
+								<?php echo nada() ?>
+								<?php echo borde_abajo() ?>
+								<?php echo celda("horas_no_cobrables") ?>
+								<?php echo borde_abajo() ?>
+								<?php echo celda("horas_castigadas") ?>
 								<?php echo borde_abajo() ?>
 								<?php echo celda("horas_por_cobrar") ?>
 								<?php echo borde_abajo() ?>
@@ -1569,10 +1577,10 @@ if (!$popup) {
 								<?php echo nada(3) ?>
 							</tr>
 							<tr>
-	<?php echo nada(1) ?>
+								<?php echo nada(1) ?>
 							</tr>
 							<tr>
-	<?php echo nada(13) ?>
+								<?php echo nada(13) ?>
 							</tr>
 							<tr>
 								<?php echo celda_disabled('valor_trabajado') ?>
@@ -1583,15 +1591,15 @@ if (!$popup) {
 								<?php echo borde_abajo(2) ?>
 								<?php echo celda('valor_cobrado') ?>
 								<?php echo borde_abajo(2) ?>
-	<?php echo celda('valor_pagado') ?>
+								<?php echo celda('valor_pagado') ?>
 							</tr>
 							<tr>
 								<?php echo borde_derecha() ?>
 								<?php echo nada() ?>
-	<?php echo borde_derecha() ?>
+								<?php echo borde_derecha() ?>
 								<?php echo nada() ?>
 								<?php echo borde_derecha() ?>
-	<?php echo nada() ?>
+								<?php echo nada() ?>
 								<?php echo borde_derecha() ?>
 								<?php echo nada() ?>
 							</tr>
@@ -1600,10 +1608,10 @@ if (!$popup) {
 							</tr>
 							<tr>
 								<?php echo celda('valor_trabajado_estandar') ?>
-	<?php echo borde_abajo() ?>
+								<?php echo borde_abajo() ?>
 								<?php echo celda_disabled("valor_no_cobrable") ?>
 								<?php echo borde_abajo() ?>
-	<?php echo celda_disabled("valor_castigado") ?>
+								<?php echo celda_disabled("valor_castigado") ?>
 								<?php echo borde_abajo() ?>
 								<?php echo celda("valor_por_cobrar") ?>
 								<?php echo borde_abajo() ?>
@@ -1624,10 +1632,10 @@ if (!$popup) {
 								<?php echo nada(3) ?>
 							</tr>
 							<tr>
-	<?php echo nada(1) ?>
+								<?php echo nada(1) ?>
 							</tr>
 							<tr>
-	<?php echo nada(13) ?>
+								<?php echo nada(13) ?>
 							</tr>
 							<tr>
 								<?php echo titulo_proporcionalidad() ?>
@@ -1638,7 +1646,7 @@ if (!$popup) {
 								<?php echo nada(2) ?>
 								<?php echo celda("diferencia_valor_estandar") ?>
 								<?php echo nada(2) ?>
-	<?php echo celda("valor_hora"); ?>
+								<?php echo celda("valor_hora"); ?>
 							</tr>
 							<tr>
 								<?php echo nada(1) ?>
@@ -1652,10 +1660,10 @@ if (!$popup) {
 							<tr>
 								<?php echo select_proporcionalidad() ?>
 								<?php echo nada(2) ?>
-	<?php echo select_moneda() ?>
+								<?php echo select_moneda() ?>
 								<?php echo nada(5) ?>
 
-	<?php echo celda("rentabilidad_base") ?>
+								<?php echo celda("rentabilidad_base") ?>
 								<?php echo nada(2) ?>
 								<?php echo celda("rentabilidad") ?>
 							</tr>
@@ -1668,11 +1676,12 @@ if (!$popup) {
 							<tr>
 								<?php echo nada(12) ?>
 							</tr>
-							<tr>	<?php echo tinta() ?>
-	<?php echo nada(8) ?>
+							<tr>
+								<?php echo tinta() ?>
+								<?php echo nada(8) ?>
 								<?php echo celda("costo") ?>
 								<?php echo nada(2) ?>
-	<?php echo celda("costo_hh") ?>
+								<?php echo celda("costo_hh") ?>
 
 							</tr>
 							<tr>
@@ -1689,13 +1698,14 @@ if (!$popup) {
 						<table style="border: 0px solid black; width:730px" cellpadding="0" cellspacing="4">
 						<!--<tr>
 							<td style="width: 330px; font-size: 11px;" colspan=6>
-								<?php echo __('Agrupar por') ?>:&nbsp;
+							<?php echo __('Agrupar por') ?>:&nbsp;
 								<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)"; id='mas_agrupadores'
 								 style='<?php echo $numero_agrupadores == 6 ? 'display:none;' : '' ?> cursor:pointer;' />
 								<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)"; id='menos_agrupadores'
 								 style=' <?php echo $numero_agrupadores == 1 ? 'display:none;' : '' ?> cursor:pointer;' />
 								<select name="vista" id="vista" onchange="RevisarTabla();">
-								<?php
+							<?php
+							if (is_array($visitas)) {
 								foreach ($vistas as $key => $v) {
 									$s = implode('-', $v);
 									echo '<option value="' . $s . '" ';
@@ -1704,7 +1714,8 @@ if (!$popup) {
 									echo ">" . implode(' - ', $vistas_lang[$key]);
 									echo "</option>\n";
 								}
-								?>
+							}
+							?>
 								</select>
 								<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?php echo $numero_agrupadores ?> />
 								<input type=hidden name=vista id=vista value='' />
@@ -1713,49 +1724,49 @@ if (!$popup) {
 							<tr>
 								<td colspan=6 align=left>
 									<div style="float:left">
-										<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)"; 
+										<img src="<?php echo Conf::ImgDir() ?>/menos.gif" onclick="Agrupadores(-1)";
 											 style='cursor:pointer;' />
-										<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)"; 
+										<img src="<?php echo Conf::ImgDir() ?>/mas.gif" onclick="Agrupadores(1)";
 											 style='cursor:pointer;' />
-	<?php echo __('Agrupar por') ?>:&nbsp;
+										<?php echo __('Agrupar por') ?>:&nbsp;
 										<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?php echo $numero_agrupadores ?> />
 										<input type=hidden name=vista id="vista" value='' />
 									</div>
 									<div style="float:left" id="agrupadores">
-	<?php
-	$ya_elegidos = array();
-	for ($i = 0; $i < 6; $i++) {
-		echo '<span id="span_agrupador_' . $i . '"';
-		if ($i >= $numero_agrupadores)
-			echo ' style="display:none;" ';
-		echo '>';
-		echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador(' . $i . ');"  ';
-		echo '/>';
-		$elegido = false;
-		$valor_previo = '';
-		foreach ($agrupadores as $key => $v) {
-			if (!in_array($v, $ya_elegidos)) {
-				echo '<option value="' . $v . '" ';
-				if (isset($agrupador[$i])) {
-					if ($agrupador[$i] == $v) {
-						echo 'selected';
-						$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_' . $i . '"><option value = "' . $v . '">' . __($v) . '</option></select>';
-						$ya_elegidos[] = $v;
-					}
-				} else if (!$elegido) {
-					echo 'selected';
-					$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_' . $i . '"><option value = "' . $v . '">' . __($v) . '</option></select>';
-					$elegido = true;
-					$ya_elegidos[] = $v;
-				}
-				echo ">" . __($v);
-				echo "</option>";
-			}
-		}
-		echo '</select></span>';
-		echo $valor_previo;
-	}
-	?>
+										<?php
+										$ya_elegidos = array();
+										for ($i = 0; $i < 6; $i++) {
+											echo '<span id="span_agrupador_' . $i . '"';
+											if ($i >= $numero_agrupadores)
+												echo ' style="display:none;" ';
+											echo '>';
+											echo '<select name="agrupador[' . $i . ']" id="agrupador_' . $i . '" style="font-size:10px; margin-top:2px; margin-bottom:2px; margin-left:6px; width:110px;" onchange="CambiarAgrupador(' . $i . ');"  ';
+											echo '/>';
+											$elegido = false;
+											$valor_previo = '';
+											foreach ($agrupadores as $key => $v) {
+												if (!in_array($v, $ya_elegidos)) {
+													echo '<option value="' . $v . '" ';
+													if (isset($agrupador[$i])) {
+														if ($agrupador[$i] == $v) {
+															echo 'selected';
+															$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_' . $i . '"><option value = "' . $v . '">' . __($v) . '</option></select>';
+															$ya_elegidos[] = $v;
+														}
+													} else if (!$elegido) {
+														echo 'selected';
+														$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_' . $i . '"><option value = "' . $v . '">' . __($v) . '</option></select>';
+														$elegido = true;
+														$ya_elegidos[] = $v;
+													}
+													echo ">" . __($v);
+													echo "</option>";
+												}
+											}
+											echo '</select></span>';
+											echo $valor_previo;
+										}
+										?>
 									</div>
 								</td>
 							</tr>
@@ -1785,10 +1796,10 @@ if (!$popup) {
 										<tr>
 											<td>
 												<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
-										<?php
-										if (isset($orden_barras_max2min) || !isset($tipo_dato))
-											echo 'checked="checked"';
-										?>
+														<?php
+														if (isset($orden_barras_max2min) || !isset($tipo_dato))
+															echo 'checked="checked"';
+														?>
 													   title=<?php echo __('Ordenar Gráfico de Barras de Mayor a Menor') ?> onclick="MostrarLimite(this.checked)"/>
 												<label for="orden_barras_max2min"><?php echo __("Gráficar de Mayor a Menor") ?></label>
 											</td>
@@ -1797,7 +1808,7 @@ if (!$popup) {
 													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?php echo $limitar ? 'checked="checked"' : '' ?> />
 													<label for="limite_checkbox"><?php echo __("y mostrar sólo") ?></label> &nbsp;
 													<input type="text" name="limite" value="<?php echo $limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
-	<?php echo __("resultados superiores") ?>
+															<?php echo __("resultados superiores") ?>
 													<span>
 														</td>
 														<td>
@@ -1817,140 +1828,255 @@ if (!$popup) {
 
 
 																	<!-- RESULTADO -->
-	<?php
-}
+																	<?php
+																}
 
-$alto = 800;
-switch ($opc) {
-	case 'print': {
-			$url_iframe = "reporte_avanzado_planilla.php?popup=1";
-			break;
-		}
-	case 'circular': {
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=circular&popup=1";
-			$alto = 540;
-			if ($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-	case 'barra': {
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=barras&popup=1";
-			$alto = 540;
-			if ($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-	case 'dispersion': {
-			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=dispersion&popup=1";
-			$alto = 640;
-			if ($orden_barras_max2min)
-				$url_iframe .= "&orden=max2min";
-			break;
-		}
-}
-$url_iframe .= "&tipo_dato=" . $tipo_dato;
-$url_iframe .= "&vista=" . $vista;
-$url_iframe .= "&id_moneda=" . $id_moneda;
-$url_iframe .= "&prop=" . $proporcionalidad;
+																$alto = 800;
+																switch ($opc) {
+																	case 'print': {
+																			$url_iframe = "reporte_avanzado_planilla.php?popup=1";
+																			break;
+																		}
+																	case 'circular': {
+																			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=circular&popup=1";
+																			$alto = 540;
+																			if ($orden_barras_max2min)
+																				$url_iframe .= "&orden=max2min";
+																			break;
+																		}
+																	case 'barra': {
+																			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=barras&popup=1";
+																			$alto = 540;
+																			if ($orden_barras_max2min)
+																				$url_iframe .= "&orden=max2min";
+																			break;
+																		}
+																	case 'dispersion': {
+																			$url_iframe = "reporte_avanzado_grafico.php?tipo_grafico=dispersion&popup=1";
+																			$alto = 640;
+																			if ($orden_barras_max2min)
+																				$url_iframe .= "&orden=max2min";
+																			break;
+																		}
+																}
+																$url_iframe .= "&tipo_dato=" . $tipo_dato;
+																$url_iframe .= "&vista=" . $vista;
+																$url_iframe .= "&id_moneda=" . $id_moneda;
+																$url_iframe .= "&prop=" . $proporcionalidad;
 
-if ($limitar)
-	$url_iframe .= "&limite=" . $limite;
-if ($agrupar)
-	$url_iframe .= "&agrupar=1";
+																if ($limitar)
+																	$url_iframe .= "&limite=" . $limite;
+																if ($agrupar)
+																	$url_iframe .= "&agrupar=1";
 
-if ($filtros_check) {
-	if ($check_clientes)
-		if (is_array($clientesF))
-			$url_iframe .= "&clientes=" . implode(',', $clientesF);
-	if ($check_profesionales)
-		if (is_array($usuariosF))
-			$url_iframe .= "&usuarios=" . implode(',', $usuariosF);
+																if ($filtros_check) {
+																	if ($check_clientes)
+																		if (is_array($clientesF))
+																			$url_iframe .= "&clientes=" . implode(',', $clientesF);
+																	if ($check_profesionales)
+																		if (is_array($usuariosF))
+																		$url_iframe .= "&usuarios=" . implode(',', $usuariosF);
 
-	if ($check_area_asunto)
-		if (is_array($areas_asunto))
-			$url_iframe .= "&areas_asunto=" . implode(',', $areas_asunto);
-	if ($check_tipo_asunto)
-		if (is_array($tipos_asunto))
-			$url_iframe .= "&tipos_asunto=" . implode(',', $tipos_asunto);
-	if ($check_moneda_contrato)
-		if (is_array($moneda_contrato))
-			$url_iframe .= "&moneda_contrato=" . implode(',', $moneda_contrato);
+																	if ($check_area_asunto)
+																		if (is_array($areas_asunto))
+																			$url_iframe .= "&areas_asunto=" . implode(',', $areas_asunto);
+																	if ($check_tipo_asunto)
+																		if (is_array($tipos_asunto))
+																			$url_iframe .= "&tipos_asunto=" . implode(',', $tipos_asunto);
 
-	if ($check_area_prof)
-		if (is_array($areas))
-			$url_iframe .= "&areas_usuario=" . implode(',', $areas);
-	if ($check_cat_prof)
-		if (is_array($categorias))
-			$url_iframe .= "&categorias_usuario=" . implode(',', $categorias);
+																	if ($check_moneda_contrato)
+																		if (is_array($moneda_contrato))
+																			$url_iframe .= "&moneda_contrato=" . implode(',', $moneda_contrato);
 
-	if ($check_encargados)
-		if (is_array($encargados))
-			$url_iframe .= "&en_com=" . implode(',', $encargados);
+																	if ($check_area_profesional)
+																		if (is_array($area_profesional))
+																			$url_iframe .= "&areas_pro=" . implode(',', $area_profesional);
 
-	if ($check_estado_cobro)
-		if (is_array($estado_cobro))
-			$url_iframe .= "&es_cob=" . implode(',', $estado_cobro);
-}
-else {
-	if (is_array($clientes))
-		$url_iframe .= "&clientes=" . implode(',', $clientes);
-	if (is_array($usuarios))
-		$url_iframe .= "&usuarios=" . implode(',', $usuarios);
-}
+																	if ($check_cat_prof)
+																		if (is_array($categorias_profesional))
+																			$url_iframe .= "&categorias_pro=" . implode(',', $categorias_profesional);
 
-$url_iframe .= "&fecha_ini=" . $fecha_ini;
-$url_iframe .= "&fecha_fin=" . $fecha_fin;
+																	if ($check_encargados)
+																		if (is_array($encargados))
+																			$url_iframe .= "&en_com=" . implode(',', $encargados);
 
-$url_iframe .= "&campo_fecha=" . $campo_fecha;
+																	if ($check_estado_cobro)
+																		if (is_array($estado_cobro))
+																			$url_iframe .= "&es_cob=" . implode(',', $estado_cobro);
+																}
+																else {
+																	if (is_array($clientes))
+																		$url_iframe .= "&clientes=" . implode(',', $clientes);
+																	if (is_array($usuarios))
+																		$url_iframe .= "&usuarios=" . implode(',', $usuarios);
+																}
 
-if ($comparar)
-	$url_iframe .= "&tipo_dato_comparado=" . $tipo_dato_comparado;
-?>
+																$url_iframe .= "&fecha_ini=" . $fecha_ini;
+																$url_iframe .= "&fecha_fin=" . $fecha_fin;
+
+																$url_iframe .= "&campo_fecha=" . $campo_fecha;
+
+																if ($comparar)
+																	$url_iframe .= "&tipo_dato_comparado=" . $tipo_dato_comparado;
+																?>
 																</form>
 
 																<?php
 																if ($opc && $opc != 'nuevo_reporte' && $opc != 'eliminar_reporte') {
 
 																	echo '<div class="resizable" id="iframereporte">
-<div class="divloading">&nbsp;</div>
-		 <iframe  class="resizableframe" onload="iframelista();" name="planilla" id="planilla" src="' . $url_iframe . '" frameborder="0" style="display:none;width:730px;height:' . $alto . ';px;"></iframe>
-</div>';
+																				<div class="divloading">&nbsp;</div>
+																						 <iframe  class="resizableframe" onload="iframelista();" name="planilla" id="planilla" src="' . $url_iframe . '" frameborder="0" style="display:none;width:730px;height:' . $alto . ';px;"></iframe>
+																				</div>';
 																} else {
 																	echo '<div class="resizable"  id="iframereporte">
-
-</div>';
+																				</div>';
 																}
 																?>
 
-																<script> 
+																<script>
 																		RevisarMoneda(); RevisarCircular(); RevisarTabla();
 																		jQuery(document).ready(function(){
-																			 
+
 																			if(jQuery('#comparar').is(':checked')) {
-																				   jQuery('#tabla, #dispersion').css('display','inline-block').show();
-																			   } else {
-																				   jQuery('#tabla, #dispersion').css('display','none').hide();
-																			   }
-																			
+																				jQuery('#tabla, #dispersion').css('display','inline-block').show();
+																			} else {
+																				jQuery('#tabla, #dispersion').css('display','none').hide();
+																			}
+
 																			jQuery('#formulario').on('click','#mis_reportes',function() {
 																				CargarReporte();
-																				 
+
 																			});
-																			
+
 																			jQuery('#fullfiltrostoggle').click(function() {
 																				jQuery('#filtrosimple').toggle();
 																				jQuery('#full_filtros').toggle();
 																			});
-																		
-	
+
+																			jQuery('#runreporte').click(function(){
+																				if (!jQuery('#filtrosimple').is(':visible')) {
+																				    jQuery('#filtrosimple :input').val('');
+																				}
+																			});					
+
+																			/*Validaciones al presional filtros*/
+																			jQuery('#fullfiltrostoggle').click(function() {
+
+																				jQuery('[id="check_clientes"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="clientesF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_profesionales"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="usuariosF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_encargados"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="encargados[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_area_profesional"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_cat_prof"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_area_asunto"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="areas_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_tipo_asunto"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="tipos_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_estado_cobro"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="estado_cobro[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			    jQuery('[id="check_moneda_contrato"] option').each(function(index, option) {
+																			        jQuery(option).attr('checked',false);
+																			    });
+																			    jQuery('[id="moneda_contrato[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+
+																			/*LIMPIAR FILTROS SEGUN SU CHECKBOX*/
+																			jQuery('#check_clientes').click(function() {
+																				jQuery('[id="clientesF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_profesionales').click(function() {
+																				jQuery('[id="usuariosF[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_encargados').click(function() {
+																				jQuery('[id="encargados[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_area_profesional').click(function() {
+																				jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_cat_prof').click(function() {
+																				jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+
+																			jQuery('#check_area_asunto').click(function() {
+																				jQuery('[id="areas_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_tipo_asunto').click(function() {
+																				jQuery('[id="tipos_asunto[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_estado_cobro').click(function() {
+																				jQuery('[id="estado_cobro[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			jQuery('#check_moneda_contrato').click(function() {
+																				jQuery('[id="moneda_contrato[]"] option').each(function(index, option) {
+																			        jQuery(option).attr('selected',false);
+																			    });
+																			});
+																			
+																			/* FIN LIMPIAR FILTROS SEGUN SU CHECKBOX*/
+
 																			jQuery('#comparar').on('click',function() {
 																				if(jQuery('#comparar').is(':checked')) {
-																				   jQuery('#tabla, #dispersion').css('display','inline-block').show();
-																			   } else {
-																				   jQuery('#tabla, #dispersion').css('display','none').hide();
-																			   }
+																					jQuery('#tabla, #dispersion').css('display','inline-block').show();
+																				} else {
+																					jQuery('#tabla, #dispersion').css('display','none').hide();
+																				}
 																			});
-	
+
 																			jQuery('#runreporte').on('click',function(){
 																				if(jQuery('#comparar').is(':checked')) {
 																					jQuery('#tipo_dato_comparado').removeAttr('disabled');
@@ -1964,7 +2090,7 @@ if ($comparar)
 																					vista[i]=jQuery(this).val();
 																				});
 																				jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
-		
+
 																				jQuery('#vista').val(vista.join('-')) ;
 																				jQuery.ajax({
 																					url: "reporte_avanzado_planilla.php?popup=1&vista="+jQuery('#vista').val(),
@@ -1975,10 +2101,8 @@ if ($comparar)
 																				});
 																			});
 																			CargarReporte();
-																		});								
+																		});
 
-																</script> 
-<?php
-$pagina->PrintBottom($popup);
-
-
+																</script>
+																<?php
+																$pagina->PrintBottom($popup);
