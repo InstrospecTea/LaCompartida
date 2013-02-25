@@ -113,7 +113,9 @@ $agrupadores = array(
 	'mes_reporte',
 	'dia_reporte',
 	'mes_emision',
-	'grupo_o_cliente'
+	'grupo_o_cliente',
+	'area_trabajo'
+
 );
 if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
 	$agrupadores[] = 'id_usuario_secundario';
