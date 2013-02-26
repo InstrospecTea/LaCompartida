@@ -19,8 +19,7 @@ class Asunto extends Objeto {
 	public static $llave_carga_masiva = 'codigo_asunto'; //array('codigo_cliente', 'glosa_asunto');
 	public static $campos_carga_masiva = array(
 		'codigo_cliente' => array(
-			'titulo' => 'Nombre Cliente',
-			'requerido' => true, //TODO: si es vacio, ingresarlo para todos los clientes
+			'titulo' => 'Nombre Cliente (vacío para ingresarlo a todos los clientes)',
 			'relacion' => 'Cliente',
 			'unico' => 'cliente_asunto'
 		),
@@ -670,19 +669,27 @@ class Asunto extends Objeto {
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Planilla_Asuntos'));
 	}
-
+	
 	public function PreCrearDato($data) {
+		if(empty($data['codigo_cliente']) || $data['codigo_cliente'] == 'NULL'){
+			return $this->IngresarAsuntoGenerico($data);
+		}
+		
 		if (isset($data['codigo_asunto'])) {
 			$this->LoadByCodigo($data['codigo_asunto']);
 		} else {
-			$query_contrato = "SELECT id_contrato AS id_contrato_cliente FROM cliente WHERE codigo_cliente = '{$data['codigo_cliente']}'";
-			$resp_contrato = $this->sesion->pdodbh->query($query_contrato);
-			$contrato = $resp_contrato->fetchAll(PDO::FETCH_ASSOC);
-			$data += $contrato[0];
+			$asunto = null;
+			if (!isset($data['id_contrato_cliente'])) {
+				$query_contrato = "SELECT id_contrato AS id_contrato_cliente FROM cliente WHERE codigo_cliente = '{$data['codigo_cliente']}'";
+				$resp_contrato = $this->sesion->pdodbh->query($query_contrato);
+				$contrato = $resp_contrato->fetchAll(PDO::FETCH_ASSOC);
+				$data += $contrato[0];
 			
-			$query_asunto = "SELECT id_asunto, codigo_asunto, id_contrato FROM asunto WHERE codigo_cliente = '{$data['codigo_cliente']}' AND glosa_asunto = '{$data['glosa_asunto']}'";
-			$resp_asunto = $this->sesion->pdodbh->query($query_asunto);
-			$asunto = $resp_asunto->fetchAll(PDO::FETCH_ASSOC);
+				$query_asunto = "SELECT id_asunto, codigo_asunto, id_contrato FROM asunto WHERE codigo_cliente = '{$data['codigo_cliente']}' AND glosa_asunto = '{$data['glosa_asunto']}'";
+				$resp_asunto = $this->sesion->pdodbh->query($query_asunto);
+				$asunto = $resp_asunto->fetchAll(PDO::FETCH_ASSOC);
+			}
+			
 			if (!empty($asunto)) {
 				$data += $asunto[0];
 			} else {
@@ -697,7 +704,17 @@ class Asunto extends Objeto {
 				$data['id_tarifa'] = $Tarifa->GuardaTarifaFlat($data['monto_tarifa_flat'], $data['id_moneda']);
 			}
 
-			//copio algunos datos de la tabla cliente a su equivalente en contrato
+			//copio algunos datos a su equivalente en contrato
+			if (empty($data['id_moneda']) || $data['id_moneda'] == 'NULL') {
+				$data['id_moneda'] = 1;
+				$monedas = array('opc_moneda_total', 'id_moneda_monto', 'opc_moneda_gastos', 'id_moneda_tramite');
+				foreach ($monedas as $moneda) {
+					if (!empty($data[$moneda]) && $data[$moneda] != 'NULL') {
+						$data['id_moneda'] = $data[$moneda];
+						break;
+					}
+				}
+			}
 			$datos_clon = array(
 				'id_moneda_tramite' => 'id_moneda',
 				'id_moneda_monto' => 'id_moneda',
@@ -747,6 +764,28 @@ class Asunto extends Objeto {
 			}
 		} else {
 			throw new Exception('No se pudo guardar el contrato asociado al asunto');
+		}
+	}
+
+	private function IngresarAsuntoGenerico($data) {
+		unset($data['codigo_cliente']);
+		
+		$query_clientes = "SELECT codigo_cliente, id_contrato AS id_contrato_cliente FROM cliente";
+		$resp_clientes = $this->sesion->pdodbh->query($query_clientes);
+		$clientes = $resp_clientes->fetchAll(PDO::FETCH_ASSOC);
+
+		foreach ($clientes as $cliente) {
+			$this->fields = array();
+			$this->changes = array();
+			$asunto = $this->PreCrearDato($data + $cliente);
+
+			$this->Fill($asunto, true);
+			if ($this->Write()) {
+				$this->PostCrearDato();
+			} else {
+				throw new Exception("Error al guardar asunto genérico {$data['glosa_asunto']} en cliente {$cliente['codigo_cliente']}" .
+					(empty($this->error) ? '' : ": {$this->error}"));
+			}
 		}
 	}
 

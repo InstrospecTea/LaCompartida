@@ -710,6 +710,16 @@ class Cliente extends Objeto {
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
 
 		//copio algunos datos de la tabla cliente a su equivalente en contrato
+		if (empty($data['id_moneda']) || $data['id_moneda'] == 'NULL') {
+			$data['id_moneda'] = 1;
+			$monedas = array('opc_moneda_total', 'id_moneda_monto', 'opc_moneda_gastos', 'id_moneda_tramite');
+			foreach ($monedas as $moneda) {
+				if (!empty($data[$moneda]) && $data[$moneda] != 'NULL') {
+					$data['id_moneda'] = $data[$moneda];
+					break;
+				}
+			}
+		}
 		$datos_clon = array(
 			'id_moneda_tramite' => 'id_moneda',
 			'id_moneda_monto' => 'id_moneda',

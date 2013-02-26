@@ -106,7 +106,7 @@ class CargaMasiva extends Objeto {
 		$instancia = $this->ObtenerInstancia($clase);
 		$campo_id = $this->CampoId($clase, $instancia);
 		$campo_glosa = $this->LlaveUnica($clase);
-		
+
 		$query = "SELECT $campo_id as id, $campo_glosa as glosa FROM {$instancia->tabla}";
 		$resp = $this->sesion->pdodbh->query($query);
 		$data = $resp->fetchAll();
@@ -232,6 +232,9 @@ class CargaMasiva extends Objeto {
 
 		if (method_exists($instancia, 'PreCrearDato')) {
 			$data = $instancia->PreCrearDato($data);
+			if (empty($data)) {
+				return null;
+			}
 		}
 
 		if (empty($instancia->editable_fields)) {
