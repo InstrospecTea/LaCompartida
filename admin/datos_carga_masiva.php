@@ -261,6 +261,8 @@ if (empty($data)) {
 			var info = campos_clase[campo];
 
 			input.removeClass('error').removeClass('warning').removeAttr('title');
+			//elimina espacios repetidos
+			input.val(input.val().replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''));
 
 			if (!info) {
 				return;
@@ -357,4 +359,6 @@ if (empty($data)) {
 		});
 	});
 
+//TODO: poder agregar/eliminar filas/columnas
+//TODO: considerar campos unicos (y multi-unicos)
 </script>

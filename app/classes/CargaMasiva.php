@@ -51,6 +51,21 @@ class CargaMasiva extends Objeto {
 	}
 
 	/**
+	 * campo que funciona como llave unica de la tabla
+	 * @param string $clase
+	 * @return string
+	 */
+	public function CampoId($clase, $instancia = null) {
+		if (isset($clase::$id_carga_masiva)) {
+			return $clase::$id_carga_masiva;
+		}
+		if (empty($instancia)) {
+			$instancia = $this->ObtenerInstancia($clase);
+		}
+		return $instancia->campo_id;
+	}
+
+	/**
 	 * obtiene una instancia del pseudomodelo
 	 * @param string $clase
 	 * @return Objeto
@@ -89,7 +104,10 @@ class CargaMasiva extends Objeto {
 	 */
 	private function ObtenerListado($clase, $invertir = false) {
 		$instancia = $this->ObtenerInstancia($clase);
-		$query = "SELECT {$instancia->campo_id} as id, {$clase::$llave_carga_masiva} as glosa FROM {$instancia->tabla}";
+		$campo_id = $this->CampoId($clase, $instancia);
+		$campo_glosa = $this->LlaveUnica($clase);
+		
+		$query = "SELECT $campo_id as id, $campo_glosa as glosa FROM {$instancia->tabla}";
 		$resp = $this->sesion->pdodbh->query($query);
 		$data = $resp->fetchAll();
 
@@ -150,7 +168,7 @@ class CargaMasiva extends Objeto {
 		$errores = array();
 		$listados = $this->ObtenerListados($clase, true);
 		$llave = $this->LlaveUnica($clase);
-		$campo_id = $this->ObtenerInstancia($clase)->campo_id;
+		$campo_id = $this->CampoId($clase);
 		$info_campos = $this->ObtenerCampos($clase);
 
 		foreach ($data as $idx => $fila) {
@@ -184,7 +202,7 @@ class CargaMasiva extends Objeto {
 					}
 
 					if ($info['tipo'] == 'bool') {
-						$fila[$campo] = strtoupper($fila[$campo][0]) != 'N' && $fila[$campo] != '0' ? 1 : 0;
+						$fila[$campo] = !empty($fila[$campo]) && strtoupper($fila[$campo][0]) != 'N' ? 1 : 0;
 					}
 				}
 
@@ -211,7 +229,7 @@ class CargaMasiva extends Objeto {
 		$instancia = $this->ObtenerInstancia($clase);
 		$instancia->fields = array();
 		$instancia->changes = array();
-		
+
 		if (method_exists($instancia, 'PreCrearDato')) {
 			$data = $instancia->PreCrearDato($data);
 		}
@@ -225,7 +243,7 @@ class CargaMasiva extends Objeto {
 			if (method_exists($instancia, 'PostCrearDato')) {
 				$instancia->PostCrearDato();
 			}
-			return $instancia->fields[$instancia->campo_id];
+			return $instancia->fields[$this->CampoId($clase, $instancia)];
 		}
 		throw new Exception("Error al guardar $clase" . (empty($instancia->error) ? '' : ": {$instancia->error}"));
 	}

@@ -34,6 +34,7 @@ class UsuarioExt extends Usuario {
 		),
 		'id_categoria_usuario' => array(
 			'titulo' => 'Categoría de Usuario',
+			'requerido' => true,
 			'relacion' => 'CategoriaUsuario',
 			'creable' => true
 		),
@@ -735,6 +736,21 @@ class UsuarioExt extends Usuario {
 		if (isset($data['admin'])) {
 			$this->extra_fields = array('admin' => $data['admin']);
 			unset($data['admin']);
+		}
+
+		$data['nombre'] = ucwords($data['nombre']);
+		$data['apellido1'] = ucwords($data['apellido1']);
+		if (isset($data['apellido2'])) {
+			$data['apellido2'] = ucwords($data['apellido2']);
+		}
+
+		$data['password'] = md5('12345');
+
+		if (empty($data['username'])) {
+			$data['username'] = $data['nombre'][0] . $data['apellido1'][0];
+			if (isset($data['apellido2'])) {
+				$data['username'] .= $data['apellido2'][0];
+			}
 		}
 
 		return $data;

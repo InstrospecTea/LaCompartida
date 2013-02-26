@@ -7,8 +7,9 @@ require_once Conf::ServerDir() . '/classes/Debug.php';
 require_once Conf::ServerDir() . '/classes/Contrato.php';
 
 class Cliente extends Objeto {
-
+	//TODO: carga masiva con hitos (num_hitos -> dividir monto en N hitos)
 	public static $llave_carga_masiva = 'glosa_cliente';
+	public static $id_carga_masiva = 'codigo_cliente';
 	public static $campos_carga_masiva = array(
 		'glosa_cliente' => 'Nombre Cliente',
 		'id_grupo_cliente' => array(
@@ -691,8 +692,8 @@ class Cliente extends Objeto {
 	}
 
 	public function PreCrearDato($data) {
-		if(isset($data['id_cliente'])) {
-			$this->Load($data['id_cliente']);
+		if(isset($data['codigo_cliente'])) {
+			$this->LoadByCodigo($data['codigo_cliente']);
 		} else {
 			$data['codigo_cliente'] = $this->AsignarCodigoCliente();
 		}
@@ -700,8 +701,8 @@ class Cliente extends Objeto {
 		if (!empty($data['monto_tarifa_flat'])) {
 			$Tarifa = new Tarifa($this->sesion);
 			$data['id_tarifa'] = $Tarifa->GuardaTarifaFlat($data['monto_tarifa_flat'], $data['id_moneda']);
-			unset($data['monto_tarifa_flat']);
 		}
+		unset($data['monto_tarifa_flat']);
 
 		//no intento guardar los campos que son de la tabla contrato
 		$campos_contrato = array('id_moneda_monto', 'id_tarifa', 'factura_ciudad', 'factura_comuna', 'id_cuenta',
@@ -742,8 +743,8 @@ class Cliente extends Objeto {
 	}
 
 	public function PostCrearDato() {
-		$Contrato = new Contrato($this->sesion);
 		$id_contrato = $this->fields['id_contrato'];
+		$Contrato = new Contrato($this->sesion);
 		if (!empty($id_contrato)) {
 			$Contrato->Load($id_contrato);
 		}
