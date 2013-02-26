@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.1.8
+Lunes 25 de febrero 2013.
+* **Fixed** [Mustra Duración correctamente](https://github.com/LemontechSA/ttb/pull/95)
+
 ## Hotfix: 13.1.7
 Viernes 22 de febrero 2013.
 * **Fixed** [Ocultar botón "Copiar datos de Cliente"](https://github.com/LemontechSA/ttb/pull/92)
