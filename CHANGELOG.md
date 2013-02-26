@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix: 13.1.8
+Lunes 25 de febrero 2013.
+* **Fixed** [Mustra Duración correctamente](https://github.com/LemontechSA/ttb/pull/95)
+
+## Hotfix: 13.1.7
+Viernes 22 de febrero 2013.
+* **Fixed** [Ocultar botón "Copiar datos de Cliente"](https://github.com/LemontechSA/ttb/pull/92)
+
+## Hotfix: 13.1.6
+Viernes 22 de febrero 2013.
+* **Fixed** [Correccion filtros en reporte avanzado](https://github.com/LemontechSA/ttb/pull/91)
+
 ## Hotfix: 13.1.5
 Miércoles 20 de febrero 2013.
 * **Fixed** [Hotfix/13.1.5](https://github.com/LemontechSA/ttb/pull/90)

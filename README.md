@@ -111,6 +111,7 @@ The Time Billing - Time Tracking
   * Copy server definition file
 
         $ cp config/cap_servers.rb.default config/cap_servers.rb
+        (Es necesario modificar este archivo. Dejar solo el servidor al que se realizará el deployeo)
 
 ###Deploy in local machinne
 
