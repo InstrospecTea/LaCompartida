@@ -49,6 +49,9 @@ if ($archivo_contabilidad) {
 $idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
+global $factura;
+($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_factura_inicio'):false; 
+
 if ($opc == 'buscar' || $opc == 'generar_factura') {
 	if ($exportar_excel) {
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
