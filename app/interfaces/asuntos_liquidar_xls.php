@@ -65,17 +65,17 @@ if ($fecha_fin)
 	$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') <= DATE_FORMAT('$fecha_fin','%Y-%m-%d') ";
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-	$codigo_asunto .= "";
-	$codigo_asunto_secundario .= ",cl.codigo_cliente_secundario";
-	$codigo_cliente .= "";
-	$codigo_cliente_secundario .= ",a.codigo_asunto_secundario";
+	$cod_asunto .= "";
+	$cod_asunto_secundario .= ",cl.codigo_cliente_secundario";
+	$cod_cliente .= "";
+	$cod_cliente_secundario .= ",a.codigo_asunto_secundario";
 	$sel_cod_asunto_sec .=",codigo_asunto_secundario";
 	$sel_cod_cli_sec .=",codigo_cliente_secundario";
 } else {
-	$codigo_asunto .= ",codigo_asunto";
-	$codigo_asunto_secundario .= "";
-	$codigo_cliente .= ",codigo_cliente";
-	$codigo_cliente_secundario .= "";
+	$cod_asunto .= ",codigo_asunto";
+	$cod_asunto_secundario .= "";
+	$cod_cliente .= ",codigo_cliente";
+	$cod_cliente_secundario .= "";
 	$sel_cod_asunto_sec .="";
 	$sel_cod_cli_sec .="";
 }
@@ -87,11 +87,11 @@ $query_asuntos_liquidar = "
 							SELECT
 								idcontrato 
 								,glosa_cliente
-								$codigo_cliente
+								$cod_cliente
 								$sel_cod_cli_sec
 								,listado_asuntos
 								,listado_codigo_asuntos
-								$codigo_asunto
+								$cod_asunto
 								$sel_cod_asunto_sec
 								,carta_honorarios
 								,abogado
@@ -117,8 +117,8 @@ $query_asuntos_liquidar = "
 								,mo.id_moneda as idmoneda
 								,a.codigo_asunto
 
-								$codigo_asunto_secundario
-								$codigo_cliente_secundario
+								$cod_asunto_secundario
+								$cod_cliente_secundario
 								
 								,(SELECT id_cobro FROM cobro WHERE cobro.id_contrato = co.id_contrato AND cobro.estado NOT IN ('CREADO','REVISION') ORDER BY fecha_fin DESC LIMIT 1 ) AS ultimo_id_cobro
 								FROM asunto a
@@ -131,6 +131,8 @@ $query_asuntos_liquidar = "
 							)zz
 							LEFT JOIN cobro ON cobro.id_cobro = ultimo_id_cobro
 							GROUP BY idcontrato, ultimo_id_cobro";
+
+//echo $query_asuntos_liquidar; exit;
 
 $lista_suntos_liquidar = new ListaAsuntos($sesion, "", $query_asuntos_liquidar);
 if ($lista_suntos_liquidar->num == 0)
