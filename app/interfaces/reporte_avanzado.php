@@ -113,13 +113,17 @@ $agrupadores = array(
 	'mes_reporte',
 	'dia_reporte',
 	'mes_emision',
-	'grupo_o_cliente',
-	'area_trabajo'
-
+	'grupo_o_cliente'
 );
+
+if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) {
+	$agrupadores[] = 'area_trabajo';
+}
+
 if (Conf::GetConf($sesion, 'EncargadoSecundario')) {
 	$agrupadores[] = 'id_usuario_secundario';
 }
+
 if ($debug == 1) {
 	$agrupadores[] = 'id_trabajo';
 	$agrupadores[] = 'dia_corte';
