@@ -63,6 +63,8 @@ if (empty($data)) {
 	}
 </style>
 <form method="POST" action="datos_carga_masiva.php">
+	<button id="btn_columna">Agregar Columna</button>
+	<button id="btn_fila">Agregar Fila</button>
 	<table id="data">
 		<thead>
 			<tr>
@@ -508,74 +510,127 @@ if (empty($data)) {
 	function serializar(selector) {
 		var data = {};
 		var elem = jQuery(selector);
-		var inputs = elem.is(':input') ? elem : elem.find(':input');
+		var inputs = elem.is(':input[name]') ? elem.filter(':input[name]') : elem.find(':input[name]');
 		inputs.each(function() {
 			data[jQuery(this).attr('name')] = jQuery(this).val();
 		});
 		return jQuery.param(data);
 	}
 
+	function agregarColumna() {
+		var idx = jQuery('#data thead th').length;
+		var sel_campo = jQuery('#data thead select:first').clone()
+				.attr('name', 'campos[' + idx + ']').val('').change(cambioCampo);
+		
+		jQuery('#data thead tr').append(
+				jQuery('<th/>').append(sel_campo)
+				);
+					
+		jQuery('#data tbody tr').each(function() {
+			agregarData(jQuery(this), idx);
+		});
+		
+		sel_campo.change();
+		
+		return false;
+	}
+
+	function agregarData(tr, col_idx) {
+		var tr_idx = tr.index();
+		tr.append(
+			jQuery('<td/>').append(
+				jQuery('<input/>', {
+					id: 'data_' + tr_idx + '_' + col_idx,
+					name: 'data[' + tr_idx + '][' + col_idx + ']',
+					class: 'col_' + col_idx
+				}).change(cambioData).focus(focusData)
+			).append(
+				jQuery('<div/>', {class: 'extra'})
+			)
+		);
+	}
+
+	function agregarFila() {
+		var tr = jQuery('<tr/>').appendTo(jQuery('#data tbody'));
+		
+		var cols = jQuery('#data thead th').length;
+		for (var col_idx = 0; col_idx < cols; col_idx++) {
+			agregarData(tr, col_idx);
+		}
+		
+		tr.find(':input').change();
+		
+		return false;
+	}
+
+	function cambioData() {
+		var input = jQuery(this);
+		var idx = input.closest('td').index();
+		var campo = campos_idx[idx];
+		var info = campos_clase[campo];
+
+		input.closest('tr').removeClass('ok');
+
+		validacionInput(input, campo, info);
+	}
+
+	function focusData() {
+		jQuery('.extra').html('');
+		var td = jQuery(this).closest('td');
+		var idx = td.index();
+		var campo = campos_idx[idx];
+		var info = campos_clase[campo];
+
+		if (!columna_validada[idx]) {
+			jQuery('[name="campos[' + idx + ']"]').change();
+		}
+
+		if (info) {
+			//mostrar listado para relaciones o checkbox para bools
+			if (info.relacion) {
+				var sel = jQuery('<select/>', {html: '<option value=""/>'});
+				jQuery.each(listados[info.relacion], function(id, valor) {
+					sel.append(jQuery('<option/>').val(id).text(valor));
+				});
+				sel.change(cambioRelacion);
+				td.find('.extra').append(sel);
+			}
+			else if (info.tipo === 'bool') {
+				//agregar checkbox
+				var check = jQuery('<input/>', {type: 'checkbox'}).change(cambioCheck);
+				td.find('.extra').append(check);
+			}
+			jQuery(this).change();
+		}
+	}
+
+	function cambioCampo() {
+		calcularCamposIdx();
+
+		var campo = jQuery(this).val();
+		var idx = jQuery(this).closest('th').index();
+		var info = campos_clase[campo];
+		var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
+		jQuery('.col_' + idx).each(function() {
+			validacionInput(jQuery(this), campo, info);
+		});
+		columna_validada[idx] = true;
+		col.removeClass('procesando');
+	}
+
 	jQuery(function() {
-		jQuery('[name^=data]').change(function() {
-			var input = jQuery(this);
-			var idx = input.closest('td').index();
-			var campo = campos_idx[idx];
-			var info = campos_clase[campo];
+		jQuery('[name^=data]').change(cambioData).focus(focusData);
 
-			input.closest('tr').removeClass('ok');
-
-			validacionInput(input, campo, info);
-		}).focus(function() {
-			jQuery('.extra').html('');
-			var td = jQuery(this).closest('td');
-			var idx = td.index();
-			var campo = campos_idx[idx];
-			var info = campos_clase[campo];
-
-
-			if (!columna_validada[idx]) {
-				jQuery('[name="campos[' + idx + ']"]').change();
-			}
-
-			if (info) {
-				//mostrar listado para relaciones o checkbox para bools
-				if (info.relacion) {
-					var sel = jQuery('<select/>', {html: '<option value=""/>'});
-					jQuery.each(listados[info.relacion], function(id, valor) {
-						sel.append(jQuery('<option/>', {value: id, text: valor}));
-					});
-					sel.change(cambioRelacion);
-					td.find('.extra').append(sel);
-				}
-				else if (info.tipo === 'bool') {
-					//agregar checkbox
-					var check = jQuery('<input/>', {type: 'checkbox'}).change(cambioCheck);
-					td.find('.extra').append(check);
-				}
-				jQuery(this).change();
-			}
-
-		});
-
-		jQuery('[name^=campos]').change(function() {
-			calcularCamposIdx();
-
-			var campo = jQuery(this).val();
-			var idx = jQuery(this).closest('th').index();
-			var info = campos_clase[campo];
-			var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
-			jQuery('.col_' + idx).each(function() {
-				validacionInput(jQuery(this), campo, info);
-			});
-			columna_validada[idx] = true;
-			col.removeClass('procesando');
-		});
+		jQuery('[name^=campos]').change(cambioCampo);
 
 		calcularCamposIdx();
 
 		if (jQuery('input').length < 1000) {
 			jQuery('[name^=campos]').change();
 		}
+
+		jQuery('#btn_columna').click(agregarColumna);
+		jQuery('#btn_fila').click(agregarFila);
 
 		jQuery('form').submit(function() {
 			var msg = '';
@@ -628,22 +683,22 @@ if (empty($data)) {
 
 			var data = serializar('#data thead') + '&clase=' + clase + '&';
 			jQuery('#data tbody tr:not(.ok)').each(function(idx) {
-				var tr = this;
-				jQuery(tr).addClass('procesando');
-				jQuery(window).scrollTop(jQuery(tr).position().top);
+				var tr = jQuery(this);
+				tr.addClass('procesando');
+				jQuery(window).scrollTop(tr.position().top);
 				jQuery.ajax('carga_masiva_ajax.php', {
 					type: 'POST',
 					data: data + serializar(tr),
 					async: false,
 					success: function(response) {
-						jQuery(tr).removeClass('procesando');
+						tr.removeClass('procesando');
 						try {
 							var resp = jQuery.parseJSON(response);
 							if (response === '[]') {
-								jQuery(tr).removeClass('warning').addClass('ok');
+								tr.removeClass('warning').addClass('ok');
 							}
 							else {
-								jQuery(tr).addClass('error').attr('title', resp[idx]);
+								tr.addClass('error').attr('title', resp[idx]);
 							}
 						} catch (e) {
 							var i = response.lastIndexOf('<!--');
@@ -651,7 +706,7 @@ if (empty($data)) {
 							if (i >= 0) {
 								error = response.substr(i + 4, response.length - 7);
 							}
-							jQuery(tr).addClass('error').attr('title', error);
+							tr.addClass('error').attr('title', error);
 						}
 					}
 				});
@@ -688,5 +743,5 @@ if (empty($data)) {
 		});
 	});
 
-//TODO: poder agregar/eliminar filas/columnas
+//TODO: poder eliminar filas/columnas
 </script>
