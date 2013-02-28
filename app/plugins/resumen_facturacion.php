@@ -31,25 +31,21 @@ function Descarga_Planilla_Resumen_Facturacion() {
 			array(
 				'field' => 'tipo',
 				'title' => 'T/DOC',
-			),
-			array(
-				'field' => 'serie',
-				'title' => 'Serie',
-				'format' => 'text',
-			),
-			array(
-				'field' => 'estado',
-				'title' => 'ESTADO',
-			),
+			));
+
+			array_push($cofiguracion_resumen , 	array(	'field' => 'serie',		'title' => 'Serie',		'format' => 'text',	)			);
+			array_push($cofiguracion_resumen , 	array(
+					'field' => 'estado',
+					'title' => 'ESTADO',
+				)			);
 		
 
-		 
-		);
+	 
 		
 		$ArregloMonedas=UtilesApp::ArregloMonedas($sesion);
 			foreach($ArregloMonedas as $id_moneda=>$Moneda) {
 				array_push($cofiguracion_resumen , 	array('field' => 'neto_'.$id_moneda, 'format' => 'number', 'title' => 'NETO '.$Moneda['simbolo'],));
-				array_push($cofiguracion_resumen , 	array('field' => 'iva_'.$id_moneda, 'format' => 'number', 'title' => 'NETO '.$Moneda['simbolo'],));
+				array_push($cofiguracion_resumen , 	array('field' => 'iva_'.$id_moneda, 'format' => 'number', 'title' => 'IGV '.$Moneda['simbolo'],));
 
 			}
 
