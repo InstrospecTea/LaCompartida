@@ -754,6 +754,7 @@ class UsuarioExt extends Usuario {
 		}
 
 		$data['password'] = md5('12345');
+		$data['force_reset_password'] = '1';
 
 		if (empty($data['username'])) {
 			$data['username'] = $data['nombre'][0] . $data['apellido1'][0];
