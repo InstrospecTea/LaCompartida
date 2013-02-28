@@ -671,10 +671,13 @@ if (empty($data)) {
 			});
 
 			var ok = jQuery('tr.ok').length;
-			var fail = jQuery().length;
+			var fail = jQuery('tr.error').length;
 			alert(ok + ' datos cargados correctamente, ' + fail + ' errores');
 			if (fail) {
 				jQuery(window).scrollTop(jQuery('tr.error').position().top);
+				jQuery('tr.error :input').one('change', function() {
+					jQuery(this).closest('tr').removeClass('error').removeAttr('title');
+				});
 			}
 
 			return false;
