@@ -43,13 +43,16 @@ function Descarga_Planilla_Resumen_Facturacion() {
 			),
 		
 
-			array('field' => 'neto_1', 'format' => 'number', 'title' => 'NETO S/.',),
-			array('field' => 'iva_1', 'format' => 'number', 'title' => 'IGV S/.',),
-			array('field' => 'neto_2', 'format' => 'number', 'title' => 'NETO US$',),
-			array('field' => 'iva_2', 'format' => 'number', 'title' => 'IGV US$',),
-			array('field' => 'neto_3', 'format' => 'number', 'title' => 'NETO EUR',),
-			array('field' => 'iva_3', 'format' => 'number', 'title' => 'IGV EUR',),
+		 
 		);
+		
+		$ArregloMonedas=UtilesApp::ArregloMonedas($sesion);
+			foreach($ArregloMonedas as $id_moneda=>$Moneda) {
+				array_push($cofiguracion_resumen , 	array('field' => 'neto_'.$id_moneda, 'format' => 'number', 'title' => 'NETO '.$Moneda['simbolo'],));
+				array_push($cofiguracion_resumen , 	array('field' => 'iva_'.$id_moneda, 'format' => 'number', 'title' => 'NETO '.$Moneda['simbolo'],));
+
+			}
+
 		$SimpleReport->LoadConfigFromArray($cofiguracion_resumen);
 		$resumen = array();
 		foreach ($results as $key => $result) {
