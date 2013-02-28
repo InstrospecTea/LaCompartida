@@ -104,6 +104,9 @@ if (!empty($cliente->fields["id_contrato"])) {
 $validaciones_segun_config = UtilesApp::GetConf($sesion, 'ValidacionesCliente');
 $obligatorio = '<span class="req">*</span>';
 
+if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contrato_cliente_defecto)) {
+	$contrato->fields = $cargar_datos_contrato_cliente_defecto;
+}
  
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
@@ -1759,7 +1762,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	<form name='formulario' id='formulario' method=post>
 		<input type=hidden name=codigo_cliente value="<?php echo $cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
 		<input type=hidden name='opcion_contrato' value="guardar_contrato" />
-		<input type=hidden name='id_contrato' value="<?php echo $contrato->fields['id_contrato'] ?>" />
+		<input type=hidden name='id_contrato' value="<?php echo isset($cargar_datos_contrato_cliente_defecto) ? '' : $contrato->fields['id_contrato']; ?>" />
 		<input type="hidden" name="desde" value="agregar_contrato" />
 <?php } ?>
 	<br />

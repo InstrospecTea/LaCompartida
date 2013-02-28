@@ -99,6 +99,12 @@ if ($codigo_cliente != '') {
 	$cliente->LoadByCodigo($codigo_cliente);
 }
 
+if ($cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "guardar")) {
+	$contrato_cliente = new Contrato($sesion);
+	$contrato_cliente->Load($cliente->fields['id_contrato']);
+	$cargar_datos_contrato_cliente_defecto = $contrato_cliente->fields;
+}
+
 if ($opcion == "guardar") {
 	$enviar_mail = 1;
 
@@ -325,174 +331,98 @@ if ($opcion == "guardar") {
 		//if($asunto->Write())
 		//{
 		if ($cobro_independiente) {
-			//COPIAR DATOS DE CLIENTE
-			if ($opc_copiar) {
-				$contra_clie = new Contrato($sesion);
-				$contra_clie->Load($cliente->fields['id_contrato']);	#cargo contrato de cliente
-				if ($contra_clie->loaded()) {
-					if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
-						$contrato->Load($asunto->fields['id_contrato']);
-					} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
-						$contrato->Load($asunto->fields['id_contrato_indep']);
-					} else {
-						$contrato = new Contrato($sesion);
+			#CONTRATO
+			if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
+				$contrato->Load($asunto->fields['id_contrato']);
+			} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
+				$contrato->Load($asunto->fields['id_contrato_indep']);
+			} else {
+				$contrato = new Contrato($sesion);
+			}
+			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
+				$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
+				$val = true;
+			} elseif ($forma_cobro == 'TASA')
+				$monto = '0';
+
+			if ($tipo_tarifa == 'flat') {
+				if (empty($tarifa_flat)) {
+					$pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
+					$val = true;
+				} else {
+					$tarifa = new Tarifa($sesion);
+					$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+					$_REQUEST['id_tarifa'] = $id_tarifa;
+				}
+			}
+
+			$contrato->Fill($_REQUEST, true);
+			$contrato->Edit('codigo_cliente', $codigo_cliente);
+
+			if ($contrato->Write()) {
+				#Subiendo Archivo
+				if (!empty($archivo_data)) {
+					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
+					$archivo->Edit('descripcion', $descripcion);
+					$archivo->Edit('archivo_data', $archivo_data);
+					$archivo->Write();
+				}
+				#cobro pendiente
+				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
+					$cobro_pendiente = new CobroPendiente($sesion);
+					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+					$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
+					$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
+					$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
+					$cobro_pendiente->Write();
+				}
+
+				foreach (array_keys($hito_fecha) as $i) {
+					if (empty($hito_monto_estimado[$i]))
+						continue;
+					$cobro_pendiente = new CobroPendiente($sesion);
+					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+					$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+					$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
+					$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
+					$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+					$cobro_pendiente->Edit("hito", '1');
+					$cobro_pendiente->Write();
+				}
+
+				$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
+				$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
+
+				if ($asunto->Write())
+					$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+				else
+					$pagina->AddError($asunto->error);
+
+				ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+				if (is_array($docs_legales)) {
+					foreach ($docs_legales as $doc_legal) {
+						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
+							continue;
+						}
+						$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
+						$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
+						$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+						if (!empty($doc_legal['honorario'])) {
+							$contrato_doc_legal->Edit('honorarios', 1);
+						}
+						if (!empty($doc_legal['gastos_con_iva'])) {
+							$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
+						}
+						if (!empty($doc_legal['gastos_sin_iva'])) {
+							$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
+						}
+						$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+						$contrato_doc_legal->Write();
 					}
-
-					$contrato->Fill($contra_clie->fields, false);
-					$contrato->Edit('codigo_cliente', $codigo_cliente);
-
-					if ($contrato->Write()) {
-						#cobros pendientes
-						CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
-						for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-							$cobro_pendiente = new CobroPendiente($sesion);
-							$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato']);
-							$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-							$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
-							$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-							$cobro_pendiente->Write();
-						}
-
-						foreach (array_keys($hito_fecha) as $i) {
-							if (empty($hito_monto_estimado[$i]))
-								continue;
-							$cobro_pendiente = new CobroPendiente($sesion);
-							$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-							$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-							$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-							$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-							$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-							$cobro_pendiente->Edit("hito", '1');
-							$cobro_pendiente->Write();
-						}
-
-
-						$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
-						$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-						if ($asunto->Write())
-							$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con &eacute;xito') . '<br>' . __('Contrato guardado con &eacute;xito'));
-						else
-							$pagina->AddError($asunto->error);
-
-						//cargar docsegales y copiarlso
-						ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-
-						$query = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos FROM contrato_documento_legal WHERE id_contrato = " . $contra_clie->fields['id_contrato'];
-						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-						while ($doc_legal = mysql_fetch_array($resp)) {
-							$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-							$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['id_tipo_documento_legal']);
-							if (!empty($doc_legal['honorarios'])) {
-								$contrato_doc_legal->Edit('honorarios', 1);
-							}
-							if (!empty($doc_legal['gastos_con_impuestos'])) {
-								$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-							}
-							if (!empty($doc_legal['gastos_sin_impuestos'])) {
-								$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-							}
-							$contrato_doc_legal->Write();
-						}
-					}
-					else
-						$pagina->AddError($contrato->error);
 				}
 			} else {
-				#CONTRATO
-				if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
-					$contrato->Load($asunto->fields['id_contrato']);
-				} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
-					$contrato->Load($asunto->fields['id_contrato_indep']);
-				} else {
-					$contrato = new Contrato($sesion);
-				}
-				if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
-					$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
-					$val = true;
-				} elseif ($forma_cobro == 'TASA')
-					$monto = '0';
-
-				if ($tipo_tarifa == 'flat') {
-					if (empty($tarifa_flat)) {
-						$pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
-						$val = true;
-					} else {
-						$tarifa = new Tarifa($sesion);
-						$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
-						$_REQUEST['id_tarifa'] = $id_tarifa;
-					}
-				}
-
-				$contrato->Fill($_REQUEST, true);
-				$contrato->Edit('codigo_cliente', $codigo_cliente);
-
-				if ($contrato->Write()) {
-					#Subiendo Archivo
-					if (!empty($archivo_data)) {
-						$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
-						$archivo->Edit('descripcion', $descripcion);
-						$archivo->Edit('archivo_data', $archivo_data);
-						$archivo->Write();
-					}
-					#cobro pendiente
-					CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-						$cobro_pendiente = new CobroPendiente($sesion);
-						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-						$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-						$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
-						$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-						$cobro_pendiente->Write();
-					}
-
-					foreach (array_keys($hito_fecha) as $i) {
-						if (empty($hito_monto_estimado[$i]))
-							continue;
-						$cobro_pendiente = new CobroPendiente($sesion);
-						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-						$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-						$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-						$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-						$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-						$cobro_pendiente->Edit("hito", '1');
-						$cobro_pendiente->Write();
-					}
-
-
-					$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
-					$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-
-					if ($asunto->Write())
-						$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-					else
-						$pagina->AddError($asunto->error);
-
-					ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					if (is_array($docs_legales)) {
-						foreach ($docs_legales as $doc_legal) {
-							if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
-								continue;
-							}
-							$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-							$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-							if (!empty($doc_legal['honorario'])) {
-								$contrato_doc_legal->Edit('honorarios', 1);
-							}
-							if (!empty($doc_legal['gastos_con_iva'])) {
-								$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-							}
-							if (!empty($doc_legal['gastos_sin_iva'])) {
-								$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-							}
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-							$contrato_doc_legal->Write();
-						}
-					}
-				}
-				else
-					$pagina->AddError($contrato->error);
+				$pagina->AddError($contrato->error);
 			}
 		} #fin if independiente
 		else {
@@ -980,21 +910,6 @@ if ($usuario_responsable_obligatorio) {
 		var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 		$('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;' + codigo_cliente_secundario + '-';
 	}
-
-<?php /*
-  function CopiarDatosCliente(form)
-  {
-  if(!form)
-  var form = $('formulario');
-
-  if(confirm('<?php echo __("¿Ud. desea copiar los datos del cliente?") ?>'))
-  {
-  form.opc_copiar.value = true;
-  form.submit();
-  return true;
-  }
-  }
- */ ?>
 </script>
 <!--onKeyUp="highlight(event)" onClick="highlight(event)"-->
 <form name=formulario id=formulario method=post>
@@ -1222,9 +1137,6 @@ if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecund
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
-					<?php
-					// <input type="button" name='copiar_datos' id='copiar_datos' onclick="CopiarDatosCliente(this.form)" value='Copiar datos de Cliente'>
-					?>
 							&nbsp;
 						</td>
 					</tr>
