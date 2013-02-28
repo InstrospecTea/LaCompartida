@@ -63,13 +63,16 @@ if (empty($data)) {
 	}
 </style>
 <form method="POST" action="datos_carga_masiva.php">
-	<button id="btn_columna">Agregar Columna</button>
-	<button id="btn_fila">Agregar Fila</button>
+	<button id="btn_agregar_columna">Agregar Columna</button>
+	<button id="btn_agregar_fila">Agregar Fila</button>
 	<table id="data">
 		<thead>
 			<tr>
 				<?php foreach ($campos as $c => $campo) { ?>
-					<th><?php echo Html::SelectArrayDecente($titulos_campos, "campos[$c]", $campo, '', '(ignorar)'); ?></th>
+					<th>
+						<?php echo Html::SelectArrayDecente($titulos_campos, "campos[$c]", $campo, '', '(ignorar)'); ?>
+						<button class="btn_eliminar_columna">X</button>
+					</th>
 				<?php } ?>
 			</tr>
 		</thead>
@@ -82,6 +85,7 @@ if (empty($data)) {
 							<div class="extra"/>
 						</td>
 					<?php } ?>
+					<td><button class="btn_eliminar_fila">X</button></td>
 				</tr>
 			<?php } ?>
 		</tbody>
@@ -126,6 +130,10 @@ if (empty($data)) {
 	 */
 	var listados_inversos = {};
 
+	/**
+	 * genera los listados inversos (glosa => id) a partir de los listados normales (id => glosa)
+	 * @returns {generarListadosInversos}
+	 */
 	function generarListadosInversos() {
 		listados_inversos = {};
 		jQuery.each(listados, function(nombre, listado) {
@@ -179,9 +187,6 @@ if (empty($data)) {
 	 * @type json
 	 */
 	var columna_validada = {};
-	jQuery('[name^=campos]').each(function(idx) {
-		columna_validada[idx] = false;
-	});
 
 	/**
 	 * agrega un valor a la lista de valores unicos, y elimina el anterior
@@ -440,6 +445,12 @@ if (empty($data)) {
 		}
 	}
 
+	/**
+	 * valida el input segun la metadata del campo que representa
+	 * @param {jQuery} input
+	 * @param {string} campo
+	 * @param {json} info
+	 */
 	function validacionInput(input, campo, info) {
 		if (input[0].className) {
 			input.removeClass('error').removeClass('warning').removeAttr('title');
@@ -487,6 +498,9 @@ if (empty($data)) {
 		input.attr('data-viejo', val);
 	}
 
+	/**
+	 * calcula los indices de columnas que corresponden a cada campo y viceversa
+	 */
 	function calcularCamposIdx() {
 		idx_campos = {};
 		campos_idx = {};
@@ -517,54 +531,131 @@ if (empty($data)) {
 		return jQuery.param(data);
 	}
 
+	/**
+	 * agrega una columna a la derecha de la tabla
+	 */
 	function agregarColumna() {
 		var idx = jQuery('#data thead th').length;
 		var sel_campo = jQuery('#data thead select:first').clone()
 				.attr('name', 'campos[' + idx + ']').val('').change(cambioCampo);
-		
+
 		jQuery('#data thead tr').append(
-				jQuery('<th/>').append(sel_campo)
+				jQuery('<th/>').append(sel_campo).append(
+				jQuery('<button/>', {class: 'btn_eliminar_columna'}).text('X').click(eliminarColumna)
+				)
 				);
-					
 		jQuery('#data tbody tr').each(function() {
 			agregarData(jQuery(this), idx);
 		});
-		
+
 		sel_campo.change();
-		
+
 		return false;
 	}
 
+	/**
+	 * agrega una celda a la tabla
+	 * @param {jQuery} tr
+	 * @param {int} col_idx
+	 */
 	function agregarData(tr, col_idx) {
 		var tr_idx = tr.index();
-		tr.append(
-			jQuery('<td/>').append(
+		var td = jQuery('<td/>').append(
 				jQuery('<input/>', {
-					id: 'data_' + tr_idx + '_' + col_idx,
-					name: 'data[' + tr_idx + '][' + col_idx + ']',
-					class: 'col_' + col_idx
-				}).change(cambioData).focus(focusData)
-			).append(
+			id: 'data_' + tr_idx + '_' + col_idx,
+			name: 'data[' + tr_idx + '][' + col_idx + ']',
+			class: 'col_' + col_idx
+		}).change(cambioData).focus(focusData)
+				).append(
 				jQuery('<div/>', {class: 'extra'})
-			)
-		);
+				);
+
+		if (tr.find('td').length > col_idx) {
+			tr.find('td:nth-of-type(' + col_idx + ')').after(td);
+		}
+		else {
+			tr.append(td);
+		}
+
+		if (!jQuery('[name="campos[' + col_idx + ']"]').is(':visible')) {
+			td.hide();
+		}
 	}
 
+	/**
+	 * agrega una fila al final de la tabla
+	 */
 	function agregarFila() {
 		var tr = jQuery('<tr/>').appendTo(jQuery('#data tbody'));
-		
+
 		var cols = jQuery('#data thead th').length;
 		for (var col_idx = 0; col_idx < cols; col_idx++) {
 			agregarData(tr, col_idx);
 		}
-		
+		tr.append(jQuery('<td/>').append(
+				jQuery('<button/>', {class: 'btn_eliminar_fila'}).text('X').click(eliminarFila)
+				));
+
 		tr.find(':input').change();
-		
+
 		return false;
 	}
 
+	/**
+	 * ignora, vacia y oculta una columna
+	 */
+	function eliminarColumna() {
+		var idx = jQuery(this).closest('th').index();
+		var inputs = jQuery('.col_' + idx);
+		if (ocultarInputs(inputs)) {
+			jQuery('[name="campos[' + idx + ']"]').val('').closest('th').hide();
+			inputs.closest('td').hide();
+		}
+
+		return false;
+	}
+
+	/**
+	 * vacia y oculta una fila
+	 */
+	function eliminarFila() {
+		var tr = jQuery(this).closest('tr');
+		var inputs = tr.find(':input[name]');
+		if (ocultarInputs(inputs)) {
+			tr.hide();
+		}
+
+		return false;
+	}
+
+	/**
+	 * vacia y oculta un conjunto de inputs, confirmando si es que traen datos
+	 * @param {jQuery} inputs
+	 * @returns {Boolean} true si se ocultaron
+	 */
+	function ocultarInputs(inputs) {
+		var no_vacios = inputs.filter(function() {
+			return jQuery(this).val() !== '';
+		});
+		if (!no_vacios.length || confirm('Hay ' + no_vacios.length + ' campos con datos, está seguro que desea eliminar la columna?')) {
+			no_vacios.val('').change();
+			return true;
+		}
+		else {
+			no_vacios.focus();
+		}
+		return false;
+	}
+
+	/**
+	 * se llama al editar un input
+	 */
 	function cambioData() {
 		var input = jQuery(this);
+		if (!input.is(':visible')) {
+			return true;
+		}
+
 		var idx = input.closest('td').index();
 		var campo = campos_idx[idx];
 		var info = campos_clase[campo];
@@ -574,6 +665,9 @@ if (empty($data)) {
 		validacionInput(input, campo, info);
 	}
 
+	/**
+	 * mostrar informacion adicional si el tipo de campo lo requiere, y valida la columna si aun no se ha hecho
+	 */
 	function focusData() {
 		jQuery('.extra').html('');
 		var td = jQuery(this).closest('td');
@@ -604,8 +698,15 @@ if (empty($data)) {
 		}
 	}
 
+	/**
+	 * se llama al cambiar el campo que representa una columna
+	 */
 	function cambioCampo() {
 		calcularCamposIdx();
+
+		if (!jQuery(this).is(':visible')) {
+			return true;
+		}
 
 		var campo = jQuery(this).val();
 		var idx = jQuery(this).closest('th').index();
@@ -619,21 +720,31 @@ if (empty($data)) {
 	}
 
 	jQuery(function() {
+		jQuery('[name^=campos]').each(function(idx) {
+			columna_validada[idx] = false;
+		});
+
 		jQuery('[name^=data]').change(cambioData).focus(focusData);
 
 		jQuery('[name^=campos]').change(cambioCampo);
 
 		calcularCamposIdx();
 
+		//si la tabla es muy grande, validarla completa es muy lento
+		//asi que se hace al momento de focusear cada columna (o al submitear)
 		if (jQuery('input').length < 1000) {
 			jQuery('[name^=campos]').change();
 		}
 
-		jQuery('#btn_columna').click(agregarColumna);
-		jQuery('#btn_fila').click(agregarFila);
+		jQuery('#btn_agregar_columna').click(agregarColumna);
+		jQuery('#btn_agregar_fila').click(agregarFila);
+		jQuery('.btn_eliminar_columna').click(eliminarColumna);
+		jQuery('.btn_eliminar_fila').click(eliminarFila);
 
 		jQuery('form').submit(function() {
 			var msg = '';
+
+			//se validan que esten las columnas que deben estar
 			var repetidos = [];
 			var faltan = [];
 			var campos = jQuery('[name^=campos]');
@@ -655,6 +766,7 @@ if (empty($data)) {
 				msg += '\nLas siguientes columnas no están pero son obligatorias: ' + faltan.join(', ');
 			}
 
+			//si aun no se valida alguna columna, se valida ahora
 			jQuery.each(columna_validada, function(idx, validada) {
 				if (!validada) {
 					var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
@@ -664,7 +776,8 @@ if (empty($data)) {
 				}
 			});
 
-			var errores = jQuery('.error');
+			//buscar errores de datos
+			var errores = jQuery('.error:visible');
 			if (errores.length) {
 				msg += '\nHay errores en los datos!';
 				errores.focus();
@@ -675,17 +788,20 @@ if (empty($data)) {
 				return false;
 			}
 
+			//si hay advertencias se avisa pero igual se puede seguir
 			var warnings = jQuery('.warning');
 			if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {
 				warnings.focus();
 				return false;
 			}
 
+			//se envian los datos fila por fila
 			var data = serializar('#data thead') + '&clase=' + clase + '&';
-			jQuery('#data tbody tr:not(.ok)').each(function(idx) {
+			jQuery('#data tbody tr:not(.ok):visible').each(function(idx) {
 				var tr = jQuery(this);
 				tr.addClass('procesando');
 				jQuery(window).scrollTop(tr.position().top);
+
 				jQuery.ajax('carga_masiva_ajax.php', {
 					type: 'POST',
 					data: data + serializar(tr),
@@ -694,6 +810,7 @@ if (empty($data)) {
 						tr.removeClass('procesando');
 						try {
 							var resp = jQuery.parseJSON(response);
+							//se recibio una respuesta json
 							if (response === '[]') {
 								tr.removeClass('warning').addClass('ok');
 							}
@@ -701,9 +818,11 @@ if (empty($data)) {
 								tr.addClass('error').attr('title', resp[idx]);
 							}
 						} catch (e) {
-							var i = response.lastIndexOf('<!--');
+							//se recibio un html
 							var error = 'Error al guardar el dato';
+							var i = response.lastIndexOf('<!--');
 							if (i >= 0) {
+								//si viene un error SQL, mostrarlo como error
 								error = response.substr(i + 4, response.length - 7);
 							}
 							tr.addClass('error').attr('title', error);
@@ -712,6 +831,7 @@ if (empty($data)) {
 				});
 			});
 
+			//se vuelven a cargar los listados para reflejar los datos que se agregaron
 			jQuery.ajax('carga_masiva_ajax.php', {
 				type: 'POST',
 				data: 'clase=' + clase + '&obtener_listados=1',
@@ -725,11 +845,12 @@ if (empty($data)) {
 				}
 			});
 
-			var ok = jQuery('tr.ok').length;
-			var fail = jQuery('tr.error').length;
+			//resumen ejecutivo
+			var ok = jQuery('tr.ok:visible').length;
+			var fail = jQuery('tr.error:visible').length;
 			alert(ok + ' datos cargados correctamente, ' + fail + ' errores');
 			if (fail) {
-				jQuery(window).scrollTop(jQuery('tr.error').position().top);
+				jQuery(window).scrollTop(jQuery('tr.error:visible').position().top);
 				jQuery('tr.error :input').one('change', function() {
 					jQuery(this).closest('tr').removeClass('error').removeAttr('title');
 				});
@@ -743,5 +864,4 @@ if (empty($data)) {
 		});
 	});
 
-//TODO: poder eliminar filas/columnas
 </script>
