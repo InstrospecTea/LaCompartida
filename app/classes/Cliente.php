@@ -42,7 +42,8 @@ class Cliente extends Objeto {
 		),
 		'forma_cobro' => array(
 			'titulo' => 'Forma de Cobro',
-			'tipo' => array('TASA', 'FLAT FEE', 'RETAINER', 'PROPORCIONAL', 'HITOS')
+			'tipo' => array('TASA', 'FLAT FEE', 'RETAINER', 'PROPORCIONAL', 'HITOS'),
+			'defval' => 'TASA'
 		),
 		'id_tarifa' => array(
 			'titulo' => 'Tarifa',

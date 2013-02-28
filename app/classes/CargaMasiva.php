@@ -229,7 +229,7 @@ class CargaMasiva extends Objeto {
 						}
 					}
 
-					if (in_array($fila[$campo], array('', 'NULL')) && isset($info['defval'])) {
+					if ((!isset($fila[$campo]) || in_array($fila[$campo], array('', 'NULL'))) && isset($info['defval'])) {
 						$fila[$campo] = $info['defval'];
 					}
 

@@ -40,6 +40,9 @@ if (empty($data)) {
 		height: 40px;
 		background-color: #42A62B;
 	}
+	#data tbody td {
+		padding: 5px;
+	}
 	#data tbody tr:nth-child(odd){
 		background-color: #eee;
 	}
@@ -54,6 +57,9 @@ if (empty($data)) {
 	}
 	.error{
 		background-color: #fcc !important;
+	}
+	.procesando{
+		background-color: #ccf !important;
 	}
 </style>
 <form method="POST" action="datos_carga_masiva.php">
@@ -117,19 +123,24 @@ if (empty($data)) {
 	 * @type json
 	 */
 	var listados_inversos = {};
-	jQuery.each(listados, function(nombre, listado) {
-		listados_inversos[nombre] = {};
-		jQuery.each(listado, function(id, valor) {
-			if (typeof(valor) !== 'string') {
-				var v = [];
-				jQuery.each(valor, function(campo, valor_campo) {
-					v.push(valor_campo);
-				});
-				valor = v.join(' / ');
-			}
-			listados_inversos[nombre][limpiar(valor)] = id;
+	
+	function generarListadosInversos(){
+		listados_inversos = {};
+		jQuery.each(listados, function(nombre, listado) {
+			listados_inversos[nombre] = {};
+			jQuery.each(listado, function(id, valor) {
+				if (typeof(valor) !== 'string') {
+					var v = [];
+					jQuery.each(valor, function(campo, valor_campo) {
+						v.push(valor_campo);
+					});
+					valor = v.join(' / ');
+				}
+				listados_inversos[nombre][limpiar(valor)] = id;
+			});
 		});
-	});
+	}
+	generarListadosInversos();
 
 	/** 
 	 * idx_campos[campo] = numero de columna (th.index())
@@ -489,15 +500,29 @@ if (empty($data)) {
 		});
 	}
 
-	console.log(new Date() + ' fin js');
-	jQuery(function() {
-		console.log(new Date() + ' onload');
+	/**
+	 * serializa los inputs dentro de un elemento
+	 * @param {string} selector
+	 * @returns {string}
+	 */
+	function serializar(selector){
+		var data = {};
+		var elem = jQuery(selector);
+		var inputs = elem.is(':input') ? elem : elem.find(':input');
+		inputs.each(function(){
+			data[jQuery(this).attr('name')] = jQuery(this).val();
+		});
+		return jQuery.param(data);
+	}
 
+	jQuery(function() {
 		jQuery('[name^=data]').change(function() {
 			var input = jQuery(this);
 			var idx = input.closest('td').index();
 			var campo = campos_idx[idx];
 			var info = campos_clase[campo];
+
+			input.closest('tr').removeClass('ok');
 
 			validacionInput(input, campo, info);
 		}).focus(function() {
@@ -536,14 +561,14 @@ if (empty($data)) {
 			calcularCamposIdx();
 
 			var campo = jQuery(this).val();
-			console.log(new Date() + ' campo: ' + campo);
-
 			var idx = jQuery(this).closest('th').index();
 			var info = campos_clase[campo];
+			var col = jQuery('td:nth-of-type('+idx+')').addClass('procesando');
 			jQuery('.col_' + idx).each(function() {
 				validacionInput(jQuery(this), campo, info);
 			});
 			columna_validada[idx] = true;
+			col.removeClass('procesando');
 		});
 
 		calcularCamposIdx();
@@ -577,7 +602,10 @@ if (empty($data)) {
 
 			jQuery.each(columna_validada, function(idx, validada) {
 				if (!validada) {
+					var col = jQuery('td:nth-of-type('+idx+')').addClass('procesando');
+					console.log('Validando columna ' + campos_clase[campos_idx[idx]].titulo);
 					jQuery('[name="campos[' + idx + ']"]').change();
+					col.removeClass('procesando');
 				}
 			});
 
@@ -597,7 +625,52 @@ if (empty($data)) {
 				warnings.focus();
 				return false;
 			}
-			return true;
+			
+			var data = serializar('#data thead') + '&clase=' + clase + '&';
+			jQuery('#data tbody tr:not(.ok)').each(function(idx){
+				var tr = this;
+				jQuery(tr).addClass('procesando');
+				jQuery(window).scrollTop(jQuery(tr).position().top);
+				jQuery.ajax('carga_masiva_ajax.php', {
+					type: 'POST',
+					data: data + serializar(tr),
+					async: false,
+					success: function(response){
+						jQuery(tr).removeClass('procesando');
+						try{
+							var resp = jQuery.parseJSON(response);
+							if(response === '[]'){
+								jQuery(tr).removeClass('warning').addClass('ok');
+							}
+							else{
+								jQuery(tr).addClass('error').attr('title', resp[idx]);
+							}
+						} catch(e){
+							var i = response.lastIndexOf('<!--');
+							var error = 'Error al guardar el dato';
+							if(i>=0){
+								error = response.substr(i + 4, response.length - 7);
+							}
+							jQuery(tr).addClass('error').attr('title', error);
+						}
+					}
+				});
+			});
+			
+			jQuery.ajax('carga_masiva_ajax.php', {
+				type: 'POST',
+				data: 'clase=' + clase + '&obtener_listados=1',
+				async: false,
+				success: function(response){
+					try{
+						listados = jQuery.parseJSON(response);
+						generarListadosInversos();
+					} catch(e) {
+					}
+				}
+			});
+			
+			return false;
 		});
 
 		jQuery('tr.error :input').one('change', function() {
