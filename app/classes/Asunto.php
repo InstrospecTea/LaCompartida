@@ -14,14 +14,15 @@ class Asunto extends Objeto {
 	var $primera_etapa = null;
 	var $monto = null;
 	
-	//TODO: usar llave unica multiple para editar, si no igual funciona pero no edita asuntos existentes, siempre y cuando:
+	//TODO: usar llave unica multiple para resaltar asuntos existentes, siempre y cuando:
 	//TODO: aplicar logica de campo unique, con soporte para unique de 2 campos (codigo_cliente/glosa_asunto)
 	public static $llave_carga_masiva = 'codigo_asunto'; //array('codigo_cliente', 'glosa_asunto');
 	public static $campos_carga_masiva = array(
 		'codigo_cliente' => array(
 			'titulo' => 'Nombre Cliente (vacío para ingresarlo a todos los clientes)',
 			'relacion' => 'Cliente',
-			'unico' => 'cliente_asunto'
+			'unico' => 'cliente_asunto',
+			'creable' => true
 		),
 		'glosa_asunto' => array(
 			'titulo' => 'Título del Asunto',

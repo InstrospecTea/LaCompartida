@@ -32,6 +32,7 @@ class CargaMasiva extends Objeto {
 			}
 			if ($campo == $llave) {
 				$info['requerido'] = true;
+				$info['unico'] = true;
 			}
 			if (is_array($info['tipo'])) {
 				$info['relacion'] = $campo;
@@ -86,11 +87,24 @@ class CargaMasiva extends Objeto {
 	public function ObtenerListados($clase, $invertir = false) {
 		$llaves = array();
 		$llaves[$clase] = $this->ObtenerListado($clase, $invertir);
-		foreach ($this->ObtenerCampos($clase) as $campo => $info) {
+		$campos = $this->ObtenerCampos($clase);
+		foreach ($campos as $campo => $info) {
 			if (is_array($info['tipo'])) {
 				$llaves[$campo] = array_combine($info['tipo'], $info['tipo']);
 			} else if (isset($info['relacion'])) {
 				$llaves[$info['relacion']] = $this->ObtenerListado($info['relacion'], $invertir);
+			} else if (isset($info['unico'])) {
+				if (!is_string($info['unico'])) {
+					$llaves[$campo] = $this->ObtenerListado($clase, $invertir, $campo);
+				} else if (!isset($llaves[$info['unico']])) {
+					$multi = array();
+					foreach ($campos as $campo_multi => $info_multi) {
+						if ($info_multi['unico'] === $info['unico']) {
+							$multi[] = $campo_multi;
+						}
+					}
+					$llaves[$info['unico']] = $this->ObtenerListado($clase, $invertir, $multi);
+				}
 			}
 		}
 		return $llaves;
@@ -102,21 +116,39 @@ class CargaMasiva extends Objeto {
 	 * @param bool $invertir listado glosa => id
 	 * @return array
 	 */
-	private function ObtenerListado($clase, $invertir = false) {
+	private function ObtenerListado($clase, $invertir = false, $campo_glosa = null, $campo_id = null) {
 		$instancia = $this->ObtenerInstancia($clase);
-		$campo_id = $this->CampoId($clase, $instancia);
-		$campo_glosa = $this->LlaveUnica($clase);
+		if (!$campo_id) {
+			$campo_id = $this->CampoId($clase, $instancia);
+		}
+		if (!$campo_glosa) {
+			$campo_glosa = $this->LlaveUnica($clase);
+		}
+		
+		if (is_array($campo_glosa)) {
+			$campo_glosa = implode(', ', $campo_glosa);
+		} else {
+			$campo_glosa .= ' as glosa';
+		}
 
-		$query = "SELECT $campo_id as id, $campo_glosa as glosa FROM {$instancia->tabla}";
+		$query = "SELECT $campo_id as id, $campo_glosa FROM {$instancia->tabla}";
 		$resp = $this->sesion->pdodbh->query($query);
-		$data = $resp->fetchAll();
+		$data = $resp->fetchAll(PDO::FETCH_ASSOC);
 
 		$lista = array();
 		foreach ($data as $fila) {
+			$id = $fila['id'];
+			if(count($fila) == 2){
+				$glosa = $fila['glosa'];
+			} else{
+				unset($fila['id']);
+				$glosa = $invertir ? implode(' / ', $fila) : $fila;
+			}
+			
 			if ($invertir) {
-				$lista[$fila['glosa']] = $fila['id'];
+				$lista[$glosa] = $id;
 			} else {
-				$lista[$fila['id']] = $fila['glosa'];
+				$lista[$id] = $glosa;
 			}
 		}
 		return $lista;

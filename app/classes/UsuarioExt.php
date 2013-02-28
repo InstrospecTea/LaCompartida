@@ -13,18 +13,27 @@ class UsuarioExt extends Usuario {
 		CONCAT_RUT_DV_USUARIO => 'RUT', //todo: agregar tipo "rut" para validar? (solo si esta configurado como rut)
 		'nombre' => array(
 			'titulo' => 'Nombre',
-			'requerido' => true
+			'requerido' => true,
+			'unico' => 'nombre_completo'
 		),
 		'apellido1' => array(
 			'titulo' => 'Apellido Paterno',
-			'requerido' => true
+			'requerido' => true,
+			'unico' => 'nombre_completo'
 		),
-		'apellido2' => 'Apellido Materno',
-		'username' => 'Código',
+		'apellido2' => array(
+			'titulo' => 'Apellido Materno',
+			'unico' => 'nombre_completo'
+		),
+		'username' => array(
+			'titulo' => 'Código',
+			'unico' => true
+		),
 		'email' => array(
 			'titulo' => 'Email',
 			'requerido' => true,
-			'tipo' => 'email'
+			'tipo' => 'email',
+			'unico' => true
 		),
 		'telefono1' => 'Teléfono 1',
 		'telefono2' => 'Teléfono 2',

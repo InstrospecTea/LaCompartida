@@ -747,6 +747,7 @@ class Cliente extends Objeto {
 			$rutdv = explode('-', $data['rut']);
 			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
 			$data['dv'] = trim($rutdv[1]);
+			$this->editable_fields[] = 'dv';
 		}
 
 		return $data;
