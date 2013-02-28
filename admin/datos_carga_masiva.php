@@ -123,8 +123,8 @@ if (empty($data)) {
 	 * @type json
 	 */
 	var listados_inversos = {};
-	
-	function generarListadosInversos(){
+
+	function generarListadosInversos() {
 		listados_inversos = {};
 		jQuery.each(listados, function(nombre, listado) {
 			listados_inversos[nombre] = {};
@@ -505,11 +505,11 @@ if (empty($data)) {
 	 * @param {string} selector
 	 * @returns {string}
 	 */
-	function serializar(selector){
+	function serializar(selector) {
 		var data = {};
 		var elem = jQuery(selector);
 		var inputs = elem.is(':input') ? elem : elem.find(':input');
-		inputs.each(function(){
+		inputs.each(function() {
 			data[jQuery(this).attr('name')] = jQuery(this).val();
 		});
 		return jQuery.param(data);
@@ -563,7 +563,7 @@ if (empty($data)) {
 			var campo = jQuery(this).val();
 			var idx = jQuery(this).closest('th').index();
 			var info = campos_clase[campo];
-			var col = jQuery('td:nth-of-type('+idx+')').addClass('procesando');
+			var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
 			jQuery('.col_' + idx).each(function() {
 				validacionInput(jQuery(this), campo, info);
 			});
@@ -602,7 +602,7 @@ if (empty($data)) {
 
 			jQuery.each(columna_validada, function(idx, validada) {
 				if (!validada) {
-					var col = jQuery('td:nth-of-type('+idx+')').addClass('procesando');
+					var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
 					console.log('Validando columna ' + campos_clase[campos_idx[idx]].titulo);
 					jQuery('[name="campos[' + idx + ']"]').change();
 					col.removeClass('procesando');
@@ -625,9 +625,9 @@ if (empty($data)) {
 				warnings.focus();
 				return false;
 			}
-			
+
 			var data = serializar('#data thead') + '&clase=' + clase + '&';
-			jQuery('#data tbody tr:not(.ok)').each(function(idx){
+			jQuery('#data tbody tr:not(.ok)').each(function(idx) {
 				var tr = this;
 				jQuery(tr).addClass('procesando');
 				jQuery(window).scrollTop(jQuery(tr).position().top);
@@ -635,20 +635,20 @@ if (empty($data)) {
 					type: 'POST',
 					data: data + serializar(tr),
 					async: false,
-					success: function(response){
+					success: function(response) {
 						jQuery(tr).removeClass('procesando');
-						try{
+						try {
 							var resp = jQuery.parseJSON(response);
-							if(response === '[]'){
+							if (response === '[]') {
 								jQuery(tr).removeClass('warning').addClass('ok');
 							}
-							else{
+							else {
 								jQuery(tr).addClass('error').attr('title', resp[idx]);
 							}
-						} catch(e){
+						} catch (e) {
 							var i = response.lastIndexOf('<!--');
 							var error = 'Error al guardar el dato';
-							if(i>=0){
+							if (i >= 0) {
 								error = response.substr(i + 4, response.length - 7);
 							}
 							jQuery(tr).addClass('error').attr('title', error);
@@ -656,20 +656,27 @@ if (empty($data)) {
 					}
 				});
 			});
-			
+
 			jQuery.ajax('carga_masiva_ajax.php', {
 				type: 'POST',
 				data: 'clase=' + clase + '&obtener_listados=1',
 				async: false,
-				success: function(response){
-					try{
+				success: function(response) {
+					try {
 						listados = jQuery.parseJSON(response);
 						generarListadosInversos();
-					} catch(e) {
+					} catch (e) {
 					}
 				}
 			});
-			
+
+			var ok = jQuery('tr.ok').length;
+			var fail = jQuery().length;
+			alert(ok + ' datos cargados correctamente, ' + fail + ' errores');
+			if (fail) {
+				jQuery(window).scrollTop(jQuery('tr.error').position().top);
+			}
+
 			return false;
 		});
 
