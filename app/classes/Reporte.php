@@ -1463,4 +1463,81 @@ class Reporte {
 		return $valor;
 	}
 
+	function setFiltros($filtros) {
+		if ($filtros['clientes']) {
+			foreach ($filtros['clientes'] as $cliente) {
+				if ($cliente) {
+					$this->addFiltro('cliente', 'codigo_cliente', $cliente);
+				}
+			}
+		}
+
+		if ($filtros['usuarios']) {
+			foreach ($filtros['usuarios'] as $usuario) {
+				if ($usuario) {
+					$this->addFiltro('usuario', 'id_usuario', $usuario);
+				}
+			}
+		}
+
+		if ($filtros['tipos_asunto']) {
+			foreach ($filtros['tipos_asunto'] as $tipo) {
+				if ($tipo) {
+					$this->addFiltro('asunto', 'id_tipo_asunto', $tipo);
+				}
+			}
+		}
+
+		if ($filtros['areas_asunto']) {
+			foreach ($filtros['areas_asunto'] as $area) {
+				if ($area) {
+					$this->addFiltro('asunto', 'id_area_proyecto', $area);
+				}
+			}
+		}
+
+		if ($filtros['areas_usuario']) {
+			foreach ($filtros['areas_usuario'] as $area_usuario) {
+				if ($area_usuario) {
+					$this->addFiltro('usuario', 'id_area_usuario', $area_usuario);
+				}
+			}
+		}
+
+		if ($filtros['categorias_usuario']) {
+			foreach ($filtros['categorias_usuario'] as $categoria_usuario) {
+				if ($categoria_usuario) {
+					$this->addFiltro('usuario', 'id_categoria_usuario', $categoria_usuario);
+				}
+			}
+		}
+
+		if ($filtros['encargados']) {
+			foreach ($filtros['encargados'] as $encargado) {
+				if ($encargado) {
+					$this->addFiltro('contrato', 'id_usuario_responsable', $encargado);
+				}
+			}
+		}
+
+		if ($filtros['estado_cobro']) {
+			foreach ($filtros['estado_cobro'] as $estado) {
+				if ($estado) {
+					$this->addFiltro('cobro', 'estado', $estado);
+				}
+			}
+		}
+
+		$this->addRangoFecha($filtros['fecha_ini'], $filtros['fecha_fin']);
+
+		if ($filtros['campo_fecha']) {
+			$this->setCampoFecha($filtros['campo_fecha']);
+		}
+
+		$this->setTipoDato($filtros['dato']);
+		$this->setVista($filtros['vista']);
+		$this->setProporcionalidad($filtros['prop']);
+		$this->id_moneda = $filtros['id_moneda'];
+	}
+
 }

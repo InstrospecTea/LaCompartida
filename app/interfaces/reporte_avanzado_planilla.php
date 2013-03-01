@@ -7,7 +7,57 @@ $pagina->PrintTop(1);
 ?>
 
 <!-- ESTILOS -->
-<style>
+<?php
+$email_style = array();
+$email_style_valor = array();
+
+$email_style['primer'] = '';
+$email_style['segundo'] = '';
+$email_style['tercer'] = '';
+$email_style['cuarto'] = '';
+$email_style['quinto'] = '';
+$email_style['sexto'] = '';
+$email_style_valor['primer'] = '';
+$email_style_valor['segundo'] = '';
+$email_style_valor['tercer'] = '';
+$email_style_valor['cuarto'] = '';
+$email_style_valor['quinto'] = '';
+$email_style_valor['sexto'] = '';
+if ($email) {
+	$base = 'style="border:1px solid #CCC;vertical-align:top;';
+	$principal = 'style="border:1px solid #E33;vertical-align:top;';
+	$secundario = 'style="border:1px solid #33E;vertical-align:top;';
+
+	$email_style['primer'] = $base . 'background-color:#c4c4dd;font-size:95%;text-align:center;"';
+	$email_style['segundo'] = $base . 'background-color:#d2d2ee; font-size:90%;text-align:center;"';
+	$email_style['tercer'] = $base . 'font-size:84%;background-color:#d9d9f2;text-align:center;"';
+	$email_style['cuarto'] = $base . 'font-size:80%;background-color:#e5e5f5;text-align:center;"';
+	$email_style['quinto'] = $base . 'font-size:76%;background-color:#f1f1f9;text-align:center;"';
+	$email_style['sexto'] = $base . 'font-size:74%;background-color:#f9f9ff;text-align:center;"';
+
+	$email_style_valor['primer']['base'] = $base . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+	$email_style_valor['segundo']['base'] = $base . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+	$email_style_valor['tercer']['base'] = $base . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+	$email_style_valor['cuarto']['base'] = $base . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+	$email_style_valor['quinto']['base'] = $base . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+	$email_style_valor['sexto']['base'] = $base . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+
+	$email_style_valor['primer']['principal'] = $principal . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+	$email_style_valor['segundo']['principal'] = $principal . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+	$email_style_valor['tercer']['principal'] = $principal . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+	$email_style_valor['cuarto']['principal'] = $principal . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+	$email_style_valor['quinto']['principal'] = $principal . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+	$email_style_valor['sexto']['principal'] = $principal . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+
+	$email_style_valor['primer']['secundario'] = $secundario . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
+	$email_style_valor['segundo']['secundario'] = $secundario . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
+	$email_style_valor['tercer']['secundario'] = $secundario . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
+	$email_style_valor['cuarto']['secundario'] = $secundario . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
+	$email_style_valor['quinto']['secundario'] = $secundario . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
+	$email_style_valor['sexto']['secundario'] = $secundario . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
+}
+?>
+<style type="text/css">
 	a:link
 	{
 		text-decoration: none;
@@ -38,106 +88,71 @@ $pagina->PrintTop(1);
 	{
 		background-color: #D7ECF7;
 		color: #000000;
-		font-size:14px;
-		text-align:center;
+		font-size: 14px;
+		text-align: center;
 		border-right: 1px solid #CCCCCC;
 	}
-	.td_h1	{		<?php if (sizeof($agrupadores) < 6) echo "display:none;" ?>	}
-	.td_h2	{		<?php if (sizeof($agrupadores) < 5) echo "display:none;" ?>	}
-	.td_h3	{		<?php if (sizeof($agrupadores) < 4) echo "display:none;" ?>	}
-	.td_h4	{		<?php if (sizeof($agrupadores) < 3) echo "display:none;" ?>	}
-	.td_h5	{		<?php if (sizeof($agrupadores) < 2) echo "display:none;" ?>	}
-
-
-	<?php
-	$email_style = array();
-	$email_style_valor = array();
-
-	$email_style['primer'] = '';
-	$email_style['segundo'] = '';
-	$email_style['tercer'] = '';
-	$email_style['cuarto'] = '';
-	$email_style['quinto'] = '';
-	$email_style['sexto'] = '';
-	$email_style_valor['primer'] = '';
-	$email_style_valor['segundo'] = '';
-	$email_style_valor['tercer'] = '';
-	$email_style_valor['cuarto'] = '';
-	$email_style_valor['quinto'] = '';
-	$email_style_valor['sexto'] = '';
-	if ($email) {
-		$base = 'style="border:1px solid #CCC;vertical-align:top;';
-		$principal = 'style="border:1px solid #E33;vertical-align:top;';
-		$secundario = 'style="border:1px solid #33E;vertical-align:top;';
-
-		$email_style['primer'] = $base . 'background-color:#c4c4dd;font-size:95%;text-align:center;"';
-		$email_style['segundo'] = $base . 'background-color:#d2d2ee; font-size:90%;text-align:center;"';
-		$email_style['tercer'] = $base . 'font-size:84%;background-color:#d9d9f2;text-align:center;"';
-		$email_style['cuarto'] = $base . 'font-size:80%;background-color:#e5e5f5;text-align:center;"';
-		$email_style['quinto'] = $base . 'font-size:76%;background-color:#f1f1f9;text-align:center;"';
-		$email_style['sexto'] = $base . 'font-size:74%;background-color:#f9f9ff;text-align:center;"';
-
-		$email_style_valor['primer']['base'] = $base . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
-		$email_style_valor['segundo']['base'] = $base . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
-		$email_style_valor['tercer']['base'] = $base . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
-		$email_style_valor['cuarto']['base'] = $base . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
-		$email_style_valor['quinto']['base'] = $base . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
-		$email_style_valor['sexto']['base'] = $base . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
-
-		$email_style_valor['primer']['principal'] = $principal . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
-		$email_style_valor['segundo']['principal'] = $principal . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
-		$email_style_valor['tercer']['principal'] = $principal . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
-		$email_style_valor['cuarto']['principal'] = $principal . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
-		$email_style_valor['quinto']['principal'] = $principal . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
-		$email_style_valor['sexto']['principal'] = $principal . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
-
-		$email_style_valor['primer']['secundario'] = $secundario . 'background-color:#c4c4dd;font-size:95%;text-align:right;"';
-		$email_style_valor['segundo']['secundario'] = $secundario . 'background-color:#d2d2ee; font-size:90%;text-align:right;"';
-		$email_style_valor['tercer']['secundario'] = $secundario . 'font-size:84%;background-color:#d9d9f2;text-align:right;"';
-		$email_style_valor['cuarto']['secundario'] = $secundario . 'font-size:80%;background-color:#e5e5f5;text-align:right;"';
-		$email_style_valor['quinto']['secundario'] = $secundario . 'font-size:76%;background-color:#f1f1f9;text-align:right;"';
-		$email_style_valor['sexto']['secundario'] = $secundario . 'font-size:74%;background-color:#f9f9ff;text-align:right;"';
-	}
-	?>
+	.td_h1	{<?php if (sizeof($agrupadores) < 6) echo "display:none;" ?>}
+	.td_h2	{<?php if (sizeof($agrupadores) < 5) echo "display:none;" ?>}
+	.td_h3	{<?php if (sizeof($agrupadores) < 4) echo "display:none;" ?>}
+	.td_h4	{<?php if (sizeof($agrupadores) < 3) echo "display:none;" ?>}
+	.td_h5	{<?php if (sizeof($agrupadores) < 2) echo "display:none;" ?>}
 
 	td.primer
 	{
 		background-color:#c4c4dd;
 		font-size:95%;
-		<?php if (sizeof($agrupadores) < 6) echo "display:none;" ?>
+		<?php
+		if (sizeof($agrupadores) < 6) {
+			echo "display:none;";
+		}
+		?>
 	}
 
 	td.segundo
 	{
 		background-color:#d2d2ee;
 		font-size:90%;
-		<?php if (sizeof($agrupadores) < 5) echo "display:none;" ?>
+		<?php
+		if (sizeof($agrupadores) < 5) {
+			echo "display:none;";
+		}
+		?>
 	}
 	td.tercer
 	{
 		font-size:84%;
 		background-color:#d9d9f2;
-		<?php if (sizeof($agrupadores) < 4) echo "display:none;" ?>
+		<?php
+		if (sizeof($agrupadores) < 4) {
+			echo "display:none;";
+		}
+		?>
 	}
 	td.cuarto
 	{
 		font-size:80%;
 		background-color:#e5e5f5;
-		<?php if (sizeof($agrupadores) < 3) echo "display:none;" ?>
-
+		<?php
+		if (sizeof($agrupadores) < 3) {
+			echo "display:none;";
+		}
+		?>
 	}
 	td.quinto
 	{
 		font-size:76%;
 		background-color:#f1f1f9;
-		<?php if (sizeof($agrupadores) < 2) echo "display:none;" ?>
-
+		<?php
+		if (sizeof($agrupadores) < 2) {
+			echo "display: none;";
+		}
+		?>
 	}
 	td.sexto
 	{
 		font-size:74%;
 		background-color:#f9f9ff;
-
 	}
 
 	td.campo
@@ -169,101 +184,8 @@ $pagina->PrintTop(1);
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 	}
-	TD.principal { border-right: solid 1px red;  border-bottom: solid 1px red; padding-right: 4px; }
-	TD.secundario { border-right: solid 1px blue; border-bottom: solid 1px blue;  padding-right: 4px; }
-
-
-	a:link.indefinido { color: #660000; }
-	span.indefinido { color: #550000; }
-
-	@media print
-	{
-		div#print_link {
-			display: none;
-		}
-	}
-
-</style>
-
-<?php
-/* Se crea el reporte según el Input del usuario */
-$reporte = new Reporte($sesion);
-
-/* FILTROS */
-
-/* PROFESIONALES */
-$users = $usuarios;
-if (!is_array($users)) {
-	$users = array($users);
-}
-foreach ($users as $usuario) {
-	if ($usuario) {
-		$reporte->addFiltro('usuario', 'id_usuario', $usuario);
-	}
-}
-
-/* CLIENTES */
-$clients = $clientes;
-if (!is_array($clients)) {
-	$clients = array($clients);
-}
-
-foreach ($clients as $cliente) {
-	if ($cliente) {
-		$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
-	}
-}
-
-/* FIN FILTROS */
-
-
-/* FILTROS ADICIONALES */
-
-/* PROFESIONALES FILTRO ADICIONAL */
-$users = $usuariosF;
-if (!is_array($users)) {
-	$users = array($users);
-}
-foreach ($users as $usuario) {
-	if ($usuario) {
-		$reporte->addFiltro('usuario', 'id_usuario', $usuario);
-	}
-}
-
-
-/* CLIENTES FILTRO ADICIONAL */
-$clients = $clientesF;
-if (!is_array($clients)) {
-	$clients = array($clients);
-}
-foreach ($clients as $cliente) {
-	if ($cliente) {
-		$reporte->addFiltro('cliente', 'codigo_cliente', $cliente);
-	}
-}
-
-/* FILTRO ENCARGADOS ADICIONAL */
-$encargados_comerciales = $encargados;
-if (!is_array($encargados_comerciales)) {
-	$encargados_comerciales = array($encargados_comerciales);
-}
-foreach ($encargados_comerciales as $encargado_com) {
-	if ($encargado_com) {
-		$reporte->addFiltro('contrato', 'id_usuario_responsable', $encargado_com);
-	}
-}
-
-/* FILTRO AREA PROFESIONAL ADICIONAL */
-
-$areas_profesionales = $area_profesional;
-if (!is_array($areas_profesionales)) {
-	$areas_profesionales = array($areas_profesionales);
-}
-foreach ($areas_profesionales as $area_pro) {
-	if ($area_pro) {
-		$reporte->addFiltro('usuario', 'id_area_usuario', $area_pro);
-	}
-}
+	TD.principal { border-right: solid 1px red; border-bottom: solid 1px red; padding-right: 4px; }
+	TD.secundario { border-right: solid 1px blue; border-bottom: solid 1px blue; padding-right: 4px; }
 
 /* FILTRO CATEGORIAS PROFESIONAL ADICIONAL */
 $categorias_profesionalF = $categorias_profesional;
@@ -276,27 +198,14 @@ foreach ($categorias_profesionalF as $cat_pro) {
 	}
 }
 
-/* FILTRO AREA ASUNTO ADICIONAL */
-$areas_asuntoF = $areas_asunto;
-if (!is_array($areas_asuntoF)) {
-	$areas_asuntoF = array($areas_asuntoF);
-}
-foreach ($areas_asuntoF as $areas_asuF) {
-	if ($areas_asuF) {
-		$reporte->addFiltro('asunto', 'id_area_proyecto', $areas_asuF);
-	}
-}
+	a:link.indefinido { color: #660000; }
+	span.indefinido { color: #550000; }
 
-/* FILTRO TIPOS ASUNTO ADICIONAL */
-$tipos_asuntoF = $tipos_asunto;
-if (!is_array($tipos_asuntoF)) {
-	$tipos_asuntoF = array($tipos_asuntoF);
-}
-foreach ($tipos_asuntoF as $tipo_asuF) {
-	if ($tipo_asuF) {
-		$reporte->addFiltro('asunto', 'id_tipo_asunto', $tipo_asuF);
+	@media print {
+		div#print_link {
+			display: none;
+		}
 	}
-}
 
 /* FILTRO ESTADO COBRO ADICIONAL */
 $estadocobro = $estado_cobro;
@@ -307,70 +216,59 @@ foreach ($estadocobro as $estadoF) {
 	$reporte->addFiltro('cobro', 'estado', $estadoF);
 }
 
-/* FILTRO MONEDA ADICIONAL */
-$monedascontrato = $moneda_contrato;
-if (!is_array($monedascontrato)) {
-	$monedascontrato = array($monedascontrato);
-}
-foreach ($monedascontrato as $monedacontrato) {
-	if ($monedacontrato) {
-		$reporte->addFiltro('contrato', 'id_moneda', $monedacontrato);
+<?php
+if (!$filtros_check) {
+	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
+	$fecha_m = '' . $fecha_mes;
+} else {
+	$clientes = null;
+	$usuarios = null;
+
+	if ($check_clientes) {
+		$clientes = $clientesF;
+	}
+	if ($check_profesionales) {
+		$usuarios = $usuariosF;
+	}
+	if ($check_area_prof) {
+		$areas_usuario = $areas;
+	}
+	if ($check_cat_prof) {
+		$categorias_usuario = $categorias;
+	}
+	if (!$check_area_asunto) {
+		$areas_asunto = null;
+	}
+	if (!$check_tipo_asunto) {
+		$tipos_asunto = null;
+	}
+	if (!$check_estado_cobro) {
+		$estado_cobro = null;
+	}
+	if (!$check_encargados) {
+		$encargados = null;
 	}
 }
 
-/* FIN FILTROS ADICIONAL */
-
-
-
-$reporte->id_moneda = $id_moneda;
-
-//genero el formato valor a ser usado en las celdas (
-$moneda = new Moneda($sesion);
-$moneda->Load($id_moneda);
-
-$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
-$formato_valor = array('cifras_decimales' => $moneda->fields['cifras_decimales'],
-	'miles' => $idioma->fields['separador_miles'],
-	'decimales' => $idioma->fields['separador_decimales']);
-
-$reporte->addRangoFecha($fecha_ini, $fecha_fin);
-
-if ($campo_fecha) {
-	$reporte->setCampoFecha($campo_fecha);
-}
-
-
-$reporte->setVista($vista);
-$reporte->setProporcionalidad($prop);
-
-/* ESTADOS */
-$estados = explode(",", $es_cob);
-if (!is_array($estados)) {
-	$estados = array($estados);
-}
-
-$reporte_c = $reporte;
-
-$reporte->setTipoDato($tipo_dato);
-foreach ($estados as $estado) {
-	if ($estado) {
-		$reporte->addFiltro('cobro', 'estado', $estado);
-	}
-}
-
+/* Se crea el reporte según el Input del usuario */
+$reporte = new Reporte($sesion);
+$dato = $tipo_dato;
+$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
+	'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+$reporte->setFiltros($filtros);
 $reporte->Query();
 $r = $reporte->toArray();
 
 $r_c = $r;
-
 if ($tipo_dato_comparado) {
+	$reporte_c = new Reporte($sesion);
+	$dato = $tipo_dato_comparado;
+	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
+		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+	$reporte_c->setFiltros($filtros);
 	$reporte_c->setTipoDato($tipo_dato_comparado);
-	foreach ($estados as $estado) {
-		if ($estado) {
-			$reporte_c->addFiltro('cobro', 'estado', $estado);
-		}
-	}
 
 	$reporte_c->Query();
 	$r_c = $reporte_c->toArray();
@@ -378,6 +276,18 @@ if ($tipo_dato_comparado) {
 	$r = $reporte->fixArray($r, $r_c);
 	$r_c = $reporte->fixArray($r_c, $r);
 }
+
+//genero el formato valor a ser usado en las celdas (
+$moneda = new Moneda($sesion);
+$moneda->Load($id_moneda);
+
+$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+$idioma->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
+$formato_valor = array(
+	'cifras_decimales' => $moneda->fields['cifras_decimales'],
+	'miles' => $idioma->fields['separador_miles'],
+	'decimales' => $idioma->fields['separador_decimales']
+);
 
 if ($tipo_dato_comparado) {
 	$titulo_reporte = __('Resumen - ') . ' ' . __($tipo_dato) . ' vs. ' . __($tipo_dato_comparado) . ' ' . __('en vista por') . ' ' . __($agrupadores[0]);
@@ -389,17 +299,15 @@ if (sizeof($r) == 2) {
 }
 ?>
 
-<script>
-
-	function Resize()
-	{
+<script type="text/javascript">
+	function Resize() {
 		height = $('tabla_planilla').offsetHeight + $('tabla_planilla_2').offsetHeight;
 		width = $('tabla_planilla_2').offsetWidth;
-		if(width < 694)
+		if (width < 694) {
 			width = 694;
+		}
 		parent.ResizeIframe(width+4, height+25);
 	}
-
 </script>
 
 
@@ -412,7 +320,7 @@ if (sizeof($r) == 2) {
 <table cellpadding="3" class="planilla" id ="tabla_planilla" style="width:99%" >
 	<tbody>
 		<tr>
-			<td colspan=5 style='font-size:90%; font-weight:bold; <?php echo $email ? 'border:0px;' : '' ?>' align=center>
+			<td colspan="5" style='font-size:90%; font-weight:bold; <?php echo $email ? 'border:0px;' : '' ?>' align="center">
 				<?php echo $titulo_reporte ?>
 			</td>
 			<td colspan=3 >
@@ -421,8 +329,7 @@ if (sizeof($r) == 2) {
 						<td style='' align=right>
 							<?php echo __('Total') . ' ' . __($tipo_dato) ?>:
 						</td>
-						<td align="right" style=''>
-
+						<td align="right" style="">
 							<?php echo Reporte::FormatoValor($sesion, $r['total'], $tipo_dato, '', $formato_valor); ?>
 						</td>
 						<td style='' align=right>
@@ -450,7 +357,7 @@ if (sizeof($r) == 2) {
 <table border=1 cellpadding="3" class="planilla" id="tabla_planilla_2">
 	<tbody>
 		<?php
-		//Imprime un valor en forma de Link. Añade los filtros correpondientes para ver los trabajos.
+//Imprime un valor en forma de Link. Añade los filtros correpondientes para ver los trabajos.
 		if (!function_exists('url')) {
 
 			function url($valor, $filtros = array(), $email) {
@@ -489,7 +396,7 @@ if (sizeof($r) == 2) {
 				$u .= "'\" ";
 
 				if ($valor === '99999!*') {
-					$u .= " title = \"" . __("Valor Indeterminado: el denominador de la fórmula es 0.") . "\" class = \"indefinido\"  ";
+					$u .= " title = \"" . __("Valor Indeterminado: el denominador de la fórmula es 0.") . "\" class = \"indefinido\" ";
 				}
 				$u.= ">" . $valor . "</a>";
 
@@ -508,19 +415,18 @@ if (sizeof($r) == 2) {
 
 				if ($comparado) {
 					$s .= "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\" ";
-					if ($email) {
+					if ($email)
 						$s .= ' ' . $email_style[$orden]['principal'] . ' ';
-					}
 					$s .= " > ";
 					$s .= url(Reporte::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
 					$s .= "</td> <tr > <td class=\"valor secundario\" ";
-					if ($email) {
+					if ($email)
 						$s .= ' ' . $email_style[$orden]['secundario'] . ' ';
-					}
 					$s .= " > ";
 					$s .= url(Reporte::FormatoValor($sesion, $valor_comparado['valor'], $comparado, '', $formato_valor), $filtros, $email);
 					$s .= "</td> </tr> </table>";
-				} else {
+				}
+				else {
 					$s .= url(Reporte::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
 				}
 			}
@@ -550,38 +456,24 @@ if (sizeof($r) == 2) {
 		}
 
 		/* HEADERS son agrupadores y tipos de datos */
-		$t = "<tr>";
+		$t = '<tr>';
 		for ($i = 0; $i < 6; $i++) {
-			$t .= "<td class='td_header td_h" . ($i + 1) . "' style='width:80px; ";
-			if ($email) {
-				$t .= " background-color: #D7ECF7;
-						color: #000000;
-						font-size:14px;
-						text-align:center;
-						border-right: 1px solid #CCCCCC; ";
-			}
-			$t .= "' >";
+			$i1 = $i + 1;
+			$t .= "<td class=\"td_header td_h{$i1}\" style=\"width:80px;\" >";
 			$t .= __($reporte->agrupador[$i]);
-			$t .= "</td>";
-			$t .= "<td class='td_header td_h" . ($i + 1) . "' style='width:50px; ";
-			if ($email) {
-				$t .= " background-color: #D7ECF7;
-						color: #000000;
-						font-size:14px;
-						text-align:center;
-						border-right: 1px solid #CCCCCC;' ";
-			}
-			$t .= "' >";
+			$t .= '</td>';
+			$t .= "<td class=\"td_header td_h{$i1}\" style=\"width:50px;\" >";
 			$t .= __(Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda));
 			if ($tipo_dato_comparado) {
-				$t .= __(" vs. ") . __(Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda));
+				$t .= __(' vs. ') . __(Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda));
 			}
-			$t .= "</td>";
+			$t .= '</td>';
 		}
-		$t .= "</tr>";
+		$t .= '</tr>';
 
 		/* Iteración principal de Tabla. Se recorren las 4 profundidades del arreglo resultado */
-		$t .= "<tr class=\"primera\">";
+		$t .= '<tr class="primera">';
+
 		foreach ($r as $k_a => $a) {
 			if (is_array($a)) {
 				celda_campo($t, 'primer', $a['filas'], $k_a, $email, $email_style);
@@ -640,9 +532,9 @@ if (sizeof($r) == 2) {
 
 	</tbody>
 </table>
-<script>
-	Event.observe(window, "load", function(e)
-	{
+
+<script type="text/javascript">
+	Event.observe(window, 'load', function(e) {
 		Resize();
 	});
 </script>

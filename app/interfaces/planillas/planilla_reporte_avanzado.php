@@ -2,10 +2,8 @@
 
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
-
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
-
 $agrupadores = explode('-', $vista);
 
 $datos = array();
@@ -19,8 +17,6 @@ $resultado = array();
 if (!$filtros_check) {
 	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
 	$fecha_m = '' . $fecha_mes;
-	/* $fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
-	  $fecha_ini = "01-".$fecha_m."-".$fecha_anio; */
 } else {
 	$clientes = null;
 	$usuarios = null;
@@ -31,15 +27,12 @@ if (!$filtros_check) {
 	if ($check_profesionales) {
 		$usuarios = $usuariosF;
 	}
-
 	if ($check_area_prof) {
 		$areas_usuario = $areas;
 	}
-
 	if ($check_cat_prof) {
 		$categorias_usuario = $categorias;
 	}
-
 	if (!$check_area_asunto) {
 		$areas_asunto = null;
 	}
@@ -62,87 +55,13 @@ if ($comparar) {
 
 foreach ($datos as $dato) {
 	$reporte[$dato] = new Reporte($sesion);
-
-	if ($clientes) {
-		foreach ($clientes as $cliente) {
-			if ($cliente) {
-				$reporte[$dato]->addFiltro('cliente', 'codigo_cliente', $cliente);
-			}
-		}
-	}
-
-	if ($usuarios) {
-		foreach ($usuarios as $usuario) {
-			if ($usuario) {
-				$reporte[$dato]->addFiltro('usuario', 'id_usuario', $usuario);
-			}
-		}
-	}
-	if ($tipos_asunto) {
-		foreach ($tipos_asunto as $tipo) {
-			if ($tipo) {
-				$reporte[$dato]->addFiltro('asunto', 'id_tipo_asunto', $tipo);
-			}
-		}
-	}
-
-	if ($areas_asunto) {
-		foreach ($areas_asunto as $area) {
-			if ($area) {
-				$reporte[$dato]->addFiltro('asunto', 'id_area_proyecto', $area);
-			}
-		}
-	}
-
-	if ($areas_usuario) {
-		foreach ($areas_usuario as $area_usuario) {
-			if ($area_usuario) {
-				$reporte[$dato]->addFiltro('usuario', 'id_area_usuario', $area_usuario);
-			}
-		}
-	}
-
-	if ($categorias_usuario) {
-		foreach ($categorias_usuario as $categoria_usuario) {
-			if ($categoria_usuario) {
-				$reporte[$dato]->addFiltro('usuario', 'id_categoria_usuario', $categoria_usuario);
-			}
-		}
-	}
-
-	if ($encargados) {
-		foreach ($encargados as $encargado) {
-			if ($encargado) {
-				$reporte[$dato]->addFiltro('contrato', 'id_usuario_responsable', $encargado);
-			}
-		}
-	}
-
-	if ($estado_cobro) {
-		foreach ($estado_cobro as $estado) {
-			if ($estado) {
-				$reporte[$dato]->addFiltro('cobro', 'estado', $estado);
-			}
-		}
-	}
-
-	$reporte[$dato]->addRangoFecha($fecha_ini, $fecha_fin);
-
-	if ($campo_fecha) {
-		$reporte[$dato]->setCampoFecha($campo_fecha);
-	}
-
-
-	$reporte[$dato]->setTipoDato($dato);
-	$reporte[$dato]->setVista($vista);
-	$reporte[$dato]->setProporcionalidad($prop);
-	$reporte[$dato]->id_moneda = $id_moneda;
-
+	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
+		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+	$reporte[$dato]->setFiltros($filtros);
 	$reporte[$dato]->Query();
-
 	$resultado[$dato] = $reporte[$dato]->toArray();
 }
-
 $wb = new Spreadsheet_Excel_Writer();
 
 $wb->send("Planilla Horas por Cliente.xls");
@@ -288,7 +207,7 @@ $ws1->mergeCells($fila, 1, $fila, 2);
 
 $columna = 0;
 
-$fila+= 2;
+$fila += 2;
 
 if ($comparar) {
 	$resultado[$tipo_dato] = Reporte::fixArray($resultado[$tipo_dato], $resultado[$tipo_dato_comparado]);
