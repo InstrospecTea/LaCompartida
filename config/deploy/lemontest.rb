@@ -42,15 +42,19 @@ namespace :deploy do
       dirname=branch.tr('/','_')
       absolute_path = base_directory << '/' << file_path << '/current/'
       symlink_path = '/var/www/virtual/lemontest.thetimebilling.com/htdocs/' << dirname
-      p absolute_path
-     p symlink_path
-    p dbname='lemontest_' << dirname.tr('_','')
+      #p absolute_path
+     #p symlink_path
+    #p dbname='lemontest_' << dirname.tr('_','')
     run " ln -nsf #{absolute_path} #{symlink_path}"
+       puts "\n\n\n\e[00;32m ====  SUCCESS: \e[0;37m deployed test environment on \e[04;36mhttp://lemontest.thetimebilling.com/#{dirname}\e[00;32m ====\e[0;37m\n\n\n"
+
   end
 
    before "deploy:update_code", "deploy:setup"
-    before "deploy:update_code", "deploy:lemontest_symlink"
+   
   after "deploy:update", "deploy:cleanup"
+   after "deploy:cleanup", "deploy:lemontest_symlink"
  
+
 
 end
