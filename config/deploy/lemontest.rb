@@ -34,6 +34,10 @@ namespace :deploy do
       run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
+  task :loadkey do
+   run "eval $(ssh-agent) "
+   run "ssh-add /root/.ssh/github_rsa"
+end
 
   task :lemontest_symlink do
       subdominio = 'lemontest'
@@ -44,15 +48,29 @@ namespace :deploy do
       symlink_path = '/var/www/virtual/lemontest.thetimebilling.com/htdocs/' << dirname
       #p absolute_path
      #p symlink_path
-    #p dbname='lemontest_' << dirname.tr('_','')
+   
     run " ln -nsf #{absolute_path} #{symlink_path}"
        puts "\n\n\n\e[00;32m ====  SUCCESS: \e[0;37m deployed test environment on \e[04;36mhttp://lemontest.thetimebilling.com/#{dirname}\e[00;32m ====\e[0;37m\n\n\n"
 
   end
 
+task :create_database do
+     dirname=branch.tr('/','_')
+       dbname='lemontest_' << dirname.tr('_','').tr('.','')
+  puts "\n\e[0;31m   #######################################################################"
+  puts           "   #     Do you need me to create database \e[01;37m #{dbname}\e[0;31m? (y/N)    #" 
+  puts           "   #######################################################################\e[0m\n"
+  proceed = STDIN.gets[0..0] rescue nil
+  if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
+    run "  mysql -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx --opt  lemontest_molde | mysql -uroot -pasdwsx #{dbname}"
+  end
+
+end
+    before "deploy:setup", "deploy:loadkey"
    before "deploy:update_code", "deploy:setup"
    
   after "deploy:update", "deploy:cleanup"
+  after "deploy:cleanup", "deploy:create_database"
    after "deploy:cleanup", "deploy:lemontest_symlink"
  
 
