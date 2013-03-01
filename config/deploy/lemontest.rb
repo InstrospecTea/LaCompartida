@@ -46,7 +46,6 @@ namespace :deploy do
      p symlink_path
     p dbname='lemontest_' << dirname.tr('_','')
     run " ln -nsf #{absolute_path} #{symlink_path}"
-    run "mysql -ulemontest -plemontest -e 'create database #{dbname}' && mysqldump  -ulemontest -plemontest --opt  lemontest_hotfix | mysql  -ulemontest -plemontest #{dbname}"
   end
 
    before "deploy:update_code", "deploy:setup"
