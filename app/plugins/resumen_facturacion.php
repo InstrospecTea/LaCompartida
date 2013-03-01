@@ -31,11 +31,13 @@ function Descarga_Planilla_Resumen_Facturacion() {
 				'title' => 'T/DOC',
 			));
 
-		array_push($cofiguracion_resumen, array(
-			'field' => 'serie',
-			'title' => 'Serie',
-			'format' => 'text'
-		));
+		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
+			array_push($cofiguracion_resumen, array(
+				'field' => 'serie',
+				'title' => 'Serie',
+				'format' => 'text'
+			));
+		}
 		array_push($cofiguracion_resumen , 	array(
 			'field' => 'estado',
 			'title' => 'ESTADO',
