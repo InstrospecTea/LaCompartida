@@ -14,10 +14,7 @@ server "lemontest.thetimebilling.com", :web, {:user => 'root'}
 
 namespace :deploy do
 
-  desc "Send email notification"
-  task :send_notification do
-    Notifier.deploy_notification(self).deliver 
-  end
+  
 
   task :update_symlinks do
     update_symlinks(self)
