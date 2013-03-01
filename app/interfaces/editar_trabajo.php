@@ -37,12 +37,11 @@
 		} else if ($opcion == 'cambiofecha') {
 			$semana=Utiles::fecha2sql($fecha);
 			$t->Edit('fecha', $semana);
-			try {
-				$t->Write(true, true);
+			if ($t->ValidarDiasIngresoTrabajo() && $t->Write(true)) {
 				die('semana|' . $semana);
-			} catch (Exception $e) {
+			} else {
 				header('HTTP/1.0 401 Unauthorized');
-				die($e->getMessage() );
+				die($t->error);
 			}
 		} else if ($opcion == 'clonar') {
 			$semana=Utiles::fecha2sql($fecha);
@@ -57,8 +56,7 @@
 				}
 			}
 
-			try {
-				$t->Write(true, true);
+			if ($t->ValidarDiasIngresoTrabajo() && $t->Write(true)) {
 				if (date('N',strtotime($t->fields['fecha'])) == 1) {
 					$lastmonday = date('Y-m-d',strtotime($t->fields['fecha']));
 				} else {
@@ -73,9 +71,9 @@
 
 				die('id_trabajo|'.$t->fields['id_trabajo'].'|'.$sesion->usuario->HorasTrabajadasEsteSemana($t->fields['id_usuario'],$lastmonday).'|'.$hhmes);
 
-			} catch (Exception $e) {
+			} else {
 				header('HTTP/1.0 401 Unauthorized');
-				die($e->getMessage() );
+				die($t->error);
 			}
 		}
 
@@ -275,13 +273,12 @@
 					$t->fields['duracion_cobrada']='00:00:00';
 				}
 
-				try {
-					if ($t->Write(true, true)) {
-						if ($actualizar_trabajo_tarifa) {
-							$t->InsertarTrabajoTarifa();
-						}
-						$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con éxito'):__('editado con éxito')));
-						// refresca el listado de horas.php cuando se graba la informacion desde el popup
+				if ($t->ValidarDiasIngresoTrabajo() && $t->Write(true)) {
+					if ($actualizar_trabajo_tarifa) {
+						$t->InsertarTrabajoTarifa();
+					}
+					$pagina->AddInfo(__('Trabajo').' '.($nuevo?__('guardado con éxito'):__('editado con éxito')));
+					// refresca el listado de horas.php cuando se graba la informacion desde el popup
 ?>
 <script>
 	if (window.opener) {
@@ -292,9 +289,8 @@
 	}*/
 </script>
 <?php
-					}
-				} catch(Exception $e) {
-					$pagina->AddError($e->getMessage());
+				} else {
+					$pagina->AddError($t->error);
 				}
 			} else {
 				$pagina->AddError("No se pueden ingresar mas de 23:59 horas por día.");
@@ -1556,3 +1552,4 @@ if (CodigoSecundario )  {
 
 
 </script>
+<?php echo SelectorHoras::Javascript(); ?>

@@ -323,7 +323,6 @@ $where .= " AND usuario.visible = 1";
 				Refrescasemana(lastweek,usuario,'lastweek');
 				calendario(semana);
 
-				/*
 				jQuery('.trabajoabierto').draggable({
 					cursor: 'move',
 					containment: '#contienehoras',
@@ -433,7 +432,6 @@ $where .= " AND usuario.visible = 1";
 						});
 					}
 				});
-				*/
 			}
 		});
 

@@ -98,44 +98,53 @@ class Trabajo extends Objeto
 			}
 		}
 
-		try {
-			if (parent::Write()) {
-				// Modificamos un trabajo que ya existÃ­a, logueamos el cambio.
-				if( $ingreso_historial ) {
-					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-				}
-				return true;
-			} else {
-				return false;
+		if (parent::Write()) {
+			// Modificamos un trabajo que ya existÃ­a, logueamos el cambio.
+			if( $ingreso_historial ) {
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			}
-		} catch (Exception $e) {
-			if($espera_excepcion) {
-				throw new Exception($e->getMessage());
-			} else {
-				return false;
-			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	function Check() {
-		if ($this->Loaded()
-				&& !in_array($this->fields['estado_cobro'], array('','SIN COBRO','CREADO','EN REVISION'))) {
-			throw new Exception('No se puede mover un trabajo cobrado');
-		} else {
-			$horasenfecha = $this->HorasEnFecha($this->fields['fecha'], $this->fields['id_usuario'], $this->fields['id_trabajo']);
+		if ($this->Loaded() && $this->changes['fecha']
+				&& !in_array($this->fields['estado_cobro'], array('', 'SIN COBRO', 'CREADO', 'EN REVISION'))) {
+			$this->error = 'No se puede mover un trabajo cobrado';
+			return false;
+		}
+
+		if ($this->changes['fecha'] || $this->changes['id_usuario']
+			|| $this->changes['id_trabajo'] || $this->changes['duracion']) {
+			$horasenfecha = $this->HorasEnFecha($this->fields['fecha'],
+				$this->fields['id_usuario'], $this->fields['id_trabajo']);
 
 			$duracion = $this->fields['duracion'];
 			$duracionsegundos = strtotime($duracion) - strtotime('today');
 			$totaldiacondicional = ($horasenfecha['duracion'] + $duracionsegundos);
 
 			if ($totaldiacondicional >= 86400) {
-				throw new Exception('No se puede trabajar más de 24 horas diarias');
-			} else {
-				return true;
+				$this->error = 'No se puede trabajar más de 24 horas diarias';
+				return false;
 			}
 		}
+		
+		return true;
 	}
 
+	public function ValidarDiasIngresoTrabajo(){
+		if($this->sesion->usuario->fields['dias_ingreso_trabajo']){
+			$fecha_tope = time() - ($this->sesion->usuario->fields['dias_ingreso_trabajo'] + 1) * 24 * 60 * 60;
+			if($fecha_tope > strtotime($this->fields['fecha'])){
+				$this->error = 'No se puede ingresar horas anteriores al ' . date('Y-m-d', $fecha_tope + 24 * 60 * 60);
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/*
 	 * param $fecha fecha que se quiere verificar en formato 'YYYY-MM-DD'
 	 * param $id_usuario id usuario, opcional
