@@ -187,17 +187,6 @@ if ($email) {
 	TD.principal { border-right: solid 1px red; border-bottom: solid 1px red; padding-right: 4px; }
 	TD.secundario { border-right: solid 1px blue; border-bottom: solid 1px blue; padding-right: 4px; }
 
-/* FILTRO CATEGORIAS PROFESIONAL ADICIONAL */
-$categorias_profesionalF = $categorias_profesional;
-if (!is_array($categorias_profesionalF)) {
-	$categorias_profesionalF = array($categorias_profesionalF);
-}
-foreach ($categorias_profesionalF as $cat_pro) {
-	if ($cat_pro) {
-		$reporte->addFiltro('usuario', 'id_categoria_usuario', $cat_pro);
-	}
-}
-
 	a:link.indefinido { color: #660000; }
 	span.indefinido { color: #550000; }
 
@@ -206,15 +195,7 @@ foreach ($categorias_profesionalF as $cat_pro) {
 			display: none;
 		}
 	}
-
-/* FILTRO ESTADO COBRO ADICIONAL */
-$estadocobro = $estado_cobro;
-if (!is_array($estado_cobro)) {
-	$estadocobro = array($estadocobro);
-}
-foreach ($estadocobro as $estadoF) {
-	$reporte->addFiltro('cobro', 'estado', $estadoF);
-}
+</style>
 
 <?php
 if (!$filtros_check) {
