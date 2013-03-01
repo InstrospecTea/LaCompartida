@@ -51,7 +51,7 @@ function Descarga_Planilla_Resumen_Facturacion() {
 			array_push($cofiguracion_resumen, array(
 				'field' => "iva_$id_moneda",
 				'format' => 'number',
-				'title' => "IGV {$Moneda['simbolo']}"
+				'title' => __('IVA') . " {$Moneda['simbolo']}"
 			));
 		}
 
