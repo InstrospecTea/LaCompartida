@@ -34,11 +34,7 @@ namespace :deploy do
       run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
-  task :loadkey do
-   run "eval $(ssh-agent) "
-   run "ssh-add /root/.ssh/github_rsa"
-end
-
+ 
   task :lemontest_symlink do
       subdominio = 'lemontest'
       dominio = 'thetimebilling.com'
@@ -58,7 +54,7 @@ task :create_database do
      dirname=branch.tr('/','_')
        dbname='lemontest_' << dirname.tr('_','').tr('.','')
   puts "\n\e[0;31m   #######################################################################"
-  puts           "   #     Do you need me to create database \e[01;37m #{dbname}\e[0;31m? (y/N)    #" 
+  puts           "   #    Do you need me to create database \e[01;37m #{dbname}\e[0;31m? (y/N)   #" 
   puts           "   #######################################################################\e[0m\n"
   proceed = STDIN.gets[0..0] rescue nil
   if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
@@ -66,8 +62,7 @@ task :create_database do
   end
 
 end
-    before "deploy:setup", "deploy:loadkey"
-   before "deploy:update_code", "deploy:setup"
+    before "deploy:update_code", "deploy:setup"
    
   after "deploy:update", "deploy:cleanup"
   after "deploy:cleanup", "deploy:create_database"
