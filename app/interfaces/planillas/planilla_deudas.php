@@ -49,7 +49,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		$campo_valor="T.saldo";
 		$campo_gvalor="T.gsaldo";
 		$campo_hvalor="T.hsaldo";
-		$where.="AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+		$where.=" AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')   AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
 		$groupby.=" d.id_documento";
 		$tipo=" 'liquidacion'";
 		$identificador=" d.id_cobro";
@@ -119,8 +119,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 
 			$join
 			WHERE
-				d.tipo_doc = 'N' AND
-				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')  
+				d.tipo_doc = 'N'
 				
 				$where
 			GROUP BY $groupby
