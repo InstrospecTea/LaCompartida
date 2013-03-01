@@ -1552,4 +1552,7 @@ if (CodigoSecundario )  {
 
 
 </script>
-<?php echo SelectorHoras::Javascript(); ?>
+<?php
+echo SelectorHoras::Javascript();
+$pagina->PrintBottom($popup);
+?>
