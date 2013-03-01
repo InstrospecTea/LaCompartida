@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.1.9
+Miercoles 27 de febrero 2013.
+* **Fixed** [Agrega hook al inicio de la interfaz factura. Complementario con pull request 76](https://github.com/LemontechSA/ttb/pull/76)
+
 
 ## Hotfix: 13.1.8
 Lunes 25 de febrero 2013.
