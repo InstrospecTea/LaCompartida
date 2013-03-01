@@ -124,7 +124,7 @@ class CargaMasiva extends Objeto {
 		if (!$campo_glosa) {
 			$campo_glosa = $this->LlaveUnica($clase);
 		}
-		
+
 		if (is_array($campo_glosa)) {
 			$campo_glosa = implode(', ', $campo_glosa);
 		} else {
@@ -138,13 +138,13 @@ class CargaMasiva extends Objeto {
 		$lista = array();
 		foreach ($data as $fila) {
 			$id = $fila['id'];
-			if(count($fila) == 2){
+			if (count($fila) == 2) {
 				$glosa = $fila['glosa'];
-			} else{
+			} else {
 				unset($fila['id']);
 				$glosa = $invertir ? implode(' / ', $fila) : $fila;
 			}
-			
+
 			if ($invertir) {
 				$lista[$glosa] = $id;
 			} else {
@@ -164,6 +164,8 @@ class CargaMasiva extends Objeto {
 		$data = array();
 		$num_cols = 0;
 
+		$cols_datos = array();
+
 		$filas = explode("\n", $raw_data);
 		foreach ($filas as $fila) {
 			if (!preg_match('/\S/', $fila)) {
@@ -173,9 +175,19 @@ class CargaMasiva extends Objeto {
 			//elimina espacios inutiles
 			foreach ($cols as $idx => $col) {
 				$cols[$idx] = trim(preg_replace('/\s+/', ' ', $col));
+				if ($cols[$idx] !== '' && !isset($cols_datos[$idx])) {
+					$cols_datos[$idx] = $idx;
+				}
 			}
 			$data[] = $cols;
 			$num_cols = max($num_cols, count($cols));
+		}
+
+		$cols_vacias = array();
+		for ($i = 0; $i < $num_cols; $i++) {
+			if (!isset($cols_datos[$i])) {
+				$cols_vacias[$i] = $i;
+			}
 		}
 
 		//rellena con vacios las filas con menos columnas
@@ -183,6 +195,11 @@ class CargaMasiva extends Objeto {
 			while (count($cols) < $num_cols) {
 				$cols[] = '';
 			}
+
+			foreach ($cols_vacias as $c) {
+				unset($cols[$c]);
+			}
+
 			$data[$idx] = $cols;
 		}
 

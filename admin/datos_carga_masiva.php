@@ -9,10 +9,6 @@ $pagina->PrintTop();
 
 $CargaMasiva = new CargaMasiva($sesion);
 
-if (isset($data) && isset($campos)) {
-	$errores = $CargaMasiva->CargarData($data, $clase, $campos);
-}
-
 $listados = $CargaMasiva->ObtenerListados($clase);
 
 $campos_clase = $CargaMasiva->ObtenerCampos($clase);
@@ -22,7 +18,15 @@ $titulos_campos = array_map(function($campo) {
 
 if (isset($raw_data)) {
 	$data = $CargaMasiva->ParsearData($raw_data);
-	$campos = array_keys($campos_clase);
+	if (!empty($data)) {
+		$llaves_campos = array_keys($campos_clase);
+		$campos = array();
+		foreach (array_keys($data[0]) as $idx) {
+			$campos[] = $llaves_campos[$idx];
+		}
+	} else {
+		$campos = array_keys($campos_clase);
+	}
 }
 
 if (empty($data)) {
@@ -62,38 +66,43 @@ if (empty($data)) {
 		background-color: #ccf !important;
 	}
 </style>
-<form method="POST" action="datos_carga_masiva.php">
-	<button id="btn_agregar_columna">Agregar Columna</button>
-	<button id="btn_agregar_fila">Agregar Fila</button>
-	<table id="data">
-		<thead>
-			<tr>
-				<?php foreach ($campos as $c => $campo) { ?>
-					<th>
-						<?php echo Html::SelectArrayDecente($titulos_campos, "campos[$c]", $campo, '', '(ignorar)'); ?>
-						<button class="btn_eliminar_columna">X</button>
-					</th>
-				<?php } ?>
-			</tr>
-		</thead>
-		<tbody>
-			<?php foreach ($data as $idx => $fila) { ?>
-				<tr <?php echo isset($errores[$idx]) ? 'class="error" title="' . $errores[$idx] . '"' : ''; ?>>
-					<?php foreach ($fila as $c => $col) { ?>
-						<td>
-							<input id="<?php echo "data_{$idx}_{$c}"; ?>" name="<?php echo "data[$idx][$c]"; ?>" value="<?php echo $col; ?>" class="col_<?php echo $c; ?>"/>
-							<div class="extra"/>
-						</td>
-					<?php } ?>
-					<td><button class="btn_eliminar_fila">X</button></td>
-				</tr>
-			<?php } ?>
-		</tbody>
-	</table>
 
-	<input type="hidden" name="clase" value="<?php echo $clase; ?>"/>
-	<input type="submit" value="Enviar"/>
-</form>
+<button id="btn_agregar_columna">Agregar Columna</button>
+<button id="btn_agregar_fila">Agregar Fila</button>
+<table id="data">
+	<thead>
+		<tr>
+			<?php foreach ($campos as $c => $campo) { ?>
+				<th>
+					<?php echo Html::SelectArrayDecente($titulos_campos, "campos[$c]", $campo, '', '(ignorar)'); ?>
+					<button class="btn_eliminar_columna">X</button>
+				</th>
+			<?php } ?>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($data as $idx => $fila) { ?>
+			<tr <?php echo isset($errores[$idx]) ? 'class="error" title="' . $errores[$idx] . '"' : ''; ?>>
+				<?php
+				$c = 0;
+				foreach ($fila as $col) {
+					?>
+					<td>
+						<input id="<?php echo "data_{$idx}_{$c}"; ?>" name="<?php echo "data[$idx][$c]"; ?>" value="<?php echo $col; ?>" class="col_<?php echo $c; ?>"/>
+						<div class="extra"/>
+					</td>
+					<?php
+					$c++;
+				}
+				?>
+				<td><button class="btn_eliminar_fila">X</button></td>
+			</tr>
+		<?php } ?>
+	</tbody>
+</table>
+
+<input type="hidden" name="clase" value="<?php echo $clase; ?>"/>
+<button id="btn_enviar">Enviar</button>
 
 <script type="text/javascript">
 	var clase = '<?php echo $clase; ?>';
@@ -253,25 +262,6 @@ if (empty($data)) {
 			}
 		}
 
-		if (nuevo === viejo) {
-			return;
-		}
-		if (nuevo) {
-			if (!valores_unicos[campo][nuevo]) {
-				valores_unicos[campo][nuevo] = [];
-			}
-			var i = valores_unicos[campo][nuevo].indexOf(idx_fila);
-			if (i < 0) {
-				valores_unicos[campo][nuevo].push(idx_fila);
-				if (valores_unicos[campo].unico && idx_campos[campo] !== undefined) {
-					if (valores_unicos[campo][nuevo].length > 1) {
-						inputsValoresUnicos(campo, nuevo)
-								.addClass('error').attr('title', 'El campo ' + titulo + ' debe ser único, pero está repetido en esta carga');
-					}
-				}
-			}
-		}
-
 		if (viejo && valores_unicos[campo][viejo]) {
 			var i = valores_unicos[campo][viejo].indexOf(idx_fila);
 			if (i >= 0) {
@@ -300,6 +290,23 @@ if (empty($data)) {
 			}
 
 		}
+		
+		if (nuevo) {
+			if (!valores_unicos[campo][nuevo]) {
+				valores_unicos[campo][nuevo] = [];
+			}
+			var i = valores_unicos[campo][nuevo].indexOf(idx_fila);
+			if (i < 0) {
+				valores_unicos[campo][nuevo].push(idx_fila);
+				if (valores_unicos[campo].unico && idx_campos[campo] !== undefined) {
+					if (valores_unicos[campo][nuevo].length > 1) {
+						inputsValoresUnicos(campo, nuevo)
+								.addClass('error').attr('title', 'El campo ' + titulo + ' debe ser único, pero está repetido en esta carga');
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -524,7 +531,7 @@ if (empty($data)) {
 	function serializar(selector) {
 		var data = {};
 		var elem = jQuery(selector);
-		var inputs = elem.is(':input[name]') ? elem.filter(':input[name]') : elem.find(':input[name]');
+		var inputs = elem.is(':input[name]') ? elem.filter(':input[name]:visible') : elem.find(':input[name]:visible');
 		inputs.each(function() {
 			data[jQuery(this).attr('name')] = jQuery(this).val();
 		});
@@ -702,21 +709,131 @@ if (empty($data)) {
 	 * se llama al cambiar el campo que representa una columna
 	 */
 	function cambioCampo() {
-		calcularCamposIdx();
-
-		if (!jQuery(this).is(':visible')) {
+		validacionColumnas(jQuery(this), 0);
+	}
+	
+	/**
+	 * valida todos los inputs de una columna
+	 * @param {jQuery} selector_campo
+	 */
+	function validarColumna(selector_campo){
+		if (!selector_campo.is(':visible')) {
 			return true;
 		}
 
-		var campo = jQuery(this).val();
-		var idx = jQuery(this).closest('th').index();
+		var campo = selector_campo.val();
 		var info = campos_clase[campo];
-		var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
-		jQuery('.col_' + idx).each(function() {
+		
+		var idx = selector_campo.closest('th').index();
+		var inputs = jQuery('.col_' + idx);
+		inputs.each(function() {
 			validacionInput(jQuery(this), campo, info);
 		});
 		columna_validada[idx] = true;
-		col.removeClass('procesando');
+	}
+
+	/**
+	 * envia asincronamente las filas de a 1
+	 * @param {jQuery} trs
+	 * @param {string} data
+	 * @param {int} idx
+	 */
+	function enviarFila(trs, data, idx) {
+		var tr = trs.get(idx);
+		if (!tr) {
+			resumenEnvio();
+			return;
+		}
+		tr = jQuery(tr);
+
+		tr.addClass('procesando');
+		jQuery(window).scrollTop(tr.position().top);
+
+		jQuery.ajax('carga_masiva_ajax.php', {
+			type: 'POST',
+			data: data + serializar(tr),
+			success: function(response) {
+				tr.removeClass('procesando');
+				try {
+					var resp = jQuery.parseJSON(response);
+					//se recibio una respuesta json
+					if (response === '[]') {
+						tr.removeClass('warning').addClass('ok');
+					}
+					else {
+						tr.addClass('error').attr('title', resp[tr.index()]);
+					}
+				} catch (e) {
+					//se recibio un html
+					var error = 'Error al guardar el dato';
+					var i = response.lastIndexOf('<!--');
+					if (i >= 0) {
+						//si viene un error SQL, mostrarlo como error
+						error = response.substr(i + 4, response.length - 7);
+					}
+					tr.addClass('error').attr('title', error);
+				}
+
+				enviarFila(trs, data, idx + 1);
+			}
+		});
+	}
+
+	/**
+	 * actualiza los listados y muestra la cantidad de datos cargados y fallados
+	 */
+	function resumenEnvio() {
+		//se vuelven a cargar los listados para reflejar los datos que se agregaron
+		jQuery.ajax('carga_masiva_ajax.php', {
+			type: 'POST',
+			data: 'clase=' + clase + '&obtener_listados=1',
+			success: function(response) {
+				try {
+					listados = jQuery.parseJSON(response);
+					generarListadosInversos();
+				} catch (e) {
+				}
+
+				//resumen ejecutivo
+				var ok = jQuery('tr.ok:visible').length;
+				var fail = jQuery('tr.error:visible').length;
+				alert(ok + ' datos cargados correctamente, ' + fail + ' errores');
+				if (fail) {
+					jQuery(window).scrollTop(jQuery('tr.error:visible').position().top);
+					jQuery('tr.error :input').one('change', function() {
+						jQuery(this).closest('tr').removeClass('error').removeAttr('title');
+					});
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * validacion asincrona de un conjunto de columnas
+	 * @param {jQuery} selectores_campo
+	 * @param {int} idx
+	 * @param {function} callback opcional
+	 */
+	function validacionColumnas(selectores_campo, idx, callback) {
+		if (!idx) {
+			calcularCamposIdx();
+		}
+		
+		var col = selectores_campo.get(idx);
+		if (col) {
+			col = jQuery(col);
+			var num_td = col.closest('th').index() + 1;
+			var tds = jQuery('#data tbody td:nth-of-type(' + num_td + ')');
+			tds.addClass('procesando');
+			setTimeout(function() {
+				validarColumna(col);
+				tds.removeClass('procesando');
+				validacionColumnas(selectores_campo, idx + 1, callback);
+			}, 0);
+		} else if(callback) {
+			callback();
+		}
 	}
 
 	jQuery(function() {
@@ -741,7 +858,7 @@ if (empty($data)) {
 		jQuery('.btn_eliminar_columna').click(eliminarColumna);
 		jQuery('.btn_eliminar_fila').click(eliminarFila);
 
-		jQuery('form').submit(function() {
+		jQuery('#btn_enviar').click(function() {
 			var msg = '';
 
 			//se validan que esten las columnas que deben estar
@@ -767,94 +884,33 @@ if (empty($data)) {
 			}
 
 			//si aun no se valida alguna columna, se valida ahora
-			jQuery.each(columna_validada, function(idx, validada) {
-				if (!validada) {
-					var col = jQuery('td:nth-of-type(' + idx + ')').addClass('procesando');
-					console.log('Validando columna ' + campos_clase[campos_idx[idx]].titulo);
-					jQuery('[name="campos[' + idx + ']"]').change();
-					col.removeClass('procesando');
+			validacionColumnas(jQuery('[name^=campos]:visible').filter(function() {
+				var idx = jQuery(this).closest('th').index();
+				return campos_idx[idx] && !columna_validada[idx];
+			}), 0, function() {
+				//buscar errores de datos
+				var errores = jQuery('.error:visible');
+				if (errores.length) {
+					msg += '\nHay errores en los datos!';
+					jQuery(errores.get(0)).focus();
 				}
-			});
 
-			//buscar errores de datos
-			var errores = jQuery('.error:visible');
-			if (errores.length) {
-				msg += '\nHay errores en los datos!';
-				errores.focus();
-			}
-
-			if (msg) {
-				alert(msg);
-				return false;
-			}
-
-			//si hay advertencias se avisa pero igual se puede seguir
-			var warnings = jQuery('.warning');
-			if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {
-				warnings.focus();
-				return false;
-			}
-
-			//se envian los datos fila por fila
-			var data = serializar('#data thead') + '&clase=' + clase + '&';
-			jQuery('#data tbody tr:not(.ok):visible').each(function(idx) {
-				var tr = jQuery(this);
-				tr.addClass('procesando');
-				jQuery(window).scrollTop(tr.position().top);
-
-				jQuery.ajax('carga_masiva_ajax.php', {
-					type: 'POST',
-					data: data + serializar(tr),
-					async: false,
-					success: function(response) {
-						tr.removeClass('procesando');
-						try {
-							var resp = jQuery.parseJSON(response);
-							//se recibio una respuesta json
-							if (response === '[]') {
-								tr.removeClass('warning').addClass('ok');
-							}
-							else {
-								tr.addClass('error').attr('title', resp[idx]);
-							}
-						} catch (e) {
-							//se recibio un html
-							var error = 'Error al guardar el dato';
-							var i = response.lastIndexOf('<!--');
-							if (i >= 0) {
-								//si viene un error SQL, mostrarlo como error
-								error = response.substr(i + 4, response.length - 7);
-							}
-							tr.addClass('error').attr('title', error);
-						}
-					}
-				});
-			});
-
-			//se vuelven a cargar los listados para reflejar los datos que se agregaron
-			jQuery.ajax('carga_masiva_ajax.php', {
-				type: 'POST',
-				data: 'clase=' + clase + '&obtener_listados=1',
-				async: false,
-				success: function(response) {
-					try {
-						listados = jQuery.parseJSON(response);
-						generarListadosInversos();
-					} catch (e) {
-					}
+				if (msg) {
+					alert(msg);
+					return false;
 				}
-			});
 
-			//resumen ejecutivo
-			var ok = jQuery('tr.ok:visible').length;
-			var fail = jQuery('tr.error:visible').length;
-			alert(ok + ' datos cargados correctamente, ' + fail + ' errores');
-			if (fail) {
-				jQuery(window).scrollTop(jQuery('tr.error:visible').position().top);
-				jQuery('tr.error :input').one('change', function() {
-					jQuery(this).closest('tr').removeClass('error').removeAttr('title');
-				});
-			}
+				//si hay advertencias se avisa pero igual se puede seguir
+				var warnings = jQuery('.warning');
+				if (warnings.length && !confirm('Hay advertencias! Desea enviar los datos de todas formas?')) {
+					jQuery(warnings.get(0)).focus();
+					return false;
+				}
+
+				//se envian los datos fila por fila
+				var data = serializar('#data thead') + '&clase=' + clase + '&';
+				enviarFila(jQuery('#data tbody tr:not(.ok):visible'), data, 0);
+			});
 
 			return false;
 		});
