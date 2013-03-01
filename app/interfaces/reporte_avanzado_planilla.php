@@ -7,7 +7,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
-	
+
 	$agrupadores = explode('-',$vista);
 
 	$pagina->PrintTop(1);
@@ -120,26 +120,26 @@ td.segundo
 {
 	background-color:#d2d2ee;
 	font-size:90%;
-	 <? if( sizeof($agrupadores) <5 ) echo "display:none;"   ?> 
+	 <?php if( sizeof($agrupadores) <5 ) echo "display:none;"   ?> 
 }
 td.tercer
 {
 	font-size:84%;
 	background-color:#d9d9f2;
-	 <? if( sizeof($agrupadores) <4 ) echo "display:none;"   ?> 
+	 <?php if( sizeof($agrupadores) <4 ) echo "display:none;"   ?> 
 }
 td.cuarto
 {
 	font-size:80%;
 	background-color:#e5e5f5;
-	 <? if( sizeof($agrupadores) <3 ) echo "display:none;"   ?> 
+	 <?php if( sizeof($agrupadores) <3 ) echo "display:none;"   ?> 
 
 }
 td.quinto
 {
 	font-size:76%;
 	background-color:#f1f1f9;
-	 <? if( sizeof($agrupadores) <2 ) echo "display:none;"   ?> 
+	 <?php if( sizeof($agrupadores) <2 ) echo "display:none;"   ?> 
 
 }
 td.sexto
@@ -194,37 +194,22 @@ span.indefinido { color: #550000; }
 
 </style>
 
-<?
+<?php
 	/*Se crea el reporte según el Input del usuario*/
 	$reporte = new Reporte($sesion);
+
+	/*FILTROS*/
 	
-	/*USUARIOS*/
-	$users = explode(",",$usuarios);
+	/*PROFESIONALES*/
+	$users = $usuarios;
 	if(!is_array($users))	
 		$users = array($users);
 	foreach($users as $usuario)
 		if($usuario)
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
-	
-	/*USUARIOS*/
-	$monedascontrato = explode(",",$moneda_contrato);
-	if(!is_array($monedascontrato))	
-		$monedascontrato = array($monedascontrato);
-	foreach($monedascontrato as $monedacontrato)
-		if($monedacontrato)
-			$reporte->addFiltro('contrato','id_moneda',$monedacontrato);
-		
-	/*ENCARGADOS*/
-	$encargados = explode(",",$en_com);
-	if(!is_array($encargados))	
-		$encargados = array($encargados);
-	foreach($encargados as $encargado)
-		if($encargado)
-			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado);
-	
 
 	/*CLIENTES*/
-	$clients = explode(",",$clientes);
+	$clients = $clientes;
 	if(!is_array($clients))	
 		$clients = array($clients);
 
@@ -232,44 +217,94 @@ span.indefinido { color: #550000; }
 		if($cliente)
 			$reporte->addFiltro('cliente','codigo_cliente',$cliente);
 
-	/*AREAS*/
-	$areas = explode(",",$areas_asunto);
-	if(!is_array($areas))	
-		$areas = array($areas);
-	foreach($areas as $area)
-		if($area)
-			$reporte->addFiltro('asunto','id_area_proyecto',$area);
-	/*TIPOS*/
-	$tipos = explode(",",$tipos_asunto);
-	if(!is_array($tipos))	
-		$tipos = array($tipos);
-	foreach($tipos as $tipo)
-		if($tipo)
-			$reporte->addFiltro('asunto','id_tipo_asunto',$tipo);
+	/*FIN FILTROS*/
 
-	/*AREAS USUARIO*/
-	$areas_usuario = explode(",",$areas_usuario);
-	if(!is_array($areas_usuario))	
-		$areas_usuario = array($areas_usuario);
-	foreach($areas_usuario as $area_usuario)
-		if($area_usuario)
-			$reporte->addFiltro('usuario','id_area_usuario',$area_usuario);
 	
-	/*CATEGORIAS USUARIO*/
-	$categorias_usuario = explode(",",$categorias_usuario);
-	if(!is_array($categorias_usuario))	
-		$categorias_usuario = array($categorias_usuario);
-	foreach($categorias_usuario as $categoria_usuario)
-		if($categoria_usuario)
-			$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
-	
+	/*FILTROS ADICIONALES*/
+
+	/*PROFESIONALES FILTRO ADICIONAL*/
+	$users = $usuariosF;
+	if(!is_array($users))	
+		$users = array($users);
+	foreach($users as $usuario)
+		if($usuario)
+			$reporte->addFiltro('usuario','id_usuario',$usuario);
+
+
+	/*CLIENTES FILTRO ADICIONAL*/
+	$clients = $clientesF;
+	if(!is_array($clients))	
+		$clients = array($clients);
+	foreach($clients as $cliente)
+		if($cliente)
+			$reporte->addFiltro('cliente','codigo_cliente',$cliente);
+
+	/*FILTRO ENCARGADOS ADICIONAL*/
+	$encargados_comerciales = $encargados;
+	if(!is_array($encargados_comerciales))
+		$encargados_comerciales = array($encargados_comerciales);
+	foreach($encargados_comerciales as $encargado_com)
+		if($encargado_com)
+			$reporte->addFiltro('contrato','id_usuario_responsable',$encargado_com);
+
+	/*FILTRO AREA PROFESIONAL ADICIONAL*/
+
+	$areas_profesionales = $area_profesional;
+	if(!is_array($areas_profesionales))	
+		$areas_profesionales = array($areas_profesionales);
+	foreach($areas_profesionales as $area_pro)
+		if($area_pro)
+			$reporte->addFiltro('usuario','id_area_usuario',$area_pro);
+
+	/*FILTRO CATEGORIAS PROFESIONAL ADICIONAL*/
+	$categorias_profesionalF = $categorias_profesional;
+	if(!is_array($categorias_profesionalF))	
+		$categorias_profesionalF = array($categorias_profesionalF);
+	foreach($categorias_profesionalF as $cat_pro)
+		if($cat_pro)
+			$reporte->addFiltro('usuario','id_categoria_usuario',$cat_pro);
+
+	/*FILTRO AREA ASUNTO ADICIONAL*/
+	$areas_asuntoF = $areas_asunto;
+	if(!is_array($areas_asuntoF))	
+		$areas_asuntoF = array($areas_asuntoF);
+	foreach($areas_asuntoF as $areas_asuF)
+		if($areas_asuF)
+			$reporte->addFiltro('asunto','id_area_proyecto',$areas_asuF);
+
+	/*FILTRO TIPOS ASUNTO ADICIONAL*/
+	$tipos_asuntoF = $tipos_asunto;
+	if(!is_array($tipos_asuntoF))	
+		$tipos_asuntoF = array($tipos_asuntoF);
+	foreach($tipos_asuntoF as $tipo_asuF)
+		if($tipo_asuF)
+			$reporte->addFiltro('asunto','id_tipo_asunto',$tipo_asuF);
+
+	/*FILTRO ESTADO COBRO ADICIONAL*/
+	$estadocobro = $estado_cobro;
+	if(!is_array($estado_cobro))
+		$estadocobro = array ($estadocobro);
+	foreach($estadocobro as $estadoF)
+			$reporte->addFiltro('cobro','estado',$estadoF);
+
+	/*FILTRO MONEDA ADICIONAL*/
+	$monedascontrato = $moneda_contrato;
+	if(!is_array($monedascontrato))	
+		$monedascontrato = array($monedascontrato);
+	foreach($monedascontrato as $monedacontrato)
+		if($monedacontrato)
+			$reporte->addFiltro('contrato','id_moneda',$monedacontrato);
+
+	/* FIN FILTROS ADICIONAL*/
+
+
 
 	$reporte->id_moneda = $id_moneda;	
 
 	//genero el formato valor a ser usado en las celdas (
 	$moneda	= new Moneda($sesion);
 	$moneda->Load($id_moneda);
-	
+
 	$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 	$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 	$formato_valor=array('cifras_decimales'=>$moneda->fields['cifras_decimales'],
@@ -277,11 +312,11 @@ span.indefinido { color: #550000; }
 	'decimales'=>$idioma->fields['separador_decimales']);
 
 	$reporte->addRangoFecha($fecha_ini,$fecha_fin);
-	
+
 	if($campo_fecha)
 		$reporte->setCampoFecha($campo_fecha);
 
-	
+
 	$reporte->setVista($vista);
 	$reporte->setProporcionalidad($prop);
 
@@ -289,19 +324,14 @@ span.indefinido { color: #550000; }
 	$estados = explode(",",$es_cob);
 	if(!is_array($estados))	
 		$estados = array($estados);
-	
+
 	$reporte_c=$reporte;
-	
-	
-	
-	
-	
+
 	$reporte->setTipoDato($tipo_dato);
 	foreach($estados as $estado)
 		if($estado)
 			$reporte->addFiltro('cobro','estado',$estado);
-		
-	
+
 	$reporte->Query();
 	$r = $reporte->toArray();
 
@@ -313,16 +343,16 @@ span.indefinido { color: #550000; }
 	foreach($estados as $estado)
 		if($estado)
 			$reporte_c->addFiltro('cobro','estado',$estado);
-		
+
 		$reporte_c->Query();
 		$r_c = $reporte_c->toArray();
 		//Se añaden datos faltantes en cada arreglo:
 		$r = $reporte->fixArray($r,$r_c);
 		$r_c = $reporte->fixArray($r_c,$r);
-	
-		
+
+
 	}
-	
+
 	if($tipo_dato_comparado)
 		$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' vs. '.__($tipo_dato_comparado).' '.__('en vista por').' '.__($agrupadores[0]);
 	else
@@ -401,7 +431,15 @@ span.indefinido { color: #550000; }
 		function url($valor,$filtros = array(), $email)
 		{
 			global $fecha_ini, $fecha_fin,$clientes,$usuarios;
-			
+
+			if (is_array($clientes)){
+			$clientes = implode(",",$clientes);	
+			}
+
+			if (is_array($usuarios)){
+			$usuarios = implode(",",$usuarios);	
+			}
+
 			if($email)
 				return $valor;
 
@@ -435,7 +473,7 @@ span.indefinido { color: #550000; }
 			//global $tipo_dato_comparado; //No puede ser global, conflicto con CRON
 			global $tipo_dato;
 			global $formato_valor;
-			
+
 			if($comparado)
 			{
 				$s .= "<table style=\"width:100%;\" > <tr> <td class=\"valor principal\" ";
@@ -459,7 +497,7 @@ span.indefinido { color: #550000; }
 		{
 
 			$s .= "<td class=\"".$orden." campo\" rowspan=".$filas;
-			
+
 			if($email)
 				$s .= ' '.$email_style[$orden].' ';
 
@@ -499,7 +537,7 @@ span.indefinido { color: #550000; }
 			$t .= "</td>";
 		}
 		$t .=	"</tr>";
-		
+
 		/*Iteración principal de Tabla. Se recorren las 4 profundidades del arreglo resultado */ 		
 		$t .= "<tr class=\"primera\">";
 		foreach($r as $k_a => $a)
@@ -544,7 +582,7 @@ span.indefinido { color: #550000; }
 												$t .= "<td class=\"quinto valor\" rowspan=".$e['filas']." ".$email_style_valor['quinto']['base']." > ";
 													celda_valor($t,'quinto',$e,array($a,$b,$c,$d,$e),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e],$tipo_dato_comparado,$email,$email_style_valor);
 												$t .= " </td>";
-												
+
 												foreach($e as $k_f => $f)
 												{
 													if(is_array($f))
@@ -564,7 +602,7 @@ span.indefinido { color: #550000; }
 						}
 					}
 				}
-				
+
 			}
 		}
 		$t .= "</tr>";

@@ -233,6 +233,8 @@ class Asunto extends Objeto {
 		$this->campo_id = "id_asunto";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->log_update = true;
+
 	}
 
 	function LoadByCodigo($codigo) {

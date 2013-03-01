@@ -1751,7 +1751,9 @@ class Cobro extends Objeto {
 	  parametros fecha_ini; fecha_fin; id_contrato
 	 */
 
-	function PrepararCobro($fecha_ini = '', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true) {
+
+	function PrepararCobro($fecha_ini = '', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+
 		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -1952,6 +1954,13 @@ class Cobro extends Objeto {
 
 				$this->Edit("incluye_honorarios", $incluye_honorarios);
 				$this->Edit("incluye_gastos", $incluye_gastos);
+
+				// Si el nuevo cobro viene desde el cron cobro programado, entonces asignarle el estado 'EN REVISION'.
+				// La idea es que el vínculo entre el nuevo cobro y el cobro programado no sea truncado cuando se eliminan
+				// los borradores del cobro
+				if ($cobro_programado == true) {
+					$this->Edit('estado', 'EN REVISION');
+				}
 
 				if ($this->Write()) {
 					####### AGREGA ASUNTOS AL COBRO #######

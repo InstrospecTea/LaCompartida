@@ -135,7 +135,7 @@
 		}
 		if($codigo_asunto_secundario)
 		{
-			$where .= " AND asunto.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
+			$where .= " AND a2.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
 		}
 		if(!empty($tipo_liquidacion) && $tipo_liquidacion!='')
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ". 	" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
@@ -228,6 +228,8 @@
 
 							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 									$query.=" LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
+							} else if ($codigo_asunto_secundario){
+								$query.=" JOIN asunto as a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
 							}
 							$query.=" left join documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'
                                                         $joinfactura
