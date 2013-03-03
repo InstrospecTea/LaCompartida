@@ -1,8 +1,20 @@
 # Changelog
+
+## Release: 13.2.0
+Domingo 3 de marzo 2013.
+* **New:** [Validaci髇 horas en trabajos diarios](https://github.com/LemontechSA/ttb/pull/71)
+* **Fixed:** [Uso correcto de c骴igo secundario en planilla de asuntos](https://github.com/LemontechSA/ttb/pull/75)
+* **New:** [Nuevo c醠culo de deuda en base a lo facturado](https://github.com/LemontechSA/ttb/pull/77)
+* **Fixed:** [Correcci髇 a la direcci髇 en la carta de Morales y Besa](https://github.com/LemontechSA/ttb/pull/93)
+* **New:** [Agrupador de 醨ea del trabajo en reportes avanzados](https://github.com/LemontechSA/ttb/pull/94)
+* **Fixed:** [Correcci髇 al ingresar documentos de pago sin NuevoModuloFactura](https://github.com/LemontechSA/ttb/pull/96)
+* **New:** [Plugins para planillas de factura (desde CPB)](https://github.com/LemontechSA/ttb/pull/97)
+* **Fixed:** [Cambio de boton "copiar del cliente" por llenar por defecto datos del contrato al crear asunto](https://github.com/LemontechSA/ttb/pull/98)
+* **Fixed:** [Centraliza los filtros para el reporte avanzado, asi evita inconsistencias entre planilla y excel.](https://github.com/LemontechSA/ttb/pull/101)
+
 ## Hotfix: 13.1.9
 Miercoles 27 de febrero 2013.
 * **Fixed** [Agrega hook al inicio de la interfaz factura. Complementario con pull request 76](https://github.com/LemontechSA/ttb/pull/76)
-
 
 ## Hotfix: 13.1.8
 Lunes 25 de febrero 2013.
@@ -30,7 +42,7 @@ Lunes 18 de febrero 2013.
 
 ## Hotfix: 13.1.2
 Lunes 18 de febrero 2013.
-* **Fixed** [Corrige la creaci贸n de clientes](https://github.com/LemontechSA/ttb/pull/85)
+* **Fixed** [Corrige la creaci髇 de clientes](https://github.com/LemontechSA/ttb/pull/85)
 
 ## Hotfix: 13.1.1
 Viernes 15 de febrero 2013.
@@ -39,7 +51,7 @@ Viernes 15 de febrero 2013.
 ## Release: 13.1.0
 Jueves 14 de febrero 2013.
 * **New:** [Borradores cobro batch](https://github.com/LemontechSA/ttb/pull/78)
-* **New:** [Refactorizaci贸n y mejoras al Cron](https://github.com/LemontechSA/ttb/pull/55)
+* **New:** [Refactorizaci髇 y mejoras al Cron](https://github.com/LemontechSA/ttb/pull/55)
 * **New:** [Plugins resumen factura y archivo contabilidad cpb](https://github.com/LemontechSA/ttb/pull/76)
 * **New:** [Clonar trabajos ctrl drag](https://github.com/LemontechSA/ttb/pull/70)
 * **Fixed:** [En la pantalla de asunto, al elegir un cliente se quedaba eternamiente intentando refrescar asunto](https://github.com/LemontechSA/ttb/pull/68)
@@ -61,7 +73,7 @@ Mi茅rcoles 13 de febrero 2013.
 Jueves 7 de febrero 2013.
 * **Fixed** [Corrige el objeto $contacto (que no existe) por $contrato. Pasaba en 2 lugares que nunca imprimian nada](https://github.com/LemontechSA/ttb/pull/74)
 Mi茅rcoles 6 de febrero 2013.
-* **Fixed** [Evita error en IE cuando los abogados no pueden ver la duraci贸n cobrable] (http://soporte.thetimebilling.com/tickets/7618?col=22917348&page=1)
+* **Fixed** [Evita error en IE cuando los abogados no pueden ver la duraci髇 cobrable] (http://soporte.thetimebilling.com/tickets/7618?col=22917348&page=1)
 
 ## Hotfix: 13.0.2
 
@@ -80,9 +92,9 @@ Lunes 28 de enero, 2013.
 
 * **Fixed:** [Corrige el problema del login cuando el identificador es Rut en Chrome/Windows](https://github.com/LemontechSA/ttb/issues/64)
 * **Fixed:** [Guarda la moneda correcta cuando se crean los saldos aprovisionados luego de emitir un cobro](https://github.com/LemontechSA/ttb/issues/64)
-* **Fixed:** [Modificaci贸n a agregar contrato y asunto para recuperar tarifa plana](https://github.com/LemontechSA/ttb/issues/64)
-* **Fixed:** [Correcci贸n para el cron que ingresa datos al demo no termine su ejecuci贸n](https://github.com/LemontechSA/ttb/issues/64)
-* **Fixed:** [Modificaci贸n a agregar contrato para definir tarifa tr谩mites](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Modificaci髇 a agregar contrato y asunto para recuperar tarifa plana](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Correcci髇 para el cron que ingresa datos al demo no termine su ejecuci髇](https://github.com/LemontechSA/ttb/issues/64)
+* **Fixed:** [Modificaci髇 a agregar contrato para definir tarifa tr谩mites](https://github.com/LemontechSA/ttb/issues/64)
 * **Fixed:** [Corrige el problema del cron correo que no enviaba copia al administrador](https://github.com/LemontechSA/ttb/issues/64)
 
 ## Release: 13.0.0
@@ -91,26 +103,26 @@ Jueves 24 de enero, 2013.
 
 * **New:** [Recupera archivo Backup Dynamo](https://github.com/LemontechSA/ttb/issues/58)
 * **New:** [Cambios para clientes mexicanos](https://github.com/LemontechSA/ttb/issues/54)
-* **New:** [Se agregan los campos giro y lugar de emisi贸n a la factura factura](https://github.com/LemontechSA/ttb/issues/49)
+* **New:** [Se agregan los campos giro y lugar de emisi髇 a la factura factura](https://github.com/LemontechSA/ttb/issues/49)
 * **New:** [Restablecer Password](https://github.com/LemontechSA/ttb/issues/48)
-* **New:** [Muestra la versi贸n de software que est谩 corriendo un ambiente](https://github.com/LemontechSA/ttb/issues/45)
+* **New:** [Muestra la versi髇 de software que est谩 corriendo un ambiente](https://github.com/LemontechSA/ttb/issues/45)
 * **New:** [Elimina popup al descargar excel revisar horas](https://github.com/LemontechSA/ttb/issues/43)
-* **New:** [filtra correos seg煤n direcci贸n v谩lida](https://github.com/LemontechSA/ttb/issues/39)
-* **Fixed:** [Traducci贸n a anchor %fecha_con_de% al ingl茅s](https://github.com/LemontechSA/ttb/issues/37)
+* **New:** [filtra correos seg煤n direcci髇 v谩lida](https://github.com/LemontechSA/ttb/issues/39)
+* **Fixed:** [Traducci髇 a anchor %fecha_con_de% al ingl茅s](https://github.com/LemontechSA/ttb/issues/37)
 
 
 ## Hotfix: 12.1.11
 
 Jueves 24 de enero, 2013.
 
-* **Fixed:** [Diferencias en el c贸digo del profesional en los tr谩mites de Cobro entre Archivo Excel y Word](https://github.com/LemontechSA/ttb/pull/59)
+* **Fixed:** [Diferencias en el c骴igo del profesional en los tr谩mites de Cobro entre Archivo Excel y Word](https://github.com/LemontechSA/ttb/pull/59)
 
 ## Hotfix: 12.1.10
 
 Martes 22 de enero, 2013.
 
 * **Fixed:** [Permite crear nuevos asuntos (y de pasada nuevos contratos) cuando el cliente tiene autocompletador de asuntos y asunto secundario](https://github.com/LemontechSA/ttb/pull/57)
-* **Fixed:** [Corrige la secci贸n cliente de la nota de cobro cuando se utiliza desde la factura](https://github.com/LemontechSA/ttb/pull/57)
+* **Fixed:** [Corrige la secci髇 cliente de la nota de cobro cuando se utiliza desde la factura](https://github.com/LemontechSA/ttb/pull/57)
 * **Fixed:** [Corrige el selector de fecha en el buscador de cobros, par茅ntesis y selector](https://github.com/LemontechSA/ttb/pull/57)
 
 Para ver m谩s historia de este hotfix, [ver aqu铆](https://github.com/LemontechSA/ttb/pull/57)
@@ -125,7 +137,7 @@ Viernes 18 de enero, 2013.
 
 Viernes 18 de enero, 2013.
 
-* **Fixed:** [Permite ingresar trabajos con c贸digo secundario](https://github.com/LemontechSA/ttb/commit/f1392f48fe40f22d11d4916ae47d40daf984eb4b)
+* **Fixed:** [Permite ingresar trabajos con c骴igo secundario](https://github.com/LemontechSA/ttb/commit/f1392f48fe40f22d11d4916ae47d40daf984eb4b)
 
 ## Hotfix: 12.1.7
 
@@ -173,12 +185,12 @@ Jueves 27 de Diciembre, 2012.
 
 Mi茅rcoles 26 de Diciembre, 2012.
 
-* **New:** [Nuevo sistema de Avisos de actualizaci贸n](https://github.com/LemontechSA/ttb/issues/5)
-* **New:** [Utilizaci贸n de cache para Conf::GetConf()](https://github.com/LemontechSA/ttb/issues/10)
+* **New:** [Nuevo sistema de Avisos de actualizaci髇](https://github.com/LemontechSA/ttb/issues/5)
+* **New:** [Utilizaci髇 de cache para Conf::GetConf()](https://github.com/LemontechSA/ttb/issues/10)
 * **New:** [Autoloader de clases en el sistema](https://github.com/LemontechSA/ttb/issues/13)
-* **New:** [Utilizaci贸n de miconf.php para desarrollo local sin adddb.php](https://github.com/LemontechSA/ttb/issues/15)
+* **New:** [Utilizaci髇 de miconf.php para desarrollo local sin adddb.php](https://github.com/LemontechSA/ttb/issues/15)
 * **New:** [Nuevo sistema de deploy autom谩tico con notificaciones al equipo](https://github.com/LemontechSA/ttb/issues/17) y #25
-* **Fixed:** [Correcci贸n de impresi贸n con Mediaprint CSS para reporte de saldo](https://github.com/LemontechSA/ttb/issues/19)
+* **Fixed:** [Correcci髇 de impresi髇 con Mediaprint CSS para reporte de saldo](https://github.com/LemontechSA/ttb/issues/19)
 * **Fixed:** [Limpieza a carpeta admin](https://github.com/LemontechSA/ttb/issues/24)
 * **Fixed:** [Limpieza a Encabezados y pie de p谩gina para cartas de cobro](https://github.com/LemontechSA/ttb/issues/28)
 
