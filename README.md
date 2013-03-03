@@ -111,6 +111,7 @@ The Time Billing - Time Tracking
   * Copy server definition file
 
         $ cp config/cap_servers.rb.default config/cap_servers.rb
+        (Es necesario modificar este archivo. Dejar solo el servidor al que se realizará el deployeo)
 
 ###Deploy in local machinne
 
@@ -139,10 +140,12 @@ The Time Billing - Time Tracking
 ##Test
 ###Pruebas de Integración
   * Duplica el archivo app/test/spec/conf.rb.default con el nombre app/test/spec/conf.rb y configura tu sitio local
+  * (Opcional) instalar el [driver de Chrome][11].
   * Ejecutar pruebas
 
         $ cd app/test
         $ rspec
+
 
 ##HubFlow
 Es como [GitFlow][7] pero con más flow. Descargar de [acá][8].
@@ -160,3 +163,4 @@ Para Windows, instalar siguiendo [estas instrucciones][9] pero editando el archi
 [8]: https://github.com/datasift/gitflow
 [9]: https://github.com/nvie/gitflow/wiki/Windows
 [10]: http://www.sublimetext.com/
+[11]: https://github.com/LemontechSA/ttb/wiki/Correr-Capybara-con-Chrome
