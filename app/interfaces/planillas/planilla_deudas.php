@@ -126,7 +126,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		GROUP BY T.glosa_cliente, T.moneda
 		ORDER BY glosa_cliente";
 
- echo $query;
+ //echo $query;
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
