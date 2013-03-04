@@ -1,15 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/Contrato.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/UsuarioExt.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/SolicitudAdelanto.php';
 
 $Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
@@ -47,9 +37,12 @@ if ($SolicitudAdelanto->Loaded()) {
 	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $SolicitudAdelanto->fields['id_solicitud_adelanto'];
 	
 	if (!empty($SolicitudAdelanto->fields['id_contrato'])) {
-		$Asunto = new Asunto($Sesion);
-		$Asunto->LoadByContrato($SolicitudAdelanto->fields['id_contrato']);
-		$codigo_asunto = $Asunto->fields['codigo_asunto'];
+		$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
+		if(empty($codigo_asunto)){
+			$Asunto = new Asunto($Sesion);
+			$Asunto->LoadByContrato($SolicitudAdelanto->fields['id_contrato']);
+			$codigo_asunto = $Asunto->fields['codigo_asunto'];
+		}
 	}
 }
 
@@ -92,17 +85,7 @@ echo $msg;
 				<?php echo UtilesApp::CampoCliente($Sesion, $SolicitudAdelanto->fields['codigo_cliente'], $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 			</td>
 		</tr>
-		<tr>
-			<td align="right" width="30%">
-				<label for="codigo_cliente"><?php echo __('Asunto'); ?></label>
-			</td>
-			<td colspan="3" align="left" id="td_selector_contrato">
-				<?php 
-				$Contrato = new Contrato($Sesion);
-				echo $Contrato->ListaSelector($SolicitudAdelanto->fields['codigo_cliente'], '', $SolicitudAdelanto->fields['id_contrato']);
-				?>
-			</td>
-		</tr>
+		<?php UtilesApp::FiltroAsuntoContrato($Sesion, $SolicitudAdelanto->fields['codigo_cliente'], $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
 		<tr>
 			<td align="right">
 				<label for="monto"><?php echo __('Monto'); ?></label>
@@ -221,34 +204,6 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 	}
 	
 	Calendar.setup({ inputField	: "fecha", ifFormat : "%d-%m-%Y", button : "img_fecha" });
-	
-	var valor_anterior_codigo;
-	var campo_cliente;
-	
-	jQuery(document).ready(function () {
-		// Cargar contratos on select
-		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
-		campo_cliente.change(ActualizarContratos);
-		valor_anterior_codigo = campo_cliente.val();
-		window.setInterval(ComprobarCodigos, 500, campo_cliente.val());
-	});
-	
-	function ActualizarContratos() {
-		url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + jQuery(this).val();
-		jQuery.ajax({
-			url: url,
-			success: function (data) {
-				jQuery('#td_selector_contrato').html(data);
-			}
-		});
-	}
-	
-	function ComprobarCodigos(valor_nuevo) {
-		if (valor_anterior_codigo != valor_nuevo) {
-			campo_cliente.change();
-			valor_anterior_codigo = valor_nuevo;
-		}
-	}
 </script>
 <?php if ($SolicitudAdelanto->Loaded()) { ?>
 	<script type="text/javascript">

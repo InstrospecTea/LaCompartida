@@ -1,17 +1,5 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Contrato.php';
-	require_once Conf::ServerDir().'/../app/classes/FacturaPago.php';
-	require_once Conf::ServerDir().'/../app/classes/Cobro.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../app/classes/InputId.php';
-	require_once Conf::ServerDir().'/../app/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/../app/classes/Autocompletador.php';
-	require_once Conf::ServerDir().'/../app/classes/DocumentoLegalNumero.php';
-
 
 	$sesion = new Sesion(array('COB','DAT'));
 
@@ -20,8 +8,8 @@
 	$contrato = new Contrato($sesion);
 
 	$cobros = new Cobro($sesion);
-	
- 
+
+
 	$series_documento = new DocumentoLegalNumero($sesion);
 
 	$query_usuario = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario
@@ -43,9 +31,9 @@
 		    $documento_cobro = new Documento($sesion);
 		    $documento_cobro->LoadByCobro($id_cobro_hide);
 		    $lista_pagos = $documento_cobro->ListaPagos();
-			 
-			    
-			/*FFF: cambio esta query para usar clase Documento    
+
+
+			/*FFF: cambio esta query para usar clase Documento
 			$query = "SELECT count(*) FROM documento WHERE id_cobro = '".$cobros->fields['id_cobro']."'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($cont_documentos) = mysql_fetch_array($resp);*/
@@ -126,12 +114,12 @@
 			if($codigo_cliente)
 				$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 			if(!empty($estado) && $estado[0]!='-1' ) {
-			
+
 				$where .= " AND cobro.estado in ('".implode("','",$estado)."') ";
 			}
-				
+
 		}
-		 
+
 		/*if($id_concepto)
 		{
 			$factura_pago = new FacturaPago($sesion);
@@ -147,7 +135,7 @@
 		}
 		if($codigo_asunto_secundario)
 		{
-			$where .= " AND asunto.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
+			$where .= " AND a2.codigo_asunto_secundario ='".$codigo_asunto_secundario."' ";
 		}
 		if(!empty($tipo_liquidacion) && $tipo_liquidacion!='')
 			$where .= " AND cobro.incluye_honorarios = '".($tipo_liquidacion&1)."' ". 	" AND cobro.incluye_gastos = '".($tipo_liquidacion&2?1:0)."' ";
@@ -162,35 +150,35 @@
 		}
                         // FFF 25-01-2012 el estado de la factura se saca de la tabla factura en el mod viejo, y de prm_estado_factura en el nuevo. Ademas, según el conf sale con o sin N de Serie
                                                         if(UtilesApp::GetConf($sesion,'NuevoModuloFactura')) {
-                                                            
+
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
                                                                           left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
-                                                                          left join prm_estado_factura pef on f1.id_estado=pef.id_estado "; 
+                                                                          left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
                                                             if (UtilesApp::GetConf($sesion, 'NumeroFacturaConSerie')) {
                                                                 $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(pef.glosa='Anulado', ' (Anulado)','')))    ";
 															}  else {
                                                                 $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', numero,if(pef.glosa='Anulado', ' (Anulado)',''))) ";
 															}
 							}  else if(UtilesApp::GetConf($sesion,'PermitirFactura')) {
-                                                             
+
                                                             $joinfactura="left join factura f1 on cobro.id_cobro=f1.id_cobro
-                                                                          left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";  
+                                                                          left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal ";
                                                             $documentof=" group_concat(DISTINCT concat(' ',prm.codigo,' ', lpad(ifnull(serie_documento_legal,1),3,'000'),'-', numero,if(f1.anulado=1, ' (Anulado)','')))   ";
 														}   else {
 															$joinfactura = "";
 															$documentof = " cobro.documento ";
 														}
-                                                        
+
 						                    if(isset($_POST['tienehonorario'])) $where.=" AND documento.subtotal_honorarios>0";
 											if(isset($_POST['tienegastociva'])) $where.=" AND documento.subtotal_gastos>0";
 											if(isset($_POST['tienegastosiva'])) $where.=" AND documento.subtotal_gastos_sin_impuesto>0";
 											if(isset($_POST['tienetramites'])) $where.=" AND documento.monto_tramites>0";
-                                                        
 
-		($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_seguimiento_cobro'):false;  
-						
-		
-		
+
+		($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_seguimiento_cobro'):false;
+
+
+
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 								cobro.id_cobro,
 								cobro.monto as cobro_monto,
@@ -225,31 +213,33 @@
 							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 								$query.=" GROUP_CONCAT(DISTINCT " . str_replace('asunto.', 'a2.', $mostrar_codigo_asuntos) . " a2.glosa_asunto SEPARATOR ', ') as asuntos_cobro,";
 							}
-								
+
 								$query.="	CONCAT(moneda_monto.simbolo, ' ', contrato.monto) AS monto_total,
 								tarifa.glosa_tarifa
 							FROM contrato join cobro ON cobro.id_contrato = contrato.id_contrato
 							 JOIN prm_moneda as moneda ON cobro.id_moneda = moneda.id_moneda
 							 JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
-						 
-							 
+
+
 							LEFT JOIN prm_moneda as moneda_monto ON contrato.id_moneda_monto = moneda_monto.id_moneda
-							LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda 
+							LEFT JOIN prm_moneda as moneda_total ON cobro.opc_moneda_total = moneda_total.id_moneda
 							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
 							left JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro ";
-							
+
 							if (UtilesApp::GetConf($sesion, 'MostrarCodigoAsuntoEnListados')) {
 									$query.=" LEFT JOIN asunto a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
+							} else if ($codigo_asunto_secundario){
+								$query.=" JOIN asunto as a2 ON cobro_asunto.codigo_asunto = a2.codigo_asunto ";
 							}
 							$query.=" left join documento on documento.id_cobro=cobro.id_cobro and documento.tipo_doc='N'
-                                                        $joinfactura 
-                                                        WHERE $where 
+                                                        $joinfactura
+                                                        WHERE $where
 							GROUP BY cobro.id_cobro, cobro.id_contrato";
-								
+
 		$x_pag = 20;
 		$orden = ' cobro.id_cobro DESC, cliente.glosa_cliente, cliente.codigo_cliente, cobro.id_contrato';
-	 
-		
+
+
                 $b = new Buscador($sesion, $query, "Cobro", $desde, $x_pag, $orden);
 		$b->mensaje_error_fecha = "N/A";
 		$b->nombre = "busc_gastos";
@@ -312,12 +302,12 @@
 								<b>".__('N° Cobro')."</b>
 							</td>";
 
-				
+
 
 				$ht .=	    "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') 		&&		UtilesApp::GetConf($sesion,'NuevoModuloFactura') 						) 
+				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') 		&&		UtilesApp::GetConf($sesion,'NuevoModuloFactura') 						)
 				{
 				$ht .=	"<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
@@ -338,7 +328,7 @@
 			$html .= "<tr onmouseover=\"this.bgColor='#bcff5c'\" onmouseout=\"this.bgColor='#F2F2F2'\">
 				<td align=right style='font-size:10px; width: 70px;'>#".$cobro->fields['id_cobro']."</td>";
 
-			
+
 
 			if (empty($cobro->fields['incluye_honorarios'])) {
 				$texto_tipo = '(sólo gastos)';
@@ -391,7 +381,7 @@
 			}
 
 			$html .= "</td>";
-			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion,'NuevoModuloFactura') ) 
+			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
 			{
 					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 					if($cobro->fields['documento'])
@@ -432,8 +422,8 @@
 	}
 	?>
 		jQuery(document).ready(function() {
-			
-			
+
+
 			jQuery('.btpopover').each(function() {
 				var idContrato=jQuery(this).attr('id').replace('tip_','');
 				jQuery(this).popover({title:'Listado de <?php echo __('asuntos'); ?>', trigger:'hover',animation:true, content:AsuntosContrato[idContrato]});
@@ -441,12 +431,12 @@
 				jQuery(this).append("<span class='asuntos_del_contrato' style='font-weight:bold;'>"+AsuntosContrato[idContrato]+"</span>");
 			}  );
 
-			
+
 
 	});
-		 
-		
-		
+
+
+
 //Genera o buisca los cobros.
 function GeneraCobros(form, desde, opcion)
 {
@@ -581,7 +571,7 @@ function Refrescar(id_foco)
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
 	var estado = $('estado').value;
-<?php 
+<?php
 	if ($orden)
 		echo "var orden = '&orden=" . $orden . "';";
 	else
@@ -681,7 +671,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 				<?php } ?>
 			</td>
 		</tr>
-		<?php 
+		<?php
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NuevoModuloFactura') )
 		{ ?>
 		<tr>
@@ -692,7 +682,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 				<input onkeydown="if(event.keyCode==13)GeneraCobros(this.form, '',false)" type="text" size="6" name="factura" id="factura" value="<?php echo $factura ?>">
 			</td>
 		</tr>
-		<?php 
+		<?php
 		}
 		?>
 	<tbody id="selectclienteasunto">
@@ -705,7 +695,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			<td nowrap colspan="3" align="left"> <?php   UtilesApp::CampoAsunto($sesion,$codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario); ?> </td>
                         </tr>
 	</tbody>
-						
+
 		<tr>
 			<td align=right><b><?php echo __('Encargado comercial')?>&nbsp;</b></td>
 			<td colspan=2 align=left><?php echo Html::SelectQuery($sesion,$query_usuario,"id_usuario",$id_usuario,'',__('Cualquiera'),'210')?>
@@ -718,10 +708,10 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 				<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso?>' >
 			</td>
 		</tr>
-		<?php } 
-		
+		<?php }
+
 		($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_filtros_seguimiento_cobro'):false; ?>
-		
+
 		<tr>
 			<td align=right><b><?php echo __('Forma de Tarificación')?>&nbsp;</b></td>
 			<td colspan=2 align=left>
@@ -741,7 +731,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			<td align=right><input type=checkbox name=usar_periodo id=usar_periodo value=1 <?php echo $usar_periodo ? 'checked' : '' ?>><b><?php echo __('Periodo creación') ?></b></td>
 			<td align=left colspan=2>
 				<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><?php echo __('Otro rango') ?></span>
-<?php 
+<?php
 				$fecha_mes = $fecha_mes != '' ? $fecha_mes : date('m');
 ?>
 				<div id=periodo style='display:<?php echo !$rango ? 'inline' : 'none' ?>;'>
@@ -751,16 +741,16 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 	  echo Html::SelectArray(array(
 					array('1', __('Enero')),
 					array('2', __('Febrero')),
-					array('3', __('Marzo)')),
+					array('3', __('Marzo')),
 					array('4', __('Abril')),
 					array('5', __('Mayo')),
-					array('6', __('Junio)')),
+					array('6', __('Junio')),
 					array('7', __('Julio')),
 					array('8', __('Agosto')),
-					array('9', __('Septiembre)')),
+					array('9', __('Septiembre')),
 					array('10', __('Octubre')),
-					array('1', __('Noviembre')),
-					array('12', __('Diciembre)')),
+					array('11', __('Noviembre')),
+					array('12', __('Diciembre')),
 					  )
 					, 'fecha_mes', $fecha_mes, '', __('Mes'),'80px') ;
 
@@ -791,12 +781,12 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 			</td>
 		</tr>
 <tr>
-			 
+
 			<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
 			<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios');?>
 			<br/><input type="checkbox" name="tienegastociva"   value="1" id="tienegastociva"  <?php if (isset($_POST['tienegastociva'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos c/ IVA');?>
 			<br/><input type="checkbox" name="tienegastosiva"   value="1" id="tienegastosiva"  <?php if (isset($_POST['tienegastosiva'])) echo 'checked="checked"' ; ?>/> Tiene <?php echo __('Gastos s/ IVA');?>
-			<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites');?> 
+			<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites');?>
 			</div>
 		</tr>
 
@@ -821,7 +811,7 @@ self.location.href = self.location.href + "#foco" + <?php echo $id_foco ?>;</scr
 
 
 
-<?php 
+<?php
 	if($opc == 'buscar')
 		$b->Imprimir('');
 

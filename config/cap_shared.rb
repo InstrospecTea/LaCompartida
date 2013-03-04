@@ -73,7 +73,7 @@ def update_symlinks(cap_vars)
       client_path = "#{cap_vars.virtual_directory}/#{subdominio}.#{dominio}"
       virtual_path = "#{client_path}/htdocs/#{subdir}"
       real_path = "#{cap_vars.current_path}"
-      run "sudo ln -s #{real_path} #{virtual_path}"
+      run "sudo ln -nsf #{real_path} #{virtual_path}"
     end
   end
   puts "\n Finished!! \n"

@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/../app/conf.php';
 		 $pagina = new Pagina($sesion);
 		 $pagina->titulo = __('Merge de Usuarios');
 	$pagina->PrintTop();
-	   if($sesion->usuario->fields['rut']!='99511620') {
+	   if(!$sesion->usuario->TienePermiso('SADM')) {
 		die('No Autorizado');
 	   }  
 	   echo '<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>';

@@ -1,25 +1,6 @@
  <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Documento.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/NeteoDocumento.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Observacion.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/FacturaPago.php';
-require_once Conf::ServerDir() . '/classes/CtaCteFact.php';
-require_once Conf::ServerDir() . '/classes/CtaCteFactMvto.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
+
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
@@ -68,6 +49,15 @@ if ($desde_webservice) {
 		$numeros_facturas = $pago->GetListaFacturasSoyPago($id_factura_pago, 'id_factura_pago', 'numero');
 		$arreglo_facturas = explode(',', $lista_facturas);
 		$codigo_cliente = $pago->fields['codigo_cliente'];
+		$id_concepto = $pago->fields['id_concepto'];
+		$tipo_doc = $pago->fields['tipo_doc'];
+		$nro_documento = $pago->fields['nro_documento'];
+		$nro_cheque = $pago->fields['nro_cheque'];
+		$descripcion = $pago->fields['descripcion'];
+		$id_banco = $pago->fields['id_banco'];
+		$id_cuenta = $pago->fields['id_cuenta'];
+		$pago_retencion = $pago->fields['pago_retencion'];
+
 	} else if (!empty($lista_facturas)) {
 		$numeros_facturas_tmp = array();
 		$query_num_facturas = "SELECT numero FROM factura WHERE id_factura IN ($lista_facturas) ";
@@ -109,14 +99,6 @@ if (!empty($pago->fields['id_neteo_documento_adelanto'])) {
 $monto_pago_adelanto = $monto_pago;
 
 
-$id_concepto = $pago->fields['id_concepto'];
-$tipo_doc = $pago->fields['tipo_doc'];
-$nro_documento = $pago->fields['nro_documento'];
-$nro_cheque = $pago->fields['nro_cheque'];
-$descripcion = $pago->fields['descripcion'];
-$id_banco = $pago->fields['id_banco'];
-$id_cuenta = $pago->fields['id_cuenta'];
-$pago_retencion = $pago->fields['pago_retencion'];
 
 if ($id_adelanto) {
 	$documento_adelanto->Load($id_adelanto);
@@ -225,24 +207,39 @@ if ($opcion == 'guardar') {
 			if ($desde_webservice) {
 				$pago->Edit('id_contabilidad', $id_contabilidad);
 			}
+				if (is_numeric($_POST['id_moneda']) && $_POST['id_moneda'] != $id_moneda)
+				$id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
+
 			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
-			//$pago->Edit('codigo_cliente', $codigo_cliente);
+
+			$codigo_cliente_factura=$_POST['codigo_cliente_factura'];
+			$monto=$_POST['monto'];
+			$monto_moneda_cobro=$_POST['monto_moneda_cobro'];
+			$id_moneda_cobro=$_POST['id_moneda_cobro'];
+			$tipo_doc=$_POST['tipo_doc'];
+			$nro_documento=$_POST['numero_doc'];
+			$numero_cheque=$_POST['numero_cheque'];
+			$descripcion=$_POST['glosa_documento'];
+			$id_banco=$_POST['id_banco'];
+			$id_cuenta=$_POST['id_cuenta'];
+			$pago_retencion=$_POST['pago_retencion'];
+			$id_concepto=$_POST['id_concepto'];
+
 			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
 			$pago->Edit('monto', $monto);
-			if (is_numeric($_POST['id_moneda']) && $_POST['id_moneda'] != $id_moneda)
-				$id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
+
 			$pago->Edit('id_moneda', $id_moneda);
 			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
 			$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
 			$pago->Edit('tipo_doc', $tipo_doc);
-			$pago->Edit('nro_documento', $numero_doc);
+			$pago->Edit('nro_documento', $nro_documento);
 			$pago->Edit('nro_cheque', $numero_cheque);
-			$pago->Edit('descripcion', $glosa_documento);
+			$pago->Edit('descripcion', $descripcion);
 			$pago->Edit('id_banco', $id_banco);
 			$pago->Edit('id_cuenta', $id_cuenta);
 			$pago->Edit('pago_retencion', $pago_retencion);
 			$pago->Edit('id_concepto', $id_concepto);
-		}
+ 		}
 		else {
 			$pago->LoadByNeteoAdelanto($id_neteo_documento_adelanto);
 		}
@@ -953,7 +950,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 				<?php echo __('Descripción') ?>
 			</td>
 			<td align=left colspan="3">
-				<textarea name=glosa_documento cols="45" rows="3"><?php
+				<textarea name="glosa_documento" id="glosa_documento" cols="45" rows="3"><?php
 				if ($descripcion)
 					echo $descripcion;
 				else if ($id_cobro) {

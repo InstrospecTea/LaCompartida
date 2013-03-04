@@ -51,6 +51,18 @@
 				$contrato_doc_legal->Write();
 			}
 		}
+			global $memcache;
+			$existememcache = isset($memcache) && is_object($memcache);
+				 $query = "SELECT glosa_opcion, valor_opcion FROM configuracion";
+					$bd_configs = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_NUM | PDO::FETCH_GROUP);
+					foreach ($bd_configs as $glosa => $valor) {
+						$sesion->arrayconf[$glosa] = $valor[0][0];
+					}
+
+					// 4.2) Si existe memcache, fijo la llave usando lo obtenido en 4.1
+					if ($existememcache) {
+						$memcache->set(DBNAME . '_config', json_encode(UtilesApp::utf8izar($sesion->arrayconf)), false, 120);
+ 					}
 	}
 ?>
 
@@ -148,7 +160,7 @@ function AgregarAsunto( numero , valor_hidden )
 <form name="formulario" id="formulario" method="post" action='' autocomplete="off" onsubmit="return validar_doc_legales(true)">
 	<input type=hidden name='opc' value='guardar'>
 <?php
-	if( $sesion->usuario->fields['rut'] != '99511620' ) 
+	if( !$sesion->usuario->TienePermiso('SADM') ) 
 		$where_orden = " WHERE orden > -1 ";
 	else 
 		$where_orden = "";
@@ -352,7 +364,7 @@ jQuery(document).ready(function() {
 			
 			jQuery('#configuracion').bind( "tabsselect", function(event, ui) {
 		 
-				if(ui.tab.innerText=='Lang') {
+				if(ui.tab.textContent=='Lang') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_lang.php',function(data) {
 						jQuery('#formulariolang').append(data);
@@ -360,7 +372,7 @@ jQuery(document).ready(function() {
 						jQuery('.sortable').sortable();
 					});
 					jQuery('#formulariolang').html('');
-				} else if(ui.tab.innerText=='Plugins') {
+				} else if(ui.tab.textContent=='Plugins') {
 					jQuery('#enviarconf').hide();
 					jQuery.get( '../../admin/archivos_plugins.php',function(data) {
 						jQuery('#formularioplugins').append(data);

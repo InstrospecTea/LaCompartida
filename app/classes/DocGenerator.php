@@ -53,9 +53,10 @@ class DocGenerator {
 	 * @param $headerMargin: margen del encabezado del documento, en centímetros
 	 * @param $footerMargin: margen del pie de página del documento, en centímetros
 	 */
-	function DocGenerator($html = '', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado = 'EMITIDO', $id_formato = '', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25, $lang = 'es', $sesion= null) {
+	function DocGenerator($html = '', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado = 'EMITIDO', $id_formato = '', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25, $lang = 'es', $sesion = null) {
 		global $desde;
 
+		$this->chunkedHeader = '';
 		$this->documentBuffer = '';
 		$this->formatBuffer = '';
 		$this->cssData = $cssData;
@@ -93,9 +94,10 @@ class DocGenerator {
 		$this->lang = $lang;
 
 		$this->configuracion = $configuracion;
-
-		$this->newSession($html, $this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin, $this->estado, $id_formato, $this->headerMargin, $this->footerMargin,$sesion);
+		$this->generateStyles($this->pageOrientation, $this->pageType, $this->topMargin, $this->rightMargin, $this->bottomMargin, $this->leftMargin, $this->estado, $id_formato, $this->headerMargin, $this->footerMargin,$sesion);
+		$this->newSession($html);
 		$this->newPage();
+
 	}
 
 //end DocGenerator()
@@ -106,16 +108,16 @@ class DocGenerator {
 	 */
 	function newPage() {
 		$this->lastPageNumber++;
-		if ($this->lastPageNumber != 1)
+		if ($this->lastPageNumber != 1) {
 			$this->documentBuffer .= "<br clear=\"all\" style=\"page-break-before: always;\">";
+		}
 		return $this->lastPageNumber;
 	}
 
 //end newPage()
 
 	/**
-	 * public int newSession(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
-	 * @param $html: HTML code of the session
+	 * public int generateStyles(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
 	 * @param $pageOrientation: The orientation of the pages of the this session, 'PORTRAIT' or 'LANDSCAPE'
 	 * @param $pageType: The type of the paper of the pages of the this session
 	 * @param $topMargin: top margin of the this session
@@ -128,10 +130,9 @@ class DocGenerator {
 	 * @param $footerMargin: margin of the footer of the document
 	 * @return int: the number of the new session
 	 */
-	function newSession($html = '', $pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL,$sesion=NULL) {
+	function generateStyles($pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL,$sesion=NULL) {
 		setlocale(LC_ALL, 'en_EN');
 
-		//don't setted now? then use document start values
 		$pageOrientation = $pageOrientation === NULL ? $this->pageOrientation : $pageOrientation;
 		$pageType = $pageType === NULL ? $this->pageType : $pageType;
 		$topMargin = $topMargin === NULL ? $this->topMargin : $topMargin;
@@ -141,33 +142,26 @@ class DocGenerator {
 		$headerMargin = $headerMargin == NULL ? $this->headerMargin : $headerMargin;
 		$footerMargin = $footerMargin == NULL ? $this->footerMargin : $footerMargin;
 
-		$this->lastSessionNumber++;
-
-		if ($this->lastSessionNumber != 1) {
-			$this->endSession();
-			$this->documentBuffer .= "<br clear=\"all\" style=\"page-break-before: always; mso-break-type: section-break\">\r\n";
-		}
-
 		switch ($pageOrientation) {
 			case 'PORTRAIT' :
 				switch ($pageType) {
-					case 'A4' :
+					case 'A4':
 						$this->atualPageWidth = A4_WIDTH * One_Cent;
 						$this->atualPageHeight = A4_HEIGHT * One_Cent;
 						break;
-					case 'A5' :
+					case 'A5':
 						$this->atualPageWidth = A5_WIDTH * One_Cent;
 						$this->atualPageHeight = A5_HEIGHT * One_Cent;
 						break;
-					case 'LETTER' :
+					case 'LETTER':
 						$this->atualPageWidth = LETTER_WIDTH * One_Cent;
 						$this->atualPageHeight = LETTER_HEIGHT * One_Cent;
 						break;
-					case 'PRC' :
+					case 'PRC':
 						$this->atualPageWidth = PRC_WIDTH * One_Cent;
 						$this->atualPageHeight = PRC_HEIGHT * One_Cent;
 						break;
-					case 'LEGAL' :
+					case 'LEGAL':
 						$this->atualPageWidth = LEGAL_WIDTH * One_Cent;
 						$this->atualPageHeight = LEGAL_HEIGHT * One_Cent;
 						break;
@@ -176,21 +170,21 @@ class DocGenerator {
 				}
 				$msoPageOrientation = 'portrait';
 				break;
-			case 'LANDSCAPE' :
+			case 'LANDSCAPE':
 				switch ($pageType) {
-					case 'A4' :
+					case 'A4':
 						$this->atualPageWidth = A4_HEIGHT * One_Cent;
 						$this->atualPageHeight = A4_WIDTH * One_Cent;
 						break;
-					case 'A5' :
+					case 'A5':
 						$this->atualPageWidth = A5_HEIGHT * One_Cent;
 						$this->atualPageHeight = A5_WIDTH * One_Cent;
 						break;
-					case 'LETTER' :
+					case 'LETTER':
 						$this->atualPageWidth = LETTER_HEIGHT * One_Cent;
 						$this->atualPageHeight = LETTER_WIDTH * One_Cent;
 						break;
-					case 'LEGAL' :
+					case 'LEGAL':
 						$this->atualPageWidth = LEGAL_HEIGHT * One_Cent;
 						$this->atualPageHeight = LEGAL_WIDTH * One_Cent;
 						break;
@@ -199,7 +193,7 @@ class DocGenerator {
 				}
 				$msoPageOrientation = 'landscape';
 				break;
-			default :
+			default:
 				die("ERROR: INVALID PAGE ORIENTATION ($pageOrientation)");
 		}
 
@@ -207,7 +201,7 @@ class DocGenerator {
 		$pageMargins = number_format($topMargin, 1, '.', '') . 'cm ' . number_format($rightMargin, 1, '.', '') . 'cm ' . number_format($bottomMargin, 1, '.', '') . 'cm ' . number_format($leftMargin, 1, '.', '') . 'cm';
 		$headerMargins = $headerMargin . 'cm';
 		$footerMargins = $footerMargin . 'cm';
-		$sessionName = "Section" . $this->lastSessionNumber;
+		$sessionName = "GenericSection";
 
 		$this->formatBuffer .= "@page $sessionName\r\n";
 		$this->formatBuffer .= "   {size: $pageSize;\r\n";
@@ -217,60 +211,68 @@ class DocGenerator {
 		$this->formatBuffer .= "   mso-footer-margin: $footerMargins;\r\n";
 		$this->formatBuffer .= "   mso-paper-source: 0;\r\n";
 
-		
-		if( $id_formato != '' )
+		if( $id_formato != '' ) {
 			$where = " WHERE id_formato = '$id_formato' ";
-		else
+		}else{
 			$where = " WHERE 1=2";
-		$query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
+		}
+		$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
 
 		if($sesion) {
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
-		list($html_header, $html_pie) = mysql_fetch_array($resp); 
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+			list($html_header, $html_pie) = mysql_fetch_array($resp);
 		}
-		if( $this->pageNums && Conf::dbUser() != 'ebmo' && Conf::dbUser() != 'otero' && Conf::dbUser() != 'vergara' && Conf::dbUser() != 'blr' && Conf::dbUser() != 'barros' && Conf::dbUser() != 'kastpinochet' && $this->estado != 'CREADO' && $this->estado != 'EN REVISION')
-		{
-			$this->formatBuffer .= "   mso-footer: url('".Conf::Host()."app/templates/default/css/pie.htm') f1;\r\n";
+
+		$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
+
+		if ($sesion) {
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			list($html_header, $html_pie) = mysql_fetch_array($resp);
 		}
-		if (Conf::dbUser() == 'barros') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/barros.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/barros.htm') f1;\r\n";
-		} else if (Conf::dbUser() == 'vergara') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/vergara.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/vergara.htm') f1;\r\n";
-		} else if (Conf::dbUser() == 'blr') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/blr.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/blr.htm') f1;\r\n";
-		} else if (Conf::dbUser() == 'ebmo') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/ebmo.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/ebmo.htm') f1;\r\n";
-		} else if (Conf::dbUser() == 'otero') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/otero.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/otero.htm') f1;\r\n";
-		} else if (Conf::dbUser() == 'kastpinochet') {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/kastpinochet.htm') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/kastpinochet.htm') f1;\r\n";
-		} else if (( $this->estado == 'CREADO' || $this->estado == 'EN REVISION' ) && ( Conf::dbUser() != 'jjr')) {
+
+		if (( $this->estado == 'CREADO' || $this->estado == 'EN REVISION' ) && ( Conf::dbUser() != 'jjr')) {
 			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') h1;\r\n";
 			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') f1;\r\n";
+
 		} else {
-			if ($html_header) $this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
-			if ($html_pie) $this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
+			if ($html_header) {
+				$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
+			}
+			if ($html_pie) {
+				$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
+			}
 		}
 		$this->formatBuffer .= "}\r\n";
 		$this->formatBuffer .= "div.$sessionName\r\n";
 		$this->formatBuffer .= "  {page: $sessionName;}\r\n\r\n";
-		$this->formatBuffer=str_replace('https','http',$this->formatBuffer);
-		
+		$this->formatBuffer = str_replace('https', 'http', $this->formatBuffer);
+
 		$this->documentBuffer .= "<div class=\"$sessionName\">\r\n";
 		$this->documentBuffer .= $html;
 
 		setlocale(LC_ALL, Conf::Locale());
-
-		return $this->lastSessionNumber;
 	}
 
-//end newSession()
+
+	/**
+	 * public int newSession(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
+	 * @param $html: HTML code of the session
+	 */
+	function newSession($html = '') {
+		setlocale(LC_ALL, 'en_EN');
+		$this->lastSessionNumber++;
+		if ($this->lastSessionNumber != 1) {
+			$this->endSession();
+			$this->documentBuffer .= "<br clear=\"all\" style=\"page-break-before: always; mso-break-type: section-break\">\r\n";
+		}
+		$this->documentBuffer .= "<div class=\"GenericSection\">\r\n";
+		$this->documentBuffer .= $html;
+		setlocale(LC_ALL, Conf::Locale());
+		return $this->lastSessionNumber;
+	}
+	//end newSession()
+
+
 
 	/**
 	 * public void output(string $fileName = '', string $saveInPath = '')
@@ -302,13 +304,50 @@ class DocGenerator {
 				echo $outputCode;
 			}
 		} else {
-			if (substr($saveInPath, -1) <> "/")
+			if (substr($saveInPath, -1) <> "/") {
 				$saveInPath = $saveInPath . "/";
+			}
 			file_put_contents($saveInPath . $fileName, $outputCode);
 		}
 	}
 
 //end output()
+
+	function startChunkedOutput($fileName = '', $desde = '') {
+		$this->chunkedHeader = "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n";
+		$this->chunkedHeader .= "   xmlns:w=\"urn:schemas-microsoft-com:office:word\"\r\n";
+		$this->chunkedHeader .= "   xmlns=\"http://www.w3.org/TR/REC-html40\">\r\n";
+		$this->chunkedHeader .= $this->getHeader($desde);
+		$this->chunkedHeader .= $this->getBodyStart();
+		header('Content-Description: File Transfer');
+		header('Expires: 0');
+		header('Content-Transfer-Encoding: chunked');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
+		header("Content-Type: application/msword; charset=\$this->documentCharset\"");
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		echo $this->chunkedHeader;
+	}
+
+	function endChunkedOutput($fileName = '') {
+		$chunkedFooter = $this->getBodyEnd();
+		$chunkedFooter .= "</html>\r\n";
+		echo $chunkedFooter;
+	}
+
+	/**
+	 * public void chunkedOutput(string $fileName = '')
+	 * @param $fileName: the file name of document
+	 */
+	function chunkedOutput($fileName = '', $desde = '') {
+		$fileName = $fileName != '' ? $fileName : basename($_SERVER['PHP_SELF'], '.php') . '.doc';
+		if ($this->chunkedHeader == '') {
+			$this->startChunkedOutput($fileName, $desde);
+		}
+		echo $this->documentBuffer;
+		$this->documentBuffer = '';
+	}
+	//end chunkedOutput()
 
 	/**
 	 * public void setDocumentLang(string $lang)
@@ -350,7 +389,7 @@ class DocGenerator {
 
 //end setFontSize()
 
-	/*	 * **************************************************
+	/*     * **************************************************
 	 * begin private functions
 	 * ************************************************* */
 
@@ -361,7 +400,7 @@ class DocGenerator {
 		$this->documentBuffer .= "</div>\r\n";
 	}
 
-//end newSession()
+	//end endSession()
 
 	/**
 	 * private float endSession(int $pixels)
@@ -498,9 +537,28 @@ class DocGenerator {
 
 		return $body;
 	}
-
 //end getBody()
 
+/**
+	 * private string getBodyStart(void)
+	 */
+	function getBodyStart() {
+		$body = "<body lang=\"$this->documentLang\" style=\"tab-interval: 35.4pt\">\r\n";
+		return $body;
+	}
+//end get_start_body()
+
+/**
+	 * private string getBodyEnd(void)
+	 */
+	function getBodyEnd() {
+		$body =  "</body>\r\n";
+
+		return $body;
+	}
+//end get_end_body()
+
+//
 	function outputxml($xml, $filename) {
 		$this->endSession();
 		header("Content-Type: application/msword; charset=ISO-8859-1");
@@ -539,7 +597,7 @@ if (!function_exists('file_get_contents')) {
 	function file_get_contents($filename, $useIncludePath = '', $context = '') {
 		if (empty($useIncludePath)) {
 			return implode('', file($filename));
-		} elseif (empty($content)) {
+		} else if (empty($content)) {
 			return implode('', file($filename, $useIncludePath));
 		} else {
 			return implode('', file($filename, $useIncludePath, $content));
@@ -560,4 +618,3 @@ if (!function_exists('file_put_contents')) {
 
 //end file_put_contents()
 }//end if
-?>

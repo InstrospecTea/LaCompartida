@@ -67,6 +67,7 @@ class Gasto extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -76,6 +77,7 @@ class Gasto extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (
@@ -85,6 +87,7 @@ class Gasto extends Objeto {
 			'extras' =>
 			array (
 				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
 			),
 		),
 		array (

@@ -1,20 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/Asunto.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/CobroPendiente.php';
-require_once Conf::ServerDir() . '/../app/classes/Archivo.php';
-require_once Conf::ServerDir() . '/../app/classes/ContratoDocumentoLegal.php';
-require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('DAT', 'SASU'));
 $pagina = new Pagina($sesion);
@@ -85,31 +70,39 @@ if ($id_asunto > 0) {
 		} else {
 			$codigo_asunto = $asunto->AsignarCodigoAsunto($codigo_cliente);
 		}
-		// validación para que al cambiar un asunto de un cliente a otro, 
+		// validación para que al cambiar un asunto de un cliente a otro,
 		// no existan cobros ni gastos asociados para el cliente inicial
-		if ($opcion == "guardar"){
-			
-			$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '".$asunto->fields['codigo_asunto']."' ) AND codigo_cliente = '".$cliente->fields['codigo_cliente']."' ";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		if ($opcion == "guardar") {
+
+			$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $cliente->fields['codigo_cliente'] . "' ";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			list($count) = mysql_fetch_array($resp);
 
-			if ($count>0){$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ').__('cobros').' '.__('asociados'));}
-			
-			$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '".$asunto->fields['codigo_asunto']."' AND codigo_cliente = '".$cliente->fields['codigo_cliente']."' ";
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-			list($count) = mysql_fetch_array($resp);		
-		
-			if ($count > 0){$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));}
-			
+			if ($count > 0) {
+				$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ') . __('cobros') . ' ' . __('asociados'));
+			}
+
+			$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' AND codigo_cliente = '" . $cliente->fields['codigo_cliente'] . "' ";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			list($count) = mysql_fetch_array($resp);
+
+			if ($count > 0) {
+				$pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
+			}
 		}
-	}
-	else if ($cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+	} else if ($cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		$codigo_asunto = $asunto->AsignarCodigoAsunto($codigo_cliente);
 	}
 }
 
 if ($codigo_cliente != '') {
 	$cliente->LoadByCodigo($codigo_cliente);
+}
+
+if ($cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "guardar")) {
+	$contrato_cliente = new Contrato($sesion);
+	$contrato_cliente->Load($cliente->fields['id_contrato']);
+	$cargar_datos_contrato_cliente_defecto = $contrato_cliente->fields;
 }
 
 if ($opcion == "guardar") {
@@ -135,18 +128,18 @@ if ($opcion == "guardar") {
 		if (empty($factura_direccion)) {
 			$pagina->AddError(__("Por favor ingrese la dirección de la factura"));
 		}
-		if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
+		if (UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {
 			if (empty($factura_comuna)) {
 				$pagina->AddError(__("Por favor ingrese la comuna de la factura"));
 			}
 		}
-		
-		if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
+
+		if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
 			if (empty($factura_ciudad)) {
 				$pagina->AddError(__("Por favor ingrese la ciudad de la factura"));
 			}
 		}
-		
+
 		if (empty($factura_telefono)) {
 			$pagina->AddError(__("Por favor ingrese el teléfono de la factura"));
 		}
@@ -230,7 +223,7 @@ if ($opcion == "guardar") {
 					}
 					break;
 				case "ESCALONADA":
-					if( empty($_POST['esc_tiempo'][0])){
+					if (empty($_POST['esc_tiempo'][0])) {
 						$pagina->AddError(__("Por favor ingrese el tiempo para la primera escala"));
 					}
 					break;
@@ -250,15 +243,15 @@ if ($opcion == "guardar") {
 		}
 	}
 
-        if ($cobro_independiente) {
-            if ( $usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1') && $desde_agrega_cliente ) {
-                $pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
-            }
+	if ($cobro_independiente) {
+		if ($usuario_responsable_obligatorio && (empty($id_usuario_responsable) or $id_usuario_responsable == '-1') && $desde_agrega_cliente) {
+			$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Comercial'));
+		}
 
-            if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
-                $pagina->AddError( __("Debe ingresar el") . " " . __('Encargado Secundario'));
-            }
-        }
+		if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
+			$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
+		}
+	}
 
 	$errores = $pagina->GetErrors();
 	if (!empty($errores)) {
@@ -293,7 +286,7 @@ if ($opcion == "guardar") {
 		$asunto->NoEditar("tarifa_especial");
 		//$asunto->EditarTodos();
 		$asunto->Edit("id_usuario", $sesion->usuario->fields['id_usuario']);
-		$asunto->Edit("codigo_asunto", $codigo_asunto);
+		$asunto->Edit("codigo_asunto", $codigo_asunto, true);
 		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 			$asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . substr(strtoupper($codigo_asunto_secundario), -4));
 		} else {
@@ -307,28 +300,28 @@ if ($opcion == "guardar") {
 			$glosa_asunto = strtoupper($glosa_asunto);
 		}
 		$asunto->Edit("glosa_asunto", $glosa_asunto);
-		$asunto->Edit("codigo_cliente", $codigo_cliente);
+		$asunto->Edit("codigo_cliente", $codigo_cliente, true);
 		if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
 			$asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
 		}
-		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto);
-		$asunto->Edit("id_area_proyecto", $id_area_proyecto);
+		$asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
+		$asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 		$asunto->Edit("id_idioma", $id_idioma);
 		$asunto->Edit("descripcion_asunto", $descripcion_asunto);
 		$asunto->Edit("id_encargado", !empty($id_encargado) ? $id_encargado : "NULL");
-		$asunto->Edit("id_encargado2",!empty($id_encargado2) ? $id_encargado2 : "NULL");
+		$asunto->Edit("id_encargado2", !empty($id_encargado2) ? $id_encargado2 : "NULL");
 		$asunto->Edit("contacto", $asunto_contacto);
 		$asunto->Edit("fono_contacto", $fono_contacto);
 		$asunto->Edit("email_contacto", $email_contacto);
 		$asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
-		$asunto->Edit("activo", $activo);
+		$asunto->Edit("activo", intval($activo), true);
 		if (!$activo) {
 			$fecha_inactivo = date('Y-m-d H:i:s');
-			$asunto->Edit("fecha_inactivo", $fecha_inactivo);
+			$asunto->Edit("fecha_inactivo", $fecha_inactivo, true);
 		} else {
-			$asunto->Edit("fecha_inactivo", '');
+			$asunto->Edit("fecha_inactivo", '', true);
 		}
-		$asunto->Edit("cobrable", $cobrable);
+		$asunto->Edit("cobrable", intval($cobrable), true);
 		$asunto->Edit("mensual", $mensual ? "SI" : "NO");
 		$asunto->Edit("alerta_hh", $asunto_alerta_hh);
 		$asunto->Edit("alerta_monto", $asunto_alerta_monto);
@@ -338,172 +331,98 @@ if ($opcion == "guardar") {
 		//if($asunto->Write())
 		//{
 		if ($cobro_independiente) {
-			//COPIAR DATOS DE CLIENTE
-			if ($opc_copiar) {
-				$contra_clie = new Contrato($sesion);
-				$contra_clie->Load($cliente->fields['id_contrato']);  #cargo contrato de cliente
-				if ($contra_clie->loaded()) {
-					if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
-						$contrato->Load($asunto->fields['id_contrato']);
-					} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
-						$contrato->Load($asunto->fields['id_contrato_indep']);
-					}	else {
-						$contrato = new Contrato($sesion);
-					}		
-				 
-					$contrato->Fill($contra_clie->fields, false);
-					
-					if ($contrato->Write()) {
-						#cobros pendientes
-						CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato']);
-						for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-							$cobro_pendiente = new CobroPendiente($sesion);
-							$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato']);
-							$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-							$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
-							$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-							$cobro_pendiente->Write();
-						}
+			#CONTRATO
+			if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
+				$contrato->Load($asunto->fields['id_contrato']);
+			} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
+				$contrato->Load($asunto->fields['id_contrato_indep']);
+			} else {
+				$contrato = new Contrato($sesion);
+			}
+			if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
+				$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
+				$val = true;
+			} elseif ($forma_cobro == 'TASA')
+				$monto = '0';
 
-						foreach (array_keys($hito_fecha) as $i) {
-							if (empty($hito_monto_estimado[$i]))
-								continue;
-							$cobro_pendiente = new CobroPendiente($sesion);
-							$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-							$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-							$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-							$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-							$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-							$cobro_pendiente->Edit("hito", '1');
-							$cobro_pendiente->Write();
-						}
-
-					 
-						$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
-						$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-						if ($asunto->Write())
-							$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con &eacute;xito') . '<br>' . __('Contrato guardado con &eacute;xito'));
-						else
-							$pagina->AddError($asunto->error);
-
-						//cargar docsegales y copiarlso
-						ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-
-						$query = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos FROM contrato_documento_legal WHERE id_contrato = " . $contra_clie->fields['id_contrato'];
-						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-						while ($doc_legal = mysql_fetch_array($resp)) {
-							$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-							$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['id_tipo_documento_legal']);
-							if (!empty($doc_legal['honorarios'])) {
-								$contrato_doc_legal->Edit('honorarios', 1);
-							}
-							if (!empty($doc_legal['gastos_con_impuestos'])) {
-								$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-							}
-							if (!empty($doc_legal['gastos_sin_impuestos'])) {
-								$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-							}
-							$contrato_doc_legal->Write();
-						}
-					}
-					else
-						$pagina->AddError($contrato->error);
-				}
-			} 	else {
-				#CONTRATO
-				if ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) {
-					$contrato->Load($asunto->fields['id_contrato']);
-					
-				} else if ($asunto->fields['id_contrato_indep'] > 0 && ($asunto->fields['id_contrato_indep'] != $cliente->fields['id_contrato'])) {
-					$contrato->Load($asunto->fields['id_contrato_indep']);
-				} else {
-					$contrato = new Contrato($sesion);
-				}
-				if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
-					$pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
+			if ($tipo_tarifa == 'flat') {
+				if (empty($tarifa_flat)) {
+					$pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
 					$val = true;
-				} elseif ($forma_cobro == 'TASA')
-					$monto = '0';
-
-				if ($tipo_tarifa == 'flat') {
-					if (empty($tarifa_flat)) {
-						$pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
-						$val = true;
-					} else {
-						$tarifa = new Tarifa($sesion);
-						$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
-					}
+				} else {
+					$tarifa = new Tarifa($sesion);
+					$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
+					$_REQUEST['id_tarifa'] = $id_tarifa;
 				}
-				
-				$contrato->Fill($_REQUEST, true); 
-				 
-				if ($contrato->Write()) {
-					#Subiendo Archivo
-					if (!empty($archivo_data)) {
-						$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
-						$archivo->Edit('descripcion', $descripcion);
-						$archivo->Edit('archivo_data', $archivo_data);
-						$archivo->Write();
-					}
-					#cobro pendiente
-					CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-						$cobro_pendiente = new CobroPendiente($sesion);
-						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-						$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-						$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
-						$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-						$cobro_pendiente->Write();
-					}
+			}
 
-					foreach (array_keys($hito_fecha) as $i) {
-						if (empty($hito_monto_estimado[$i]))
-							continue;
-						$cobro_pendiente = new CobroPendiente($sesion);
-						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-						$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-						$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-						$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-						$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-						$cobro_pendiente->Edit("hito", '1');
-						$cobro_pendiente->Write();
-					}
-						
-						
-					$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
-					$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
-				
-					if ($asunto->Write())
-						$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-					else
-						$pagina->AddError($asunto->error);
+			$contrato->Fill($_REQUEST, true);
+			$contrato->Edit('codigo_cliente', $codigo_cliente);
 
-					ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					if (is_array($docs_legales)) {
-						foreach ($docs_legales as $doc_legal) {
-							if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
-								continue;
-							}
-							$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-							$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-							if (!empty($doc_legal['honorario'])) {
-								$contrato_doc_legal->Edit('honorarios', 1);
-							}
-							if (!empty($doc_legal['gastos_con_iva'])) {
-								$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-							}
-							if (!empty($doc_legal['gastos_sin_iva'])) {
-								$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-							}
-							$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-							$contrato_doc_legal->Write();
-						}
-					}
+			if ($contrato->Write()) {
+				#Subiendo Archivo
+				if (!empty($archivo_data)) {
+					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
+					$archivo->Edit('descripcion', $descripcion);
+					$archivo->Edit('archivo_data', $archivo_data);
+					$archivo->Write();
 				}
+				#cobro pendiente
+				CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
+					$cobro_pendiente = new CobroPendiente($sesion);
+					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+					$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
+					$cobro_pendiente->Edit("descripcion", $valor_descripcion[$i]);
+					$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
+					$cobro_pendiente->Write();
+				}
+
+				foreach (array_keys($hito_fecha) as $i) {
+					if (empty($hito_monto_estimado[$i]))
+						continue;
+					$cobro_pendiente = new CobroPendiente($sesion);
+					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+					$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+					$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
+					$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
+					$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+					$cobro_pendiente->Edit("hito", '1');
+					$cobro_pendiente->Write();
+				}
+
+				$asunto->Edit("id_contrato", $contrato->fields['id_contrato']);
+				$asunto->Edit("id_contrato_indep", $contrato->fields['id_contrato']);
+
+				if ($asunto->Write())
+					$pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 				else
-					$pagina->AddError($contrato->error);
+					$pagina->AddError($asunto->error);
+
+				ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+				if (is_array($docs_legales)) {
+					foreach ($docs_legales as $doc_legal) {
+						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
+							continue;
+						}
+						$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
+						$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
+						$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+						if (!empty($doc_legal['honorario'])) {
+							$contrato_doc_legal->Edit('honorarios', 1);
+						}
+						if (!empty($doc_legal['gastos_con_iva'])) {
+							$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
+						}
+						if (!empty($doc_legal['gastos_sin_iva'])) {
+							$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
+						}
+						$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+						$contrato_doc_legal->Write();
+					}
+				}
+			} else {
+				$pagina->AddError($contrato->error);
 			}
 		} #fin if independiente
 		else {
@@ -549,7 +468,7 @@ $pagina->PrintTop($popup);
 	function MuestraPorValidacion(divID)
 	{
 		var divArea = $(divID);
-		var divAreaImg = $(divID+"_img");
+		var divAreaImg = $(divID + "_img");
 		var divAreaVisible = divArea.style['display'] != "none";
 		divArea.style['display'] = "inline";
 		divAreaImg.innerHTML = "<img src='../templates/default/img/menos.gif' border='0' title='Ocultar'>";
@@ -557,19 +476,19 @@ $pagina->PrintTop($popup);
 
 	function Validar(form)
 	{
-		if(!form) {
+		if (!form) {
 			var form = $('formulario');
 		}
 
-		<?php if ( UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto') == 1 ): ?>
-			if ( form.id_encargado && ! form.id_encargado.value ) {
-				alert('<?php echo 'Debe ingresar '. __('Usuario encargado') ?>');
+<?php if (UtilesApp::GetConf($sesion, 'AtacheSecundarioSoloAsunto') == 1): ?>
+			if (form.id_encargado && !form.id_encargado.value) {
+				alert('<?php echo 'Debe ingresar ' . __('Usuario encargado') ?>');
 				form.id_encargado.focus();
 				return false;
 			}
-		<?php endif; ?>
+<?php endif; ?>
 
-		if(!form.glosa_asunto.value)
+		if (!form.glosa_asunto.value)
 		{
 			alert("Debe ingresar un título");
 			form.glosa_asunto.focus();
@@ -583,36 +502,36 @@ if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	?>
-				if(!form.codigo_cliente_secundario.value)
-				{
-					alert("Debe ingresar un cliente");
-					form.codigo_cliente_secundario.focus();
-					return false;
-				}
-				if(!form.codigo_asunto_secundario.value)
-				{
-					alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
-					form.codigo_asunto_secundario.focus();
-					return false;
-				}
+			if (!form.codigo_cliente_secundario.value)
+			{
+				alert("Debe ingresar un cliente");
+				form.codigo_cliente_secundario.focus();
+				return false;
+			}
+			if (!form.codigo_asunto_secundario.value)
+			{
+				alert("<?php echo __('Debe ingresar el código secundario del asunto') ?>");
+				form.codigo_asunto_secundario.focus();
+				return false;
+			}
 	<?php
- } else {
+} else {
 	?>
-			if(!form.codigo_cliente.value)
+			if (!form.codigo_cliente.value)
 			{
 				alert("Debe ingresar un cliente");
 				form.codigo_cliente.focus();
 				return false;
 			}
 	<?php
- }
+}
 ?>
 
-		if( document.getElementById('cobro_independiente').checked ) {
+		if (document.getElementById('cobro_independiente').checked) {
 <?php if ($validaciones_segun_config) { ?>
 				// DATOS FACTURACION
 
-				if(!form.factura_rut.value)
+				if (!form.factura_rut.value)
 				{
 					alert("<?php echo __('Debe ingresar el') . ' ' . __('RUT') . ' ' . __('del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -620,7 +539,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.factura_razon_social.value)
+				if (!form.factura_razon_social.value)
 				{
 					alert("<?php echo __('Debe ingresar la razón social del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -628,7 +547,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.factura_giro.value)
+				if (!form.factura_giro.value)
 				{
 					alert("<?php echo __('Debe ingresar el giro del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -636,34 +555,34 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.factura_direccion.value)
+				if (!form.factura_direccion.value)
 				{
 					alert("<?php echo __('Debe ingresar la dirección del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
 					form.factura_direccion.focus();
 					return false;
 				}
-				<?php if( UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) {	?>
-				if(!form.factura_comuna.value)
-				{
-					alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_comuna.focus();
-					return false;
-				}
-				<?php } ?>
+	<?php if (UtilesApp::existecampo('factura_comuna', 'contrato', $sesion)) { ?>
+					if (!form.factura_comuna.value)
+					{
+						alert("<?php echo __('Debe ingresar la comuna del cliente') ?>");
+						MuestraPorValidacion('datos_factura');
+						form.factura_comuna.focus();
+						return false;
+					}
+	<?php } ?>
 
-				<?php if( UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {	?>
-				if(!form.factura_ciudad.value)
-				{
-					alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
-					MuestraPorValidacion('datos_factura');
-					form.factura_ciudad.focus();
-					return false;
-				}
-				<?php } ?>
+	<?php if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) { ?>
+					if (!form.factura_ciudad.value)
+					{
+						alert("<?php echo __('Debe ingresar la ciudad del cliente') ?>");
+						MuestraPorValidacion('datos_factura');
+						form.factura_ciudad.focus();
+						return false;
+					}
+	<?php } ?>
 
-				if(form.id_pais.options[0].selected == true)
+				if (form.id_pais.options[0].selected == true)
 				{
 					alert("<?php echo __('Debe ingresar el pais del cliente') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -671,7 +590,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.cod_factura_telefono.value)
+				if (!form.cod_factura_telefono.value)
 				{
 					alert("<?php echo __('Debe ingresar el codigo de area del teléfono') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -679,7 +598,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.factura_telefono.value)
+				if (!form.factura_telefono.value)
 				{
 					alert("<?php echo __('Debe ingresar el número de telefono') ?>");
 					MuestraPorValidacion('datos_factura');
@@ -688,7 +607,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 
 				// SOLICITANTE
-				if(form.titulo_contacto.options[0].selected == true)
+				if (form.titulo_contacto.options[0].selected == true)
 				{
 					alert("<?php echo __('Debe ingresar el titulo del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -696,7 +615,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.nombre_contacto.value)
+				if (!form.nombre_contacto.value)
 				{
 					alert("<?php echo __('Debe ingresar el nombre del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -704,7 +623,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.apellido_contacto.value)
+				if (!form.apellido_contacto.value)
 				{
 					alert("<?php echo __('Debe ingresar el apellido del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -712,7 +631,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.fono_contacto_contrato.value)
+				if (!form.fono_contacto_contrato.value)
 				{
 					alert("<?php echo __('Debe ingresar el teléfono del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -720,7 +639,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.email_contacto_contrato.value)
+				if (!form.email_contacto_contrato.value)
 				{
 					alert("<?php echo __('Debe ingresar el email del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -728,7 +647,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-				if(!form.direccion_contacto_contrato.value)
+				if (!form.direccion_contacto_contrato.value)
 				{
 					alert("<?php echo __('Debe ingresar la dirección de envío del solicitante') ?>");
 					MuestraPorValidacion('datos_solicitante');
@@ -737,7 +656,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 
 				// DATOS DE TARIFICACION
-				if(!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
+				if (!(form.tipo_tarifa[0].checked || form.tipo_tarifa[1].checked))
 				{
 					alert("<?php echo __('Debe seleccionar un tipo de tarifa') ?>");
 					MuestraPorValidacion('datos_cobranza');
@@ -747,7 +666,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 
 				/* Revisa antes de enviar, que se haya escrito un monto si seleccionó tarifa plana */
 
-				if( form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0 )
+				if (form.tipo_tarifa[1].checked && form.tarifa_flat.value.length == 0)
 				{
 					alert("<?php echo __('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto.') ?>");
 					MuestraPorValidacion('datos_cobranza');
@@ -756,40 +675,46 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				}
 
 				/*if(!form.id_moneda.options[0].selected == true)
-		{
-			alert("<?php echo __('Debe seleccionar una moneda para la tarifa') ?>");
-			MuestraPorValidacion('datos_cobranza');
-			form.id_moneda.focus();
-			return false;
-		}*/
+				 {
+				 alert("<?php echo __('Debe seleccionar una moneda para la tarifa') ?>");
+				 MuestraPorValidacion('datos_cobranza');
+				 form.id_moneda.focus();
+				 return false;
+				 }*/
 
-				if(!$$('[name="forma_cobro"]').any(function(elem){return elem.checked;}))
+				if (!$$('[name="forma_cobro"]').any(function(elem) {
+					return elem.checked;
+				}))
 				{
 					alert("<?php echo __('Debe seleccionar una forma de cobro') . ' ' . __('para la tarifa') ?>");
 					form.forma_cobro[0].focus();
 					return false;
 				}
 
-				if($('fc7').checked){
-					if($$('[id^="fila_hito_"]').any(function(elem){return !validarHito(elem, true);})){
+				if ($('fc7').checked) {
+					if ($$('[id^="fila_hito_"]').any(function(elem) {
+						return !validarHito(elem, true);
+					})) {
 						return false;
 					}
-					if(!$$('[id^="hito_monto_"]').any(function(elem){return Number(elem.value)>0;})){
+					if (!$$('[id^="hito_monto_"]').any(function(elem) {
+						return Number(elem.value) > 0;
+					})) {
 						alert("<?php echo __('Debe ingresar al menos un hito válido') ?>");
 						$('hito_descripcion_1').focus();
 						return false;
 					}
 				}
 				/*
-		if(!form.opc_moneda_total.value)
-		{
-			alert("<?php echo __('Debe seleccionar una moneda para mostrar el total') ?>");
-			MuestraPorValidacion('datos_cobranza');
-			form.opc_moneda_total.focus();
-			return false;
-		}*/
+				 if(!form.opc_moneda_total.value)
+				 {
+				 alert("<?php echo __('Debe seleccionar una moneda para mostrar el total') ?>");
+				 MuestraPorValidacion('datos_cobranza');
+				 form.opc_moneda_total.focus();
+				 return false;
+				 }*/
 
-				if(!form.observaciones.value)
+				if (!form.observaciones.value)
 				{
 					alert("<?php echo __('Debe ingresar un detalle para la cobranza') ?>");
 					MuestraPorValidacion('datos_cobranza');
@@ -797,24 +722,25 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					return false;
 				}
 
-<?php }  
-               if ($usuario_responsable_obligatorio) { ?>
-                    if ($('id_usuario_responsable').value == '-1' && $('cobro_independiente').checked)
-                    {
-                        alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
-                        $('id_usuario_responsable').focus();
-                        return false;
-                    }
-                    <?php } ?>
+<?php }
+if ($usuario_responsable_obligatorio) {
+	?>
+				if ($('id_usuario_responsable').value == '-1' && $('cobro_independiente').checked)
+				{
+					alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Comercial') ?>");
+					$('id_usuario_responsable').focus();
+					return false;
+				}
+<?php } ?>
 
-                    <?php if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
-                    if ($('id_usuario_secundario').value == '-1' && $('cobro_independiente').checked)
-                    {
-                        alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
-                        $('id_usuario_secundario').focus();
-                        return false;
-                    }
-                    <?php } ?>
+<?php if ($usuario_secundario_obligatorio && UtilesApp::GetConf($sesion, 'EncargadoSecundario')) { ?>
+				if ($('id_usuario_secundario').value == '-1' && $('cobro_independiente').checked)
+				{
+					alert("<?php echo __("Debe ingresar el") . " " . __('Encargado Secundario') ?>");
+					$('id_usuario_secundario').focus();
+					return false;
+				}
+<?php } ?>
 		}
 
 		form.submit();
@@ -830,29 +756,29 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		http.open('get', 'ajax.php?accion=info_cobro&codigo_cliente=' + cliente);
 		http.onreadystatechange = function()
 		{
-			if(http.readyState == 4)
+			if (http.readyState == 4)
 			{
 				var response = http.responseText;
 				var update = new Array();
-				if(response.indexOf('|') != -1 && response.indexOf('VACIO') != -1)
+				if (response.indexOf('|') != -1 && response.indexOf('VACIO') != -1)
 					alert(response);
-				else if(response.indexOf('|') != -1)
+				else if (response.indexOf('|') != -1)
 				{
 					arreglo = response.split("|");
 					/*
-				document.formulario.razon_social.value = arreglo[0];
-				document.formulario.rut.value = arreglo[1];
-				document.formulario.giro.value = arreglo[2];
-				document.formulario.direccion_contacto.value = arreglo[3];
+					 document.formulario.razon_social.value = arreglo[0];
+					 document.formulario.rut.value = arreglo[1];
+					 document.formulario.giro.value = arreglo[2];
+					 document.formulario.direccion_contacto.value = arreglo[3];
 					 */
 				}
 				else
 				{
 					/*
-				document.formulario.razon_social.value = "";
-				document.formulario.rut.value = "";
-				document.formulario.giro.value = "";
-				document.formulario.direccion_contacto.value = "";
+					 document.formulario.razon_social.value = "";
+					 document.formulario.rut.value = "";
+					 document.formulario.giro.value = "";
+					 document.formulario.direccion_contacto.value = "";
 					 */
 				}
 			}
@@ -869,17 +795,17 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		http.open('get', 'ajax.php?accion=check_codigo_asunto&codigo_asunto=' + asunto);
 		http.onreadystatechange = function()
 		{
-			if(http.readyState == 4)
+			if (http.readyState == 4)
 			{
 				var response = http.responseText;
 				var update = new Array();
-				if(response.indexOf('OK') == -1 && response.indexOf('NO') == -1)
+				if (response.indexOf('OK') == -1 && response.indexOf('NO') == -1)
 				{
 					alert(response);
 				}
 				else
 				{
-					if(response.indexOf('NO') != -1)
+					if (response.indexOf('NO') != -1)
 					{
 						alert("<?php echo __('El código ingresado ya se encuentra asignado a otro asunto. Por favor ingrese uno nuevo') ?>");
 						campo.value = "";
@@ -907,7 +833,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	{
 		fc1 = document.getElementById("fc1");
 
-		if(fc1.checked)
+		if (fc1.checked)
 			HideMonto();
 		else
 			ShowMonto();
@@ -917,11 +843,11 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	{
 		cobro_independiente = document.getElementById("cobro_independiente");
 
-		if(cobro_independiente.checked)
+		if (cobro_independiente.checked)
 		{
 			ShowFormaCobro();
 			MostrarMonto();
-		}else{
+		} else {
 			HideFormaCobro();
 			HideMonto();
 		}
@@ -944,15 +870,15 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		alert(form.mensual.value);
 	}
 
-	function Contratos(codigo,id_contrato)
+	function Contratos(codigo, id_contrato)
 	{
 		var div = $("div_contrato");
 		var http = getXMLHTTP();
 
-		http.open('get', 'ajax.php?accion=lista_contrato&codigo_cliente=' + codigo +'&id_contrato=' + id_contrato, false);
+		http.open('get', 'ajax.php?accion=lista_contrato&codigo_cliente=' + codigo + '&id_contrato=' + id_contrato, false);
 		http.onreadystatechange = function()
 		{
-			if(http.readyState == 4)
+			if (http.readyState == 4)
 			{
 				var response = http.responseText;
 				div.innerHTML = response;
@@ -967,7 +893,7 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		var check = $(valor);
 		var td = $('tbl_copiar_datos');
 
-		if(check.checked)
+		if (check.checked)
 		{
 			tbl.style['display'] = 'inline';
 			td.style['display'] = 'inline';
@@ -979,23 +905,10 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		}
 	}
 
-        function SetearLetraCodigoSecundario() 
-        {
-           var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
-           $('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;'+codigo_cliente_secundario+'-';
-        }
-
-	function CopiarDatosCliente(form)
+	function SetearLetraCodigoSecundario()
 	{
-		if(!form)
-			var form = $('formulario');
-
-		if(confirm('<?php echo __("¿Ud. desea copiar los datos del cliente?") ?>'))
-		{
-			form.opc_copiar.value = true;
-			form.submit();
-			return true;
-		}
+		var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
+		$('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;' + codigo_cliente_secundario + '-';
 	}
 </script>
 <!--onKeyUp="highlight(event)" onClick="highlight(event)"-->
@@ -1011,48 +924,49 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 					<table>
 						<tr>
 							<td align=right>
-<?php echo __('Código') ?>
+								<?php echo __('Código') ?>
 							</td>
 							<td align=left>
-								<input id=codigo_asunto name=codigo_asunto <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> size=10 maxlength=10 value="<?php echo $asunto->fields['codigo_asunto'] ?>" onchange="this.value=this.value.toUpperCase();<?php if (!$asunto->Loaded())
-	echo "CheckCodigo();"; ?>"/>
+								<input id=codigo_asunto name=codigo_asunto <?php echo $codigo_obligatorio ? 'readonly="readonly"' : '' ?> size=10 maxlength=10 value="<?php echo $asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase();<?php if (!$asunto->Loaded())
+									echo "CheckCodigo();";
+								?>"/>
 								&nbsp;&nbsp;&nbsp;
-<?php
-    echo __('Código secundario');
-    if( $cliente->fields['codigo_cliente_secundario'] ) {
-        $glosa_codigo_cliente_secundario = '&nbsp;&nbsp;'.$cliente->fields['codigo_cliente_secundario'].'-';
-    } else {
-        $glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
-    }
-?>
-                                                                
-          <div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>                                                      
-<?php
- if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
-	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='5' value='" . substr($asunto->fields['codigo_asunto_secundario'], -4) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
+								<?php
+								echo __('Código secundario');
+								if ($cliente->fields['codigo_cliente_secundario']) {
+									$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;' . $cliente->fields['codigo_cliente_secundario'] . '-';
+								} else {
+									$glosa_codigo_cliente_secundario = '&nbsp;&nbsp;';
+								}
+								?>
+
+								<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;"><?php echo $glosa_codigo_cliente_secundario; ?></div>
+								<?php
+								if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='5' value='" . substr($asunto->fields['codigo_asunto_secundario'], -4) . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
 						<span style='color:#FF0000; font-size:10px'>*</span>";
-} else {
-	if ($asunto->fields['codigo_asunto_secundario'] != '')
-		list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $asunto->fields['codigo_asunto_secundario']);
-	echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
+								} else {
+									if ($asunto->fields['codigo_asunto_secundario'] != '')
+										list( $codigo_cli_sec, $codigo_asunto_secundario ) = split("-", $asunto->fields['codigo_asunto_secundario']);
+									echo "<input id=codigo_asunto_secundario name=codigo_asunto_secundario size='15' maxlength='20' value='" . $codigo_asunto_secundario . "' onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
 						<span style='font-size:10px'>(" . __('Opcional') . ")</span>";
-}
-?>
+								}
+								?>
 							</td>
 						</tr>
-						<?php if(UtilesApp::GetConf($sesion, 'ExportacionLedes')){ ?>
-						<tr>
-							<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
-								<?php echo __('Código de homologación'); ?>
-							</td>
-							<td align=left>
-								<input name="codigo_homologacion" size="45" value="<?php echo $asunto->fields['codigo_homologacion']; ?>" />
-							</td>
-						</tr>
-						<?php } ?>
+						<?php if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) { ?>
+							<tr>
+								<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+									<?php echo __('Código de homologación'); ?>
+								</td>
+								<td align=left>
+									<input name="codigo_homologacion" size="45" value="<?php echo $asunto->fields['codigo_homologacion']; ?>" />
+								</td>
+							</tr>
+<?php } ?>
 						<tr>
 							<td align=right>
-<?php echo __('Título') ?>
+								<?php echo __('Título') ?>
 							</td>
 							<td align=left>
 								<input name=glosa_asunto size=45 value="<?php echo $asunto->fields['glosa_asunto'] ?>" />
@@ -1065,10 +979,10 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 							</td>
 							<td align=left>
 <?php
- if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
+if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'CodigoSecundario') ) || ( method_exists('Conf', 'CodigoSecundario') && Conf::CodigoSecundario() ))) {
 	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $cliente->fields['codigo_cliente_secundario'], "  ", "SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value);");
 } else {
-	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value);" );
+	echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $asunto->fields['codigo_cliente'] ? $asunto->fields['codigo_cliente'] : $cliente->fields['codigo_cliente'], "  ", "CambioEncargadoSegunCliente(this.value);");
 }
 ?>
 								<span style="color:#FF0000; font-size:10px">*</span>
@@ -1094,40 +1008,41 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 						</tr>
 						<tr>
 							<td align=right>
-								<?php echo __('Descripción') ?>
+						<?php echo __('Descripción') ?>
 							</td>
 							<td align=left>
 								<textarea name=descripcion_asunto cols="50"><?php echo $asunto->fields['descripcion_asunto'] ?></textarea>
 							</td>
 						</tr>
-						<?php 	//if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
-									
-							echo '<tr><td align=right>';
-                                                                                    echo __('Usuario responsable');
-                                                        echo '</td><td align=left>';
-echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+						<?php
+						//if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario') ) {
+
+						echo '<tr><td align=right>';
+						echo __('Usuario responsable');
+						echo '</td><td align=left>';
+						echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "  ", "Seleccione", "200"); 
- if ( isset($encargado_obligatorio) && $encargado_obligatorio ): 
-	echo $obligatorio;
- endif; 
-					echo '</td></tr>';
-								//} 
-					IF( UtilesApp::GetConf($sesion, 'AsuntosEncargado2') ) { 
-		echo '<tr><td align=right>'.__('Encargado 2');
-		echo '</td><td align=left>';
-		echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
+																				ORDER BY usuario.apellido1", "id_encargado", $asunto->fields['id_encargado'], "  ", "Seleccione", "200");
+						if (isset($encargado_obligatorio) && $encargado_obligatorio):
+							echo $obligatorio;
+						endif;
+						echo '</td></tr>';
+						//}
+						IF (UtilesApp::GetConf($sesion, 'AsuntosEncargado2')) {
+							echo '<tr><td align=right>' . __('Encargado 2');
+							echo '</td><td align=left>';
+							echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 																				FROM usuario
 																				WHERE usuario.id_usuario IN (SELECT id_usuario FROM usuario_permiso)
 																				AND usuario.activo = 1
-																				ORDER BY usuario.apellido1","id_encargado2",
-									$asunto->fields['id_encargado2'], "","Seleccione","200");  
-		echo '</td></tr>';
-		 } ?>
-	<tr>
-		<td align=right>
+																				ORDER BY usuario.apellido1", "id_encargado2", $asunto->fields['id_encargado2'], "", "Seleccione", "200");
+							echo '</td></tr>';
+						}
+						?>
+						<tr>
+							<td align=right>
 <?php echo __('Contacto solicitante') ?>
 							</td>
 							<td align=left>
@@ -1150,10 +1065,10 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 								<label for="activo"><?php echo __('Activo') ?></label>
 							</td>
 							<td align=left>
-								<input type=checkbox name=activo id=activo value="1" <?php echo $asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo !$asunto->Loaded() ? 'checked' : '' ?> />
+								<input type=checkbox name=activo id=activo value="1" <?php echo $asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$asunto->Loaded() ? 'checked' : '' ?> />
 								&nbsp;&nbsp;&nbsp;
 								<label for="cobrable"><?php echo __('Cobrable') ?></label>
-								<input  type=checkbox name=cobrable id=cobrable value="1" <?php echo $asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo !$asunto->Loaded() ? 'checked' : '' ?>  />
+								<input  type=checkbox name=cobrable id=cobrable value="1" <?php echo $asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$asunto->Loaded() ? 'checked' : '' ?>  />
 								&nbsp;&nbsp;&nbsp;
 								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
 								<input type=checkbox id=actividades_obligatorias name=actividades_obligatorias value="1" <?php echo $asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
@@ -1201,20 +1116,20 @@ echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario,CONCAT_WS(' ',apellid
 					</fieldset>
 				-->
 				<br>
-<?php
-if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente']) ) {
-	$checked = 'checked';
-} else {
-	$checked = '';
-}
- 
-$hide_areas = '';
-$params_asuntos_array['codigo_permiso'] = 'SASU';
-$permisos_asuntos = $sesion->usuario->permisos->Find('FindPermiso', $params_asuntos_array); #tiene permiso de admin de asuntos
-if ($permisos_asuntos->fields['permitido']) {
-	$hide_areas = 'style="display: none;"';
-}
-?>
+				<?php
+				if ($asunto->fields['id_contrato'] && ($asunto->fields['id_contrato'] != $cliente->fields['id_contrato']) && ($asunto->fields['codigo_cliente'] == $cliente->fields['codigo_cliente'])) {
+					$checked = 'checked';
+				} else {
+					$checked = '';
+				}
+
+				$hide_areas = '';
+				$params_asuntos_array['codigo_permiso'] = 'SASU';
+				$permisos_asuntos = $sesion->usuario->permisos->Find('FindPermiso', $params_asuntos_array); #tiene permiso de admin de asuntos
+				if ($permisos_asuntos->fields['permitido']) {
+					$hide_areas = 'style="display: none;"';
+				}
+				?>
 				<table width='100%' cellspacing='0' cellpadding='0'>
 					<tr>
 						<td  <?php echo $hide_areas; ?> >
@@ -1222,20 +1137,22 @@ if ($permisos_asuntos->fields['permitido']) {
 							<label for="cobro_independiente"><?php echo __('Se cobrará de forma independiente') ?></label>
 						</td>
 						<td id='tbl_copiar_datos' style='display:<?php echo $checked != '' ? 'inline' : 'none' ?>;'>
-							<input type="button" name='copiar_datos' id='copiar_datos' onclick="CopiarDatosCliente(this.form)" value='Copiar datos de Cliente'>&nbsp;&nbsp;
+							&nbsp;
 						</td>
 					</tr>
 				</table>
 				<br>
 				<div  id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-					
-<?php if (!$permisos_asuntos->fields['permitido']) { require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php'; } ?>
-					
-					
+
+<?php if (!$permisos_asuntos->fields['permitido']) {
+	require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+} ?>
+
+
 				</div>
 				<br>
 				<fieldset class="border_plomo tb_base">
-					<legend><?php echo __('Alertas').' '.__('Asunto') ?></legend>
+					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
 					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
 					<table>
 						<tr>
@@ -1275,27 +1192,27 @@ if ($permisos_asuntos->fields['permitido']) {
 					<table>
 						<tr>
 							<td colspan=6 align="center">
-<?php
-if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
-	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
- } else {
-	$funcion_validar = "return Validar(this.form);";
-}
-?>
+						<?php
+						if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
+							$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', this.form, false);";
+						} else {
+							$funcion_validar = "return Validar(this.form);";
+						}
+						?>
 								<input type='button' class='btn' value="<?php echo __('Guardar'); ?>" onclick="<?php echo $funcion_validar; ?>" />
 							</td>
 						</tr>
 <?php
- if ($motivo == "agregar_proyecto") {
+if ($motivo == "agregar_proyecto") {
 	?>
-						<!--  <tr>
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<!--  <tr>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-									<td width="680" align=right><img src="<?php echo Conf::ImgDir() ?>/volver.gif" border="0" /> <a href="#" onclick="Volver();" title="Volver">Volver Atr&aacute;s</a></td>
-							</tr>
+										<td width="680" align=right><img src="<?php echo Conf::ImgDir() ?>/volver.gif" border="0" /> <a href="#" onclick="Volver();" title="Volver">Volver Atr&aacute;s</a></td>
+								</tr>
 							-->
 	<?php
- }
+}
 ?>
 					</table>
 				</fieldset>
@@ -1304,53 +1221,59 @@ if (UtilesApp::GetConf($sesion, 'RevisarTarifas')) {
 </form>
 
 <script>
-    
+
 	//Contratos('<?php echo $asunto->fields['codigo_cliente']; ?>','<?php echo $asunto->fields['id_contrato']; ?>');
 	var form = $('formulario');
 	ShowContrato(form, 'cobro_independiente');
-	
+
 	jQuery('document').ready(function() {
-	   
-	   jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function() {
-	       CambioEncargadoSegunCliente(jQuery(this).val());
-	   });
+
+		jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function() {
+			CambioEncargadoSegunCliente(jQuery(this).val());
+		});
 	});
-function CambioEncargadoSegunCliente(idcliente) {
-    var CopiarEncargadoAlAsunto=<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto")?'1':'0');?>;
-    var UsuarioSecundario=<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario')? '1':'0' );?>;
-    var ObligatorioEncargadoSecundarioAsunto=<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto')? '1':'0' );?>;
-    jQuery('#id_usuario_secundario').removeAttr('disabled');
-    jQuery('#id_usuario_responsable').removeAttr('disabled');
-    jQuery.post('../ajax.php',{accion:'busca_encargado_por_cliente',codigobuscado:idcliente},function(data) {
-	if(window.console ) console.debug(data);
-        var ladata=data.split('|');
-	jQuery('#id_usuario_responsable').attr({'disabled':''}).val(ladata[0]);
-        if(ladata[1] && jQuery('#id_usuario_secundario option[value='+ladata[1]+']').length>0) {
-            if(UsuarioSecundario) jQuery('#id_usuario_secundario').attr({'disabled':''}).val(ladata[1]);
-        } else {
-          if(ladata[2])  jQuery('#id_usuario_secundario').append('<option value="'+ladata[1]+'" selected="selected">'+ladata[2]+'</option>').attr({'disabled':''}).val(ladata[1]);;
-        }
-        
-          jQuery('#id_usuario_responsable').removeAttr('disabled');
-	if(CopiarEncargadoAlAsunto) {
-		jQuery('#id_usuario_responsable').attr({'disabled':'disabled'});
-                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').attr({'disabled':'disabled'});
-	   } else if(ObligatorioEncargadoSecundarioAsunto) {
-             
-                if(UsuarioSecundario) 	jQuery('#id_usuario_secundario').removeAttr('disabled');
-	   }
-	
-	   
-           jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
-	});
-	 jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
-}
-	
+	function CambioEncargadoSegunCliente(idcliente) {
+		var CopiarEncargadoAlAsunto =<?php echo (UtilesApp::GetConf($sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
+		var UsuarioSecundario =<?php echo (UtilesApp::GetConf($sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
+		var ObligatorioEncargadoSecundarioAsunto =<?php echo (UtilesApp::GetConf($sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
+		jQuery('#id_usuario_secundario').removeAttr('disabled');
+		jQuery('#id_usuario_responsable').removeAttr('disabled');
+		jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function(data) {
+			if (window.console)
+				console.debug(data);
+			var ladata = data.split('|');
+			jQuery('#id_usuario_responsable').attr({'disabled': ''}).val(ladata[0]);
+			if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
+				if (UsuarioSecundario)
+					jQuery('#id_usuario_secundario').attr({'disabled': ''}).val(ladata[1]);
+			} else {
+				if (ladata[2])
+					jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
+				;
+			}
+
+			jQuery('#id_usuario_responsable').removeAttr('disabled');
+			if (CopiarEncargadoAlAsunto) {
+				jQuery('#id_usuario_responsable').attr({'disabled': 'disabled'});
+				if (UsuarioSecundario)
+					jQuery('#id_usuario_secundario').attr({'disabled': 'disabled'});
+			} else if (ObligatorioEncargadoSecundarioAsunto) {
+
+				if (UsuarioSecundario)
+					jQuery('#id_usuario_secundario').removeAttr('disabled');
+			}
+
+
+			jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
+		});
+		jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
+	}
+
 </script>
 <?php echo InputId::Javascript($sesion) ?>
 
 <?php
- $pagina->PrintBottom($popup);
+$pagina->PrintBottom($popup);
 
 function EnviarEmail($asunto) {
 	global $sesion;
@@ -1375,16 +1298,16 @@ function EnviarEmail($asunto) {
 		while (list($nombre, $email) = mysql_fetch_array($resp)) {
 			$from = Conf::AppName();
 			$headers = "From: Time & Billing <" . $MailSistema . ">" . "\r\n" .
-					"Reply-To: " . $MailSistema . "\r\n" .
-					'X-Mailer: PHP/' . phpversion();
+							"Reply-To: " . $MailSistema . "\r\n" .
+							'X-Mailer: PHP/' . phpversion();
 			$mensaje = "Estimado(a) $nombre,\nse ha agregado el asunto $glosa ($codigo) al cliente $cliente en el sistema de Time & Billing.\nDescripción: $desc\nRecuerda refrescar las listas de la aplicación local Time & Billing.";
 			Utiles::Insertar($sesion, "Nuevo asunto - " . Conf::AppName(), $mensaje, $email, $nombre);
 		}
 	} else {
 		$from = Conf::AppName();
 		$headers = "From: Time & Billing <" . $MailSistema . ">" . "\r\n" .
-				"Reply-To: " . $MailSistema . "\r\n" .
-				'X-Mailer: PHP/' . phpversion();
+						"Reply-To: " . $MailSistema . "\r\n" .
+						'X-Mailer: PHP/' . phpversion();
 		$mensaje = "Estimado(a) Admin,\nse ha agregado el asunto $glosa ($codigo) al cliente $cliente en el sistema de Time & Billing.\nDescripción: $desc\nRecuerda refrescar las listas de la aplicación local Time & Billing.";
 		$email = UtilesApp::GetConf($sesion, 'MailAdmin');
 		Utiles::Insertar($sesion, "Nuevo asunto - " . Conf::AppName(), $mensaje, $email, $nombre);

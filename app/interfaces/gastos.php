@@ -33,9 +33,9 @@ function Opciones(& $fila) {
 	if ($editar) {
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Gasto',730,580,'agregar_gasto.php?id_gasto=$id_gasto&popup=1&prov=$prov');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
 		if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) {
-				$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 title=Eliminar></a>";
+			$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 title=Eliminar></a>";
 		} else {
-				$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 title=Eliminar></a>";
+			$html_opcion .= "<a target=_parent href='javascript:void(0)' onclick=\"parent.EliminaGasto($id_gasto)\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 title=Eliminar></a>";
 		}
 	} else {
 		$html_opcion .= "<a href='javascript:void(0)' onclick=\"alert('" . __('No se puede modificar este gasto.\n') . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.') . "');\" ><img src='" . Conf::ImgDir() . "/editar_off.gif' border=0 title=\"" . __('Cobro ya Emitido al Cliente') . "\"></a>&nbsp;";
@@ -111,7 +111,6 @@ if ($opc == 'buscar') {
 					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
 					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
 					$asuntos_list = array();
-
 					while (list($codigo) = mysql_fetch_array($resp)) {
 						array_push($asuntos_list, $codigo);
 					}
@@ -130,7 +129,7 @@ if ($opc == 'buscar') {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
 		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
+			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
 		}
 		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
@@ -144,6 +143,7 @@ if ($opc == 'buscar') {
 		if (isset($cobrable) && $cobrable != '') {
 			$where .= " AND cta_corriente.cobrable =$cobrable";
 		}
+
 		if (isset($id_tipo) and $id_tipo != '') {
 			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
 		}
@@ -159,7 +159,7 @@ if ($opc == 'buscar') {
 		} else if ($fecha1) {
 			$where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "' ";
 		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . "' ";
+			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59' ";
 		} else if (!empty($id_cobro)) {
 			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
 		}
@@ -173,7 +173,6 @@ if ($opc == 'buscar') {
 		} else if ($egresooingreso == 'sologastos') {
 			$where .= " AND cta_corriente.ingreso IS NULL ";
 		}
-
 	} else {
 		$where = base64_decode($where);
 	}
@@ -303,8 +302,8 @@ if ($preparar_cobro == 1) {
 <script  src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
-	var contratos= {};
-	var tablagastos=null;
+	var contratos = {};
+	var tablagastos = null;
 	function Preparar_Cobro(form) {
 		form.action = 'gastos.php?preparar_cobro=1';
 		form.submit();
@@ -316,6 +315,7 @@ if ($preparar_cobro == 1) {
 		var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente_secundario').value+'&codigo_asunto='+$('codigo_asunto_secundario').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?php echo UtilesApp::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
 <?php } else { ?>
 		var acc = 'gastos.php?id_gasto='+id+'&accion=eliminar&codigo_cliente='+$('codigo_cliente').value+'&codigo_asunto='+$('codigo_asunto').value+'&fecha1='+$('fecha1').value+'&fecha2='+$('fecha2').value<?php echo UtilesApp::GetConf($sesion, 'TipoGasto') ? "+'&id_tipo='+$('id_tipo').value" : "" ?>+'&opc=buscar';
+
 <?php } ?>
 		if (parseInt(id) > 0 && confirm('¿Desea eliminar el gasto seleccionado?') == true) {
 			self.location.href = acc;
@@ -486,134 +486,136 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 if (!UtilesApp::GetConf($sesion, 'NumeroGasto')) {
 	echo ' { "bVisible": false, "aTargets": [ 0 ] },';
 }
+
 //if ( !UtilesApp::GetConf($sesion,'NumeroGasto') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 //if ( !UtilesApp::GetConf($sesion,'NumeroOT') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 //if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
 if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
-		echo ' { "bVisible": false, "aTargets": [ 7 ] },';
+	echo ' { "bVisible": false, "aTargets": [ 7 ] },';
 }
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
-		echo ' { "bVisible": false, "aTargets": [10 ] },';
+	echo ' { "bVisible": false, "aTargets": [10 ] },';
 }
-?>
-					{"fnRender": function (o,val) { return o.aData[12]; },"bUseRendered": false , "aTargets": [0] },
-					{"fnRender": function ( o, val ) {
-						var respuesta='';
-						if(o.aData[9]=='SIN COBRO' || o.aData[9]=='CREADO' || o.aData[9]=='EN REVISION') {
-							respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[12]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
-							respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[12]+"'/>";
-						} else {
-							respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
-						}
+?>  {"fnRender": function (o,val) {
+			return o.aData[12];
+		},"bUseRendered": false , "aTargets": [0] },
+		{  "fnRender": function ( o, val ) {
+			var respuesta='';
+			if(o.aData[9]=='SIN COBRO' || o.aData[9]=='CREADO' || o.aData[9]=='EN REVISION') {
+				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[12]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
+				respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[12]+"'/>";
+			} else {
+				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
+			}
 
-						return respuesta;
-					}, "bUseRendered": false, "aTargets": [12]},
-					{"fnRender": function ( o, val ) {
-						var idcobro=o.aData[8];
-						var respuesta='';
-						if (idcobro>0) {
-							respuesta+="<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+idcobro+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+idcobro+"</a><br/>";
-						}
-						return respuesta+'<small>'+o.aData[9]+'</small>';
-					}, "aTargets": [8]},
-					{"fnRender": function (o,val) {
-						var tipo=(o.aData[3]!=' - ')? o.aData[3]+' ':'';
-						return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
-					}, "aTargets": [3]},
-					{"fnRender": function (o,val) {
-						if(o.aData[5]) {
-							return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
-						}
-					}, "aTargets": [5]},
-					{"fnRender": function (o,val) {
-						return o.aData[0];
-					}, "bUseRendered": false, "aTargets": [1] },
-					{"fnRender": function (o,val) {
-						var activo=(o.aData[11]='SI')? 'activo' :'inactivo';
-						if (typeof(contratos)!="undefined") {
-							contratos['contrato_'+o.aData[14]]=o.aData[14];
-						}
-						return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
-					}, "bUseRendered": false , "aTargets": [2] }
-					],
-					"aaSorting": [[0,'desc']],
-					"iDisplayLength": 25,
-					"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
-					"sPaginationType": "full_numbers",
-					"sDom":  'T<"top"ip>rt<"bottom">',
-					"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [
+			return respuesta;
+		}, "bUseRendered": false, "aTargets": [12]},
+		{"fnRender": function ( o, val ) {
+			var idcobro=o.aData[8];
+			var respuesta='';
+			if (idcobro>0) {
+				respuesta+="<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+idcobro+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+idcobro+"</a><br/>";
+			}
+			return respuesta+'<small>'+o.aData[9]+'</small>';
+		}, "aTargets": [8]},
+		{"fnRender": function (o,val) {
+			var tipo=(o.aData[3]!=' - ')? o.aData[3]+' ':'';
+			return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
+		}, "aTargets": [3]},
+		{"fnRender": function (o,val) {
+			if(o.aData[5]) {
+				return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
+			}
+		}, "aTargets": [5]},
+		{"fnRender": function (o,val) {
+			return o.aData[0];
+		}, "bUseRendered": false, "aTargets": [1] },
+		{"fnRender": function (o,val) {
+			var activo=(o.aData[11]='SI')? 'activo' :'inactivo';
+			if (typeof(contratos)!="undefined") {
+				contratos['contrato_'+o.aData[14]]=o.aData[14];
+			}
+			return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
+		}, "bUseRendered": false , "aTargets": [2] }
+		],
+		"aaSorting": [[0,'desc']],
+		"iDisplayLength": 25,
+		"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
+		"sPaginationType": "full_numbers",
+		"sDom":  'T<"top"ip>rt<"bottom">',
+		"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [
 <?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_js_gastos') : false; ?>  {
-							"sExtends":    "copy",
-							"sAction":     "flash_copy",
-							"sButtonText": "Copiar esta consulta",
-							"fnClick": function ( nButton, oConfig, oFlash ) {
-								var uri='<?php echo Conf:: Server() . $_SERVER['REQUEST_URI']; ?>';
-								oFlash.setText( uri+'?buscar=1&'+jQuery('#form_gastos').serialize() );
-							},
-							"fnComplete": function ( nButton, oConfig, oFlash, sFlash ) {
-								alert( 'Se ha copiado la consulta actual al portapapeles' );
-							}
-						}, {
-							"sExtends":    "text",
-							"sButtonText": "Editar Seleccionados",
-							"fnClick": function ( nButton, oConfig, oFlash ) {
-								top.window.jQuery('#dialogomodal .divloading').hide();
-								if (jQuery('#selectodos').is(':checked')) {
-									var url='ajax/ajax_gastos.php?opclistado=listado&selectodos=1&'+jQuery('#form_gastos').serialize();
-								} else {
-									var arrayseleccionados=new Array();
-									jQuery('.eligegasto:checked').each(function() {
-										var laid=jQuery(this).attr('id').replace('check_','');
-										arrayseleccionados.push(parseInt(laid));
-									});
-									if (arrayseleccionados.length==0) return false;
-										jQuery('#serializacion').val(arrayseleccionados);
-										var url='ajax/ajax_gastos.php?opclistado=listado&movimientos='+jQuery('#serializacion').val().replace(',',';');
-									}
-
-									top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option','title',' Editar Gastos Masivamente ').dialog( "option",
-										"buttons", {
-											"Modificar": function() {
-												jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos',jQuery('#form_edita_gastos_masivos').serialize(),function(data) {
-													if (window.console) {
-														console.log(data);
-													}
-												},'jsonp');
-
-												jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
-												jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
-
-												jQuery(this).dialog("close");
-											},
-											"Cancelar": function() {
-												jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
-												jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
-												jQuery(this).dialog("close");
-											}
-										});
-
-										top.window.jQuery('#dialogomodal').load(url, function() {
-											if (jQuery('#codcliente').val()==1) {
-												jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').attr('readonly','readonly');
-												jQuery('#overlayeditargastos').prepend(jQuery('#selectclienteasunto'));
-											}
-										});
-									}
-								} ]
-							}
-						}).show();
-
-						jQuery("#boton_buscar").removeAttr('disabled');
-						return true;
+				"sExtends":    "copy",
+				"sAction":     "flash_copy",
+				"sButtonText": "Copiar esta consulta",
+				"fnClick": function ( nButton, oConfig, oFlash ) {
+					var uri='<?php echo Conf:: Server() . $_SERVER['REQUEST_URI']; ?>';
+					oFlash.setText( uri+'?buscar=1&'+jQuery('#form_gastos').serialize() );
+				},
+				"fnComplete": function ( nButton, oConfig, oFlash, sFlash ) {
+					alert( 'Se ha copiado la consulta actual al portapapeles' );
+				}
+			}, {
+				"sExtends":    "text",
+				"sButtonText": "Editar Seleccionados",
+				"fnClick": function ( nButton, oConfig, oFlash ) {
+					top.window.jQuery('#dialogomodal .divloading').hide();
+					if (jQuery('#selectodos').is(':checked')) {
+						var url='ajax/ajax_gastos.php?opclistado=listado&selectodos=1&'+jQuery('#form_gastos').serialize();
 					} else {
-						return false;
-					}
-				});
+						var arrayseleccionados=new Array();
+						jQuery('.eligegasto:checked').each(function() {
+							var laid=jQuery(this).attr('id').replace('check_','');
+							arrayseleccionados.push(parseInt(laid));
+						});
+						if (arrayseleccionados.length==0) return false;
+							jQuery('#serializacion').val(arrayseleccionados);
+							var url='ajax/ajax_gastos.php?opclistado=listado&movimientos='+jQuery('#serializacion').val().replace(',',';');
+						}
+
+						top.window.jQuery('#dialogomodal').dialog('open').dialog('open').dialog('option','title',' Editar Gastos Masivamente ').dialog( "option",
+							"buttons", {
+								"Modificar": function() {
+									jQuery.post('ajax/ajax_gastos.php?opc=actualizagastos',jQuery('#form_edita_gastos_masivos').serialize(),function(data) {
+										if (window.console) {
+											console.log(data);
+										}
+									},'jsonp');
+
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
+									jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
+
+									jQuery(this).dialog("close");
+								},
+								"Cancelar": function() {
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').removeAttr('readonly');
+									jQuery('#selectclienteasunto').insertBefore('#leyendaasunto');
+									jQuery(this).dialog("close");
+								}
+							});
+
+							top.window.jQuery('#dialogomodal').load(url, function() {
+								if (jQuery('#codcliente').val()==1) {
+									jQuery('#codigo_cliente,#campo_codigo_asunto,#campo_codigo_asunto_secundario, #codigo_cliente_secundario, #glosa_cliente').attr('readonly','readonly');
+									jQuery('#overlayeditargastos').prepend(jQuery('#selectclienteasunto'));
+								}
+							});
+						}
+					} ]
+				}
+			}).show();
+
+			jQuery("#boton_buscar").removeAttr('disabled');
+			return true;
+		} else {
+			return false;
+		}
+	});
 
 <?php
 if ($opc == 'buscar' || isset($_GET['buscar'])) {
-		echo "jQuery('#boton_buscar').click();";
+	echo "jQuery('#boton_buscar').click();";
 }
 ?>
 });

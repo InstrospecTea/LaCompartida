@@ -233,6 +233,8 @@ class Asunto extends Objeto {
 		$this->campo_id = "id_asunto";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->log_update = true;
+
 	}
 
 	function LoadByCodigo($codigo) {
@@ -282,7 +284,7 @@ class Asunto extends Objeto {
 		$campo = 'codigo_asunto' . ($secundario ? '_secundario' : '');
 		$tipo = UtilesApp::GetConf($this->sesion,'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
 		$largo = $tipo == 2 ? 3 : 4;
-		
+
 		$where_codigo_gastos = '';
 		if (UtilesApp::GetConf($this->sesion, 'CodigoEspecialGastos')) {
 			if ($glosa_asunto=='GASTOS' || $glosa_asunto=='Gastos') {
@@ -292,18 +294,18 @@ class Asunto extends Objeto {
 		}
 		$yy = date('y');
 		$anio = $tipo ? '' : "AND $campo LIKE '%-$yy%'";
-		
+
 		$where_codigo_cliente = $secundario ?
 			"JOIN cliente USING(codigo_cliente) WHERE cliente.codigo_cliente_secundario = '$codigo_cliente'" :
 			"WHERE asunto.codigo_cliente = '$codigo_cliente'";
-		
+
 		$query = "SELECT CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)), UNSIGNED INTEGER) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
 		if(empty($codigo)){
 			$codigo = $tipo ? 0 : $yy * 100;
 		}
-		
+
 		return sprintf("%s-%0{$largo}d", $codigo_cliente, $codigo + 1);
 	}
 
@@ -343,7 +345,7 @@ class Asunto extends Objeto {
 		$query = "SELECT SUM(TIME_TO_SEC(duracion_cobrada))/3600 as hrs_no_cobradas
 							FROM trabajo AS t2
 							LEFT JOIN cobro on t2.id_cobro=cobro.id_cobro
-							WHERE 1 $where 
+							WHERE 1 $where
 							AND t2.cobrable = 1
 							AND t2.codigo_asunto='" . $this->fields['codigo_asunto'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -356,15 +358,15 @@ class Asunto extends Objeto {
 		if (!$emitido)
 			$where = " AND (trabajo.id_cobro IS NULL OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION') ";
 
-		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo   
-							FROM trabajo 
-							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto 
-							JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
-							LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa) 
-							LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro 
-							WHERE 1 $where  
-							AND trabajo.cobrable = 1 
+		$query = "SELECT SUM((TIME_TO_SEC(duracion_cobrada)/3600)*usuario_tarifa.tarifa), prm_moneda.simbolo
+							FROM trabajo
+							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
+							JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+							JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+							LEFT JOIN usuario_tarifa ON (trabajo.id_usuario=usuario_tarifa.id_usuario AND contrato.id_moneda=usuario_tarifa.id_moneda AND contrato.id_tarifa = usuario_tarifa.id_tarifa)
+							LEFT JOIN cobro on trabajo.id_cobro=cobro.id_cobro
+							WHERE 1 $where
+							AND trabajo.cobrable = 1
 							AND trabajo.codigo_asunto='" . $this->fields['codigo_asunto'] . "' GROUP BY trabajo.codigo_asunto";
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -373,8 +375,8 @@ class Asunto extends Objeto {
 	}
 
 	function AlertaAdministrador($mensaje, $sesion) {
-		$query = "SELECT CONCAT_WS(' ',nombre, apellido1, apellido2) as nombre, email 
-								FROM usuario 
+		$query = "SELECT CONCAT_WS(' ',nombre, apellido1, apellido2) as nombre, email
+								FROM usuario
 							 WHERE activo=1 AND id_usuario = '" . $this->fields['id_encargado'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($nombre, $email) = mysql_fetch_array($resp);
@@ -415,9 +417,9 @@ class Asunto extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($count) = mysql_fetch_array($resp);
 		if ($count > 0) {
-			$query = "SELECT cobro.id_cobro 
-									FROM cobro_asunto 
-									JOIN cobro ON cobro.id_cobro = cobro_asunto.id_cobro 
+			$query = "SELECT cobro.id_cobro
+									FROM cobro_asunto
+									JOIN cobro ON cobro.id_cobro = cobro_asunto.id_cobro
 									WHERE cobro_asunto.codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 			list($cobro) = mysql_fetch_array($resp);
@@ -441,6 +443,162 @@ class Asunto extends Objeto {
 		$query = "DELETE FROM asunto WHERE codigo_asunto = '" . $this->fields['codigo_asunto'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		return true;
+	}
+
+	public function QueryReporte($filtros = array()) {
+		extract($filtros);
+		$wheres = array();
+
+		if ($activo) {
+			$wheres[] = "a1.activo = " . ($activo == 'SI' ? 1 : 0);
+		}
+
+		if ($codigo_asunto != "") {
+			$wheres[] = "a1.codigo_asunto LIKE '$codigo_asunto%'";
+		}
+
+		if ($glosa_asunto != "") {
+			$nombre = strtr($glosa_asunto, ' ', '%');
+			$wheres[] = "a1.glosa_asunto LIKE '%$nombre%'";
+		}
+
+		if ($codigo_cliente || $codigo_cliente_secundario) {
+			if (UtilesApp::GetConf($this->sesion,'CodigoSecundario')) {
+				$wheres[] = "cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
+				$cliente = new Cliente($this->sesion);
+				if ($cliente->LoadByCodigoSecundario($codigo_cliente_secundario)) {
+					$codigo_cliente = $cliente->fields['codigo_cliente'];
+				}
+			} else {
+				$wheres[] = "cliente.codigo_cliente = '$codigo_cliente'";
+			}
+		}
+
+		if ($opc == "entregar_asunto") {
+			$wheres[] = "a1.codigo_cliente = '$codigo_cliente' ";
+		}
+
+		if ($fecha1 || $fecha2) {
+			$wheres[] = "a1.fecha_creacion BETWEEN '" . Utiles::fecha2sql($fecha1) . "' AND '" . Utiles::fecha2sql($fecha2) . " 23:59:59'";
+		}
+
+		if ($motivo == "cobros") {
+			$wheres[] = "a1.activo='1' AND a1.cobrable = '1'";
+		}
+
+		if ($id_usuario) {
+			$wheres[] = "a1.id_encargado = '$id_usuario' ";
+		}
+
+		if ($id_area_proyecto) {
+			$wheres[] = "a1.id_area_proyecto = '$id_area_proyecto' ";
+		}
+
+		$on_encargado2 = UtilesApp::GetConf($this->sesion, 'EncargadoSecundario') ? "contrato.id_usuario_secundario" : "a1.id_encargado2";
+
+		$where = empty($wheres) ? '' : (' WHERE ' . implode(' AND ', $wheres));
+
+		//Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
+		return "SELECT SQL_CALC_FOUND_ROWS
+			a1.codigo_asunto,
+			a1.codigo_asunto_secundario as codigo_secundario,
+			a1.glosa_asunto,
+			a1.descripcion_asunto,
+			a1.id_moneda,
+			IF(a1.activo=1,'SI','NO') as activo,
+			a1.fecha_inactivo,
+			a1.contacto,
+			IF(a1.cobrable=1, 'SI', 'NO') as cobrable,
+			a1.fono_contacto,
+			a1.email_contacto,
+			a1.direccion_contacto,
+			IF(a1.actividades_obligatorias=1, 'SI', 'NO') as actividades_obligatorias,
+			a1.fecha_creacion,
+
+			tarifa.glosa_tarifa,
+			cliente.glosa_cliente,
+			prm_tipo_proyecto.glosa_tipo_proyecto AS tipo_proyecto,
+			prm_area_proyecto.glosa AS area_proyecto,
+			prm_idioma.glosa_idioma,
+			contrato.monto,
+			contrato.forma_cobro,
+			prm_moneda.glosa_moneda,
+			prm_moneda.simbolo as simbolo_moneda,
+			prm_moneda.cifras_decimales as decimales_moneda,
+
+			usuario.username as username,
+			CONCAT(usuario.apellido1, ', ', usuario.nombre) as nombre,
+
+			usuario_ec.username as username_ec,
+			CONCAT(usuario_ec.apellido1, ', ', usuario_ec.nombre) as nombre_ec,
+
+			usuario_secundario.username as username_secundario,
+			IF(usuario_secundario.username IS NULL, '', CONCAT(usuario_secundario.apellido1, ', ', usuario_secundario.nombre)) as nombre_secundario,
+
+			SUM(TIME_TO_SEC(trabajo.duracion))/3600 AS horas_trabajadas,
+			SUM(IF(cobro_trabajo.estado IS NULL OR cobro_trabajo.estado = 'CREADO' OR cobro_trabajo.estado = 'EN REVISION',
+				TIME_TO_SEC(trabajo.duracion_cobrada), 0))/3600 AS horas_no_cobradas
+
+			FROM asunto AS a1
+			LEFT JOIN cliente ON cliente.codigo_cliente=a1.codigo_cliente
+			LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
+			LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
+			LEFT JOIN prm_idioma ON a1.id_idioma = prm_idioma.id_idioma
+			LEFT JOIN prm_tipo_proyecto ON a1.id_tipo_asunto=prm_tipo_proyecto.id_tipo_proyecto
+			LEFT JOIN prm_area_proyecto ON a1.id_area_proyecto=prm_area_proyecto.id_area_proyecto
+			LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
+			LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
+			LEFT JOIN usuario as usuario_ec ON contrato.id_usuario_responsable = usuario_ec.id_usuario
+			LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = $on_encargado2
+			LEFT JOIN trabajo ON trabajo.codigo_asunto = a1.codigo_asunto AND trabajo.cobrable = 1
+			LEFT JOIN cobro as cobro_trabajo ON trabajo.id_cobro = cobro_trabajo.id_cobro
+
+			$where
+			GROUP BY a1.codigo_asunto
+			ORDER BY a1.codigo_asunto, a1.codigo_cliente ASC";
+	}
+
+	public function DownloadExcel($filtros = array()) {
+		$statement = $this->sesion->pdodbh->prepare($this->QueryReporte($filtros));
+		$statement->execute();
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
+
+		$SimpleReport = new SimpleReport($this->sesion);
+		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
+		$SimpleReport->LoadConfiguration('ASUNTOS');
+
+		//overridear configuraciones del reporte con confs
+		$usa_username = UtilesApp::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema');
+		$mostrar_encargado_secundario = UtilesApp::GetConf($this->sesion, 'EncargadoSecundario');
+		$mostrar_encargado2 = UtilesApp::GetConf($this->sesion, 'AsuntosEncargado2');
+		$encargado = $mostrar_encargado_secundario || $mostrar_encargado2;
+
+		$SimpleReport->Config->columns['username']->Visible($usa_username && !$encargado);
+		$SimpleReport->Config->columns['username_ec']->Visible($usa_username && $encargado);
+		$SimpleReport->Config->columns['username_secundario']->Visible($usa_username && $encargado);
+		$SimpleReport->Config->columns['nombre']->Visible(!$usa_username && !$encargado);
+		$SimpleReport->Config->columns['nombre_ec']->Visible(!$usa_username && $encargado);
+		$SimpleReport->Config->columns['nombre_secundario']->Visible(!$usa_username && $encargado);
+
+		if($mostrar_encargado_secundario){
+			$SimpleReport->Config->columns['username_ec']->Title(__('Encargado Comercial'));
+			$SimpleReport->Config->columns['nombre_ec']->Title(__('Encargado Comercial'));
+			$SimpleReport->Config->columns['username_secundario']->Title(__('Encargado Secundario'));
+			$SimpleReport->Config->columns['nombre_secundario']->Title(__('Encargado Secundario'));
+		}
+
+		//swapear codigo y codigo_secundario
+		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
+			$SimpleReport->Config->columns['codigo_asunto']->Field('codigo_secundario');
+			$SimpleReport->Config->columns['codigo_secundario']->Field('codigo_asunto');
+		}
+
+		$SimpleReport->LoadResults($results);
+
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
+		$writer->save(__('Planilla_Asuntos'));
 	}
 
 }

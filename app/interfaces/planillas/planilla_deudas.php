@@ -1,11 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Contrato.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
+
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
@@ -25,59 +20,115 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 
 	if(!empty($id_contrato)){
 		$where .= " AND cobro.id_contrato = '$id_contrato' ";
+	 
 	}
 
 	if(!empty($tipo_liquidacion)){ //1-2 = honorarios-gastos, 3 = mixtas
 		$honorarios = $tipo_liquidacion & 1;
 		$gastos = $tipo_liquidacion & 2 ? 1 : 0;
-
-		$join .= ' JOIN contrato ON contrato.id_contrato = cobro.id_contrato ';
-
 		$where .= "
 			AND contrato.separar_liquidaciones = '".($tipo_liquidacion=='3' ? 0 : 1)."'
 			AND cobro.incluye_honorarios = '$honorarios'
 			AND cobro.incluye_gastos = '$gastos' ";
+		 
+	}
+	
+	if($_POST['solo_monto_facturado']) {
+		$campo_valor="T.fsaldo";
+		$campo_gvalor="T.fgsaldo";
+		$campo_hvalor="T.fhsaldo";
+		$where.="AND  ccfm.saldo!=0 ";
+		$groupby.=" factura.id_factura";
+		$tipo=" pdl.glosa";
+		$identificador=" factura.id_factura";
+		$fecha_atraso=" factura.fecha";
+		$label=" concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+		$identificadores='facturas';
+		$linktofile='agregar_factura.php?id_factura=';
+	} else {
+		$campo_valor="T.saldo";
+		$campo_gvalor="T.gsaldo";
+		$campo_hvalor="T.hsaldo";
+		$where.="AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+		$groupby.=" d.id_documento";
+		$tipo=" 'liquidacion'";
+		$identificador=" d.id_cobro";
+		$fecha_atraso=" cobro.fecha_emision";
+		$label=" d.id_cobro ";
+		$identificadores='cobros';
+		$linktofile='cobros6.php?id_cobro=';
 	}
 
 	$query = "SELECT
 			T.glosa_cliente,
 			T.moneda,
-			-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, T.saldo, 0)) AS '0-30',
-			-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, T.saldo, 0)) AS '31-60',
-			-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, T.saldo, 0)) AS '61-90',
-			-SUM(IF(T.dias_atraso_pago > 90, T.saldo, 0)) AS '91+',
-			-SUM(T.saldo) AS total,
-			GROUP_CONCAT(identificador SEPARATOR ', ') as cobros
+			-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
+			-SUM(IF(T.dias_atraso_pago BETWEEN 31 AND 60, $campo_valor, 0)) AS '31-60',
+			-SUM(IF(T.dias_atraso_pago BETWEEN 61 AND 90, $campo_valor, 0)) AS '61-90',
+			-SUM(IF(T.dias_atraso_pago > 90, $campo_valor, 0)) AS '91+',
+			-SUM($campo_valor) AS total,
+			-SUM($campo_hvalor) AS htotal,
+			-SUM($campo_gvalor) AS gtotal,
+			concat('{',group_concat(concat('".'"'."',identificador,'".'":"'."',label,'".'"'."') separator ','), '}')  as identificadores
+			
 		FROM
-			(SELECT
-				d.fecha,
-				d.id_cobro AS identificador,
-				'liquidacion' AS tipo,
-				d.glosa_documento AS descripcion,
-				d.codigo_cliente,
+			(SELECT 	";  
+	/*$query .= " if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+					if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+					
+				) as tipo_cobro,"*/
+		$query .= "		d.fecha,
+				$identificador AS identificador,
+				$tipo AS tipo,
+				d.glosa_documento  AS descripcion,
+				$label as label,
+				cliente.codigo_cliente,
 				cliente.glosa_cliente AS glosa_cliente,
 				d.monto AS  monto,
-				d.monto * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS monto_base,
+				d.monto *  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS monto_base, 
+				sum(ccfm.monto_bruto) AS fmonto, 
+				sum(ccfm.monto_bruto)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fmonto_base, 
 				-1 * (d.saldo_honorarios + d.saldo_gastos) AS saldo,
-				-1 * (d.saldo_honorarios + d.saldo_gastos) * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio) AS saldo_base,
-				DATEDIFF(NOW(), cobro.fecha_emision) AS dias_atraso_pago,
+				-1 * (d.saldo_honorarios + d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS saldo_base,
+				sum(ccfm.saldo) AS fsaldo, 
+				sum(ccfm.saldo)*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fsaldo_base, 
+				
+
+				-1 * (d.saldo_honorarios) AS hsaldo,
+				-1 * (d.saldo_honorarios ) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS hsaldo_base,
+				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0)) AS fhsaldo, 
+				sum(if(cobro.incluye_honorarios=1,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fhsaldo_base, 
+				
+				-1 * (d.saldo_gastos) AS gsaldo,
+				-1 * (d.saldo_gastos) * (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS gsaldo_base,
+				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0)) AS fgsaldo, 
+				sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))*  (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio )) AS fgsaldo_base, 
+
+				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
 				moneda_documento.simbolo AS moneda
 			FROM
 				documento d
-			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-			INNER JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
-			JOIN cliente ON d.codigo_cliente = cliente.codigo_cliente
-			JOIN cobro ON cobro.id_cobro = d.id_cobro
+			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
+			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
+			left JOIN cliente ON d.codigo_cliente = cliente.codigo_cliente
+			left JOIN cobro ON cobro.id_cobro = d.id_cobro
+			left JOIN factura  on factura.id_cobro=d.id_cobro
+			left JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
+			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
+
 			$join
 			WHERE
 				d.tipo_doc = 'N' AND
-				(d.saldo_honorarios + d.saldo_gastos) > 0
+				cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')  
+				
 				$where
-			GROUP BY d.id_documento
+			GROUP BY $groupby
 			) AS T
 		GROUP BY T.glosa_cliente, T.moneda
 		ORDER BY glosa_cliente";
 
+//echo $query;
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
@@ -85,25 +136,19 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'field' => 'glosa_cliente',
 			'title' => __('Cliente'),
 			'extras' => array(
-				'attrs' => 'style="text-align:left"',
+				'attrs' => 'width="28%" style="text-align:left;"',
 				'groupinline' => true
 			)
 		),
                 array(
-                        'field' => 'cobros',
-                        'title' => utf8_encode(__('Cobros')),
+                        'field' => 'identificadores',
+                        'title' => __(ucfirst($identificadores)),
                         'extras' => array(
-                                'attrs' => 'width="10%" style="text-align:right"'
+                                'attrs' => 'width="11%" style="text-align:right;display:none;"','class' => 'identificadores'
                         )
                 ),
-		array(
-			'field' => 'cobros',
-			'title' => utf8_encode(__('Cobros')),
-			'extras' => array(
-				'attrs' => 'width="10%" style="text-align:right"',
-				'class' => 'cobros'
-			)
-		),
+		 
+
 		array(
 			'field' => '0-30',
 			'title' => '0-30 ' . utf8_encode(__('días')),
@@ -111,7 +156,8 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'extras' => array(
 				'subtotal' => 'moneda',
 				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right"'
+				'attrs' => 'width="10%" style="text-align:right"',
+				
 			)
 		),
 		array(
@@ -121,7 +167,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'extras' => array(
 				'subtotal' => 'moneda',
 				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right"'
+				'attrs' => 'width="10%" style="text-align:right"'
 			)
 		),
 		array(
@@ -131,7 +177,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'extras' => array(
 				'subtotal' => 'moneda',
 				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right"'
+				'attrs' => 'width="10%" style="text-align:right"'
 			)
 		),
 		array(
@@ -141,7 +187,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'extras' => array(
 				'subtotal' => 'moneda',
 				'symbol' => 'moneda',
-				'attrs' => 'width="16%" style="text-align:right"'
+				'attrs' => 'width="10%" style="text-align:right"'
 			)
 		),
 		array(
@@ -151,9 +197,29 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 			'extras' => array(
 				'subtotal' => 'moneda',
 				'symbol' => 'moneda',
+				'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
+			)
+		)/*,
+			array(
+			'field' => 'htotal',
+			'title' => __('Total Honorarios'),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
 				'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
 			)
-		)
+		),
+			array(
+			'field' => 'gtotal',
+			'title' => __('Total Gastos'),
+			'format' => 'number',
+			'extras' => array(
+				'subtotal' => 'moneda',
+				'symbol' => 'moneda',
+				'attrs' => 'width="16%" style="text-align:right;font-weight:bold"'
+			)
+		)*/
 	);
 
 	$SimpleReport->LoadConfigFromArray($config_reporte);
@@ -174,6 +240,8 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Antigüedad Deudas Clientes');
 $Pagina->PrintTop();
 ?>
+<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
+<script type="text/javascript" src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
 <table width="90%">
 	<tr>
 		<td>
@@ -196,15 +264,15 @@ $Pagina->PrintTop();
 								<?php echo UtilesApp::CampoCliente($Sesion, $_REQUEST['codigo_cliente']); ?>
 							</td>
 						</tr>
+						<?php UtilesApp::FiltroAsuntoContrato($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato); ?>
+						
 						<tr>
 							<td align="right" width="30%">
-								<label for="id_contrato"><?php echo __('Asuntos'); ?></label>
+								<label for="filtro_facturado"><?php echo __('Considerar sólo monto facturado'); ?></label>
 							</td>
-							<td colspan="3" align="left" id="td_selector_contrato">
-								<?php
-								$Contrato = new Contrato($Sesion);
-								echo $Contrato->ListaSelector($_REQUEST['codigo_cliente'], '', $_REQUEST['id_contrato']);
-								?>
+							<td colspan="3" align="left"  >
+								<input type="checkbox" id="solo_monto_facturado" name="solo_monto_facturado"  value="1" <?php echo $solo_monto_facturado ? 'checked' : ''?>/>
+							<div class="inlinehelp" title="Sólo monto facturado" style="cursor: help;vertical-align:middle;padding:2px;margin: -5px 1px 2px;display:inline-block;font-weight:bold;color:#999;" help="El reporte por defecto considera el saldo liquidado de cada liquidación. Active este campo para considerar sólo el saldo facturado.">?</div>
 							</td>
 						</tr>
 						<tr>
@@ -234,33 +302,12 @@ $Pagina->PrintTop();
 	</tr>
 </table>
 <script type="text/javascript">
-	var valor_anterior_codigo;
-	var campo_cliente;
-
-	function ActualizarContratos(val) {
-		var url = root_dir + '/app/ajax.php?accion=cargar_contratos&codigo_cliente=' + val;
-		jQuery.ajax({
-			url: url,
-			success: function (data) {
-				jQuery('#td_selector_contrato').html(data);
-			}
-		});
-	}
-
-	function ComprobarCodigos() {
-		var valor_nuevo = campo_cliente.val()
-		if (valor_anterior_codigo != valor_nuevo) {
-			ActualizarContratos(valor_nuevo);
-			valor_anterior_codigo = valor_nuevo;
-		}
-	}
-
+<?php echo "var linktofile= '$linktofile';";?>
 	jQuery(document).ready(function () {
-		// Cargar contratos on select
-		campo_cliente = jQuery('input[name^="codigo_cliente"], select[name^="codigo_cliente"]');
-		valor_anterior_codigo = campo_cliente.val();
-		window.setInterval(ComprobarCodigos, 500);
-
+		
+			jQuery('.inlinehelp').each(function() {
+				jQuery(this).popover({title:jQuery(this).attr('title'), trigger:'hover',animation:true, content:jQuery(this).attr('help')});
+			} );
 		jQuery('#boton_xls').click(function(){
 			jQuery('#opcion').val('xls');
 		});
@@ -269,18 +316,21 @@ $Pagina->PrintTop();
 		});
 
 		jQuery('.subtotal td').css('font-weight', 'bold');
-		
-		jQuery('.cobros').each(function(){
+		jQuery('.encabezado').show();
+		jQuery('.identificadores').show().each(function(){
 			var td = jQuery(this);
-			var ids = td.html().split(', ');
+			var contenido=td.html();
 			td.html('');
-			for(var i=0; i<ids.length; i++){
-				td.append(jQuery('<a/>', {
-					text: ids[i],
+			jQuery.each(jQuery.parseJSON(contenido), function(id,label) {
+		      td.append(jQuery('<a/>', {
+					text: label,
+					style:'white-space:nowrap;',
 					href: 'javascript:void(0)',
-					onclick: "nuovaFinestra('Cobro', 1000, 700,'../cobros6.php?id_cobro="+ids[i]+"&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
+					onclick: "nuovaFinestra('Cobro', 1000, 700,'../"+linktofile+id+"&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
 				})).append(' ');
-			}
+		    });
+			
+			
 		});
 	});
 </script>

@@ -29,6 +29,7 @@ class SolicitudAdelanto extends Objeto {
 		'id_usuario_solicitante',
 		'id_usuario_ingreso',
 		'id_contrato',
+		'codigo_asunto',
 		'id_template'
 	);
 

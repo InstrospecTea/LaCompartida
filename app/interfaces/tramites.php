@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -18,11 +18,11 @@
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
 	# solo se muestran las opciones al admin de datos
-	
+
 	$tramite = new TramiteTipo($sesion);
 	if($id_tramite_tipo)
 	 $tramite->LoadId($id_tramite_tipo);
-	 	
+
 
 	if( $accion=='guardar' )
 	{
@@ -32,14 +32,14 @@
 				$tramite->Edit('trabajo_si_no_defecto',$trabajo_si_no_defecto);
 				if($trabajo_si_no_defecto==1)
 					$tramite->Edit('duracion_defecto',$duracion);
-					
+
 					$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto=1";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					list($id_tramite_tarifa)=mysql_fetch_array($resp);
-					
+
 					$query = "SELECT id_moneda FROM prm_moneda ORDER BY id_moneda";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					
+
 				if($tramite->Write())
 					{
 						$pagina->AddInfo(__('Trámite').' '.__('guardado con exito'));
@@ -47,7 +47,7 @@
 					}
 				else
 						$setvalores=false;
-						
+
 				if($setvalores)
 					{
 					while( list($id_moneda)=mysql_fetch_array($resp))
@@ -71,15 +71,15 @@
 					else
 						$tramite->Edit('duracion_defecto',$duracion);
 					}
-					
-					
+
+
 					$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto=1";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					list($id_tramite_tarifa)=mysql_fetch_array($resp);
-					
+
 					$query = "SELECT id_moneda FROM prm_moneda ORDER BY id_moneda";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					
+
 					if($tramite->Write())
 					{
 						$pagina->AddInfo(__('Trámite').' '.__('editado con exito'));
@@ -87,15 +87,15 @@
 					}
 				else
 						$setvalores=false;
-					
+
 			if($setvalores)
 				{
 					while( list($id_moneda)=mysql_fetch_array($resp))
 					{
 						if( $tarifa_tramite[$id_moneda] )
 						{
-							$query2 = "INSERT INTO tramite_valor( id_tramite_tipo, id_moneda, id_tramite_tarifa )  
-															VALUES( ".$tramite->fields['id_tramite_tipo'].", ".$id_moneda.", ".$id_tramite_tarifa." ) 
+							$query2 = "INSERT INTO tramite_valor( id_tramite_tipo, id_moneda, id_tramite_tarifa )
+															VALUES( ".$tramite->fields['id_tramite_tipo'].", ".$id_moneda.", ".$id_tramite_tarifa." )
 															ON DUPLICATE KEY UPDATE tarifa=".$tarifa_tramite[$id_moneda];
 							mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 						}
@@ -113,7 +113,7 @@
 			$pagina->AddError($tramite_eliminar->error);
 		else
 			$pagina->AddInfo(__('Trámite').' '.__('eliminado con éxito'));
-			
+
 			unset($tramite);
 	}
 	$pagina->titulo = __('Trámites');
@@ -123,7 +123,7 @@ $pagina->PrintTop( $popup );
 
 <script type="text/javascript">
 	function IsNumeric(strString)
-   //  check for valid numeric strings	
+   //  check for valid numeric strings
    {
    var strValidChars = "0123456789.-";
    var strChar;
@@ -155,7 +155,7 @@ function Validar(form, desde, ids)
 		form.glosa_tramite.focus();
 		return false;
 	}
-	
+
 	for(var i=0; i<arrayids.length; i++)
 	{
 		if(document.getElementById('tarifa_tramite['+arrayids[i]+']').value)
@@ -165,8 +165,8 @@ function Validar(form, desde, ids)
 					document.getElementById('tarifa_tramite['+arrayids[i]+']').value=0;
 				}
 			}
-	} 
-	
+	}
+
 	if( form.trabajo_si_no_defecto.checked )
 	{
 		if(!form.duracion.value )
@@ -180,7 +180,7 @@ function Validar(form, desde, ids)
 	form.action = 'tramites.php?accion=guardar&opcion=agregar&popup=1';
 	else if(desde=='editar')
 	form.action = 'tramites.php?accion=guardar&opcion=editar&popup=1';
-	
+
 	form.submit();
 	return true;
 }
@@ -218,10 +218,10 @@ function SubeTiempo( campo, direccion, intervalo, cont )
 {
 	var gRepeatTimeInMS = $('gRepeatTimeInMS').value;
 	var gIsMouseDown = $('gIsMouseDown').value;
-	
+
 	if( !cont )
 		var cont=0;
-		
+
 	if( gIsMouseDown=='true' )
 	{
 		cont++;
@@ -316,7 +316,7 @@ function EliminaTramite(id_tramite_tipo)
 	return true;
 }
 
-function EditarTramite( id_tramite_tipo ) 
+function EditarTramite( id_tramite_tipo )
 {
 	var urlo = "tramites.php?id_tramite_tipo=" + id_tramite_tipo + "&popup=1&opcion=editar";
 	nuovaFinestra('Editar_Tramite',730,470,urlo,'top=100, left=125');
@@ -325,7 +325,7 @@ function EditarTramite( id_tramite_tipo )
 function AgregarNuevo( tipo )
 {
 	var nombre = document.getElementById('glosa_tramite').value;
-	
+
 	var urlo = "tramites.php?popup=1&opcion=agregar&glosa_tramite=" + nombre;
 	nuovaFinestra('Agregar_Tramite',730,470,urlo,'top=100, left=125');
 }
@@ -343,7 +343,7 @@ function Refrescar()
 <input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
 <input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 <input type=hidden name=max_hora id=max_hora value=14 />
-<?php 
+<?php
 	if($p_admin)
 	{
 ?>
@@ -355,7 +355,7 @@ function Refrescar()
 			</td>
 		</tr>
 	</table>
-<?php 
+<?php
 	}
 	if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 	{
@@ -386,7 +386,7 @@ function Refrescar()
 					<input type="text" name="glosa_tramite" id="glosa_tramite" size="35" value="<?php echo $tramite->fields['glosa_tramite'] ? $tramite->fields['glosa_tramite'] : $glosa_tramite ?>">
 				</td>
 			</tr>
-			<?php 
+			<?php
 			if( $opcion == 'agregar' || $opcion == 'editar' ) {
 			?>
 			<tr>
@@ -400,9 +400,9 @@ function Refrescar()
             <?php echo __('Duración')?>
         </td>
         <td colspan="4" align=left>
-    <?php 
-    
-     
+    <?php
+
+
 	//Revisa el Conf si esta permitido y la función existe
 	if( method_exists('Conf','GetConf') )
 	{
@@ -410,7 +410,7 @@ function Refrescar()
 		{
 ?>
 					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?php 
+<?php
 		}
 		else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='java')
 		{
@@ -419,7 +419,7 @@ function Refrescar()
 		else if(Conf::GetConf($sesion,'TipoIngresoHoras')=='selector')
 		{
 			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $t->fields['duracion_defecto'] : $duracion, 14);
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $tramite->fields['duracion_defecto'] : $duracion, 14);
 		}
 	}
 	else if (method_exists('Conf','TipoIngresoHoras'))
@@ -428,7 +428,7 @@ function Refrescar()
 		{
 ?>
 					<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion_defecto'] ? UtilesApp::Time2Decimal($tramite->fields['duracion_defecto']) : $duracion ?>" id="duracion" size="6" maxlength=4 <?php echo  !$nuevo && $sesion->usuario->fields['id_usuario']!=$id_usuario ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form,'duracion');"/>
-<?php 
+<?php
 		}
 		else if(Conf::TipoIngresoHoras()=='java')
 		{
@@ -437,7 +437,7 @@ function Refrescar()
 		else if(Conf::TipoIngresoHoras()=='selector')
 		{
 			if(!$duracion) $duracion = '00:00:00';
-			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $t->fields['duracion_defecto'] : $duracion, 14);
+			echo SelectorHoras::PrintTimeSelector($sesion,"duracion", $tramite->fields['duracion_defecto'] ? $tramite->fields['duracion_defecto'] : $duracion, 14);
 		}
 	}
 	else
@@ -451,35 +451,35 @@ function Refrescar()
 				<td colspan="2"><b><?php echo __('Valores Tarifa Standard:')?></b></td><td colspan="4"></td>
 			</tr>
 			<tr>
-					<?php 
+					<?php
 					$query = "SELECT count(*) FROM prm_moneda";
 					$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					list($cont_monedas)=mysql_fetch_array($resp);
-					
+
 					$query = "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda ASC";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-					
+
 					$ids=array();
 					while(list($id, $glosa_moneda)=mysql_fetch_array($resp))
 					{
 						$ids[]=$id;
 						if($tramite->fields['id_tramite_tipo'])
 							{
-								$query2= "SELECT tarifa 
-														FROM tramite_valor 
-														JOIN tramite_tarifa USING( id_tramite_tarifa ) 
+								$query2= "SELECT tarifa
+														FROM tramite_valor
+														JOIN tramite_tarifa USING( id_tramite_tarifa )
 														WHERE tarifa_defecto=1
-															AND id_tramite_tipo=".$tramite->fields['id_tramite_tipo']." 
+															AND id_tramite_tipo=".$tramite->fields['id_tramite_tipo']."
 															AND id_moneda=".$id;
 								$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion);
 								list($tarifa)=mysql_fetch_array($resp2);
-							} 
+							}
 						echo '<td width="'.$width.'" align="'.$align.'">'.$glosa_moneda.'<br><input type=\"text\" id="tarifa_tramite['.$id.']" name="tarifa_tramite['.$id.']"  size=\"10\" value="'.$tarifa.'" /></td>';
 					}
 					$ids=implode(',',$ids);
 					?>
 			</tr>
-		<?php  } 
+		<?php  }
 			else
 			{ ?>
 				<tr>
@@ -493,16 +493,16 @@ function Refrescar()
 			<tr>
 				<td colspan="2"></td>
 				<td colspan="2" align=left>
-					<?php  
+					<?php
 					if( $opcion != 'agregar' && $opcion != 'editar' ) { ?>
 					<input type=button class=btn name=buscar value=<?php echo __('Buscar')?> onclick="Listar(this.form, 'buscar')">
-			<?php 	}	else { 
+			<?php 	}	else {
 					 if( $opcion == 'agregar' )  {?>
 					<input type=button class=btn value="<?php echo __('Guardar')?>" onclick="Validar(this.form, 'agregar', '<?php echo $ids ?>')" >
 				<?php  } else if( $opcion == 'editar' ) { ?>
 					<input type=button class=btn value="<?php echo __('Guardar')?>" onclick="Validar(this.form, 'editar', '<?php echo $ids ?>')" >
 				<?php  } } ?>
-				</td> 
+				</td>
 		<?php 	if( !($opcion=='agregar') || $accion=='guardar' )  { ?>
 				<td colspan="2" align="right"> <img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('tramite')" title="Agregar Tramite"><?php echo $opcion=='editar' || $accion=='guardar' ? __('Nuevo') : __('Agregar')?> <?php echo __('trámite')?></a></td>
 		<?php 	} ?>
@@ -513,7 +513,7 @@ function Refrescar()
 </form>
 
 
-<?php 
+<?php
 	if($buscar)
 	{
 		if(!$id_moneda) $id_moneda=1;
@@ -544,7 +544,7 @@ function Refrescar()
 		global $sesion;
 		global $desde;
 		$id_tramite_tipo=$fila->fields['id_tramite_tipo'];
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) 
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
 		{
 		$txt .= " <a href='javascript:void(0);' onclick=\"EditarTramite($id_tramite_tipo);\" title='".__('Editar Trámite')."'><img src='".Conf::ImgDir()."/editar_on.gif' border=0 alt='Editar tramite' /></a>"
 			. "<a href='javascript:void(0);' onclick=\"if (confirm('¿".__('Est&aacute; seguro de eliminar el')." ".__('trámite')."?'))EliminaTramite($id_tramite_tipo);\"><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
@@ -556,15 +556,15 @@ function Refrescar()
 		}
 		return $txt;
 	}
-	
-	
+
+
 	if(($opcion == 'agregar' || $opcion == 'editar' ) && $accion=='guardar')
 	{ ?>
 			<script language='javascript'>
 				window.opener.Refrescar();
 			</script>
-<?php } 
+<?php }
 echo SelectorHoras::Javascript();
 $pagina->PrintBottom($popup);
 ?>
-	
+
