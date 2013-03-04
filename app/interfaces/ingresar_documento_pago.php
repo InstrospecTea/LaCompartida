@@ -870,8 +870,11 @@ $pagina->PrintTop($popup);
 				if ($id_cobro && !$adelanto) {
 					$disabled_monto = 'class="actualizador"';
 				}
+				if (!$adelanto) {
+					$disabled_monto .= ' readonly="readonly" style="background: #eee; cursor: default"';
+				}
 				?>
-				<input name="monto" <?php echo $disabled_monto ?> id="monto" size="10" value="<?php echo str_replace("-", "", $documento->fields['monto']); ?>" readonly="readonly" style="background: #eee; cursor: default" />
+				<input name="monto" <?php echo $disabled_monto ?> id="monto" size="10" value="<?php echo str_replace("-", "", $documento->fields['monto']); ?>" />
 				<input name="monto_aux"  class="oculto" style="display:none;"   type="text" id="monto_aux" size="10" value="<?php echo str_replace("-", "", $documento->fields['monto']); ?>" />
 
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
