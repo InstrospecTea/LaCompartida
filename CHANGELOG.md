@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.2.2
+Lunes 4 de marzo 2013.
+* **New** [Agrega tag de rut, ciudad, comuna y código postal a la carta de cobro](https://github.com/LemontechSA/ttb/pull/106)
+
 ## Hotfix: 13.2.1
 Lunes 4 de marzo 2013.
 * **Fixed** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
