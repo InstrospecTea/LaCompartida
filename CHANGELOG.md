@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.2.1
+Lunes 4 de marzo 2013.
+* **Fixed** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
+
 ## Release: 13.2.0
 Domingo 3 de marzo 2013.
 * **New:** [Validación horas en trabajos diarios](https://github.com/LemontechSA/ttb/pull/71)
