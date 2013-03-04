@@ -253,6 +253,11 @@ if ($opcion == "guardar") {
 				}
 			}
 
+			if (isset($_REQUEST['nombre_contacto'])) {
+				// nombre_contacto no existe como campo en la tabla contrato y es necesario crear la variable "contacto" dentro de _REQUEST
+				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
+			}
+
 			$contrato->Fill($_REQUEST, true);
 			$contrato->Edit('codigo_cliente', $codigo_cliente);
 
