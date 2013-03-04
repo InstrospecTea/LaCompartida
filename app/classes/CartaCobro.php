@@ -1911,6 +1911,7 @@ class CartaCobro extends NotaCobro {
 				/* encargado comercial y iniciales encargado comercial */
 				$html2 = str_replace('%inciales_encargado%', $iniciales_encargado, $html2);
 				$html2 = str_replace('%encargado_comercial%', $nombre_encargado, $html2);
+				$html2 = str_replace('%xrut%', $contrato->fields['rut'], $html2);
 
 
 //numero Cobro + año + INICIALES username para PSU abogados
@@ -2034,10 +2035,11 @@ class CartaCobro extends NotaCobro {
 				}
 
 				$html2 = str_replace('%num_factura%', $this->fields['documento'], $html2);
-
+				$html2 = str_replace('%ciudad_cliente%', $contrato->fields['factura_ciudad'], $html2);
+				$html2 = str_replace('%comuna_cliente%', $contrato->fields['factura_comuna'], $html2);
+				$html2 = str_replace('%codigo_postal_cliente%', $contrato->fields['factura_codigopostal'], $html2);
 
 				break;
-
 
 
 			case 'ADJ': //GenerarDocumentoCartaComun
