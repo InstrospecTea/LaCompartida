@@ -15,7 +15,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 	$join = '';
 
 	if(!empty($codigo_cliente)){
-		$where .= " AND d.codigo_cliente = '$codigo_cliente' ";
+		$where .= " AND contrato.codigo_cliente = '$codigo_cliente' ";
 	}
 
 	if(!empty($id_contrato)){
@@ -108,12 +108,13 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 				moneda_documento.simbolo AS moneda
 			FROM cobro 
 			left join documento d  ON cobro.id_cobro = d.id_cobro
-			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
+			left JOIN prm_moneda moneda_documento ON cobro.opc_moneda_total = moneda_documento.id_moneda
 			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
-			left JOIN cliente ON d.codigo_cliente = cliente.codigo_cliente
-			left JOIN factura  on factura.id_cobro=d.id_cobro
+			
+			left JOIN factura  on factura.id_cobro=cobro.id_cobro
 			left JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
 			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+			left JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
 
 			$join
@@ -126,7 +127,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		GROUP BY T.glosa_cliente, T.moneda
 		ORDER BY glosa_cliente";
 
- //echo $query;
+ // echo $query;
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
