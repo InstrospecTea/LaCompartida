@@ -49,7 +49,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		$campo_valor="T.saldo";
 		$campo_gvalor="T.gsaldo";
 		$campo_hvalor="T.hsaldo";
-		$where.=" AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')   AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
+		$where.="AND d.tipo_doc = 'N' AND cobro.estado NOT IN ('CREADO', 'EN REVISION', 'INCOBRABLE')   AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
 		$groupby.=" d.id_documento";
 		$tipo=" 'liquidacion'";
 		$identificador=" d.id_cobro";
@@ -106,20 +106,19 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 
 				DATEDIFF(NOW(), $fecha_atraso) AS dias_atraso_pago,
 				moneda_documento.simbolo AS moneda
-			FROM
-				documento d
+			FROM cobro 
+			left join documento d  ON cobro.id_cobro = d.id_cobro
 			left JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
 			left JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
 			left JOIN cliente ON d.codigo_cliente = cliente.codigo_cliente
-			left JOIN cobro ON cobro.id_cobro = d.id_cobro
 			left JOIN factura  on factura.id_cobro=d.id_cobro
 			left JOIN cta_cte_fact_mvto ccfm on ccfm.id_factura=factura.id_factura
 			left JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			left join prm_documento_legal pdl on pdl.id_documento_legal=factura.id_documento_legal
 
 			$join
-			WHERE
-				d.tipo_doc = 'N'
+			WHERE 1
+				
 				
 				$where
 			GROUP BY $groupby
@@ -127,7 +126,7 @@ if(in_array($_REQUEST['opcion'], array('buscar', 'xls'))){
 		GROUP BY T.glosa_cliente, T.moneda
 		ORDER BY glosa_cliente";
 
-//echo $query;
+ echo $query;
 	$SimpleReport = new SimpleReport($Sesion);
 	$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 	$config_reporte = array(
