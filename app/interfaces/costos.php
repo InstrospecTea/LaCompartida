@@ -34,9 +34,9 @@ if ($opc == 'copiar_datos_anteriores') {
 		$fecha_ini = ($fecha_a - 1) . '-07-01';
 		$fecha_fin = ($fecha_a - 1) . '-12-31';
 	}
-	$query = "INSERT IGNORE INTO usuario_costo ( id_usuario, fecha, costo )
+	$query = "REPLACE INTO usuario_costo (id_usuario, fecha, costo)
 		SELECT id_usuario, DATE_ADD( fecha, INTERVAL 6 MONTH ), costo
-		FROM usuario_costo WHERE fecha >= '$fecha_ini' AND fecha <= '$fecha_fin' ";
+			FROM usuario_costo WHERE fecha >= '$fecha_ini' AND fecha <= '$fecha_fin'";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 } else if ($opc == 'guardar') {
 	foreach ($costo_mes as $id_usuario => $arr_costo) {
