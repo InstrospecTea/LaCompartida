@@ -267,9 +267,9 @@ if ($buscar || $opc == "entregar_asunto") {
 			$where .= " AND a1.cobrable=0 ";
 	}
 
-	if ($codigo_asunto != "") {
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')  ) {
-			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto%'";
+	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
+		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+			$where .= " AND a1.codigo_asunto_secundario Like '{$codigo_asunto_secundario}%'";
 		} else {
 			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
 		}
@@ -330,7 +330,7 @@ if ($buscar || $opc == "entregar_asunto") {
 					left join contrato on contrato.id_contrato=a1.id_contrato
 					WHERE $where
 					GROUP BY a1.codigo_asunto";
-			 
+
 	if ($orden == "")
 		$orden = "a1.activo DESC, horas_no_cobradas DESC, glosa_asunto";
 	if (stristr($orden, ".") === FALSE)
