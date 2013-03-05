@@ -1,8 +1,16 @@
 # Changelog
 
+## Hotfix: 13.2.3
+Martes 5 de marzo 2013.
+* **Fixed:** [Corrige los filtros area profesional y categoria enr reportes avanzados](https://github.com/LemontechSA/ttb/pull/108)
+
+## Hotfix: 13.2.2
+Lunes 4 de marzo 2013.
+* **New:** [Agrega tag de rut, ciudad, comuna y código postal a la carta de cobro](https://github.com/LemontechSA/ttb/pull/106)
+
 ## Hotfix: 13.2.1
 Lunes 4 de marzo 2013.
-* **Fixed** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
+* **Fixed:** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
 
 ## Release: 13.2.0
 Domingo 3 de marzo 2013.
