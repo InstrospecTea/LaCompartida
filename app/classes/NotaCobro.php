@@ -6699,6 +6699,7 @@ $row = str_replace('%td_retainer%', '', $row);
 
 		return $htmltemporal;
 	}
+	
 
 	function GenerarSeccionResumenProfesional($parser, $theTag, $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
 

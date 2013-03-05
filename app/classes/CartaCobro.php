@@ -2150,8 +2150,7 @@ class CartaCobro extends NotaCobro {
 
 				case 'FILAS_FACTURAS_DEL_COBRO':
 
-							from factura 
-				$row_template = $html2;
+ 				$row_template = $html2;
 				$html2 = '';
 					
 				
@@ -2168,6 +2167,7 @@ class CartaCobro extends NotaCobro {
 						$row=str_replace('%factura_periodo%',$factura[0]['periodo'],$row);
 						$html2.=$row;
 					}
+				}
 												
 				break;
 
