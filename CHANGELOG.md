@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.2.4
+Martes 5 de marzo 2013.
+* **Fixed:** [Envia mail al administrador al enviar correos si el estudio tiene configurado el MailAdmin](https://github.com/LemontechSA/ttb/pull/109)
+
 ## Hotfix: 13.2.3
 Martes 5 de marzo 2013.
 * **Fixed:** [Corrige los filtros area profesional y categoria enr reportes avanzados](https://github.com/LemontechSA/ttb/pull/108)
