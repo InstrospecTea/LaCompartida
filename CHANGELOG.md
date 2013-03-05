@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix: 13.2.5
+Martes 5 de marzo 2013.
+* **Fixed:** [Filtra por código asunto secundario](https://github.com/LemontechSA/ttb/pull/110)
+
 ## Hotfix: 13.2.4
 Martes 5 de marzo 2013.
 * **Fixed:** [Envia mail al administrador al enviar correos si el estudio tiene configurado el MailAdmin](https://github.com/LemontechSA/ttb/pull/109)
