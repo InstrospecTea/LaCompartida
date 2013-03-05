@@ -1,5 +1,7 @@
 <?php
-require_once 'NotaCobro.php';
+
+require_once dirname(__FILE__) . '/../conf.php'; 
+
 
 class CartaCobro extends NotaCobro {
 	var $carta_tabla = 'carta';
@@ -7,13 +9,20 @@ class CartaCobro extends NotaCobro {
 	var $carta_formato = 'formato';
 
 	public $secciones = array(
-		'FECHA' => 'Sección FECHA',
-		'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
-		'DETALLE' => 'Sección DETALLE',
-		'ADJ' => 'Sección ADJ',
-		'PIE' => 'Sección PIE',
-		'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
-		'SALTO_PAGINA' => 'Sección SALTO_PAGINA'
+		'CARTA' => array(
+			'FECHA' => 'Sección FECHA',
+			'ENVIO_DIRECCION' => 'Sección ENVIO_DIRECCION',
+			'DETALLE' => 'Sección DETALLE',
+			'ADJ' => 'Sección ADJ',
+			'PIE' => 'Sección PIE',
+			'DATOS_CLIENTE' => 'Sección DATOS_CLIENTE',
+			'SALTO_PAGINA' => 'Sección SALTO_PAGINA'
+		),
+		'DETALLE' => array(
+			'FILAS_ASUNTOS_RESUMEN' => 'FILAS_ASUNTOS_RESUMEN',
+			'FILAS_FACTURAS_DEL_COBRO' => 'FILAS_FACTURAS_DEL_COBRO',
+			'FILA_FACTURAS_PENDIENTES' => 'FILA_FACTURAS_PENDIENTES'
+		)
 	);
 	public $diccionario = array(
 		'CARTA' => array(
@@ -249,9 +258,18 @@ class CartaCobro extends NotaCobro {
 			'%total_asunto%' => 'total_asunto',
 			'%total_asunto_mi%' => 'total_asunto_mi',
 		),
+		'FILA_FACTURAS_PENDIENTES' => array(
+			'%facturas_pendientes%' => 'facturas_pendientes'
+		),
 		'SALTO_PAGINA' => array()
 	);
-
+	function __construct($sesion, $fields,$ArrayFacturasDelContrato,$ArrayTotalesDelContrato,$NotaCobroSerializada) {
+		$this->sesion=$sesion; 
+		$this->fields=$fields;
+		$this->ArrayFacturasDelContrato=$ArrayFacturasDelContrato;
+		$this->ArrayTotalesDelContrato=$ArrayTotalesDelContrato;
+		$this->espacio=UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')?'':'&nbsp;';
+	}
 	function NuevoRegistro(){
 		return array(
 			'descripcion' => 'Nueva Carta',
@@ -283,6 +301,10 @@ class CartaCobro extends NotaCobro {
 
 		switch ($theTag) {
 			case 'CARTA': //GenerarDocumentoCarta
+				
+				//$html2 = str_replace('%CARTA_GASTOS%', $this->GenerarDocumentoCartaComun($parser_carta, 'CARTA_GASTOS', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				//$html2 = str_replace('%CARTA_HONORARIOS%', $this->GenerarDocumentoCartaComun($parser_carta, 'CARTA_HONORARIOS', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
@@ -524,23 +546,15 @@ class CartaCobro extends NotaCobro {
 				/*
 				 * INICIO - CARTA GASTOS DE VFCabogados, 2011-03-04
 				 */
-				if (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio()) {
-					$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'] . number_format($saldo_egreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
-					$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'] . number_format($saldo_ingreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
-					$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
+				 
+					$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_egreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
+					$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_ingreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
+					$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
 
-					$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-					$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-					$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				} else {
-					$html2 = str_replace('%saldo_egreso_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_egreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
-					$html2 = str_replace('%saldo_ingreso_moneda_total%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_ingreso_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // suma ingresos cobrables
-					$html2 = str_replace('%saldo_gastos_balance%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2);
-
-					$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . ' ' . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-					$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-					$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . ' ' . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
-				}/*
+					$html2 = str_replace('%subtotal_gastos_solo_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_balance_gastos_moneda_total, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+					$html2 = str_replace('%subtotal_gastos_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['subtotal_gastos_sin_provision'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+					$html2 = str_replace('%subtotal_gastos_diff_con_sin_provision%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($x_cobro_gastos['gasto_total'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '.-', $html2); // en la carta se especifica que el monto debe aparecer como positivo
+				/*
 				 * FIN - CARTA GASTOS DE VFCabogados, 2011-03-04
 				 */
 
@@ -589,10 +603,7 @@ class CartaCobro extends NotaCobro {
 				if ($lang != 'es')
 					$monto_moneda += $total_gastos;
 				if ($total_gastos > 0) {
-					if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ValorSinEspacio') ) || ( method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio() )))
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-					else
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
 
 				#Fechas periodo
@@ -978,6 +989,10 @@ class CartaCobro extends NotaCobro {
 
 		switch ($theTag) {
 			case 'CARTA': //GenerarDocumentoCarta2
+				
+				//$html2 = str_replace('%CARTA_GASTOS%', $this->GenerarDocumentoCartaComun($parser_carta, 'CARTA_GASTOS', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+				//$html2 = str_replace('%CARTA_HONORARIOS%', $this->GenerarDocumentoCartaComun($parser_carta, 'CARTA_HONORARIOS', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta), $html2);
+
 				if (method_exists('Conf', 'GetConf')) {
 					$PdfLinea1 = Conf::GetConf($this->sesion, 'PdfLinea1');
 					$PdfLinea2 = Conf::GetConf($this->sesion, 'PdfLinea2');
@@ -1268,18 +1283,14 @@ class CartaCobro extends NotaCobro {
 				if ($lang != 'es')
 					$monto_moneda += $total_gastos;
 				if ($total_gastos > 0) {
-					if (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio())
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-					else
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . ' ' . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+					 
+						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				}	else {
+					 
+						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . $this->espacio . number_format(0, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				}
-				else {
-					if (method_exists('Conf', 'ValorSinEspacio') && Conf::ValorSinEspacio())
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . number_format(0, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-					else
-						$html2 = str_replace('%monto_gasto%', $moneda_total->fields['simbolo'] . ' ' . number_format(0, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
-				}
-
+				$html2 = str_replace('%saldo_gasto_facturado%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($this->ArrayTotalesDelContrato[$this->fields['id_cobro']]['saldo_gastos'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
+				$html2 = str_replace('%saldo_gasto_facturado_moneda_base%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($this->ArrayTotalesDelContrato[$this->fields['id_cobro']]['saldo_gastos_moneda'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				#Fechas periodo
 				$datefrom = strtotime($this->fields['fecha_ini'], 0);
 				$dateto = strtotime($this->fields['fecha_fin'], 0);
@@ -2139,37 +2150,32 @@ class CartaCobro extends NotaCobro {
 
 				case 'FILAS_FACTURAS_DEL_COBRO':
 
-					$query="select concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
-						prm_moneda.simbolo,
-						factura.total-factura.iva as total_sin_impuesto,
-						factura.iva,
-						factura.total ,
-						date_format(fecha,'%Y-%m') as periodo
-							from factura
-							join prm_moneda  using (id_moneda)
-							join prm_documento_legal using (id_documento_legal)
-							where id_cobro=".$this->fields['id_cobro'];
-					$facturasST=$this->sesion->pdodbh->query($query) ;
-					$facturasRS=$facturasST->fetchAll();
+							from factura 
 				$row_template = $html2;
 				$html2 = '';
-					foreach ($facturasRS as $factura) {
+					
+				
+				$facturasRS=$this->ArrayFacturasDelContrato;//($this->sesion,$nuevomodulofactura,$this->fields['id_cobro']);
+				
+				foreach ($facturasRS as $numfact => $factura) {
 					$row=$row_template;
-					$row=str_replace('%factura_numero%',$factura['facturanumero'],$row);
-					$row=str_replace('%factura_moneda%',$factura['simbolo'],$row);
-					$row=str_replace('%factura_total_sin_impuesto%',$factura['total_sin_impuesto'],$row);
-					$row=str_replace('%factura_impuesto%',$factura['iva'],$row);
-					$row=str_replace('%factura_total%',$factura['total'],$row);
-					$row=str_replace('%factura_periodo%',$factura['periodo'],$row);
-
-					$html2.=$row;
+					if($factura[0]['id_cobro']==$this->fields['id_cobro']) {
+						$row=str_replace('%factura_numero%',$numfact,$row);
+						$row=str_replace('%factura_moneda%',$factura[0]['simbolo_moneda_total'],$row);
+						$row=str_replace('%factura_total_sin_impuesto%',number_format($factura[0]['total_sin_impuesto'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),$row);
+						$row=str_replace('%factura_impuesto%',number_format($factura[0]['iva'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),$row);
+						$row=str_replace('%factura_total%',number_format($factura[0]['total'], $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),$row);
+						$row=str_replace('%factura_periodo%',$factura[0]['periodo'],$row);
+						$html2.=$row;
 					}
-
+												
 				break;
 
 				case 'FILA_FACTURAS_PENDIENTES': //GenerarDocumentoCartaComun
-
-					$query = "SELECT numero  FROM `factura` WHERE `estado` NOT IN ('1.3.4') AND `anulado` != 1 AND codigo_cliente=" . $this->fields['codigo_cliente'];
+					//original
+					//$query = "SELECT numero  FROM `factura` WHERE `estado` NOT IN ('1.3.4') AND `anulado` != 1 AND codigo_cliente=" . $this->fields['codigo_cliente'];
+					//fix
+					$query = "SELECT numero  FROM `factura` WHERE `id_estado` NOT IN (1, 3, 4) AND `anulado` != 1 AND codigo_cliente=" . $this->fields['codigo_cliente'];
 					$facturasST = $this->sesion->pdodbh->query($query);
 					$facturasRS = $facturasST->fetchAll();
 					$row_template = $html2;
@@ -2203,7 +2209,9 @@ class CartaCobro extends NotaCobro {
 						    ,c.subtotal_gastos , c.impuesto, c.impuesto_gastos
 						    ,kant.kant
 
-						    FROM cobro_asunto ca join cobro c using(id_cobro) join asunto a using (codigo_asunto)
+						    FROM cobro_asunto ca
+							join cobro c ON (c.id_cobro = ca.id_cobro)
+							join asunto a ON (a.codigo_asunto = ca.codigo_asunto)
 						    join (select id_cobro, count(codigo_asunto) kant from cobro_asunto group by id_cobro) kant on kant.id_cobro=c.id_cobro
 						    join (select @rownum:=0, @sumat1:=0, @sumat2:=0, @sumag:=0) fff
 						    join prm_moneda pm on pm.id_moneda=c.id_moneda
@@ -2280,4 +2288,4 @@ class CartaCobro extends NotaCobro {
 		return $html2;
 	}
 
-}
+} 
