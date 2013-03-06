@@ -6641,8 +6641,18 @@ $row = str_replace('%td_retainer%', '', $row);
 
 	// Similar a la seccion detalle pago, pero con un orden distinto, se hizo para FayCa
 	function GenerarSeccionDetallePagoContrato($html, $idioma) {
-
 		global $cobro_moneda, $x_resultados;
+		/**
+		* Etiquetas
+		* %documentos_de_pago% pagos sin contar adelantos
+		* %documentos_de_adelanto% pagos por concepto de adelantos
+		* %pagos_liquidacion% la suma de los dos anteriores
+		* %saldo_del_cobro% el total original menos los pagos que se hayan hecho por cualquier concepto
+		* %blank_line% inserta una fila en blanco para ayudar a diagramar
+		* %saldo_anterior% la suma de los saldos de otros cobros emitidos con saldo pendiente, que pertenezcan al mismo contrato
+		* %saldo_total_adeudado% suma de lo anterior más el saldo del presente cobro
+		* %adelantos_sin_asignar% adelantos del mismo cliente no asignados, restringidos al presente contrato (o sin restricción de contrato cuando estamos en un cobro del contrato por defecto para este cliente)
+		**/
 
 		$fila = $html;
 		$fila_adelantos = "";
@@ -6673,7 +6683,9 @@ $row = str_replace('%td_retainer%', '', $row);
 
 
 
-		$pagos_liquidacion .=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$documentos_de_pago 	.=number_format($saldo_pagos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$documentos_de_adelanto .=number_format($saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$pagos_liquidacion 		.=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 		
 
 		if (($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') && $saldo_total_cobro == 0) {
@@ -6684,8 +6696,11 @@ $row = str_replace('%td_retainer%', '', $row);
 		$saldo_total_adeudado = number_format($saldo_total_adeudado, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
  
-
+		$htmltemporal=str_replace('%documentos_de_pago%','<tr class="tr_total"><td>' . __('Pagos Realizados') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $documentos_de_pago . '</td></tr>',$htmltemporal);
+		$htmltemporal=str_replace('%documentos_de_adelanto%','<tr class="tr_total"><td>' . __('Adelantos Utilizados') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $documentos_de_adelanto . '</td></tr>',$htmltemporal);
+		
 		$htmltemporal=str_replace('%pagos_liquidacion%','<tr ><td>' . __($this->fields['codigo_idioma'] . '_pagos_liquidacion') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $pagos_liquidacion . '</td></tr>',$htmltemporal);
+		
 		$htmltemporal=str_replace('%saldo_del_cobro%','<tr class="tr_total"><td>' . __('Saldo del cobro') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_cobro . '</td></tr>',$htmltemporal);
 		$htmltemporal=str_replace('%blank_line%',"<tr><td> </td><td> </td></tr>",$htmltemporal);
 		$htmltemporal=str_replace('%saldo_anterior%','<tr  ><td>' . __('Saldo anterior') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_contrato . '</td></tr>',$htmltemporal);
