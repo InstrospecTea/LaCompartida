@@ -55,7 +55,7 @@ task :create_database do
   puts           "   #######################################################################\e[0m\n"
   proceed = STDIN.gets[0..0] rescue nil
   if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
-    run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -h192.168.1.24 -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx #{dbname}"
+    run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
   end
 
 end
