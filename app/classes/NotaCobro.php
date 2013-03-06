@@ -6709,6 +6709,8 @@ $row = str_replace('%td_retainer%', '', $row);
 		if ($montoadelantosinasignar > 0) {
 			$montoadelantosinasignar = number_format($montoadelantosinasignar, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 			$htmltemporal=str_replace('%adelantos_sin_asignar%','<tr "><td>' . __($this->fields['codigo_idioma'] . '_adelantos_sin_asignar') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $montoadelantosinasignar . '</td></tr>',$htmltemporal);
+		} else {
+			$htmltemporal=str_replace('%adelantos_sin_asignar%','',$htmltemporal);
 		}
 
 		return $htmltemporal;
