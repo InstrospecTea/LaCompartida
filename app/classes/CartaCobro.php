@@ -263,7 +263,7 @@ class CartaCobro extends NotaCobro {
 		),
 		'SALTO_PAGINA' => array()
 	);
-	function __construct($sesion, $fields,$ArrayFacturasDelContrato,$ArrayTotalesDelContrato,$NotaCobroSerializada) {
+	function __construct($sesion, $fields,$ArrayFacturasDelContrato,$ArrayTotalesDelContrato) {
 		$this->sesion=$sesion; 
 		$this->fields=$fields;
 		$this->ArrayFacturasDelContrato=$ArrayFacturasDelContrato;
