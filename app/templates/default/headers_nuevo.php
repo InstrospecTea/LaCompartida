@@ -7,8 +7,8 @@ $subdomain = substr($laurl, 0, $punto);
 $maindomain = str_replace($subdomain . '.', '', $laurl);
 if ($subdomain)
 	$subdomain = '/' . $subdomain;
-$elpath = $subdomain . $_SERVER['SCRIPT_URL'];
-$pathseguro = 'https://' . str_replace('lemontech.cl', 'thetimebilling.com', $laurl) . $_SERVER['SCRIPT_URL'];
+$elpath = $subdomain .  ($_SERVER['SCRIPT_URL']? $_SERVER['SCRIPT_URL']:$_SERVER['PHP_SELF']);
+$pathseguro = 'https://' . str_replace('lemontech.cl', 'thetimebilling.com', $laurl) . ($_SERVER['SCRIPT_URL']? $_SERVER['SCRIPT_URL']:$_SERVER['PHP_SELF']);
 
 define('HEADERLOADED', 1);
 define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
@@ -25,7 +25,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 				var _sf_async_config={};
 				var __dcid = __dcid || [];
 
-<?php if (defined('APPDOMAIN') && substr(APPDOMAIN, 0, 5) == 'https') echo '_sf_async_config.pathseguro="' . $pathseguro . '";'; ?>
+<?php echo '_sf_async_config.pathseguro="' . $pathseguro . '";'; ?>
 	var baseurl= '<?php echo base64_encode($laurl); ?>';
 	var root_dir = '<?php echo Conf::RootDir(); ?>';
 	var img_dir = '<?php echo Conf::ImgDir() ?>';
@@ -47,7 +47,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 			<!--<![endif]-->
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/jquery-ui.css" />
+			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
 			<link rel="stylesheet" type="text/css" href="//assets.zendesk.com/external/zenbox/v2.5/zenbox.css" />
@@ -76,9 +76,9 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 				    google.load("jquery", "1");
 				    google.load("jqueryui", "1");
 					<?php	 if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) { ?>
-						 var popup=true; 
+						 var popup=1; 
 					<?php } else { ?>
-						var popup=false;
+						var popup=0;
 					<?php } ?>
 				//]]>
 				</script>

@@ -14,7 +14,7 @@ $Slim=Slim::getInstance('default',true);
 	} else {
 		$Slim->applyHook('hook_footer');
 		echo '<div id="ultimocontenedor" style="clear:both;height:70px; width:130px;margin:40px auto 5px ;text-align:center;">
-				<img src="//static.thetimebilling.com/images/logo_bottom.jpg" width="125" height="37" style="padding:15px 15px 0;float:left;" />&nbsp;
+				<i class="sprite sprite-logo_bottom" style="margin:15px 15px 0;float:left;" ></i>&nbsp;
 			<div id="DigiCertClickID_iIR9fwBQ" style="float:right;" >&nbsp;</div>
 			</div>';
 
