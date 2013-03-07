@@ -106,7 +106,6 @@ $where .= " AND usuario.visible = 1";
 
 <link href="//static.thetimebilling.com/contextmenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
 <script src="//static.thetimebilling.com/contextmenu/jquery.contextMenu.js" type="text/javascript"></script>
-<script src="//static.thetimebilling.com/js/bootstrap.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 	function SecToTime(sec_numb) {
