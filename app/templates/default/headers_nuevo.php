@@ -38,7 +38,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<title><?php echo Conf::AppName() ?> - <?php echo $this->titulo ?></title>
 			<!-- <?php echo Conf::TimestampDeployCSS() ?> -->
 			<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
-			<link rel="shortcut icon" href="https://static.thetimebilling.com/favicon.ico" />
+			<link rel="shortcut icon" href="//static.thetimebilling.com/favicon.ico" />
 
 			<!--[if IE]>
 			<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/css_ie_only.css" />
@@ -69,12 +69,21 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 					}
 					#zenbox_tab {padding:0 !important;min-width:0 !important;}
 				</style>
-				<script src='//www.google.com/jsapi'></script>
-				<script>
-					google.load("jquery","1.7");
+				<script type="text/javascript" src="//www.google.com/jsapi"></script>
+
+				<script type="text/javascript">
+				//<![CDATA[
+				    google.load("jquery", "1");
+				    google.load("jqueryui", "1");
+					<?php	 if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) { ?>
+						 var popup=true; 
+					<?php } else { ?>
+						var popup=false;
+					<?php } ?>
+				//]]>
 				</script>
-			<script type="text/javascript" src="//static.thetimebilling.com/js/pluginsplus.js"></script>
-			<script  type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>
+
+ 			<script  type="text/javascript" src="//static.thetimebilling.com/js/all.123456789.js"></script>
 
 
 				<!--[if lt IE 9]>
