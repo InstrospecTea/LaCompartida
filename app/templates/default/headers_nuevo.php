@@ -18,9 +18,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
 			<script language="JavaScript" type="text/javascript">
-
 				var DivLoading='<div class="divloading">&nbsp;</div>';
 				var _sf_async_config={};
 				var __dcid = __dcid || [];
@@ -29,13 +27,16 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 	var baseurl= '<?php echo base64_encode($laurl); ?>';
 	var root_dir = '<?php echo Conf::RootDir(); ?>';
 	var img_dir = '<?php echo Conf::ImgDir() ?>';
+
 	var console = console || {
 		log:function(){},
 		warn:function(){},
 		error:function(){}
 	};
 			</script>
+
 			<title><?php echo Conf::AppName() ?> - <?php echo $this->titulo ?></title>
+
 			<!-- <?php echo Conf::TimestampDeployCSS() ?> -->
 			<link rel="stylesheet" type="text/css" href="https://static.thetimebilling.com/templates/default/css/deploy/all.1226330411_nuevo.css" />
 			<link rel="shortcut icon" href="//static.thetimebilling.com/favicon.ico" />
@@ -48,27 +49,10 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<!--<![endif]-->
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
-			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
+
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
 			<link rel="stylesheet" type="text/css" href="//assets.zendesk.com/external/zenbox/v2.5/zenbox.css" />
-			<style type="text/css" media="screen, projection">
-					#zenbox_tab.ZenboxTabRight {
-						background: url(//static.thetimebilling.com/templates/default/img/tag_soporte3.png);
-						background-position: left 0;
-						-webkit-transform: rotate(0);
-						-moz-transform: rotate(0);
-						-o-transform: rotate(0);
-						-ms-transform: rotate(0);
-						transform: rotate(0);
-						height: 110px !important;
-						width: 46px !important;
-						height: 75px;
-						right: 0 !important;
-						position: absolute;
-						text-indent: -4000px;
-					}
-					#zenbox_tab {padding:0 !important;min-width:0 !important;}
-				</style>
+			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
 				<script type="text/javascript" src="//www.google.com/jsapi"></script>
 
 				<script type="text/javascript">
