@@ -1082,6 +1082,7 @@ jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.
 
 			});
 		});
+	}
 });
 
 
