@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -13,44 +13,62 @@
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 
+	// Revisamos si el usuario tiene categoría de revisor.
+	$params_array['codigo_permiso'] = 'REV';
+	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	// Revisamos si el usuario es de cobranza.
+	$params_array['codigo_permiso'] = 'COB';
+	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
+	if($permisos->fields['permitido'] || $permiso_cobranza->fields['permitido']) {// Si el usuario tiene categorÃ­a de revisor o es de cobranza puede ver a todos
+		$where = '';
+	} else { // En otro caso solo puede ver a los que tenga asignados para revisar.
+		$where = "AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields[id_usuario]}) OR usuario.id_usuario={$sesion->usuario->fields[id_usuario]}) ";
+	}
+	if (!empty($id_area_usuario)) {
+		$esc_id_area_usuario = mysql_real_escape_string($id_area_usuario);
+		$where .= "AND id_area_usuario = '{$esc_id_area_usuario}'";
+	}
+	$query_usuarios = "SELECT
+							usuario.id_usuario,
+							CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre) AS nombre
+						FROM usuario JOIN usuario_permiso USING(id_usuario)
+						WHERE usuario.visible = 1
+							AND usuario_permiso.codigo_permiso='PRO' {$where} ORDER BY nombre ASC";
+
 	/*Eliminando trabajo*/
-	if($opcion == "eliminar")  #ELIMINAR TRABAJO
-	{
+	if($opcion == 'eliminar') { #ELIMINAR TRABAJO
 		$t = new Trabajo($sesion);
 		$t->Load($id_trab);
-		if(! $t->Eliminar() )
+		if(! $t->Eliminar() ) {
 			$pagina->AddError($t->error);
-		else
-		{
+		} else {
 			$pagina->AddInfo(__('Trabajo').' '.__('eliminado con éxito'));
 			unset($t);
 		}
+	} elseif($opcion == 'filtro_usuarios') {
+		$resp = mysql_query($query_usuarios, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$lista_usuarios = array();
+		while( $tmp_usuario = mysql_fetch_assoc($resp)) {
+			$lista_usuarios[$tmp_usuario['id_usuario']] = $tmp_usuario['nombre'];
+		}
+		die(json_encode(UtilesApp::utf8izar($lista_usuarios)));
 	}
 
 	$pagina->titulo = __('Resumen semana');
 	$pagina->PrintTop();
 
 	$dias = array("Lunes", "Martes", "Miércoles", "Jueves", "Viernes","Sábado","Domingo");
-if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
-{?>
+	$diseno_nuevo = ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() );
+	$style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
+	?>
 	<form method=post id=form_semana name=form_semana>
-		<table class="tb_base" width="85%" style="border: 1px solid #BDBDBD;">
+		<table class="tb_base" width="85%" <?php echo $style; ?>>
 			<tr>
 				<td align="center">
 					<table width="90%">
 						<tr>
 							<td>
 
-<?php }
-else
-{?>
-		<form method=post id=form_semana name=form_semana><table class="tb_base" width="85%">
-			<tr>
-				<td align="center">
-					<table width="90%">
-						<tr>
-							<td>
-<?php }?>
 		<input type='hidden' name='accion' value=''>
 		<input type='hidden' name='opcion' value=''>
 		&nbsp;</td>
@@ -63,30 +81,13 @@ else
 			<?php echo __('Área Usuario')?>:
 		</td>
 		<td valign="top" class="texto" align="left">
-			<?php echo Html::SelectQuery($sesion,'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa','id_area_usuario', $id_area_usuario,'onchange="if(this.selectedIndex > 0) $(\'usuarios[]\').disabled = true; else $(\'usuarios[]\').disabled = false;"', 'Cualquiera')?>
+			<?php echo Html::SelectQuery($sesion, 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa', 'id_area_usuario', $id_area_usuario, '', 'Cualquiera')?>
 		</td>
 	</tr>
 	<tr>
-		<td align=right><?php echo __('Usuario')?>:
-<?php 
-	// Revisamos si el usuario tiene categorÃ­a de revisor.
-	$params_array['codigo_permiso'] = 'REV';
-	$permisos = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	// Revisamos si el usuario es de cobranza.
-	$params_array['codigo_permiso'] = 'COB';
-	$permiso_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	if($permisos->fields['permitido'] || $permiso_cobranza->fields['permitido']) // Si el usuario tiene categorÃ­a de revisor o es de cobranza puede ver a todos
-		$where = '';
-	else // En otro caso solo puede ver a los que tenga asignados para revisar.
-		$where = " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=".$sesion->usuario->fields[id_usuario].") OR usuario.id_usuario=".$sesion->usuario->fields[id_usuario].") ";
-
-
-?>
-	</td><td align=left>
-<?php 
-	echo(Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ".$where." ORDER BY nombre ASC", "usuarios[]",$usuarios,$id_area_usuario? " disabled=true multiple size=5":"multiple size=5","","200"));
-
-?>
+		<td align=right><?php echo __('Usuario')?>: </td>
+	<td align="left">
+		<?php echo(Html::SelectQuery($sesion, $query_usuarios, 'usuarios[]', $usuarios, ' multiple="multiple" size="10"', '', '300')); ?>
 						</td>
 					</tr>
 					<tr>
@@ -114,35 +115,22 @@ else
 </form>
 <br />
 
-<?php 
+<?php
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
-	
-  
-  
+
 	$usr = new Usuario($sesion);
 
-	if($id_area_usuario)
-	{
-		$usuarios = array();
-		$query = "SELECT id_usuario FROM usuario WHERE id_area_usuario = '".mysql_real_escape_string($id_area_usuario)."'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		while( list($id_usuario) = mysql_fetch_array($resp))
-			$usuarios[] = $id_usuario;
-	}
-
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
-	//if( is_array($usuarios) ) 		$objeto_semana = new Semana($sesion,"",$usuarios);
-	
-	for($j=0;$j<count($usuarios);$j++)
-	{
+
+	for ($j = 0; $j < count($usuarios); ++$j) {
 
 		$id_usuario = $usuarios[$j];
 		$usr->loadId($id_usuario);
-		
-		if( $j==0 & ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
+
+		if( $j==0 & $diseno_ )
 			echo "<table class=\"tb_base\" width=\"85%\" style=\"border: 1px solid #BDBDBD;\"><tr><td align=\"center\">";
-		
+
 		if($semana == "")
 		{
 			$semana2 = "CURRENT_DATE()";
@@ -174,10 +162,10 @@ else
 				$td = 'duracion';
 		}
 
-		$query = "SELECT *, 
-								TIME_TO_SEC($td)/90 as alto, 
+		$query = "SELECT *,
+								TIME_TO_SEC($td)/90 as alto,
 								$td as duracion_pedida,
-								DAYOFWEEK(fecha) AS dia_semana, 
+								DAYOFWEEK(fecha) AS dia_semana,
 								trabajo.cobrable
 							FROM trabajo
 							JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
@@ -201,7 +189,7 @@ else
 			echo("<tr>");
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 				echo("<td style='width: 100px; text-align:left;'><img src='".Conf::ImgDir()."/izquierda_nuevo.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('".$semana_anterior."')\"></td>");
-			else	
+			else
 				echo("<td style='width: 100px; text-align:left;'><img src='".Conf::ImgDir()."/izquierda.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('".$semana_anterior."')\"></td>");
 			echo("<td colspan='5' align='center' style='width: 500px;'><b>".__('Semana del').":</b> ".$semana_del."</td>");
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
@@ -282,10 +270,9 @@ else
 			}
 			else
 			{
-				if(strpos($duracion,":"))
+				if(strpos($duracion,":")) {
 					list($hh,$mm,$ss) = split(":",$duracion);
-				else
-				{
+				} else {
 					$hh = floor($duracion/3600);
 					$mm = floor(($duracion-$hh*3600)/60);
 					$ss = $duracion-$hh*3600-$mm*60;
@@ -308,7 +295,7 @@ else
 			{
 				$no_cobrable = '';
 			/*	$color = $objeto_semana->colores[$cod_asunto_color];
-				
+
 				if($color == '')*/
 					$color = '#E8E7D9';
 			}
@@ -358,7 +345,7 @@ else
 						");
 			}
 			else
-			{ 
+			{
 				echo("
 					<td style='width: 20%; border: 1px solid black; text-align:center;'>
 					$hora:$minutos
@@ -369,7 +356,15 @@ else
 		echo("</tr>");
 		echo("</table><br/>");
 ?>
-<script>
+
+<?php
+	if( $j == count($usuarios)-1 && $diseno_nuevo )
+		echo "</td></tr></table>";
+	} #END FOR Clientes
+
+
+?>
+<script type="text/javascript">
 	/* Array de los items del Menú */
 	document.observe('dom:loaded', function(){
 		var myMenuItems = [
@@ -400,45 +395,25 @@ else
 
 	/* Array para todos los trabajos ingresados */
 	var arr_trabajos = new Array();
-<?php 
-	for($i = 0; $i < $lista->num; $i++)
-	{
-?>
+	<?php for($i = 0; $i < $lista->num; $i++) { ?>
 		arr_trabajos[<?php echo $i?>] = <?php echo $lista->Get($i)->fields[id_trabajo]?>;
-<?php 
-	}
-?>
+	<?php } ?>
 	/*
 		Inicializando Menú
 		creando cada menú según cantidad de trabajos hayan ingresados
 	*/
 	var list_div = parseInt(<?php echo $lista->num;?>);
-	for(i=0;i<list_div;i++)
-	{
+	for(i=0;i<list_div;i++) {
 		new Proto.Menu({
 	  selector: '#'+arr_trabajos[i], // context menu will be shown when element with id of "contextArea" is clicked
 	  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
 	  menuItems: myMenuItems // array of menu items
 		})
 	}
-})
+});
 
-
-</script>
-<?php 
-	if( $j == count($usuarios)-1 && ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
-		echo "</td></tr></table>";
-	} #END FOR Clientes
-	
-	
-	$pagina->PrintBottom();
-
-?>
-
-<script>
 /* Cambia semana */
-function CambiaSemana( fecha )
-{
+function CambiaSemana( fecha ) {
 	var form = $('form_semana');
 	form.semana.value = fecha;
 	var accion = 'resumen_semana.php?semana='+fecha;
@@ -451,18 +426,13 @@ function CambiaSemana( fecha )
 	Opcion menu lateral
 	opcion->elimina; nuevo o '' ('' editar)
 */
-function OpcionesTrabajo(id_trabajo, opcion )
-{
-	if(opcion == 'nuevo' || opcion == 'edit')
-	{
+function OpcionesTrabajo(id_trabajo, opcion ) {
+	if (opcion == 'nuevo' || opcion == 'edit') {
 		var id_edicion_trabajo = id_trabajo.split('-',1);
-		nuovaFinestra('Editar_Trabajo',550,350,'editar_trabajo.php?id_trabajo='+id_edicion_trabajo+'&popup=1&opcion='+opcion,'');
-	}
-	else
-	{
+		nuovaFinestra('Editar_Trabajo', 550, 350, 'editar_trabajo.php?id_trabajo=' + id_edicion_trabajo + '&popup=1&opcion=' + opcion,'');
+	} else {
 		var form = document.getElementById('form_semana');
-		if(id_trabajo)
-		{
+		if (id_trabajo) {
 			form.opcion.value = opcion;
 			form.action = '?id_trab='+id_trabajo;
 			form.submit();
@@ -470,8 +440,32 @@ function OpcionesTrabajo(id_trabajo, opcion )
 	}
 }
 jQuery(document).ready(function() {
-jQuery('.cajatrabajo').each(function() {
-				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
-			});	 
-			});
+	jQuery('.cajatrabajo').each(function() {
+		jQuery(this).css('background-color', window.top.s2c(jQuery(this).attr('rel')));
+	});
+
+	jQuery('#id_area_usuario').bind('change', function() {
+		var usuarios_seleccionados = jQuery('select[id="usuarios[]"]').val();
+		jQuery.ajax('?opcion=filtro_usuarios', {
+			type: 'post',
+			dataType: 'json',
+			data: {'id_area_usuario': jQuery(this).val()},
+			success: function(opciones) {
+				var usuarios = jQuery('select[id="usuarios[]"]');
+				usuarios.html('');
+				jQuery.each(opciones, function(val, text) {
+					usuarios.append(
+						jQuery('<option></option>')
+							.val(val)
+							.html(text)
+							.attr('selected', jQuery.inArray(val, usuarios_seleccionados) >= 0)
+					);
+				});
+			}
+		});
+	});
+});
+
 </script>
+
+<?php $pagina->PrintBottom(); ?>
