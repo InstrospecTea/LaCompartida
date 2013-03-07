@@ -1,4 +1,6 @@
 # Changelog
+## Hotfix: 13.2.7
+* **Fixed:** [No adivinar una fecha de inicio del cobro cuando no se declara especificamente](https://github.com/LemontechSA/ttb/pull/113)
 
 ## Hotfix: 13.2.6
 Martes 5 de marzo 2013.
