@@ -9731,7 +9731,7 @@ QUERY;
 		case 7.33:
 			$queries = array();
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
-				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL DEFAULT";
+				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
 			}
 			ejecutar($queries, $dbh);
 			break;
