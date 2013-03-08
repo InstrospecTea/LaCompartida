@@ -1,9 +1,9 @@
 
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
-  	   	<script type="text/javascript">window.jQuery || document.write('<script src="//static.thetimebilling.com/js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
-		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.js"></script>
-
+	  <script src="//static.thetimebilling.com/js/vendor/modernizr-2.6.1.min.js"></script>
+    <script type="text/javascript">window.jQuery || document.write('<script src="//static.thetimebilling.com/js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.js"></script>
 </div>
 
 
@@ -11,10 +11,12 @@
 $Slim=Slim::getInstance('default',true);
 	if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) {
 		$Slim->applyHook('hook_footer_popup');
+		echo '<script type="text/javascript" src="//static.thetimebilling.com/js/footerpopup.js"></script>';
 	} else {
 		$Slim->applyHook('hook_footer');
+		echo '<script type="text/javascript" src="//static.thetimebilling.com/js/footer3.js"></script>';
 		echo '<div id="ultimocontenedor" style="clear:both;height:70px; width:130px;margin:40px auto 5px ;text-align:center;">
-				<i class="sprite sprite-logo_bottom" style="margin:15px 15px 0;float:left;" ></i>&nbsp;
+				<img src="//static.thetimebilling.com/images/logo_bottom.jpg" width="125" height="37" style="padding:15px 15px 0;float:left;" />&nbsp;
 			<div id="DigiCertClickID_iIR9fwBQ" style="float:right;" >&nbsp;</div>
 			</div>';
 
