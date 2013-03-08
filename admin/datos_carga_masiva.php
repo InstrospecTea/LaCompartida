@@ -179,7 +179,7 @@ if (empty($data)) {
 	 */
 	var valores_unicos = {};
 	jQuery.each(campos_clase, function(campo, info) {
-		if (info.relacion || info.unico === true) {
+		if (info.relacion && typeof(info.unico) !== 'string' || info.unico === true) {
 			valores_unicos[campo] = {
 				unico: info.unico
 			};
