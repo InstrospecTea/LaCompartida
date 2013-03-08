@@ -240,8 +240,7 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Antigüedad Deudas Clientes');
 $Pagina->PrintTop();
 ?>
-<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
-<script type="text/javascript" src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
+
 <table width="90%">
 	<tr>
 		<td>
@@ -304,10 +303,7 @@ $Pagina->PrintTop();
 <script type="text/javascript">
 <?php echo "var linktofile= '$linktofile';";?>
 	jQuery(document).ready(function () {
-		
-			jQuery('.inlinehelp').each(function() {
-				jQuery(this).popover({title:jQuery(this).attr('title'), trigger:'hover',animation:true, content:jQuery(this).attr('help')});
-			} );
+		  
 		jQuery('#boton_xls').click(function(){
 			jQuery('#opcion').val('xls');
 		});
