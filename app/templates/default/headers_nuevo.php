@@ -47,7 +47,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 			<!--<![endif]-->
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/js/jquery-ui.css" />
+			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
 			<link rel="stylesheet" type="text/css" href="//assets.zendesk.com/external/zenbox/v2.5/zenbox.css" />
