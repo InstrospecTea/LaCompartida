@@ -7,7 +7,7 @@ $sesion = new Sesion(array('ADM'));
 $CargaMasiva = new CargaMasiva($sesion);
 
 if (isset($data) && isset($campos)) {
-	$errores = $CargaMasiva->CargarData($data, $clase, $campos);
+	$errores = $CargaMasiva->CargarData(UtilesApp::utf8izar($data, false), $clase, $campos);
 	echo json_encode(UtilesApp::utf8izar($errores));
 } else if (isset($obtener_listados)) {
 	$listados = $CargaMasiva->ObtenerListados($clase);
