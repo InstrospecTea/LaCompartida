@@ -611,7 +611,7 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 						fp.nro_cheque AS numero_cheque,
 						fp.descripcion,
 						prm_banco.nombre AS banco,
-						cuenta_banco.glosa AS cuenta,
+						cuenta_banco.numero AS cuenta,
 						fp.pago_retencion,
 						pfpc.glosa AS concepto
 					FROM factura_pago fp
