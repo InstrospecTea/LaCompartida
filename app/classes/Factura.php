@@ -1821,7 +1821,7 @@ class Factura extends Objeto {
 				$where .= " AND factura.id_moneda = " . $id_moneda . " ";
 			}
 			if ($grupo_ventas) {
-				$where .= " AND (prm_documento_legal.grupo = 'VENTAS' OR prm_documento_legal.grupo = 'VENTA')";
+				$where .= " AND prm_documento_legal.grupo = 'VENTAS'";
 			}
 			if ($razon_social) {
 				$where .= " AND factura.cliente LIKE '%" . $razon_social . "%'";
