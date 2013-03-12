@@ -78,101 +78,10 @@ if ($id_gasto != "") {
 if ($opc == 'buscar') {
 	if ($orden == "") {
 		$orden = "fecha DESC";
-	}
+	} 
 
 	if ($where == '') {
-		$where = 1;
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			if ($codigo_cliente_secundario) {
-				$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
-				$cliente = new Cliente($sesion);
-				$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
-
-				if ($codigo_asunto_secundario) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list_secundario = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list_secundario, $codigo);
-					}
-					$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
-				}
-			}
-		} else {
-			if ($codigo_cliente) {
-				$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
-				$cliente = new Cliente($sesion);
-				$cliente->LoadByCodigo($codigo_cliente);
-				if ($codigo_asunto) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigo($codigo_asunto);
-					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list, $codigo);
-					}
-					$lista_asuntos = implode("','", $asuntos_list);
-				}
-			}
-		}
-
-		$fecha_ini = ($fecha1 != '') ? Utiles::fecha2sql($fecha1) : '';
-		$fecha_fin = ($fecha2 != '') ? Utiles::fecha2sql($fecha2) : '';
-
-		if ($cobrado == 'NO') {
-			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
-		}
-		if ($cobrado == 'SI') {
-			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
-		}
-		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
-		}
-		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
-			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
-		}
-		if ($id_usuario_orden) {
-			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-		}
-		if ($id_usuario_responsable) {
-			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-		}
-		if (isset($cobrable) && $cobrable != '') {
-			$where .= " AND cta_corriente.cobrable =$cobrable";
-		}
-
-		if (isset($id_tipo) and $id_tipo != '') {
-			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
-		}
-
-		if ($clientes_activos == 'activos') {
-			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		}
-		if ($clientes_activos == 'inactivos') {
-			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
-		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND cta_corriente.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . "' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
-			$where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "' ";
-		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59' ";
-		} else if (!empty($id_cobro)) {
-			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
-		}
-
-		// Filtrar por moneda del gasto
-		if ($moneda_gasto != '') {
-			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
-		}
-		if ($egresooingreso == 'soloingreso') {
-			$where .= " AND cta_corriente.ingreso IS NOT NULL ";
-		} else if ($egresooingreso == 'sologastos') {
-			$where .= " AND cta_corriente.ingreso IS NULL ";
-		}
+		$where=$gasto->WhereQuery($_REQUEST);
 	} else {
 		$where = base64_decode($where);
 	}

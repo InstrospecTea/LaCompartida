@@ -289,7 +289,129 @@ class Gasto extends Objeto {
 		$writer->save(__('Gastos'));
 	}
 
-	public function SearchQuery($where) {
+
+
+	public function WhereQuery($request) {
+		$where = 1;
+		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
+			if ($_REQUEST['codigo_cliente_secundario']) {
+				$where .= " AND cliente.codigo_cliente_secundario = '{$_REQUEST['codigo_cliente_secundario']}'";
+				$cliente = new Cliente($this->sesion);
+				$cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
+
+				if ($_REQUEST['codigo_asunto_secundario']) {
+					$asunto = new Asunto($this->sesion);
+					$asunto->LoadByCodigoSecundario($_REQUEST['codigo_asunto_secundario']);
+					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
+					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+					$asuntos_list_secundario = array();
+					while (list($codigo) = mysql_fetch_array($resp)) {
+						array_push($asuntos_list_secundario, $codigo);
+					}
+					$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
+				}
+			}
+		} else {
+			if (!empty($_REQUEST['codigo_cliente'])) {
+				$where .= " AND cta_corriente.codigo_cliente = '{$_REQUEST['codigo_cliente']}'";
+				$cliente = new Cliente($this->sesion);
+				$cliente->LoadByCodigo($_REQUEST['codigo_cliente']);
+				if ($_REQUEST['codigo_asunto']) {
+					$asunto = new Asunto($this->sesion);
+					$asunto->LoadByCodigo($_REQUEST['codigo_asunto']);
+					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
+					$resp = mysql_query($query_asuntos, $this->sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $this->sesion->dbh);
+					$asuntos_list = array();
+					while (list($codigo) = mysql_fetch_array($resp)) {
+						array_push($asuntos_list, $codigo);
+					}
+					$lista_asuntos = implode("','", $asuntos_list);
+				}
+			}
+		}
+
+		$fecha1 = !empty($_REQUEST['fecha1'])? Utiles::fecha2sql($_REQUEST['fecha1']) : '';
+		$fecha2 = !empty($_REQUEST['fecha2'])? Utiles::fecha2sql($_REQUEST['fecha2']) : '';
+
+		if ($_REQUEST['cobrado'] == 'NO') {
+			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
+		}
+		if ($_REQUEST['cobrado'] == 'SI') {
+			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
+		}
+		if ($_REQUEST['codigo_asunto'] && $lista_asuntos) {
+			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
+		}
+		if ($_REQUEST['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
+			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
+		}
+		if ($_REQUEST['id_usuario_orden']) {
+			$where .= " AND cta_corriente.id_usuario_orden = '{$_REQUEST['id_usuario_orden']}'";
+		}
+		if ($_REQUEST['id_usuario_responsable']) {
+			$where .= " AND contrato.id_usuario_responsable = '{$_REQUEST['id_usuario_responsable']}' ";
+		}
+		if (isset($_REQUEST['cobrable']) &&  $_REQUEST['cobrable'] != '') {
+			$where .= " AND cta_corriente.cobrable ={$_REQUEST['cobrable']}";
+		}
+
+		if (isset($_REQUEST['id_tipo']) and $_REQUEST['id_tipo'] != '') {
+			$where .= " AND cta_corriente.id_cta_corriente_tipo = '{$_REQUEST['id_tipo']}'";
+		}
+
+		if ($_REQUEST['clientes_activos'] == 'activos') {
+			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
+		} else if ($_REQUEST['clientes_activos']  == 'inactivos') {
+			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
+		}
+		if ($fecha1 && $fecha2) {
+			$where .= " AND cta_corriente.fecha BETWEEN '$fecha1' AND '$fecha2' ";
+		} else if ($fecha1) {
+			$where .= " AND cta_corriente.fecha >= '$fecha1' ";
+		} else if ($fecha2) {
+			$where .= " AND cta_corriente.fecha <= '$fecha2' ";
+		} else if (!empty($id_cobro)) {
+			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
+		}
+
+		// Filtrar por moneda del gasto
+		if ($_REQUEST['moneda_gasto'] != '') {
+			$where .= " AND cta_corriente.id_moneda={$_REQUEST['moneda_gasto']} ";
+		}
+		if ($_REQUEST['egresooingreso'] == 'soloingreso') {
+			$where .= " AND cta_corriente.ingreso IS NOT NULL ";
+		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
+			$where .= " AND cta_corriente.ingreso IS NULL ";
+		}
+
+		return $where;
+	}
+
+	public static function SelectFromQuery($join_extra='') {
+		//Sirve para hacer count(*) sobre el conjunto, sin cláusula orden, limit ni group by
+		return "cta_corriente
+			LEFT JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
+			LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
+			LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+			LEFT JOIN usuario AS u_ingresa ON u_ingresa.id_usuario = cta_corriente.id_usuario
+			LEFT JOIN usuario AS u_ordena ON u_ordena.id_usuario = cta_corriente.id_usuario_orden
+			LEFT JOIN usuario AS u_encargado ON u_encargado.id_usuario = contrato.id_usuario_responsable
+			LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
+			LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+			LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
+			LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
+			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
+			LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
+			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+			 $join_extra ";
+
+
+
+	}
+
+ 
+
+	public function SearchQuery($where,$col_select='',$join_extra='') {
 		return "SELECT SQL_BIG_RESULT SQL_NO_CACHE
 				cta_corriente.id_movimiento,
 				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
@@ -328,23 +450,18 @@ class Gasto extends Objeto {
 				cta_corriente.numero_ot,
 				cta_corriente.id_moneda,
 				prm_moneda.codigo AS codigo_moneda,
-				cta_corriente.con_impuesto
-			FROM cta_corriente
-			LEFT JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
-			LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
-			LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-			LEFT JOIN usuario AS u_ingresa ON u_ingresa.id_usuario = cta_corriente.id_usuario
-			LEFT JOIN usuario AS u_ordena ON u_ordena.id_usuario = cta_corriente.id_usuario_orden
-			LEFT JOIN usuario AS u_encargado ON u_encargado.id_usuario = contrato.id_usuario_responsable
-			LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
-			LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
-			LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
-			LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
-			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
-			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+				cta_corriente.con_impuesto,
+				prm_idioma.codigo_idioma,
+				contrato.activo AS contrato_activo,
+				1 as opcion,
+				contrato.id_contrato
+				$col_select
+			FROM ".self::SelectFromQuery($join_extra)."
 			WHERE 1 AND $where";
 	}
 }
+
+ 
 
 #end Class
 if(!class_exists('ListaGastos')) {

@@ -15,6 +15,7 @@ require_once 'Spreadsheet/Excel/Writer.php';
 
 $sesion = new Sesion(array('OFI', 'COB'));
 $pagina = new Pagina($sesion);
+$gasto =new Gasto($sesion);
 
 #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
@@ -135,47 +136,9 @@ if ($codigo_asunto) {
     $ws1->mergeCells(3, 1, 3, 4);
 }
 ########################### SQL INFORME DE GASTOS #########################
-$where = "1";
+$where = $gasto->WhereQuery($_REQUEST);
 $join_extra = "";
-if ($cobrado == 'NO') {
-	$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
-}
-if ($cobrado == 'SI') {
-	$where .= " AND cta_corriente.id_cobro is not null AND cobro.estado IN ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL', 'PAGADO', 'ENVIADO AL CLIENTE', 'INCOBRABLE') ";
-}
-if ($codigo_cliente) {
-    $where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
-    $cliente = new Cliente($sesion);
-    $cliente->LoadByCodigo($codigo_cliente);
-    $total_cta = number_format($cliente->TotalCuentaCorriente(), 0, ",", ".");
-}
-if ($codigo_asunto)
-    $where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
-if ($id_usuario_orden)
-    $where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-if ($id_usuario_responsable)
-    $where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-if ($id_tipo)
-    $where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
-if ($clientes_activos == 'activos')
-    $where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-if ($clientes_activos == 'inactivos')
-    $where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
-if ($fecha1)
-    $where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "'";
-if ($fecha2)
-    $where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 
-// Filtrar por moneda del gasto
-if ($moneda_gasto != '') {
-    $where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
-}
-
-if ($egresooingreso == 'soloingreso') {
-	$where .= " AND cta_corriente.ingreso IS NOT NULL ";
-} else if ($egresooingreso == 'sologastos') {
-	$where .= " AND cta_corriente.ingreso IS NULL ";
-}
 
 $moneda_base = Utiles::MonedaBase($sesion);
 $moneda = new Moneda($sesion);
@@ -221,7 +184,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable') || UtilesApp::GetConf($sesio
     $col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 }
 
-if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
+//if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     $col_select .= ", cobro.estado as estado_cobro, 
 					moneda_gastos_segun_cobro.tipo_cambio as tipo_cambio_segun_cobro,
 					( SELECT SUM(subtotal_gastos * cmf.tipo_cambio / cmb.tipo_cambio ) + SUM(subtotal_gastos_sin_impuesto * cmf.tipo_cambio / cmb.tipo_cambio) as stgastosfactura 
@@ -232,35 +195,15 @@ if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 	) as acumulado_factura";
     $join_extra .= "LEFT JOIN cobro_moneda as moneda_gastos_segun_cobro ON moneda_gastos_segun_cobro.id_cobro = cobro.id_cobro AND moneda_gastos_segun_cobro.id_moneda = cta_corriente.id_moneda ";
     $orden .= ", cta_corriente.id_cobro ASC ";
-}
+//}
 
 if ($flag_sin_orden_previo) {
     $orden .=", fecha DESC ";
 }
-$query = "SELECT cta_corriente.egreso,
-				cta_corriente.ingreso,
-				cta_corriente.monto_cobrable*cta_corriente.cobrable as monto_cobrable,
-				cta_corriente.codigo_cliente,
-				cliente.glosa_cliente,
-				cta_corriente.id_cobro,
-				cta_corriente.id_moneda,
-				prm_moneda.simbolo,
-				cta_corriente.fecha,
-				asunto.glosa_asunto,
-				cta_corriente.descripcion
-				$col_select
-			FROM cta_corriente
-				LEFT JOIN asunto USING(codigo_asunto)
-				LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-				LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-				LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
-				JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
-				LEFT JOIN cobro ON cta_corriente.id_cobro = cobro.id_cobro 
-				$join_extra
-			WHERE $where 
-			ORDER BY $orden";
+$query=$gasto->SearchQuery($where.'  ORDER BY '.$orden,  $col_select,$join_extra);
 
-/* echo $query; exit; */
+ 
+ //echo $query; exit; 
 $lista_gastos = new ListaGastos($sesion, '', $query);
 
 $egreso = $lista_gastos->Get(0)->fields['egreso'] * $tipo_cambio / $moneda_base['tipo_cambio'];
@@ -299,22 +242,22 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 	$gastos_por_cobrar = $gasto->fields['egreso'] > 0 ? $gasto->fields['monto_cobrable'] : (-1 * $gasto->fields['monto_cobrable'] );
     }
     if ($gasto->fields['egreso'] > 0) {
-	$total_balance_egreso +=($gasto->fields['egreso'] * $tipo_cambio) / $moneda_base['tipo_cambio'];
-	$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio) / $moneda_base['tipo_cambio'];
+	$total_balance_egreso +=($gasto->fields['egreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+	$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
     }
     if ($gasto->fields['ingreso'] > 0) {
-	$total_balance_ingreso +=($gasto->fields['ingreso'] * $tipo_cambio) / $moneda_base['tipo_cambio'];
-	$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio) / $moneda_base['tipo_cambio'];
+	$total_balance_ingreso +=($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+	$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
     }
 
     if ($codigo_cliente_anterior == $gasto->fields['codigo_cliente']) {
 	if ($gasto->fields['egreso'] > 0) {
-	    $egreso += (double) ($gasto->fields['egreso'] * $tipo_cambio / $moneda_base['tipo_cambio']);
-	    $egreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio']);
+	    $egreso += (double) ($gasto->fields['egreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+	    $egreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
 	}
 	if ($gasto->fields['ingreso'] > 0) {
-	    $ingreso += (double) ($gasto->fields['ingreso'] * $tipo_cambio / $moneda_base['tipo_cambio']);
-	    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio']);
+	    $ingreso += (double) ($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+	    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
 	}
 
 	if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
@@ -322,8 +265,8 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 		if ($gasto->fields['estado_cobro'] == ''
 			|| $gasto->fields['estado_cobro'] == 'CREADO'
 			|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
-		    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
-		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
+		    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
 		} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
 			|| $gasto->fields['estado_cobro'] == 'FACTURADO'
 			|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
