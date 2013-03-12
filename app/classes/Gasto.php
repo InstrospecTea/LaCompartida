@@ -465,10 +465,10 @@ class Gasto extends Objeto {
 	}
 
 
-	public static function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
+	public static function TotalCuentaCorriente($sesion, $where = '1',$cobrable=1,$array=false) {
 
 		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
+		if($cobrable!='' && Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 			$where .= " AND  cta_corriente.cobrable = $cobrable ";
 		}
 		$total_ingresos = 0;
