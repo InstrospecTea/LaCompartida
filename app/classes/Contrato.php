@@ -1094,7 +1094,8 @@ class Contrato extends Objeto {
 
 			$this->Edit("id_tarifa",  $this->fields['id_tarifa'] ? $this->fields['id_tarifa']  : 'NULL');
 			$this->Edit("id_tramite_tarifa",$this->fields['id_tramite_tarifa']    ? $this->fields['id_tramite_tarifa']    : 'NULL' );
-				$this->Edit("id_formato", $this->fields['id_formato']     ? $this->fields['id_formato']     : 'NULL');
+			$this->Edit("id_formato", empty($this->fields['id_formato']) || $this->fields['id_formato'] == 'NULL' ? '0' : $this->fields['id_formato']);
+			$this->Edit("id_cuenta", empty($this->fields['id_cuenta']) || $this->fields['id_cuenta'] == 'NULL' ? '0' : $this->fields['id_cuenta']);
 
 
 

@@ -7,6 +7,9 @@ require_once Conf::ServerDir().'/../app/classes/Moneda.php';
 
 class Tarifa extends Objeto
 {
+	
+	public static $llave_carga_masiva = 'glosa_tarifa';
+	
 	function Tarifa($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "tarifa";
