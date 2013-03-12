@@ -1,9 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 
 /**
  * Clase que maneja los diferentes tipos de mail (mensual, semanal, diario),
@@ -446,7 +443,10 @@ class Notificacion {
 
 				// Enviar mail (id_usuario_mail, mensaje);
 				if ($enviar) {
-					$mensajes[$id_usuario_mail] = $mensaje;
+					$mensajes[$id_usuario_mail] = array(
+						'tipo' => 'semanal',
+						'mensaje' => $mensaje
+					);
 				}
 			}
 		}
@@ -694,7 +694,10 @@ class Notificacion {
 				}
 
 				if ($enviar) {
-					$mensajes[$id_usuario_mail] = $mensaje;
+					$mensajes[$id_usuario_mail] = array(
+						'tipo' => 'diario',
+						'mensaje' => $mensaje
+					);
 				}
 			}
 		}

@@ -9728,6 +9728,37 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.34:
+			$queries = array();
+			$queries[] = "CREATE  TABLE `prm_tipo_correo` (`id` INT NOT NULL AUTO_INCREMENT, `nombre` VARCHAR(45) NULL, PRIMARY KEY (`id`) ) ENGINE = InnoDB DEFAULT CHARACTER SET = latin1;";
+			$queries[] = "ALTER TABLE `log_correo` ENGINE = InnoDB;";
+			if(!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_usuario` INT NULL AFTER `id_log_correo;";
+			}
+			if(!ExisteCampo('tipo_id', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_tipo_correo` INT NULL  AFTER `id_usuario`;";
+			}
+			if(!ExisteCampo('fecha_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_envio` DATETIME NULL DEFAULT NULL  AFTER `enviado`;";
+			}
+			if(!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `intento_envio` INT NULL  AFTER `fecha_envio`;";
+			}
+			if(!ExisteCampo('fecha_creacion', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` CHANGE COLUMN `fecha` `fecha_creacion` DATETIME NULL  AFTER `intento_envio`;";
+			}
+			if(!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha_creacion`;";
+			}
+			if(!ExisteIndex('fk_log_correo_tipo_correo', 'log_correo', $dbh)) {
+				$queries[] = "ALTER TABLE `log_correo` ADD CONSTRAINT `fk_log_correo_tipo_correo` FOREIGN KEY (`id_tipo_correo`) REFERENCES `prm_tipo_correo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, ADD INDEX `fk_log_correo_tipo_correo` (`id_tipo_correo` ASC);";
+			}
+			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha_creacion WHERE fecha_modificacion IS NULL;";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspencion_pago_comision';";
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9736,7 +9767,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.32;
+$max_update = 7.34;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
