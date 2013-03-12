@@ -9728,6 +9728,21 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.33:
+			$queries=array();
+		
+		if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
+			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
+			}
+		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
+			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
+			}
+		if(!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) )	 {
+			$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			}
+		ejecutar($queries, $dbh);
+		break;
+
 	}
 }
 

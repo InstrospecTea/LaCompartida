@@ -129,7 +129,7 @@ class NeteoDocumento extends Objeto
 			}
 
 			//Elimino la provisión que se pudo haber generado por pagar gastos
-			$query = "DELETE from cta_corriente WHERE cta_corriente.neteo_pago = '".$this->fields['id_neteo_documento']."' ";
+			$query = "DELETE from cta_corriente WHERE cta_corriente.id_neteo_documento = '".$this->fields['id_neteo_documento']."' ";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
 		}
@@ -274,7 +274,7 @@ echo "cambioCobro:".$cambio_cobro."<br>";*/
 							$provision->Edit('descripcion',"Pago de Gastos de Cobro #".$id_cobro." por Documento #".$documento_pago->fields['id_documento']);
 						else
 							$provision->Edit('descripcion',"Pago de Gastos por Documento #".$documento_pago->fields['id_documento']." para documento de cobro externo");
-						$provision->Edit('neteo_pago',$this->fields['id_neteo_documento']);
+						$provision->Edit('id_neteo_documento',$this->fields['id_neteo_documento']);
 						$provision->Edit('incluir_en_cobro','NO');
 						$provision->Edit('fecha',date('Y-m-d H:i:s'));
 						$provision->Write();

@@ -96,7 +96,7 @@ class Cobro extends Objeto {
 					$provision->Edit('ingreso', $this->fields['monto_gastos']);
 					$provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
-					$provision->Edit('id_cobro', 'NULL');
+					$provision->Edit('id_cobro', $this->fields['id_cobro']);
 					$provision->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 					$provision->Edit('codigo_asunto', 'NULL');
 					$provision->Edit('descripcion', $descripcion);
