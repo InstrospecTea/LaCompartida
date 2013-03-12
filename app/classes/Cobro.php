@@ -90,7 +90,8 @@ class Cobro extends Objeto {
 					$descripcion .= __(" por Documento #") . $id_documento;
 				}
 
-				if ($this->fields['monto_gastos'] > 0) {
+				// Deprecated. El ingreso de este movimiento ficticio ya se maneja en la clase NeteoDocumento.
+				/*if ($this->fields['monto_gastos'] > 0) {
 					$provision = new Gasto($this->sesion);
 					$provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
 					$provision->Edit('ingreso', $this->fields['monto_gastos']);
@@ -104,7 +105,7 @@ class Cobro extends Objeto {
 					$provision->Edit('incluir_en_cobro', 'NO');
 					$provision->Edit('fecha', date('Y-m-d H:i:s'));
 					$provision->Write();
-				}
+				}*/
 				$nuevo_pago = true;
 			}
 		} else {

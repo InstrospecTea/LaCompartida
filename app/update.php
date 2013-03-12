@@ -9730,7 +9730,8 @@ QUERY;
 
 		case 7.33:
 			$queries=array();
-		
+		$queries[]="update cta_corriente set id_cobro=substring_index(substring_index(descripcion,'#',-2),' ',1) where incluir_en_cobro='NO'";
+
 		if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
 			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
 			}
@@ -9751,7 +9752,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.32;
+$max_update = 7.33;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
