@@ -78,7 +78,7 @@ if ($_GET['totalctacorriente']) { ?>
 	<form id="buscacliente" method="POST" action="seguimiento_cobro.php" target="_blank">
 		<b><?php
 			echo __('Balance cuenta gastos'); ?>: <?php echo UtilesApp::GetSimboloMonedaBase($sesion);
-			$balance = UtilesApp::TotalCuentaCorriente($sesion, $where, $cobrable, true);
+			$balance = $gasto::TotalCuentaCorriente($sesion, $where, $cobrable, true);
 			if ($codigo_cliente_secundario || $codigo_cliente) { ?>
 				<input type="hidden" id="codcliente" name="codcliente" value="1"/>
 			<?php } else { ?>

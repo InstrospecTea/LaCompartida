@@ -397,12 +397,15 @@ class Gasto extends Objeto {
 			LEFT JOIN usuario AS u_ordena ON u_ordena.id_usuario = cta_corriente.id_usuario_orden
 			LEFT JOIN usuario AS u_encargado ON u_encargado.id_usuario = contrato.id_usuario_responsable
 			LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
-			LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+			JOIN prm_moneda as moneda_gasto ON cta_corriente.id_moneda=moneda_gasto.id_moneda
+			JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
 			LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
 			LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 			LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
 			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+			LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
+			LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
 			 $join_extra ";
 
 
@@ -411,7 +414,7 @@ class Gasto extends Objeto {
 
  
 
-	public function SearchQuery($where,$col_select='',$join_extra='') {
+	public static function SearchQuery($where,$col_select='',$join_extra='') {
 		return "SELECT SQL_BIG_RESULT SQL_NO_CACHE
 				cta_corriente.id_movimiento,
 				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
@@ -428,7 +431,7 @@ class Gasto extends Objeto {
 				u_ordena.username AS username_ordena,
 				prm_cta_corriente_tipo.glosa AS tipo,
 				cta_corriente.descripcion,
-				prm_moneda.simbolo,
+				moneda_gasto.simbolo,
 				cta_corriente.egreso,
 				cta_corriente.ingreso,
 				IF(
@@ -436,6 +439,7 @@ class Gasto extends Objeto {
 					monto_cobrable * (-1),
 					monto_cobrable
 				) AS monto_cobrable,
+				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
@@ -446,10 +450,10 @@ class Gasto extends Objeto {
 				prm_tipo_documento_asociado.glosa AS tipo_documento_asociado,
 				cta_corriente.fecha_factura AS fecha_documento_asociado,
 				cta_corriente.codigo_factura_gasto AS codigo_documento_asociado,
-				prm_moneda.cifras_decimales,
+				moneda_gasto.cifras_decimales,
 				cta_corriente.numero_ot,
 				cta_corriente.id_moneda,
-				prm_moneda.codigo AS codigo_moneda,
+				moneda_gasto.codigo AS codigo_moneda,
 				cta_corriente.con_impuesto,
 				prm_idioma.codigo_idioma,
 				contrato.activo AS contrato_activo,
@@ -459,6 +463,45 @@ class Gasto extends Objeto {
 			FROM ".self::SelectFromQuery($join_extra)."
 			WHERE 1 AND $where";
 	}
+
+
+	public static function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
+
+		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
+		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
+			$where .= " AND  cta_corriente.cobrable = $cobrable ";
+		}
+		$total_ingresos = 0;
+		$total_egresos = 0;
+
+		
+
+		$query=self::SearchQuery($where);
+						
+
+
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+
+			while($ingresoyegreso=mysql_fetch_assoc($resp) ) {
+				if ($ingresoyegreso['monto_cobrable'] > 0) {
+					$total_ingresos += $ingresoyegreso['tipo_cambio_segun_cobro']*$ingresoyegreso['monto_cobrable']*$ingresoyegreso['cobrable'];
+				} else if ($ingresoyegreso['monto_cobrable'] < 0) {
+					$total_egresos += $ingresoyegreso['tipo_cambio_segun_cobro']*$ingresoyegreso['monto_cobrable']*$ingresoyegreso['cobrable'];
+					if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
+				}
+			}
+			$total = -($total_ingresos - $total_egresos);
+		if($array) {
+			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
+		} else {
+			return $total;
+		}
+
+
+	}
+
+
 }
 
  

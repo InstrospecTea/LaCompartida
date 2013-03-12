@@ -184,9 +184,9 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable') || UtilesApp::GetConf($sesio
     $col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
 }
 
-//if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
+if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     $col_select .= ", cobro.estado as estado_cobro, 
-					moneda_gastos_segun_cobro.tipo_cambio as tipo_cambio_segun_cobro,
+					 
 					( SELECT SUM(subtotal_gastos * cmf.tipo_cambio / cmb.tipo_cambio ) + SUM(subtotal_gastos_sin_impuesto * cmf.tipo_cambio / cmb.tipo_cambio) as stgastosfactura 
 						FROM factura 
 							JOIN cobro_moneda cmf ON (factura.id_cobro = cmf.id_cobro AND factura.id_moneda = cmf.id_moneda )
@@ -195,7 +195,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable') || UtilesApp::GetConf($sesio
 	) as acumulado_factura";
     $join_extra .= "LEFT JOIN cobro_moneda as moneda_gastos_segun_cobro ON moneda_gastos_segun_cobro.id_cobro = cobro.id_cobro AND moneda_gastos_segun_cobro.id_moneda = cta_corriente.id_moneda ";
     $orden .= ", cta_corriente.id_cobro ASC ";
-//}
+}
 
 if ($flag_sin_orden_previo) {
     $orden .=", fecha DESC ";
