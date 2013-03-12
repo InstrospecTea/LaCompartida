@@ -9730,17 +9730,19 @@ QUERY;
 
 		case 7.33:
 			$queries=array();
-		$queries[]=" update cta_corriente cc 
-				join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
- 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
-				set cc.id_cobro=doc.id_cobro,
-					cc.neteo_pago=nd.id_neteo_documento,
-					cc.documento_pago=nd.id_documento_pago
-			where cc.incluir_en_cobro='NO' ";
-
-		if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
+			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
 			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
 			}
+			
+			$queries[]=" update cta_corriente cc 
+					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
+	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					set cc.id_cobro=doc.id_cobro,
+						cc.id_neteo_documento=nd.id_neteo_documento,
+						cc.documento_pago=nd.id_documento_pago
+				where cc.incluir_en_cobro='NO' ";
+
+		
 		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
 			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
 			}
