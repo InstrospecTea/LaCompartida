@@ -392,20 +392,36 @@ class Contrato extends Objeto {
 						AND cta_corriente.cobrable = 1
 						AND asunto.id_contrato = '$id_contrato'						";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		
 		while (list($monto, $id_moneda) = mysql_fetch_array($resp)) {
-			$suma_gastos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
+		$suma_gastos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
+					, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
+					, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
+					, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
+					, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
+			);
+		if($monto>=0) {
+			$suma_egresos += UtilesApp::CambiarMoneda($monto //monto_moneda_l
+					, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
+					, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
+					, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
+					, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
+			);
+		} elseif($monto<0) {
+			$suma_provisiones -= UtilesApp::CambiarMoneda($monto //monto_moneda_l
 					, $this->monedas[$id_moneda]['tipo_cambio']//tipo de cambio ini
 					, $this->monedas[$id_moneda]['cifras_decimales']//decimales ini
 					, $this->monedas[$moneda_gastos]['tipo_cambio']//tipo de cambio fin
 					, $this->monedas[$moneda_gastos]['cifras_decimales']//decimales fin
 			);
 		}
+		}
 		if($suma_gastos<0) $suma_gastos=0;
 		#$query_gastos = "SELECT * FROM cta_corriente ";
 		if ($horas_castigadas) {
-			return array($horas_por_cobrar, $monto_por_cobrar, $hh_castigadas, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo']);
+			return array($horas_por_cobrar, $monto_por_cobrar, $hh_castigadas, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo'],$suma_egresos,$suma_provisiones);
 		} else {
-			return array($horas_por_cobrar, $monto_por_cobrar, 0, $suma_gastos, $this->monedas[$moneda_gastos]['simbolo']);
+			return array($horas_por_cobrar, $monto_por_cobrar, 0             , $suma_gastos, $this->monedas[$moneda_gastos]['simbolo'],$suma_egresos,$suma_provisiones);
 		}
 	}
 
