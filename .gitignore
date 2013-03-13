@@ -176,4 +176,6 @@ pip-log.txt
 /app/interfaces/DOMPDF_FONT_DIRlog.htm
 
 app/version.php
-sftp-config.json
+sftp-config*
+*.sublime-project
+*.sublime-workspace
