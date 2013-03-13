@@ -6,7 +6,8 @@ server "lemontest.thetimebilling.com", :web, {:user => 'root'}
  set :current_stage, "custom"
   custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch []: ")
   custom_name = custom_branch.split('/').last
-  set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_name}"
+  custom_stage = custom_branch.split('/').first
+  set :file_path, "#{deploy_dir_name}/#{application}/#{custom_stage}_#{custom_name}"
   set :branch, custom_branch
   set :deploy_to, "#{base_directory}/#{file_path}"
 
