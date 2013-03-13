@@ -370,8 +370,8 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.fecha >= '$fecha1' ";
 		} else if ($fecha2) {
 			$where .= " AND cta_corriente.fecha <= '$fecha2' ";
-		} else if (!empty($id_cobro)) {
-			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
+		} else if (!empty($_REQUEST['id_cobro'])) {
+			$where .= " AND cta_corriente.id_cobro='{$_REQUEST['id_cobro']}' ";
 		}
 
 		// Filtrar por moneda del gasto
@@ -379,9 +379,9 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.id_moneda={$_REQUEST['moneda_gasto']} ";
 		}
 		if ($_REQUEST['egresooingreso'] == 'soloingreso') {
-			$where .= " AND cta_corriente.ingreso IS NOT NULL ";
+			$where .= " AND cta_corriente.ingreso IS NOT NULL AND cta_corriente.ingreso>0 ";
 		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
-			$where .= " AND cta_corriente.ingreso IS NULL ";
+			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
 
 		return $where;
@@ -439,11 +439,11 @@ class Gasto extends Objeto {
 					monto_cobrable * (-1),
 					monto_cobrable
 				) AS monto_cobrable,
-				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
+				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as monto_cobrable_moneda_base,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
-				IF(cta_corriente.cobrable = 1,'SI', 'NO') AS cobrable,
+				cta_corriente.cobrable,
 				cta_corriente.numero_documento,
 				prm_proveedor.rut AS rut_proveedor,
 				prm_proveedor.glosa AS nombre_proveedor,
@@ -461,7 +461,11 @@ class Gasto extends Objeto {
 				contrato.id_contrato
 				$col_select
 			FROM ".self::SelectFromQuery($join_extra)."
-			WHERE 1 AND $where";
+			WHERE 
+			1 
+			AND incluir_en_cobro='SI' 
+			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) 
+			AND $where ";
 	}
 
 
@@ -484,14 +488,17 @@ class Gasto extends Objeto {
 
 
 			while($ingresoyegreso=mysql_fetch_assoc($resp) ) {
-				if ($ingresoyegreso['monto_cobrable'] > 0) {
-					$total_ingresos += $ingresoyegreso['tipo_cambio_segun_cobro']*$ingresoyegreso['monto_cobrable']*$ingresoyegreso['cobrable'];
-				} else if ($ingresoyegreso['monto_cobrable'] < 0) {
-					$total_egresos += $ingresoyegreso['tipo_cambio_segun_cobro']*$ingresoyegreso['monto_cobrable']*$ingresoyegreso['cobrable'];
-					if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
-				}
+				 
+					if ($ingresoyegreso['monto_cobrable'] < 0) {
+						$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
+					} else if ($ingresoyegreso['monto_cobrable'] > 0) {
+						$total_egresos += $ingresoyegreso['monto_cobrable_moneda_base'];
+						if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
+					}
+				 
 			}
-			$total = -($total_ingresos - $total_egresos);
+			//echo 'Ingreso:'.$total_ingresos.' Egreso: '.$total_egresos.'<br>';
+			$total = $total_ingresos-$total_egresos;
 		if($array) {
 			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
 		} else {

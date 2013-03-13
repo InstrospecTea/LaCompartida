@@ -186,7 +186,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable') || UtilesApp::GetConf($sesio
 
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     $col_select .= ", cobro.estado as estado_cobro, 
-					 
+					moneda_gastos_segun_cobro.tipo_cambio as tipo_cambio_segun_cobro,
 					( SELECT SUM(subtotal_gastos * cmf.tipo_cambio / cmb.tipo_cambio ) + SUM(subtotal_gastos_sin_impuesto * cmf.tipo_cambio / cmb.tipo_cambio) as stgastosfactura 
 						FROM factura 
 							JOIN cobro_moneda cmf ON (factura.id_cobro = cmf.id_cobro AND factura.id_moneda = cmf.id_moneda )
@@ -210,10 +210,10 @@ $egreso = $lista_gastos->Get(0)->fields['egreso'] * $tipo_cambio / $moneda_base[
 $ingreso = $lista_gastos->Get(0)->fields['ingreso'] * $tipo_cambio / $moneda_base['tipo_cambio'];
 
 if ($egreso > 0) {
-    $egreso_cobrable = $lista_gastos->Get(0)->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio'];
+    $egreso_cobrable = $lista_gastos->Get(0)->fields['monto_cobrable_moneda_base'];
 }
 if ($ingreso > 0) {
-    $ingreso_cobrable = $lista_gastos->Get(0)->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio'];
+    $ingreso_cobrable = $lista_gastos->Get(0)->fields['monto_cobrable_moneda_base'];
 }
 $nombre_cliente_anterior = $lista_gastos->Get(0)->fields['glosa_cliente'];
 $codigo_cliente_anterior = $lista_gastos->Get(0)->fields['codigo_cliente'];
@@ -239,25 +239,25 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
     $tipo_cambio_segun_cobro = $gasto->fields['tipo_cambio_segun_cobro'] != '' ? $gasto->fields['tipo_cambio_segun_cobro'] : $tipo_cambio;
 
     if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-	$gastos_por_cobrar = $gasto->fields['egreso'] > 0 ? $gasto->fields['monto_cobrable'] : (-1 * $gasto->fields['monto_cobrable'] );
+	$gastos_por_cobrar = $gasto->fields['egreso'] > 0 ? $gasto->fields['monto_cobrable_moneda_base'] : (-1 * $gasto->fields['monto_cobrable_moneda_base'] );
     }
     if ($gasto->fields['egreso'] > 0) {
 	$total_balance_egreso +=($gasto->fields['egreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
-	$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+	$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
     }
     if ($gasto->fields['ingreso'] > 0) {
 	$total_balance_ingreso +=($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
-	$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+	$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
     }
 
     if ($codigo_cliente_anterior == $gasto->fields['codigo_cliente']) {
 	if ($gasto->fields['egreso'] > 0) {
 	    $egreso += (double) ($gasto->fields['egreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-	    $egreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+	    $egreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
 	}
 	if ($gasto->fields['ingreso'] > 0) {
 	    $ingreso += (double) ($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-	    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+	    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
 	}
 
 	if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
@@ -355,11 +355,11 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 
 	if ($gasto->fields['egreso'] > 0) {
 	    $ingreso_cobrable = 0;
-	    $egreso_cobrable = (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio']);
+	    $egreso_cobrable = (double) ($gasto->fields['monto_cobrable_moneda_base']);
 	}
 	if ($gasto->fields['ingreso'] > 0) {
 	    $egreso_cobrable = 0;
-	    $ingreso_cobrable = (double) ($gasto->fields['monto_cobrable'] * $tipo_cambio / $moneda_base['tipo_cambio']);
+	    $ingreso_cobrable = (double) ($gasto->fields['monto_cobrable_moneda_base']);
 	}
 
 	if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {

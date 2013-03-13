@@ -217,7 +217,7 @@ if ($_GET['totalctacorriente']) { ?>
 			$fila['ingreso'] ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
 			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
 			$fila['id_cobro'] ? $fila['id_cobro'] : ' ',
-			$fila['estado'] ? $fila['estado'] : ' ',
+			$fila['estado_cobro'] ? $fila['estado_cobro'] : ' ',
 			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
