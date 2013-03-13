@@ -241,53 +241,71 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
     if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 	$gastos_por_cobrar = $gasto->fields['egreso'] > 0 ? $gasto->fields['monto_cobrable_moneda_base'] : (-1 * $gasto->fields['monto_cobrable_moneda_base'] );
     }
-    if ($gasto->fields['egreso'] > 0) {
-	$total_balance_egreso +=($gasto->fields['egreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
-	$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
+    if ($gasto->fields['egreso'] > 0  ) {
+		$total_balance_egreso +=($gasto->fields['egreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+		$total_balance_egreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
+		if($gasto->fields['estado_cobro']=='PAGADO') {
+				$total_balance_ingreso +=($gasto->fields['egreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+				$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
+		}
+
     }
     if ($gasto->fields['ingreso'] > 0) {
-	$total_balance_ingreso +=($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
-	$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
+    	if($gasto->fields['estado_cobro']!='PAGADO') {
+			$total_balance_ingreso +=($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro) / $moneda_base['tipo_cambio'];
+			$total_balance_ingreso_cobrable +=($gasto->fields['monto_cobrable_moneda_base']);
+		}
     }
 
     if ($codigo_cliente_anterior == $gasto->fields['codigo_cliente']) {
-	if ($gasto->fields['egreso'] > 0) {
-	    $egreso += (double) ($gasto->fields['egreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-	    $egreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
-	}
-	if ($gasto->fields['ingreso'] > 0) {
-	    $ingreso += (double) ($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-	    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
-	}
-
-	if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-	    if ($gasto->fields['esCobrable'] == 'Si') {
-		if ($gasto->fields['estado_cobro'] == ''
-			|| $gasto->fields['estado_cobro'] == 'CREADO'
-			|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
-		    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-		} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
-			|| $gasto->fields['estado_cobro'] == 'FACTURADO'
-			|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
-			|| $gasto->fields['estado_cobro'] == 'PAGO PARCIAL'
-			|| $gasto->fields['estado_cobro'] == 'PAGADO') {
-		    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+		if ($gasto->fields['egreso'] > 0) {
+			$egreso += (double) ($gasto->fields['egreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			$egreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
+			if($gasto->fields['estado_cobro']=='PAGADO') {
+			    $ingreso += (double) ($gasto->fields['egreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
+			}
 		}
-	    }
+		if ($gasto->fields['ingreso'] > 0) {
+			if($gasto->fields['estado_cobro']!='PAGADO') {
+			    $ingreso += (double) ($gasto->fields['ingreso'] * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			    $ingreso_cobrable += (double) ($gasto->fields['monto_cobrable_moneda_base']);
+			}
+		}
+
+		if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
+		    if ($gasto->fields['esCobrable'] == 'Si') {
+			if ($gasto->fields['estado_cobro'] == ''
+				|| $gasto->fields['estado_cobro'] == 'CREADO'
+				|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
+			    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
+				|| $gasto->fields['estado_cobro'] == 'FACTURADO'
+				|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
+				|| $gasto->fields['estado_cobro'] == 'PAGO PARCIAL'
+				 ) {
+			    $total_gastos_por_cobrar_cliente += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			} else if($gasto->fields['estado_cobro'] == 'PAGADO'
+				|| $gasto->fields['estado_cobro'] == 'INCOBRABLE') 	 {
+				 $total_gastos_por_cobrar_cliente +=0;
+				  $total_gastos_por_cobrar += 0;
+			    }
+
+		    }
 	}
 
-	/*
-	 * esto va afuera, por que si el ultimo gasto para el cobro revisado es "no cobrable", 
-	 * omitiría descontar los gastos de facturas con pago parcial o facturadas 			 * 
-	 */
-	if ($gasto->fields['id_cobro'] != $id_cobro_anterior) {
-	    $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
-	    $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
-	    $acumulado_factura_cobro_anterior = $gasto->fields['acumulado_factura'];
-	    $id_cobro_anterior = $gasto->fields['id_cobro'];
-	}
+			/*
+			 * esto va afuera, por que si el ultimo gasto para el cobro revisado es "no cobrable", 
+			 * omitiría descontar los gastos de facturas con pago parcial o facturadas 			 * 
+			 */
+			if ($gasto->fields['id_cobro'] != $id_cobro_anterior) {
+			    $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
+			    $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
+			    $acumulado_factura_cobro_anterior = $gasto->fields['acumulado_factura'];
+			    $id_cobro_anterior = $gasto->fields['id_cobro'];
+			}
     } else {
 	$ws1->write($filas, $columna_cliente, $nombre_cliente_anterior, $formato_normal);
 	$ws1->writeNumber($filas, $columna_egreso, $egreso, $formato_moneda);
@@ -364,19 +382,22 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 
 	if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 	    if ($gasto->fields['esCobrable'] == 'Si') {
-		if ($gasto->fields['estado_cobro'] == ''
-			|| $gasto->fields['estado_cobro'] == 'CREADO'
-			|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
-		    $total_gastos_por_cobrar_cliente = (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
-		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
-		} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
-			|| $gasto->fields['estado_cobro'] == 'FACTURADO'
-			|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
-			|| $gasto->fields['estado_cobro'] == 'PAGO PARCIAL'
-			|| $gasto->fields['estado_cobro'] == 'PAGADO') {
-		    $total_gastos_por_cobrar_cliente = (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-		    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
-		}
+			if ($gasto->fields['estado_cobro'] == ''
+				|| $gasto->fields['estado_cobro'] == 'CREADO'
+				|| $gasto->fields['estado_cobro'] == 'EN REVISION') {
+			    $total_gastos_por_cobrar_cliente = (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
+			    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio / $moneda_base['tipo_cambio']);
+			} elseif ($gasto->fields['estado_cobro'] == 'EMITIDO'
+				|| $gasto->fields['estado_cobro'] == 'FACTURADO'
+				|| $gasto->fields['estado_cobro'] == 'ENVIADO AL CLIENTE'
+				|| $gasto->fields['estado_cobro'] == 'PAGO PARCIAL') {
+			    $total_gastos_por_cobrar_cliente = (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			    $total_gastos_por_cobrar += (double) ( $gastos_por_cobrar * $tipo_cambio_segun_cobro / $moneda_base['tipo_cambio']);
+			} else if($gasto->fields['estado_cobro'] == 'PAGADO'
+				|| $gasto->fields['estado_cobro'] == 'INCOBRABLE') 	 {
+				 $total_gastos_por_cobrar_cliente +=0;
+				  $total_gastos_por_cobrar += 0;
+			}
 	    } else {
 		$total_gastos_por_cobrar_cliente = 0;
 	    }

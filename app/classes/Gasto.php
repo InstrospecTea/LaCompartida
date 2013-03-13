@@ -489,13 +489,14 @@ class Gasto extends Objeto {
 
 			while($ingresoyegreso=mysql_fetch_assoc($resp) ) {
 				 
+				 if($ingresoyegreso['estado_cobro']!='PAGADO' && $ingresoyegreso['estado_cobro']!='INCOBRABLE') {
 					if ($ingresoyegreso['monto_cobrable'] < 0) {
 						$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
 					} else if ($ingresoyegreso['monto_cobrable'] > 0) {
 						$total_egresos += $ingresoyegreso['monto_cobrable_moneda_base'];
 						if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
 					}
-				 
+				 }
 			}
 			//echo 'Ingreso:'.$total_ingresos.' Egreso: '.$total_egresos.'<br>';
 			$total = $total_ingresos-$total_egresos;
