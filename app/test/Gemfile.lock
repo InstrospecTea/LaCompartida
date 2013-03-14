@@ -61,6 +61,7 @@ GEM
       json (>= 1.7.6)
     gyoku (1.0.0)
       builder (>= 2.1.2)
+    headless (1.0.1)
     hike (1.2.1)
     httpi (2.0.2)
       rack
@@ -158,8 +159,10 @@ DEPENDENCIES
   capybara
   capybara-webkit
   cucumber-rails
+  headless
   jquery-rails
   rails (= 3.2.12)
   rspec
   rspec-rails
   savon
+  selenium-webdriver
