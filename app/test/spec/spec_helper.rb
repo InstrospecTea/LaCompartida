@@ -4,6 +4,7 @@ require 'bundler/setup'
 require 'rspec'
 require 'capybara/rspec'
 require 'capybara-webkit'
+require 'active_support/time'
 
 require 'conf'
 #Dir.glob(File.dirname(__FILE__) + '/factories/*', &method(:require))

@@ -5,7 +5,7 @@ def activar_montocobrable
 		click_link 'Configuracion por Lemontech'
 		page.check('UsaMontoCobrable');
  		find_by_id('enviarconf').click
-		sleep 2.seconds
+		sleep 1.seconds
 end 
 
 def desactivar_montocobrable 
@@ -13,7 +13,7 @@ def desactivar_montocobrable
 		click_link 'Configuracion por Lemontech'
 		page.uncheck('UsaMontoCobrable');
 		find_by_id('enviarconf').click
-		sleep 2.seconds
+		sleep 1.seconds
 end 
 
 
@@ -32,7 +32,7 @@ describe 'Al agregar un gasto mediante la pantalla popup', :type => :request , :
 			page.fill_in 'monto', :with => '215.458'
 			page.fill_in 'monto_cobrable', :with => '115.455'
 		 	page.fill_in 'descripcion', :with => 'El monto cobrable es menos que el original?'
-		 	assert( find_field('monto').value!= find_field('monto_cobrable').value)
+		 	 find_field('monto').value.should_not eq(find_field('monto_cobrable').value)
 		end
 
 		
@@ -46,7 +46,7 @@ describe 'Al agregar un gasto mediante la pantalla popup', :type => :request , :
 	
 		it 'no debe ofrecer el campo "monto cobrable" ' do
 			visit '/app/interfaces/agregar_gasto.php?popup=1&prov=false'
-				page.should_not have 'monto_cobrable'
+				page.should_not have_css('#monto_cobrable')
 		 end
 
 		
