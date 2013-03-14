@@ -32,6 +32,7 @@ describe 'Al agregar un gasto mediante la pantalla popup', :type => :request , :
 			page.fill_in 'monto', :with => '215.458'
 			page.fill_in 'monto_cobrable', :with => '115.455'
 		 	page.fill_in 'descripcion', :with => 'El monto cobrable es menos que el original?'
+		 	sleep 2.seconds
 		 	 find_field('monto').value.should_not eq(find_field('monto_cobrable').value)
 		end
 
@@ -46,7 +47,9 @@ describe 'Al agregar un gasto mediante la pantalla popup', :type => :request , :
 	
 		it 'no debe ofrecer el campo "monto cobrable" ' do
 			visit '/app/interfaces/agregar_gasto.php?popup=1&prov=false'
-				page.should_not have_css('#monto_cobrable')
+			page.fill_in 'descripcion', :with => 'Verdad que no hay campo monto cobrable?'
+		 	sleep 2.seconds
+		 	page.should_not have_css('#monto_cobrable')
 		 end
 
 		
