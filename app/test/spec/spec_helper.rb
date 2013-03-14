@@ -5,6 +5,8 @@ require 'rspec'
 require 'capybara/rspec'
 require 'capybara-webkit'
 require 'active_support/time'
+require 'savon'
+
 
 require 'conf'
 #Dir.glob(File.dirname(__FILE__) + '/factories/*', &method(:require))
@@ -16,7 +18,7 @@ Capybara.register_driver :chrome do |app|
 end
 
 
-Capybara.javascript_driver = :chrome
+Capybara.javascript_driver = :webkit
 Capybara.save_and_open_page_path = File.dirname(__FILE__) + '/../snapshots'
 Capybara.app_host = APPHOST
 Capybara.default_wait_time = 5
