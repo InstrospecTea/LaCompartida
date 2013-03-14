@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.2.9
+* **Fixed:** [Corrección en validación de fecha cuando usuarios de cobranza editan trabajos](https://github.com/LemontechSA/ttb/pull/117)
+
 ## Hotfix: 13.2.8
 * **Fixed:** [Modifica la forma de presentar y aplicar los filtros](https://github.com/LemontechSA/ttb/pull/116)
 

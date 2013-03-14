@@ -136,6 +136,11 @@ class Trabajo extends Objeto
 
 	public function ValidarDiasIngresoTrabajo(){
 		if($this->sesion->usuario->fields['dias_ingreso_trabajo']){
+			//solo validar la fecha tope si no tiene permiso de cobranza
+			if ($this->sesion->usuario->TienePermiso('COB')) {
+				return true;
+			}
+                        
 			$fecha_tope = time() - ($this->sesion->usuario->fields['dias_ingreso_trabajo'] + 1) * 24 * 60 * 60;
 			if($fecha_tope > strtotime($this->fields['fecha'])){
 				$this->error = 'No se puede ingresar horas anteriores al ' . date('Y-m-d', $fecha_tope + 24 * 60 * 60);
