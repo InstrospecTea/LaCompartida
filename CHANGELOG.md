@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.2.10
+* **Fixed:** [En vez de subir los backups a un bucket para cada cliente, usa el mismo bucket y luego un subdirectorio. Esto, porque Amazon tiene un límite de 100 buckets y ya lo pasamos]
+
 ## Hotfix: 13.2.9
 * **Fixed:** [Corrección en validación de fecha cuando usuarios de cobranza editan trabajos](https://github.com/LemontechSA/ttb/pull/117)
 
