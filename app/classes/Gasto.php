@@ -383,7 +383,7 @@ class Gasto extends Objeto {
 		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
 			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
-
+		$where.="AND incluir_en_cobro='SI' ";
 		return $where;
 	}
 
@@ -440,6 +440,7 @@ class Gasto extends Objeto {
 					monto_cobrable
 				) AS monto_cobrable,
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as monto_cobrable_moneda_base,
+				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
@@ -463,7 +464,7 @@ class Gasto extends Objeto {
 			FROM ".self::SelectFromQuery($join_extra)."
 			WHERE 
 			1 
-			AND incluir_en_cobro='SI' 
+			
 			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) 
 			AND $where ";
 	}
@@ -486,8 +487,9 @@ class Gasto extends Objeto {
 
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-
-			while($ingresoyegreso=mysql_fetch_assoc($resp) ) {
+			$resp=$sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+			//echo '<pre>'; 			print_r($resp);			echo '</pre>';
+			foreach($resp as $ingresoyegreso ) {
 				 
 				 if($ingresoyegreso['estado_cobro']!='PAGADO' && $ingresoyegreso['estado_cobro']!='INCOBRABLE') {
 					if ($ingresoyegreso['monto_cobrable'] < 0) {

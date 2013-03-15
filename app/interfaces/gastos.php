@@ -94,7 +94,7 @@ if ($opc == 'buscar') {
 	$idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
-	$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where), 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
+	$total_cta = number_format($gasto::TotalCuentaCorriente($sesion, $where), 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 } else if ($opc == 'xls') {
 	require_once('gastos_xls.php');
 	exit;

@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
 
-$sesion = new Sesion(array('ADM'));
+$sesion = new Sesion(array('ADM','COB','SEC'));
 $gasto= new Gasto($sesion);
 
 $limitdesde = isset($_REQUEST['iDisplayStart']) ? $_REQUEST['iDisplayStart'] : '0';
@@ -78,6 +78,12 @@ if ($_GET['totalctacorriente']) { ?>
 	<form id="buscacliente" method="POST" action="seguimiento_cobro.php" target="_blank">
 		<b><?php
 			echo __('Balance cuenta gastos'); ?>: <?php echo UtilesApp::GetSimboloMonedaBase($sesion);
+
+			if ($where == 1) {
+				$where=$gasto->WhereQuery($_REQUEST);
+			} else {
+				$where = base64_decode($where);
+			}
 			$balance = $gasto::TotalCuentaCorriente($sesion, $where, $cobrable, true);
 			if ($codigo_cliente_secundario || $codigo_cliente) { ?>
 				<input type="hidden" id="codcliente" name="codcliente" value="1"/>
@@ -89,11 +95,13 @@ if ($_GET['totalctacorriente']) { ?>
 				<input type="hidden" id="codigo_cliente" name="codigo_cliente" value="<?php echo $codigo_cliente; ?>"/>
 				<input type="hidden" id="codigo_cliente_secundario" name="codigo_cliente_secundario" value="<?php echo $codigo_cliente_secundario; ?>"/>
 				<input type="hidden" id="festado" name="estado[]" value="CREADO"/>
-				<input type="hidden" id="festado" name="opc" value="buscar"/>
-				<input type="hidden" id="festado" name="fecha_fin" value="<?php echo date('d-m-Y'); ?>"/>
-				<input type="hidden"  name="ingreso" value="<?php echo $balance[1]; ?>"/>
-				<input type="hidden"  name="egreso" value="<?php echo $balance[2]; ?>"/>
-				<input type="hidden" id="balance" name="balance" value="<?php echo $balance[3]; ?>"/>
+				<input type="hidden" id="op" name="opc" value="buscar"/>
+				<input type="hidden" id="ffin" name="fecha_fin" value="<?php echo date('d-m-Y'); ?>"/>
+				<input type="hidden"  name="balance" 	value="<?php echo $balance[0]; ?>"/>
+				<input type="hidden"  name="ingreso" 	value="<?php echo $balance[1]; ?>"/>
+				<input type="hidden"  name="egreso" 	value="<?php echo $balance[2]; ?>"/>
+				<input type="hidden"  name="borrador" 	value="<?php echo $balance[3]; ?>"/>
+				
 			<?php } else {
 				echo number_format($balance, 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 			}?>
@@ -169,8 +177,7 @@ if ($_GET['totalctacorriente']) { ?>
 
 
 	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where ";
-
- 
+//echo $selectcount;
 
 
 
