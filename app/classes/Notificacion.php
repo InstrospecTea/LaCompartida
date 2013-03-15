@@ -485,7 +485,7 @@ class Notificacion {
 
 							$color = $i % 2 ? '#DDDDDD' : '#FFFFFF';
 							$fila = str_replace('%COLOR', $color, $fila);
-							$i++;
+							++$i;
 
 							$filas .= $fila;
 						}

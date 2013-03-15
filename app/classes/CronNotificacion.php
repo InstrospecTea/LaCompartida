@@ -44,7 +44,7 @@ class CronNotificacion extends Cron {
 		$this->log('INICIO diarios');
 		$this->diarios();
 
-		if (date("j") == 1) {
+		if (date('j') == 1) {
 			CobroPendiente::GenerarCobrosPeriodicos($this->Sesion);
 		}
 

@@ -99,23 +99,15 @@ class Alerta {
 			$asunto->Edit('notificado_hr_excedida_ult_cobro', '1');
 			$asunto->Write();
 		}
-
-		/*
-		  if(($total_monto * ($asunto->fields['alerta_porctje_lim_monto']/100) > $asunto->fields['limite_monto']) && ($asunto->fields['limite_monto'] > 0))
-		  $asunto->AlertaAdministrador("$total_monto Se ha alcanzado el limite de alerta de porcentaje de monto de ".$asunto->fields['alerta_porctje_lim_monto']."% asignado en el asunto ".$asunto->fields['glosa_asunto']);
-
-		  if(($total_horas_trabajadas * ($asunto->fields['alerta_porctje_lim_hh']/100) > $asunto->fields['limite_hh']) && ($asunto->fields['limite_hh'] > 0))
-		  $asunto->AlertaAdministrador("$total_horas_trabajadas Se ha alcanzado el limite de alerta de porcentaje de horas hombre de ".$asunto->fields['alerta_porctje_lim_hh']."% asignado en el asunto ".$asunto->fields['glosa_asunto']);
-		 */
 	}
 
 	function EnviarAlertaProfesional($id_usuario, $mensaje, $sesion, $header = true) {
-		if (is_numeric($id_persona)) {
-			$query = "SELECT email, CONCAT_WS(' ', nombre, apellido1) as nombre FROM usuario WHERE usuario.activo=1 AND id_usuario = '{$id_persona}'";
+		if (is_numeric($id_usuario)) {
+			$query = "SELECT email, CONCAT_WS(' ', nombre, apellido1) as nombre FROM usuario WHERE usuario.activo=1 AND id_usuario = '{$id_usuario}'";
 			$resp = mysql_query($query);
 			list($email, $nombre) = mysql_fetch_array($resp);
 		} else {
-			list($email, $nombre) = explode(':', $id_persona);
+			list($email, $nombre) = explode(':', $id_usuario);
 		}
 
 		$tipo = null;

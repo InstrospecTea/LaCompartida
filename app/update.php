@@ -9744,16 +9744,13 @@ QUERY;
 			if(!ExisteCampo('intento_envio', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `intento_envio` INT NULL  AFTER `fecha_envio`;";
 			}
-			if(!ExisteCampo('fecha_creacion', 'log_correo', $dbh)) {
-				$queries[] = "ALTER TABLE `log_correo` CHANGE COLUMN `fecha` `fecha_creacion` DATETIME NULL  AFTER `intento_envio`;";
-			}
 			if(!ExisteCampo('fecha_modificacion', 'log_correo', $dbh)) {
-				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha_creacion`;";
+				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `fecha_modificacion` DATETIME NULL DEFAULT NULL  AFTER `fecha`;";
 			}
 			if(!ExisteIndex('fk_log_correo_tipo_correo', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD CONSTRAINT `fk_log_correo_tipo_correo` FOREIGN KEY (`id_tipo_correo`) REFERENCES `prm_tipo_correo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION, ADD INDEX `fk_log_correo_tipo_correo` (`id_tipo_correo` ASC);";
 			}
-			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha_creacion WHERE fecha_modificacion IS NULL;";
+			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha WHERE fecha_modificacion IS NULL;";
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspencion_pago_comision';";
