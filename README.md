@@ -78,6 +78,8 @@ The Time Billing - Time Tracking
 
 * [Probar configuración][6]
 
+> Si AWSSDK arroja un error de certificado SSL, buscar el archivo ```curl-ca-bundle.crt``` (si se instaló Git usando RailsInstaller, debería estar en C:\RailsInstaller\Git\bin\curl-ca-bundle.crt) y agregar la siguiente línea al php.ini: ```curl.cainfo="(path del archivo)"```
+
 > **Opcional**: Crea el directorio virtual time_tracking en tu apache y apuntalo al directorio del repositorio
 
 > Recuerda reiniciar Apache cada vez que hagas cambios en la configuración y tener el servidor Mysql iniciado

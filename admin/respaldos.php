@@ -12,12 +12,12 @@ $sesion = new Sesion(array('ADM'));
 if (!defined('SUBDOMAIN')) {
 	die('Error: contacte a soporte para obtener su dirección de subdominio');
 } else {
-	$bucketName = 'ttbackup' . SUBDOMAIN;
+	$bucketName = 'ttbackups';// . SUBDOMAIN;
 }
 
 	if ($_POST['filename']) {
 		$filename = $_POST['filename'];
-		$curl_url = $S3->get_object_url($bucketName, $filename, "+12 hours", array('https' => true, 'returnCurlHandle' => true));
+		$curl_url = $S3->get_object_url($bucketName, SUBDOMAIN.'/'.$filename, "+12 hours", array('https' => true, 'returnCurlHandle' => true));
 		$ch = curl_init($curl_url);
 		header('Content-type: application/octet-stream');
 		header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -37,7 +37,7 @@ if (!defined('SUBDOMAIN')) {
 			$mensajedr = '<div class="alert alert-success">Busque el archivo <b>' . $dropname. '</b> dentro de unos minutos en su carpeta dropbox <i>/Apps/TheTimeBilling/</i></div>';
 
 			$fp = fopen('php://temp', 'rw');
-			$curl_url = $S3->get_object_url($bucketName, $dropname, "2 hours", array('https' => true, 'returnCurlHandle' => true));
+			$curl_url = $S3->get_object_url($bucketName, SUBDOMAIN.'/'.$dropname, "2 hours", array('https' => true, 'returnCurlHandle' => true));
 			$ch = curl_init($curl_url);
 
 			
@@ -75,7 +75,7 @@ if (!defined('SUBDOMAIN')) {
 
 
 
-	<br>	Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
+	<br>	V3: Estos son los respaldos disponibles para su sistema. Los enlaces de descarga sólo serán válidos  por dos horas<br><br>
 	<?php
 echo '<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>';
 echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min.css" />';
@@ -92,7 +92,6 @@ echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min
 		
 		<th>Tama&ntilde;o</th>
 		<th>Fecha Modificaci&oacute;n</th>
-		<th style='width: 90px;'>Torrent</th>
 		<th style='width: 45px;'>Dropbox</th> 
 		</tr></thead>\n<tbody>";
 
@@ -101,10 +100,10 @@ echo '<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min
 	if (($bucket = $S3->list_objects($bucketName)) !== false) {
 
 		foreach ($bucket->body as $object) {
-			 
-			if ($object->Size >= 20000) {
+			 $dropname = $object->Key;
+			if ($object->Size >= 20000 && strpos($dropname,SUBDOMAIN.'/')===0) {
 
-				$dropname = $object->Key;
+				$dropname = str_replace(SUBDOMAIN.'/','',$dropname);
 				//$torrent = $S3->get_object_url($bucketName, $dropname, "+2 days", array('torrent' => true));
 				echo "<tr><td><a class='iconzip' rel='$dropname' style='  float:left;font-size:14px;' href=\"javascript::void();\">$dropname</a> &nbsp;  &nbsp;&nbsp; </td>";
 				echo "<td>";
