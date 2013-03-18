@@ -70,10 +70,10 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 					#zenbox_tab {padding:0 !important;min-width:0 !important;}
 				</style>
 				 <script type="text/javascript" src="//www.google.com/jsapi"></script>
-			 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+			 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 				<script type="text/javascript">
 				 	<?php	 if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) { ?>
-						 var popup=1; 
+						 var popup=1;
 					<?php } else { ?>
 						var popup=0;
 					<?php } ?>
