@@ -9728,6 +9728,12 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.33:
+			$queries = array();
+			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro N:NoAplica R:Recaudacion CC:certificado de crédito'";
+			ejecutar($queries, $dbh);
+			break;
+
 	}
 }
 
@@ -9736,7 +9742,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.32;
+$max_update = 7.33;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
