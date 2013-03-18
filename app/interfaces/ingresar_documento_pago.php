@@ -906,37 +906,32 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 		<tr>
-			<td align="right">
-				<?php echo __('Número Documento:') ?>
+			<td align=right>
+				<?php echo __('Tipo:') ?>
 			</td>
-			<td align="left">
-				<input name="numero_doc" id="numero_doc" size="20" value="<?php echo str_replace("-", "", $documento->fields['numero_doc']); ?>" />
-				<?php echo __('Tipo:') ?>&nbsp;
-				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;'>
-					<?php if ($documento->fields['tipo_doc'] == 'E' || $documento->fields['tipo_doc'] == '' || $documento->fields['tipo_doc'] == 'N') { ?>
-						<option value='E' selected>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'C') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C' selected>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'T') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T' selected>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'O') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O' selected>Otro</option>
+			<td align=left>
+				<select name='tipo_doc' id='tipo_doc'  style='width: 130px;' onchange="ShowCheque();">
+					<?php
+					$query = "SELECT codigo, glosa FROM prm_tipo_pago ORDER BY orden ASC";
+					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+					$tipos = array();
+					while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
+						$tipos[$codigo] = $glosa;
+					}
+					$cod_tipo = $tipo_doc;
+					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O' , 'R' , 'CC'))) {
+						$cod_tipo = 'T';
+					}
+					foreach ($tipos as $k => $v) {
+						?>
+						<option value="<?php echo $k ?>" <?php echo $k == $cod_tipo ? 'selected' : '' ?>><?php echo $v ?></option>
 					<?php } ?>
 				</select>
+
+				<?php echo __('N° Documento:') ?>
+				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $nro_documento); ?>" />
 			</td>
-		</tr>
 
 		<tr>
 			<td align="right">
