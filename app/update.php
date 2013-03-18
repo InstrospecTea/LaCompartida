@@ -9728,7 +9728,7 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.34:
+		case 7.33:
 			$queries = array();
 			$queries[] = "CREATE  TABLE `prm_tipo_correo` (`id` INT NOT NULL AUTO_INCREMENT, `nombre` VARCHAR(45) NULL, PRIMARY KEY (`id`) ) ENGINE = InnoDB DEFAULT CHARACTER SET = latin1;";
 			$queries[] = "ALTER TABLE `log_correo` ENGINE = InnoDB;";
@@ -9764,7 +9764,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.34;
+$max_update = 7.33;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
