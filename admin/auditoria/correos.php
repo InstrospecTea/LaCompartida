@@ -6,6 +6,7 @@ $pagina->titulo = __('Auditoria Correos');
 $pagina->PrintTop();
 ?>
 <form id="form_correos" action="<?php echo $_SERVER[PHP_SELF]; ?>" method="post">
+	<input type="hidden" name="buscar" value="1"/>
 	<table style="width: 90%">
 		<tr>
 			<td>
@@ -63,7 +64,7 @@ $pagina->PrintTop();
 </form>
 
 <?php
-if ($buscar || 1) {
+if ($buscar) {
 	$where = '1';
 	if (!empty($mail)) {
 		$mail = mysql_real_escape_string($mail);
@@ -81,11 +82,11 @@ if ($buscar || 1) {
 	}
 	if (!empty($fecha1)) {
 		$fecha1 = Utiles::fecha2sql($fecha1);
-		$where .= " AND C.fecha_creacion >= '{$fecha1}'";
+		$where .= " AND C.fecha >= '{$fecha1}'";
 	}
 	if (!empty($fecha2)) {
 		$fecha2 = Utiles::fecha2sql($fecha2);
-		$where .= " AND date_add(C.fecha_creacion, interval -1 day) < '{$fecha2}'";
+		$where .= " AND date_add(C.fecha, interval -1 day) < '{$fecha2}'";
 	}
 
 	$query = "SELECT SQL_CALC_FOUND_ROWS C.id_log_correo,
@@ -96,7 +97,7 @@ if ($buscar || 1) {
 					TC.nombre tipo_correo,
 					if(C.enviado, 'Si', 'No') enviado,
 					C.fecha_envio,
-					C.fecha_creacion,
+					C.fecha AS fecha_creacion,
 					C.fecha_modificacion
 				FROM log_correo AS C
 				LEFT JOIN prm_tipo_correo TC ON TC.id = C.id_tipo_correo
