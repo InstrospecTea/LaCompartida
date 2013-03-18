@@ -1252,17 +1252,17 @@ if (!$popup) {
 												</tr>
 												<tr valign=top>
 													<td align=right>
-														<input type="checkbox" name="check_area_profesional" id="check_area_profesional" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_profesional ? 'checked' : '' ?> />
-														<label for="check_area_profesional">
+														<input type="checkbox" name="check_area_prof" id="check_area_prof" value="1" onchange="$$('.area_prof_full').invoke('toggle')" <?php echo $check_area_prof ? 'checked' : '' ?> />
+														<label for="check_area_prof">
 															<b><?php echo __('Área Profesional') ?>:&nbsp;&nbsp;</b>
 														</label>
 													</td>
 													<td align=left>
-														<div class = 'area_prof_full' style='width:200px;<?php echo $check_area_profesional ? "display:none;" : "" ?>'>
-															<label for="check_area_profesional" style="cursor:pointer"><hr></label>
+														<div class='area_prof_full' style='width:200px;<?php echo $check_area_prof ? "display:none;" : "" ?>'>
+															<label for="check_area_prof" style="cursor:pointer"><hr></label>
 														</div>
-														<div class = 'area_prof_full' style="<?php echo $check_area_profesional ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "area_profesional[]", $area_profesional, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
+														<div class='area_prof_full' style="<?php echo $check_area_prof ? "" : "display:none;" ?>">
+															<?php echo Html::SelectQuery($sesion, "SELECT id, glosa FROM prm_area_usuario ORDER BY glosa", "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="4" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1278,7 +1278,7 @@ if (!$popup) {
 															<label for="check_cat_prof" style="cursor:pointer"><hr></label>
 														</div>
 														<div class = 'cat_prof_full' style="<?php echo $check_cat_prof ? "" : "display:none;" ?>">
-															<?php echo Html::SelectQuery($sesion, "SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias_profesional[]", $categorias_profesional, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+															<?php echo Html::SelectQuery($sesion, "SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 														</div>
 													</td>
 												</tr>
@@ -1429,7 +1429,7 @@ if (!$popup) {
 											if ($campo_fecha == 'emision')
 												echo 'checked="checked"';
 											?>
-																										onclick ="SincronizarCampoFecha()" />
+												onclick ="SincronizarCampoFecha()" />
 										</span>
 									</td>
 									<td align=left>
@@ -1894,13 +1894,13 @@ if (!$popup) {
 																		if (is_array($moneda_contrato))
 																			$url_iframe .= "&moneda_contrato=" . implode(',', $moneda_contrato);
 
-																	if ($check_area_profesional)
-																		if (is_array($area_profesional))
-																			$url_iframe .= "&areas_pro=" . implode(',', $area_profesional);
+																	if ($check_area_prof)
+																		if (is_array($areas))
+																			$url_iframe .= "&areas_pro=" . implode(',', $areas);
 
 																	if ($check_cat_prof)
-																		if (is_array($categorias_profesional))
-																			$url_iframe .= "&categorias_pro=" . implode(',', $categorias_profesional);
+																		if (is_array($categorias))
+																			$url_iframe .= "&categorias_pro=" . implode(',', $categorias);
 
 																	if ($check_encargados)
 																		if (is_array($encargados))
@@ -1958,13 +1958,16 @@ if (!$popup) {
 																			jQuery('#fullfiltrostoggle').click(function() {
 																				jQuery('#filtrosimple').toggle();
 																				jQuery('#full_filtros').toggle();
+
+																				j_filtros_check = jQuery('#filtros_check');
+																				j_filtros_check.attr('checked', !j_filtros_check.is(':checked'));
 																			});
 
 																			jQuery('#runreporte').click(function(){
 																				if (!jQuery('#filtrosimple').is(':visible')) {
 																				    jQuery('#filtrosimple :input').val('');
 																				}
-																			});					
+																			});
 
 																			/*Validaciones al presional filtros*/
 																			jQuery('#fullfiltrostoggle').click(function() {
@@ -1987,16 +1990,16 @@ if (!$popup) {
 																			    jQuery('[id="encargados[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
-																			    jQuery('[id="check_area_profesional"] option').each(function(index, option) {
+																			    jQuery('[id="check_area_prof"] option').each(function(index, option) {
 																			        jQuery(option).attr('checked',false);
 																			    });
-																			    jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			    jQuery('[id="areas[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			    jQuery('[id="check_cat_prof"] option').each(function(index, option) {
 																			        jQuery(option).attr('checked',false);
 																			    });
-																			    jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																			    jQuery('[id="categorias[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			    jQuery('[id="check_area_asunto"] option').each(function(index, option) {
@@ -2041,13 +2044,13 @@ if (!$popup) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			});
-																			jQuery('#check_area_profesional').click(function() {
-																				jQuery('[id="area_profesional[]"] option').each(function(index, option) {
+																			jQuery('#check_area_prof').click(function() {
+																				jQuery('[id="areas[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			});
 																			jQuery('#check_cat_prof').click(function() {
-																				jQuery('[id="categorias_profesional[]"] option').each(function(index, option) {
+																				jQuery('[id="categorias[]"] option').each(function(index, option) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			});
@@ -2072,7 +2075,7 @@ if (!$popup) {
 																			        jQuery(option).attr('selected',false);
 																			    });
 																			});
-																			
+
 																			/* FIN LIMPIAR FILTROS SEGUN SU CHECKBOX*/
 
 																			jQuery('#comparar').on('click',function() {

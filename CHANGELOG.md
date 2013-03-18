@@ -1,8 +1,41 @@
 # Changelog
+## Hotfix: 13.2.9
+* **Fixed:** [Corrección en validación de fecha cuando usuarios de cobranza editan trabajos](https://github.com/LemontechSA/ttb/pull/117)
+
+## Hotfix: 13.2.8
+* **Fixed:** [Modifica la forma de presentar y aplicar los filtros](https://github.com/LemontechSA/ttb/pull/116)
+
+# Changelog
+## Hotfix: 13.2.7
+* **Fixed:** [No adivinar una fecha de inicio del cobro cuando no se declara especificamente](https://github.com/LemontechSA/ttb/pull/113)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
+
+## Hotfix: 13.2.5
+Martes 5 de marzo 2013.
+* **Fixed:** [Filtra por código asunto secundario](https://github.com/LemontechSA/ttb/pull/110)
+
+## Hotfix: 13.2.4
+Martes 5 de marzo 2013.
+* **Fixed:** [Envia mail al administrador al enviar correos si el estudio tiene configurado el MailAdmin](https://github.com/LemontechSA/ttb/pull/109)
+
+## Hotfix: 13.2.3
+Martes 5 de marzo 2013.
+* **Fixed:** [Corrige los filtros area profesional y categoria enr reportes avanzados](https://github.com/LemontechSA/ttb/pull/108)
+
+## Hotfix: 13.2.2
+Lunes 4 de marzo 2013.
+* **New:** [Agrega tag de rut, ciudad, comuna y código postal a la carta de cobro](https://github.com/LemontechSA/ttb/pull/106)
 
 ## Hotfix: 13.2.1
 Lunes 4 de marzo 2013.
-* **Fixed** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
+* **Fixed:** [Corrige el ingreso de adelantos en el sistema](https://github.com/LemontechSA/ttb/pull/104)
 
 ## Release: 13.2.0
 Domingo 3 de marzo 2013.
