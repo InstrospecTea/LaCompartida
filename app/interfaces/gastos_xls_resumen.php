@@ -1,16 +1,7 @@
-<?
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../app/classes/Moneda.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Gasto.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
+
 require_once 'Spreadsheet/Excel/Writer.php';
 
 $sesion = new Sesion(array('OFI', 'COB'));
@@ -200,11 +191,13 @@ if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 if ($flag_sin_orden_previo) {
     $orden .=", fecha DESC ";
 }
-$query=$gasto->SearchQuery($where.'  ORDER BY '.$orden,  $col_select,$join_extra);
+$query=$gasto->SearchQuery($sesion, $where.'  ORDER BY '.$orden,  $col_select,$join_extra);
 
  
- //echo $query; exit; 
+
 $lista_gastos = new ListaGastos($sesion, '', $query);
+
+
 
 $egreso = $lista_gastos->Get(0)->fields['egreso'] * $gasto->fields['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio'];
 $ingreso = $lista_gastos->Get(0)->fields['ingreso'] * $gasto->fields['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio'];
@@ -406,7 +399,7 @@ for ($v = 0; $v < $lista_gastos->num; $v++) {
 //para que descuente facturas para el ultimo cobro (si es que tiene asociadas )
 $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
 $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
-
+//echo $query; exit; 
 
 $columna_actual = 0;
 $ws1->write($filas, $columna_cliente, $nombre_cliente_anterior, $formato_normal);
