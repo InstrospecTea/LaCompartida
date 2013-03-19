@@ -912,7 +912,15 @@ $pagina->PrintTop($popup);
 			<td align=left>
 				<select name='tipo_doc' id='tipo_doc'  style='width: 130px;' onchange="ShowCheque();">
 					<?php
-					$query = "SELECT codigo, glosa FROM prm_tipo_pago ORDER BY orden ASC";
+					
+					if (!$pago) {
+						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
+					}
+
+					if (!$adelanto) {						
+						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'T' ORDER BY orden ASC";
+					}
+					
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 					$tipos = array();
@@ -920,7 +928,7 @@ $pagina->PrintTop($popup);
 						$tipos[$codigo] = $glosa;
 					}
 					$cod_tipo = $tipo_doc;
-					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O' , 'R' , 'CC'))) {
+					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) {
 						$cod_tipo = 'T';
 					}
 					foreach ($tipos as $k => $v) {

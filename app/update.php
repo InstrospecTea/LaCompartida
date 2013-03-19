@@ -9730,7 +9730,16 @@ QUERY;
 
 		case 7.33:
 			$queries = array();
-			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro N:NoAplica R:Recaudacion CC:certificado de crédito'";
+			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crédito'";
+			$queries[] = "ALTER TABLE  `prm_tipo_pago` ADD  `familia` VARCHAR( 1 ) NOT NULL COMMENT 'Tipo de documento (A:Adelanto P:Pago T:Todos)' FIRST";
+			$queries[] = "UPDATE  `timetracking`.`prm_tipo_pago` SET  `familia` =  'T'";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'EP',  'Efectivo',  '7')";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'RP',  'Resguardo',  '11')";
+			$queries[] = "INSERT INTO  `timetracking`.`prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CC',  'certificado de credito',  '12')";
+			
 			ejecutar($queries, $dbh);
 			break;
 
