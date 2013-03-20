@@ -1367,22 +1367,22 @@ if( UtilesApp::GetConf($sesion, 'NuevoModuloFactura') ) {
 			monto_impuesto_suma = parseFloat(monto_impuesto) + parseFloat(monto_impuesto_gasto);
 			console.log(monto_impuesto,monto_impuesto_gasto,monto_impuesto_suma);
 			//monto_impuesto_suma= jQuery.formatNumber(monto_impuesto_suma, {format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
-<?php
-if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
-	?>
-					monto_gasto_sin_impuesto = form.monto_gastos_sin_iva.value;
-	<?php
-}
-?>
+			<?php
+			if (UtilesApp::GetConf($sesion, 'UsarGastosConSinImpuesto') == '1') {
+				?>
+								monto_gasto_sin_impuesto = form.monto_gastos_sin_iva.value;
+				<?php
+			}
+			?>
 
 			monto_neto_suma = parseFloat(form.monto_honorarios_legales.value) +
 			 					parseFloat(form.monto_gastos_con_iva.value)
 			  		+ parseFloat(monto_gasto_sin_impuesto);
 
 			form.monto_neto.value = monto_neto_suma;
-			form.monto_iva_honorarios_legales.value = jQuery.formatNumber(monto_impuesto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
-			form.monto_iva_gastos_con_iva.value = jQuery.formatNumber(monto_impuesto_gasto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
-			form.iva.value = jQuery.formatNumber(monto_impuesto_suma+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"});
+			jQuery('#monto_iva_honorarios_legales').val(jQuery.formatNumber(monto_impuesto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"}));
+			jQuery('#monto_iva_gastos_con_iva').val(jQuery.formatNumber(monto_impuesto_gasto+0.000001,{format:"0.<?php echo str_pad('',$cifras_decimales_opc_moneda_total,"0"); ?>", locale:"us"}));
+			jQuery('#iva').val(jQuery('#monto_iva_honorarios_legales').parseNumber()+jQuery('#monto_iva_gastos_con_iva').parseNumber());
 			var total = Number($('monto_neto').value.replace(',','.')) + Number($('iva').value.replace(',','.'));
 			$('total').value = total.toFixed(decimales);
 
