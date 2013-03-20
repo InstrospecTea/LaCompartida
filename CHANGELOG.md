@@ -20,6 +20,10 @@
 Martes 5 de marzo 2013.
 * **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
 
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
+
 ## Hotfix: 13.2.5
 Martes 5 de marzo 2013.
 * **Fixed:** [Filtra por código asunto secundario](https://github.com/LemontechSA/ttb/pull/110)
