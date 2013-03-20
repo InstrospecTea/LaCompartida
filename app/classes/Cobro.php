@@ -1123,6 +1123,8 @@ class Cobro extends Objeto {
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0') + ($s > 0 ? ($s / 3600) : '0');
 				$duracion_minutos = $h * 60 + $m + $s / 60;
 
+				$id_usuario=$trabajo->fields['id_usuario'];
+
 				// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 				if ($profesional[$id_usuario]['tarifa'] == '') {
 					$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
