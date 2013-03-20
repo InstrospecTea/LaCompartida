@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.2.11
+* **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
+
+
 ## Hotfix: 13.2.10
 * **Fixed:** [En vez de subir los backups a un bucket para cada cliente, usa el mismo bucket y luego un subdirectorio. Esto, porque Amazon tiene un límite de 100 buckets y ya lo pasamos](https://github.com/LemontechSA/ttb/pull/125)
 
