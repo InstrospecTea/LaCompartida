@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe "login", :type => :request, :js => true do
+describe "login", :type => :request do
 	it "should fail when entering invalid credentials" do
 		visit '/'
 		fill_in 'rut', :with => '1234'

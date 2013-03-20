@@ -6,8 +6,7 @@ server "lemontest.thetimebilling.com", :web, {:user => 'root'}
  set :current_stage, "custom"
   custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch []: ")
   custom_name = custom_branch.split('/').last
-  custom_stage = custom_branch.split('/').first
-  set :file_path, "#{deploy_dir_name}/#{application}/#{custom_stage}_#{custom_name}"
+  set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_name}"
   set :branch, custom_branch
   set :deploy_to, "#{base_directory}/#{file_path}"
 
@@ -56,7 +55,7 @@ task :create_database do
   puts           "   #######################################################################\e[0m\n"
   proceed = STDIN.gets[0..0] rescue nil
   if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
-    run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
+    run "  mysql -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx --opt  lemontest_molde | mysql -uroot -pasdwsx #{dbname}"
   end
 
 end
