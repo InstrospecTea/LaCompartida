@@ -87,7 +87,7 @@ if ($opc == 'buscar') {
 	}
 
 	if ($exportar_excel) {
-		$search_query = $gasto->SearchQuery($where);
+		$search_query = $gasto->SearchQuery($sesion,$where);
 		$gasto->DownloadExcel($search_query);
 	}
 
@@ -420,6 +420,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			return respuesta;
 		}, "bUseRendered": false, "aTargets": [12]},
+		
 		{"fnRender": function ( o, val ) {
 			var idcobro=o.aData[8];
 			var respuesta='';
@@ -428,10 +429,12 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			}
 			return respuesta+'<small>'+o.aData[9]+'</small>';
 		}, "aTargets": [8]},
+		
 		{"fnRender": function (o,val) {
 			var tipo=(o.aData[3]!=' - ')? o.aData[3]+' ':'';
 			return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
 		}, "aTargets": [3]},
+		
 		{"fnRender": function (o,val) {
 			if(o.aData[5]) {
 				return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
@@ -445,7 +448,8 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			if (typeof(contratos)!="undefined") {
 				contratos['contrato_'+o.aData[14]]=o.aData[14];
 			}
-			return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
+			 var datacliente=o.aData[1].split('|');
+			return '<a href="agregar_cliente.php?codigo_cliente='+datacliente[0]+'">'+datacliente[0]+'</a> '+datacliente[1]+'<div class="tipodescripcion">('+activo+')</div>';
 		}, "bUseRendered": false , "aTargets": [2] }
 		],
 		"aaSorting": [[0,'desc']],

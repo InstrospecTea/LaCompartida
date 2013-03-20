@@ -352,7 +352,7 @@ class Gasto extends Objeto {
 			$where .= " AND contrato.id_usuario_responsable = '{$_REQUEST['id_usuario_responsable']}' ";
 		}
 		if (isset($_REQUEST['cobrable']) &&  $_REQUEST['cobrable'] != '') {
-			$where .= " AND cta_corriente.cobrable ={$_REQUEST['cobrable']}";
+			$where .= " AND cta_corriente.cobrable ={$_REQUEST['cobrable']} ";
 		}
 
 		if (isset($_REQUEST['id_tipo']) and $_REQUEST['id_tipo'] != '') {
@@ -383,7 +383,7 @@ class Gasto extends Objeto {
 		} else if ($_REQUEST['egresooingreso'] == 'sologastos') {
 			$where .= " AND cta_corriente.egreso IS NOT NULL AND cta_corriente.egreso>0 ";
 		}
-		$where.="AND incluir_en_cobro='SI' ";
+		$where.=" AND incluir_en_cobro='SI' ";
 		return $where;
 	}
 
@@ -414,8 +414,8 @@ class Gasto extends Objeto {
 
  
 
-	public static function SearchQuery($where,$col_select='',$join_extra='') {
-		return "SELECT SQL_BIG_RESULT SQL_NO_CACHE
+	public static function SearchQuery($sesion,$where,$col_select='',$join_extra='') {
+		$query= "SELECT SQL_BIG_RESULT SQL_NO_CACHE
 				cta_corriente.id_movimiento,
 				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
 				DATE_FORMAT(cta_corriente.fecha_creacion, '%Y-%m-%d') AS fecha_creacion,
@@ -433,13 +433,18 @@ class Gasto extends Objeto {
 				cta_corriente.descripcion,
 				moneda_gasto.simbolo,
 				cta_corriente.egreso,
-				cta_corriente.ingreso,
-				IF(
-					monto_cobrable = ingreso,
-					monto_cobrable * (-1),
-					monto_cobrable
-				) AS monto_cobrable,
-				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as monto_cobrable_moneda_base,
+				cta_corriente.ingreso, 
+				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
+		
+	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {		
+			$query.="	IF(	monto_cobrable = ingreso,monto_cobrable * (-1),	monto_cobrable) AS monto_cobrable,
+						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as  monto_cobrable_moneda_base,  \n \n";
+		} else {
+			$query.="	if(ifnull(egreso,0)=0,-1*ifnull(ingreso,0), egreso)  AS monto_cobrable,
+						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
+		}
+		
+		$query.="\n\n	
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
@@ -467,12 +472,13 @@ class Gasto extends Objeto {
 			
 			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) 
 			AND $where ";
+			return $query;
 	}
 
 
 	public static function TotalCuentaCorriente($sesion, $where = '1',$cobrable=1,$array=false) {
 
-		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
+		//$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
 		if($cobrable!='' && Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 			$where .= " AND  cta_corriente.cobrable = $cobrable ";
 		}
@@ -481,20 +487,21 @@ class Gasto extends Objeto {
 
 		
 
-		$query=self::SearchQuery($where);
+		$query=self::SearchQuery($sesion,$where);
 						
+	// echo 'LA query es:'. $query;
 
+		//	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-			$resp=$sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+			$gastosST=$sesion->pdodbh->query($query);
+			//$gastosRS=$gastosST->fetchAll(PDO::FETCH_ASSOC);
 			//echo '<pre>'; 			print_r($resp);			echo '</pre>';
-			foreach($resp as $ingresoyegreso ) {
+			while($ingresoyegreso=$gastosST->fetch(PDO::FETCH_ASSOC) ) {
 				 
 				 if($ingresoyegreso['estado_cobro']!='PAGADO' && $ingresoyegreso['estado_cobro']!='INCOBRABLE') {
-					if ($ingresoyegreso['monto_cobrable'] < 0) {
+					if ($ingresoyegreso['monto_cobrable'] < 0) {  // es provisión
 						$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
-					} else if ($ingresoyegreso['monto_cobrable'] > 0) {
+					} else if ($ingresoyegreso['monto_cobrable'] > 0) { // es gasto
 						$total_egresos += $ingresoyegreso['monto_cobrable_moneda_base'];
 						if($ingresoyegreso['estado_cobro']=='CREADO' || $ingresoyegreso['estado_cobro']=='SIN COBRO') $egresos_borrador += $ingresoyegreso['monto_cobrable_moneda_base'];
 					}

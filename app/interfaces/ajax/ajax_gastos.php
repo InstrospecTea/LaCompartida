@@ -173,7 +173,7 @@ if ($_GET['totalctacorriente']) { ?>
 	$selectfrom = $gasto::SelectFromQuery();
 
 				
-	$query = $gasto->SearchQuery($where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
+	$query = $gasto->SearchQuery($sesion,$where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
 
 	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where ";
@@ -216,7 +216,7 @@ if ($_GET['totalctacorriente']) { ?>
 	foreach ($resp as $fila) {
 		$stringarray = array(
 			date('d-m-Y', strtotime($fila['fecha'])),
-			$fila['glosa_cliente'] ? utf8_encode($fila['glosa_cliente']) : ' - ',
+			$fila['glosa_cliente']  ? utf8_encode($fila['codigo_cliente'].'|'.$fila['glosa_cliente']) : ' - ',
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
 			$fila['tipo'] ? $fila['tipo'] : ' - ',
 			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
@@ -228,7 +228,7 @@ if ($_GET['totalctacorriente']) { ?>
 			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
-			$fila['egreso'] > 0 ? $fila['simbolo'] . ' ' . $fila['monto_cobrable'] : ' ',
+			$fila['egreso'] ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
 			$fila['id_contrato']
 		);
 		$resultado['aaData'][] = $stringarray;
