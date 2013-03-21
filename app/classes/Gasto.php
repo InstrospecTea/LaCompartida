@@ -432,15 +432,15 @@ class Gasto extends Objeto {
 				prm_cta_corriente_tipo.glosa AS tipo,
 				cta_corriente.descripcion,
 				moneda_gasto.simbolo,
-				cta_corriente.egreso,
-				cta_corriente.ingreso, 
+					ifnull(cta_corriente.egreso,0) egreso,
+					ifnull(cta_corriente.ingreso,0) ingreso, 
 				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
 		
 	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {		
-			$query.="	IF(	monto_cobrable = ingreso,monto_cobrable * (-1),	monto_cobrable) AS monto_cobrable,
+			$query.="	IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as  monto_cobrable_moneda_base,  \n \n";
 		} else {
-			$query.="	if(ifnull(egreso,0)=0,-1*ifnull(ingreso,0), egreso)  AS monto_cobrable,
+			$query.="	if(	ifnull(cta_corriente.ingreso,0)>0,-1*ifnull(ingreso,0), ifnull(cta_corriente.egreso,0))  AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
 		}
 		
@@ -470,7 +470,8 @@ class Gasto extends Objeto {
 			WHERE 
 			1 
 			
-			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) 
+			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' )
+			AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL) 
 			AND $where ";
 			return $query;
 	}

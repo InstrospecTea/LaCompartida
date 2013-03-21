@@ -220,15 +220,15 @@ if ($_GET['totalctacorriente']) { ?>
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
 			$fila['tipo'] ? $fila['tipo'] : ' - ',
 			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
-			$fila['egreso'] ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
-			$fila['ingreso'] ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
+			$fila['ingresooegreso']=='ingreso' ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
 			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
 			$fila['id_cobro'] ? $fila['id_cobro'] : ' ',
 			$fila['estado_cobro'] ? $fila['estado_cobro'] : ' ',
 			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
-			$fila['egreso'] ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
 			$fila['id_contrato']
 		);
 		$resultado['aaData'][] = $stringarray;

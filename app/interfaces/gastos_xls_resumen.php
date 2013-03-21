@@ -194,13 +194,13 @@ if ($flag_sin_orden_previo) {
 $query=$gasto->SearchQuery($sesion, $where.'  ORDER BY '.$orden,  $col_select,$join_extra);
 
  
+ if($_GET['query']=='query') die($query);
+ $gastos=$sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
- $gastos=$sesion->pdodbh->query($query);
 
+$primergasto=$gastos[0];
 
-$primergasto=$gastos->fetch(PDO::FETCH_ASSOC);
-
-$egreso = $primergasto['egreso'] * $primergasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio'];
+/*$egreso = $primergasto['egreso'] * $primergasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio'];
 $ingreso = $primergasto['ingreso'] * $primergasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio'];
 
 if ($egreso > 0) {
@@ -208,7 +208,7 @@ if ($egreso > 0) {
 }
 if ($ingreso > 0) {
     $ingreso_cobrable = $primergasto['monto_cobrable_moneda_base'];
-}
+}*/
 $nombre_cliente_anterior = $primergasto['glosa_cliente'];
 $codigo_cliente_anterior = $primergasto['codigo_cliente'];
 $acumulado_factura_cobro_anterior = !empty($primergasto['acumulado_factura']) ? $primergasto['acumulado_factura'] : 0;
@@ -219,20 +219,21 @@ $col_egreso_cobrable_para_formula = Utiles::NumToColumnaExcel($columna_egreso_co
 $col_ingreso_para_formula = Utiles::NumToColumnaExcel($columna_ingreso);
 $col_ingreso_cobrable_para_formula = Utiles::NumToColumnaExcel($columna_ingreso_cobrable);
 $col_balance_para_formula = Utiles::NumToColumnaExcel($columna_balance);
+
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     $col_gastos_por_cobrar_para_formula = Utiles::NumToColumnaExcel($columna_gastos_por_cobrar);
 }
 
-while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
+foreach($gastos as $gasto) {
      $columna_actual = 0;
-    //echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto);echo '</pre>'; 
-     
+     //echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto);echo '</pre>'; 
+    
 
  
     if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-	$gastos_por_cobrar = $gasto['egreso'] > 0 ? $gasto['monto_cobrable_moneda_base'] : (-1 * $gasto['monto_cobrable_moneda_base'] );
+	$gastos_por_cobrar = $gasto['estado_cobro']=='PAGADO'? 0 : $gasto['ingresooegreso'] == 'egreso' ? $gasto['monto_cobrable_moneda_base'] : (-1 * $gasto['monto_cobrable_moneda_base'] );
     }
-    if ($gasto['egreso'] > 0  ) {
+    if ($gasto['ingresooegreso'] == 'egreso'  ) {
 		$total_balance_egreso +=($gasto['egreso'] * $gasto['tipo_cambio_segun_cobro']) / $moneda_base['tipo_cambio'];
 		$total_balance_egreso_cobrable +=($gasto['monto_cobrable_moneda_base']);
 		if($gasto['estado_cobro']=='PAGADO') {
@@ -242,7 +243,7 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 
     }
 
-    if ($gasto['ingreso'] > 0) {
+    if ($gasto['ingresooegreso'] == 'ingreso') {
     	if($gasto['estado_cobro']!='PAGADO') {
 			$total_balance_ingreso +=($gasto['ingreso'] * $gasto['tipo_cambio_segun_cobro']) / $moneda_base['tipo_cambio'];
 			$total_balance_ingreso_cobrable +=($gasto['monto_cobrable_moneda_base']);
@@ -250,7 +251,7 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
     }
     
     if ($codigo_cliente_anterior == $gasto['codigo_cliente']) {
-		if ($gasto['egreso'] > 0) {
+		if ($gasto['ingresooegreso'] == 'egreso') {
 			$egreso += (double) ($gasto['egreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
 			$egreso_cobrable += (double) ($gasto['monto_cobrable_moneda_base']);
 			if($gasto['estado_cobro']=='PAGADO') {
@@ -258,7 +259,7 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 			    $ingreso_cobrable += (double) ($gasto['monto_cobrable_moneda_base']);
 			}
 		}
-		if ($gasto['ingreso'] > 0) {
+		if ($gasto['ingresooegreso'] == 'ingreso') {
 			if($gasto['estado_cobro']!='PAGADO') {
 			    $ingreso += (double) ($gasto['ingreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
 			    $ingreso_cobrable += (double) ($gasto['monto_cobrable_moneda_base']);
@@ -292,7 +293,7 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 			 * esto va afuera, por que si el ultimo gasto para el cobro revisado es "no cobrable", 
 			 * omitiría descontar los gastos de facturas con pago parcial o facturadas 			 * 
 			 */
-			if ($gasto['id_cobro'] != $id_cobro_anterior) {
+			if ($gasto['id_cobro'] != $id_cobro_anterior && $gasto['estado_cobro']!='PAGADO') {
 			    $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
 			    $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
 			    $acumulado_factura_cobro_anterior = $gasto['acumulado_factura'];
@@ -325,6 +326,7 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 			    $ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_para_formula" . ($filas + 1) . " - $col_egreso_para_formula" . ($filas + 1), $formato_moneda);
 			}
 	    }
+
 	} else {
 		    if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 				$ws1->writeNumber($filas, $columna_egreso_cobrable, $egreso_cobrable, $formato_moneda);
@@ -332,7 +334,9 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 				$ws1->writeNumber($filas, $columna_ingreso_cobrable, $ingreso_cobrable, $formato_moneda);
 		 
 				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
+
 		    } else {
+
 				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_para_formula" . ($filas + 1) . " - $col_egreso_para_formula" . ($filas + 1), $formato_moneda);
 		    }
 	}
@@ -354,13 +358,13 @@ while($gasto=$gastos->fetch(PDO::FETCH_ASSOC)) {
 
 	
 
-	if ($gasto['egreso'] > 0) {
+	if ($gasto['ingresooegreso'] == 'egreso') {
 	    $egreso = (double) ($gasto['egreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
 	    $egreso_cobrable = (double) ($gasto['monto_cobrable_moneda_base']);
 	    $ingreso=  ($gasto['estado_cobro'] == 'PAGADO')? $egreso:0;
 	    $ingreso_cobrable = ($gasto['estado_cobro'] == 'PAGADO')? $egreso_cobrable:0;
 	}
-	if ($gasto['ingreso'] > 0) {
+	if ($gasto['ingresooegreso'] == 'ingreso') {
 	    $egreso_cobrable = 0;
 	    $egreso=0;
 	    $ingreso = ($gasto['estado_cobro'] == 'PAGADO')? 0: (double) ($gasto['ingreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
@@ -401,6 +405,7 @@ $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
 
 $columna_actual = 0;
 $ws1->write($filas, $columna_cliente, $nombre_cliente_anterior, $formato_normal);
+
 $ws1->writeNumber($filas, $columna_egreso, $egreso, $formato_moneda);
 if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
     $ws1->writeNumber($filas, $columna_egreso_cobrable, $egreso_cobrable, $formato_moneda);
@@ -409,13 +414,24 @@ $ws1->writeNumber($filas, $columna_ingreso, $ingreso, $formato_moneda);
 if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
     $ws1->writeNumber($filas, $columna_ingreso_cobrable, $ingreso_cobrable, $formato_moneda);
 }
-$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
+
+
+
+    if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
+	
+				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
+
+		    } else {
+
+				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_para_formula" . ($filas + 1) . " - $col_egreso_para_formula" . ($filas + 1), $formato_moneda);
+		    }
 $ws1->write($filas, $columna_es_cobrable, $gasto['esCobrable'], $formato_moneda);
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     //$ws1->writeNumber($filas, $columna_gastos_por_cobrar, $total_gastos_por_cobrar_cliente, $formato_moneda);
     $ws1->writeNumber($filas, $columna_gastos_por_cobrar, max($total_gastos_por_cobrar_cliente, 0), $formato_moneda);
     $total_gastos_por_cobrar -= min($total_gastos_por_cobrar_cliente, 0);
 }
+
 ++$filas;
 
 $ws1->write($filas, $columna_cliente, __('Total'), $formato_total);
