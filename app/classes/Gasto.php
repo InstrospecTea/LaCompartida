@@ -437,10 +437,10 @@ class Gasto extends Objeto {
 				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
 		
 	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {		
-			$query.="	IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable) AS monto_cobrable,
+			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0,IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable)) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as  monto_cobrable_moneda_base,  \n \n";
 		} else {
-			$query.="	if(	ifnull(cta_corriente.ingreso,0)>0,-1*ifnull(ingreso,0), ifnull(cta_corriente.egreso,0))  AS monto_cobrable,
+			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0, if(	ifnull(cta_corriente.ingreso,0)>0,-1*ifnull(ingreso,0), ifnull(cta_corriente.egreso,0)) ) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
 		}
 		

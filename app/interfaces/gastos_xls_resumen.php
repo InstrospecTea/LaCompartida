@@ -425,7 +425,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 
 				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_para_formula" . ($filas + 1) . " - $col_egreso_para_formula" . ($filas + 1), $formato_moneda);
 		    }
-$ws1->write($filas, $columna_es_cobrable, $gasto['esCobrable'], $formato_moneda);
+if(is_array($gasto)) $ws1->write($filas, $columna_es_cobrable, $gasto['esCobrable'], $formato_moneda);
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
     //$ws1->writeNumber($filas, $columna_gastos_por_cobrar, $total_gastos_por_cobrar_cliente, $formato_moneda);
     $ws1->writeNumber($filas, $columna_gastos_por_cobrar, max($total_gastos_por_cobrar_cliente, 0), $formato_moneda);
