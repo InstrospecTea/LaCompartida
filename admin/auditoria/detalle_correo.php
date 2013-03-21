@@ -88,7 +88,7 @@ if ($correo['tipo'] == 'diario') {
 }
 ?>
 <table style="width: 100%" cellpadding="3">
-	<tr><td class="cvs"><?php echo __('Fecha Creación'); ?>: </td><td colspan="3"><?php echo $correo['fecha_creacion']; ?></td></tr>
+	<tr><td class="cvs"><?php echo __('Fecha Creaci&oacute;n'); ?>: </td><td colspan="3"><?php echo $correo['fecha_creacion']; ?></td></tr>
 	<tr><td class="cvs"><?php echo __('Enviado'); ?>: </td><td colspan="3"><?php echo $correo['enviado'] ? 'Si' : 'No'; ?></td></tr>
 	<tr><td class="cvs"><?php echo __('Fecha Envio'); ?>: </td><td colspan="3"><?php echo $correo['fecha_envio']; ?></td></tr>
 	<?php if (!empty($ultimo_trabajo_previo)) { ?>
