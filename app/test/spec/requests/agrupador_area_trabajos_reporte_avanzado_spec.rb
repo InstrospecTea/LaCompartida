@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe 'Agrupador area trabajos en reporte avanzado', :type => :request do
+describe 'Agrupador area trabajos en reporte avanzado', :type => :request, :js => true do
 	before(:each) do
 		login_admin
 		visit '/app/interfaces/configuracion.php'

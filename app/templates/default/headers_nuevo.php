@@ -47,7 +47,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_navegadores_menos_ie.css" />
 			<!--<![endif]-->
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/templates/default/css/css_nuevo_diseno.css" />
-			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/jquery-ui.css" />
+			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
 			<link rel="stylesheet" type="text/css" href="//assets.zendesk.com/external/zenbox/v2.5/zenbox.css" />
@@ -69,9 +69,17 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 					}
 					#zenbox_tab {padding:0 !important;min-width:0 !important;}
 				</style>
-				<script src='//www.google.com/jsapi'></script>
-				<script>
-					google.load("jquery","1.7");
+				 <script type="text/javascript" src="//www.google.com/jsapi"></script>
+			 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+				<script type="text/javascript">
+				 	<?php	 if($popup==true || (isset($_GET['popup']) && $_GET['popup']==1)) { ?>
+						 var popup=1;
+					<?php } else { ?>
+						var popup=0;
+					<?php } ?>
+					var jQueryUI = new jQuery.Deferred();
+					var BootStrap = new jQuery.Deferred();
+					var scriptaculous = new jQuery.Deferred();
 				</script>
 			<script type="text/javascript" src="//static.thetimebilling.com/js/pluginsplus.js"></script>
 			<script  type="text/javascript" src="//static.thetimebilling.com/js/all.1234370043.js"></script>

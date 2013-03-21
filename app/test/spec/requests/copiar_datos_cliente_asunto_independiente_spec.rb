@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe 'Copiar datos del cliente al cobrar un asunto independiente', :type => :request do
+describe 'Copiar datos del cliente al cobrar un asunto independiente', :type => :request, :js => true do
   before(:each) do
     login_admin
     visit '/app/interfaces/clientes.php'

@@ -1,7 +1,4 @@
 # Changelog
-## Hotfix: 13.2.12
-* **Fixed:** [Sesion en mayúsculas, clase TramiteTarifa](https://github.com/LemontechSA/ttb/pull/132)
-
 ## Hotfix: 13.2.11
 * **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
 
@@ -18,6 +15,10 @@
 # Changelog
 ## Hotfix: 13.2.7
 * **Fixed:** [No adivinar una fecha de inicio del cobro cuando no se declara especificamente](https://github.com/LemontechSA/ttb/pull/113)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
 
 ## Hotfix: 13.2.6
 Martes 5 de marzo 2013.

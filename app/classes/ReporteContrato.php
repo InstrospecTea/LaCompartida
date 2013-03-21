@@ -559,7 +559,7 @@ class ReporteContrato extends Contrato {
 		if (!$this->separar_asuntos && !$separar_asuntos) {
 			$querydescuentos = "select  cob.id_contrato, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio)  descuento
 								from cobro  cob join contrato con using (id_contrato)
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda
+								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
 								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
 								
 								where cob.descuento>0 and cob.estado in ('CREADO','EN REVISION') 
@@ -568,7 +568,7 @@ class ReporteContrato extends Contrato {
 		} else {
 			$querydescuentos = "select ca.codigo_asunto, sum(cob.descuento*pmcon.tipo_cambio/pmcob.tipo_cambio) / ca2.divisor, cob.id_contrato
 								from cobro  cob join contrato con using (id_contrato)
-								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda
+								join prm_moneda pmcob on pmcob.id_moneda=cob.id_moneda_monto
 								join prm_moneda pmcon on pmcon.id_moneda=con.id_moneda
 								join cobro_asunto ca on ca.id_cobro=cob.id_cobro
 								join (select id_cobro, count(*) divisor from cobro_asunto group by id_cobro) as ca2 on ca2.id_cobro=cob.id_cobro
@@ -862,7 +862,6 @@ class ReporteContrato extends Contrato {
 
 				break;
 		endswitch;
-
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($total_monto_trabajado, $moneda, $id_moneda) = mysql_fetch_array($resp);
 		//echo 'Monto estimado: '.$total_monto_trabajado.'<br>';
@@ -1160,7 +1159,7 @@ where ol.eliminado=0
 					     $bwherefecha2
 					   $bwhereestado
 GROUP BY  $bagrupador";
-		
+
 		$respolap = mysql_query($bquerygastos, $this->sesion->dbh) or Utiles::errorSQL($bquerygastos, __FILE__, __LINE__, $this->sesion->dbh);
 
 		//mail('ffigueroa@lemontech.cl', 'Querygastos', $bquerygastos);
