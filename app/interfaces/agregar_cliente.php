@@ -253,11 +253,6 @@ if ($opcion == "guardar") {
 				}
 			}
 
-			if (isset($_REQUEST['nombre_contacto'])) {
-				// nombre_contacto no existe como campo en la tabla contrato y es necesario crear la variable "contacto" dentro de _REQUEST
-				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
-			}
-
 			$contrato->Fill($_REQUEST, true);
 			$contrato->Edit('codigo_cliente', $codigo_cliente);
 
@@ -748,8 +743,10 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	}
 
 </script>
- 
- <style>
+<script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
+
+<!--<link rel="stylesheet" href="//static.thetimebilling.com/css/bootstrap.min.css" />-->
+<style>
 
 	 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"]
 	, input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {padding: 1px 2px !important;}
@@ -1042,9 +1039,7 @@ if ($CodigoSecundario) {
 			jQuery( "#iframe_asuntos" ).attr('src',iframesrc);
 		}, 2000);
 	});
-jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.com/js/bootstrap.min.js"  ,
-                dataType: "script",
-                complete: function() {
+
     jQuery('#codigo_cliente_secundario').blur(function() {
 	if(jQuery(this).val()=="") return;
 	<?php if ($_GET['id_cliente'])  {
@@ -1087,8 +1082,7 @@ jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.
 
 			});
 		});
-	}
-});
+
 
 
 

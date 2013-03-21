@@ -4,58 +4,8 @@ require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
-define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
-
 class UsuarioExt extends Usuario {
 
-	public static $llave_carga_masiva = CONCAT_RUT_DV_USUARIO;
-	public static $campos_carga_masiva = array(
-		CONCAT_RUT_DV_USUARIO => 'RUT', //todo: agregar tipo "rut" para validar? (solo si esta configurado como rut)
-		'nombre' => array(
-			'titulo' => 'Nombre',
-			'requerido' => true,
-			'unico' => 'nombre_completo'
-		),
-		'apellido1' => array(
-			'titulo' => 'Apellido Paterno',
-			'requerido' => true,
-			'unico' => 'nombre_completo'
-		),
-		'apellido2' => array(
-			'titulo' => 'Apellido Materno',
-			'unico' => 'nombre_completo'
-		),
-		'username' => array(
-			'titulo' => 'Código',
-			'unico' => true
-		),
-		'email' => array(
-			'titulo' => 'Email',
-			'requerido' => true,
-			'tipo' => 'email',
-			'unico' => true
-		),
-		'telefono1' => 'Teléfono 1',
-		'telefono2' => 'Teléfono 2',
-		'admin' => array(
-			'titulo' => 'Es Administrador',
-			'tipo' => 'bool'
-		),
-		'id_categoria_usuario' => array(
-			'titulo' => 'Categoría de Usuario',
-			'requerido' => true,
-			'relacion' => 'CategoriaUsuario',
-			'creable' => true
-		),
-		'id_area_usuario' => array(
-			'titulo' => 'Área de Usuario',
-			'relacion' => 'AreaUsuario',
-			'creable' => true,
-			'defval' => 1
-		)
-	);
-	public $tabla = 'usuario';
-	public $campo_id = 'id_usuario';
 	var $secretarios = null;
 
 	function Loaded() {
@@ -518,7 +468,8 @@ class UsuarioExt extends Usuario {
 
 					$glosa_actual = (sizeof($_arr_sde_actual) ? implode("<br />", $_arr_sde_actual) : '');
 					$glosa_origen = (sizeof($_arr_sde_original) ? implode("<br />", $_arr_sde_original) : '');
-				} else if (trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria' || trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados') {
+				} else if (trim($historia['nombre_dato']) == 'activo' || trim($historia['nombre_dato']) == 'alerta diaria'
+					|| trim($historia['nombre_dato']) == 'alerta semanal' || trim($historia['nombre_dato']) == 'resumen horas semanales de abogados revisados') {
 					$glosa_actual = (!empty($historia['valor_actual'])) ? 'activo' : 'inactivo';
 					$glosa_origen = (!empty($historia['valor_original'])) ? 'activo' : 'inactivo';
 				} else {
@@ -721,89 +672,17 @@ class UsuarioExt extends Usuario {
 		);
 	}
 
-	public function TienePermiso($permiso) {
+	public function TienePermiso($permiso){
 		return $this->permisos->Find('FindPermiso', array('codigo_permiso' => $permiso))->fields['permitido'];
 	}
 
 	public function LoadWithToken($token) {
 		$query = "SELECT * FROM " . $this->tbl_usuario
-			. " WHERE reset_password_token = '$token'"
-			. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
+						. " WHERE reset_password_token = '$token'"
+						. " AND NOW() <= DATE_ADD(reset_password_sent_at, INTERVAL 1 HOUR)";
 
 		return $this->LoadWithQuery($query);
 	}
-
-	public function PreCrearDato($data) {
-		$data['rut'] = $data[CONCAT_RUT_DV_USUARIO];
-		unset($data[CONCAT_RUT_DV_USUARIO]);
-		if (Conf::GetConf($this->sesion, 'NombreIdentificador') == 'RUT') {
-			$rutdv = explode('-', $data['rut']);
-			$data['rut'] = preg_replace('/\D/', '', $rutdv[0]);
-			$data['dv'] = trim($rutdv[1]);
-		}
-
-		if (isset($data['admin'])) {
-			$this->extra_fields = array('admin' => $data['admin']);
-			unset($data['admin']);
-		}
-
-		$data['nombre'] = ucwords($data['nombre']);
-		$data['apellido1'] = ucwords($data['apellido1']);
-		if (isset($data['apellido2'])) {
-			$data['apellido2'] = ucwords($data['apellido2']);
-		}
-
-		$data['password'] = md5('12345');
-		$data['force_reset_password'] = '1';
-
-		if (empty($data['username'])) {
-			$data['username'] = $data['nombre'][0] . $data['apellido1'][0];
-			if (isset($data['apellido2'])) {
-				$data['username'] .= $data['apellido2'][0];
-			}
-		}
-
-		return $data;
-	}
-
-	public function PostCrearDato() {
-		$permisos = array('ALL', 'PRO');
-		if (isset($this->extra_fields['admin']) && !empty($this->extra_fields['admin'])) {
-			$permisos = array(
-				'ADM', 'ALL', 'COB', 'DAT', 'REP', 'REV', 'TAR', 'SOC', 'OFI', 'PRO'
-			);
-		}
-		$values = array();
-		foreach ($permisos as $permiso) {
-			$values[] = "({$this->fields['id_usuario']}, '$permiso')";
-		}
-		$query = 'INSERT IGNORE INTO usuario_permiso (id_usuario, codigo_permiso) VALUES ' . implode(', ', $values);
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	/**
-	 * Completa el objeto con los valores que vengan en $parametros
-	 * 
-	 * @param array $parametros entrega los campos y valores del objeto campo => valor
-	 * @param boolean $edicion indica si se marcan los $parametros para edición
-	 */
-	function Fill($parametros, $edicion = false) {
-		foreach ($parametros as $campo => $valor) {
-			if (in_array($campo, $this->editable_fields)) {
-				$this->fields[$campo] = $valor;
-
-				if ($edicion) {
-					$this->Edit($campo, $valor);
-				}
-			} else {
-				$this->extra_fields[$campo] = $valor;
-			}
-		}
-	}
-
-	function Write() {
-		$this->loaded = !empty($this->fields['id_usuario']);
-		return parent::Write();
-	}
-
 }
+
+?>

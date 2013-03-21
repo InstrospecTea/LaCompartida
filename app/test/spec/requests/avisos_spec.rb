@@ -5,7 +5,7 @@ def elimina_avisos_previos
 	click_button 'Eliminar'
 end
 
-describe "avisos", :type => :request, :js => true do
+describe "avisos", :type => :request do
 	before(:each) do
 		login_admin
 		elimina_avisos_previos

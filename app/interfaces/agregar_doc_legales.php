@@ -1,14 +1,14 @@
 <?php
 	$query_doc_legales = "SELECT id_documento_legal AS id, glosa FROM prm_documento_legal ORDER BY glosa";
 	$query_nros_doc_legales = "SELECT COUNT(*) FROM prm_documento_legal";
-	$nros_doc_legales = mysql_query($query_nros_doc_legales, $Sesion->dbh) or Utiles::errorSQL($query_nros_doc_legales,__FILE__,__LINE__,$Sesion->dbh);
+	$nros_doc_legales = mysql_query($query_nros_doc_legales, $sesion->dbh) or Utiles::errorSQL($query_nros_doc_legales,__FILE__,__LINE__,$sesion->dbh);
 	list($nros_doc_legales)=mysql_fetch_array($nros_doc_legales);
 
 	$query_contrato_docs_legales = "SELECT id_tipo_documento_legal, honorarios, gastos_con_impuestos, gastos_sin_impuestos
 		FROM contrato_documento_legal 
 		WHERE id_contrato " . (empty($contrato->fields['id_contrato']) ? 'IS NULL' : '= ' . $contrato->fields['id_contrato']);
 
-	$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $Sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales,__FILE__,__LINE__,$Sesion->dbh);
+	$contrato_docs_legales = mysql_query($query_contrato_docs_legales, $sesion->dbh) or Utiles::errorSQL($query_contrato_docs_legales,__FILE__,__LINE__,$sesion->dbh);
 	$nro_docs_legales = mysql_num_rows($contrato_docs_legales);
 ?>
 <script type="text/javascript">
@@ -28,7 +28,7 @@ var fila_doc_legal = <?php echo $nro_docs_legales ?>;
 			<?php $i = 0; ?>
 			<?php while (list($id_tipo_documento_legal, $honorario, $gastos_con_impuestos, $gastos_sin_impuestos) = mysql_fetch_array($contrato_docs_legales)) { ?>
 			<tr id="doc_legal_<?php echo $i ?>">
-				<td align="center"><?php echo Html::SelectQuery( $Sesion, $query_doc_legales, 'docs_legales['. $i . '][documento_legal]', $id_tipo_documento_legal, null, 'Documento Legal' ) ?></td>
+				<td align="center"><?php echo Html::SelectQuery( $sesion, $query_doc_legales, 'docs_legales['. $i . '][documento_legal]', $id_tipo_documento_legal, null, 'Documento Legal' ) ?></td>
 				<td align="center"><input id="honorario_<?php echo $i ?>" type="checkbox" class="honorario" name="docs_legales[<?php echo $i ?>][honorario]" <?php echo $honorario == '1' ? 'checked="checked"' : '' ?> /></td>
 				<td align="center"><input id="gastos_con_iva_<?php echo $i ?>" type="checkbox" class="gastos_con_iva" name="docs_legales[<?php echo $i ?>][gastos_con_iva]" <?php echo $gastos_con_impuestos == '1' ? 'checked="checked"' : '' ?> /></td>
 				<td align="center"><input id="gastos_sin_iva_<?php echo $i ?>" type="checkbox" class="gastos_sin_iva" name="docs_legales[<?php echo $i ?>][gastos_sin_iva]" <?php echo $gastos_sin_impuestos == '1' ? 'checked="checked"' : '' ?> /></td>
@@ -39,7 +39,7 @@ var fila_doc_legal = <?php echo $nro_docs_legales ?>;
 			
 		<?php else: ?>
 		<tr id="doc_legal_0">
-			<td align="center"><?php echo Html::SelectQuery( $Sesion, $query_doc_legales, 'docs_legales[0][documento_legal]', null, null, 'Documento Legal' ) ?></td>
+			<td align="center"><?php echo Html::SelectQuery( $sesion, $query_doc_legales, 'docs_legales[0][documento_legal]', null, null, 'Documento Legal' ) ?></td>
 			<td align="center"><input id="honorario_0" type="checkbox" class="honorario" name="docs_legales[0][honorario]" /></td>
 			<td align="center"><input id="gastos_con_iva_0" type="checkbox" class="gastos_con_iva" name="docs_legales[0][gastos_con_iva]" /></td>
 			<td align="center"><input id="gastos_sin_iva_0" type="checkbox" class="gastos_sin_iva" name="docs_legales[0][gastos_sin_iva]" /></td>
@@ -222,7 +222,7 @@ var fila_doc_legal = <?php echo $nro_docs_legales ?>;
 <table style="display:none;">
 	<tbody id="template_docs_legales">
 		<tr id="doc_legal_#{fila}">
-			<td align="center"><?php echo Html::SelectQuery( $Sesion, $query_doc_legales, 'docs_legales[#{fila}][documento_legal]', null, null, 'Documento Legal' ) ?></td>
+			<td align="center"><?php echo Html::SelectQuery( $sesion, $query_doc_legales, 'docs_legales[#{fila}][documento_legal]', null, null, 'Documento Legal' ) ?></td>
 			<td align="center"><input id="honorario_#{fila}" type="checkbox" class="honorario" name="docs_legales[#{fila}][honorario]" /></td>
 			<td align="center"><input id="gastos_con_iva_#{fila}" type="checkbox" class="gastos_con_iva" name="docs_legales[#{fila}][gastos_con_iva]" /></td>
 			<td align="center"><input id="gastos_sin_iva_#{fila}" type="checkbox" class="gastos_sin_iva" name="docs_legales[#{fila}][gastos_sin_iva]" /></td>
