@@ -123,7 +123,7 @@ td.sorting_1 {background:transparent !important;}
 		jQuery('#boton_buscar').click(function() {
 			var tablagastos=   jQuery('#tablon').hide().dataTable({
                                  "fnPreDrawCallback": function( oSettings ) {
-									jQuery('#tablon').fadeTo('fast',0.1);
+									//jQuery('#tablon').fadeTo('fast',0.1);
 									
 								},
 								 
@@ -141,7 +141,7 @@ td.sorting_1 {background:transparent !important;}
 									jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData, 
 										"success": fnCallback,
 										"complete" :function() {
-											jQuery('#tablon').fadeTo(0, 1);
+										//	jQuery('#tablon').fadeTo(0, 1);
 										}
 									})
 								},
