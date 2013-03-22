@@ -3,8 +3,15 @@ load 'config/cap_notify'
 load 'config/cap_shared'
 server "lemontest.thetimebilling.com", :web, {:user => 'root'}
 
+
+def current_git_branch
+  branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
+   branch
+end
+
  set :current_stage, "custom"
-  custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch []: ")
+ # default_branch = fetch(:branch, current_git_branch)
+  custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch [#{current_git_branch}]: ")
   custom_name = custom_branch.split('/').last
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_name}"
   set :branch, custom_branch
