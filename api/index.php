@@ -1,51 +1,82 @@
 <?php
-
-require '../fw/classes/Slim/Slim.php';
-require '../app/miconf.php';
+require_once dirname(__FILE__) . '/../fw/classes/Slim/Slim.php';
+require_once dirname(__FILE__) . '/../app/conf.php';
 
 $app = new Slim();
 
-define('_AUTH_TOKEN', 'lemontech#99511620');
-define('_USER', '99511620');
-define('_PASSWORD', 'admin.asdwsx');
-define('_SECURE_SITE', 'https://lemontech.thetimebilling.com');
-
 $app->post('/login', function () {
 	$_app = Slim::getInstance();
+	$_db = getConnection();
 	$response = array();
 
 	$user = $_app->request()->params('user');
 	$password = $_app->request()->params('password');
-	$secure_site = $_app->request()->params('secure_site');
+	$app_key = $_app->request()->params('app_key');
 
-	$auth_token = _AUTH_TOKEN;
+	$password_encryption = md5($password);
+	$auth_token = makeAuthToken($user);
 
-	try {
-		$db = getConnection();
+	$sql = "SELECT `user`.id_usuario AS `id` FROM `usuario` AS `user` WHERE `user`.`rut`=:user AND `user`.`password`=:password";
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('user', $user);
+	$_stmt->bindParam('password', $password_encryption);
+	$_stmt->execute();
+	$user_data = $_stmt->fetchObject();
+
+	if (is_object($user_data)) {
+		$sql = "SELECT `user_token`.`id` FROM `user_token` WHERE `user_token`.`id`=:id";
+		$_stmt = $_db->prepare($sql);
+		$_stmt->bindParam('id', $user_data->id);
+		$_stmt->execute();
+		$user_token_data = $_stmt->fetchObject();
+
+		// if exist the auth_token then replace for the new one
+		if (is_object($user_token_data)) {
+			$sql = "UPDATE `user_token` SET `user_token`.`auth_token`=:auth_token, `user_token`.`modified`=:modified WHERE `user_token`.`id`=:id";
+			$_stmt = $_db->prepare($sql);
+			$_stmt->bindParam('auth_token', $auth_token);
+			$_stmt->bindParam('id', $user_data->id);
+			$_stmt->bindParam('modified', date('Y-m-d H:i:s'));
+			$_stmt->execute();
+		} else {
+			// if not exist then create the auth_token
+			$sql = "INSERT INTO `user_token` SET `user_token`.`id`=:id, `user_token`.`auth_token`=:auth_token, `user_token`.`app_key`=:app_key, `user_token`.`created`=:created";
+			$_stmt = $_db->prepare($sql);
+			$_stmt->bindParam('id', $user_data->id);
+			$_stmt->bindParam('auth_token', $auth_token);
+			$_stmt->bindParam('app_key', $app_key);
+			$_stmt->bindParam('created', date('Y-m-d H:i:s'));
+			$_stmt->execute();
+		}
+
 		$response['auth_token'] = $auth_token;
-	} catch(Exception $e) {
-		$_app->halt(500, 'POST /login | ' . $e->getMessage());
+	} else {
+		halt("The user doesn't exist");
 	}
 
-	echo json_encode($response);
+	outputJson($response);
 });
 
 $app->get('/clients', function () {
 	$response = array();
 	$_app = Slim::getInstance();
+	$_db = getConnection();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$active = 1;
 
-	try {
-		$db = getConnection();
+	$sql = "SELECT `client`.`codigo_cliente` AS `code`, `client`.`glosa_cliente` AS `name`, `contract`.`direccion_contacto` AS `address` FROM `cliente` AS `client` INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato` WHERE `client`.`activo`=:active ORDER BY `client`.`glosa_cliente`";
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('active', $active);
+	$_stmt->execute();
+
+	while ($client_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
 		$client = array(
-			'code' => 'C666',
-			'name' => 'LEMONTECH',
-			'address' => 'AV TECNOLIMON'
+			'code' => utf8_encode($client_data->code),
+			'name' => utf8_encode($client_data->name),
+			'address' => utf8_encode(trim($client_data->address))
 		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /clients | ' . $e->getMessage());
+		array_push($response, $client);
 	}
 
 	echo json_encode($response);
@@ -305,24 +336,71 @@ function getConnection() {
 	$dbuser = DBUSER;
 	$dbpass = DBPASS;
 	$dbname = DBNAME;
+
 	try {
 		$dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
 		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $dbh;
 	} catch(PDOException $e) {
-		$_app = Slim::getInstance();
-		$_app->halt(500, 'Error connection MySQL | ' . $e->getMessage());
+		halt('Error connection MySQL > ' . $e->getMessage());
 	}
 }
 
 function validateAuthTokenSendByHeaders() {
+	$_db = getConnection();
 	$_app = Slim::getInstance();
 	$_req = $_app->request();
+
 	$auth_token = $_req->headers('AUTH_TOKEN');
 
-	if ($auth_token != _AUTH_TOKEN) {
-		$_app->halt(500, 'Error invalid AUTH_TOKEN');
+	$sql = "SELECT `user_token`.`id` FROM `user_token` WHERE `user_token`.`auth_token`=:auth_token";
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('auth_token', $auth_token);
+	$_stmt->execute();
+	$user_token_data = $_stmt->fetchObject();
+
+	// if not exist the auth_token then return error
+	if (!is_object($user_token_data)) {
+		halt('Invalid AUTH_TOKEN');
+	} else {
+		return $user_token_data->id;
 	}
 }
 
-?>
+function makeAuthToken($secret) {
+  $str = '';
+  for ($i = 0; $i < 7; $i++) {
+  	$str .= randAlphanumeric();
+  }
+  $pos = rand(0, 24);
+  $str .= chr(65 + $pos);
+  $str .= substr(md5($str . $secret), $pos, 8);
+  return sha1($str);
+}
+
+function randAlphanumeric() {
+	$subsets[0] = array('min' => 48, 'max' => 57); // ascii digits
+	$subsets[1] = array('min' => 65, 'max' => 90); // ascii lowercase English letters
+	$subsets[2] = array('min' => 97, 'max' => 122); // ascii uppercase English letters
+	// random choice between lowercase, uppercase, and digits
+	$s = rand(0, 2);
+	$ascii_code = rand($subsets[$s]['min'], $subsets[$s]['max']);
+	return chr($ascii_code);
+}
+
+function halt($message = null, $code = 500) {
+	$_app = Slim::getInstance();
+	$_req = $_app->request();
+	$_app->halt($code, $_app->request()->getMethod() . ' | ' . $_req->getPath() . ' | ' . $message);
+}
+
+function outputJson($response) {
+	header('Cache-Control: no-cache, must-revalidate');
+	header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+	header('Content-type: application/json');
+
+	//TODO: apply utf8 to array
+
+	echo json_encode($response);
+	exit;
+}
