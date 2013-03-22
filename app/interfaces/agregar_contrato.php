@@ -141,184 +141,6 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	
 	$contrato->Fill($_REQUEST, true);
 	
-	/*$contrato->Edit("glosa_contrato", $glosa_contrato, true);
-	$contrato->Edit("codigo_cliente", $codigo_cliente, true);
-	$contrato->Edit("id_usuario_responsable", (!empty($id_usuario_responsable) && $id_usuario_responsable != -1 ) ? $id_usuario_responsable : "NULL", true);
-	if (!UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
-		$id_usuario_secundario = $id_usuario_responsable;
-	}
-	$contrato->Edit("id_usuario_secundario", (!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL", true);
-	$contrato->Edit("observaciones", $observaciones);
-	if (UtilesApp::GetConf($sesion, 'TituloContacto')) {
-		$contrato->Edit("titulo_contacto", $titulo_contacto);
-		$contrato->Edit("contacto", $nombre_contacto);
-		$contrato->Edit("apellido_contacto", $apellido_contacto);
-	} else {
-		$contrato->Edit("contacto", $contacto, true);
-	}
-	$contrato->Edit("fono_contacto", $fono_contacto_contrato);
-	$contrato->Edit("email_contacto", $email_contacto_contrato, true);
-	$contrato->Edit("direccion_contacto", $direccion_contacto_contrato);
-	$contrato->Edit("id_pais", $id_pais, true);
-	$contrato->Edit("id_cuenta", $id_cuenta, true);
-
-	if (UtilesApp::GetConf($sesion, 'SegundaCuentaBancaria')) {
-		$contrato->Edit("id_cuenta2", $id_cuenta2, true);
-	}
-
-	$contrato->Edit("es_periodico", $es_periodico, true);
-	$contrato->Edit("activo", $activo_contrato ? 'SI' : 'NO', true);
-	$contrato->Edit("usa_impuesto_separado", $impuesto_separado ? '1' : '0', true);
-	$contrato->Edit("usa_impuesto_gastos", $impuesto_gastos ? '1' : '0', true);
-	$contrato->Edit("periodo_fecha_inicio", $periodo_fecha_inicio, true);
-	$contrato->Edit("periodo_repeticiones", $periodo_repeticiones, true);
-	$contrato->Edit("periodo_intervalo", $periodo_intervalo, true);
-	$contrato->Edit("periodo_unidad", $codigo_unidad);
-	
-	
-	
-	$monto = str_replace(',', '.', $monto); //en caso de usar comas en vez de puntos
-	$contrato->Edit("monto", $monto, true);
-	$contrato->Edit("id_moneda", $id_moneda, true);
-	$contrato->Edit("id_moneda_tramite", $id_moneda_tramite, true);
-	$contrato->Edit("forma_cobro", $forma_cobro, true);
-	$contrato->Edit("fecha_inicio_cap", Utiles::fecha2sql($fecha_inicio_cap));
-	$retainer_horas = str_replace(',', '.', $retainer_horas); //en caso de usar comas en vez de puntos
-	$contrato->Edit("retainer_horas", $retainer_horas);
-	if (is_array($usuarios_retainer)) {
-		$retainer_usuarios = implode(',', $usuarios_retainer);
-	}else {
-		$retainer_usuarios = $usuarios_retainer;
-	}
-	$contrato->Edit("retainer_usuarios", $retainer_usuarios);
-	$contrato->Edit("id_usuario_modificador", $sesion->usuario->fields['id_usuario']);
-	$contrato->Edit("id_carta", $id_carta ? $id_carta : 'NULL');
-	
-	$contrato->Edit("id_formato", $id_formato ? $id_formato : 'NULL');
-	$contrato->Edit("id_tarifa", $id_tarifa ? $id_tarifa : 'NULL');
-	$contrato->Edit("id_tramite_tarifa", $id_tramite_tarifa ? $id_tramite_tarifa : 'NULL');
-	// facturacion
-	$contrato->Edit("rut", $factura_rut);
-	$contrato->Edit("factura_razon_social", $factura_razon_social);
-	$contrato->Edit("factura_giro", $factura_giro);
-	$contrato->Edit("factura_direccion", $factura_direccion);
-
-	if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
-		$contrato->Edit("factura_ciudad", $factura_cuidad);
-	}
-
-	if (UtilesApp::existecampo('factura_ciudad', 'contrato', $sesion)) {
-		$contrato->Edit("factura_comuna", $factura_comuna);
-	}
-
-	$contrato->Edit("factura_telefono", $factura_telefono);
-	$contrato->Edit("cod_factura_telefono", $cod_factura_telefono);
-	// Opc contrato
-	$contrato->Edit("opc_ver_detalles_por_hora", $opc_ver_detalles_por_hora);
-	$contrato->Edit("opc_ver_modalidad", $opc_ver_modalidad);
-	$contrato->Edit("opc_ver_profesional", $opc_ver_profesional);
-	$contrato->Edit("opc_ver_profesional_iniciales", $opc_ver_profesional_iniciales);
-	$contrato->Edit("opc_ver_profesional_categoria", $opc_ver_profesional_categoria);
-	$contrato->Edit("opc_ver_profesional_tarifa", $opc_ver_profesional_tarifa);
-	$contrato->Edit("opc_ver_profesional_importe", $opc_ver_profesional_importe);
-	$contrato->Edit("opc_ver_gastos", $opc_ver_gastos);
-	$contrato->Edit("opc_ver_concepto_gastos", $opc_ver_concepto_gastos);
-	$contrato->Edit("opc_ver_morosidad", $opc_ver_morosidad);
-	$contrato->Edit("opc_ver_resumen_cobro", $opc_ver_resumen_cobro);
-	$contrato->Edit("opc_ver_detalles_por_hora_iniciales", $opc_ver_detalles_por_hora_iniciales);
-	$contrato->Edit("opc_ver_detalles_por_hora_categoria", $opc_ver_detalles_por_hora_categoria);
-	$contrato->Edit("opc_ver_detalles_por_hora_tarifa", $opc_ver_detalles_por_hora_tarifa);
-	$contrato->Edit("opc_ver_detalles_por_hora_importe", $opc_ver_detalles_por_hora_importe);
-	$contrato->Edit("opc_ver_descuento", $opc_ver_descuento);
-	$contrato->Edit("opc_ver_tipo_cambio", $opc_ver_tipo_cambio);
-	$contrato->Edit('opc_ver_valor_hh_flat_fee', $opc_ver_valor_hh_flat_fee);
-	$contrato->Edit("opc_ver_numpag", $opc_ver_numpag);
-	$contrato->Edit("opc_ver_carta", $opc_ver_carta);
-	$contrato->Edit("opc_papel", $opc_papel);
-	$contrato->Edit("opc_moneda_total", $opc_moneda_total);
-	$contrato->Edit("opc_moneda_gastos", $opc_moneda_gastos);
-	$contrato->Edit("opc_ver_solicitante", $opc_ver_solicitante);
-	$contrato->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
-	$contrato->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
-	$contrato->Edit("opc_ver_cobrable", $opc_ver_cobrable);
-	$contrato->Edit("opc_ver_columna_cobrable", $opc_ver_columna_cobrable);
-	if ($opc_restar_retainer) {
-		$contrato->Edit("opc_restar_retainer", $opc_restar_retainer);
-	}
-	if ($opc_ver_detalle_retainer) {
-		$contrato->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
-	}
-	$contrato->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
-	$contrato->Edit("codigo_idioma", $codigo_idioma != '' ? $codigo_idioma : 'es');
-
-	/* tarifa escalonada */
-	/*if (isset($_POST['esc_tiempo'])) {
-		for ($i = 1; $i <= sizeof($_POST['esc_tiempo']); $i++) {
-			if ($_POST['esc_tiempo'][$i - 1] != '') {
-				$contrato->Edit('esc' . $i . '_tiempo', $_POST['esc_tiempo'][$i - 1]);
-				if ($_POST['esc_selector'][$i - 1] != 1) {
-					//caso monto
-					$contrato->Edit('esc' . $i . '_id_tarifa', "NULL");
-					$contrato->Edit('esc' . $i . '_monto', $_POST['esc_monto'][$i - 1]);
-				} else {
-					//caso tarifa
-					$contrato->Edit('esc' . $i . '_id_tarifa', $_POST['esc_id_tarifa_' . $i]);
-					$contrato->Edit('esc' . $i . '_monto', "NULL");
-				}
-				$contrato->Edit('esc' . $i . '_id_moneda', $_POST['esc_id_moneda_' . $i]);
-				$contrato->Edit('esc' . $i . '_descuento', $_POST['esc_descuento'][$i - 1]);
-			} else {
-				$contrato->Edit('esc' . $i . '_tiempo', "NULL");
-				$contrato->Edit('esc' . $i . '_id_tarifa', "NULL");
-				$contrato->Edit('esc' . $i . '_monto', "NULL");
-				$contrato->Edit('esc' . $i . '_id_moneda', "NULL");
-				$contrato->Edit('esc' . $i . '_descuento', "NULL");
-			}
-		}
-	}
-
-
-	// descuento
-	$contrato->Edit("tipo_descuento", $tipo_descuento);
-	if ($tipo_descuento == 'PORCENTAJE') {
-		$porcentaje_descuento = str_replace(',', '.', $porcentaje_descuento); //en caso de usar comas en vez de puntos
-		$contrato->Edit("porcentaje_descuento", $porcentaje_descuento > 0 ? $porcentaje_descuento : '0');
-		$contrato->Edit("descuento", '0');
-	} else {
-		$descuento = str_replace(',', '.', $descuento); //en caso de usar comas en vez de puntos
-		$contrato->Edit("descuento", $descuento > 0 ? $descuento : '0');
-		$contrato->Edit("porcentaje_descuento", '0');
-	}
-
-	$contrato->Edit("id_moneda_monto", $id_moneda_monto);
-	$contrato->Edit("alerta_hh", $alerta_hh);
-	$contrato->Edit("alerta_monto", $alerta_monto);
-	$contrato->Edit("limite_hh", $limite_hh);
-	$contrato->Edit("limite_monto", $limite_monto);
-
-	// Editar notificaciones
-	$contrato->Edit('notificar_encargado_principal', $notificar_encargado_principal);
-	if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
-		$contrato->Edit('notificar_encargado_secundario', $notificar_encargado_secundario);
-	}
-
-	if ($enviar_alerta_otros_correos == '1') {
-		$correos_separados = explode(',', $notificar_otros_correos);
-		for ($i = 0; $i < count($correos_separados); $i++) {
-			$correos_separados[$i] = trim($correos_separados[$i]);
-		}
-		$notificar_otros_correos = implode(',', $correos_separados);
-	} else {
-		$notificar_otros_correos = '';
-	}
-	$contrato->Edit('notificar_otros_correos', $notificar_otros_correos);
-
-	$contrato->Edit("separar_liquidaciones", empty($separar_liquidaciones) ? '0' : '1');
-
-	if (UtilesApp::GetConf($sesion, 'ExportacionLedes')) {
-		$contrato->Edit('exportacion_ledes', empty($exportacion_ledes) ? '0' : '1');
-	}
-*/
 	if ($contrato->Write()) {
 		// cobros pendientes
 		CobroPendiente::EliminarPorContrato($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
@@ -346,32 +168,33 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		}
 
 		ContratoDocumentoLegal::EliminarDocumentosLegales($sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-		foreach ($docs_legales as $doc_legal) {
-			if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
-				continue;
+		if (is_array($docs_legales)) {
+			foreach ($docs_legales as $doc_legal) {
+				if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
+					continue;
+				}
+				$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
+				$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
+				$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+				if (!empty($doc_legal['honorario'])) {
+					$contrato_doc_legal->Edit('honorarios', 1);
+				}
+				if (!empty($doc_legal['gastos_con_iva'])) {
+					$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
+				}
+				if (!empty($doc_legal['gastos_sin_iva'])) {
+					$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
+				}
+				$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
+				$contrato_doc_legal->Write();
 			}
-			$contrato_doc_legal = new ContratoDocumentoLegal($sesion);
-			$contrato_doc_legal->Edit('id_contrato', $contrato->fields['id_contrato']);
-			$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-			if (!empty($doc_legal['honorario'])) {
-				$contrato_doc_legal->Edit('honorarios', 1);
-			}
-			if (!empty($doc_legal['gastos_con_iva'])) {
-				$contrato_doc_legal->Edit('gastos_con_impuestos', 1);
-			}
-			if (!empty($doc_legal['gastos_sin_iva'])) {
-				$contrato_doc_legal->Edit('gastos_sin_impuestos', 1);
-			}
-			$contrato_doc_legal->Edit('id_tipo_documento_legal', $doc_legal['documento_legal']);
-			$contrato_doc_legal->Write();
-		}
 
-		if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
-			mysql_query("UPDATE cliente SET id_usuario_encargado = '" .
-					((!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL") .
-					"' WHERE id_contrato = " . $contrato->fields['id_contrato'], $sesion->dbh);
+			if (UtilesApp::GetConf($sesion, 'EncargadoSecundario')) {
+				mysql_query("UPDATE cliente SET id_usuario_encargado = '" .
+						((!empty($id_usuario_secundario) && $id_usuario_secundario != -1 ) ? $id_usuario_secundario : "NULL") .
+						"' WHERE id_contrato = " . $contrato->fields['id_contrato'], $sesion->dbh);
+			}
 		}
-
 		$pagina->AddInfo(__('Contrato guardado con éxito'));
 	} else {
 		$pagina->AddError($contrato->error);
