@@ -16,7 +16,10 @@ $app->post('/login', function () {
 	$password_encryption = md5($password);
 	$auth_token = makeAuthToken($user);
 
-	$sql = "SELECT `user`.id_usuario AS `id` FROM `usuario` AS `user` WHERE `user`.`rut`=:user AND `user`.`password`=:password";
+	$sql = "SELECT `user`.id_usuario AS `id`
+		FROM `usuario` AS `user`
+		WHERE `user`.`rut`=:user AND `user`.`password`=:password";
+
 	$_stmt = $_db->prepare($sql);
 	$_stmt->bindParam('user', $user);
 	$_stmt->bindParam('password', $password_encryption);
@@ -24,7 +27,10 @@ $app->post('/login', function () {
 	$user_data = $_stmt->fetchObject();
 
 	if (is_object($user_data)) {
-		$sql = "SELECT `user_token`.`id` FROM `user_token` WHERE `user_token`.`id`=:id";
+		$sql = "SELECT `user_token`.`id`
+			FROM `user_token`
+			WHERE `user_token`.`id`=:id";
+
 		$_stmt = $_db->prepare($sql);
 		$_stmt->bindParam('id', $user_data->id);
 		$_stmt->execute();
@@ -32,7 +38,10 @@ $app->post('/login', function () {
 
 		// if exist the auth_token then replace for the new one
 		if (is_object($user_token_data)) {
-			$sql = "UPDATE `user_token` SET `user_token`.`auth_token`=:auth_token, `user_token`.`modified`=:modified WHERE `user_token`.`id`=:id";
+			$sql = "UPDATE `user_token`
+				SET `user_token`.`auth_token`=:auth_token, `user_token`.`modified`=:modified
+				WHERE `user_token`.`id`=:id";
+
 			$_stmt = $_db->prepare($sql);
 			$_stmt->bindParam('auth_token', $auth_token);
 			$_stmt->bindParam('id', $user_data->id);
@@ -40,7 +49,10 @@ $app->post('/login', function () {
 			$_stmt->execute();
 		} else {
 			// if not exist then create the auth_token
-			$sql = "INSERT INTO `user_token` SET `user_token`.`id`=:id, `user_token`.`auth_token`=:auth_token, `user_token`.`app_key`=:app_key, `user_token`.`created`=:created";
+			$sql = "INSERT INTO `user_token`
+				SET `user_token`.`id`=:id, `user_token`.`auth_token`=:auth_token,
+					`user_token`.`app_key`=:app_key, `user_token`.`created`=:created";
+
 			$_stmt = $_db->prepare($sql);
 			$_stmt->bindParam('id', $user_data->id);
 			$_stmt->bindParam('auth_token', $auth_token);
@@ -58,68 +70,115 @@ $app->post('/login', function () {
 });
 
 $app->get('/clients', function () {
-	$response = array();
 	$_app = Slim::getInstance();
 	$_db = getConnection();
+	$response = array();
 
 	$user_id = validateAuthTokenSendByHeaders();
-	$active = 1;
 
-	$sql = "SELECT `client`.`codigo_cliente` AS `code`, `client`.`glosa_cliente` AS `name`, `contract`.`direccion_contacto` AS `address` FROM `cliente` AS `client` INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato` WHERE `client`.`activo`=:active ORDER BY `client`.`glosa_cliente`";
+	// find if the client used secondary code
+	$option = 'CodigoSecundario';
+	$use_secondary_code = false;
+	$sql = "SELECT `configuration`.`glosa_opcion` AS `option`, `configuration`.`valor_opcion` AS `value`
+		FROM `configuracion` AS `configuration`
+		WHERE `configuration`.`glosa_opcion`=:option";
+
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('option', $option);
+	$_stmt->execute();
+	$configuration_data = $_stmt->fetchObject();
+
+	if (is_object($configuration_data) && $configuration_data->value == '1') {
+		$use_secondary_code = true;
+	}
+
+	$active = 1;
+	$sql = "SELECT `client`.`codigo_cliente` AS `code`, `client`.`codigo_cliente_secundario` AS `secondary_code`,
+		`client`.`glosa_cliente` AS `name`, `contract`.`direccion_contacto` AS `address`
+		FROM `cliente` AS `client`
+			INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
+		WHERE `client`.`activo`=:active
+		ORDER BY `client`.`glosa_cliente` ASC";
+
 	$_stmt = $_db->prepare($sql);
 	$_stmt->bindParam('active', $active);
 	$_stmt->execute();
 
 	while ($client_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
 		$client = array(
-			'code' => utf8_encode($client_data->code),
-			'name' => utf8_encode($client_data->name),
-			'address' => utf8_encode(trim($client_data->address))
+			'code' => $use_secondary_code ? $client_data->secondary_code : $client_data->code,
+			'name' => $client_data->name,
+			'address' => $client_data->address
 		);
+
 		array_push($response, $client);
 	}
 
-	echo json_encode($response);
+	outputJson($response);
 });
 
 $app->get('/clients/:code/matters', function ($code) {
-	$response = array();
 	$_app = Slim::getInstance();
+	$_db = getConnection();
+	$response = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$active = 1;
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => $code,
-			'name' => 'LEMONTECH'
+	$sql = "SELECT `matter`.`codigo_asunto` AS `code`, `matter`.`glosa_asunto` AS `name`
+		FROM `cliente` AS `client`
+			INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+		WHERE (`client`.`codigo_cliente`=:code OR `client`.`codigo_cliente_secundario`=:code)
+			AND `matter`.`activo`=:active
+		ORDER BY `matter`.`glosa_asunto` ASC";
+
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('code', $code);
+	$_stmt->bindParam('active', $active);
+	$_stmt->execute();
+
+	while ($matter_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
+		$matter = array(
+			'code' => $matter_data->code,
+			'name' => $matter_data->name
 		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /clients/:code/matters | ' . $e->getMessage());
+
+		array_push($response, $matter);
 	}
 
-	echo json_encode($response);
+	outputJson($response);
 });
 
 $app->get('/matters', function () {
-	$response = array();
 	$_app = Slim::getInstance();
+	$_db = getConnection();
+	$response = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$active = 1;
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
+	$sql = "SELECT `client`.`codigo_cliente` AS `client_code`, `matter`.`codigo_asunto` AS `code`,
+		`matter`.`glosa_asunto` AS `name`
+		FROM `cliente` AS `client`
+			INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+		WHERE `matter`.`activo`=:active
+		ORDER BY `matter`.`glosa_asunto` ASC";
+
+	$_stmt = $_db->prepare($sql);
+	$_stmt->bindParam('active', $active);
+	$_stmt->execute();
+
+	while ($matter_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
+		$matter = array(
+			'client_code' => $matter_data->client_code,
+			'code' => $matter_data->code,
+			'name' => $matter_data->name
 		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /matters | ' . $e->getMessage());
+
+		array_push($response, $matter);
 	}
 
-	echo json_encode($response);
+	outputJson($response);
 });
 
 $app->get('/activities', function () {
@@ -347,9 +406,9 @@ function getConnection() {
 }
 
 function validateAuthTokenSendByHeaders() {
-	$_db = getConnection();
 	$_app = Slim::getInstance();
 	$_req = $_app->request();
+	$_db = getConnection();
 
 	$auth_token = $_req->headers('AUTH_TOKEN');
 
@@ -395,12 +454,33 @@ function halt($message = null, $code = 500) {
 }
 
 function outputJson($response) {
-	header('Cache-Control: no-cache, must-revalidate');
-	header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-	header('Content-type: application/json');
-
-	//TODO: apply utf8 to array
-
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+	header("Cache-Control: no-cache, must-revalidate");
+	header("Pragma: no-cache");
+	header('Content-type: application/json; charset=utf-8');
+	$response = applyUtf8ToArray($response);
 	echo json_encode($response);
 	exit;
+}
+
+function applyUtf8ToArray($data, $encode = true) {
+	if (is_array($data)) {
+		foreach ($data as $key => $value) {
+			unset($data[$key]);
+			$key = applyUtf8ToArray($key, $encode);
+			$data[$key] = applyUtf8ToArray($value, $encode);
+		}
+	} else if (is_string($data)) {
+		$data = trim($data);
+		// ^ = XOR = or exclusive = true && false || false && true
+		if (mb_detect_encoding($data, 'UTF-8', true) == 'UTF-8' ^ $encode) {
+			$data = $encode ? utf8_encode($data) : utf8_decode($data);
+		}
+
+		if ($data == '') {
+			$data = null;
+		}
+	}
+
+	return $data;
 }
