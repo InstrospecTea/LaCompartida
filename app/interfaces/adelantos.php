@@ -13,9 +13,9 @@
 	require_once Conf::ServerDir().'/classes/Cliente.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
- 
 
-	$sesion = new Sesion(array('OFI','COB','SEC'));	
+
+	$sesion = new Sesion(array('OFI','COB','SEC'));
 	$pagina = new Pagina($sesion);
 	$documento = new Documento($sesion);
 	$cliente = new Cliente($sesion);
@@ -36,16 +36,16 @@
 	}
 
 	$pagina->PrintTop();
-	
+
 	$codigo_cliente = empty($codigo_cliente) && $codigo_cliente_secundario ? $cliente->CodigoSecundarioACodigo($codigo_cliente_secundario) : $codigo_cliente;
-	
+
 	$params_array['codigo_permiso'] = 'COB';
 	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	
 
-	
-	
-		
+
+
+
+
 ?>
 <style type="text/css">
     @import "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css";
@@ -76,7 +76,7 @@ td.sorting_1 {background:transparent !important;}
 
 <script type="text/javascript">
 	var MonedaArray= new Array();
-	<?php 
+	<?php
 		$currency=array();
 		$querycurrency="select * from prm_moneda";
 		$respcurrency = mysql_query($querycurrency, $sesion->dbh);
@@ -87,15 +87,15 @@ td.sorting_1 {background:transparent !important;}
 		}
 		  echo 'var PERMISOCOBRANZA = '.($p_cobranza->fields['permitido'] ? 1 : 0) .';';
 	?>
-		
+
     jQuery(document).ready(function() {
-     
-	 
+
+
 	 jQuery('.noborraradelanto').live('click',function() {
-	 		 jQuery('#mensaje').html('No se puede borrar el adelanto, ha sido utilizado en al menos <?php echo __('un cobro'); ?>...');  
-			 
+	 		 jQuery('#mensaje').html('No se puede borrar el adelanto, ha sido utilizado en al menos <?php echo __('un cobro'); ?>...');
+
 	 });
-	 
+
 	 jQuery('.desborraradelanto').live('click',function() {
 	 var laID=jQuery(this).attr('id').replace('desborra_','');
 
@@ -118,16 +118,17 @@ td.sorting_1 {background:transparent !important;}
 															return false;
 														}
 	});
- 
-		
+
+
 		jQuery('#boton_buscar').click(function() {
 			var tablagastos=   jQuery('#tablon').hide().dataTable({
                                  "fnPreDrawCallback": function( oSettings ) {
 									jQuery('#tablon').fadeTo('fast',0.1);
-									
+
 								},
-								 
-								"bDestroy":true,	
+
+								"bDestroy":true,
+								"bServerSide": true,
                                 "oLanguage": {    "sProcessing":   "Procesando..." ,   "sLengthMenu":   "Mostrar _MENU_ registros","sZeroRecords":  "No se encontraron resultados",  "sInfo":         "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
                                     "sInfoEmpty":    "Mostrando desde 0 hasta 0 de 0 registros",  "sInfoFiltered": "(filtrado de _MAX_ registros en total)",   "sInfoPostFix":  "",  "sSearch":       "Filtrar:",
                                     "sUrl":          "", 	"oPaginate": {            "sPrevious": "Anterior",   "sNext":     "Siguiente"}
@@ -136,50 +137,50 @@ td.sorting_1 {background:transparent !important;}
                                 "sAjaxSource": "ajax/ajax_adelantos.php?accion=listaadelanto&where=1&"+jQuery('#form_adelantos').serialize(),
                                 "bJQueryUI": true,
                                 "bDeferRender": true,
-							 
+
 								"fnServerData": function ( sSource, aoData, fnCallback ) {
-									jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData, 
+									jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData,
 										"success": fnCallback,
 										"complete" :function() {
 											jQuery('#tablon').fadeTo(0, 1);
 										}
 									})
 								},
-							
+
                                 "aoColumnDefs": [
                                {  "sClass": "alignleft",    "aTargets": [ 1,3 ]   },
 							   {  "sClass": "alignright",    "aTargets": [ 4,5 ]   },
 							     {  "sClass": "aligncenter",    "aTargets": [ 7 ]   },
 									 {  "sClass": "marginleft",    "aTargets": [ 1,3 ]   },
-                                    
-                                    
+
+
                                     {  "sWidth": "60px",    "aTargets": [0,2,5,4,5 ]   },
-                                   
+
 									  { "bVisible": false, "aTargets": [ 7 ] },
-									  
+
 			    {  "fnRender": function ( o, val ) {
 							 return   o.aData[6]+'<br>'+ o.aData[3];
                         },    "aTargets": [ 3 ]   } ,
-                     
+
 					 {  "fnRender": function ( o, val ) {
 							 return   MonedaArray[+o.aData[7]] +' '+o.aData[4]
                         },    "aTargets": [ 4 ]   } ,
 					 {  "fnRender": function ( o, val ) {
 							 return   MonedaArray[+o.aData[7]] +' '+o.aData[5]
                         },    "aTargets": [ 5]   } ,
-					
-					
+
+
 					 {  "fnRender": function ( o, val ) {
-							
+
 							var respuesta="<a href=\"javascript:void(0)\"  style=\"float:right;display:inline;margin-right:10px;\" onclick=\"nuovaFinestra('Agregar_Adelanto', 730, 580,'ingresar_documento_pago.php?id_documento="+ o.aData[0]+"&amp;adelanto=1&amp;popup=1', 'top=100, left=155');\"><img src=\"https://static.thetimebilling.com/images/editar_on.gif\" border=\"0\" title=\"Editar\"></a>";
-							
+
 							if (jQuery('#eliminados').is(':checked')) {
-								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='desborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";	
+								respuesta="<a href=\"javascript:void(0)\"  id=\"desborra_"+ o.aData[0]+"\" class='desborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/undelete.gif\" border=\"0\" title=\"Restaurar\"></a>";
 							} else {
 								if (o.aData[4]!=o.aData[5]) {
 									respuesta+="<a href=\"javascript:void(0)\"    class='noborraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon-off.gif\" border=\"0\" title=\"No se puede editar\"></a>";
 								} else {
-									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
+									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='borraradelanto' \"><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";
 								}
 							}
 							if(PERMISOCOBRANZA==1) {
@@ -187,11 +188,11 @@ td.sorting_1 {background:transparent !important;}
 							} else {
 								return   '-';
 							}
-                        },    "aTargets": [ 6 ]   } 
-					 	
-						
-						
-                    
+                        },    "aTargets": [ 6 ]   }
+
+
+
+
 	         ],
 			 "aaSorting": [[0,'desc']],
                 "iDisplayLength": 25,
@@ -199,18 +200,18 @@ td.sorting_1 {background:transparent !important;}
                 "sPaginationType": "full_numbers",
                 "sDom":  'T<"top"ip>rt<"bottom">'
                 ,"oTableTools": {            "sSwfPath": "../js/copy_cvs_xls.swf",	"aButtons": [ "xls","copy" ]     }
-				
-               
-			  
+
+
+
             }).show();
 		});
-		 
+
 });
 
 
 
     function Refrescarse() {
-                
+
              jQuery('#boton_buscar').click();
     }
 	function AgregarNuevo(tipo)
@@ -227,18 +228,18 @@ td.sorting_1 {background:transparent !important;}
 		{
 			var urlo = "ingresar_documento_pago.php?popup=1&adelanto=1" + url_extension;
                         return	nuovaFinestra('Agregar_Adelanto', 720, 500, urlo, 'top=100, left=125');
-        
+
                 }
-    
+
 	}
- 
- 
-        
+
+
+
 </script>
 
-<?php 
+<?php
 //echo Autocompletador::CSS();
- 
+
 	?>
 
 <table width="90%">
@@ -273,12 +274,12 @@ td.sorting_1 {background:transparent !important;}
 							<td align=right><?php echo __('Fecha Desde') ?></td>
 							<td align="left">
 								<input type="text" name="fecha1" class="fechadiff" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-								
+
 							</td>
 							<td align="left" colspan="2">
 								<?php echo __('Fecha Hasta')?>
 								<input type="text" name="fecha2" class="fechadiff" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-								
+
 							</td>
 						</tr>
 						<tr>
@@ -312,7 +313,7 @@ td.sorting_1 {background:transparent !important;}
 							<td></td>
 							<td colspan=2 align=left>
 								<input name="boton_buscar" id="boton_buscar" type="button" value="<?php echo __('Buscar') ?>" class="btn">
-                                                                
+
 							</td>
 							<td width='40%' align="right">
 								<?php if($p_cobranza->fields['permitido']) {				?>
@@ -344,19 +345,19 @@ td.sorting_1 {background:transparent !important;}
 		<th >idcobro</th></tr>
 	</thead>
 	<tbody>
-		
+
 	</tbody></table>
 </div>
 <?php
 
-	
-	
+
+
 	/*if (UtilesApp::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	{
 		echo(Autocompletador::Javascript($sesion));
 	}
-	 * 
+	 *
 	 */
 	//echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
- 
+
