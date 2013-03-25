@@ -1,4 +1,11 @@
 # Changelog
+## Hotfix: 13.2.13
+viernes 22 de marzo 2013
+* **Fixed:** [Corrige peginador de adelantos](https://github.com/LemontechSA/ttb/pull/133)
+
+## Hotfix: 13.2.12
+* **Fixed:** [Sesion en mayúsculas, clase TramiteTarifa](https://github.com/LemontechSA/ttb/pull/132)
+
 ## Hotfix: 13.2.11
 * **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
 
