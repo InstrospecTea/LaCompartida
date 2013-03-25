@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.2.14
+Lunes 25 de marzo 2013
+* **Fixed:** [Mostrar numeros de factura en Seguimiento de Cobros](https://github.com/LemontechSA/ttb/pull/134)
+
 ## Hotfix: 13.2.13
 viernes 22 de marzo 2013
 * **Fixed:** [Corrige peginador de adelantos](https://github.com/LemontechSA/ttb/pull/133)
