@@ -381,7 +381,7 @@
 			}
 
 			$html .= "</td>";
-			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
+			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
 			{
 					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 					if($cobro->fields['documento'])
