@@ -93,23 +93,14 @@ $app->get('/activities', function () {
 });
 
 $app->get('/areas', function () {
-	$response = array();
-	$_app = Slim::getInstance();
+	$Session = new Sesion();
+	$WorkArea = new AreaTrabajo($Session);
+	$work_areas = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$work_areas = $WorkArea->findAll();
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /areas | ' . $e->getMessage());
-	}
-
-	echo json_encode($response);
+	outputJson($work_areas);
 });
 
 $app->get('/tasks', function () {
@@ -310,6 +301,7 @@ function outputJson($response) {
 	header("Pragma: no-cache");
 	header('Content-type: application/json; charset=utf-8');
 	$response = UtilesApp::utf8izar($response);
+	array_walk_recursive($response, function(&$x) { $x = trim($x); });
 	echo json_encode($response);
 	exit;
 }
