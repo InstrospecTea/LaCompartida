@@ -30,7 +30,7 @@ class AreaTrabajo extends Objeto {
 			array_push($work_areas,
 				array(
 					'code' => $work_area->code,
-					'name' => !empty($work_area->name) ? $work_area->name : null,
+					'name' => !empty($work_area->name) ? $work_area->name : null
 				)
 			);
 		}

@@ -104,23 +104,14 @@ $app->get('/areas', function () {
 });
 
 $app->get('/tasks', function () {
-	$response = array();
-	$_app = Slim::getInstance();
+	$Session = new Sesion();
+	$Task = new Tarea($Session);
+	$tasks = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$tasks = $Task->findAll();
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /tasks | ' . $e->getMessage());
-	}
-
-	echo json_encode($response);
+	outputJson($tasks);
 });
 
 $app->get('/translations', function () {
