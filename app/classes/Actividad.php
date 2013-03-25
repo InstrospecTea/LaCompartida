@@ -53,6 +53,35 @@ class Actividad extends Objeto
 	  $codigo_actividad=sprintf("%04d",$f);
 	  return $codigo_actividad;
 	}
+
+	/**
+	 * Find all activities
+	 * Return an array with next elements:
+	 * 	code, name and matter_code
+	 */
+	function findAll() {
+		$activities = array();
+
+		$sql = "SELECT `activity`.`codigo_asunto` AS `matter_code`, `activity`.`codigo_actividad` AS `code`,
+			`activity`.`glosa_actividad` AS `name`
+			FROM `actividad` AS `activity`
+			ORDER BY `activity`.`glosa_actividad` ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->execute();
+
+		while ($activity = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($activities,
+				array(
+					'code' => $activity->code,
+					'name' => !empty($activity->name) ? $activity->name : null,
+					'matter_code' => !empty($activity->matter_code) ? $activity->matter_code : null
+				)
+			);
+		}
+
+		return $activities;
+	}
 }
 
 class ListaActividades extends Lista

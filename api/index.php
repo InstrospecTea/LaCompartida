@@ -49,6 +49,7 @@ $app->get('/clients/:code/matters', function ($code) {
 	$Session = new Sesion();
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
+
 	$matters = array();
 
 	// validate client code
@@ -63,15 +64,15 @@ $app->get('/clients/:code/matters', function ($code) {
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
-	$matters = $Matter->findAllByCodeClient($code);
+	$matters = $Matter->findAllByClientCode($code);
 
 	outputJson($matters);
 });
 
 $app->get('/matters', function () {
 	$Session = new Sesion();
-
 	$Matter = new Asunto($Session);
+
 	$matters = array();
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -81,23 +82,14 @@ $app->get('/matters', function () {
 });
 
 $app->get('/activities', function () {
-	$response = array();
-	$_app = Slim::getInstance();
+	$Session = new Sesion();
+	$Activity = new Actividad($Session);
+	$activities = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$activities = $Activity->findAll();
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /activities | ' . $e->getMessage());
-	}
-
-	echo json_encode($response);
+	outputJson($activities);
 });
 
 $app->get('/areas', function () {

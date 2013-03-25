@@ -784,14 +784,14 @@ class Cliente extends Objeto {
 	public function findAllActive() {
 		$active = 1;
 		$clients = array();
-		$sql_select_code_client = '`client`.`codigo_cliente`';
+		$sql_select_client_code = '`client`.`codigo_cliente`';
 
 		// find if the client used secondary code
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
-			$sql_select_code_client = '`client`.`codigo_cliente_secundario`';
+			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
-		$sql = "SELECT $sql_select_code_client AS `code`, `client`.`glosa_cliente` AS `name`,
+		$sql = "SELECT $sql_select_client_code AS `code`, `client`.`glosa_cliente` AS `name`,
 			`contract`.`direccion_contacto` AS `address`
 			FROM `cliente` AS `client`
 				INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`

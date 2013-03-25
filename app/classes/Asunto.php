@@ -791,24 +791,26 @@ class Asunto extends Objeto {
 	}
 
 	/**
-	 * Find all active matters by code client
+	 * Find all active matters by client code
+	 * Return an array with next elements:
+	 * 	code (secondary if used) and name
 	 */
-	public function findAllByCodeClient($code) {
+	public function findAllByClientCode($code) {
 		$matters = array();
 		$active = 1;
-		$sql_select_code_matter = '`matter`.`codigo_asunto`';
-		$sql_where_code_client = '`client`.`codigo_cliente`';
+		$sql_select_matter_code = '`matter`.`codigo_asunto`';
+		$sql_where_client_code = '`client`.`codigo_cliente`';
 
 		// find if the client used secondary code
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
-			$sql_select_code_matter = '`matter`.`codigo_asunto_secundario`';
-			$sql_where_code_client = '`client`.`codigo_cliente_secundario`';
+			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
+			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
-		$sql = "SELECT $sql_select_code_matter AS `code`, `matter`.`glosa_asunto` AS `name`
+		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
-			WHERE $sql_where_code_client=:code AND `matter`.`activo`=:active
+			WHERE $sql_where_client_code=:code AND `matter`.`activo`=:active
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
@@ -836,16 +838,16 @@ class Asunto extends Objeto {
 	public function findAllActive() {
 		$matters = array();
 		$active = 1;
-		$sql_select_code_client = '`client`.`codigo_cliente`';
-		$sql_select_code_matter = '`matter`.`codigo_asunto`';
+		$sql_select_client_code = '`client`.`codigo_cliente`';
+		$sql_select_matter_code = '`matter`.`codigo_asunto`';
 
 		// find if the client used secondary code
 		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
-			$sql_select_code_client = '`client`.`codigo_cliente_secundario`';
-			$sql_select_code_matter = '`matter`.`codigo_asunto_secundario`';
+			$sql_select_client_code = '`client`.`codigo_cliente_secundario`';
+			$sql_select_matter_code = '`matter`.`codigo_asunto_secundario`';
 		}
 
-		$sql = "SELECT $sql_select_code_client AS `client_code`, $sql_select_code_matter AS `code`,
+		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
 			`matter`.`glosa_asunto` AS `name`
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`

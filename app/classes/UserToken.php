@@ -4,7 +4,7 @@ require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
 
 class UserToken extends Objeto {
 	function findById($id) {
-		echo $sql = "SELECT `user_token`.`id`, `user_token`.`auth_token`, `user_token`.`app_key`,
+		$sql = "SELECT `user_token`.`id`, `user_token`.`auth_token`, `user_token`.`app_key`,
 				`user_token`.`created`, `user_token`.`modified`
 			FROM `user_token`
 			WHERE `user_token`.`id`=:id";
@@ -14,8 +14,6 @@ class UserToken extends Objeto {
 		$Statement->execute();
 
 		$user_token_data = $Statement->fetchObject();
-
-		var_dump($user_token_data); exit;
 
 		if (is_object($user_token_data)) {
 			return $user_token_data;
