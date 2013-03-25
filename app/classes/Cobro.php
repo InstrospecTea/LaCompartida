@@ -1123,6 +1123,8 @@ class Cobro extends Objeto {
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0') + ($s > 0 ? ($s / 3600) : '0');
 				$duracion_minutos = $h * 60 + $m + $s / 60;
 
+				$id_usuario=$trabajo->fields['id_usuario'];
+
 				// Se obtiene la tarifa del profesional que hizo el trabajo (sólo si no se tiene todavía).
 				if ($profesional[$id_usuario]['tarifa'] == '') {
 					$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
@@ -1752,7 +1754,7 @@ class Cobro extends Objeto {
 	 */
 
 
-	function PrepararCobro($fecha_ini = '', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+	function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 
 		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
@@ -1774,7 +1776,7 @@ class Cobro extends Objeto {
 				}
 			}
 
-			if ($fecha_ini == '') {
+			/*if ($fecha_ini == '') {
 				//uso la fecha final del ultimo cobro y le sumo 1 dia
 				$sql = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) as fuc
 							FROM cobro
@@ -1801,7 +1803,7 @@ class Cobro extends Objeto {
 						$fecha_ini = '0000-00-00'; //=$fmt?? xq se usa el 00-00-0000??? ah?????
 					}
 				}
-			}
+			}*/
 
 			//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 			$genera = $emitir_obligatoriamente;

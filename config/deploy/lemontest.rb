@@ -3,8 +3,15 @@ load 'config/cap_notify'
 load 'config/cap_shared'
 server "lemontest.thetimebilling.com", :web, {:user => 'root'}
 
+
+ 
+   default_branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
+
  set :current_stage, "custom"
-  custom_branch = Capistrano::CLI.ui.ask("Enter Feature Branch []: ")
+
+   custom_branch = Capistrano::CLI.ui.ask("Enter Release/Hotfix Branch [#{default_branch}]: ")
+ custom_branch = (custom_branch && custom_branch.length > 0) ? custom_branch : default_branch
+
   custom_name = custom_branch.split('/').last
   set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_name}"
   set :branch, custom_branch
@@ -55,7 +62,7 @@ task :create_database do
   puts           "   #######################################################################\e[0m\n"
   proceed = STDIN.gets[0..0] rescue nil
   if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
-    run "  mysql -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx --opt  lemontest_molde | mysql -uroot -pasdwsx #{dbname}"
+    run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
   end
 
 end

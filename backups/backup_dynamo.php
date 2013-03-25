@@ -202,7 +202,7 @@ foreach ($arreglo as $sitio) {
     );
     $slavehost = ($sitio['dbslave'] != '_' && $sitio['dbslave'] != '') ? $sitio['dbslave'] : $sitio['dbhost'];
     $subdominiosubdir = explode('.', $sitio['subdominiosubdir']);
-    $bucketname = 'ttbackup' . $subdominiosubdir[0];
+    $bucketname = 'ttbackups' ;
     loguear('comprobando bucket S3 ' . $bucketname);
     try {
       $comprobarbucket = $S3sdk->create_bucket($bucketname, AmazonS3::REGION_US_E1);
@@ -223,8 +223,9 @@ foreach ($arreglo as $sitio) {
     $ret = 0;
 
     //genero el dump sql
-    $filebkp = $db . "_" . $fecha . ".sql.gz";
-    $path = $conf->dir_temp . "/" . $filebkp;
+    $path = $conf->dir_temp . "/" . $db . "_" . $fecha . ".sql.gz";
+    $filebkp = $subdominiosubdir[0].'/'.$db . "_" . $fecha . ".sql.gz";
+
 
     if ($sitio['mistery'] == 1)
       $sitio['dbpass'] = decrypt($sitio['dbpass'], $sitio['backupdir']);

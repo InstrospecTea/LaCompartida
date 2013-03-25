@@ -25,15 +25,13 @@ if (!UtilesApp::GetConf($sesion,'ActualizacionTerminado')) {
 		<div style="position:absolute;top:0px;left:50%;margin-left:-485px;width:485px;text-align:left;">
 			<a style="border:0 none;" href="<?php echo Conf::RootDir().'/app/usuarios/index.php';?>" style="border:0 none;text-decoration:none;">
 <?php
-	if (defined('ROOTDIR') && ROOTDIR == 'tt2') {
-		echo '<img  style="border:0 none;"  src="https://estaticos.thetimebilling.com/images/logo_top_new_tt2_blanco.png" />';
-	} else {
-		echo '<img  style="border:0 none;" src="'. Conf::ImgDir().'/logo_top.png" rel="'.ROOTDIR.'"/>';
+ 
+		echo '<i class="sprite sprite-logo_top" rel="'.ROOTDIR.'"></i>';
 		echo '<script>';
 		echo "var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;";
 		echo "if (is_chrome && window.console) console.log('Es Chrome '+navigator.userAgent);";
 		echo '</script>';
-	}
+	 
 ?></a></div>
 		<div style="position:absolute;top:0px;left:50%;width:485px;text-align:right;"><br/>
 			<span style="color:#FFFFFF;">
