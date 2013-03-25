@@ -1,184 +1,83 @@
 <?php
-require_once dirname(__FILE__) . '/../fw/classes/Slim/Slim.php';
 require_once dirname(__FILE__) . '/../app/conf.php';
 
 $app = new Slim();
 
 $app->post('/login', function () {
-	$_app = Slim::getInstance();
-	$_db = getConnection();
-	$response = array();
+	$Session = new Sesion();
+	$UserToken = new UserToken($Session);
+	$Slim = Slim::getInstance();
 
-	$user = $_app->request()->params('user');
-	$password = $_app->request()->params('password');
-	$app_key = $_app->request()->params('app_key');
+	$user = $Slim->request()->params('user');
+	$password = $Slim->request()->params('password');
+	$app_key = $Slim->request()->params('app_key');
+	$auth_token = $UserToken->makeAuthToken($user);
 
-	$password_encryption = md5($password);
-	$auth_token = makeAuthToken($user);
-
-	$sql = "SELECT `user`.id_usuario AS `id`
-		FROM `usuario` AS `user`
-		WHERE `user`.`rut`=:user AND `user`.`password`=:password";
-
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('user', $user);
-	$_stmt->bindParam('password', $password_encryption);
-	$_stmt->execute();
-	$user_data = $_stmt->fetchObject();
-
-	if (is_object($user_data)) {
-		$sql = "SELECT `user_token`.`id`
-			FROM `user_token`
-			WHERE `user_token`.`id`=:id";
-
-		$_stmt = $_db->prepare($sql);
-		$_stmt->bindParam('id', $user_data->id);
-		$_stmt->execute();
-		$user_token_data = $_stmt->fetchObject();
-
-		// if exist the auth_token then replace for the new one
-		if (is_object($user_token_data)) {
-			$sql = "UPDATE `user_token`
-				SET `user_token`.`auth_token`=:auth_token, `user_token`.`modified`=:modified
-				WHERE `user_token`.`id`=:id";
-
-			$_stmt = $_db->prepare($sql);
-			$_stmt->bindParam('auth_token', $auth_token);
-			$_stmt->bindParam('id', $user_data->id);
-			$_stmt->bindParam('modified', date('Y-m-d H:i:s'));
-			$_stmt->execute();
-		} else {
-			// if not exist then create the auth_token
-			$sql = "INSERT INTO `user_token`
-				SET `user_token`.`id`=:id, `user_token`.`auth_token`=:auth_token,
-					`user_token`.`app_key`=:app_key, `user_token`.`created`=:created";
-
-			$_stmt = $_db->prepare($sql);
-			$_stmt->bindParam('id', $user_data->id);
-			$_stmt->bindParam('auth_token', $auth_token);
-			$_stmt->bindParam('app_key', $app_key);
-			$_stmt->bindParam('created', date('Y-m-d H:i:s'));
-			$_stmt->execute();
-		}
-
-		$response['auth_token'] = $auth_token;
-	} else {
+	if (!$Session->login($user, null, $password)) {
 		halt("The user doesn't exist");
+	} else {
+		$user_token_data = array(
+			'id' => $Session->usuario->fields['id_usuario'],
+			'auth_token' => $auth_token,
+			'app_key' => $app_key
+		);
+
+		if (!$UserToken->save($user_token_data)) {
+			halt("Unexpected error when saving data");
+		}
 	}
 
-	outputJson($response);
+	outputJson(array('auth_token' => $auth_token));
 });
 
 $app->get('/clients', function () {
-	$_app = Slim::getInstance();
-	$_db = getConnection();
-	$response = array();
+	$Session = new Sesion();
+	$Client = new Cliente($Session);
 
+	$clients = array();
 	$user_id = validateAuthTokenSendByHeaders();
+	$clients = $Client->findAllActive();
 
-	// find if the client used secondary code
-	$option = 'CodigoSecundario';
-	$use_secondary_code = false;
-	$sql = "SELECT `configuration`.`glosa_opcion` AS `option`, `configuration`.`valor_opcion` AS `value`
-		FROM `configuracion` AS `configuration`
-		WHERE `configuration`.`glosa_opcion`=:option";
-
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('option', $option);
-	$_stmt->execute();
-	$configuration_data = $_stmt->fetchObject();
-
-	if (is_object($configuration_data) && $configuration_data->value == '1') {
-		$use_secondary_code = true;
-	}
-
-	$active = 1;
-	$sql = "SELECT `client`.`codigo_cliente` AS `code`, `client`.`codigo_cliente_secundario` AS `secondary_code`,
-		`client`.`glosa_cliente` AS `name`, `contract`.`direccion_contacto` AS `address`
-		FROM `cliente` AS `client`
-			INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
-		WHERE `client`.`activo`=:active
-		ORDER BY `client`.`glosa_cliente` ASC";
-
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('active', $active);
-	$_stmt->execute();
-
-	while ($client_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
-		$client = array(
-			'code' => $use_secondary_code ? $client_data->secondary_code : $client_data->code,
-			'name' => $client_data->name,
-			'address' => $client_data->address
-		);
-
-		array_push($response, $client);
-	}
-
-	outputJson($response);
+	outputJson($clients);
 });
 
 $app->get('/clients/:code/matters', function ($code) {
-	$_app = Slim::getInstance();
-	$_db = getConnection();
-	$response = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
-	$active = 1;
-
-	$sql = "SELECT `matter`.`codigo_asunto` AS `code`, `matter`.`glosa_asunto` AS `name`
-		FROM `cliente` AS `client`
-			INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
-		WHERE (`client`.`codigo_cliente`=:code OR `client`.`codigo_cliente_secundario`=:code)
-			AND `matter`.`activo`=:active
-		ORDER BY `matter`.`glosa_asunto` ASC";
-
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('code', $code);
-	$_stmt->bindParam('active', $active);
-	$_stmt->execute();
-
-	while ($matter_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
-		$matter = array(
-			'code' => $matter_data->code,
-			'name' => $matter_data->name
-		);
-
-		array_push($response, $matter);
+	if (is_null($code) || $code == '') {
+		halt("Invalid code client");
 	}
 
-	outputJson($response);
+	$Session = new Sesion();
+	$Client = new Cliente($Session);
+	$Matter = new Asunto($Session);
+	$matters = array();
+
+	// validate client code
+	if (UtilesApp::GetConf($Session, 'CodigoSecundario') == '1') {
+		$client = $Client->LoadByCodigoSecundario($code);
+	} else {
+		$client = $Client->LoadByCodigo($code);
+	}
+
+	if ($client === false) {
+		halt("The client doesn't exist");
+	}
+
+	$user_id = validateAuthTokenSendByHeaders();
+	$matters = $Matter->findAllByCodeClient($code);
+
+	outputJson($matters);
 });
 
 $app->get('/matters', function () {
-	$_app = Slim::getInstance();
-	$_db = getConnection();
-	$response = array();
+	$Session = new Sesion();
+
+	$Matter = new Asunto($Session);
+	$matters = array();
 
 	$user_id = validateAuthTokenSendByHeaders();
-	$active = 1;
+	$matters = $Matter->findAllActive();
 
-	$sql = "SELECT `client`.`codigo_cliente` AS `client_code`, `matter`.`codigo_asunto` AS `code`,
-		`matter`.`glosa_asunto` AS `name`
-		FROM `cliente` AS `client`
-			INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
-		WHERE `matter`.`activo`=:active
-		ORDER BY `matter`.`glosa_asunto` ASC";
-
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('active', $active);
-	$_stmt->execute();
-
-	while ($matter_data = $_stmt->fetch(PDO::FETCH_OBJ)) {
-		$matter = array(
-			'client_code' => $matter_data->client_code,
-			'code' => $matter_data->code,
-			'name' => $matter_data->name
-		);
-
-		array_push($response, $matter);
-	}
-
-	outputJson($response);
+	outputJson($matters);
 });
 
 $app->get('/activities', function () {
@@ -390,33 +289,14 @@ $app->put('/users/:id/works', function ($id) {
 
 $app->run();
 
-function getConnection() {
-	$dbhost = DBHOST;
-	$dbuser = DBUSER;
-	$dbpass = DBPASS;
-	$dbname = DBNAME;
-
-	try {
-		$dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
-		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		return $dbh;
-	} catch(PDOException $e) {
-		halt('Error connection MySQL > ' . $e->getMessage());
-	}
-}
-
 function validateAuthTokenSendByHeaders() {
-	$_app = Slim::getInstance();
-	$_req = $_app->request();
-	$_db = getConnection();
+	$Session = new Sesion();
+	$UserToken = new UserToken($Session);
+	$Slim = Slim::getInstance();
+	$Request = $Slim->request();
 
-	$auth_token = $_req->headers('AUTH_TOKEN');
-
-	$sql = "SELECT `user_token`.`id` FROM `user_token` WHERE `user_token`.`auth_token`=:auth_token";
-	$_stmt = $_db->prepare($sql);
-	$_stmt->bindParam('auth_token', $auth_token);
-	$_stmt->execute();
-	$user_token_data = $_stmt->fetchObject();
+	$auth_token = $Request->headers('AUTH_TOKEN');
+	$user_token_data = $UserToken->findByAuthToken($auth_token);
 
 	// if not exist the auth_token then return error
 	if (!is_object($user_token_data)) {
@@ -426,31 +306,10 @@ function validateAuthTokenSendByHeaders() {
 	}
 }
 
-function makeAuthToken($secret) {
-  $str = '';
-  for ($i = 0; $i < 7; $i++) {
-  	$str .= randAlphanumeric();
-  }
-  $pos = rand(0, 24);
-  $str .= chr(65 + $pos);
-  $str .= substr(md5($str . $secret), $pos, 8);
-  return sha1($str);
-}
-
-function randAlphanumeric() {
-	$subsets[0] = array('min' => 48, 'max' => 57); // ascii digits
-	$subsets[1] = array('min' => 65, 'max' => 90); // ascii lowercase English letters
-	$subsets[2] = array('min' => 97, 'max' => 122); // ascii uppercase English letters
-	// random choice between lowercase, uppercase, and digits
-	$s = rand(0, 2);
-	$ascii_code = rand($subsets[$s]['min'], $subsets[$s]['max']);
-	return chr($ascii_code);
-}
-
 function halt($message = null, $code = 500) {
-	$_app = Slim::getInstance();
-	$_req = $_app->request();
-	$_app->halt($code, $_app->request()->getMethod() . ' | ' . $_req->getPath() . ' | ' . $message);
+	$Slim = Slim::getInstance();
+	$Request = $Slim->request();
+	$Slim->halt($code, $Slim->request()->getMethod() . ' | ' . $Request->getPath() . ' | ' . $message);
 }
 
 function outputJson($response) {
@@ -458,29 +317,7 @@ function outputJson($response) {
 	header("Cache-Control: no-cache, must-revalidate");
 	header("Pragma: no-cache");
 	header('Content-type: application/json; charset=utf-8');
-	$response = applyUtf8ToArray($response);
+	$response = UtilesApp::utf8izar($response);
 	echo json_encode($response);
 	exit;
-}
-
-function applyUtf8ToArray($data, $encode = true) {
-	if (is_array($data)) {
-		foreach ($data as $key => $value) {
-			unset($data[$key]);
-			$key = applyUtf8ToArray($key, $encode);
-			$data[$key] = applyUtf8ToArray($value, $encode);
-		}
-	} else if (is_string($data)) {
-		$data = trim($data);
-		// ^ = XOR = or exclusive = true && false || false && true
-		if (mb_detect_encoding($data, 'UTF-8', true) == 'UTF-8' ^ $encode) {
-			$data = $encode ? utf8_encode($data) : utf8_decode($data);
-		}
-
-		if ($data == '') {
-			$data = null;
-		}
-	}
-
-	return $data;
 }

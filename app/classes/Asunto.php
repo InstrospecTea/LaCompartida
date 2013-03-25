@@ -13,7 +13,7 @@ class Asunto extends Objeto {
 	//Primera etapa del proyecto
 	var $primera_etapa = null;
 	var $monto = null;
-	
+
 	//TODO: usar llave unica multiple para resaltar asuntos existentes, siempre y cuando:
 	//TODO: aplicar logica de campo unique, con soporte para unique de 2 campos (codigo_cliente/glosa_asunto)
 	public static $llave_carga_masiva = 'codigo_asunto'; //array('codigo_cliente', 'glosa_asunto');
@@ -82,7 +82,7 @@ class Asunto extends Objeto {
 			'relacion' => 'Moneda'
 		)
 	);
-	
+
 	public static $configuracion_reporte = array(
 		array(
 			'field' => 'codigo_asunto',
@@ -670,12 +670,12 @@ class Asunto extends Objeto {
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Planilla_Asuntos'));
 	}
-	
+
 	public function PreCrearDato($data) {
 		if(empty($data['codigo_cliente']) || $data['codigo_cliente'] == 'NULL'){
 			return $this->IngresarAsuntoGenerico($data);
 		}
-		
+
 		if (isset($data['codigo_asunto'])) {
 			$this->LoadByCodigo($data['codigo_asunto']);
 		} else {
@@ -685,12 +685,12 @@ class Asunto extends Objeto {
 				$resp_contrato = $this->sesion->pdodbh->query($query_contrato);
 				$contrato = $resp_contrato->fetchAll(PDO::FETCH_ASSOC);
 				$data += $contrato[0];
-			
+
 				$query_asunto = "SELECT id_asunto, codigo_asunto, id_contrato FROM asunto WHERE codigo_cliente = '{$data['codigo_cliente']}' AND glosa_asunto = '{$data['glosa_asunto']}'";
 				$resp_asunto = $this->sesion->pdodbh->query($query_asunto);
 				$asunto = $resp_asunto->fetchAll(PDO::FETCH_ASSOC);
 			}
-			
+
 			if (!empty($asunto)) {
 				$data += $asunto[0];
 			} else {
@@ -770,7 +770,7 @@ class Asunto extends Objeto {
 
 	private function IngresarAsuntoGenerico($data) {
 		unset($data['codigo_cliente']);
-		
+
 		$query_clientes = "SELECT codigo_cliente, id_contrato AS id_contrato_cliente FROM cliente";
 		$resp_clientes = $this->sesion->pdodbh->query($query_clientes);
 		$clientes = $resp_clientes->fetchAll(PDO::FETCH_ASSOC);
@@ -788,6 +788,85 @@ class Asunto extends Objeto {
 					(empty($this->error) ? '' : ": {$this->error}"));
 			}
 		}
+	}
+
+	/**
+	 * Find all active matters by code client
+	 */
+	public function findAllByCodeClient($code) {
+		$matters = array();
+		$active = 1;
+		$sql_select_code_matter = '`matter`.`codigo_asunto`';
+		$sql_where_code_client = '`client`.`codigo_cliente`';
+
+		// find if the client used secondary code
+		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
+			$sql_select_code_matter = '`matter`.`codigo_asunto_secundario`';
+			$sql_where_code_client = '`client`.`codigo_cliente_secundario`';
+		}
+
+		$sql = "SELECT $sql_select_code_matter AS `code`, `matter`.`glosa_asunto` AS `name`
+			FROM `cliente` AS `client`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+			WHERE $sql_where_code_client=:code AND `matter`.`activo`=:active
+			ORDER BY `matter`.`glosa_asunto` ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('code', $code);
+		$Statement->bindParam('active', $active);
+		$Statement->execute();
+
+		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($matters,
+				array(
+					'code' => $matter->code,
+					'name' => !empty($matter->name) ? $matter->name : null
+				)
+			);
+		}
+
+		return $matters;
+	}
+
+	/**
+	 * Find all active matters
+	 * Return an array with next elements:
+	 * 	code (secondary if used) and name
+	 */
+	public function findAllActive() {
+		$matters = array();
+		$active = 1;
+		$sql_select_code_client = '`client`.`codigo_cliente`';
+		$sql_select_code_matter = '`matter`.`codigo_asunto`';
+
+		// find if the client used secondary code
+		if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario') == '1') {
+			$sql_select_code_client = '`client`.`codigo_cliente_secundario`';
+			$sql_select_code_matter = '`matter`.`codigo_asunto_secundario`';
+		}
+
+		$sql = "SELECT $sql_select_code_client AS `client_code`, $sql_select_code_matter AS `code`,
+			`matter`.`glosa_asunto` AS `name`
+			FROM `cliente` AS `client`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+			WHERE `matter`.`activo`=:active
+			ORDER BY `matter`.`glosa_asunto` ASC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('active', $active);
+		$Statement->execute();
+
+		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($matters,
+				array(
+					'client_code' => $matter->client_code,
+					'code' => $matter->code,
+					'name' => !empty($matter->name) ? $matter->name : null
+				)
+			);
+		}
+
+		return $matters;
 	}
 
 }
