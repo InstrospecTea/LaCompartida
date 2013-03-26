@@ -23,16 +23,39 @@ if (empty($correo['id_usuario'])) {
 	exit;
 }
 
-function toString($a) {
+function tabla($trabajos, $con_total = true, $hora_correo = null) {
+	$fmt_fecha_hora = '%d-%m-%Y %H:%M:%S';
+	$fmt_fecha = '%d-%m-%Y';
 	$string = '';
-	foreach ($a as $k => $v) {
-		$string .= "<strong>$k</strong>: $v. ";
+	$total_tpl = '<tr style="font-weight: bold;"><td colspan="3" style="font-weight: bold;">Total</td><td style="font-weight: bold;">%s</td></tr>';
+	$row_tpl = '<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>';
+	$string .= '<table style="width: 100%"><tr><td class="encabezado">Fecha Creacion</td>
+					<td class="encabezado">Fecha</td><td class="encabezado">Código asunto</td>
+					<td class="encabezado">Duración</td></tr>';
+	$total = 0;
+	$despliega_hora_correo = true;
+	foreach ($trabajos as $trabajo) {
+		if (!empty($hora_correo) && $hora_correo < $trabajo['fecha_creacion'] && $despliega_hora_correo) {
+			$string .= sprintf('<tr><td colspan="4" class="encabezado">Hora envío correo, acumula %s horas ingresadas.</td></tr>', number_format($total, 2));
+			$despliega_hora_correo = false;
+		}
+		$total += $trabajo['duracion'];
+		$string .= sprintf($row_tpl,
+							Utiles::sql2date($trabajo['fecha_creacion'], $fmt_fecha_hora),
+							Utiles::sql2date($trabajo['fecha'], $fmt_fecha),
+							$trabajo['codigo_asunto'],
+							number_format($trabajo['duracion'], 2)
+						);
 	}
+	if ($con_total) {
+		$string .= sprintf($total_tpl, number_format($total, 2));
+	}
+	$string .= '</table>';
 	return $string;
 }
 
 if ($correo['tipo'] == 'diario') {
-	$campos_trabajos = 'fecha_creacion, fecha, codigo_asunto, FORMAT(TIME_TO_SEC(duracion)/3600, 2) AS duracion';
+	$campos_trabajos = 'fecha_creacion, fecha, codigo_asunto, TIME_TO_SEC(duracion)/3600 AS duracion';
 	$query = "SELECT {$campos_trabajos} FROM trabajo
 				WHERE id_usuario = {$correo['id_usuario']}
 					AND fecha = '{$correo['dia_creacion']}'";
@@ -86,22 +109,20 @@ if ($correo['tipo'] == 'diario') {
 }
 ?>
 <table style="width: 100%" cellpadding="3">
-	<tr><td class="cvs"><?php echo __('Fecha Creaci&oacute;n'); ?>: </td><td colspan="3"><?php echo $correo['fecha_creacion']; ?></td></tr>
+	<tr><td class="cvs"><?php echo __('Fecha Creaci&oacute;n'); ?>: </td><td colspan="3"><?php echo Utiles::sql2date($correo['fecha_creacion'], '%d-%m-%Y %H:%M:%S'); ?></td></tr>
 	<tr><td class="cvs"><?php echo __('Enviado'); ?>: </td><td colspan="3"><?php echo $correo['enviado'] ? 'Si' : 'No'; ?></td></tr>
-	<tr><td class="cvs"><?php echo __('Fecha Envio'); ?>: </td><td colspan="3"><?php echo $correo['fecha_envio']; ?></td></tr>
+	<tr><td class="cvs"><?php echo __('Fecha Envio'); ?>: </td><td colspan="3"><?php echo Utiles::sql2date($correo['fecha_envio'], '%d-%m-%Y %H:%M:%S'); ?></td></tr>
 	<?php if (!empty($trabajos)) { ?>
 		<tr>
-			<td class="cvs" rowspan="<?php echo count($trabajos); ?>"><?php echo __('Trabajos'); ?>: </td>
-			<?php foreach($trabajos as $trabajo) { ?>
-				<td><?php echo toString($trabajo); ?></td>
-			<?php } ?>
+			<td class="cvs"><?php echo __('Trabajos'); ?>: </td>
+			<td><?php echo tabla($trabajos, true, $correo['fecha_creacion']); ?></td>
 		</tr>
 	<?php } ?>
 	<?php if (!empty($ultimo_trabajo_previo)) { ?>
-		<tr><td class="cvs"><?php echo __('Trabajo previo'); ?>: </td><td><?php echo toString($ultimo_trabajo_previo); ?></td></tr>
+		<tr><td class="cvs"><?php echo __('Trabajo previo'); ?>: </td><td><?php echo tabla(array($ultimo_trabajo_previo), false); ?></td></tr>
 	<?php } ?>
 	<?php if (!empty($siguiente_trabajo)) { ?>
-		<tr><td class="cvs"><?php echo __('Siguiente trabajo'); ?>: </td><td><?php echo toString($siguiente_trabajo); ?></td></tr>
+		<tr><td class="cvs"><?php echo __('Siguiente trabajo'); ?>: </td><td><?php echo tabla(array($siguiente_trabajo), false); ?></td></tr>
 	<?php } ?>
 
 	<?php if (!empty($total_trabajos_previos)) { ?>
