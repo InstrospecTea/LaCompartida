@@ -171,19 +171,11 @@ if ($opcion == "guardar") {
 
 		if ($gasto->Write()) {
 			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
-			?>
-			<script language='javascript'>
-				if(  parent.window.Refrescarse ) {
-					parent.window.Refrescarse(); 
-				} else if( window.opener.Refrescar ) {
-					window.opener.Refrescar(); 
-				}
-			</script>
-			<?php
+		 
 		}
 	}
 }
-
+ 
 $pagina->titulo = $txt_pagina;
 $pagina->PrintTop($popup);
 
@@ -191,7 +183,11 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-	
+		if(parent.window.Refrescarse) {
+					parent.window.Refrescarse(); 
+				} else if( window.opener.Refrescar ) {
+					window.opener.Refrescar(); 
+				}
 
 	function ShowGastos(valor)
 	{

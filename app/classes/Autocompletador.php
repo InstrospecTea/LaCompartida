@@ -179,35 +179,38 @@ class Autocompletador
 				}
 				Autocompletador.activate();
 			}
-			function RevisarConsistenciaClienteAsunto( form ) {
-		var accion = 'consistencia_cliente_asunto';
-		if( form.codigo_cliente_secundario && !form.codigo_cliente )
-			var codigo_cliente = form.codigo_cliente_secundario.value;
-		else 
-			var codigo_cliente = form.codigo_cliente.value;
-		if( form.codigo_asunto_secundario && !form.codigo_asunto )
-			var codigo_asunto = form.codigo_asunto_secundario.value;
-		else
-			var codigo_asunto = form.codigo_asunto.value;
-		var http = getXMLHTTP();
-		http.open('get','ajax.php?accion='+accion+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente, false);
-		http.onreadystatechange = function()
-		{
-			if(http.readyState == 4)
-			{
-				var response = http.responseText;
-				if( response == \"OK\" ) {
-					return true;
-				} else {
-					alert('El asunto seleccionado no corresponde al cliente seleccionado.');
-					if( form.codigo_asunto_secundario && !form.codigo_asunto )
-						form.codigo_asunto_secundario.focus();
-					else
-						form.codigo_asunto.focus();
-					return false;
-				}
+		function RevisarConsistenciaClienteAsunto( form ) {
+			var accion = 'consistencia_cliente_asunto';
+
+			if( jQuery('#codigo_cliente_secundario').length>0 ) {
+				var codigo_cliente = jQuery('#codigo_cliente_secundario').val();
+			} else  {
+				var codigo_cliente = jQuery('#codigo_cliente').val();
 			}
-		};
+			if( form.codigo_asunto_secundario && !form.codigo_asunto )
+				var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
+			else
+				var codigo_asunto = jQuery('#codigo_asunto').val();
+			console.log(codigo_cliente,codigo_asunto);
+			var http = getXMLHTTP();
+			http.open('get','ajax.php?accion='+accion+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente, false);
+			http.onreadystatechange = function()
+			{
+				if(http.readyState == 4)
+				{
+					var response = http.responseText;
+					if( response == \"OK\" ) {
+						return true;
+					} else {
+						alert('El asunto seleccionado no corresponde al cliente seleccionado.');
+						if( form.codigo_asunto_secundario && !form.codigo_asunto )
+							form.codigo_asunto_secundario.focus();
+						else
+							form.codigo_asunto.focus();
+						return false;
+					}
+				}
+			};
 	    http.send(null);
 }
 		</script>";
