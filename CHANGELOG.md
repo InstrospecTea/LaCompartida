@@ -1,6 +1,10 @@
 # Changelog
+## Hotfix: 13.2.15
+martes 26 de marzo 2013
+* **Fixed** [Agrega metodo Contrato->LoadByCodigoSecundario](https://www.pivotaltracker.com/story/show/46909219)
+
 ## Hotfix: 13.2.14
-Lunes 25 de marzo 2013
+lunes  25 de marzo 2013
 * **Fixed:** [Mostrar numeros de factura en Seguimiento de Cobros](https://github.com/LemontechSA/ttb/pull/134)
 
 ## Hotfix: 13.2.13
