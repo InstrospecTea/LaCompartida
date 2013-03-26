@@ -1,14 +1,6 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
+
+require_once dirname(__FILE__) . '/../conf.php'; 
 
 $sesion = new Sesion(array('PRO', 'REV', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
@@ -88,43 +80,8 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 }
 
 
-//echo "<iframe name=trabajos onload=\"calcHeight(this.id, 'pagina_body');\" id='trabajos' src='".$url_iframe."' frameborder=0 width=100% height=2000px></iframe>";
-?>
-<script type="text/javascript">
-<?php echo "var url_iframe='$url_iframe';"; ?>
-	function calcHeight(idIframe, idMainElm){
-		ifr = $(idIframe);
-		the_size = ifr.$(idMainElm).offsetHeight + 20;
-		if( the_size < 500 ) the_size = 500;
-		new Effect.Morph(ifr, {
-			style: 'height:'+the_size+'px',
-			duration: 0.2
-		});
-	}
 
-	/*jQuery(document).ready(function() {
-      
-    
- jQuery('#divhoras').load(url_iframe+'   #form_trabajos');
- jQuery('#trabajos').attr('src',url_iframe+'&esajax=1');
-	 jQuery('#boton_buscar').live('click',function() {
-	 jQuery('#form_trabajos').append('<input type="hidden" id="esajax" name="esajax" value="1"/>');
-	 jQuery('#form_trabajos').attr({'action': url_iframe+'&esajax=1','target':'trabajos' }).submit();
-	 calcHeight('trabajos', 'pagina_body');
-	return false;
- });
- jQuery('#trabajos').load(function() {
-	  calcHeight('trabajos', 'pagina_body');
-	      
- });
-	
-});*/
-     
-  
-	//<div style="width:100%;height:100%;border: 0 none;" id="divhoras">&nbsp;</div><iframe name='trabajos'  id='trabajos' frameborder=0 width=100% height=100px></iframe>
-</script>
 
-<?php
-echo "<iframe name=trabajos onload=\"calcHeight(this.id, 'pagina_body');\" id='trabajos' src='" . $url_iframe . "' frameborder=0 width=100% height=2000px></iframe>";
+echo "<iframe name='trabajos' class='resizableframe'  id='trabajos' src='" . $url_iframe . "' frameborder=0 width=100% height=2000px></iframe>";
 $pagina->PrintBottom();
 
