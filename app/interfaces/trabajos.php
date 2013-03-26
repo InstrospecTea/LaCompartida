@@ -278,12 +278,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		 global $where, $query;
 		 $where=$wherelocal;
 	// TOTAL HORAS
-<<<<<<< HEAD
-	$query = "SELECT
-					SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion,
-					SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada
-				FROM trabajo
-=======
+ 
 	$query = "SELECT 
 					SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
 					SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada ";
@@ -291,7 +286,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	  	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 		
 	$query.=" FROM trabajo
->>>>>>> 13.2.15
+ 
 				JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 				LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 				LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
@@ -352,13 +347,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 					tramite_tipo.glosa_tramite,
 					trabajo.fecha,
 					prm_idioma.codigo_idioma as codigo_idioma,
-<<<<<<< HEAD
-					contrato.id_tarifa
-					$select_glosa_actividad
-				FROM trabajo
-				JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-				LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
-=======
+ 
 					contrato.id_tarifa  
 					$select_glosa_actividad ";
 							   	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
@@ -366,7 +355,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 				$query.=" FROM trabajo
 				LEFT JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
 				LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
->>>>>>> 13.2.15
+ 
 				LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 				LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 				LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
@@ -1114,22 +1103,14 @@ function funcionTR(& $trabajo) {
 ?>
 <script type="text/javascript">
 
-<<<<<<< HEAD
-
-	jQuery(document).ready(function() {
-		/* jQuery('#uicss').load(function() {
-        jQuery('#cobrado').buttonset();
-        jQuery('#cobrable').buttonset();
-        jQuery('#revisado').buttonset();
-    });*/
-=======
+ 
 	jQuery(document).ready(function() { 
 		 
 		if(jQuery('#fecha_ini').val()=="") 	{ 
 			jQuery('#fecha_ini').val('01-<?php echo date("m-Y",strtotime("-3 MONTH")); ?>');
 			}
 		
->>>>>>> 13.2.15
+ 
 		jQuery('#descargapro').click(function() {
 			jQuery('#descargapro').attr('disabled','disabled');
 			var Where='<?php echo base64_encode($where) ?>';
