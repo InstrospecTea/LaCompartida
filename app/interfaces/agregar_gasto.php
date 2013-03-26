@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php'; 
+require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
@@ -33,7 +33,7 @@ if ( ( $gasto->Loaded() && $gasto->fields['egreso'] > 0 ) || $prov == 'false') {
 	$txt_tipo = __('Provisión');
 	$prov = 'true';
 }
-	
+
 
 if ($opcion == "guardar") {
 	if (!$codigo_cliente && $codigo_cliente_secundario) {
@@ -112,9 +112,9 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_moneda", $id_moneda);
 		$gasto->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "NULL");
 		$gasto->Edit("codigo_asunto", $codigo_asunto ? $codigo_asunto : "NULL");
- 
+
 		$gasto->Edit("codigo_gasto",$codigo_gasto ? $codigo_gasto : "NULL");
- 
+
 		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
@@ -171,27 +171,23 @@ if ($opcion == "guardar") {
 
 		if ($gasto->Write()) {
 			$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
-			?>
-			<script language='javascript'>
-				if(  parent.window.Refrescarse ) {
+		}
+	}
+}
+ 
+$pagina->titulo = $txt_pagina;
+$pagina->PrintTop($popup);
+
+
+?>
+
+<script type="text/javascript">
+
+		if(parent.window.Refrescarse) {
 					parent.window.Refrescarse(); 
 				} else if( window.opener.Refrescar ) {
 					window.opener.Refrescar(); 
 				}
-			</script>
-			<?php
-		}
-	}
-}
-
-$pagina->titulo = $txt_pagina;
-$pagina->PrintTop($popup);
-
- 
-?>
-
-<script type="text/javascript">
-	
 
 	function ShowGastos(valor)
 	{
@@ -202,22 +198,17 @@ $pagina->PrintTop($popup);
 	}
 
 
-	function CambiaMonto( form )
-	{
+	function CambiaMonto(form, id) {
 		var monto = form.monto.value;
-		//form.monto.value = monto.replace(',','.');
-<?php
-if (UtilesApp::GetConf($sesion, 'ComisionGastos')) {
-	?>
-				form.monto_cobrable.value = (form.monto.value * (1+form.porcentajeComision.value/100)).toFixed(2);
-	<?php
-} else {
-	?>
-				if( form.monto_cobrable )
+		if (form.monto_cobrable) {
+			<?php if (UtilesApp::GetConf($sesion, 'ComisionGastos')) { ?>
+				form.monto_cobrable.value = (form.monto.value * (1 + form.porcentajeComision.value / 100)).toFixed(2);
+			<?php } else { ?>
+				if (id != 'monto_cobrable') {
 					form.monto_cobrable.value = form.monto.value;
-	<?php
-}
-?>
+				}
+			<?php } ?>
+		}
 	}
 
 	function Validar(form)
@@ -260,7 +251,7 @@ if (UtilesApp::GetConf($sesion, 'ComisionGastos')) {
 <?php } ?>
 
 		  if(typeof  RevisarConsistenciaClienteAsunto == 'function')       RevisarConsistenciaClienteAsunto( form );
-	
+
 <?php if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) { ?>
 			if((monto <= 0 || isNaN(monto)) && (monto_cobrable <= 0 || isNaN(monto_cobrable)))
 			{
@@ -306,7 +297,7 @@ if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 			alert('<?php echo __('Debe seleccionar una Moneda') ?>');
 			return false;
 		}
-        
+
         //if(jQuery('#id_usuario_orden').val()==-1) jQuery('#id_usuario_orden').val(<?php echo $id_usuario; ?>);
         if(jQuery('#id_usuario').val()==-1) jQuery('#id_usuario').val(<?php echo $id_usuario; ?>);
 		form.submit();
@@ -337,7 +328,7 @@ if (UtilesApp::GetConf($sesion, 'TodoMayuscula')) {
 			return true;
 		}
         var txt_span = document.getElementById('txt_span');
-        
+
 		if(!codigo)
 		{
 			txt_span.innerHTML = '';
@@ -374,17 +365,17 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 
 <?php
 	$contrato=new Contrato($sesion);
-	
+
 	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 		$contrato->LoadByCodigoAsuntoSecundario($codigo_asunto_secundario);
 		echo 'var CodigoSecundario=1;';
 	} else {
 		$contrato->LoadByCodigoAsunto($codigo_asunto);
 		echo 'var CodigoSecundario=0;';
-	} 
+	}
 	$gasto->extra_fields['id_contrato']=$contrato->fields['id_contrato'];
 	?>
-	
+
 	function AgregarNuevo(tipo, prov)	{
 		if(CodigoSecundario) {
 					var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
@@ -402,7 +393,7 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 						var urlo = "agregar_gasto.php?popup=1&prov="+prov+"&codigo_cliente="+codigo_cliente+"&codigo_asunto="+codigo_asunto;
 						window.location=urlo;
 					}
-		 } 
+		 }
 	}
 
 	function AgregarProveedor()
@@ -467,12 +458,12 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 			 <span class="fl">
 				<b><?php echo __('Información de') ?> <?php echo $prov == 'true' ? __('provisión') : __('gasto') ?></b>
 			</span>
-			
+
 				 <a href='javascript:void(0)' class="fr btn botonizame" icon="agregar"   style="margin:2px;" onclick="AgregarNuevo('gasto',<?php echo $prov ?>);" title="Agregar Gasto"><?php echo $prov == 'true' ? __('Nueva provisión') : __('Nuevo gasto') ?></a>
 				<?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_agregar_gasto_inicio') : false; ?>
 			</div>
-		 
- 
+
+
 	<table class="border_plomo" style="background-color: #FFFFFF;" width='96%'>
 		<tr>
 			<td align=right>
@@ -806,25 +797,22 @@ if (UtilesApp::GetConf($sesion, 'IdiomaGrande')) {
 				<a class="btn botonizame" href="javascript:void();" icon="ui-icon-save" onclick="return Validar(jQuery('#form_gastos').get(0));"><?php echo  __('Guardar') ?></a>
 				<a class="btn botonizame"  href="javascript:void();" icon="ui-icon-exit" onclick="window.close();" ><?php echo  __('Cancelar') ?></a>
 			</div>
-		 
+
 
 </form>
- <script type="text/javascript">
-	 
-<?php 
 
-
-	if (UtilesApp::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
+<script type="text/javascript">
+	<?php if (UtilesApp::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
 		CargaIdioma("<?php echo $codigo_asunto ?>");
-<?php } ?>
-	jQuery("#monto, #monto_cobrable").change(function(){
+	<?php } ?>
+
+	jQuery("#monto, #monto_cobrable").change(function() {
 		var str = jQuery(this).val();
-		jQuery(this).val( str.replace(',','.') );
-		jQuery(this).parseNumber({format:"#.00", locale:"us"});
-		jQuery(this).formatNumber({format:"#.00", locale:"us"});
-		CambiaMonto(this.form);
+		jQuery(this).val(str.replace(',', '.'));
+		jQuery(this).parseNumber({format:"0.00", locale:"us"});
+		jQuery(this).formatNumber({format:"0.00", locale:"us"});
+		CambiaMonto(this.form, this.id);
 	});
 </script>
-<?php
 
-$pagina->PrintBottom($popup);
+<?php $pagina->PrintBottom($popup);
