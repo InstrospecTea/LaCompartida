@@ -32,7 +32,7 @@ function toString($a) {
 }
 
 if ($correo['tipo'] == 'diario') {
-	$campos_trabajos = 'fecha_creacion, fecha, codigo_asunto';
+	$campos_trabajos = 'fecha_creacion, fecha, codigo_asunto, FORMAT(TIME_TO_SEC(duracion)/3600, 2) AS duracion';
 	$query = "SELECT {$campos_trabajos} FROM trabajo
 				WHERE id_usuario = {$correo['id_usuario']}
 					AND fecha = '{$correo['dia_creacion']}'";
@@ -50,9 +50,7 @@ if ($correo['tipo'] == 'diario') {
 					LIMIT 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		$ultimo_trabajo_previo = mysql_fetch_assoc($resp);
-	}
 
-	if (empty($trabajos)) {
 		$query = "SELECT {$campos_trabajos} FROM trabajo
 					WHERE id_usuario = {$correo['id_usuario']}
 						AND fecha_creacion > '{$correo['fecha_creacion']}'
@@ -91,11 +89,16 @@ if ($correo['tipo'] == 'diario') {
 	<tr><td class="cvs"><?php echo __('Fecha Creaci&oacute;n'); ?>: </td><td colspan="3"><?php echo $correo['fecha_creacion']; ?></td></tr>
 	<tr><td class="cvs"><?php echo __('Enviado'); ?>: </td><td colspan="3"><?php echo $correo['enviado'] ? 'Si' : 'No'; ?></td></tr>
 	<tr><td class="cvs"><?php echo __('Fecha Envio'); ?>: </td><td colspan="3"><?php echo $correo['fecha_envio']; ?></td></tr>
-	<?php if (!empty($ultimo_trabajo_previo)) { ?>
-		<tr><td class="cvs"><?php echo __('Trabajo previo'); ?>: </td><td><?php echo toString($ultimo_trabajo_previo); ?></td></tr>
+	<?php if (!empty($trabajos)) { ?>
+		<tr>
+			<td class="cvs" rowspan="<?php echo count($trabajos); ?>"><?php echo __('Trabajos'); ?>: </td>
+			<?php foreach($trabajos as $trabajo) { ?>
+				<td><?php echo toString($trabajo); ?></td>
+			<?php } ?>
+		</tr>
 	<?php } ?>
 	<?php if (!empty($ultimo_trabajo_previo)) { ?>
-		<tr><td class="cvs"><?php echo __('Trabajos'); ?>: </td><td><?php echo toString($ultimo_trabajo_previo); ?></td></tr>
+		<tr><td class="cvs"><?php echo __('Trabajo previo'); ?>: </td><td><?php echo toString($ultimo_trabajo_previo); ?></td></tr>
 	<?php } ?>
 	<?php if (!empty($siguiente_trabajo)) { ?>
 		<tr><td class="cvs"><?php echo __('Siguiente trabajo'); ?>: </td><td><?php echo toString($siguiente_trabajo); ?></td></tr>

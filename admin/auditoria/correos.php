@@ -139,12 +139,12 @@ function acciones($data) {
 	});
 	jQuery('.show-mail').click(function() {
 		var id = jQuery(this).attr('id').split('_')[1];
-		jQuery('<div/>').load(root_dir + '/admin/auditoria/leer_correo.php?id=' + id).dialog({title: 'Correo', width: 640, height: 400});
+		jQuery('<div/>').load(root_dir + '/admin/auditoria/leer_correo.php?id=' + id).dialog({title: 'Correo', width: 640, height: 400, modal: true});
 		return false;
 	});
 	jQuery('.show-detail').click(function() {
 		var id = jQuery(this).attr('id').split('_')[1];
-		jQuery('<div/>').load(root_dir + '/admin/auditoria/detalle_correo.php?id=' + id).dialog({title: 'Detalle', width: 640, height: 400});
+		jQuery('<div/>').load(root_dir + '/admin/auditoria/detalle_correo.php?id=' + id).dialog({title: 'Detalle', width: 640, height: 400, modal: true});
 		return false;
 	});
 </script>
