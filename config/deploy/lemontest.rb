@@ -57,13 +57,21 @@ namespace :deploy do
 task :create_database do
      dirname=branch.tr('/','_')
        dbname='lemontest_' << dirname.tr('_','').tr('.','')
-  puts "\n\e[0;31m   #######################################################################"
-  puts           "   #    Do you need me to create database \e[01;37m #{dbname}\e[0;31m? (y/N)   #" 
-  puts           "   #######################################################################\e[0m\n"
-  proceed = STDIN.gets[0..0] rescue nil
-  if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
-    run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'create database #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
-  end
+
+      existedb = `mysql -h192.168.1.24 -uroot -pasdwsx -e "show databases like '%dbname%'";`
+      
+      if(existedb==nil) 
+        puts "\n\e[0;31m   ##########################################################################"
+        puts           "   #    No existe la base \e[01;37m #{dbname}\e[0;31m, desea crearla? (y/N) #" 
+        puts           "   #########################################################################\e[0m\n"
+        proceed = STDIN.gets[0..0] rescue nil
+        if (proceed == 'y' || proceed == 'Y'  || proceed == 's' || proceed == 'S'  )
+          run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'CREATE DATABASE IF NOT EXISTS #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
+        end
+      else
+          puts "\n\e[0;35m   ############# NO NECESITO CREAR LA BASE \e[01;37m #{dbname}\e[0;35m (PORQUE YA EXISTE) ################\n\n"
+       end
+
 
 end
     before "deploy:update_code", "deploy:setup"
