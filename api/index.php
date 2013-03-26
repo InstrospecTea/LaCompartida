@@ -27,7 +27,11 @@ $app->post('/login', function () {
 		}
 	}
 
-	outputJson(array('auth_token' => $auth_token));
+	outputJson(array(
+		'auth_token' => $auth_token,
+		'user_id' => $Session->usuario->fields['id_usuario']
+		)
+	);
 });
 
 $app->get('/clients', function () {
@@ -115,23 +119,27 @@ $app->get('/tasks', function () {
 });
 
 $app->get('/translations', function () {
-	$response = array();
-	$_app = Slim::getInstance();
+	$Session = new Sesion();
+	$Translation = new Translation($Session);
+	$translations = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
+	$translation_files = $Translation->findAllActive();
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /translations | ' . $e->getMessage());
+	if (is_array($translation_files) && !empty($translation_files)) {
+		$_LANG = array();
+		foreach ($translation_files as $translation_file) {
+			include Conf::ServerDir() . '/lang/' . $translation_file['file'];
+		}
+
+		if (is_array($_LANG) && !empty($_LANG)) {
+			foreach ($_LANG as $key => $value) {
+				array_push($translations, array('code' => $key, 'value' => $value));
+			}
+		}
 	}
 
-	echo json_encode($response);
+	outputJson($translations);
 });
 
 $app->get('/settings', function () {

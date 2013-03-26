@@ -1,16 +1,9 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
+require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
 
 class AreaTrabajo extends Objeto {
-
-	function AreaProyecto($sesion, $fields = '', $params = '') {
-		$this->tabla = 'prm_area_trabajo';
-		$this->campo_id = 'id_area_trabajo';
-		$this->sesion = $sesion;
-		$this->fields = $fields;
-	}
-
 	/**
 	 * Find all work areas
 	 * Return an array with next elements:
