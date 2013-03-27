@@ -1,23 +1,17 @@
-Feature: comprobar que puedo ingresar gastos
+# language: es
+# encoding: utf-8
+Característica: agrego un gasto
  
   Como el usuario admin
-  Para comprobar que puedo ingresar un gasto
+  Para comprobar que puedo agregar un gasto
 
-
-  @javascript  
-  Scenario: Voy a la pantalla de gastos
-  When I am on la pagina de login
-  And I fill in "99511620" for "rut"
-  And I fill in "admin.asdwsx" for "password"
-  And I press "Entrar"
-  And I go to la pantalla de gastos
-  Then I should see "Revisar Gastos"
-
-
-  When I click on "Agregar gasto"
-  And me cambio al popup
-  And I fill in "0025-0002" for "campo_codigo_asunto"
-  And I fill in "150" for "monto"
-  And I fill in "Gasto generado por cucumber" for "descripcion"
-  And I click on "Guardar"
-  Then I should see "Gasto Guardado con éxito"
+ @javascript  
+  Escenario: agrego un gasto
+  Cuando me logeo
+  Entonces debiera estar en la pagina de inicio
+  Cuando visito la pantalla de gastos
+  Entonces debiera ver "Revisar Gastos"
+  Cuando pincho en "Agregar gasto"
+  Y me cambio al popup
+  Y genero un gasto aleatorio
+  Entonces debiera ver "Gasto Guardado con éxito"

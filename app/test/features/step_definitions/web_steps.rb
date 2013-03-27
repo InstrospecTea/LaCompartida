@@ -55,11 +55,37 @@ Given /^(?:|I )am on (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
+Given /^estoy en (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
 
+When /^genero un gasto aleatorio$/ do
+  asunto = ["0003-0001", "0006-0001", "0007-0001", "0013-0001", "0010-0001", "0017-0001","0025-0002","2020-0003" ,"2017-0004","2008-0001"]
+  codigo_asunto = asunto[rand(asunto.length)]
+  monto_aleatorio=1000+rand(5000)
+  descripcion="Gasto generado por cucumber para asunto " << codigo_asunto
+  fill_in('campo_codigo_asunto', :with => codigo_asunto)
+  fill_in('monto', :with => monto_aleatorio)
+  fill_in('descripcion', :with => descripcion)
+   click_on "Guardar"
+end
+
+
+When(/^me logeo$/) do
+  visit path_to('la pagina de login')
+    fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+  click_on "Entrar"
+end
 
 When /^(?:|I )go to (.+)$/ do |page_name|
   visit path_to(page_name)
 end
+
+When /^visito (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+
 
 When /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
@@ -69,11 +95,24 @@ When /^(?:|I )click on "([^"]*)"$/ do |button|
   click_on(button)
 end
 
+When /^pincho en "([^"]*)"$/ do |button|
+  click_on(button)
+end
+
+When /^pongo usuario y password$/ do 
+  fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+end
+
 When /^(?:|I )follow "([^"]*)"$/ do |link|
   click_link(link)
 end
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
+  fill_in(field, :with => value)
+end
+
+When /escribo "([^"]*)" en el campo "([^"]*)"$/ do |value,field|
   fill_in(field, :with => value)
 end
 
@@ -130,7 +169,23 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
   end
 end
 
+Then /^debiera ver "([^"]*)"$/ do |text|
+  if page.respond_to? :should
+    page.should have_content(text)
+  else
+    assert page.has_content?(text)
+  end
+end
+
 Then /^(?:|I )should see css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
+  end
+end
+
+Then /^debiera ver css "([^"]*)"$/ do |css|
   if page.respond_to? :should
     page.should have_css(css)
   else
@@ -255,6 +310,16 @@ Then /^(?:|I )should be on (.+)$/ do |page_name|
   end
 end
 
+Then /^debiera estar en (.+)$/ do |page_name|
+  current_path = URI.parse(current_url).path
+  if current_path.respond_to? :should
+    current_path.should == path_to(page_name)
+  else
+    assert_equal path_to(page_name), current_path
+  end
+end
+
+
 Then /^(?:|I )should have the following query string:$/ do |expected_pairs|
   query = URI.parse(current_url).query
   actual_params = query ? CGI.parse(query) : {}
@@ -276,7 +341,7 @@ end
 
 
 def call_lista_gastos usuario,password,timestamp
-      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp }).to_hash
+      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp })
 end
 
 When /^me conecto al cliente wsdl$/ do
@@ -286,7 +351,8 @@ end
  
 
 When(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
- @result = call_lista_gastos usuario, password,timestamp
+ @resultado = call_lista_gastos(usuario, password,timestamp)
+  @result=@resultado.body.to_hash
 end
 
  
@@ -296,7 +362,7 @@ Then /^debiera devolverme los metodos disponibles$/ do
  end
 
 Then /^debiera devolver al menos un gasto$/ do
-   assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Hash))
+  assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Array))
  end
 
 Then /^no debiera devolver gastos$/ do
