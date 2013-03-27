@@ -87,7 +87,7 @@ if ($opc == 'buscar') {
 	}
 
 	if ($exportar_excel) {
-		$search_query = $gasto->SearchQuery($where);
+		$search_query = $gasto->SearchQuery($sesion, $where);
 		$gasto->DownloadExcel($search_query);
 	}
 
