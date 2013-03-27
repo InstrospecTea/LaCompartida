@@ -87,8 +87,7 @@ if ($opc == 'buscar') {
 	}
 
 	if ($exportar_excel) {
-		$search_query = $gasto->SearchQuery($sesion,$where);
-		//die($search_query);
+		$search_query = $gasto->SearchQuery($where);
 		$gasto->DownloadExcel($search_query);
 	}
 
@@ -421,7 +420,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			return respuesta;
 		}, "bUseRendered": false, "aTargets": [12]},
-		
+
 		{"fnRender": function ( o, val ) {
 			var idcobro=o.aData[8];
 			var respuesta='';
@@ -547,6 +546,8 @@ function Refrescar() {
 
  
 			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
+		<td>
+			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
 			<form method='post' name="form_gastos" action='' id="form_gastos">
 
 <?php if (isset($_GET['opc']) && $_GET['opc'] == 'buscar' && $where != '') echo '<input type="hidden" name="where" id="where" value="' . base64_encode($where) . '"/>'; ?>
@@ -666,7 +667,6 @@ function Refrescar() {
 <?php } ?>
  
 					</table>
-
 							<div  style="padding:10px;text-align:right;">
 								<a name="boton_buscar" id='boton_buscar' icon="find" class="btn botonizame buscargastos" rel="buscar" ><?php echo __('Buscar') ?></a>
 								<a name="boton_xls" id="boton_excel"  icon="xls" class="btn botonizame buscargastos"  rel="excel" ><?php echo __('Descargar Excel') ?></a>
@@ -691,6 +691,8 @@ function Refrescar() {
 <?php } ?>
 			</form>
  
+	</tr>
+</table>
 
 <div id="totalcta" style='font-size:11px;z-index:999;'><b>
 <?php

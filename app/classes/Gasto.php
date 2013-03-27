@@ -289,6 +289,62 @@ class Gasto extends Objeto {
 		$writer->save(__('Gastos'));
 	}
 
+	public function SearchQuery($where) {
+		return "SELECT SQL_BIG_RESULT SQL_NO_CACHE
+				cta_corriente.id_movimiento,
+				DATE_FORMAT(cta_corriente.fecha, '%Y-%m-%d') AS fecha,
+				DATE_FORMAT(cta_corriente.fecha_creacion, '%Y-%m-%d') AS fecha_creacion,
+				cta_corriente.codigo_cliente,
+				cliente.glosa_cliente,
+				asunto.codigo_asunto,
+				asunto.glosa_asunto,
+				CONCAT(u_encargado.apellido1, ', ', u_encargado.nombre) AS encargado_comercial,
+				CONCAT(u_ingresa.apellido1, ', ', u_ingresa.nombre) AS usuario_ingresa,
+				CONCAT(u_ordena.apellido1, ', ', u_ordena.nombre) AS usuario_ordena,
+				u_encargado.username AS username_encargado,
+				u_ingresa.username AS username_ingresa,
+				u_ordena.username AS username_ordena,
+				prm_cta_corriente_tipo.glosa AS tipo,
+				cta_corriente.descripcion,
+				prm_moneda.simbolo,
+				cta_corriente.egreso,
+				cta_corriente.ingreso,
+				IF(
+					monto_cobrable = ingreso,
+					monto_cobrable * (-1),
+					monto_cobrable
+				) AS monto_cobrable,
+				cta_corriente.con_impuesto,
+				cta_corriente.id_cobro,
+				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
+				IF(cta_corriente.cobrable = 1,'SI', 'NO') AS cobrable,
+				cta_corriente.numero_documento,
+				prm_proveedor.rut AS rut_proveedor,
+				prm_proveedor.glosa AS nombre_proveedor,
+				prm_tipo_documento_asociado.glosa AS tipo_documento_asociado,
+				cta_corriente.fecha_factura AS fecha_documento_asociado,
+				cta_corriente.codigo_factura_gasto AS codigo_documento_asociado,
+				prm_moneda.cifras_decimales,
+				cta_corriente.numero_ot,
+				cta_corriente.id_moneda,
+				prm_moneda.codigo AS codigo_moneda,
+				cta_corriente.con_impuesto
+			FROM cta_corriente
+			LEFT JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
+			LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
+			LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+			LEFT JOIN usuario AS u_ingresa ON u_ingresa.id_usuario = cta_corriente.id_usuario
+			LEFT JOIN usuario AS u_ordena ON u_ordena.id_usuario = cta_corriente.id_usuario_orden
+			LEFT JOIN usuario AS u_encargado ON u_encargado.id_usuario = contrato.id_usuario_responsable
+			LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
+			LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
+			LEFT JOIN prm_tipo_documento_asociado ON cta_corriente.id_tipo_documento_asociado = prm_tipo_documento_asociado.id_tipo_documento_asociado
+			LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
+			LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
+			LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
+			WHERE 1 AND $where";
+	}
+
 
 
 	public function WhereQuery($request) {

@@ -10,13 +10,11 @@ gem 'jquery-rails'
 
 group :development, :test do
 	gem 'rspec'
-	  gem 'rspec-rails'
+	gem 'rspec-rails'
   gem 'capybara'
   gem "capybara-webkit"
-  	gem 'savon'
-     gem 'cucumber-rails',:require=>false
-     gem 'headless'
-gem 'selenium-webdriver'
-
+  gem 'savon'
+  gem 'cucumber-rails',:require=>false
+  gem 'headless'
+  gem 'selenium-webdriver'
 end
- 
