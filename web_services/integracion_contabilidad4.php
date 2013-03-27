@@ -1225,7 +1225,7 @@ function ListaGastos($usuario, $password, $timestamp) {
 
 	$Gasto = new Gasto($Sesion);
 	$where = " fecha >= FROM_UNIXTIME($timestamp) ";
-	$query_gastos = $Gasto->SearchQuery($where);
+	$query_gastos = $Gasto->SearchQuery($Sesion, $where);
 
 	$result_gastos = $Sesion->pdodbh->query($query_gastos)->fetchAll(PDO::FETCH_ASSOC);
 
