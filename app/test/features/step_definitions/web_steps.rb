@@ -22,6 +22,7 @@
 require 'uri'
 require 'cgi'
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
+require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "env"))
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "selectors"))
 
 module WithinHelpers
@@ -34,6 +35,10 @@ end
 
 World(WithinHelpers)
 
+ When /^estoy en la pantalla de login$/ do
+  visit Capybara.app_host
+end
+
 # Single-line step scoper
 When /^(.*) within (.*[^:])$/ do |step, parent|
   with_scope(parent) { When step }
@@ -44,9 +49,13 @@ When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
   with_scope(parent) { When "#{step}:", table_or_string }
 end
 
+
+
 Given /^(?:|I )am on (.+)$/ do |page_name|
   visit path_to(page_name)
 end
+
+
 
 When /^(?:|I )go to (.+)$/ do |page_name|
   visit path_to(page_name)
@@ -54,6 +63,10 @@ end
 
 When /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
+end
+
+When /^(?:|I )click on "([^"]*)"$/ do |button|
+  click_on(button)
 end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
@@ -66,6 +79,10 @@ end
 
 When /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
   fill_in(field, :with => value)
+end
+
+When /^me cambio al popup$/ do 
+     page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
 # Use this to fill in an entire form with data from a table. Example:
@@ -110,6 +127,14 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
     page.should have_content(text)
   else
     assert page.has_content?(text)
+  end
+end
+
+Then /^(?:|I )should see css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
   end
 end
 
@@ -219,16 +244,7 @@ Then /^the "([^"]*)" checkbox(?: within (.*))? should be checked$/ do |label, pa
   end
 end
 
-Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
-  with_scope(parent) do
-    field_checked = find_field(label)['checked']
-    if field_checked.respond_to? :should
-      field_checked.should be_false
-    else
-      assert !field_checked
-    end
-  end
-end
+
  
 Then /^(?:|I )should be on (.+)$/ do |page_name|
   current_path = URI.parse(current_url).path
@@ -258,22 +274,24 @@ end
 
 
 
+
 def call_lista_gastos usuario,password,timestamp
       response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp }).to_hash
 end
 
 When /^me conecto al cliente wsdl$/ do
-   @client = Savon.client(wsdl: "http://cplaw.thetimebilling.com/time_tracking_feature/web_services/integracion_contabilidad4.php?wsdl")
+   @client = Savon.client(wsdl:  Capybara.app_host  << "/web_services/integracion_contabilidad4.php?wsdl")
 end
 
  
 
 When(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
- @result = call_lista_gastos "cplaw","cplaw",timestamp
+ @result = call_lista_gastos usuario, password,timestamp
 end
 
  
 Then /^debiera devolverme los metodos disponibles$/ do
+   p @client.operations
    assert(@client.operations.kind_of?(Array))
  end
 
@@ -294,4 +312,13 @@ Then /^no debiera devolver gastos$/ do
      expect { @client.call_lista_gastos "juanito","juanito",1356998400}.to raise_error
  end
 
- 
+ Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
+  with_scope(parent) do
+    field_checked = find_field(label)['checked']
+    if field_checked.respond_to? :should
+      field_checked.should be_false
+    else
+      assert !field_checked
+    end
+  end
+end
