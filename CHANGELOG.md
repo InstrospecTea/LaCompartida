@@ -1,4 +1,47 @@
 # Changelog
+## Hotfix: 13.2.15
+martes 26 de marzo 2013
+* **Fixed** [Agrega metodo Contrato->LoadByCodigoSecundario](https://www.pivotaltracker.com/story/show/46909219)
+
+## Hotfix: 13.2.14
+lunes  25 de marzo 2013
+* **Fixed:** [Mostrar numeros de factura en Seguimiento de Cobros](https://github.com/LemontechSA/ttb/pull/134)
+
+## Hotfix: 13.2.13
+viernes 22 de marzo 2013
+* **Fixed:** [Corrige peginador de adelantos](https://github.com/LemontechSA/ttb/pull/133)
+
+## Hotfix: 13.2.12
+* **Fixed:** [Sesion en mayúsculas, clase TramiteTarifa](https://github.com/LemontechSA/ttb/pull/132)
+
+## Hotfix: 13.2.11
+* **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
+
+
+## Hotfix: 13.2.10
+* **Fixed:** [En vez de subir los backups a un bucket para cada cliente, usa el mismo bucket y luego un subdirectorio. Esto, porque Amazon tiene un límite de 100 buckets y ya lo pasamos](https://github.com/LemontechSA/ttb/pull/125)
+
+## Hotfix: 13.2.9
+* **Fixed:** [Corrección en validación de fecha cuando usuarios de cobranza editan trabajos](https://github.com/LemontechSA/ttb/pull/117)
+
+## Hotfix: 13.2.8
+* **Fixed:** [Modifica la forma de presentar y aplicar los filtros](https://github.com/LemontechSA/ttb/pull/116)
+
+# Changelog
+## Hotfix: 13.2.7
+* **Fixed:** [No adivinar una fecha de inicio del cobro cuando no se declara especificamente](https://github.com/LemontechSA/ttb/pull/113)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
+
+## Hotfix: 13.2.5
+Martes 5 de marzo 2013.
+* **Fixed:** [Filtra por código asunto secundario](https://github.com/LemontechSA/ttb/pull/110)
 
 ## Hotfix: 13.2.4
 Martes 5 de marzo 2013.

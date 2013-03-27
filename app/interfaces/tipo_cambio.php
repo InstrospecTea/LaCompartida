@@ -1,12 +1,6 @@
-<?
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-    require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-    require_once Conf::ServerDir().'/classes/Moneda.php';
+<?php 
+
+require_once dirname(__FILE__) . '/../conf.php'; 
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
@@ -33,7 +27,11 @@
 			else
 			{
 				$moneda->Edit('tipo_cambio', ${"valor_".$moneda->fields['id_moneda']});
+ 
+				
 			}
+			$moneda->Edit('cifras_decimales', ${"decimales_".$moneda->fields['id_moneda']});
+ 
 			if(!$moneda->Write())
 			{
 				$error = true;			
@@ -70,55 +68,100 @@
 </style>
 <form name=formulario id=formulario method=post autocomplete='off'>
 <input type=hidden name=opc value=guardar>
-<table width=90% align=center class="border_plomo tb_base" cellspacing=5>
+ 
+<table width="600" align=center class="border_plomo tb_base"  cellspacing=5>
 <tr>
-	<td align=right width=40%>
-		<strong><?=__('Moneda')?></strong>	
+	<td align=right width="40%">
+		<strong><?php echo __('Moneda')?></strong>	
 	</td>
-	<td width=10px>
-		<!--<strong><?=__('Base')?></strong>-->
+	<td width="10px">
+		<!--<strong><?php echo __('Base')?></strong>-->
 	</td>
-	<td width=60%>
-		<strong><?=__('Tasa')?></strong>
+	<td width="20%">
+		<strong><?php echo __('Tasa')?></strong>
+	</td>
+	<td width="20%">
+		<strong><?php echo __('Decimales')?></strong>
 	</td>
 </td>
-<?
+<?php 
+ 
 	for($x=0;$x<$lista->num;$x++)
 	{
 		$mon = $lista->Get($x);
 ?>
 <tr>
 	<td align=right>
-	 <?=$mon->fields['glosa_moneda']?>: 
+ 
+	 <?php echo $mon->fields['glosa_moneda']?>: 
+	  <?php echo $mon->fields['moneda_base'] ? "<br><small style='color:#999;'>(moneda base)</small>":""?>
 	</td>
 	<td align=center>
-        <input style='display:none' type=radio name="moneda_base" <?=$mon->fields['moneda_base'] ? "checked":""?> value="<?=$mon->fields['id_moneda']?>" onchange="Input('valor_<?=$mon->fields['glosa_moneda']?>')" readonly>
+       <input style='display:none' type=radio name="moneda_base" <?php echo $mon->fields['moneda_base'] ? "checked":""?> value="<?php echo $mon->fields['id_moneda']?>" onchange="Input('valor_<?php echo $mon->fields['glosa_moneda']?>')" readonly>
 	</td>
 	<td>
-		<input type=hidden id="moneda_<?=$mon->fields['id_moneda']?>" name="moneda_<?=$mon->fields['id_moneda']?>" value="<?=$mon->fields['tipo_cambio']?>"/>
-		<input type="text" class="txt_input" size="10" value="<?=number_format($mon->fields['tipo_cambio'],$mon->fields['cifras_decimales'],'.','')?>" <?=$mon->fields['tipo_cambio_referencia'] ? "disabled":""?> name="valor_<?=$mon->fields['id_moneda']?>" id="valor_<?=$mon->fields['id_moneda']?>" />
-		<!-- onchange="GrabarCampo('moneda','<?=$mon->fields['id_moneda']?>',this.value,'<?=$mon->fields['glosa_moneda']?>');" -->
+		<input type=hidden id="moneda_<?php echo $mon->fields['id_moneda']?>" name="moneda_<?php echo $mon->fields['id_moneda']?>" value="<?php echo $mon->fields['tipo_cambio']?>"/>
+		<input type="text" class="txt_input" size="10" value="<?php echo $mon->fields['tipo_cambio'];?>" alt="<?php echo $mon->fields['tipo_cambio'];?>" <?php echo $mon->fields['tipo_cambio_referencia'] ? "disabled":""?> name="valor_<?php echo $mon->fields['id_moneda']?>" id="valor_<?php echo $mon->fields['id_moneda']?>" />
+		<!-- onchange="GrabarCampo('moneda','<?php echo $mon->fields['id_moneda']?>',this.value,'<?php echo $mon->fields['glosa_moneda']?>');" -->
+	</td>
+	<td>
+		<input type="text" class="txt_input decimales" size="4" value="<?php echo $mon->fields['cifras_decimales']; ?>" readonly="readonly" name="decimales_<?php echo $mon->fields['id_moneda']?>" id="decimales_<?php echo $mon->fields['id_moneda']?>" />
 	</td>
 </tr>
-<?
+<?php 
+ 
 		if($mon->fields['moneda_base'])
 			$id_moneda_base = $mon->fields['id_moneda'];
 	}
 ?>
 <tr>
-	<td colspan=3>
+ 
+	<td colspan=4>
+ 
 		&nbsp;
 	</td>
 </tr>
 <tr>
-	<td colspan=3 align=center>
-		<input type="submit" class="btn" value="<?=__('Guardar')?>" onclick="return Validar(this.form);">
+ 
+	<td colspan=4 align=center>
+		<input type="submit" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);">
+ 
 	</td>
 </tr>
 </table>
 </form>
 <script>
-	var id_moneda_base = <?=$id_moneda_base?>;
+ 
+	jQuery('document').ready(function() {
+		
+		jQuery('.decimales').dblclick(function() {
+			jQuery(this).removeAttr('readonly');
+		});
+		
+		jQuery('.decimales').each(function() {
+			var decimales=jQuery(this).val();
+			var str_decimales="";
+			for(var n=decimales;n>0;n--) {
+				str_decimales+="0";
+			}
+			var targetcell=jQuery(this).attr('id').replace('decimales_','valor_');
+			jQuery('#'+targetcell).formatNumber({format:"0."+str_decimales, locale:"us"});
+			
+		});
+		
+		jQuery('.decimales').on('keyup',function() {
+			var decimales=jQuery(this).val();
+			var str_decimales="";
+			for(var n=decimales;n>0;n--) {
+				str_decimales+="0";
+			}
+			var targetcell=jQuery(this).attr('id').replace('decimales_','valor_');
+			jQuery('#'+targetcell).val(jQuery('#'+targetcell).attr('alt')).formatNumber({format:"0."+str_decimales, locale:"us"});
+			
+		});
+	});
+	var id_moneda_base = <?php echo $id_moneda_base?>;
+ 
 
 function Validar(form)
 {
@@ -134,23 +177,27 @@ function Validar(form)
 
 	if(id_moneda_base != m_base)
 	{
-		if(!confirm("<?=__('Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?')?>"))
+
+		if(!confirm("<?php echo __('Ha seleccionado otra moneda base, ¿ Está seguro que desea continuar?')?>"))
 			return false;
 	}
 	return true;*/
-	//form.<?="valor_".$mon->fields['id_moneda']?>;
+	//form.<?php echo "valor_".$mon->fields['id_moneda']?>;
 	var f = document.getElementById('formulario');
 	var errores = "";
-<?	
+<?php 	
+ 
 	for($x=0;$x<$lista->num;$x++)
     {
         $mon = $lista->Get($x);
 ?>
-		if( f.<?="valor_".$mon->fields['id_moneda']?>.value.length == 0 || f.<?="valor_".$mon->fields['id_moneda']?>.value == 0 )
+ 
+		if( f.<?php echo "valor_".$mon->fields['id_moneda']?>.value.length == 0 || f.<?php echo "valor_".$mon->fields['id_moneda']?>.value == 0 )
 		{
 			errores += "- <?php echo $mon->fields['glosa_moneda']; ?> \n";
 		}
-<?
+<?php 
+ 
     }	
 ?>
 	if( errores.length > 0 )
@@ -194,15 +241,19 @@ function GrabarCampo(accion,id_moneda,valor,glosa)
 function Input(name)
 {
     var form = document.getElementById('formulario');
-<?
+ 
+<?php 
+ 
     for($x=0;$x<$lista->num;$x++)
     {
         $mon = $lista->Get($x);
 ?>
-        form.<?="valor_".$mon->fields['id_moneda']?>.disabled = false;
-		if(form.<?="valor_".$mon->fields['id_moneda']?>.name == name)
-			form.<?="valor_".$mon->fields['id_moneda']?>.disabled = true;
-<?
+ 
+        form.<?php echo "valor_".$mon->fields['id_moneda']?>.disabled = false;
+		if(form.<?php echo "valor_".$mon->fields['id_moneda']?>.name == name)
+			form.<?php echo "valor_".$mon->fields['id_moneda']?>.disabled = true;
+<?php 
+ 
     }
 ?>
 }
@@ -213,16 +264,20 @@ for($x=0;$x<$lista->num;$x++)
 		$cf = $mon->fields['cifras_decimales'];
 		if( $cf > 0 ) { $dec = "."; while( $cf-- > 0 ){ $dec .= "0"; } }
 ?>
-	jQuery("#valor_<?=$mon->fields['id_moneda']?>").blur(function(){
+ 
+	jQuery("#valor_<?php echo $mon->fields['id_moneda']?>").blur(function(){
 	   var str = jQuery(this).val();
 	   jQuery(this).val( str.replace(',','.') );
-	   jQuery(this).parseNumber({format:"#<?=$dec?>", locale:"us"});
-	   jQuery(this).formatNumber({format:"#<?=$dec?>", locale:"us"});
+	   jQuery(this).parseNumber({format:"#<?php echo $dec?>", locale:"us"});
+	   jQuery(this).formatNumber({format:"#<?php echo $dec?>", locale:"us"});
+ 
 	});
 <?php
 	}
 ?>
 </script>
-<?
+ 
+<?php 
+ 
 	$pagina->PrintBottom();
 ?>

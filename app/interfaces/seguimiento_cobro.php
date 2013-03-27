@@ -307,7 +307,7 @@
 				$ht .=	    "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') 		&&		UtilesApp::GetConf($sesion,'NuevoModuloFactura') 						)
+				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
 				{
 				$ht .=	"<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
@@ -381,7 +381,7 @@
 			}
 
 			$html .= "</td>";
-			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
+			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
 			{
 					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 					if($cobro->fields['documento'])
@@ -407,9 +407,7 @@
 	$pagina->PrintTop();
 
 ?>
-<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
-<script type="text/javascript" src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
-
+ 
 <script type="text/javascript">
 	var AsuntosContrato=new Array();
 	<?php
@@ -423,6 +421,10 @@
 	?>
 		jQuery(document).ready(function() {
 
+  jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.com/js/bootstrap.min.js"  ,
+                dataType: "script",
+                complete: function() {
+                
 
 			jQuery('.btpopover').each(function() {
 				var idContrato=jQuery(this).attr('id').replace('tip_','');
@@ -430,7 +432,9 @@
 
 				jQuery(this).append("<span class='asuntos_del_contrato' style='font-weight:bold;'>"+AsuntosContrato[idContrato]+"</span>");
 			}  );
-
+  
+                }
+            });
 
 
 	});

@@ -182,7 +182,9 @@
 					}
 				}
 
-				$t->Edit("duracion", $tipo_ingreso == 'decimal' ?	UtilesApp::Decimal2Time($duracion) : $duracion);
+				$duracion_nueva = $tipo_ingreso == 'decimal' ?	UtilesApp::Decimal2Time($duracion) : $duracion;
+				$cambio_duracion = strtotime($duracion_nueva) != strtotime($t->fields['duracion']);
+				$t->Edit("duracion", $duracion_nueva);
 
 				if ($duracion_cobrada == '') {
 					$duracion_cobrada = $duracion;
@@ -220,6 +222,8 @@
 				} else {
 					$t->Edit('descripcion', $descripcion);
 				}
+				
+				$cambio_fecha = strtotime($t->fields['fecha']) != strtotime(Utiles::fecha2sql($fecha));
 				$t->Edit('fecha', Utiles::fecha2sql($fecha));
 				// $t->Edit('fecha',$fecha);
 				if (isset($codigo_actividad)) {
@@ -273,7 +277,11 @@
 					$t->fields['duracion_cobrada']='00:00:00';
 				}
 
-				if ($t->ValidarDiasIngresoTrabajo() && $t->Write(true)) {
+				$ingreso_valido = true;
+				if ($cambio_duracion || $cambio_fecha) {
+					$ingreso_valido = $t->ValidarDiasIngresoTrabajo();
+				}
+				if ($ingreso_valido && $t->Write(true)) {
 					if ($actualizar_trabajo_tarifa) {
 						$t->InsertarTrabajoTarifa();
 					}
