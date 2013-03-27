@@ -1,11 +1,14 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('COB'));
 $autocompletador = (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador');
 $codigoSecundario = (UtilesApp::GetConf($sesion, 'CodigoSecundario'));
+
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
+
 // para manejar el uso de adelantos sin tener que pichicatear las cifras.
 if ($_POST['montoadelanto']) {
 	$montoadelanto = $_POST['montoadelanto'];
@@ -37,6 +40,7 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$SolicitudAdelanto->Load($id_solicitud_adelanto);
 
 	$calculo_solicitud = $sesion->pdodbh->query($SolicitudAdelanto->SearchQuery())->fetch(PDO::FETCH_ASSOC);
+
 	if (empty($calculo_solicitud['saldo_solicitud_adelanto'])) {
 		$calculo_solicitud['saldo_solicitud_adelanto'] = $SolicitudAdelanto->fields['monto'];
 	}
@@ -48,6 +52,7 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$id_contrato = $SolicitudAdelanto->fields['id_contrato'];
 	$codigo_cliente = $SolicitudAdelanto->fields['codigo_cliente'];
 	$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
+
 	if ($id_contrato && !$codigo_asunto) {
 		$Asunto = new Asunto($sesion);
 		$Asunto->LoadByContrato($id_contrato);
@@ -105,6 +110,7 @@ if ($opcion == "guardar") {
 			$datos_neteo[$pedazos[0]][$pedazos[2] . '_' . $pedazos[1]] = $val;
 		}
 	}
+
 	$arreglo_pagos_detalle = array();
 	foreach ($datos_neteo as $llave => $valor) {
 		if ($valor['pago_honorarios'] > 0 || $valor['pago_gastos'] > 0) {
@@ -158,7 +164,9 @@ $pagina->titulo = $txt_pagina;
 
 $pagina->PrintTop($popup);
 ?>
+
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
+
 <?php if ($opcion == "guardar") { ?>
 	<script type="text/javascript">
 	if( window.opener.Refrescarse ) {
@@ -174,6 +182,7 @@ $pagina->PrintTop($popup);
 		format = jQuery('#id_moneda').val() == 1 ? '0' : '#.00';
 		return {format: format, locale: 'us'};
 	}
+
 	function Uniformar() {
 		jQuery('.saldojq, #monto_pagos, #monto, #monto_aux, #saldo_pago, #saldo_pago_aux').each(function() {
 			jQuery(this).val(jQuery(this).val().replace(',','.'));
@@ -202,6 +211,7 @@ $pagina->PrintTop($popup);
 				return false;
 			}
 		}
+
 		var monto_pagos = Math.round($F('monto_pagos')*1000)/1000;
 		var monto_pagos_real=monto_pagos+Number(jQuery('#anteriorduro').val());
 
@@ -913,11 +923,11 @@ $pagina->PrintTop($popup);
 				<select name='tipo_doc' id='tipo_doc'  style='width: 130px;' onchange="ShowCheque();">
 					<?php
 					
-					if (!$pago) {
+					if ($pago) {
 						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
 					}
 
-					if (!$adelanto) {						
+					if ($adelanto) {						
 						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'T' ORDER BY orden ASC";
 					}
 					
@@ -927,7 +937,9 @@ $pagina->PrintTop($popup);
 					while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
 						$tipos[$codigo] = $glosa;
 					}
+
 					$cod_tipo = $tipo_doc;
+
 					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) {
 						$cod_tipo = 'T';
 					}

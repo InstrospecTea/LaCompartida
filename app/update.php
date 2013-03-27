@@ -9739,9 +9739,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
 			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
-			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'RP',  'Resguardo',  '11')";
-			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CC',  'Certificado de crédito',  '12')";
-			
+						
 			ejecutar($queries, $dbh);
 			break;
 
