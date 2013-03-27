@@ -9707,12 +9707,12 @@ QUERY;
 			break;
 		case 7.31:
 			$queries = array();
-			if(!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
+			if (!ExisteCampo('codigo_asunto', 'solicitud_adelanto', $dbh)) {
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
 			}
-			if(!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
+			if (!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
 				$queries[] = "ALTER TABLE `documento` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `documento` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
@@ -9728,6 +9728,13 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.33:
+			$queries = array();
+			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
+				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
+			}
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9736,7 +9743,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.32;
+$max_update = 7.33;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
