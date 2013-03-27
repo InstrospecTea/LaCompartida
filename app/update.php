@@ -9730,11 +9730,27 @@ QUERY;
 
 		case 7.33:
 			$queries = array();
+
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
 			}
 			ejecutar($queries, $dbh);
 			break;
+
+			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crédito'";
+			if (!ExisteCampo('familia', 'prm_tipo_pago', $dbh)) {
+				$queries[] = "ALTER TABLE  `prm_tipo_pago` ADD  `familia` VARCHAR( 1 ) NOT NULL COMMENT 'Tipo de documento (A:Adelanto P:Pago T:Todos)' FIRST";
+			}
+			$queries[] = "UPDATE  `prm_tipo_pago` SET  `familia` =  'T'";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'EP',  'Efectivo',  '7')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
+						
+			ejecutar($queries, $dbh);
+			break;
+
+
 	}
 }
 

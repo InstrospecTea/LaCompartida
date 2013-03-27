@@ -1,11 +1,14 @@
 <?php
+
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('COB'));
 $autocompletador = (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador');
 $codigoSecundario = (UtilesApp::GetConf($sesion, 'CodigoSecundario'));
+
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
+
 // para manejar el uso de adelantos sin tener que pichicatear las cifras.
 if ($_POST['montoadelanto']) {
 	$montoadelanto = $_POST['montoadelanto'];
@@ -37,6 +40,7 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$SolicitudAdelanto->Load($id_solicitud_adelanto);
 
 	$calculo_solicitud = $sesion->pdodbh->query($SolicitudAdelanto->SearchQuery())->fetch(PDO::FETCH_ASSOC);
+
 	if (empty($calculo_solicitud['saldo_solicitud_adelanto'])) {
 		$calculo_solicitud['saldo_solicitud_adelanto'] = $SolicitudAdelanto->fields['monto'];
 	}
@@ -48,6 +52,7 @@ if ($id_solicitud_adelanto && !$id_documento && UtilesApp::GetConf($sesion, 'Usa
 	$id_contrato = $SolicitudAdelanto->fields['id_contrato'];
 	$codigo_cliente = $SolicitudAdelanto->fields['codigo_cliente'];
 	$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
+
 	if ($id_contrato && !$codigo_asunto) {
 		$Asunto = new Asunto($sesion);
 		$Asunto->LoadByContrato($id_contrato);
@@ -105,6 +110,7 @@ if ($opcion == "guardar") {
 			$datos_neteo[$pedazos[0]][$pedazos[2] . '_' . $pedazos[1]] = $val;
 		}
 	}
+
 	$arreglo_pagos_detalle = array();
 	foreach ($datos_neteo as $llave => $valor) {
 		if ($valor['pago_honorarios'] > 0 || $valor['pago_gastos'] > 0) {
@@ -158,7 +164,9 @@ $pagina->titulo = $txt_pagina;
 
 $pagina->PrintTop($popup);
 ?>
+
 <script  type="text/javascript" src="https://static.thetimebilling.com/js/typewatch.js"></script>
+
 <?php if ($opcion == "guardar") { ?>
 	<script type="text/javascript">
 	if( window.opener.Refrescarse ) {
@@ -174,6 +182,7 @@ $pagina->PrintTop($popup);
 		format = jQuery('#id_moneda').val() == 1 ? '0' : '#.00';
 		return {format: format, locale: 'us'};
 	}
+
 	function Uniformar() {
 		jQuery('.saldojq, #monto_pagos, #monto, #monto_aux, #saldo_pago, #saldo_pago_aux').each(function() {
 			jQuery(this).val(jQuery(this).val().replace(',','.'));
@@ -202,6 +211,7 @@ $pagina->PrintTop($popup);
 				return false;
 			}
 		}
+
 		var monto_pagos = Math.round($F('monto_pagos')*1000)/1000;
 		var monto_pagos_real=monto_pagos+Number(jQuery('#anteriorduro').val());
 
@@ -906,37 +916,42 @@ $pagina->PrintTop($popup);
 			</tr>
 		<?php } ?>
 		<tr>
-			<td align="right">
-				<?php echo __('Número Documento:') ?>
+			<td align=right>
+				<?php echo __('Tipo:') ?>
 			</td>
-			<td align="left">
-				<input name="numero_doc" id="numero_doc" size="20" value="<?php echo str_replace("-", "", $documento->fields['numero_doc']); ?>" />
-				<?php echo __('Tipo:') ?>&nbsp;
-				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;'>
-					<?php if ($documento->fields['tipo_doc'] == 'E' || $documento->fields['tipo_doc'] == '' || $documento->fields['tipo_doc'] == 'N') { ?>
-						<option value='E' selected>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'C') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C' selected>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'T') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T' selected>Transferencia</option>
-						<option value='O'>Otro</option>
-					<?php } if ($documento->fields['tipo_doc'] == 'O') { ?>
-						<option value='E'>Efectivo</option>
-						<option value='C'>Cheque</option>
-						<option value='T'>Transferencia</option>
-						<option value='O' selected>Otro</option>
+			<td align=left>
+				<select name='tipo_doc' id='tipo_doc'  style='width: 130px;' onchange="ShowCheque();">
+					<?php
+					
+					if ($pago) {
+						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
+					}
+
+					if ($adelanto) {						
+						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'T' ORDER BY orden ASC";
+					}
+					
+					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+					$tipos = array();
+					while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
+						$tipos[$codigo] = $glosa;
+					}
+
+					$cod_tipo = $tipo_doc;
+
+					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) {
+						$cod_tipo = 'T';
+					}
+					foreach ($tipos as $k => $v) {
+						?>
+						<option value="<?php echo $k ?>" <?php echo $k == $cod_tipo ? 'selected' : '' ?>><?php echo $v ?></option>
 					<?php } ?>
 				</select>
+
+				<?php echo __('N° Documento:') ?>
+				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $nro_documento); ?>" />
 			</td>
-		</tr>
 
 		<tr>
 			<td align="right">
