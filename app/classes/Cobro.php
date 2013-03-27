@@ -1910,7 +1910,6 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 	  parametros fecha_ini; fecha_fin; id_contrato
 	 */
 
-	function PrepararCobro($fecha_ini = '', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true) {
 	function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
@@ -1931,35 +1930,6 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 					$fecha_fin = $fecha_hito;
 				}
 			}
-
-			/*if ($fecha_ini == '') {
-				//uso la fecha final del ultimo cobro y le sumo 1 dia
-				$sql = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) as fuc
-							FROM cobro
-							WHERE cobro.id_contrato = $id_contrato
-							AND incluye_honorarios = $incluye_honorarios
-							AND incluye_gastos = $incluye_gastos";
-				$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
-				list($fuc) = mysql_fetch_array($resp);
-
-				$fecha_ini = $fuc;
-
-				//si tengo un trabajo anterior a esa fecha, elimino la fecha de inicio (???)
-				if (!empty($incluye_honorarios)) {
-					$sql_2 = "SELECT MIN(trabajo.fecha) as fmt
-									FROM trabajo
-									JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
-
-									WHERE fecha <= '$fecha_fin' AND trabajo.id_cobro IS NULL
-									AND trabajo.cobrable = 1 AND asunto.id_contrato = '$id_contrato'";
-					$resp_2 = mysql_query($sql_2, $this->sesion->dbh) or Utiles::errorSQL($sql_2, __FILE__, __LINE__, $this->sesion->dbh);
-					list($fmt) = mysql_fetch_array($resp_2);
-
-					if ($fuc > $fmt) {
-						$fecha_ini = '0000-00-00'; //=$fmt?? xq se usa el 00-00-0000??? ah?????
-					}
-				}
-			}*/
 
 			//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 			$genera = $emitir_obligatoriamente;
