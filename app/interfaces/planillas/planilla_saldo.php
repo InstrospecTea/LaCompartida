@@ -199,7 +199,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json')) && !empty($_RE
 			WHERE
 				cc.cobrable = 1 AND
 				(cc.id_cobro IS NULL OR cobro.estado IN ('CREADO', 'EN REVISION')) AND
-				cc.neteo_pago IS NULL AND
+				cc.id_neteo_documento IS NULL AND
 				cc.documento_pago IS NULL AND
 				cc.codigo_cliente = '$codigo_cliente'
 				$where_gastos

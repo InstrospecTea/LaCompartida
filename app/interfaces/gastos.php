@@ -78,114 +78,23 @@ if ($id_gasto != "") {
 if ($opc == 'buscar') {
 	if ($orden == "") {
 		$orden = "fecha DESC";
-	}
+	} 
 
 	if ($where == '') {
-		$where = 1;
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			if ($codigo_cliente_secundario) {
-				$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
-				$cliente = new Cliente($sesion);
-				$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
-
-				if ($codigo_asunto_secundario) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list_secundario = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list_secundario, $codigo);
-					}
-					$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
-				}
-			}
-		} else {
-			if ($codigo_cliente) {
-				$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
-				$cliente = new Cliente($sesion);
-				$cliente->LoadByCodigo($codigo_cliente);
-				if ($codigo_asunto) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigo($codigo_asunto);
-					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list, $codigo);
-					}
-					$lista_asuntos = implode("','", $asuntos_list);
-				}
-			}
-		}
-
-		$fecha_ini = ($fecha1 != '') ? Utiles::fecha2sql($fecha1) : '';
-		$fecha_fin = ($fecha2 != '') ? Utiles::fecha2sql($fecha2) : '';
-
-		if ($cobrado == 'NO') {
-			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
-		}
-		if ($cobrado == 'SI') {
-			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
-		}
-		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
-		}
-		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
-			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
-		}
-		if ($id_usuario_orden) {
-			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-		}
-		if ($id_usuario_responsable) {
-			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-		}
-		if (isset($cobrable) && $cobrable != '') {
-			$where .= " AND cta_corriente.cobrable =$cobrable";
-		}
-
-		if (isset($id_tipo) and $id_tipo != '') {
-			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
-		}
-
-		if ($clientes_activos == 'activos') {
-			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		}
-		if ($clientes_activos == 'inactivos') {
-			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
-		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND cta_corriente.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . "' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
-			$where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "' ";
-		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59' ";
-		} else if (!empty($id_cobro)) {
-			$where .= " AND cta_corriente.id_cobro='$id_cobro' ";
-		}
-
-		// Filtrar por moneda del gasto
-		if ($moneda_gasto != '') {
-			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
-		}
-		if ($egresooingreso == 'soloingreso') {
-			$where .= " AND cta_corriente.ingreso IS NOT NULL ";
-		} else if ($egresooingreso == 'sologastos') {
-			$where .= " AND cta_corriente.ingreso IS NULL ";
-		}
+		$where=$gasto->WhereQuery($_REQUEST);
 	} else {
 		$where = base64_decode($where);
 	}
 
 	if ($exportar_excel) {
-		$search_query = $gasto->SearchQuery($where);
+		$search_query = $gasto->SearchQuery($sesion, $where);
 		$gasto->DownloadExcel($search_query);
 	}
 
 	$idioma_default = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
-	$total_cta = number_format(UtilesApp::TotalCuentaCorriente($sesion, $where), 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
+	$total_cta = number_format($gasto::TotalCuentaCorriente($sesion, $where), 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 } else if ($opc == 'xls') {
 	require_once('gastos_xls.php');
 	exit;
@@ -511,6 +420,7 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 
 			return respuesta;
 		}, "bUseRendered": false, "aTargets": [12]},
+
 		{"fnRender": function ( o, val ) {
 			var idcobro=o.aData[8];
 			var respuesta='';
@@ -519,10 +429,12 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			}
 			return respuesta+'<small>'+o.aData[9]+'</small>';
 		}, "aTargets": [8]},
+		
 		{"fnRender": function (o,val) {
 			var tipo=(o.aData[3]!=' - ')? o.aData[3]+' ':'';
 			return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
 		}, "aTargets": [3]},
+		
 		{"fnRender": function (o,val) {
 			if(o.aData[5]) {
 				return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
@@ -536,7 +448,8 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 			if (typeof(contratos)!="undefined") {
 				contratos['contrato_'+o.aData[14]]=o.aData[14];
 			}
-			return o.aData[1]+'<div class="tipodescripcion">('+activo+')</div>';
+			 var datacliente=o.aData[1].split('|');
+			return '<a href="agregar_cliente.php?codigo_cliente='+datacliente[0]+'">'+datacliente[0]+'</a> '+datacliente[1]+'<div class="tipodescripcion">('+activo+')</div>';
 		}, "bUseRendered": false , "aTargets": [2] }
 		],
 		"aaSorting": [[0,'desc']],
@@ -631,8 +544,8 @@ function Refrescar() {
 }
 </script>
 
-<table  width="90%">
-	<tr>
+ 
+			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
 		<td>
 			<input type="hidden" name="serializacion" id="serializacion" size="70"/>
 			<form method='post' name="form_gastos" action='' id="form_gastos">
@@ -640,9 +553,10 @@ function Refrescar() {
 <?php if (isset($_GET['opc']) && $_GET['opc'] == 'buscar' && $where != '') echo '<input type="hidden" name="where" id="where" value="' . base64_encode($where) . '"/>'; ?>
 				<input type='hidden' name='opc' id='opc' value=buscar>
 				<input type='hidden' name='motivo' id='motivo' value='gastos'/>
-				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
+				<fieldset class="tb_base" style="width: 90%;border: 1px solid #BDBDBD;margin:auto;">
 					<legend><?php echo __('Filtros') ?></legend>
-					<table style="border: 0px solid black" width='720px'>
+					
+					<table style="border: 0px solid black" width='750px'>
 						<tr>
 							<td align=right><?php echo __('Cobrado') ?></td>
 							<td align='left'>
@@ -655,7 +569,7 @@ function Refrescar() {
 						</tr>
 						<tbody id="selectclienteasunto">
 							<tr>
-								<td align=right width='30%'><?php echo __('Nombre Cliente') ?></td>
+								<td align=right width='20%'><?php echo __('Nombre Cliente') ?></td>
 								<td nowrap colspan=3 align=left>
 <?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 								</td>
@@ -751,22 +665,19 @@ function Refrescar() {
 							<td></td>
 						</tr>
 <?php } ?>
-						<tr>
-							<td></td>
-							<td colspan=2 align=left>
-								 <!--<input name=boton_buscar id='boton_buscar' type="button" value="<?php echo __('Buscar') ?>"   rel="buscar" class=" btn buscargastos">-->
-								<input name="boton_buscar" id='boton_buscar' type="button" value="<?php echo __('Buscar') ?>"  rel="buscar" class=" btn buscargastos" />
-								<input name="boton_xls" id="boton_excel" type="button" value="<?php echo __('Descargar Excel') ?>"   rel="excel" class=" btn buscargastos">
-								<input name="boton_xls_resumen" type="button" value="<?php echo __('Descargar Resumen Excel') ?>"   rel="excel_resumen" class=" btn buscargastos" />
-							</td>
-							<td width='40%' align=right>
-<?php if (!$nuevo_modulo_gastos) { ?>
-								<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo __('Agregar provisión') ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<?php } ?>
-								<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo __('Agregar') ?> <?php echo __('gasto') ?></a>
-							</td>
-						</tr>
+ 
 					</table>
+							<div  style="padding:10px;text-align:right;">
+								<a name="boton_buscar" id='boton_buscar' icon="find" class="btn botonizame buscargastos" rel="buscar" ><?php echo __('Buscar') ?></a>
+								<a name="boton_xls" id="boton_excel"  icon="xls" class="btn botonizame buscargastos"  rel="excel" ><?php echo __('Descargar Excel') ?></a>
+								<a name="boton_xls_resumen"  icon="xls" rel="excel_resumen" class="btn botonizame buscargastos" ><?php echo __('Descargar Resumen Excel') ?></a>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<?php if (!$nuevo_modulo_gastos) { ?>
+								&nbsp;<a href='javascript:void(0)' class="btn botonizame" icon="agregar" onclick="AgregarNuevo('provision')" title="Agregar provisi&oacute;n"><?php echo __('Agregar provisión') ?></a>
+<?php } ?>
+								&nbsp;<a href='javascript:void(0)' class="btn botonizame"  icon="agregar"  onclick="AgregarNuevo('gasto')" title="Agregar Gasto"><?php echo __('Agregar') ?> <?php echo __('gasto') ?></a>
+							</div>
+
 				</fieldset>
 				<br>
 <?php if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')) { ?>
@@ -779,7 +690,7 @@ function Refrescar() {
 				</table>
 <?php } ?>
 			</form>
-		</td>
+ 
 	</tr>
 </table>
 

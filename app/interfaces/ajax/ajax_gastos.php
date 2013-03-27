@@ -1,7 +1,8 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
 
-$sesion = new Sesion(array('ADM'));
+$sesion = new Sesion(array('ADM','COB','SEC'));
+$gasto= new Gasto($sesion);
 
 $limitdesde = isset($_REQUEST['iDisplayStart']) ? $_REQUEST['iDisplayStart'] : '0';
 $limitcantidad = isset($_REQUEST['iDisplayLength']) ? $_REQUEST['iDisplayLength'] : '25';
@@ -57,102 +58,8 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 	echo "jQuery('#boton_buscar').click();";
 	die();
 } else if ($_REQUEST['opc'] == 'buscar' || ($_GET['opclistado'] == 'listado' && $_GET['selectodos'] == 1) || $_GET['totalctacorriente'] == 1) {
-	if ($where != '') {
-		$where = 1;
-
-		if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-			if ($codigo_cliente_secundario) {
-				$where .= " AND cliente.codigo_cliente_secundario = '$codigo_cliente_secundario'";
-
-				if ($codigo_asunto_secundario) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigoSecundario($codigo_asunto_secundario);
-					$query_asuntos = "SELECT codigo_asunto_secundario FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list_secundario = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list_secundario, $codigo);
-					}
-					$lista_asuntos_secundario = implode("','", $asuntos_list_secundario);
-				}
-			}
-		} else {
-			if ($codigo_cliente) {
-				$where .= " AND cta_corriente.codigo_cliente = '$codigo_cliente'";
-
-				if ($codigo_asunto) {
-					$asunto = new Asunto($sesion);
-					$asunto->LoadByCodigo($codigo_asunto);
-					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
-					$resp = mysql_query($query_asuntos, $sesion->dbh) or Utiles::errorSQL($query_asuntos, __FILE__, __LINE__, $sesion->dbh);
-					$asuntos_list = array();
-					while (list($codigo) = mysql_fetch_array($resp)) {
-						array_push($asuntos_list, $codigo);
-					}
-					$lista_asuntos = implode("','", $asuntos_list);
-				}
-			}
-		}
-		if ($fecha1 != '') {
-			$fecha_ini = Utiles::fecha2sql($fecha1);
-		} else {
-			$fecha_ini = '';
-		}
-		if ($fecha2 != '') {
-			$fecha_fin = Utiles::fecha2sql($fecha2);
-		} else {
-			$fecha_fin = '';
-		}
-
-		if ($_GET['egresooingreso'] == 'soloingreso') {
-			$where .= " AND cta_corriente.ingreso>0";
-		} else if ($_GET['egresooingreso'] == 'sologastos') {
-			$where .= " AND cta_corriente.egreso>0";
-		}
-		if ($cobrado == 'NO') {
-			$where .= " AND (cta_corriente.id_cobro is null OR  cobro.estado  in ('SIN COBRO','CREADO','EN REVISION')   ) ";
-		}
-		if ($cobrado == 'SI') {
-			$where .= " AND cta_corriente.id_cobro is not null AND cobro.estado in ('EMITIDO', 'FACTURADO', 'PAGO PARCIAL','PAGADO', 'ENVIADO AL CLIENTE' ,'INCOBRABLE') ";
-		}
-		if ($codigo_asunto && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
-		}
-		if ($codigo_asunto_secundario && $lista_asuntos_secundario) {
-			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";
-		}
-		if ($id_usuario_orden) {
-			$where .= " AND cta_corriente.id_usuario_orden = '$id_usuario_orden'";
-		}
-		if (isset($cobrable) && $cobrable != '') {
-			$where .= " AND cta_corriente.cobrable = $cobrable";
-		}
-		if ($id_usuario_responsable) {
-			$where .= " AND contrato.id_usuario_responsable = '$id_usuario_responsable' ";
-		}
-		if (isset($id_tipo) and $id_tipo != '') {
-			$where .= " AND cta_corriente.id_cta_corriente_tipo = '$id_tipo'";
-		}
-		if ($clientes_activos == 'activos') {
-			$where .= " AND ( ( cliente.activo = 1 AND asunto.activo = 1 ) OR ( cliente.activo AND asunto.activo IS NULL ) ) ";
-		}
-		if ($clientes_activos == 'inactivos') {
-			$where .= " AND ( cliente.activo != 1 OR asunto.activo != 1 ) ";
-		}
-		if ($fecha1 && $fecha2) {
-			$where .= " AND cta_corriente.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . "' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
-		} else if ($fecha1) {
-			$where .= " AND cta_corriente.fecha >= '" . Utiles::fecha2sql($fecha1) . "' ";
-		} else if ($fecha2) {
-			$where .= " AND cta_corriente.fecha <= '" . Utiles::fecha2sql($fecha2) . "' ";
-		} else if (!empty($id_cobro)) {
-			$where .= " AND cobro.id_cobro='$id_cobro' ";
-		}
-
-		// Filtrar por moneda del gasto
-		if ($moneda_gasto != '') {
-			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
-		}
+	if ($where == 1) {
+		$where=$gasto->WhereQuery($_REQUEST);
 	} else {
 		$where = base64_decode($where);
 	}
@@ -161,6 +68,8 @@ if ($_REQUEST['opc'] == 'actualizagastos') {
 	$idioma_default->Load(strtolower(UtilesApp::GetConf($sesion, 'Idioma')));
 
 	$col_select = " ,if(cta_corriente.cobrable = 1,'Si','No') as esCobrable ";
+
+	
 }
 
 
@@ -169,7 +78,13 @@ if ($_GET['totalctacorriente']) { ?>
 	<form id="buscacliente" method="POST" action="seguimiento_cobro.php" target="_blank">
 		<b><?php
 			echo __('Balance cuenta gastos'); ?>: <?php echo UtilesApp::GetSimboloMonedaBase($sesion);
-			$balance = UtilesApp::TotalCuentaCorriente($sesion, $where, $cobrable, true);
+
+			if ($where == 1) {
+				$where=$gasto->WhereQuery($_REQUEST);
+			} else {
+				$where = base64_decode($where);
+			}
+			$balance = $gasto::TotalCuentaCorriente($sesion, $where, $cobrable, true);
 			if ($codigo_cliente_secundario || $codigo_cliente) { ?>
 				<input type="hidden" id="codcliente" name="codcliente" value="1"/>
 			<?php } else { ?>
@@ -180,11 +95,13 @@ if ($_GET['totalctacorriente']) { ?>
 				<input type="hidden" id="codigo_cliente" name="codigo_cliente" value="<?php echo $codigo_cliente; ?>"/>
 				<input type="hidden" id="codigo_cliente_secundario" name="codigo_cliente_secundario" value="<?php echo $codigo_cliente_secundario; ?>"/>
 				<input type="hidden" id="festado" name="estado[]" value="CREADO"/>
-				<input type="hidden" id="festado" name="opc" value="buscar"/>
-				<input type="hidden" id="festado" name="fecha_fin" value="<?php echo date('d-m-Y'); ?>"/>
-				<input type="hidden"  name="ingreso" value="<?php echo $balance[1]; ?>"/>
-				<input type="hidden"  name="egreso" value="<?php echo $balance[2]; ?>"/>
-				<input type="hidden" id="balance" name="balance" value="<?php echo $balance[3]; ?>"/>
+				<input type="hidden" id="op" name="opc" value="buscar"/>
+				<input type="hidden" id="ffin" name="fecha_fin" value="<?php echo date('d-m-Y'); ?>"/>
+				<input type="hidden"  name="balance" 	value="<?php echo $balance[0]; ?>"/>
+				<input type="hidden"  name="ingreso" 	value="<?php echo $balance[1]; ?>"/>
+				<input type="hidden"  name="egreso" 	value="<?php echo $balance[2]; ?>"/>
+				<input type="hidden"  name="borrador" 	value="<?php echo $balance[3]; ?>"/>
+				
 			<?php } else {
 				echo number_format($balance, 0, $idioma_default->fields['separador_decimales'], $idioma_default->fields['separador_miles']);
 			}?>
@@ -253,49 +170,14 @@ if ($_GET['totalctacorriente']) { ?>
 <?php
 } else if ($_REQUEST['opc'] == 'buscar') {
 
-	$selectfrom = "FROM cta_corriente
-						LEFT JOIN asunto USING(codigo_asunto)
-						LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-						LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
-						LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
-						LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
-						LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-						LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-						LEFT JOIN cobro on cta_corriente.id_cobro=cobro.id_cobro
-					WHERE
-						$where
-						 ";
-	$query = "SELECT
-				cta_corriente.id_movimiento,
-				cta_corriente.fecha,
-				cta_corriente.egreso,
-				cta_corriente.ingreso,
-				cta_corriente.monto_cobrable,
-				ifnull(cta_corriente.codigo_cliente,'-') codigo_cliente,
-				ifnull(cta_corriente.numero_documento,'-') numero_documento,
-				cta_corriente.numero_ot,
-				ifnull(cta_corriente.descripcion,'-') descripcion,
-				cobro.id_cobro,
-				ifnull(concat_ws(' - ',asunto.codigo_asunto,asunto.glosa_asunto),'-') glosa_asunto,
-				ifnull(concat_ws(' - ',cliente.codigo_cliente, cliente.glosa_cliente),'-') glosa_cliente,
-				prm_moneda.simbolo,
-				prm_moneda.cifras_decimales,
-				prm_cta_corriente_tipo.glosa as tipo,
-				ifnull(cobro.estado,'SIN COBRO') as estado,
-				cta_corriente.con_impuesto,
-				prm_idioma.codigo_idioma,
-				contrato.activo AS contrato_activo,
-				1 as opcion, contrato.id_contrato
-				$col_select
-			$selectfrom
-			ORDER BY $orden
-			LIMIT $limitdesde,$limitcantidad";
+	$selectfrom = $gasto::SelectFromQuery();
+
+				
+	$query = $gasto->SearchQuery($sesion,$where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
 
-	$selectcount = "SELECT COUNT(*) $selectfrom ";
-
-	$sesion->debug($query);
-
+	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where ";
+//echo $selectcount;
 
 
 
@@ -334,19 +216,19 @@ if ($_GET['totalctacorriente']) { ?>
 	foreach ($resp as $fila) {
 		$stringarray = array(
 			date('d-m-Y', strtotime($fila['fecha'])),
-			$fila['glosa_cliente'] ? utf8_encode($fila['glosa_cliente']) : ' - ',
+			$fila['glosa_cliente']  ? utf8_encode($fila['codigo_cliente'].'|'.$fila['glosa_cliente']) : ' - ',
 			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
 			$fila['tipo'] ? $fila['tipo'] : ' - ',
 			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
-			$fila['egreso'] ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
-			$fila['ingreso'] ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
+			$fila['ingresooegreso']=='ingreso' ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
 			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
 			$fila['id_cobro'] ? $fila['id_cobro'] : ' ',
-			$fila['estado'] ? $fila['estado'] : ' ',
+			$fila['estado_cobro'] ? $fila['estado_cobro'] : ' ',
 			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
 			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
 			$fila['id_movimiento'],
-			$fila['egreso'] > 0 ? $fila['simbolo'] . ' ' . $fila['monto_cobrable'] : ' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
 			$fila['id_contrato']
 		);
 		$resultado['aaData'][] = $stringarray;

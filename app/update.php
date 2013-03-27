@@ -9734,6 +9734,7 @@ QUERY;
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
 			}
+			
 			ejecutar($queries, $dbh);
 			break;
 
@@ -9755,6 +9756,31 @@ QUERY;
 			break;
 
 
+		case 7.35:
+			$queries = array();
+
+			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
+			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
+			}
+			
+			$queries[]=" update cta_corriente cc 
+					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
+	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					set cc.id_cobro=doc.id_cobro,
+						cc.id_neteo_documento=nd.id_neteo_documento,
+						cc.documento_pago=nd.id_documento_pago
+				where cc.incluir_en_cobro='NO' ";
+
+		
+		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
+			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
+			}
+		if(!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) )	 {
+			$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			}
+		ejecutar($queries, $dbh);
+		break;
+
 	}
 }
 
@@ -9763,7 +9789,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.34;
+$max_update = 7.35;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
