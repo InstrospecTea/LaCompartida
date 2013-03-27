@@ -22,6 +22,7 @@
 require 'uri'
 require 'cgi'
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
+require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "env"))
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "selectors"))
 
 module WithinHelpers
@@ -34,6 +35,10 @@ end
 
 World(WithinHelpers)
 
+ When /^estoy en la pantalla de login$/ do
+  visit Capybara.app_host
+end
+
 # Single-line step scoper
 When /^(.*) within (.*[^:])$/ do |step, parent|
   with_scope(parent) { When step }
@@ -44,16 +49,59 @@ When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
   with_scope(parent) { When "#{step}:", table_or_string }
 end
 
+
+
 Given /^(?:|I )am on (.+)$/ do |page_name|
   visit path_to(page_name)
+end
+
+Given /^estoy en (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+
+When /^genero un gasto aleatorio$/ do
+  asunto = ["0003-0001", "0006-0001", "0007-0001", "0013-0001", "0010-0001", "0017-0001","0025-0002","2020-0003" ,"2017-0004","2008-0001"]
+  codigo_asunto = asunto[rand(asunto.length)]
+  monto_aleatorio=1000+rand(5000)
+  descripcion="Gasto generado por cucumber para asunto " << codigo_asunto
+  fill_in('campo_codigo_asunto', :with => codigo_asunto)
+  fill_in('monto', :with => monto_aleatorio)
+  fill_in('descripcion', :with => descripcion)
+   click_on "Guardar"
+end
+
+
+When(/^me logeo$/) do
+  visit path_to('la pagina de login')
+    fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+  click_on "Entrar"
 end
 
 When /^(?:|I )go to (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
+When /^visito (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+
+
 When /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
+end
+
+When /^(?:|I )click on "([^"]*)"$/ do |button|
+  click_on(button)
+end
+
+When /^pincho en "([^"]*)"$/ do |button|
+  click_on(button)
+end
+
+When /^pongo usuario y password$/ do 
+  fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
 end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
@@ -64,8 +112,16 @@ When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
   fill_in(field, :with => value)
 end
 
+When /escribo "([^"]*)" en el campo "([^"]*)"$/ do |value,field|
+  fill_in(field, :with => value)
+end
+
 When /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
   fill_in(field, :with => value)
+end
+
+When /^me cambio al popup$/ do 
+     page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
 # Use this to fill in an entire form with data from a table. Example:
@@ -110,6 +166,30 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
     page.should have_content(text)
   else
     assert page.has_content?(text)
+  end
+end
+
+Then /^debiera ver "([^"]*)"$/ do |text|
+  if page.respond_to? :should
+    page.should have_content(text)
+  else
+    assert page.has_content?(text)
+  end
+end
+
+Then /^(?:|I )should see css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
+  end
+end
+
+Then /^debiera ver css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
   end
 end
 
@@ -219,16 +299,7 @@ Then /^the "([^"]*)" checkbox(?: within (.*))? should be checked$/ do |label, pa
   end
 end
 
-Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
-  with_scope(parent) do
-    field_checked = find_field(label)['checked']
-    if field_checked.respond_to? :should
-      field_checked.should be_false
-    else
-      assert !field_checked
-    end
-  end
-end
+
  
 Then /^(?:|I )should be on (.+)$/ do |page_name|
   current_path = URI.parse(current_url).path
@@ -238,6 +309,16 @@ Then /^(?:|I )should be on (.+)$/ do |page_name|
     assert_equal path_to(page_name), current_path
   end
 end
+
+Then /^debiera estar en (.+)$/ do |page_name|
+  current_path = URI.parse(current_url).path
+  if current_path.respond_to? :should
+    current_path.should == path_to(page_name)
+  else
+    assert_equal path_to(page_name), current_path
+  end
+end
+
 
 Then /^(?:|I )should have the following query string:$/ do |expected_pairs|
   query = URI.parse(current_url).query
@@ -258,27 +339,30 @@ end
 
 
 
+
 def call_lista_gastos usuario,password,timestamp
-      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp }).to_hash
+      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp })
 end
 
 When /^me conecto al cliente wsdl$/ do
-   @client = Savon.client(wsdl: "http://cplaw.thetimebilling.com/time_tracking_feature/web_services/integracion_contabilidad4.php?wsdl")
+   @client = Savon.client(wsdl:  Capybara.app_host  << "/web_services/integracion_contabilidad4.php?wsdl")
 end
 
  
 
 When(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
- @result = call_lista_gastos "cplaw","cplaw",timestamp
+ @resultado = call_lista_gastos(usuario, password,timestamp)
+  @result=@resultado.body.to_hash
 end
 
  
 Then /^debiera devolverme los metodos disponibles$/ do
+   p @client.operations
    assert(@client.operations.kind_of?(Array))
  end
 
 Then /^debiera devolver al menos un gasto$/ do
-   assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Hash))
+  assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Array))
  end
 
 Then /^no debiera devolver gastos$/ do
@@ -294,4 +378,13 @@ Then /^no debiera devolver gastos$/ do
      expect { @client.call_lista_gastos "juanito","juanito",1356998400}.to raise_error
  end
 
- 
+ Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
+  with_scope(parent) do
+    field_checked = find_field(label)['checked']
+    if field_checked.respond_to? :should
+      field_checked.should be_false
+    else
+      assert !field_checked
+    end
+  end
+end
