@@ -9737,6 +9737,10 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.34;
+
+			$queries = array();
+
 			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crédito'";
 			if (!ExisteCampo('familia', 'prm_tipo_pago', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_tipo_pago` ADD  `familia` VARCHAR( 1 ) NOT NULL COMMENT 'Tipo de documento (A:Adelanto P:Pago T:Todos)' FIRST";
@@ -9759,7 +9763,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.33;
+$max_update = 7.34;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
