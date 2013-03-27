@@ -15,8 +15,7 @@ set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}_#{custom_nam
 set :branch, custom_branch
 set :deploy_to, "#{base_directory}/#{file_path}"
 
-
-
+ 
 namespace :deploy do
 
   
@@ -67,8 +66,15 @@ task :create_database do
           run "  mysql -h192.168.1.24 -uroot -pasdwsx -e 'CREATE DATABASE IF NOT EXISTS #{dbname}' && mysqldump -uroot -pasdwsx  -h192.168.1.24 --opt  lemontest_molde | mysql -uroot -pasdwsx -h192.168.1.24  #{dbname}"
         end
       else
-          puts "\n\e[0;35m   ############# NO NECESITO CREAR LA BASE \e[01;37m #{dbname}\e[0;35m (PORQUE YA EXISTE) ################\n\n"
-       end
+          puts "\n\e[0;32m   ############# NO NECESITO CREAR LA BASE \e[01;37m #{dbname}\e[0;32m (PORQUE YA EXISTE) ################\n\n"
+          puts "       __                                  _                 _"
+          puts "      (_ )                              __( )_              ( )     "
+          puts "       | |  ___    ___ ___    ___    ___\\__  _\\ ___    ___  | |__  "
+          puts "       | | / __\\  / _ ` _ \\  / _ \\  / _ \\ | |  / __\\  / ___\\| _  \\ "
+          puts "       | |(  ___|| ( ) ( ) |( (_) )| ( ) || |_(  ___|( (___ | | | | "
+          puts "      (___)\\____)(_) (_) (_) \\___/ (_) (_)\\___)\\____) \\____)(_) (_) \n \n"
+
+end
 
 
 end
@@ -81,3 +87,5 @@ end
 
 
 end
+
+

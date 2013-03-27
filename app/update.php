@@ -9732,11 +9732,12 @@ QUERY;
 			$queries = array();
 			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
-			$queries=array();
+			}
 			
 			ejecutar($queries, $dbh);
 			break;
-case 7.34:
+
+		case 7.34:
 			$queries = array();
 
 			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
