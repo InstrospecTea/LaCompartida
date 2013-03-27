@@ -916,7 +916,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			<td align=left>
 				<select name='tipo_doc' id='tipo_doc'  style='width: 100px;' onchange="ShowCheque();">
 					<?php
-					$query = "SELECT codigo, glosa FROM prm_tipo_pago ORDER BY orden ASC";
+					$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
 					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 					$tipos = array();
