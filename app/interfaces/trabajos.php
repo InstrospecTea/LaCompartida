@@ -193,9 +193,14 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		$cobro->LoadAsuntos();
 		$query_asuntos = implode("','", $cobro->asuntos);
 		$id_contrato=$cobro->fields['id_contrato'];
-		
-			$where .= " AND (trabajo.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
-			$where_gastos .= " (AND cta_corriente.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
+
+		 if(count($cobro->asuntos)>0) {
+			$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
+			$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
+		} else {
+			$where .= " AND   contrato.id_contrato='$id_contrato'";
+			$where_gastos .= " AND   contrato.id_contrato='$id_contrato'";
+		}
 
 		//$where .= " AND trabajo.cobrable = 1";
 		if ($opc == 'buscar') {
@@ -212,7 +217,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 		
 			if($id_contrato) {
 				$where .= " AND (trabajo.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
-				$where_gastos .= " (AND cta_corriente.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
+				$where_gastos .= " AND ( cta_corriente.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
 			} else {
 				$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
 				$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
