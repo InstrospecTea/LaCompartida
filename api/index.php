@@ -47,7 +47,7 @@ $app->get('/clients', function () {
 
 $app->get('/clients/:code/matters', function ($code) {
 	if (is_null($code) || $code == '') {
-		halt("Invalid code client");
+		halt("Invalid client code");
 	}
 
 	$Session = new Sesion();
@@ -143,80 +143,75 @@ $app->get('/translations', function () {
 });
 
 $app->get('/settings', function () {
-	$response = array();
-	$_app = Slim::getInstance();
+	$Session = new Sesion();
+	$settings = array();
 
-	validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
 
-	try {
-		$db = getConnection();
-		$client = array(
-			'code' => 'C999666',
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /settings | ' . $e->getMessage());
+	if (is_array($Session->arrayconf) && !empty($Session->arrayconf)) {
+		foreach ($Session->arrayconf as $key => $value) {
+			array_push($settings, array('code' => $key, 'value' => $value));
+		}
 	}
 
-	echo json_encode($response);
+	outputJson($settings);
 });
 
 $app->get('/users/:id', function ($id) {
-	$response = array();
-	$_app = Slim::getInstance();
-
-	validateAuthTokenSendByHeaders();
-
-	try {
-		$db = getConnection();
-		$client = array(
-			'id' => $id,
-			'name' => 'LEMONTECH'
-		);
-		$response[] = $client;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /users/:id | ' . $e->getMessage());
+	if (is_null($id) || empty($id)) {
+		halt("Invalid user ID");
 	}
 
-	echo json_encode($response);
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$user = array();
+
+	$user_id = validateAuthTokenSendByHeaders();
+
+	if (!$User->LoadId($id)) {
+		halt("The user doesn't exist");
+	} else {
+		$user = array(
+			'id' => (int) $User->fields['id_usuario'],
+			'identification_number' => $User->fields['rut'],
+			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre']
+		);
+	}
+
+	outputJson($user);
 });
 
 $app->get('/users/:id/works', function ($id) {
-	$response = array();
-	$_app = Slim::getInstance();
-
-	validateAuthTokenSendByHeaders();
-
-	$after = $_app->request()->params('after');
-	$before = $_app->request()->params('before');
-
-	try {
-		$db = getConnection();
-		$work = array(
-			'id' => $id,
-			'creation_date' => strtotime(date('Y-m-d H:i:s')),
-			'date' => strtotime(date('Y-m-d H:i:s')),
-			'duration' => date('i'),
-			'notes' => 'notes',
-			'rate' => 1.1,
-			'read_only' => 0,
-			'requester' => 'requester',
-			'activity_code' => 'C9090',
-			'area_code' => 'C9090',
-			'client_code' => 'C9090',
-			'matter_code' => 'C9090',
-			'task_code' => 'C9090',
-			'user_id' => $id,
-			'billable' => 1,
-			'visible' => 1,
-		);
-		$response[] = $work;
-	} catch(Exception $e) {
-		$_app->halt(500, 'GET /users/:id/works | ' . $e->getMessage());
+	if (is_null($id) || empty($id)) {
+		halt("Invalid user ID");
 	}
 
-	echo json_encode($response);
+	$user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$Work = new Trabajo($Session);
+	$Slim = Slim::getInstance();
+	$works = array();
+
+	$before = $Slim->request()->params('before');
+	$after = $Slim->request()->params('after');
+
+	if (!is_null($before)) {
+		$before = isValidTimeStamp($before) ? date('Y-m-d H:i:s', $before) : null;
+	}
+
+	if (!is_null($after)) {
+		$after = isValidTimeStamp($after) ? date('Y-m-d H:i:s', $after) : null;
+	}
+
+	if (!$User->LoadId($id)) {
+		halt("The user doesn't exist");
+	} else {
+		$works = $Work->findAllWorksByUserId($id, $before, $after);
+	}
+
+	outputJson($works);
 });
 
 $app->put('/users/:id/works', function ($id) {
@@ -300,7 +295,13 @@ function outputJson($response) {
 	header("Pragma: no-cache");
 	header('Content-type: application/json; charset=utf-8');
 	$response = UtilesApp::utf8izar($response);
-	array_walk_recursive($response, function(&$x) { $x = trim($x); });
+	array_walk_recursive($response, function(&$x) { if (is_string($x)) $x = trim($x); });
 	echo json_encode($response);
 	exit;
+}
+
+function isValidTimeStamp($timestamp) {
+	return ((string) (int) $timestamp === $timestamp)
+	&& ($timestamp <= PHP_INT_MAX)
+	&& ($timestamp >= ~PHP_INT_MAX);
 }

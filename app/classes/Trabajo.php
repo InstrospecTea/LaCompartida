@@ -130,7 +130,7 @@ class Trabajo extends Objeto
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -140,7 +140,7 @@ class Trabajo extends Objeto
 			if ($this->sesion->usuario->TienePermiso('COB')) {
 				return true;
 			}
-                        
+
 			$fecha_tope = time() - ($this->sesion->usuario->fields['dias_ingreso_trabajo'] + 1) * 24 * 60 * 60;
 			if($fecha_tope > strtotime($this->fields['fecha'])){
 				$this->error = 'No se puede ingresar horas anteriores al ' . date('Y-m-d', $fecha_tope + 24 * 60 * 60);
@@ -149,7 +149,7 @@ class Trabajo extends Objeto
 		}
 		return true;
 	}
-	
+
 	/*
 	 * param $fecha fecha que se quiere verificar en formato 'YYYY-MM-DD'
 	 * param $id_usuario id usuario, opcional
@@ -716,6 +716,65 @@ class Trabajo extends Objeto
 				return "$mensajes$num_modificados trabajos actualizados.<br/>$num_insertados trabajos agregados.";
 			}
 		}
+	}
+
+	function findAllWorksByUserId($id, $before = null, $after = null) {
+		$works = array();
+
+		$sql = "SELECT `work`.`id_trabajo` AS `id`, `work`.`fecha_creacion` AS `creation_date`,
+			`work`.`fecha` AS `date`, `work`.`duracion` AS `duration`, `work`.`descripcion` AS `notes`,
+			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
+			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
+			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
+			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`
+			FROM `trabajo` AS `work`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
+				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
+			WHERE `work`.`id_usuario`=:id AND `work`.`fecha_creacion` BETWEEN :before AND :after
+			ORDER BY `work`.`id_trabajo` DESC";
+
+		if (is_null($before) || is_null($after)) {
+			$before = date('Y-m-d 00:00:00');
+			$after = date('Y-m-d 23:59:59');
+		}
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $id);
+		$Statement->bindParam('before', $before);
+		$Statement->bindParam('after', $after);
+		$Statement->execute();
+
+		while ($work = $Statement->fetch(PDO::FETCH_OBJ)) {
+			$date_read_only = null;
+			$date_now = strtotime('now');
+			if (!empty($work->date_read_only)) {
+				$date_read_only = strtotime($work->date_read_only);
+			}
+
+			array_push($works,
+				array(
+					'id' => (int) $work->id,
+					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
+					'date' => !empty($work->date) ? strtotime($work->date) : null,
+					'duration' => !empty($work->duration) ? $work->duration : null,
+					'notes' => !empty($work->notes) ? $work->notes : null,
+					'rate' => !empty($work->rate) ? (float) $work->rate : null,
+					'read_only' => (($date_read_only >= $date_now) ? 0 : 1),
+					'requester' => !empty($work->requester) ? $work->requester : null,
+					'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
+					'area_code' => !empty($work->area_code) ? $work->area_code : null,
+					'client_code' => !empty($work->client_code) ? $work->client_code : null,
+					'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
+					'task_code' => !empty($work->task_code) ? $work->task_code : null,
+					'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
+					'billable' => !empty($work->billable) ? (int) $work->billable : null,
+					'visible' => !empty($work->visible) ? (int) $work->visible : null
+				)
+			);
+		}
+
+		return $works;
 	}
 }
 
