@@ -1,5 +1,7 @@
 # Changelog
-
+## Hotfix: 13.3.1
+Jueves 28 marzo 2013
+* **Fixed:** [Sesion debe ir en mayuscula en la interfaz agregar_contrato](Comercial me debe el ticket)
 ## Release: 13.3.0
 Miércoles 27 de marzo 2013.
 * **New:** [Integración contable de gastos](https://github.com/LemontechSA/ttb/pull/30)
