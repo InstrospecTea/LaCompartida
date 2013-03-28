@@ -129,7 +129,7 @@ class NeteoDocumento extends Objeto
 			}
 
 			//Elimino la provisión que se pudo haber generado por pagar gastos
-			$query = "DELETE from cta_corriente WHERE cta_corriente.neteo_pago = '".$this->fields['id_neteo_documento']."' ";
+			$query = "DELETE from cta_corriente WHERE cta_corriente.id_neteo_documento = '".$this->fields['id_neteo_documento']."' ";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 
 		}
@@ -256,25 +256,28 @@ echo "cambioCobro:".$cambio_cobro."<br>";*/
 						$provision->Edit('id_moneda',$documento_pago->fields['id_moneda']);
 						$provision->Edit('ingreso',$pago_gastos);
 						$provision->Edit('monto_cobrable',$pago_gastos);
-						$provision->Edit('id_cobro','NULL');
-                                                $provision->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
-                                                $provision->Edit('id_usuario_orden',$this->sesion->usuario->fields['id_usuario']);
+						$provision->Edit('id_cobro',$id_cobro);
+                        $provision->Edit('id_usuario',$this->sesion->usuario->fields['id_usuario']);
+                        $provision->Edit('id_usuario_orden',$this->sesion->usuario->fields['id_usuario']);
 						$provision->Edit('codigo_cliente', $documento_pago->fields['codigo_cliente']);
+						$provision->Edit('numero_documento', $this->fields['id_documento_pago']);
 
 						$query_gastos = "SELECT cta_corriente.codigo_asunto FROM cta_corriente
 											WHERE (cta_corriente.id_cobro = '$id_cobro') LIMIT 1 ";
 						$resp = mysql_query($query_gastos, $this->sesion->dbh) or Utiles::errorSQL($query_gastos,__FILE__,__LINE__,$this->sesion->dbh);
 						list($codigo_asunto) = mysql_fetch_array($resp);
-						if($codigo_asunto)
+						if($codigo_asunto) {
 							$provision->Edit('codigo_asunto',$codigo_asunto);
-						else
+						} else {
 							$provision->Edit('codigo_asunto','NULL');
+						}
 
-						if($id_cobro)
+						if($id_cobro) {
 							$provision->Edit('descripcion',"Pago de Gastos de Cobro #".$id_cobro." por Documento #".$documento_pago->fields['id_documento']);
-						else
+						}	else {
 							$provision->Edit('descripcion',"Pago de Gastos por Documento #".$documento_pago->fields['id_documento']." para documento de cobro externo");
-						$provision->Edit('neteo_pago',$this->fields['id_neteo_documento']);
+						}
+						$provision->Edit('id_neteo_documento',$this->fields['id_neteo_documento'],true);
 						$provision->Edit('incluir_en_cobro','NO');
 						$provision->Edit('fecha',date('Y-m-d H:i:s'));
 						$provision->Write();
@@ -351,6 +354,8 @@ echo "cambioCobro:".$cambio_cobro."<br>";*/
 					}
 				}
 			}
+
+				
 		}
 		return $out;
 	}

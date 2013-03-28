@@ -23,7 +23,7 @@ if(file_exists($errorpath)) {
 	$tamano=filesize($errorpath);
 	echo 'El log tiene un tamaño de '.$tamano.' bytes.';
    $gestor = fopen($errorpath, 'r'); 
-  if($tamano>30000)   fseek($gestor, -30000); 
+  if($tamano>30000)   fseek($gestor, -30000,SEEK_END); 
   
   echo '<pre class="brush: bash;">';
 	while (!feof($gestor)) {

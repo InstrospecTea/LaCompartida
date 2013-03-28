@@ -307,7 +307,7 @@
 				$ht .=	    "<td style='font-size:10px; ' align=left>
 								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
 							</td>";
-				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') 		&&		UtilesApp::GetConf($sesion,'NuevoModuloFactura') 						)
+				if( 	UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
 				{
 				$ht .=	"<td align=center style='font-size:10px; width: 70px;'>
 								<b>N° Factura</b>
@@ -381,7 +381,7 @@
 			}
 
 			$html .= "</td>";
-			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros') && UtilesApp::GetConf($sesion,'NuevoModuloFactura') )
+			if( UtilesApp::GetConf($sesion,'FacturaSeguimientoCobros'))
 			{
 					$html .= "<td align=center style='font-size:10px; width: 70px;'>&nbsp;";
 					if($cobro->fields['documento'])

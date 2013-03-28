@@ -14,14 +14,15 @@ require 'savon'
 Capybara.register_driver :chrome do |app|
   Capybara::Selenium::Driver.new(app, :browser => :chrome)
 end
-#Capybara.default_driver = :chrome 
-Capybara.javascript_driver = :chrome 
+#Capybara.default_driver = :chrome
+Capybara.javascript_driver = :chrome
 Capybara.save_and_open_page_path = File.dirname(__FILE__) + '/../snapshots'
  Capybara.default_wait_time = 3
 
 Capybara.configure do |config|
   config.run_server = false
-  config.app_host   = 'http://lemontest.thetimebilling.com/develop'
+  config.app_host   = 'http://lemontest.thetimebilling.com/feature_integracion-contable-gastos'
+  config.server_host  = '/feature_integracion-contable-gastos'
 end
 # Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
 # order to ease the transition to Capybara we set the default here. If you'd

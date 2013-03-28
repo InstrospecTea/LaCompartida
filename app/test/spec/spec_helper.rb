@@ -13,10 +13,10 @@ require 'conf'
 
 # Capybara configuration
 Capybara.default_driver = :selenium
+
 Capybara.register_driver :chrome do |app|
   Capybara::Selenium::Driver.new(app, :browser => :chrome)
 end
-
 
 Capybara.javascript_driver = :webkit
 Capybara.save_and_open_page_path = File.dirname(__FILE__) + '/../snapshots'
