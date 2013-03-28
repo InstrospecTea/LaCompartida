@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix: 13.3.2
 Jueves 28 marzo 2013
-* **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro] (ticket pendiente)
+* **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro] (https://www.pivotaltracker.com/story/show/47074217)
 
 ## Hotfix: 13.3.1
 Jueves 28 marzo 2013
