@@ -289,7 +289,7 @@ class Gasto extends Objeto {
 		$writer->save(__('Gastos'));
 	}
 
-	
+
 
 
 	public function WhereQuery($request) {
@@ -413,7 +413,7 @@ class Gasto extends Objeto {
 
 	}
 
- 
+
 
 	public static function SearchQuery($sesion,$where,$col_select='',$join_extra='') {
 		$query= "SELECT SQL_BIG_RESULT SQL_NO_CACHE
@@ -434,18 +434,18 @@ class Gasto extends Objeto {
 				cta_corriente.descripcion,
 				moneda_gasto.simbolo,
 					ifnull(cta_corriente.egreso,0) egreso,
-					ifnull(cta_corriente.ingreso,0) ingreso, 
+					ifnull(cta_corriente.ingreso,0) ingreso,
 				if(ifnull(cta_corriente.ingreso,0)=0, 'egreso','ingreso') as ingresooegreso,";
-		
-	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {		
+
+	if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0,IF(	ifnull(cta_corriente.ingreso,0)>0,monto_cobrable * (-1),	monto_cobrable)) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*cta_corriente.monto_cobrable as  monto_cobrable_moneda_base,  \n \n";
 		} else {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0, if(	ifnull(cta_corriente.ingreso,0)>0,-1*ifnull(ingreso,0), ifnull(cta_corriente.egreso,0)) ) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
 		}
-		
-		$query.="\n\n	
+
+		$query.="\n\n
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
@@ -468,11 +468,11 @@ class Gasto extends Objeto {
 				contrato.id_contrato
 				$col_select
 			FROM ".self::SelectFromQuery($join_extra)."
-			WHERE 
-			1 
-			
+			WHERE
+			1
+
 			AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' )
-			AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL) 
+			AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL)
 			AND $where ";
 			return $query;
 	}
@@ -487,10 +487,10 @@ class Gasto extends Objeto {
 		$total_ingresos = 0;
 		$total_egresos = 0;
 
-		
+
 
 		$query=self::SearchQuery($sesion,$where);
-						
+
 	// echo 'LA query es:'. $query;
 
 		//	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -499,7 +499,7 @@ class Gasto extends Objeto {
 			//$gastosRS=$gastosST->fetchAll(PDO::FETCH_ASSOC);
 			//echo '<pre>'; 			print_r($resp);			echo '</pre>';
 			while($ingresoyegreso=$gastosST->fetch(PDO::FETCH_ASSOC) ) {
-				 
+
 				 if($ingresoyegreso['estado_cobro']!='PAGADO' && $ingresoyegreso['estado_cobro']!='INCOBRABLE') {
 					if ($ingresoyegreso['monto_cobrable'] < 0) {  // es provisión
 						$total_ingresos += $ingresoyegreso['monto_cobrable_moneda_base'];
@@ -523,7 +523,7 @@ class Gasto extends Objeto {
 
 }
 
- 
+
 
 #end Class
 if(!class_exists('ListaGastos')) {
