@@ -2,19 +2,24 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+
+if(!class_exists('Cobro')) {
 class Cobro extends Objeto {
 
 	var $asuntos = array();
-	var $FacturasDelCobro = array();
-	var $StringFacturasDelCobro = array();
+	var $ArrayFacturasDelContrato =array();
+	var $ArrayTotalesDelContrato =array();
+	var $ArrayStringFacturasDelContrato =array();
 
-	function Cobro($sesion, $fields = "", $params = "") {
+	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
 		$this->campo_id = "id_cobro";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
 		$this->guardar_fecha = true;
+		
+		
 	}
 
 	function Write() {
@@ -90,13 +95,14 @@ class Cobro extends Objeto {
 					$descripcion .= __(" por Documento #") . $id_documento;
 				}
 
-				if ($this->fields['monto_gastos'] > 0) {
+				// Deprecated. El ingreso de este movimiento ficticio ya se maneja en la clase NeteoDocumento.
+				/*if ($this->fields['monto_gastos'] > 0) {
 					$provision = new Gasto($this->sesion);
 					$provision->Edit('id_moneda', $this->fields['opc_moneda_total']);
 					$provision->Edit('ingreso', $this->fields['monto_gastos']);
 					$provision->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 					$provision->Edit('id_usuario_orden', $this->sesion->usuario->fields['id_usuario']);
-					$provision->Edit('id_cobro', 'NULL');
+					$provision->Edit('id_cobro', $this->fields['id_cobro']);
 					$provision->Edit('codigo_cliente', $this->fields['codigo_cliente']);
 					$provision->Edit('codigo_asunto', 'NULL');
 					$provision->Edit('descripcion', $descripcion);
@@ -104,7 +110,7 @@ class Cobro extends Objeto {
 					$provision->Edit('incluir_en_cobro', 'NO');
 					$provision->Edit('fecha', date('Y-m-d H:i:s'));
 					$provision->Write();
-				}
+				}*/
 				$nuevo_pago = true;
 			}
 		} else {
@@ -280,24 +286,177 @@ class Cobro extends Objeto {
 		list($cantidad_facturas) = mysql_fetch_array($resp);
 		return $cantidad_facturas;
 	}
+ 
+	/*
+	 * @param $sesion objeto sesion
+	 * @param $nuevomodulofactura bool dice si está activo
+	 * @param $id_cobro int si se especifica un cobro, solo trae facturas y documentos de ese cobro
+	 * @param $tipo string sirve para filtrar la query: 'G' trae solo cobros de gastos, 'H' solo cobro de honorarios, 'M' sólo cobros mixtos. 
+	 */
+		function FacturasDelContrato($sesion=null,$nuevomodulofactura=false,$id_cobro=null,$tipo='') {
+		if($sesion==null) $sesion=$this->sesion;
+		$this->ArrayFacturasDelContrato=array();
+			if ($nuevomodulofactura) {
+					$query = "SELECT 
+				concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero ,
+				cobro.id_cobro, 
+				 
+				  cobro.fecha_enviado_cliente,cobro.fecha_emision,
+								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total,
+								factura.subtotal as subtotal_honorarios,
+								cobro_moneda.tipo_cambio,
+								cobro.tipo_cambio_moneda,
+								prm_moneda.cifras_decimales,
+								
+								
+								 cast(factura.total-factura.iva as decimal(10,4)) as total_sin_impuesto ,
+								factura.iva,
+								factura.total ,
+								date_format(factura.fecha,'%Y-%m') as periodo,
+								factura.subtotal as subtotal_honorarios,
+									factura.subtotal_gastos,
+									factura.subtotal_gastos_sin_impuesto,
+									ccfm.saldo, 
+									ccfm.id_moneda, 
+									cobro.incluye_honorarios,
+									cobro.incluye_gastos,
+								(if(ccfm.id_moneda=cobro_moneda.id_moneda, 1,(cobro.tipo_cambio_moneda/cobro_moneda.tipo_cambio)  )) as tasa_cambio
+								, if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
+								FROM cobro
+								LEFT JOIN factura using (id_cobro)
+								LEFT JOIN cta_cte_fact_mvto ccfm using (id_factura)
+								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+								JOIN prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
+                              	WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'
+								 ";//and ccfm.saldo<0  ";
+					//editado: AND cobro.estado!='PAGADO'
+				} else {
+					$query = "SELECT cobro.documento as facturanumero,
+								cobro.id_cobro, 
+								cobro.fecha_enviado_cliente,cobro.fecha_emision,
+								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total, cobro.monto,
+								cobro_moneda.tipo_cambio,cobro.tipo_cambio_moneda,prm_moneda.cifras_decimales,
+								 cast(documento.monto-documento.impuesto as decimal(10,4)) as total_sin_impuesto ,
+								documento.impuesto as  iva,
+								documento.monto as total ,
+								date_format(documento.fecha,'%Y-%m') as periodo,
+								documento.subtotal_honorarios,
+								documento.subtotal_gastos,
+								documento.subtotal_gastos_sin_impuesto,
+								documento.saldo_honorarios,
+								documento.saldo_gastos,
+								documento.id_moneda,
+									cobro.incluye_honorarios,
+									cobro.incluye_gastos,
+								if(documento.id_moneda= cobro.id_moneda,1,cm1.tipo_cambio / cm2.tipo_cambio) as tasa_cambio,
+								if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									) as tipo_cobro
+ 								FROM cobro 
+								LEFT join documento on cobro.id_cobro=documento.id_cobro and documento.tipo_doc='N'
+								
+				LEFT JOIN cobro_moneda as cm1 ON cm1.id_cobro = documento.id_cobro AND cm1.id_moneda = documento.id_moneda
+				LEFT JOIN cobro_moneda as cm2 ON cm2.id_cobro =cobro.id_cobro AND cm2.id_moneda =cobro.opc_moneda_total
 
-	function FacturasDelCobro() {
-		$query = "select concat(prm_documento_legal.glosa,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) as facturanumero,
-						prm_moneda.simbolo,
-						cast(factura.total-factura.iva as decimal(10,4)) as total_sin_impuesto ,
-						factura.iva,
-						factura.total ,
-						date_format(fecha,'%Y-%m') as periodo
-							from factura
-							join prm_moneda ON (prm_moneda.id_moneda = factura.id_moneda)
-							join prm_documento_legal ON (prm_documento_legal.id_documento_legal = factura.id_documento_legal)
-							where id_cobro=" . $this->fields['id_cobro'];
-		$facturasST = $this->sesion->pdodbh->query($query);
-		$this->FacturasDelCobro = $facturasST->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_GROUP);
+								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
+								LEFT JOIN prm_moneda as moneda_total ON moneda_total.id_moneda = cobro.opc_moneda_total
+								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=cobro.opc_moneda_total
+								WHERE   cobro.estado!='CREADO' AND cobro.estado!='EN REVISION' AND cobro.estado!='INCOBRABLE'";
+				}
+//AND cobro.estado!='PAGADO'
 
-		return $this->FacturasDelCobro;
+				$query .= " AND cobro.id_contrato=" . $this->fields['id_contrato'];
+				if($id_cobro!=null) $query .= " AND cobro.id_cobro=" . $id_cobro;
+				
+				if($tipo!='') $query .= " AND if(cobro.incluye_honorarios=1 and cobro.incluye_gastos=0 , 'H',
+										if(cobro.incluye_honorarios=0 and cobro.incluye_gastos=1 , 'G','M')
+									)='" . $tipo."'";
+		// echo '<br><br>'.$query.'<hr><br>';
+				
+				$facturasST=$sesion->pdodbh->query($query) ;
+				$this->ArrayFacturasDelContrato=$facturasST->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP);
+				return $this->ArrayFacturasDelContrato;
+				
+
 	}
+function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) {
+	$totales=array();
+	 
+	if (count($facturas)>0) {
+					foreach ($facturas as $facturaarray) {
+						
+						$factura=$facturaarray[0];
+						$monto_honorarios = number_format($factura['subtotal_honorarios'], $factura['cifras_decimales'], '.', '');
+						$monto_gastos_c_iva = number_format($factura['subtotal_gastos'], $factura['cifras_decimales'], '.', '');
+						$monto_gastos_s_iva = number_format($factura['subtotal_gastos_sin_impuesto'], $factura['cifras_decimales'], '.', '');
+						$monto_gastos=$monto_gastos_c_iva+$monto_gastos_s_iva;
+						
+						$monto_honorarios_moneda = $monto_honorarios*$factura['tasa_cambio'];
+						$monto_gastos_c_iva_moneda = $monto_gastos_c_iva*$factura['tasa_cambio'];
+						$monto_gastos_s_iva_moneda = $monto_gastos_s_iva*$factura['tasa_cambio'];
+						$monto_gastos_moneda=$monto_gastos*$factura['tasa_cambio'];
+						
+						
+						$total_en_moneda = $monto_honorarios_moneda= $total_honorarios * ($factura['tipo_cambio_moneda'] / $factura['tipo_cambio']);
+							if ($nuevomodulofactura) {
+							if ($factura['incluye_honorarios'] == 1) {
+								$saldo_honorarios = -1 * $factura['saldo'];
+								$saldo_gastos = 0;
+							} else {
+								$saldo_honorarios = 0;
+								$saldo_gastos = -1 * $factura['saldo'];
+							}
+						} else {
+							$saldo_honorarios = $factura['saldo_honorarios'];
+							$saldo_gastos = $factura['saldo_gastos'];
+						}
+						
+						$totales['contrato']['adeudado']+=$total_en_moneda;
+						$totales['contrato']['moneda_adeudado'] = $factura['glosa_moneda'];
+						$totales['contrato']['monto_gastos_c_iva']+=$monto_gastos_c_iva;
+						$totales['contrato']['monto_gastos_c_iva_moneda']+=$monto_gastos_c_iva_moneda;
+						$totales['contrato']['monto_gastos_s_iva']+=$monto_gastos_s_iva;
+						$totales['contrato']['monto_gastos_s_iva_moneda']+=$monto_gastos_s_iva_moneda;
+						$totales['contrato']['monto_gastos']+=$monto_gastos;
+						$totales['contrato']['monto_gastos_moneda']+=$monto_gastos_moneda;
+						$totales['contrato']['monto_honorarios']+=$monto_honorarios;
+						$totales['contrato']['monto_honorarios_moneda']+=$monto_honorarios_moneda;
+						$totales['contrato']['monto_honorarios+gastos']+=$monto_gastos+$monto_honorarios;
+						$totales['contrato']['monto_honorarios+gastos_moneda']+=$monto_gastos_moneda+$monto_honorarios_moneda;
+						$totales['contrato']['saldo_honorarios']+=$saldo_honorarios;
+						$totales['contrato']['saldo_gastos']+=$saldo_gastos;
+						
+						$totales['contrato']['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
+						
+						if($id_cobro!=null && $factura['id_cobro']==$id_cobro) {
+							$totales[$id_cobro]['adeudado']+=$total_en_moneda;
+							$totales[$id_cobro]['moneda_adeudado'] = $factura['glosa_moneda'];
+							$totales[$id_cobro]['monto_gastos_c_iva']+=$monto_gastos_c_iva;
+							$totales[$id_cobro]['monto_gastos_c_iva_moneda']+=$monto_gastos_c_iva_moneda;
+							$totales[$id_cobro]['monto_gastos_s_iva']+=$monto_gastos_s_iva;
+							$totales[$id_cobro]['monto_gastos_s_iva_moneda']+=$monto_gastos_s_iva_moneda;
+							$totales[$id_cobro]['monto_gastos']+=$monto_gastos;
+							$totales[$id_cobro]['monto_gastos_moneda']+=$monto_gastos_moneda;
+							$totales[$id_cobro]['monto_honorarios']+=$monto_honorarios;
+							$totales[$id_cobro]['monto_honorarios_moneda']+=$monto_honorarios_moneda;
+							$totales[$id_cobro]['monto_honorarios+gastos']+=$monto_gastos+$monto_honorarios;
+							$totales[$id_cobro]['monto_honorarios+gastos_moneda']+=$monto_gastos_moneda+$monto_honorarios_moneda;
+							$totales[$id_cobro]['saldo_honorarios']+=$saldo_honorarios;
+							$totales[$id_cobro]['saldo_gastos']+=$saldo_gastos;
+							$totales[$id_cobro]['simbolo_moneda_total'] = $factura['simbolo_moneda_total'];
 
+						}
+						
+					}
+				
+	}
+	$this->ArrayTotalesDelContrato=$totales;
+	return $this->ArrayTotalesDelContrato;
+}
 	function TieneFacturasSinAnular() {
 		$cantidad_facturas = $this->CantidadFacturasSinAnular();
 		if ($cantidad_facturas > 0) {
@@ -374,9 +533,7 @@ class Cobro extends Objeto {
 								JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total
 							WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
 			} else {
-				$query = "SELECT
-								ROUND( SUM(nd.valor_cobro_honorarios + nd.valor_cobro_gastos ), mon.cifras_decimales ),
-								ROUND( SUM(nd.valor_cobro_honorarios + nd.valor_cobro_gastos ), mon.cifras_decimales )
+				$query = "SELECT ROUND( SUM(-1*docpago.monto), mon.cifras_decimales ), ROUND( SUM(-1*docpago.monto), mon.cifras_decimales )
 							FROM documento doccobro
 								join neteo_documento nd on doccobro.id_documento=nd.id_documento_cobro
 								join documento docpago on docpago.id_documento=nd.id_documento_pago
@@ -537,7 +694,7 @@ class Cobro extends Objeto {
 	function AnularEmision($estado = 'CREADO') {
 		$id_cobro = $this->fields['id_cobro'];
 
-		$query = "SELECT count(*) FROM neteo_documento nd JOIN documento d ON nd.id_documento_cobro = d.id_documento WHERE d.id_cobro = '$id_cobro'";
+		$query = "SELECT count(*) FROM documento WHERE id_cobro = '$id_cobro' AND tipo_doc != 'N' ";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($cantidad_pagos) = mysql_fetch_array($resp);
 
@@ -1753,9 +1910,7 @@ class Cobro extends Objeto {
 	  parametros fecha_ini; fecha_fin; id_contrato
 	 */
 
-
 	function PrepararCobro($fecha_ini = '0000-00-00', $fecha_fin, $id_contrato, $emitir_obligatoriamente = false, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
-
 		$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 		$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -1775,35 +1930,6 @@ class Cobro extends Objeto {
 					$fecha_fin = $fecha_hito;
 				}
 			}
-
-			/*if ($fecha_ini == '') {
-				//uso la fecha final del ultimo cobro y le sumo 1 dia
-				$sql = "SELECT DATE_ADD(MAX(fecha_fin), INTERVAL 1 DAY) as fuc
-							FROM cobro
-							WHERE cobro.id_contrato = $id_contrato
-							AND incluye_honorarios = $incluye_honorarios
-							AND incluye_gastos = $incluye_gastos";
-				$resp = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
-				list($fuc) = mysql_fetch_array($resp);
-
-				$fecha_ini = $fuc;
-
-				//si tengo un trabajo anterior a esa fecha, elimino la fecha de inicio (???)
-				if (!empty($incluye_honorarios)) {
-					$sql_2 = "SELECT MIN(trabajo.fecha) as fmt
-									FROM trabajo
-									JOIN asunto on trabajo.codigo_asunto = asunto.codigo_asunto
-
-									WHERE fecha <= '$fecha_fin' AND trabajo.id_cobro IS NULL
-									AND trabajo.cobrable = 1 AND asunto.id_contrato = '$id_contrato'";
-					$resp_2 = mysql_query($sql_2, $this->sesion->dbh) or Utiles::errorSQL($sql_2, __FILE__, __LINE__, $this->sesion->dbh);
-					list($fmt) = mysql_fetch_array($resp_2);
-
-					if ($fuc > $fmt) {
-						$fecha_ini = '0000-00-00'; //=$fmt?? xq se usa el 00-00-0000??? ah?????
-					}
-				}
-			}*/
 
 			//si es obligatorio, incluye+hay honorarios, o incluye+hay gastos, se genera el cobro
 			$genera = $emitir_obligatoriamente;
@@ -1957,13 +2083,6 @@ class Cobro extends Objeto {
 				$this->Edit("incluye_honorarios", $incluye_honorarios);
 				$this->Edit("incluye_gastos", $incluye_gastos);
 
-				// Si el nuevo cobro viene desde el cron cobro programado, entonces asignarle el estado 'EN REVISION'.
-				// La idea es que el vínculo entre el nuevo cobro y el cobro programado no sea truncado cuando se eliminan
-				// los borradores del cobro
-				if ($cobro_programado == true) {
-					$this->Edit('estado', 'EN REVISION');
-				}
-
 				if ($this->Write()) {
 					####### AGREGA ASUNTOS AL COBRO #######
 					$contrato->AddCobroAsuntos($this->fields['id_cobro']);
@@ -1994,7 +2113,8 @@ class Cobro extends Objeto {
 												AND cta_corriente.cobrable = 1
 												AND cta_corriente.codigo_cliente = '" . $contrato->fields['codigo_cliente'] . "'
 												AND (asunto.id_contrato = '" . $contrato->fields['id_contrato'] . "')
-												$and_fecha";
+												AND cta_corriente.fecha <= '$fecha_fin'";
+						if($fecha_ini!='') $query_gastos.="AND cta_corriente.fecha >= '$fecha_ini'";
 						$lista_gastos = new ListaGastos($this->sesion, '', $query_gastos);
 						for ($v = 0; $v < $lista_gastos->num; $v++) {
 							$gasto = $lista_gastos->Get($v);
@@ -2469,7 +2589,7 @@ class Cobro extends Objeto {
 	}
 
 	function MontoFacturado() {
-		$query = "SELECT if(f.id_documento_legal IN (1,3,4),'INGRESO','EGRESO') as modo
+		$query = "SELECT if(f.id_documento_legal NOT IN (2),'INGRESO','EGRESO') as modo
 						,f.total
 						,m1.cifras_decimales as cifras_decimales_ini
 						,m1.tipo_cambio as tipo_cambio_ini
@@ -2514,7 +2634,86 @@ class Cobro extends Objeto {
 		}
 		return $mensaje;
 	}
+	
+	/**
+	 *
+	 * @param obj $sesion opcional, la sesion autenticada
+	 * @param int $id_cobro
+	 * @return array
+	 */
+		function DetallePagoContrato($sesion=null,$id_cobro=null) {
+		 if($sesion==null) $sesion=$this->sesion;
+		 if($id_cobro==null) $id_cobro=$this->fields[$this->campo_id];
+		 			$nuevomodulofactura=UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
 
+		 	$queryadelantos = "SELECT ifnull(documento.id_contrato,0) as id_contrato, -1*saldo_pago*if(documento.id_moneda=".$this->fields['opc_moneda_total'].",1,cm1.tipo_cambio / cm2.tipo_cambio)  as saldo_adelanto, cliente.id_contrato as contrato_default
+								FROM `documento`
+								join cliente on documento.codigo_cliente=cliente.codigo_cliente
+								join cobro_moneda cm1 on cm1.id_moneda=documento.id_moneda and cm1.id_cobro=" . $this->fields['id_cobro'] . "
+								join cobro_moneda cm2 on cm2.id_moneda=" . $this->fields['opc_moneda_total'] . " and cm2.id_cobro=" . $this->fields['id_cobro'] . "
+								WHERE es_adelanto=1 and documento.codigo_cliente='" . $this->fields['codigo_cliente'] . "'";
+
+
+		$montoadelantosinasignar = 0;
+		$adelantossinasignar = $this->sesion->pdodbh->query($queryadelantos);
+		foreach ($adelantossinasignar as $adelantosinasignar) {
+
+			if ($adelantosinasignar['id_contrato'] == $this->fields['id_contrato']) {
+				$montoadelantosinasignar+=$adelantosinasignar['saldo_adelanto'];
+			} else if ($adelantosinasignar['id_contrato']==0 && $adelantosinasignar['contrato_default']==$this->fields['id_contrato']) {
+				$montoadelantosinasignar+=$adelantosinasignar['saldo_adelanto'];
+			}
+		}
+		$saldo_pagos = 0;
+		$saldo_adelantos = 0;
+if ($this->TienePagosAdelantos()) {
+			$query = "
+					SELECT doc_pago.es_adelanto, doc_pago.glosa_documento, (neteo_documento.valor_cobro_honorarios + neteo_documento.valor_cobro_gastos) * -1 AS monto, doc_pago.fecha, prm_moneda.tipo_cambio
+					FROM documento AS doc_pago
+					JOIN neteo_documento ON doc_pago.id_documento = neteo_documento.id_documento_pago
+					JOIN documento AS doc ON doc.id_documento = neteo_documento.id_documento_cobro
+					JOIN prm_moneda ON prm_moneda.id_moneda = doc_pago.id_moneda
+					WHERE doc.id_cobro = " . $this->fields['id_cobro'];
+			$pagos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			while ($pago = mysql_fetch_assoc($pagos)) {
+				$fila_adelanto_ = str_replace('%descripcion%', substr($pago['glosa_documento'], 0, 30 + strpos(' ', substr($pago['glosa_documento'], 30, 50))) . ' (' . $pago['fecha'] . ')', $html);
+				$monto_pago = $pago['monto'];
+				$monto_pago_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto_pago, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$fila_adelanto_ = str_replace('%saldo_pago%', $monto_pago_simbolo, $fila_adelanto_);
+
+				$saldo += (float) $monto_pago;
+				if ($pago['es_adelanto'] == 1) {
+					$saldo_adelantos += (float) $monto_pago;
+				} else {
+					$saldo_pagos+= (float) $monto_pago;
+				}
+				$fila_adelantos .= $fila_adelanto_;
+			}
+		}
+		
+		//$facturasRS=$this->ArrayFacturasDelContrato($this->sesion,$nuevomodulofactura);
+		$totales=$this->ArrayTotalesDelContrato;
+		
+	 
+		$saldo_total_cobro = $totales[$id_cobro]['saldo_honorarios']+$totales[$id_cobro]['saldo_gastos'];
+		$saldo_total_adeudado = $totales['contrato']['saldo_honorarios']+$totales['contrato']['saldo_gastos'];
+		$saldo_total_contrato = $saldo_total_adeudado-$saldo_total_cobro;
+ 
+		 
+		return array(
+			'montoadelantosinasignar'=>$montoadelantosinasignar,
+			'saldo'=>$saldo,
+			'saldo_adelantos'=>$saldo_adelantos,
+			'saldo_pagos'=>$saldo_pagos,
+			'fila_adelantos'=>$fila_adelantos,
+			'saldo_total_contrato'=>$saldo_total_contrato,
+			'saldo_total_cobro'=>$saldo_total_cobro,
+			'saldo_total_adeudado'=>$saldo_total_adeudado,
+		);
+	}
+
+
+}
 }
 
 if (!class_exists('ListaCobros')) {

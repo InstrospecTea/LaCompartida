@@ -1288,6 +1288,7 @@ function funcionTR(& $contrato) {
 
 	#WIP
 	$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : '', Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
+	// echo '<pre>';print_r($wip);echo '</pre>';
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 	$html .= "<td style='border:1px dashed #999999; font-size:10px'>" . __('WIP (Work in progress)') . "</td><td colspan=4 style='border:1px dashed #999999'>";
 	$html .= "<div id='wip_$i'>";
@@ -1297,7 +1298,13 @@ function funcionTR(& $contrato) {
 
 	$wip_honorarios = ($wip[0] != '' ? number_format($wip[0], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.' : '0 Hrs.') .
 			" (Según HH en " . $contrato->fields['simbolo'] . ' ' . number_format($wip[1], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ")";
+	
 	$wip_gastos = $wip[4] . ' ' . number_format($wip[3], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en gastos';
+	if($wip[6]>0) {
+		$wip_egresos = $wip[4] . number_format($wip[5], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en egresos';
+		$wip_ingresos = $wip[4] . number_format($wip[6], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en provisiones';
+		$wip_gastos='<div style="border-bottom: 1px black dotted;display:inline-block;cursor:help;" title="'.$wip_egresos .' vs '. $wip_ingresos.'">'.$wip_gastos.'</div>';
+		}
 	switch ($tipo_liquidacion) { //1-2 = honorarios-gastos, 3 = mixtas
 		case 1: $txt_wip = $wip_honorarios;
 			break;

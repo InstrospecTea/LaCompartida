@@ -533,48 +533,7 @@ class UtilesApp extends Utiles {
 
 	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
 
-		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
-			$where .= " AND  cta_corriente.cobrable = $cobrable ";
-		}
-		$total_ingresos = 0;
-		$total_egresos = 0;
-
-		$query = "SELECT
-								IF( cta_corriente.id_cobro IS NOT NULL, ingreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), ingreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
-								IF( cta_corriente.id_cobro IS NOT NULL, egreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), egreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
-								IF( cta_corriente.id_cobro IS NOT NULL, monto_cobrable*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), monto_cobrable*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable
-							, ifnull(cobro.estado,'SIN COBRO') as estado FROM cta_corriente
-							JOIN prm_moneda as moneda_gasto ON cta_corriente.id_moneda=moneda_gasto.id_moneda
-							JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
-								LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
-								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
-								LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
-								LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
-								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								left JOIN cliente ON  cliente.codigo_cliente=ifnull(asunto.codigo_cliente, cta_corriente.codigo_cliente)
-							WHERE $where";
-
-
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-
-			while($ingresoyegreso=mysql_fetch_array($resp) ) {
-				if ($ingresoyegreso[0] > 0) {
-				$total_ingresos += $ingresoyegreso[2];
-				} else if ($ingresoyegreso[1] > 0) {
-				$total_egresos += $ingresoyegreso[2];
-				if($ingresoyegreso[3]=='CREADO' || $ingresoyegreso[3]=='SIN COBRO') $egresos_borrador += $ingresoyegreso[2];
-				}
-			}
-			$total = $total_ingresos - $total_egresos;
-		if($array) {
-			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
-		} else {
-			return $total;
-		}
+		return Gasto::TotalCuentaCorriente($sesion, $where ,$cobrable,$array);
 
 
 	}

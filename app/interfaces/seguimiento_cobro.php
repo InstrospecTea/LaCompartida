@@ -407,9 +407,7 @@
 	$pagina->PrintTop();
 
 ?>
-<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
-<script type="text/javascript" src="//static.thetimebilling.com/js/bootstrap.min.js"></script>
-
+ 
 <script type="text/javascript">
 	var AsuntosContrato=new Array();
 	<?php
@@ -423,6 +421,10 @@
 	?>
 		jQuery(document).ready(function() {
 
+  jQuery.ajax({async: true,cache:true, type: "GET", url: "//static.thetimebilling.com/js/bootstrap.min.js"  ,
+                dataType: "script",
+                complete: function() {
+                
 
 			jQuery('.btpopover').each(function() {
 				var idContrato=jQuery(this).attr('id').replace('tip_','');
@@ -430,7 +432,9 @@
 
 				jQuery(this).append("<span class='asuntos_del_contrato' style='font-weight:bold;'>"+AsuntosContrato[idContrato]+"</span>");
 			}  );
-
+  
+                }
+            });
 
 
 	});

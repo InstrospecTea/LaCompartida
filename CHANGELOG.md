@@ -1,13 +1,25 @@
 # Changelog
+
+## Release: 13.3.0
+Miércoles 27 de marzo 2013.
+* **New:** [Integración contable de gastos](https://github.com/LemontechSA/ttb/pull/30)
+* **New:** [Carga masiva de excel para implementación](https://github.com/LemontechSA/ttb/pull/99)
+* **Fixed:** [Guardar datos solicitante al agregar un cliente](https://github.com/LemontechSA/ttb/pull/107)
+* **New:** [Integración de nuevos métodos para NotaCobro y CartaCobro](https://github.com/LemontechSA/ttb/pull/111)
+* **New:** [Pantalla de configuración labels para usabilidad](https://github.com/LemontechSA/ttb/pull/114)
+* **Fixed:** [Diferenciar "monto" de "monto cobrable" en ingreso de gasto](https://github.com/LemontechSA/ttb/pull/118)
+* **Fixed:** [Uniforma las queries de gastos en todo el sistema](https://github.com/LemontechSA/ttb/pull/124)
+* **New:** [Selector de tipo de pago para adelantos y pagos](https://github.com/LemontechSA/ttb/pull/127)
+
 ## Hotfix: 13.2.15
 martes 26 de marzo 2013
 * **Fixed** [Agrega metodo Contrato->LoadByCodigoSecundario](https://www.pivotaltracker.com/story/show/46909219)
 
 ## Hotfix: 13.2.14
-
 lunes  25 de marzo 2013
 * **Fixed:** [Mostrar numeros de factura en Seguimiento de Cobros](https://github.com/LemontechSA/ttb/pull/134)
 
+## Hotfix: 13.2.13
 viernes 22 de marzo 2013
 * **Fixed:** [Corrige peginador de adelantos](https://github.com/LemontechSA/ttb/pull/133)
 
@@ -16,7 +28,6 @@ viernes 22 de marzo 2013
 
 ## Hotfix: 13.2.11
 * **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
-
 
 ## Hotfix: 13.2.10
 * **Fixed:** [En vez de subir los backups a un bucket para cada cliente, usa el mismo bucket y luego un subdirectorio. Esto, porque Amazon tiene un límite de 100 buckets y ya lo pasamos](https://github.com/LemontechSA/ttb/pull/125)
@@ -30,6 +41,10 @@ viernes 22 de marzo 2013
 # Changelog
 ## Hotfix: 13.2.7
 * **Fixed:** [No adivinar una fecha de inicio del cobro cuando no se declara especificamente](https://github.com/LemontechSA/ttb/pull/113)
+
+## Hotfix: 13.2.6
+Martes 5 de marzo 2013.
+* **Fixed:** [Copiar datos del semestre anterior](https://github.com/LemontechSA/ttb/pull/112)
 
 ## Hotfix: 13.2.6
 Martes 5 de marzo 2013.
@@ -121,17 +136,16 @@ Jueves 14 de febrero 2013.
 
 
 ## Hotfix: 13.0.4
-MiÃ©rcoles 13 de febrero 2013.
+Miércoles 13 de febrero 2013.
 * **Fixed** [Corrige la consulta de seguimiento de cobros](https://www.pivotaltracker.com/projects/286009#!/stories/44387509)
 
 ## Hotfix: 13.0.3
 Jueves 7 de febrero 2013.
 * **Fixed** [Corrige el objeto $contacto (que no existe) por $contrato. Pasaba en 2 lugares que nunca imprimian nada](https://github.com/LemontechSA/ttb/pull/74)
-MiÃ©rcoles 6 de febrero 2013.
+Miércoles 6 de febrero 2013.
 * **Fixed** [Evita error en IE cuando los abogados no pueden ver la duración cobrable] (http://soporte.thetimebilling.com/tickets/7618?col=22917348&page=1)
 
 ## Hotfix: 13.0.2
-
 Viernes 1 de febrero, 2013.
 * **Fixed** [Le da ancho al dv](https://github.com/LemontechSA/ttb/commit/6cfa4ad56dc3756c62d3911f3ac67216a14b88f7#index.php)
 

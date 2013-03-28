@@ -177,4 +177,5 @@ pip-log.txt
 
 app/version.php
 sftp-config*
-*.sublime-*
+*.sublime-project
+*.sublime-workspace
