@@ -198,8 +198,8 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 			$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
 			$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos')";// or contrato.id_contrato='$id_contrato')";
 		} else {
-			$where .= " AND   contrato.id_contrato='$id_contrato'";
-			$where_gastos .= " AND   contrato.id_contrato='$id_contrato'";
+			$where .= " AND   cobro.id_contrato='$id_contrato'";
+			$where_gastos .= " AND   cobro.id_contrato='$id_contrato'";
 		}
 
 		//$where .= " AND trabajo.cobrable = 1";
@@ -216,8 +216,8 @@ if (isset($cobro) || $opc == 'buscar' || $excel) {
 	} else if ($query_asuntos) { // FFF si viene seteado el codigo de asunto, lo mantengo
 		
 			if($id_contrato) {
-				$where .= " AND (trabajo.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
-				$where_gastos .= " AND ( cta_corriente.codigo_asunto IN ('$query_asuntos') or contrato.id_contrato='$id_contrato')";
+				$where .= " AND (trabajo.codigo_asunto IN ('$query_asuntos') or cobro.id_contrato='$id_contrato')";
+				$where_gastos .= " AND ( cta_corriente.codigo_asunto IN ('$query_asuntos') or cobro.id_contrato='$id_contrato')";
 			} else {
 				$where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
 				$where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
