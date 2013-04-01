@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.3.3
+Lunes 1 de abril 2013
+* **Fixed:** [Corrige error en el método WhereQuery de la clase Gasto, que se manifestaba al filtrar por asunto](https://www.pivotaltracker.com/story/show/47089611)
 ## Hotfix: 13.3.2
 Jueves 28 marzo 2013
 * **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro] (https://www.pivotaltracker.com/story/show/47074217)
