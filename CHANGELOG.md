@@ -1,5 +1,14 @@
 # Changelog
+## Hotfix: 13.3.3
+Lunes 1 de abril 2013
+* **Fixed:** [Corrige error en el método WhereQuery de la clase Gasto, que se manifestaba al filtrar por asunto](https://www.pivotaltracker.com/story/show/47089611)
+## Hotfix: 13.3.2
+Jueves 28 marzo 2013
+* **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro] (https://www.pivotaltracker.com/story/show/47074217)
 
+## Hotfix: 13.3.1
+Jueves 28 marzo 2013
+* **Fixed:** [Sesion debe ir en mayuscula en la interfaz agregar_contrato](http://lemontech.zendesk.com/tickets/8180?col=22917348&page=1)
 ## Release: 13.3.0
 Miércoles 27 de marzo 2013.
 * **New:** [Integración contable de gastos](https://github.com/LemontechSA/ttb/pull/30)
