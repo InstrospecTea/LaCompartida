@@ -166,16 +166,17 @@ $app->get('/users/:id', function ($id) {
 	$User = new Usuario($Session);
 	$user = array();
 
-	$user_id = validateAuthTokenSendByHeaders();
+	//$user_id = validateAuthTokenSendByHeaders();
 
 	if (!$User->LoadId($id)) {
 		halt("The user doesn't exist");
 	} else {
 		$user = array(
 			'id' => (int) $User->fields['id_usuario'],
-			'identification_number' => $User->fields['rut'],
+			'code' => $User->fields['rut'],
 			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre']
 		);
+
 	}
 
 	outputJson($user);

@@ -722,7 +722,7 @@ class Trabajo extends Objeto
 		$works = array();
 
 		$sql = "SELECT `work`.`id_trabajo` AS `id`, `work`.`fecha_creacion` AS `creation_date`,
-			`work`.`fecha` AS `date`, `work`.`duracion` AS `duration`, `work`.`descripcion` AS `notes`,
+			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
 			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
 			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
 			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
@@ -757,7 +757,7 @@ class Trabajo extends Objeto
 					'id' => (int) $work->id,
 					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
 					'date' => !empty($work->date) ? strtotime($work->date) : null,
-					'duration' => !empty($work->duration) ? $work->duration : null,
+					'duration' => !empty($work->duration) ? (float) $work->duration : null,
 					'notes' => !empty($work->notes) ? $work->notes : null,
 					'rate' => !empty($work->rate) ? (float) $work->rate : null,
 					'read_only' => (($date_read_only >= $date_now) ? 0 : 1),
