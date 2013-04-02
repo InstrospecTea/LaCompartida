@@ -137,11 +137,11 @@ if ($opc == 'guardar') {
 
 
 <?php
-if ($Sesion->usuario->fields['rut'] != '99511620') {
+/*if ($Sesion->usuario->fields['rut'] != '99511620') {
 	$where_orden = " WHERE orden > -1 ";
-} else {
+} else {*/
 	$where_orden = "WHERE glosa_configuracion_categoria!='Plugins - Hooks'";
-}
+//}
 $query = "SELECT  glosa_opcion,id, valor_opcion, comentario, valores_posibles, configuracion.id_configuracion_categoria, glosa_configuracion_categoria, orden
 					FROM configuracion
 					JOIN configuracion_categoria ON configuracion.id_configuracion_categoria=configuracion_categoria.id_configuracion_categoria

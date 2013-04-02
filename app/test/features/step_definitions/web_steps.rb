@@ -99,6 +99,11 @@ When /^pincho en "([^"]*)"$/ do |button|
   click_on(button)
 end
 
+When /^activo boton "([^"]*)"$/ do |button|
+page.evaluate_script("jQuery(\"input[type='checkbox'][name='{button}']\").removeClass('ui-helper-hidden-accessible')")
+check(button)
+end
+
 When /^pongo usuario y password$/ do 
   fill_in('rut', :with => '99511620')
   fill_in('password', :with => 'admin.asdwsx')
