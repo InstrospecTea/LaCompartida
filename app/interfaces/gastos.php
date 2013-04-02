@@ -642,9 +642,11 @@ function Refrescar() {
 								</td>
 								<td></td>
 							</tr>
-<?php } else { ?>
-	<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />
-<?php } ?>
+<?php } else {  
+	echo '<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />';
+  	$Slim=Slim::getInstance('default')  ? $Slim->applyHook('hook_formulario_gastos') : false;	
+	}
+ ?>
 							<tr>
 								<td align=right><?php echo __('Moneda') ?></td>
 								<td colspan="2" align="left">
