@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-require_once dirname(__FILE__) . '/Cobro.php';
+
 
 require_once('Numbers/Words.php');
 
@@ -11,6 +11,9 @@ class NotaCobro extends Cobro {
 	var $asuntos = array();
 	var $x_resultados = array();
 	var $sesion = null;
+	var $carta_tabla = 'cobro_rtf';
+	var $carta_id = 'id_formato';
+	var $carta_formato = 'cobro_template';
 
 	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro";
@@ -20,6 +23,8 @@ class NotaCobro extends Cobro {
 		$this->log_update = true;
 		$this->x_resultados = array();
 		$this->guardar_fecha = true;
+		$this->espacio=UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')?'':'&nbsp;';
+
 	}
 
 	/*
@@ -9792,8 +9797,8 @@ class NotaCobro extends Cobro {
         return $htmltemporal;
     }
 	
-	function GenerarSeccionResumenProfesional($parser, $theTag , $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) { 
-		
+	function GenerarSeccionResumenProfesional($parser, $theTag, $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
+
 		global $contrato;
 		global $cobro_moneda;
 		//global $moneda_total;
@@ -9814,8 +9819,8 @@ class NotaCobro extends Cobro {
 		$html = $parser->tags[$theTag];
 
 		switch ($theTag) {
-		
-			case 'RESUMEN_PROFESIONAL':  
+
+			case 'RESUMEN_PROFESIONAL':
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 					$cobro_valores = array();
 
@@ -9830,23 +9835,23 @@ class NotaCobro extends Cobro {
 
 					// Se seleccionan todos los trabajos del cobro, se incluye que sea cobrable ya que a los trabajos visibles
 					// tambien se consideran dentro del cobro, tambien se incluye el valor del retainer del trabajo.
-					$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada, 
-									trabajo.descripcion, 
-									trabajo.fecha, 
-									trabajo.id_usuario, 
-									$dato_monto_cobrado as monto_cobrado, 
-									trabajo.id_moneda as id_moneda_trabajo, 
-									trabajo.id_trabajo, 
-									trabajo.tarifa_hh, 
-									trabajo.cobrable, 
-									trabajo.visible, 
-									trabajo.codigo_asunto, 
-									CONCAT_WS(' ', nombre, apellido1) as usr_nombre, 
-									prm_categoria_usuario.glosa_categoria as categoria 
+					$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
+									trabajo.descripcion,
+									trabajo.fecha,
+									trabajo.id_usuario,
+									$dato_monto_cobrado as monto_cobrado,
+									trabajo.id_moneda as id_moneda_trabajo,
+									trabajo.id_trabajo,
+									trabajo.tarifa_hh,
+									trabajo.cobrable,
+									trabajo.visible,
+									trabajo.codigo_asunto,
+									CONCAT_WS(' ', nombre, apellido1) as usr_nombre,
+									prm_categoria_usuario.glosa_categoria as categoria
 							FROM trabajo
 							JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario 
-							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "' 
+							LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
+							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.id_tramite=0
 							ORDER BY trabajo.fecha ASC";
 					$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -9955,10 +9960,10 @@ class NotaCobro extends Cobro {
 					return $html;
 				}
 				$columna_hrs_retainer = $this->fields['opc_ver_detalle_retainer'] && ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL');
-				
-				
+
+
 				$columna_hrs_trabajadas_categoria = $GLOBALS['columna_hrs_trabajadas_categoria'];
-				 
+
 				$columna_hrs_trabajadas = $this->fields['opc_ver_horas_trabajadas'];
 
 				if ($this->fields['opc_ver_profesional'] == 0)
@@ -9981,7 +9986,7 @@ class NotaCobro extends Cobro {
 						if ($data['duracion_retainer'] > 0 && ( $this->fields['forma_cobro'] != 'FLAT FEE' || ( UtilesApp::GetConf($this->sesion, 'ResumenProfesionalVial') ) ))
 							$retainer = true;
 						//if ($data['duracion_descontada'] > 0)
-							$descontado = true;
+						$descontado = true;
 						if ($data['flatfee'] > 0)
 							$flatfee = true;
 						if ($data['duracion_incobrables'] > 0)
@@ -10208,7 +10213,6 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%valor_cobrado_hh%', number_format(0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 					else
 						$html3 = str_replace('%valor_cobrado_hh%', number_format($valor_cobrado_hh, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-					}
 				}
 				$html3 = str_replace('%glosa%', __('Total'), $html3);
 				if ($han_trabajado_menos_del_retainer || $this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas']) {
