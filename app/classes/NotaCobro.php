@@ -378,7 +378,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
 				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
-				$html = str_replace('%fono%', __('TEL�FONO'), $html);
+				$html = str_replace('%fono%', __('TELéFONO'), $html);
 					$html = str_replace('%fax%', __('TELEFAX'), $html);
 
                 $html = str_replace('%asunto%', __('Asunto'), $html);
@@ -416,7 +416,7 @@ class NotaCobro extends Cobro {
 						$detalle_escala = "";
 
 						$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('m�s hrs') . " ";
+						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
 						$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " "
 								. __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
 						if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
@@ -1234,7 +1234,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor_contacto%', empty($asunto->fields['contacto']) ? '' : $asunto->fields['contacto'], $row);
 
 					$row = str_replace('%registro%', __('Registro de Tiempo'), $row);
-					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Tel�fono'), $row);
+					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 					$row = str_replace('%valor_telefono%', empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 					if ($cont_trabajos > 0) {
 						if ($this->fields["opc_ver_detalles_por_hora"] == 1) {
@@ -1348,7 +1348,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor_contacto%', empty($asunto->fields['contacto']) ? '' : $asunto->fields['contacto'], $row);
 					$row = str_replace('%servicios%', __('Servicios prestados'), $row);
 					$row = str_replace('%registro%', __('Registro de Tiempo'), $row);
-					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Tel�fono'), $row);
+					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 					$row = str_replace('%valor_telefono%', empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 
 					$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumento($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
@@ -3017,7 +3017,7 @@ class NotaCobro extends Cobro {
 
 			/*
 			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
-			  aparecer� como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
+			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
 			 */
 			case 'CTA_CORRIENTE': //GenerarDocumento
 				if ($this->fields['opc_ver_gastos'] == 0)
@@ -4267,7 +4267,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor_contacto%', empty($asunto->fields['contacto']) ? '' : $asunto->fields['contacto'], $row);
 
 					$row = str_replace('%registro%', __('Registro de Tiempo'), $row);
-					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Tel�fono'), $row);
+					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 					$row = str_replace('%valor_telefono%', empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 
 					if ($cont_trabajos > 0) {
@@ -4389,7 +4389,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor_contacto%', empty($asunto->fields['contacto']) ? '' : $asunto->fields['contacto'], $row);
 					$row = str_replace('%servicios%', __('Servicios prestados'), $row);
 					$row = str_replace('%registro%', __('Registro de Tiempo'), $row);
-					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Tel�fono'), $row);
+					$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 					$row = str_replace('%valor_telefono%', empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 
 					$row = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
@@ -9331,7 +9331,7 @@ class NotaCobro extends Cobro {
 
 			/*
 			  CTA_CORRIENTE -> nuevo tag para la representación de la cuenta corriente (gastos, provisiones)
-			  aparecer� como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
+			  aparecerá como Saldo Inicial; Movimientos del periodo; Saldo Periodo; Saldo Final
 			 */
 			case 'CTA_CORRIENTE': //GenerarDocumentoComun
 				if ($this->fields['opc_ver_gastos'] == 0)
