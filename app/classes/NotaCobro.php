@@ -26,6 +26,86 @@ class NotaCobro extends Cobro {
 		$this->espacio=UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')?'':'&nbsp;';
 
 	}
+	function NuevoRegistro() {
+		return array(
+			'descripcion' => 'Nueva nota de cobro',
+			'html_header' => '',
+			'html_pie' => '',
+			'cobro_template' => '',
+			'cobro_css' => '',
+			'pdf_encabezado_imagen' => '',
+			'pdf_encabezado_texto' => ''
+		);
+	}
+
+	public function ObtenerCarta($id = null) {
+		if (empty($id)) {
+			return $this->NuevoRegistro() + array('secciones' => array(key($this->secciones) => ''));
+		}
+
+		$query = "SELECT * FROM {$this->carta_tabla} WHERE {$this->carta_id} = '$id'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$carta = mysql_fetch_assoc($resp);
+		$parser = new TemplateParser($carta[$this->carta_formato]);
+		$carta['secciones'] = $parser->tags;
+		return $carta;
+	}
+
+	function GuardarCarta($data) {
+		$formato = '';
+		foreach ($data['secciones'] as $seccion => $html) {
+			$formato .= "\n###$seccion###\n$html\n";
+		}
+		$data[$this->carta_formato] = $formato;
+		unset($data['secciones']);
+
+		$Carta = new Objeto($this->sesion, array(), '', $this->carta_tabla, $this->carta_id);
+		$Carta->guardar_fecha = false;
+		$Carta->editable_fields = array_keys($data);
+		$Carta->Fill($data, true);
+		if ($Carta->Write()) {
+			return $Carta->fields[$this->carta_id];
+		}
+		return false;
+	}
+
+	function PrevisualizarDocumento($data, $id_cobro) {
+		$formato = '';
+		foreach ($data['secciones'] as $seccion => $html) {
+			$formato .= "\n###$seccion###\n$html\n";
+		}
+		$html = $this->ReemplazarHTML($formato, $id_cobro);
+		$doc = new DocGenerator($html, $data['cobro_css'], $this->fields['opc_papel'], $this->fields['opc_ver_numpag'], 'PORTRAIT',
+						1.5, 2, 2, 2, $this->fields['estado']);
+		libxml_use_internal_errors(true);
+		$doc->output('previsualizacion_carta.doc');
+		exit;
+	}
+
+	function PrevisualizarValores($id_cobro) {
+		$html = '';
+		$secciones = array(key($this->secciones));
+		foreach ($this->secciones as $subsecciones) {
+			$secciones = array_merge($secciones, array_keys($subsecciones));
+		}
+		foreach ($secciones as $seccion) {
+			$html .= "\n\n###$seccion###\n
+			<tr><th colspan=3>$seccion</th></tr>\n\n";
+			if (isset($this->diccionario[$seccion])) {
+				foreach ($this->diccionario[$seccion] as $tag => $desc_tag) {
+					$html .= '<tr><td>' . str_replace('%', '&#37;', $tag) .
+							"</td><td>$tag</td><td>" .
+							str_replace('%', '&#37;', $desc_tag) . "</td></tr>\n";
+				}
+			}
+			if (isset($this->secciones[$seccion])) {
+				foreach (array_keys($this->secciones[$seccion]) as $subseccion) {
+					$html .= "\n%$subseccion%\n";
+				}
+			}
+		}
+		return '<table border="1">' . $this->ReemplazarHTML($html, $id_cobro) . '</table>';
+	}
 
 	/*
 	  String to number
