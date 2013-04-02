@@ -8,7 +8,7 @@ $pagina->titulo = __('Configuración');
 $pagina->PrintTop();
 
 if ($opc == 'guardar') {
-	$Sesion->pdodbh->exec("update configuracion set id_configuracion_categoria=10 where glosa_opcion='BeaconTimer'");
+	$Sesion->pdodbh->exec("update configuracion set id_configuracion_categoria=9 where glosa_opcion='BeaconTimer'");
 	foreach ($opcion as $id => $valor) {
 		if (isset($opcion_hidden[$id])) {
 			$opcion_hidden[$id] = 1;
@@ -147,13 +147,13 @@ $query = "SELECT  glosa_opcion,id, valor_opcion, comentario, valores_posibles, c
 					JOIN configuracion_categoria ON configuracion.id_configuracion_categoria=configuracion_categoria.id_configuracion_categoria
 					$where_orden
 					ORDER BY configuracion.id_configuracion_categoria, orden, glosa_opcion ASC";
-$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+					
 $arrayopciones = array();
 $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 //echo '<pre>';print_r($ConfRS);echo '</pre><hr>';
 ?>
 <div style="padding:5px;" id="buscacampos">Buscar un campo en particular:&nbsp;&nbsp;&nbsp;</div>
-
+<?php echo $query; ?>
 <div id="configuracion" class="tabs"	>
 
 	<ul id="tabs">

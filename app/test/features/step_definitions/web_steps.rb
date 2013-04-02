@@ -59,6 +59,9 @@ Given /^estoy en (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
+
+
+
 When /^genero un gasto aleatorio$/ do
   asunto = ["0003-0001", "0006-0001", "0007-0001", "0013-0001", "0010-0001", "0017-0001","0025-0002","2020-0003" ,"2017-0004","2008-0001"]
   codigo_asunto = asunto[rand(asunto.length)]
@@ -69,6 +72,8 @@ When /^genero un gasto aleatorio$/ do
   fill_in('descripcion', :with => descripcion)
    click_on "Guardar"
 end
+
+
 
 
 When(/^me logeo$/) do
@@ -95,11 +100,25 @@ When /^(?:|I )click on "([^"]*)"$/ do |button|
   click_on(button)
 end
 
+
+
+When /^pincho en el primer "([^"]*)"$/ do |css|
+  page.all(css)[1].click
+end
+
+When /^pincho el link "([^"]*)"$/ do |link|
+  click_link(link)
+end
+
+When /^pincho el seudoboton "([^"]*)"$/ do |link|
+  page.find('span', :text => link,:visible => true).click
+end
+
 When /^pincho en "([^"]*)"$/ do |button|
   click_on(button)
 end
 
-When /^activo boton "([^"]*)"$/ do |button|
+When /^activo "([^"]*)"$/ do |button|
 page.evaluate_script("jQuery(\"input[type='checkbox'][name='{button}']\").removeClass('ui-helper-hidden-accessible')")
 check(button)
 end
@@ -109,9 +128,11 @@ When /^pongo usuario y password$/ do
   fill_in('password', :with => 'admin.asdwsx')
 end
 
+
 When /^(?:|I )follow "([^"]*)"$/ do |link|
   click_link(link)
 end
+
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
   fill_in(field, :with => value)
@@ -129,24 +150,13 @@ When /^me cambio al popup$/ do
      page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
-# Use this to fill in an entire form with data from a table. Example:
-#
-#   When I fill in the following:
-#     | Account Number | 5002       |
-#     | Expiry date    | 2009-11-01 |
-#     | Note           | Nice guy   |
-#     | Wants Email?   |            |
-#
-# TODO: Add support for checkbox, select or option
-# based on naming conventions.
-#
-When /^(?:|I )fill in the following:$/ do |fields|
-  fields.rows_hash.each do |name, value|
-    When %{I fill in "#{name}" with "#{value}"}
-  end
-end
+
 
 When /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
+  select(value, :from => field)
+end
+
+When /^elijo "([^"]*)" en "([^"]*)"$/ do |value, field|
   select(value, :from => field)
 end
 
@@ -382,6 +392,23 @@ Then /^no debiera devolver gastos$/ do
  Then /^debiera tirar un error cuando recibe parametros incorrectos$/ do
      expect { @client.call_lista_gastos "juanito","juanito",1356998400}.to raise_error
  end
+
+ # Use this to fill in an entire form with data from a table. Example:
+#
+#   When I fill in the following:
+#     | Account Number | 5002       |
+#     | Expiry date    | 2009-11-01 |
+#     | Note           | Nice guy   |
+#     | Wants Email?   |            |
+#
+# TODO: Add support for checkbox, select or option
+# based on naming conventions.
+#
+When /^(?:|I )fill in the following:$/ do |fields|
+  fields.rows_hash.each do |name, value|
+    When %{I fill in "#{name}" with "#{value}"}
+  end
+end
 
  Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
   with_scope(parent) do
