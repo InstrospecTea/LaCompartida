@@ -117,6 +117,112 @@ class NotaCobro extends Cobro {
 		return number_format((float) $str, 0, ',', '.');
 	}
 
+	function ReemplazarHTML($html, $id_cobro) {
+		$parser = new TemplateParser($html);
+
+		if (empty($id_cobro)) {
+			$query = 'SELECT id_cobro FROM cobro ORDER BY id_cobro DESC LIMIT 1';
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($id_cobro) = mysql_fetch_array($resp);
+		}
+		$this->Load($id_cobro);
+			
+			
+		return $this->GenerarEjemplo($parser);
+	}
+
+	function GenerarEjemplo($parser) {
+		return $this->GeneraHTMLCobro(false, $parser, 2);
+	}
+
+	function ParametrosGeneracion() {
+		// Para mostrar un resumen de horas de cada profesional al principio del documento.
+		global $resumen_profesional_id_usuario;
+		global $resumen_profesional_nombre;
+		global $resumen_profesional_hrs_trabajadas;
+		global $resumen_profesional_hrs_retainer;
+		global $resumen_profesional_hrs_descontadas;
+		global $resumen_profesional_hh;
+		global $resumen_profesional_valor_hh;
+		global $resumen_profesional_categoria;
+		global $resumen_profesional_id_categoria;
+		global $resumen_profesionales;
+		$resumen_profesional_id_usuario = array();
+		$resumen_profesional_nombre = array();
+		$resumen_profesional_hrs_trabajadas = array();
+		$resumen_profesional_hrs_retainer = array();
+		$resumen_profesional_hrs_descontadas = array();
+		$resumen_profesional_hh = array();
+		$resumen_profesional_valor_hh = array();
+		$resumen_profesional_categoria = array();
+		$resumen_profesional_id_categoria = array();
+		$resumen_profesionales = array();
+
+		global $contrato;
+		$contrato = new Contrato($this->sesion);
+		$contrato->Load($this->fields['id_contrato']);
+
+
+		global $x_detalle_profesional;
+		global $x_resumen_profesional;
+		global $x_factor_ajuste;
+		list( $x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste ) = $this->DetalleProfesional();
+		global $x_resultados;
+		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+		$this->x_resultados = $x_resultados;
+
+
+		global $x_cobro_gastos;
+		$x_cobro_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
+
+		$lang = $this->fields['codigo_idioma'];
+
+		$cliente = new Cliente($this->sesion);
+		$cliente->LoadByCodigo($this->fields['codigo_cliente']);
+
+		global $cobro_moneda;
+		$cobro_moneda = new CobroMoneda($this->sesion);
+		$cobro_moneda->Load($this->fields['id_cobro']);
+
+		global $moneda_total;
+		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
+
+		$tipo_cambio_moneda_total = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['tipo_cambio'];
+		if ($tipo_cambio_moneda_total == 0)
+			$tipo_cambio_moneda_total = 1;
+
+		if ($lang == '')
+			$lang = 'es';
+
+		/*
+		  require_once Conf::ServerDir()."/lang/$lang.php";
+		 */
+
+		$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
+		$idioma->Load($lang);
+
+		// Moneda
+		$moneda = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda->Load($this->fields['id_moneda']);
+
+		$moneda_base = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_base->Load($this->fields['id_moneda_base']);
+
+		//Moneda cliente
+		$moneda_cli = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
+		$moneda_cli->Load($cliente->fields['id_moneda']);
+		$moneda_cliente_cambio = $cobro_moneda->moneda[$cliente->fields['id_moneda']]['tipo_cambio'];
+
+		if ($this->fields['codigo_idioma'] == 'es') {
+			setlocale(LC_ALL, "es_ES");
+		} else if ($this->fields['codigo_idioma'] == 'en') {
+			setlocale(LC_ALL, 'en_US.UTF-8');
+		}
+
+		return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
+	}
+	
 	/*
 	  Generacion de DOC COBRO
 	 */
