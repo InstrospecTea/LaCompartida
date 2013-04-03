@@ -83,11 +83,19 @@ When(/^me logeo$/) do
   click_on "Entrar"
 end
 
+Dado(/^que estoy logueado$/) do
+  visit path_to('la pagina de login')
+  fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+  click_on "Entrar"
+end
+
 When /^(?:|I )go to (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
 When /^visito (.+)$/ do |page_name|
+  step "me logeo"
   visit path_to(page_name)
 end
 
@@ -116,6 +124,12 @@ end
 
 When /^pincho en "([^"]*)"$/ do |button|
   click_on(button)
+end
+
+When /^filtro provisiones$/ do
+  step "visito la pantalla de gastos"
+  step "elijo \"soloingreso\" en \"egresooingreso\""
+  step "pincho el seudoboton \"Buscar\""
 end
 
 When /^activo "([^"]*)"$/ do |button|
@@ -150,6 +164,9 @@ When /^me cambio al popup$/ do
      page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
+When /^me cambio de ventana$/ do 
+     page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
+end
 
 
 When /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
