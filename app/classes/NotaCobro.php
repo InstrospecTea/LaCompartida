@@ -265,7 +265,11 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
 				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
-				$html = str_replace('%fax%', __('TELEFAX'), $html);
+					$html = str_replace('%fax%', __('TELEFAX'), $html);
+
+                $html = str_replace('%asunto%', __('Asunto'), $html);
+                $html = str_replace('%glosa_asunto%', __('Glosa') . ' ' . __('Asunto'), $html);
+                $html = str_replace('%codigo_asunto%', __('Código') . ' ' . __('Asunto'), $html);
 
 				$cliente = new Cliente($this->sesion);
 				if (UtilesApp::GetConf($this->sesion, 'CodigoSecundario')) {
@@ -371,7 +375,13 @@ class NotaCobro extends Cobro {
 					if (($k + 1) < count($this->asuntos))
 						$imprimir_asuntos .= '<br />';
 				}
-
+                if (array_key_exists('codigo_contrato', $contrato->fields)) {
+                    $html = str_replace('%glosa_codigo_contrato%', __('Código') . ' ' . __('Contrato'), $html);
+                    $html = str_replace('%codigo_contrato%', $contrato->fields['codigo_contrato'], $html);
+                } else {
+                    $html = str_replace('%glosa_codigo_contrato%', '', $html);
+                    $html = str_replace('%codigo_contrato%', '', $html);
+                }
 				$html = str_replace('%honorario_yo_gastos%', __('honorario_yo_gastos'), $html);
 				$html = str_replace('%materia%', __('Materia'), $html);
 				$html = str_replace('%glosa_asunto_sin_codigo%', $imprimir_asuntos, $html);
@@ -436,7 +446,15 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%nro_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%cobro_factura_nro%', empty($this->fields['documento']) ? '' : $this->fields['documento'], $html);
 				$html = str_replace('%nro_factura%', empty($this->fields['documento']) ? '' : $this->fields['documento'], $html);
-				$html = str_replace('%modalidad%', $this->fields['opc_ver_modalidad'] == 1 ? __('Modalidad') : '', $html);
+                $nuevomodulofactura=UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+                $facturasRS=$this->ArrayFacturasDelContrato;
+                foreach($facturasRS as $factura=>$datos) {
+                    if($datos[0]['id_cobro']!=$this->fields['id_cobro']) {
+                        unset($facturasRS[$factura]);
+                    }
+                }
+                $html = str_replace('%lista_facturas%', implode(', ', array_keys($facturasRS)), $html);
+                $html = str_replace('%modalidad%', $this->fields['opc_ver_modalidad'] == 1 ? __('Modalidad') : '', $html);
 				$html = str_replace('%tipo_honorarios%', $this->fields['opc_ver_modalidad'] == 1 ? __('Tipo de Honorarios') : '', $html);
 				if ($this->fields['forma_cobro'] == 'RETAINER' && $contrato->fields['glosa_contrato'] != '')
 					$html = str_replace('%valor_modalidad_tyc%', $this->fields['opc_ver_modalidad'] == 1 ? __($contrato->fields['glosa_contrato']) : '', $html);
@@ -635,7 +653,8 @@ class NotaCobro extends Cobro {
 								ORDER BY fecha ASC";
 				$lista_gastos = new ListaGastos($this->sesion, '', $query);
 				$total_gastos_moneda = 0;
-				for ($i = 0; $i < $lista_gastos->num; $i++) {				$gasto = $lista_gastos->Get($i);
+				for ($i = 0; $i < $lista_gastos->num; $i++) {				
+					$gasto = $lista_gastos->Get($i);
 
 					if ($gasto->fields['egreso'] > 0)
 						$saldo = $gasto->fields['monto_cobrable'];
