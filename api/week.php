@@ -5,6 +5,8 @@ $Session = new Sesion();
 $UserToken = new UserToken($Session);
 
 $auth_token = $_REQUEST['AUTH_TOKEN'];
+$day = $_REQUEST['day'];
+
 $user_token_data = $UserToken->findByAuthToken($auth_token);
 
 // if not exist the auth_token then return error
@@ -99,14 +101,23 @@ if (!is_object($user_token_data)) {
         width: 10%;
       }
     </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//static.thetimebilling.com/js/bottom.js"></script>
   </head>
   <body>
 <?php
 // El nombre es para que el include funcione
 $id_usuario = $user_token_data->id;
-$semana = '2013-02-01';
+$semana = $day;
 
 include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
 ?>
+    <script>
+      jQuery(document).ready(function () {
+        jQuery('.pintame').each(function() {
+          jQuery(this).css('background-color', window.top.s2c(jQuery(this).attr('rel')));
+        });
+      });
+    </script>
   </body>
 </html>
