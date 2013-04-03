@@ -2937,6 +2937,7 @@ class NotaCobro extends Cobro {
 	}
 
 	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
+		
 		global $contrato;
 		global $cobro_moneda;
 		//global $moneda_total;
@@ -2958,25 +2959,38 @@ class NotaCobro extends Cobro {
 
 		switch ($theTag) {
 
-			case 'INFORME': //GenerarDocumento2
-				#INSERTANDO CARTA
-				$html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
-				$html = str_replace('%xfecha_ano_dos_digitos%', date("y", strtotime($this->fields['fecha_emision'])), $html);
-				$html = str_replace('%xfecha_mes_dia_ano%', date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
+ 			case 'INFORME': //GenerarDocumentoCarta2
+                #INSERTANDO CARTA
+                $nuevomodulofactura=UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+                if(strpos($html,'%INFORME_GASTOS%')!==false) {
+                    $this->ArrayFacturasDelContrato=$this->FacturasDelContrato($this->sesion,$nuevomodulofactura,null,'G');
+                    $this->ArrayTotalesDelContrato=$this->TotalesDelContrato($this->ArrayFacturasDelContrato,$nuevomodulofactura,$this->fields['id_cobro']);
+                    $html = str_replace('%INFORME_GASTOS%', '', $html);
+                } else 	if(strpos($html,'%INFORME_HONORARIOS%')!==false) {
+                    $this->ArrayFacturasDelContrato=$this->FacturasDelContrato($this->sesion,$nuevomodulofactura,null,'H');
+                    $this->ArrayTotalesDelContrato=$this->TotalesDelContrato($this->ArrayFacturasDelContrato,$nuevomodulofactura,$this->fields['id_cobro']);
+                    $html = str_replace('%INFORME_HONORARIOS%', '', $html);
 
-				$fechacabecera = ($this->fields['fecha_emision'] == 'NULL' || $this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == "") ? time() : strtotime($this->fields['fecha_emision']);
+                }
 
-				$html = str_replace('%xfecha_mespalabra_dia_ano%', strftime(Utiles::FormatoStrfTime("%B %e, %Y"), $fechacabecera), $html);
+                $html = str_replace('%xfecha_mes_dos_digitos%', date("m", strtotime($this->fields['fecha_emision'])), $html);
+                $html = str_replace('%xfecha_ano_dos_digitos%', date("y", strtotime($this->fields['fecha_emision'])), $html);
+                $html = str_replace('%xfecha_mes_dia_ano%', date("m-d-Y", strtotime($this->fields['fecha_emision'])), $html);
+
+                $fechacabecera = ($this->fields['fecha_emision'] == 'NULL' || $this->fields['fecha_emision'] == '0000-00-00' || $this->fields['fecha_emision'] == "") ? time() : strtotime($this->fields['fecha_emision']);
+
+                $html = str_replace('%xfecha_mespalabra_dia_ano%', strftime(Utiles::FormatoStrfTime("%B %e, %Y"), $fechacabecera), $html);
 
 
-				$html = str_replace('%xnro_factura%', $this->fields['id_cobro'], $html);
-				$html = str_replace('%xnombre_cliente%', $contrato->fields['factura_razon_social'], $html);
-				$html = str_replace('%xglosa_cliente%', $contrato->fields['factura_razon_social'], $html);
-				$html = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html);
-				$html = str_replace('%xrut%', $contrato->fields['rut'], $html);
+                $html = str_replace('%xnro_factura%', $this->fields['id_cobro'], $html);
+                $html = str_replace('%xnombre_cliente%', $contrato->fields['factura_razon_social'], $html);
+                $html = str_replace('%xglosa_cliente%', $contrato->fields['factura_razon_social'], $html);
+                $html = str_replace('%xdireccion%', nl2br($contrato->fields['factura_direccion']), $html);
+                $html = str_replace('%xrut%', $contrato->fields['rut'], $html);
 
-				require_once('CartaCobro.php');
-				$CartaCobro = new CartaCobro($this->sesion, $this->fields);
+                require_once('CartaCobro.php');
+
+                $CartaCobro = new CartaCobro($this->sesion, $this->fields,$this->ArrayFacturasDelContrato,$this->ArrayTotalesDelContrato);
 				$textocarta = $CartaCobro->GenerarDocumentoCarta2($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 				$html = str_replace('%COBRO_CARTA%', $textocarta, $html);
 
@@ -3045,6 +3059,11 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 				$html = str_replace('%fax%', __('TELEFAX'), $html);
 
+				$html = str_replace('%asunto%', __('Asunto'), $html);
+                $html = str_replace('%glosa_asunto%', __('Glosa') . ' ' . __('Asunto'), $html);
+                $html = str_replace('%codigo_asunto%', __('Código') . ' ' . __('Asunto'), $html);
+                $html = str_replace('%label_codigo_cliente%', __('Código') . ' ' . __('Cliente'), $html);
+
 				/* especiales acl */
 				$html = str_replace('%nota_cobro_acl%', __('Nota de Cobro ACL'), $html);
 				$html = str_replace('%reference_no_acl%', __('reference no acl'), $html);
@@ -3063,6 +3082,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%banco%', __('Banco'), $html);
 				$html = str_replace('%direccion%', __('Dirección'), $html);
 				$html = str_replace('%cuenta_bancaria%', __('Cuenta'), $html);
+				
 				/*
 				 * WIRE INSTRUCTIONS
 				 * Beneficiary
@@ -3189,8 +3209,6 @@ class NotaCobro extends Cobro {
 				} else {
 					//$html = str_replace('%RESUMEN_PROFESIONAL%', $this->GenerarDocumento2($parser,'RESUMEN_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 					$html = str_replace('%RESUMEN_PROFESIONAL%', $this->GenerarSeccionResumenProfesional($parser,'RESUMEN_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-							 
-					
 				}
 
 				$html = str_replace('%ENDOSO%', $this->GenerarDocumentoComun($parser, 'ENDOSO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
