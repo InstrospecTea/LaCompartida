@@ -18,20 +18,23 @@
   Como el usuario admin
   Para activar el plugin de conversion provision-adelanto
 
-  @javascript 
-  Escenario: activo el plugin y el nuevo modulo de gastos
-    Cuando visito la pantalla de configuracion
-    Y pincho el link "Configuracion por Lemontech"
-    Y activo "NuevoModuloGastos"
-    Y pincho el link "Plugins"
-    Y activo "convertir_provision_en_adelanto"
-    Y pincho el seudoboton "Guardar"
-    Y visito la pantalla de gastos
-    Entonces debiera ver "Gastos y Provisiones"
+#  @javascript 
+#  Escenario: activo el plugin y el nuevo modulo de gastos
+#    Cuando visito la pantalla de configuracion
+#    Y pincho el link "Configuracion por Lemontech"
+#    Y activo "NuevoModuloGastos"
+#    Y pincho el link "Plugins"
+#    Y activo "convertir_provision_en_adelanto"
+#    Y pincho el seudoboton "Guardar"
+#    Y visito la pantalla de gastos
+#    Entonces debiera ver "Gastos y Provisiones"
 
   @javascript 
   Escenario: filtro provisiones y edito la primera
-    Cuando filtro provisiones
+    Cuando visito la pantalla de gastos
+    Y elijo "Sólo provisiones" en "egresooingreso"
+    Y pincho el seudoboton "Buscar"
+    Y cuento la cantidad de provisiones
     Entonces debiera ver css "td.tablagastos"
     Cuando pincho en el primer "a.editargasto"
     Y me cambio de ventana

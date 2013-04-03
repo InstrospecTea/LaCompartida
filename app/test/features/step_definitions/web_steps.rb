@@ -35,18 +35,18 @@ end
 
 World(WithinHelpers)
 
- When /^estoy en la pantalla de login$/ do
+ Cuando /^estoy en la pantalla de login$/ do
   visit Capybara.app_host
 end
 
 # Single-line step scoper
-When /^(.*) within (.*[^:])$/ do |step, parent|
-  with_scope(parent) { When step }
+Cuando /^(.*) within (.*[^:])$/ do |step, parent|
+  with_scope(parent) { Cuando step }
 end
 
 # Multi-line step scoper
-When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
-  with_scope(parent) { When "#{step}:", table_or_string }
+Cuando /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
+  with_scope(parent) { Cuando "#{step}:", table_or_string }
 end
 
 
@@ -62,7 +62,7 @@ end
 
 
 
-When /^genero un gasto aleatorio$/ do
+Cuando /^genero un gasto aleatorio$/ do
   asunto = ["0003-0001", "0006-0001", "0007-0001", "0013-0001", "0010-0001", "0017-0001","0025-0002","2020-0003" ,"2017-0004","2008-0001"]
   codigo_asunto = asunto[rand(asunto.length)]
   monto_aleatorio=1000+rand(5000)
@@ -76,7 +76,7 @@ end
 
 
 
-When(/^me logeo$/) do
+Cuando(/^me logeo$/) do
   visit path_to('la pagina de login')
     fill_in('rut', :with => '99511620')
   fill_in('password', :with => 'admin.asdwsx')
@@ -90,106 +90,111 @@ Dado(/^que estoy logueado$/) do
   click_on "Entrar"
 end
 
-When /^(?:|I )go to (.+)$/ do |page_name|
+Cuando /^(?:|I )go to (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
-When /^visito (.+)$/ do |page_name|
+Cuando /^visito (.+)$/ do |page_name|
   step "me logeo"
   visit path_to(page_name)
 end
 
 
-When /^(?:|I )press "([^"]*)"$/ do |button|
+Cuando /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
 end
 
-When /^(?:|I )click on "([^"]*)"$/ do |button|
+Cuando /^(?:|I )click on "([^"]*)"$/ do |button|
   click_on(button)
 end
 
 
 
-When /^pincho en el primer "([^"]*)"$/ do |css|
+Cuando /^pincho en el primer "([^"]*)"$/ do |css|
   page.all(css)[1].click
 end
 
-When /^pincho el link "([^"]*)"$/ do |link|
+Cuando /^pincho el link "([^"]*)"$/ do |link|
   click_link(link)
 end
 
-When /^pincho el seudoboton "([^"]*)"$/ do |link|
+Cuando /^pincho el seudoboton "([^"]*)"$/ do |link|
   page.find('span', :text => link,:visible => true).click
 end
 
-When /^pincho en "([^"]*)"$/ do |button|
+Cuando /^pincho en "([^"]*)"$/ do |button|
   click_on(button)
 end
 
-When /^filtro provisiones$/ do
+Cuando /^filtro provisiones$/ do
   step "visito la pantalla de gastos"
   step "elijo \"soloingreso\" en \"egresooingreso\""
   step "pincho el seudoboton \"Buscar\""
 end
 
-When /^activo "([^"]*)"$/ do |button|
+Cuando /^activo "([^"]*)"$/ do |button|
 page.evaluate_script("jQuery(\"input[type='checkbox'][name='{button}']\").removeClass('ui-helper-hidden-accessible')")
 check(button)
 end
 
-When /^pongo usuario y password$/ do 
+Cuando /^pongo usuario y password$/ do 
   fill_in('rut', :with => '99511620')
   fill_in('password', :with => 'admin.asdwsx')
 end
 
 
-When /^(?:|I )follow "([^"]*)"$/ do |link|
+Cuando /^(?:|I )follow "([^"]*)"$/ do |link|
   click_link(link)
 end
 
+Cuando(/^cuento la cantidad de provisiones$/) do
+   respuesta=find('div#tablon_info').native.content
+   p respuesta
+end
 
-When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
+
+Cuando /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
   fill_in(field, :with => value)
 end
 
-When /escribo "([^"]*)" en el campo "([^"]*)"$/ do |value,field|
+Cuando /escribo "([^"]*)" en el campo "([^"]*)"$/ do |value,field|
   fill_in(field, :with => value)
 end
 
-When /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
+Cuando /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
   fill_in(field, :with => value)
 end
 
-When /^me cambio al popup$/ do 
+Cuando /^me cambio al popup$/ do 
      page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
-When /^me cambio de ventana$/ do 
+Cuando /^me cambio de ventana$/ do 
      page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
 end
 
 
-When /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
+Cuando /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
   select(value, :from => field)
 end
 
-When /^elijo "([^"]*)" en "([^"]*)"$/ do |value, field|
+Cuando /^elijo "([^"]*)" en "([^"]*)"$/ do |value, field|
   select(value, :from => field)
 end
 
-When /^(?:|I )check "([^"]*)"$/ do |field|
+Cuando /^(?:|I )check "([^"]*)"$/ do |field|
   check(field)
 end
 
-When /^(?:|I )uncheck "([^"]*)"$/ do |field|
+Cuando /^(?:|I )uncheck "([^"]*)"$/ do |field|
   uncheck(field)
 end
 
-When /^(?:|I )choose "([^"]*)"$/ do |field|
+Cuando /^(?:|I )choose "([^"]*)"$/ do |field|
   choose(field)
 end
 
-When /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
+Cuando /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
   attach_file(field, File.expand_path(path))
 end
 
@@ -376,13 +381,13 @@ def call_lista_gastos usuario,password,timestamp
       response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp })
 end
 
-When /^me conecto al cliente wsdl$/ do
+Cuando /^me conecto al cliente wsdl$/ do
    @client = Savon.client(wsdl:  Capybara.app_host  << "/web_services/integracion_contabilidad4.php?wsdl")
 end
 
  
 
-When(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
+Cuando(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
  @resultado = call_lista_gastos(usuario, password,timestamp)
   @result=@resultado.body.to_hash
 end
@@ -412,7 +417,7 @@ Then /^no debiera devolver gastos$/ do
 
  # Use this to fill in an entire form with data from a table. Example:
 #
-#   When I fill in the following:
+#   Cuando I fill in the following:
 #     | Account Number | 5002       |
 #     | Expiry date    | 2009-11-01 |
 #     | Note           | Nice guy   |
@@ -421,9 +426,9 @@ Then /^no debiera devolver gastos$/ do
 # TODO: Add support for checkbox, select or option
 # based on naming conventions.
 #
-When /^(?:|I )fill in the following:$/ do |fields|
+Cuando /^(?:|I )fill in the following:$/ do |fields|
   fields.rows_hash.each do |name, value|
-    When %{I fill in "#{name}" with "#{value}"}
+    Cuando %{I fill in "#{name}" with "#{value}"}
   end
 end
 
