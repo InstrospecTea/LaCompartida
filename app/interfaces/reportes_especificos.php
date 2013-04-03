@@ -131,6 +131,9 @@
 				<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reportes_horas.php' style="color:#000;text-decoration: none;"><?php echo __('Gráfico por Período')?></a></li>
 				<li><a href='planillas.php' style="color:#000;text-decoration: none;"><?php echo __('Profesional v/s Cliente')?></a></li>
 				<li><a href='olap.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte gen&eacute;rico')?></a></li>
+				<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_retribuciones_b.php' style="color:#000;text-decoration: none;"><?php echo __('Detalle de Retribuciones por Cobro')?></a></li>
+				<li><a href='<?php echo Conf::RootDir()?>/app/interfaces/reporte_retribuciones_resumen_b.php' style="color:#000;text-decoration: none;"><?php echo __('Resumen de Retribuciones por Profesional')?></a></li>
+
 
       </ul>
 		</td>
