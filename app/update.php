@@ -9783,13 +9783,13 @@ QUERY;
 
 		case 7.36:
 			$queries[] = "CREATE TABLE IF NOT EXISTS `user_token` (
-				  `id` int(11) NOT NULL,
-				  `auth_token` varchar(60) NOT NULL DEFAULT '',
-				  `app_key` varchar(250) NOT NULL,
-				  `created` datetime NOT NULL,
-				  `modified` datetime NOT NULL,
-				  PRIMARY KEY (`id`),
-				  CONSTRAINT `user` FOREIGN KEY (`id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+				`user_id` int(11) NOT NULL,
+				`auth_token` varchar(60) NOT NULL DEFAULT '',
+				`app_key` varchar(250) NOT NULL,
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`user_id`),
+				CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			ejecutar($queries, $dbh);
 			break;
