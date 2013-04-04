@@ -807,9 +807,12 @@ class Asunto extends Objeto {
 			$sql_where_client_code = '`client`.`codigo_cliente_secundario`';
 		}
 
-		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`
+		$sql = "SELECT $sql_select_matter_code AS `code`, `matter`.`glosa_asunto` AS `name`,
+		 	`prm_idioma`.`codigo_idioma` AS `language`,
+			`prm_idioma`.`glosa_idioma` AS `language_name`
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+				LEFT JOIN `prm_idioma` USING (`id_idioma`)
 			WHERE $sql_where_client_code=:code AND `matter`.`activo`=:active
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
@@ -822,7 +825,9 @@ class Asunto extends Objeto {
 			array_push($matters,
 				array(
 					'code' => $matter->code,
-					'name' => !empty($matter->name) ? $matter->name : null
+					'name' => !empty($matter->name) ? $matter->name : null,
+					'language' =>  !empty($matter->language) ? $matter->languag : null,
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
 				)
 			);
 		}
@@ -848,9 +853,11 @@ class Asunto extends Objeto {
 		}
 
 		$sql = "SELECT $sql_select_client_code AS `client_code`, $sql_select_matter_code AS `code`,
-			`matter`.`glosa_asunto` AS `name`
+			`matter`.`glosa_asunto` AS `name`, `prm_idioma`.`codigo_idioma` AS `language`,
+			`prm_idioma`.`glosa_idioma` AS `language_name`
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
+				LEFT JOIN `prm_idioma` USING (`id_idioma`)
 			WHERE `matter`.`activo`=:active
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
@@ -863,7 +870,9 @@ class Asunto extends Objeto {
 				array(
 					'client_code' => $matter->client_code,
 					'code' => $matter->code,
-					'name' => !empty($matter->name) ? $matter->name : null
+					'name' => !empty($matter->name) ? $matter->name : null,
+					'language' =>  !empty($matter->language) ? $matter->languag : null,
+					'language_name' => !empty($matter->language_name) ? $matter->language_name : null
 				)
 			);
 		}

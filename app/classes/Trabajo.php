@@ -739,7 +739,7 @@ class Trabajo extends Objeto
 			FROM `trabajo` AS `work`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
-			WHERE `work`.`id_usuario`=:id AND `work`.`fecha_creacion` BETWEEN :before AND :after
+			WHERE `work`.`id_usuario`=:id AND `work`.`fecha` BETWEEN :after AND :before
 			ORDER BY `work`.`id_trabajo` DESC";
 
 		if (is_null($before) || is_null($after)) {
