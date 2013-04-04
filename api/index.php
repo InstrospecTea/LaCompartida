@@ -17,7 +17,7 @@ $app->post('/login', function () {
 		halt("The user doesn't exist");
 	} else {
 		$user_token_data = array(
-			'id' => $Session->usuario->fields['id_usuario'],
+			'user_id' => $Session->usuario->fields['id_usuario'],
 			'auth_token' => $auth_token,
 			'app_key' => $app_key
 		);
@@ -271,6 +271,71 @@ $app->put('/users/:id/works', function ($id) {
 	outputJson($work);
 });
 
+$app->post('/users/:user_id/works/:id', function ($user_id, $id) {
+	if (is_null($user_id) || empty($user_id)) {
+		halt("Invalid user ID");
+	}
+
+	if (is_null($id) || empty($id)) {
+		halt("Invalid work ID");
+	}
+
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$Work = new Trabajo($Session);
+	$Slim = Slim::getInstance();
+	$work = array();
+
+	$work['id'] = $id;
+	$work['date'] = $Slim->request()->params('date');
+	$work['duration'] = (float) $Slim->request()->params('duration');
+	$work['notes'] = $Slim->request()->params('notes');
+	$work['rate'] = (float) $Slim->request()->params('rate');
+	$work['requester'] = $Slim->request()->params('requester');
+	$work['activity_code'] = $Slim->request()->params('activity_code');
+	$work['area_code'] = $Slim->request()->params('area_code');
+	$work['matter_code'] = $Slim->request()->params('matter_code');
+	$work['task_code'] = $Slim->request()->params('task_code');
+	$work['user_id'] = (int) $user_id;
+	$work['billable'] = (int) $Slim->request()->params('billable');
+	$work['visible'] = (int) $Slim->request()->params('visible');
+
+	if (!is_null($work['date']) || !isValidTimeStamp($work['date'])) {
+		$work['date'] = date('Y-m-d H:i:s', $work['date']);
+	} else {
+		halt("The date format is incorrect");
+	}
+
+	if (!is_null($work['duration'])) {
+		$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));
+	} else {
+		halt("The duration format is incorrect");
+	}
+
+	if (!$User->LoadId($user_id)) {
+		halt("The user doesn't exist");
+	} else {
+		if (!$Work->Load($id)) {
+			halt("The work doesn't exist");
+		} else {
+			$validate = $Work->validateDataOfWork($work);
+			if ($validate['error'] == true) {
+				halt($validate['description']);
+			} else {
+				if (!$Work->save($work)) {
+					halt($validate['description']);
+				} else {
+					$work['id'] = $Work->fields['id_trabajo'];
+				}
+			}
+		}
+	}
+
+	outputJson($work);
+});
+
 $app->run();
 
 function validateAuthTokenSendByHeaders() {
@@ -286,7 +351,7 @@ function validateAuthTokenSendByHeaders() {
 	if (!is_object($user_token_data)) {
 		halt('Invalid AUTH_TOKEN');
 	} else {
-		return $user_token_data->id;
+		return $user_token_data->user_id;
 	}
 }
 

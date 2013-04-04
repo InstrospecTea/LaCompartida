@@ -12,8 +12,9 @@
 
 			$.ajax({
 				//url: 'login',
-				url: 'users/1/works',
 				//url: 'clients/002538/matters',
+				url: 'users/1/works',
+				//url: 'users/1/works/618205',
 				/*data: {
 					'user' : '99511620',
 					'password' : 'admin.asdwsx',
@@ -22,10 +23,10 @@
 				//data: {'before' : '1346209200', 'after' : '1364785200'},
 				data: {
 					'date' : 1364871600,
-					'duration' : 1439,
-					'notes' : 'test',
+					'duration' : 1,
+					'notes' : 'test4',
 					'rate' : 1,
-					'requester' : 'test test test',
+					'requester' : 'test1 test2 test3',
 					'activity_code' : 'A2013',
 					'area_code' : 1,
 					'matter_code' : '0001-01',

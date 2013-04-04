@@ -795,7 +795,6 @@ class Trabajo extends Objeto
 		$created_date = date('Y-m-d H:i:s');
 
 		if (!empty($data['id'])) {
-			$this->Load($data['id']);
 			if ($this->Loaded()) {
 				$created_date = $this->fields['fecha_creacion'];
 
@@ -833,8 +832,8 @@ class Trabajo extends Objeto
 
 		if (!Trabajo::CantHorasDia($duration, $data['date'], $data['user_id'], $this->sesion)) {
 			$total_minutes_per_day = Conf::GetConf($this->sesion, 'CantidadHorasDia') ? Conf::GetConf($this->sesion, 'CantidadHorasDia') : 1439;
-			$total_minutes_per_day = date('H:i:s', mktime(0, $total_minutes_per_day, 0, 0, 0, 0));
-			return array('error' => true, 'description' => "Can not enter up to {$total_minutes_per_day} 24 hours per day");
+			$total_minutes_per_day = date('H:i', mktime(0, $total_minutes_per_day, 0, 0, 0, 0));
+			return array('error' => true, 'description' => "You can not enter more than {$total_minutes_per_day} hours per day");
 		}
 
 		if (empty($data['notes'])) {
@@ -993,7 +992,9 @@ class Trabajo extends Objeto
 			$this->Edit('visible', 0);
 		}
 
-		$this->Edit('id_usuario', $data['user_id']);
+		if (empty($data['id'])) {
+			$this->Edit('id_usuario', $data['user_id']);
+		}
 
 		$this->Edit('tarifa_hh', $data['rate']);
 
