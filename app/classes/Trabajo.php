@@ -735,10 +735,12 @@ class Trabajo extends Objeto
 			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
 			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
 			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
-			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`
+			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
+			`work`.`revisado` AS `revised`
 			FROM `trabajo` AS `work`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
+				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
 			WHERE `work`.`id_usuario`=:id AND `work`.`fecha` BETWEEN :after AND :before
 			ORDER BY `work`.`id_trabajo` DESC";
 
@@ -753,12 +755,21 @@ class Trabajo extends Objeto
 		$Statement->bindParam('after', $after);
 		$Statement->execute();
 
+		$date_now = strtotime('now');
 		while ($work = $Statement->fetch(PDO::FETCH_OBJ)) {
-			$date_read_only = null;
-			$date_now = strtotime('now');
+			$read_only = 0;
 			if (!empty($work->date_read_only)) {
-				$date_read_only = strtotime($work->date_read_only);
-				// agregar lógica de revisado o cobrado
+				if ($date_now >= strtotime($work->date_read_only)) {
+					$read_only = 1;
+				}
+			}
+
+			if (!in_array($work->charge_status, array('CREADO', 'EN REVISION', '', 'SIN COBRO', null))) {
+				$read_only = 1;
+			}
+
+			if ($work->revised == '1') {
+				$read_only = 1;
 			}
 
 			array_push($works,
@@ -769,7 +780,7 @@ class Trabajo extends Objeto
 					'duration' => !empty($work->duration) ? (float) $work->duration : null,
 					'notes' => !empty($work->notes) ? $work->notes : null,
 					'rate' => !empty($work->rate) ? (float) $work->rate : null,
-					'read_only' => (($date_read_only >= $date_now) ? 0 : 1),
+					'read_only' => $read_only,
 					'requester' => !empty($work->requester) ? $work->requester : null,
 					'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
 					'area_code' => !empty($work->area_code) ? $work->area_code : null,
@@ -797,10 +808,10 @@ class Trabajo extends Objeto
 		if (!empty($data['id'])) {
 			if ($this->Loaded()) {
 				$created_date = $this->fields['fecha_creacion'];
-
-				if (($this->Estado() == 'Cobrado' || $this->Estado() == __('Cobrado'))) {
+				$charge_status = $this->Estado();
+				if (($charge_status == 'Cobrado' || $charge_status == __('Cobrado'))) {
 					return array('error' => true, 'description' => "Work is already charged");
-				} else if ($this->Estado() == 'Revisado' || $this->Estado() == __('Revisado')) {
+				} else if ($charge_status == 'Revisado' || $charge_status == __('Revisado')) {
 					return array('error' => true, 'description' => "The work is revised");
 				}
 			} else {

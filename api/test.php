@@ -20,8 +20,8 @@
 					'password' : 'admin.asdwsx',
 					'app_key' : 'https://lemontech.thetimebilling.com'
 				},*/
-				//data: {'before' : '1346209200', 'after' : '1364785200'},
-				data: {
+				data: {'after' : '1364871600', 'before' : '1364871600'},
+				/*data: {
 					'date' : 1364871600,
 					'duration' : 1,
 					'notes' : 'test4',
@@ -34,10 +34,10 @@
 					'user_id' : 1,
 					'billable' : 1,
 					'visible' : 1
-				},
+				},*/
+				type: 'get'
 				//type: 'post'
-				//type: 'get'
-				type: 'put'
+				//type: 'put'
 			}).done(function(data) {
 				//console.log(data);
 				//$('#output').html(data);
