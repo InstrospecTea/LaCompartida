@@ -5488,6 +5488,7 @@ class NotaCobro extends Cobro {
 
 						if ($this->fields['opc_ver_horas_trabajadas']) {
 							$row = str_replace('%hh_trabajada%', $data['glosa_duracion_trabajada'], $row);
+							$row = str_replace('%hrs_trabajadas%', $data['glosa_duracion_trabajada'], $row);
 							if ($descontado) {
 								$row = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $row);
 								$row = str_replace('%hh_descontada%', $data['glosa_duracion_descontada'], $row);
