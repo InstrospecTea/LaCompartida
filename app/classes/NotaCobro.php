@@ -9904,65 +9904,81 @@ class NotaCobro extends Cobro {
 	}
 
 	// Similar a la seccion detalle pago, pero con un orden distinto, se hizo para FayCa
-    function GenerarSeccionDetallePagoContrato($html, $idioma) {
+	function GenerarSeccionDetallePagoContrato($html, $idioma) {
+		global $cobro_moneda, $x_resultados;
+		/**
+		* Etiquetas
+		* %documentos_de_pago% pagos sin contar adelantos
+		* %documentos_de_adelanto% pagos por concepto de adelantos
+		* %pagos_liquidacion% la suma de los dos anteriores
+		* %saldo_del_cobro% el total original menos los pagos que se hayan hecho por cualquier concepto
+		* %blank_line% inserta una fila en blanco para ayudar a diagramar
+		* %saldo_anterior% la suma de los saldos de otros cobros emitidos con saldo pendiente, que pertenezcan al mismo contrato
+		* %saldo_total_adeudado% suma de lo anterior más el saldo del presente cobro
+		* %adelantos_sin_asignar% adelantos del mismo cliente no asignados, restringidos al presente contrato (o sin restricción de contrato cuando estamos en un cobro del contrato por defecto para este cliente)
+		**/
 
-        global $cobro_moneda, $x_resultados;
-
-        $fila = $html;
-        $fila_adelantos = "";
-        $htmltemporal = "";
-        $monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
-        $moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
-        $espacio_moneda = ' ';
-        if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')) {
-            $espacio_moneda = '';
-        }
-        $seccion_detalle_pago_contrato = $this->DetallePagoContrato($this->sesion, $this->fields['id_cobro']);
-
-
-        $montoadelantosinasignar = $seccion_detalle_pago_contrato['montoadelantosinasignar'];
-
-        $saldo = $seccion_detalle_pago_contrato['saldo'];
-        $saldo_adelantos = $seccion_detalle_pago_contrato['saldo_adelantos'];
-        $saldo_pagos = $seccion_detalle_pago_contrato['saldo_pagos'];
-        $fila_adelantos = $seccion_detalle_pago_contrato['fila_adelantos'];
-
-        $monto_total += (float) $saldo;
-        $monto_total_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-
-        $saldo_total_contrato = $seccion_detalle_pago_contrato['saldo_total_contrato'];
-        $saldo_total_cobro = $seccion_detalle_pago_contrato['saldo_total_cobro'];
-        $saldo_total_adeudado = $seccion_detalle_pago_contrato['saldo_total_adeudado'];
+		$fila = $html;
+		$fila_adelantos = "";
+		$htmltemporal = $html;
+		$monto_total = (float) $x_resultados['monto_cobro_original_con_iva'][$this->fields['opc_moneda_total']];
+		$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+		$espacio_moneda = ' ';
+		if (UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')) {
+			$espacio_moneda = '';
+		}
+		$seccion_detalle_pago_contrato = $this->DetallePagoContrato($this->sesion, $this->fields['id_cobro']);
 
 
+		$montoadelantosinasignar = $seccion_detalle_pago_contrato['montoadelantosinasignar'];
 
-        $pagos_liquidacion .=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-        $htmltemporal.='<tr ><td>' . __($this->fields['codigo_idioma'] . '_pagos_liquidacion') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $pagos_liquidacion . '</td></tr>';
+		$saldo = $seccion_detalle_pago_contrato['saldo'];
+		$saldo_adelantos = $seccion_detalle_pago_contrato['saldo_adelantos'];
+		$saldo_pagos = $seccion_detalle_pago_contrato['saldo_pagos'];
+		$fila_adelantos = $seccion_detalle_pago_contrato['fila_adelantos'];
 
-        if (($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') && $saldo_total_cobro == 0) {
-            $saldo_total_cobro = $monto_total;
-        }
-        $saldo_total_cobro = number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-        $htmltemporal.='<tr class="tr_total"><td>' . __('Saldo del cobro') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_cobro . '</td></tr>';
-
-
-
-        $htmltemporal.="			<tr><td> </td><td> </td></tr>					";
-        $saldo_total_contrato = number_format($saldo_total_contrato, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-        $htmltemporal.='<tr  ><td>' . __('Saldo anterior') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_contrato . '</td></tr>';
+		$monto_total += (float) $saldo;
+		$monto_total_simbolo = $moneda['simbolo'] . $espacio_moneda . number_format($monto_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 
 
-        $saldo_total_adeudado = number_format($saldo_total_adeudado, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-        $htmltemporal.='<tr class="tr_total"><td>' . __('Saldo total adeudado') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_adeudado . '</td></tr>';
+		$saldo_total_contrato = $seccion_detalle_pago_contrato['saldo_total_contrato'];
+		$saldo_total_cobro = $seccion_detalle_pago_contrato['saldo_total_cobro'];
+		$saldo_total_adeudado = $seccion_detalle_pago_contrato['saldo_total_adeudado'];
 
-        if ($montoadelantosinasignar > 0) {
-            $montoadelantosinasignar = number_format($montoadelantosinasignar, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-            $htmltemporal.='<tr "><td>' . __($this->fields['codigo_idioma'] . '_adelantos_sin_asignar') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $montoadelantosinasignar . '</td></tr>';
-        }
 
-        return $htmltemporal;
-    }
+
+		$documentos_de_pago 	.=number_format($saldo_pagos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$documentos_de_adelanto .=number_format($saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$pagos_liquidacion 		.=number_format($saldo_pagos + $saldo_adelantos, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		
+
+		if (($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') && $saldo_total_cobro == 0) {
+			$saldo_total_cobro = $monto_total;
+		}
+		$saldo_total_cobro = number_format($saldo_total_cobro, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$saldo_total_contrato = number_format($saldo_total_contrato, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+		$saldo_total_adeudado = number_format($saldo_total_adeudado, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+
+ 
+		$htmltemporal=str_replace('%documentos_de_pago%','<tr class="tr_total"><td>' . __('Pagos Realizados') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $documentos_de_pago . '</td></tr>',$htmltemporal);
+		$htmltemporal=str_replace('%documentos_de_adelanto%','<tr class="tr_total"><td>' . __('Adelantos Utilizados') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $documentos_de_adelanto . '</td></tr>',$htmltemporal);
+		
+		$htmltemporal=str_replace('%pagos_liquidacion%','<tr ><td>' . __($this->fields['codigo_idioma'] . '_pagos_liquidacion') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $pagos_liquidacion . '</td></tr>',$htmltemporal);
+		
+		$htmltemporal=str_replace('%saldo_del_cobro%','<tr class="tr_total"><td>' . __('Saldo del cobro') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_cobro . '</td></tr>',$htmltemporal);
+		$htmltemporal=str_replace('%blank_line%',"<tr><td> </td><td> </td></tr>",$htmltemporal);
+		$htmltemporal=str_replace('%saldo_anterior%','<tr  ><td>' . __('Saldo anterior') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_contrato . '</td></tr>',$htmltemporal);
+		$htmltemporal=str_replace('%saldo_total_adeudado%','<tr class="tr_total"><td>' . __('Saldo total adeudado') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $saldo_total_adeudado . '</td></tr>',$htmltemporal);
+
+		if ($montoadelantosinasignar > 0) {
+			$montoadelantosinasignar = number_format($montoadelantosinasignar, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+			$htmltemporal=str_replace('%adelantos_sin_asignar%','<tr "><td>' . __($this->fields['codigo_idioma'] . '_adelantos_sin_asignar') . '</td><td align="right">' . $moneda['simbolo'] . $espacio_moneda . $montoadelantosinasignar . '</td></tr>',$htmltemporal);
+		} else {
+			$htmltemporal=str_replace('%adelantos_sin_asignar%','',$htmltemporal);
+		}
+
+		return $htmltemporal;
+	}
 	
 	function GenerarSeccionResumenProfesional($parser, $theTag, $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
 
