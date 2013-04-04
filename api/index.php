@@ -167,16 +167,21 @@ $app->get('/users/:id', function ($id) {
 	$user = array();
 
 	//$user_id = validateAuthTokenSendByHeaders();
-
 	if (!$User->LoadId($id)) {
 		halt("The user doesn't exist");
 	} else {
+		$max_daily_minutes = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
 		$user = array(
 			'id' => (int) $User->fields['id_usuario'],
 			'code' => $User->fields['rut'],
-			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre']
+			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre'],
+			'weekly_alert' => !empty($User->fields['alerta_semanal']) ? (int) $User->fields['alerta_semanal'] : null,
+			'daily_alert' =>  !empty($User->fields['alerta_diaria']) ? (int) $User->fields['alerta_diaria'] : null,
+			'min_daily_hours' => !empty($User->fields['restriccion_diario']) ? (float) $User->fields['restriccion_diario'] : null,
+			'max_daily_hours' => (float) ($max_daily_minutes / 60.0),
+			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
+			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 		);
-
 	}
 
 	outputJson($user);
