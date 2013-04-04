@@ -10786,6 +10786,7 @@ class NotaCobro extends Cobro {
 					}
 				} else if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%hrs_trabajadas_real%', __('Hrs. Trabajadas'), $html);
+					$html = str_replace('%hrs_trabajadas%', __('Hrs. Trabajadas'), $html);
 					$html = str_replace('%hrs_descontadas_real%', __('Hrs. Descontadas'), $html);
 					$html = str_replace('%horas_cobrables%', '', $html);
 					$html = str_replace('%hrs_mins_trabajadas_real%', __('Hrs.:Mins. Trabajadas'), $html);
