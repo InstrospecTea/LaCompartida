@@ -10,6 +10,10 @@ class NotaCobro extends Cobro {
 
 	var $asuntos = array();
 	var $x_resultados = array();
+
+	/**
+	 * @var Sesion
+	 */
 	var $sesion = null;
 	var $carta_tabla = 'cobro_rtf';
 	var $carta_id = 'id_formato';
@@ -26,6 +30,7 @@ class NotaCobro extends Cobro {
 		$this->espacio=UtilesApp::GetConf($this->sesion, 'ValorSinEspacio')?'':'&nbsp;';
 
 	}
+
 	function NuevoRegistro() {
 		return array(
 			'descripcion' => 'Nueva nota de cobro',
@@ -322,8 +327,19 @@ class NotaCobro extends Cobro {
 		switch ($theTag) {
 			case 'INFORME': //GenerarDocumento
 				#INSERTANDO CARTA
+			$nuevomodulofactura=UtilesApp::GetConf($this->sesion, 'NuevoModuloFactura');
+ 				if(strpos($html,'%INFORME_GASTOS%')!==false) {
+ 				$this->ArrayFacturasDelContrato=$this->FacturasDelContrato($this->sesion,$nuevomodulofactura,null,'G');
+				$this->ArrayTotalesDelContrato=$this->TotalesDelContrato($this->ArrayFacturasDelContrato,$nuevomodulofactura,$this->fields['id_cobro']);
+				$html = str_replace('%INFORME_GASTOS%', '', $html);
+			} else 	if(strpos($html,'%INFORME_HONORARIOS%')!==false) {
+ 				$this->ArrayFacturasDelContrato=$this->FacturasDelContrato($this->sesion,$nuevomodulofactura,null,'H');
+				$this->ArrayTotalesDelContrato=$this->TotalesDelContrato($this->ArrayFacturasDelContrato,$nuevomodulofactura,$this->fields['id_cobro']);
+				$html = str_replace('%INFORME_HONORARIOS%', '', $html);
+			}
+
 				include_once('CartaCobro.php');
-				$CartaCobro = new CartaCobro($this->sesion, $this->fields);
+				$CartaCobro = new CartaCobro($this->sesion, $this->fields,$this->ArrayFacturasDelContrato,$this->ArrayTotalesDelContrato);
 				$textocarta = $CartaCobro->GenerarDocumentoCarta($parser_carta, 'CARTA', $lang, $moneda_cliente_cambio, $moneda_cli, $idioma, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $cliente, $id_carta);
 				$html = str_replace('%COBRO_CARTA%', $textocarta, $html);
 				if (method_exists('Conf', 'GetConf')) {
@@ -378,7 +394,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%socio%', __('SOCIO'), $html);
 				$html = str_replace('%socio_cobrador%', __('SOCIO COBRADOR'), $html);
 				$html = str_replace('%nombre_socio%', $nombre_encargado, $html);
-				$html = str_replace('%fono%', __('TELéFONO'), $html);
+				$html = str_replace('%fono%', __('TELÉFONO'), $html);
 					$html = str_replace('%fax%', __('TELEFAX'), $html);
 
                 $html = str_replace('%asunto%', __('Asunto'), $html);
