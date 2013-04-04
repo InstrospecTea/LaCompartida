@@ -899,9 +899,31 @@ class NotaCobro extends Cobro {
 						else
 							$html = str_replace('%valor_equivalente%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
-					break;
+						//break;
 				}
+
+				$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
+				if ($this->fields['id_carta'] == 3) {
+					$html = str_replace('%nota_disclaimer%', __('Nota Disclaimer'), $html);
+				} else {
+					$html = str_replace('%nota_disclaimer%', ' ', $html);
+				}
+				if ($this->fields['opc_ver_morosidad']) {
+
+					$html = str_replace('%DETALLES_PAGOS%', $this->GenerarSeccionDetallePago($parser->tags['DETALLES_PAGOS'], $idioma), $html);
+
+					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', $this->GenerarSeccionDetallePagoContrato($parser->tags['DETALLES_PAGOS_CONTRATO'], $idioma), $html);
+				} else {
+					$html = str_replace('%DETALLES_PAGOS%', '', $html);
+					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', '', $html);
+				}
+
+				//Adelantos
+				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
+
+
+				
 
 			case 'RESTAR_RETAINER': //GenerarDocumento
 				if ($columna_hrs_retainer || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
@@ -6696,8 +6718,27 @@ class NotaCobro extends Cobro {
 						else
 							$html = str_replace('%valor_equivalente%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . ' ' . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 					}
-					break;
+						//break;
 				}
+
+				$html = str_replace('%total_subtotal_cobro%', __('Total Cobro'), $html);
+				if ($this->fields['id_carta'] == 3) {
+					$html = str_replace('%nota_disclaimer%', __('Nota Disclaimer'), $html);
+				} else {
+					$html = str_replace('%nota_disclaimer%', ' ', $html);
+				}
+				if ($this->fields['opc_ver_morosidad']) {
+
+					$html = str_replace('%DETALLES_PAGOS%', $this->GenerarSeccionDetallePago($parser->tags['DETALLES_PAGOS'], $idioma), $html);
+
+					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', $this->GenerarSeccionDetallePagoContrato($parser->tags['DETALLES_PAGOS_CONTRATO'], $idioma), $html);
+				} else {
+					$html = str_replace('%DETALLES_PAGOS%', '', $html);
+					$html = str_replace('%DETALLES_PAGOS_CONTRATO%', '', $html);
+				}
+
+				//Adelantos
+				//$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2,  $idioma, $cliente, $moneda, $moneda_base, $trabajo,  $profesionales, $gasto,  $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
 
