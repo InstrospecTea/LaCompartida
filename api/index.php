@@ -216,53 +216,59 @@ $app->get('/users/:id/works', function ($id) {
 });
 
 $app->put('/users/:id/works', function ($id) {
-	$response = array();
-	$_app = Slim::getInstance();
-
-	validateAuthTokenSendByHeaders();
-
-	$creation_date = $_app->request()->params('creation_date');
-	$date = $_app->request()->params('date');
-	$duration = $_app->request()->params('duration');
-	$notes = $_app->request()->params('notes');
-	$rate = $_app->request()->params('rate');
-	$read_only = $_app->request()->params('read_only');
-	$requester = $_app->request()->params('requester');
-	$activity_code = $_app->request()->params('activity_code');
-	$area_code = $_app->request()->params('area_code');
-	$client_code = $_app->request()->params('client_code');
-	$matter_code = $_app->request()->params('matter_code');
-	$task_code = $_app->request()->params('task_code');
-	$user_id = $_app->request()->params('user_id');
-	$billable = $_app->request()->params('billable');
-	$visible = $_app->request()->params('visible');
-
-	try {
-		$db = getConnection();
-		$work = array(
-			'id' => 1,
-			'creation_date' => strtotime(date('Y-m-d H:i:s')),
-			'date' => strtotime(date('Y-m-d H:i:s')),
-			'duration' => date('i'),
-			'notes' => 'notes',
-			'rate' => 1.1,
-			'read_only' => 0,
-			'requester' => 'requester',
-			'activity_code' => 'C9090',
-			'area_code' => 'C9090',
-			'client_code' => 'C9090',
-			'matter_code' => 'C9090',
-			'task_code' => 'C9090',
-			'user_id' => $id,
-			'billable' => 1,
-			'visible' => 1,
-		);
-		$response[] = $work;
-	} catch(Exception $e) {
-		$_app->halt(500, 'PUT /users/:id/works | ' . $e->getMessage());
+	if (is_null($id) || empty($id)) {
+		halt("Invalid user ID");
 	}
 
-	echo json_encode($response);
+	$user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$Work = new Trabajo($Session);
+	$Slim = Slim::getInstance();
+	$work = array();
+
+	$work['date'] = $Slim->request()->params('date');
+	$work['duration'] = (float) $Slim->request()->params('duration');
+	$work['notes'] = $Slim->request()->params('notes');
+	$work['rate'] = (float) $Slim->request()->params('rate');
+	$work['requester'] = $Slim->request()->params('requester');
+	$work['activity_code'] = $Slim->request()->params('activity_code');
+	$work['area_code'] = $Slim->request()->params('area_code');
+	$work['matter_code'] = $Slim->request()->params('matter_code');
+	$work['task_code'] = $Slim->request()->params('task_code');
+	$work['user_id'] = (int) $Slim->request()->params('user_id');
+	$work['billable'] = (int) $Slim->request()->params('billable');
+	$work['visible'] = (int) $Slim->request()->params('visible');
+
+	if (!is_null($work['date']) || !isValidTimeStamp($work['date'])) {
+		$work['date'] = date('Y-m-d H:i:s', $work['date']);
+	} else {
+		halt("The date format is incorrect");
+	}
+
+	if (!is_null($work['duration'])) {
+		$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));
+	} else {
+		halt("The duration format is incorrect");
+	}
+
+	if (!$User->LoadId($id)) {
+		halt("The user doesn't exist");
+	} else {
+		$validate = $Work->validateDataOfWork($work);
+		if ($validate['error'] == true) {
+			halt($validate['description']);
+		} else {
+			if (!$Work->save($work)) {
+				halt($validate['description']);
+			} else {
+				$work['id'] = $Work->fields['id_trabajo'];
+			}
+		}
+	}
+
+	outputJson($work);
 });
 
 $app->run();
@@ -284,10 +290,11 @@ function validateAuthTokenSendByHeaders() {
 	}
 }
 
-function halt($message = null, $code = 500) {
+function halt($error_message = null, $error_code = null, $halt_code = 400) {
+	$errors = array();
 	$Slim = Slim::getInstance();
-	$Request = $Slim->request();
-	$Slim->halt($code, $Slim->request()->getMethod() . ' | ' . $Request->getPath() . ' | ' . $message);
+	array_push($errors, array('message' => $error_message, 'code' => $error_code));
+	$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
 }
 
 function outputJson($response) {

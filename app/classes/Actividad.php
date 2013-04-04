@@ -82,6 +82,28 @@ class Actividad extends Objeto
 
 		return $activities;
 	}
+
+	/**
+	 * Load activity by code
+	 * Returns a bool, true if exist record or false if doesn't exist
+	 */
+	function loadByCode($activity_code) {
+		$sql = "SELECT `activity`.`id_actividad` AS `id`
+			FROM `actividad` AS `activity`
+			WHERE `activity`.`codigo_actividad`=:activity_code";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('activity_code', $activity_code);
+		$Statement->execute();
+
+		$activity = $Statement->fetch(PDO::FETCH_OBJ);
+
+		if (is_object($activity)) {
+			return $this->Load($activity->id);
+		}
+
+		return false;
+	}
 }
 
 class ListaActividades extends Lista
