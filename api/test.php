@@ -11,16 +11,16 @@
 			});
 
 			$.ajax({
-				//url: 'login',
+				url: 'login',
 				//url: 'clients/002538/matters',
-				url: 'users/1/works',
+				//url: 'users/1/works',
 				//url: 'users/1/works/618205',
-				/*data: {
+				data: {
 					'user' : '99511620',
 					'password' : 'admin.asdwsx',
 					'app_key' : 'https://lemontech.thetimebilling.com'
-				},*/
-				data: {'after' : '1364871600', 'before' : '1364871600'},
+				},
+				//data: {'after' : '1364871600', 'before' : '1364871600'},
 				/*data: {
 					'date' : 1364871600,
 					'duration' : 1,
@@ -35,8 +35,8 @@
 					'billable' : 1,
 					'visible' : 1
 				},*/
-				type: 'get'
-				//type: 'post'
+				//type: 'get'
+				type: 'post'
 				//type: 'put'
 			}).done(function(data) {
 				//console.log(data);

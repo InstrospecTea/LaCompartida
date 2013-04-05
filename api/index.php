@@ -13,6 +13,18 @@ $app->post('/login', function () {
 	$app_key = $Slim->request()->params('app_key');
 	$auth_token = $UserToken->makeAuthToken($user);
 
+	if (is_null($user) || $user == '') {
+		halt("Invalid user data");
+	}
+
+	if (is_null($password) || $password == '') {
+		halt("Invalid password data");
+	}
+
+	if (is_null($app_key) || $app_key == '') {
+		halt("Invalid application key data");
+	}
+
 	if (!$Session->login($user, null, $password)) {
 		halt("The user doesn't exist");
 	} else {
