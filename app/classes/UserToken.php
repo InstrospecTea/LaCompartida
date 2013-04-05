@@ -75,7 +75,7 @@ class UserToken extends Objeto {
 					`user_token`.`app_key`=:app_key, `user_token`.`created`=:created";
 
 			$Statement = $this->sesion->pdodbh->prepare($sql);
-			$Statement->bindParam('user_id', $user_token_data->user_id);
+			$Statement->bindParam('user_id', $data['user_id']);
 			$Statement->bindParam('auth_token', $data['auth_token']);
 			$Statement->bindParam('app_key', $data['app_key']);
 			$Statement->bindParam('created', date('Y-m-d H:i:s'));
