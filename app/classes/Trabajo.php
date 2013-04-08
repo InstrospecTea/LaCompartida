@@ -909,6 +909,11 @@ class Trabajo extends Objeto
 		$type_income_hour = Conf::GetConf($this->sesion, 'TipoIngresoHoras');
 		$update_rate_work = true;
 
+		// convert to latin1 encoding
+		foreach ($data as $key => $value) {
+			$data[$key] = utf8_decode($value);
+		}
+
 		$Matter = new Asunto($this->sesion);
 		$matter_code = $data['matter_code'];
 
