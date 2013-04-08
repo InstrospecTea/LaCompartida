@@ -2848,6 +2848,7 @@ class NotaCobro extends Cobro {
 				$minutos_descontado_real = sprintf("%02d", $totales['tiempo_descontado_real'] % 60);
 				$html = str_replace('%glosa%', __('Total'), $html);
 				$html = str_replace('%glosa_honorarios%', __('Total Honorarios'), $html);
+				
 				if ($descontado || $retainer || $flatfee) {
 					if ($this->fields['opc_ver_horas_trabajadas']) {
 						$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
@@ -2861,7 +2862,6 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%hrs_trabajadas%', $horas_trabajadas . ':' . $minutos_trabajadas, $html);
 					$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
 					$html = str_replace('%hrs_descontadas_real%', $horas_descontado_real . ':' . $minutos_descontado_real, $html);
-					$html = str_replace('%hrs_descontadas%', $horas_descontado . ':' . $minutos_descontado, $html);
 				} else {
 					$html = str_replace('%hrs_trabajadas%', '', $html);
 					$html = str_replace('%hrs_trabajadas_real%', '', $html);
