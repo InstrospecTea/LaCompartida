@@ -9199,7 +9199,6 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%hrs_trabajadas%', $horas_trabajadas . ':' . $minutos_trabajadas, $html);
 					$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
 					$html = str_replace('%hrs_descontadas_real%', $horas_descontado_real . ':' . $minutos_descontado_real, $html);
-					$html = str_replace('%hrs_descontadas%', $horas_descontado . ':' . $minutos_descontado, $html);
 				} else {
 					$html = str_replace('%hrs_trabajadas%', '', $html);
 					$html = str_replace('%hrs_trabajadas_real%', '', $html);
