@@ -67,8 +67,8 @@ require_once dirname(__FILE__).'/../app/conf.php';
 				case '192.168.1.24':
 					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'asdwsx');
 				break;
-				case '192.168.1.24':
-				case '192.168.1.24':
+				case '192.168.2.101':
+				case '192.168.2.102':
 					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'admin.asdwsx');
 				break;
 
@@ -145,6 +145,10 @@ foreach($arraybases as $base) {
 			if($_POST['detalle']) {
 				echo '<pre>Excepción en '.$base.':<br>';
 				echo $e->getMessage().'<br>';
+				if(strpos($e->getMessage,'SQLSTATE[42S02]: Base table or view not found')===0) {
+					echo 'La tabla no existe';
+				}
+					echo '<hr>Traza:<br>';
 				print_r($e->getTrace());
 				echo '</pre>';
 			}
