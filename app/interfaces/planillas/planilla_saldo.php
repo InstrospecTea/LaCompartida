@@ -102,6 +102,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_liquidaciones = " AND (d.saldo_honorarios + d.saldo_gastos) > 0 ";
 	}
 
+	if ($mostrar_detalle) {
+		$where_liquidaciones .= " AND d.codigo_cliente = '$codigo_cliente' ";
+		$where_adelantos .= " AND d.codigo_cliente = '$codigo_cliente' ";
+		$where_gastos .= " AND cc.codigo_cliente = '$codigo_cliente' ";
+	}
+
 	if ($mostrar_sin_saldo) {
 		$where_liquidaciones .= " OR (
 			d.tipo_doc = 'N' AND
@@ -117,12 +123,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			$where_adelantos
 		)";
 //		$where_gastos .= "";
-	}
-
-	if ($mostrar_detalle) {
-		$where_liquidaciones .= " AND d.codigo_cliente = '$codigo_cliente' ";
-		$where_adelantos .= " AND d.codigo_cliente = '$codigo_cliente' ";
-		$where_gastos .= " AND cc.codigo_cliente = '$codigo_cliente' ";
 	}
 
 	$query_liquidaciones = "SELECT
@@ -321,8 +321,23 @@ $Pagina = new Pagina($Sesion);
 $Pagina->titulo = __('Reporte Saldo');
 $Pagina->PrintTop($popup);
 ?>
+<style>
+	.subreport {
+		border-left: 1px solid grey;
+		border-right: 1px solid grey;
+	}
+		.subreport h1 {
+			font-size: 12px;
+			margin-left: 5%;
+		}
+		.subreport td.encabezado {
+			background-color: lightgrey;
+			color: grey;
+			font-weight: bold;
+		}
+</style>
 <table width="90%">
-    <tr>
+		<tr>
 		<td>
 			<form method="POST" name="form_reporte_saldo" action="#" id="form_reporte_saldo">
 				<input  id="xdesde"  name="xdesde" type="hidden" value="">
@@ -364,16 +379,16 @@ $Pagina->PrintTop($popup);
 								?>
 							</td>
 						</tr>
-                        <tr>
-                            <td align=right><?php echo __('Fecha Desde') ?></td>
-                            <td nowrap align=left>
-                                <input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-                            </td>
-                            <td nowrap align=left colspan=2>
+												<tr>
+														<td align=right><?php echo __('Fecha Desde') ?></td>
+														<td nowrap align=left>
+																<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+														</td>
+														<td nowrap align=left colspan=2>
 								&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
-                                <input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-                            </td>
-                        </tr>
+																<input  class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+														</td>
+												</tr>
 						<tr>
 							<td>&nbsp;</td>
 							<td colspan="3" align="left">
@@ -397,22 +412,32 @@ $Pagina->PrintTop($popup);
 				</fieldset>
 			</form>
 		</td>
-    </tr>
+		</tr>
 </table>
 <link rel="stylesheet" type="text/css" media="print" href="https://static.thetimebilling.com/css/imprimir.css" />
 <script type="text/javascript">
-    jQuery(document).ready(function () {
-		jQuery('#boton_xls').click(function(){
-			jQuery('#opcion').val('xls');
-		});
-		jQuery('#boton_buscar').click(function(){
-			jQuery('#opcion').val('buscar');
-		});
+		jQuery(document).ready(function () {
+			jQuery('#boton_xls').click(function(){
+				jQuery('#opcion').val('xls');
+			});
+			jQuery('#boton_buscar').click(function(){
+				jQuery('#opcion').val('buscar');
+			});
 
-		jQuery('.saldo:contains(-)').css('color', '#f00');
-		jQuery('.saldo:not(:contains(-))').css('color', '#00f');
-		jQuery('.subtotal td').css('font-weight', 'bold');
-    });
+			jQuery('.saldo:contains(-)').css('color', '#f00');
+			jQuery('.saldo:not(:contains(-))').css('color', '#00f');
+			jQuery('.subtotal td').css('font-weight', 'bold');
+
+			/*jQuery('table.buscador > tbody > tr > td:first-child').each(function(idx, el) {
+				var td = jQuery(el);
+				var contenido = td.html();
+				td.html('');
+				td.append(jQuery('<a/>', {
+					text: contenido,
+					href: 'planilla_saldo.php?codigo_cliente='
+				})).append(' ');
+			});*/
+		});
 </script>
 <?php
 if ($_REQUEST['opcion'] == 'buscar') {
