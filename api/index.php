@@ -3,6 +3,9 @@ require_once dirname(__FILE__) . '/../app/conf.php';
 
 $app = new Slim();
 
+define(MIN_TIMESTAMP, 315532800);
+define(MAX_TIMESTAMP, 4182191999);
+
 $app->post('/login', function () {
 	$Session = new Sesion();
 	$UserToken = new UserToken($Session);
@@ -246,6 +249,7 @@ $app->put('/users/:id/works', function ($id) {
 	$work = array();
 
 	$work['date'] = $Slim->request()->params('date');
+	$work['created_date'] = $Slim->request()->params('created_date');
 	$work['duration'] = (float) $Slim->request()->params('duration');
 	$work['notes'] = $Slim->request()->params('notes');
 	$work['rate'] = (float) $Slim->request()->params('rate');
@@ -258,10 +262,16 @@ $app->put('/users/:id/works', function ($id) {
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
 
-	if (!is_null($work['date']) || !isValidTimeStamp($work['date'])) {
+	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
 	} else {
 		halt("The date format is incorrect");
+	}
+
+	if (!is_null($work['created_date']) && isValidTimeStamp($work['created_date'])) {
+		$work['created_date'] = date('Y-m-d H:i:s', $work['created_date']);
+	} else {
+		halt("The created date format is incorrect");
 	}
 
 	if (!is_null($work['duration'])) {
@@ -319,7 +329,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	$work['billable'] = (int) $Slim->request()->params('billable');
 	$work['visible'] = (int) $Slim->request()->params('visible');
 
-	if (!is_null($work['date']) || !isValidTimeStamp($work['date'])) {
+	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
 	} else {
 		halt("The date format is incorrect");
@@ -391,7 +401,6 @@ function outputJson($response) {
 }
 
 function isValidTimeStamp($timestamp) {
-	return ((string) (int) $timestamp === $timestamp)
-	&& ($timestamp <= PHP_INT_MAX)
-	&& ($timestamp >= ~PHP_INT_MAX);
+	return ($timestamp >= MIN_TIMESTAMP)
+	&& ($timestamp <= MAX_TIMESTAMP);
 }

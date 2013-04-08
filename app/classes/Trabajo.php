@@ -788,8 +788,8 @@ class Trabajo extends Objeto
 					'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
 					'task_code' => !empty($work->task_code) ? $work->task_code : null,
 					'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
-					'billable' => !empty($work->billable) ? (int) $work->billable : null,
-					'visible' => !empty($work->visible) ? (int) $work->visible : null
+					'billable' => !empty($work->billable) ? (int) $work->billable : 0,
+					'visible' => !empty($work->visible) ? (int) $work->visible : 0
 				)
 			);
 		}
@@ -803,7 +803,6 @@ class Trabajo extends Objeto
 	 *  error (bool) and description (string) of error
 	 */
 	function validateDataOfWork($data) {
-		$created_date = date('Y-m-d H:i:s');
 
 		if (!empty($data['id'])) {
 			if ($this->Loaded()) {
@@ -817,6 +816,8 @@ class Trabajo extends Objeto
 			} else {
 				return array('error' => true, 'description' => "The work doesn't exist");
 			}
+		} else {
+			$created_date = $data['created_date'];
 		}
 
 		if (empty($data['duration']) || $data['duration'] == '00:00:00') {
@@ -932,8 +933,8 @@ class Trabajo extends Objeto
 
 			// revisar para codigo secundario
 			if ($matter_code != $this->fields['codigo_asunto']) {
-				$PreviousContract = new Contrato($sesion);
-				$ModifiedContract = new Contrato($sesion);
+				$PreviousContract = new Contrato($this->sesion);
+				$ModifiedContract = new Contrato($this->sesion);
 
 				$PreviousContract->LoadByCodigoAsunto($this->fields['codigo_asunto']);
 				$ModifiedContract->LoadByCodigoAsunto($matter_code);
