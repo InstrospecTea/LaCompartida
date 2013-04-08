@@ -11,9 +11,6 @@
 			});
 
 			$.ajax({
-				//url: 'login',
-				//url: 'clients/002538/matters',
-				//url: 'users/1/works',
 				url: 'users/1/works/6610',
 				/*data: {
 					'user' : '99511620',
