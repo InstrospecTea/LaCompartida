@@ -145,9 +145,7 @@ foreach($arraybases as $base) {
 			if($_POST['detalle']) {
 				echo '<pre>Excepción en '.$base.':<br>';
 				echo $e->getMessage().'<br>';
-				if(strpos($e->getMessage,'SQLSTATE[42S02]: Base table or view not found')===0) {
-					echo 'La tabla no existe';
-				}
+				
 					echo '<hr>Traza:<br>';
 				print_r($e->getTrace());
 				echo '</pre>';
