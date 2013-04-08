@@ -92,10 +92,12 @@ foreach($arraybases as $base) {
 		echo '<br><b>'.$query.'</b><br>';
 			echo '</pre>';
 		}
-			if(stripos($query,'select')===false) {
-				$filas=$sesion->pdodbh2->exec($query);
+			if(stripos($query,'select')===false && stripos($query,'show')===false) {
+				$stmt =$sesion->pdodbh2->prepare($query);
+
+				$filas=$stmt->execute();
 				echo '<br>Filas afectadas: '. $filas.'</br>';
-				 
+				$stmt->closeCursor();
 			} else {
 
 				$filas=$sesion->pdodbh2->query($query);
