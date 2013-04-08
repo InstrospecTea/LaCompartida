@@ -290,7 +290,7 @@ $app->put('/users/:id/works', function ($id) {
 			if (!$Work->save($work)) {
 				halt($validate['description']);
 			} else {
-				$work['id'] = $Work->fields['id_trabajo'];
+				$work = $Work->findById($Work->fields['id_trabajo']);
 			}
 		}
 	}
@@ -354,7 +354,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 				if (!$Work->save($work)) {
 					halt($validate['description']);
 				} else {
-					$work['id'] = $Work->fields['id_trabajo'];
+					$work = $Work->findById($Work->fields['id_trabajo']);
 				}
 			}
 		}

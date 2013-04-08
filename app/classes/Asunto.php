@@ -858,7 +858,7 @@ class Asunto extends Objeto {
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE `matter`.`activo`=:active
+			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto` <> ''
 			ORDER BY `matter`.`glosa_asunto` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
