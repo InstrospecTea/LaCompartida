@@ -162,14 +162,21 @@ $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('
 			 
 			
 			if(existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
-				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo, u.activo_juicio
-			               FROM usuario u left JOIN prm_categoria_usuario p 
-                            ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
+			   	$queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
+u.activo ,  u.activo_juicio,
+date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00') fechamesanterior, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
+FROM usuario u 
+left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
+left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
+ group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria                         ";   
 			} else {
 		
-				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo
-			               FROM usuario u left JOIN prm_categoria_usuario p 
-                            ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
+				$queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
+u.activo , date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00') fechamesanterior, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
+FROM usuario u 
+left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
+left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
+ group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria                         ";   
 			}
 			$respuser=mysql_query($queryuser, $sesion->dbh) or die(mysql_error());
 			
