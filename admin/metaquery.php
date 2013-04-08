@@ -17,9 +17,9 @@ require_once dirname(__FILE__).'/../app/conf.php';
 	   echo '<form class="form-horizontal" method="POST">';
 	   echo '<div class="controls controls-row"><label class="span3 al">Host de Base de Datos</label>
 				'
-					.Html::SelectArray(array(
-						'192.168.1.101',
-						'192.168.1.102',
+					.Html::SelectArray(array('192.168.1.24',
+						'192.168.2.101',
+						'192.168.2.102',
 						'rdsdb1.thetimebilling.com',
 						'rdsdb2.thetimebilling.com',
 						'rdsdb3.thetimebilling.com',
@@ -61,16 +61,29 @@ require_once dirname(__FILE__).'/../app/conf.php';
 	   
 	   if(isset($_POST['ejecutar']) && $_POST['ejecutar']=='ejecutar') {
  try {
-	$cadenadb = 'mysql:dbname=phpmyadmin;host='  .$_POST['dbhost'];
-			$sesion->pdodbh2 = new PDO(
-					$cadenadb,
-					 'admin',
-					 'admin1awdx');
+ 	$dbhost=$_POST['dbhost'];
+	$cadenadb = 'mysql:dbname=phpmyadmin;host='  .$dbhost;
+			switch ($dbhost) {
+				case '192.168.1.24':
+					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'asdwsx');
+				break;
+				case '192.168.1.24':
+				case '192.168.1.24':
+					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'admin.asdwsx');
+				break;
+
+				default:
+					$sesion->pdodbh2 = new PDO($cadenadb, 'admin',	 'admin1awdx');
+				break;
+			}
+			
+		 
+			
 			$sesion->pdodbh2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 
 			echo "Error Connection: " . $e->getMessage();
-			file_put_contents("/var/www/error_logs/".DBHOST."_Connection-log.txt", DATE . PHP_EOL . $e->getMessage() . PHP_EOL . PHP_EOL, FILE_APPEND);
+			//file_put_contents("/var/www/error_logs/".DBHOST."_Connection-log.txt", DATE . PHP_EOL . $e->getMessage() . PHP_EOL . PHP_EOL, FILE_APPEND);
 		}
 		
 $bases=$sesion->pdodbh2->query("SHOW DATABASES like '{$_POST['schema']}'  ")	  ;
