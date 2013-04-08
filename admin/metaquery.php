@@ -15,35 +15,37 @@ require_once dirname(__FILE__).'/../app/conf.php';
 	   
 	   echo '<div class="container-fluid">';
 	   echo '<form class="form-horizontal" method="POST">';
-	   echo '<div class="controls controls-row"><label class="span3">Host de Base de Datos</label>
+	   echo '<div class="controls controls-row"><label class="span3 al">Host de Base de Datos</label>
 				'
 					.Html::SelectArray(array(
 						'192.168.1.101',
 						'192.168.1.102',
 						'rdsdb1.thetimebilling.com',
 						'rdsdb2.thetimebilling.com',
-						'rdsdb3.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
+						'rdsdb3.thetimebilling.com',
+						'rdsdb4.thetimebilling.com',
+						'rdsdb5.thetimebilling.com'), 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px').'
 				
 			</div><br/>';
 	  
-	   echo '<div class="controls controls-row"><label class="span3">Schemas a utilizar</label>
+	   echo '<div class="controls controls-row"><label class="span3 al">Schemas a utilizar</label>
 			 
 					<input type="text" class="span5" name="schema" id="schema" value="'.$_POST['schema'].'" placeholder="acepta match parcial: ej %_tt% cubre tt2 y tt3"/>
 						
 					</div><br/>';
 	   
-	   echo '<div class="controls controls-row"><label class="span3">Query a ejecutar</label>
+	   echo '<div class="controls controls-row"><label class="span3 al">Query a ejecutar</label>
 				 
 					<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior">'.$_POST['query'].'</textarea>
 			
 			</div><br/>';
 
-		 echo '<div class="controls controls-row"><label class="span3">Mostrar la query que estoy ejecutando</label>
+		 echo '<div class="controls controls-row"><label class="span5  al">Mostrar la query que estoy ejecutando</label>
 			 
 					<input type="checkbox" checked="checked"   name="detalle" id="detalle" value="1" />
 						
 					</div><br/>';	
-		echo '<div class="controls controls-row"><label class="span3">Mostrar errores o excepciones que arroje mysql</label>
+		echo '<div class="controls controls-row"><label class="span5  al">Mostrar errores o excepciones que arroje mysql</label>
 			 
 					<input type="checkbox"  checked="checked"   name="errores" id="errores" value="1" />
 						
