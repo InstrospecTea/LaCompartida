@@ -926,6 +926,23 @@ class Trabajo extends Objeto
 			$seconds_matter_code = $Matter->fields['codigo_asunto_secundario'];
 		}
 
+		if (!empty($data['billable'])) {
+			$billable = 1;
+			$visible = 1;
+		} else {
+			$billable = 0;
+			$visible = $data['visible'];
+		}
+
+		// Si el asunto no es cobrable
+		if ($Matter->Loaded() && $Matter->fields['cobrable'] == 0) {
+			$billable = 0;
+			$visible = 0;
+		}
+
+		$this->Edit('cobrable', $billable);
+		$this->Edit('visible', $visible);
+
 		$duration = $type_income_hour == 'decimal' ? UtilesApp::Decimal2Time($data['duration']) : $data['duration'];
 
 		if ($this->Loaded()) {
@@ -971,6 +988,21 @@ class Trabajo extends Objeto
 
 		$this->Edit('codigo_asunto', $matter_code);
 
+		// Agregar valores de tarifa
+		if ($this->Loaded() && $Matter->Loaded()) {
+			$Contract = new Contrato($this->sesion);
+			$Contract->Load($Matter->fields['id_contrato']);
+			if ($Contract->Loaded()) {
+				if (!$this->fields['tarifa_hh']) {
+					$this->Edit('tarifa_hh', Funciones::Tarifa($this->sesion, $id_usuario, $Contract->fields['id_moneda'], $matter_code));
+				}
+
+				if (!$this->fields['costo_hh']) {
+					$this->Edit('costo_hh', Funciones::TarifaDefecto($this->sesion, $data['user_id'], $Contract->fields['id_moneda']));
+				}
+			}
+		}
+
 		$ordenado_por = Conf::GetConf($this->sesion, 'OrdenadoPor');
 		if (in_array($ordenado_por, array(1, 2))) {
 			$this->Edit('solicitante', addslashes($data['requester']));
@@ -992,40 +1024,13 @@ class Trabajo extends Objeto
 
 		$cambio_fecha = strtotime($this->fields['fecha']) != strtotime($data['date']);
 		$this->Edit('fecha', $data['date']);
-
 		$this->Edit('codigo_tarea', !empty($data['task_code']) ? $data['task_code'] : 'NULL');
-
-		if ($data['billable'] == 0) {
-			$this->Edit('cobrable', 0);
-			$this->Edit('visible', $data['visible']);
-		} else {
-			$this->Edit('cobrable', 1);
-			$this->Edit('visible', 1);
-		}
-
-		// Si el asunto no es cobrable
-		if ($asunto->fields['cobrable'] == 0) {
-			$this->Edit('cobrable', 0);
-			$this->Edit('visible', 0);
-		}
 
 		if (empty($data['id'])) {
 			$this->Edit('id_usuario', $data['user_id']);
 		}
 
 		$this->Edit('tarifa_hh', $data['rate']);
-
-		// Agregar valores de tarifa
-		$asunto = new Asunto($this->sesion);
-		$asunto->LoadByCodigo($this->fields['codigo_asunto']);
-		$contrato = new Contrato($this->sesion);
-		$contrato->Load($asunto->fields['id_contrato']);
-
-		if (!$t->fields['costo_hh']) {
-			$this->Edit('costo_hh', Funciones::TarifaDefecto($this->sesion, $data['user_id'], $contrato->fields['id_moneda']));
-		}
-
-		$this->Edit('codigo_asunto', $data['matter_code']);
 
 		if ($this->Write(true)) {
 			if (!empty($data['user_id'])) {
@@ -1042,6 +1047,75 @@ class Trabajo extends Objeto
 		}
 
 		return false;
+	}
+
+	/**
+	 * Find work by work id
+	 * Returns an array with next elements:
+	 *  id, creation_date, date, duration, notes
+	 *  rate, read_only, requester, activity_code, area_code
+	 *  client_code, matter_code, task_code, user_id
+	 *  billable, visible
+	 */
+	function findById($id) {
+		$_work = array();
+
+		$sql = "SELECT `work`.`id_trabajo` AS `id`, `work`.`fecha_creacion` AS `creation_date`,
+			`work`.`fecha` AS `date`, TIME_TO_SEC(`work`.`duracion`)/60.0 AS `duration`, `work`.`descripcion` AS `notes`,
+			`work`.`tarifa_hh` AS `rate`, `work`.`solicitante` AS `requester`,
+			`work`.`codigo_actividad` AS `activity_code`, `work`.`id_area_trabajo` AS `area_code`,
+			`matter`.`codigo_cliente` AS `client_code`, `work`.`codigo_asunto` AS `matter_code`,
+			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
+			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
+			`work`.`revisado` AS `revised`
+			FROM `trabajo` AS `work`
+				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
+				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
+				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
+			WHERE `work`.`id_trabajo`=:id
+			ORDER BY `work`.`id_trabajo` DESC";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('id', $id);
+		$Statement->execute();
+
+		$date_now = strtotime('now');
+		$work = $Statement->fetch(PDO::FETCH_OBJ);
+		$read_only = 0;
+		if (!empty($work->date_read_only)) {
+			if ($date_now >= strtotime($work->date_read_only)) {
+				$read_only = 1;
+			}
+		}
+
+		if (!in_array($work->charge_status, array('CREADO', 'EN REVISION', '', 'SIN COBRO', null))) {
+			$read_only = 1;
+		}
+
+		if ($work->revised == '1') {
+			$read_only = 1;
+		}
+
+		$_work = array(
+			'id' => (int) $work->id,
+			'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
+			'date' => !empty($work->date) ? strtotime($work->date) : null,
+			'duration' => !empty($work->duration) ? (float) $work->duration : null,
+			'notes' => !empty($work->notes) ? $work->notes : null,
+			'rate' => !empty($work->rate) ? (float) $work->rate : null,
+			'read_only' => $read_only,
+			'requester' => !empty($work->requester) ? $work->requester : null,
+			'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
+			'area_code' => !empty($work->area_code) ? $work->area_code : null,
+			'client_code' => !empty($work->client_code) ? $work->client_code : null,
+			'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
+			'task_code' => !empty($work->task_code) ? $work->task_code : null,
+			'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
+			'billable' => !empty($work->billable) ? (int) $work->billable : 0,
+			'visible' => !empty($work->visible) ? (int) $work->visible : 0
+		);
+
+		return $_work;
 	}
 }
 
