@@ -1,7 +1,14 @@
 <?php
 require_once dirname(__FILE__) . '/../app/conf.php';
 
-$Session = new Sesion();
+define(MIN_TIMESTAMP, 315532800);
+define(MAX_TIMESTAMP, 4182191999);
+function isValidTimeStamp($timestamp) {
+  return ($timestamp >= MIN_TIMESTAMP)
+  && ($timestamp <= MAX_TIMESTAMP);
+}
+
+$Session = new Sesion(null, true);
 $UserToken = new UserToken($Session);
 
 $auth_token = $_REQUEST['AUTH_TOKEN'];
@@ -14,6 +21,16 @@ if (!is_object($user_token_data)) {
   exit('Invalid AUTH_TOKEN');
 }
 
+if (!isset($_REQUEST['day'])) {
+  exit('Invalid day');
+}
+
+if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
+  $semana = date('Y-m-d', $_REQUEST['day']);
+} else {
+  exit("The date format is incorrect");
+}
+
 ?>
 <html>
   <head>
@@ -24,7 +41,7 @@ if (!is_object($user_token_data)) {
         margin: 0;
         padding: 0;
         font-family: Arial;
-        font-size: 14pt !important;
+        font-size: 10pt !important;
         text-align: center;
       }
 
@@ -171,8 +188,7 @@ if (!is_object($user_token_data)) {
   <body>
 <?php
 // El nombre es para que el include funcione
-$id_usuario = $user_token_data->id;
-$semana = $day;
+$id_usuario = $user_token_data->user_id;
 
 include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
 ?>
@@ -186,7 +202,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
         target  = false,
         tooltip = false,
         title   = false;
- 
+
     targets.bind( 'mouseenter', function()
     {
         target  = $( this );
@@ -194,25 +210,25 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
         tip = tip.replace("ddrivetip('", "");
         tip = tip.replace("')", "");
         tooltip = $( '<div id="tooltip"></div>' );
- 
+
         if( !tip || tip == '' )
             return false;
- 
+
         target.removeAttr( 'title' );
         tooltip.css( 'opacity', 0 )
                .html( tip )
                .appendTo( 'body' );
- 
+
         var init_tooltip = function()
         {
             if( $( window ).width() < tooltip.outerWidth() * 1.5 )
                 tooltip.css( 'max-width', $( window ).width() / 2 );
             else
                 tooltip.css( 'max-width', 340 );
- 
+
             var pos_left = target.offset().left + ( target.outerWidth() / 2 ) - ( tooltip.outerWidth() / 2 ),
                 pos_top  = target.offset().top - tooltip.outerHeight() - 20;
- 
+
             if( pos_left < 0 )
             {
                 pos_left = target.offset().left + target.outerWidth() / 2 - 20;
@@ -220,7 +236,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
             }
             else
                 tooltip.removeClass( 'left' );
- 
+
             if( pos_left + tooltip.outerWidth() > $( window ).width() )
             {
                 pos_left = target.offset().left - tooltip.outerWidth() + target.outerWidth() / 2 + 20;
@@ -228,7 +244,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
             }
             else
                 tooltip.removeClass( 'right' );
- 
+
             if( pos_top < 0 )
             {
                 var pos_top  = target.offset().top + target.outerHeight();
@@ -236,24 +252,24 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
             }
             else
                 tooltip.removeClass( 'top' );
- 
+
             tooltip.css( { left: pos_left, top: pos_top } )
                    .animate( { top: '+=10', opacity: 1 }, 50 );
         };
- 
+
         init_tooltip();
         $( window ).resize( init_tooltip );
- 
+
         var remove_tooltip = function()
         {
             tooltip.animate( { top: '-=10', opacity: 0 }, 50, function()
             {
                 $( this ).remove();
             });
- 
+
             target.attr( 'title', tip );
         };
- 
+
         target.bind( 'mouseleave', remove_tooltip );
         tooltip.bind( 'click', remove_tooltip );
     });
