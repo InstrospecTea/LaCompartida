@@ -37,6 +37,17 @@ require_once dirname(__FILE__).'/../app/conf.php';
 					<textarea name="query" id="query"  class="span5" rows="4" placeholder="escriba su query (se ejecuta sobre todos los schema que cumplen con el campo anterior">'.$_POST['query'].'</textarea>
 			
 			</div><br/>';
+
+		 echo '<div class="controls controls-row"><label class="span3">Mostrar la query que estoy ejecutando</label>
+			 
+					<input type="checkbox" checked="checked"   name="detalle" id="detalle" value="1" />
+						
+					</div><br/>';	
+		echo '<div class="controls controls-row"><label class="span3">Mostrar errores o excepciones que arroje mysql</label>
+			 
+					<input type="checkbox"  checked="checked"   name="errores" id="errores" value="1" />
+						
+					</div><br/>';		
 	   
 	   echo ' <div class="control-group">   
 						<div class="controls">
@@ -64,50 +75,62 @@ $bases=$sesion->pdodbh2->query("SHOW DATABASES like '{$_POST['schema']}'  ")	  ;
  $arraybases=$bases->fetchAll(PDO::FETCH_COLUMN,0);
 
 foreach($arraybases as $base) {
-
-	 echo '<pre style="text-align:left;">';
+	
 	$query=trim($_POST['query']);
 
 
-
+	
 	
 	try {
 
 		$sesion->pdodbh2->exec("use $base;");
-		echo "use $base;\n";
+		if($_POST['detalle']) {
+		echo '<pre style="text-align:left;">';
+			echo "use $base;\n";
 		echo '<br><b>'.$query.'</b><br>';
-
+			echo '</pre>';
+		}
 			if(stripos($query,'select')===false) {
 				$filas=$sesion->pdodbh2->exec($query);
-				echo 'Filas afectadas: '. $filas;
-				echo '</pre>';
+				echo '<br>Filas afectadas: '. $filas.'</br>';
+				 
 			} else {
 
 				$filas=$sesion->pdodbh2->query($query);
 				$filasRS=$filas->fetchAll(PDO::FETCH_ASSOC);
 				$cuerpo="";
-				echo '</pre>';
+			
 						foreach ($filasRS as $fila) {
 							$cabeceras=array_keys($fila);
 							$cuerpo.= '<tr>';
+							if(empty($_POST['detalle'])) {
+								$cuerpo.= '<td>'.$base.'</td>';
+							}
 							foreach($fila as $celda) {
 								$cuerpo.= '<td>'.str_replace(",",", ",$celda).'</td>';
 							}
 							$cuerpo.= '</tr>';
 						}
-
+						if(count($filasRS)>0) {
 					echo '<table class="table-bordered" border="1">';
-					echo '<thead><tr><th>'.implode('</th><th>',$cabeceras).'</th></tr></thead>';
+					echo '<thead><tr><th>';
+					if(empty($_POST['detalle'])) {
+								echo 'Base de Datos</th><th>';
+							}
+					echo implode('</th><th>',$cabeceras).'</th></tr></thead>';
 					echo '<tbody>';
 					echo $cuerpo;
 					echo '</tbody>';
 					echo '</table><hr><br>';
+				}
 			}
 		} catch (PDOException $e) {
-			echo 'Excepción en '.$base.':<br>';
-			echo $e->getMessage().'<br>';
-			print_r($e->getTrace());
-			echo '</pre>';
+			if($_POST['detalle']) {
+				echo '<pre>Excepción en '.$base.':<br>';
+				echo $e->getMessage().'<br>';
+				print_r($e->getTrace());
+				echo '</pre>';
+			}
 		}
 	}
 
