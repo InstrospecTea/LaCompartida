@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 13.3.4 
+Jueves 4 de abril 2013
+* **Fixed:** [Restablece la Nota de Cobro 13.2.15 y luego aplica las nuevas funcionalidades del release 13.3.0 sin romper la seccion Detalle Profesional](https://www.pivotaltracker.com/story/show/47074217)
+
 ## Hotfix: 13.3.3
 Lunes 1 de abril 2013
 * **Fixed:** [Corrige error en el método WhereQuery de la clase Gasto, que se manifestaba al filtrar por asunto](https://www.pivotaltracker.com/story/show/47089611)
