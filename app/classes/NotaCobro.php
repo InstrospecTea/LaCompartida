@@ -5853,14 +5853,19 @@ class NotaCobro extends Cobro {
 					if ($descontado) {
 						$html = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $html);
 						$html = str_replace('%hh_descontada%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado'] / 60), $html);
+						$html = str_replace('%hrs_descontadas%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado'] / 60), $html);
 					} else {
 						$html = str_replace('%td_descontada%', '', $html);
 						$html = str_replace('%hh_descontada%', '', $html);
+						$html = str_replace('%hrs_descontadas%', '', $html);
 					}
 				} else {
 					$html = str_replace('%td_descontada%', '', $html);
 					$html = str_replace('%hh_trabajada%', '', $html);
 					$html = str_replace('%hh_descontada%', '', $html);
+					$html = str_replace('%hrs_descontadas%', '', $html);
+
+
 				}
 				if ($retainer || $flatfee) {
 					$html = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html);
@@ -5905,7 +5910,6 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%hrs_trabajadas%', $horas_trabajadas . ':' . $minutos_trabajadas, $html);
 					$html = str_replace('%hrs_trabajadas_real%', $horas_trabajadas_real . ':' . $minutos_trabajadas_real, $html);
 					$html = str_replace('%hrs_descontadas_real%', Utiles::Decimal2GlosaHora($totales['tiempo_descontado_real'] / 60), $html);
-					$html = str_replace('%hrs_descontadas%', $horas_descontado . ':' . $minutos_descontado, $html);
 				} else {
 					$html = str_replace('%hrs_trabajadas%', '', $html);
 					$html = str_replace('%hrs_trabajadas_real%', '', $html);
