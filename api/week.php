@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../app/conf.php';
 
-$Session = new Sesion();
+$Session = new Sesion(null, true);
 $UserToken = new UserToken($Session);
 
 $auth_token = $_REQUEST['AUTH_TOKEN'];
@@ -12,6 +12,12 @@ $user_token_data = $UserToken->findByAuthToken($auth_token);
 // if not exist the auth_token then return error
 if (!is_object($user_token_data)) {
   exit('Invalid AUTH_TOKEN');
+} else {
+  // Login the user
+  // $Session->usuario = new Usuario($Sesion);
+  // $Session->usuario->LoadId($user_token_data->user_id);
+  // $Session->usuario = new UsuarioExt($Session, $Session->usuario->fields['rut']);
+  // $Session->logged = true;
 }
 
 ?>
@@ -29,8 +35,7 @@ if (!is_object($user_token_data)) {
       }
 
       .semana_del_dia,
-      .total_mes_actual,
-      .total_semana_actual {
+      .total_mes_actual {
         display: none;
       }
 
@@ -47,7 +52,6 @@ if (!is_object($user_token_data)) {
         position: fixed;
         top: 0;
         z-index: 999;
-        background-color: white;
         padding: 5pt 0;
       }
 
@@ -74,6 +78,11 @@ if (!is_object($user_token_data)) {
         float: left;
       }
 
+      #celdastrabajo #celdadia3,
+      #celdastrabajo #celdadia5 {
+        background-color: #F0F0F0;
+      }
+
       #celdastrabajo #celdadia7,
       #celdastrabajo #celdadia1 {
         width: 10%;
@@ -82,23 +91,53 @@ if (!is_object($user_token_data)) {
       #celdastrabajo .cajatrabajo {
         width: 95% !important;
         font-size: 14pt !important;
-        border: 1pt solid black !important;
+        border: 0pt solid black !important;
         border-radius: 5pt !important;
         padding: 2pt !important;
         min-height: 88pt;
+        margin: 3pt auto;
       }
 
-      #celdastrabajo .totaldia {
+      #celdastrabajo .totaldia,
+      .total_semana_actual {
         width: 16%;
         position: fixed;
         bottom: 0;
-        background-color: black;
-        color: white;
         padding: 5pt 0;
       }
+
       #celdastrabajo #celdadia7 .totaldia,
-      #celdastrabajo #celdadia7 .totaldia {
-        width: 10%;
+      #celdastrabajo #celdadia1 .totaldia {
+        display: none;
+      }
+
+      #cabecera_dias,
+      #celdastrabajo .totaldia,
+      .total_semana_actual {
+        /*background-color: #2A323F;*/
+        background-image: linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+        background-image: -o-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+        background-image: -moz-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+        background-image: -webkit-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+        background-image: -ms-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+
+        background-image: -webkit-gradient(
+          linear,
+          left bottom,
+          left top,
+          color-stop(0, rgb(17,22,26)),
+          color-stop(0.1, rgb(56,67,87)),
+          color-stop(0.5, rgb(46,55,70))
+        );
+
+        color: #CCCCCC;
+      }
+
+      .total_semana_actual {
+        width: 20%;
+        right: 0;
+        text-align: right;
+        font-weight: bold;
       }
 
       /*
@@ -133,12 +172,12 @@ if (!is_object($user_token_data)) {
     }
       #tooltip:after
       {
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
         border-top: 10px solid #333;
-            border-top-color: rgba( 0, 0, 0, .7 );
+        border-top-color: rgba( 0, 0, 0, .7 );
         content: '';
         position: absolute;
         left: 50%;
@@ -147,9 +186,9 @@ if (!is_object($user_token_data)) {
       }
         #tooltip.top:after
         {
-              border-top-color: transparent;
+          border-top-color: transparent;
           border-bottom: 10px solid #333;
-              border-bottom-color: rgba( 0, 0, 0, .6 );
+          border-bottom-color: rgba( 0, 0, 0, .6 );
           top: -20px;
           bottom: auto;
         }
@@ -171,7 +210,7 @@ if (!is_object($user_token_data)) {
   <body>
 <?php
 // El nombre es para que el include funcione
-$id_usuario = $user_token_data->id;
+$id_usuario = $user_token_data->user_id;
 $semana = $day;
 
 include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
@@ -186,15 +225,24 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
         target  = false,
         tooltip = false,
         title   = false;
+
+        targets.each(function (idx, el) {
+          tip = $(el).attr( 'onmouseover' );
+          tip = tip.replace("ddrivetip('", "");
+          tip = tip.replace("')", "");
+          tip = tip.replace(/<b>.*<\/\/b>/, "");
+          $(el).attr('data-title', tip);
+          $(el).removeAttr('onmouseover');
+          $(el).removeAttr('onmouseout');
+        });
  
-    targets.bind( 'mouseenter', function()
+    targets.bind( 'mouseenter', function(event)
     {
+        event.preventDefault();
         target  = $( this );
-        tip     = target.attr( 'onmouseover' );
-        tip = tip.replace("ddrivetip('", "");
-        tip = tip.replace("')", "");
+        //tip = tip.replace(/<b>.*<\/b>/gm, "");
         tooltip = $( '<div id="tooltip"></div>' );
- 
+        tip = target.attr('data-title');
         if( !tip || tip == '' )
             return false;
  
