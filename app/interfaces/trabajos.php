@@ -1,4 +1,4 @@
-<?php
+	<?php
 require_once dirname(dirname(__FILE__)).'/conf.php'; 
 
 
@@ -1110,11 +1110,6 @@ function funcionTR(& $trabajo) {
 
  
 	jQuery(document).ready(function() { 
-		 
-		if(jQuery('#fecha_ini').val()=="") 	{ 
-			jQuery('#fecha_ini').val('01-<?php echo date("m-Y",strtotime("-3 MONTH")); ?>');
-			}
-		
  
 		jQuery('#descargapro').click(function() {
 			jQuery('#descargapro').attr('disabled','disabled');
