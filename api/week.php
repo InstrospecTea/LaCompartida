@@ -11,7 +11,7 @@ function isValidTimeStamp($timestamp) {
 $Session = new Sesion(null, true);
 $UserToken = new UserToken($Session);
 
-$auth_token = $_REQUEST['AUTH_TOKEN'];
+$auth_token = $_REQUEST['AUTHTOKEN'];
 $day = $_REQUEST['day'];
 
 $user_token_data = $UserToken->findByAuthToken($auth_token);

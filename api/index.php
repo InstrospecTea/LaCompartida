@@ -371,12 +371,12 @@ function validateAuthTokenSendByHeaders() {
 	$Slim = Slim::getInstance();
 	$Request = $Slim->request();
 
-	$auth_token = $Request->headers('AUTH_TOKEN');
+	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token_data = $UserToken->findByAuthToken($auth_token);
 
 	// if not exist the auth_token then return error
 	if (!is_object($user_token_data)) {
-		halt('Invalid AUTH_TOKEN');
+		halt('Invalid AUTH TOKEN');
 	} else {
 		return $user_token_data->user_id;
 	}
