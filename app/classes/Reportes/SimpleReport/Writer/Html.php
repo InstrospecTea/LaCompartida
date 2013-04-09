@@ -64,10 +64,20 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 //			$filename = $this->SimpleReport->Config->title;
 //		}
 		if ($this->SimpleReport->custom_format['collapsible']) {
-				$html .= "<script>jQuery('.ver-detalle').click(function(){
-					jQuery(this).closest('tr').next().find('.subreport').toggle();
-					return false;
-				});</script>";
+				$html .= "<script>
+					jQuery('.ver-detalle').click(function() {
+						sr_sender = jQuery(this);
+						sr_detalle = sr_sender.closest('tr').next().find('.subreport');
+						sr_detalle.toggle();
+						sr_imglink = sr_sender.find('img');
+						if (sr_detalle.css('display') == 'none') {
+							sr_imglink.attr('src', '//static.thetimebilling.com/images/mas.gif');
+						} else {
+							sr_imglink.attr('src', '//static.thetimebilling.com/images/menos.gif');
+						}
+						return false;
+					});
+					</script>";
 		}
 
 		return $html;
@@ -253,16 +263,27 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 				} else {
 					$html .= '<tr class="subtotal">';
 				}
+				// Calcular las columnas que no tienen total para el colspan de la glosa
+				$i = 0;
+				foreach ($columns as $idx => $column) {
+					if (isset($totals[$idx])) {
+						break;
+					}
+					$i++;
+				}
+				$colspan_total = $i;
 				foreach ($columns as $idx => $column) {
 					if (isset($totals[$idx])) {
 						$row[$column->field] = $totals[$idx];
 						$html .= $this->td($row, $column);
 					} else {
-						$html .=  "<td class='level$level'>$name&nbsp;</td>";
-						$name = '';
+						if ($colspan_total > 0) {
+							$html .=  "<td colspan='$colspan_total' class='level$level'>$name&nbsp;</td>";
+							$colspan_total = -1;
+						}
 					}
 				}
-				$i+=1;
+				$i += 1;
 				$html .= '</tr>';
 			}
 		}

@@ -256,7 +256,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 	$SimpleReport->LoadResults($results);
 
-	if ($mostrar_detalle) {
+	if (true || $mostrar_detalle) {
 		/*$details_query =
 			"SELECT
 				r.codigo_cliente,
@@ -284,8 +284,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 		$statement = $Sesion->pdodbh->prepare($details_query);
 		$statement->execute();
-		$details_results = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$details_results[$codigo_cliente] = $details_results;
+		$details_all = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		foreach ($details_all as $detail) {
+			$details_results[$detail['codigo_cliente']][] = $detail;
+		}
 
 		$SimpleReportDetails->LoadResults($details_results);
 
@@ -293,6 +296,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			'SimpleReport' => $SimpleReportDetails,
 			'Keys' => array('codigo_cliente'),
 			'Level' => 1
+		));
+
+		$SimpleReport->SetCustomFormat(array(
+			'collapsible' => true
 		));
 
 		//$SimpleReport = null;
@@ -323,17 +330,31 @@ $Pagina->PrintTop($popup);
 ?>
 <style>
 	.subreport {
-		border-left: 1px solid grey;
-		border-right: 1px solid grey;
+		padding-bottom: 40px;
 	}
 		.subreport h1 {
 			font-size: 12px;
 			margin-left: 5%;
+			color: #777;
+			font-weight: normal;
 		}
 		.subreport td.encabezado {
-			background-color: lightgrey;
-			color: grey;
-			font-weight: bold;
+			background-color: #ddd;
+			color: #040;
+		}
+
+		.subreport .buscador > tbody > tr {
+			border-left: 1px solid #BDBDBD;
+			border-right: 1px solid #BDBDBD;
+		}
+		.subreport .buscador > tbody > tr.subtotal {
+			border-left: none;
+			border-right: none;
+		}
+		.subreport .buscador > tbody > tr.subtotal td.level2 {
+			text-align: left;
+			color: #777;
+			font-weight: normal !important;
 		}
 </style>
 <table width="90%">
