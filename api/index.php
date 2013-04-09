@@ -288,7 +288,7 @@ $app->put('/users/:id/works', function ($id) {
 			halt($validate['description']);
 		} else {
 			if (!$Work->save($work)) {
-				halt($validate['description']);
+				halt("Unexpected error when saving data");
 			} else {
 				$work = $Work->findById($Work->fields['id_trabajo']);
 			}
@@ -352,7 +352,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 				halt($validate['description']);
 			} else {
 				if (!$Work->save($work)) {
-					halt($validate['description']);
+					halt("Unexpected error when saving data");
 				} else {
 					$work = $Work->findById($Work->fields['id_trabajo']);
 				}
@@ -361,6 +361,36 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	}
 
 	outputJson($work);
+});
+
+$app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
+	if (is_null($user_id) || empty($user_id)) {
+		halt("Invalid user ID");
+	}
+
+	if (is_null($id) || empty($id)) {
+		halt("Invalid work ID");
+	}
+
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$Work = new Trabajo($Session);
+
+	if (!$User->LoadId($user_id)) {
+		halt("The user doesn't exist");
+	} else {
+		if (!$Work->Load($id)) {
+			halt("The work doesn't exist");
+		} else {
+			if (!$Work->Eliminar()) {
+				halt("Unexpected error when deleting data");
+			}
+		}
+	}
+
+	halt(null, null, 200);
 });
 
 $app->run();
@@ -385,8 +415,16 @@ function validateAuthTokenSendByHeaders() {
 function halt($error_message = null, $error_code = null, $halt_code = 400) {
 	$errors = array();
 	$Slim = Slim::getInstance();
-	array_push($errors, array('message' => $error_message, 'code' => $error_code));
-	$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
+	switch ($halt_code) {
+		case 200:
+			$Slim->halt(200);
+			break;
+
+		default:
+			array_push($errors, array('message' => $error_message, 'code' => $error_code));
+			$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
+			break;
+	}
 }
 
 function outputJson($response) {

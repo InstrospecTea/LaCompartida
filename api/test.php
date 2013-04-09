@@ -7,14 +7,15 @@
 		<script type="text/javascript">
 		$(function() {
 			$.ajaxSetup({
-				headers: {'AUTH_TOKEN' : 'f0ef5f57052f8836c8815c1ec83e31a52be81571'}
+				headers: {'AUTH_TOKEN' : 'bb9b7afc4b246f19f202b96d5e70f59ba916cfbf'}
 			});
 
 			$.ajax({
+
 				//url: 'login',
 				//url: 'clients/002538/matters',
-				url: 'users/1/works',
-				//url: 'users/1/works/618205',
+				//url: 'users/1/works',
+				url: 'users/1/works/23643',
 
 				/*data: {
 					'user' : '99511620',
@@ -22,7 +23,7 @@
 					'app_key' : 'https://lemontech.thetimebilling.com'
 				},*/
 				//data: {'after' : '1364871600', 'before' : '1364871600'},
-				data: {
+				/*data: {
 					'created_date' : 1365193560.328282,
 					'date' : 1365134400,
 					'duration' : 100,
@@ -36,11 +37,13 @@
 					'user_id' : 1,
 					'billable' : 1,
 					'visible' : 0
-				},
+				},*/
 
 				//type: 'get'
 				//type: 'post'
-				type: 'put'
+				//type: 'put'
+				type: 'delete'
+
 			}).done(function(data) {
 				//console.log(data);
 				//$('#output').html(data);
