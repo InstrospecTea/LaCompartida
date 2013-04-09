@@ -2,7 +2,19 @@
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
-$pagina = new Pagina($sesion);
+
+if (isset($_REQUEST['AUTH_TOKEN'])) {
+	$auth_token = $_REQUEST['AUTH_TOKEN'];
+	$UserToken = new UserToken($sesion);
+	$user_token_data = $UserToken->findByAuthToken($auth_token);
+	$pagina = new Pagina($sesion, true);
+	$usuario = new UsuarioExt($sesion);
+	$usuario->Load($user_token_data->user_id);
+	$usuario->LoadPermisos($user_token_data->user_id);
+	$sesion->usuario = $usuario;
+} else {
+	$pagina = new Pagina($sesion);
+}
 
 header("Content-Type: text/html; charset=ISO-8859-1");
 //Permisos
