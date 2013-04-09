@@ -162,14 +162,25 @@ $Slim->map('/EntregarDatosClientes(/:callback)', 'EntregarDatosClientes')->via('
 			 
 			
 			if(existecampo('activo_juicio', 'usuario', $sesion->dbh)) {
-				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo, u.activo_juicio
-			               FROM usuario u left JOIN prm_categoria_usuario p 
-                            ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
+			   	$queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
+u.activo ,  u.activo_juicio,
+date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00') fechamesanterior, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
+,if(up.id_usuario is null,0,1) as timekeeper
+FROM usuario u 
+left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
+left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
+left join  usuario_permiso up on up.id_usuario=u.id_usuario and up.codigo_permiso='PRO'
+ group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria                         ";   
 			} else {
 		
-				$queryuser = "SELECT id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, id_categoria_lemontech, u.activo
-			               FROM usuario u left JOIN prm_categoria_usuario p 
-                            ON u.id_categoria_usuario = p.id_categoria_usuario                            ";   
+				$queryuser = "SELECT u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria,
+u.activo , date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00') fechamesanterior, sum(time_to_sec(ifnull(trabajo.duracion,0)))/3600 as hrs_trabajadas
+,if(up.id_usuario is null,0,1) as timekeeper
+FROM usuario u 
+left JOIN prm_categoria_usuario pcu ON u.id_categoria_usuario = pcu.id_categoria_usuario
+left JOIN trabajo on trabajo.id_usuario=u.id_usuario AND trabajo.fecha>= date_format(curdate() - interval 1 month,'%Y-%m-01 00:00:00')
+left join  usuario_permiso up on up.id_usuario=u.id_usuario and up.codigo_permiso='PRO'
+ group by  u.id_usuario, nombre, apellido1, apellido2, u.id_categoria_usuario, pcu.id_categoria_lemontech,pcu.glosa_categoria                         ";   
 			}
 			$respuser=mysql_query($queryuser, $sesion->dbh) or die(mysql_error());
 			
@@ -215,26 +226,26 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
  			
 			$querydatos="select * from
 
-(select count(*) as gastos from cta_corriente) cc,
-(select count(*) as tramites from tramite) tram,
-(SELECT sum( if( estado != 'CREADO' && estado != 'EN REVISION', 1, 0 ) ) AS emitidos, sum( if( estado = 'PAGADO', 1, 0 ) ) AS pagados
-FROM cobro) cobros,
-(select count(*) as facturas from factura) fc,
+			(select count(*) as gastos from cta_corriente) cc,
+			(select count(*) as tramites from tramite) tram,
+			(SELECT sum( if( estado != 'CREADO' && estado != 'EN REVISION', 1, 0 ) ) AS emitidos, sum( if( estado = 'PAGADO', 1, 0 ) ) AS pagados
+			FROM cobro) cobros,
+			(select count(*) as facturas from factura) fc,
 
-(select 
-sum(if(tr.fecha>=fechas.inicio_ano,time_to_sec(tr.duracion)/3600,0)) as HH_ANO,
-sum(if(tr.fecha>=fechas.inicio_mes and tr.fecha<=fechas.fin_mes,time_to_sec(tr.duracion)/3600,0)) as HH_MES,
-sum(if(tr.fecha>=fechas.iniciosemana and tr.fecha<=fechas.finsemana,time_to_sec(tr.duracion)/3600,0)) as HH_SEMANA,
-(select max(version)  version_tt from version_db) as version_tt
-$version_ct
-$causas
-from trabajo tr,
-(select 
-YEAR(CURDATE())*10000+101 inicio_ano,
-date_format(LAST_DAY(now() - interval 1 month),'%Y%m%d') fin_mes,
-concat(date_format(LAST_DAY(now() - interval 1 month),'%Y%m'),'01') inicio_mes,
- date_format(subdate(now(), INTERVAL 7+weekday(now()) DAY),'%Y%m%d') iniciosemana,
-date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) fechas) trabajos";
+			(select 
+			sum(if(tr.fecha>=fechas.inicio_ano,time_to_sec(tr.duracion)/3600,0)) as HH_ANO,
+			sum(if(tr.fecha>=fechas.inicio_mes and tr.fecha<=fechas.fin_mes,time_to_sec(tr.duracion)/3600,0)) as HH_MES,
+			sum(if(tr.fecha>=fechas.iniciosemana and tr.fecha<=fechas.finsemana,time_to_sec(tr.duracion)/3600,0)) as HH_SEMANA,
+			(select max(version)  version_tt from version_db) as version_tt
+			$version_ct
+			$causas
+			from trabajo tr,
+			(select 
+			YEAR(CURDATE())*10000+101 inicio_ano,
+			date_format(LAST_DAY(now() - interval 1 month),'%Y%m%d') fin_mes,
+			concat(date_format(LAST_DAY(now() - interval 1 month),'%Y%m'),'01') inicio_mes,
+			 date_format(subdate(now(), INTERVAL 7+weekday(now()) DAY),'%Y%m%d') iniciosemana,
+			date_format(subdate(now(), INTERVAL 1+weekday(now()) DAY),'%Y%m%d') finsemana) fechas) trabajos";
 	 
 			 $respuesta =$sesion->pdodbh->query( $querydatos); 
 			
