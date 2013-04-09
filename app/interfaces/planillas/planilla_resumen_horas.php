@@ -117,15 +117,21 @@
 	$ws->write($offset_filas, $offset_columnas+10, __('Margen bruto'), $formato_titulo_5);
 	$ws->write($offset_filas, $offset_columnas+11, __('Porcentaje margen'), $formato_titulo_5);
 
-	// Varibles necesarias para obtener los distintos tipos de horas usando la clase Reporte
+	/*
+	*
+	* Varibles necesarias para obtener los distintos tipos de horas usando la clase Reporte
+	* valor_pagado 	 Este se puede comparar con las horas pagadas.
+	* valor_cobrado  Este se compara con las horas trabajadas para tener el costo real por hora.
+	*/
+
 	$tipo_dato = array();
 	$tipo_dato[] = 'horas_trabajadas';
 	$tipo_dato[] = 'horas_cobrables';
 	$tipo_dato[] = 'horas_visibles';
 	$tipo_dato[] = 'horas_cobradas';
 	$tipo_dato[] = 'horas_pagadas';
-	$tipo_dato[] = 'valor_cobrado';		// Este se compara con las horas trabajadas para tener el costo real por hora.
-	$tipo_dato[] = 'valor_pagado';		// Este se puede comparar con las horas pagadas.
+	$tipo_dato[] = 'valor_cobrado';
+	$tipo_dato[] = 'valor_pagado';
 	$tipo_dato[] = 'valor_por_pagar';
 
 	// Número de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
@@ -136,21 +142,20 @@
 	$i=0;
 
 	$meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"),__("Julio"),__("Agosto"),__("Septiembre"),__("Octubre"),__("Noviembre"),__("Diciembre"));
+
 	$fecha1_a = substr($fecha1, 6);
 	$fecha2_a = substr($fecha2, 6);
-	$fecha1_m = substr($fecha1, 3, 2)-1;
+	$fecha1_m = substr($fecha1, 3, 2);
 	$fecha2_m = substr($fecha2, 3, 2);
-	if($fecha2_m==12)
-	{
-		$fecha2_m = 0;
-		++$fecha2_a;
-	}
 
 	if($vista == 'profesional')
 	{
-                $largo_meses = array('',31, Utiles::es_bisiesto($fecha_anio)?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-                $fecha_ini = $fecha1_a.'-'.$fecha1_m.'-01';
-                $fecha_fin = $fecha2_a.'-'.$fecha2_m.'-'.$largo_meses[$fecha2_m];
+
+		$fecha_ini = "{$fecha1_a}-{$fecha1_m}-01";
+		$largo_meses = cal_days_in_month(CAL_GREGORIAN, $fecha2_m, $fecha2_a);
+		$fecha_fin = "{$fecha2_a}-{$fecha2_m}-{$largo_meses}";
+
+
 		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
 			$dato_profesional = "username";
 		else
@@ -177,6 +182,8 @@
                               LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario AND usuario_permiso.codigo_permiso = 'PRO' 
                               WHERE visible = 1 $where_usuarios 
 								ORDER BY apellido1, apellido2, nombre, id_usuario";
+
+		//echo '<pre>'; echo $query; exit;							
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		while(list($nombre_usuario, $id_usr) = mysql_fetch_array($resp))
 		{
