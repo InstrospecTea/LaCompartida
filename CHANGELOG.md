@@ -1,6 +1,13 @@
 # Changelog
+## Hotfix 13.3.5
+miercoles 10 de abril 2013
+* **Fixed:** [Arregla descarga planilla de hh.](https://www.pivotaltracker.com/story/show/47805683)
+
+
+
+
 ## Hotfix 13.3.5 
-Jueves 9 de abril 2013
+martes 9 de abril 2013
 * **Fixed:** [Permite filtrar por mes al reporte financiero.](https://www.pivotaltracker.com/story/show/47649165)
 
 ## Hotfix 13.3.4 
