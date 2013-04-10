@@ -246,7 +246,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
           tip = $(el).attr( 'onmouseover' );
           tip = tip.replace("ddrivetip('", "");
           tip = tip.replace("')", "");
-          tip = tip.replace(/<b>.*<\/\/b>/, "");
+          tip = tip.replace(/<b>.*?<\/b><br>/g, "");
           $(el).attr('data-title', tip);
           $(el).removeAttr('onmouseover');
           $(el).removeAttr('onmouseout');
