@@ -401,14 +401,11 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 		});
 
+		setTimeout(function() {jQuery('#input_buscacampo').focus();}, 1000);
 
-		jQuery('#input_buscacampo').focus();
 	});
-
-
 	</script>
 	<!-- <script src="//static.thetimebilling.com/js/bootstrap.min.js"></script>-->
-
 
 	<?php
 	$pagina->PrintBottom($popup);
