@@ -312,9 +312,9 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	}
 	if ($_REQUEST['opcion'] == 'json') {
 		foreach ($results as $fila) {
-			$saldo_total += $fila['saldo_base'];
+			$saldo_total += $fila['saldo_liquidaciones'] + $fila['saldo_gastos'] + $fila['saldo_adelantos'];
 		}
-		$moneda_base = $fila['moneda_base'];
+		$moneda_base = $fila['simbolo_moneda'];
 		$data = array(
 			"resultado" => $moneda_base . ' ' . number_format($saldo_total, 2, ',', '.')
 		);
