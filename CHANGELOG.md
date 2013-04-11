@@ -1,6 +1,17 @@
 # Changelog
+##Hotfix 13.3.7
+jueves 11 abrirl 2013
+* **Fixed:** [Formaliza correccion a clase trabajo hecha directo en produccion el 4 de abril] (https://www.pivotaltracker.com/story/show/47443091)
+
+## Hotfix 13.3.6
+miercoles 10 de abril 2013
+* **Fixed:** [Arregla descarga planilla de hh.](https://www.pivotaltracker.com/story/show/47805683)
+
+
+
+
 ## Hotfix 13.3.5 
-Jueves 9 de abril 2013
+martes 9 de abril 2013
 * **Fixed:** [Permite filtrar por mes al reporte financiero.](https://www.pivotaltracker.com/story/show/47649165)
 
 ## Hotfix 13.3.4 
