@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.3.9
+jueves 11 de abril 2013
+* **Fixed:** [Corrige la forma de tratar los radio](#160)
+
 
 ##Hotfix 13.3.8
 jueves 11 abrirl 2013
@@ -12,11 +16,11 @@ jueves 11 abrirl 2013
 miercoles 10 de abril 2013
 * **Fixed:** [Arregla descarga planilla de hh.](https://www.pivotaltracker.com/story/show/47805683)
 
-## Hotfix 13.3.5 
+## Hotfix 13.3.5
 martes 9 de abril 2013
 * **Fixed:** [Permite filtrar por mes al reporte financiero.](https://www.pivotaltracker.com/story/show/47649165)
 
-## Hotfix 13.3.4 
+## Hotfix 13.3.4
 Jueves 4 de abril 2013
 * **Fixed:** [Restablece la Nota de Cobro 13.2.15 y luego aplica las nuevas funcionalidades del release 13.3.0 sin romper la seccion Detalle Profesional](https://www.pivotaltracker.com/story/show/47074217)
 
