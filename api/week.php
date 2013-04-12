@@ -40,7 +40,7 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
 ?>
 <html>
   <head>
-    <meta name=”viewport” content=”width=device-width, initial-scale=1″ />
+    <meta name="viewport" content="width=device-width"/>
     <style>
       html, body {
         height: 100%;
@@ -155,6 +155,7 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         right: 0;
         text-align: right;
         font-weight: bold;
+        padding-left: 5px !important;
       }
 
       /*
@@ -236,6 +237,8 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
         $('.pintame').each(function() {
           $(this).css('background-color', window.top.s2c($(this).attr('rel')));
         });
+
+        $('.total_semana_actual').text($('.total_semana_actual').text().replace("semana", ""));
 
         var targets = $( '.cajatrabajo' ),
         target  = false,

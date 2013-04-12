@@ -3,8 +3,8 @@ require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 
-if (isset($_REQUEST['AUTH_TOKEN'])) {
-	$auth_token = $_REQUEST['AUTH_TOKEN'];
+if (isset($_REQUEST['AUTHTOKEN'])) {
+	$auth_token = $_REQUEST['AUTHTOKEN'];
 	$UserToken = new UserToken($sesion);
 	$user_token_data = $UserToken->findByAuthToken($auth_token);
 	$pagina = new Pagina($sesion, true);
