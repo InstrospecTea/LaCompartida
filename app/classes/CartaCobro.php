@@ -545,27 +545,9 @@ class CartaCobro extends NotaCobro {
 
 				// Si utiliza el nuevo módulo, agrego el saldo de adelantos para gastos a
 				if (Conf::GetConf($this->sesion, 'NuevoModuloGastos')) {
-					$query_adelantos = "SELECT
-							SUM(-1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio)) AS saldo
-						FROM
-							documento d
-						INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-						INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = '{$moneda_total->fields['id_moneda']}'
-						WHERE
-							d.es_adelanto = 1 AND
-							d.saldo_pago < 0 AND
-							d.pago_gastos = '1' AND
-							(
-								d.id_contrato = '{$this->fields['id_contrato']}' OR
-								(
-									d.id_contrato IS NULL AND
-									d.codigo_cliente = '{$this->fields['codigo_cliente']}'
-								)
-							)";
-					$resp_adelantos = mysql_query($query_adelantos, $this->sesion->dbh) or Utiles::errorSQL($query_adelantos, __FILE__, __LINE__, $this->sesion->dbh);
-					list($saldo_adelantos_de_gasto) = mysql_fetch_array($resp_adelantos);
-
-					$saldo_ingreso_moneda_total += $saldo_adelantos_de_gasto;
+					$detalle_pagos_contrato = Cobro::DetallePagoContrato($this->sesion, $this->fields['id_cobro']);
+					$saldo_ingreso_moneda_total += -1 * $detalle_pagos_contrato['saldo_adelantos'];
+					$saldo_ingreso_moneda_total += -1 * $detalle_pagos_contrato['montoadelantosinasignar'];
 				}
 
 				$saldo_balance_gastos_moneda_total = max(0, $saldo_ingreso_moneda_total - $saldo_egreso_moneda_total);
