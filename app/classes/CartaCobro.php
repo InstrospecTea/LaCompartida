@@ -546,9 +546,8 @@ class CartaCobro extends NotaCobro {
 				// Si utiliza el nuevo módulo, agrego el saldo de adelantos para gastos a
 				if (Conf::GetConf($this->sesion, 'NuevoModuloGastos')) {
 					$detalle_pagos_contrato = Cobro::DetallePagoContrato($this->sesion, $this->fields['id_cobro']);
-					//echo print_r($detalle_pagos_contrato, true); exit;
 					$saldo_ingreso_moneda_total += -1 * $detalle_pagos_contrato['saldo_adelantos'];
-					$saldo_ingreso_moneda_total += $detalle_pagos_contrato['montoadelantosinasignar'];
+					$saldo_ingreso_moneda_total += $detalle_pagos_contrato['monto_adelantos_sin_asignar_gastos'];
 				}
 
 				$saldo_balance_gastos_moneda_total = max(0, $saldo_ingreso_moneda_total - $saldo_egreso_moneda_total);

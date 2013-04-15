@@ -2659,7 +2659,9 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 													1,
 													cm1.tipo_cambio / cm2.tipo_cambio
 												) AS saldo_adelanto,
-												cliente.id_contrato AS contrato_default
+												cliente.id_contrato AS contrato_default,
+												documento.pago_gastos,
+												documento.pago_honorarios
 											FROM `documento`
 											INNER JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
 											INNER JOIN cobro_moneda cm1 ON
@@ -2673,14 +2675,27 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 											 	AND documento.codigo_cliente = '{$this->fields['codigo_cliente']}'";
 
 
-		$montoadelantosinasignar = 0;
-		$adelantossinasignar = $this->sesion->pdodbh->query($queryadelantos);
+		$monto_adelantos_sin_asignar = array(
+			'total' => 0,
+			'honorarios' => 0,
+			'gastos' => 0
+		);
 
-		foreach ($adelantossinasignar as $adelantosinasignar) {
-			if ($adelantosinasignar['id_contrato'] == $this->fields['id_contrato']) {
-				$montoadelantosinasignar += $adelantosinasignar['saldo_adelanto'];
-			} else if ($adelantosinasignar['id_contrato'] == 0 && $adelantosinasignar['contrato_default'] == $this->fields['id_contrato']) {
-				$montoadelantosinasignar += $adelantosinasignar['saldo_adelanto'];
+		$adelantos_sin_asignar = $this->sesion->pdodbh->query($queryadelantos);
+
+		foreach ($adelantos_sin_asignar as $adelanto) {
+			$saldo_adelanto = $adelanto['saldo_adelanto'];
+			if (($adelanto['id_contrato'] == $this->fields['id_contrato']) ||
+				($adelanto['id_contrato'] == 0 && $adelanto['contrato_default'] == $this->fields['id_contrato']))  {
+
+				$monto_adelantos_sin_asignar['total'] += $saldo_adelanto;
+
+				if ($adelanto['pago_honorarios']) {
+					$monto_adelantos_sin_asignar['honorarios'] += $saldo_adelanto;
+				}
+				if ($adelanto['pago_gastos']) {
+					$monto_adelantos_sin_asignar['gastos'] += $saldo_adelanto;
+				}
 			}
 		}
 		$saldo_pagos = 0;
@@ -2723,7 +2738,10 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		$saldo_total_contrato = $saldo_total_adeudado - $saldo_total_cobro;
 
 		return array(
-			'montoadelantosinasignar' => $montoadelantosinasignar,
+			'montoadelantosinasignar' => $monto_adelantos_sin_asignar['total'],
+			'monto_adelantos_sin_asignar_total' => $monto_adelantos_sin_asignar['total'],
+			'monto_adelantos_sin_asignar_honorarios' => $monto_adelantos_sin_asignar['honorarios'],
+			'monto_adelantos_sin_asignar_gastos' => $monto_adelantos_sin_asignar['gastos'],
 			'saldo' => $saldo,
 			'saldo_adelantos' => $saldo_adelantos,
 			'saldo_pagos' => $saldo_pagos,
