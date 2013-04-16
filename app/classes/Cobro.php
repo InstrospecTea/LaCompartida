@@ -2694,7 +2694,7 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 			}
 
 			// Lógica general, se muestran adelantos del contrato del cobro o adelantos sin contrato (para todos)
-			if ($adelanto['id_contrato'] == $this->fields['id_contrato'] || $adelanto['id_contrato'] == 0)
+			if ($adelanto['id_contrato'] == $this->fields['id_contrato'] || $adelanto['id_contrato'] == 0) {
 				$monto_adelantos_sin_asignar['total'] += $saldo_adelanto;
 
 				if ($adelanto['pago_honorarios']) {
