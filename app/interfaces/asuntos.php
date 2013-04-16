@@ -396,17 +396,21 @@ function Opciones(& $fila) {
 	$id_asunto = $fila->fields['id_asunto'];
 	if (UtilesApp::GetConf($sesion, 'UsaDisenoNuevo')) {
 		if ($permisos_asuntos->fields['permitido']) {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>";
+		return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
+		
 		} else {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+			 $opciones ="<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
+			 $opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
+			 $opciones .="<a class=\"ui-icon ui-icon-zoomin logdialog\" rel=\"asunto\" id=\"{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+					 	return $opciones;
 		}
+
 	} else {
 		if ($permisos_asuntos->fields['permitido']) {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>";
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
 		} else {
-			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar actividad></a>"
-				. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='" . Conf::ImgDir() . "/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
+			return "<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>"
+					. "<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja.gif' border=0 alt='Eliminar' /></a>";
 		}
 	}
 }
