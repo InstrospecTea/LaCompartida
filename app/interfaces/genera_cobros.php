@@ -1161,14 +1161,18 @@ function funcionTR(& $contrato) {
 					(!empty($cobro->fields['incluye_honorarios']) ? $texto_honorarios : $texto_gastos);
 			$html .= "<tr style='font-size:10px; vertical-align:middle; text-align:center;'><td width=3%>&nbsp;<img src='" . Conf::ImgDir() . "/color_amarillo.gif' border=0></td>
 									<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>
-									<td align=left width=84% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
+									<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
 
-			$html .= "<td align=center width=8%><img src='" . Conf::ImgDir() . "/editar_on.gif' title='" . __('Continuar con el cobro') . "' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1050,690,'cobros5.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1');\">&nbsp;";
-			if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )))
-				$html .= "<img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
-			else
-				$html .= "<img src='" . Conf::ImgDir() . "/cruz_roja.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
+			$html .= "<td align=center width='12%'>";
+			$html .= "<img class='fl' src='" . Conf::ImgDir() . "/editar_on.gif' title='" . __('Continuar con el cobro') . "' border=0 style='margin-right: 5px;cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1050,690,'cobros5.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1');\">&nbsp;";
+			$html .="<a class=\"ui-icon lupa fl logdialog\" rel=\"cobro\" id=\"cobro_{$cobro->fields['id_cobro']}\"  ></a>";	
+			if (Conf::GetConf($sesion, 'UsaDisenoNuevo') ) {
+				$html .= "<img class='fl'  src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
+			} else {
+				$html .= "<img  class='fl' src='" . Conf::ImgDir() . "/cruz_roja.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
+			}
 		}
+		
 		$html .= "</tr></table></div>";
 		$html .= "</td></tr>\n";
 		#FIN DIV borrador

@@ -401,7 +401,7 @@ function Opciones(& $fila) {
 		} else {
 			 $opciones ="<a target='_parent' href=agregar_asunto.php?id_asunto=$id_asunto><img src='//static.thetimebilling.com/images/editar_on.gif' border=0 title=Editar actividad></a>";
 			 $opciones .="<a href='javascript:void(0);' onclick=\"if  (confirm('¿" . __('Está seguro de eliminar el') . " " . __('asunto') . "?'))EliminaAsunto('" . $from . "'," . $id_asunto . ");\" ><img src='//static.thetimebilling.com/images/cruz_roja_nuevo.gif' border=0 alt='Eliminar' /></a>";
-			 $opciones .="<a class=\"ui-icon ui-icon-zoomin logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+			 $opciones .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"asunto\" id=\"asunto_{$fila->fields['id_asunto']}\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
 					 	return $opciones;
 		}
 
