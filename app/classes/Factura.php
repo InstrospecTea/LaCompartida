@@ -2,8 +2,73 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+define('CONCAT_FACTURA', 'CONCAT(id_documento_legal,"-",serie_documento_legal,"-",numero)');
+
 class Factura extends Objeto {
 	var $max_numero = 1000000000;
+
+	public static $llave_carga_masiva = CONCAT_FACTURA;
+	public static $campos_carga_masiva = array(
+		'id_documento_legal' => array(
+			'titulo' => 'Tipo documento (FA,NC,ND,BO)',
+			'requerido' => true,
+			'relacion' => 'PrmDocumentoLegal',
+			'unico' => 'documento_legal'
+		),
+		'serie_documento_legal' => array(
+			'titulo' => 'Serie Documento',
+			'requerido' => true,
+			'unico' => 'documento_legal'
+		),
+		'numero' => array(
+			'titulo' => 'Número Documento',
+			'unico' => 'documento_legal'
+		),
+		'fecha' => array(
+			'titulo' => 'Fecha',
+			'tipo' => 'fecha'
+		),
+		'cliente' => 'Glosa Cliente',
+		'RUT_cliente' => 'RUT Cliente',
+		'direccion_cliente' => 'Dirección Cliente',
+		'comuna_cliente' => 'Comuna Cliente',
+		'factura_codigopostal' => 'Código Postal Cliente',
+		'ciudad_cliente' => 'Ciudad Cliente',
+		'giro_cliente' => 'Giro Cliente',
+		'subtotal' => array(
+			'titulo' => 'Subtotal Honorarios',
+			'tipo' => 'numero'
+		),
+		'subtotal_gastos' => array(
+			'titulo' => 'Subtotal Gastos c/IVA',
+			'tipo' => 'numero'
+		),
+		'subtotal_gastos_sin_impuesto' => array(
+			'titulo' => 'Subtotal Gastos s/IVA',
+			'tipo' => 'numero'
+		),
+		'iva' => array(
+			'titulo' => 'IVA',
+			'tipo' => 'numero'
+		),
+		'total' => array(
+			'titulo' => 'Total',
+			'tipo' => 'numero'
+		),
+		'id_moneda' => array(
+			'titulo' => 'Moneda',
+			'relacion' => 'Moneda'
+		),
+		'id_cobro' => array(
+			'titulo' => 'N° Liquidación',
+			'creable' => true
+		),
+		'id_documento_legal_padre' => array(
+			'titulo' => 'Tipo documento asociado (FA,NC,ND,BO)',
+			'relacion' => 'PrmDocumentoLegal'
+		),
+		'id_factura_padre' => 'Factura Asociada'
+	);
 
 	public static $configuracion_reporte = array (
 		array (
@@ -221,8 +286,15 @@ class Factura extends Objeto {
 		return false;
 	}
 
-	function LoadByNumero($numero) {
-		$query = "SELECT id_factura FROM factura WHERE numero = '$numero';";
+	function LoadByNumero($numero, $serie = null, $tipo_documento = null) {
+		$query_extras = "";
+		if ($serie) {
+			$query_extras .= " AND serie_documento_legal = '$serie'";
+		}
+		if ($tipo_documento) {
+			$query_extras .= " AND id_documento_legal = '$tipo_documento'";
+		}
+		$query = "SELECT id_factura FROM factura WHERE numero = '$numero' $query_extras;";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($id) = mysql_fetch_array($resp);
 
@@ -231,7 +303,7 @@ class Factura extends Objeto {
 		}
 		return false;
 	}
-
+	
 	function ObtenerValorReal($id_factura) {
 		$query = "SELECT ( (-1) * SUM( ccfm.monto_bruto * ccfmm.tipo_cambio / ccfmmbase.tipo_cambio ) ) as valor_real
 					FROM cta_cte_fact_mvto ccfm
@@ -1944,6 +2016,68 @@ class Factura extends Objeto {
 		}
 
 		return $results;
+	}
+
+	public function PreCrearDato($data) {
+		$data['descripcion'] = __('Honorarios Legales');
+		$data['descripcion_subtotal_gastos'] = __('Gastos c/ IVA');
+		$data['descripcion_subtotal_gastos_sin_impuesto'] = __('Gastos s/ IVA');
+		$data['honorarios'] = $data['subtotal'];
+		$data['gastos'] = $data['subtotal_gastos'] + $data['subtotal_gastos_sin_impuesto'];
+
+		$subtotal = $data['total'] - $data['iva'];
+		$data['porcentaje_impuesto'] = floor($data['iva'] * 100 / $subtotal);
+		$data['subtotal_sin_descuento'] = $subtotal;
+
+		if (!empty($data['id_factura_padre'])) {
+			$factura_padre_array = explode('-', $data['id_factura_padre']);
+			$factura_padre_serie = intval($factura_padre_array[0]);
+			$factura_padre_numero = intval($factura_padre_array[1]);
+			$factura_padre = new Factura($this->sesion);
+			$factura_padre->LoadByNumero($factura_padre_numero, $factura_padre_serie, $data['id_documento_legal_padre']);
+			if ($factura_padre->Loaded()) {
+				$data['id_factura_padre'] = $factura_padre->fields['id_factura'];
+				$data['id_cobro'] = $factura_padre->fields['id_cobro'];
+				$data['id_contrato'] = $factura_padre->fields['id_contrato'];
+				$data['codigo_cliente'] = $factura_padre->fields['codigo_cliente'];
+				
+			} else {
+				unset($data['id_factura_padre']);
+			}
+		} 
+		unset($data['id_documento_legal_padre']);
+		
+		return $data;
+	}
+
+	public function PostCrearDato() {
+		$Movimiento = new CtaCteFact($this->sesion);
+		$PrmDocumentoLegal = new PrmDocumentoLegal($this->sesion);
+		$PrmDocumentoLegal->Load($this->fields['id_documento_legal']);
+		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
+		// Si es NC los montos se consideran como pagos
+		$signo = $tipo_documento_legal == 'NC' ? 1 : -1;
+		if (!empty($this->fields['id_factura_padre'])) {
+			$neteos = array(array(
+				$this->fields['id_factura_padre'], 
+				$signo * $this->fields['total']
+			));
+		}
+		// 1. Crear cta_cte_fact_mvto
+		$Movimiento->RegistrarMvto($this->fields['id_moneda'],
+				$signo * ($this->fields['total'] - $this->fields['iva']),
+				$signo * $this->fields['iva'],
+				$signo * $this->fields['total'],
+				$this->fields['fecha'],
+				$neteos,
+				$this->fields['id_factura'],
+				null,
+				$tipo_documento_legal);
+		
+		// 2. Crear los factura_cobro
+		$Cobro = new Cobro($this->sesion);
+		$Cobro->Load($this->fields['id_cobro']);
+		$Cobro->AgregarFactura($this);
 	}
 }
 

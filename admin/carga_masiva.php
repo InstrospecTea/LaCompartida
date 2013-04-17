@@ -9,7 +9,7 @@ $pagina->PrintTop();
 ?>
 <form method="POST" action="datos_carga_masiva.php">
 	<!-- TODO: agregar opcion para cargar datos ya existentes para edicion masiva -->
-	Cargar <?php echo Html::SelectArray(array('UsuarioExt', 'Cliente', 'Asunto'), 'clase'); ?>
+	Cargar <?php echo Html::SelectArray(array('UsuarioExt', 'Cliente', 'Asunto', 'Factura'), 'clase'); ?>
 	<a href="javascript:ejemplo()">¿Qué debo pegar en el recuadro? (descarga ejemplo)</a>
 	<textarea name="raw_data" rows="18" cols="100"></textarea><br /><br />
 	<input type="submit" value="Enviar"/>

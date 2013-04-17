@@ -250,8 +250,18 @@ class CargaMasiva extends Objeto {
 						$fila[$campo] = $info['defval'];
 					}
 
-					if ($info['tipo'] == 'bool') {
-						$fila[$campo] = !empty($fila[$campo]) && strtoupper($fila[$campo][0]) != 'N' ? 1 : 0;
+					switch ($info['tipo']) {
+						case 'bool':
+							$fila[$campo] = !empty($fila[$campo]) && strtoupper($fila[$campo][0]) != 'N' ? 1 : 0;
+							break;
+
+						case 'numero':
+							$fila[$campo] = str_replace(',', '.', $fila[$campo]);
+							break;
+
+						case 'fecha':
+							$fila[$campo] = Utiles::fecha2sql($fila[$campo]);
+							break;
 					}
 				}
 
