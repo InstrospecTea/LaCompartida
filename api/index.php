@@ -149,7 +149,6 @@ $app->get('/translations', function () {
 		if (is_array($_LANG) && !empty($_LANG)) {
 			array_push($translations, array('code' => 'Matters', 'value' => $_LANG['Asuntos']));
 			array_push($translations, array('code' => 'Works', 'value' => $_LANG['Trabajos']));
-			array_push($translations, array('code' => 'Notes', 'value' => $_LANG['Descripción']));
 			array_push($translations, array('code' => 'Clients', 'value' => $_LANG['Clientes']));
 		}
 	}
