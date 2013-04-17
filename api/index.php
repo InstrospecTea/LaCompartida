@@ -164,8 +164,8 @@ $app->get('/settings', function () {
 	$user_id = validateAuthTokenSendByHeaders();
 
 	if (is_array($Session->arrayconf) && !empty($Session->arrayconf)) {
-		foreach ($Session->arrayconf as $key => $value) {
-			array_push($settings, array('code' => $key, 'value' => $value));
+		if ($Session->arrayconf['Intervalo']) {
+			array_push($settings, array('code' => 'IncrementalStep', 'value' => $Session->arrayconf['Intervalo']));
 		}
 	}
 
