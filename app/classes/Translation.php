@@ -22,6 +22,7 @@ class Translation extends Objeto {
 		$Statement->execute();
 
 		while ($translation = $Statement->fetch(PDO::FETCH_OBJ)) {
+
 			array_push($translations,
 				array(
 					'code' => $translation->code,
@@ -29,6 +30,7 @@ class Translation extends Objeto {
 					'order' => !empty($translation->order) ? $translation->order : null,
 				)
 			);
+
 		}
 
 		return $translations;

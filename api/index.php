@@ -138,7 +138,7 @@ $app->get('/translations', function () {
 	$Translation = new Translation($Session);
 	$translations = array();
 
-	$user_id = validateAuthTokenSendByHeaders();
+	//$user_id = validateAuthTokenSendByHeaders();
 	$translation_files = $Translation->findAllActive();
 
 	if (is_array($translation_files) && !empty($translation_files)) {
@@ -146,11 +146,11 @@ $app->get('/translations', function () {
 		foreach ($translation_files as $translation_file) {
 			include Conf::ServerDir() . '/lang/' . $translation_file['file'];
 		}
-
 		if (is_array($_LANG) && !empty($_LANG)) {
-			foreach ($_LANG as $key => $value) {
-				array_push($translations, array('code' => $key, 'value' => $value));
-			}
+			array_push($translations, array('code' => 'Matters', 'value' => $_LANG['Asuntos']));
+			array_push($translations, array('code' => 'Works', 'value' => $_LANG['Trabajos']));
+			array_push($translations, array('code' => 'Notes', 'value' => $_LANG['Descripción']));
+			array_push($translations, array('code' => 'Clients', 'value' => $_LANG['Clientes']));
 		}
 	}
 
