@@ -46,7 +46,7 @@ if ($opcion == "guardar") {
 			$pagina->AddError(__('Existe cliente'));
 			$val = true;
 		}
-		if ($codigo_cliente_secundario) {
+		if ( $codigo_cliente_secundario and empty($id_cliente) ) {
 			$query_codigos = "SELECT codigo_cliente_secundario FROM cliente WHERE id_cliente != '" . $cli->fields['id_cliente'] . "'";
 			$resp_codigos = mysql_query($query_codigos, $sesion->dbh) or Utiles::errorSQL($query_codigos, __FILE__, __LINE__, $sesion->dbh);
 			while (list($codigo_cliente_secundario_temp) = mysql_fetch_array($resp_codigos)) {

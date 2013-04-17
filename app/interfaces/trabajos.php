@@ -872,7 +872,7 @@ function Opciones(& $trabajo, $texto = '') {
 
 	if ($p_revisor->fields['permitido']) {
 		if ($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro'])) {
-			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',600,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
+			$opc_html.= "<a style='vertical-align:top;' href=# onclick=\"nuovaFinestra('Editar_Trabajo',700,500,'editar_trabajo.php?id_cobro=" . $id_cobro . "&id_trabajo=" . $trabajo->fields[id_trabajo] . "&popup=1','');\" title=" . __('Editar') . ">" . (($texto == '') ? "<img src=$img_dir/editar_on.gif border=0>" : $texto) . "</a>";
 		} else {
 			$opc_html.= "<a style='vertical-align:top;'  href=\"javascript:void(0)\" onclick=\"alert('" ;
 			$opc_html.= __("No se puede modificar este trabajo. El Cobro que lo incluye ya ha sido Emitido al Cliente.") ;

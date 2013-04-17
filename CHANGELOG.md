@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix: 13.3.11
+jueves 11 de abril 2013
+* **Fixed:** [Corrige tamaño popup editar horas. Permite modificar cliente en ambiente con codigo secundario. Conf MastacaraCodigoCliente  ](https://github.com/LemontechSA/ttb/pull/162)
+
 ## Hotfix: 13.3.10
 jueves 11 de abril 2013
 * **Fixed:** [Corrige la carta de cobro de gastos para VFC con cálculo antigüo y nuevo módulo gastos](https://github.com/LemontechSA/ttb/pull/161)
