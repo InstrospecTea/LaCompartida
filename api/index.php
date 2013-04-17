@@ -138,7 +138,7 @@ $app->get('/translations', function () {
 	$Translation = new Translation($Session);
 	$translations = array();
 
-	//$user_id = validateAuthTokenSendByHeaders();
+	$user_id = validateAuthTokenSendByHeaders();
 	$translation_files = $Translation->findAllActive();
 
 	if (is_array($translation_files) && !empty($translation_files)) {
