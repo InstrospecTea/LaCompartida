@@ -2766,7 +2766,27 @@ function TotalesDelContrato($facturas,$nuevomodulofactura=false,$id_cobro=null) 
 		);
 	}
 
+	function AgregarFactura(Factura $Factura) {
+		$Documento = new Documento($this->sesion);
+		$Documento->LoadByCobro($this->fields['id_cobro']);
 
+		$valores = array(
+			$Factura->fields['id_factura'],
+			$this->fields['id_cobro'],
+			$Documento->fields['id_documento'],
+			$Factura->fields['subtotal_sin_descuento'] + $Factura->fields['subtotal_gastos'] + $Factura->fields['subtotal_gastos_sin_impuesto'],
+			$Factura->fields['iva'],
+			$Factura->fields['id_moneda'],
+			$Documento->fields['id_moneda']
+		);
+
+		$query = "DELETE FROM factura_cobro WHERE id_factura = '{$Factura->fields['id_factura']}' AND id_cobro = '{$this->fields['id_cobro']}' ";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+		$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
+			VALUES ('" . implode("','", $valores) . "')";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+	}
 }
 }
 
