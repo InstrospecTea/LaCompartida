@@ -210,7 +210,7 @@ if ($opcion == 'guardar') {
 				if (is_numeric($_POST['id_moneda']) && $_POST['id_moneda'] != $id_moneda)
 				$id_moneda = $_POST['id_moneda']; // permite refrescar tipo de moneda al editar cobro
 
-			$pago->Edit('fecha', Utiles::fecha2sql($fecha));
+			$pago->Edit('fecha', Utiles::fecha2sql($fecha),true);
 
 			$codigo_cliente_factura=$_POST['codigo_cliente_factura'];
 			$monto=$_POST['monto'];
@@ -225,20 +225,19 @@ if ($opcion == 'guardar') {
 			$pago_retencion=$_POST['pago_retencion'];
 			$id_concepto=$_POST['id_concepto'];
 
-			$pago->Edit('codigo_cliente', $codigo_cliente_factura);
-			$pago->Edit('monto', $monto);
-
-			$pago->Edit('id_moneda', $id_moneda);
-			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro);
-			$pago->Edit('id_moneda_cobro', $id_moneda_cobro);
-			$pago->Edit('tipo_doc', $tipo_doc);
-			$pago->Edit('nro_documento', $nro_documento);
-			$pago->Edit('nro_cheque', $numero_cheque);
-			$pago->Edit('descripcion', $descripcion);
-			$pago->Edit('id_banco', $id_banco);
-			$pago->Edit('id_cuenta', $id_cuenta);
-			$pago->Edit('pago_retencion', $pago_retencion);
-			$pago->Edit('id_concepto', $id_concepto);
+			$pago->Edit('codigo_cliente', $codigo_cliente_factura,true);
+			$pago->Edit('monto', $monto,true);
+			$pago->Edit('id_moneda', $id_moneda,true);
+			$pago->Edit('monto_moneda_cobro', $monto_moneda_cobro,true);
+			$pago->Edit('id_moneda_cobro', $id_moneda_cobro,true);
+			$pago->Edit('tipo_doc', $tipo_doc,true);
+			$pago->Edit('nro_documento', $nro_documento,true);
+			$pago->Edit('nro_cheque', $numero_cheque,true);
+			$pago->Edit('descripcion', $descripcion,true);
+			$pago->Edit('id_banco', $id_banco,true);
+			$pago->Edit('id_cuenta', $id_cuenta,true);
+			$pago->Edit('pago_retencion', $pago_retencion,true);
+			$pago->Edit('id_concepto', $id_concepto,true);
  		}
 		else {
 			$pago->LoadByNeteoAdelanto($id_neteo_documento_adelanto);
@@ -759,7 +758,7 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 	<input type=hidden name=opcion value="guardar" />
 	<input type=hidden name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
 	<input type=hidden name='id_cobro' id='id_cobro' value='<?php echo $id_cobro ?>' />
-	<input type=hidden name='lista_facturas' id='lista_facturas' value='<?php echo $lista_facturas ?>' />
+	<input type="hidden" name='lista_facturas' id='lista_facturas' value='<?php echo $lista_facturas ?>' />
 	<input type=hidden name='id_factura_pago' id='id_factura_pago' value='<?php echo $pago->fields['id_factura_pago']; ?>' />
 	<input type=hidden name='cifras_decimales_pago' id='cifras_decimales_pago' value="<?php echo $moneda_pago->fields['cifras_decimales'] ?>" />
 	<input type=hidden name='cifras_decimales_cobro' id='cifras_decimales_cobro' value="<?php echo $moneda_cobro->fields['cifras_decimales'] ?>" />
