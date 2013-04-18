@@ -17,19 +17,19 @@ $app->post('/login', function () {
 	$auth_token = $UserToken->makeAuthToken($user);
 
 	if (is_null($user) || $user == '') {
-		halt("Invalid user data");
+		halt("Invalid user data", "InvalidUserData");
 	}
 
 	if (is_null($password) || $password == '') {
-		halt("Invalid password data");
+		halt("Invalid password data", "InvalidPasswordData");
 	}
 
 	if (is_null($app_key) || $app_key == '') {
-		halt("Invalid application key data");
+		halt("Invalid application key data", "InvalidAppKey");
 	}
 
 	if (!$Session->login($user, null, $password)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		$user_token_data = array(
 			'user_id' => $Session->usuario->fields['id_usuario'],
@@ -38,7 +38,7 @@ $app->post('/login', function () {
 		);
 
 		if (!$UserToken->save($user_token_data)) {
-			halt("Unexpected error when saving data");
+			halt("Unexpected error when saving data", "UnexpectedSave");
 		}
 	}
 
@@ -173,7 +173,7 @@ $app->get('/settings', function () {
 
 $app->get('/users/:id', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID");
+		halt("Invalid user ID", "InvalidUserID");
 	}
 
 	$Session = new Sesion();
@@ -182,7 +182,7 @@ $app->get('/users/:id', function ($id) {
 
 	//$user_id = validateAuthTokenSendByHeaders();
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		$max_daily_minutes = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
 		$user = array(
@@ -203,7 +203,7 @@ $app->get('/users/:id', function ($id) {
 
 $app->get('/users/:id/works', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID");
+		halt("Invalid user ID", "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -236,7 +236,7 @@ $app->get('/users/:id/works', function ($id) {
 
 $app->put('/users/:id/works', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID");
+		halt("Invalid user ID", "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -253,6 +253,7 @@ $app->put('/users/:id/works', function ($id) {
 	$work['notes'] = $Slim->request()->params('notes');
 	$work['rate'] = (float) $Slim->request()->params('rate');
 	$work['requester'] = $Slim->request()->params('requester');
+
 	$work['activity_code'] = $Slim->request()->params('activity_code');
 	$work['area_code'] = $Slim->request()->params('area_code');
 	$work['matter_code'] = $Slim->request()->params('matter_code');
@@ -299,7 +300,7 @@ $app->put('/users/:id/works', function ($id) {
 
 $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	if (is_null($user_id) || empty($user_id)) {
-		halt("Invalid user ID");
+		halt("Invalid user ID", "InvalidUserID");
 	}
 
 	if (is_null($id) || empty($id)) {
@@ -364,7 +365,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 
 $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 	if (is_null($user_id) || empty($user_id)) {
-		halt("Invalid user ID");
+		halt("Invalid user ID", "InvalidUserID");
 	}
 
 	if (is_null($id) || empty($id)) {
