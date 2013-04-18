@@ -56,15 +56,13 @@ $app->get('/clients', function () {
 	$clients = array();
 	$user_id = validateAuthTokenSendByHeaders();
 	$clients = $Client->findAllActive();
-
 	outputJson($clients);
 });
 
 $app->get('/clients/:code/matters', function ($code) {
 	if (is_null($code) || $code == '') {
-		halt("Invalid client code");
+		halt("Invalid client code", "InvalidClientCode");
 	}
-
 	$Session = new Sesion();
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
@@ -79,7 +77,7 @@ $app->get('/clients/:code/matters', function ($code) {
 	}
 
 	if ($client === false) {
-		halt("The client doesn't exist");
+		halt("The client doesn't exist", "ClientDoesntExists");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -226,7 +224,7 @@ $app->get('/users/:id/works', function ($id) {
 	}
 
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		$works = $Work->findAllWorksByUserId($id, $before, $after);
 	}
@@ -281,7 +279,7 @@ $app->put('/users/:id/works', function ($id) {
 	}
 
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		$validate = $Work->validateDataOfWork($work);
 		if ($validate['error'] == true) {
@@ -342,7 +340,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	}
 
 	if (!$User->LoadId($user_id)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		if (!$Work->Load($id)) {
 			halt("The work doesn't exist");
@@ -379,7 +377,7 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 	$Work = new Trabajo($Session);
 
 	if (!$User->LoadId($user_id)) {
-		halt("The user doesn't exist");
+		halt("The user doesn't exist", "UserDoesntExist");
 	} else {
 		if (!$Work->Load($id)) {
 			halt("The work doesn't exist");
