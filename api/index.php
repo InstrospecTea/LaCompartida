@@ -17,19 +17,19 @@ $app->post('/login', function () {
 	$auth_token = $UserToken->makeAuthToken($user);
 
 	if (is_null($user) || $user == '') {
-		halt("Invalid user data", "InvalidUserData");
+		halt(__("Invalid user data"), "InvalidUserData");
 	}
 
 	if (is_null($password) || $password == '') {
-		halt("Invalid password data", "InvalidPasswordData");
+		halt(__("Invalid password data"), "InvalidPasswordData");
 	}
 
 	if (is_null($app_key) || $app_key == '') {
-		halt("Invalid application key data", "InvalidAppKey");
+		halt(__("Invalid application key data"), "InvalidAppKey");
 	}
 
 	if (!$Session->login($user, null, $password)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$user_token_data = array(
 			'user_id' => $Session->usuario->fields['id_usuario'],
@@ -38,7 +38,7 @@ $app->post('/login', function () {
 		);
 
 		if (!$UserToken->save($user_token_data)) {
-			halt("Unexpected error when saving data", "UnexpectedSave");
+			halt(__("Unexpected error when saving data"), "UnexpectedSave");
 		}
 	}
 
@@ -61,7 +61,7 @@ $app->get('/clients', function () {
 
 $app->get('/clients/:code/matters', function ($code) {
 	if (is_null($code) || $code == '') {
-		halt("Invalid client code", "InvalidClientCode");
+		halt(__("Invalid client code"), "InvalidClientCode");
 	}
 	$Session = new Sesion();
 	$Client = new Cliente($Session);
@@ -77,7 +77,7 @@ $app->get('/clients/:code/matters', function ($code) {
 	}
 
 	if ($client === false) {
-		halt("The client doesn't exist", "ClientDoesntExists");
+		halt(__("The client doesn't exist"), "ClientDoesntExists");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -171,7 +171,7 @@ $app->get('/settings', function () {
 
 $app->get('/users/:id', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID", "InvalidUserID");
+		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$Session = new Sesion();
@@ -180,7 +180,7 @@ $app->get('/users/:id', function ($id) {
 
 	//$user_id = validateAuthTokenSendByHeaders();
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$max_daily_minutes = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
 		$user = array(
@@ -201,7 +201,7 @@ $app->get('/users/:id', function ($id) {
 
 $app->get('/users/:id/works', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID", "InvalidUserID");
+		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -224,7 +224,7 @@ $app->get('/users/:id/works', function ($id) {
 	}
 
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$works = $Work->findAllWorksByUserId($id, $before, $after);
 	}
@@ -234,7 +234,7 @@ $app->get('/users/:id/works', function ($id) {
 
 $app->put('/users/:id/works', function ($id) {
 	if (is_null($id) || empty($id)) {
-		halt("Invalid user ID", "InvalidUserID");
+		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -263,30 +263,34 @@ $app->put('/users/:id/works', function ($id) {
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
 	} else {
-		halt("The date format is incorrect");
+		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	if (!is_null($work['created_date']) && isValidTimeStamp($work['created_date'])) {
 		$work['created_date'] = date('Y-m-d H:i:s', $work['created_date']);
 	} else {
-		halt("The created date format is incorrect");
+		halt(__("The created date format is incorrect"), "InvalidCreationDate");
 	}
 
 	if (!is_null($work['duration'])) {
 		$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));
 	} else {
-		halt("The duration format is incorrect");
+		halt(__("The duration format is incorrect"), "InvalidDuration");
 	}
 
 	if (!$User->LoadId($id)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$validate = $Work->validateDataOfWork($work);
 		if ($validate['error'] == true) {
-			halt($validate['description']);
+			halt($validate['description'], "ValidationError");
 		} else {
 			if (!$Work->save($work)) {
-				halt("Unexpected error when saving data");
+				if (!is_null($Work->error) && !empty($Work->error)) {
+					halt($Work->error, "ValidationError");
+				} else {
+					halt(__("Unexpected error when saving data"), "UnexpectedSave");
+				}
 			} else {
 				$work = $Work->findById($Work->fields['id_trabajo']);
 			}
@@ -298,11 +302,11 @@ $app->put('/users/:id/works', function ($id) {
 
 $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	if (is_null($user_id) || empty($user_id)) {
-		halt("Invalid user ID", "InvalidUserID");
+		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	if (is_null($id) || empty($id)) {
-		halt("Invalid work ID");
+		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
@@ -330,27 +334,31 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
 	} else {
-		halt("The date format is incorrect");
+		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
 	if (!is_null($work['duration'])) {
 		$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));
 	} else {
-		halt("The duration format is incorrect");
+		halt(__("The duration format is incorrect"), "InvalidDuration");
 	}
 
 	if (!$User->LoadId($user_id)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		if (!$Work->Load($id)) {
-			halt("The work doesn't exist");
+			halt(__("The work doesn't exist"), "WorkDoesntExist");
 		} else {
 			$validate = $Work->validateDataOfWork($work);
 			if ($validate['error'] == true) {
-				halt($validate['description']);
+				halt($validate['description'], "ValidationError");
 			} else {
 				if (!$Work->save($work)) {
-					halt("Unexpected error when saving data");
+					if (!is_null($Work->error) && !empty($Work->error)) {
+						halt($Work->error, "ValidationError");
+					} else {
+						halt(__("Unexpected error when saving data"), "UnexpectedSave");
+					}
 				} else {
 					$work = $Work->findById($Work->fields['id_trabajo']);
 				}
@@ -363,11 +371,11 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 
 $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 	if (is_null($user_id) || empty($user_id)) {
-		halt("Invalid user ID", "InvalidUserID");
+		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	if (is_null($id) || empty($id)) {
-		halt("Invalid work ID");
+		halt(__("Invalid work ID"), "InvalidWorkID");
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
@@ -377,13 +385,17 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 	$Work = new Trabajo($Session);
 
 	if (!$User->LoadId($user_id)) {
-		halt("The user doesn't exist", "UserDoesntExist");
+		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		if (!$Work->Load($id)) {
-			halt("The work doesn't exist");
+			halt(__("The work doesn't exist"), "WorkDoesntExist");
 		} else {
 			if (!$Work->Eliminar()) {
-				halt("Unexpected error when deleting data");
+				if (!is_null($Work->error) && !empty($Work->error)) {
+					halt($Work->error, "ValidationError");
+				} else {
+					halt(__("Unexpected error deleting data"), "UnexpectedDelete");
+				}
 			}
 		}
 	}
@@ -404,7 +416,7 @@ function validateAuthTokenSendByHeaders() {
 
 	// if not exist the auth_token then return error
 	if (!is_object($user_token_data)) {
-		halt('Invalid AUTH TOKEN');
+		halt(__('Invalid AUTH TOKEN'), "SecurityError");
 	} else {
 		return $user_token_data->user_id;
 	}
