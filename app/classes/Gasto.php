@@ -317,7 +317,7 @@ class Gasto extends Objeto {
 				$where .= " AND cta_corriente.codigo_cliente = '{$_REQUEST['codigo_cliente']}'";
 				$cliente = new Cliente($this->sesion);
 				$cliente->LoadByCodigo($_REQUEST['codigo_cliente']);
-				if ($_REQUEST['codigo_asunto']) {
+				if (!empty($_REQUEST['codigo_asunto'])) {
 					$asunto = new Asunto($this->sesion);
 					$asunto->LoadByCodigo($_REQUEST['codigo_asunto']);
 					$query_asuntos = "SELECT codigo_asunto FROM asunto WHERE id_contrato = '" . $asunto->fields['id_contrato'] . "' ";
@@ -330,7 +330,6 @@ class Gasto extends Objeto {
 				}
 			}
 		}
-
 		$fecha1 = !empty($_REQUEST['fecha1'])? Utiles::fecha2sql($_REQUEST['fecha1']) : '';
 		$fecha2 = !empty($_REQUEST['fecha2'])? Utiles::fecha2sql($_REQUEST['fecha2']) : '';
 
@@ -341,7 +340,7 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.id_cobro is not null AND (cobro.estado = 'EMITIDO' OR cobro.estado = 'FACTURADO' OR cobro.estado = 'PAGO PARCIAL' OR cobro.estado = 'PAGADO' OR cobro.estado = 'ENVIADO AL CLIENTE' OR cobro.estado='INCOBRABLE') ";
 		}
 		if ($_REQUEST['codigo_asunto'] && $lista_asuntos) {
-			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
+			$where .= " AND cta_corriente.codigo_asunto IN ('$lista_asuntos')";
 		}
 		if ($_REQUEST['codigo_asunto_secundario'] && $lista_asuntos_secundario) {
 			$where .= " AND asunto.codigo_asunto_secundario IN ('$lista_asuntos_secundario')";

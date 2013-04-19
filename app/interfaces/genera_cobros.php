@@ -315,6 +315,7 @@ if (UtilesApp::GetConf($sesion, 'SoloGastos')) {
 				close:function(ev,ui) {
 					jQuery(this).html('');
 					interrumpeproceso=1;
+					jQuery('#boton_buscar').click();
 				},
 				open: function() {
 					jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -351,7 +352,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaGG=function(i) {
 																	 if(i>=largoGG) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores)');
+																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores). <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -371,7 +372,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaHH=function(j) {
 																	 if(j>=largoHH) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores)');
+																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -391,7 +392,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaMIXTAS=function(k) {
 																	 if(k>=largoMIXTAS ) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores)');
+																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -453,7 +454,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 															var generaClientes=function(k) {
 																if(k>=largoClientes) {
 																	jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores)');
+																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																	jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																	jQuery('#loading, #nocerrar').hide();
 																	jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -575,6 +576,7 @@ Impresión de cobros
 														 close:function(ev,ui) {
 															 jQuery(this).html('');
 															 interrumpeproceso=1;
+
 														 },
 														 open: function() {
 															 jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -765,11 +767,13 @@ else
 
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return true;
 				},
 				"<?php echo __('Cerrar') ?>": function() {
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return false;
 				}
 			}

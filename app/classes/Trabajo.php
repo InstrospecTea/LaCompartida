@@ -679,7 +679,7 @@ class Trabajo extends Objeto
 											id_usuario_trabajador = '{$trabajo_original->fields['id_usuario']}',
 											id_usuario_trabajador_modificado = '{$usuario->fields['id_usuario']}',
 											accion = 'SUBIR_XLS',
-											codigo_asunt = '{$trabajo_original->fields['codigo_asunto']}',
+											codigo_asunto = '{$trabajo_original->fields['codigo_asunto']}',
 											codigo_asunto_modificado = '$codigo_asunto',
 											cobrable = '{$trabajo_original->fields['cobrable']}',
 											cobrable_modificado = '$cobrable',

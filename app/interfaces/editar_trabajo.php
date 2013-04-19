@@ -785,27 +785,25 @@ UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $c
 					}
 				?>
 				<td colspan="2" align=right>
-					<?php	if ($mostrar_cobrable) { ?>
-					<?php echo __('Cobrable')?><br/>
+					<?php if ($mostrar_cobrable) { ?>
+						<?php echo __('Cobrable')?><br/>
 					<?php } ?>
 				</td>
 				<td align=left>
-					<?php  if ($mostrar_cobrable) { 		 ?>
-
-					<input type="checkbox" style="display:inline;" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
-					<?php } 	else { ?>
-					<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
+					<?php if ($mostrar_cobrable) { ?>
+						<input type="checkbox" style="display:inline;" name="cobrable" <?php echo  ($t->fields['cobrable'] == 1 ? " checked='checked'  value='1'" : ""); ?> id="chkCobrable" onClick="CheckVisible();">
+					<?php } else { ?>
+						<input type="hidden" name="cobrable" id="chkCobrable" value='1' >
 					<?php } ?>
 					&nbsp;&nbsp;
 					<div id=divVisible style="display:inline">
-					<?php if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) {
-						echo __('Visible');
-						echo "<input  style=\"display:inline;\" type=\"checkbox\" name=\"visible\" value=\"1\" checked=". (($t->fields['visible'] == 1)? '"checked"' : '""') ." id=\"chkVisible\" onMouseover=\"ddrivetip('Trabajo será visible en la ". __('Nota de Cobro')."')\" onMouseout=\"hideddrivetip()\"/>";
-					 } else {
-
-						echo "<input type=\"hidden\" name=\"visible\" value=\"". (($t->fields['visible']) ? $t->fields['visible'] : 1) ."\" id=\"hiddenVisible\" />";
-					 }
-					?>
+					<?php if ($permiso_revisor->fields['permitido'] || Conf::GetConf($sesion,'AbogadoVeDuracionCobrable')) { ?>
+						<?php echo __('Visible'); ?>
+						<input type="hidden" name="visible" value="0" />
+						<input  style="display:inline;" type="checkbox" name="visible" value="1" <?php echo ($t->fields['visible'] == 1) ? 'checked="checked"' : ''; ?> id="chkVisible" onMouseover="ddrivetip('Trabajo será visible en la <?php echo __('Nota de Cobro'); ?>')" onMouseout="hideddrivetip()"/>
+					<?php } else { ?>
+						<input type="hidden" name="visible" value="<?php echo $t->fields['visible'] ? $t->fields['visible'] : 1; ?>" id="hiddenVisible" />
+					<?php } ?>
 					</div>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 <?php

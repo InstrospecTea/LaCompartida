@@ -1,4 +1,43 @@
 # Changelog
+## Hotfix: 13.3.10
+jueves 11 de abril 2013
+* **Fixed:** [Corrige la carta de cobro de gastos para VFC con cálculo antigüo y nuevo módulo gastos](https://github.com/LemontechSA/ttb/pull/161)
+
+## Hotfix: 13.3.9
+jueves 11 de abril 2013
+* **Fixed:** [Corrige la forma de tratar los radio](https://github.com/LemontechSA/ttb/pull/160)
+
+##Hotfix 13.3.8
+jueves 11 abrirl 2013
+* **Fixed:** [Modifica permiso Admin datos para agregar clientes](https://github.com/LemontechSA/ttb/pull/158) [#pivotal](https://www.pivotaltracker.com/story/show/47240779)
+
+##Hotfix 13.3.7
+jueves 11 abrirl 2013
+* **Fixed:** [Formaliza correccion a clase trabajo hecha directo en produccion el 4 de abril](https://github.com/LemontechSA/ttb/pull/157) [#pivotal](https://www.pivotaltracker.com/story/show/47443091)
+
+## Hotfix 13.3.6
+miercoles 10 de abril 2013
+* **Fixed:** [Arregla descarga planilla de hh.](https://github.com/LemontechSA/ttb/pull/154) [#pivotal](https://www.pivotaltracker.com/story/show/47805683)
+
+## Hotfix 13.3.5
+martes 9 de abril 2013
+* **Fixed:** [Permite filtrar por mes al reporte financiero.](https://github.com/LemontechSA/ttb/pull/152) [#pivotal](https://www.pivotaltracker.com/story/show/47649165)
+
+## Hotfix 13.3.4
+Jueves 4 de abril 2013
+* **Fixed:** [Restablece la Nota de Cobro 13.2.15 y luego aplica las nuevas funcionalidades del release 13.3.0 sin romper la seccion Detalle Profesional](https://github.com/LemontechSA/ttb/pull/148) [#pivotal](https://www.pivotaltracker.com/story/show/47074217)
+
+## Hotfix: 13.3.3
+Lunes 1 de abril 2013
+* **Fixed:** [Corrige error en el método WhereQuery de la clase Gasto, que se manifestaba al filtrar por asunto](https://github.com/LemontechSA/ttb/pull/142) [#pivotal](https://www.pivotaltracker.com/story/show/47089611)
+
+## Hotfix: 13.3.2
+Jueves 28 marzo 2013
+* **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro](https://github.com/LemontechSA/ttb/pull/141) [#pivotal](https://www.pivotaltracker.com/story/show/47074217)
+
+## Hotfix: 13.3.1
+Jueves 28 marzo 2013
+* **Fixed:** [Sesion debe ir en mayuscula en la interfaz agregar_contrato](https://github.com/LemontechSA/ttb/pull/140) [#zendesk](http://lemontech.zendesk.com/tickets/8180?col=22917348&page=1)
 
 ## Release: 13.3.0
 Miércoles 27 de marzo 2013.

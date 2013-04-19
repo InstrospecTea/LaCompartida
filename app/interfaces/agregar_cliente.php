@@ -849,7 +849,9 @@ function TTip($texto) {
 									endif; ?>
 
 <?php
-$params_array['lista_permisos'] = array('REV'); // permisos de consultor jefe
+// permisos de consultor jefe
+$params_array['lista_permisos'] = array('REV','DAT');
+
 $permisos = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
 if ($permisos->fields['permitido']) {
