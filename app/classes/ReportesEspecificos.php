@@ -22,6 +22,11 @@ class ReportesEspecificos {
 			)
 		),
 		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+			'visible' => false
+		),
+		array(
 			'field' => 'descripcion',
 			'title' => 'Descripción',
 			'extras' => array(
@@ -109,7 +114,7 @@ public static $configuracion_saldo_clientes_resumen = array(
 		),
 		array(
 			'field' => 'saldo_adelantos',
-			'title' => 'Adelantos sin utilizar',
+			'title' => 'Adelantos no utilizados',
 			'format' => 'number',
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',

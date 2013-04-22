@@ -1679,9 +1679,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<div class="span1"><input type="hidden" name="separar_liquidaciones" value="0"/><input  class="span1" id="separar_liquidaciones" type="checkbox" name="separar_liquidaciones" value="1" <?php echo $separar_liquidaciones == '1' ? 'checked="checked"' : '' ?>  /></div>
 			</td></tr>
 			<?php
-			$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1";
+			$query = UsuarioExt::QueryComerciales();
 			?>
 			<tr   class="controls controls-row ">
 				<td class="al"><div class="span4">
