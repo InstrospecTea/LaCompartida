@@ -400,7 +400,7 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 		}
 	}
 
-	outputJson("OK");
+	outputJson(array('result' => 'OK'));
 
 });
 
