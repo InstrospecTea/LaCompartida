@@ -771,27 +771,38 @@ class Trabajo extends Objeto
 			if ($work->revised == '1') {
 				$read_only = 1;
 			}
-
-			array_push($works,
-				array(
+			$work = array(
 					'id' => (int) $work->id,
 					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
 					'date' => !empty($work->date) ? strtotime($work->date) : null,
 					'duration' => !empty($work->duration) ? (float) $work->duration : null,
 					'notes' => !empty($work->notes) ? $work->notes : null,
-					'rate' => !empty($work->rate) ? (float) $work->rate : null,
 					'read_only' => $read_only,
-					'requester' => !empty($work->requester) ? $work->requester : null,
-					'activity_code' => !empty($work->activity_code) ? $work->activity_code : null,
-					'area_code' => !empty($work->area_code) ? $work->area_code : null,
-					'client_code' => !empty($work->client_code) ? $work->client_code : null,
-					'matter_code' => !empty($work->matter_code) ? $work->matter_code : null,
-					'task_code' => !empty($work->task_code) ? $work->task_code : null,
 					'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
 					'billable' => !empty($work->billable) ? (int) $work->billable : 0,
 					'visible' => !empty($work->visible) ? (int) $work->visible : 0
-				)
-			);
+				);
+
+			if (!empty($work->rate)) {
+				$work['rate'] = $work->rate;
+			}
+			if (!empty($work->requester)) {
+				$work['requester'] = $work->requester;
+			}
+			if (!empty($work->activity_code)) {
+				$work['activity_code'] = $work->activity_code;
+			}
+			if (!empty($work->area_code)) {
+				$work['area_code'] = $work->area_code;
+			}
+			if (!empty($work->client_code)) {
+				$work['client_code'] = $work->client_code;
+			}
+			if (!empty($work->task_code)) {
+				$work['task_code'] = $work->task_code;
+			}
+
+			array_push($works, $work);
 		}
 
 		return $works;
