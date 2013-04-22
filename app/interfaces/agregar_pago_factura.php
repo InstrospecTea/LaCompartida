@@ -826,24 +826,8 @@ $query__listado .=" ) AND f.id_moneda = '$id_moneda_cobro' AND f.anulado = 0 and
 			<td align="right" width="20%"><?php echo __('Cliente ') ?></td>
 			<td colspan="3" align="left">
 				<?php
-				if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-					$cliente = new Cliente($sesion);
-					$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario($codigo_cliente);
-				}
+				UtilesApp::CampoCliente($sesion,$pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente,$codigo_cliente_secundario,$codigo_asunto,$codigo_asunto_secundario, '', 280, "+CargarTabla(1);"); 
 
-				if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
-					if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario, '', 280, "CargarTabla(1);");
-					} else {
-						echo Autocompletador::ImprimirSelector($sesion, $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente, '', '', 280, "CargarTabla(1);");
-					}
-				} else {
-					if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente_secundario", "glosa_cliente", "codigo_cliente_secundario", $codigo_cliente_secundario, "", "", 280);
-					} else {
-						echo InputId::ImprimirSinCualquiera($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente, " disabled ", "CargarTabla(1);", 280);
-					}
-				}
 				?>
 			</td>
 		</tr>
