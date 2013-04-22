@@ -114,18 +114,21 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$b->funcionTR = "funcionTR";
 }
 
+
 function Opciones(& $fila) {
 	global $sesion;
 
 	$id_factura = $fila->fields['id_factura'];
 	$codigo_cliente = $fila->fields['codigo_cliente'];
-	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura',730,580,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
+	$html_opcion .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura',730,700,'agregar_factura.php?id_factura=$id_factura&codigo_cliente=$codigo_cliente&popup=1');\" >&nbsp;</a>&nbsp;";
 	if (UtilesApp::GetConf($sesion, 'ImprimirFacturaDoc')) {
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(" . $id_factura . ");\" ><img src='" . Conf::ImgDir() . "/doc.gif' border=0 title=\"Imprimir Word\"></a>";
+		$html_opcion .= "<a class=\"fl ui-button doc\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href='javascript:void(0)' onclick=\"ImprimirDocumento(" . $id_factura . ");\" >&nbsp;</a>";
 	}
 	if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf')) {
-		$html_opcion .= "<a href='javascript:void(0)' onclick=\"ImprimirPDF(" . $id_factura . ");\" ><img src='" . Conf::ImgDir() . "/pdf.gif' border=0 title=\"Imprimir Pdf\"></a>";
+		$html_opcion .= "<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href='javascript:void(0)' onclick=\"ImprimirPDF(" . $id_factura . ");\" >&nbsp;</a>";
 	}
+	 $html_opcion .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"factura\" id=\"factura_" . $id_factura . "\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+
 	return $html_opcion;
 }
 
