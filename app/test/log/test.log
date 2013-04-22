@@ -9,3 +9,4 @@ Started GET "/feature_integracion-contable-gastos" for 127.0.0.1 at 2013-03-27 0
 Started GET "/feature_integracion-contable-gastos" for 127.0.0.1 at 2013-03-27 08:23:25 -0300
 Started GET "/feature_integracion-contable-gastos/feature_integracion-contable-gastos/app/usuarios/index.php" for 127.0.0.1 at 2013-03-27 08:23:59 -0300
 Started GET "/feature_integracion-contable-gastos" for 127.0.0.1 at 2013-03-27 08:55:15 -0300
+Started GET "/feature_convertir_provision_en_adelanto" for 127.0.0.1 at 2013-04-02 15:29:41 -0300
