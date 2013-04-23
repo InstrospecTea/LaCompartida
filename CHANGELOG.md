@@ -2,7 +2,7 @@
 
 ## Hotfix: 13.3.11
 jueves 22 de abril 2013
-* **Fixed:** [ Corrige reporte_anual, Crear cliente con conf CorreosModificacionAdminDatos ](https://github.com/LemontechSA/ttb/pull/163)
+* **Fixed:** [ Corrige reporte_anual, Crear cliente con conf CorreosModificacionAdminDatos ](https://github.com/LemontechSA/ttb/pull/170)
 
 ## Hotfix: 13.3.11
 jueves 17 de abril 2013
