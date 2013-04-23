@@ -1505,9 +1505,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
+			//jQuery('.seccioncobrable').hide();
 		}
 	});
 	if (jQuery('#chkCobrable').is(':checked')) {
@@ -1515,9 +1515,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
+			//jQuery('.seccioncobrable').hide();
 		}
 
 			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
