@@ -798,6 +798,9 @@ class Trabajo extends Objeto
 			if (!empty($work->client_code)) {
 				$mapped_work['client_code'] = $work->client_code;
 			}
+			if (!empty($work->matter_code)) {
+				$mapped_work['matter_code'] = $work->matter_code;
+			}
 			if (!empty($work->task_code)) {
 				$mapped_work['task_code'] = $work->task_code;
 			}
