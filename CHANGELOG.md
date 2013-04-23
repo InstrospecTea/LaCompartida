@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix: 13.3.11
+## Hotfix: 13.3.12
 jueves 22 de abril 2013
 * **Fixed:** [ Corrige reporte_anual, Crear cliente con conf CorreosModificacionAdminDatos ](https://github.com/LemontechSA/ttb/pull/170)
 
