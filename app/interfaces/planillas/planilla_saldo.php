@@ -89,7 +89,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$join_gastos = '';
 	$select_liquidaciones =
 		$select_adelantos =
-		$select_gastos = '';
+		$select_gastos =
+		$select_resumen = "";
 
 	$tipo_liq_gastos = 'G';
 	$tipo_liq_honorarios = 'H';
@@ -104,16 +105,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 	}
 
 	if (!empty($encargado_comercial)) {
-		$join_gastos .= " INNER JOIN contrato ON cliente.id_contrato = contrato.id_contrato";
-		$join_gastos .= " LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable";
-		$join_adelantos .= " INNER JOIN contrato ON d.id_contrato = contrato.id_contrato";
-		$join_adelantos .= " LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable";
-		$join_liquidaciones .= " LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable";
-
-		$select_gastos .= "encargado_comercial.username AS encargado_comercial,";
-		$select_adelantos .= "encargado_comercial.username AS encargado_comercial,";
-		$select_liquidaciones .= "encargado_comercial.username AS encargado_comercial,";
-
 		$where_gastos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_adelantos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_liquidaciones .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
@@ -164,6 +155,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$query_liquidaciones = "SELECT
 				$select_liquidaciones
+				encargado_comercial.username AS encargado_comercial,
 				DATE(cobro.fecha_emision) AS fecha,
 				d.id_cobro AS identificador,
 				'$texto_liquidaciones_por_pagar' AS tipo,
@@ -188,6 +180,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 			INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
+			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_liquidaciones
 			WHERE
 				d.tipo_doc = 'N' AND
@@ -197,6 +190,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$query_adelantos = "SELECT
 				$select_adelantos
+				encargado_comercial.username AS encargado_comercial,
 				d.fecha,
 				d.id_documento AS identificador,
 				'$texto_adelantos_no_utilizados' AS tipo,
@@ -217,6 +211,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
+			INNER JOIN contrato ON d.id_contrato = contrato.id_contrato
+			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_adelantos
 			WHERE
 				d.es_adelanto = 1 AND
@@ -226,6 +222,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$query_gastos = "SELECT
 				$select_gastos
+				encargado_comercial.username AS encargado_comercial,
 				DATE(cc.fecha) AS fecha,
 				cc.id_movimiento AS identificador,
 				IF ( cc.ingreso IS NULL, '$texto_gastos_por_liquidar', '$texto_provisiones_por_liquidar' ) AS tipo,
@@ -253,6 +250,8 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = cc.codigo_cliente
 			LEFT JOIN cobro ON cc.id_cobro = cobro.id_cobro
+			INNER JOIN contrato ON cliente.id_contrato = contrato.id_contrato
+			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_gastos
 			WHERE
 				cc.cobrable = 1 AND
@@ -267,6 +266,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$SimpleReport->LoadConfiguration('REPORTE_SALDO_CLIENTES_RESUMEN');
 
+	$SimpleReport->Config->columns['encargado_comercial']->Title(__('Encargado Comercial'));
 	$SimpleReport->Config->columns['saldo_liquidaciones']->Title($texto_liquidaciones_por_pagar);
 	$SimpleReport->Config->columns['saldo_gastos']->Title($texto_gastos_por_liquidar);
 	$SimpleReport->Config->columns['saldo_adelantos']->Title($texto_adelantos_no_utilizados);
@@ -281,6 +281,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	$query =
 		"SELECT
+			r.encargado_comercial,
 			r.codigo_cliente,
 			r.glosa_cliente,
 			SUM(IF(r.tipo = '$texto_liquidaciones_por_pagar', r.monto_base, 0)) AS total_liquidaciones,

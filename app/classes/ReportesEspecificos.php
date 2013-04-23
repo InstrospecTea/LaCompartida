@@ -93,6 +93,11 @@ public static $configuracion_saldo_clientes_resumen = array(
 			)
 		),
 		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial',
+			'visible' => false
+		),
+		array(
 			'field' => 'saldo_liquidaciones',
 			'title' => 'Liquidaciones por pagar',
 			'format' => 'number',
