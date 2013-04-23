@@ -771,7 +771,7 @@ class Trabajo extends Objeto
 			if ($work->revised == '1') {
 				$read_only = 1;
 			}
-			$work = array(
+			$mapped_work = array(
 					'id' => (int) $work->id,
 					'creation_date' => !empty($work->creation_date) ? strtotime($work->creation_date) : null,
 					'date' => !empty($work->date) ? strtotime($work->date) : null,
@@ -784,25 +784,25 @@ class Trabajo extends Objeto
 				);
 
 			if (!empty($work->rate)) {
-				$work['rate'] = $work->rate;
+				$mapped_work['rate'] = $work->rate;
 			}
 			if (!empty($work->requester)) {
-				$work['requester'] = $work->requester;
+				$mapped_work['requester'] = $work->requester;
 			}
 			if (!empty($work->activity_code)) {
-				$work['activity_code'] = $work->activity_code;
+				$mapped_work['activity_code'] = $work->activity_code;
 			}
 			if (!empty($work->area_code)) {
-				$work['area_code'] = $work->area_code;
+				$mapped_work['area_code'] = $work->area_code;
 			}
 			if (!empty($work->client_code)) {
-				$work['client_code'] = $work->client_code;
+				$mapped_work['client_code'] = $work->client_code;
 			}
 			if (!empty($work->task_code)) {
-				$work['task_code'] = $work->task_code;
+				$mapped_work['task_code'] = $work->task_code;
 			}
 
-			array_push($works, $work);
+			array_push($works, $mapped_work);
 		}
 
 		return $works;
