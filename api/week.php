@@ -232,8 +232,8 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         height: 0;
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
-        border-top: 10px solid #333;
-        border-top-color: #333;
+        border-top: 10px solid #EEE;
+        border-top-color: #EEE;
         content: '';
         position: absolute;
         left: 50%;
@@ -243,7 +243,7 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         #tooltip.top:after
         {
           border-top-color: transparent;
-          border-bottom: 10px solid #333;
+          border-bottom: 10px solid #EEE;
           border-bottom-color: #EEE;
           top: -20px;
           bottom: auto;
