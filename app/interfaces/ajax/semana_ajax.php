@@ -131,19 +131,20 @@ echo '<input style="text-indent: -10000px;color:white;position: absolute;right:0
 $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 ?>
 <div class="semanacompleta" style="padding:0px 75px;float:left;">
-	<div class="semana_del_dia" style="text-align:left;float:left;">
-<?php echo __('Semana del'); ?>:
-		<b><?php echo Utiles::sql3fecha($semanacompleta[1][0], '%d de %B de %Y'); ?></b>
+
+	<div class="semana_del_dia" style="text-align:left;float:left;width:100%;">
+		<div id="previous_button" class="button" style="text-align:center;float:left;width:5%;">&nbsp;</div>
+		<div style="text-align:center;float:left;width:90%;">
+			<?php echo __('Semana del'); ?>:
+			<b><?php echo Utiles::sql3fecha($semanacompleta[1][0], '%d de %B de %Y'); ?></b>
+		</div>
+		<div id="next_button" class="button" style="text-align:center;float:left;width:5%;">&nbsp;</div>
 	</div>
+
 	<div class="total_mes_actual" style="text-align:left;float:right;">
-		<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual') ?>:
-
-		<?php
-		$horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
-		?>
+		<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual'); ?>:
+		<?php $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : ''); ?>
 		<strong id="totalmes"><?php echo $horas_trabajadas_mes; ?></strong>
-
-
 	</div>
 	<?php
 	$arraytrabajo = array();
