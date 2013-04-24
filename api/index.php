@@ -152,6 +152,24 @@ $app->get('/settings', function () {
 		if ($Session->arrayconf['Intervalo']) {
 			array_push($settings, array('code' => 'IncrementalStep', 'value' => $Session->arrayconf['Intervalo']));
 		}
+		if ($Session->arrayconf['CantidadHorasDia']) {
+			array_push($settings, array('code' => 'TotalDailyTime', 'value' => $Session->arrayconf['CantidadHorasDia']));
+		}
+		if ($Session->arrayconf['UsarAreaTrabajos']) {
+			array_push($settings, array('code' => 'UseWorkingAreas', 'value' => $Session->arrayconf['UsarAreaTrabajos']));
+		}
+		if ($Session->arrayconf['UsoActividades']) {
+			array_push($settings, array('code' => 'UseActivities', 'value' => $Session->arrayconf['UsoActividades']));
+		}
+		if ($Session->arrayconf['GuardarTarifaAlIngresoDeHora']) {
+			array_push($settings, array('code' => 'UseWorkRate', 'value' => $Session->arrayconf['GuardarTarifaAlIngresoDeHora']));
+		}
+		if ($Session->arrayconf['OrdenadoPor']) {
+			array_push($settings, array('code' => 'UseRequester', 'value' => $Session->arrayconf['OrdenadoPor']));
+		}
+		if ($Session->arrayconf['TodoMayuscula']) {
+			array_push($settings, array('code' => 'UseUppercase', 'value' => $Session->arrayconf['TodoMayuscula']));
+		}
 	}
 
 	outputJson($settings);
