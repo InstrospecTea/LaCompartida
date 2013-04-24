@@ -232,8 +232,8 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         height: 0;
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
-        border-top: 10px solid #EEE;
-        border-top-color: #EEE;
+        border-top: 10px solid #AAA;
+        border-top-color: #CCC;
         content: '';
         position: absolute;
         left: 50%;
