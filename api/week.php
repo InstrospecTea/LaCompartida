@@ -51,7 +51,19 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         text-align: center;
       }
 
-      .semana_del_dia,
+      .semana_del_dia {
+        background-color: #263443 !important;
+        height: 25px !important;
+        top: 0;
+        position: fixed;
+        color: #CCCCCC !important;
+        width: 100%;
+        text-align: center !important;
+        font-size: 10pt !important;
+        padding-top: 5px !important;
+        z-index: 999;
+      }
+
       .total_mes_actual {
         display: none;
       }
@@ -67,13 +79,15 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
       #cabecera_dias {
         width: 100%;
         position: fixed;
-        top: 0;
+        top: 25px;
         z-index: 999;
-        padding: 5pt 0;
+        padding: 0;
+        background-color: #263443 !important;
+        color: #CCCCCC;
       }
 
       #cabecera_dias .diasemana {
-        width: 16%;
+        width: 15.4%;
         float: left;
       }
 
@@ -87,17 +101,19 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         width: 100% !important;
         height: 100%;
         padding: 30pt 0;
+        padding-top: 40px !important;
+        padding-bottom: 25px !important;
       }
 
       #celdastrabajo .celdadias {
-        width: 16%;
+        width: 15.4%;
         height: 100%;
         float: left;
       }
 
       #celdastrabajo #celdadia3,
       #celdastrabajo #celdadia5 {
-        background-color: #F0F0F0;
+        background-color: #F9F9F9;
       }
 
       #celdastrabajo #celdadia7,
@@ -106,21 +122,49 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
       }
 
       #celdastrabajo .cajatrabajo {
-        width: 95% !important;
-        font-size: 14pt !important;
-        border: 0pt solid black !important;
-        border-radius: 5pt !important;
-        padding: 2pt !important;
-        min-height: 88pt;
-        margin: 3pt auto;
+        font-size: 9pt !important;
+        padding: 0px !important;
+        padding-top: 5px !important;
+        min-height: 30pt;
+        margin: 0px;
+        border-top: 0px !important;
+        border-left: 0px !important;
+        border-right: 0px !important;
+        border-radius: 5px !important;
+        border-bottom: 1px #888 solid !important;
+        box-shadow: 0 1px 0 rgba(0,0,0,.05),inset 0 1px 0 white;
+        background-color: #ececec;
+        background-image: -webkit-linear-gradient(top, #e0e0e0, #d0d0d0);
+        font-weight: bold;
       }
+
+      #celdastrabajo .cajatrabajo a {
+        text-decoration: none !important;
+        color: black;
+      }
+
+      .cajatrabajo-odd {
+        background-image: -webkit-linear-gradient(top, #A7A7A7, #A9ADA9) !important;
+      }
+
+      .cajatrabajo-selected {
+        background-image: -webkit-linear-gradient(top, #20ADE7, #20ADE7) !important;
+        color: white !important;
+      }
+
+      .cajatrabajo-selected a {
+        text-decoration: none !important;
+        color: white !important;
+      }
+
 
       #celdastrabajo .totaldia,
       .total_semana_actual {
-        width: 16%;
+        width: 15.4%;
         position: fixed;
         bottom: 0;
         padding: 5pt 0;
+        -webkit-box-shadow: inset 5px 12px 5px -10px #000000;
       }
 
       #celdastrabajo #celdadia7 .totaldia,
@@ -128,14 +172,13 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         display: none;
       }
 
-      #cabecera_dias,
       #celdastrabajo .totaldia,
       .total_semana_actual {
         /*background-color: #2A323F;*/
         background-image: linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
         background-image: -o-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
         background-image: -moz-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
-        background-image: -webkit-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
+        background-image: -webkit-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(39,55,72) 50%);
         background-image: -ms-linear-gradient(bottom, rgb(17,22,26) 0%, rgb(56,67,87) 10%, rgb(46,55,70) 50%);
 
         background-image: -webkit-gradient(
@@ -144,18 +187,19 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
           left top,
           color-stop(0, rgb(17,22,26)),
           color-stop(0.1, rgb(56,67,87)),
-          color-stop(0.5, rgb(46,55,70))
+          color-stop(0.5, rgb(39,55,72))
         );
 
         color: #CCCCCC;
       }
 
       .total_semana_actual {
-        width: 20%;
+        width: 24%;
         right: 0;
         text-align: right;
         font-weight: bold;
         padding-left: 5px !important;
+        padding-right: 10px;
       }
 
       /*
@@ -166,16 +210,10 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
       font-family: Ubuntu, sans-serif;
       font-size: 0.875em;
       text-align: center;
-      text-shadow: 0 1px rgba( 0, 0, 0, .5 );
       line-height: 1.5;
-      color: #fff;
-      background: #333;
-      background: -webkit-gradient( linear, left top, left bottom, from( rgba( 0, 0, 0, .7 ) ), to( rgba( 0, 0, 0, .9 ) ) );
-      background: -webkit-linear-gradient( top, rgba( 0, 0, 0, .7 ), rgba( 0, 0, 0, .9 ) );
-      background: -moz-linear-gradient( top, rgba( 0, 0, 0, .7 ), rgba( 0, 0, 0, .9 ) );
-      background: -ms-radial-gradient( top, rgba( 0, 0, 0, .7 ), rgba( 0, 0, 0, .9 ) );
-      background: -o-linear-gradient( top, rgba( 0, 0, 0, .7 ), rgba( 0, 0, 0, .9 ) );
-      background: linear-gradient( top, rgba( 0, 0, 0, .7 ), rgba( 0, 0, 0, .9 ) );
+      color: #333;
+      background: #EEE;
+      background:  -webkit-linear-gradient(top, #EEE, #CCC);
       -webkit-border-radius: 5px;
       -moz-border-radius: 5px;
       border-radius: 5px;
@@ -195,7 +233,7 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
         border-top: 10px solid #333;
-        border-top-color: rgba( 0, 0, 0, .7 );
+        border-top-color: #333;
         content: '';
         position: absolute;
         left: 50%;
@@ -206,7 +244,7 @@ if (!is_null($_REQUEST['day']) && isValidTimeStamp($_REQUEST['day'])) {
         {
           border-top-color: transparent;
           border-bottom: 10px solid #333;
-          border-bottom-color: rgba( 0, 0, 0, .6 );
+          border-bottom-color: #EEE;
           top: -20px;
           bottom: auto;
         }
@@ -244,7 +282,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
         target  = false,
         tooltip = false,
         title   = false;
-
+        var color = ""
         targets.each(function (idx, el) {
           tip = $(el).attr( 'onmouseover' );
           tip = tip.replace("ddrivetip('", "");
@@ -253,6 +291,15 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
           $(el).attr('data-title', tip);
           $(el).removeAttr('onmouseover');
           $(el).removeAttr('onmouseout');
+          if (idx % 2) {
+            $(el).addClass('cajatrabajo-odd');
+          }
+         // $(el).attr("style", "font-size:8px; background-color:");
+        });
+
+        $('.diasemana').each(function(idx, el){
+          var text = $(el).text();
+          $(el).html(text.trim().substring(0, 3) + " " + text.split(" ")[1]);
         });
 
     targets.bind( 'mouseenter', function(event)
@@ -304,6 +351,8 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
             else
                 tooltip.removeClass( 'top' );
 
+            $('.cajatrabajo').removeClass('cajatrabajo-selected');
+            target.addClass('cajatrabajo-selected');
             tooltip.css( { left: pos_left, top: pos_top } )
                    .animate( { top: '+=10', opacity: 1 }, 50 );
         };
@@ -319,6 +368,7 @@ include APPPATH . '/app/interfaces/ajax/semana_ajax.php';
             });
 
             target.attr( 'title', tip );
+            $('.cajatrabajo').removeClass('cajatrabajo-selected');
         };
 
         target.bind( 'mouseleave', remove_tooltip );
