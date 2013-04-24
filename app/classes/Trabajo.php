@@ -823,19 +823,19 @@ class Trabajo extends Objeto
 				$created_date = $this->fields['fecha_creacion'];
 				$charge_status = $this->Estado();
 				if (($charge_status == 'Cobrado' || $charge_status == __('Cobrado'))) {
-					return array('error' => true, 'description' => "Work is already charged");
+					return array('error' => true, 'description' => __("Work is already charged"));
 				} else if ($charge_status == 'Revisado' || $charge_status == __('Revisado')) {
-					return array('error' => true, 'description' => "The work is revised");
+					return array('error' => true, 'description' => __("The work is revised"));
 				}
 			} else {
-				return array('error' => true, 'description' => "The work doesn't exist");
+				return array('error' => true, 'description' => __("The work doesn't exist"));
 			}
 		} else {
 			$created_date = $data['created_date'];
 		}
 
 		if (empty($data['duration']) || $data['duration'] == '00:00:00') {
-			return array('error' => true, 'description' => "The hours entered must be greater than 0");
+			return array('error' => true, 'description' => __("The hours entered must be greater than 0"));
 		}
 
 		$duration = $data['duration'];
@@ -844,11 +844,11 @@ class Trabajo extends Objeto
 		}
 
 		if (empty($data['user_id'])) {
-			return array('error' => true, 'description' => "Invalid user ID");
+			return array('error' => true, 'description' => __("Invalid user ID"));
 		} else {
 			$User = new Usuario($this->sesion);
 			if (!$User->LoadId($data['user_id'])) {
-				return array('error' => true, 'description' => "The user doesn't exist");
+				return array('error' => true, 'description' => __("The user doesn't exist"));
 			} else {
 				if (!$this->validateWorkingDays($User->fields['dias_ingreso_trabajo'], $created_date, $data['date'])) {
 					return array('error' => true, 'description' => $this->error . ' ' . strtotime('2013-04-02'));
@@ -859,18 +859,18 @@ class Trabajo extends Objeto
 		if (!Trabajo::CantHorasDia($duration, $data['date'], $data['user_id'], $this->sesion)) {
 			$total_minutes_per_day = Conf::GetConf($this->sesion, 'CantidadHorasDia') ? Conf::GetConf($this->sesion, 'CantidadHorasDia') : 1439;
 			$total_minutes_per_day = date('H:i', mktime(0, $total_minutes_per_day, 0, 0, 0, 0));
-			return array('error' => true, 'description' => "You can not enter more than {$total_minutes_per_day} hours per day");
+			return array('error' => true, 'description' => __("You can not enter more than") . " $total_minutes_per_day " . __("hours per day"));
 		}
 
 		if (empty($data['notes'])) {
-			return array('error' => true, 'description' => "Invalid notes");
+			return array('error' => true, 'description' => __("Invalid Description"));
 		}
 
 		if (Conf::GetConf($this->sesion, 'UsoActividades')) {
 			if (!empty($data['activity_code'])) {
 				$Activity = new Actividad($this->sesion);
 				if (!$Activity->loadByCode($data['activity_code'])) {
-					return array('error' => true, 'description' => "The activity doesn't exist");
+					return array('error' => true, 'description' => __("The activity doesn't exist"));
 				}
 			}
 		}
@@ -879,15 +879,15 @@ class Trabajo extends Objeto
 			if (!empty($data['area_code'])) {
 				$WorkArea = new AreaTrabajo($this->sesion);
 				if (!$WorkArea->Load($data['area_code'])) {
-					return array('error' => true, 'description' => "The area code doesn't exist");
+					return array('error' => true, 'description' => __("The area code doesn't exist"));
 				}
 			} else {
-				return array('error' => true, 'description' => "Invalid area code");
+				return array('error' => true, 'description' => __("Invalid area code"));
 			}
 		}
 
 		if (empty($data['matter_code']))  {
-			return array('error' => true, 'description' => "Invalid matter code");
+			return array('error' => true, 'description' => __("Invalid matter code"));
 		} else {
 			$Matter = new Asunto($this->sesion);
 			if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
@@ -896,7 +896,7 @@ class Trabajo extends Objeto
 				$Matter->LoadByCodigo($data['matter_code']);
 			}
 			if (!$Matter->Loaded()) {
-				return array('error' => true, 'description' => "The matter doesn't exist");
+				return array('error' => true, 'description' => __("The matter doesn't exist"));
 			}
 		}
 
@@ -907,7 +907,7 @@ class Trabajo extends Objeto
 		if ($income_working_days) {
 			$deadline = strtotime($created_date) - ($income_working_days + 1) * 24 * 60 * 60;
 			if ($deadline > strtotime($date)) {
-				$this->error = "You can not enter hours prior to " . date('Y-m-d', $deadline + 24 * 60 * 60);
+				$this->error = __("You can not enter hours prior to") . " " . date('Y-m-d', $deadline + 24 * 60 * 60);
 				return false;
 			}
 		}

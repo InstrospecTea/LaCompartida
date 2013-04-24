@@ -6,6 +6,7 @@ $app = new Slim();
 define(MIN_TIMESTAMP, 315532800);
 define(MAX_TIMESTAMP, 4182191999);
 
+
 $app->post('/login', function () {
 	$Session = new Sesion();
 	$UserToken = new UserToken($Session);
@@ -133,24 +134,11 @@ $app->get('/tasks', function () {
 
 $app->get('/translations', function () {
 	$Session = new Sesion();
-	$Translation = new Translation($Session);
-	$translations = array();
-
 	$user_id = validateAuthTokenSendByHeaders();
-	$translation_files = $Translation->findAllActive();
-
-	if (is_array($translation_files) && !empty($translation_files)) {
-		$_LANG = array();
-		foreach ($translation_files as $translation_file) {
-			include Conf::ServerDir() . '/lang/' . $translation_file['file'];
-		}
-		if (is_array($_LANG) && !empty($_LANG)) {
-			array_push($translations, array('code' => 'Matters', 'value' => $_LANG['Asuntos']));
-			array_push($translations, array('code' => 'Works', 'value' => $_LANG['Trabajos']));
-			array_push($translations, array('code' => 'Clients', 'value' => $_LANG['Clientes']));
-		}
-	}
-
+	$translations = array();
+	array_push($translations, array('code' => 'Matters', 'value' => __("Asuntos")));
+	array_push($translations, array('code' => 'Works', 'value' => __('Trabajos')));
+	array_push($translations, array('code' => 'Clients', 'value' => __('Clientes')));
 	outputJson($translations);
 });
 
@@ -432,7 +420,7 @@ function halt($error_message = null, $error_code = null, $halt_code = 400) {
 			break;
 
 		default:
-			array_push($errors, array('message' => $error_message, 'code' => $error_code));
+			array_push($errors, array('message' => UtilesApp::utf8izar($error_message), 'code' => $error_code));
 			$Slim->halt($halt_code, json_encode(array('errors' => $errors)));
 			break;
 	}
