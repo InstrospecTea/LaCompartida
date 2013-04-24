@@ -307,6 +307,18 @@ $next_week = $_REQUEST['day'] + 604800;
 
 				$('.total_semana_actual').text($('.total_semana_actual').text().replace('semana', ''));
 
+				for (var x = 1; x <= 6; x++){
+					var total_dia = 0;
+					$('.cajatrabajo.dia' + x).each(function(){
+						total_dia += $(this).height();
+					});
+					if (total_dia == 0) {
+						$('#celdadia' + x).height('100%');
+					} else {
+						$('#celdadia' + x).height((100 + total_dia) + 'px');
+					}
+				}
+
 				var targets = $('.cajatrabajo'),
 				target  = false,
 				tooltip = false,
