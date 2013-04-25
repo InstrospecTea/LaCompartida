@@ -111,6 +111,10 @@ class Gasto extends Objeto {
 			'title' => 'N° Documento',
 		),
 		array (
+			'field' => 'numero_ot',
+			'title' => 'N° Orden Trabajo',
+		),
+		array (
 			'field' => 'rut_proveedor',
 			'title' => 'RUT Proveedor',
 		),
