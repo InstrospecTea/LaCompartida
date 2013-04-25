@@ -199,6 +199,7 @@ $app->get('/users/:id', function ($id) {
 			'max_daily_hours' => (float) ($max_daily_minutes / 60.0),
 			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
+			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null
 		);
 	}
 
