@@ -47,7 +47,7 @@ function Authenticate()  {
 $Slim->map('/EntregarListaClientes(/:callback)', 'EntregarListaClientes')->via('GET', 'POST');
 
 	function EntregarListaClientes($callback='') {
-        
+        global $sesion;
 				$Slim=Slim::getInstance('default',true);
 				$usuario= $Slim->request()->params('usuario');
 				$password= $Slim->request()->params('password');
