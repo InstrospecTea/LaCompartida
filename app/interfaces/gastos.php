@@ -385,19 +385,21 @@ if (UtilesApp::GetConf($sesion, 'ExcelGastosDesglosado')) {
 					});
 				},
 				"aoColumnDefs": [
-					{  "sClass": "alignleft",    "aTargets": [ 1,2,3,4 ]   },
-					{  "sClass": "marginleft",    "aTargets": [ 2 ]   },
-					{  "sClass": "tablagastos",    "aTargets": [ 0,1,2,3,4,5,6,7,8,9,10  ]   },
-					{  "sWidth": "60px",    "aTargets": [0,1,5,6,11,12 ]   },
-					{  "bSortable":false,    "aTargets": [2,3,4,11,12 ]   },
-					{ "bVisible": false, "aTargets": [  4,9,11,13 ] },
+					{  "sClass": "alignleft",    	"aTargets": [ 1,2,3,4 ]   },
+					{  "sClass": "marginleft",    	"aTargets": [ 2 ]   },
+					{  "sClass": "tablagastos",    	"aTargets": [ 0,1,2,3,4,5,6,7,8,9,10  ]   },
+					{  "sWidth": "60px",    		"aTargets": [ 0,1,5,6,11,12] },
+					{  "bSortable":false,    		"aTargets": [ 2,3,4,11,12] },
+					{  "bVisible": false, 			"aTargets": [ 5,10,12,14] },
 <?php
+
 if (!UtilesApp::GetConf($sesion, 'NumeroGasto')) {
 	echo ' { "bVisible": false, "aTargets": [ 0 ] },';
 }
 
-//if ( !UtilesApp::GetConf($sesion,'NumeroGasto') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
-//if ( !UtilesApp::GetConf($sesion,'NumeroOT') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
+if ( !UtilesApp::GetConf($sesion,'NumeroOT') ) {
+	echo ' { "bVisible": false, "aTargets": [ 2 ] },';
+}
 //if ( !UtilesApp::GetConf($sesion,'FacturaAsociada') ) echo ' { "bVisible": false, "aTargets": [ 14 ] },';
 
 if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
@@ -406,20 +408,22 @@ if (!UtilesApp::GetConf($sesion, 'UsarImpuestoPorGastos')) {
 if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 	echo ' { "bVisible": false, "aTargets": [10 ] },';
 }
-?>  {"fnRender": function (o,val) {
-			return o.aData[12];
-		},"bUseRendered": false , "aTargets": [0] },
+?>  	
+		{  "fnRender": function ( o, val ) {
+			return o.aData[2];
+		}, "bUseRendered": false, "aTargets": [2]},	
+
 		{  "fnRender": function ( o, val ) {
 			var respuesta='';
 			if(o.aData[9]=='SIN COBRO' || o.aData[9]=='CREADO' || o.aData[9]=='EN REVISION') {
-				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[12]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
+				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"nuevaVentana('Editar_Gasto',1000,700,'agregar_gasto.php?id_gasto="+o.aData[0]+"&popup=1&contitulo=true&id_foco=7', '');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_on.gif'></a><a style='float:left;display:inline;' onclick='EliminaGasto("+o.aData[12]+")' href='javascript:void(0)' target='_parent'><img border='0' title='Eliminar' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif'></a>";
 				respuesta+="<input type='checkbox' class='eligegasto' id='check_"+o.aData[12]+"'/>";
 			} else {
 				respuesta+="<a href=\"#\" style=\"float:left;display:inline;\" onclick=\"alert('<?php echo __('No se puede modificar este gasto') . ': ' . __('El Cobro') . __(' que lo incluye ya ha sido Emitido al Cliente.'); ?>');\"><img border='0' title='Editar' src='https://static.thetimebilling.com/images/editar_off.gif'></a>";
 			}
 
 			return respuesta;
-		}, "bUseRendered": false, "aTargets": [12]},
+		}, "bUseRendered": false, "aTargets": [13]},
 
 		{"fnRender": function ( o, val ) {
 			var idcobro=o.aData[8];
@@ -428,29 +432,27 @@ if (!UtilesApp::GetConf($sesion, 'UsarGastosCobrable')) {
 				respuesta+="<a title=\"Ver Cobro asociado\" onclick=\"nuevaVentana('Editar_Contrato',1024,700,'cobros6.php?id_cobro="+idcobro+"&amp;popup=1&amp;contitulo=true');\" href=\"javascript:void(0)\">"+idcobro+"</a><br/>";
 			}
 			return respuesta+'<small>'+o.aData[9]+'</small>';
-		}, "aTargets": [8]},
+		}, "aTargets": [10]},
 		
 		{"fnRender": function (o,val) {
-			var tipo=(o.aData[3]!=' - ')? o.aData[3]+' ':'';
-			return o.aData[2]+'<div class="tipodescripcion">('+tipo+o.aData[4]+')</div>';
-		}, "aTargets": [3]},
-		
-		{"fnRender": function (o,val) {
-			if(o.aData[5]) {
-				return o.aData[5]+'<br/><small>'+o.aData[13]+'</small>';
+			if(o.aData[13]) {
+				return o.aData[13]+'<br/><small>'+o.aData[13]+'</small>';
 			}
-		}, "aTargets": [5]},
+		}, "aTargets": [6]},
+
 		{"fnRender": function (o,val) {
-			return o.aData[0];
-		}, "bUseRendered": false, "aTargets": [1] },
+			var tipo=(o.aData[15]!=' - ')? o.aData[15]+' ':'';
+			return o.aData[4]+'<div class="tipodescripcion">('+tipo+o.aData[5]+')</div>';
+		}, "aTargets": [4]},
+
 		{"fnRender": function (o,val) {
-			var activo=(o.aData[11]='SI')? 'activo' :'inactivo';
+			var activo=(o.aData[12]='SI')? 'activo' :'inactivo';
 			if (typeof(contratos)!="undefined") {
-				contratos['contrato_'+o.aData[14]]=o.aData[14];
+				contratos['contrato_'+o.aData[12]]=o.aData[12];
 			}
-			 var datacliente=o.aData[1].split('|');
+			 var datacliente=o.aData[3].split('|');
 			return '<a href="agregar_cliente.php?codigo_cliente='+datacliente[0]+'">'+datacliente[0]+'</a> '+datacliente[1]+'<div class="tipodescripcion">('+activo+')</div>';
-		}, "bUseRendered": false , "aTargets": [2] }
+		}, "bUseRendered": false , "aTargets": [3] }
 		],
 		"aaSorting": [[0,'desc']],
 		"iDisplayLength": 25,
@@ -708,6 +710,7 @@ if ($opc == 'buscar') {
 		<tr class="encabezadolight">
 			<th>Correlativo</th>
 			<th>Fecha</th>
+			<th>Nº OT</th>
 			<th width="190"><?php echo __('Cliente'); ?></th>
 			<th width="260"><?php echo __('Asunto'); ?><br><small>(descripcion)</small></th>
 			<th>Descripción</th>
@@ -715,7 +718,7 @@ if ($opc == 'buscar') {
 			<th>Ingreso</th>
 			<th><?php echo __('Impuesto'); ?></th>
 			<th width="70"><?php echo __('Cobro'); ?><br/><small>(estado)</small></th>
-			<th>Estado<br>Cobro</th>
+			<th>Cobro</th>
 			<th width="60"><?php echo __('Cobrable'); ?></th>
 			<th><?php echo __('Contrato'); ?><br>Activo</th>
 			<th width="60">Opción <input type="checkbox" id="selectodos"/></th>
