@@ -58,6 +58,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	}
 
 	$query = "SELECT
+			T.codigo_cliente,
 			T.glosa_cliente,
 			T.moneda,
 			-SUM(IF(T.dias_atraso_pago BETWEEN 0 AND 30, $campo_valor, 0)) AS '0-30',
@@ -201,7 +202,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 					)
 			),
 			array(
-				'field' => 'cantidad_seguimiento',
+				'field' => 'codigo_cliente',
 				'title' => '&nbsp;',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:right"',
@@ -351,11 +352,12 @@ echo Html::SelectArray(array(
 			var td = jQuery(this);
 			var contenido = td.html();
 			if (contenido.trim() != '') {
-				var link = jQuery('<a/>', { text: contenido, href: 'javascript:void(0)' });
+				var link = jQuery('<a/>', { text: '', href: 'javascript:void(0)' });
+				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/tarea.gif' }));
 				td.html('');
 				td.append(link).append(' ');
-				link.popover({ title: '<?php echo __('Seguimiento del cliente'); ?>', trigger: 'click', placement: 'left', html: true, content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=ACH" />' });
 			}
+			td.popover({ title: '<?php echo __('Seguimiento del cliente'); ?>', trigger: 'click', placement: 'left', html: true, content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + contenido + '" />' });
 		});
 	});
 </script>
