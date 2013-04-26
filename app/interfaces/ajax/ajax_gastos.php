@@ -215,22 +215,22 @@ if ($_GET['totalctacorriente']) { ?>
 	$mas = 0;
 	foreach ($resp as $fila) {
 		$stringarray = array(
-/*0*/			$fila['id_movimiento'],
-/*1*/			date('d-m-Y', strtotime($fila['fecha'])),
-/*2*/			$fila['numero_ot'],
-/*3*/			$fila['glosa_cliente']  ? utf8_encode($fila['codigo_cliente'].'|'.$fila['glosa_cliente']) : ' - ',
-/*4*/			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
-/*5*/			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
-/*6*/			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
-/*7*/			$fila['ingresooegreso']=='ingreso' ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
-/*8*/			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
-/*9*/			$fila['estado_cobro'] ? $fila['estado_cobro'] : ' ',
-/*10*/			$fila['id_cobro'] ? $fila['id_cobro'] : ' ',
-/*11*/			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
-/*12*/			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
-/*13*/			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
-/*14*/			$fila['id_contrato'],
-/*15*/			$fila['tipo'] ? $fila['tipo'] : ' - '
+			$fila['id_movimiento'],
+			date('d-m-Y', strtotime($fila['fecha'])),
+			$fila['numero_ot'],
+			$fila['glosa_cliente']  ? utf8_encode($fila['codigo_cliente'].'|'.$fila['glosa_cliente']) : ' - ',
+			$fila['glosa_asunto'] ? utf8_encode($fila['glosa_asunto']) : ' - ',
+			$fila['descripcion'] ? utf8_encode($fila['descripcion']) : ' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['monto_cobrable']:' ',
+			$fila['ingresooegreso']=='ingreso' ? $fila['simbolo'] . ' ' . $fila['ingreso'] : ' ',
+			$fila['con_impuesto'] ? $fila['con_impuesto'] : ' ',
+			$fila['estado_cobro'] ? $fila['estado_cobro'] : ' ',
+			$fila['id_cobro'] ? $fila['id_cobro'] : ' ',
+			$fila['esCobrable'] ? $fila['esCobrable'] : 'No',
+			$fila['contrato_activo'] ? $fila['contrato_activo'] : ' ',
+			$fila['ingresooegreso']=='egreso' ? $fila['simbolo'] . ' ' . $fila['egreso'] : ' ',
+			$fila['id_contrato'],
+			$fila['tipo'] ? $fila['tipo'] : ' - '
 		);
 		$resultado['aaData'][] = $stringarray;
 		$mas += $fila['egreso'];
