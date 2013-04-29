@@ -274,9 +274,11 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		{
 			$no_cobrable = __('No cobrable');
 			$color = '#FFFFFF';
+			$pintame = '';
 		}
 		else
 		{
+			$pintame = ' pintame ';
 			$no_cobrable = '';
 			$color = $objeto_semana->colores[$cod_asunto_color];
 			if($color == '')
@@ -295,7 +297,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 				echo("</td><td width=14%>");
 		}	
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  class=\"cajatrabajo\" rel=\"$cod_asunto\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  class=\"cajatrabajo $pintame\" rel=\"$cod_asunto\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");
@@ -441,7 +443,7 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 			})
 		}
 	})
-	jQuery('.cajatrabajo').each(function() {
+	jQuery('.pintame').each(function() {
 				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
 			});	 
 </script>
