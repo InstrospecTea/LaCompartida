@@ -32,7 +32,9 @@ class ClienteSeguimiento extends Objeto
 					cs.id,
 					cs.fecha_creacion,
 					cs.comentario,
-					CONCAT(u.apellido1, ', ', u.nombre) AS username,
+					CONCAT(u.apellido1, ', ', u.nombre) AS nombre_usuario,
+					CONCAT(LEFT(u.nombre, 1), LEFT(u.apellido1, 1), LEFT(u.apellido2, 1)) AS iniciales_usuario,
+					u.username AS username_usuario,
 					cs.codigo_cliente
 				FROM cliente_seguimiento cs
 				INNER JOIN usuario u ON u.id_usuario = cs.id_usuario";
@@ -46,6 +48,8 @@ class ClienteSeguimiento extends Objeto
 		if (count($wheres) > 0) {
 			$query .= " WHERE " . implode(' AND ', $wheres);
 		}
+
+		$query .= " ORDER BY cs.fecha_creacion DESC";
 
 		return $query;
 	}

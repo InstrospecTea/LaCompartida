@@ -202,7 +202,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 					)
 			),
 			array(
-				'field' => 'codigo_cliente',
+				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
 				'title' => '&nbsp;',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:right"',
@@ -320,6 +320,16 @@ echo Html::SelectArray(array(
 </div>
 <script type="text/javascript">
 <?php echo "var linktofile= '$linktofile';"; ?>
+	show_popover = function(sender, codigo_cliente) {
+		sender.popover({
+			title: '<?php echo __('Seguimiento del cliente'); ?>',
+			trigger: 'click',
+			placement: 'left',
+			html: true,
+			content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
+		});
+	};
+
 	jQuery(document).ready(function() {
 		var seguimiento_template = jQuery('#seguimiento_template');
 		jQuery('.inlinehelp').each(function() {
@@ -352,12 +362,19 @@ echo Html::SelectArray(array(
 			var td = jQuery(this);
 			var contenido = td.html();
 			if (contenido.trim() != '') {
+				partes = contenido.split('|');
+				codigo_cliente = partes[0];
+				cantidad_seguimiento = partes[1];
 				var link = jQuery('<a/>', { text: '', href: 'javascript:void(0)' });
-				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/tarea.gif' }));
+				icono = 'tarea_inactiva.gif';
+				if (parseInt(cantidad_seguimiento) > 0) {
+					icono = 'tarea.gif';
+				}
+				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/' + icono }));
 				td.html('');
 				td.append(link).append(' ');
 			}
-			td.popover({ title: '<?php echo __('Seguimiento del cliente'); ?>', trigger: 'click', placement: 'left', html: true, content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + contenido + '" />' });
+			show_popover(td, codigo_cliente);
 		});
 	});
 </script>
