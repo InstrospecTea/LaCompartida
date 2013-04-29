@@ -335,7 +335,7 @@ class Cobro extends Objeto {
 								 ";//and ccfm.saldo<0  ";
 					//editado: AND cobro.estado!='PAGADO'
 				} else {
-					$query = "SELECT cobro.documento as facturanumero,
+					$query = "SELECT ifnull(cobro.documento,cobro.id_cobro) as facturanumero,
 								cobro.id_cobro,
 								cobro.fecha_enviado_cliente,cobro.fecha_emision,
 								prm_moneda.simbolo, moneda_total.glosa_moneda, moneda_total.simbolo as simbolo_moneda_total, cobro.monto,
