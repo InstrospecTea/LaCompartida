@@ -2,15 +2,15 @@
 require_once dirname(__FILE__) . '/../app/conf.php';
 
 $app = new Slim();
-
+$Session = new Sesion();
 define(MIN_TIMESTAMP, 315532800);
 define(MAX_TIMESTAMP, 4182191999);
 
 
-$app->post('/login', function () {
-	$Session = new Sesion();
+$app->post('/login', function () use ($app,$Session) {
+	
 	$UserToken = new UserToken($Session);
-	$Slim = Slim::getInstance();
+	$Slim = $app;
 
 	$user = $Slim->request()->params('user');
 	$password = $Slim->request()->params('password');
@@ -50,21 +50,21 @@ $app->post('/login', function () {
 	);
 });
 
-$app->get('/clients', function () {
-	$Session = new Sesion();
+$app->get('/clients', function () use ($Session,$app) {
+	 
 	$Client = new Cliente($Session);
-
+	$timestamp=$app->request()->params('timestamp');
 	$clients = array();
 	$user_id = validateAuthTokenSendByHeaders();
-	$clients = $Client->findAllActive();
+	$clients = $Client->findAllActive($timestamp);
 	outputJson($clients);
 });
 
-$app->get('/clients/:code/matters', function ($code) {
+$app->get('/clients/:code/matters', function ($code) use ($Session) {
 	if (is_null($code) || $code == '') {
 		halt(__("Invalid client code"), "InvalidClientCode");
 	}
-	$Session = new Sesion();
+	
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
 
@@ -87,20 +87,20 @@ $app->get('/clients/:code/matters', function ($code) {
 	outputJson($matters);
 });
 
-$app->get('/matters', function () {
-	$Session = new Sesion();
+$app->get('/matters', function () use ($Session,$app) {
+	 
 	$Matter = new Asunto($Session);
-
-	$matters = array();
+	$timestamp=$app->request()->params('timestamp');
+ 	$matters = array();
 
 	$user_id = validateAuthTokenSendByHeaders();
-	$matters = $Matter->findAllActive();
+	$matters = $Matter->findAllActive($timestamp);
 
 	outputJson($matters);
 });
 
-$app->get('/activities', function () {
-	$Session = new Sesion();
+$app->get('/activities', function () use ($Session) {
+	 
 	$Activity = new Actividad($Session);
 	$activities = array();
 
@@ -110,8 +110,8 @@ $app->get('/activities', function () {
 	outputJson($activities);
 });
 
-$app->get('/areas', function () {
-	$Session = new Sesion();
+$app->get('/areas', function () use ($Session) {
+	 
 	$WorkArea = new AreaTrabajo($Session);
 	$work_areas = array();
 
@@ -121,8 +121,8 @@ $app->get('/areas', function () {
 	outputJson($work_areas);
 });
 
-$app->get('/tasks', function () {
-	$Session = new Sesion();
+$app->get('/tasks', function () use ($Session) {
+	 
 	$Task = new Tarea($Session);
 	$tasks = array();
 
@@ -132,8 +132,8 @@ $app->get('/tasks', function () {
 	outputJson($tasks);
 });
 
-$app->get('/translations', function () {
-	$Session = new Sesion();
+$app->get('/translations', function () use ($Session) {
+	 
 	$user_id = validateAuthTokenSendByHeaders();
 	$translations = array();
 	array_push($translations, array('code' => 'Matters', 'value' => __("Asuntos")));
@@ -142,8 +142,8 @@ $app->get('/translations', function () {
 	outputJson($translations);
 });
 
-$app->get('/settings', function () {
-	$Session = new Sesion();
+$app->get('/settings', function () use ($Session) {
+	 
 	$settings = array();
 
 	$user_id = validateAuthTokenSendByHeaders();
@@ -175,13 +175,13 @@ $app->get('/settings', function () {
 	outputJson($settings);
 });
 
-$app->get('/users/:id', function ($id) {
+$app->get('/users/:id', function ($id) use ($Session) {
+	 
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$Session = new Sesion();
-	$User = new Usuario($Session);
+ 	$User = new Usuario($Session);
 	$user = array();
 
 	//$user_id = validateAuthTokenSendByHeaders();
@@ -206,17 +206,17 @@ $app->get('/users/:id', function ($id) {
 	outputJson($user);
 });
 
-$app->get('/users/:id/works', function ($id) {
+$app->get('/users/:id/works', function ($id) use ($Session,$app) {
+	 
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = Slim::getInstance();
+	$Slim = $app;
 	$works = array();
 
 	$before = $Slim->request()->params('before');
@@ -239,17 +239,17 @@ $app->get('/users/:id/works', function ($id) {
 	outputJson($works);
 });
 
-$app->put('/users/:id/works', function ($id) {
+$app->put('/users/:id/works', function ($id) use ($Session,$app) {
+	 
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
-	$User = new Usuario($Session);
+ 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = Slim::getInstance();
+	$Slim = $app;
 	$work = array();
 
 	$work['date'] = $Slim->request()->params('date');
@@ -307,7 +307,7 @@ $app->put('/users/:id/works', function ($id) {
 	outputJson($work);
 });
 
-$app->post('/users/:user_id/works/:id', function ($user_id, $id) {
+$app->post('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session,$app) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -318,10 +318,9 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
-	$User = new Usuario($Session);
+ 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = Slim::getInstance();
+	$Slim = $app;
 	$work = array();
 
 	$work['id'] = $id;
@@ -376,7 +375,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id) {
 	outputJson($work);
 });
 
-$app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
+$app->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -387,7 +386,7 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
+	
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
 
