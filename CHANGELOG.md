@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix: 13.3.13
+jueves 26 de abril 2013
+* **Fixed:** [ Corrige problema de calculo en seccion GenerarSeccionDetallePago para fayca ](https://github.com/LemontechSA/ttb/pull/174)
 
 ## Hotfix: 13.3.12
 jueves 22 de abril 2013
