@@ -38,6 +38,12 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 				background-color: white;
 				width: 100%;
 			}
+			form textarea {
+				vertical-align: text-top;
+			}
+			form input {
+				vertical-align: text-top;
+			}
 		</style>
 	</head>
 	<body>

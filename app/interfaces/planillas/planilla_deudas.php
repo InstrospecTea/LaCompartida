@@ -200,14 +200,6 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 							'symbol' => 'moneda',
 							'attrs' => 'width="12%" style="text-align:right;font-weight:bold"'
 					)
-			),
-			array(
-				'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
-				'title' => '&nbsp;',
-				'extras' => array(
-					'attrs' => 'width="5%" style="text-align:right"',
-					'class' => 'seguimiento'
-				)
 			)
 			/* ,
 					  array(
@@ -231,6 +223,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 					  )
 					  ) */
 	);
+
+	// Configuración especial para mostrar el seguimiento del cliente
+	if ($_REQUEST['opcion'] != 'xls') {
+		$config_reporte[] = array(
+			'field' => '=CONCATENATE(%codigo_cliente%,"|",%cantidad_seguimiento%)',
+			'title' => '&nbsp;',
+			'extras' => array(
+				'attrs' => 'width="5%" style="text-align:right"',
+				'class' => 'seguimiento'
+			)
+		);
+	}
 
 	$SimpleReport->LoadConfigFromArray($config_reporte);
 
