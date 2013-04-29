@@ -133,12 +133,12 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 <div class="semanacompleta" style="padding:0px 75px;float:left;">
 
 	<div class="semana_del_dia" style="text-align:left;float:left;width:100%;">
-		<div id="previous_button" class="button" style="text-align:center;float:left;width:5%;">&nbsp;</div>
+		<div id="previous_button" class="button_left" style="text-align:center;float:left;width:5%;">&nbsp;</div>
 		<div style="text-align:center;float:left;width:90%;">
 			<?php echo __('Semana del'); ?>:
 			<b><?php echo Utiles::sql3fecha($semanacompleta[1][0], '%d de %B de %Y'); ?></b>
 		</div>
-		<div id="next_button" class="button" style="text-align:center;float:left;width:5%;">&nbsp;</div>
+		<div id="next_button" class="button_right" style="text-align:center;float:left;width:5%;">&nbsp;</div>
 	</div>
 
 	<div class="total_mes_actual" style="text-align:left;float:right;">

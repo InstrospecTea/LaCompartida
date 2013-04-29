@@ -56,8 +56,8 @@ $next_week = $_REQUEST['day'] + 604800;
 			}
 
 			.semana_del_dia {
-				background-color: #263443 !important;
-				height: 25px !important;
+				background-color: #253546 !important;
+				height: 20px !important;
 				top: 0;
 				position: fixed;
 				color: #CCCCCC !important;
@@ -65,7 +65,8 @@ $next_week = $_REQUEST['day'] + 604800;
 				text-align: center !important;
 				font-size: 10pt !important;
 				padding-top: 5px !important;
-				z-index: 999;
+				overflow: visible !important;
+				z-index: 998;
 			}
 
 			.total_mes_actual {
@@ -84,9 +85,9 @@ $next_week = $_REQUEST['day'] + 604800;
 				width: 100%;
 				position: fixed;
 				top: 25px;
-				z-index: 999;
+				z-index: 996;
 				padding: 0;
-				background-color: #263443 !important;
+				background-color: #253546 !important;
 				color: #CCCCCC;
 			}
 
@@ -259,20 +260,18 @@ $next_week = $_REQUEST['day'] + 604800;
 				margin: 0;
 			}
 
-			.button {
-				font-family: Ubuntu, sans-serif;
-				font-size: 12px;
-				text-align: center;
-				color: #333;
-				background: #EEE;
-				background: -webkit-linear-gradient(top, #EEE, #CCC);
-				-webkit-border-radius: 5px;
-				-moz-border-radius: 5px;
-				border-radius: 5px;
-				border-top: 1px solid #fff;
-				-webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
-				-moz-box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
-				box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+			.button_left {
+				background-image: url('http://static.thetimebilling.com/cartas/img/week_change_left.png');
+				background-repeat: no-repeat;
+				background-position: center top;
+				height: 30px;
+			}
+
+			.button_right {
+				background-image: url('http://static.thetimebilling.com/cartas/img/week_change_right.png');
+				background-repeat: no-repeat;
+				background-position: center top;
+				height: 30px;
 			}
 		</style>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -294,8 +293,8 @@ $next_week = $_REQUEST['day'] + 604800;
 					$(this).css('background-color', window.top.s2c($(this).attr('rel')));
 				});
 
-				$('#previous_button').html('&larr;');
-				$('#next_button').html('&rarr;');
+				// $('#previous_button').html('&larr;');
+				// $('#next_button').html('&rarr;');
 
 				$('#previous_button').click(function() {
 					location.href = '?AUTHTOKEN=' + auth_token + '&day=' + previous_week;
