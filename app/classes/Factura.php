@@ -28,7 +28,11 @@ class Factura extends Objeto {
 			'titulo' => 'Fecha',
 			'tipo' => 'fecha'
 		),
-		'cliente' => 'Glosa Cliente',
+		'codigo_cliente' => array(
+			'titulo' => 'Glosa Cliente TTB',
+			'relacion' => 'Cliente'
+		),
+		'cliente' => 'Glosa Cliente Factura',
 		'RUT_cliente' => 'RUT Cliente',
 		'direccion_cliente' => 'Dirección Cliente',
 		'comuna_cliente' => 'Comuna Cliente',
@@ -59,9 +63,9 @@ class Factura extends Objeto {
 			'titulo' => 'Moneda',
 			'relacion' => 'Moneda'
 		),
+		'descripcion' => 'Descripción',
 		'id_cobro' => array(
-			'titulo' => 'N° Liquidación',
-			'creable' => true
+			'titulo' => 'N° Liquidación'
 		),
 		'id_documento_legal_padre' => array(
 			'titulo' => 'Tipo documento asociado (FA,NC,ND,BO)',
@@ -2019,7 +2023,10 @@ class Factura extends Objeto {
 	}
 
 	public function PreCrearDato($data) {
-		$data['descripcion'] = __('Honorarios Legales');
+		if (empty($data['descripcion'])) {
+			$data['descripcion'] = __('Honorarios Legales');
+		}
+
 		$data['descripcion_subtotal_gastos'] = __('Gastos c/ IVA');
 		$data['descripcion_subtotal_gastos_sin_impuesto'] = __('Gastos s/ IVA');
 		$data['honorarios'] = $data['subtotal'];
@@ -2028,6 +2035,50 @@ class Factura extends Objeto {
 		$subtotal = $data['total'] - $data['iva'];
 		$data['porcentaje_impuesto'] = floor($data['iva'] * 100 / $subtotal);
 		$data['subtotal_sin_descuento'] = $subtotal;
+
+		if (!empty($data['id_cobro'])) {
+			$Cliente = new Cliente($this->sesion);
+			$Cliente->LoadByCodigo($data['codigo_cliente']);
+
+			$Cobro = new Cobro($this->sesion);
+			$Cobro->Load($data['id_cobro']);
+
+			if (!$Cobro->Loaded()) {
+				$Cobro->Edit('codigo_cliente', $data['codigo_cliente']);
+				$Cobro->Edit('monto_subtotal', $subtotal);
+				$Cobro->Edit('monto_ajustado', $subtotal);
+				$Cobro->Edit('monto_original', $subtotal);
+				$Cobro->Edit('porcentaje_impuesto', $data['porcentaje_impuesto']);
+				$Cobro->Edit('impuesto', $data['iva']);
+				$Cobro->Edit('id_moneda_monto', $data['id_moneda']);
+				$Cobro->Edit('monto_trabajos', $subtotal);
+				$Cobro->Edit('monto', $subtotal);
+				$Cobro->Edit('total_minutos', 0);
+				$Cobro->Edit('honorarios_pagados', $data['total']);
+				$Cobro->Edit('fecha_cobro', $data['fecha']);
+				$Cobro->Edit('estado', 'PAGADO');
+				$Cobro->Edit('fecha_ini', $data['fecha']);
+				$Cobro->Edit('fecha_fin', $data['fecha']);
+				$Cobro->Edit('id_moneda', $data['id_moneda']);
+				$Cobro->Edit('forma_cobro', 'FLAT FEE');
+				$Cobro->Edit('fecha_en_revision', $data['fecha']);
+				$Cobro->Edit('fecha_modificacion', $data['fecha']);
+				$Cobro->Edit('fecha_emision', $data['fecha']);
+				$Cobro->Edit('fecha_facturacion', $data['fecha']);
+				$Cobro->Edit('fecha_enviado_cliente', $data['fecha']);
+				$Cobro->Edit('fecha_pago_parcial', $data['fecha']);
+				$Cobro->Edit('id_contrato', $Cliente->fields['id_contrato']);
+				$Cobro->Edit('estado', 'CREADO');
+
+				$data['id_contrato'] = $Cliente->fields['id_contrato'];
+
+				if ($Cobro->GuardarCobro(true, true) == '') {
+					$data['id_cobro'] = $Cobro->fields['id_cobro'];
+				} else {
+					unset($data['id_cobro']);
+				}
+			}
+		}
 
 		if (!empty($data['id_factura_padre'])) {
 			$factura_padre_array = explode('-', $data['id_factura_padre']);
@@ -2040,13 +2091,12 @@ class Factura extends Objeto {
 				$data['id_cobro'] = $factura_padre->fields['id_cobro'];
 				$data['id_contrato'] = $factura_padre->fields['id_contrato'];
 				$data['codigo_cliente'] = $factura_padre->fields['codigo_cliente'];
-				
 			} else {
 				unset($data['id_factura_padre']);
 			}
-		} 
+		}
 		unset($data['id_documento_legal_padre']);
-		
+
 		return $data;
 	}
 
@@ -2057,9 +2107,10 @@ class Factura extends Objeto {
 		$tipo_documento_legal = $PrmDocumentoLegal->fields['codigo'];
 		// Si es NC los montos se consideran como pagos
 		$signo = $tipo_documento_legal == 'NC' ? 1 : -1;
+		$neteos = array();
 		if (!empty($this->fields['id_factura_padre'])) {
 			$neteos = array(array(
-				$this->fields['id_factura_padre'], 
+				$this->fields['id_factura_padre'],
 				$signo * $this->fields['total']
 			));
 		}
@@ -2073,7 +2124,7 @@ class Factura extends Objeto {
 				$this->fields['id_factura'],
 				null,
 				$tipo_documento_legal);
-		
+
 		// 2. Crear los factura_cobro
 		$Cobro = new Cobro($this->sesion);
 		$Cobro->Load($this->fields['id_cobro']);
