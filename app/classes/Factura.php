@@ -1696,8 +1696,11 @@ class Factura extends Objeto {
 		$writer->save(__('Reg_Venta'));
 	}
 
-	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+	public function QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable ) {
 
 		global $query, $where, $groupby;
@@ -1893,12 +1896,18 @@ class Factura extends Objeto {
 
  
 
-	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+	public function DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable) {
 
-		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_cia,
+		$query = $this->QueryReporte($orden, $where, $numero, $fecha1, $fecha2
+		,$tipo_documento_legal_buscado
+		, $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario
+		, $id_contrato, $id_cia,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
