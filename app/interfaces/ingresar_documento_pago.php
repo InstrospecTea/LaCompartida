@@ -920,37 +920,24 @@ $pagina->PrintTop($popup);
 				<?php echo __('Tipo:') ?>
 			</td>
 			<td align=left>
-				<select name='tipo_doc' id='tipo_doc'  style='width: 130px;' onchange="ShowCheque();">
-					<?php
-					
-					if ($pago) {
-						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
-					}
+				<?php
+				if ($pago) {
+					$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'P' ORDER BY orden ASC";
+				} else if ($adelanto) {
+					$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'T' ORDER BY orden ASC";
+				}
 
-					if ($adelanto) {						
-						$query = "SELECT codigo, glosa FROM prm_tipo_pago WHERE familia = 'T' ORDER BY orden ASC";
-					}
-					
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-					$tipos = array();
-					while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
-						$tipos[$codigo] = $glosa;
-					}
+				$tipos = array();
+				while (list($codigo, $glosa) = mysql_fetch_array($resp)) {
+					$tipos[$codigo] = $glosa;
+				}
 
-					$cod_tipo = $tipo_doc;
-
-					if (!in_array($cod_tipo, array('N', 'A', 'E', 'C', 'O'))) {
-						$cod_tipo = 'T';
-					}
-					foreach ($tipos as $k => $v) {
-						?>
-						<option value="<?php echo $k ?>" <?php echo $k == $cod_tipo ? 'selected' : '' ?>><?php echo $v ?></option>
-					<?php } ?>
-				</select>
-
-				<?php echo __('N° Documento:') ?>
-				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $nro_documento); ?>" />
+				echo Html::SelectArrayDecente($tipos, 'tipo_doc', $tipo_doc, 'id="tipo_doc" onchange="ShowCheque();"', '', '100px');
+				echo __('N° Documento:');
+				?>
+				<input name=numero_doc size=10 value="<?php echo str_replace("-", "", $numero_doc); ?>" />
 			</td>
 
 		<tr>
