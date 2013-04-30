@@ -858,9 +858,10 @@ class Asunto extends Objeto {
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto` <> ''  and `matter`.`fecha_touch` >= :timestamp
+			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto` <> ''
+			 and (`matter`.`fecha_touch` >= :timestamp or `matter`.`fecha_creacion` >= :timestamp)
 			ORDER BY `matter`.`glosa_asunto` ASC";
-			 
+
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('active', $active);

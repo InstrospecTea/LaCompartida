@@ -795,7 +795,7 @@ class Cliente extends Objeto {
 			`contract`.`direccion_contacto` AS `address`
 			FROM `cliente` AS `client`
 				INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
-			WHERE `client`.`activo`=:active  and `client`.`fecha_touch` >= :timestamp
+			WHERE `client`.`activo`=:active  and (`client`.`fecha_touch` >= :timestamp or `client`.`fecha_creacion` >= :timestamp)
 			ORDER BY `client`.`glosa_cliente` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
