@@ -448,23 +448,21 @@ if (method_exists('Conf', 'dbUser') && Conf::dbUser() == "rebaza") {
 					 
 				</td>
 			</tr>
-			<tr>
-				<td colspan="3" align="right">
+			<tr id="fila_botones">
+				<td colspan="4" style="text-align:center;margin:auto;">
 					<a name='boton_buscar' id='boton_buscar'  class="btn botonizame" icon="find"   onclick="BuscarFacturas(jQuery('#form_facturas').get(0),'buscar')" class=btn><?php echo __('Buscar') ?></a>
 				 
-					<input type="button" value="<?php echo __('Descargar Excel'); ?>" class="btn botonizame" id="boton_descarga" name="boton_excel" onclick="BuscarFacturas(this.form, 'exportar_excel')">
-				<?php ($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_factura_fin'):false; ?>
-				</td>
-				<td align="right">
-<?php 
+					<a    class="btn botonizame" id="boton_descarga" icon="xls" name="boton_excel" onclick="BuscarFacturas(jQuery('#form_facturas').get(0), 'exportar_excel')"><?php echo __('Descargar Excel'); ?></a>
+				<?php ($Slim=Slim::getInstance()) ?  $Slim->applyHook('hook_factura_fin'):false;  
+				 
+ 
 
 if (UtilesApp::GetConf($sesion, 'DescargarArchivoContabilidad')) { ?>
 						<input type="button" value="<?php echo __('Descargar Archivo Contabilidad'); ?>" class="btn" name="boton_contabilidad" onclick="BuscarFacturas(this.form, 'archivo_contabilidad')" />
 						<br />
 						<label>desde el asiento contable
 							<input type="text" size="4" name="desde_asiento_contable" value="<?php echo $desde_asiento_contable; ?>" /></label>
-<?php } 
- ?>
+<?php }  ?>
 				</td>
 			</tr>
 		</table>

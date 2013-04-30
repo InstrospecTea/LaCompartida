@@ -190,6 +190,16 @@ class Factura extends Objeto {
 			'title' => 'Cifras Decimales',
 			'visible' => false,
 		),
+				array (
+			'field' => 'glosa_estudio',
+			'title' => 'Emisor',
+			'visible' => false,
+		),
+			array (
+			'field' => 'id_factura',
+			'title' => 'id_factura',
+			'visible' => false,
+		),
 	);
 
 	function Factura($sesion, $fields = "", $params = "") {
