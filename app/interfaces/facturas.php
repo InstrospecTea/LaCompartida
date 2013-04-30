@@ -337,6 +337,7 @@ $config->columns['codigo_cliente']->visible=false;
 $config->columns['observaciones']->visible=false;
 $config->columns['descripcion']->visible=false;
 $config->columns['codigos_asunto']->visible=false;
+$config->columns['estado']->class='cellcenter';
 $config->columns['simbolo']->visible=false;
 $config->columns['monto_real']->visible=false;
 $config->columns['tipo_cambio']->visible=false;

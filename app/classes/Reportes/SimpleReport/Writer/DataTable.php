@@ -147,6 +147,9 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 
 					$aoArray[ $column->field] = '{    "aTargets": ["'. $column->field .'" ] ';
 					$aoArray[ $column->field] .= ', "mData": "'. $column->field .'" ';
+
+				
+					 
 					if($column->visible===false) {
 					 	 $aoArray[ $column->field] .= ',"bVisible": false';
 					 } else {
@@ -160,7 +163,12 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 						} else if($column->format=='date') {
 							$aoArray[ $column->field] .= ', "mRender": function ( data, type, row ) { if(data=="") return;var fecha=new Date(data); return  jQuery.datepicker.formatDate("dd/mm/y",fecha); }';
 						} else {
-							$aoArray[ $column->field] .= ', "sClass": "al" ';
+							if($column->class) {
+								 $aoArray[ $column->field] .= ', "sClass": "'.$column->class.'" ';	
+							} else {
+								$aoArray[ $column->field] .= ', "sClass": "al" ';	
+							}
+							
 						}
 				    
 				 	}
