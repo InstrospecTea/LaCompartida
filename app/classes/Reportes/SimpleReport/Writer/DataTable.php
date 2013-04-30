@@ -136,19 +136,17 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 		foreach($result as $resultado) {
 			$aadata[]=json_encode(UtilesApp::utf8izar(($resultado)));
 		}
-		 return '['.implode(",\n ",$aadata)."\n];";
+		 return "[".implode(",\n\n ",$aadata)."\n];";
 
 
  
 	}
 	private function ColumnsToaoColumnDefs($columns) {
 			$aoArray=array();
-			 
 			foreach ($columns as $column) {
 
 					$aoArray[ $column->field] = '{    "aTargets": ["'. $column->field .'" ] ';
 					$aoArray[ $column->field] .= ', "mData": "'. $column->field .'" ';
-
 					if($column->visible===false) {
 					 	 $aoArray[ $column->field] .= ',"bVisible": false';
 					 } else {
@@ -167,10 +165,8 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 				    
 				 	}
 
-					 $aoArray[ $column->field] .= ',   "sDefaultContent": "" ';
-					
-					  
-					 $aoArray[ $column->field] .= '}';
+					$aoArray[ $column->field] .= ',   "sDefaultContent": "" ';
+					$aoArray[ $column->field] .= '}';
 				}
 				return $aoArray;
 	}
@@ -190,9 +186,7 @@ class SimpleReport_Writer_DataTable implements SimpleReport_Writer_IWriter {
 					$aoArray[] .= $column;
 				}
 
-			if($this->acciones) {
-				$aoArray[]=$this->acciones;
-			}
+		
 		
 			return "\t". '"aoColumnDefs": ['."\n".implode(",\n",$aoArray)."\n ]";
 	}
