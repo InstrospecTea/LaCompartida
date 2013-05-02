@@ -840,7 +840,7 @@ class Asunto extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used) and name
 	 */
-	public function findAllActive($timestamp=0) {
+	public function findAllActive($timestamp = 0) {
 		$matters = array();
 		$active = 1;
 		$sql_select_client_code = '`client`.`codigo_cliente`';
@@ -858,14 +858,13 @@ class Asunto extends Objeto {
 			FROM `cliente` AS `client`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_cliente` = `client`.`codigo_cliente`
 				LEFT JOIN `prm_idioma` USING (`id_idioma`)
-			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto` <> ''
-			 and (`matter`.`fecha_touch` >= :timestamp or `matter`.`fecha_creacion` >= :timestamp)
+			WHERE `matter`.`activo`=:active AND `matter`.`glosa_asunto`<>''
+			 AND (`matter`.`fecha_touch`>=:timestamp OR `matter`.`fecha_creacion`>=:timestamp)
 			ORDER BY `matter`.`glosa_asunto` ASC";
-
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('active', $active);
-		$Statement->bindParam('timestamp', date('Y-m-d',$timestamp));
+		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
 		$Statement->execute();
 
 		while ($matter = $Statement->fetch(PDO::FETCH_OBJ)) {

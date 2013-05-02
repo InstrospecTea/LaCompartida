@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../app/conf.php';
 
-$app = new Slim();
+$Slim = new Slim();
 $Session = new Sesion();
 
 define(MIN_TIMESTAMP, 315532800);
@@ -10,9 +10,8 @@ define(MAX_TIMESTAMP, 4182191999);
 // header('Access-Control-Allow-Origin: *');
 // header('Access-Control-Allow-Methods: GET, POST, PUT');
 
-$app->post('/login', function () use ($Session, $app) {
+$Slim->post('/login', function () use ($Session, $Slim) {
 	$UserToken = new UserToken($Session);
-	$Slim = $app;
 
 	$user = $Slim->request()->params('user');
 	$password = $Slim->request()->params('password');
@@ -53,10 +52,14 @@ $app->post('/login', function () use ($Session, $app) {
 	);
 });
 
-$app->get('/clients', function () use ($Session, $app) {
+$Slim->get('/clients', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$timestamp = $app->request()->params('timestamp');
+	$timestamp = $Slim->request()->params('timestamp');
+
+	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+		halt(__("The date format is incorrect"), "InvalidDate");
+	}
 
 	$Client = new Cliente($Session);
 	$clients = $Client->findAllActive($timestamp);
@@ -64,7 +67,7 @@ $app->get('/clients', function () use ($Session, $app) {
 	outputJson($clients);
 });
 
-$app->get('/clients/:code/matters', function ($code) use ($Session) {
+$Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 	if (is_null($code) || $code == '') {
 		halt(__("Invalid client code"), "InvalidClientCode");
 	}
@@ -91,10 +94,14 @@ $app->get('/clients/:code/matters', function ($code) use ($Session) {
 	outputJson($matters);
 });
 
-$app->get('/matters', function () use ($Session, $app) {
+$Slim->get('/matters', function () use ($Session, $Slim) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$timestamp=$app->request()->params('timestamp');
+	$timestamp = $Slim->request()->params('timestamp');
+
+	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+		halt(__("The date format is incorrect"), "InvalidDate");
+	}
 
 	$Matter = new Asunto($Session);
 	$matters = $Matter->findAllActive($timestamp);
@@ -102,7 +109,7 @@ $app->get('/matters', function () use ($Session, $app) {
 	outputJson($matters);
 });
 
-$app->get('/activities', function () use ($Session) {
+$Slim->get('/activities', function () use ($Session) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$Activity = new Actividad($Session);
@@ -111,7 +118,7 @@ $app->get('/activities', function () use ($Session) {
 	outputJson($activities);
 });
 
-$app->get('/areas', function () use ($Session) {
+$Slim->get('/areas', function () use ($Session) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$WorkArea = new AreaTrabajo($Session);
@@ -120,7 +127,7 @@ $app->get('/areas', function () use ($Session) {
 	outputJson($work_areas);
 });
 
-$app->get('/tasks', function () use ($Session) {
+$Slim->get('/tasks', function () use ($Session) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$Task = new Tarea($Session);
@@ -129,7 +136,7 @@ $app->get('/tasks', function () use ($Session) {
 	outputJson($tasks);
 });
 
-$app->get('/translations', function () use ($Session) {
+$Slim->get('/translations', function () use ($Session) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$translations = array();
@@ -140,7 +147,7 @@ $app->get('/translations', function () use ($Session) {
 	outputJson($translations);
 });
 
-$app->get('/settings', function () use ($Session) {
+$Slim->get('/settings', function () use ($Session) {
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$settings = array();
@@ -178,12 +185,13 @@ $app->get('/settings', function () use ($Session) {
 	outputJson($settings);
 });
 
-$app->get('/users/:id', function ($id) use ($Session) {
+$Slim->get('/users/:id', function ($id) use ($Session) {
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$User = new Usuario($Session);
 	$user = array();
 
@@ -201,14 +209,16 @@ $app->get('/users/:id', function ($id) use ($Session) {
 			'max_daily_hours' => (float) ($max_daily_minutes / 60.0),
 			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
-			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null
+			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
+			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : null,
+			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : null
 		);
 	}
 
 	outputJson($user);
 });
 
-$app->get('/users/:id/works', function ($id) use ($Session, $app) {
+$Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -217,7 +227,7 @@ $app->get('/users/:id/works', function ($id) use ($Session, $app) {
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = $app;
+
 	$works = array();
 
 	$before = $Slim->request()->params('before');
@@ -240,7 +250,7 @@ $app->get('/users/:id/works', function ($id) use ($Session, $app) {
 	outputJson($works);
 });
 
-$app->put('/users/:id/works', function ($id) use ($Session, $app) {
+$Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	if (is_null($id) || empty($id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -249,7 +259,7 @@ $app->put('/users/:id/works', function ($id) use ($Session, $app) {
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = $app;
+
 	$work = array();
 
 	$work['date'] = $Slim->request()->params('date');
@@ -307,7 +317,7 @@ $app->put('/users/:id/works', function ($id) use ($Session, $app) {
 	outputJson($work);
 });
 
-$app->post('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session, $app) {
+$Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, $Slim) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -320,7 +330,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session,
 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
-	$Slim = $app;
+
 	$work = array();
 
 	$work['id'] = $id;
@@ -375,7 +385,7 @@ $app->post('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session,
 	outputJson($work);
 });
 
-$app->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session) {
+$Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -408,42 +418,43 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Sessio
 	outputJson(array('result' => 'OK'));
 });
 
-$app->put('/users/:user_id/device', function ($user_id) {
+$Slim->put('/users/:user_id/device', function ($user_id) use ($Session, $Slim) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
-	$Slim = Slim::getInstance();
 
 	$token = $Slim->request()->params('token');
-	$device = array();
+	$new_device = array();
 
 	if (is_null($token) || empty($token)) {
 		halt(__("Invalid token device"), "InvalidTokenDevice");
 	}
 
-	$device['user_id'] = $user_id;
-	$device['token'] = $token;
+	$new_device['user_id'] = $user_id;
+	$new_device['token'] = $token;
 
 	if (!$User->LoadId($user_id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
-		if (!$UserDevice->save($device)) {
-			halt(__("Unexpected error when saving data"), "UnexpectedSave");
-		} else {
-			$device = $UserDevice->findByToken($token);
+		$device = $UserDevice->findByToken($token);
+		if (!is_object($device)) {
+			if (!$UserDevice->save($new_device)) {
+				halt(__("Unexpected error when saving data"), "UnexpectedSave");
+			} else {
+				$device = $UserDevice->findByToken($token);
+			}
 		}
 	}
 
 	outputJson($device);
 });
 
-$app->delete('/users/:user_id/device/:token', function ($user_id, $token) {
+$Slim->delete('/users/:user_id/device/:token', function ($user_id, $token) use ($Session) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
@@ -454,7 +465,6 @@ $app->delete('/users/:user_id/device/:token', function ($user_id, $token) {
 
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
 
@@ -474,16 +484,36 @@ $app->delete('/users/:user_id/device/:token', function ($user_id, $token) {
 	outputJson(array('result' => 'OK'));
 });
 
-$app->post('/users/:id', function ($id) {
+$Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
+	if (is_null($id) || empty($id)) {
+		halt(__("Invalid user ID"), "InvalidUserID");
+	}
+
 	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
-	$Session = new Sesion();
-	$user = array();
+	$User = new Usuario($Session);
+	$receive_alerts = (int) $Slim->request()->params('receive_alerts');
+	$alert_hour = $Slim->request()->params('alert_hour');
 
-	outputJson($user);
+	if (is_null($alert_hour) || !isValidTimeStamp($alert_hour)) {
+		halt(__("The date format is incorrect"), "InvalidDate");
+	}
+
+	if (!$User->LoadId($id)) {
+		halt(__("The user doesn't exist"), "UserDoesntExist");
+	} else {
+		$User->Edit('receive_alerts', $receive_alerts);
+		$User->Edit('alert_hour', date('H:i:s', $alert_hour));
+
+		if (!$User->Write()) {
+			halt(__("Unexpected error when saving data"), "UnexpectedSave");
+		}
+	}
+
+	outputJson(array('result' => 'OK'));
 });
 
-$app->run();
+$Slim->run();
 
 function validateAuthTokenSendByHeaders() {
 	$Session = new Sesion();

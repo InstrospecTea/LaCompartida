@@ -14,17 +14,14 @@
 
 				//url: 'login',
 				//url: 'clients/002538/matters',
+				url: 'users/1',
 				//url: 'users/1/works',
 				//url: 'users/1/works/23643',
 				//url: 'users/1/device',
-				url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
+				//url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
 
-				/*data: {
-					'user' : '99511620',
-					'password' : 'admin.asdwsx',
-					'app_key' : 'https://lemontech.thetimebilling.com'
-				},*/
-				//data: {'after' : '1364871600', 'before' : '1364871600'},
+				//data: { 'user' : '99511620', 'password' : 'admin.asdwsx', 'app_key' : 'https://lemontech.thetimebilling.com' },
+				//data: { 'after' : '1364871600', 'before' : '1364871600' },
 				/*data: {
 					'created_date' : 1365193560.328282,
 					'date' : 1365134400,
@@ -41,11 +38,12 @@
 					'visible' : 0
 				},*/
 				//data: { 'token' : 'bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf' },
+				//data: { 'receive_alerts' : 1, 'alert_hour' :  1357070400 },
 
-				//type: 'get'
+				type: 'get'
 				//type: 'post'
 				//type: 'put'
-				type: 'delete'
+				//type: 'delete'
 
 			}).done(function(data) {
 				//console.log(data);

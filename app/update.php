@@ -9811,6 +9811,8 @@ QUERY;
 			$queries[] = "ALTER TABLE `user_token` ADD KEY `user_token_user_id` (`user_id`);";
 			$queries[] = "ALTER TABLE `user_token` ADD CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
 
+			$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
+
 			ejecutar($queries, $dbh);
 			break;
 	}

@@ -781,7 +781,7 @@ class Cliente extends Objeto {
 	 * Return an array with next elements:
 	 * 	code (secondary if used), name and address
 	 */
-	public function findAllActive($timestamp) {
+	public function findAllActive($timestamp = 0) {
 		$active = 1;
 		$clients = array();
 		$sql_select_client_code = '`client`.`codigo_cliente`';
@@ -795,15 +795,14 @@ class Cliente extends Objeto {
 			`contract`.`direccion_contacto` AS `address`
 			FROM `cliente` AS `client`
 				INNER JOIN `contrato` AS `contract` ON `contract`.`id_contrato`=`client`.`id_contrato`
-			WHERE `client`.`activo`=:active  and (`client`.`fecha_touch` >= :timestamp or `client`.`fecha_creacion` >= :timestamp)
+			WHERE `client`.`activo`=:active AND (`client`.`fecha_touch`>=:timestamp OR `client`.`fecha_creacion`>=:timestamp)
 			ORDER BY `client`.`glosa_cliente` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('active', $active);
-		$Statement->bindParam('timestamp', date('Y-m-d',$timestamp));
+		$Statement->bindParam('timestamp', date('Y-m-d', $timestamp));
 
 		$Statement->execute();
-
 
 		while ($client = $Statement->fetch(PDO::FETCH_OBJ)) {
 			array_push($clients,
