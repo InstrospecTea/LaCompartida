@@ -6,7 +6,6 @@ $app = new Slim();
 define(MIN_TIMESTAMP, 315532800);
 define(MAX_TIMESTAMP, 4182191999);
 
-
 $app->post('/login', function () {
 	$Session = new Sesion();
 	$UserToken = new UserToken($Session);
@@ -51,12 +50,12 @@ $app->post('/login', function () {
 });
 
 $app->get('/clients', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$Client = new Cliente($Session);
-
-	$clients = array();
-	$user_id = validateAuthTokenSendByHeaders();
 	$clients = $Client->findAllActive();
+
 	outputJson($clients);
 });
 
@@ -64,10 +63,12 @@ $app->get('/clients/:code/matters', function ($code) {
 	if (is_null($code) || $code == '') {
 		halt(__("Invalid client code"), "InvalidClientCode");
 	}
+
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$Client = new Cliente($Session);
 	$Matter = new Asunto($Session);
-
 	$matters = array();
 
 	// validate client code
@@ -81,72 +82,67 @@ $app->get('/clients/:code/matters', function ($code) {
 		halt(__("The client doesn't exist"), "ClientDoesntExists");
 	}
 
-	$user_id = validateAuthTokenSendByHeaders();
 	$matters = $Matter->findAllByClientCode($code);
 
 	outputJson($matters);
 });
 
 $app->get('/matters', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$Matter = new Asunto($Session);
-
-	$matters = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
 	$matters = $Matter->findAllActive();
 
 	outputJson($matters);
 });
 
 $app->get('/activities', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$Activity = new Actividad($Session);
-	$activities = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
 	$activities = $Activity->findAll();
 
 	outputJson($activities);
 });
 
 $app->get('/areas', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$WorkArea = new AreaTrabajo($Session);
-	$work_areas = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
 	$work_areas = $WorkArea->findAll();
 
 	outputJson($work_areas);
 });
 
 $app->get('/tasks', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$Task = new Tarea($Session);
-	$tasks = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
 	$tasks = $Task->findAll();
 
 	outputJson($tasks);
 });
 
 $app->get('/translations', function () {
-	$Session = new Sesion();
-	$user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$translations = array();
 	array_push($translations, array('code' => 'Matters', 'value' => __("Asuntos")));
 	array_push($translations, array('code' => 'Works', 'value' => __('Trabajos')));
 	array_push($translations, array('code' => 'Clients', 'value' => __('Clientes')));
+
 	outputJson($translations);
 });
 
 $app->get('/settings', function () {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$settings = array();
-
-	$user_id = validateAuthTokenSendByHeaders();
 
 	if (is_array($Session->arrayconf) && !empty($Session->arrayconf)) {
 		if ($Session->arrayconf['Intervalo']) {
@@ -180,11 +176,12 @@ $app->get('/users/:id', function ($id) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
 	$Session = new Sesion();
 	$User = new Usuario($Session);
 	$user = array();
 
-	//$user_id = validateAuthTokenSendByHeaders();
 	if (!$User->LoadId($id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
@@ -211,7 +208,7 @@ $app->get('/users/:id/works', function ($id) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$Session = new Sesion();
 	$User = new Usuario($Session);
@@ -244,7 +241,7 @@ $app->put('/users/:id/works', function ($id) {
 		halt(__("Invalid user ID"), "InvalidUserID");
 	}
 
-	$user_id = validateAuthTokenSendByHeaders();
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
 
 	$Session = new Sesion();
 	$User = new Usuario($Session);
@@ -408,7 +405,81 @@ $app->delete('/users/:user_id/works/:id', function ($user_id, $id) {
 	}
 
 	outputJson(array('result' => 'OK'));
+});
 
+$app->put('/users/:user_id/device', function ($user_id) {
+	if (is_null($user_id) || empty($user_id)) {
+		halt(__("Invalid user ID"), "InvalidUserID");
+	}
+
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$UserDevice = new UserDevice($Session);
+	$Slim = Slim::getInstance();
+
+	$token = $Slim->request()->params('token');
+	$device = array();
+
+	if (is_null($token) || empty($token)) {
+		halt(__("Invalid token device"), "InvalidTokenDevice");
+	}
+
+	$device['user_id'] = $user_id;
+	$device['token'] = $token;
+
+	if (!$User->LoadId($user_id)) {
+		halt(__("The user doesn't exist"), "UserDoesntExist");
+	} else {
+		if (!$UserDevice->save($device)) {
+			halt(__("Unexpected error when saving data"), "UnexpectedSave");
+		} else {
+			$device = $UserDevice->findByToken($token);
+		}
+	}
+
+	outputJson($device);
+});
+
+$app->delete('/users/:user_id/device/:token', function ($user_id, $token) {
+	if (is_null($user_id) || empty($user_id)) {
+		halt(__("Invalid user ID"), "InvalidUserID");
+	}
+
+	if (is_null($token) || empty($token)) {
+		halt(__("Invalid token device"), "InvalidTokenDevice");
+	}
+
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$User = new Usuario($Session);
+	$UserDevice = new UserDevice($Session);
+
+	if (!$User->LoadId($user_id)) {
+		halt(__("The user doesn't exist"), "UserDoesntExist");
+	} else {
+		$device = $UserDevice->findByToken($token);
+		if (is_object($device)) {
+			if (!$UserDevice->delete($device->id)) {
+				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
+			}
+		} else {
+			halt(__("The user device doesn't exist"), "UserDeviceDoesntExist");
+		}
+	}
+
+	outputJson(array('result' => 'OK'));
+});
+
+$app->post('/users/:id', function ($id) {
+	$auth_token_user_id = validateAuthTokenSendByHeaders();
+
+	$Session = new Sesion();
+	$user = array();
+
+	outputJson($user);
 });
 
 $app->run();

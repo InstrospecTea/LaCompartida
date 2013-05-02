@@ -7,7 +7,7 @@
 		<script type="text/javascript">
 		$(function() {
 			$.ajaxSetup({
-				headers: {'AUTH_TOKEN' : 'bb9b7afc4b246f19f202b96d5e70f59ba916cfbf'}
+				headers: {'AUTHTOKEN' : 'bb9b7afc4b246f19f202b96d5e70f59ba916cfbf'}
 			});
 
 			$.ajax({
@@ -15,7 +15,9 @@
 				//url: 'login',
 				//url: 'clients/002538/matters',
 				//url: 'users/1/works',
-				url: 'users/1/works/23643',
+				//url: 'users/1/works/23643',
+				//url: 'users/1/device',
+				url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
 
 				/*data: {
 					'user' : '99511620',
@@ -38,6 +40,7 @@
 					'billable' : 1,
 					'visible' : 0
 				},*/
+				//data: { 'token' : 'bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf' },
 
 				//type: 'get'
 				//type: 'post'

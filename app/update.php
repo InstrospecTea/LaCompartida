@@ -9794,6 +9794,25 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
+		case 7.37:
+			$queries[] = "CREATE TABLE `user_device` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`token` varchar(120) NOT NULL DEFAULT '',
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				UNIQUE KEY `user_device_token` (`token`),
+				KEY `user_device_user_id` (`user_id`),
+				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+			$queries[] = "ALTER TABLE `user_token` DROP FOREIGN KEY `user_id`;";
+			$queries[] = "ALTER TABLE `user_token` ADD KEY `user_token_user_id` (`user_id`);";
+			$queries[] = "ALTER TABLE `user_token` ADD CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
+
+			ejecutar($queries, $dbh);
+			break;
 	}
 }
 
@@ -9802,7 +9821,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.36;
+$max_update = 7.37;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
