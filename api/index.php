@@ -210,8 +210,8 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
-			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : null,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : null
+			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
+			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : 0
 		);
 	}
 
