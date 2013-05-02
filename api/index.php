@@ -57,7 +57,7 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 
 	$timestamp = $Slim->request()->params('timestamp');
 
-	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
@@ -99,7 +99,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 
 	$timestamp = $Slim->request()->params('timestamp');
 
-	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
