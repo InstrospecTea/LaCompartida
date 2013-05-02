@@ -495,10 +495,6 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	$receive_alerts = (int) $Slim->request()->params('receive_alerts');
 	$alert_hour = $Slim->request()->params('alert_hour');
 
-	if (is_null($alert_hour) || !isValidTimeStamp($alert_hour)) {
-		halt(__("The date format is incorrect"), "InvalidDate");
-	}
-
 	if (!$User->LoadId($id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
