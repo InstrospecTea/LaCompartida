@@ -518,7 +518,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : 0
+			'alert_hour' => !empty($User->fields['alert_hour']) ? strtotime($User->fields['alert_hour']) : 0
 		);
 		outputJson($user);
 
