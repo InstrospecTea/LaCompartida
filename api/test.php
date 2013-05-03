@@ -7,7 +7,7 @@
 		<script type="text/javascript">
 		$(function() {
 			$.ajaxSetup({
-				headers: {'AUTHTOKEN' : 'bb9b7afc4b246f19f202b96d5e70f59ba916cfbf'}
+				headers: {'AUTHTOKEN' : 'da752bbc755243867ca3537566b744d59f710471'}
 			});
 
 			$.ajax({
