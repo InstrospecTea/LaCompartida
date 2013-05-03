@@ -46,6 +46,12 @@ $next_week = $_REQUEST['day'] + 604800;
 	<head>
 		<meta name="viewport" content="width=device-width"/>
 		<style>
+
+			* {
+    		-webkit-touch-callout: none;
+    		-webkit-user-select: none; /* Disable selection/Copy of UIWebView */
+			}
+
 			html, body {
 				height: 100%;
 				margin: 0;

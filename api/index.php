@@ -57,7 +57,7 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 
 	$timestamp = $Slim->request()->params('timestamp');
 
-	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
@@ -99,7 +99,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 
 	$timestamp = $Slim->request()->params('timestamp');
 
-	if (is_null($timestamp) || !isValidTimeStamp($timestamp)) {
+	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
 		halt(__("The date format is incorrect"), "InvalidDate");
 	}
 
@@ -210,8 +210,8 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
-			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : null,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : null
+			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
+			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
 		);
 	}
 
@@ -494,10 +494,6 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 	$receive_alerts = (int) $Slim->request()->params('receive_alerts');
 	$alert_hour = $Slim->request()->params('alert_hour');
 
-	if (is_null($alert_hour) || !isValidTimeStamp($alert_hour)) {
-		halt(__("The date format is incorrect"), "InvalidDate");
-	}
-
 	if (!$User->LoadId($id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
@@ -507,9 +503,27 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		if (!$User->Write()) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
 		}
+
+		$max_daily_minutes = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
+		$user = array(
+			'id' => (int) $User->fields['id_usuario'],
+			'code' => $User->fields['rut'],
+			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre'],
+			'weekly_alert' => !empty($User->fields['alerta_semanal']) ? (int) $User->fields['alerta_semanal'] : null,
+			'daily_alert' =>  !empty($User->fields['alerta_diaria']) ? (int) $User->fields['alerta_diaria'] : null,
+			'min_daily_hours' => !empty($User->fields['restriccion_diario']) ? (float) $User->fields['restriccion_diario'] : null,
+			'max_daily_hours' => (float) ($max_daily_minutes / 60.0),
+			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
+			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
+			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
+			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
+			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
+		);
+		outputJson($user);
+
 	}
 
-	outputJson(array('result' => 'OK'));
+
 });
 
 $Slim->run();
@@ -567,6 +581,12 @@ function outputJson($response) {
 	array_walk_recursive($response, function(&$x) { if (is_string($x)) $x = trim($x); });
 	echo json_encode($response);
 	exit;
+}
+
+function time2seconds($time='00:00:00')
+{
+    list($hours, $mins, $secs) = explode(':', $time);
+    return ($hours * 3600 ) + ($mins * 60 ) + $secs;
 }
 
 function isValidTimeStamp($timestamp) {
