@@ -211,7 +211,7 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : 0
+			'alert_hour' => !empty($User->fields['alert_hour']) ? strtotime($User->fields['alert_hour']) : 0
 		);
 	}
 
@@ -499,7 +499,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$User->Edit('receive_alerts', $receive_alerts);
-		$User->Edit('alert_hour', date('H:i:s', $alert_hour));
+		$User->Edit('alert_hour', gmdate("H:i:s", $alert_hour));
 
 		if (!$User->Write()) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
