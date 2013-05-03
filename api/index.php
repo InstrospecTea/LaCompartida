@@ -519,11 +519,9 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
 			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
 		);
+
 		outputJson($user);
-
 	}
-
-
 });
 
 $Slim->run();
@@ -583,10 +581,9 @@ function outputJson($response) {
 	exit;
 }
 
-function time2seconds($time='00:00:00')
-{
-    list($hours, $mins, $secs) = explode(':', $time);
-    return ($hours * 3600 ) + ($mins * 60 ) + $secs;
+function time2seconds($time = '00:00:00') {
+	list($hours, $mins, $secs) = explode(':', $time);
+	return ($hours * 3600 ) + ($mins * 60 ) + $secs;
 }
 
 function isValidTimeStamp($timestamp) {
