@@ -211,7 +211,7 @@ $Slim->get('/users/:id', function ($id) use ($Session) {
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? strtotime($User->fields['alert_hour']) : 0
+			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
 		);
 	}
 
@@ -518,7 +518,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
 			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
-			'alert_hour' => !empty($User->fields['alert_hour']) ? strtotime($User->fields['alert_hour']) : 0
+			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
 		);
 		outputJson($user);
 
@@ -570,6 +570,12 @@ function outputJson($response) {
 	array_walk_recursive($response, function(&$x) { if (is_string($x)) $x = trim($x); });
 	echo json_encode($response);
 	exit;
+}
+
+function time2seconds($time='00:00:00')
+{
+    list($hours, $mins, $secs) = explode(':', $time);
+    return ($hours * 3600 ) + ($mins * 60 ) + $secs;
 }
 
 function isValidTimeStamp($timestamp) {
