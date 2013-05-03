@@ -499,7 +499,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$User->Edit('receive_alerts', $receive_alerts);
-		$User->Edit('alert_hour',  date('c', mktime(0, 0, $alert_hour, 1, 1, 1970)));
+		$User->Edit('alert_hour', date('H:i:s', $alert_hour));
 
 		if (!$User->Write()) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
