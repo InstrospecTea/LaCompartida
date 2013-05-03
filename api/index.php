@@ -504,9 +504,27 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		if (!$User->Write()) {
 			halt(__("Unexpected error when saving data"), "UnexpectedSave");
 		}
+
+		$max_daily_minutes = method_exists('Conf','CantidadHorasDia') ? Conf::CantidadHorasDia() : 1439;
+		$user = array(
+			'id' => (int) $User->fields['id_usuario'],
+			'code' => $User->fields['rut'],
+			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre'],
+			'weekly_alert' => !empty($User->fields['alerta_semanal']) ? (int) $User->fields['alerta_semanal'] : null,
+			'daily_alert' =>  !empty($User->fields['alerta_diaria']) ? (int) $User->fields['alerta_diaria'] : null,
+			'min_daily_hours' => !empty($User->fields['restriccion_diario']) ? (float) $User->fields['restriccion_diario'] : null,
+			'max_daily_hours' => (float) ($max_daily_minutes / 60.0),
+			'min_weekly_hours' => !empty($User->fields['restriccion_min']) ? $User->fields['restriccion_min'] : null,
+			'max_weekly_hours' => !empty($User->fields['restriccion_max']) ? $User->fields['restriccion_max'] : null,
+			'days_track_works' => !empty($User->fields['dias_ingreso_trabajo']) ? $User->fields['dias_ingreso_trabajo'] : null,
+			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
+			'alert_hour' => !empty($User->fields['alert_hour']) ? $User->fields['alert_hour'] : 0
+		);
+		outputJson($user);
+
 	}
 
-	outputJson(array('result' => 'OK'));
+
 });
 
 $Slim->run();
