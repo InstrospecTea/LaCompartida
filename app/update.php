@@ -9782,6 +9782,7 @@ QUERY;
 		break;
 
 		case 7.36:
+			$queries[] = "DROP TABLE IF EXISTS `user_device`;";
 			$queries[] = "CREATE TABLE `user_device` (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`user_id` int(11) NOT NULL,
