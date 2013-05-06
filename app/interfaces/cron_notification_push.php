@@ -50,14 +50,17 @@ class CronNotificationPush extends Cron {
 				$this->log('INICIO NotificationService->addMessage');
 				$message = "";
 				if (!empty($user['minimum_restriction_alert'])) {
-					$message = $user['minimum_restriction_alert'] . '\n';
+					$message = $user['minimum_restriction_alert'];
 				}
 				if (!empty($user['maximum_restriction_alert'])) {
-					$message .= $user['maximum_restriction_alert'];
+					$message .= !empty($message) ? ', ' . $user['maximum_restriction_alert'] : $user['maximum_restriction_alert'];
 				}
-				$notificationService->addMessage($user['id_usuario'], __("Time Entry restrictions alert"),
+				$title = __("Time Entry restrictions alert");
+				var_dump($message);
+				$notificationService->addMessage($user['id'], $title,
 						array(
-							"notificationMessage" => $message
+							"notificationMessage" => UtilesApp::utf8izar($message),
+							"notificationTitle" => UtilesApp::utf8izar($title)
 			  		));
 			  $this->log('FIN NotificationService->addMessage');
 			}

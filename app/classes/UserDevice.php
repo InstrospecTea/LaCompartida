@@ -6,7 +6,7 @@ class UserDevice extends Objeto {
 	/**
 	 * Find by token
 	 * Return an array with next elements:
-	 * 	id, user_id, auth_token, app_key, created and modified
+	 * 	id, user_id, token, created and modified
 	 */
 	function findByToken($token) {
 		$sql = "SELECT `user_device`.`id`
@@ -29,7 +29,7 @@ class UserDevice extends Objeto {
 	/**
 	 * Find by ID
 	 * Return an array with next elements:
-	 * 	id, user_id, auth_token, app_key, created and modified
+	 * 	id, user_id, token, created and modified
 	 */
 	function findById($id) {
 		$sql = "SELECT `user_device`.`id`, `user_device`.`user_id`, `user_device`.`token`, `user_device`.`created`, `user_device`.`modified`
@@ -47,6 +47,25 @@ class UserDevice extends Objeto {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Find by User ID
+	 * Return an array with device tokens
+	 */
+	public function tokensByUserId($user_id) {
+		$sql = "SELECT `user_device`.`token`
+			FROM `user_device`
+			WHERE `user_device`.`user_id`=:user_id";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('user_id', $user_id);
+		$Statement->execute();
+		$tokens = array();
+		while ($device = $Statement->fetch(PDO::FETCH_OBJ)) {
+			array_push($tokens, $device->token);
+		}
+		return $tokens;
 	}
 
 	/**

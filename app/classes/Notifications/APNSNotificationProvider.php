@@ -34,7 +34,6 @@ class APNSNotificationProvider  implements INotificationProvider {
     foreach ($tokens as $idx => $token) {
       $aps_message = new ApnsPHP_Message($token);
       $aps_message->setCustomIdentifier(sprintf("Message-TTB-%03d-%03d", $user_id, $idx));
-      $aps_message->setText($title);
       if (array_key_exists("badgeNumber", $extras) && !is_null($extras["badgeNumber"])) {
         $aps_message->setBadge($extras["badgeNumber"]);
       }
@@ -43,10 +42,15 @@ class APNSNotificationProvider  implements INotificationProvider {
       }
       if (array_key_exists("notificationMessage", $extras) && !is_null($extras["notificationMessage"])) {
         $aps_message->setCustomProperty('notificationMessage', $extras["notificationMessage"]);
+        $title .= ': ' . $extras["notificationMessage"];
+      }
+      if (array_key_exists("notificationTitle", $extras) && !is_null($extras["notificationTitle"])) {
+        $aps_message->setCustomProperty('notificationTitle', $extras["notificationTitle"]);
       }
       if (array_key_exists("notificationURL", $extras) && !is_null($extras["notificationURL"])) {
         $aps_message->setCustomProperty('notificationURL', $extras["notificationURL"]);
       }
+      $aps_message->setText($title);
       $this->pushService->add($aps_message);
     }
   }
@@ -78,7 +82,9 @@ class APNSNotificationProvider  implements INotificationProvider {
   }
 
   function deviceTokensForUser($user_id) {
-    return array("ed05ca868cc8d5c8393f2eb50a32ca007c37ad777dba3e17e9a23936a2df213b");
+    $userDevice = new UserDevice($this->session);
+    $tokens = $userDevice->tokensByUserId($user_id);
+    return $tokens; //array("ed05ca868cc8d5c8393f2eb50a32ca007c37ad777dba3e17e9a23936a2df213b");
   }
 
 }
