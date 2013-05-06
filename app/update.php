@@ -9782,8 +9782,8 @@ QUERY;
 		break;
 
 		case 7.36:
-			$queries[] = "DROP TABLE IF EXISTS `user_device`;";
-			$queries[] = "CREATE TABLE `user_device` (
+			$queries = array();
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_device` (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`user_id` int(11) NOT NULL,
 				`token` varchar(120) NOT NULL DEFAULT '',
@@ -9795,8 +9795,7 @@ QUERY;
 				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$queries[] = "DROP TABLE IF EXISTS `user_token`;";
-			$queries[] = "CREATE TABLE `user_token` (
+			$queries[] = "CREATE TABLE IF NOT EXISTS `user_token` (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`user_id` int(11) NOT NULL,
 				`auth_token` varchar(60) NOT NULL DEFAULT '',
