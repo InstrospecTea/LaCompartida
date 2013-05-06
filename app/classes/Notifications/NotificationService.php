@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '../../../conf.php';
+require_once Conf::ServerDir() . '/classes/Log.php';
 require_once Conf::ServerDir() . '/classes/Notifications/APNSNotificationProvider.php';
 
 class NotificationService {
@@ -17,7 +18,7 @@ class NotificationService {
   }
 
   function logError($error) {
-    echo $error;
+    Log::write(trim($error), "NotificationService");
   }
 
   function expandOptions() {
