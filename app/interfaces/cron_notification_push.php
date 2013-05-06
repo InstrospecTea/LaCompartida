@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../classes/Cron.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
 require_once Conf::ServerDir() . '/classes/AlertaCron.php';
+require_once Conf::ServerDir() . '/classes/Notifications/NotificationService.php';
 
 ini_set('display_errors', 'on');
 
@@ -24,11 +25,46 @@ class CronNotificationPush extends Cron {
 		}
 	}
 
-	public function main() {
+	public function main($environment) {
 		$this->log('INICIO CronNotificacionPush');
 		$time = date('H:i:00');
+		$this->environment = NotificationService::ENVIRONMENT_SANDBOX;
+		if (!is_null($environment) && $environment == 'production') {
+			$this->environment = NotificationService::ENVIRONMENT_PRODUCTION;
+		}
+		echo $this->environment;
 		$notify_users = $this->getNotifyUsers($time);
+		$this->notifyUsers($notify_users);
 		$this->log('FIN CronNotificacionPush');
+	}
+
+	private function notifyUsers($notify_users) {
+		$this->log('INICIO notifyUsers');
+		if (is_array($notify_users) && (!empty($notify_users))) {
+			$options = array(
+			  "providers" => array("APNSNotificationProvider"),
+			  "environment" => $this->environment
+			);
+			$notificationService = new NotificationService($this->Session, $options);
+			foreach ($notify_users as $user) {
+				$this->log('INICIO NotificationService->addMessage');
+				$message = "";
+				if (!empty($user['minimum_restriction_alert'])) {
+					$message = $user['minimum_restriction_alert'] . '\n';
+				}
+				if (!empty($user['maximum_restriction_alert'])) {
+					$message .= $user['maximum_restriction_alert'];
+				}
+				$notificationService->addMessage($user['id_usuario'], __("Time Entry restrictions alert"),
+						array(
+							"notificationMessage" => $message
+			  		));
+			  $this->log('FIN NotificationService->addMessage');
+			}
+			$this->log('INICIO NotificationService->Deliver');
+			$notificationService->deliver();
+		}
+		$this->log('FIN notifyUsers');
 	}
 
 	private function getNotifyUsers($alert_hour = '00:00:00') {
@@ -79,5 +115,7 @@ class CronNotificationPush extends Cron {
 	}
 }
 
+
+$environment = $_GET['environment']; //sandbox, production
 $CronNotificationPush = new CronNotificationPush();
-$CronNotificationPush->main();
+$CronNotificationPush->main($environment);
