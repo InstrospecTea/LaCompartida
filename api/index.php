@@ -508,7 +508,7 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 		$user = array(
 			'id' => (int) $User->fields['id_usuario'],
 			'code' => $User->fields['rut'],
-			'name' => $User->fields['apellido1'] . ' ' . $User->fields['apellido2'] . ' ' . $User->fields['nombre'],
+			'name' => $User->fields['nombre'] . ' ' . $User->fields['apellido1'] . ' ' . $User->fields['apellido2'],
 			'weekly_alert' => !empty($User->fields['alerta_semanal']) ? (int) $User->fields['alerta_semanal'] : null,
 			'daily_alert' =>  !empty($User->fields['alerta_diaria']) ? (int) $User->fields['alerta_diaria'] : null,
 			'min_daily_hours' => !empty($User->fields['restriccion_diario']) ? (float) $User->fields['restriccion_diario'] : null,
