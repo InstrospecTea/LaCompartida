@@ -1,7 +1,20 @@
 <?php
 
 require_once dirname(__FILE__) . '../../../conf.php';
+require_once Conf::ServerDir() . '/classes/Log.php';
 require_once 'ApnsPHP/Autoload.php';
+
+class ApnsNotificationLog implements ApnsPHP_Log_Interface
+{
+  /**
+   * Logs a message.
+   *
+   * @param  $sMessage @type string The message.
+   */
+  public function log($sMessage) {
+    Log::write(trim($sMessage), "APNSNotificationProvider");
+  }
+}
 
 class APNSNotificationProvider  implements INotificationProvider {
 
@@ -14,6 +27,7 @@ class APNSNotificationProvider  implements INotificationProvider {
     $this->pushService = null;
     $this->session = $session;
     $this->environment = $environment;
+    $this->logger = new ApnsNotificationLog();
   }
 
   public function connect() {
@@ -21,6 +35,7 @@ class APNSNotificationProvider  implements INotificationProvider {
     $certificationAuth = $this->chooseCeritifcate(APNSNotificationProvider::CERT_TYPE_AUTH);
     if ($certificate) {
       $this->pushService = new ApnsPHP_Push($this->environment, $certificate);
+      $this->pushService->setLogger($this->logger);
       $this->pushService->setRootCertificationAuthority($certificationAuth);
       $this->pushService->connect();
       return true;
@@ -67,6 +82,9 @@ class APNSNotificationProvider  implements INotificationProvider {
     $this->pushService->disconnect();
   }
 
+  /**
+  * Selecciona un certificado válido para conexión con Apple
+  */
   function chooseCeritifcate($type) {
     if ($type == APNSNotificationProvider::CERT_TYPE_APNS) {
       if ($this->environment = APNSNotificationProvider::ENVIRONMENT_SANDBOX) {
@@ -81,6 +99,9 @@ class APNSNotificationProvider  implements INotificationProvider {
     }
   }
 
+  /**
+  * Obtiene los device Tokens del user_id seleccionado
+  */
   function deviceTokensForUser($user_id) {
     $userDevice = new UserDevice($this->session);
     $tokens = $userDevice->tokensByUserId($user_id);

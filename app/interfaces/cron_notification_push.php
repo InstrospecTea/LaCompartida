@@ -32,7 +32,6 @@ class CronNotificationPush extends Cron {
 		if (!is_null($environment) && $environment == 'production') {
 			$this->environment = NotificationService::ENVIRONMENT_PRODUCTION;
 		}
-		echo $this->environment;
 		$notify_users = $this->getNotifyUsers($time);
 		$this->notifyUsers($notify_users);
 		$this->log('FIN CronNotificacionPush');
