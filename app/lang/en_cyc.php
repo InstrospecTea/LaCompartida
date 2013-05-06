@@ -690,7 +690,9 @@ $_LANG['forma_cobro'] = "Type of Fee Agreement";
 $_LANG['cliente'] = "Client";
 $_LANG['id_usuario_responsable'] = "Commercial Manager";
 $_LANG['id_usuario_secundario'] = "Secundary Manager";
-$_LANG['codigo_cliente'] = "Cliente Code";
+$_LANG['codigo_cliente'] = "Client Code";
+$_LANG['codigo_cliente_secundario'] = "Client Code";
+$_LANG['codigo_asunto_secundario'] = "Issue Code";
 $_LANG['fecha_emision'] = "Output Date";
 $_LANG['grupo_o_cliente'] = "Group or Client";
 

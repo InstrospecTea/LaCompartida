@@ -680,7 +680,9 @@ $_LANG['id_usuario_responsable'] = "Commercial Manager";
 $_LANG['id_usuario_secundario'] = "Secundary Manager";
 $_LANG['area_usuario'] = "Professional Area";
 $_LANG['categoria_usuario'] = "Professional Category";
-$_LANG['codigo_cliente'] = "Cliente Code";
+$_LANG['codigo_cliente'] = "Client Code";
+$_LANG['codigo_cliente_secundario'] = "Client Code";
+$_LANG['codigo_asunto_secundario'] = "Issue Code";
 $_LANG['fecha_emision'] = "Output Date";
 $_LANG['grupo_o_cliente'] = "Group or Client";
 

@@ -897,6 +897,8 @@ $_LANG['prm_area_proyecto_glosa'] = "Área Asunto";
 $_LANG['codigo_asunto'] = "Código Asunto";
 $_LANG['glosa_asunto_con_codigo'] = "Asunto";
 $_LANG['codigo_cliente'] = "Codigo Cliente";
+$_LANG['codigo_cliente_secundario'] = "Codigo Cliente";
+$_LANG['codigo_asunto_secundario'] = "Codigo Asunto";
 $_LANG['fecha_emision'] = "Fecha Emisi&oacute;n";
 $_LANG['grupo o cliente'] = "Grupo o Cliente";
 
