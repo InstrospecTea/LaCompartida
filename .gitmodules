@@ -7,6 +7,6 @@
 [submodule "backups/PHPMailer"]
 	path = backups/PHPMailer
 	url = git://github.com/Synchro/PHPMailer.git
-[submodule "app/classes/APNS"]
-	path = app/classes/APNS
+[submodule "app/classes/ApnsPHP"]
+	path = app/classes/ApnsPHP
 	url = git@github.com:LemontechSA/ApnsPHP.git

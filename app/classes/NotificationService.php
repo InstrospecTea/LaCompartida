@@ -7,7 +7,7 @@ class NotificationService {
 
   const ENVIRONMENT_PRODUCTION = 0;
   const ENVIRONMENT_SANDBOX = 1;
-  const PROVIDER_APNS = 0;
+  const PROVIDER_APNS = 0; //Provider debiera ser interfaz
 
   const CERT_TYPE_APNS = 0;
   const CERT_TYPE_AUTH = 1;
