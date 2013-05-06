@@ -8,7 +8,7 @@ error_reporting(-1);
 
 
 $options = array(
-  "provider" =>  NotificationService::PROVIDER_APNS,
+  "providers" => array("APNSNotificationProvider"),
   "environment" => NotificationService::ENVIRONMENT_SANDBOX
 );
 
