@@ -8,13 +8,16 @@ class UserDevice extends Objeto {
 	 * Return an array with next elements:
 	 * 	id, user_id, token, created and modified
 	 */
-	function findByToken($token) {
+	function findByToken($token, $user_id) {
+
 		$sql = "SELECT `user_device`.`id`
 			FROM `user_device`
-			WHERE `user_device`.`token`=:token";
+			WHERE `user_device`.`user_id` = :user_id
+				AND `user_device`.`token` = :token";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('token', $token);
+		$Statement->bindParam('user_id', $user_id);
 		$Statement->execute();
 
 		$user_device_data = $Statement->fetchObject();

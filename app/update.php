@@ -9792,6 +9792,7 @@ QUERY;
 				PRIMARY KEY (`id`),
 				UNIQUE KEY `user_device_token` (`token`),
 				KEY `user_device_user_id` (`user_id`),
+				KEY `user_device_user_id_token` (`user_id`, `token`),
 				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 

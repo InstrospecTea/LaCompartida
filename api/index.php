@@ -440,12 +440,12 @@ $Slim->put('/users/:user_id/device', function ($user_id) use ($Session, $Slim) {
 	if (!$User->LoadId($user_id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
-		$device = $UserDevice->findByToken($token);
-		if (!is_object($device)) {
+		$device = $UserDevice->findByToken($token, $user_id);
+		if (!is_object($device)){
 			if (!$UserDevice->save($new_device)) {
 				halt(__("Unexpected error when saving data"), "UnexpectedSave");
 			} else {
-				$device = $UserDevice->findByToken($token);
+				$device = $UserDevice->findByToken($token, $user_id);
 			}
 		}
 	}
@@ -470,7 +470,7 @@ $Slim->delete('/users/:user_id/device/:token', function ($user_id, $token) use (
 	if (!$User->LoadId($user_id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
-		$device = $UserDevice->findByToken($token);
+		$device = $UserDevice->findByToken($token, $user_id);
 		if (is_object($device)) {
 			if (!$UserDevice->delete($device->id)) {
 				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
