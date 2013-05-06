@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php';
+require_once dirname(__FILE__) . '../../../conf.php';
 require_once 'ApnsPHP/Autoload.php';
 
 class NotificationService {
@@ -42,14 +42,14 @@ class NotificationService {
      if (!is_null($this->provider) && $this->provider == NotificationService::PROVIDER_APNS) {
         if ($type == NotificationService::PROVIDER_APNS) {
           if ($this->environment = NotificationService::ENVIRONMENT_SANDBOX) {
-            return dirname(__FILE__) . '/../../config/apns/apns-sandbox.pem';
+            return Conf::ServerDir() . '/../config/apns/apns-sandbox.pem';
           }
           if ($this->environment = NotificationService::ENVIRONMENT_PRODUCTION) {
-            return dirname(__FILE__) . '/../../config/apns/server_certificates_bundle_production.pem';
+            return Conf::ServerDir() . '/../config/apns/server_certificates_bundle_production.pem';
           }
         }
         if ($type == NotificationService::CERT_TYPE_AUTH) {
-          return dirname(__FILE__) . '/../../config/apns/entrust_root_certification_authority.pem';
+          return Conf::ServerDir() . '/../config/apns/entrust_root_certification_authority.pem';
         }
      }
   }

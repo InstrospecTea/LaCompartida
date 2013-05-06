@@ -1,8 +1,11 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
+require_once dirname(__FILE__) . '../../../conf.php';
+require_once Conf::ServerDir() . '/classes/Notifications/NotificationService.php';
+
 $sesion = new Sesion(null, true);
 
 error_reporting(-1);
+
 
 $options = array(
   "provider" =>  NotificationService::PROVIDER_APNS,
