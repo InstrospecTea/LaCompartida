@@ -268,7 +268,6 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	$work['notes'] = $Slim->request()->params('notes');
 	$work['rate'] = (float) $Slim->request()->params('rate');
 	$work['requester'] = $Slim->request()->params('requester');
-
 	$work['activity_code'] = $Slim->request()->params('activity_code');
 	$work['area_code'] = $Slim->request()->params('area_code');
 	$work['matter_code'] = $Slim->request()->params('matter_code');
@@ -520,21 +519,19 @@ $Slim->post('/users/:id', function ($id) use ($Session, $Slim) {
 			'receive_alerts' => !empty($User->fields['receive_alerts']) ? $User->fields['receive_alerts'] : 0,
 			'alert_hour' => !empty($User->fields['alert_hour']) ? time2seconds($User->fields['alert_hour']) : 0
 		);
+
 		outputJson($user);
-
 	}
-
-
 });
 
 $Slim->run();
 
 function validateAuthTokenSendByHeaders() {
-	$Session = new Sesion();
-	$UserToken = new UserToken($Session);
-	$Slim = Slim::getInstance();
-	$Request = $Slim->request();
+	global $Session, $Slim;
 
+	$UserToken = new UserToken($Session);
+
+	$Request = $Slim->request();
 	$auth_token = $Request->headers('AUTHTOKEN');
 	$user_token_data = $UserToken->findByAuthToken($auth_token);
 
@@ -542,6 +539,18 @@ function validateAuthTokenSendByHeaders() {
 	if (!is_object($user_token_data)) {
 		halt(__('Invalid AUTH TOKEN'), "SecurityError");
 	} else {
+		// verify if the token is expired
+		// date_default_timezone_set("UTC");
+		$now = time();
+		$expiry_date = strtotime($user_token_data->expiry_date);
+		if ($expiry_date < $now) {
+			if ($UserToken->delete($user_token_data->id)) {
+				halt(__('Expired AUTH TOKEN'), "SecurityError");
+			} else {
+				halt(__("Unexpected error deleting data"), "UnexpectedDelete");
+			}
+		}
+
 		return $user_token_data->user_id;
 	}
 }
@@ -572,10 +581,9 @@ function outputJson($response) {
 	exit;
 }
 
-function time2seconds($time='00:00:00')
-{
-    list($hours, $mins, $secs) = explode(':', $time);
-    return ($hours * 3600 ) + ($mins * 60 ) + $secs;
+function time2seconds($time = '00:00:00') {
+	list($hours, $mins, $secs) = explode(':', $time);
+	return ($hours * 3600 ) + ($mins * 60 ) + $secs;
 }
 
 function isValidTimeStamp($timestamp) {

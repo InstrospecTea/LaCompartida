@@ -1082,6 +1082,7 @@ $_LANG['Código Postal'] = "Código Postal";
 
 /* Langs para API REST Errors */
 $_LANG["Invalid AUTH TOKEN"] = "Sesión de usuario inválida";
+$_LANG["Expired AUTH TOKEN"] = "Sesión de usuario expiró";
 $_LANG["Invalid user data"] = "Datos del usuario inválidos";
 $_LANG["Invalid user ID"] = "Identificación del usuario inválida";
 $_LANG["The user doesn't exist"] = "El usuario no existe";
@@ -1091,7 +1092,7 @@ $_LANG["Invalid client code"] = "El código del cliente no es válido";
 $_LANG["Invalid work ID"] = "El id del trabajo no es válido";
 $_LANG["The work doesn't exist"] = "El trabajo no existe";
 $_LANG["The client doesn't exist"] = "El cliente no existe";
-$_LANG["The date format is incorrect"] = "El formato de la fecha del trabajo es incorrecto";
+$_LANG["The date format is incorrect"] = "El formato de la fecha es incorrecto";
 $_LANG["The created date format is incorrect"] = "La fecha de creación del trabajo es incorrecta";
 $_LANG["The duration format is incorrect"] = "La duración del trabajo es incorrecta";
 $_LANG["Unexpected error when saving data"] = "Error al intentar guardar";
@@ -1108,3 +1109,5 @@ $_LANG["Invalid area code"] = "Area inválida";
 $_LANG["Invalid matter code"] = "Asunto inválido";
 $_LANG["The matter doesn't exist"] = "El Asunto no existe";
 $_LANG["You can not enter hours prior to"] = "No puede ingresar horas anteriores al";
+$_LANG["Entered only %HOURS hours of at least %MINIMUM"] = "Sólo ha ingresado %HOURS horas de un mínimo de %MINIMUM";
+$_LANG["It entered %HOURS hours, exceeding its maximum of %MAXIMUM"] = "Ha ingresado %HOURS horas, superando su máximo de %MAXIMUM";

@@ -9782,19 +9782,6 @@ QUERY;
 		break;
 
 		case 7.36:
-			$queries[] = "CREATE TABLE IF NOT EXISTS `user_token` (
-				`user_id` int(11) NOT NULL,
-				`auth_token` varchar(60) NOT NULL DEFAULT '',
-				`app_key` varchar(250) NOT NULL,
-				`created` datetime NOT NULL,
-				`modified` datetime NOT NULL,
-				PRIMARY KEY (`user_id`),
-				CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
-				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
-			ejecutar($queries, $dbh);
-			break;
-
-		case 7.37:
 			$queries[] = "CREATE TABLE `user_device` (
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`user_id` int(11) NOT NULL,
@@ -9807,9 +9794,20 @@ QUERY;
 				CONSTRAINT `user_device_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$queries[] = "ALTER TABLE `user_token` DROP FOREIGN KEY `user_id`;";
-			$queries[] = "ALTER TABLE `user_token` ADD KEY `user_token_user_id` (`user_id`);";
-			$queries[] = "ALTER TABLE `user_token` ADD CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			$queries[] = "DROP TABLE IF EXISTS `user_token`;";
+			$queries[] = "CREATE TABLE `user_token` (
+				`id` int(11) NOT NULL AUTO_INCREMENT,
+				`user_id` int(11) NOT NULL,
+				`auth_token` varchar(60) NOT NULL DEFAULT '',
+				`app_key` varchar(250) NOT NULL,
+				`expiry_date` datetime NOT NULL,
+				`created` datetime NOT NULL,
+				`modified` datetime NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `user_token_user_id` (`user_id`),
+				KEY `user_token_auth_token` (`auth_token`),
+				CONSTRAINT `user_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$queries[] = "ALTER TABLE `usuario` ADD COLUMN `receive_alerts` TINYINT(1) DEFAULT 0, ADD COLUMN `alert_hour` TIME DEFAULT NULL;";
 
@@ -9823,7 +9821,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.37;
+$max_update = 7.36;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
