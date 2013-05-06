@@ -56,7 +56,6 @@ class CronNotificationPush extends Cron {
 					$message .= !empty($message) ? ', ' . $user['maximum_restriction_alert'] : $user['maximum_restriction_alert'];
 				}
 				$title = __("Time Entry restrictions alert");
-				var_dump($message);
 				$notificationService->addMessage($user['id'], $title,
 						array(
 							"notificationMessage" => UtilesApp::utf8izar($message),
