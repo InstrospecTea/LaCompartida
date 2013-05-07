@@ -72,6 +72,31 @@ class UserDevice extends Objeto {
 	}
 
 	/**
+	 * Update all devices with an invalid token
+	 */
+	function updateInvalidToken($last_token, $device_token) {
+		if (is_null($last_token)) {
+			return false;
+		}
+
+		if (is_null($device_token)) {
+			return false;
+		}
+
+		$sql = "UPDATE `user_device`
+				SET `user_device`.`modified` 	= :modified,
+						`user_device`.`token` 		= :device_token
+				WHERE `user_device`.`token`		= :last_token";
+
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('modified', date('Y-m-d H:i:s'));
+		$Statement->bindParam('device_token', $device_token);
+		$Statement->bindParam('last_token', $last_token);
+
+		return $Statement->execute();
+	}
+
+	/**
 	 * Save data
 	 * returns true if the update or insert completed successfully
 	 */

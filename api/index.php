@@ -427,25 +427,29 @@ $Slim->put('/users/:user_id/device', function ($user_id) use ($Session, $Slim) {
 	$User = new Usuario($Session);
 	$UserDevice = new UserDevice($Session);
 
-	$token = $Slim->request()->params('token');
+	$device_token = $Slim->request()->params('token');
+	$last_token = $Slim->request()->params('lastToken');
 	$new_device = array();
 
-	if (is_null($token) || empty($token)) {
+	if (is_null($device_token) || empty($device_token)) {
 		halt(__("Invalid token device"), "InvalidTokenDevice");
 	}
 
 	$new_device['user_id'] = $user_id;
-	$new_device['token'] = $token;
+	$new_device['token'] = $device_token;
 
 	if (!$User->LoadId($user_id)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
-		$device = $UserDevice->findByToken($token, $user_id);
+		if (!is_null($last_token) && !empty($last_token)) {
+			$UserDevice->updateInvalidToken($last_token, $device_token);
+		}
+		$device = $UserDevice->findByToken($device_token, $user_id);
 		if (!is_object($device)){
 			if (!$UserDevice->save($new_device)) {
 				halt(__("Unexpected error when saving data"), "UnexpectedSave");
 			} else {
-				$device = $UserDevice->findByToken($token, $user_id);
+				$device = $UserDevice->findByToken($device_token, $user_id);
 			}
 		}
 	}
