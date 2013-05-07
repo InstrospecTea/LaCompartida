@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix: 13.3.15
+lunes 30 de abril 2013
+* **Fixed:** [Corrige error planilla saldo con clientes que utilizan codigo secundario](#178)
+
 ## Hotfix: 13.3.14
 lunes 29 de abril 2013
 * **Fixed:** [Corrige selector de documento](#176)
