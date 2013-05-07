@@ -38,6 +38,7 @@ class APNSNotificationProvider  implements INotificationProvider {
       $this->pushService->setLogger($this->logger);
       $this->pushService->setRootCertificationAuthority($certificationAuth);
       $this->pushService->connect();
+      $this->tokens = array();
       return true;
     } else {
       return false;
@@ -65,6 +66,7 @@ class APNSNotificationProvider  implements INotificationProvider {
       if (array_key_exists("notificationURL", $extras) && !is_null($extras["notificationURL"])) {
         $aps_message->setCustomProperty('notificationURL', $extras["notificationURL"]);
       }
+      $aps_message->setCustomProperty('userID', $user_id);
       $aps_message->setText($title);
       $this->pushService->add($aps_message);
     }
