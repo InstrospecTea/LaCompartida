@@ -101,7 +101,7 @@ $estados_cobro = array("CREADO",
 		$agrupadores = array(
 			'glosa_cliente',
 			'codigo_cliente_secundario',
-			'codigo_asunto_secundario',
+			'codigo_asunto',
 			'glosa_asunto_con_codigo',
 			'profesional',
 			'estado',
