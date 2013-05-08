@@ -93,7 +93,7 @@ class APNSNotificationProvider  implements INotificationProvider {
         return Conf::ServerDir() . '/../config/apns/apns-sandbox.pem';
       }
       if ($this->environment = APNSNotificationProvider::ENVIRONMENT_PRODUCTION) {
-        return Conf::ServerDir() . '/../config/apns/server_certificates_bundle_production.pem';
+        return Conf::ServerDir() . '/../config/apns/apns-production.pem';
       }
     }
     if ($type == APNSNotificationProvider::CERT_TYPE_AUTH) {
