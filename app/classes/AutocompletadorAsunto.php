@@ -40,9 +40,9 @@ class AutocompletadorAsunto
 		if( $width == '' )
 			{
 				if($mas_recientes)
-					$width = '245';
+					$width = '260';
 				else
-					$width = '305';
+					$width = '320';
 			}
 			$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"".$glosa_asunto."\" style=\"width: ".$width."px\"/>";
 		
