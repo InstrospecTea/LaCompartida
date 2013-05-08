@@ -3,32 +3,25 @@
 	
 
 	$sesion = new Sesion();
-	$pedazo = strtolower(utf8_decode(addslashes($_GET['term'])));
+	$pedazo = strtolower(utf8_decode(addslashes($_POST['term'])));
 	
-if(!$pedazo) 	{
-		$query = "SELECT DISTINCT tabla1.codigo_cliente as id, tabla1.glosa_cliente  as label, tabla1.glosa_cliente  as value FROM
-                            (
-                                SELECT 
-                                SUBSTRING( trabajo.codigo_asunto, 1, 4 ) AS codigo_cliente, 
-                                cliente.glosa_cliente as glosa_cliente,
-                                trabajo.fecha, 
-                                id_trabajo 
-                                FROM trabajo  
-                                JOIN cliente ON cliente.codigo_cliente = SUBSTRING( codigo_asunto, 1, 4 ) 
-                                WHERE trabajo.id_usuario = '".$_POST['id_usuario']."' 
-                                ORDER BY trabajo.fecha DESC, id_trabajo DESC 
-                                LIMIT 30
-                            ) as tabla1
-                            LIMIT 5"; 
-	} else if(  Conf::GetConf($sesion,'CodigoSecundario') )	{
-		$query = "SELECT codigo_cliente_secundario as id, glosa_cliente as label, glosa_cliente as value
-				FROM cliente
-				WHERE activo=1 AND lcase(glosa_cliente) LIKE '%$pedazo%' 
-				ORDER BY glosa_cliente
-				LIMIT 10";
-	
-	} else 	{
-		$query = "SELECT codigo_cliente as id, glosa_cliente as label, glosa_cliente as value
+$id=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_secundario':'codigo_cliente';
+$id_usuario=empty($_POST['id_usuario'])?  $sesion->usuario->fields['id_usuario']:$_POST['id_usuario'];
+if(empty($pedazo)) 	{
+		$query = "(select distinct cliente.{$id} as id, cliente.glosa_cliente as value
+					from trabajo join asunto using (codigo_asunto) join cliente using (codigo_cliente)
+					 WHERE trabajo.id_usuario = {$id_usuario}
+					order by trabajo.fecha desc
+					limit 0,5)   
+					union
+					(select distinct cliente.{$id}, cliente.glosa_cliente
+					from  asunto join cliente using (codigo_cliente)
+					order by asunto.fecha_creacion desc
+					limit 0,5)    
+  					"; 
+                     
+	} else {
+			$query = "SELECT {$id} as id, glosa_cliente as value
 				FROM cliente
 				WHERE activo=1 AND lcase(glosa_cliente) LIKE '%$pedazo%'
 				ORDER BY glosa_cliente

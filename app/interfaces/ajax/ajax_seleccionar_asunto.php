@@ -2,63 +2,42 @@
 	require_once dirname(__FILE__).'/../../conf.php';
  
 	$sesion = new Sesion();
-	$pedazo = strtolower(utf8_decode($_GET['term']));
-	$codigo_cliente = $_GET['codigo_cliente'];
+	$pedazo = strtolower(utf8_decode($_POST['term']));
+	$codigo_cliente = $_POST['codigo_cliente'];
+	$id=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_asunto_secundario':'codigo_asunto';
+	$campocodigocliente=Conf::GetConf($sesion,'CodigoSecundario') ? 'codigo_secundario':'codigo_cliente';
+
+	$id_usuario=empty($_POST['id_usuario'])?  $sesion->usuario->fields['id_usuario']:$_POST['id_usuario'];
 	
-	if(!$pedazo)
-	{
-		$query = "SELECT DISTINCT SUBSTRING(codigo_asunto, 6, 4) AS codigo_asunto
-					FROM trabajo
-					WHERE id_usuario='".$_POST['id_usuario']."'
-					ORDER BY fecha DESC
-					LIMIT 5";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		$where = '';
-		while(list($codigo_asunto) = mysql_fetch_array($resp))
-		{
-			$where .= "codigo_asunto='$codigo_asunto' OR ";
-		}
-		$where .= 0;
-		$query = "SELECT codigo_asunto as id, glosa_asunto as value
-				FROM asunto
-				WHERE $where";
-	} 	else if( Conf::GetConf($sesion,'CodigoSecundario'))  {
-		if( $codigo_cliente != '0')
-		{
-			$query = "SELECT codigo_asunto_secundario as id, glosa_asunto as value
-					FROM asunto
-					WHERE activo=1 AND glosa_asunto LIKE '%$pedazo%'
-					AND codigo_cliente = '$codigo_cliente'
-					ORDER BY glosa_asunto
-					LIMIT 10";
-		}
-		else
-		{
-			$query = "SELECT codigo_asunto_secundario as id, glosa_asunto as value
-					FROM asunto
-					WHERE activo=1 AND glosa_asunto LIKE '%$pedazo%'
-					
-					ORDER BY glosa_asunto
-					LIMIT 10";
-		}
+
+	if(empty($pedazo)) 	{
+
+
+
+		$query = "(select distinct asunto.{$id}  as id, asunto.glosa_asunto as value
+				from trabajo join asunto using (codigo_asunto)
+				 WHERE trabajo.id_usuario = {$id_usuario}
+				order by trabajo.fecha desc
+				limit 0,5)   
+				union
+				(select distinct asunto.{$id}  as id, asunto.glosa_asunto as value
+				from  asunto  
+				order by asunto.fecha_creacion desc
+				limit 0,5)    
+				 ";
+	
 	
 	} else	{
 		
-		if($codigo_cliente) 	{
-			$query = "SELECT codigo_asunto as id, glosa_asunto as value
-					FROM asunto
-					WHERE activo=1 AND lower(glosa_asunto) LIKE '%$pedazo%'
-					AND codigo_cliente = '$codigo_cliente'
-					ORDER BY glosa_asunto
-					LIMIT 10";
-		} 	else 		{
-			$query = "SELECT codigo_asunto as id, glosa_asunto as value
-					FROM asunto
-					WHERE activo=1 AND lower(glosa_asunto) LIKE '%$pedazo%'
-					
-					ORDER BY glosa_asunto
-					LIMIT 10";
-		}
+		 
+			$query = "SELECT $id as id, glosa_asunto as value
+						FROM asunto
+						WHERE activo=1 AND lower(glosa_asunto) LIKE '%$pedazo%'";
+			if($codigo_cliente) {
+					$query .="	AND {$campocodigocliente} = '$codigo_cliente'";	
+			} 
+			$query .="ORDER BY glosa_asunto		LIMIT 10";
+	 
 	}
  //echo $query;
 	$resp = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
@@ -71,4 +50,5 @@
  		echo json_encode(array("id"=>"cualquiera", "value"=>__('Cualquiera')));
  	}
 	
+
 

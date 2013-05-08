@@ -38,7 +38,7 @@ class Autocompletador
 			$output .= "<input type=\"text\" id=\"glosa_cliente\" name=\"glosa_cliente\" value=\"".$glosa_cliente."\" style=\"width: ".$width."px;\"/>";
 		}
 		if( $mas_recientes ) 
-			$output .= "<input type=\"button\" class=\"btn\" value=\"".__('Más recientes')."\" onclick=\"cargarMejoresOpciones();\" />";
+			$output .= "<input type=\"button\" id=\"clientes_recientes\" class=\"btn\" value=\"".__('Más recientes')."\"  />";
 			
 		$output .= "<span id=\"indicador_glosa_cliente\" style=\"display: none\">
 			<img src=\"".Conf::ImgDir()."/ajax_loader.gif\" alt=\"".__('Trabajando')."...\" />
@@ -58,8 +58,11 @@ class Autocompletador
  		}
 		$output = "
 		<script type=\"text/javascript\">
- 		  id_usuario_original = ".$id_usuario." 
+		var	id_usuario_original = ".intval($sesion->usuario->fields['id_usuario']).";
 			
+
+
+
 			jQuery(document).ready(function() {
 					jQueryUI.done(function() {
 
@@ -69,7 +72,15 @@ class Autocompletador
 						
 
 						jQuery( \"#glosa_cliente\" ).autocomplete({
-						      source: \"".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_cliente.php\",
+						         source: function( request, response ) {
+							        console.log(request,response);
+							        jQuery.ajax({url: \"".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_cliente.php\",
+							        	data: {term:request.term,  id_usuario:id_usuario_original },
+							        	dataType:\"json\",
+							        	type:\"POST\"}).done(function( data ) {
+							          response( data );
+							        });
+							      },
 						      minLength: 3,
 						      select: function( event, ui ) {
 						      	console.log(ui);
@@ -81,6 +92,10 @@ class Autocompletador
         						$output.= " 
       							}	
 						    });
+
+							jQuery('#clientes_recientes').click(function() {
+								jQuery('#glosa_cliente').autocomplete('option','minLength',0).autocomplete('search','').autocomplete('option','minLength',3);
+							});
 					});
 				}); 
 				 
@@ -129,16 +144,7 @@ class Autocompletador
 				};
 				http.send(null);
 			}
-			function cargarMejoresOpciones()
-			{
-				$('glosa_cliente').value='';
-				if(id_usuario_original != $('id_usuario').options[$('id_usuario').selectedIndex].value)
-				{
-					id_usuario_original = $('id_usuario').options[$('id_usuario').selectedIndex].value;
-					Autocompletador = new Ajax.Autocompleter(\"glosa_cliente\", \"sugerencias_glosa_cliente\", \"ajax_seleccionar_cliente.php\", {minChars: 3, indicator: 'indicador_glosa_cliente', afterUpdateElement: getSelectionId, parameters:'id_usuario='+id_usuario_original});
-				}
-				Autocompletador.activate();
-			}
+ 
 		function RevisarConsistenciaClienteAsunto( form ) {
 			var accion = 'consistencia_cliente_asunto';
 

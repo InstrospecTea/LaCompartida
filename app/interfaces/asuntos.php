@@ -188,11 +188,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 					<td nowrap class="al" colspan=4>
 						<?php
 						if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
-							if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-								echo AutocompletadorAsunto::ImprimirSelector($sesion, '', $codigo_asunto_secundario, $codigo_cliente);
-							} else {
-								echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, '', $codigo_cliente);
-							}
+					 		echo AutocompletadorAsunto::ImprimirSelector($sesion, $codigo_asunto, $codigo_asunto_secundario, $codigo_cliente,$codigo_cliente_secundario, true);
 						} else {
 							?>
 							<input onkeydown="if(event.keyCode==13) Listar(this.form, 'buscar');" type="text" name="codigo_asunto" size="15" value="<?php echo $codigo_asunto ?>" onchange="this.value=this.value.toUpperCase();">

@@ -44,13 +44,10 @@ class AutocompletadorAsunto
 				else
 					$width = '305';
 			}
-		//if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"".$glosa_asunto."\" style=\"width: ".$width."px\"/>";
-		/*else
-			$output .= "<input type=\"text\" id=\"glosa_asunto\" name=\"glosa_asunto\" value=\"".$glosa_asunto."\" style=\"width: ".$width."px;\"/>";
-		*/
+		
 		if( $mas_recientes )
-			$output .= "<input type=\"button\" class=\"btn\" value=\"".__('Más recientes')."\" onclick=\"cargarMejoresOpciones();\" />";
+			$output .= "<input type=\"button\" id=\"asuntos_recientes\" class=\"btn\" value=\"".__('Más recientes')."\" />";
 
 		$output .= "<span id=\"indicador_glosa_asunto\" style=\"display: none\">
 			<img src=\"".Conf::ImgDir()."/ajax_loader.gif\" alt=\"".__('Trabajando')."...\" />
@@ -62,34 +59,8 @@ class AutocompletadorAsunto
 
 	function CSS()
 	{
-		$output .= "<style type=\"text/css\">
-										div.autocomplete {
-											position:absolute;
-											width:250px;
-											background-color:white;
-											border:1px solid #888;
-											margin:0;
-											padding:0;
-										}
-										div.autocomplete ul {
-											list-style-type:none;
-											background-color: white;
-											margin:0;
-											padding:0;
-										}
-										div.autocomplete ul li.selected { background-color: #ffb;}
-										div.autocomplete ul li {
-											list-style-type:none;
-											display:block;
-											background-color: white;
-											margin:0;
-											padding:2px;
-											height:32px;
-											cursor:pointer;
-										}
-								</style>";
-
-	return $output;
+		
+	return;
 	}
 
 	function Javascript( $sesion , $cargar_select = true , $onchange = '' )
@@ -101,7 +72,7 @@ class AutocompletadorAsunto
  		}
 		$output = "
 		<script type=\"text/javascript\">
-			id_usuario_original = ".$id_usuario."
+		var	id_usuario_original = ".intval($sesion->usuario->fields['id_usuario']).";
 
 			
 	jQuery(document).ready(function() {
@@ -111,9 +82,12 @@ class AutocompletadorAsunto
 						jQuery( \"#glosa_asunto\" ).autocomplete({
 						
 							      source: function( request, response ) {
-							        var term = request.term;
+							      
 							        request.codigo_cliente= jQuery('#".$lasid[2]."').val();
-							        jQuery.getJSON( '".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_asunto.php', request, function( data, status, xhr ) {
+							        jQuery.ajax({url: '".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_asunto.php',
+							        	data: {term:request.term, codigo_cliente:jQuery('#".$lasid[2]."').val(), id_usuario:id_usuario_original },
+							        	dataType:\"json\",
+							        	type:\"POST\"}).done(function( data ) {
 							          response( data );
 							        });
 							      },
@@ -129,6 +103,11 @@ class AutocompletadorAsunto
       							}	
 						    });
 
+					});
+
+					
+					jQuery('#asuntos_recientes').click(function() {
+						jQuery('#glosa_asunto').autocomplete('option','minLength',0).autocomplete('search','').autocomplete('option','minLength',3);
 					});
 				}); 
 			
@@ -191,16 +170,7 @@ class AutocompletadorAsunto
 				return \"glosa_asunto=\"+glosa_asunto+\"&codigo_cliente=\" + codigo_cliente;
 			}
 
-			function cargarMejoresOpciones()
-			{
-				$('glosa_asunto').value='';
-				if(id_usuario_original != $('id_usuario').options[$('id_usuario').selectedIndex].value)
-				{
-					id_usuario_original = $('id_usuario').options[$('id_usuario').selectedIndex].value;
-					Autocompletador = new Ajax.Autocompleter(\"glosa_asunto\", \"sugerencias_glosa_asunto\", \"ajax_seleccionar_asunto.php\", {minChars: 3, indicator: 'indicador_glosa_asunto', afterUpdateElement: getSelectionId, parameters:'id_usuario='+id_usuario_original});
-				}
-				Autocompletador.activate();
-			}
+ 
 		</script>";
 		return $output;
 	}
