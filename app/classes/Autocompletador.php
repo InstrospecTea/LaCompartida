@@ -73,7 +73,7 @@ class Autocompletador
 
 						jQuery( \"#glosa_cliente\" ).autocomplete({
 						         source: function( request, response ) {
-							        console.log(request,response);
+							      //  console.log(request,response);
 							        jQuery.ajax({url: \"".Conf::RootDir()."/app/interfaces/ajax/ajax_seleccionar_cliente.php\",
 							        	data: {term:request.term,  id_usuario:id_usuario_original },
 							        	dataType:\"json\",
@@ -83,7 +83,7 @@ class Autocompletador
 							      },
 						      minLength: 3,
 						      select: function( event, ui ) {
-						      	console.log(ui);
+						      	//console.log(ui);
         						jQuery('#".$lasid[0]."').val(ui.item.id);
         						jQuery('#glosa_cliente').val(ui.item.value);
         						";
@@ -157,7 +157,7 @@ class Autocompletador
 				var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
 			else
 				var codigo_asunto = jQuery('#codigo_asunto').val();
-			console.log(codigo_cliente,codigo_asunto);
+			//console.log(codigo_cliente,codigo_asunto);
 			var http = getXMLHTTP();
 			http.open('get','ajax.php?accion='+accion+'&codigo_asunto='+codigo_asunto+'&codigo_cliente='+codigo_cliente, false);
 			http.onreadystatechange = function()

@@ -93,7 +93,7 @@ class AutocompletadorAsunto
 							      },
       					          minLength: 3,
 						      select: function( event, ui ) {
-						      	console.log(ui);
+						      	//console.log(ui);
         						jQuery('#".$lasid[1]."').val(ui.item.id);
         						jQuery('#glosa_asunto').val(ui.item.value);
         						";
