@@ -177,7 +177,7 @@ if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial') == 1) {
 					</td>
 					<td nowrap class="al" colspan="3">
 
-						<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, false, 320,' '); ?>
+						<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, false, 320,'',false); ?>
 
 					</td>
 				</tr>

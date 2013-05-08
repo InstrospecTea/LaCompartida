@@ -6,11 +6,6 @@ class Autocompletador
 	function ImprimirSelector($sesion, $codigo_cliente="", $codigo_cliente_secundario="", $mas_recientes=false, $width='', $oncambio='')
 	{
 		$output = ' ';
-	if ($oncambio=='') {
-					$oncambio="CargarGlosaCliente();";
-				} elseif (substr($oncambio,0,1)=='+') {
-					$oncambio="CargarGlosaCliente(); $oncambio";
-				}
 
 		if(  Conf::GetConf($sesion,'CodigoSecundario') ) {
 			$output .= "<input type=\"hidden\" maxlength=\"10\" size=\"10\" id=\"codigo_cliente\" class=\"codigo_cliente\" name=\"codigo_cliente\" onChange=\" $oncambio\" value=\"".$codigo_cliente."\" />
@@ -53,12 +48,6 @@ class Autocompletador
 		return $output;
 	}
 	
-	function CSS()
-	{
-		
-				
-	return "";
-	}
 	
 	function Javascript( $sesion , $cargar_select = true , $onchange = '' )
 	{
@@ -74,7 +63,9 @@ class Autocompletador
 			jQuery(document).ready(function() {
 					jQueryUI.done(function() {
 
-				 	
+				 		jQuery(\"#".$lasid[0]."\").change(function() {
+				 			". $onchange.";
+				 		});
 						
 
 						jQuery( \"#glosa_cliente\" ).autocomplete({
@@ -85,9 +76,9 @@ class Autocompletador
         						jQuery('#".$lasid[0]."').val(ui.item.id);
         						jQuery('#glosa_cliente').val(ui.item.value);
         						";
-        						$output.= $onchange;
-        						$output.= "CargarSelect('".$lasid[0]."','".$lasid[1]."','cargar_asuntos');";
-        						$output.= "
+        						//$output.= $onchange;
+        					if($cargar_select)	$output.= "CargarSelect('".$lasid[0]."','".$lasid[1]."','cargar_asuntos');";
+        						$output.= " 
       							}	
 						    });
 					});
@@ -185,5 +176,10 @@ class Autocompletador
 		</script>";
 		return $output;
 	}
+
+	function CSS() 	{
+			return;
+	}
+	
 }
  

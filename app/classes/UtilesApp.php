@@ -48,16 +48,23 @@ class UtilesApp extends Utiles {
 		return $result['simbolo'];
 	}
 
-	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '') {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '',$cargar_selectores=true) {
 		echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
+				if ($oncambio=='') {
+					$oncambio="CargarGlosaCliente();";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio="CargarGlosaCliente(); $oncambio";
+				}
+			echo Autocompletador::Javascript($sesion,$cargar_selectores,$oncambio);
+
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width   );
 			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
 			}
-			echo Autocompletador::Javascript($sesion);
+			
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio=='') {
