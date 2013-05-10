@@ -127,7 +127,7 @@ function Opciones(& $fila) {
 	if (UtilesApp::GetConf($sesion, 'ImprimirFacturaPdf')) {
 		$html_opcion .= "<a class=\"fl ui-button pdf\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" href='javascript:void(0)' onclick=\"ImprimirPDF(" . $id_factura . ");\" >&nbsp;</a>";
 	}
-	 $html_opcion .="<a  class=\"ui-icon lupa fr logdialog\" rel=\"factura\" id=\"factura_" . $id_factura . "\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";
+	 $html_opcion .=UtilesApp::LogDialog($sesion, 'factura',$id_factura);
 
 	return $html_opcion;
 }

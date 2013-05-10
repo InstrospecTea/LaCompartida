@@ -293,8 +293,12 @@
 					$texto_acuerdo = $cobro->fields['forma_cobro'];
                                 else
                                         $texto_acuerdo = $cobro->fields['forma_cobro']." por ".$cobro->fields['simbolo_moneda_contrato']." ".number_format($cobro->fields['monto'],$cobro->fields['cifras_decimales_moneda_contrato'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
-		    	$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>".$texto_acuerdo.', Tarifa: '.$cobro->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?popup=1&id_contrato=".$cobro->fields['id_contrato']."');\" title='".__('Editar Información Comercial')."'>Editar</a></td>";
-		    	$html .= "</tr>";
+		    	$html .= "<td style='font-size:10px' align=left colspan=2 valign=top><b>".$texto_acuerdo.', Tarifa: '.$cobro->fields['glosa_tarifa']."</b>&nbsp;&nbsp;<a href='javascript:void(0)' style='font-size:10px' onclick=\"nuovaFinestra('Editar_Contrato',800,600,'agregar_contrato.php?popup=1&id_contrato=".$cobro->fields['id_contrato']."');\" title='".__('Editar Información Comercial')."'>Editar</a>";
+		    	
+		    //descomentar si se quiere ver el log de contrato
+		    //	$html .=	UtilesApp::LogDialog($sesion, 'contrato',$cobro->fields['id_contrato']);
+
+		    	$html .="</td></tr>";
 		    	//$html .="<script> new Tip('tip_".$j."', '".$cobro->fields['asuntos']."', {title : '".__('Listado de asuntos')."', effect: '', offset: {x:-2, y:10}}); </script>";
 
 		    	$ht = "<tr bgcolor='#F2F2F2'>
@@ -389,14 +393,11 @@
 					$html .= "</td>";
 			}
 			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
-			$html .= "<img class='fl'  src='".Conf::ImgDir()."/editar_on.gif' title='".__('Continuar con el cobro')."' border=0 style='cursor:pointer' onclick=\"nuevaVentana('Editar_Contrato',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;";
-			#if($cobro->fields['estado'] == 'EMITIDO' || $cobro->fields['estado'] == 'CREADO')
-			if(  UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) {
-				$html .=  "<img class='fl' src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">";
-			} else {
-				$html .=  "<img class='fl'  src='".Conf::ImgDir()."/cruz_roja.gif' title='".__('Eliminar cobro')."' border=0 style='cursor:pointer' onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">";
-			}
-			$html .="<a class=\"ui-icon lupa fr logdialog\" rel=\"cobro\" id=\"cobro_{$cobro->fields['id_cobro']}\"  ></a>";	
+			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='".__('Continuar con el cobro')."' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true&id_foco=".$j."', '');\">&nbsp;</a>";
+
+			$html .=  "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='".__('Eliminar cobro')."'  onclick=\"EliminarCobros('".$cobro->fields['id_cobro']."','".$cobro->fields['estado']."')\">&nbsp;</a>";
+			 
+			$html .=	UtilesApp::LogDialog($sesion, 'cobro',$cobro->fields['id_cobro']);
 
 			$html .= "</td></table>";
 		    $html .= "</div></tr>";
@@ -431,7 +432,7 @@
 
 			jQuery('.btpopover').each(function() {
 				var idContrato=jQuery(this).attr('id').replace('tip_','');
-				jQuery(this).popover({title:'Listado de <?php echo __('asuntos'); ?>', trigger:'hover',animation:true, content:AsuntosContrato[idContrato]});
+				jQuery(this).popover({placement:'right',title:'Listado de <?php echo __('asuntos'); ?>', trigger:'hover',animation:true, content:AsuntosContrato[idContrato]});
 
 				jQuery(this).append("<span class='asuntos_del_contrato' style='font-weight:bold;'>"+AsuntosContrato[idContrato]+"</span>");
 			}  );

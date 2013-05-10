@@ -50,25 +50,7 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/jquery-ui.css" />
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/main.css">
 			<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/bootstrap-popover.css"/>
-			<link rel="stylesheet" type="text/css" href="//assets.zendesk.com/external/zenbox/v2.5/zenbox.css" />
-			<style type="text/css" media="screen, projection">
-					#zenbox_tab.ZenboxTabRight {
-						background: url(//static.thetimebilling.com/templates/default/img/tag_soporte3.png);
-						background-position: left 0;
-						-webkit-transform: rotate(0);
-						-moz-transform: rotate(0);
-						-o-transform: rotate(0);
-						-ms-transform: rotate(0);
-						transform: rotate(0);
-						height: 110px !important;
-						width: 46px !important;
-						height: 75px;
-						right: 0 !important;
-						position: absolute;
-						text-indent: -4000px;
-					}
-					#zenbox_tab {padding:0 !important;min-width:0 !important;}
-				</style>
+ 
 				 <script type="text/javascript" src="//www.google.com/jsapi"></script>
 			 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 				<script type="text/javascript">

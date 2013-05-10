@@ -1163,14 +1163,13 @@ function funcionTR(& $contrato) {
 									<td align=center width=5% style='font-size:10px'>#" . $cobro->fields['id_cobro'] . "</td>
 									<td align=left width=82% style='font-size:10px'>$texto_tipo&nbsp;de " . $texto_monto . $texto_horas . "</td>";
 
-			$html .= "<td align=center width='12%'>";
-			$html .= "<img class='fl' src='" . Conf::ImgDir() . "/editar_on.gif' title='" . __('Continuar con el cobro') . "' border=0 style='margin-right: 5px;cursor:pointer' onclick=\"nuevaVentana('Editar_Cobro',1050,690,'cobros5.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1');\">&nbsp;";
-			$html .="<a class=\"ui-icon lupa fl logdialog\" rel=\"cobro\" id=\"cobro_{$cobro->fields['id_cobro']}\"  ></a>";	
-			if (Conf::GetConf($sesion, 'UsaDisenoNuevo') ) {
-				$html .= "<img class='fl'  src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
-			} else {
-				$html .= "<img  class='fl' src='" . Conf::ImgDir() . "/cruz_roja.gif' title='" . __('Eliminar cobro') . "' border=0 style='cursor:pointer' onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\"></td></tr>";
-			}
+
+			$html .= "<td align=center style=\"white-space:nowrap; width: 52px;\">";
+			$html .= "<a class=\"fl ui-button editar\" style=\"margin: 3px 1px;width: 18px;height: 18px;\"   title='".__('Continuar con el cobro')."' href=\"javascript:void(0)\" onclick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros6.php?id_cobro=".$cobro->fields['id_cobro']."&popup=1&contitulo=true', '');\">&nbsp;</a>";
+			$html .=  "<a class=\"fl ui-button cruz_roja\" style=\"margin: 3px 1px;width: 18px;height: 18px;\" title='".__('Eliminar cobro')."'  onclick=\"DeleteCobro(this.form,'" . $cobro->fields['id_cobro'] . "',$i,'" . $contrato->fields['id_contrato'] . "')\">&nbsp;</a>";
+			$html .=	UtilesApp::LogDialog($sesion, 'cobro',$cobro->fields['id_cobro']);
+
+			$html .= "</td>";
 		}
 		
 		$html .= "</tr></table></div>";

@@ -11,7 +11,8 @@ $Slim=new Slim( array( 'templates.path' =>Conf::ServerDir() . '/templates/slim')
 
  $Slim->get('/LogDB/:titulo_tabla/:id_field',function($titulo_tabla,$id_field)  use ($Slim,$Sesion,$Log) {
    
-   $LogDB=new LogDB($Sesion,$titulo_tabla,$id_field); 
+
+   $LogDB=new LogDB($Sesion,$titulo_tabla,intval($id_field)); 
    if(count($LogDB->ArrayMovimientos)==0) {
     echo 'No hay movimientos para este '.$titulo_tabla;
    } else {

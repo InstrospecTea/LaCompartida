@@ -271,7 +271,10 @@ class FacturaPago extends Objeto
 			$html .= "<td align=center>
 									<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=".$pago->fields['id_factura_pago']."&id_factura=".$factura->fields['id_factura']."&id_cobro=".$factura->fields['id_cobro']."&popup=1', 'top=100, left=155');\" ><img src='".Conf::ImgDir()."/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
 									<img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' onclick=\"if( confirm('Está eliminando un pago. Se reajustarán los saldos de los documentos asociados. ¿Desea continuar?') )EliminarPago('".$pago->fields['id_factura_pago']."');\" />";
-			$html .= "<a  class=\"ui-icon lupa fr logdialog\" rel=\"factura_pago\" id=\"factura_pago_" . $pago->fields['id_factura_pago'] . "\" style=\"display:inline-block;width:16px;margin:1px;\">&nbsp;</a>";									
+			$html .= UtilesApp::LogDialog($sesion, 'factura_pago',$pago->fields['id_factura_pago']);
+
+
+
 				$html.="</td>";
 			$html .= "</tr>";
 		}

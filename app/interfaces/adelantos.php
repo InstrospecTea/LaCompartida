@@ -140,7 +140,9 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 									respuesta+="<a href=\"javascript:void(0)\"  id=\"borra_"+ o.aData[0]+"\" class='fr borraradelanto' ><img src=\"https://static.thetimebilling.com/images/delete-icon16.gif\" border=\"0\" title=\"Editar\"></a>";	
 								}
 							}
- 													respuesta+="<a href=\"javascript:void(0)\"  id=\"documento_"+ o.aData[0]+"\" class=\"ui-icon lupa fr logdialog\" rel=\"documento\"   ></a>";	
+ 							respuesta+='<?php echo	UtilesApp::LogDialog($sesion, 'documento',"'+ o.aData[0]+'");?>';
+ 							//"<a href=\"javascript:void(0)\"  id=\"documento_"+ o.aData[0]+"\" class=\"ui-icon lupa fr logdialog\" rel=\"documento\"   ></a>";	
+			
 
 
 							if(PERMISOCOBRANZA==1) {

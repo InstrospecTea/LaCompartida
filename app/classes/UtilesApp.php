@@ -2,14 +2,7 @@
 
 //Clase UtilesApp
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/DocumentoMoneda.php';
-require_once Conf::ServerDir() . '/classes/Autocompletador.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-
+ 
 class UtilesApp extends Utiles {
 
 	/**
@@ -2225,5 +2218,19 @@ HTML;
 															 ( ".$id_usuario.", 'REV' )";
 					return mysql_query($query,$sesion->dbh);
 }
+
+/**
+ * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
+ * @param object $sesion   la sesión con el usuario logueado, para saber si tiene permiso de ver los logs
+ * @param string $elemento el tipo de elemento que se está revisando: cobro, asunto, factura, factura_pago, etc.
+ * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
+ */
+	public static function LogDialog($sesion,$elemento,$id) {
+			
+				if( $sesion->usuario->TienePermiso('SADM') ) {
+						return "<a class=\"ui-icon lupa fr logdialog\" rel=\"$elemento\" id=\"{$elemento}_{$id}\"  ></a>";	
+				}
+
+	}
 
 }
