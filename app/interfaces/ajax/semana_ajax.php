@@ -176,7 +176,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
 		if ($lista->Get($i)->fields['cobrable'] == 0 || $lista->Get($i)->fields['cobrable'] == 2) {
 			$no_cobrable = __('No cobrable');
-			$color = '#F0F0F0';
+			$color = '#FFFFFF';
 			$pintame = '';
 		} else {
 			$no_cobrable = '';

@@ -7549,7 +7549,7 @@ class NotaCobro extends Cobro {
                     //muestra las iniciales de los profesionales
                     list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
                     $row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
-
+					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
                     if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
                         $row = str_replace('%profesional%', $tramite->fields['iniciales'], $row);

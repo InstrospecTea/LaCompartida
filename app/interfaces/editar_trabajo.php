@@ -273,9 +273,11 @@
 					$t->Edit('costo_hh', Funciones::TarifaDefecto($sesion, $id_usuario, $contrato->fields['id_moneda']));
 				}
 
-				if ($t->fields['cobrable'] == 0) {
-					$t->fields['duracion_cobrada']='00:00:00';
-				}
+
+// Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
+//                             if ($t->fields['cobrable'] == 0) {
+//                                     $t->fields['duracion_cobrada']='00:00:00';
+//                             }
 
 				$ingreso_valido = true;
 				if ($cambio_duracion || $cambio_fecha) {
@@ -1501,9 +1503,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
+			//jQuery('.seccioncobrable').hide();
 		}
 	});
 	if (jQuery('#chkCobrable').is(':checked')) {
@@ -1511,9 +1513,9 @@ function AgregarNuevo(tipo)
 			jQuery('#divVisible').hide();
 			jQuery('.seccioncobrable').show();
 		} else {
-			jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
+			//jQuery('#duracion_cobrada, #hora_duracion_cobrada, #minuto_duracion_cobrada').attr('disabled','disabled');
 			jQuery('#divVisible').show();
-			jQuery('.seccioncobrable').hide();
+			//jQuery('.seccioncobrable').hide();
 		}
 
 			var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
