@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix: 13.3.15
+lunes 09 de mayo 2013
+* **Fixed:** [Corrige error de error de despliege documento excel y agrega la opcion solicitante en gastos](#)
+
+## Hotfix: 13.3.15
 lunes 30 de abril 2013
 * **Fixed:** [Corrige error planilla saldo con clientes que utilizan codigo secundario](#178)
 
