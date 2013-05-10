@@ -179,4 +179,4 @@ app/version.php
 sftp-config*
 *.sublime-project
 *.sublime-workspace
-.idea
+.idea*

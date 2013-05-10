@@ -21,6 +21,12 @@ module NavigationHelpers
 
       when /^la pantalla de gastos$/
         '/app/interfaces/gastos.php'  
+    
+      when /^la pantalla de configuracion$/
+        '/app/interfaces/configuracion.php' 
+
+    when /^la pantalla de phpminiadmin$/
+        '/admin/phpminiadmin.php' 
 
     when /^la pagina de login$/
        Capybara.app_host 

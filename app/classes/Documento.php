@@ -186,7 +186,7 @@ class Documento extends Objeto {
 
 				$id_documento = $this->fields['id_documento'];
 				$ids_monedas = explode(',', $ids_monedas_documento);
-				$tipo_cambios = explode(',', $tipo_cambios_documento);
+				$tipo_cambios = is_array($tipo_cambios_documento)? $tipo_cambios_documento : explode(',', $tipo_cambios_documento);
 				$tipo_cambio = array();
 				foreach ($tipo_cambios as $key => $tc) {
 					$tipo_cambio[$ids_monedas[$key]] = $tc;

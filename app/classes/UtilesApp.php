@@ -1751,10 +1751,11 @@ HTML;
 
 		$moneda_base = Utiles::MonedaBase($sesion);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
+		$query = "SELECT SQL_CALC_FOUND_ROWS
+					cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
 					prm_proveedor.id_proveedor as id_proveedor,
-																																													prm_proveedor.glosa as glosa_proveedor,
+					prm_proveedor.glosa as glosa_proveedor,
 					usuario.username as id_usuario,
 					usuario.username as username,
 					cta_corriente.fecha,
@@ -1769,16 +1770,17 @@ HTML;
 					prm_cta_corriente_tipo.glosa AS tipo_gasto,
 					IF(descripcion like 'Saldo aprovisionado%','SI','NO') as es_liquido_provision
 				FROM cta_corriente
-					LEFT JOIN asunto USING(codigo_asunto)
+				LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-																																				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
 				LEFT JOIN usuario ON cta_corriente.id_usuario_orden = usuario.id_usuario
-				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
-		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
+				WHERE cta_corriente.id_cobro='$id_cobro'";
 
-		$query.="AND cta_corriente.incluir_en_cobro = 'SI'
-					AND cta_corriente.cobrable = 1
-				ORDER BY cta_corriente.fecha ASC";
+		$query .= $soloegreso ? ' AND egreso > 0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
+
+		$query .= "AND cta_corriente.incluir_en_cobro = 'SI'
+							AND cta_corriente.cobrable = 1
+							ORDER BY cta_corriente.fecha ASC";
 
 		$lista_gastos = new ListaGastos($sesion, '', $query);
 

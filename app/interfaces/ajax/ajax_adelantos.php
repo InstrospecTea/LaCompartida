@@ -46,27 +46,27 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 		$where .= ' AND documento.id_moneda = ' . intval($_GET['moneda']);
 	}
 
-	$selectfrom = "FROM documento
+	$selectfrom = "FROM
+		documento
 		JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
 		JOIN cliente ON documento.codigo_cliente = cliente.codigo_cliente
-		left join (
-			SELECT codigo_cliente, id_contrato, GROUP_CONCAT( glosa_asunto ) AS glosa_asuntos
-			FROM asunto
-			GROUP BY id_contrato, codigo_cliente
-		) asuntos on documento.codigo_cliente = asuntos.codigo_cliente and (documento.id_contrato = asuntos.id_contrato)
+		left join asunto  on documento.codigo_cliente = asunto.codigo_cliente and (documento.id_contrato = asunto.id_contrato) 
 	WHERE $where";
 
 	$query = "SELECT
 		documento.id_documento,
 		cliente.glosa_cliente,
 		documento.fecha,
-		IF(documento.id_contrato is null, 'Todos los Asuntos',  asuntos.glosa_asuntos) as asuntos,
+		IF(documento.id_contrato is null, 'Todos los Asuntos',  GROUP_CONCAT( glosa_asunto ) ) as asuntos,
 		IF(documento.monto = 0, 0, documento.monto*-1) AS monto,
 		IF(documento.saldo_pago = 0, 0, documento.saldo_pago*-1) AS saldo_pago,
 		documento.glosa_documento,
 		prm_moneda.id_moneda
-		$selectfrom
-		LIMIT $limitdesde,$limitcantidad";
+		$selectfrom";
+
+		$query .= " GROUP BY documento.id_documento, cliente.glosa_cliente, documento.fecha, documento.monto, documento.saldo_pago, documento.glosa_documento, prm_moneda.id_moneda";
+
+		$query.=" LIMIT $limitdesde,$limitcantidad";
 
 	$selectcount = "SELECT COUNT(*) $selectfrom ";
 

@@ -353,7 +353,12 @@ class Cliente extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($codigo) = mysql_fetch_array($resp);
 		$f = $codigo + 1;
-		$codigo_cliente = sprintf("%06d", $f);
+		
+        if ( UtilesApp::GetConf($this->sesion, 'MascaraCodigoCliente')) {
+            $codigo_cliente = sprintf("%04d", $f);
+        } else {
+            $codigo_cliente = sprintf("%06d", $f);
+        }
 		return $codigo_cliente;
 	}
 
