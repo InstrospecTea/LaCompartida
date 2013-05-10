@@ -17,7 +17,8 @@ if ($p_cobranza->fields['permitido']) {
 $params_array['codigo_permiso'] = 'PRO';
 $p_profesional = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 //echo '<pre>';print_r($_REQUEST);echo '</pre>';
-if ($id_cobro) {
+if ($motivo=='cobros' && $id_cobro) {
+
 	$cobro = new Cobro($sesion);
 	$cobro->Load($id_cobro);
 
