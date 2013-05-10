@@ -211,7 +211,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 			INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
 			INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = $moneda_mostrar
 			INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
-			INNER JOIN contrato ON d.id_contrato = contrato.id_contrato
+			LEFT JOIN contrato ON d.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
 			$join_adelantos
 			WHERE
@@ -296,11 +296,11 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		FROM ( ($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos) ) AS r
 			GROUP BY glosa_cliente";
 
-	// echo $query;
-	// echo $query_adelantos;
-	// echo $query_gastos;
-	// echo $query_liquidaciones;
-	// exit;
+	 //echo $query;
+	 //echo $query_adelantos;
+	 //echo $query_gastos;
+	 //echo $query_liquidaciones;
+	 //exit;
 
 	$statement = $Sesion->pdodbh->prepare($query);
 	$statement->execute();
