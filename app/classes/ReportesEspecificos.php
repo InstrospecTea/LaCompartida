@@ -105,6 +105,7 @@ public static $configuracion_saldo_clientes_resumen = array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
 				'attrs' => 'width="15%" style="text-align:right"',
+				'subtotal_type' => 'FIXED'
 			)
 		),
 		array(
@@ -114,7 +115,8 @@ public static $configuracion_saldo_clientes_resumen = array(
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"'
+				'attrs' => 'width="15%" style="text-align:right"',
+				'subtotal_type' => 'FIXED'
 			)
 		),
 		array(
@@ -124,7 +126,8 @@ public static $configuracion_saldo_clientes_resumen = array(
 			'extras' => array(
 				'symbol' => 'simbolo_moneda',
 				'class' => 'saldo',
-				'attrs' => 'width="15%" style="text-align:right"'
+				'attrs' => 'width="15%" style="text-align:right"',
+				'subtotal_type' => 'FIXED'
 			)
 		),
 		array(

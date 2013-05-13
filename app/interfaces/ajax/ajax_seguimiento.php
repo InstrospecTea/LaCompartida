@@ -85,13 +85,5 @@ $seguimientos = $ClienteSeguimiento->FindAll();
 				</div>
 			</form>
 		</div>
-		<script>
-			jQuery(document).ready(function () {
-				jQuery('#submit').click(function () {
-					jQuery('form').submit();
-					return false;
-				});
-			});
-		</script>
 	</body>
 </html>

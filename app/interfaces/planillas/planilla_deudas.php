@@ -38,11 +38,13 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 		$where.="AND  ccfm.saldo!=0 ";
 		$groupby.=" factura.id_factura";
 		$tipo = " pdl.glosa";
-		$identificador = " factura.id_factura";
 		$fecha_atraso = " factura.fecha";
 		$label = " concat(pdl.codigo,' N° ',  lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 		$identificadores = 'facturas';
-		$linktofile = 'agregar_factura.php?id_factura=';
+		//$linktofile = 'agregar_factura.php?id_factura=';
+		//$identificador = " factura.id_factura";
+		$identificador = " d.id_cobro";
+		$linktofile = 'cobros6.php?id_cobro=';
 	} else {
 		$campo_valor = "T.saldo";
 		$campo_gvalor = "T.gsaldo";
@@ -50,10 +52,10 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 		$where.="AND ((d.saldo_honorarios + d.saldo_gastos)>0 ) ";
 		$groupby.=" d.id_documento";
 		$tipo = " 'liquidacion'";
-		$identificador = " d.id_cobro";
 		$fecha_atraso = " cobro.fecha_emision";
 		$label = " d.id_cobro ";
 		$identificadores = 'cobros';
+		$identificador = " d.id_cobro";
 		$linktofile = 'cobros6.php?id_cobro=';
 	}
 
@@ -246,6 +248,18 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls'))) {
 	$SimpleReport->LoadResults($results);
 
 	if ($_REQUEST['opcion'] == 'xls') {
+		$new_results = array();
+		foreach ($results as $result) {
+			$array = json_decode(utf8_encode($result['identificadores']), true);
+			$identificadores = array();
+			foreach ($array as $key => $value) {
+				$identificadores[] = utf8_decode($value);
+			}
+			$result['identificadores'] = implode(', ', $identificadores);
+			$new_results[] = $result;
+		}
+
+		$SimpleReport->LoadResults($new_results);
 		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
 		$writer->save('Reporte_antiguedad_deuda');
 	}
@@ -324,14 +338,28 @@ echo Html::SelectArray(array(
 </div>
 <script type="text/javascript">
 <?php echo "var linktofile= '$linktofile';"; ?>
+	var current_popover;
 	show_popover = function(sender, codigo_cliente) {
+		codigo_cliente = sender.data('codigo_cliente');
+
+		if (current_popover != undefined) {
+			codigo_cliente_old = current_popover.data('codigo_cliente');
+			if (codigo_cliente != codigo_cliente_old) {
+				current_popover.popover('hide');
+			} else {
+				sender.popover('hide');
+			}
+		}
+		current_popover = sender;
 		sender.popover({
 			title: '<?php echo __('Seguimiento del cliente'); ?>',
-			trigger: 'click',
+			trigger: 'manual',
 			placement: 'left',
 			html: true,
 			content: '<iframe width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php?codigo_cliente=' + codigo_cliente + '" />'
 		});
+
+		sender.popover('show')
 	};
 
 	jQuery(document).ready(function() {
@@ -377,8 +405,21 @@ echo Html::SelectArray(array(
 				link.append(jQuery('<img/>', { src: '<?php echo Conf::ImgDir(); ?>/' + icono }));
 				td.html('');
 				td.append(link).append(' ');
+				td.data('codigo_cliente', codigo_cliente);
 			}
-			show_popover(td, codigo_cliente);
+
+			td.click(function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				show_popover(jQuery(this));
+			});
+		});
+
+		jQuery('body').click(function () {
+			if (current_popover != undefined) {
+				current_popover.popover('hide');
+			}
 		});
 	});
 </script>
