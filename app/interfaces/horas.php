@@ -43,19 +43,33 @@ if ($from == 'cliente') {
 	$url_iframe = 'trabajos.php?popup=1&id_usuario=' . $id_usuario . '&' . $codigo_cliente_url . '=' . $codigo_cliente . '&' . $codigo_asunto_url . '=' . $codigo_asunto . '&opc=buscar&fecha_ini=' . Utiles::sql2date($fecha_ini) . '&fecha_fin=' . Utiles::sql2date($fecha_fin);
 } else if ($from == 'reporte') {
 	$url_iframe = 'trabajos.php?popup=1&opc=buscar&from=reporte';
-	$url_iframe .= $id_usuario ? "&id_usuario=" . $id_usuario : '';
-	$url_iframe .= $usuarios ? "&usuarios=" . $usuarios : '';
-	$url_iframe .= $fecha_ini ? "&fecha_ini=" . $fecha_ini : '';
-	$url_iframe .= $fecha_fin ? "&fecha_fin=" . $fecha_fin : '';
-	$url_iframe .= $codigo_cliente ? "&codigo_cliente=" . $codigo_cliente : '';
-	$url_iframe .= $codigo_asunto ? "&codigo_asunto=" . $codigo_asunto : '';
-	$url_iframe .= $id_grupo_cliente ? "&id_grupo_cliente=" . $id_grupo_cliente : '';
-	$url_iframe .= $mes ? "&mes=" . $mes : '';
-	$url_iframe .= $estado ? "&estado=" . $estado : '';
-	$url_iframe .= $lis_usuarios ? "&lis_usuarios=" . $lis_usuarios : '';
-	$url_iframe .= $lis_clientes ? "&lis_clientes=" . $lis_clientes : '';
-	$url_iframe .= $campo_fecha ? "&campo_fecha=" . $campo_fecha : '';
+	$url_iframe .= $id_usuario ? 		"&id_usuario=" . $id_usuario : '';
+	$url_iframe .= $usuarios ? 			"&usuarios=" . $usuarios : '';
+	$url_iframe .= $fecha_ini ? 		"&fecha_ini=" . $fecha_ini : '';
+	$url_iframe .= $fecha_fin ? 		"&fecha_fin=" . $fecha_fin : '';
 
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')&& !empty($codigo_cliente)) {
+		$query_cod_secundario = "SELECT codigo_cliente_secundario FROM cliente where codigo_cliente = $codigo_cliente";
+		$resp = mysql_query($query_cod_secundario) or Utiles::errorSQL($query_cod_secundario, __FILE__, __LINE__);
+		list($codigo_cliente_secundario) = mysql_fetch_array($resp);
+		$url_iframe .= $codigo_cliente ? 	'&' . $codigo_cliente_url . '='. $codigo_cliente_secundario : '';
+	}else{
+		$url_iframe .= $codigo_cliente ? 	'&' . $codigo_cliente_url . '='. $codigo_cliente : '';
+	}
+
+	if (UtilesApp::GetConf($sesion, 'CodigoSecundario')&& !empty($codigo_asunto)) {
+		$url_iframe .= $codigo_asunto ? 	'&' . $codigo_asunto_url . '=' . $codigo_asunto_secundario : '';
+	}else{
+		$url_iframe .= $codigo_asunto ? 	'&' . $codigo_asunto_url . '=' . $codigo_asunto : '';
+	}
+
+	$url_iframe .= $codigo_asunto ? 	'&' . $codigo_asunto_url . '=' . $codigo_asunto : '';
+	$url_iframe .= $id_grupo_cliente ? 	"&id_grupo_cliente=" . $id_grupo_cliente : '';
+	$url_iframe .= $mes ? 				"&mes=" . $mes : '';
+	$url_iframe .= $estado ? 			"&estado=" . $estado : '';
+	$url_iframe .= $lis_usuarios ? 		"&lis_usuarios=" . $lis_usuarios : '';
+	$url_iframe .= $lis_clientes ? 		"&lis_clientes=" . $lis_clientes : '';
+	$url_iframe .= $campo_fecha ? 		"&campo_fecha=" . $campo_fecha : '';
 	if ($id_cobro) {
 		if ($id_cobro != 'Indefinido') {
 			$url_iframe .= "&id_cobro=" . $id_cobro;
@@ -63,7 +77,7 @@ if ($from == 'cliente') {
 	}
 } else if ($from == 'horas') {
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
-	$url_iframe = "trabajos.php?popup=1&id_usuario=" . $id_usuario . "&codigo_cliente=" . $codigo_cliente . "&opc=buscar";
+	$url_iframe = "trabajos.php?popup=1&id_usuario=" . $id_usuario . '&' . $codigo_cliente_url . '=' . $codigo_cliente . "&opc=buscar";
 	if ($id_cobro && $id_cobro != 'Indefinido') {
 			$url_iframe .= "&id_cobro=" . $id_cobro;
 		}

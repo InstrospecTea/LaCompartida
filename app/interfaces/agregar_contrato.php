@@ -138,6 +138,11 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
 		$val = true;
 	}
+
+	if (isset($_REQUEST['nombre_contacto'])) {
+		// nombre_contacto no existe como campo en la tabla contrato y es necesario crear la variable "contacto" dentro de _REQUEST
+		$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
+	}
 	
 	$contrato->Fill($_REQUEST, true);
 	

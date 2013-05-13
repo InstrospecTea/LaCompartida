@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 if(!class_exists('Moneda')) {
 	class Moneda extends Objeto {
+		 public static $llave_carga_masiva = 'codigo';
 
 		function Moneda($sesion, $fields = "", $params = "") {
 			$this->tabla = "prm_moneda";

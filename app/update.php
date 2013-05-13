@@ -9780,6 +9780,21 @@ QUERY;
 			}
 		ejecutar($queries, $dbh);
 		break;
+		
+		case 7.36:
+			$query = array();
+			$comentario = 'Esta opcion limita la generacion de codigos de cliente a solo 4 digitos';
+
+			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+                                            VALUES('MascaraCodigoCliente', 0, 'boolean','{$comentario}', 10, -1)";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+			break;
 
 	}
 }
@@ -9789,7 +9804,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.35;
+$max_update = 7.36;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
