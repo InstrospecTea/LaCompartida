@@ -1,14 +1,5 @@
 <?php  	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-	require_once Conf::ServerDir().'/../app/classes/InputId.php';
-	require_once Conf::ServerDir().'/../app/classes/Autocompletador.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
+
 
 	$sesion = new Sesion(array('DAT','PRO'));
 	$pagina = new Pagina($sesion);
@@ -90,7 +81,9 @@ function EliminaCliente(id_cliente)
 	return true;
 }
 </script>
-<?php  	echo Autocompletador::CSS();
+<?php  	
+echo Autocompletador::CSS();
+echo Autocompletador::Javascript($sesion,false);
 ?>
 <form method=post action="<?php echo  $_SERVER[PHP_SELF] ?>" name="form_cliente" id="form_cliente">
 <!--<input type=hidden name=opcion value="Buscar" />-->
@@ -106,11 +99,8 @@ function EliminaCliente(id_cliente)
 			</td>
 		</tr>
 	</table>
-<?php  	}
-if( UtilesApp::GetConf($sesion,'UsaDisenoNuevo') ) { ?>
-	<table width="90%"><tr><td> <?php  }
-else { ?>
-	<table width="100%"><tr><td> <?php  } ?>
+<?php  	}  ?>
+	<table width="90%"><tr><td> 
 	<fieldset width="100%" class="tb_base">
 		<legend><?php echo __('Filtros')?></legend>
 		<table width='720px' cellspacing=3 cellpadding=3>
@@ -119,10 +109,8 @@ else { ?>
 					<?php echo __('Nombre Cliente')?>
 				</td>
 				<td align=left>
-					<input type="text" name="glosa_cliente" id="glosa_cliente" size="35" value="<?php echo $glosa_cliente?>">
-					<span id="indicador_glosa_cliente" style="display: none;">
-					<img src=<?php echo Conf::ImgDir()."/ajax_loader.gif"?> alt=<?php echo __('Trabajando')?>."..." />
-					</span>
+					<input type="text" name="glosa_cliente" id="glosa_cliente" size="50" value="<?php echo $glosa_cliente?>">
+					
 					<div id="sugerencias_glosa_cliente" class="autocomplete" style="display:none; z-index:100;"></div>
 				</td>
 			</tr>
@@ -179,15 +167,7 @@ else { ?>
 	</fieldset>
 </td></tr></table>
 </form>
- <script>
-google.load("scriptaculous", "1.9.0");
-</script>
-<script type="text/javascript">
-    
  
-Autocompletador = new Ajax.Autocompleter("glosa_cliente", "sugerencias_glosa_cliente", "ajax_seleccionar_cliente.php", {minChars: 1, indicator: 'indicador_glosa_cliente'});
-
-</script>
 <?php  	if($buscar)
 	{
 		$where = '1';
