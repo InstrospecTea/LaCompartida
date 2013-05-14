@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/../conf.php';
+use TTB\Utiles as Utiles;
 
 class Alerta {
 

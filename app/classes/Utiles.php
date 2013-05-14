@@ -73,13 +73,19 @@ class Utiles extends \Utiles {
 		return $respuesta;
 	}
 
-	/*
-	  Funcion que inserta en la cola de correos. Revisa también si el correo no se repite en un día siempre y cuando
-	  sea diario. En el caso contrario no chequea el día simplemente el mensaje.
-	  Esto esta hecho para las tareas que pueden tener muchas modificaciones y no se deben repetir los correos.
+	/**
+	 * Funcion que inserta correos en la cola de idem.
+	 * @param object  $sesion     la sesión con que se conecta a la DB para hacer las consultas
+	 * @param string  $subject    subject del mail
+	 * @param string  $mensaje    contenido del mail
+	 * @param string  $email      email del destinatario
+	 * @param string  $nombre     nombre del destinatario
+	 * @param boolean $es_diario  cuando es true, evita repetir el mismo tipo, al mismo destinatario, en el mismo día
+	 * @param int  $id_usuario  el id_usuario del destinatario
+	 * @param string  $tipo       Tipo de correo: alerta diaria, semanal, etc
+	 * @param boolean $simular    Cuando es true, marca el correo como si ya lo hubiera enviado
 	 */
-
-	function Insertar($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null) {
+	function Insertar($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null,$simular=false) {
 		$id_tipo_correo = null;
 		if (!empty($tipo)) {
 			$TipoCorreo = new TipoCorreo($sesion);
@@ -108,6 +114,9 @@ class Utiles extends \Utiles {
 			}
 			if (!empty($id_tipo_correo)) {
 				$query2 .= ", id_tipo_correo = '{$id_tipo_correo}'";
+			}
+			if($simular) {
+				$query2 .= ", enviado = 1, fecha_envio = NOW()";
 			}
 			mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 		}
