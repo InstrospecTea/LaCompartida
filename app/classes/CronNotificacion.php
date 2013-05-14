@@ -197,7 +197,7 @@ class CronNotificacion extends Cron {
 		// Ahora que tengo los datos, construyo el arreglo de mensajes a enviar
 		$mensajes = $this->Notificacion->mensajeSemanal($dato_semanal);
 
-		if ($this->correo=='correo') {
+		if ($this->correo=='generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
@@ -241,7 +241,7 @@ class CronNotificacion extends Cron {
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
 
-		if ($this->correo=='correo') {
+		if ($this->correo=='generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
@@ -316,7 +316,7 @@ class CronNotificacion extends Cron {
 						'fecha' => date_format($date, 'd/m/Y  H:i:s')
 					);
 				}
-				if ($this->correo=='correo') {
+				if ($this->correo=='generar_correo') {
 					$query_update = "UPDATE modificaciones_contrato
 										SET fecha_enviado=NOW()
 										WHERE fecha_modificacion >= '$fecha'";

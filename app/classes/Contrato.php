@@ -1497,6 +1497,19 @@ class Contrato extends Objeto {
 		return $datos;
 	}
 
+	function QueriesPrevias($sesion) {
+		$Contrato = new Contrato($sesion);
+
+		$updateestado = "UPDATE trabajo SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE cta_corriente SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE tramite SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";
+		$updateestado .= "UPDATE trabajo JOIN cobro c ON trabajo.id_cobro = c.id_cobro SET trabajo.estadocobro = c.estado WHERE c.fecha_touch >= trabajo.fecha_touch;";
+		$updateestado .= "UPDATE cta_corriente JOIN cobro c ON cta_corriente.id_cobro = c.id_cobro SET cta_corriente.estadocobro = c.estado WHERE c.fecha_touch >= cta_corriente.fecha_touch;";
+		$updateestado .= "UPDATE tramite JOIN cobro c ON tramite.id_cobro = c.id_cobro SET tramite.estadocobro = c.estado WHERE c.fecha_touch >= tramite.fecha_touch;";
+
+		$Contrato->sesion->pdodbh->exec($updateestado);
+	}
+
 }
 
 class ListaContrato extends Lista {
