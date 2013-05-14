@@ -23,6 +23,8 @@ class APNSNotificationProvider  implements INotificationProvider {
   const ENVIRONMENT_PRODUCTION = 0;
   const ENVIRONMENT_SANDBOX = 1;
 
+  const ERROR_INVALID_TOKEN = 8;
+
   public function __construct($session, $environment) {
     $this->pushService = null;
     $this->session = $session;
@@ -73,32 +75,76 @@ class APNSNotificationProvider  implements INotificationProvider {
   }
 
   public function deliver() {
-    $this->pushService->send();
+    $queue = $this->pushService->getQueue();
+    if (!empty($queue)) {
+      $this->pushService->send();
+    }
     $aErrorQueue = $this->pushService->getErrors();
     if (!empty($aErrorQueue)) {
-      var_dump($aErrorQueue);
+      foreach ($aErrorQueue as $error) {
+        $tokens = $error["MESSAGE"]->getRecipients();
+        $errors = $error["ERRORS"];
+        $invalid_token = false;
+        foreach ($errors as $device_error) {
+          if ($device_error["statusCode"] == APNSNotificationProvider::ERROR_INVALID_TOKEN) {
+            $invalid_token = true;
+          }
+        }
+        foreach ($tokens as $token) {
+          if ($invalid_token == true) {
+            $this->logger.log("APNSError: INVALID TOKEN: " . $token);
+            $userDevice = new UserDevice($this->session);
+            $userDevice->deleteByToken($token);
+          }
+        }
+      }
     }
   }
 
   public function disconnect() {
     $this->pushService->disconnect();
+    $this->removeInvalidTokens();
   }
+
+  public function test() {
+    $this->deliver();
+    $this->removeInvalidTokens();
+  }
+
 
   /**
   * Selecciona un certificado válido para conexión con Apple
   */
   function chooseCeritifcate($type) {
     if ($type == APNSNotificationProvider::CERT_TYPE_APNS) {
-      if ($this->environment = APNSNotificationProvider::ENVIRONMENT_SANDBOX) {
+      if ($this->environment == APNSNotificationProvider::ENVIRONMENT_SANDBOX) {
         return Conf::ServerDir() . '/../config/apns/apns-sandbox.pem';
       }
-      if ($this->environment = APNSNotificationProvider::ENVIRONMENT_PRODUCTION) {
+      if ($this->environment == APNSNotificationProvider::ENVIRONMENT_PRODUCTION) {
         return Conf::ServerDir() . '/../config/apns/apns-production.pem';
       }
     }
     if ($type == APNSNotificationProvider::CERT_TYPE_AUTH) {
       return Conf::ServerDir() . '/../config/apns/entrust_root_certification_authority.pem';
     }
+  }
+
+  /**
+  * Elimina tokens inválidos de mensajes fallidos
+  */
+  function removeInvalidTokens() {
+    $feedback = new ApnsPHP_Feedback(
+      $this->environment,
+      $this->chooseCeritifcate(APNSNotificationProvider::CERT_TYPE_APNS)
+    );
+    $feedback->connect();
+    $aDeviceTokens = $feedback->receive();
+    if (is_array($aDeviceTokens) && !empty($aDeviceTokens)) {
+      foreach ($aDeviceTokens as $deviceToken) {
+        $this->logger.log('APNSFeedback:' . $deviceToken);
+      }
+    }
+    $feedback->disconnect();
   }
 
   /**
@@ -109,5 +155,6 @@ class APNSNotificationProvider  implements INotificationProvider {
     $tokens = $userDevice->tokensByUserId($user_id);
     return $tokens; //array("ed05ca868cc8d5c8393f2eb50a32ca007c37ad777dba3e17e9a23936a2df213b");
   }
+
 
 }

@@ -72,4 +72,35 @@ class NotificationService {
       }
     }
   }
+
+  public function test() {
+    if ($this->hasProvider()) {
+      foreach ($this->providers as $provider) {
+        $provider->test();
+      }
+    }
+  }
+
+}
+
+$test = $_GET['test'];
+$environment = $_GET['environment']; //sandbox, production
+if (isset($test)) {
+  $default_environment = NotificationService::ENVIRONMENT_SANDBOX;
+  if (!is_null($environment) && $environment == 'production') {
+    $default_environment = NotificationService::ENVIRONMENT_PRODUCTION;
+  }
+  $options = array(
+    "providers" => array("APNSNotificationProvider"),
+    "environment" => $default_environment
+  );
+  $session = new Sesion(null, true);
+  $notificationService = new NotificationService($session, $options);
+  $notificationService->addMessage(1, "test message",
+      array(
+        "notificationMessage" => "test message description",
+        "notificationTitle" => "test message title"
+      )
+  );
+  $notificationService->test();
 }

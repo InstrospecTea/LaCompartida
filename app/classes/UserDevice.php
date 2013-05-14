@@ -149,4 +149,20 @@ class UserDevice extends Objeto {
 
 		return $Statement->execute();
 	}
+
+	/**
+	 * Delete data by Token
+	 * returns true if the delete completed successfully, else false
+	 */
+	function deleteByToken($token) {
+		if (!isset($token) || empty($token)) {
+			return false;
+		}
+
+		$sql = "DELETE FROM `user_device` WHERE `user_device`.`token`=:token";
+		$Statement = $this->sesion->pdodbh->prepare($sql);
+		$Statement->bindParam('token', $token);
+
+		return $Statement->execute();
+	}
 }

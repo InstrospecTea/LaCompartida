@@ -17,7 +17,7 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 	$password = $Slim->request()->params('password');
 	$app_key = $Slim->request()->params('app_key');
 	$auth_token = $UserToken->makeAuthToken($user);
-
+	$dv = null;
 	if (is_null($user) || $user == '') {
 		halt(__("Invalid user data"), "InvalidUserData");
 	}
@@ -30,7 +30,15 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 		halt(__("Invalid application key data"), "InvalidAppKey");
 	}
 
-	if (!$Session->login($user, null, $password)) {
+	if (strtolower(UtilesApp::Getconf($Session, 'NombreIdentificador')) == 'rut') {
+		$user_array =	preg_split('/[-]/', $user);
+		$user = $user_array[0];
+		if (count($user_array) == 2) {
+			$dv = $user_array[1];
+		}
+	}
+
+	if (!$Session->login($user, $dv, $password)) {
 		halt(__("The user doesn't exist"), "UserDoesntExist");
 	} else {
 		$user_token_data = array(

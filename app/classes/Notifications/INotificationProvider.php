@@ -25,4 +25,9 @@ interface INotificationProvider {
    */
   public function disconnect();
 
+  /**
+  * Make a test!
+  */
+  public function test();
+
 }
