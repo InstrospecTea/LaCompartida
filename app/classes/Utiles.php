@@ -85,7 +85,7 @@ class Utiles extends \Utiles {
 	 * @param string  $tipo       Tipo de correo: alerta diaria, semanal, etc
 	 * @param boolean $simular    Cuando es true, marca el correo como si ya lo hubiera enviado
 	 */
-	function Insertar($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null,$simular=false) {
+	public static function InsertarPlus($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null,$simular=false) {
 		$id_tipo_correo = null;
 		if (!empty($tipo)) {
 			$TipoCorreo = new TipoCorreo($sesion);

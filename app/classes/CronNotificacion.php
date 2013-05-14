@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/../conf.php';
 require_once dirname(__FILE__) . '/../classes/Cron.php';
 require_once dirname(__FILE__) . '/../classes/AlertaCron.php';
 
@@ -9,19 +10,20 @@ require_once dirname(__FILE__) . '/../classes/AlertaCron.php';
  */
 class CronNotificacion extends Cron {
 
-	public $Alerta;
+	public $AlertaCron;
 	public $Notificacion;
 	private $correo = false;
 	private $desplegar_correo;
 	private $datoDiario = array();
+	var $Sesion = null;
 
-	public function __construct() {
+	public function __construct($Sesion) {
 		$this->fecha_cron = date('Y-m-d');
 		$this->FileNameLog = 'CronNotificacion';
 
 		parent::__construct();
-
-		$this->Alerta = new Alerta($this->Sesion);
+		$this->Sesion=$Sesion;
+		$this->AlertaCron = new Alerta($this->Sesion);
 		$this->Notificacion = new Notificacion($this->Sesion);
 
 		if (method_exists('Conf', 'GetConf')) {
@@ -34,14 +36,15 @@ class CronNotificacion extends Cron {
 	public function main($correo, $desplegar_correo = null, $forzar_semanal='') {
 		$this->log('INICIO CronNotificacion');
 
-		$this->Sesion->phpConsole();
+		$this->Sesion->phpConsole(1);
 		
 		$this->correo = $correo;
 		if(empty($this->correo)) {
 			$this->Sesion->debug('No se recibió parámetro para la acción a ejecutar. Terminamos.');
-			die('Finalizado')
+			die('Finalizado');
 		} 
-		$this->Sesion->debug('empieza el cron notificacion');
+		 $this->Sesion->debug('empieza el cron notificacion');
+
 
 		$this->desplegar_correo = $desplegar_correo;
 
@@ -50,8 +53,9 @@ class CronNotificacion extends Cron {
 			$this->log('INICIO semanales');
 			$this->semanales();
 		}
-
+	 	 
 		$this->log('INICIO diarios');
+		$this->Sesion->debug('INICIO diarios');
 		$this->diarios();
 
 		if (date('j') == 1) {
@@ -61,6 +65,7 @@ class CronNotificacion extends Cron {
 		$this->suspension_pago();
 
 		$this->log('FIN CronNotificacion');
+		$this->Sesion->debug('FIN CronNotificacion');
 	}
 
 	public function semanales() {
@@ -103,8 +108,8 @@ class CronNotificacion extends Cron {
 				$profesional->LoadId($id_usuario);
 				$minimo = $profesional->fields['restriccion_min'];
 				$maximo = $profesional->fields['restriccion_max'];
-				$horas = $this->Alerta->HorasUltimaSemana($id_usuario);
-				$horas_cobrables = $this->Alerta->HorasCobrablesUltimaSemana($id_usuario);
+				$horas = $this->AlertaCron->HorasUltimaSemana($id_usuario);
+				$horas_cobrables = $this->AlertaCron->HorasCobrablesUltimaSemana($id_usuario);
 
 				if (!$horas) {
 					$horas = '0.00';
@@ -243,7 +248,7 @@ class CronNotificacion extends Cron {
 
 		if ($this->correo=='generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
 		} else 	if ($this->correo=='desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 			var_dump($this->datoDiario);
@@ -251,7 +256,7 @@ class CronNotificacion extends Cron {
 		} else if ($this->correo=='simular_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$mensaje['simular']=true;
-				$this->Alerta->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
 			}
 		}
 	}
@@ -473,6 +478,7 @@ class CronNotificacion extends Cron {
 			$contrato = new Contrato($this->Sesion);
 			$contrato->Load($data_contrato['id_contrato']);
 
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 			// Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 			if ($contrato->fields['limite_monto'] > 0) {
 				list($total_monto, $moneda_total_monto) = $contrato->TotalMonto();
@@ -530,6 +536,8 @@ class CronNotificacion extends Cron {
 				$contrato->Edit('notificado_monto_excedido', '1');
 				$contrato->Write();
 			}
+
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 
 			// Notificacion "Límite de horas"
 			if (($total_horas_trabajadas > $contrato->fields['limite_hh']) && ($contrato->fields['limite_hh'] > 0 ) && ($contrato->fields['notificado_hr_excedido'] == 0)) {
@@ -653,6 +661,7 @@ class CronNotificacion extends Cron {
 
 			$this->datoDiario[$resultado_cliente['id_usuario']]['nombre_pila'] = $resultado_cliente['username'];
 
+			list($total_monto, $moneda_total_monto,$total_horas_trabajadas,$total_horas_ult_cobro,$total_monto_ult_cobro, $moneda_desde_ult_cobro)=array(0,1,0,0,0,1);
 			//Los cuatro límites: monto desde siempre, horas desde siempre, horas no emitidas, monto no emitido.
 			if ($cliente->fields['limite_monto'] > 0) {
 				list($total_monto, $moneda_total_monto) = $cliente->TotalMonto();

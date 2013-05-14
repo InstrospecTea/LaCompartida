@@ -1497,7 +1497,7 @@ class Contrato extends Objeto {
 		return $datos;
 	}
 
-	function QueriesPrevias($sesion) {
+	public static	function QueriesPrevias($sesion) {
 		$Contrato = new Contrato($sesion);
 
 		$updateestado = "UPDATE trabajo SET estadocobro = 'SIN COBRO' WHERE id_cobro IS NULL;";

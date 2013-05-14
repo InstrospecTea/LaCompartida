@@ -1,12 +1,10 @@
 <?php
-require_once dirname(dirname(__FILE__)) . '/classes/CronNotificacion.php';
+date_default_timezone_set('America/Santiago');
+require_once dirname(__FILE__) . '/../conf.php'; 
 
-ini_set('display_errors', 'on');
-$Cron = new CronNotificacion;
-/*$correo = $argv[1] == 'correo' || isset($_GET['correo']);
-$desplegar_correo = $argv[1] == 'desplegar_correo' || isset($_GET['desplegar_correo']);
-$Cron->main($correo, $desplegar_correo);/
-
+ 
+$sesion = new Sesion(null, true);
+$CronNotificacion = new CronNotificacion($sesion);
  
 	
 	/**
@@ -27,6 +25,7 @@ $Cron->main($correo, $desplegar_correo);/
 	 */
 	} else if ( ($argv[1] == 'simular_correo') || (isset($_GET['correo']) && $_GET['correo']=='simular_correo')) {
 			$correo = 'simular_correo';
+			
 	} else {
 			$correo = null;
 	}
@@ -41,4 +40,4 @@ $Cron->main($correo, $desplegar_correo);/
 	
 
 
-	$Cron->main($correo, $desplegar_correo, $forzar_semanal);
+	$CronNotificacion->main($correo, $desplegar_correo, $forzar_semanal);

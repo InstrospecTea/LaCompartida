@@ -125,7 +125,7 @@ class Alerta {
 		$from = html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
-		Utiles::Insertar($sesion, "Alerta $from", $mensaje, $to, $nombre, false, $id_usuario, $tipo, $simular);
+		Utiles::InsertarPlus($sesion, "Alerta $from", $mensaje, $to, $nombre, false, $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {
@@ -216,7 +216,7 @@ class Alerta {
 		}
 
 		foreach ($mensajes as $id_usuario => $mensaje) {
-			Utiles::Insertar($sesion, "Aviso $from", $mensaje, $to, "Administrador");
+			Utiles::InsertarPlus($sesion, "Aviso $from", $mensaje, $to, "Administrador");
 		}
 	}
 
