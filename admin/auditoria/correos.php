@@ -1,6 +1,14 @@
 <?php
 require_once dirname(__FILE__) . '/../../app/conf.php';
 $sesion = new Sesion(array('ADM'));
+
+if(isset($_GET['cambiarestado'])) {
+	$nuevoestado=$_GET['enviado'];
+	$id_log_correo=$_GET['id_log_correo'];
+	$query="update log_correo set enviado='{$nuevoestado}' where id_log_correo=$id_log_correo;";
+	$sesion->pdodbh->exec($query);
+	die($query);
+}
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Auditoria Correos');
 $pagina->PrintTop();
@@ -53,6 +61,7 @@ $pagina->PrintTop();
 								</td>
 								<td align="left">
 									<a class="btn botonizame" id="buscar_correos"  href="#"  icon="find"><?php echo __('Buscar') ?></a>
+									<a class="btn botonizame" id="simular_correos"  href="#"  icon="code"><?php echo __('Generar Correos de Prueba') ?></a>
 								</td>
 							</tr>
 						</tbody>
@@ -101,7 +110,7 @@ if ($buscar) {
 					C.fecha_modificacion
 				FROM log_correo AS C
 				LEFT JOIN prm_tipo_correo TC ON TC.id = C.id_tipo_correo
-				WHERE $where";
+				WHERE $where  ";
 
 	if (!empty($orden)) {
 		$orden = 'C.id_log_correo';
@@ -113,7 +122,7 @@ if ($buscar) {
 	$b->AgregarEncabezado('subject', __('Subject'), $estilo);
 	$b->AgregarEncabezado('tipo_correo', __('Tipo'), $estilo);
 	$b->AgregarEncabezado('mail', __('Correo'), $estilo);
-	$b->AgregarEncabezado('enviado', __('Enviado'), $estilo);
+	$b->AgregarFuncion('Enviado', __('Enviado'), ' class="enviadosino" ');
 	$b->AgregarEncabezado('intento_envio', __('Intentos'), $estilo);
 	$b->AgregarEncabezado('fecha_envio', __('Fecha Envío'), $estilo);
 	$b->AgregarEncabezado('fecha_creacion', __('Fecha Creación'), $estilo);
@@ -130,13 +139,27 @@ function acciones($data) {
 	$btns .= sprintf($tpl_btn, 'detail', "detail_$id", 'comment');
 	return $btns;
 }
+function enviado($data) {
+
+	return  '<div id="enviado_'. $data->fields['id_log_correo'].'" class="enviado_si_no" data-value="'.$data->fields['enviado'].'" style="cursor:pointer;" title="Pinche para cambiar el estado del correo" >'.$data->fields['enviado'].'</div>';
+}
 ?>
 
 <script type="text/javascript">
+jQuery(document).ready(function() {
+	<?php if(!isset($_POST['enviado']) || $_POST['enviado']=='') {
+		echo "jQuery('#enviado').val('');";
+	} ?>
+
 	jQuery('#buscar_correos').click(function() {
 		jQuery('#form_correos').submit();
-		return false;
+		 
 	});
+
+	jQuery('#simular_correos').click(function() {
+		jQuery('<div/>').load(root_dir + '/app/interfaces/cron_notificacion.php?correo=simular_correo').dialog({title: 'Simular Correos', width: 840, height: 600, modal: true});
+	});
+	
 	jQuery('.show-mail').click(function() {
 		var id = jQuery(this).attr('id').split('_')[1];
 		jQuery('<div/>').load(root_dir + '/admin/auditoria/leer_correo.php?id=' + id).dialog({title: 'Correo', width: 640, height: 400, modal: true});
@@ -147,6 +170,18 @@ function acciones($data) {
 		jQuery('<div/>').load(root_dir + '/admin/auditoria/detalle_correo.php?id=' + id).dialog({title: 'Detalle', width: 640, height: 400, modal: true});
 		return false;
 	});
+
+	jQuery('.enviado_si_no').click(function() {
+		var valor = jQuery(this).data('value')=='No'? [1,'Si']:[0,'No'];
+		var iD = jQuery(this).attr('id').replace('enviado_','');
+		jQuery.ajax({data:{id_log_correo:iD, enviado:valor[0],cambiarestado:1}
+		}).done(function() {
+			jQuery('#enviado_'+iD).data('value',valor).html(valor[1]);
+		});
+		
+		
+	});
+});
 </script>
 
 <?php

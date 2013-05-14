@@ -245,18 +245,19 @@ class CronNotificacion extends Cron {
 
 		// Fin del mail diario. Envío.
 		$mensajes = $this->Notificacion->mensajeDiario($this->datoDiario);
-
+		
 		if ($this->correo=='generar_correo') {
 			foreach ($mensajes as $id_usuario => $mensaje) {
-				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
 			}
 		} else 	if ($this->correo=='desplegar_correo' && $this->desplegar_correo == 'aefgaeddfesdg23k1h3kk1') {
 			var_dump($this->datoDiario);
 			echo implode('<br><br><br>', $mensajes);
 		} else if ($this->correo=='simular_correo') {
+			
 			foreach ($mensajes as $id_usuario => $mensaje) {
 				$mensaje['simular']=true;
-				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, false);
+				$this->AlertaCron->EnviarAlertaProfesional($id_usuario, $mensaje, $this->Sesion, true);
 			}
 		}
 	}
@@ -799,8 +800,10 @@ class CronNotificacion extends Cron {
 				FROM usuario
 					INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario
 				WHERE usuario_permiso.codigo_permiso = 'PRO' AND usuario.alerta_diaria = 1
-					AND usuario.retraso_max_notificado = 0 AND usuario.activo = 1";
-
+					AND usuario.activo = 1";
+					if($this->correo!='simular_correo') {
+						$query.=" AND usuario.retraso_max_notificado = 0 ";
+					}
 			$profesionales = $this->query($query);
 			$total_profesionales = count($profesionales);
 

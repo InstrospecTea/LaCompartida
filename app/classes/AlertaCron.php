@@ -125,7 +125,8 @@ class Alerta {
 		$from = html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
-		Utiles::InsertarPlus($sesion, "Alerta $from", $mensaje, $to, $nombre, false, $id_usuario, $tipo, $simular);
+
+		Utiles::InsertarPlus($sesion, "Alerta $from", $mensaje, $to, $nombre, $tipo=='diario', $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {

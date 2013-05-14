@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../app/conf.php';
 $sesion = new Sesion(array('ADM'));
-$query = "SELECT C.id_usuario, C.fecha AS fecha_creacion, date(C.fecha) AS dia_creacion, C.fecha_envio, C.enviado, TC.nombre tipo
+$query = "SELECT C.id_usuario, C.fecha AS fecha_creacion, date(C.fecha) AS dia_creacion, C.mail, C.subject, C.mensaje, C.fecha_envio, C.enviado, TC.nombre tipo
 			FROM log_correo AS C
 				LEFT JOIN prm_tipo_correo AS TC ON TC.id = C.id_tipo_correo
 			WHERE C.id_log_correo = $id
@@ -50,7 +50,10 @@ function tabla($trabajos, $con_total = true, $hora_correo = null) {
 	if ($con_total) {
 		$string .= sprintf($total_tpl, number_format($total, 2));
 	}
+	
+
 	$string .= '</table>';
+
 	return $string;
 }
 
@@ -131,4 +134,9 @@ if ($correo['tipo'] == 'diario') {
 	<?php if (!empty($total_trabajos_semana)) { ?>
 		<tr><td class="cvs"><?php echo __('Total trabajos semana'); ?>: </td><td><?php echo $total_trabajos_semana['total_horas']; ?></td></tr>
 	<?php } ?>
+
+	<tr><td class="cvs"><?php echo __('Para'); ?>: </td><td><?php echo $correo['mail']; ?></td></tr>
+	<tr><td class="cvs"><?php echo __('Subject'); ?>: </td><td><?php echo $correo['subject']; ?></td></tr>
+	<tr><td class="cvs" colspan="2"><?php echo __('Mensaje'); ?>:  <small>(<?php echo $correo['enviado']; ?>)</small></td></tr>
+	<tr><td colspan="2"><div style="padding: .5em 1em; border-left: 3px #ddd solid; margin-left: 1em;"><?php echo $correo['mensaje']; ?></div></td></tr>
 </table>

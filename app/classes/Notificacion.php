@@ -463,6 +463,9 @@ class Notificacion {
 
 			foreach ($dato as $id_usuario_mail => $alertas) {
 				$enviar = false;
+				if(!array_key_exists('nombre_pila',$alertas)) {
+					$alertas['nombre_pila']='Usuario';
+				}
 				$mensaje = str_replace('%USUARIO', $alertas['nombre_pila'], $estructura['header']);
 
 				if (isset($alertas['asunto_excedido']) && $alertas['asunto_excedido']) {

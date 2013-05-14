@@ -93,18 +93,25 @@ class Utiles extends \Utiles {
 		}
 		$where_dia = '';
 		if ($es_diario) {
-			$where_dia = ' AND YEAR(fecha) = YEAR(NOW()) AND MONTH(fecha) = MONTH(NOW()) AND DAY(fecha) = DAY(NOW())';
+			$where_dia = ' AND fecha>CURDATE()';
 		}
 		$mensaje = mysql_real_escape_string($mensaje);
 		$query = "SELECT COUNT(id_log_correo)
 					FROM log_correo
-					WHERE subject='{$subject}' AND mail='{$email}' AND mensaje='{$mensaje}' {$where_dia}";
+					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
+		if($simular) {
+			
+			echo $query.'<pre>'."\n".$subject."\n". $$tipo."\n". $email."\n". $nombre.'</pre>';
+		}
+
+		$query .=" AND mensaje='" . mysql_real_escape_string($mensaje) . "' ";
 		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		
 		list($count) = mysql_fetch_array($resp2);
 		if ($count == 0) {
 			$query2 = "INSERT INTO log_correo SET
 				subject = '{$subject}',
-				mensaje = '{$mensaje}',
+				mensaje = '" . mysql_real_escape_string($mensaje) . "',
 				mail = '{$email}',
 				nombre = '{$nombre}',
 				fecha = NOW()
