@@ -9712,7 +9712,7 @@ QUERY;
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `solicitud_adelanto` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE";
 			}
-			if(!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
+			if (!ExisteCampo('codigo_asunto', 'documento', $dbh)) {
 				$queries[] = "ALTER TABLE `documento` ADD `codigo_asunto` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL COMMENT 'solo sirve para mostrar en el editor el mismo asunto que se selecciono en un principio, pero lo que cuenta es el contrato' AFTER `id_contrato`";
 				$queries[] = "ALTER TABLE `documento` ADD INDEX ( `codigo_asunto` ) ";
 				$queries[] = "ALTER TABLE `documento` ADD FOREIGN KEY (`codigo_asunto`) REFERENCES `asunto`(`codigo_asunto`) ON DELETE SET NULL ON UPDATE CASCADE;";
@@ -9727,6 +9727,74 @@ QUERY;
 				((SELECT id_usuario FROM usuario where rut = '99511620'), 'SADM')";
 			ejecutar($queries, $dbh);
 			break;
+
+		case 7.33:
+			$queries = array();
+
+			if (ExisteCampo('rut', 'prm_proveedor', $dbh)) {
+				$queries[] = "ALTER TABLE  `prm_proveedor` CHANGE  `rut`  `rut` VARCHAR( 15 ) NOT NULL";
+			}
+			
+			ejecutar($queries, $dbh);
+			break;
+
+		case 7.34;
+
+			$queries = array();
+
+			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crédito'";
+			if (!ExisteCampo('familia', 'prm_tipo_pago', $dbh)) {
+				$queries[] = "ALTER TABLE  `prm_tipo_pago` ADD  `familia` VARCHAR( 1 ) NOT NULL COMMENT 'Tipo de documento (A:Adelanto P:Pago T:Todos)' FIRST";
+			}
+			$queries[] = "UPDATE  `prm_tipo_pago` SET  `familia` =  'T'";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'EP',  'Efectivo',  '7')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'CP',  'Cheque',  '8')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'TP',  'Transferencia',  '9')";
+			$queries[] = "INSERT IGNORE INTO  `prm_tipo_pago` (`familia` ,`codigo` ,`glosa` ,`orden`) VALUES ('P',  'OP',  'Otro',  '10')";
+						
+			ejecutar($queries, $dbh);
+			break;
+
+
+		case 7.35:
+			$queries = array();
+
+			if (ExisteCampo('neteo_pago', 'cta_corriente', $dbh)) {
+			$queries[]="ALTER TABLE  `cta_corriente` CHANGE  `neteo_pago`  `id_neteo_documento` INT( 11 ) NULL DEFAULT NULL";
+			}
+			
+			$queries[]=" update cta_corriente cc 
+					join documento doc on doc.id_cobro=substring_index(substring_index(cc.descripcion,'#',-2),' ',1)  and doc.tipo_doc='N'
+	 				join neteo_documento nd on nd.id_documento_cobro=doc.id_documento and nd.id_documento_pago=trim(substring_index(cc.descripcion,'#',-1) )
+					set cc.id_cobro=doc.id_cobro,
+						cc.id_neteo_documento=nd.id_neteo_documento,
+						cc.documento_pago=nd.id_documento_pago
+				where cc.incluir_en_cobro='NO' ";
+
+		
+		if(!ExisteIndex('id_neteo_documento', $tabla, $dbh))	 {
+			$queries[]="ALTER TABLE  `cta_corriente` ADD INDEX (  `id_neteo_documento` )";
+			}
+		if(!ExisteLlaveForanea('cta_corriente','id_neteo_documento','neteo_documento','id_neteo_documento', $dbh) )	 {
+			$queries[] = "ALTER TABLE `cta_corriente` ADD CONSTRAINT   FOREIGN KEY (`id_neteo_documento`) REFERENCES `neteo_documento` (`id_neteo_documento`) ON DELETE CASCADE ON UPDATE CASCADE;";
+			}
+		ejecutar($queries, $dbh);
+		break;
+		
+		case 7.36:
+			$query = array();
+			$comentario = 'Esta opcion limita la generacion de codigos de cliente a solo 4 digitos';
+
+			$query[] = "INSERT ignore INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
+                                            VALUES('MascaraCodigoCliente', 0, 'boolean','{$comentario}', 10, -1)";
+
+			foreach ($query as $q) {
+				if (!($res = mysql_query($q, $dbh) )) {
+					throw new Exception($q . "---" . mysql_error());
+				}
+			}
+
+		break;
 
 		case 7.37:
 			$queries = array();
@@ -9762,6 +9830,7 @@ QUERY;
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'prueba';";
 			ejecutar($queries, $dbh);
 		break;	
+
 	}
 }
 

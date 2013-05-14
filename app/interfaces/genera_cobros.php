@@ -315,6 +315,7 @@ if (UtilesApp::GetConf($sesion, 'SoloGastos')) {
 				close:function(ev,ui) {
 					jQuery(this).html('');
 					interrumpeproceso=1;
+					jQuery('#boton_buscar').click();
 				},
 				open: function() {
 					jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -351,7 +352,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaGG=function(i) {
 																	 if(i>=largoGG) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores)');
+																		 jQuery('#respuestagg').html('Proceso finalizado: se ha generado '+largoGG+' liquidaciones de gastos. ('+errores+' con errores). <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -371,7 +372,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaHH=function(j) {
 																	 if(j>=largoHH) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores)');
+																		 jQuery('#respuestahh').html('Proceso finalizado: se ha generado '+largoHH+' liquidaciones de honorarios. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -391,7 +392,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 																 var generaMIXTAS=function(k) {
 																	 if(k>=largoMIXTAS ) {
 																		 jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores)');
+																		 jQuery('#respuestamixtas').html('Proceso finalizado: se ha generado '+largoMIXTAS+' liquidaciones mixtas. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																		 jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																		 jQuery('#loading, #nocerrar').hide();
 																		 jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -453,7 +454,7 @@ if (UtilesApp::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') {
 															var generaClientes=function(k) {
 																if(k>=largoClientes) {
 																	jQuery('#form_busca #campo_codigo_cliente, #form_busca #codigo_cliente').val(codigo_cliente);
-																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores)');
+																	jQuery('#respuestamixtas').html('<h3>Proceso finalizado</h3> Se han procesado '+largoClientes+' clientes. ('+errores+' con errores) <br><br>Presione "Cerrar" para refrescar la informaci&oacute;n.');
 																	jQuery(".ui-dialog-buttonpane button:contains('Generar')").remove();
 																	jQuery('#loading, #nocerrar').hide();
 																	jQuery(".ui-dialog-buttonpane button:contains('Cancelar')").text("Cerrar");
@@ -575,6 +576,7 @@ Impresión de cobros
 														 close:function(ev,ui) {
 															 jQuery(this).html('');
 															 interrumpeproceso=1;
+
 														 },
 														 open: function() {
 															 jQuery('.ui-dialog-titlebar').addClass('ui-icon-warning');
@@ -765,11 +767,13 @@ else
 
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return true;
 				},
 				"<?php echo __('Cerrar') ?>": function() {
 
 					jQuery( this ).dialog( "close" );
+					jQuery('#boton_buscar').click();
 					return false;
 				}
 			}
@@ -1288,6 +1292,7 @@ function funcionTR(& $contrato) {
 
 	#WIP
 	$wip = $contrato->ProximoCobroEstimado($fecha_ini ? Utiles::fecha2sql($fecha_ini) : '', Utiles::fecha2sql($fecha_fin), $contrato->fields['id_contrato']);
+	// echo '<pre>';print_r($wip);echo '</pre>';
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; \">";
 	$html .= "<td style='border:1px dashed #999999; font-size:10px'>" . __('WIP (Work in progress)') . "</td><td colspan=4 style='border:1px dashed #999999'>";
 	$html .= "<div id='wip_$i'>";
@@ -1297,7 +1302,13 @@ function funcionTR(& $contrato) {
 
 	$wip_honorarios = ($wip[0] != '' ? number_format($wip[0], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.' : '0 Hrs.') .
 			" (Según HH en " . $contrato->fields['simbolo'] . ' ' . number_format($wip[1], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ")";
+	
 	$wip_gastos = $wip[4] . ' ' . number_format($wip[3], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en gastos';
+	if($wip[6]>0) {
+		$wip_egresos = $wip[4] . number_format($wip[5], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en egresos';
+		$wip_ingresos = $wip[4] . number_format($wip[6], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en provisiones';
+		$wip_gastos='<div style="border-bottom: 1px black dotted;display:inline-block;cursor:help;" title="'.$wip_egresos .' vs '. $wip_ingresos.'">'.$wip_gastos.'</div>';
+		}
 	switch ($tipo_liquidacion) { //1-2 = honorarios-gastos, 3 = mixtas
 		case 1: $txt_wip = $wip_honorarios;
 			break;

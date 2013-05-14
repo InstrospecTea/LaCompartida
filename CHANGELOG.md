@@ -1,4 +1,80 @@
 # Changelog
+## Hotfix: 13.3.15
+lunes 09 de mayo 2013
+* **Fixed:** [Corrige error de error de despliege documento excel y agrega la opcion solicitante en gastos](#)
+
+## Hotfix: 13.3.15
+lunes 30 de abril 2013
+* **Fixed:** [Corrige error planilla saldo con clientes que utilizan codigo secundario](#178)
+
+## Hotfix: 13.3.14
+lunes 29 de abril 2013
+* **Fixed:** [Corrige selector de documento](#176)
+
+## Hotfix: 13.3.13
+jueves 26 de abril 2013
+* **Fixed:** [ Corrige problema de calculo en seccion GenerarSeccionDetallePago para fayca ](https://github.com/LemontechSA/ttb/pull/174)
+
+## Hotfix: 13.3.12
+jueves 22 de abril 2013
+* **Fixed:** [ Corrige reporte_anual, Crear cliente con conf CorreosModificacionAdminDatos ](https://github.com/LemontechSA/ttb/pull/170)
+* **Fixed:** [Globaliza $sesion en un webservice de uso interno]
+
+## Hotfix: 13.3.11
+jueves 17 de abril 2013
+* **Fixed:** [Corrige tamaño popup editar horas. Permite modificar cliente en ambiente con codigo secundario. Conf MastacaraCodigoCliente  ](https://github.com/LemontechSA/ttb/pull/162)
+
+## Hotfix: 13.3.10
+jueves 11 de abril 2013
+* **Fixed:** [Corrige la carta de cobro de gastos para VFC con cálculo antigüo y nuevo módulo gastos](https://github.com/LemontechSA/ttb/pull/161)
+
+## Hotfix: 13.3.9
+jueves 11 de abril 2013
+* **Fixed:** [Corrige la forma de tratar los radio](https://github.com/LemontechSA/ttb/pull/160)
+
+##Hotfix 13.3.8
+jueves 11 abrirl 2013
+* **Fixed:** [Modifica permiso Admin datos para agregar clientes](https://github.com/LemontechSA/ttb/pull/158) [#pivotal](https://www.pivotaltracker.com/story/show/47240779)
+
+##Hotfix 13.3.7
+jueves 11 abrirl 2013
+* **Fixed:** [Formaliza correccion a clase trabajo hecha directo en produccion el 4 de abril](https://github.com/LemontechSA/ttb/pull/157) [#pivotal](https://www.pivotaltracker.com/story/show/47443091)
+
+## Hotfix 13.3.6
+miercoles 10 de abril 2013
+* **Fixed:** [Arregla descarga planilla de hh.](https://github.com/LemontechSA/ttb/pull/154) [#pivotal](https://www.pivotaltracker.com/story/show/47805683)
+
+## Hotfix 13.3.5
+martes 9 de abril 2013
+* **Fixed:** [Permite filtrar por mes al reporte financiero.](https://github.com/LemontechSA/ttb/pull/152) [#pivotal](https://www.pivotaltracker.com/story/show/47649165)
+
+## Hotfix 13.3.4
+Jueves 4 de abril 2013
+* **Fixed:** [Restablece la Nota de Cobro 13.2.15 y luego aplica las nuevas funcionalidades del release 13.3.0 sin romper la seccion Detalle Profesional](https://github.com/LemontechSA/ttb/pull/148) [#pivotal](https://www.pivotaltracker.com/story/show/47074217)
+
+## Hotfix: 13.3.3
+Lunes 1 de abril 2013
+* **Fixed:** [Corrige error en el método WhereQuery de la clase Gasto, que se manifestaba al filtrar por asunto](https://github.com/LemontechSA/ttb/pull/142) [#pivotal](https://www.pivotaltracker.com/story/show/47089611)
+
+## Hotfix: 13.3.2
+Jueves 28 marzo 2013
+* **Fixed:** [Corrige query de la interfaz trabajos. Tenía un error sintáctico que se manifiesta cuando se busca trabajos en la pantalla 2 del cobro](https://github.com/LemontechSA/ttb/pull/141) [#pivotal](https://www.pivotaltracker.com/story/show/47074217)
+
+## Hotfix: 13.3.1
+Jueves 28 marzo 2013
+* **Fixed:** [Sesion debe ir en mayuscula en la interfaz agregar_contrato](https://github.com/LemontechSA/ttb/pull/140) [#zendesk](http://lemontech.zendesk.com/tickets/8180?col=22917348&page=1)
+
+## Release: 13.3.0
+Miércoles 27 de marzo 2013.
+* **New:** [Integración contable de gastos](https://github.com/LemontechSA/ttb/pull/30)
+* **New:** [Carga masiva de excel para implementación](https://github.com/LemontechSA/ttb/pull/99)
+* **Fixed:** [Guardar datos solicitante al agregar un cliente](https://github.com/LemontechSA/ttb/pull/107)
+* **New:** [Integración de nuevos métodos para NotaCobro y CartaCobro](https://github.com/LemontechSA/ttb/pull/111)
+* **New:** [Pantalla de configuración labels para usabilidad](https://github.com/LemontechSA/ttb/pull/114)
+* **Fixed:** [Diferenciar "monto" de "monto cobrable" en ingreso de gasto](https://github.com/LemontechSA/ttb/pull/118)
+* **Fixed:** [Uniforma las queries de gastos en todo el sistema](https://github.com/LemontechSA/ttb/pull/124)
+* **New:** [Selector de tipo de pago para adelantos y pagos](https://github.com/LemontechSA/ttb/pull/127)
+
 ## Hotfix: 13.2.15
 martes 26 de marzo 2013
 * **Fixed** [Agrega metodo Contrato->LoadByCodigoSecundario](https://www.pivotaltracker.com/story/show/46909219)
@@ -16,7 +92,6 @@ viernes 22 de marzo 2013
 
 ## Hotfix: 13.2.11
 * **Fixed:** [Correccion Tarifa proporcional](https://github.com/LemontechSA/ttb/pull/130)
-
 
 ## Hotfix: 13.2.10
 * **Fixed:** [En vez de subir los backups a un bucket para cada cliente, usa el mismo bucket y luego un subdirectorio. Esto, porque Amazon tiene un límite de 100 buckets y ya lo pasamos](https://github.com/LemontechSA/ttb/pull/125)
@@ -125,17 +200,16 @@ Jueves 14 de febrero 2013.
 
 
 ## Hotfix: 13.0.4
-MiÃ©rcoles 13 de febrero 2013.
+Miércoles 13 de febrero 2013.
 * **Fixed** [Corrige la consulta de seguimiento de cobros](https://www.pivotaltracker.com/projects/286009#!/stories/44387509)
 
 ## Hotfix: 13.0.3
 Jueves 7 de febrero 2013.
 * **Fixed** [Corrige el objeto $contacto (que no existe) por $contrato. Pasaba en 2 lugares que nunca imprimian nada](https://github.com/LemontechSA/ttb/pull/74)
-MiÃ©rcoles 6 de febrero 2013.
+Miércoles 6 de febrero 2013.
 * **Fixed** [Evita error en IE cuando los abogados no pueden ver la duración cobrable] (http://soporte.thetimebilling.com/tickets/7618?col=22917348&page=1)
 
 ## Hotfix: 13.0.2
-
 Viernes 1 de febrero, 2013.
 * **Fixed** [Le da ancho al dv](https://github.com/LemontechSA/ttb/commit/6cfa4ad56dc3756c62d3911f3ac67216a14b88f7#index.php)
 

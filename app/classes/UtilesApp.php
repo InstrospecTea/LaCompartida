@@ -48,16 +48,23 @@ class UtilesApp extends Utiles {
 		return $result['simbolo'];
 	}
 
-	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '') {
+	public static function CampoCliente($sesion, $codigo_cliente = null, $codigo_cliente_secundario = null, $codigo_asunto = null, $codigo_asunto_secundario = null,$mas_recientes = false, $width = 320, $oncambio = '',$cargar_selectores=true) {
 		echo InputId::Javascript($sesion);
 		if (UtilesApp::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 			echo Autocompletador::CSS();
+				if ($oncambio=='') {
+					$oncambio="CargarGlosaCliente();";
+				} elseif (substr($oncambio,0,1)=='+') {
+					$oncambio="CargarGlosaCliente(); $oncambio";
+				}
+			echo Autocompletador::Javascript($sesion,$cargar_selectores,$oncambio);
+
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, $codigo_cliente_secundario,$mas_recientes , $width   );
 			} else {
-				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width , $oncambio );
+				echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente, null,$mas_recientes , $width  );
 			}
-			echo Autocompletador::Javascript($sesion);
+			
 		} else {
 			if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 				if ($oncambio=='') {
@@ -533,48 +540,7 @@ class UtilesApp extends Utiles {
 
 	function TotalCuentaCorriente(&$sesion, $where = '1',$cobrable=1,$array=false) {
 
-		$where .= " AND ( cobro.estado IS NULL OR cobro.estado NOT LIKE 'INCOBRABLE' ) ";
-		if($cobrable!='' && self::GetConf($sesion, 'UsarGastosCobrable')) {
-			$where .= " AND  cta_corriente.cobrable = $cobrable ";
-		}
-		$total_ingresos = 0;
-		$total_egresos = 0;
-
-		$query = "SELECT
-								IF( cta_corriente.id_cobro IS NOT NULL, ingreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), ingreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
-								IF( cta_corriente.id_cobro IS NOT NULL, egreso*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), egreso*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ),
-								IF( cta_corriente.id_cobro IS NOT NULL, monto_cobrable*(cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), monto_cobrable*(moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable
-							, ifnull(cobro.estado,'SIN COBRO') as estado FROM cta_corriente
-							JOIN prm_moneda as moneda_gasto ON cta_corriente.id_moneda=moneda_gasto.id_moneda
-							JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
-								LEFT JOIN asunto ON asunto.codigo_asunto = cta_corriente.codigo_asunto
-								LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-								LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-								LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
-								LEFT JOIN cobro_moneda as cobro_moneda_gasto ON ( cobro_moneda_gasto.id_moneda = moneda_gasto.id_moneda AND cobro_moneda_gasto.id_cobro = cta_corriente.id_cobro )
-								LEFT JOIN cobro_moneda as cobro_moneda_base ON ( cobro_moneda_base.id_moneda = moneda_base.id_moneda AND cobro_moneda_base.id_cobro = cta_corriente.id_cobro )
-								LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo=prm_cta_corriente_tipo.id_cta_corriente_tipo
-								left JOIN cliente ON  cliente.codigo_cliente=ifnull(asunto.codigo_cliente, cta_corriente.codigo_cliente)
-							WHERE $where";
-
-
-			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-
-			while($ingresoyegreso=mysql_fetch_array($resp) ) {
-				if ($ingresoyegreso[0] > 0) {
-				$total_ingresos += $ingresoyegreso[2];
-				} else if ($ingresoyegreso[1] > 0) {
-				$total_egresos += $ingresoyegreso[2];
-				if($ingresoyegreso[3]=='CREADO' || $ingresoyegreso[3]=='SIN COBRO') $egresos_borrador += $ingresoyegreso[2];
-				}
-			}
-			$total = $total_ingresos - $total_egresos;
-		if($array) {
-			return array($total,$total_ingresos,$total_egresos, $egresos_borrador);
-		} else {
-			return $total;
-		}
+		return Gasto::TotalCuentaCorriente($sesion, $where ,$cobrable,$array);
 
 
 	}
@@ -1792,10 +1758,11 @@ HTML;
 
 		$moneda_base = Utiles::MonedaBase($sesion);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS cta_corriente.id_movimiento,
+		$query = "SELECT SQL_CALC_FOUND_ROWS
+					cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
 					prm_proveedor.id_proveedor as id_proveedor,
-																																													prm_proveedor.glosa as glosa_proveedor,
+					prm_proveedor.glosa as glosa_proveedor,
 					usuario.username as id_usuario,
 					usuario.username as username,
 					cta_corriente.fecha,
@@ -1810,16 +1777,17 @@ HTML;
 					prm_cta_corriente_tipo.glosa AS tipo_gasto,
 					IF(descripcion like 'Saldo aprovisionado%','SI','NO') as es_liquido_provision
 				FROM cta_corriente
-					LEFT JOIN asunto USING(codigo_asunto)
+				LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN prm_cta_corriente_tipo ON cta_corriente.id_cta_corriente_tipo = prm_cta_corriente_tipo.id_cta_corriente_tipo
-																																				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
+				LEFT JOIN prm_proveedor ON cta_corriente.id_proveedor = prm_proveedor.id_proveedor
 				LEFT JOIN usuario ON cta_corriente.id_usuario_orden = usuario.id_usuario
-				WHERE cta_corriente.id_cobro='" . $id_cobro . "'";
-		$query.=$soloegreso ? ' AND egreso>0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
+				WHERE cta_corriente.id_cobro='$id_cobro'";
 
-		$query.="AND cta_corriente.incluir_en_cobro = 'SI'
-					AND cta_corriente.cobrable = 1
-				ORDER BY cta_corriente.fecha ASC";
+		$query .= $soloegreso ? ' AND egreso > 0 ' : ' AND (egreso > 0 OR ingreso > 0) ';
+
+		$query .= "AND cta_corriente.incluir_en_cobro = 'SI'
+							AND cta_corriente.cobrable = 1
+							ORDER BY cta_corriente.fecha ASC";
 
 		$lista_gastos = new ListaGastos($sesion, '', $query);
 

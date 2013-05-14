@@ -270,12 +270,14 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		if ($lista->Get($i)->fields[cobrable] == 0 || $lista->Get($i)->fields[cobrable] == 2) {
 			$no_cobrable = 'No cobrable';
 			$color = '#FFFFFF';
+			$pintame = '';
 		} else {
 			$no_cobrable = '';
 			/* 	$color = $objeto_semana->colores[$cod_asunto_color];
 
 			  if($color == '') */
 			$color = '#E8E7D9';
+			$pintame = ' pintame ';
 		}
 
 		$total[$dia_semana] += $hh + $mm / 60;
@@ -292,7 +294,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 			for ($q = $dia_anterior + 1; $q <= $dia_semana; $q++)
 				echo("</td><td style='width: 100px'>");
 		}
-		echo("<div id='" . $id_trabajo . "' $tooltip class=\"cajatrabajo\" rel=\"$cod_asunto\" onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
+		echo("<div id='" . $id_trabajo . "' $tooltip class=\"cajatrabajo $pintame\" rel=\"$cod_asunto\" onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
 		echo("<b id='" . $id_trabajo . "'>$cod_asunto</b>");
 		if ($alto > 24) {
 			echo("<br />Hr:$duracion");
@@ -411,7 +413,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		}
 	}
 	jQuery(document).ready(function() {
-		jQuery('.cajatrabajo').each(function() {
+		jQuery('.pintame').each(function() {
 			jQuery(this).css('background-color', window.top.s2c(jQuery(this).attr('rel')));
 		});
 

@@ -179,6 +179,7 @@
 		
 		$query = "SELECT id_documento AS num_docs
 				, glosa_documento
+				, fecha
 				, SUM(IF(monto_base>0, monto_base, 0)) AS egresos
 				, SUM(IF(monto_base>0, 0, -monto_base)) AS ingresos
 				, monto_base
@@ -318,7 +319,7 @@
 		$ws->write($filas, $col_balance, __('Balance parcial'), $formato_titulo);
 
 		// imprimir filas
-		while(list($numero, $descripcion, $egresos, $ingresos, $monto, $id_moneda_documento) = mysql_fetch_array($resp))
+		while(list($numero, $descripcion, $fecha, $egresos, $ingresos, $monto, $id_moneda_documento) = mysql_fetch_array($resp))
 		{
 			$egreso_moneda_base  = UtilesApp::CambiarMoneda($egresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);
 			$ingreso_moneda_base = UtilesApp::CambiarMoneda($ingresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);

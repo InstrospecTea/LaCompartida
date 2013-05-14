@@ -22,6 +22,7 @@
 require 'uri'
 require 'cgi'
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
+require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "env"))
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "selectors"))
 
 module WithinHelpers
@@ -34,74 +35,166 @@ end
 
 World(WithinHelpers)
 
+ Cuando /^estoy en la pantalla de login$/ do
+  visit Capybara.app_host
+end
+
 # Single-line step scoper
-When /^(.*) within (.*[^:])$/ do |step, parent|
-  with_scope(parent) { When step }
+Cuando /^(.*) within (.*[^:])$/ do |step, parent|
+  with_scope(parent) { Cuando step }
 end
 
 # Multi-line step scoper
-When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
-  with_scope(parent) { When "#{step}:", table_or_string }
+Cuando /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
+  with_scope(parent) { Cuando "#{step}:", table_or_string }
 end
+
+
 
 Given /^(?:|I )am on (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
-When /^(?:|I )go to (.+)$/ do |page_name|
+Given /^estoy en (.+)$/ do |page_name|
   visit path_to(page_name)
 end
 
-When /^(?:|I )press "([^"]*)"$/ do |button|
+
+
+
+Cuando /^genero un gasto aleatorio$/ do
+  asunto = ["0003-0001", "0006-0001", "0007-0001", "0013-0001", "0010-0001", "0017-0001","0025-0002","2020-0003" ,"2017-0004","2008-0001"]
+  codigo_asunto = asunto[rand(asunto.length)]
+  monto_aleatorio=1000+rand(5000)
+  descripcion="Gasto generado por cucumber para asunto " << codigo_asunto
+  fill_in('campo_codigo_asunto', :with => codigo_asunto)
+  fill_in('monto', :with => monto_aleatorio)
+  fill_in('descripcion', :with => descripcion)
+   click_on "Guardar"
+end
+
+
+
+
+Cuando(/^me logeo$/) do
+  visit path_to('la pagina de login')
+    fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+  click_on "Entrar"
+end
+
+Dado(/^que estoy logueado$/) do
+  visit path_to('la pagina de login')
+  fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+  click_on "Entrar"
+end
+
+Cuando /^(?:|I )go to (.+)$/ do |page_name|
+  visit path_to(page_name)
+end
+
+Cuando /^visito (.+)$/ do |page_name|
+  step "me logeo"
+  visit path_to(page_name)
+end
+
+
+Cuando /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
 end
 
-When /^(?:|I )follow "([^"]*)"$/ do |link|
+Cuando /^(?:|I )click on "([^"]*)"$/ do |button|
+  click_on(button)
+end
+
+
+
+Cuando /^pincho en el primer "([^"]*)"$/ do |css|
+  page.all(css)[1].click
+end
+
+Cuando /^pincho el link "([^"]*)"$/ do |link|
   click_link(link)
 end
 
-When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
+Cuando /^pincho el seudoboton "([^"]*)"$/ do |link|
+  page.find('span', :text => link,:visible => true).click
+end
+
+Cuando /^pincho en "([^"]*)"$/ do |button|
+  click_on(button)
+end
+
+Cuando /^filtro provisiones$/ do
+  step "visito la pantalla de gastos"
+  step "elijo \"soloingreso\" en \"egresooingreso\""
+  step "pincho el seudoboton \"Buscar\""
+end
+
+Cuando /^activo "([^"]*)"$/ do |button|
+page.evaluate_script("jQuery(\"input[type='checkbox'][name='{button}']\").removeClass('ui-helper-hidden-accessible')")
+check(button)
+end
+
+Cuando /^pongo usuario y password$/ do 
+  fill_in('rut', :with => '99511620')
+  fill_in('password', :with => 'admin.asdwsx')
+end
+
+
+Cuando /^(?:|I )follow "([^"]*)"$/ do |link|
+  click_link(link)
+end
+
+Cuando(/^cuento la cantidad de provisiones$/) do
+   respuesta=find('div#tablon_info').native.content
+   p respuesta
+end
+
+
+Cuando /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
   fill_in(field, :with => value)
 end
 
-When /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
+Cuando /escribo "([^"]*)" en el campo "([^"]*)"$/ do |value,field|
   fill_in(field, :with => value)
 end
 
-# Use this to fill in an entire form with data from a table. Example:
-#
-#   When I fill in the following:
-#     | Account Number | 5002       |
-#     | Expiry date    | 2009-11-01 |
-#     | Note           | Nice guy   |
-#     | Wants Email?   |            |
-#
-# TODO: Add support for checkbox, select or option
-# based on naming conventions.
-#
-When /^(?:|I )fill in the following:$/ do |fields|
-  fields.rows_hash.each do |name, value|
-    When %{I fill in "#{name}" with "#{value}"}
-  end
+Cuando /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
+  fill_in(field, :with => value)
 end
 
-When /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
+Cuando /^me cambio al popup$/ do 
+     page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
+end
+
+Cuando /^me cambio de ventana$/ do 
+     page.driver.browser.switch_to().window(page.driver.browser.window_handles.last) 
+end
+
+
+Cuando /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
   select(value, :from => field)
 end
 
-When /^(?:|I )check "([^"]*)"$/ do |field|
+Cuando /^elijo "([^"]*)" en "([^"]*)"$/ do |value, field|
+  select(value, :from => field)
+end
+
+Cuando /^(?:|I )check "([^"]*)"$/ do |field|
   check(field)
 end
 
-When /^(?:|I )uncheck "([^"]*)"$/ do |field|
+Cuando /^(?:|I )uncheck "([^"]*)"$/ do |field|
   uncheck(field)
 end
 
-When /^(?:|I )choose "([^"]*)"$/ do |field|
+Cuando /^(?:|I )choose "([^"]*)"$/ do |field|
   choose(field)
 end
 
-When /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
+Cuando /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
   attach_file(field, File.expand_path(path))
 end
 
@@ -110,6 +203,30 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
     page.should have_content(text)
   else
     assert page.has_content?(text)
+  end
+end
+
+Then /^debiera ver "([^"]*)"$/ do |text|
+  if page.respond_to? :should
+    page.should have_content(text)
+  else
+    assert page.has_content?(text)
+  end
+end
+
+Then /^(?:|I )should see css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
+  end
+end
+
+Then /^debiera ver css "([^"]*)"$/ do |css|
+  if page.respond_to? :should
+    page.should have_css(css)
+  else
+    assert page.has_css?(css)
   end
 end
 
@@ -219,16 +336,7 @@ Then /^the "([^"]*)" checkbox(?: within (.*))? should be checked$/ do |label, pa
   end
 end
 
-Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
-  with_scope(parent) do
-    field_checked = find_field(label)['checked']
-    if field_checked.respond_to? :should
-      field_checked.should be_false
-    else
-      assert !field_checked
-    end
-  end
-end
+
  
 Then /^(?:|I )should be on (.+)$/ do |page_name|
   current_path = URI.parse(current_url).path
@@ -238,6 +346,16 @@ Then /^(?:|I )should be on (.+)$/ do |page_name|
     assert_equal path_to(page_name), current_path
   end
 end
+
+Then /^debiera estar en (.+)$/ do |page_name|
+  current_path = URI.parse(current_url).path
+  if current_path.respond_to? :should
+    current_path.should == path_to(page_name)
+  else
+    assert_equal path_to(page_name), current_path
+  end
+end
+
 
 Then /^(?:|I )should have the following query string:$/ do |expected_pairs|
   query = URI.parse(current_url).query
@@ -258,27 +376,30 @@ end
 
 
 
+
 def call_lista_gastos usuario,password,timestamp
-      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp }).to_hash
+      response = @client.call(:lista_gastos, message: { usuario: usuario, password: password,timestamp:timestamp })
 end
 
-When /^me conecto al cliente wsdl$/ do
-   @client = Savon.client(wsdl: "http://cplaw.thetimebilling.com/time_tracking_feature/web_services/integracion_contabilidad4.php?wsdl")
+Cuando /^me conecto al cliente wsdl$/ do
+   @client = Savon.client(wsdl:  Capybara.app_host  << "/web_services/integracion_contabilidad4.php?wsdl")
 end
 
  
 
-When(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
- @result = call_lista_gastos "cplaw","cplaw",timestamp
+Cuando(/^envio una peticion "(.*?)" con params \("(.*?)","(.*?)",(.*?)\)$/) do |metodo, usuario, password, timestamp|
+ @resultado = call_lista_gastos(usuario, password,timestamp)
+  @result=@resultado.body.to_hash
 end
 
  
 Then /^debiera devolverme los metodos disponibles$/ do
+   p @client.operations
    assert(@client.operations.kind_of?(Array))
  end
 
 Then /^debiera devolver al menos un gasto$/ do
-   assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Hash))
+  assert(@result[:lista_gastos_response][:lista_gastos][:item].kind_of?(Array))
  end
 
 Then /^no debiera devolver gastos$/ do
@@ -294,4 +415,30 @@ Then /^no debiera devolver gastos$/ do
      expect { @client.call_lista_gastos "juanito","juanito",1356998400}.to raise_error
  end
 
- 
+ # Use this to fill in an entire form with data from a table. Example:
+#
+#   Cuando I fill in the following:
+#     | Account Number | 5002       |
+#     | Expiry date    | 2009-11-01 |
+#     | Note           | Nice guy   |
+#     | Wants Email?   |            |
+#
+# TODO: Add support for checkbox, select or option
+# based on naming conventions.
+#
+Cuando /^(?:|I )fill in the following:$/ do |fields|
+  fields.rows_hash.each do |name, value|
+    Cuando %{I fill in "#{name}" with "#{value}"}
+  end
+end
+
+ Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label, parent|
+  with_scope(parent) do
+    field_checked = find_field(label)['checked']
+    if field_checked.respond_to? :should
+      field_checked.should be_false
+    else
+      assert !field_checked
+    end
+  end
+end

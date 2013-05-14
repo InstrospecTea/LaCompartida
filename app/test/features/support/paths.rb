@@ -14,8 +14,22 @@ module NavigationHelpers
     case page_name
 
     when /^the home\s?page$/
-      '/'
+     Capybara.app_host 
 
+    when /^la pagina de inicio$/
+     Capybara.server_host << '/app/usuarios/index.php'  
+
+      when /^la pantalla de gastos$/
+        '/app/interfaces/gastos.php'  
+    
+      when /^la pantalla de configuracion$/
+        '/app/interfaces/configuracion.php' 
+
+    when /^la pantalla de phpminiadmin$/
+        '/admin/phpminiadmin.php' 
+
+    when /^la pagina de login$/
+       Capybara.app_host 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #
