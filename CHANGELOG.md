@@ -1,5 +1,9 @@
 # Changelog
-## Hotfix: 13.3.15
+## Hotfix: 13.3.17
+lunes 14 de mayo 2013
+* **Fixed:** [Permite agregar codigo asunto secundario con mas de 4 caracteres](#185)
+
+## Hotfix: 13.3.16
 lunes 09 de mayo 2013
 * **Fixed:** [Corrige error de error de despliege documento excel y agrega la opcion solicitante en gastos](#)
 
