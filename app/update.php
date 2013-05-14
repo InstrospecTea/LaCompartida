@@ -9728,10 +9728,15 @@ QUERY;
 			ejecutar($queries, $dbh);
 			break;
 
-		case 7.33:
+		case 7.37:
 			$queries = array();
-			$queries[] = "CREATE  TABLE `prm_tipo_correo` (`id` INT NOT NULL AUTO_INCREMENT, `nombre` VARCHAR(45) NULL, PRIMARY KEY (`id`) ) ENGINE = InnoDB DEFAULT CHARACTER SET = latin1;";
-			$queries[] = "ALTER TABLE `log_correo` ENGINE = InnoDB;";
+			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_tipo_correo` (
+							  `id` int(11) NOT NULL AUTO_INCREMENT,
+							  `nombre` varchar(45) DEFAULT NULL,
+							  PRIMARY KEY (`id`),
+							  UNIQUE KEY `nombre` (`nombre`)
+							) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
+			
 			if(!ExisteCampo('id_usuario', 'log_correo', $dbh)) {
 				$queries[] = "ALTER TABLE `log_correo` ADD COLUMN `id_usuario` INT NULL AFTER `id_log_correo;";
 			}
@@ -9753,9 +9758,10 @@ QUERY;
 			$queries[] = "UPDATE `log_correo` SET fecha_modificacion = fecha WHERE fecha_modificacion IS NULL;";
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'diario';";
 			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'semanal';";
-			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspencion_pago_comision';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'suspension_pago_comision';";
+			$queries[] = "INSERT INTO `prm_tipo_correo` SET nombre = 'prueba';";
 			ejecutar($queries, $dbh);
-			break;
+		break;	
 	}
 }
 
@@ -9764,7 +9770,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 7.33;
+$max_update = 7.37;
 $force = 0;
 if (isset($_GET['maxupdate']))
 	$max_update = round($_GET['maxupdate'], 2);
