@@ -111,9 +111,11 @@ class Alerta {
 		}
 
 		$tipo = null;
+		$simular=false;
 		if (is_array($mensaje)) {
 			$tipo = $mensaje['tipo'];
 			$mensaje = $mensaje['mensaje'];
+			$simular=!empty($mensaje['simular']) && $mensaje['simular'];
 		}
 		if ($header) {
 			$mensaje = (!empty($nombre) ? "Usuario: $nombre \n" : "") . "Alerta: $mensaje";
@@ -122,7 +124,7 @@ class Alerta {
 		$from = html_entity_decode(Conf::AppName());
 
 		$to = $email; // Mail a Usuario
-		Utiles::Insertar($sesion, "Alerta $from", $mensaje, $to, $nombre, false, $id_usuario, $tipo);
+		Utiles::Insertar($sesion, "Alerta $from", $mensaje, $to, $nombre, false, $id_usuario, $tipo, $simular);
 	}
 
 	function AlertaProfesional($id_persona, $opc_mail, $sesion) {
