@@ -99,19 +99,17 @@ class Utiles extends \Utiles {
 		$query = "SELECT COUNT(id_log_correo)
 					FROM log_correo
 					WHERE subject='{$subject}' AND mail='{$email}'  AND id_tipo_correo={$id_tipo_correo}  {$where_dia}";
-		if($simular) {
-			
-			echo $query.'<pre>'."\n".$subject."\n". $$tipo."\n". $email."\n". $nombre.'</pre>';
-		}
+		$querytemp=$query;
+		
 
-		$query .=" AND mensaje='" . mysql_real_escape_string($mensaje) . "' ";
+		$query .=" AND mensaje= '{$mensaje}' ";
 		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		
 		list($count) = mysql_fetch_array($resp2);
 		if ($count == 0) {
 			$query2 = "INSERT INTO log_correo SET
 				subject = '{$subject}',
-				mensaje = '" . mysql_real_escape_string($mensaje) . "',
+				mensaje = '{$mensaje}',
 				mail = '{$email}',
 				nombre = '{$nombre}',
 				fecha = NOW()
@@ -126,6 +124,14 @@ class Utiles extends \Utiles {
 				$query2 .= ", enviado = 1, fecha_envio = NOW()";
 			}
 			mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
+			
+			if($simular) {
+				echo 'Nuevo Correo<pre>'."\n".$subject."\n". $tipo."\n". $email."\n". $nombre.'</pre><hr>';
+			}
+		} else {
+			if($simular) {
+				echo 'Omitiendo Correo Repetido<pre>'."\n".$subject."\n". $tipo."\n". $email."\n". $nombre.'</pre><hr>';
+			}
 		}
 	}
 
