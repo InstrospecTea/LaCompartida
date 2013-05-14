@@ -1722,6 +1722,12 @@ class NotaCobro extends Cobro {
 				else
 					$dato_monto_cobrado = " trabajo.monto_cobrado ";
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -1746,7 +1752,7 @@ class NotaCobro extends Cobro {
 							$join_categoria
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -4830,6 +4836,12 @@ class NotaCobro extends Cobro {
 					$mostrar_horas_incobrables = "";
 				}
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -4858,7 +4870,7 @@ class NotaCobro extends Cobro {
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$mostrar_horas_incobrables 
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
@@ -7971,6 +7983,12 @@ class NotaCobro extends Cobro {
 					$mostrar_horas_incobrables = "";
 				}
 
+				if ($this->fields['opc_ver_cobrable']){
+					$and .= "";
+				} else {
+					$and .= "AND trabajo.visible = 1";
+				}
+
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
@@ -8001,7 +8019,7 @@ class NotaCobro extends Cobro {
 							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
 							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
 							$mostrar_horas_incobrables
-							AND trabajo.visible=1 AND trabajo.id_tramite=0 $where_horas_cero
+							$and AND trabajo.id_tramite=0 $where_horas_cero
 							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
