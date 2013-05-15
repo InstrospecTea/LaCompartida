@@ -2,6 +2,9 @@
 ## Hotfix: 13.3.17
 lunes 14 de mayo 2013
 * **Fixed:** [Permite agregar codigo asunto secundario con mas de 4 caracteres](#185)
+* **Fixed:** [Permite editar el visible del cobro cuando el asunto al cual esta asociado esta definido como no cobrable](#185)
+* **Fixed:** [Recupera funcionalidad de opc ver trabajos no visibles](#185)
+* **Fixed:** [Corrige problema de fecha desde en excel de cobro](#185)
 
 ## Hotfix: 13.3.16
 lunes 09 de mayo 2013
