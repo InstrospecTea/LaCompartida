@@ -82,9 +82,10 @@
 		}
 
 		/*
-		hemos cambiado el cliente por lo tanto
-		este trabajo tomará un cobro CREADO del asunto, sino NULL
+		*    hemos cambiado el cliente por lo tanto
+		*    este trabajo tomará un cobro CREADO del asunto, sino NULL
 		*/
+
 		if (!$codigo_asunto_secundario) {
 			//se carga el codigo secundario
 			$asunto = new Asunto($sesion);
@@ -100,7 +101,10 @@
 			$codigo_asunto = $asunto->fields['codigo_asunto'];
 		}
 
-		// revisar para codigo secundario
+		/*
+		*	revisar para codigo secundario
+		*/
+
 		if ($codigo_asunto != $t->fields['codigo_asunto']) {
 			$contrato_anterior = new Contrato($sesion);
 			$contrato_modificado = new Contrato($sesion);
@@ -252,7 +256,9 @@
 				// Si el asunto no es cobrable
 				if ($asunto->fields['cobrable'] == 0) {
 					$t->Edit("cobrable",'0');
-					$t->Edit("visible",'0');
+					/*
+					*	$t->Edit("visible",'0');
+					*/
 					$pagina->AddInfo(__('El Trabajo se guardó como NO COBRABLE (Por Maestro).'));
 				}
 				if (!$id_usuario) {
@@ -274,10 +280,13 @@
 				}
 
 
-// Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
-//                             if ($t->fields['cobrable'] == 0) {
-//                                     $t->fields['duracion_cobrada']='00:00:00';
-//                             }
+				/*
+				*	Comentado a peticion de ICC por nueva definicion (originalmente aplicado a mano en release 13.2.15)
+				* 
+				*   if ($t->fields['cobrable'] == 0) {
+				*		$t->fields['duracion_cobrada']='00:00:00';
+				*	}
+				*/   
 
 				$ingreso_valido = true;
 				if ($cambio_duracion || $cambio_fecha) {
